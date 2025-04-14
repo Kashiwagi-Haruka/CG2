@@ -16,7 +16,13 @@ class DX12 {
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc;
 	ID3D12CommandAllocator* commandAllocator;
 	ID3D12GraphicsCommandList* commandList;
-	
+	IDXGISwapChain4* swapChain = nullptr;
+	DXGI_SWAP_CHAIN_DESC1* swapChainDesc;
+
+	int32_t kClientWidth;
+	int32_t kClientHeight;
+	HWND hwnd;
+
 public:
 	void Initialize();
 
