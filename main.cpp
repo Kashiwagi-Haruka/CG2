@@ -1,14 +1,14 @@
 #include"GameBase.h"
-#include "DX12.h"
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	GameBase* gameBase=new GameBase;
-	DX12* dx12 = new DX12;
+
 	//エンジンの初期化
 	gameBase->Initialize(L"CG2", 1280, 720);
-	dx12->Initialize();
-	SetUnhandledExceptionFilter(dx12->ExportDump);
+	
+	SetUnhandledExceptionFilter(gameBase->ExportDump);
 
 	
 
