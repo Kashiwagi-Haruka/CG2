@@ -83,7 +83,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConvertString.cpp" />
-    <ClCompile Include="DX12.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="GameBase.cpp" />
     <ClCompile Include="main.cpp" />
@@ -93,7 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConvertString.h" />
-    <ClInclude Include="DX12.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="GameBase.h" />
   </ItemGroup>
