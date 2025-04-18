@@ -18,16 +18,19 @@ private:
 	ConvertString* CStr{};
 	std::wstring wstringValue = L"k";
 
+	ID3D12Debug1* debugController = nullptr;
 	IDXGIFactory7* dxgiFactory;
 	HRESULT hr;
 	HWND hwnd;
-
+	// 使用するアダプタ用の変数。最初にnullptrを入れておく
+	IDXGIAdapter4* useAdapter = nullptr;
 	ID3D12Device* device = nullptr;
 	ID3D12CommandQueue* commandQueue;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc;
 	ID3D12CommandAllocator* commandAllocator;
 	ID3D12GraphicsCommandList* commandList;
 	IDXGISwapChain4* swapChain = nullptr;
+	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
 	// SwapChainからResourceを引っ張ってくる。
 	ID3D12Resource* swapChainResources[2] = {nullptr};
@@ -73,6 +76,8 @@ public:
 	void FenceEvent();
 
 	void CheackResourceLeaks();
+
+	void ResourceRelease();
 
 	MSG* GetMsg() { return &msg; };
 };

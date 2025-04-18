@@ -32,7 +32,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//出力ウィンドウへの文字出力
 	gameBase->OutPutLog();
-	
+	gameBase->ResourceRelease();
 	gameBase->CheackResourceLeaks();
 
 	return 0;

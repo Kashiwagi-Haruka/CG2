@@ -60,8 +60,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	// 初期化の根本的な部分でエラーが出た場合はプログラムが間違っているか、どうにもできない場合が多いのでassertにしておく
 	assert(SUCCEEDED(hr));
 
-	// 使用するアダプタ用の変数。最初にnullptrを入れておく
-	IDXGIAdapter4* useAdapter = nullptr;
+	
 	// 良い順にアダプタを頼む
 	for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND; ++i) {
 
@@ -190,7 +189,7 @@ void GameBase::WindowClear() {
 	assert(SUCCEEDED(hr));
 
 	// ディスクリプタヒープの生成
-	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
+	
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
 
 	rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV; // レンダーターゲットビュー用
@@ -293,7 +292,7 @@ void GameBase::DebugLayer() {
 
 #ifdef _DEBUG
 
-ID3D12Debug1* debugController = nullptr;
+
 
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
 	//デバッグレイヤー
@@ -393,4 +392,24 @@ void GameBase::CheackResourceLeaks() {
 	}
 
 
+}
+void GameBase::ResourceRelease() {
+
+	CloseHandle(fenceEvent);
+	fence->Release();
+	rtvDescriptorHeap->Release();
+	swapChainResources[0]->Release();
+	swapChainResources[1]->Release();
+	swapChain->Release();
+	commandList->Release();
+	commandAllocator->Release();
+	commandQueue->Release();
+	device->Release();
+	useAdapter->Release();
+	dxgiFactory->Release();
+#ifdef _DEBUG
+	debugController->Release();
+#endif // _DEBUG
+
+	CloseWindow(hwnd);
 }
