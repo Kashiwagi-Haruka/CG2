@@ -443,4 +443,44 @@ IDxcBlob* GameBase::CompileShader(const std::wstring& filePath, const wchar_t* p
 	hr = dxcCompiler->Compile(&shaderSourceBuffer, arguments, _countof(arguments), includeHandler, IID_PPV_ARGS(&shaderResult));
 
 	assert(SUCCEEDED(hr));
+
+	//警告・エラーがでたらログに出して止める
+
+	IDxcBlobUtf8* shaderError = nullptr;
+	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
+	
+	Log(shaderError->GetStringPointer());
+		// 警告・エラーダメゼッタイ
+	assert(false);
+	}
+	//コンパイル結果から実行用のバイナル部分を取得
+	shaderBlob = nullptr;
+	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+	assert(SUCCEEDED(hr));
+	//成功したログを出す
+	Log(CStr->ConvertString_(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+
+	//もう使わないリソース解放
+	ShaderSource->Release();
+	shaderResult->Release();
+	//実行用のバイナリを変更
+	return shaderBlob;
+}
+void GameBase::RootSignature() {
+//RootSignature作成
+	descriptionRootsSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	//シリアライズしてバイナリにする
+	signatureBlob=nullptr;
+	errorBlob=nullptr;
+	hr = D3D12SerializeRootSignature(&descriptionRootsSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	if (FAILED(hr)) {
+		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		assert(false);
+	}
+	//バイナリを基に作成
+	rootSignature = nullptr;
+	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+	assert(SUCCEEDED(hr));
+
 }

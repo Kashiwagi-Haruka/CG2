@@ -60,6 +60,15 @@ private:
 	IDxcBlobEncoding* ShaderSource;
 	DxcBuffer shaderSourceBuffer;
 	IDxcResult* shaderResult;
+	IDxcBlob* shaderBlob;
+
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootsSignature{};
+	// シリアライズしてバイナリにする
+	ID3DBlob* signatureBlob;
+	ID3DBlob* errorBlob;
+
+	// バイナリを基に作成
+	ID3D12RootSignature* rootSignature;
 
 public:
 
@@ -104,5 +113,10 @@ public:
 	/// <param name="includeHandler"></param>
 	/// <returns></returns>
 	IDxcBlob* CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
+
+	void RootSignature();
+	 
+
+
 };
 
