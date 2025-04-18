@@ -6,7 +6,7 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "Dbghelp.lib")
 #pragma comment(lib, "dxguid.lib")
-
+#pragma comment(lib, "dxcompiler.lib")
 
 LRESULT CALLBACK GameBase::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
@@ -21,12 +21,10 @@ LRESULT CALLBACK GameBase::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
-
 void GameBase::Log(const std::string& message) {	
 
 	OutputDebugStringA(message.c_str()); 
 }
-
 void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight) {
 
 	wc.lpfnWndProc = WindowProc;
@@ -104,7 +102,6 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	DebugError();
 	WindowClear();
 }
-
 bool GameBase::IsMsgQuit() {
 
 	if (msg.message != WM_QUIT) {
@@ -114,7 +111,6 @@ bool GameBase::IsMsgQuit() {
 
 	return false;
 }
-
 void GameBase::OutPutLog() {
 
 
@@ -125,7 +121,6 @@ void GameBase::OutPutLog() {
 	}
 	Log(CStr->ConvertString_(std::format(L"WSTRING {}\n", wstringValue)));
 }
-
 LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 	// 時刻を取得して、時刻に名前を入れたファイルを作成。Dumpsディレクトリ以下に出力
 	SYSTEMTIME time;
@@ -149,7 +144,6 @@ LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 
 	return EXCEPTION_EXECUTE_HANDLER;
 }
-
 void GameBase::WindowClear() {
 	// コマンドキューを生成する
 	commandQueue = nullptr;
@@ -287,7 +281,6 @@ assert(SUCCEEDED(hr));
 
 
 }
-
 void GameBase::DebugLayer() {
 
 #ifdef _DEBUG
@@ -305,7 +298,6 @@ void GameBase::DebugLayer() {
 #endif // DEBUG
 
 }
-
 void GameBase::DebugError() {
 
 #ifdef _DEBUG
@@ -352,7 +344,6 @@ void GameBase::DebugError() {
 
 
 }
-
 void GameBase::TransitionBarrier() {
 	//transitionBarrierの設定
 	
@@ -360,7 +351,6 @@ void GameBase::TransitionBarrier() {
 
 
 }
-
 void GameBase::CrtvTransitionBarrier() {
 	//画面に描く処理はすべて終わり、画面に映すので、状態を遷移
 	//今回はRenderTargetからPresentにする。
@@ -369,7 +359,6 @@ void GameBase::CrtvTransitionBarrier() {
 	//TransitionBarrierを張る
 	commandList->ResourceBarrier(1, &barrier);
 }
-
 void GameBase::FenceEvent() {
 	
 	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
@@ -378,7 +367,6 @@ void GameBase::FenceEvent() {
 	
 	assert(fenceEvent != nullptr);
 }
-
 void GameBase::CheackResourceLeaks() {
 
 	IDXGIDebug1* debug;
@@ -412,4 +400,47 @@ void GameBase::ResourceRelease() {
 #endif // _DEBUG
 
 	CloseWindow(hwnd);
+}
+
+void GameBase::DXCInitialize() { 
+	dxcUtils = nullptr;
+	dxcCompiler = nullptr;
+	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
+	assert(SUCCEEDED(hr));
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
+	assert(SUCCEEDED(hr));
+
+	includeHandler = nullptr;
+	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
+	assert(SUCCEEDED(hr));
+}
+
+IDxcBlob* GameBase::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler) {
+	// これからシェーダーをコンパイルする旨をログに出す
+	Log(CStr->ConvertString_(std::format(L" Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
+	// hlslファイルを読み込む
+	ShaderSource = nullptr;
+	hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &ShaderSource);
+	// 読めなかったら止める
+	assert(SUCCEEDED(hr));
+	shaderSourceBuffer.Ptr = ShaderSource->GetBufferPointer();
+	shaderSourceBuffer.Size = ShaderSource->GetBufferSize();
+	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
+
+	LPCWSTR arguments[] = {
+	    filePath.c_str(),
+	    L"-E",
+	    L"main",
+	    L"-T",
+	    profile,
+	    L"-Zi",
+	    L"-Qembed_debug"
+	    L"-Od",
+	    L"-Zpr",
+	};
+	shaderResult = nullptr;
+
+	hr = dxcCompiler->Compile(&shaderSourceBuffer, arguments, _countof(arguments), includeHandler, IID_PPV_ARGS(&shaderResult));
+
+	assert(SUCCEEDED(hr));
 }

@@ -6,6 +6,8 @@
 #include <dxgi1_6.h>
 #include <cassert>
 #include "ConvertString.h"
+//dxc
+#include <dxcapi.h>
 
 
 class GameBase {
@@ -49,6 +51,16 @@ private:
 	int32_t kClientWidth = 1280;
 	int32_t kClientHeight = 720;
 
+	// DXC
+	// dxcCompilerを初期化
+	IDxcUtils* dxcUtils;
+	IDxcCompiler3* dxcCompiler;
+
+	IDxcIncludeHandler* includeHandler;
+	IDxcBlobEncoding* ShaderSource;
+	DxcBuffer shaderSourceBuffer;
+	IDxcResult* shaderResult;
+
 public:
 
 	
@@ -80,5 +92,17 @@ public:
 	void ResourceRelease();
 
 	MSG* GetMsg() { return &msg; };
+
+	void DXCInitialize();
+	/// <summary>
+	/// CompileShader関数
+	/// </summary>
+	/// <param name="filePath">CompilerするShaderファイルへのパス</param>
+	/// <param name="profile">Compilerに使用するProfile</param>
+	/// <param name="dxcUtils">初期化で使用するものを3つ</param>
+	/// <param name="dxcCompiler"></param>
+	/// <param name="includeHandler"></param>
+	/// <returns></returns>
+	IDxcBlob* CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
 };
 
