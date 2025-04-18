@@ -29,11 +29,27 @@ private:
 	ID3D12GraphicsCommandList* commandList;
 	IDXGISwapChain4* swapChain = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
+	// SwapChainからResourceを引っ張ってくる。
+	ID3D12Resource* swapChainResources[2] = {nullptr};
+	// これから書き込むバックバッファのインデックスを取得
+	UINT backBufferIndex;
+	// transitionBarrierの設定
+	D3D12_RESOURCE_BARRIER barrier{};
+
+	// 初期値0でFenceをつくる
+	ID3D12Fence* fence = nullptr;
+	uint64_t fenceValue = 0;
+	// FenceのSignalを持つためのイベントを作成する
+	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
 
 	int32_t kClientWidth = 1280;
 	int32_t kClientHeight = 720;
 
 public:
+
+	
+
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 	void Log(const std::string& message);
@@ -46,8 +62,18 @@ public:
 
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
 
-
 	void WindowClear();
+
+	void DebugLayer();
+	void DebugError();
+	void TransitionBarrier();
+
+	void CrtvTransitionBarrier();
+
+	void FenceEvent();
+
+	void CheackResourceLeaks();
+
 	MSG* GetMsg() { return &msg; };
 };
 
