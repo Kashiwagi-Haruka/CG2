@@ -494,14 +494,18 @@ void GameBase::RootSignature() {
 	descriptionRootsSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 	
 	//RootParameter作成。複数設定できるので配列。今回は結果1つだけなので長さ1の配列
-	D3D12_ROOT_PARAMETER rootParameters[1] = {};	
+	D3D12_ROOT_PARAMETER rootParameters[2] = {};	
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[1].Descriptor.ShaderRegister = 0;
 	descriptionRootsSignature.pParameters = rootParameters;
 	descriptionRootsSignature.NumParameters = _countof(rootParameters);
 
 	MaterialResource();
+	TransformationMatrixResource();
 
 	//シリアライズしてバイナリにする
 	signatureBlob=nullptr;
@@ -646,28 +650,36 @@ void GameBase::VertexBufferView() {
 }
 
 void GameBase::ResourceCommand() {
+	// 前提条件の確認
+	assert(commandList != nullptr);
+	assert(rootSignature != nullptr);
+	assert(graphicsPipelineState != nullptr);
+	assert(materialResource != nullptr);
+	assert(wvpResource != nullptr);
 
-	commandList->RSSetViewports(1, &viewport); // Viewportを設定
+	// ビューポートとシザー矩形の設定
+	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-	// Scirssorを設定
-	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+
+	// ルートシグネチャとパイプラインステートの設定
 	commandList->SetGraphicsRootSignature(rootSignature);
 	commandList->SetPipelineState(graphicsPipelineState);
-	// PSOを設定
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-	// VBVを設定
-	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//マテリアルCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-	// 描画! (DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	commandList->DrawInstanced(3, 1, 0, 0);
 
+	// 頂点バッファとトポロジの設定
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// 定数バッファとシェーダーリソースの設定
+	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+	commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+
+	// 描画コール
+	commandList->DrawInstanced(3, 1, 0, 0);
 }
 
 void GameBase::TraiangleResourceRelease() {
-
-materialResource->Release();
+	wvpResource->Release();
+	materialResource->Release();
 
 	vertexResource->Release();
 	graphicsPipelineState->Release();
@@ -723,4 +735,18 @@ ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device, size_t size
 	}
 
 	return buffer;
+}
+void GameBase::TransformationMatrixResource() {
+	// リソースの作成
+	wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
+	assert(wvpResource != nullptr); // nullptr チェックを追加
+
+	// リソースにデータを書き込む
+	Matrix4x4* wvpData = nullptr;
+	HRESULT hr = wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+	assert(SUCCEEDED(hr));      // Map の成功確認
+	assert(wvpData != nullptr); // 有効なポインタであることを確認
+
+	// 単位行列を設定
+	*wvpData = function.MakeIdentity();
 }

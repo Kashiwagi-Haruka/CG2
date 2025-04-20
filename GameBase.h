@@ -9,7 +9,7 @@
 #include "ConvertString.h"
 //dxc
 #include <dxcapi.h>
-
+#include"Function.h" 
 
 class GameBase {
 
@@ -98,6 +98,9 @@ private:
 
 	ID3D12Resource* materialResource;
 
+	Function function;
+	ID3D12Resource* wvpResource;
+
 public:
 
 	
@@ -159,5 +162,6 @@ public:
 	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 	
 	void MaterialResource();
+	void TransformationMatrixResource();
 };
 
