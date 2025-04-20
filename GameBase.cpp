@@ -2,10 +2,12 @@
 #include <DbgHelp.h>
 #include <strsafe.h>
 #include <dxgidebug.h>
+
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "Dbghelp.lib")
 #pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "dxcompiler.lib")
 
 
 LRESULT CALLBACK GameBase::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
@@ -21,12 +23,10 @@ LRESULT CALLBACK GameBase::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
-
 void GameBase::Log(const std::string& message) {	
 
 	OutputDebugStringA(message.c_str()); 
 }
-
 void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight) {
 
 	wc.lpfnWndProc = WindowProc;
@@ -104,7 +104,6 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	DebugError();
 	WindowClear();
 }
-
 bool GameBase::IsMsgQuit() {
 
 	if (msg.message != WM_QUIT) {
@@ -114,7 +113,6 @@ bool GameBase::IsMsgQuit() {
 
 	return false;
 }
-
 void GameBase::OutPutLog() {
 
 
@@ -125,7 +123,6 @@ void GameBase::OutPutLog() {
 	}
 	Log(CStr->ConvertString_(std::format(L"WSTRING {}\n", wstringValue)));
 }
-
 LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 	// 時刻を取得して、時刻に名前を入れたファイルを作成。Dumpsディレクトリ以下に出力
 	SYSTEMTIME time;
@@ -149,7 +146,6 @@ LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 
 	return EXCEPTION_EXECUTE_HANDLER;
 }
-
 void GameBase::WindowClear() {
 	// コマンドキューを生成する
 	commandQueue = nullptr;
@@ -229,7 +225,10 @@ void GameBase::WindowClear() {
 	// 2つ目を作る
 	device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
 
-
+	DXCInitialize();
+	PSO();
+	VertexResource();
+	VertexBufferView();
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	
 	// TransitionBarrierの設定
@@ -252,6 +251,11 @@ void GameBase::WindowClear() {
 	// 指定した色で画面全体をクリアする
 	float clearColor[] = {0.1f, 0.25f, 0.5f, 1.0f}; // 青っぽい色。RGBAの順
 	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+	
+		ResourceCommand();
+
+	
+	
 	CrtvTransitionBarrier();
 
 // コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
@@ -264,8 +268,11 @@ ID3D12CommandList* commandLists[] = {commandList};
 commandQueue->ExecuteCommandLists(1, commandLists);
 // GPUと05に画面の交換を行うよう通知する
 swapChain->Present(1, 0);
-
 FenceEvent();
+
+
+
+	
 
 //Fenceの値を更新
 fenceValue++;
@@ -279,6 +286,8 @@ if (fence->GetCompletedValue() < fenceValue) {
 	WaitForSingleObject(fenceEvent, INFINITE);
 }
 
+
+
 // 次のフレーム用のコマンドリストを準備
 hr = commandAllocator->Reset();
 assert(SUCCEEDED(hr));
@@ -287,7 +296,6 @@ assert(SUCCEEDED(hr));
 
 
 }
-
 void GameBase::DebugLayer() {
 
 #ifdef _DEBUG
@@ -305,7 +313,6 @@ void GameBase::DebugLayer() {
 #endif // DEBUG
 
 }
-
 void GameBase::DebugError() {
 
 #ifdef _DEBUG
@@ -352,7 +359,6 @@ void GameBase::DebugError() {
 
 
 }
-
 void GameBase::TransitionBarrier() {
 	//transitionBarrierの設定
 	
@@ -360,7 +366,6 @@ void GameBase::TransitionBarrier() {
 
 
 }
-
 void GameBase::CrtvTransitionBarrier() {
 	//画面に描く処理はすべて終わり、画面に映すので、状態を遷移
 	//今回はRenderTargetからPresentにする。
@@ -369,7 +374,6 @@ void GameBase::CrtvTransitionBarrier() {
 	//TransitionBarrierを張る
 	commandList->ResourceBarrier(1, &barrier);
 }
-
 void GameBase::FenceEvent() {
 	
 	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
@@ -378,7 +382,6 @@ void GameBase::FenceEvent() {
 	
 	assert(fenceEvent != nullptr);
 }
-
 void GameBase::CheackResourceLeaks() {
 
 	IDXGIDebug1* debug;
@@ -394,7 +397,7 @@ void GameBase::CheackResourceLeaks() {
 
 }
 void GameBase::ResourceRelease() {
-
+	TraiangleResourceRelease();
 	CloseHandle(fenceEvent);
 	fence->Release();
 	rtvDescriptorHeap->Release();
@@ -412,4 +415,256 @@ void GameBase::ResourceRelease() {
 #endif // _DEBUG
 
 	CloseWindow(hwnd);
+}
+
+void GameBase::DXCInitialize() { 
+	dxcUtils = nullptr;
+	dxcCompiler = nullptr;
+	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
+	assert(SUCCEEDED(hr));
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
+	assert(SUCCEEDED(hr));
+
+	includeHandler = nullptr;
+	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
+	assert(SUCCEEDED(hr));
+
+
+
+
+	
+
+}
+
+IDxcBlob* GameBase::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler) {
+	// これからシェーダーをコンパイルする旨をログに出す
+	Log(CStr->ConvertString_(std::format(L" Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
+	// hlslファイルを読み込む
+	ShaderSource = nullptr;
+	hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &ShaderSource);
+	// 読めなかったら止める
+	assert(SUCCEEDED(hr));
+	shaderSourceBuffer.Ptr = ShaderSource->GetBufferPointer();
+	shaderSourceBuffer.Size = ShaderSource->GetBufferSize();
+	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
+
+	LPCWSTR arguments[] = {
+	    filePath.c_str(),
+	    L"-E",
+	    L"main",
+	    L"-T",
+	    profile,
+	    L"-Zi",
+	    L"-Qembed_debug",
+	    L"-Od",
+	    L"-Zpr",
+	};
+	shaderResult = nullptr;
+
+	hr = dxcCompiler->Compile(&shaderSourceBuffer, arguments, _countof(arguments), includeHandler, IID_PPV_ARGS(&shaderResult));
+
+	assert(SUCCEEDED(hr));
+
+	//警告・エラーがでたらログに出して止める
+
+	IDxcBlobUtf8* shaderError = nullptr;
+	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
+	
+	Log(shaderError->GetStringPointer());
+		// 警告・エラーダメゼッタイ
+	assert(false);
+	}
+	//コンパイル結果から実行用のバイナル部分を取得
+	shaderBlob = nullptr;
+	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+	assert(SUCCEEDED(hr));
+	//成功したログを出す
+	Log(CStr->ConvertString_(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+
+	//もう使わないリソース解放
+	ShaderSource->Release();
+	shaderResult->Release();
+	//実行用のバイナリを変更
+	return shaderBlob;
+}
+
+void GameBase::RootSignature() {
+//RootSignature作成
+	descriptionRootsSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	//シリアライズしてバイナリにする
+	signatureBlob=nullptr;
+	errorBlob=nullptr;
+	hr = D3D12SerializeRootSignature(&descriptionRootsSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	if (FAILED(hr)) {
+		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		assert(false);
+	}
+	//バイナリを基に作成
+	rootSignature = nullptr;
+	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+	assert(SUCCEEDED(hr));
+
+}
+void GameBase::InputLayout() { 
+	
+	
+	inputElementDescs[0].SemanticName = "POSITION";
+	inputElementDescs[0].SemanticIndex = 0;
+	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputLayoutDesc.pInputElementDescs = inputElementDescs;
+	inputLayoutDesc.NumElements = _countof(inputElementDescs);
+
+}
+void GameBase::BlenderState() {
+
+	//すべての色要素を書き込む
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+}
+void GameBase::RasterizerState() {
+	
+	//裏面を表示しない
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	//三角形の中を塗りつぶす
+	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+}
+void GameBase::SCompile() { 
+		// shaderをコンパイルする
+	vertexShaderBlob = CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	    assert(vertexShaderBlob != nullptr);
+	pixelShaderBlob = CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	    assert(pixelShaderBlob != nullptr);
+
+
+}
+void GameBase::PSO() {
+	RootSignature();
+	InputLayout();
+	BlenderState();
+	RasterizerState();
+	SCompile();
+	graphicsPipelineStateDesc.pRootSignature=rootSignature;                                                   // RootSignature
+	graphicsPipelineStateDesc.InputLayout=inputLayoutDesc;                                                   // InputLayout
+	graphicsPipelineStateDesc.VS = {vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize()}; // VertexShader
+	graphicsPipelineStateDesc.PS = {pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize()};   // PixelShader
+	graphicsPipelineStateDesc.BlendState=blendDesc;                                                           // BlendState
+	graphicsPipelineStateDesc.RasterizerState =rasterizerDesc;                                                 // RasterizerState
+	// 書き込むRTVの情報
+	graphicsPipelineStateDesc.NumRenderTargets = 1;
+	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	// 利用するトポロジ (形状)のタイプ。三角形
+	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	// どのように画面に色を打ち込むかの設定(気にしなくて良い)
+	graphicsPipelineStateDesc.SampleDesc.Count = 1;
+	graphicsPipelineStateDesc.SampleMask=D3D12_DEFAULT_SAMPLE_MASK;
+	
+	graphicsPipelineState = nullptr;
+	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	if (FAILED(hr)) {
+		Log(std::format("Failed to create GraphicsPipelineState. HRESULT: 0x{:08X}\n", static_cast<unsigned int>(hr)));
+		assert(false);
+	}
+	assert(SUCCEEDED(hr));
+
+}
+void GameBase::VertexResource() {
+
+	// 頂点リソース用のヒープの設定
+	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
+	uploadHeapProperties.Type=D3D12_HEAP_TYPE_UPLOAD; // UploadHeapを使う
+	// 頂点リソースの設定
+	D3D12_RESOURCE_DESC vertexResourceDesc{};
+	// バッファリソース。テクスチャの場合はまた別の設定をする
+	vertexResourceDesc.Dimension=D3D12_RESOURCE_DIMENSION_BUFFER;
+	vertexResourceDesc.Width = sizeof(Vector4) * 3; // リソースのサイズ。今回はVector4を3頂点分
+	                                               // バッファの場合はこれらはさにする決まり
+	vertexResourceDesc.Height = 1;
+	vertexResourceDesc.DepthOrArraySize = 1;
+	vertexResourceDesc.MipLevels = 1;
+	vertexResourceDesc.SampleDesc.Count = 1;
+	// バッファの場合はこれにする決まり
+	vertexResourceDesc.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	// 実際に頂点リソースを作る
+	vertexResource = nullptr;
+	hr=device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexResource));
+	assert(SUCCEEDED(hr));
+
+
+
+}
+
+void GameBase::VertexBufferView() {
+	
+	//リソースの先頭アドレスから使う
+	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	//使用するリソースのサイズは頂点3つ分のサイズ
+	vertexBufferView.SizeInBytes = sizeof(Vector4) * 3;
+	//1頂点当たりのサイズ
+	vertexBufferView.StrideInBytes = sizeof(Vector4);
+
+	//頂点リソースにデータを書き込む
+	Vector4* vertexData = nullptr;
+	//書き込むためのアドレスを取得
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	// 左下
+	vertexData[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
+	// 上
+	 vertexData[1] = {0.0f, 0.5f, 0.0f, 1.0f};
+	// 右下
+	vertexData[2] = {0.5f, -0.5f, 0.0f, 1.0f};
+
+
+	// クライアント領域のサイズと一緒にして画面全体に表示
+	viewport.Width = float(kClientWidth);
+	viewport.Height = float(kClientHeight);
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	
+	// 基本的にビューポートと同じ矩形が構成されるようにする
+	scissorRect.left = 0;
+	scissorRect.right = kClientWidth;
+	scissorRect.top = 0;
+	scissorRect.bottom = kClientHeight;
+
+
+
+}
+
+void GameBase::ResourceCommand() {
+
+	commandList->RSSetViewports(1, &viewport); // Viewportを設定
+	commandList->RSSetScissorRects(1, &scissorRect);
+	// Scirssorを設定
+	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	commandList->SetGraphicsRootSignature(rootSignature);
+	commandList->SetPipelineState(graphicsPipelineState);
+	// PSOを設定
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+	// VBVを設定
+	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	// 描画! (DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
+	commandList->DrawInstanced(3, 1, 0, 0);
+
+}
+
+void GameBase::TraiangleResourceRelease() {
+
+	vertexResource->Release();
+	graphicsPipelineState->Release();
+	signatureBlob->Release();
+	if (errorBlob) {
+		errorBlob->Release();
+	}
+	rootSignature->Release();
+	pixelShaderBlob->Release();
+	vertexShaderBlob->Release();
+
+
+
+
 }
