@@ -76,6 +76,9 @@ private:
 
 	// バイナリを基に作成
 	ID3D12RootSignature* rootSignature;
+
+
+
 	//shaderをコンパイルする
 	IDxcBlob* vertexShaderBlob;
 	IDxcBlob* pixelShaderBlob;
@@ -92,6 +95,8 @@ private:
 	D3D12_VIEWPORT viewport{};
 	// シザー矩形
 	D3D12_RECT scissorRect{};
+
+	ID3D12Resource* materialResource;
 
 public:
 
@@ -150,5 +155,9 @@ public:
 	void VertexBufferView();
 	void ResourceCommand();
 	void TraiangleResourceRelease();
+
+	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
+	
+	void MaterialResource();
 };
 

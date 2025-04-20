@@ -492,6 +492,17 @@ IDxcBlob* GameBase::CompileShader(const std::wstring& filePath, const wchar_t* p
 void GameBase::RootSignature() {
 //RootSignature作成
 	descriptionRootsSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	
+	//RootParameter作成。複数設定できるので配列。今回は結果1つだけなので長さ1の配列
+	D3D12_ROOT_PARAMETER rootParameters[1] = {};	
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[0].Descriptor.ShaderRegister = 0;
+	descriptionRootsSignature.pParameters = rootParameters;
+	descriptionRootsSignature.NumParameters = _countof(rootParameters);
+
+	MaterialResource();
+
 	//シリアライズしてバイナリにする
 	signatureBlob=nullptr;
 	errorBlob=nullptr;
@@ -587,7 +598,7 @@ void GameBase::VertexResource() {
 	// バッファの場合はこれにする決まり
 	vertexResourceDesc.Layout=D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	// 実際に頂点リソースを作る
-	vertexResource = nullptr;
+	vertexResource = CreateBufferResource(device,sizeof(Vector4)*3);
 	hr=device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexResource));
 	assert(SUCCEEDED(hr));
 
@@ -647,12 +658,16 @@ void GameBase::ResourceCommand() {
 	// VBVを設定
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//マテリアルCBufferの場所を設定
+	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 	// 描画! (DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
 	commandList->DrawInstanced(3, 1, 0, 0);
 
 }
 
 void GameBase::TraiangleResourceRelease() {
+
+materialResource->Release();
 
 	vertexResource->Release();
 	graphicsPipelineState->Release();
@@ -667,4 +682,45 @@ void GameBase::TraiangleResourceRelease() {
 
 
 
+}
+
+void GameBase::MaterialResource() {
+	//マテリアル用のリソースをつくる。今回はcolor1つ分のサイズを用意する
+	materialResource = CreateBufferResource(device, sizeof(Vector4));
+	//マテリアルにデータを書き込む
+	Vector4* materialData = nullptr;
+	//書き込むためのアドレスを取得
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	//今回は赤を書き込んでみる
+	*materialData = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+
+}
+ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
+	assert(device != nullptr); // デバイスが正しく初期化されていることを確認
+
+	// ヒープのプロパティ設定
+	D3D12_HEAP_PROPERTIES heapProperties = {};
+	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD; // CPU から GPU へ転送する用途
+
+	// リソースの設定
+	D3D12_RESOURCE_DESC resourceDesc = {};
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Width = sizeInBytes; // バッファサイズ
+	resourceDesc.Height = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.Format = DXGI_FORMAT_UNKNOWN; // バッファはフォーマット不要
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+	// リソースの作成
+	ID3D12Resource* buffer = nullptr;
+	HRESULT hr = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&buffer));
+
+	if (FAILED(hr)) {
+		assert(false && "Failed to create buffer resource!"); // エラー時のデバッグ
+		return nullptr;
+	}
+
+	return buffer;
 }
