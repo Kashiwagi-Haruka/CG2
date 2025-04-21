@@ -39,13 +39,12 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 	RegisterClass(&wc);
 
-
 	wrc = {0, 0, WindowWidth, WindowHeight};
 
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 	hwnd = CreateWindow(wc.lpszClassName, TitleName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, wrc.right - wrc.left, wrc.bottom - wrc.top, nullptr, nullptr, wc.hInstance, nullptr);
-	///Debuglayer
+	/// Debuglayer
 	DebugLayer();
 
 	ShowWindow(hwnd, SW_SHOW);
@@ -60,7 +59,6 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	// 初期化の根本的な部分でエラーが出た場合はプログラムが間違っているか、どうにもできない場合が多いのでassertにしておく
 	assert(SUCCEEDED(hr));
 
-	
 	// 良い順にアダプタを頼む
 	for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND; ++i) {
 
@@ -103,8 +101,9 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	Log("Complete create D3D12Device!!!\n"); // 初期化完了のログをだす
 	DebugError();
 	WindowClear();
-}
-bool GameBase::IsMsgQuit() {
+	transform = {{1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f}};
+};
+	bool GameBase::IsMsgQuit() {
 
 	if (msg.message != WM_QUIT) {
 	
@@ -494,13 +493,18 @@ void GameBase::RootSignature() {
 	descriptionRootsSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 	
 	//RootParameter作成。複数設定できるので配列。今回は結果1つだけなので長さ1の配列
-	D3D12_ROOT_PARAMETER rootParameters[2] = {};	
+	D3D12_ROOT_PARAMETER rootParameters[2] = {};
+
+	// 頂点シェーダーの b0（transformationMatrix）
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
+
+	// ピクセルシェーダーの b0（material）
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	rootParameters[1].Descriptor.ShaderRegister = 0;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[1].Descriptor.ShaderRegister = 1;
+
 	descriptionRootsSignature.pParameters = rootParameters;
 	descriptionRootsSignature.NumParameters = _countof(rootParameters);
 
@@ -524,14 +528,18 @@ void GameBase::RootSignature() {
 void GameBase::InputLayout() { 
 	
 	
-	inputElementDescs[0].SemanticName = "POSITION";
+	/*inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
-	inputLayoutDesc.NumElements = _countof(inputElementDescs);
-
+	inputLayoutDesc.NumElements = _countof(inputElementDescs);*/
+	D3D12_INPUT_ELEMENT_DESC layout[] = {
+	    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+	    {"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+    };
+	inputLayoutDesc = {layout, _countof(layout)};
 }
 void GameBase::BlenderState() {
 
@@ -555,11 +563,18 @@ void GameBase::SCompile() {
 
 }
 void GameBase::PSO() {
+	graphicsPipelineStateDesc = {}; // ←これが必要！！
+
 	RootSignature();
+	assert(rootSignature != nullptr);
+
 	InputLayout();
 	BlenderState();
 	RasterizerState();
 	SCompile();
+	assert(vertexShaderBlob != nullptr);
+	assert(pixelShaderBlob != nullptr);
+
 	graphicsPipelineStateDesc.pRootSignature=rootSignature;                                                   // RootSignature
 	graphicsPipelineStateDesc.InputLayout=inputLayoutDesc;                                                   // InputLayout
 	graphicsPipelineStateDesc.VS = {vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize()}; // VertexShader
@@ -574,7 +589,8 @@ void GameBase::PSO() {
 	// どのように画面に色を打ち込むかの設定(気にしなくて良い)
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask=D3D12_DEFAULT_SAMPLE_MASK;
-	
+	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
 	graphicsPipelineState = nullptr;
 	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	if (FAILED(hr)) {
@@ -669,9 +685,12 @@ void GameBase::ResourceCommand() {
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// 定数バッファとシェーダーリソースの設定
-	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-	commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+	// 定数バッファの設定
+	// b0: TransformationMatrix（頂点シェーダー用）
+	commandList->SetGraphicsRootConstantBufferView(0, transformationMatrixResource->GetGPUVirtualAddress());
+
+	// b1: Material（ピクセルシェーダー用）
+	commandList->SetGraphicsRootConstantBufferView(1, materialResource->GetGPUVirtualAddress());
 
 	// 描画コール
 	commandList->DrawInstanced(3, 1, 0, 0);
@@ -737,16 +756,36 @@ ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device, size_t size
 	return buffer;
 }
 void GameBase::TransformationMatrixResource() {
-	// リソースの作成
-	wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
-	assert(wvpResource != nullptr); // nullptr チェックを追加
+	// TransformationMatrix用の定数バッファリソース作成（サイズ：Matrix4x4）
+	transformationMatrixResource = CreateBufferResource(device, sizeof(Matrix4x4));
+	assert(transformationMatrixResource != nullptr);
 
-	// リソースにデータを書き込む
-	Matrix4x4* wvpData = nullptr;
-	HRESULT hr = wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-	assert(SUCCEEDED(hr));      // Map の成功確認
-	assert(wvpData != nullptr); // 有効なポインタであることを確認
+	// リソースをマップして、書き込み用ポインタ取得
+	hr = transformationMatrixResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
+	assert(SUCCEEDED(hr));
+	assert(transformationMatrixData != nullptr);
 
-	// 単位行列を設定
-	*wvpData = function.MakeIdentity();
+	// 初期値：単位行列を設定
+	*transformationMatrixData = function.MakeIdentity();
+}
+void GameBase::UpdateTransform() {
+	// Y軸回転を増やして回転アニメーション
+	transform.rotate.y += 0.3f;
+
+	// 各行列を計算
+	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(
+	    0.45f,            // 視野角
+	    1280.0f / 720.0f, // アスペクト比
+	    0.1f,             // Near
+	    100.0f            // Far
+	);
+
+	// WVP行列を合成
+	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+
+	// 定数バッファにWVP行列を書き込む
+	*transformationMatrixData = worldViewProjectionMatrix;
 }

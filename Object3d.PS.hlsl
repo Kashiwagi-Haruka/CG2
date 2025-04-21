@@ -2,7 +2,7 @@ struct Material
 {
     float4 color;
 };
-ConstantBuffer<Material> gMaterial : register(b0);
+ConstantBuffer<Material> gMaterial : register(b1);
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;

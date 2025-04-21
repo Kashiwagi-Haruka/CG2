@@ -9,17 +9,14 @@ class Function {
 	Vector3 translate_;
 	Matrix4x4 worldMatrix_;
 
-	static const int kRowHeight=20;
-	static const int kColumnWidth=60;
+	static const int kRowHeight = 20;
+	static const int kColumnWidth = 60;
 
-	
-
-	//描画
+	// 描画
 	void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 	void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
 
-	public:
-
+public:
 	Function();
 	~Function();
 	void Math();
@@ -48,5 +45,7 @@ class Function {
 	// affine行列
 	Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate);
 
-
+	// Projection行列（透視投影）
+	Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearZ, float farZ);
+	
 };

@@ -12,23 +12,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	
 
-	while (gameBase->IsMsgQuit())
-	{
+	while (gameBase->IsMsgQuit()) {
+		// 全メッセージを処理
 		if (PeekMessage(gameBase->GetMsg(), NULL, 0, 0, PM_REMOVE)) {
-			TranslateMessage(gameBase->GetMsg());
-			DispatchMessage(gameBase->GetMsg());
+		
+				TranslateMessage(gameBase->GetMsg());
+				DispatchMessage(gameBase->GetMsg());
+			
 		} else {
 
-			
+			// メッセージが無くなってからゲーム処理
+			gameBase->UpdateTransform();
 
-			//ゲームの処理
-
-
+			// ゲームのロジック処理とか
 		}
-
-
-
 	}
+
 
 	//出力ウィンドウへの文字出力
 	gameBase->OutPutLog();

@@ -232,3 +232,17 @@ void Function::Draw() {
 	
 
 }
+Matrix4x4 Function::MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearZ, float farZ) {
+	float yScale = 1.0f / tanf(fovY / 2.0f);
+	float xScale = yScale / aspectRatio;
+	float zRange = farZ - nearZ;
+
+	Matrix4x4 mat = {};
+	mat.m[0][0] = xScale;
+	mat.m[1][1] = yScale;
+	mat.m[2][2] = farZ / zRange;
+	mat.m[2][3] = 1.0f;
+	mat.m[3][2] = (-nearZ * farZ) / zRange;
+
+	return mat;
+}

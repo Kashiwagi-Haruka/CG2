@@ -100,6 +100,22 @@ private:
 
 	Function function;
 	ID3D12Resource* wvpResource;
+	ID3D12Resource* transformationMatrixResource;
+	Matrix4x4* wvpData;
+	Matrix4x4* transformationMatrixData;
+	struct Transform {
+		Vector3 scale;
+		Vector3 rotate;
+		Vector3 translate;
+	};
+
+	Transform transform;
+	Transform cameraTransform = {
+	    {1.0f, 1.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f},
+        {0.0f,0.0f,-5.0f}
+    };
+	
 
 public:
 
@@ -110,6 +126,8 @@ public:
 	void Log(const std::string& message);
 
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
+
+	void UpdateTransform();
 
 	bool IsMsgQuit();
 
