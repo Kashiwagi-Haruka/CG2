@@ -3,6 +3,7 @@
 #include <strsafe.h>
 #include <dxgidebug.h>
 
+
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "Dbghelp.lib")
@@ -497,13 +498,13 @@ void GameBase::RootSignature() {
 
 	// 頂点シェーダーの b0（transformationMatrix）
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
 
 	// ピクセルシェーダーの b0（material）
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[1].Descriptor.ShaderRegister = 1;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[1].Descriptor.ShaderRegister = 0;
 
 	descriptionRootsSignature.pParameters = rootParameters;
 	descriptionRootsSignature.NumParameters = _countof(rootParameters);
@@ -590,6 +591,18 @@ void GameBase::PSO() {
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask=D3D12_DEFAULT_SAMPLE_MASK;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	graphicsPipelineStateDesc.DepthStencilState.DepthEnable = TRUE;
+	graphicsPipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	graphicsPipelineStateDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+	graphicsPipelineStateDesc.DepthStencilState.StencilEnable = FALSE;
+	graphicsPipelineStateDesc.DepthStencilState.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+	graphicsPipelineStateDesc.DepthStencilState.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+	graphicsPipelineStateDesc.DepthStencilState.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	graphicsPipelineStateDesc.DepthStencilState.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+	graphicsPipelineStateDesc.DepthStencilState.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	graphicsPipelineStateDesc.DepthStencilState.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	graphicsPipelineStateDesc.DepthStencilState.BackFace = graphicsPipelineStateDesc.DepthStencilState.FrontFace;
+
 
 	graphicsPipelineState = nullptr;
 	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
@@ -671,7 +684,7 @@ void GameBase::ResourceCommand() {
 	assert(rootSignature != nullptr);
 	assert(graphicsPipelineState != nullptr);
 	assert(materialResource != nullptr);
-	assert(wvpResource != nullptr);
+	
 
 	// ビューポートとシザー矩形の設定
 	commandList->RSSetViewports(1, &viewport);
@@ -697,7 +710,7 @@ void GameBase::ResourceCommand() {
 }
 
 void GameBase::TraiangleResourceRelease() {
-	wvpResource->Release();
+
 	materialResource->Release();
 
 	vertexResource->Release();

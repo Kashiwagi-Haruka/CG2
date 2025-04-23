@@ -215,6 +215,8 @@ Matrix4x4 Function::MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 tran
 	return result;
 }
 
+
+
 void Function::VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
 
 

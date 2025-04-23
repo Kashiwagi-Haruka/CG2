@@ -99,9 +99,9 @@ private:
 	ID3D12Resource* materialResource;
 
 	Function function;
-	ID3D12Resource* wvpResource;
+	
 	ID3D12Resource* transformationMatrixResource;
-	Matrix4x4* wvpData;
+
 	Matrix4x4* transformationMatrixData;
 	struct Transform {
 		Vector3 scale;
@@ -164,7 +164,6 @@ public:
 	IDxcBlob* CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
 
 	void RootSignature();
-	 
 	void InputLayout();
 	void BlenderState();
 	void RasterizerState();
