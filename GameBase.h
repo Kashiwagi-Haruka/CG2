@@ -6,11 +6,14 @@
 #include <dxgi1_6.h>
 #include <cassert>
 #include "ConvertString.h"
-
+#include <dxcapi.h>
+#include "Function.h"
+#include "Vector4.h"
 
 class GameBase {
 
 private:
+
 	WNDCLASS wc{};
 	RECT wrc;
 	
@@ -49,6 +52,27 @@ private:
 	int32_t kClientWidth = 1280;
 	int32_t kClientHeight = 720;
 
+
+	D3D12_VIEWPORT viewport;
+	// シザー矩形
+	D3D12_RECT scissorRect;
+	ID3D12RootSignature* rootSignature;
+	// 実際に生成
+	ID3D12PipelineState* graphicsPipelineState;
+	// 頂点バッファビューを作成する
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+	// 実際に頂点リソースを作る
+	ID3D12Resource* vertexResource;
+	// シリアライズしてバイナリにする
+	ID3DBlob* signatureBlob;
+	ID3DBlob* errorBlob;
+	IDxcBlob* pixelShaderBlob;
+	IDxcBlob* vertexShaderBlob;
+	IDxcUtils* dxcUtils;
+	IDxcCompiler3* dxcCompiler;
+	IDxcIncludeHandler* includeHandler;
+
+
 public:
 
 	
@@ -80,5 +104,17 @@ public:
 	void ResourceRelease();
 
 	MSG* GetMsg() { return &msg; };
+
+
+	void DXCInitialize();
+	IDxcBlob* CompileShader(// CompilerするShaderファイルへのパス
+	    const std::wstring& filePath,
+	    // Compilerに使用するProfile
+	    const wchar_t* profile,
+	    // 初期化で生成したものをつかう
+	    IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
+	void PSO();
+
+	void VertexResource();
 };
 
