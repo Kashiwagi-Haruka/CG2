@@ -72,6 +72,10 @@ private:
 	IDxcCompiler3* dxcCompiler;
 	IDxcIncludeHandler* includeHandler;
 
+		// バッファの設定
+	D3D12_HEAP_PROPERTIES heapProperties;
+	D3D12_RESOURCE_DESC resourceDesc;
+	ID3D12Resource* materialResource;
 
 public:
 
@@ -116,5 +120,7 @@ public:
 	void PSO();
 
 	void VertexResource();
+
+	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 };
 

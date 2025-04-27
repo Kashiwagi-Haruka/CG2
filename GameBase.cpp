@@ -260,6 +260,7 @@ void GameBase::WindowClear() {
 	commandList->SetGraphicsRootSignature(rootSignature);
 	commandList->SetPipelineState(graphicsPipelineState);     // PSOを設定
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView); // VBVを設定
+	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -388,13 +389,15 @@ void GameBase::CrtvTransitionBarrier() {
 }
 
 void GameBase::FenceEvent() {
-	
+	// Fenceの作成
 	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	assert(SUCCEEDED(hr));
 
-	
+	// ←ここ追加！！
+	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	assert(fenceEvent != nullptr);
 }
+
 
 void GameBase::CheackResourceLeaks() {
 
@@ -411,6 +414,8 @@ void GameBase::CheackResourceLeaks() {
 
 }
 void GameBase::ResourceRelease() {
+
+
 	vertexResource->Release();
 	graphicsPipelineState->Release();
 	signatureBlob->Release();
@@ -541,6 +546,14 @@ Log("device is OK\n");
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
+	// RootParameter作成。複数設定できるので配列。今回は結果1つだけなので長さ1の配列
+	D3D12_ROOT_PARAMETER rootParameters[1] = {};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;    // CBVを使う
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+	rootParameters[0].Descriptor.ShaderRegister = 0;                    // レジスタ番号0とバインド
+	descriptionRootSignature.pParameters = rootParameters;              // ルートパラメータ配列へのポインタ
+	descriptionRootSignature.NumParameters = _countof(rootParameters);  // 配列の長さ
+
 	// シリアライズしてバイナリにする
 	 signatureBlob = nullptr;
 	 errorBlob = nullptr;
@@ -609,52 +622,24 @@ Log("device is OK\n");
 }
 
 void GameBase::VertexResource() {
+	// 頂点リソース作成（CreateBufferResourceだけでOK）
+	vertexResource = CreateBufferResource(device, sizeof(Vector4) * 3);
 
-	// 頂点リソース用のヒープの設定
-	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
-	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD; // UploadHeapを使う
-
-	// 頂点リソースの設定
-	D3D12_RESOURCE_DESC vertexResourceDesc{};
-	// バッファリソース。テクスチャの場合はまた別の設定をする
-	vertexResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	vertexResourceDesc.Width = sizeof(Vector4) * 3; // リソースのサイズ。今回はVector4を3頂点分
-	vertexResourceDesc.Height = 1;
-	vertexResourceDesc.DepthOrArraySize = 1;
-	vertexResourceDesc.MipLevels = 1;
-	vertexResourceDesc.SampleDesc.Count = 1;
-	// バッファの場合はこれもこう決まり
-	vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-
-	// 実際に頂点リソースを作る
-	vertexResource = nullptr;
-	hr = device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexResource));
-	assert(SUCCEEDED(hr));
-
-
-	// 頂点バッファビューを作成する
-	vertexBufferView={};
-	// リソースの先頭のアドレスから使う
+	// 頂点バッファビュー作成
+	vertexBufferView = {};
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	// 使用するリソースのサイズは頂点3つ分のサイズ
 	vertexBufferView.SizeInBytes = sizeof(Vector4) * 3;
-	// 1頂点あたりのサイズ
 	vertexBufferView.StrideInBytes = sizeof(Vector4);
 
-	// 頂点リソースにデータを書き込む
+	// 頂点データ書き込み
 	Vector4* vertexData = nullptr;
-	// 書き込むためのアドレスを取得
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	// 左下
-	vertexData[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
-	// 上
-	vertexData[1] = {0.0f, 0.5f, 0.0f, 1.0f};
-	// 右下
-	vertexData[2] = {0.5f, -0.5f, 0.0f, 1.0f};
+	vertexData[0] = {-0.5f, -0.5f, 0.0f, 1.0f}; // 左下
+	vertexData[1] = {0.0f, 0.5f, 0.0f, 1.0f};   // 上
+	vertexData[2] = {0.5f, -0.5f, 0.0f, 1.0f};  // 右下
 
-	// ビューポート
-	viewport={};
-	// クライアント領域のサイズと一緒にして画面全体に表示
+	// ビューポート設定
+	viewport = {};
 	viewport.Width = float(kClientWidth);
 	viewport.Height = float(kClientHeight);
 	viewport.TopLeftX = 0;
@@ -662,12 +647,54 @@ void GameBase::VertexResource() {
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 
-	// シザー矩形
-	scissorRect={};
-	// 基本的にビューポートと同じ矩形が構成されるようにする
+	// シザー矩形設定
+	scissorRect = {};
 	scissorRect.left = 0;
 	scissorRect.right = kClientWidth;
 	scissorRect.top = 0;
 	scissorRect.bottom = kClientHeight;
+
+	// マテリアルリソース作成
+	materialResource = CreateBufferResource(device, sizeof(Vector4));
+
+	// マテリアルデータ書き込み（赤）
+	Vector4* materialData = nullptr;
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	*materialData = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 }
+
+ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
+	// バッファの設定（UPLOAD用に変更）
+	D3D12_HEAP_PROPERTIES heapProperties = {};
+	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+	D3D12_RESOURCE_DESC resourceDesc = {};
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Width = sizeInBytes;
+	resourceDesc.Height = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	ID3D12Resource* bufferResource = nullptr;
+
+	HRESULT hr = device->CreateCommittedResource(
+	    &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc,
+	    D3D12_RESOURCE_STATE_GENERIC_READ, // Uploadならこれ
+	    nullptr, IID_PPV_ARGS(&bufferResource));
+
+	if (FAILED(hr)) {
+		return nullptr;
+	}
+
+	return bufferResource;
+}
+
+
+
+
+
 
