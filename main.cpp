@@ -19,8 +19,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			DispatchMessage(gameBase->GetMsg());
 		} else {
 
-			
-
+			gameBase->Update();
+			gameBase->Draw();
 			//ゲームの処理
 
 

@@ -1,51 +1,32 @@
 #pragma once
 #include "Matrix4x4.h"
 #include "Vector3.h"
+#include <cstdint>
+
 
 class Function {
 
-	Vector3 scale_;
-	Vector3 rotate_;
-	Vector3 translate_;
-	Matrix4x4 worldMatrix_;
-
-	static const int kRowHeight=20;
-	static const int kColumnWidth=60;
-
 	public:
-
-	Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
-	Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2);
-	Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
-	Matrix4x4 Inverse(const Matrix4x4& m);
-	Matrix4x4 Transpose(const Matrix4x4& m);
-	Matrix4x4 MakeIdentity();
-
-	//平行移動
-	Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
-	//拡大縮小
-	Matrix4x4 MakeScaleMatrix(const Vector3& scale);
-	//座標変換
-	Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
-	//X軸回転
-	Matrix4x4 MakeRotateXMatrix(float radian);
-	//Y軸回転
-	Matrix4x4 MakeRotateYMatrix(float radian);
-	// Z軸回転
-	Matrix4x4 MakeRotateZMatrix(float radian);
-
-	//affine行列
-	Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate);
-
 	
 
+	Matrix4x4 MakeRotateXMatrix(float radian);
+	Matrix4x4 MakeRotateYMatrix(float radian);
+	Matrix4x4 MakeRotateZMatrix(float radian);
+	Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
+	Vector3 Cross(const Vector3& v1, const Vector3& v2);
+	
 
-	Function();
-	~Function();
-	void Math();
+	Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix4x4);
+	Matrix4x4 Inverse(const Matrix4x4& m);
+	Matrix4x4 MakeTranslateMatrix(Vector3 translate);
+	Matrix4x4 MakeScaleMatrix(Vector3 scale);
+	Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate);
 
+	Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
 
+	Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip);
 
-
-
+	Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);
+	Matrix4x4 Transpose(const Matrix4x4& m);
+	Matrix4x4 MakeIdentity();
 };

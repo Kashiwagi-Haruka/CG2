@@ -189,7 +189,7 @@ void GameBase::WindowClear() {
 	assert(SUCCEEDED(hr));
 
 	// ディスクリプタヒープの生成
-	
+
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
 
 	rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV; // レンダーターゲットビュー用
@@ -211,27 +211,23 @@ void GameBase::WindowClear() {
 	assert(swapChainResources[backBufferIndex] != nullptr);
 	//
 
-	
-
 	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;//出力結果をSRGBに変換して書き込む
-	rtvDesc.ViewDimension =D3D12_RTV_DIMENSION_TEXTURE2D;// 2dテクスチャとして書き込む
+	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;      // 出力結果をSRGBに変換して書き込む
+	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D; // 2dテクスチャとして書き込む
 	// ディスクリプタの先頭を取得する
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	// RTVを2つ作るのでディスクリプタを2つ用意
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+
 	// まず1つ目を作る。1つ目は最初のところに作る。作る場所をこちらで指定してあげる必要がある
 	rtvHandles[0] = rtvStartHandle;
 	device->CreateRenderTargetView(swapChainResources[0], &rtvDesc, rtvHandles[0]);
 	// 2つ目のディスクリプタハンドルを得る(自力で)
-	rtvHandles[1].ptr = rtvHandles[0].ptr+device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	// 2つ目を作る
 	device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
 
-
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-	
+
 	// TransitionBarrierの設定
 	// 今回のバリアはTransition
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -246,66 +242,67 @@ void GameBase::WindowClear() {
 	assert(commandList != nullptr);
 	// TransitionBarrierを張る
 	commandList->ResourceBarrier(1, &barrier);
-	
+
 	// 描画先のRTVを設定する
 	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
 	// 指定した色で画面全体をクリアする
 	float clearColor[] = {0.1f, 0.25f, 0.5f, 1.0f}; // 青っぽい色。RGBAの順
 	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-	
+
 	commandList->RSSetViewports(1, &viewport);       // Viewportを設定
 	commandList->RSSetScissorRects(1, &scissorRect); // Scissorを設定
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	commandList->SetGraphicsRootSignature(rootSignature);
-	commandList->SetPipelineState(graphicsPipelineState);     // PSOを設定
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView); // VBVを設定
-	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+	commandList->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
+	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());  // PixelShader側
+	commandList->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress()); // VertexShader側
 
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
 	commandList->DrawInstanced(3, 1, 0, 0);
-	
+
 	CrtvTransitionBarrier();
 
-// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
-hr = commandList->Close();
+	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
+	hr = commandList->Close();
 
-assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr));
 
-// GPUにコマンドリストの実行を行わせる
-ID3D12CommandList* commandLists[] = {commandList};
-commandQueue->ExecuteCommandLists(1, commandLists);
-// GPUと05に画面の交換を行うよう通知する
-swapChain->Present(1, 0);
+	// GPUにコマンドリストの実行を行わせる
+	ID3D12CommandList* commandLists[] = {commandList};
+	commandQueue->ExecuteCommandLists(1, commandLists);
+	// GPUと05に画面の交換を行うよう通知する
+	// GPUとOSに画面の交換を行うよう通知する
+	swapChain->Present(1, 0);
 
-FenceEvent();
+	// Fenceを作る
+	fenceValue = 0;
+	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	assert(SUCCEEDED(hr));
 
+	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	assert(fenceEvent != nullptr);
 
+	// Fenceの値を更新
+	fenceValue++;
+	commandQueue->Signal(fence, fenceValue);
 
-//Fenceの値を更新
-fenceValue++;
-//GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
-commandQueue->Signal(fence, fenceValue);
-//Fenceの値が指定したSignal値にたどり着いているか確認する
-//GetCompletedValueの初期値はFence作成時に渡した初期値
-if (fence->GetCompletedValue() < fenceValue) {
-	//指定したsignalにたどり着いてないので、たどり着くまで待つようにイベントを設定する
-	fence->SetEventOnCompletion(fenceValue, fenceEvent);
-	WaitForSingleObject(fenceEvent, INFINITE);
+	// Fenceの値が指定Signalに達してるか確認
+	if (fence->GetCompletedValue() < fenceValue) {
+		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+		WaitForSingleObject(fenceEvent, INFINITE); // ★ここでちゃんとGPUが終わるまで待つ！
+	}
+
+	//// ★ここまでちゃんと待ったら、ようやくリセット
+	//hr = commandAllocator->Reset();
+	//assert(SUCCEEDED(hr));
+	//hr = commandList->Reset(commandAllocator, nullptr);
+	//assert(SUCCEEDED(hr));
 }
-
-// 次のフレーム用のコマンドリストを準備
-hr = commandAllocator->Reset();
-assert(SUCCEEDED(hr));
-hr = commandList->Reset(commandAllocator, nullptr);
-assert(SUCCEEDED(hr));
-
-
-}
-
 void GameBase::DebugLayer() {
 
 #ifdef _DEBUG
@@ -414,9 +411,15 @@ void GameBase::CheackResourceLeaks() {
 
 }
 void GameBase::ResourceRelease() {
-
+	// --- 追加！ ---
+	if (transformResource) {
+		transformResource->Unmap(0, nullptr); // ちゃんと最後だけUnmapする
+	}
 
 	vertexResource->Release();
+	materialResource->Release();  // ←これも元々あった
+	transformResource->Release(); // ★追加！！！！！
+
 	graphicsPipelineState->Release();
 	signatureBlob->Release();
 	if (errorBlob) {
@@ -425,6 +428,7 @@ void GameBase::ResourceRelease() {
 	rootSignature->Release();
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();
+
 	CloseHandle(fenceEvent);
 	fence->Release();
 	rtvDescriptorHeap->Release();
@@ -437,12 +441,14 @@ void GameBase::ResourceRelease() {
 	device->Release();
 	useAdapter->Release();
 	dxgiFactory->Release();
+
 #ifdef _DEBUG
 	debugController->Release();
-#endif // _DEBUG
+#endif
 
 	CloseWindow(hwnd);
 }
+
 
 void GameBase::DXCInitialize() {
 
@@ -538,34 +544,42 @@ IDxcBlob* GameBase::CompileShader(
 	return shaderBlob;
 }
 void GameBase::PSO() {
-Log("PSO() Start\n");
-assert(device != nullptr);
-Log("device is OK\n");
+	Log("PSO() Start\n");
+	assert(device != nullptr);
+	Log("device is OK\n");
 
 	// RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	// RootParameter作成。複数設定できるので配列。今回は結果1つだけなので長さ1の配列
-	D3D12_ROOT_PARAMETER rootParameters[1] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;    // CBVを使う
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
-	rootParameters[0].Descriptor.ShaderRegister = 0;                    // レジスタ番号0とバインド
-	descriptionRootSignature.pParameters = rootParameters;              // ルートパラメータ配列へのポインタ
-	descriptionRootSignature.NumParameters = _countof(rootParameters);  // 配列の長さ
+	// RootParameter作成。Material(PixelShader用)とTransform(VertexShader用)
+	D3D12_ROOT_PARAMETER rootParameters[2] = {};
 
-	// シリアライズしてバイナリにする
-	 signatureBlob = nullptr;
-	 errorBlob = nullptr;
+	// 0番目: PixelShader用のMaterial
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[0].Descriptor.ShaderRegister = 0;
+
+	// 1番目: VertexShader用のTransform
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[1].Descriptor.ShaderRegister = 1;
+
+	descriptionRootSignature.pParameters = rootParameters;
+	descriptionRootSignature.NumParameters = _countof(rootParameters);
+
+	signatureBlob = nullptr;
+	errorBlob = nullptr;
 	hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
 		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 
-	// バイナリを元に生成
-	 rootSignature = nullptr;
+	rootSignature = nullptr;
 	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+	
+
 	assert(SUCCEEDED(hr));
 
 	// InputLayout
@@ -622,23 +636,25 @@ Log("device is OK\n");
 }
 
 void GameBase::VertexResource() {
-	// 頂点リソース作成（CreateBufferResourceだけでOK）
+	// 頂点リソース作成
 	vertexResource = CreateBufferResource(device, sizeof(Vector4) * 3);
-
-	// 頂点バッファビュー作成
 	vertexBufferView = {};
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexBufferView.SizeInBytes = sizeof(Vector4) * 3;
 	vertexBufferView.StrideInBytes = sizeof(Vector4);
 
-	// 頂点データ書き込み
 	Vector4* vertexData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	vertexData[0] = {-0.5f, -0.5f, 0.0f, 1.0f}; // 左下
-	vertexData[1] = {0.0f, 0.5f, 0.0f, 1.0f};   // 上
-	vertexData[2] = {0.5f, -0.5f, 0.0f, 1.0f};  // 右下
+	vertexData[1] = {0.5f, -0.5f, 0.0f, 1.0f};  // 右下
+	vertexData[2] = {0.0f, 0.5f, 0.0f, 1.0f};   // 上
 
-	// ビューポート設定
+
+
+
+
+
+	// ビューポートとシザー設定
 	viewport = {};
 	viewport.Width = float(kClientWidth);
 	viewport.Height = float(kClientHeight);
@@ -647,21 +663,25 @@ void GameBase::VertexResource() {
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 
-	// シザー矩形設定
 	scissorRect = {};
 	scissorRect.left = 0;
 	scissorRect.right = kClientWidth;
 	scissorRect.top = 0;
 	scissorRect.bottom = kClientHeight;
 
-	// マテリアルリソース作成
+	// --- マテリアル用リソース ---
 	materialResource = CreateBufferResource(device, sizeof(Vector4));
-
-	// マテリアルデータ書き込み（赤）
 	Vector4* materialData = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	*materialData = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+	*materialData = Vector4(1.0f, 0.0f, 0.0f, 1.0f); // 赤
+
+	// --- トランスフォーム用リソース ---
+	transformResource = CreateBufferResource(device, sizeof(Matrix4x4));
+	transformResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // ←ここ！！起動時にマップしっぱなし
+	*transformationMatrixData = function.MakeIdentity();                                     // 初期値は単位行列
 }
+
+
 
 ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
 	// バッファの設定（UPLOAD用に変更）
@@ -693,8 +713,105 @@ ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device, size_t size
 	return bufferResource;
 }
 
+void GameBase::Update() {
+	// --- 回転角度を更新（Y軸回転だけ）
+	transform.rotate.y += 0.03f;
+
+	// --- ワールド行列を作成（スケール → 回転 → 移動）
+	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+
+	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
+	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+	*transformationMatrixData = worldViewProjectionMatrix;
+
+	// --- バッファに書き込む
+	/**wvpData = worldMatrix;*/
+}
+
+void GameBase::Draw() {
+	// ★ここ！毎回リセットする
+	hr = commandAllocator->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList->Reset(commandAllocator, nullptr);
+	assert(SUCCEEDED(hr));
+
+	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+	// --- (以下描画処理続く) ---
+
+		// TransitionBarrierの設定
+	// 今回のバリアはTransition
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	// Noneにしておく
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	// バリアを張る対象のリソース。現在のバックアップに対して行う
+	barrier.Transition.pResource = swapChainResources[backBufferIndex];
+	// 遷移前(現在)のResourceState
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	// 遷移後のResourceState
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	assert(commandList != nullptr);
+
+	// TransitionBarrierを張る
+	commandList->ResourceBarrier(1, &barrier);
+
+	// 描画先のRTVを設定する
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
+	// 指定した色で画面全体をクリアする
+	float clearColor[] = {0.1f, 0.25f, 0.5f, 1.0f}; // 青っぽい色。RGBAの順
+	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+
+	commandList->RSSetViewports(1, &viewport);       // Viewportを設定
+	commandList->RSSetScissorRects(1, &scissorRect); // Scissorを設定
+
+	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	commandList->SetGraphicsRootSignature(rootSignature);
+	commandList->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
+	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());  // PixelShader側
+	commandList->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress()); // VertexShader側
+
+	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
+	commandList->DrawInstanced(3, 1, 0, 0);
+
+	CrtvTransitionBarrier();
+
+	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
+	hr = commandList->Close();
+
+	assert(SUCCEEDED(hr));
+
+	// GPUにコマンドリストの実行を行わせる
+	ID3D12CommandList* commandLists[] = {commandList};
+	commandQueue->ExecuteCommandLists(1, commandLists);
+	// GPUと05に画面の交換を行うよう通知する
+	// GPUとOSに画面の交換を行うよう通知する
+	swapChain->Present(1, 0);
+
+	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+
+	// Fenceで同期
+	fenceValue++;
+	commandQueue->Signal(fence, fenceValue);
+
+	if (fence->GetCompletedValue() < fenceValue) {
+		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+		WaitForSingleObject(fenceEvent, INFINITE);
+	}
+
+}
 
 
 
-
-
+void GameBase::FrameStart() {
+	hr = commandAllocator->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList->Reset(commandAllocator, nullptr);
+	assert(SUCCEEDED(hr));
+}

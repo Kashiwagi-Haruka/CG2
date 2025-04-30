@@ -76,8 +76,42 @@ private:
 	D3D12_HEAP_PROPERTIES heapProperties;
 	D3D12_RESOURCE_DESC resourceDesc;
 	ID3D12Resource* materialResource;
+	// --- 頂点用 (Transform行列) のリソース追加 ---
+	ID3D12Resource* transformResource = nullptr;
+
+		// RTVを2つ作るのでディスクリプタを2つ用意
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	
+	Function function;
+
+	struct Transform {
+
+		Vector3 scale;
+		Vector3 rotate;
+		Vector3 translate;
+
+
+	};
+
+	Transform transform = {
+	    {1.0f, 1.0f, 1.0f}, // scale
+	    {0.0f, 0.0f, 0.0f}, // rotate
+	    {0.0f, 0.0f, 0.0f}  // translate
+	};
+
+Transform cameraTransform = {
+	    {1.0f, 1.0f,       1.0f }, // スケール
+	    {0.0f, 0, 0.0f }, // ←Y軸180度回転！
+	    {0.0f, 0.0f,-10.0f}  // Zマイナス方向に下げる
+	};
+
+
+	//Matrix4x4* wvpData = nullptr; // ← transformResource用のポインタをメンバに持つ
+	Matrix4x4* transformationMatrixData = nullptr;
 
 public:
+	void FrameStart(); // フレーム最初の準備
+
 
 	
 
@@ -86,6 +120,9 @@ public:
 	void Log(const std::string& message);
 
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
+
+	void Update();
+	void Draw();
 
 	bool IsMsgQuit();
 
