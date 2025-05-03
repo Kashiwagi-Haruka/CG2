@@ -10,17 +10,19 @@
 
 LRESULT CALLBACK GameBase::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
+		return true;
+	}
+
 	switch (msg) {
-
 	case WM_DESTROY:
-
 		PostQuitMessage(0);
-
 		return 0;
 	}
 
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
+
 
 void GameBase::Log(const std::string& message) {	
 
@@ -190,13 +192,18 @@ void GameBase::WindowClear() {
 
 	// ディスクリプタヒープの生成
 
-	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
+	rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	
+	// SRV用ディスクリプタヒープ作成
+	srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
-	rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV; // レンダーターゲットビュー用
-	rtvDescriptorHeapDesc.NumDescriptors = 2;                    // ダブルバッファ用に2つ。多くてもかまわない
-	hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap));
-	// ディスクリプタヒープがつくれなかったので起動できない
-	assert(SUCCEEDED(hr));
+
+
+	//rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV; // レンダーターゲットビュー用
+	//rtvDescriptorHeapDesc.NumDescriptors = 2;                    // ダブルバッファ用に2つ。多くてもかまわない
+	//hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap));
+	//// ディスクリプタヒープがつくれなかったので起動できない
+	//assert(SUCCEEDED(hr));
 	DXCInitialize();
 
 	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResources[0]));
@@ -227,6 +234,12 @@ void GameBase::WindowClear() {
 	device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
 
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+	// ImGui 初期化はここで！
+	imguiM.MInitialize(hwnd, device, swapChainDesc, rtvDesc, srvDescriptorHeap);
+
+
+
 
 	// TransitionBarrierの設定
 	// 今回のバリアはTransition
@@ -266,6 +279,7 @@ void GameBase::WindowClear() {
 	commandList->DrawInstanced(3, 1, 0, 0);
 
 	CrtvTransitionBarrier();
+	
 
 	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
 	hr = commandList->Close();
@@ -411,7 +425,10 @@ void GameBase::CheackResourceLeaks() {
 
 }
 void GameBase::ResourceRelease() {
-	// --- 追加！ ---
+	
+	imguiM.Finalize();
+
+
 	if (transformResource) {
 		transformResource->Unmap(0, nullptr); // ちゃんと最後だけUnmapする
 	}
@@ -779,6 +796,22 @@ void GameBase::Draw() {
 	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
 	commandList->DrawInstanced(3, 1, 0, 0);
 
+	
+	// ImGui フレーム開始
+	imguiM.NewFrame();
+
+	// --- ImGui ウィンドウ記述 ---
+	ImGui::Begin("Debug Window");
+	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+	ImGui::End();
+
+	ImGui::ShowDemoWindow();
+
+	// ImGui 描画（SRVヒープとコマンドリストを渡す）
+	imguiM.Render(srvDescriptorHeap, commandList);
+
+	// RenderTarget → Present に戻す
+	
 	CrtvTransitionBarrier();
 
 	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
@@ -814,4 +847,17 @@ void GameBase::FrameStart() {
 	assert(SUCCEEDED(hr));
 	hr = commandList->Reset(commandAllocator, nullptr);
 	assert(SUCCEEDED(hr));
+}
+
+ID3D12DescriptorHeap* GameBase::CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
+
+	ID3D12DescriptorHeap* descriptorHeap = nullptr;
+	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
+	descriptorHeapDesc.Type = heapType;
+	descriptorHeapDesc.NumDescriptors = numDescriptors;
+	descriptorHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+	assert(SUCCEEDED(hr));
+
+	return descriptorHeap;
 }
