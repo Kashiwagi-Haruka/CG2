@@ -247,55 +247,8 @@ void GameBase::WindowClear() {
 	GPUHandle_ = texture_.GetGpuHandle();
 	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる
 
-	// TransitionBarrierの設定
-	// 今回のバリアはTransition
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	// Noneにしておく
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	// バリアを張る対象のリソース。現在のバックアップに対して行う
-	barrier.Transition.pResource = swapChainResources[backBufferIndex];
-	// 遷移前(現在)のResourceState
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	// 遷移後のResourceState
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	assert(commandList != nullptr);
-	// TransitionBarrierを張る
-	commandList->ResourceBarrier(1, &barrier);
+	DrawcommandList();
 
-	// 描画先のRTVを設定する
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
-	// 指定した色で画面全体をクリアする
-	float clearColor[] = {0.1f, 0.25f, 0.5f, 1.0f}; // 青っぽい色。RGBAの順
-	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-
-	commandList->RSSetViewports(1, &viewport);       // Viewportを設定
-	commandList->RSSetScissorRects(1, &scissorRect); // Scissorを設定
-
-	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	commandList->SetGraphicsRootSignature(rootSignature);
-	commandList->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
-	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());  // PixelShader側
-	commandList->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress()); // VertexShader側
-	
-	assert(commandList != nullptr);
-	assert(materialResource != nullptr);
-	assert(transformResource != nullptr);
-	if (!commandList || !vertexResource || !materialResource || !transformResource) {
-		OutputDebugStringA("One or more critical resources are NULL.\n");
-		return;
-	}
-	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap};
-	commandList->SetDescriptorHeaps(1, descriptorHeaps);
-
-	commandList->SetGraphicsRootDescriptorTable(2,GPUHandle_);
-	
-
-	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	commandList->DrawInstanced(3, 1, 0, 0);
 
 	CrtvTransitionBarrier();
 	
@@ -330,12 +283,6 @@ void GameBase::WindowClear() {
 		WaitForSingleObject(fenceEvent, INFINITE); // ★ここでちゃんとGPUが終わるまで待つ！
 	}
 
-	//// ★ここまでちゃんと待ったら、ようやくリセット
-	//hr = commandAllocator->Reset();
-	//assert(SUCCEEDED(hr));
-	//hr = commandList->Reset(commandAllocator, nullptr);
-	//assert(SUCCEEDED(hr));
-	
 }
 void GameBase::DebugLayer() {
 
@@ -762,7 +709,14 @@ void GameBase::VertexResource() {
 	// --- トランスフォーム用リソース ---
 	transformResource = CreateBufferResource(device, sizeof(Matrix4x4));
 	transformResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // ←ここ！！起動時にマップしっぱなし
-	*transformationMatrixData = function.MakeIdentity();                                     // 初期値は単位行列
+	*transformationMatrixData = function.MakeIdentity(); // 初期値は単位行列
+	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+
+	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
+	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+	*transformationMatrixData = worldViewProjectionMatrix;
 }
 
 
@@ -823,49 +777,7 @@ void GameBase::Draw() {
 
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
-	// --- (以下描画処理続く) ---
-
-		// TransitionBarrierの設定
-	// 今回のバリアはTransition
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	// Noneにしておく
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	// バリアを張る対象のリソース。現在のバックアップに対して行う
-	barrier.Transition.pResource = swapChainResources[backBufferIndex];
-	// 遷移前(現在)のResourceState
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	// 遷移後のResourceState
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	assert(commandList != nullptr);
-
-	// TransitionBarrierを張る
-	commandList->ResourceBarrier(1, &barrier);
-
-	// 描画先のRTVを設定する
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
-	// 指定した色で画面全体をクリアする
-	float clearColor[] = {0.1f, 0.25f, 0.5f, 1.0f}; // 青っぽい色。RGBAの順
-	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-
-	commandList->RSSetViewports(1, &viewport);       // Viewportを設定
-	commandList->RSSetScissorRects(1, &scissorRect); // Scissorを設定
-
-	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	commandList->SetGraphicsRootSignature(rootSignature);
-	commandList->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
-	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());  // PixelShader側
-	commandList->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress()); // VertexShader側
-	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap};
-	commandList->SetDescriptorHeaps(1, descriptorHeaps);
-
-	commandList->SetGraphicsRootDescriptorTable(2, GPUHandle_);
-
-	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	commandList->DrawInstanced(3, 1, 0, 0);
+	DrawcommandList();
 
 	
 	// ImGui フレーム開始
@@ -931,4 +843,58 @@ ID3D12DescriptorHeap* GameBase::CreateDescriptorHeap(ID3D12Device* device, D3D12
 	assert(SUCCEEDED(hr));
 
 	return descriptorHeap;
+}
+
+void GameBase::DrawcommandList() {
+
+
+	
+
+
+	// TransitionBarrierの設定
+	// 今回のバリアはTransition
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	// Noneにしておく
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	// バリアを張る対象のリソース。現在のバックアップに対して行う
+	barrier.Transition.pResource = swapChainResources[backBufferIndex];
+	// 遷移前(現在)のResourceState
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	// 遷移後のResourceState
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	assert(commandList != nullptr);
+
+	// TransitionBarrierを張る
+	commandList->ResourceBarrier(1, &barrier);
+
+	// 描画先のRTVを設定する
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
+	// 指定した色で画面全体をクリアする
+	float clearColor[] = {0.1f, 0.25f, 0.5f, 1.0f}; // 青っぽい色。RGBAの順
+	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+
+	commandList->RSSetViewports(1, &viewport);       // Viewportを設定
+	commandList->RSSetScissorRects(1, &scissorRect); // Scissorを設定
+
+	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	commandList->SetGraphicsRootSignature(rootSignature);
+	commandList->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
+	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());  // PixelShader側
+	commandList->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress()); // VertexShader側
+	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap};
+	commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+	commandList->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+
+	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
+	commandList->DrawInstanced(3, 1, 0, 0);
+
+
+
+
+
 }
