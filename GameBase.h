@@ -111,7 +111,14 @@ Transform cameraTransform = {
 	    {0.0f, 0, 0.0f }, // ←Y軸180度回転！
 	    {0.0f, 0.0f,-10.0f}  // Zマイナス方向に下げる
 	};
-
+	Transform transformSprite{
+	    {1.0f, 1.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f}
+    };
+Matrix4x4* transformationMatrixDataSprite;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite;
+ID3D12Resource* transformationMatrixResourceSprite;
 
 	//Matrix4x4* wvpData = nullptr; // ← transformResource用のポインタをメンバに持つ
 	Matrix4x4* transformationMatrixData = nullptr;

@@ -751,6 +751,47 @@ void GameBase::VertexResource() {
 	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
 	*transformationMatrixData = worldViewProjectionMatrix;
+
+	// --- Sprite用 頂点リソース ---
+	ID3D12Resource* vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
+	vertexBufferViewSprite={};
+	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
+	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
+
+	VertexData* vertexDataSprite = nullptr;
+	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+
+	// 1枚目の三角形（左下 → 左上 → 右下）
+	vertexDataSprite[0].position = {0.0f, 360.0f, 0.0f, 1.0f}; // 左下
+	vertexDataSprite[0].texcoord = {0.0f, 1.0f};
+
+	vertexDataSprite[1].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
+	vertexDataSprite[1].texcoord = {0.0f, 0.0f};
+
+	vertexDataSprite[2].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
+	vertexDataSprite[2].texcoord = {1.0f, 1.0f};
+
+	// 2枚目の三角形（左上 → 右上 → 右下）
+	vertexDataSprite[3].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
+	vertexDataSprite[3].texcoord = {0.0f, 0.0f};
+
+	vertexDataSprite[4].position = {640.0f, 0.0f, 0.0f, 1.0f}; // 右上
+	vertexDataSprite[4].texcoord = {1.0f, 0.0f};
+
+	vertexDataSprite[5].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
+	vertexDataSprite[5].texcoord = {1.0f, 1.0f};
+
+	vertexResourceSprite->Unmap(0, nullptr);
+	// Sprite用の TransformationMatrix リソース作成（1個分）
+	transformationMatrixResourceSprite = CreateBufferResource(device, sizeof(Matrix4x4));
+
+	// データへのポインタ取得
+	transformationMatrixDataSprite = nullptr;
+	transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+
+	// 単位行列を書き込んでおく（初期状態）
+	*transformationMatrixDataSprite = function.MakeIdentity();
 }
 
 
@@ -797,9 +838,19 @@ void GameBase::Update() {
 	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
 	*transformationMatrixData = worldViewProjectionMatrix;
+	// Sprite用のワールド行列（スケール・回転・移動から生成）
+	Matrix4x4 worldMatrixSprite = function.MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
 
-	// --- バッファに書き込む
-	/**wvpData = worldMatrix;*/
+	// View行列（カメラ、今回は単位行列で固定）
+	Matrix4x4 viewMatrixSprite = function.MakeIdentity();
+
+	// 射影行列（平行投影、画面サイズで生成）
+	Matrix4x4 projectionMatrixSprite = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
+
+	// 最終WVP行列の計算と書き込み
+	Matrix4x4 worldViewProjectionMatrixSprite = function.Multiply(worldMatrixSprite, function.Multiply(viewMatrixSprite, projectionMatrixSprite));
+
+	*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 }
 
 void GameBase::Draw() {
@@ -960,6 +1011,13 @@ void GameBase::DrawcommandList() {
 
 
 
+	    // VBV設定（スプライト用）
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 
+	// Transform（WVP）設定（ルートパラメータ1番目）
+	commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+
+	// 描画（6頂点＝2枚三角形）
+	commandList->DrawInstanced(6, 1, 0, 0);
 
 }
