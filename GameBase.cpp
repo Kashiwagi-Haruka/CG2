@@ -235,6 +235,16 @@ void GameBase::WindowClear() {
 	// 2つ目を作る
 	device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
 
+	ID3D12Resource* depthStenicilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+
+	dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+
+	device->CreateDepthStencilView(depthStenicilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
 	// ImGui 初期化はここで！
@@ -646,6 +656,16 @@ void GameBase::PSO() {
 	graphicsPipelineStateDesc.NumRenderTargets = 1;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
+	// DepthStencil の設定
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+	depthStencilDesc.DepthEnable = true;                           // Depth 有効化
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;  // 書き込みON
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 近いほど前に表示
+
+	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT; // DSV のフォーマットを指定
+
+
 	// 利用するポリゴン（形状）のタイプ。三角形
 	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
@@ -661,10 +681,10 @@ void GameBase::PSO() {
 
 void GameBase::VertexResource() {
 	// 頂点リソース作成
-	vertexResource = CreateBufferResource(device, sizeof(VertexData) * 3);
+	vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
 	assert(vertexResource != nullptr);
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 	
 	VertexData* vertexData = nullptr;
@@ -681,6 +701,20 @@ void GameBase::VertexResource() {
 	// 右下
 	vertexData[2].position = {0.5f, -0.5f, 0.0f, 1.0f};
 	vertexData[2].texcoord = {1.0f, 1.0f};
+
+	// 左下2
+	vertexData[3].position = {-0.5f, -0.5f, 0.5f, 1.0f};
+	vertexData[3].texcoord = {0.0f, 1.0f};
+
+	// 上2
+	vertexData[4].position = {0.0f, 0.0f, 0.0f, 1.0f};
+	vertexData[4].texcoord = {0.5f, 0.0f};
+
+	// 右下2
+	vertexData[5].position = {0.5f, -0.5f, -0.5f, 1.0f};
+	vertexData[5].texcoord = {1.0f, 1.0f};
+
+
 
 	vertexResource->Unmap(0, nullptr);
 
@@ -844,6 +878,34 @@ ID3D12DescriptorHeap* GameBase::CreateDescriptorHeap(ID3D12Device* device, D3D12
 
 	return descriptorHeap;
 }
+ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
+
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = width;
+	resourceDesc.Height = height;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	D3D12_CLEAR_VALUE depthClearValue{};
+	depthClearValue.DepthStencil.Depth = 1.0f;
+	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	ID3D12Resource* resource = nullptr;
+	hr = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthClearValue, IID_PPV_ARGS(&resource));
+	assert(SUCCEEDED(hr));
+
+	
+	return resource;
+
+
+}
 
 void GameBase::DrawcommandList() {
 
@@ -868,10 +930,13 @@ void GameBase::DrawcommandList() {
 	commandList->ResourceBarrier(1, &barrier);
 
 	// 描画先のRTVを設定する
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+
 	// 指定した色で画面全体をクリアする
 	float clearColor[] = {0.1f, 0.25f, 0.5f, 1.0f}; // 青っぽい色。RGBAの順
 	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	commandList->RSSetViewports(1, &viewport);       // Viewportを設定
 	commandList->RSSetScissorRects(1, &scissorRect); // Scissorを設定
@@ -891,7 +956,7 @@ void GameBase::DrawcommandList() {
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	commandList->DrawInstanced(3, 1, 0, 0);
+	commandList->DrawInstanced(6, 1, 0, 0);
 
 
 
