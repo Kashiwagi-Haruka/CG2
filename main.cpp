@@ -3,6 +3,7 @@
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
+	CoInitializeEx(0, COINITBASE_MULTITHREADED);
 	GameBase* gameBase=new GameBase;
 
 	//エンジンの初期化
@@ -34,7 +35,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	gameBase->OutPutLog();
 	gameBase->ResourceRelease();
 	gameBase->CheackResourceLeaks();
-
+	CoUninitialize();
 	return 0;
 
 }

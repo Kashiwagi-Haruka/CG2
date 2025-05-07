@@ -10,6 +10,8 @@
 #include "Function.h"
 #include "Vector4.h"
 #include "imGuiM.h"
+#include "Texture.h"
+#include "VertexData.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
 
 class GameBase {
@@ -113,6 +115,9 @@ Transform cameraTransform = {
 
 	//Matrix4x4* wvpData = nullptr; // ← transformResource用のポインタをメンバに持つ
 	Matrix4x4* transformationMatrixData = nullptr;
+
+	Texture texture_;
+	D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle_;
 
 public:
 	void FrameStart(); // フレーム最初の準備

@@ -104,7 +104,9 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	assert(device != nullptr);
 	Log("Complete create D3D12Device!!!\n"); // 初期化完了のログをだす
 	DebugError();
+
 	WindowClear();
+	
 }
 
 bool GameBase::IsMsgQuit() {
@@ -238,8 +240,12 @@ void GameBase::WindowClear() {
 	// ImGui 初期化はここで！
 	imguiM.MInitialize(hwnd, device, swapChainDesc, rtvDesc, srvDescriptorHeap);
 
-
-
+	if (srvDescriptorHeap == nullptr) {
+		assert(false);
+	}
+	texture_.Initialize(device, srvDescriptorHeap);
+	GPUHandle_ = texture_.GetGpuHandle();
+	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる
 
 	// TransitionBarrierの設定
 	// 今回のバリアはTransition
@@ -271,6 +277,19 @@ void GameBase::WindowClear() {
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
 	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());  // PixelShader側
 	commandList->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress()); // VertexShader側
+	
+	assert(commandList != nullptr);
+	assert(materialResource != nullptr);
+	assert(transformResource != nullptr);
+	if (!commandList || !vertexResource || !materialResource || !transformResource) {
+		OutputDebugStringA("One or more critical resources are NULL.\n");
+		return;
+	}
+	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap};
+	commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+	commandList->SetGraphicsRootDescriptorTable(2,GPUHandle_);
+	
 
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -316,6 +335,7 @@ void GameBase::WindowClear() {
 	//assert(SUCCEEDED(hr));
 	//hr = commandList->Reset(commandAllocator, nullptr);
 	//assert(SUCCEEDED(hr));
+	
 }
 void GameBase::DebugLayer() {
 
@@ -426,6 +446,7 @@ void GameBase::CheackResourceLeaks() {
 }
 void GameBase::ResourceRelease() {
 	
+	
 	imguiM.Finalize();
 
 
@@ -486,9 +507,7 @@ void GameBase::DXCInitialize() {
 	VertexResource();
 }
 
-IDxcBlob* GameBase::CompileShader(
-    // CompilerするShaderファイルへのパス
-    const std::wstring& filePath,
+IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパス*/const std::wstring& filePath,
     // Compilerに使用するProfile
     const wchar_t* profile,
     // 初期化で生成したものをつかう
@@ -560,6 +579,7 @@ IDxcBlob* GameBase::CompileShader(
 	// 実行用のバイナリを返却
 	return shaderBlob;
 }
+
 void GameBase::PSO() {
 	Log("PSO() Start\n");
 	assert(device != nullptr);
@@ -570,7 +590,13 @@ void GameBase::PSO() {
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	// RootParameter作成。Material(PixelShader用)とTransform(VertexShader用)
-	D3D12_ROOT_PARAMETER rootParameters[2] = {};
+	D3D12_ROOT_PARAMETER rootParameters[3] = {};
+
+	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+	descriptorRange[0].BaseShaderRegister = 0;
+	descriptorRange[0].NumDescriptors = 1;
+	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	// 0番目: PixelShader用のMaterial
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -582,8 +608,27 @@ void GameBase::PSO() {
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[1].Descriptor.ShaderRegister = 1;
 
+
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
+
+	//Sampler
+	D3D12_STATIC_SAMPLER_DESC staticSampler[1] = {};
+	staticSampler[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	staticSampler[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSampler[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSampler[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSampler[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	staticSampler[0].MaxLOD = D3D12_FLOAT32_MAX;
+	staticSampler[0].ShaderRegister = 0;
+	staticSampler[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	descriptionRootSignature.pStaticSamplers=staticSampler;
+	descriptionRootSignature.NumStaticSamplers = _countof(staticSampler);
 
 	signatureBlob = nullptr;
 	errorBlob = nullptr;
@@ -600,11 +645,26 @@ void GameBase::PSO() {
 	assert(SUCCEEDED(hr));
 
 	// InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[1] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
+
+	// POSITION（float4）
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescs[0].InputSlot = 0;
 	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+	inputElementDescs[0].InstanceDataStepRate = 0;
+
+	// TEXCOORD（float2）
+	inputElementDescs[1].SemanticName = "TEXCOORD";
+	inputElementDescs[1].SemanticIndex = 0;
+	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	inputElementDescs[1].InputSlot = 0;
+	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+	inputElementDescs[1].InstanceDataStepRate = 0;
+
 
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
@@ -654,21 +714,28 @@ void GameBase::PSO() {
 
 void GameBase::VertexResource() {
 	// 頂点リソース作成
-	vertexResource = CreateBufferResource(device, sizeof(Vector4) * 3);
-	vertexBufferView = {};
+	vertexResource = CreateBufferResource(device, sizeof(VertexData) * 3);
+	assert(vertexResource != nullptr);
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(Vector4) * 3;
-	vertexBufferView.StrideInBytes = sizeof(Vector4);
-
-	Vector4* vertexData = nullptr;
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
+	vertexBufferView.StrideInBytes = sizeof(VertexData);
+	
+	VertexData* vertexData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	vertexData[0] = {-0.5f, -0.5f, 0.0f, 1.0f}; // 左下
-	vertexData[1] = {0.5f, -0.5f, 0.0f, 1.0f};  // 右下
-	vertexData[2] = {0.0f, 0.5f, 0.0f, 1.0f};   // 上
 
+	// 左下
+	vertexData[0].position = {-0.5f, -0.5f, 0.0f, 1.0f};
+	vertexData[0].texcoord = {0.0f, 1.0f};
 
+	// 上
+	vertexData[1].position = {0.0f, 0.5f, 0.0f, 1.0f};
+	vertexData[1].texcoord = {0.5f, 0.0f};
 
+	// 右下
+	vertexData[2].position = {0.5f, -0.5f, 0.0f, 1.0f};
+	vertexData[2].texcoord = {1.0f, 1.0f};
 
+	vertexResource->Unmap(0, nullptr);
 
 
 	// ビューポートとシザー設定
@@ -690,7 +757,7 @@ void GameBase::VertexResource() {
 	materialResource = CreateBufferResource(device, sizeof(Vector4));
 	Vector4* materialData = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	*materialData = Vector4(1.0f, 0.0f, 0.0f, 1.0f); // 赤
+	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 赤
 
 	// --- トランスフォーム用リソース ---
 	transformResource = CreateBufferResource(device, sizeof(Matrix4x4));
@@ -789,6 +856,10 @@ void GameBase::Draw() {
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
 	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());  // PixelShader側
 	commandList->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress()); // VertexShader側
+	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap};
+	commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+	commandList->SetGraphicsRootDescriptorTable(2, GPUHandle_);
 
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -805,7 +876,7 @@ void GameBase::Draw() {
 	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 	ImGui::End();
 
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 
 	// ImGui 描画（SRVヒープとコマンドリストを渡す）
 	imguiM.Render(srvDescriptorHeap, commandList);
