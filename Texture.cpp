@@ -69,7 +69,7 @@ ID3D12Resource* Texture::CreateTextureResource(ID3D12Device* device, const Direc
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;          // プロセッサの近くに配置
 
 	// Resourceの生成
-	ID3D12Resource* resource = nullptr;
+	resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(
 	    &heapProperties,                   // Heapの設定
 	    D3D12_HEAP_FLAG_NONE,              // Heapの特殊な設定。特になし。
@@ -102,5 +102,11 @@ void Texture::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchI
 		    UINT(img->rowPitch), // 1枚サイズ
 		    UINT(img->slicePitch));
 		assert(SUCCEEDED(hr));
+	}
+}
+void Texture::Finalize() {
+	if (resource) {
+		resource->Release();
+		
 	}
 }

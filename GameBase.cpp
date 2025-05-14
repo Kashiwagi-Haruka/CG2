@@ -403,17 +403,26 @@ void GameBase::CheackResourceLeaks() {
 }
 void GameBase::ResourceRelease() {
 	
-	
+	texture_.Finalize();
 	imguiM.Finalize();
+	
+	vertexResourceSphere->Release();
+
+	if (vertexResourceSprite) {
+		vertexResourceSprite->Release();
+	}
+	if (transformationMatrixResourceSprite) {
+		transformationMatrixResourceSprite->Release();
+	}
 
 
 	if (transformResource) {
 		transformResource->Unmap(0, nullptr); // ちゃんと最後だけUnmapする
 	}
-
+	
 	vertexResource->Release();
-	materialResource->Release();  // ←これも元々あった
-	transformResource->Release(); // ★追加！！！！！
+	materialResource->Release(); 
+	transformResource->Release(); 
 
 	graphicsPipelineState->Release();
 	signatureBlob->Release();
@@ -753,7 +762,7 @@ void GameBase::VertexResource() {
 	*transformationMatrixData = worldViewProjectionMatrix;
 
 	// --- Sprite用 頂点リソース ---
-	ID3D12Resource* vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
+	vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
 	vertexBufferViewSprite={};
 	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
 	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
@@ -792,6 +801,99 @@ void GameBase::VertexResource() {
 
 	// 単位行列を書き込んでおく（初期状態）
 	*transformationMatrixDataSprite = function.MakeIdentity();
+
+	
+		//// 通常の三角形の初期化（もともとの処理）
+		//vertexResource = CreateBufferResource(device, sizeof(VertexData) * 3);
+		//vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+		//vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
+		//vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+		//VertexData* vertexData = nullptr;
+		//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+		//vertexData[0].position = {0.0f, 0.5f, 0.0f, 1.0f};
+		//vertexData[0].texcoord = {0.5f, 0.0f};
+		//vertexData[1].position = {0.5f, -0.5f, 0.0f, 1.0f};
+		//vertexData[1].texcoord = {1.0f, 1.0f};
+		//vertexData[2].position = {-0.5f, -0.5f, 0.0f, 1.0f};
+		//vertexData[2].texcoord = {0.0f, 1.0f};
+		//vertexResource->Unmap(0, nullptr);
+
+		// 球体メッシュの追加（新規追加）
+		const int kSubdivision = 16;
+		const float pi = 3.14159265f;
+		const float kLonEvery = pi * 2.0f / float(kSubdivision);
+		const float kLatEvery = pi / float(kSubdivision);
+
+		const int kVertexCount = kSubdivision * kSubdivision * 6;
+	    kVertexCount_ = kVertexCount;
+		vertexResourceSphere = CreateBufferResource(device, sizeof(VertexData) * kVertexCount);
+		vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
+		vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * kVertexCount;
+		vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
+
+		VertexData* sphereVertexData = nullptr;
+		vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&sphereVertexData));
+
+		for (int latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+			float lat = -pi / 2.0f + kLatEvery * latIndex;
+			for (int lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+				float lon = lonIndex * kLonEvery;
+				int start = (latIndex * kSubdivision + lonIndex) * 6;
+
+				float nextLat = lat + kLatEvery;
+				float nextLon = lon + kLonEvery;
+
+				Vector4 a = {cosf(lat) * cosf(lon), sinf(lat), cosf(lat) * sinf(lon), 1.0f};
+				Vector4 b = {cosf(nextLat) * cosf(lon), sinf(nextLat), cosf(nextLat) * sinf(lon), 1.0f};
+				Vector4 c = {cosf(lat) * cosf(nextLon), sinf(lat), cosf(lat) * sinf(nextLon), 1.0f};
+				Vector4 d = {cosf(nextLat) * cosf(nextLon), sinf(nextLat), cosf(nextLat) * sinf(nextLon), 1.0f};
+
+				float u = float(lonIndex) / float(kSubdivision);
+				float v = 1.0f - float(latIndex) / float(kSubdivision);
+
+				sphereVertexData[start + 0] = {
+				    a, {u, v}
+                };
+				sphereVertexData[start + 1] = {
+				    b, {u, v - (1.0f / kSubdivision)}
+                };
+				sphereVertexData[start + 2] = {
+				    c, {u + (1.0f / kSubdivision), v}
+                };
+				sphereVertexData[start + 3] = {
+				    c, {u + (1.0f / kSubdivision), v}
+                };
+				sphereVertexData[start + 4] = {
+				    b, {u, v - (1.0f / kSubdivision)}
+                };
+				sphereVertexData[start + 5] = {
+				    d, {u + (1.0f / kSubdivision), v - (1.0f / kSubdivision)}
+                };
+			}
+		}
+		vertexResourceSphere->Unmap(0, nullptr);
+
+		//// その他の初期化（もともとの処理）
+		//viewport = {0.0f, 0.0f, static_cast<float>(kClientWidth), static_cast<float>(kClientHeight), 0.0f, 1.0f};
+		//scissorRect = {0, 0, kClientWidth, kClientHeight};
+
+		//materialResource = CreateBufferResource(device, sizeof(Vector4));
+		//Vector4* materialData = nullptr;
+		//materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+		//*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+
+		//transformResource = CreateBufferResource(device, sizeof(Matrix4x4));
+		//transformResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
+		//*transformationMatrixData = function.MakeIdentity();
+
+		//Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+		//Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+		//Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
+		//Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
+		//Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+		//*transformationMatrixData = worldViewProjectionMatrix;
+	
 }
 
 
@@ -1008,7 +1110,11 @@ void GameBase::DrawcommandList() {
 
 	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
 	commandList->DrawInstanced(6, 1, 0, 0);
-
+	
+	
+	// --- 球体描画 ---（追加すべき！）
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
+	commandList->DrawInstanced(kVertexCount_, 1, 0, 0);
 
 
 	    // VBV設定（スプライト用）

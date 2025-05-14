@@ -68,8 +68,7 @@ private:
 	ID3D12PipelineState* graphicsPipelineState;
 	// 頂点バッファビューを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
-	// 実際に頂点リソースを作る
-	ID3D12Resource* vertexResource;
+
 	// シリアライズしてバイナリにする
 	ID3DBlob* signatureBlob;
 	ID3DBlob* errorBlob;
@@ -82,9 +81,14 @@ private:
 		// バッファの設定
 	D3D12_HEAP_PROPERTIES heapProperties;
 	D3D12_RESOURCE_DESC resourceDesc;
+	// 実際に頂点リソースを作る
+	ID3D12Resource* vertexResource;
 	ID3D12Resource* materialResource;
 	// --- 頂点用 (Transform行列) のリソース追加 ---
 	ID3D12Resource* transformResource = nullptr;
+	ID3D12Resource* vertexResourceSprite;
+	ID3D12Resource* transformationMatrixResourceSprite;
+	ID3D12Resource* vertexResourceSphere;
 
 		// RTVを2つ作るのでディスクリプタを2つ用意
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
@@ -118,7 +122,9 @@ Transform cameraTransform = {
     };
 Matrix4x4* transformationMatrixDataSprite;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite;
-ID3D12Resource* transformationMatrixResourceSprite;
+	
+D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
+	int kVertexCount_;
 
 	//Matrix4x4* wvpData = nullptr; // ← transformResource用のポインタをメンバに持つ
 	Matrix4x4* transformationMatrixData = nullptr;
