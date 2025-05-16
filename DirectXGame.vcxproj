@@ -78,7 +78,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>C:\Class\Program\DirectXGame\externals\DirectXTex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -104,6 +105,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="GameBase.cpp" />
+    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="imGuiM.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -125,6 +127,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Function.h" />
     <ClInclude Include="GameBase.h" />
+    <ClInclude Include="GameScene.h" />
     <ClInclude Include="imGuiM.h" />
     <ClInclude Include="Matrix4x4.h" />
     <ClInclude Include="Texture.h" />

@@ -253,7 +253,9 @@ void GameBase::WindowClear() {
 	if (srvDescriptorHeap == nullptr) {
 		assert(false);
 	}
-	texture_.Initialize(device, srvDescriptorHeap);
+	texture_.Initialize(
+	    device, srvDescriptorHeap,
+	   "C:/Class/Program/DirectXGame/Resources/white1x1.png");
 	GPUHandle_ = texture_.GetGpuHandle();
 	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる
 
@@ -355,14 +357,6 @@ void GameBase::DebugError() {
 
 #endif // _DEBUG
 
-
-
-}
-
-void GameBase::TransitionBarrier() {
-	//transitionBarrierの設定
-	
-	
 
 
 }
@@ -681,42 +675,41 @@ void GameBase::PSO() {
 
 void GameBase::VertexResource() {
 	// 頂点リソース作成
-	vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
-	assert(vertexResource != nullptr);
+	vertexResource = CreateBufferResource(device, sizeof(VertexData) * kMaxVertices);
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * kMaxVertices;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 	
-	VertexData* vertexData = nullptr;
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	//VertexData* vertexData = nullptr;
+	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
-	// 左下
-	vertexData[0].position = {-0.5f, -0.5f, 0.0f, 1.0f};
-	vertexData[0].texcoord = {0.0f, 1.0f};
+	//// 左下
+	//vertexData[0].position = {-0.5f, -0.5f, 0.0f, 1.0f};
+	//vertexData[0].texcoord = {0.0f, 1.0f};
 
-	// 上
-	vertexData[1].position = {0.0f, 0.5f, 0.0f, 1.0f};
-	vertexData[1].texcoord = {0.5f, 0.0f};
+	//// 上
+	//vertexData[1].position = {0.0f, 0.5f, 0.0f, 1.0f};
+	//vertexData[1].texcoord = {0.5f, 0.0f};
 
-	// 右下
-	vertexData[2].position = {0.5f, -0.5f, 0.0f, 1.0f};
-	vertexData[2].texcoord = {1.0f, 1.0f};
+	//// 右下
+	//vertexData[2].position = {0.5f, -0.5f, 0.0f, 1.0f};
+	//vertexData[2].texcoord = {1.0f, 1.0f};
 
-	// 左下2
-	vertexData[3].position = {-0.5f, -0.5f, 0.5f, 1.0f};
-	vertexData[3].texcoord = {0.0f, 1.0f};
+	//// 左下2
+	//vertexData[3].position = {-0.5f, -0.5f, 0.5f, 1.0f};
+	//vertexData[3].texcoord = {0.0f, 1.0f};
 
-	// 上2
-	vertexData[4].position = {0.0f, 0.0f, 0.0f, 1.0f};
-	vertexData[4].texcoord = {0.5f, 0.0f};
+	//// 上2
+	//vertexData[4].position = {0.0f, 0.0f, 0.0f, 1.0f};
+	//vertexData[4].texcoord = {0.5f, 0.0f};
 
-	// 右下2
-	vertexData[5].position = {0.5f, -0.5f, -0.5f, 1.0f};
-	vertexData[5].texcoord = {1.0f, 1.0f};
+	//// 右下2
+	//vertexData[5].position = {0.5f, -0.5f, -0.5f, 1.0f};
+	//vertexData[5].texcoord = {1.0f, 1.0f};
 
 
 
-	vertexResource->Unmap(0, nullptr);
+	//vertexResource->Unmap(0, nullptr);
 
 
 	// ビューポートとシザー設定
@@ -814,13 +807,7 @@ void GameBase::Draw() {
 	DrawcommandList();
 
 	
-	// ImGui フレーム開始
-	imguiM.NewFrame();
-
-	// --- ImGui ウィンドウ記述 ---
-	ImGui::Begin("Debug Window");
-	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-	ImGui::End();
+	
 
 	//ImGui::ShowDemoWindow();
 
@@ -963,3 +950,113 @@ void GameBase::DrawcommandList() {
 
 
 }
+
+// （その他インクルードは省略）
+
+// --- フレーム開始: Reset → バックバッファ取得 → RenderTarget設定＆クリア ---
+// GameBase.cpp より抜粋
+void GameBase::BeginFlame() {
+	// ① 現在のバックバッファをフレーム毎に更新
+	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+	// ② 頂点オフセットリセット
+	currentVertexOffset_ = 0;
+
+	// ③ コマンドリストのリセット
+	FrameStart();
+
+	// ④ バックバッファへのバリア & RTV 設定 & クリア
+	DrawcommandList(); // ここで barrier.pResource に swapChainResources[backBufferIndex] が使われる
+
+	// ⑤ ImGui 準備
+	imguiM.NewFrame();
+}
+
+
+
+// --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
+void GameBase::EndFlame() {
+	
+	imguiM.Render(srvDescriptorHeap, commandList);
+
+	// RenderTarget→Present に戻す
+	CrtvTransitionBarrier(); // バリア遷移 :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
+
+	// コマンドリストをクローズして実行
+	hr = commandList->Close();
+	assert(SUCCEEDED(hr));
+	ID3D12CommandList* lists[] = {commandList};
+	commandQueue->ExecuteCommandLists(1, lists);
+
+	// 画面を切り替え
+	swapChain->Present(1, 0);
+
+	// フェンスで CPU/GPU 同期
+	fenceValue++;
+	commandQueue->Signal(fence, fenceValue);
+	if (fence->GetCompletedValue() < fenceValue) {
+		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+		WaitForSingleObject(fenceEvent, INFINITE);
+	}
+}
+
+
+void GameBase::DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, Texture& texture) {
+	// オフセットを今の位置で取得
+	UINT offsetVerts = currentVertexOffset_;
+	// 1) 頂点バッファをマップして、offset から書き込み
+	VertexData* vd = nullptr;
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vd));
+	vd += offsetVerts; // ← 3 頂点単位でずらす
+	for (int i = 0; i < 3; ++i) {
+		vd[i].position = {positions[i].x, positions[i].y, positions[i].z, 1.0f};
+		vd[i].texcoord = texcoords[i];
+	}
+	vertexResource->Unmap(0, nullptr);
+
+	// 2) マテリアルカラーを更新
+	Vector4* mat = nullptr;
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&mat));
+	*mat = color;
+	materialResource->Unmap(0, nullptr);
+
+	// 3) ワールドビュー射影行列は既に transformResource に書き込まれている前提
+
+	// 4) ルートパラメータ設定
+	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+	commandList->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress());
+
+	// 5) テクスチャ用ディスクリプタ
+	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap};
+	commandList->SetDescriptorHeaps(_countof(heaps), heaps);
+	commandList->SetGraphicsRootDescriptorTable(2, texture.GetGpuHandle());
+
+	// 6) 頂点バッファビューを設定
+	// 頂点バッファビューを設定（オフセットを反映）
+	
+	D3D12_VERTEX_BUFFER_VIEW vbv{};
+	vbv.BufferLocation = +vertexResource->GetGPUVirtualAddress() + +offsetVerts * sizeof(VertexData);
+	vbv.SizeInBytes = sizeof(VertexData) * 3;
+	vbv.StrideInBytes = sizeof(VertexData);
+	commandList->IASetVertexBuffers(0, 1, &vbv);
+
+	// 7) プリミティブ／ドロー
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->DrawInstanced(3, 1, 0, 0);
+
+	
+  // ⑧ 次回のオフセットを進める
+	currentVertexOffset_ += 3;
+}
+
+int GameBase::LoadTexture(const std::string& fileName) {
+	// 新しいTextureオブジェクトをvectorに追加
+	textures_.emplace_back();
+	// Initializeのオーバーロードを利用してファイル名で読み込み
+	textures_.back().Initialize(device, srvDescriptorHeap, fileName);
+	return static_cast<int>(textures_.size() - 1);
+}
+
+
+// GameBase.cpp の適当な場所に追加
+void GameBase::SetWorldViewProjection(const Matrix4x4& wvp) { *transformationMatrixData = wvp; }

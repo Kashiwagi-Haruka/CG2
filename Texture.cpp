@@ -1,6 +1,6 @@
 #include "Texture.h"
 
-void Texture::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* srvDescriptorHeap) {
+void Texture::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* srvDescriptorHeap, const std::string& fileName) {
 
 	// Textureを読んで転送する
 	DirectX::ScratchImage mipImages = LoadTexture("Resources/uvChecker.png");

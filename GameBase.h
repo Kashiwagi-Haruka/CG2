@@ -55,6 +55,8 @@ private:
 	// FenceのSignalを持つためのイベントを作成する
 	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
+	    // 新規：複数テクスチャ保持用コンテナ
+	std::vector<Texture> textures_;
 
 	int32_t kClientWidth = 1280;
 	int32_t kClientHeight = 720;
@@ -118,7 +120,8 @@ Transform cameraTransform = {
 
 	Texture texture_;
 	D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle_;
-
+	UINT currentVertexOffset_ = 0;             // 追加：次に書き込む頂点のオフセット（頂点数単位）
+	static constexpr UINT kMaxVertices = 1024; // 十分な大きさで定義しておく
 public:
 	void FrameStart(); // フレーム最初の準備
 
@@ -156,6 +159,7 @@ public:
 
 	MSG* GetMsg() { return &msg; };
 
+	int LoadTexture(const std::string& fileName);
 
 	void DXCInitialize();
 	IDxcBlob* CompileShader(// CompilerするShaderファイルへのパス
@@ -170,8 +174,25 @@ public:
 
 	void DrawcommandList();
 
+
+	void BeginFlame();
+	void EndFlame();
+	
+	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, Texture& texture);
+	
+	  // テクスチャ取得用 (必要に応じて)
+	Texture& GetTexture(int index) { return textures_.at(index); }/// <summary>GPU 定数バッファ（transformResource）に行列を書き込む</summary>
+	void SetWorldViewProjection(const Matrix4x4& wvp);
+
+
+	// GameBase.h に追記
+	const Transform& GetCameraTransform() const { return cameraTransform; }
+
 	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
+
+	ID3D12Device* GetDevice() { return device; };
+	ID3D12DescriptorHeap* GetSrvHeap() { return srvDescriptorHeap; };
 };
 
