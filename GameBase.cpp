@@ -74,7 +74,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
 
 			// 採用したアダプタの情報をログに出力。wstringの方なので注意
-			Log(CStr->ConvertString_(std::format(L"Use Adapater: {}\n", adapterDesc.Description)));
+			Log(CStr.ConvertString_(std::format(L"Use Adapater: {}\n", adapterDesc.Description)));
 			break;
 		}
 		useAdapter = nullptr; // ソフトウェアアダプタの場合は見なかった。
@@ -127,7 +127,7 @@ void GameBase::OutPutLog() {
 	if (FAILED(hr)) {
 		Log("Failed to create fence. HRESULT: " + std::to_string(hr));
 	}
-	Log(CStr->ConvertString_(std::format(L"WSTRING {}\n", wstringValue)));
+	Log(CStr.ConvertString_(std::format(L"WSTRING {}\n", wstringValue)));
 }
 
 LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
@@ -235,7 +235,7 @@ void GameBase::WindowClear() {
 	// 2つ目を作る
 	device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
 
-	ID3D12Resource* depthStenicilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+	depthStenicilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
 
 	dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
@@ -277,13 +277,17 @@ void GameBase::WindowClear() {
 	// GPUとOSに画面の交換を行うよう通知する
 	swapChain->Present(1, 0);
 
-	// Fenceを作る
+// Fenceを作る
 	fenceValue = 0;
 	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	assert(SUCCEEDED(hr));
 
-	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	assert(fenceEvent != nullptr);
+	// fenceEvent の多重生成を防ぐ！
+	if (!fenceEvent) {
+		fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		assert(fenceEvent != nullptr);
+	}
+
 
 	// Fenceの値を更新
 	fenceValue++;
@@ -371,14 +375,18 @@ void GameBase::CrtvTransitionBarrier() {
 }
 
 void GameBase::FenceEvent() {
-	// Fenceの作成
 	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	assert(SUCCEEDED(hr));
 
-	// ←ここ追加！！
-	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	// 二重生成防止
+	if (!fenceEvent) {
+		fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		assert(fenceEvent != nullptr);
+	}
+
 	assert(fenceEvent != nullptr);
 }
+
 
 
 void GameBase::CheackResourceLeaks() {
@@ -397,29 +405,53 @@ void GameBase::CheackResourceLeaks() {
 }
 void GameBase::ResourceRelease() {
 	
-	
-	imguiM.Finalize();
 
+	imguiM.Finalize();
+	
+	texture_.Release();
 
 	if (transformResource) {
-		transformResource->Unmap(0, nullptr); // ちゃんと最後だけUnmapする
+		transformResource->Unmap(0, nullptr);
 	}
-
 	vertexResource->Release();
-	materialResource->Release();  // ←これも元々あった
-	transformResource->Release(); // ★追加！！！！！
+	materialResource->Release();
+	transformResource->Release();
 
 	graphicsPipelineState->Release();
 	signatureBlob->Release();
 	if (errorBlob) {
 		errorBlob->Release();
 	}
+	if (includeHandler) {
+		includeHandler->Release();
+		includeHandler = nullptr;
+	}
+	if (dxcCompiler) {
+		dxcCompiler->Release();
+		dxcCompiler = nullptr;
+	}
+	if (dxcUtils) {
+		dxcUtils->Release();
+		dxcUtils = nullptr;
+	}
+
+	// ← ここに追加
+	srvDescriptorHeap->Release();
+	dsvDescriptorHeap->Release();
+
 	rootSignature->Release();
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();
 
-	CloseHandle(fenceEvent);
+    if (fenceEvent) {
+		CloseHandle(fenceEvent);
+		fenceEvent = nullptr; // ★追加推奨（予期せぬ再利用防止）
+	}
 	fence->Release();
+	if (depthStenicilResource) {
+		depthStenicilResource->Release();
+		depthStenicilResource = nullptr;
+	}
 	rtvDescriptorHeap->Release();
 	swapChainResources[0]->Release();
 	swapChainResources[1]->Release();
@@ -437,6 +469,7 @@ void GameBase::ResourceRelease() {
 
 	CloseWindow(hwnd);
 }
+
 
 
 void GameBase::DXCInitialize() {
@@ -466,7 +499,7 @@ IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパ�
 	// ここの中身をこの後書いていく
 	// 1. hlslファイルを読む
 	// // これからシェーダーをコンパイルする旨をログに出す
-	Log(CStr->ConvertString_(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
+	Log(CStr.ConvertString_(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
 
 	// hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
@@ -521,7 +554,7 @@ IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパ�
 	assert(SUCCEEDED(hr));
 
 	// 成功したログを出す
-	Log(CStr->ConvertString_(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+	Log(CStr.ConvertString_(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
 
 	// もう使わないリソースを解放
 	shaderSource->Release();
@@ -621,9 +654,18 @@ void GameBase::PSO() {
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
-	// BlendStateの設定
+// BlendStateの設定（透過を有効化）
 	D3D12_BLEND_DESC blendDesc{};
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	auto& rt = blendDesc.RenderTarget[0];
+	rt.BlendEnable = TRUE;                    // ブレンド有効化
+	rt.SrcBlend = D3D12_BLEND_SRC_ALPHA;      // ソース：アルファ
+	rt.DestBlend = D3D12_BLEND_INV_SRC_ALPHA; // デスティネーション：1-ソースアルファ
+	rt.BlendOp = D3D12_BLEND_OP_ADD;          // 加算
+	rt.SrcBlendAlpha = D3D12_BLEND_ONE;       // アルファチャンネル用（通常はONE）
+	rt.DestBlendAlpha = D3D12_BLEND_ZERO;     // アルファ
+	rt.BlendOpAlpha = D3D12_BLEND_OP_ADD;     // アルファも加算
+	rt.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
 
 	// RasiterzerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};

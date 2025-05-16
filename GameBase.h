@@ -22,7 +22,7 @@ private:
 	RECT wrc;
 	
 	MSG msg{};
-	ConvertString* CStr{};
+	ConvertString CStr{};
 	std::wstring wstringValue = L"k";
 
 	ID3D12Debug1* debugController = nullptr;
@@ -53,7 +53,7 @@ private:
 	ID3D12Fence* fence = nullptr;
 	uint64_t fenceValue = 0;
 	// FenceのSignalを持つためのイベントを作成する
-	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	HANDLE fenceEvent = nullptr;
 
 	    // 新規：複数テクスチャ保持用コンテナ
 	std::vector<Texture> textures_;
@@ -122,6 +122,9 @@ Transform cameraTransform = {
 	D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle_;
 	UINT currentVertexOffset_ = 0;             // 追加：次に書き込む頂点のオフセット（頂点数単位）
 	static constexpr UINT kMaxVertices = 1024; // 十分な大きさで定義しておく
+
+	ID3D12Resource* depthStenicilResource = nullptr;
+
 public:
 	void FrameStart(); // フレーム最初の準備
 

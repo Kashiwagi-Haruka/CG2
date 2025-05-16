@@ -5,8 +5,10 @@ void Texture::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* srvDescript
 	// Textureを読んで転送する
 	DirectX::ScratchImage mipImages = LoadTexture("Resources/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	ID3D12Resource* textureResource = CreateTextureResource(device, metadata);
-	UploadTextureData(textureResource, mipImages);
+	textureResource_ = CreateTextureResource(device, metadata);
+	UploadTextureData(textureResource_, mipImages);
+	
+
 
 
 	// --- SRV作成用にmeta情報を使ってView記述 ---
@@ -26,7 +28,7 @@ void Texture::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* srvDescript
 	textureSrvHandleGPU_.ptr += descriptorSize;
 
 	// --- SRV作成 ---
-	device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
+	device->CreateShaderResourceView(textureResource_, &srvDesc, textureSrvHandleCPU);
 	assert(metadata.format != DXGI_FORMAT_UNKNOWN);
 
 	OutputDebugStringA(std::format("GPU Handle: 0x{:X}\n", textureSrvHandleGPU_.ptr).c_str());
@@ -102,5 +104,13 @@ void Texture::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchI
 		    UINT(img->rowPitch), // 1枚サイズ
 		    UINT(img->slicePitch));
 		assert(SUCCEEDED(hr));
+	}
+}
+
+// Texture.cpp に追加
+void Texture::Release() {
+	if (textureResource_) {
+		textureResource_->Release();
+		textureResource_ = nullptr;
 	}
 }

@@ -15,10 +15,16 @@ class Texture{
 	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuHandle();
+	// Texture.h に追加
+public:
+	void Release();
 
 	
 
 private:
+	// Texture.h に追加
+private:
+	ID3D12Resource* textureResource_ = nullptr;
 
 	ConvertString Cstr;
 	

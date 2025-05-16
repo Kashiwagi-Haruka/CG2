@@ -5,6 +5,8 @@
 #include <vector>
 #include <random>
 #include <array>
+#include <cstdlib>  // srand, rand
+#include <ctime>    // time
   	struct SpreadTri {
 	float progress; // 0(奥)→1(手前)
 	Vector2 dir;    // ばら撒く方向の単位ベクトル
@@ -158,6 +160,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
    static const float speedZ = 0.004f;   // Z移動速度
    Vector4 PColor = {1.0f,1.0f,1.0f,1.0f};
    static float spinAngle = 0.0f; // フレーム間で角度を保持
+
+   // main.cpp の先頭付近 or GameBase::Draw() の最初あたりで
+   //  ────────────────
+   // テクスチャの幅・高さが W, H
+   const float W = static_cast<float>(512);
+   const float H = static_cast<float>(512);
+
+   // 白点を置いた座標が (W-1, H-1) のときの UV
+   static const Vector2 whiteUV = {(W - 0.5f) / W, (H - 0.5f) / H};
+   // ────────────────
+
 	while (gameBase->IsMsgQuit())
 	{
 		if (PeekMessage(gameBase->GetMsg(), NULL, 0, 0, PM_REMOVE)) {
@@ -204,65 +217,87 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	            Texture& cur = gameBase->GetTexture(texIdx);
 	
 			static bool spreadInit = false;
-			switch (sceneIndex) {
-			case 0: {
-				auto world = function.MakeAffineMatrix(
-				    {commonScale[0], commonScale[1], commonScale[2]},
-				    {commonRotateEuler[0] * (float)M_PI / 180.0f, commonRotateEuler[1] * (float)M_PI / 180.0f, commonRotateEuler[2] * (float)M_PI / 180.0f},
-				    {commonTranslate[0], commonTranslate[1], commonTranslate[2]});
-				Vector3 pos[3];
-				for (int i = 0; i < 3; ++i)
-					pos[i] = function.Transform(basePos[i],world);
-				Vector4 col = {commonTriColor[0], commonTriColor[1], commonTriColor[2], commonTriColor[3]};
-				gameBase->DrawTriangle(pos, baseUV, col, cur);
-			} break;
-			case 1: {
-				// ── 1) GPU 定数バッファを単位行列にリセット ──
-				Matrix4x4 id{};
-				id.m[0][0] = id.m[1][1] = id.m[2][2] = id.m[3][3] = 1.0f;
-				gameBase->SetWorldViewProjection(id);
+			    switch (sceneIndex) {
+			    case 0: {
+				    auto world = function.MakeAffineMatrix(
+				        {commonScale[0], commonScale[1], commonScale[2]},
+				        {commonRotateEuler[0] * (float)M_PI / 180.0f, commonRotateEuler[1] * (float)M_PI / 180.0f, commonRotateEuler[2] * (float)M_PI / 180.0f},
+				        {commonTranslate[0], commonTranslate[1], commonTranslate[2]});
+				    Vector3 pos[3];
+				    for (int i = 0; i < 3; ++i)
+					    pos[i] = function.Transform(basePos[i], world);
+				    Vector4 col = {commonTriColor[0], commonTriColor[1], commonTriColor[2], commonTriColor[3]};
+				    gameBase->DrawTriangle(pos, baseUV, col, cur);
+			    } break;
+			    case 1: {
+				    // ─── 1) NDC そのまま通す ───
+				    Matrix4x4 id{};
+				    id.m[0][0] = id.m[1][1] = id.m[2][2] = id.m[3][3] = 1.0f;
+				    gameBase->SetWorldViewProjection(id);
 
+				    // ─── 2) 回転角度更新 ───
+				    spinAngle += 0.02f; // 好みで回転スピード調整
+				    float c = cosf(spinAngle), s = sinf(spinAngle);
 
-				// ── 3) 角度更新 ──
-				spinAngle += 0.03f; // お好きなスピードに調整
-				float c = cosf(spinAngle);
-				float s = sinf(spinAngle);
-				// ── 追加：全体を下に動かす量 ──
-				static float moveDown = 0.0f;
-				moveDown -= 0.002f;  
-				// ── 4) ローカル三角形（中心原点、サイズ0.2×0.2） ──
-				static constexpr Vector3 localTri[3] = {
-				    {-0.1f, 0.1f,  0.0f},
-				    {0.1f,  0.1f,  0.0f},
-				    {0.0f,  -0.1f, 0.0f},
-				};
-				Vector4 triColor = {0.5f, 0.8f, 0.8f, 1.0f};
+				    // ─── 3) ランダム落下初期化 ───
+				    static bool initialized = false;
+				    struct Tri {
+					    float x, y, z, speed;
+				    };
+				    static const int TRI_COUNT = 50;
+				    static Tri tris[TRI_COUNT];
+				    if (!initialized) {
+					    initialized = true;
+					    srand((unsigned)time(nullptr));
+					    for (int i = 0; i < TRI_COUNT; ++i) {
+						    tris[i].x = (rand() / float(RAND_MAX)) * 2.0f - 1.0f;
+						    tris[i].y = (rand() / float(RAND_MAX)) * 2.0f + 1.0f;
+						    float t = rand() / float(RAND_MAX);
+						    tris[i].z = -1.0f + (t * t) * 2.0f; // t² によって手前（-1）寄りに偏る
+						    tris[i].speed = 0.005f + (rand() / float(RAND_MAX)) * 0.015f;
+					    }
+				    }
 
-				// ── 5) 縦方向に 10 個並べるオフセット計算 ──
-				const float startY = -0.9f;
-				const float stepY = 1.8f / 9.0f;
+				    // ─── 4) ローカル三角形（単位サイズ）＆色・UV ───
+				    constexpr Vector3 localTri[3] = {
+				        {-0.05f, 0.05f,  0.0f},
+				        {0.05f,  0.05f,  0.0f},
+				        {0.0f,   -0.05f, 0.0f},
+				    };
+				    Vector4 triColor = {0.5f, 0.8f, 0.8f, 0.5f};
+				    Vector2 uv = {0.0f, 0.0f};
 
-				// ── 6) 描画ループ ──
-				for (int i = 0; i < 10; ++i) {
-					float yOff = startY + stepY * i;
-					Vector3 tri[3];
+				    // ─── 5) 描画ループ ───
+				    for (int i = 0; i < TRI_COUNT; ++i) {
+					    // 位置更新
+					    tris[i].y -= tris[i].speed;
+					    if (tris[i].y < -1.2f) {
+						    tris[i].x = (rand() / float(RAND_MAX)) * 2.0f - 1.0f;
+						    tris[i].y = 1.2f + (rand() / float(RAND_MAX)) * 1.0f;
+						    float t = rand() / float(RAND_MAX);
+						    const float gamma = 0.7f;
+						    float u = powf(t, gamma);
+						    tris[i].z = -1.0f + u * 2.0f;
+						    tris[i].speed = 0.005f + (rand() / float(RAND_MAX)) * 0.015f;
+					    }
 
-					 for (int v = 0; v < 3; ++v) {
-						// 各頂点を「回転」→「Yオフセット」→「下方向移動」
-						float x0 = localTri[v].x;
-						float y0 = localTri[v].y;
-						float xr = x0 * c + y0 * s;
-						float yr = -x0 * s + y0 * c;
-						tri[v] = {
-						    xr,
-						    yr + yOff + moveDown, // ← ここで下方向への移動量を足す
-						    0.0f};
-					}
+					    // 回転＋平行移動を手計算
+					    Vector3 tri[3];
+					    for (int v = 0; v < 3; ++v) {
+						    float x0 = localTri[v].x;
+						    float y0 = localTri[v].y;
+						    // Z 軸回転
+						    float xr = x0 * c - y0 * s;
+						    float yr = x0 * s + y0 * c;
+						    // NDC にマッピング
+						    tri[v] = {xr + tris[i].x, yr + tris[i].y, tris[i].z};
+					    }
 
-					gameBase->DrawTriangle(tri, uv, triColor, cur);
-				}
-				break;
-			}
+					    gameBase->DrawTriangle(tri, &uv, triColor, cur);
+				    }
+				    break;
+			    }
+
 			case 2: {
 				auto wA = function.MakeAffineMatrix(
 				    {depthScaleA[0], depthScaleA[1], depthScaleA[2]},
@@ -283,8 +318,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					pB[i] = function.Transform(basePos2[i], wB);
 				Vector4 cB = {depthTriColorB[0], depthTriColorB[1], depthTriColorB[2], depthTriColorB[3]};
 				gameBase->DrawTriangle(pB, baseUV, cB, cur);
-			} break;
-			}
+				} break;
+				}
 
 
        
