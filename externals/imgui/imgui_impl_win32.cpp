@@ -3,7 +3,7 @@
 
 // Implemented features:
 //  [X] Platform: Clipboard support (for Win32 this is actually part of core dear imgui)
-//  [X] Platform: Keyboard support. Since 1.87 we are using the io.AddKeyEvent() function. Pass ImGuiKey values to all key functions e.g. ImGui::IsKeyPressed(ImGuiKey_Space). [Legacy VK_* values will also be supported unless IMGUI_DISABLE_OBSOLETE_KEYIO is set]
+//  [X] Platform: Keyboard support. Since 1.87 we are using the io.AddKeyEvent() function_. Pass ImGuiKey values to all key functions e.g. ImGui::IsKeyPressed(ImGuiKey_Space). [Legacy VK_* values will also be supported unless IMGUI_DISABLE_OBSOLETE_KEYIO is set]
 //  [X] Platform: Gamepad support. Enabled with 'io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad'.
 //  [X] Platform: Mouse cursor shape and visibility. Disable with 'io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange'.
 
@@ -56,7 +56,7 @@ typedef DWORD (WINAPI *PFN_XInputGetState)(DWORD, XINPUT_STATE*);
 //  2021-02-18: Added ImGui_ImplWin32_EnableAlphaCompositing(). Non Visual Studio users will need to link with dwmapi.lib (MinGW/gcc: use -ldwmapi).
 //  2021-02-17: Fixed ImGui_ImplWin32_EnableDpiAwareness() attempting to get SetProcessDpiAwareness from shcore.dll on Windows 8 whereas it is only supported on Windows 8.1.
 //  2021-01-25: Inputs: Dynamically loading XInput DLL.
-//  2020-12-04: Misc: Fixed setting of io.DisplaySize to invalid/uninitialized data when after hwnd has been closed.
+//  2020-12-04: Misc: Fixed setting of io.DisplaySize to invalid/uninitialized data when after hwnd_ has been closed.
 //  2020-03-03: Inputs: Calling AddInputCharacterUTF16() to support surrogate pairs leading to codepoint >= 0x10000 (for more complete CJK inputs)
 //  2020-02-17: Added ImGui_ImplWin32_EnableDpiAwareness(), ImGui_ImplWin32_GetDpiScaleForHwnd(), ImGui_ImplWin32_GetDpiScaleForMonitor() helper functions.
 //  2020-01-14: Inputs: Added support for #define IMGUI_IMPL_WIN32_DISABLE_GAMEPAD/IMGUI_IMPL_WIN32_DISABLE_LINKING_XINPUT.
@@ -112,7 +112,7 @@ static ImGui_ImplWin32_Data* ImGui_ImplWin32_GetBackendData()
 }
 
 // Functions
-bool    ImGui_ImplWin32_Init(void* hwnd)
+bool    ImGui_ImplWin32_Init(void* hwnd_)
 {
     ImGuiIO& io = ImGui::GetIO();
     IM_ASSERT(io.BackendPlatformUserData == nullptr && "Already initialized a platform backend!");
@@ -130,13 +130,13 @@ bool    ImGui_ImplWin32_Init(void* hwnd)
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
 
-    bd->hWnd = (HWND)hwnd;
+    bd->hWnd = (HWND)hwnd_;
     bd->TicksPerSecond = perf_frequency;
     bd->Time = perf_counter;
     bd->LastMouseCursor = ImGuiMouseCursor_COUNT;
 
-    // Set platform dependent data in viewport
-    ImGui::GetMainViewport()->PlatformHandleRaw = (void*)hwnd;
+    // Set platform dependent data in viewport_
+    ImGui::GetMainViewport()->PlatformHandleRaw = (void*)hwnd_;
 
     // Dynamically load XInput library
 #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
@@ -495,7 +495,7 @@ static ImGuiKey ImGui_ImplWin32_VirtualKeyToImGuiKey(WPARAM wParam)
 #endif
 
 // Win32 message handler (process Win32 mouse/keyboard inputs, etc.)
-// Call from your application's message handler. Keep calling your message handler unless this function returns TRUE.
+// Call from your application's message handler. Keep calling your message handler unless this function_ returns TRUE.
 // When implementing your own backend, you can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if Dear ImGui wants to use your inputs.
 // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
 // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
@@ -503,10 +503,10 @@ static ImGuiKey ImGui_ImplWin32_VirtualKeyToImGuiKey(WPARAM wParam)
 // PS: In this Win32 handler, we use the capture API (GetCapture/SetCapture/ReleaseCapture) to be able to read mouse coordinates when dragging mouse outside of our window bounds.
 // PS: We treat DBLCLK messages as regular mouse down messages, so this code will work on windows classes that have the CS_DBLCLKS flag set. Our own example app code doesn't set this flag.
 #if 0
-// Copy this line into your .cpp file to forward declare the function.
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+// Copy this line into your .cpp file to forward declare the function_.
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg_, WPARAM wParam, LPARAM lParam);
 #endif
-IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd_, UINT msg_, WPARAM wParam, LPARAM lParam)
 {
     if (ImGui::GetCurrentContext() == nullptr)
         return 0;
@@ -514,25 +514,25 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
     ImGuiIO& io = ImGui::GetIO();
     ImGui_ImplWin32_Data* bd = ImGui_ImplWin32_GetBackendData();
 
-    switch (msg)
+    switch (msg_)
     {
     case WM_MOUSEMOVE:
     case WM_NCMOUSEMOVE:
     {
         // We need to call TrackMouseEvent in order to receive WM_MOUSELEAVE events
-        const int area = (msg == WM_MOUSEMOVE) ? 1 : 2;
-        bd->MouseHwnd = hwnd;
+        const int area = (msg_ == WM_MOUSEMOVE) ? 1 : 2;
+        bd->MouseHwnd = hwnd_;
         if (bd->MouseTrackedArea != area)
         {
-            TRACKMOUSEEVENT tme_cancel = { sizeof(tme_cancel), TME_CANCEL, hwnd, 0 };
-            TRACKMOUSEEVENT tme_track = { sizeof(tme_track), (DWORD)((area == 2) ? (TME_LEAVE | TME_NONCLIENT) : TME_LEAVE), hwnd, 0 };
+            TRACKMOUSEEVENT tme_cancel = { sizeof(tme_cancel), TME_CANCEL, hwnd_, 0 };
+            TRACKMOUSEEVENT tme_track = { sizeof(tme_track), (DWORD)((area == 2) ? (TME_LEAVE | TME_NONCLIENT) : TME_LEAVE), hwnd_, 0 };
             if (bd->MouseTrackedArea != 0)
                 ::TrackMouseEvent(&tme_cancel);
             ::TrackMouseEvent(&tme_track);
             bd->MouseTrackedArea = area;
         }
         POINT mouse_pos = { (LONG)GET_X_LPARAM(lParam), (LONG)GET_Y_LPARAM(lParam) };
-        if (msg == WM_NCMOUSEMOVE && ::ScreenToClient(hwnd, &mouse_pos) == FALSE) // WM_NCMOUSEMOVE are provided in absolute coordinates.
+        if (msg_ == WM_NCMOUSEMOVE && ::ScreenToClient(hwnd_, &mouse_pos) == FALSE) // WM_NCMOUSEMOVE are provided in absolute coordinates.
             break;
         io.AddMousePosEvent((float)mouse_pos.x, (float)mouse_pos.y);
         break;
@@ -540,10 +540,10 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
     case WM_MOUSELEAVE:
     case WM_NCMOUSELEAVE:
     {
-        const int area = (msg == WM_MOUSELEAVE) ? 1 : 2;
+        const int area = (msg_ == WM_MOUSELEAVE) ? 1 : 2;
         if (bd->MouseTrackedArea == area)
         {
-            if (bd->MouseHwnd == hwnd)
+            if (bd->MouseHwnd == hwnd_)
                 bd->MouseHwnd = nullptr;
             bd->MouseTrackedArea = 0;
             io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
@@ -556,12 +556,12 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
     case WM_XBUTTONDOWN: case WM_XBUTTONDBLCLK:
     {
         int button = 0;
-        if (msg == WM_LBUTTONDOWN || msg == WM_LBUTTONDBLCLK) { button = 0; }
-        if (msg == WM_RBUTTONDOWN || msg == WM_RBUTTONDBLCLK) { button = 1; }
-        if (msg == WM_MBUTTONDOWN || msg == WM_MBUTTONDBLCLK) { button = 2; }
-        if (msg == WM_XBUTTONDOWN || msg == WM_XBUTTONDBLCLK) { button = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 3 : 4; }
+        if (msg_ == WM_LBUTTONDOWN || msg_ == WM_LBUTTONDBLCLK) { button = 0; }
+        if (msg_ == WM_RBUTTONDOWN || msg_ == WM_RBUTTONDBLCLK) { button = 1; }
+        if (msg_ == WM_MBUTTONDOWN || msg_ == WM_MBUTTONDBLCLK) { button = 2; }
+        if (msg_ == WM_XBUTTONDOWN || msg_ == WM_XBUTTONDBLCLK) { button = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 3 : 4; }
         if (bd->MouseButtonsDown == 0 && ::GetCapture() == nullptr)
-            ::SetCapture(hwnd);
+            ::SetCapture(hwnd_);
         bd->MouseButtonsDown |= 1 << button;
         io.AddMouseButtonEvent(button, true);
         return 0;
@@ -572,12 +572,12 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
     case WM_XBUTTONUP:
     {
         int button = 0;
-        if (msg == WM_LBUTTONUP) { button = 0; }
-        if (msg == WM_RBUTTONUP) { button = 1; }
-        if (msg == WM_MBUTTONUP) { button = 2; }
-        if (msg == WM_XBUTTONUP) { button = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 3 : 4; }
+        if (msg_ == WM_LBUTTONUP) { button = 0; }
+        if (msg_ == WM_RBUTTONUP) { button = 1; }
+        if (msg_ == WM_MBUTTONUP) { button = 2; }
+        if (msg_ == WM_XBUTTONUP) { button = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 3 : 4; }
         bd->MouseButtonsDown &= ~(1 << button);
-        if (bd->MouseButtonsDown == 0 && ::GetCapture() == hwnd)
+        if (bd->MouseButtonsDown == 0 && ::GetCapture() == hwnd_)
             ::ReleaseCapture();
         io.AddMouseButtonEvent(button, false);
         return 0;
@@ -593,7 +593,7 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
     case WM_SYSKEYDOWN:
     case WM_SYSKEYUP:
     {
-        const bool is_key_down = (msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN);
+        const bool is_key_down = (msg_ == WM_KEYDOWN || msg_ == WM_SYSKEYDOWN);
         if (wParam < 256)
         {
             // Submit modifiers
@@ -633,10 +633,10 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
     }
     case WM_SETFOCUS:
     case WM_KILLFOCUS:
-        io.AddFocusEvent(msg == WM_SETFOCUS);
+        io.AddFocusEvent(msg_ == WM_SETFOCUS);
         return 0;
     case WM_CHAR:
-        if (::IsWindowUnicode(hwnd))
+        if (::IsWindowUnicode(hwnd_))
         {
             // You can also use ToAscii()+GetKeyboardState() to retrieve characters.
             if (wParam > 0 && wParam < 0x10000)
@@ -721,7 +721,7 @@ typedef HRESULT(WINAPI* PFN_SetProcessDpiAwareness)(PROCESS_DPI_AWARENESS);     
 typedef HRESULT(WINAPI* PFN_GetDpiForMonitor)(HMONITOR, MONITOR_DPI_TYPE, UINT*, UINT*);        // Shcore.lib + dll, Windows 8.1+
 typedef DPI_AWARENESS_CONTEXT(WINAPI* PFN_SetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT); // User32.lib + dll, Windows 10 v1607+ (Creators Update)
 
-// Helper function to enable DPI awareness without setting up a manifest
+// Helper function_ to enable DPI awareness without setting up a manifest
 void ImGui_ImplWin32_EnableDpiAwareness()
 {
     if (_IsWindows10OrGreater())
@@ -777,9 +777,9 @@ float ImGui_ImplWin32_GetDpiScaleForMonitor(void* monitor)
     return xdpi / 96.0f;
 }
 
-float ImGui_ImplWin32_GetDpiScaleForHwnd(void* hwnd)
+float ImGui_ImplWin32_GetDpiScaleForHwnd(void* hwnd_)
 {
-    HMONITOR monitor = ::MonitorFromWindow((HWND)hwnd, MONITOR_DEFAULTTONEAREST);
+    HMONITOR monitor = ::MonitorFromWindow((HWND)hwnd_, MONITOR_DEFAULTTONEAREST);
     return ImGui_ImplWin32_GetDpiScaleForMonitor(monitor);
 }
 
@@ -792,9 +792,9 @@ float ImGui_ImplWin32_GetDpiScaleForHwnd(void* hwnd)
 #endif
 
 // [experimental]
-// Borrowed from GLFW's function updateFramebufferTransparency() in src/win32_window.c
+// Borrowed from GLFW's function_ updateFramebufferTransparency() in src/win32_window.c
 // (the Dwm* functions are Vista era functions but we are borrowing logic from GLFW)
-void ImGui_ImplWin32_EnableAlphaCompositing(void* hwnd)
+void ImGui_ImplWin32_EnableAlphaCompositing(void* hwnd_)
 {
     if (!_IsWindowsVistaOrGreater())
         return;
@@ -812,14 +812,14 @@ void ImGui_ImplWin32_EnableAlphaCompositing(void* hwnd)
         bb.dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION;
         bb.hRgnBlur = region;
         bb.fEnable = TRUE;
-        ::DwmEnableBlurBehindWindow((HWND)hwnd, &bb);
+        ::DwmEnableBlurBehindWindow((HWND)hwnd_, &bb);
         ::DeleteObject(region);
     }
     else
     {
         DWM_BLURBEHIND bb = {};
         bb.dwFlags = DWM_BB_ENABLE;
-        ::DwmEnableBlurBehindWindow((HWND)hwnd, &bb);
+        ::DwmEnableBlurBehindWindow((HWND)hwnd_, &bb);
     }
 }
 

@@ -76,7 +76,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 	const char* scenes[] = {"TriangleScene", "ParticleScene", "DepthBuffer"};
 
-	Function function;
+	Function function_;
 	
 
 	int checkerId = gameBase->LoadTexture("Resources/uvChecker.png");
@@ -216,13 +216,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			static bool spreadInit = false;
 			    switch (sceneIndex) {
 			    case 0: {
-				    auto world = function.MakeAffineMatrix(
+				    auto world = function_.MakeAffineMatrix(
 				        {commonScale[0], commonScale[1], commonScale[2]},
 				        {commonRotateEuler[0] * (float)M_PI / 180.0f, commonRotateEuler[1] * (float)M_PI / 180.0f, commonRotateEuler[2] * (float)M_PI / 180.0f},
 				        {commonTranslate[0], commonTranslate[1], commonTranslate[2]});
 				    Vector3 pos[3];
 				    for (int i = 0; i < 3; ++i)
-					    pos[i] = function.Transform(basePos[i], world);
+					    pos[i] = function_.Transform(basePos[i], world);
 				    Vector4 col = {commonTriColor[0], commonTriColor[1], commonTriColor[2], commonTriColor[3]};
 				    gameBase->DrawTriangle(pos, baseUV, col, cur);
 			    } break;
@@ -296,23 +296,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			    }
 
 			case 2: {
-				auto wA = function.MakeAffineMatrix(
+				auto wA = function_.MakeAffineMatrix(
 				    {depthScaleA[0], depthScaleA[1], depthScaleA[2]},
 				    {depthRotateEulerA[0] * (float)M_PI / 180.0f, depthRotateEulerA[1] * (float)M_PI / 180.0f, depthRotateEulerA[2] * (float)M_PI / 180.0f},
 				    {depthTranslateA[0], depthTranslateA[1], depthTranslateA[2]});
 				Vector3 pA[3];
 				for (int i = 0; i < 3; ++i)
-					pA[i] = function.Transform(basePos1[i], wA);
+					pA[i] = function_.Transform(basePos1[i], wA);
 				Vector4 cA = {depthTriColorA[0], depthTriColorA[1], depthTriColorA[2], depthTriColorA[3]};
 				gameBase->DrawTriangle(pA, baseUV, cA, cur);
 
-				auto wB = function.MakeAffineMatrix(
+				auto wB = function_.MakeAffineMatrix(
 				    {depthScaleB[0], depthScaleB[1], depthScaleB[2]},
 				    {depthRotateEulerB[0] * (float)M_PI / 180.0f, depthRotateEulerB[1] * (float)M_PI / 180.0f, depthRotateEulerB[2] * (float)M_PI / 180.0f},
 				    {depthTranslateB[0], depthTranslateB[1], depthTranslateB[2]});
 				Vector3 pB[3];
 				for (int i = 0; i < 3; ++i)
-					pB[i] = function.Transform(basePos2[i], wB);
+					pB[i] = function_.Transform(basePos2[i], wB);
 				Vector4 cB = {depthTriColorB[0], depthTriColorB[1], depthTriColorB[2], depthTriColorB[3]};
 				gameBase->DrawTriangle(pB, baseUV, cB, cur);
 				} break;

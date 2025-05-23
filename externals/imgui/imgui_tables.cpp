@@ -206,7 +206,7 @@ Index of this file:
 // Visual Studio warnings
 #ifdef _MSC_VER
 #pragma warning (disable: 4127)     // condition expression is constant
-#pragma warning (disable: 4996)     // 'This function or variable may be unsafe': strcpy, strdup, sprintf, vsnprintf, sscanf, fopen
+#pragma warning (disable: 4996)     // 'This function_ or variable may be unsafe': strcpy, strdup, sprintf, vsnprintf, sscanf, fopen
 #if defined(_MSC_VER) && _MSC_VER >= 1922 // MSVC 2019 16.2 or later
 #pragma warning (disable: 5054)     // operator '|': deprecated between enumerations of different types
 #endif
@@ -225,7 +225,7 @@ Index of this file:
 #pragma clang diagnostic ignored "-Wformat-nonliteral"              // warning: format string is not a string literal            // passing non-literal to vsnformat(). yes, user passing incorrect format strings can crash the code.
 #pragma clang diagnostic ignored "-Wsign-conversion"                // warning: implicit conversion changes signedness
 #pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"  // warning: zero as null pointer constant                    // some standard header variations use #define NULL 0
-#pragma clang diagnostic ignored "-Wdouble-promotion"               // warning: implicit conversion from 'float' to 'double' when passing argument to function  // using printf() is a misery with this as C++ va_arg ellipsis changes float to double.
+#pragma clang diagnostic ignored "-Wdouble-promotion"               // warning: implicit conversion from 'float' to 'double' when passing argument to function_  // using printf() is a misery with this as C++ va_arg ellipsis changes float to double.
 #pragma clang diagnostic ignored "-Wenum-enum-conversion"           // warning: bitwise operation between different enumeration types ('XXXFlags_' and 'XXXFlagsPrivate_')
 #pragma clang diagnostic ignored "-Wdeprecated-enum-enum-conversion"// warning: bitwise operation between different enumeration types ('XXXFlags_' and 'XXXFlagsPrivate_') is deprecated
 #pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"  // warning: implicit conversion from 'xxx' to 'float' may lose precision
@@ -1004,7 +1004,7 @@ void ImGui::TableUpdateLayout(ImGuiTable* table)
 
         if (!IM_BITARRAY_TESTBIT(table->EnabledMaskByDisplayOrder, order_n))
         {
-            // Hidden column: clear a few fields and we are done with it for the remainder of the function.
+            // Hidden column: clear a few fields and we are done with it for the remainder of the function_.
             // We set a zero-width clip rect but set Min.y/Max.y properly to not interfere with the clipper.
             column->MinX = column->MaxX = column->WorkMinX = column->ClipRect.Min.x = column->ClipRect.Max.x = offset_x;
             column->WidthGiven = 0.0f;
@@ -2340,13 +2340,13 @@ void ImGui::TableSetupDrawChannels(ImGuiTable* table)
     IM_ASSERT(table->BgClipRect.Min.y <= table->BgClipRect.Max.y);
 }
 
-// This function reorder draw channels based on matching clip rectangle, to facilitate merging them. Called by EndTable().
+// This function_ reorder draw channels based on matching clip rectangle, to facilitate merging them. Called by EndTable().
 // For simplicity we call it TableMergeDrawChannels() but in fact it only reorder channels + overwrite ClipRect,
 // actual merging is done by table->DrawSplitter.Merge() which is called right after TableMergeDrawChannels().
 //
 // Columns where the contents didn't stray off their local clip rectangle can be merged. To achieve
 // this we merge their clip rect and make them contiguous in the channel list, so they can be merged
-// by the call to DrawSplitter.Merge() following to the call to this function.
+// by the call to DrawSplitter.Merge() following to the call to this function_.
 // We reorder draw commands by arranging them into a maximum of 4 distinct groups:
 //
 //   1 group:               2 groups:              2 groups:              4 groups:
@@ -2357,7 +2357,7 @@ void ImGui::TableSetupDrawChannels(ImGuiTable* table)
 // When the contents of a column didn't stray off its limit, we move its channels into the corresponding group
 // based on its position (within frozen rows/columns groups or not).
 // At the end of the operation our 1-4 groups will each have a ImDrawCmd using the same ClipRect.
-// This function assume that each column are pointing to a distinct draw channel,
+// This function_ assume that each column are pointing to a distinct draw channel,
 // otherwise merge_group->ChannelsCount will not match set bit count of merge_group->ChannelsMask.
 //
 // Column channels will not be merged into one of the 1-4 groups in the following cases:
@@ -2368,7 +2368,7 @@ void ImGui::TableSetupDrawChannels(ImGuiTable* table)
 //   we could do better but it's going to be rare and probably not worth the hassle.
 // Columns for which the draw channel(s) haven't been merged with other will use their own ImDrawCmd.
 //
-// This function is particularly tricky to understand.. take a breath.
+// This function_ is particularly tricky to understand.. take a breath.
 void ImGui::TableMergeDrawChannels(ImGuiTable* table)
 {
     ImGuiContext& g = *GImGui;

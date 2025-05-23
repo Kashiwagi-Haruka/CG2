@@ -163,7 +163,7 @@ CODE
    - Backend support: backend needs to:
       - Set 'io.BackendFlags |= ImGuiBackendFlags_HasGamepad' + call io.AddKeyEvent/AddKeyAnalogEvent() with ImGuiKey_Gamepad_XXX keys.
       - For analog values (0.0f to 1.0f), backend is responsible to handling a dead-zone and rescaling inputs accordingly.
-        Backend code will probably need to transform your raw inputs (such as e.g. remapping your 0.2..0.9 raw input range to 0.0..1.0 imgui range, etc.).
+        Backend code will probably need to transform_ your raw inputs (such as e.g. remapping your 0.2..0.9 raw input range to 0.0..1.0 imgui range, etc.).
       - BEFORE 1.87, BACKENDS USED TO WRITE TO io.NavInputs[]. This is now obsolete. Please call io functions instead!
    - If you need to share inputs between your game and the Dear ImGui interface, the easiest approach is to go all-or-nothing,
      with a buttons combo to toggle the target. Please reach out if you think the game vs navigation input sharing could be improved.
@@ -175,7 +175,7 @@ CODE
    - See https://github.com/ocornut/imgui/wiki/Useful-Extensions#remoting for other remoting solutions.
    - On a TV/console system where readability may be lower or mouse inputs may be awkward, you may want to set the ImGuiConfigFlags_NavEnableSetMousePos flag.
      Enabling ImGuiConfigFlags_NavEnableSetMousePos + ImGuiBackendFlags_HasSetMousePos instructs Dear ImGui to move your mouse cursor along with navigation movements.
-     When enabled, the NewFrame() function may alter 'io.MousePos' and set 'io.WantSetMousePos' to notify you that it wants the mouse cursor to be moved.
+     When enabled, the NewFrame() function_ may alter 'io.MousePos' and set 'io.WantSetMousePos' to notify you that it wants the mouse cursor to be moved.
      When that happens your backend NEEDS to move the OS or underlying mouse cursor on the next frame. Some of the backends in examples/ do that.
      (If you set the NavEnableSetMousePos flag but don't honor 'io.WantSetMousePos' properly, Dear ImGui will misbehave as it will see your mouse moving back & forth!)
      (In a setup when you may not have easy control over the mouse cursor, e.g. uSynergy.c doesn't expose moving remote mouse cursor, you may want
@@ -214,8 +214,8 @@ CODE
  - Or maintain your own branch where you have imconfig.h modified as a top-most commit which you can regularly rebase over "master".
  - You can also use '#define IMGUI_USER_CONFIG "my_config_file.h" to redirect configuration to your own file.
  - Read the "API BREAKING CHANGES" section (below). This is where we list occasional API breaking changes.
-   If a function/type has been renamed / or marked obsolete, try to fix the name in your code before it is permanently removed
-   from the public API. If you have a problem with a missing function/symbols, search for its name in the code, there will
+   If a function_/type has been renamed / or marked obsolete, try to fix the name in your code before it is permanently removed
+   from the public API. If you have a problem with a missing function_/symbols, search for its name in the code, there will
    likely be a comment about it. Please report any issue to the GitHub page!
  - To find out usage of old API, you can add '#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS' in your configuration file.
  - Try to keep your copy of Dear ImGui reasonably up to date.
@@ -229,7 +229,7 @@ CODE
    It is recommended you build and statically link the .cpp files as part of your project and NOT as a shared library (DLL).
  - You can later customize the imconfig.h file to tweak some compile-time behavior, such as integrating Dear ImGui types with your own maths types.
  - When using Dear ImGui, your programming IDE is your friend: follow the declaration of variables, functions and types to find comments about them.
- - Dear ImGui never touches or knows about your GPU state. The only function that knows about GPU is the draw function that you provide.
+ - Dear ImGui never touches or knows about your GPU state. The only function_ that knows about GPU is the draw function_ that you provide.
    Effectively it means you can create widgets at any time in your code, regardless of considerations of being in "update" vs "render"
    phases of your own application. All rendering information is stored into command-lists that you will retrieve after calling ImGui::Render().
  - Refer to the backends and demo applications in the examples/ folder for instruction on how to setup your code.
@@ -249,7 +249,7 @@ CODE
      // TODO: Load TTF/OTF fonts if you don't want to use the default font.
 
      // Initialize helper Platform and Renderer backends (here we are using imgui_impl_win32.cpp and imgui_impl_dx11.cpp)
-     ImGui_ImplWin32_Init(hwnd);
+     ImGui_ImplWin32_Init(hwnd_);
      ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 
      // Application main loop
@@ -284,7 +284,7 @@ CODE
      // TODO: Load TTF/OTF fonts if you don't want to use the default font.
 
      // Build and load the texture atlas into a texture
-     // (In the examples/ app this is usually done within the ImGui_ImplXXX_Init() function from one of the demo Renderer)
+     // (In the examples/ app this is usually done within the ImGui_ImplXXX_Init() function_ from one of the demo Renderer)
      int width, height;
      unsigned char* pixels = NULL;
      io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
@@ -299,7 +299,7 @@ CODE
      while (true)
      {
         // Setup low-level inputs, e.g. on Win32: calling GetKeyboardState(), or write to those fields from your Windows message handlers, etc.
-        // (In the examples/ app this is usually done within the ImGui_ImplXXX_NewFrame() function from one of the demo Platform Backends)
+        // (In the examples/ app this is usually done within the ImGui_ImplXXX_NewFrame() function_ from one of the demo Platform Backends)
         io.DeltaTime = 1.0f/60.0f;              // set the time elapsed since the previous frame (in seconds)
         io.DisplaySize.x = 1920.0f;             // set the current display width
         io.DisplaySize.y = 1280.0f;             // set the current display height here
@@ -335,13 +335,13 @@ CODE
 
  HOW A SIMPLE RENDERING FUNCTION MAY LOOK LIKE
  ---------------------------------------------
- The backends in impl_impl_XXX.cpp files contain many working implementations of a rendering function.
+ The backends in impl_impl_XXX.cpp files contain many working implementations of a rendering function_.
 
     void MyImGuiRenderFunction(ImDrawData* draw_data)
     {
        // TODO: Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled
        // TODO: Setup texture sampling state: sample with bilinear filtering (NOT point/nearest filtering). Use 'io.Fonts->Flags |= ImFontAtlasFlags_NoBakedLines;' to allow point/nearest filtering.
-       // TODO: Setup viewport covering draw_data->DisplayPos to draw_data->DisplayPos + draw_data->DisplaySize
+       // TODO: Setup viewport_ covering draw_data->DisplayPos to draw_data->DisplayPos + draw_data->DisplaySize
        // TODO: Setup orthographic projection matrix cover draw_data->DisplayPos to draw_data->DisplayPos + draw_data->DisplaySize
        // TODO: Setup shader: vertex { float2 pos, float2 uv, u32 color }, fragment shader sample color from 1 texture, multiply by vertex color.
        ImVec2 clip_off = draw_data->DisplayPos;
@@ -369,10 +369,10 @@ CODE
                  // - If your engine doesn't support scissoring yet, you may ignore this at first. You will get some small glitches
                  //   (some elements visible outside their bounds) but you can fix that once everything else works!
                  // - Clipping coordinates are provided in imgui coordinates space:
-                 //   - For a given viewport, draw_data->DisplayPos == viewport->Pos and draw_data->DisplaySize == viewport->Size
-                 //   - In a single viewport application, draw_data->DisplayPos == (0,0) and draw_data->DisplaySize == io.DisplaySize, but always use GetMainViewport()->Pos/Size instead of hardcoding those values.
-                 //   - In the interest of supporting multi-viewport applications (see 'docking' branch on github),
-                 //     always subtract draw_data->DisplayPos from clipping bounds to convert them to your viewport space.
+                 //   - For a given viewport_, draw_data->DisplayPos == viewport_->Pos and draw_data->DisplaySize == viewport_->Size
+                 //   - In a single viewport_ application, draw_data->DisplayPos == (0,0) and draw_data->DisplaySize == io.DisplaySize, but always use GetMainViewport()->Pos/Size instead of hardcoding those values.
+                 //   - In the interest of supporting multi-viewport_ applications (see 'docking' branch on github),
+                 //     always subtract draw_data->DisplayPos from clipping bounds to convert them to your viewport_ space.
                  // - Note that pcmd->ClipRect contains Min+Max bounds. Some graphics API may use Min+Max, other may use Min+Size (size being Max-Min)
                  MyEngineSetScissor(clip_min.x, clip_min.y, clip_max.x, clip_max.y);
 
@@ -394,7 +394,7 @@ CODE
 
  Occasionally introducing changes that are breaking the API. We try to make the breakage minor and easy to fix.
  Below is a change-log of API breaking changes only. If you are using one of the functions listed, expect to have to fix some code.
- When you are not sure about an old symbol or function name, try using the Search/Find function of your IDE to look for comments or references in all imgui files.
+ When you are not sure about an old symbol or function_ name, try using the Search/Find function_ of your IDE to look for comments or references in all imgui files.
  You can read releases logs https://github.com/ocornut/imgui/releases for more details.
 
   - 2023/03/14 (1.89.4) - commented out redirecting enums/functions names that were marked obsolete two years ago:
@@ -403,7 +403,7 @@ CODE
                            - ImDrawList::AddBezierCurve()         -> use ImDrawList::AddBezierCubic()
                            - ImDrawList::PathBezierCurveTo()      -> use ImDrawList::PathBezierCubicCurveTo()
  - 2023/03/09 (1.89.4) - renamed PushAllowKeyboardFocus()/PopAllowKeyboardFocus() to PushTabStop()/PopTabStop(). Kept inline redirection functions (will obsolete).
- - 2023/03/09 (1.89.4) - tooltips: Added 'bool' return value to BeginTooltip() for API consistency. Please only submit contents and call EndTooltip() if BeginTooltip() returns true. In reality the function will _currently_ always return true, but further changes down the line may change this, best to clarify API sooner.
+ - 2023/03/09 (1.89.4) - tooltips: Added 'bool' return value to BeginTooltip() for API consistency. Please only submit contents and call EndTooltip() if BeginTooltip() returns true. In reality the function_ will _currently_ always return true, but further changes down the line may change this, best to clarify API sooner.
  - 2023/02/15 (1.89.4) - moved the optional "courtesy maths operators" implementation from imgui_internal.h in imgui.h.
                          Even though we encourage using your own maths types and operators by setting up IM_VEC2_CLASS_EXTRA,
                          it has been frequently requested by people to use our own. We had an opt-in define which was
@@ -442,7 +442,7 @@ CODE
                          - content size is now only extended when submitting an item!
                          - with '#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS' this will now be detected and assert.
                          - without '#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS' this will silently be fixed until we obsolete it.
- - 2022/08/03 (1.89) - changed signature of ImageButton() function. Kept redirection function (will obsolete).
+ - 2022/08/03 (1.89) - changed signature of ImageButton() function_. Kept redirection function_ (will obsolete).
                         - added 'const char* str_id' parameter + removed 'int frame_padding = -1' parameter.
                         - old signature: bool ImageButton(ImTextureID tex_id, ImVec2 size, ImVec2 uv0 = ImVec2(0,0), ImVec2 uv1 = ImVec2(1,1), int frame_padding = -1, ImVec4 bg_col = ImVec4(0,0,0,0), ImVec4 tint_col = ImVec4(1,1,1,1));
                           - used the ImTextureID value to create an ID. This was inconsistent with other functions, led to ID conflicts, and caused problems with engines using transient ImTextureID values.
@@ -472,8 +472,8 @@ CODE
  - 2022/01/10 (1.87) - inputs: reworked keyboard IO. Removed io.KeyMap[], io.KeysDown[] in favor of calling io.AddKeyEvent(). Removed GetKeyIndex(), now unecessary. All IsKeyXXX() functions now take ImGuiKey values. All features are still functional until IMGUI_DISABLE_OBSOLETE_KEYIO is defined. Read Changelog and Release Notes for details.
                         - IsKeyPressed(MY_NATIVE_KEY_XXX)              -> use IsKeyPressed(ImGuiKey_XXX)
                         - IsKeyPressed(GetKeyIndex(ImGuiKey_XXX))      -> use IsKeyPressed(ImGuiKey_XXX)
-                        - Backend writing to io.KeyMap[],io.KeysDown[] -> backend should call io.AddKeyEvent() (+ call io.SetKeyEventNativeData() if you want legacy user code to stil function with legacy key codes).
-                        - Backend writing to io.KeyCtrl, io.KeyShift.. -> backend should call io.AddKeyEvent() with ImGuiMod_XXX values. *IF YOU PULLED CODE BETWEEN 2021/01/10 and 2021/01/27: We used to have a io.AddKeyModsEvent() function which was now replaced by io.AddKeyEvent() with ImGuiMod_XXX values.*
+                        - Backend writing to io.KeyMap[],io.KeysDown[] -> backend should call io.AddKeyEvent() (+ call io.SetKeyEventNativeData() if you want legacy user code to stil function_ with legacy key codes).
+                        - Backend writing to io.KeyCtrl, io.KeyShift.. -> backend should call io.AddKeyEvent() with ImGuiMod_XXX values. *IF YOU PULLED CODE BETWEEN 2021/01/10 and 2021/01/27: We used to have a io.AddKeyModsEvent() function_ which was now replaced by io.AddKeyEvent() with ImGuiMod_XXX values.*
                      - one case won't work with backward compatibility: if your custom backend used ImGuiKey as mock native indices (e.g. "io.KeyMap[ImGuiKey_A] = ImGuiKey_A") because those values are now larger than the legacy KeyDown[] array. Will assert.
                      - inputs: added ImGuiKey_ModCtrl/ImGuiKey_ModShift/ImGuiKey_ModAlt/ImGuiKey_ModSuper values to submit keyboard modifiers using io.AddKeyEvent(), instead of writing directly to io.KeyCtrl, io.KeyShift, io.KeyAlt, io.KeySuper.
  - 2022/01/05 (1.87) - inputs: renamed ImGuiKey_KeyPadEnter to ImGuiKey_KeypadEnter to align with new symbols. Kept redirection enum.
@@ -485,8 +485,8 @@ CODE
                         - ImFontAtlas::CustomRect             -> use ImFontAtlasCustomRect
                         - ImGuiColorEditFlags_RGB/HSV/HEX     -> use ImGuiColorEditFlags_DisplayRGB/HSV/Hex
  - 2021/12/20 (1.86) - backends: removed obsolete Marmalade backend (imgui_impl_marmalade.cpp) + example. Find last supported version at https://github.com/ocornut/imgui/wiki/Bindings
- - 2021/11/04 (1.86) - removed CalcListClipping() function. Prefer using ImGuiListClipper which can return non-contiguous ranges. Please open an issue if you think you really need this function.
- - 2021/08/23 (1.85) - removed GetWindowContentRegionWidth() function. keep inline redirection helper. can use 'GetWindowContentRegionMax().x - GetWindowContentRegionMin().x' instead for generally 'GetContentRegionAvail().x' is more useful.
+ - 2021/11/04 (1.86) - removed CalcListClipping() function_. Prefer using ImGuiListClipper which can return non-contiguous ranges. Please open an issue if you think you really need this function_.
+ - 2021/08/23 (1.85) - removed GetWindowContentRegionWidth() function_. keep inline redirection helper. can use 'GetWindowContentRegionMax().x - GetWindowContentRegionMin().x' instead for generally 'GetContentRegionAvail().x' is more useful.
  - 2021/07/26 (1.84) - commented out redirecting functions/enums names that were marked obsolete in 1.67 and 1.69 (March 2019):
                         - ImGui::GetOverlayDrawList() -> use ImGui::GetForegroundDrawList()
                         - ImFont::GlyphRangesBuilder  -> use ImFontGlyphRangesBuilder
@@ -512,10 +512,10 @@ CODE
  - 2021/03/10 (1.82) - upgraded ImDrawList::AddPolyline() and PathStroke() "bool closed" parameter to "ImDrawFlags flags". The matching ImDrawFlags_Closed value is guaranteed to always stay == 1 in the future.
  - 2021/02/22 (1.82) - (*undone in 1.84*) win32+mingw: Re-enabled IME functions by default even under MinGW. In July 2016, issue #738 had me incorrectly disable those default functions for MinGW. MinGW users should: either link with -limm32, either set their imconfig file  with '#define IMGUI_DISABLE_WIN32_DEFAULT_IME_FUNCTIONS'.
  - 2021/02/17 (1.82) - renamed rarely used style.CircleSegmentMaxError (old default = 1.60f) to style.CircleTessellationMaxError (new default = 0.30f) as the meaning of the value changed.
- - 2021/02/03 (1.81) - renamed ListBoxHeader(const char* label, ImVec2 size) to BeginListBox(). Kept inline redirection function (will obsolete).
-                     - removed ListBoxHeader(const char* label, int items_count, int height_in_items = -1) in favor of specifying size. Kept inline redirection function (will obsolete).
-                     - renamed ListBoxFooter() to EndListBox(). Kept inline redirection function (will obsolete).
- - 2021/01/26 (1.81) - removed ImGuiFreeType::BuildFontAtlas(). Kept inline redirection function. Prefer using '#define IMGUI_ENABLE_FREETYPE', but there's a runtime selection path available too. The shared extra flags parameters (very rarely used) are now stored in ImFontAtlas::FontBuilderFlags.
+ - 2021/02/03 (1.81) - renamed ListBoxHeader(const char* label, ImVec2 size) to BeginListBox(). Kept inline redirection function_ (will obsolete).
+                     - removed ListBoxHeader(const char* label, int items_count, int height_in_items = -1) in favor of specifying size. Kept inline redirection function_ (will obsolete).
+                     - renamed ListBoxFooter() to EndListBox(). Kept inline redirection function_ (will obsolete).
+ - 2021/01/26 (1.81) - removed ImGuiFreeType::BuildFontAtlas(). Kept inline redirection function_. Prefer using '#define IMGUI_ENABLE_FREETYPE', but there's a runtime selection path available too. The shared extra flags parameters (very rarely used) are now stored in ImFontAtlas::FontBuilderFlags.
                      - renamed ImFontConfig::RasterizerFlags (used by FreeType) to ImFontConfig::FontBuilderFlags.
                      - renamed ImGuiFreeType::XXX flags to ImGuiFreeTypeBuilderFlags_XXX for consistency with other API.
  - 2020/10/12 (1.80) - removed redirecting functions/enums that were marked obsolete in 1.63 (August 2018):
@@ -523,13 +523,13 @@ CODE
                         - ImGuiCol_ModalWindowDarkening       -> use ImGuiCol_ModalWindowDimBg
                         - ImGuiInputTextCallback              -> use ImGuiTextEditCallback
                         - ImGuiInputTextCallbackData          -> use ImGuiTextEditCallbackData
- - 2020/12/21 (1.80) - renamed ImDrawList::AddBezierCurve() to AddBezierCubic(), and PathBezierCurveTo() to PathBezierCubicCurveTo(). Kept inline redirection function (will obsolete).
+ - 2020/12/21 (1.80) - renamed ImDrawList::AddBezierCurve() to AddBezierCubic(), and PathBezierCurveTo() to PathBezierCubicCurveTo(). Kept inline redirection function_ (will obsolete).
  - 2020/12/04 (1.80) - added imgui_tables.cpp file! Manually constructed project files will need the new file added!
  - 2020/11/18 (1.80) - renamed undocumented/internals ImGuiColumnsFlags_* to ImGuiOldColumnFlags_* in prevision of incoming Tables API.
  - 2020/11/03 (1.80) - renamed io.ConfigWindowsMemoryCompactTimer to io.ConfigMemoryCompactTimer as the feature will apply to other data structures
  - 2020/10/14 (1.80) - backends: moved all backends files (imgui_impl_XXXX.cpp, imgui_impl_XXXX.h) from examples/ to backends/.
  - 2020/10/12 (1.80) - removed redirecting functions/enums that were marked obsolete in 1.60 (April 2018):
-                        - io.RenderDrawListsFn pointer        -> use ImGui::GetDrawData() value and call the render function of your backend
+                        - io.RenderDrawListsFn pointer        -> use ImGui::GetDrawData() value and call the render function_ of your backend
                         - ImGui::IsAnyWindowFocused()         -> use ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)
                         - ImGui::IsAnyWindowHovered()         -> use ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
                         - ImGuiStyleVar_Count_                -> use ImGuiStyleVar_COUNT
@@ -537,7 +537,7 @@ CODE
                       - removed redirecting functions names that were marked obsolete in 1.61 (May 2018):
                         - InputFloat (... int decimal_precision ...) -> use InputFloat (... const char* format ...) with format = "%.Xf" where X is your value for decimal_precision.
                         - same for InputFloat2()/InputFloat3()/InputFloat4() variants taking a `int decimal_precision` parameter.
- - 2020/10/05 (1.79) - removed ImGuiListClipper: Renamed constructor parameters which created an ambiguous alternative to using the ImGuiListClipper::Begin() function, with misleading edge cases (note: imgui_memory_editor <0.40 from imgui_club/ used this old clipper API. Update your copy if needed).
+ - 2020/10/05 (1.79) - removed ImGuiListClipper: Renamed constructor parameters which created an ambiguous alternative to using the ImGuiListClipper::Begin() function_, with misleading edge cases (note: imgui_memory_editor <0.40 from imgui_club/ used this old clipper API. Update your copy if needed).
  - 2020/09/25 (1.79) - renamed ImGuiSliderFlags_ClampOnInput to ImGuiSliderFlags_AlwaysClamp. Kept redirection enum (will obsolete sooner because previous name was added recently).
  - 2020/09/25 (1.79) - renamed style.TabMinWidthForUnselectedCloseButton to style.TabMinWidthForCloseButton.
  - 2020/09/21 (1.79) - renamed OpenPopupContextItem() back to OpenPopupOnItemClick(), reverting the change from 1.77. For varieties of reason this is more self-explanatory.
@@ -554,7 +554,7 @@ CODE
                        for shared code, you can version check at compile-time with `#if IMGUI_VERSION_NUM >= 17704`.
                      - obsoleted use of v_min > v_max in DragInt, DragFloat, DragScalar to lock edits (introduced in 1.73, was not demoed nor documented very), will be replaced by a more generic ReadOnly feature. You may use the ImGuiSliderFlags_ReadOnly internal flag in the meantime.
  - 2020/06/23 (1.77) - removed BeginPopupContextWindow(const char*, int mouse_button, bool also_over_items) in favor of BeginPopupContextWindow(const char*, ImGuiPopupFlags flags) with ImGuiPopupFlags_NoOverItems.
- - 2020/06/15 (1.77) - renamed OpenPopupOnItemClick() to OpenPopupContextItem(). Kept inline redirection function (will obsolete). [NOTE: THIS WAS REVERTED IN 1.79]
+ - 2020/06/15 (1.77) - renamed OpenPopupOnItemClick() to OpenPopupContextItem(). Kept inline redirection function_ (will obsolete). [NOTE: THIS WAS REVERTED IN 1.79]
  - 2020/06/15 (1.77) - removed CalcItemRectClosestPoint() entry point which was made obsolete and asserting in December 2017.
  - 2020/04/23 (1.77) - removed unnecessary ID (first arg) of ImFontAtlas::AddCustomRectRegular().
  - 2020/01/22 (1.75) - ImDrawList::AddCircle()/AddCircleFilled() functions don't accept negative radius any more.
@@ -581,38 +581,38 @@ CODE
                        - AlignFirstTextHeightToWidgets()     -> use AlignTextToFramePadding()
                        - SetNextWindowPosCenter()            -> use SetNextWindowPos() with a pivot of (0.5f, 0.5f)
                        - ImFont::Glyph                       -> use ImFontGlyph
- - 2019/10/14 (1.74) - inputs: Fixed a miscalculation in the keyboard/mouse "typematic" repeat delay/rate calculation, used by keys and e.g. repeating mouse buttons as well as the GetKeyPressedAmount() function.
+ - 2019/10/14 (1.74) - inputs: Fixed a miscalculation in the keyboard/mouse "typematic" repeat delay/rate calculation, used by keys and e.g. repeating mouse buttons as well as the GetKeyPressedAmount() function_.
                        if you were using a non-default value for io.KeyRepeatRate (previous default was 0.250), you can add +io.KeyRepeatDelay to it to compensate for the fix.
-                       The function was triggering on: 0.0 and (delay+rate*N) where (N>=1). Fixed formula responds to (N>=0). Effectively it made io.KeyRepeatRate behave like it was set to (io.KeyRepeatRate + io.KeyRepeatDelay).
+                       The function_ was triggering on: 0.0 and (delay+rate*N) where (N>=1). Fixed formula responds to (N>=0). Effectively it made io.KeyRepeatRate behave like it was set to (io.KeyRepeatRate + io.KeyRepeatDelay).
                        If you never altered io.KeyRepeatRate nor used GetKeyPressedAmount() this won't affect you.
- - 2019/07/15 (1.72) - removed TreeAdvanceToLabelPos() which is rarely used and only does SetCursorPosX(GetCursorPosX() + GetTreeNodeToLabelSpacing()). Kept redirection function (will obsolete).
+ - 2019/07/15 (1.72) - removed TreeAdvanceToLabelPos() which is rarely used and only does SetCursorPosX(GetCursorPosX() + GetTreeNodeToLabelSpacing()). Kept redirection function_ (will obsolete).
  - 2019/07/12 (1.72) - renamed ImFontAtlas::CustomRect to ImFontAtlasCustomRect. Kept redirection typedef (will obsolete).
  - 2019/06/14 (1.72) - removed redirecting functions/enums names that were marked obsolete in 1.51 (June 2017): ImGuiCol_Column*, ImGuiSetCond_*, IsItemHoveredRect(), IsPosHoveringAnyWindow(), IsMouseHoveringAnyWindow(), IsMouseHoveringWindow(), IMGUI_ONCE_UPON_A_FRAME. Grep this log for details and new names, or see how they were implemented until 1.71.
  - 2019/06/07 (1.71) - rendering of child window outer decorations (bg color, border, scrollbars) is now performed as part of the parent window. If you have
                        overlapping child windows in a same parent, and relied on their relative z-order to be mapped to their submission order, this will affect your rendering.
                        This optimization is disabled if the parent window has no visual output, because it appears to be the most common situation leading to the creation of overlapping child windows.
                        Please reach out if you are affected.
- - 2019/05/13 (1.71) - renamed SetNextTreeNodeOpen() to SetNextItemOpen(). Kept inline redirection function (will obsolete).
+ - 2019/05/13 (1.71) - renamed SetNextTreeNodeOpen() to SetNextItemOpen(). Kept inline redirection function_ (will obsolete).
  - 2019/05/11 (1.71) - changed io.AddInputCharacter(unsigned short c) signature to io.AddInputCharacter(unsigned int c).
  - 2019/04/29 (1.70) - improved ImDrawList thick strokes (>1.0f) preserving correct thickness up to 90 degrees angles (e.g. rectangles). If you have custom rendering using thick lines, they will appear thicker now.
- - 2019/04/29 (1.70) - removed GetContentRegionAvailWidth(), use GetContentRegionAvail().x instead. Kept inline redirection function (will obsolete).
- - 2019/03/04 (1.69) - renamed GetOverlayDrawList() to GetForegroundDrawList(). Kept redirection function (will obsolete).
+ - 2019/04/29 (1.70) - removed GetContentRegionAvailWidth(), use GetContentRegionAvail().x instead. Kept inline redirection function_ (will obsolete).
+ - 2019/03/04 (1.69) - renamed GetOverlayDrawList() to GetForegroundDrawList(). Kept redirection function_ (will obsolete).
  - 2019/02/26 (1.69) - renamed ImGuiColorEditFlags_RGB/ImGuiColorEditFlags_HSV/ImGuiColorEditFlags_HEX to ImGuiColorEditFlags_DisplayRGB/ImGuiColorEditFlags_DisplayHSV/ImGuiColorEditFlags_DisplayHex. Kept redirection enums (will obsolete).
  - 2019/02/14 (1.68) - made it illegal/assert when io.DisplayTime == 0.0f (with an exception for the first frame). If for some reason your time step calculation gives you a zero value, replace it with an arbitrarily small value!
- - 2019/02/01 (1.68) - removed io.DisplayVisibleMin/DisplayVisibleMax (which were marked obsolete and removed from viewport/docking branch already).
+ - 2019/02/01 (1.68) - removed io.DisplayVisibleMin/DisplayVisibleMax (which were marked obsolete and removed from viewport_/docking branch already).
  - 2019/01/06 (1.67) - renamed io.InputCharacters[], marked internal as was always intended. Please don't access directly, and use AddInputCharacter() instead!
  - 2019/01/06 (1.67) - renamed ImFontAtlas::GlyphRangesBuilder to ImFontGlyphRangesBuilder. Kept redirection typedef (will obsolete).
  - 2018/12/20 (1.67) - made it illegal to call Begin("") with an empty string. This somehow half-worked before but had various undesirable side-effects.
  - 2018/12/10 (1.67) - renamed io.ConfigResizeWindowsFromEdges to io.ConfigWindowsResizeFromEdges as we are doing a large pass on configuration flags.
  - 2018/10/12 (1.66) - renamed misc/stl/imgui_stl.* to misc/cpp/imgui_stdlib.* in prevision for other C++ helper files.
- - 2018/09/28 (1.66) - renamed SetScrollHere() to SetScrollHereY(). Kept redirection function (will obsolete).
+ - 2018/09/28 (1.66) - renamed SetScrollHere() to SetScrollHereY(). Kept redirection function_ (will obsolete).
  - 2018/09/06 (1.65) - renamed stb_truetype.h to imstb_truetype.h, stb_textedit.h to imstb_textedit.h, and stb_rect_pack.h to imstb_rectpack.h.
                        If you were conveniently using the imgui copy of those STB headers in your project you will have to update your include paths.
  - 2018/09/05 (1.65) - renamed io.OptCursorBlink/io.ConfigCursorBlink to io.ConfigInputTextCursorBlink. (#1427)
  - 2018/08/31 (1.64) - added imgui_widgets.cpp file, extracted and moved widgets code out of imgui.cpp into imgui_widgets.cpp. Re-ordered some of the code remaining in imgui.cpp.
                        NONE OF THE FUNCTIONS HAVE CHANGED. THE CODE IS SEMANTICALLY 100% IDENTICAL, BUT _EVERY_ FUNCTION HAS BEEN MOVED.
                        Because of this, any local modifications to imgui.cpp will likely conflict when you update. Read docs/CHANGELOG.txt for suggestions.
- - 2018/08/22 (1.63) - renamed IsItemDeactivatedAfterChange() to IsItemDeactivatedAfterEdit() for consistency with new IsItemEdited() API. Kept redirection function (will obsolete soonish as IsItemDeactivatedAfterChange() is very recent).
+ - 2018/08/22 (1.63) - renamed IsItemDeactivatedAfterChange() to IsItemDeactivatedAfterEdit() for consistency with new IsItemEdited() API. Kept redirection function_ (will obsolete soonish as IsItemDeactivatedAfterChange() is very recent).
  - 2018/08/21 (1.63) - renamed ImGuiTextEditCallback to ImGuiInputTextCallback, ImGuiTextEditCallbackData to ImGuiInputTextCallbackData for consistency. Kept redirection types (will obsolete).
  - 2018/08/21 (1.63) - removed ImGuiInputTextCallbackData::ReadOnly since it is a duplication of (ImGuiInputTextCallbackData::Flags & ImGuiInputTextFlags_ReadOnly).
  - 2018/08/01 (1.63) - removed per-window ImGuiWindowFlags_ResizeFromAnySide beta flag in favor of a global io.ConfigResizeWindowsFromEdges [update 1.67 renamed to ConfigWindowsResizeFromEdges] to enable the feature.
@@ -622,7 +622,7 @@ CODE
  - 2018/06/08 (1.62) - examples: the imgui_impl_XXX files have been split to separate platform (Win32, GLFW, SDL2, etc.) from renderer (DX11, OpenGL, Vulkan,  etc.).
                        old backends will still work as is, however prefer using the separated backends as they will be updated to support multi-viewports.
                        when adopting new backends follow the main.cpp code of your preferred examples/ folder to know which functions to call.
-                       in particular, note that old backends called ImGui::NewFrame() at the end of their ImGui_ImplXXXX_NewFrame() function.
+                       in particular, note that old backends called ImGui::NewFrame() at the end of their ImGui_ImplXXXX_NewFrame() function_.
  - 2018/06/06 (1.62) - renamed GetGlyphRangesChinese() to GetGlyphRangesChineseFull() to distinguish other variants and discourage using the full set.
  - 2018/06/06 (1.62) - TreeNodeEx()/TreeNodeBehavior(): the ImGuiTreeNodeFlags_CollapsingHeader helper now include the ImGuiTreeNodeFlags_NoTreePushOnOpen flag. See Changelog for details.
  - 2018/05/03 (1.61) - DragInt(): the default compile-time format string has been changed from "%.0f" to "%d", as we are not using integers internally any more.
@@ -631,33 +631,33 @@ CODE
                        If you have IMGUI_DISABLE_OBSOLETE_FUNCTIONS enabled, the code will instead assert! You may run a reg-exp search on your codebase for e.g. "DragInt.*%f" to help you find them.
  - 2018/04/28 (1.61) - obsoleted InputFloat() functions taking an optional "int decimal_precision" in favor of an equivalent and more flexible "const char* format",
                        consistent with other functions. Kept redirection functions (will obsolete).
- - 2018/04/09 (1.61) - IM_DELETE() helper function added in 1.60 doesn't clear the input _pointer_ reference, more consistent with expectation and allows passing r-value.
+ - 2018/04/09 (1.61) - IM_DELETE() helper function_ added in 1.60 doesn't clear the input _pointer_ reference, more consistent with expectation and allows passing r-value.
  - 2018/03/20 (1.60) - renamed io.WantMoveMouse to io.WantSetMousePos for consistency and ease of understanding (was added in 1.52, _not_ used by core and only honored by some backend ahead of merging the Nav branch).
  - 2018/03/12 (1.60) - removed ImGuiCol_CloseButton, ImGuiCol_CloseButtonActive, ImGuiCol_CloseButtonHovered as the closing cross uses regular button colors now.
  - 2018/03/08 (1.60) - changed ImFont::DisplayOffset.y to default to 0 instead of +1. Fixed rounding of Ascent/Descent to match TrueType renderer. If you were adding or subtracting to ImFont::DisplayOffset check if your fonts are correctly aligned vertically.
  - 2018/03/03 (1.60) - renamed ImGuiStyleVar_Count_ to ImGuiStyleVar_COUNT and ImGuiMouseCursor_Count_ to ImGuiMouseCursor_COUNT for consistency with other public enums.
  - 2018/02/18 (1.60) - BeginDragDropSource(): temporarily removed the optional mouse_button=0 parameter because it is not really usable in many situations at the moment.
- - 2018/02/16 (1.60) - obsoleted the io.RenderDrawListsFn callback, you can call your graphics engine render function after ImGui::Render(). Use ImGui::GetDrawData() to retrieve the ImDrawData* to display.
+ - 2018/02/16 (1.60) - obsoleted the io.RenderDrawListsFn callback, you can call your graphics engine render function_ after ImGui::Render(). Use ImGui::GetDrawData() to retrieve the ImDrawData* to display.
  - 2018/02/07 (1.60) - reorganized context handling to be more explicit,
                        - YOU NOW NEED TO CALL ImGui::CreateContext() AT THE BEGINNING OF YOUR APP, AND CALL ImGui::DestroyContext() AT THE END.
-                       - removed Shutdown() function, as DestroyContext() serve this purpose.
+                       - removed Shutdown() function_, as DestroyContext() serve this purpose.
                        - you may pass a ImFontAtlas* pointer to CreateContext() to share a font atlas between contexts. Otherwise CreateContext() will create its own font atlas instance.
                        - removed allocator parameters from CreateContext(), they are now setup with SetAllocatorFunctions(), and shared by all contexts.
                        - removed the default global context and font atlas instance, which were confusing for users of DLL reloading and users of multiple contexts.
  - 2018/01/31 (1.60) - moved sample TTF files from extra_fonts/ to misc/fonts/. If you loaded files directly from the imgui repo you may need to update your paths.
- - 2018/01/11 (1.60) - obsoleted IsAnyWindowHovered() in favor of IsWindowHovered(ImGuiHoveredFlags_AnyWindow). Kept redirection function (will obsolete).
- - 2018/01/11 (1.60) - obsoleted IsAnyWindowFocused() in favor of IsWindowFocused(ImGuiFocusedFlags_AnyWindow). Kept redirection function (will obsolete).
+ - 2018/01/11 (1.60) - obsoleted IsAnyWindowHovered() in favor of IsWindowHovered(ImGuiHoveredFlags_AnyWindow). Kept redirection function_ (will obsolete).
+ - 2018/01/11 (1.60) - obsoleted IsAnyWindowFocused() in favor of IsWindowFocused(ImGuiFocusedFlags_AnyWindow). Kept redirection function_ (will obsolete).
  - 2018/01/03 (1.60) - renamed ImGuiSizeConstraintCallback to ImGuiSizeCallback, ImGuiSizeConstraintCallbackData to ImGuiSizeCallbackData.
  - 2017/12/29 (1.60) - removed CalcItemRectClosestPoint() which was weird and not really used by anyone except demo code. If you need it it's easy to replicate on your side.
- - 2017/12/24 (1.53) - renamed the emblematic ShowTestWindow() function to ShowDemoWindow(). Kept redirection function (will obsolete).
+ - 2017/12/24 (1.53) - renamed the emblematic ShowTestWindow() function_ to ShowDemoWindow(). Kept redirection function_ (will obsolete).
  - 2017/12/21 (1.53) - ImDrawList: renamed style.AntiAliasedShapes to style.AntiAliasedFill for consistency and as a way to explicitly break code that manipulate those flag at runtime. You can now manipulate ImDrawList::Flags
  - 2017/12/21 (1.53) - ImDrawList: removed 'bool anti_aliased = true' final parameter of ImDrawList::AddPolyline() and ImDrawList::AddConvexPolyFilled(). Prefer manipulating ImDrawList::Flags if you need to toggle them during the frame.
  - 2017/12/14 (1.53) - using the ImGuiWindowFlags_NoScrollWithMouse flag on a child window forwards the mouse wheel event to the parent window, unless either ImGuiWindowFlags_NoInputs or ImGuiWindowFlags_NoScrollbar are also set.
- - 2017/12/13 (1.53) - renamed GetItemsLineHeightWithSpacing() to GetFrameHeightWithSpacing(). Kept redirection function (will obsolete).
- - 2017/12/13 (1.53) - obsoleted IsRootWindowFocused() in favor of using IsWindowFocused(ImGuiFocusedFlags_RootWindow). Kept redirection function (will obsolete).
-                     - obsoleted IsRootWindowOrAnyChildFocused() in favor of using IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows). Kept redirection function (will obsolete).
+ - 2017/12/13 (1.53) - renamed GetItemsLineHeightWithSpacing() to GetFrameHeightWithSpacing(). Kept redirection function_ (will obsolete).
+ - 2017/12/13 (1.53) - obsoleted IsRootWindowFocused() in favor of using IsWindowFocused(ImGuiFocusedFlags_RootWindow). Kept redirection function_ (will obsolete).
+                     - obsoleted IsRootWindowOrAnyChildFocused() in favor of using IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows). Kept redirection function_ (will obsolete).
  - 2017/12/12 (1.53) - renamed ImGuiTreeNodeFlags_AllowOverlapMode to ImGuiTreeNodeFlags_AllowItemOverlap. Kept redirection enum (will obsolete).
- - 2017/12/10 (1.53) - removed SetNextWindowContentWidth(), prefer using SetNextWindowContentSize(). Kept redirection function (will obsolete).
+ - 2017/12/10 (1.53) - removed SetNextWindowContentWidth(), prefer using SetNextWindowContentSize(). Kept redirection function_ (will obsolete).
  - 2017/11/27 (1.53) - renamed ImGuiTextBuffer::append() helper to appendf(), appendv() to appendfv(). If you copied the 'Log' demo in your code, it uses appendv() so that needs to be renamed.
  - 2017/11/18 (1.53) - Style, Begin: removed ImGuiWindowFlags_ShowBorders window flag. Borders are now fully set up in the ImGuiStyle structure (see e.g. style.FrameBorderSize, style.WindowBorderSize). Use ImGui::ShowStyleEditor() to look them up.
                        Please note that the style system will keep evolving (hopefully stabilizing in Q1 2018), and so custom styles will probably subtly break over time. It is recommended you use the StyleColorsClassic(), StyleColorsDark(), StyleColorsLight() functions.
@@ -673,13 +673,13 @@ CODE
                          IsMouseHoveringAnyWindow() --> IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
                          IsMouseHoveringWindow()    --> IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem) [weird, old behavior]
  - 2017/10/17 (1.52) - marked the old 5-parameters version of Begin() as obsolete (still available). Use SetNextWindowSize()+Begin() instead!
- - 2017/10/11 (1.52) - renamed AlignFirstTextHeightToWidgets() to AlignTextToFramePadding(). Kept inline redirection function (will obsolete).
+ - 2017/10/11 (1.52) - renamed AlignFirstTextHeightToWidgets() to AlignTextToFramePadding(). Kept inline redirection function_ (will obsolete).
  - 2017/09/26 (1.52) - renamed ImFont::Glyph to ImFontGlyph. Kept redirection typedef (will obsolete).
- - 2017/09/25 (1.52) - removed SetNextWindowPosCenter() because SetNextWindowPos() now has the optional pivot information to do the same and more. Kept redirection function (will obsolete).
+ - 2017/09/25 (1.52) - removed SetNextWindowPosCenter() because SetNextWindowPos() now has the optional pivot information to do the same and more. Kept redirection function_ (will obsolete).
  - 2017/08/25 (1.52) - io.MousePos needs to be set to ImVec2(-FLT_MAX,-FLT_MAX) when mouse is unavailable/missing. Previously ImVec2(-1,-1) was enough but we now accept negative mouse coordinates. In your backend if you need to support unavailable mouse, make sure to replace "io.MousePos = ImVec2(-1,-1)" with "io.MousePos = ImVec2(-FLT_MAX,-FLT_MAX)".
- - 2017/08/22 (1.51) - renamed IsItemHoveredRect() to IsItemRectHovered(). Kept inline redirection function (will obsolete). -> (1.52) use IsItemHovered(ImGuiHoveredFlags_RectOnly)!
-                     - renamed IsMouseHoveringAnyWindow() to IsAnyWindowHovered() for consistency. Kept inline redirection function (will obsolete).
-                     - renamed IsMouseHoveringWindow() to IsWindowRectHovered() for consistency. Kept inline redirection function (will obsolete).
+ - 2017/08/22 (1.51) - renamed IsItemHoveredRect() to IsItemRectHovered(). Kept inline redirection function_ (will obsolete). -> (1.52) use IsItemHovered(ImGuiHoveredFlags_RectOnly)!
+                     - renamed IsMouseHoveringAnyWindow() to IsAnyWindowHovered() for consistency. Kept inline redirection function_ (will obsolete).
+                     - renamed IsMouseHoveringWindow() to IsWindowRectHovered() for consistency. Kept inline redirection function_ (will obsolete).
  - 2017/08/20 (1.51) - renamed GetStyleColName() to GetStyleColorName() for consistency.
  - 2017/08/20 (1.51) - added PushStyleColor(ImGuiCol idx, ImU32 col) overload, which _might_ cause an "ambiguous call" compilation error if you are using ImColor() with implicit cast. Cast to ImU32 or ImVec4 explicily to fix.
  - 2017/08/15 (1.51) - marked the weird IMGUI_ONCE_UPON_A_FRAME helper macro as obsolete. prefer using the more explicit ImGuiOnceUponAFrame type.
@@ -699,7 +699,7 @@ CODE
  - 2016/07/30 (1.50) - SameLine(x) with x>0.0f is now relative to left of column/group if any, and not always to left of window. This was sort of always the intent and hopefully, breakage should be minimal.
  - 2016/05/12 (1.49) - title bar (using ImGuiCol_TitleBg/ImGuiCol_TitleBgActive colors) isn't rendered over a window background (ImGuiCol_WindowBg color) anymore.
                        If your TitleBg/TitleBgActive alpha was 1.0f or you are using the default theme it will not affect you, otherwise if <1.0f you need to tweak your custom theme to readjust for the fact that we don't draw a WindowBg background behind the title bar.
-                       This helper function will convert an old TitleBg/TitleBgActive color into a new one with the same visual output, given the OLD color and the OLD WindowBg color:
+                       This helper function_ will convert an old TitleBg/TitleBgActive color into a new one with the same visual output, given the OLD color and the OLD WindowBg color:
                        ImVec4 ConvertTitleBgCol(const ImVec4& win_bg_col, const ImVec4& title_bg_col) { float new_a = 1.0f - ((1.0f - win_bg_col.w) * (1.0f - title_bg_col.w)), k = title_bg_col.w / new_a; return ImVec4((win_bg_col.x * win_bg_col.w + title_bg_col.x) * k, (win_bg_col.y * win_bg_col.w + title_bg_col.y) * k, (win_bg_col.z * win_bg_col.w + title_bg_col.z) * k, new_a); }
                        If this is confusing, pick the RGB value from title bar from an old screenshot and apply this as TitleBg/TitleBgActive. Or you may just create TitleBgActive from a tweaked TitleBg color.
  - 2016/05/07 (1.49) - removed confusing set of GetInternalState(), GetInternalStateSize(), SetInternalState() functions. Now using CreateContext(), DestroyContext(), GetCurrentContext(), SetCurrentContext().
@@ -708,7 +708,7 @@ CODE
  - 2016/04/26 (1.49) - changed ImDrawList::PushClipRect(ImVec4 rect) to ImDrawList::PushClipRect(Imvec2 min,ImVec2 max,bool intersect_with_current_clip_rect=false). Note that higher-level ImGui::PushClipRect() is preferable because it will clip at logic/widget level, whereas ImDrawList::PushClipRect() only affect your renderer.
  - 2016/04/03 (1.48) - removed style.WindowFillAlphaDefault setting which was redundant. Bake default BG alpha inside style.Colors[ImGuiCol_WindowBg] and all other Bg color values. (ref GitHub issue #337).
  - 2016/04/03 (1.48) - renamed ImGuiCol_TooltipBg to ImGuiCol_PopupBg, used by popups/menus and tooltips. popups/menus were previously using ImGuiCol_WindowBg. (ref github issue #337)
- - 2016/03/21 (1.48) - renamed GetWindowFont() to GetFont(), GetWindowFontSize() to GetFontSize(). Kept inline redirection function (will obsolete).
+ - 2016/03/21 (1.48) - renamed GetWindowFont() to GetFont(), GetWindowFontSize() to GetFontSize(). Kept inline redirection function_ (will obsolete).
  - 2016/03/02 (1.48) - InputText() completion/history/always callbacks: if you modify the text buffer manually (without using DeleteChars()/InsertChars() helper) you need to maintain the BufTextLen field. added an assert.
  - 2016/01/23 (1.48) - fixed not honoring exact width passed to PushItemWidth(), previously it would add extra FramePadding.x*2 over that width. if you had manual pixel-perfect alignment in place it might affect you.
  - 2015/12/27 (1.48) - fixed ImDrawList::AddRect() which used to render a rectangle 1 px too large on each axis.
@@ -722,7 +722,7 @@ CODE
  - 2015/07/14 (1.43) - add new ImFontAtlas::AddFont() API. For the old AddFont***, moved the 'font_no' parameter of ImFontAtlas::AddFont** functions to the ImFontConfig structure.
                        you need to render your textured triangles with bilinear filtering to benefit from sub-pixel positioning of text.
  - 2015/07/08 (1.43) - switched rendering data to use indexed rendering. this is saving a fair amount of CPU/GPU and enables us to get anti-aliasing for a marginal cost.
-                       this necessary change will break your rendering function! the fix should be very easy. sorry for that :(
+                       this necessary change will break your rendering function_! the fix should be very easy. sorry for that :(
                      - if you are using a vanilla copy of one of the imgui_impl_XXX.cpp provided in the example, you just need to update your copy and you can ignore the rest.
                      - the signature of the io.RenderDrawListsFn handler has changed!
                        old: ImGui_XXXX_RenderDrawLists(ImDrawList** const cmd_lists, int cmd_lists_count)
@@ -734,24 +734,24 @@ CODE
                      - if you REALLY cannot render indexed primitives, you can call the draw_data->DeIndexAllBuffers() method to de-index the buffers. This is slow and a waste of CPU/GPU. Prefer using indexed rendering!
                      - refer to code in the examples/ folder or ask on the GitHub if you are unsure of how to upgrade. please upgrade!
  - 2015/07/10 (1.43) - changed SameLine() parameters from int to float.
- - 2015/07/02 (1.42) - renamed SetScrollPosHere() to SetScrollFromCursorPos(). Kept inline redirection function (will obsolete).
+ - 2015/07/02 (1.42) - renamed SetScrollPosHere() to SetScrollFromCursorPos(). Kept inline redirection function_ (will obsolete).
  - 2015/07/02 (1.42) - renamed GetScrollPosY() to GetScrollY(). Necessary to reduce confusion along with other scrolling functions, because positions (e.g. cursor position) are not equivalent to scrolling amount.
  - 2015/06/14 (1.41) - changed ImageButton() default bg_col parameter from (0,0,0,1) (black) to (0,0,0,0) (transparent) - makes a difference when texture have transparence
  - 2015/06/14 (1.41) - changed Selectable() API from (label, selected, size) to (label, selected, flags, size). Size override should have been rarely used. Sorry!
- - 2015/05/31 (1.40) - renamed GetWindowCollapsed() to IsWindowCollapsed() for consistency. Kept inline redirection function (will obsolete).
- - 2015/05/31 (1.40) - renamed IsRectClipped() to IsRectVisible() for consistency. Note that return value is opposite! Kept inline redirection function (will obsolete).
+ - 2015/05/31 (1.40) - renamed GetWindowCollapsed() to IsWindowCollapsed() for consistency. Kept inline redirection function_ (will obsolete).
+ - 2015/05/31 (1.40) - renamed IsRectClipped() to IsRectVisible() for consistency. Note that return value is opposite! Kept inline redirection function_ (will obsolete).
  - 2015/05/27 (1.40) - removed the third 'repeat_if_held' parameter from Button() - sorry! it was rarely used and inconsistent. Use PushButtonRepeat(true) / PopButtonRepeat() to enable repeat on desired buttons.
  - 2015/05/11 (1.40) - changed BeginPopup() API, takes a string identifier instead of a bool. ImGui needs to manage the open/closed state of popups. Call OpenPopup() to actually set the "open" state of a popup. BeginPopup() returns true if the popup is opened.
  - 2015/05/03 (1.40) - removed style.AutoFitPadding, using style.WindowPadding makes more sense (the default values were already the same).
- - 2015/04/13 (1.38) - renamed IsClipped() to IsRectClipped(). Kept inline redirection function until 1.50.
+ - 2015/04/13 (1.38) - renamed IsClipped() to IsRectClipped(). Kept inline redirection function_ until 1.50.
  - 2015/04/09 (1.38) - renamed ImDrawList::AddArc() to ImDrawList::AddArcFast() for compatibility with future API
  - 2015/04/03 (1.38) - removed ImGuiCol_CheckHovered, ImGuiCol_CheckActive, replaced with the more general ImGuiCol_FrameBgHovered, ImGuiCol_FrameBgActive.
  - 2014/04/03 (1.38) - removed support for passing -FLT_MAX..+FLT_MAX as the range for a SliderFloat(). Use DragFloat() or Inputfloat() instead.
- - 2015/03/17 (1.36) - renamed GetItemBoxMin()/GetItemBoxMax()/IsMouseHoveringBox() to GetItemRectMin()/GetItemRectMax()/IsMouseHoveringRect(). Kept inline redirection function until 1.50.
+ - 2015/03/17 (1.36) - renamed GetItemBoxMin()/GetItemBoxMax()/IsMouseHoveringBox() to GetItemRectMin()/GetItemRectMax()/IsMouseHoveringRect(). Kept inline redirection function_ until 1.50.
  - 2015/03/15 (1.36) - renamed style.TreeNodeSpacing to style.IndentSpacing, ImGuiStyleVar_TreeNodeSpacing to ImGuiStyleVar_IndentSpacing
- - 2015/03/13 (1.36) - renamed GetWindowIsFocused() to IsWindowFocused(). Kept inline redirection function until 1.50.
+ - 2015/03/13 (1.36) - renamed GetWindowIsFocused() to IsWindowFocused(). Kept inline redirection function_ until 1.50.
  - 2015/03/08 (1.35) - renamed style.ScrollBarWidth to style.ScrollbarWidth (casing)
- - 2015/02/27 (1.34) - renamed OpenNextNode(bool) to SetNextTreeNodeOpened(bool, ImGuiSetCond). Kept inline redirection function until 1.50.
+ - 2015/02/27 (1.34) - renamed OpenNextNode(bool) to SetNextTreeNodeOpened(bool, ImGuiSetCond). Kept inline redirection function_ until 1.50.
  - 2015/02/27 (1.34) - renamed ImGuiSetCondition_*** to ImGuiSetCond_***, and _FirstUseThisSession becomes _Once.
  - 2015/02/11 (1.32) - changed text input callback ImGuiTextEditCallback return type from void-->int. reserved for future use, return 0 for now.
  - 2015/02/10 (1.32) - renamed GetItemWidth() to CalcItemWidth() to clarify its evolving behavior
@@ -763,7 +763,7 @@ CODE
                        - old:  const void* png_data; unsigned int png_size; ImGui::GetDefaultFontData(NULL, NULL, &png_data, &png_size); [..Upload texture to GPU..];
                        - new:  unsigned char* pixels; int width, height; io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height); [..Upload texture to GPU..]; io.Fonts->SetTexID(YourTexIdentifier);
                        you now have more flexibility to load multiple TTF fonts and manage the texture buffer for internal needs. It is now recommended that you sample the font texture with bilinear interpolation.
- - 2015/01/11 (1.30) - added texture identifier in ImDrawCmd passed to your render function (we can now render images). make sure to call io.Fonts->SetTexID()
+ - 2015/01/11 (1.30) - added texture identifier in ImDrawCmd passed to your render function_ (we can now render images). make sure to call io.Fonts->SetTexID()
  - 2015/01/11 (1.30) - removed IO.PixelCenterOffset (unnecessary, can be handled in user projection matrix)
  - 2015/01/11 (1.30) - removed ImGui::IsItemFocused() in favor of ImGui::IsItemActive() which handles all widgets
  - 2014/12/10 (1.18) - removed SetNewWindowDefaultPos() in favor of new generic API SetNextWindowPos(pos, ImGuiSetCondition_FirstUseEver)
@@ -794,14 +794,14 @@ CODE
  Q: Where is the documentation?
  A: This library is poorly documented at the moment and expects the user to be acquainted with C/C++.
     - Run the examples/ and explore them.
-    - See demo code in imgui_demo.cpp and particularly the ImGui::ShowDemoWindow() function.
+    - See demo code in imgui_demo.cpp and particularly the ImGui::ShowDemoWindow() function_.
     - The demo covers most features of Dear ImGui, so you can read the code and see its output.
     - See documentation and comments at the top of imgui.cpp + effectively imgui.h.
     - Dozens of standalone example applications using e.g. OpenGL/DirectX are provided in the
       examples/ folder to explain how to integrate Dear ImGui with your own engine/application.
     - The Wiki (https://github.com/ocornut/imgui/wiki) has many resources and links.
     - The Glossary (https://github.com/ocornut/imgui/wiki/Glossary) page also may be useful.
-    - Your programming IDE is your friend, find the type or function declaration to find comments
+    - Your programming IDE is your friend, find the type or function_ declaration to find comments
       associated with it.
 
  Q: What is this library called?
@@ -935,7 +935,7 @@ CODE
 // Visual Studio warnings
 #ifdef _MSC_VER
 #pragma warning (disable: 4127)             // condition expression is constant
-#pragma warning (disable: 4996)             // 'This function or variable may be unsafe': strcpy, strdup, sprintf, vsnprintf, sscanf, fopen
+#pragma warning (disable: 4996)             // 'This function_ or variable may be unsafe': strcpy, strdup, sprintf, vsnprintf, sscanf, fopen
 #if defined(_MSC_VER) && _MSC_VER >= 1922   // MSVC 2019 16.2 or later
 #pragma warning (disable: 5054)             // operator '|': deprecated between enumerations of different types
 #endif
@@ -959,15 +959,15 @@ CODE
 #pragma clang diagnostic ignored "-Wformat-pedantic"                // warning: format specifies type 'void *' but the argument has type 'xxxx *' // unreasonable, would lead to casting every %p arg to void*. probably enabled by -pedantic.
 #pragma clang diagnostic ignored "-Wint-to-void-pointer-cast"       // warning: cast to 'void *' from smaller integer type 'int'
 #pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"  // warning: zero as null pointer constant                    // some standard header variations use #define NULL 0
-#pragma clang diagnostic ignored "-Wdouble-promotion"               // warning: implicit conversion from 'float' to 'double' when passing argument to function  // using printf() is a misery with this as C++ va_arg ellipsis changes float to double.
+#pragma clang diagnostic ignored "-Wdouble-promotion"               // warning: implicit conversion from 'float' to 'double' when passing argument to function_  // using printf() is a misery with this as C++ va_arg ellipsis changes float to double.
 #pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"  // warning: implicit conversion from 'xxx' to 'float' may lose precision
 #elif defined(__GNUC__)
 // We disable -Wpragmas because GCC doesn't provide a has_warning equivalent and some forks/patches may not follow the warning/version association.
 #pragma GCC diagnostic ignored "-Wpragmas"                  // warning: unknown option after '#pragma GCC diagnostic' kind
-#pragma GCC diagnostic ignored "-Wunused-function"          // warning: 'xxxx' defined but not used
+#pragma GCC diagnostic ignored "-Wunused-function_"          // warning: 'xxxx' defined but not used
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"      // warning: cast to pointer from integer of different size
 #pragma GCC diagnostic ignored "-Wformat"                   // warning: format '%p' expects argument of type 'void*', but argument 6 has type 'ImGuiWindow*'
-#pragma GCC diagnostic ignored "-Wdouble-promotion"         // warning: implicit conversion from 'float' to 'double' when passing argument to function
+#pragma GCC diagnostic ignored "-Wdouble-promotion"         // warning: implicit conversion from 'float' to 'double' when passing argument to function_
 #pragma GCC diagnostic ignored "-Wconversion"               // warning: conversion to 'xxxx' from 'xxxx' may alter its value
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"        // warning: format not a string literal, format string not checked
 #pragma GCC diagnostic ignored "-Wstrict-overflow"          // warning: assuming signed overflow does not occur when assuming that (X - c) > X is always false
@@ -1010,7 +1010,7 @@ static void             WindowSettingsHandler_WriteAll(ImGuiContext*, ImGuiSetti
 // Platform Dependents default implementation for IO functions
 static const char*      GetClipboardTextFn_DefaultImpl(void* user_data_ctx);
 static void             SetClipboardTextFn_DefaultImpl(void* user_data_ctx, const char* text);
-static void             SetPlatformImeDataFn_DefaultImpl(ImGuiViewport* viewport, ImGuiPlatformImeData* data);
+static void             SetPlatformImeDataFn_DefaultImpl(ImGuiViewport* viewport_, ImGuiPlatformImeData* data);
 
 namespace ImGui
 {
@@ -1071,7 +1071,7 @@ static void             UpdateViewportsNewFrame();
 // - Heaps and globals are not shared across DLL boundaries!
 // - You will need to call SetCurrentContext() + SetAllocatorFunctions() for each static/DLL boundary you are calling from.
 // - Same applies for hot-reloading mechanisms that are reliant on reloading DLL (note that many hot-reloading mechanisms work without DLL).
-// - Using Dear ImGui via a shared library is not recommended, because of function call overhead and because we don't guarantee backward nor forward ABI compatibility.
+// - Using Dear ImGui via a shared library is not recommended, because of function_ call overhead and because we don't guarantee backward nor forward ABI compatibility.
 // - Confused? In a debugger: add GImGui to your watch window and notice how its value changes depending on your current location (which DLL boundary you are in).
 
 // Current context pointer. Implicitly used by all Dear ImGui functions. Always assumed to be != NULL.
@@ -1159,7 +1159,7 @@ ImGuiStyle::ImGuiStyle()
     ImGui::StyleColorsDark(this);
 }
 
-// To scale your entire UI (e.g. if you want your app to use High DPI or generally be DPI aware) you may use this helper function. Scaling the fonts is done separately and is up to you.
+// To scale your entire UI (e.g. if you want your app to use High DPI or generally be DPI aware) you may use this helper function_. Scaling the fonts is done separately and is up to you.
 // Important: This operation is lossy because we round all sizes to integer. If you need to change your scale multiples, call this over a freshly initialized ImGuiStyle structure rather than scaling multiple times.
 void ImGuiStyle::ScaleAllSizes(float scale_factor)
 {
@@ -1780,7 +1780,7 @@ const char* ImStrSkipBlank(const char* str)
 // We support stb_sprintf which is much faster (see: https://github.com/nothings/stb/blob/master/stb_sprintf.h)
 // You may set IMGUI_USE_STB_SPRINTF to use our default wrapper, or set IMGUI_DISABLE_DEFAULT_FORMAT_FUNCTIONS
 // and setup the wrapper yourself. (FIXME-OPT: Some of our high-level operations such as ImGuiTextBuffer::appendfv() are
-// designed using two-passes worst case, which probably could be improved using the stbsp_vsprintfcb() function.)
+// designed using two-passes worst case, which probably could be improved using the stbsp_vsprintfcb() function_.)
 #ifdef IMGUI_USE_STB_SPRINTF
 #define STB_SPRINTF_IMPLEMENTATION
 #ifdef IMGUI_STB_SPRINTF_FILENAME
@@ -2140,7 +2140,7 @@ const char* ImTextCharToUtf8(char out_buf[5], unsigned int c)
     return out_buf;
 }
 
-// Not optimal but we very rarely use this function.
+// Not optimal but we very rarely use this function_.
 int ImTextCountUtf8BytesFromChar(const char* in_text, const char* in_text_end)
 {
     unsigned int unused = 0;
@@ -2345,7 +2345,7 @@ void* ImGuiStorage::GetVoidPtr(ImGuiID key) const
     return it->val_p;
 }
 
-// References are only valid until a new value is added to the storage. Calling a Set***() function or a Get***Ref() function invalidates the pointer.
+// References are only valid until a new value is added to the storage. Calling a Set***() function_ or a Get***Ref() function_ invalidates the pointer.
 int* ImGuiStorage::GetIntRef(ImGuiID key, int default_val)
 {
     ImGuiStoragePair* it = LowerBound(Data, key);
@@ -2698,7 +2698,7 @@ static void ImGuiListClipper_SeekCursorAndSetupPrevLine(float pos_y, float line_
     float off_y = pos_y - window->DC.CursorPos.y;
     window->DC.CursorPos.y = pos_y;
     window->DC.CursorMaxPos.y = ImMax(window->DC.CursorMaxPos.y, pos_y - g.Style.ItemSpacing.y);
-    window->DC.CursorPosPrevLine.y = window->DC.CursorPos.y - line_height;  // Setting those fields so that SetScrollHereY() can properly function after the end of our clipper usage.
+    window->DC.CursorPosPrevLine.y = window->DC.CursorPos.y - line_height;  // Setting those fields so that SetScrollHereY() can properly function_ after the end of our clipper usage.
     window->DC.PrevLineSize.y = (line_height - g.Style.ItemSpacing.y);      // If we end up needing more accurate data (to e.g. use SameLine) we may as well make the clipper have a fourth step to let user process and display the last item in their list.
     if (ImGuiOldColumns* columns = window->DC.CurrentColumns)
         columns->LineMinY = window->DC.CursorPos.y;                         // Setting this so that cell Y position are set properly
@@ -3246,7 +3246,7 @@ void ImGui::RenderTextClippedEx(ImDrawList* draw_list, const ImVec2& pos_min, co
     if (clip_rect) // If we had no explicit clipping rectangle then pos==clip_min
         need_clipping |= (pos.x < clip_min->x) || (pos.y < clip_min->y);
 
-    // Align whole block. We should defer that to the better rendering function when we'll have support for individual line alignment.
+    // Align whole block. We should defer that to the better rendering function_ when we'll have support for individual line alignment.
     if (align.x > 0.0f) pos.x = ImMax(pos.x, pos.x + (pos_max.x - pos.x - text_size.x) * align.x);
     if (align.y > 0.0f) pos.y = ImMax(pos.y, pos.y + (pos_max.y - pos.y - text_size.y) * align.y);
 
@@ -3277,7 +3277,7 @@ void ImGui::RenderTextClipped(const ImVec2& pos_min, const ImVec2& pos_max, cons
         LogRenderedText(&pos_min, text, text_display_end);
 }
 
-// Another overly complex function until we reorganize everything into a nice all-in-one helper.
+// Another overly complex function_ until we reorganize everything into a nice all-in-one helper.
 // This is made more complex because we have dissociated the layout rectangle (pos_min..pos_max) which define _where_ the ellipsis is, from actual clipping of text and limit of the ellipsis display.
 // This is because in the context of tabs we selectively hide part of the text when the Close Button appears, but we don't want the ellipsis to move.
 void ImGui::RenderTextEllipsis(ImDrawList* draw_list, const ImVec2& pos_min, const ImVec2& pos_max, float clip_max_x, float ellipsis_max_x, const char* text, const char* text_end_full, const ImVec2* text_size_if_known)
@@ -3315,7 +3315,7 @@ void ImGui::RenderTextEllipsis(ImDrawList* draw_list, const ImVec2& pos_min, con
         }
         while (text_end_ellipsis > text && ImCharIsBlankA(text_end_ellipsis[-1]))
         {
-            // Trim trailing space before ellipsis (FIXME: Supporting non-ascii blanks would be nice, for this we need a function to backtrack in UTF-8 text)
+            // Trim trailing space before ellipsis (FIXME: Supporting non-ascii blanks would be nice, for this we need a function_ to backtrack in UTF-8 text)
             text_end_ellipsis--;
             text_size_clipped_x -= font->CalcTextSizeA(font_size, FLT_MAX, 0.0f, text_end_ellipsis, text_end_ellipsis + 1).x; // Ascii blanks are always 1 byte
         }
@@ -3401,16 +3401,16 @@ void ImGui::RenderMouseCursor(ImVec2 base_pos, float base_scale, ImGuiMouseCurso
     ImFontAtlas* font_atlas = g.DrawListSharedData.Font->ContainerAtlas;
     for (int n = 0; n < g.Viewports.Size; n++)
     {
-        // We scale cursor with current viewport/monitor, however Windows 10 for its own hardware cursor seems to be using a different scale factor.
+        // We scale cursor with current viewport_/monitor, however Windows 10 for its own hardware cursor seems to be using a different scale factor.
         ImVec2 offset, size, uv[4];
         if (!font_atlas->GetMouseCursorTexData(mouse_cursor, &offset, &size, &uv[0], &uv[2]))
             continue;
-        ImGuiViewportP* viewport = g.Viewports[n];
+        ImGuiViewportP* viewport_ = g.Viewports[n];
         const ImVec2 pos = base_pos - offset;
         const float scale = base_scale;
-        if (!viewport->GetMainRect().Overlaps(ImRect(pos, pos + ImVec2(size.x + 2, size.y + 2) * scale)))
+        if (!viewport_->GetMainRect().Overlaps(ImRect(pos, pos + ImVec2(size.x + 2, size.y + 2) * scale)))
             continue;
-        ImDrawList* draw_list = GetForegroundDrawList(viewport);
+        ImDrawList* draw_list = GetForegroundDrawList(viewport_);
         ImTextureID tex_id = font_atlas->TexID;
         draw_list->PushTextureID(tex_id);
         draw_list->AddImage(tex_id, pos + ImVec2(1, 0) * scale, pos + (ImVec2(1, 0) + size) * scale, uv[2], uv[3], col_shadow);
@@ -3515,12 +3515,12 @@ void ImGui::Initialize()
     // Setup default platform clipboard/IME handlers.
     g.IO.GetClipboardTextFn = GetClipboardTextFn_DefaultImpl;    // Platform dependent default implementations
     g.IO.SetClipboardTextFn = SetClipboardTextFn_DefaultImpl;
-    g.IO.ClipboardUserData = (void*)&g;                          // Default implementation use the ImGuiContext as user data (ideally those would be arguments to the function)
+    g.IO.ClipboardUserData = (void*)&g;                          // Default implementation use the ImGuiContext as user data (ideally those would be arguments to the function_)
     g.IO.SetPlatformImeDataFn = SetPlatformImeDataFn_DefaultImpl;
 
-    // Create default viewport
-    ImGuiViewportP* viewport = IM_NEW(ImGuiViewportP)();
-    g.Viewports.push_back(viewport);
+    // Create default viewport_
+    ImGuiViewportP* viewport_ = IM_NEW(ImGuiViewportP)();
+    g.Viewports.push_back(viewport_);
     g.TempBuffer.resize(1024 * 3 + 1, 0);
 
 #ifdef IMGUI_HAS_DOCK
@@ -3529,7 +3529,7 @@ void ImGui::Initialize()
     g.Initialized = true;
 }
 
-// This function is merely here to free heap allocations.
+// This function_ is merely here to free heap allocations.
 void ImGui::Shutdown()
 {
     // The fonts atlas can be used prior to calling NewFrame(), so we clear it even if g.Initialized is FALSE (which would happen if we never called NewFrame)
@@ -3892,7 +3892,7 @@ bool ImGui::IsItemHovered(ImGuiHoveredFlags flags)
         ImGuiItemStatusFlags status_flags = g.LastItemData.StatusFlags;
         if (!(status_flags & ImGuiItemStatusFlags_HoveredRect))
             return false;
-        IM_ASSERT((flags & (ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_NoPopupHierarchy)) == 0);   // Flags not supported by this function
+        IM_ASSERT((flags & (ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_NoPopupHierarchy)) == 0);   // Flags not supported by this function_
 
         // Done with rectangle culling so we can perform heavier checks now
         // Test if we are hovering the right window (our window could be behind another window)
@@ -3968,8 +3968,8 @@ bool ImGui::ItemHoverable(const ImRect& bb, ImGuiID id)
         return false;
     }
 
-    // We exceptionally allow this function to be called with id==0 to allow using it for easy high-level
-    // hover test in widgets code. We could also decide to split this function is two.
+    // We exceptionally allow this function_ to be called with id==0 to allow using it for easy high-level
+    // hover test in widgets code. We could also decide to split this function_ is two.
     if (id != 0)
         SetHoveredID(id);
 
@@ -4034,7 +4034,7 @@ float ImGui::CalcWrapWidthForPos(const ImVec2& pos, float wrap_pos_x)
     if (wrap_pos_x == 0.0f)
     {
         // We could decide to setup a default wrapping max point for auto-resizing windows,
-        // or have auto-wrap (with unspecified wrapping pos) behave as a ContentSize extending function?
+        // or have auto-wrap (with unspecified wrapping pos) behave as a ContentSize extending function_?
         //if (window->Hidden && (window->Flags & ImGuiWindowFlags_AlwaysAutoResize))
         //    wrap_pos_x = ImMax(window->WorkRect.Min.x + g.FontSize * 10.0f, window->WorkRect.Max.x);
         //else
@@ -4089,12 +4089,12 @@ ImGuiIO& ImGui::GetIO()
     return GImGui->IO;
 }
 
-// Pass this to your backend rendering function! Valid after Render() and until the next call to NewFrame()
+// Pass this to your backend rendering function_! Valid after Render() and until the next call to NewFrame()
 ImDrawData* ImGui::GetDrawData()
 {
     ImGuiContext& g = *GImGui;
-    ImGuiViewportP* viewport = g.Viewports[0];
-    return viewport->DrawDataP.Valid ? &viewport->DrawDataP : NULL;
+    ImGuiViewportP* viewport_ = g.Viewports[0];
+    return viewport_->DrawDataP.Valid ? &viewport_->DrawDataP : NULL;
 }
 
 double ImGui::GetTime()
@@ -4107,33 +4107,33 @@ int ImGui::GetFrameCount()
     return GImGui->FrameCount;
 }
 
-static ImDrawList* GetViewportDrawList(ImGuiViewportP* viewport, size_t drawlist_no, const char* drawlist_name)
+static ImDrawList* GetViewportDrawList(ImGuiViewportP* viewport_, size_t drawlist_no, const char* drawlist_name)
 {
     // Create the draw list on demand, because they are not frequently used for all viewports
     ImGuiContext& g = *GImGui;
-    IM_ASSERT(drawlist_no < IM_ARRAYSIZE(viewport->DrawLists));
-    ImDrawList* draw_list = viewport->DrawLists[drawlist_no];
+    IM_ASSERT(drawlist_no < IM_ARRAYSIZE(viewport_->DrawLists));
+    ImDrawList* draw_list = viewport_->DrawLists[drawlist_no];
     if (draw_list == NULL)
     {
         draw_list = IM_NEW(ImDrawList)(&g.DrawListSharedData);
         draw_list->_OwnerName = drawlist_name;
-        viewport->DrawLists[drawlist_no] = draw_list;
+        viewport_->DrawLists[drawlist_no] = draw_list;
     }
 
     // Our ImDrawList system requires that there is always a command
-    if (viewport->DrawListsLastFrame[drawlist_no] != g.FrameCount)
+    if (viewport_->DrawListsLastFrame[drawlist_no] != g.FrameCount)
     {
         draw_list->_ResetForNewFrame();
         draw_list->PushTextureID(g.IO.Fonts->TexID);
-        draw_list->PushClipRect(viewport->Pos, viewport->Pos + viewport->Size, false);
-        viewport->DrawListsLastFrame[drawlist_no] = g.FrameCount;
+        draw_list->PushClipRect(viewport_->Pos, viewport_->Pos + viewport_->Size, false);
+        viewport_->DrawListsLastFrame[drawlist_no] = g.FrameCount;
     }
     return draw_list;
 }
 
-ImDrawList* ImGui::GetBackgroundDrawList(ImGuiViewport* viewport)
+ImDrawList* ImGui::GetBackgroundDrawList(ImGuiViewport* viewport_)
 {
-    return GetViewportDrawList((ImGuiViewportP*)viewport, 0, "##Background");
+    return GetViewportDrawList((ImGuiViewportP*)viewport_, 0, "##Background");
 }
 
 ImDrawList* ImGui::GetBackgroundDrawList()
@@ -4142,9 +4142,9 @@ ImDrawList* ImGui::GetBackgroundDrawList()
     return GetBackgroundDrawList(g.Viewports[0]);
 }
 
-ImDrawList* ImGui::GetForegroundDrawList(ImGuiViewport* viewport)
+ImDrawList* ImGui::GetForegroundDrawList(ImGuiViewport* viewport_)
 {
-    return GetViewportDrawList((ImGuiViewportP*)viewport, 1, "##Foreground");
+    return GetViewportDrawList((ImGuiViewportP*)viewport_, 1, "##Foreground");
 }
 
 ImDrawList* ImGui::GetForegroundDrawList()
@@ -4416,8 +4416,8 @@ void ImGui::NewFrame()
     // Mark rendering data as invalid to prevent user who may have a handle on it to use it.
     for (int n = 0; n < g.Viewports.Size; n++)
     {
-        ImGuiViewportP* viewport = g.Viewports[n];
-        viewport->DrawDataP.Clear();
+        ImGuiViewportP* viewport_ = g.Viewports[n];
+        viewport_->DrawDataP.Clear();
     }
 
     // Drag and drop keep the source ID alive so even if the source disappear our state is consistent
@@ -4671,7 +4671,7 @@ static void AddDrawListToDrawData(ImVector<ImDrawList*>* out_list, ImDrawList* d
     //   (B) Or handle 32-bit indices in your renderer backend, and uncomment '#define ImDrawIdx unsigned int' line in imconfig.h.
     //       Most example backends already support this. For example, the OpenGL example code detect index size at compile-time:
     //         glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
-    //       Your own engine or render API may use different parameters or function calls to specify index sizes.
+    //       Your own engine or render API may use different parameters or function_ calls to specify index sizes.
     //       2 and 4 bytes indices are generally supported by most graphics API.
     // - If for some reason neither of those solutions works for you, a workaround is to call BeginChild()/EndChild() before reaching
     //   the 64K limit to split your draw commands in multiple draw lists.
@@ -4684,9 +4684,9 @@ static void AddDrawListToDrawData(ImVector<ImDrawList*>* out_list, ImDrawList* d
 static void AddWindowToDrawData(ImGuiWindow* window, int layer)
 {
     ImGuiContext& g = *GImGui;
-    ImGuiViewportP* viewport = g.Viewports[0];
+    ImGuiViewportP* viewport_ = g.Viewports[0];
     g.IO.MetricsRenderWindows++;
-    AddDrawListToDrawData(&viewport->DrawDataBuilder.Layers[layer], window->DrawList);
+    AddDrawListToDrawData(&viewport_->DrawDataBuilder.Layers[layer], window->DrawList);
     for (int i = 0; i < window->DC.ChildWindows.Size; i++)
     {
         ImGuiWindow* child = window->DC.ChildWindows[i];
@@ -4700,7 +4700,7 @@ static inline int GetWindowDisplayLayer(ImGuiWindow* window)
     return (window->Flags & ImGuiWindowFlags_Tooltip) ? 1 : 0;
 }
 
-// Layer is locked for the root window, however child windows may use a different viewport (e.g. extruding menu)
+// Layer is locked for the root window, however child windows may use a different viewport_ (e.g. extruding menu)
 static inline void AddRootWindowToDrawData(ImGuiWindow* window)
 {
     AddWindowToDrawData(window, GetWindowDisplayLayer(window));
@@ -4724,16 +4724,16 @@ void ImDrawDataBuilder::FlattenIntoSingleLayer()
     }
 }
 
-static void SetupViewportDrawData(ImGuiViewportP* viewport, ImVector<ImDrawList*>* draw_lists)
+static void SetupViewportDrawData(ImGuiViewportP* viewport_, ImVector<ImDrawList*>* draw_lists)
 {
     ImGuiIO& io = ImGui::GetIO();
-    ImDrawData* draw_data = &viewport->DrawDataP;
+    ImDrawData* draw_data = &viewport_->DrawDataP;
     draw_data->Valid = true;
     draw_data->CmdLists = (draw_lists->Size > 0) ? draw_lists->Data : NULL;
     draw_data->CmdListsCount = draw_lists->Size;
     draw_data->TotalVtxCount = draw_data->TotalIdxCount = 0;
-    draw_data->DisplayPos = viewport->Pos;
-    draw_data->DisplaySize = viewport->Size;
+    draw_data->DisplayPos = viewport_->Pos;
+    draw_data->DisplaySize = viewport_->Size;
     draw_data->FramebufferScale = io.DisplayFramebufferScale;
     for (int n = 0; n < draw_lists->Size; n++)
     {
@@ -4745,7 +4745,7 @@ static void SetupViewportDrawData(ImGuiViewportP* viewport, ImVector<ImDrawList*
 }
 
 // Push a clipping rectangle for both ImGui logic (hit-testing etc.) and low-level ImDrawList rendering.
-// - When using this function it is sane to ensure that float are perfectly rounded to integer values,
+// - When using this function_ it is sane to ensure that float are perfectly rounded to integer values,
 //   so that e.g. (int)(max.x-min.x) in user's render produce correct result.
 // - If the code here changes, may need to update code of functions like NextColumn() and PushColumnClipRect():
 //   some frequently called functions which to modify both channels and clipping simultaneously tend to use the
@@ -4769,8 +4769,8 @@ static void ImGui::RenderDimmedBackgroundBehindWindow(ImGuiWindow* window, ImU32
     if ((col & IM_COL32_A_MASK) == 0)
         return;
 
-    ImGuiViewportP* viewport = (ImGuiViewportP*)GetMainViewport();
-    ImRect viewport_rect = viewport->GetMainRect();
+    ImGuiViewportP* viewport_ = (ImGuiViewportP*)GetMainViewport();
+    ImRect viewport_rect = viewport_->GetMainRect();
 
     // Draw behind window by moving the draw command at the FRONT of the draw list
     {
@@ -4832,15 +4832,15 @@ static void ImGui::RenderDimmedBackgrounds()
 
         // Draw border around CTRL+Tab target window
         ImGuiWindow* window = g.NavWindowingTargetAnim;
-        ImGuiViewport* viewport = GetMainViewport();
+        ImGuiViewport* viewport_ = GetMainViewport();
         float distance = g.FontSize;
         ImRect bb = window->Rect();
         bb.Expand(distance);
-        if (bb.GetWidth() >= viewport->Size.x && bb.GetHeight() >= viewport->Size.y)
-            bb.Expand(-distance - 1.0f); // If a window fits the entire viewport, adjust its highlight inward
+        if (bb.GetWidth() >= viewport_->Size.x && bb.GetHeight() >= viewport_->Size.y)
+            bb.Expand(-distance - 1.0f); // If a window fits the entire viewport_, adjust its highlight inward
         if (window->DrawList->CmdBuffer.Size == 0)
             window->DrawList->AddDrawCmd();
-        window->DrawList->PushClipRect(viewport->Pos, viewport->Pos + viewport->Size);
+        window->DrawList->PushClipRect(viewport_->Pos, viewport_->Pos + viewport_->Size);
         window->DrawList->AddRect(bb.Min, bb.Max, GetColorU32(ImGuiCol_NavWindowingHighlight, g.NavWindowingHighlightAlpha), window->WindowRounding, 0, 3.0f);
         window->DrawList->PopClipRect();
     }
@@ -4866,18 +4866,18 @@ void ImGui::EndFrame()
     if (g.IO.SetPlatformImeDataFn && memcmp(ime_data, &g.PlatformImeDataPrev, sizeof(ImGuiPlatformImeData)) != 0)
     {
         IMGUI_DEBUG_LOG_IO("Calling io.SetPlatformImeDataFn(): WantVisible: %d, InputPos (%.2f,%.2f)\n", ime_data->WantVisible, ime_data->InputPos.x, ime_data->InputPos.y);
-        ImGuiViewport* viewport = GetMainViewport();
+        ImGuiViewport* viewport_ = GetMainViewport();
 #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
-        if (viewport->PlatformHandleRaw == NULL && g.IO.ImeWindowHandle != NULL)
+        if (viewport_->PlatformHandleRaw == NULL && g.IO.ImeWindowHandle != NULL)
         {
-            viewport->PlatformHandleRaw = g.IO.ImeWindowHandle;
-            g.IO.SetPlatformImeDataFn(viewport, ime_data);
-            viewport->PlatformHandleRaw = NULL;
+            viewport_->PlatformHandleRaw = g.IO.ImeWindowHandle;
+            g.IO.SetPlatformImeDataFn(viewport_, ime_data);
+            viewport_->PlatformHandleRaw = NULL;
         }
         else
 #endif
         {
-            g.IO.SetPlatformImeDataFn(viewport, ime_data);
+            g.IO.SetPlatformImeDataFn(viewport_, ime_data);
         }
     }
 
@@ -4944,7 +4944,7 @@ void ImGui::EndFrame()
 
 // Prepare the data for rendering so you can call GetDrawData()
 // (As with anything within the ImGui:: namspace this doesn't touch your GPU or graphics API at all:
-// it is the role of the ImGui_ImplXXXX_RenderDrawData() function provided by the renderer backend)
+// it is the role of the ImGui_ImplXXXX_RenderDrawData() function_ provided by the renderer backend)
 void ImGui::Render()
 {
     ImGuiContext& g = *GImGui;
@@ -4958,13 +4958,13 @@ void ImGui::Render()
 
     CallContextHooks(&g, ImGuiContextHookType_RenderPre);
 
-    // Add background ImDrawList (for each active viewport)
+    // Add background ImDrawList (for each active viewport_)
     for (int n = 0; n != g.Viewports.Size; n++)
     {
-        ImGuiViewportP* viewport = g.Viewports[n];
-        viewport->DrawDataBuilder.Clear();
-        if (viewport->DrawLists[0] != NULL)
-            AddDrawListToDrawData(&viewport->DrawDataBuilder.Layers[0], GetBackgroundDrawList(viewport));
+        ImGuiViewportP* viewport_ = g.Viewports[n];
+        viewport_->DrawDataBuilder.Clear();
+        if (viewport_->DrawLists[0] != NULL)
+            AddDrawListToDrawData(&viewport_->DrawDataBuilder.Layers[0], GetBackgroundDrawList(viewport_));
     }
 
     // Draw modal/window whitening backgrounds
@@ -4994,15 +4994,15 @@ void ImGui::Render()
     g.IO.MetricsRenderVertices = g.IO.MetricsRenderIndices = 0;
     for (int n = 0; n < g.Viewports.Size; n++)
     {
-        ImGuiViewportP* viewport = g.Viewports[n];
-        viewport->DrawDataBuilder.FlattenIntoSingleLayer();
+        ImGuiViewportP* viewport_ = g.Viewports[n];
+        viewport_->DrawDataBuilder.FlattenIntoSingleLayer();
 
-        // Add foreground ImDrawList (for each active viewport)
-        if (viewport->DrawLists[1] != NULL)
-            AddDrawListToDrawData(&viewport->DrawDataBuilder.Layers[0], GetForegroundDrawList(viewport));
+        // Add foreground ImDrawList (for each active viewport_)
+        if (viewport_->DrawLists[1] != NULL)
+            AddDrawListToDrawData(&viewport_->DrawDataBuilder.Layers[0], GetForegroundDrawList(viewport_));
 
-        SetupViewportDrawData(viewport, &viewport->DrawDataBuilder.Layers[0]);
-        ImDrawData* draw_data = &viewport->DrawDataP;
+        SetupViewportDrawData(viewport_, &viewport_->DrawDataBuilder.Layers[0]);
+        ImDrawData* draw_data = &viewport_->DrawDataP;
         g.IO.MetricsRenderVertices += draw_data->TotalVtxCount;
         g.IO.MetricsRenderIndices += draw_data->TotalIdxCount;
     }
@@ -5195,7 +5195,7 @@ void ImGui::SetItemAllowOverlap()
         g.ActiveIdAllowOverlap = true;
 }
 
-// FIXME: It might be undesirable that this will likely disable KeyOwner-aware shortcuts systems. Consider a more fine-tuned version for the two users of this function.
+// FIXME: It might be undesirable that this will likely disable KeyOwner-aware shortcuts systems. Consider a more fine-tuned version for the two users of this function_.
 void ImGui::SetActiveIdUsingAllKeyboardKeys()
 {
     ImGuiContext& g = *GImGui;
@@ -5532,7 +5532,7 @@ static ImVec2 CalcWindowAutoFitSize(ImGuiWindow* window, const ImVec2& size_cont
     }
     else
     {
-        // Maximum window size is determined by the viewport size or monitor size
+        // Maximum window size is determined by the viewport_ size or monitor size
         const bool is_popup = (window->Flags & ImGuiWindowFlags_Popup) != 0;
         const bool is_menu = (window->Flags & ImGuiWindowFlags_ChildMenu) != 0;
         ImVec2 size_min = style.WindowMinSize;
@@ -5958,7 +5958,7 @@ void ImGui::RenderWindowTitleBarContents(ImGuiWindow* window, const ImRect& titl
     // Collapse button (submitting first so it gets priority when choosing a navigation init fallback)
     if (has_collapse_button)
         if (CollapseButton(window->GetID("#COLLAPSE"), collapse_button_pos))
-            window->WantCollapseToggle = true; // Defer actual collapsing to next frame as we are too far in the Begin() function
+            window->WantCollapseToggle = true; // Defer actual collapsing to next frame as we are too far in the Begin() function_
 
     // Close button
     if (has_close_button)
@@ -6123,7 +6123,7 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
         window->IDStack.push_back(window->ID);
 
     // Add to stack
-    // We intentionally set g.CurrentWindow to NULL to prevent usage until when the viewport is set, then will call SetCurrentWindow()
+    // We intentionally set g.CurrentWindow to NULL to prevent usage until when the viewport_ is set, then will call SetCurrentWindow()
     g.CurrentWindow = window;
     ImGuiWindowStackData window_stack_data;
     window_stack_data.Window = window;
@@ -6250,7 +6250,7 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
             window->HiddenFramesCannotSkipItems = 1;
 
         // Hide popup/tooltip window when re-opening while we measure size (because we recycle the windows)
-        // We reset Size/ContentSize for reappearing popups/tooltips early in this function, so further code won't be tempted to use the old size.
+        // We reset Size/ContentSize for reappearing popups/tooltips early in this function_, so further code won't be tempted to use the old size.
         if (window_just_activated_by_user && (flags & (ImGuiWindowFlags_Popup | ImGuiWindowFlags_Tooltip)) != 0)
         {
             window->HiddenFramesCannotSkipItems = 1;
@@ -6265,10 +6265,10 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
         }
 
         // SELECT VIEWPORT
-        // FIXME-VIEWPORT: In the docking/viewport branch, this is the point where we select the current viewport (which may affect the style)
+        // FIXME-VIEWPORT: In the docking/viewport_ branch, this is the point where we select the current viewport_ (which may affect the style)
 
-        ImGuiViewportP* viewport = (ImGuiViewportP*)(void*)GetMainViewport();
-        SetWindowViewport(window, viewport);
+        ImGuiViewportP* viewport_ = (ImGuiViewportP*)(void*)GetMainViewport();
+        SetWindowViewport(window, viewport_);
         SetCurrentWindow(window);
 
         // LOCK BORDER SIZE AND PADDING FOR THE FRAME (so that altering them doesn't cause inconsistencies)
@@ -6391,12 +6391,12 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
 
         // Calculate the range of allowed position for that window (to be movable and visible past safe area padding)
         // When clamping to stay visible, we will enforce that window->Pos stays inside of visibility_rect.
-        ImRect viewport_rect(viewport->GetMainRect());
-        ImRect viewport_work_rect(viewport->GetWorkRect());
+        ImRect viewport_rect(viewport_->GetMainRect());
+        ImRect viewport_work_rect(viewport_->GetWorkRect());
         ImVec2 visibility_padding = ImMax(style.DisplayWindowPadding, style.DisplaySafeAreaPadding);
         ImRect visibility_rect(viewport_work_rect.Min + visibility_padding, viewport_work_rect.Max - visibility_padding);
 
-        // Clamp position/size so window stays visible within its viewport or monitor
+        // Clamp position/size so window stays visible within its viewport_ or monitor
         // Ignore zero-sized display explicitly to avoid losing positions if a window manager reports zero-sized window when initializing or minimizing.
         if (!window_pos_set_by_api && !(flags & ImGuiWindowFlags_ChildWindow))
             if (viewport_rect.GetWidth() > 0.0f && viewport_rect.GetHeight() > 0.0f)
@@ -6485,7 +6485,7 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
         }
 
         // UPDATE RECTANGLES (1- THOSE NOT AFFECTED BY SCROLLING)
-        // Update various regions. Variables they depend on should be set above in this function.
+        // Update various regions. Variables they depend on should be set above in this function_.
         // We set this up after processing the resize grip so that our rectangles doesn't lag by a frame.
 
         // Outer rectangle
@@ -7140,7 +7140,7 @@ bool ImGui::IsWindowAbove(ImGuiWindow* potential_above, ImGuiWindow* potential_b
 
 bool ImGui::IsWindowHovered(ImGuiHoveredFlags flags)
 {
-    IM_ASSERT((flags & (ImGuiHoveredFlags_AllowWhenOverlapped | ImGuiHoveredFlags_AllowWhenDisabled)) == 0);   // Flags not supported by this function
+    IM_ASSERT((flags & (ImGuiHoveredFlags_AllowWhenOverlapped | ImGuiHoveredFlags_AllowWhenDisabled)) == 0);   // Flags not supported by this function_
     ImGuiContext& g = *GImGui;
     ImGuiWindow* ref_window = g.HoveredWindow;
     ImGuiWindow* cur_window = g.CurrentWindow;
@@ -7489,7 +7489,7 @@ void ImGui::SetKeyboardFocusHere(int offset)
     IMGUI_DEBUG_LOG_ACTIVEID("SetKeyboardFocusHere(%d) in window \"%s\"\n", offset, window->Name);
 
     // It makes sense in the vast majority of cases to never interrupt a drag and drop.
-    // When we refactor this function into ActivateItem() we may want to make this an option.
+    // When we refactor this function_ into ActivateItem() we may want to make this an option.
     // MovingWindow is protected from most user inputs using SetActiveIdUsingNavAndKeys(), but
     // is also automatically dropped in the event g.ActiveId is stolen.
     if (g.DragDropActive || g.MovingWindow != NULL)
@@ -8059,7 +8059,7 @@ bool ImGui::IsKeyPressed(ImGuiKey key, ImGuiID owner_id, ImGuiInputFlags flags)
     const float t = key_data->DownDuration;
     if (t < 0.0f)
         return false;
-    IM_ASSERT((flags & ~ImGuiInputFlags_SupportedByIsKeyPressed) == 0); // Passing flags not supported by this function!
+    IM_ASSERT((flags & ~ImGuiInputFlags_SupportedByIsKeyPressed) == 0); // Passing flags not supported by this function_!
 
     bool pressed = (t == 0.0f);
     if (!pressed && ((flags & ImGuiInputFlags_Repeat) != 0))
@@ -8118,7 +8118,7 @@ bool ImGui::IsMouseClicked(ImGuiMouseButton button, ImGuiID owner_id, ImGuiInput
     const float t = g.IO.MouseDownDuration[button];
     if (t < 0.0f)
         return false;
-    IM_ASSERT((flags & ~ImGuiInputFlags_SupportedByIsKeyPressed) == 0); // Passing flags not supported by this function!
+    IM_ASSERT((flags & ~ImGuiInputFlags_SupportedByIsKeyPressed) == 0); // Passing flags not supported by this function_!
 
     const bool repeat = (flags & ImGuiInputFlags_Repeat) != 0;
     const bool pressed = (t == 0.0f) || (repeat && t > g.IO.KeyRepeatDelay && CalcTypematicRepeatAmount(t - g.IO.DeltaTime, t, g.IO.KeyRepeatDelay, g.IO.KeyRepeatRate) > 0);
@@ -8830,7 +8830,7 @@ bool ImGui::TestKeyOwner(ImGuiKey key, ImGuiID owner_id)
 void ImGui::SetKeyOwner(ImGuiKey key, ImGuiID owner_id, ImGuiInputFlags flags)
 {
     IM_ASSERT(IsNamedKeyOrModKey(key) && (owner_id != ImGuiKeyOwner_Any || (flags & (ImGuiInputFlags_LockThisFrame | ImGuiInputFlags_LockUntilRelease)))); // Can only use _Any with _LockXXX flags (to eat a key away without an ID to retrieve it)
-    IM_ASSERT((flags & ~ImGuiInputFlags_SupportedBySetKeyOwner) == 0); // Passing flags not supported by this function!
+    IM_ASSERT((flags & ~ImGuiInputFlags_SupportedBySetKeyOwner) == 0); // Passing flags not supported by this function_!
 
     ImGuiKeyOwnerData* owner_data = GetKeyOwnerData(key);
     owner_data->OwnerCurr = owner_data->OwnerNext = owner_id;
@@ -8857,7 +8857,7 @@ void ImGui::SetItemKeyOwner(ImGuiKey key, ImGuiInputFlags flags)
         flags |= ImGuiInputFlags_CondDefault_;
     if ((g.HoveredId == id && (flags & ImGuiInputFlags_CondHovered)) || (g.ActiveId == id && (flags & ImGuiInputFlags_CondActive)))
     {
-        IM_ASSERT((flags & ~ImGuiInputFlags_SupportedBySetItemKeyOwner) == 0); // Passing flags not supported by this function!
+        IM_ASSERT((flags & ~ImGuiInputFlags_SupportedBySetItemKeyOwner) == 0); // Passing flags not supported by this function_!
         SetKeyOwner(key, id, flags & ~ImGuiInputFlags_CondMask_);
     }
 }
@@ -8885,7 +8885,7 @@ bool ImGui::Shortcut(ImGuiKeyChord key_chord, ImGuiID owner_id, ImGuiInputFlags 
 
     if (!IsKeyPressed(key, owner_id, (flags & (ImGuiInputFlags_Repeat | (ImGuiInputFlags)ImGuiInputFlags_RepeatRateMask_))))
         return false;
-    IM_ASSERT((flags & ~ImGuiInputFlags_SupportedByShortcut) == 0); // Passing flags not supported by this function!
+    IM_ASSERT((flags & ~ImGuiInputFlags_SupportedByShortcut) == 0); // Passing flags not supported by this function_!
 
     return true;
 }
@@ -8895,7 +8895,7 @@ bool ImGui::Shortcut(ImGuiKeyChord key_chord, ImGuiID owner_id, ImGuiInputFlags 
 // [SECTION] ERROR CHECKING
 //-----------------------------------------------------------------------------
 
-// Helper function to verify ABI compatibility between caller code and compiled version of Dear ImGui.
+// Helper function_ to verify ABI compatibility between caller code and compiled version of Dear ImGui.
 // Verify that the type sizes are matching between the calling file's compilation unit and imgui.cpp's compilation unit
 // If this triggers you have an issue:
 // - Most commonly: mismatched headers and compiled code version.
@@ -8973,7 +8973,7 @@ static void ImGui::ErrorCheckNewFrameSanityChecks()
     IM_ASSERT((g.IO.DeltaTime > 0.0f || g.FrameCount == 0)              && "Need a positive DeltaTime!");
     IM_ASSERT((g.FrameCount == 0 || g.FrameCountEnded == g.FrameCount)  && "Forgot to call Render() or EndFrame() at the end of the previous frame?");
     IM_ASSERT(g.IO.DisplaySize.x >= 0.0f && g.IO.DisplaySize.y >= 0.0f  && "Invalid DisplaySize value!");
-    IM_ASSERT(g.IO.Fonts->IsBuilt()                                     && "Font Atlas not built! Make sure you called ImGui_ImplXXXX_NewFrame() function for renderer backend, which should call io.Fonts->GetTexDataAsRGBA32() / GetTexDataAsAlpha8()");
+    IM_ASSERT(g.IO.Fonts->IsBuilt()                                     && "Font Atlas not built! Make sure you called ImGui_ImplXXXX_NewFrame() function_ for renderer backend, which should call io.Fonts->GetTexDataAsRGBA32() / GetTexDataAsAlpha8()");
     IM_ASSERT(g.Style.CurveTessellationTol > 0.0f                       && "Invalid style setting!");
     IM_ASSERT(g.Style.CircleTessellationMaxError > 0.0f                 && "Invalid style setting!");
     IM_ASSERT(g.Style.Alpha >= 0.0f && g.Style.Alpha <= 1.0f            && "Invalid style setting!"); // Allows us to avoid a few clamps in color computations
@@ -9205,7 +9205,7 @@ void ImGui::ItemSize(const ImVec2& size, float text_baseline_y)
     if (window->SkipItems)
         return;
 
-    // We increase the height in this function to accommodate for baseline offset.
+    // We increase the height in this function_ to accommodate for baseline offset.
     // In theory we should be offsetting the starting position (window->DC.CursorPos), that will be the topic of a larger refactor,
     // but since ItemSize() is not yet an API that moves the cursor (to handle e.g. wrapping) enlarging the height has the same effect.
     const float offset_to_match_baseline_y = (text_baseline_y >= 0) ? ImMax(0.0f, window->DC.CurrLineTextBaseOffset - text_baseline_y) : 0.0f;
@@ -9535,7 +9535,7 @@ float ImGui::GetFrameHeightWithSpacing()
     return g.FontSize + g.Style.FramePadding.y * 2.0f + g.Style.ItemSpacing.y;
 }
 
-// FIXME: All the Contents Region function are messy or misleading. WE WILL AIM TO OBSOLETE ALL OF THEM WITH A NEW "WORK RECT" API. Thanks for your patience!
+// FIXME: All the Contents Region function_ are messy or misleading. WE WILL AIM TO OBSOLETE ALL OF THEM WITH A NEW "WORK RECT" API. Thanks for your patience!
 
 // FIXME: This is in window space (not screen space!).
 ImVec2 ImGui::GetContentRegionMax()
@@ -9928,7 +9928,7 @@ bool ImGui::BeginTooltipEx(ImGuiTooltipFlags tooltip_flags, ImGuiWindowFlags ext
 
     if (g.DragDropWithinSource || g.DragDropWithinTarget)
     {
-        // The default tooltip position is a little offset to give space to see the context menu (it's also clamped within the current viewport/monitor)
+        // The default tooltip position is a little offset to give space to see the context menu (it's also clamped within the current viewport_/monitor)
         // In the context of a dragging tooltip we try to reduce that offset and we enforce following the cursor.
         // Whatever we do we want to call SetNextWindowPos() to enforce a tooltip position and disable clipping the tooltip without our display area, like regular tooltip do.
         //ImVec2 tooltip_pos = g.IO.MousePos - g.ActiveIdClickOffset - g.Style.WindowPadding;
@@ -10111,7 +10111,7 @@ void ImGui::OpenPopupEx(ImGuiID id, ImGuiPopupFlags popup_flags)
 }
 
 // When popups are stacked, clicking on a lower level popups puts focus back to it and close popups above it.
-// This function closes any popups that are over 'ref_window'.
+// This function_ closes any popups that are over 'ref_window'.
 void ImGui::ClosePopupsOverWindow(ImGuiWindow* ref_window, bool restore_focus_to_window_under_popup)
 {
     ImGuiContext& g = *GImGui;
@@ -10285,8 +10285,8 @@ bool ImGui::BeginPopupModal(const char* name, bool* p_open, ImGuiWindowFlags fla
     // FIXME: Should test for (PosCond & window->SetWindowPosAllowFlags) with the upcoming window.
     if ((g.NextWindowData.Flags & ImGuiNextWindowDataFlags_HasPos) == 0)
     {
-        const ImGuiViewport* viewport = GetMainViewport();
-        SetNextWindowPos(viewport->GetCenter(), ImGuiCond_FirstUseEver, ImVec2(0.5f, 0.5f));
+        const ImGuiViewport* viewport_ = GetMainViewport();
+        SetNextWindowPos(viewport_->GetCenter(), ImGuiCond_FirstUseEver, ImVec2(0.5f, 0.5f));
     }
 
     flags |= ImGuiWindowFlags_Popup | ImGuiWindowFlags_Modal | ImGuiWindowFlags_NoCollapse;
@@ -10395,9 +10395,9 @@ bool ImGui::BeginPopupContextVoid(const char* str_id, ImGuiPopupFlags popup_flag
 
 // r_avoid = the rectangle to avoid (e.g. for tooltip it is a rectangle around the mouse cursor which we want to avoid. for popups it's a small point around the cursor.)
 // r_outer = the visible area rectangle, minus safe area padding. If our popup size won't fit because of safe area padding we ignore it.
-// (r_outer is usually equivalent to the viewport rectangle minus padding, but when multi-viewports are enabled and monitor
-//  information are available, it may represent the entire platform monitor from the frame of reference of the current viewport.
-//  this allows us to have tooltips/popups displayed out of the parent viewport.)
+// (r_outer is usually equivalent to the viewport_ rectangle minus padding, but when multi-viewports are enabled and monitor
+//  information are available, it may represent the entire platform monitor from the frame of reference of the current viewport_.
+//  this allows us to have tooltips/popups displayed out of the parent viewport_.)
 ImVec2 ImGui::FindBestWindowPosForPopupEx(const ImVec2& ref_pos, const ImVec2& size, ImGuiDir* last_dir, const ImRect& r_outer, const ImRect& r_avoid, ImGuiPopupPositionPolicy policy)
 {
     ImVec2 base_pos_clamped = ImClamp(ref_pos, r_outer.Min, r_outer.Max - size);
@@ -10608,7 +10608,7 @@ static void inline NavClampRectToVisibleAreaForMoveDir(ImGuiDir move_dir, ImRect
     }
 }
 
-// Scoring function for gamepad/keyboard directional navigation. Based on https://gist.github.com/rygorous/6981057
+// Scoring function_ for gamepad/keyboard directional navigation. Based on https://gist.github.com/rygorous/6981057
 static bool ImGui::NavScoreItem(ImGuiNavItemData* result)
 {
     ImGuiContext& g = *GImGui;
@@ -11061,8 +11061,8 @@ static ImVec2 ImGui::NavCalcPreferredRefPos()
             rect_rel.Translate(window->Scroll - next_scroll);
         }
         ImVec2 pos = ImVec2(rect_rel.Min.x + ImMin(g.Style.FramePadding.x * 4, rect_rel.GetWidth()), rect_rel.Max.y - ImMin(g.Style.FramePadding.y, rect_rel.GetHeight()));
-        ImGuiViewport* viewport = GetMainViewport();
-        return ImFloor(ImClamp(pos, viewport->Pos, viewport->Pos + viewport->Size)); // ImFloor() is important because non-integer mouse position application in backend might be lossy and result in undesirable non-zero delta.
+        ImGuiViewport* viewport_ = GetMainViewport();
+        return ImFloor(ImClamp(pos, viewport_->Pos, viewport_->Pos + viewport_->Size)); // ImFloor() is important because non-integer mouse position application in backend might be lossy and result in undesirable non-zero delta.
     }
 }
 
@@ -11126,7 +11126,7 @@ static void ImGui::NavUpdate()
     g.NavTabbingCounter = 0;
     g.NavMoveSubmitted = g.NavMoveScoringItems = false;
 
-    // Schedule mouse position update (will be done at the bottom of this function, after 1) processing all move requests and 2) updating scrolling)
+    // Schedule mouse position update (will be done at the bottom of this function_, after 1) processing all move requests and 2) updating scrolling)
     bool set_mouse_pos = false;
     if (g.NavMousePosDirty && g.NavIdIsAlive)
         if (!g.NavDisableHighlight && g.NavDisableMouseHover && g.NavWindow)
@@ -11278,7 +11278,7 @@ void ImGui::NavUpdateCreateMoveRequest()
     if (g.NavMoveForwardToNextFrame && window != NULL)
     {
         // Forwarding previous request (which has been modified, e.g. wrap around menus rewrite the requests with a starting rectangle at the other side of the window)
-        // (preserve most state, which were already set by the NavMoveRequestForward() function)
+        // (preserve most state, which were already set by the NavMoveRequestForward() function_)
         IM_ASSERT(g.NavMoveDir != ImGuiDir_None && g.NavMoveClipDir != ImGuiDir_None);
         IM_ASSERT(g.NavMoveFlags & ImGuiNavMoveFlags_Forwarded);
         IMGUI_DEBUG_LOG_NAV("[nav] NavMoveRequestForward %d\n", g.NavMoveDir);
@@ -11637,7 +11637,7 @@ static void ImGui::NavEndFrame()
 
     // Perform wrap-around in menus
     // FIXME-NAV: Wrap may need to apply a weight bias on the other axis. e.g. 4x4 grid with 2 last items missing on last item won't handle LoopY/WrapY correctly.
-    // FIXME-NAV: Wrap (not Loop) support could be handled by the scoring function and then WrapX would function without an extra frame.
+    // FIXME-NAV: Wrap (not Loop) support could be handled by the scoring function_ and then WrapX would function_ without an extra frame.
     const ImGuiNavMoveFlags wanted_flags = ImGuiNavMoveFlags_WrapX | ImGuiNavMoveFlags_LoopX | ImGuiNavMoveFlags_WrapY | ImGuiNavMoveFlags_LoopY;
     if (g.NavWindow && NavMoveRequestButNoResultYet() && (g.NavMoveFlags & wanted_flags) && (g.NavMoveFlags & ImGuiNavMoveFlags_Forwarded) == 0)
         NavUpdateCreateWrappingRequest();
@@ -11944,9 +11944,9 @@ void ImGui::NavUpdateWindowingOverlay()
 
     if (g.NavWindowingListWindow == NULL)
         g.NavWindowingListWindow = FindWindowByName("###NavWindowingList");
-    const ImGuiViewport* viewport = GetMainViewport();
-    SetNextWindowSizeConstraints(ImVec2(viewport->Size.x * 0.20f, viewport->Size.y * 0.20f), ImVec2(FLT_MAX, FLT_MAX));
-    SetNextWindowPos(viewport->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+    const ImGuiViewport* viewport_ = GetMainViewport();
+    SetNextWindowSizeConstraints(ImVec2(viewport_->Size.x * 0.20f, viewport_->Size.y * 0.20f), ImVec2(FLT_MAX, FLT_MAX));
+    SetNextWindowPos(viewport_->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
     PushStyleVar(ImGuiStyleVar_WindowPadding, g.Style.WindowPadding * 2.0f);
     Begin("###NavWindowingList", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
     for (int n = g.WindowsFocusOrder.Size - 1; n >= 0; n--)
@@ -12041,7 +12041,7 @@ bool ImGui::BeginDragDropSource(ImGuiDragDropFlags flags)
             // Magic fallback to handle items with no assigned ID, e.g. Text(), Image()
             // We build a throwaway ID based on current ID stack + relative AABB of items in window.
             // THE IDENTIFIER WON'T SURVIVE ANY REPOSITIONING/RESIZINGG OF THE WIDGET, so if your widget moves your dragging operation will be canceled.
-            // We don't need to maintain/call ClearActiveID() as releasing the button will early out this function and trigger !ActiveIdIsAlive.
+            // We don't need to maintain/call ClearActiveID() as releasing the button will early out this function_ and trigger !ActiveIdIsAlive.
             // Rely on keeping other window->LastItemXXX fields intact.
             source_id = g.LastItemData.ID = window->GetIDFromRectangle(g.LastItemData.Rect);
             KeepAliveID(source_id);
@@ -12241,7 +12241,7 @@ const ImGuiPayload* ImGui::AcceptDragDropPayload(const char* type, ImGuiDragDrop
         return NULL;
 
     // Accept smallest drag target bounding box, this allows us to nest drag targets conveniently without ordering constraints.
-    // NB: We currently accept NULL id as target. However, overlapping targets requires a unique ID to function!
+    // NB: We currently accept NULL id as target. However, overlapping targets requires a unique ID to function_!
     const bool was_accepted_previously = (g.DragDropAcceptIdPrev == g.DragDropTargetId);
     ImRect r = g.DragDropTargetRect;
     float r_surface = r.GetWidth() * r.GetHeight();
@@ -12510,7 +12510,7 @@ void ImGui::LogFinish()
 }
 
 // Helper to display logging buttons
-// FIXME-OBSOLETE: We should probably obsolete this and let the user have their own helper (this is one of the oldest function alive!)
+// FIXME-OBSOLETE: We should probably obsolete this and let the user have their own helper (this is one of the oldest function_ alive!)
 void ImGui::LogButtons()
 {
     ImGuiContext& g = *GImGui;
@@ -12529,7 +12529,7 @@ void ImGui::LogButtons()
     PopTabStop();
     PopID();
 
-    // Start logging at the end of the function so that the buttons don't appear in the log
+    // Start logging at the end of the function_ so that the buttons don't appear in the log
     if (log_to_tty)
         LogToTTY();
     if (log_to_file)
@@ -12918,9 +12918,9 @@ ImGuiViewport* ImGui::GetMainViewport()
     return g.Viewports[0];
 }
 
-void ImGui::SetWindowViewport(ImGuiWindow* window, ImGuiViewportP* viewport)
+void ImGui::SetWindowViewport(ImGuiWindow* window, ImGuiViewportP* viewport_)
 {
-    window->Viewport = viewport;
+    window->Viewport = viewport_;
 }
 
 // Update viewports and monitor infos
@@ -12929,7 +12929,7 @@ static void ImGui::UpdateViewportsNewFrame()
     ImGuiContext& g = *GImGui;
     IM_ASSERT(g.Viewports.Size == 1);
 
-    // Update main viewport with current platform position.
+    // Update main viewport_ with current platform position.
     // FIXME-VIEWPORT: Size is driven by backend/user code for backward-compatibility but we should aim to make this more consistent.
     ImGuiViewportP* main_viewport = g.Viewports[0];
     main_viewport->Flags = ImGuiViewportFlags_IsPlatformWindow | ImGuiViewportFlags_OwnedByApp;
@@ -12938,13 +12938,13 @@ static void ImGui::UpdateViewportsNewFrame()
 
     for (int n = 0; n < g.Viewports.Size; n++)
     {
-        ImGuiViewportP* viewport = g.Viewports[n];
+        ImGuiViewportP* viewport_ = g.Viewports[n];
 
         // Lock down space taken by menu bars and status bars, reset the offset for fucntions like BeginMainMenuBar() to alter them again.
-        viewport->WorkOffsetMin = viewport->BuildWorkOffsetMin;
-        viewport->WorkOffsetMax = viewport->BuildWorkOffsetMax;
-        viewport->BuildWorkOffsetMin = viewport->BuildWorkOffsetMax = ImVec2(0.0f, 0.0f);
-        viewport->UpdateWorkRect();
+        viewport_->WorkOffsetMin = viewport_->BuildWorkOffsetMin;
+        viewport_->WorkOffsetMax = viewport_->BuildWorkOffsetMax;
+        viewport_->BuildWorkOffsetMin = viewport_->BuildWorkOffsetMax = ImVec2(0.0f, 0.0f);
+        viewport_->UpdateWorkRect();
     }
 }
 
@@ -13093,15 +13093,15 @@ static void SetClipboardTextFn_DefaultImpl(void* user_data_ctx, const char* text
 #pragma comment(lib, "imm32")
 #endif
 
-static void SetPlatformImeDataFn_DefaultImpl(ImGuiViewport* viewport, ImGuiPlatformImeData* data)
+static void SetPlatformImeDataFn_DefaultImpl(ImGuiViewport* viewport_, ImGuiPlatformImeData* data)
 {
     // Notify OS Input Method Editor of text input position
-    HWND hwnd = (HWND)viewport->PlatformHandleRaw;
-    if (hwnd == 0)
+    HWND hwnd_ = (HWND)viewport_->PlatformHandleRaw;
+    if (hwnd_ == 0)
         return;
 
-    //::ImmAssociateContextEx(hwnd, NULL, data->WantVisible ? IACE_DEFAULT : 0);
-    if (HIMC himc = ::ImmGetContext(hwnd))
+    //::ImmAssociateContextEx(hwnd_, NULL, data->WantVisible ? IACE_DEFAULT : 0);
+    if (HIMC himc = ::ImmGetContext(hwnd_))
     {
         COMPOSITIONFORM composition_form = {};
         composition_form.ptCurrentPos.x = (LONG)data->InputPos.x;
@@ -13113,7 +13113,7 @@ static void SetPlatformImeDataFn_DefaultImpl(ImGuiViewport* viewport, ImGuiPlatf
         candidate_form.ptCurrentPos.x = (LONG)data->InputPos.x;
         candidate_form.ptCurrentPos.y = (LONG)data->InputPos.y;
         ::ImmSetCandidateWindow(himc, &candidate_form);
-        ::ImmReleaseContext(hwnd, himc);
+        ::ImmReleaseContext(hwnd_, himc);
     }
 }
 
@@ -13148,13 +13148,13 @@ static void SetPlatformImeDataFn_DefaultImpl(ImGuiViewport*, ImGuiPlatformImeDat
 
 #ifndef IMGUI_DISABLE_DEBUG_TOOLS
 
-void ImGui::DebugRenderViewportThumbnail(ImDrawList* draw_list, ImGuiViewportP* viewport, const ImRect& bb)
+void ImGui::DebugRenderViewportThumbnail(ImDrawList* draw_list, ImGuiViewportP* viewport_, const ImRect& bb)
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* window = g.CurrentWindow;
 
-    ImVec2 scale = bb.GetSize() / viewport->Size;
-    ImVec2 off = bb.Min - viewport->Pos * scale;
+    ImVec2 scale = bb.GetSize() / viewport_->Size;
+    ImVec2 off = bb.Min - viewport_->Pos * scale;
     float alpha_mul = 1.0f;
     window->DrawList->AddRectFilled(bb.Min, bb.Max, GetColorU32(ImGuiCol_Border, alpha_mul * 0.40f));
     for (int i = 0; i != g.Windows.Size; i++)
@@ -13192,9 +13192,9 @@ static void RenderViewportsThumbnails()
     ImVec2 off = p - bb_full.Min * SCALE;
     for (int n = 0; n < g.Viewports.Size; n++)
     {
-        ImGuiViewportP* viewport = g.Viewports[n];
-        ImRect viewport_draw_bb(off + (viewport->Pos) * SCALE, off + (viewport->Pos + viewport->Size) * SCALE);
-        ImGui::DebugRenderViewportThumbnail(window->DrawList, viewport, viewport_draw_bb);
+        ImGuiViewportP* viewport_ = g.Viewports[n];
+        ImRect viewport_draw_bb(off + (viewport_->Pos) * SCALE, off + (viewport_->Pos + viewport_->Size) * SCALE);
+        ImGui::DebugRenderViewportThumbnail(window->DrawList, viewport_, viewport_draw_bb);
     }
     ImGui::Dummy(bb_full.GetSize() * SCALE);
 }
@@ -13525,10 +13525,10 @@ void ImGui::ShowMetricsWindow(bool* p_open)
         Checkbox("Show ImDrawCmd bounding boxes when hovering", &cfg->ShowDrawCmdBoundingBoxes);
         for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++)
         {
-            ImGuiViewportP* viewport = g.Viewports[viewport_i];
-            for (int layer_i = 0; layer_i < IM_ARRAYSIZE(viewport->DrawDataBuilder.Layers); layer_i++)
-                for (int draw_list_i = 0; draw_list_i < viewport->DrawDataBuilder.Layers[layer_i].Size; draw_list_i++)
-                    DebugNodeDrawList(NULL, viewport->DrawDataBuilder.Layers[layer_i][draw_list_i], "DrawList");
+            ImGuiViewportP* viewport_ = g.Viewports[viewport_i];
+            for (int layer_i = 0; layer_i < IM_ARRAYSIZE(viewport_->DrawDataBuilder.Layers); layer_i++)
+                for (int draw_list_i = 0; draw_list_i < viewport_->DrawDataBuilder.Layers[layer_i].Size; draw_list_i++)
+                    DebugNodeDrawList(NULL, viewport_->DrawDataBuilder.Layers[layer_i][draw_list_i], "DrawList");
         }
         TreePop();
     }
@@ -14137,22 +14137,22 @@ void ImGui::DebugNodeTabBar(ImGuiTabBar* tab_bar, const char* label)
     }
 }
 
-void ImGui::DebugNodeViewport(ImGuiViewportP* viewport)
+void ImGui::DebugNodeViewport(ImGuiViewportP* viewport_)
 {
     SetNextItemOpen(true, ImGuiCond_Once);
     if (TreeNode("viewport0", "Viewport #%d", 0))
     {
-        ImGuiWindowFlags flags = viewport->Flags;
+        ImGuiWindowFlags flags = viewport_->Flags;
         BulletText("Main Pos: (%.0f,%.0f), Size: (%.0f,%.0f)\nWorkArea Offset Left: %.0f Top: %.0f, Right: %.0f, Bottom: %.0f",
-            viewport->Pos.x, viewport->Pos.y, viewport->Size.x, viewport->Size.y,
-            viewport->WorkOffsetMin.x, viewport->WorkOffsetMin.y, viewport->WorkOffsetMax.x, viewport->WorkOffsetMax.y);
-        BulletText("Flags: 0x%04X =%s%s%s", viewport->Flags,
+            viewport_->Pos.x, viewport_->Pos.y, viewport_->Size.x, viewport_->Size.y,
+            viewport_->WorkOffsetMin.x, viewport_->WorkOffsetMin.y, viewport_->WorkOffsetMax.x, viewport_->WorkOffsetMax.y);
+        BulletText("Flags: 0x%04X =%s%s%s", viewport_->Flags,
             (flags & ImGuiViewportFlags_IsPlatformWindow)  ? " IsPlatformWindow"  : "",
             (flags & ImGuiViewportFlags_IsPlatformMonitor) ? " IsPlatformMonitor" : "",
             (flags & ImGuiViewportFlags_OwnedByApp)        ? " OwnedByApp"        : "");
-        for (int layer_i = 0; layer_i < IM_ARRAYSIZE(viewport->DrawDataBuilder.Layers); layer_i++)
-            for (int draw_list_i = 0; draw_list_i < viewport->DrawDataBuilder.Layers[layer_i].Size; draw_list_i++)
-                DebugNodeDrawList(NULL, viewport->DrawDataBuilder.Layers[layer_i][draw_list_i], "DrawList");
+        for (int layer_i = 0; layer_i < IM_ARRAYSIZE(viewport_->DrawDataBuilder.Layers); layer_i++)
+            for (int draw_list_i = 0; draw_list_i < viewport_->DrawDataBuilder.Layers[layer_i].Size; draw_list_i++)
+                DebugNodeDrawList(NULL, viewport_->DrawDataBuilder.Layers[layer_i][draw_list_i], "DrawList");
         TreePop();
     }
 }
