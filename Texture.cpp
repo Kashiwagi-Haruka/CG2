@@ -3,7 +3,8 @@
 void Texture::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* srvDescriptorHeap, const std::string& fileName) {
 
 	// Textureを読んで転送する
-	DirectX::ScratchImage mipImages = LoadTexture("Resources/uvChecker.png");
+	DirectX::ScratchImage mipImages = LoadTexture(fileName); // ←これが正しい
+
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	textureResource_ = CreateTextureResource(device, metadata);
 	UploadTextureData(textureResource_, mipImages);

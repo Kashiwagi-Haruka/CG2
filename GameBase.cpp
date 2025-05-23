@@ -197,7 +197,7 @@ void GameBase::WindowClear() {
 	rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 	
 	// SRV用ディスクリプタヒープ作成
-	srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 256, true);
 
 
 
@@ -255,7 +255,7 @@ void GameBase::WindowClear() {
 	}
 	texture_.Initialize(
 	    device, srvDescriptorHeap,
-	   "C:/Class/Program/DirectXGame/Resources/white1x1.png");
+	   "C:/Class/Program/DirectXGame/Resources/uvChecker.png");
 	GPUHandle_ = texture_.GetGpuHandle();
 	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる
 
@@ -404,71 +404,177 @@ void GameBase::CheackResourceLeaks() {
 
 }
 void GameBase::ResourceRelease() {
-	
+	// --- GPUが完全に終わるまで待つ（Unmap前に必須） ---
+	if (commandQueue && fence && fenceEvent) {
+		fence->Signal(fenceValue);
+		if (fence->GetCompletedValue() < fenceValue) {
+			fence->SetEventOnCompletion(fenceValue, fenceEvent);
+			WaitForSingleObject(fenceEvent, INFINITE);
+		}
+		++fenceValue;
+	}
 
-	imguiM.Finalize();
-	
-	texture_.Release();
-
+	// --- Transform のアンマップ ---
 	if (transformResource) {
 		transformResource->Unmap(0, nullptr);
 	}
-	vertexResource->Release();
-	materialResource->Release();
-	transformResource->Release();
 
-	graphicsPipelineState->Release();
-	signatureBlob->Release();
+
+
+	// --- テクスチャリソース ---
+	texture_.Release();
+
+	// --- 各種リソース ---
+	if (vertexResource) {
+		vertexResource->Release();
+		vertexResource = nullptr;
+	}
+
+	if (materialResource) {
+		materialResource->Release();
+		materialResource = nullptr;
+	}
+
+	if (transformResource) {
+		transformResource->Release();
+		transformResource = nullptr;
+	}
+
+
+	if (graphicsPipelineState) {
+		graphicsPipelineState->Release();
+		graphicsPipelineState = nullptr;
+	}
+
+	if (signatureBlob) {
+		signatureBlob->Release();
+		signatureBlob = nullptr;
+	}
+
 	if (errorBlob) {
 		errorBlob->Release();
+		errorBlob = nullptr;
 	}
+
 	if (includeHandler) {
 		includeHandler->Release();
 		includeHandler = nullptr;
 	}
+
 	if (dxcCompiler) {
 		dxcCompiler->Release();
 		dxcCompiler = nullptr;
 	}
+
 	if (dxcUtils) {
 		dxcUtils->Release();
 		dxcUtils = nullptr;
 	}
 
-	// ← ここに追加
-	srvDescriptorHeap->Release();
-	dsvDescriptorHeap->Release();
 
-	rootSignature->Release();
-	pixelShaderBlob->Release();
-	vertexShaderBlob->Release();
 
-    if (fenceEvent) {
-		CloseHandle(fenceEvent);
-		fenceEvent = nullptr; // ★追加推奨（予期せぬ再利用防止）
+	if (dsvDescriptorHeap) {
+		dsvDescriptorHeap->Release();
+		dsvDescriptorHeap = nullptr;
 	}
-	fence->Release();
+
+	if (rootSignature) {
+		rootSignature->Release();
+		rootSignature = nullptr;
+	}
+
+	if (pixelShaderBlob) {
+		pixelShaderBlob->Release();
+		pixelShaderBlob = nullptr;
+	}
+
+	if (vertexShaderBlob) {
+		vertexShaderBlob->Release();
+		vertexShaderBlob = nullptr;
+	}
+
+	if (fenceEvent) {
+		CloseHandle(fenceEvent);
+		fenceEvent = nullptr;
+	}
+
+	if (fence) {
+		fence->Release();
+		fence = nullptr;
+	}
+
 	if (depthStenicilResource) {
 		depthStenicilResource->Release();
 		depthStenicilResource = nullptr;
 	}
-	rtvDescriptorHeap->Release();
-	swapChainResources[0]->Release();
-	swapChainResources[1]->Release();
-	swapChain->Release();
-	commandList->Release();
-	commandAllocator->Release();
-	commandQueue->Release();
-	device->Release();
-	useAdapter->Release();
-	dxgiFactory->Release();
+
+	if (rtvDescriptorHeap) {
+		rtvDescriptorHeap->Release();
+		rtvDescriptorHeap = nullptr;
+	}
+
+	for (int i = 0; i < 2; ++i) {
+		if (swapChainResources[i]) {
+			swapChainResources[i]->Release();
+			swapChainResources[i] = nullptr;
+		}
+	}
+
+	if (swapChain) {
+		swapChain->Release();
+		swapChain = nullptr;
+	}
+
+	if (commandList) {
+		commandList->Release();
+		commandList = nullptr;
+	}
+
+	if (commandAllocator) {
+		commandAllocator->Release();
+		commandAllocator = nullptr;
+	}
+
+	if (commandQueue) {
+		commandQueue->Release();
+		commandQueue = nullptr;
+	}
+	imguiM.Finalize(); // これを一番最後近くに移動する
+	if (srvDescriptorHeap) {
+		srvDescriptorHeap->Release();
+		srvDescriptorHeap = nullptr;
+	}
+	if (device) {
+		device->Release();
+		device = nullptr;
+	}
+
+	if (useAdapter) {
+		useAdapter->Release();
+		useAdapter = nullptr;
+	}
+
+	if (dxgiFactory) {
+		dxgiFactory->Release();
+		dxgiFactory = nullptr;
+	}
 
 #ifdef _DEBUG
-	debugController->Release();
+	if (debugController) {
+		debugController->Release();
+		debugController = nullptr;
+	}
 #endif
+
+	IDXGIDebug1* debug = nullptr;
+	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
+		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+		debug->Release();
+	}
 
 	CloseWindow(hwnd);
 }
+
 
 
 
@@ -722,37 +828,7 @@ void GameBase::VertexResource() {
 	vertexBufferView.SizeInBytes = sizeof(VertexData) * kMaxVertices;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 	
-	//VertexData* vertexData = nullptr;
-	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-
-	//// 左下
-	//vertexData[0].position = {-0.5f, -0.5f, 0.0f, 1.0f};
-	//vertexData[0].texcoord = {0.0f, 1.0f};
-
-	//// 上
-	//vertexData[1].position = {0.0f, 0.5f, 0.0f, 1.0f};
-	//vertexData[1].texcoord = {0.5f, 0.0f};
-
-	//// 右下
-	//vertexData[2].position = {0.5f, -0.5f, 0.0f, 1.0f};
-	//vertexData[2].texcoord = {1.0f, 1.0f};
-
-	//// 左下2
-	//vertexData[3].position = {-0.5f, -0.5f, 0.5f, 1.0f};
-	//vertexData[3].texcoord = {0.0f, 1.0f};
-
-	//// 上2
-	//vertexData[4].position = {0.0f, 0.0f, 0.0f, 1.0f};
-	//vertexData[4].texcoord = {0.5f, 0.0f};
-
-	//// 右下2
-	//vertexData[5].position = {0.5f, -0.5f, -0.5f, 1.0f};
-	//vertexData[5].texcoord = {1.0f, 1.0f};
-
-
-
-	//vertexResource->Unmap(0, nullptr);
-
+	
 
 	// ビューポートとシザー設定
 	viewport = {};
@@ -774,18 +850,21 @@ void GameBase::VertexResource() {
 	Vector4* materialData = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 赤
-
+	materialResource->Unmap(0, nullptr);
 	// --- トランスフォーム用リソース ---
 	transformResource = CreateBufferResource(device, sizeof(Matrix4x4));
 	transformResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // ←ここ！！起動時にマップしっぱなし
-	*transformationMatrixData = function.MakeIdentity(); // 初期値は単位行列
+	*transformationMatrixData = function.MakeIdentity(); // 初期値は単位行列]// 例：Drawの最後に Unmap する
+	
 	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
 	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
 	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+	
 	*transformationMatrixData = worldViewProjectionMatrix;
+
 }
 
 
@@ -806,7 +885,7 @@ ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device, size_t size
 	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	ID3D12Resource* bufferResource = nullptr;
+	bufferResource = nullptr;
 
 	HRESULT hr = device->CreateCommittedResource(
 	    &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc,
@@ -837,56 +916,56 @@ void GameBase::Update() {
 	/**wvpData = worldMatrix;*/
 }
 
-void GameBase::Draw() {
-	// ★ここ！毎回リセットする
-	hr = commandAllocator->Reset();
-	assert(SUCCEEDED(hr));
-	hr = commandList->Reset(commandAllocator, nullptr);
-	assert(SUCCEEDED(hr));
-
-	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
-	DrawcommandList();
-
-	
-	
-
-	//ImGui::ShowDemoWindow();
-
-	// ImGui 描画（SRVヒープとコマンドリストを渡す）
-	imguiM.Render(srvDescriptorHeap, commandList);
-
-	// RenderTarget → Present に戻す
-	
-	CrtvTransitionBarrier();
-
-	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
-	hr = commandList->Close();
-
-	assert(SUCCEEDED(hr));
-
-	// GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = {commandList};
-	commandQueue->ExecuteCommandLists(1, commandLists);
-	// GPUと05に画面の交換を行うよう通知する
-	// GPUとOSに画面の交換を行うよう通知する
-	swapChain->Present(1, 0);
-
-	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
-
-	// Fenceで同期
-	fenceValue++;
-	commandQueue->Signal(fence, fenceValue);
-
-	if (fence->GetCompletedValue() < fenceValue) {
-		fence->SetEventOnCompletion(fenceValue, fenceEvent);
-		WaitForSingleObject(fenceEvent, INFINITE);
-	}
-
-}
-
-
+//void GameBase::Draw() {
+//	// ★ここ！毎回リセットする
+//	hr = commandAllocator->Reset();
+//	assert(SUCCEEDED(hr));
+//	hr = commandList->Reset(commandAllocator, nullptr);
+//	assert(SUCCEEDED(hr));
+//
+//	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+//
+//	DrawcommandList();
+//
+//	
+//	
+//
+//	//ImGui::ShowDemoWindow();
+//
+//	// ImGui 描画（SRVヒープとコマンドリストを渡す）
+//	imguiM.Render(srvDescriptorHeap, commandList);
+//
+//	// RenderTarget → Present に戻す
+//	
+//	CrtvTransitionBarrier();
+//
+//	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
+//	hr = commandList->Close();
+//
+//	assert(SUCCEEDED(hr));
+//
+//	// GPUにコマンドリストの実行を行わせる
+//	ID3D12CommandList* commandLists[] = {commandList};
+//	commandQueue->ExecuteCommandLists(1, commandLists);
+//	// GPUと05に画面の交換を行うよう通知する
+//	// GPUとOSに画面の交換を行うよう通知する
+//	swapChain->Present(1, 0);
+//
+//	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+//
+//
+//	// Fenceで同期
+//	fenceValue++;
+//	commandQueue->Signal(fence, fenceValue);
+//
+//	if (fence->GetCompletedValue() < fenceValue) {
+//		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+//		WaitForSingleObject(fenceEvent, INFINITE);
+//	}
+//
+//}
+//
+//
 
 void GameBase::FrameStart() {
 	hr = commandAllocator->Reset();
@@ -926,7 +1005,7 @@ ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device
 	depthClearValue.DepthStencil.Depth = 1.0f;
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	ID3D12Resource* resource = nullptr;
+	resource = nullptr;
 	hr = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthClearValue, IID_PPV_ARGS(&resource));
 	assert(SUCCEEDED(hr));
 
@@ -1001,6 +1080,10 @@ void GameBase::BeginFlame() {
 	// ① 現在のバックバッファをフレーム毎に更新
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
+	// --- 安全チェック ---
+	assert(backBufferIndex < 2);
+	assert(swapChainResources[backBufferIndex] != nullptr); // 安全強化！
+
 	// ② 頂点オフセットリセット
 	currentVertexOffset_ = 0;
 
@@ -1008,11 +1091,12 @@ void GameBase::BeginFlame() {
 	FrameStart();
 
 	// ④ バックバッファへのバリア & RTV 設定 & クリア
-	DrawcommandList(); // ここで barrier.pResource に swapChainResources[backBufferIndex] が使われる
+	DrawcommandList();
 
 	// ⑤ ImGui 準備
 	imguiM.NewFrame();
 }
+
 
 
 

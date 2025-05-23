@@ -80,8 +80,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 
 	int checkerId = gameBase->LoadTexture("Resources/uvChecker.png");
-	int whiteId = gameBase->LoadTexture("Resources/white1x1.png");
-	int ballId = gameBase->LoadTexture("Resources/monsterBall.png");
+
    
 	struct Particle {
 		Vector3 pos; // ワールド空間での座標
@@ -118,9 +117,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	static int texIdx = 0;
    const char* names[] = {
-	   "Checker",
-	   "Ball",
-	   "White"};
+	   "Checker"};
 
    // ① 三角形毎のパラメータをまとめる構造体
    struct DepthTriParam {

@@ -60,8 +60,8 @@ private:
 
 	int32_t kClientWidth = 1280;
 	int32_t kClientHeight = 720;
-
-
+	ID3D12Resource* bufferResource = nullptr;
+	ID3D12Resource* resource = nullptr;
 	D3D12_VIEWPORT viewport;
 	// シザー矩形
 	D3D12_RECT scissorRect;
@@ -138,7 +138,7 @@ public:
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
 
 	void Update();
-	void Draw();
+	/*void Draw();*/
 
 	bool IsMsgQuit();
 
