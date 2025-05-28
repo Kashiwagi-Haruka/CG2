@@ -235,7 +235,7 @@ void GameBase::WindowClear() {
 	// 2つ目を作る
 	device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
 
-	ID3D12Resource* depthStenicilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+	depthStenicilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
 
 	dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
@@ -417,7 +417,7 @@ void GameBase::ResourceRelease() {
 
 
 	if (transformResource) {
-		transformResource->Unmap(0, nullptr); // ちゃんと最後だけUnmapする
+		//transformResource->Unmap(0, nullptr); // ちゃんと最後だけUnmapする
 	}
 	
 	vertexResource->Release();
@@ -435,6 +435,9 @@ void GameBase::ResourceRelease() {
 
 	CloseHandle(fenceEvent);
 	fence->Release();
+	dsvDescriptorHeap->Release();
+	depthStenicilResource->Release();
+	srvDescriptorHeap->Release();
 	rtvDescriptorHeap->Release();
 	swapChainResources[0]->Release();
 	swapChainResources[1]->Release();
@@ -446,9 +449,9 @@ void GameBase::ResourceRelease() {
 	useAdapter->Release();
 	dxgiFactory->Release();
 
-#ifdef _DEBUG
-	debugController->Release();
-#endif
+//#ifdef _DEBUG
+//	debugController->Release();
+//#endif
 
 	CloseWindow(hwnd);
 }

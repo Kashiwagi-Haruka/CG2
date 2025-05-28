@@ -92,6 +92,7 @@ private:
 
 		// RTVを2つ作るのでディスクリプタを2つ用意
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	ID3D12Resource* depthStenicilResource=nullptr;
 	ID3D12DescriptorHeap* dsvDescriptorHeap;
 	Function function;
 
