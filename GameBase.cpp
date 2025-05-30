@@ -1176,3 +1176,25 @@ void GameBase::EndFlame() {
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
 }
+void GameBase::DrawTriangle(const Vector3& v0, const Vector3& v1, const Vector3& v2, uint32_t color) {
+	if (currentVertexOffset_ + 3 > kMaxVertices_) {
+		// 頂点数が上限を超える場合は描画しない
+		return;
+	}
+
+	VertexData* vertexData = nullptr;
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+
+	vertexData[currentVertexOffset_ + 0].position = v0;
+	vertexData[currentVertexOffset_ + 1].position = v1;
+	vertexData[currentVertexOffset_ + 2].position = v2;
+
+	for (int i = 0; i < 3; ++i) {
+		vertexData[currentVertexOffset_ + i].texcoord = {0.0f, 0.0f}; // UV不要なら 0 埋め
+		vertexData[currentVertexOffset_ + i].color = color;
+	}
+
+	vertexResource->Unmap(0, nullptr);
+
+	currentVertexOffset_ += 3; // 三角形分オフセットを進める
+}

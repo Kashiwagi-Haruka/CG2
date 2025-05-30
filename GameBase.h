@@ -132,7 +132,8 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 
 	Texture texture_;
 	D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle_;
-
+	UINT currentVertexOffset_ = 0;              // 追加：次に書き込む頂点のオフセット（頂点数単位）
+	static constexpr UINT kMaxVertices_ = 1024; // 十分な大きさで定義しておく
 public:
 	void FrameStart(); // フレーム最初の準備
 
