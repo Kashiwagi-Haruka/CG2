@@ -91,7 +91,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	for (size_t i = 0; i < _countof(featureLevels); ++i) {
 
 		// 採用したアダプターでデバイスを生成
-		hr_ = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device));
+		hr_ = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device_));
 
 		// 指定した機能レベルでデバイスが生成できたかを確認
 		if (SUCCEEDED(hr_)) {
@@ -101,7 +101,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 		}
 	}
 	// デバイスの生成がうまくいかなかったので起動できない
-	assert(device != nullptr);
+	assert(device_ != nullptr);
 	Log("Complete create D3D12Device!!!\n"); // 初期化完了のログをだす
 	DebugError();
 
@@ -160,20 +160,20 @@ void GameBase::WindowClear() {
 	commandQueueDesc = {};
 	commandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT; // 主に描画用途
-	hr_ = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue_));
+	hr_ = device_->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue_));
 
 	// コマンドキューの生成がうまくいかなかったので起動できない
 	assert(SUCCEEDED(hr_));
 
 	// コマンドアロケータを生成する
 	commandAllocator = nullptr;
-	hr_ = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
+	hr_ = device_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
 	// コマンドアロケータの生成がうまくいかなかったので起動できない
 	assert(SUCCEEDED(hr_));
 
 	// コマンドリストを生成する
 	commandList_ = nullptr;
-	hr_ = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList_));
+	hr_ = device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList_));
 	// コマンドリストの生成がうまくいかなかったので起動できない
 	assert(SUCCEEDED(hr_));
 
@@ -194,16 +194,16 @@ void GameBase::WindowClear() {
 
 	// ディスクリプタヒープの生成
 
-	rtvDescriptorHeap_ = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	rtvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 	
 	// SRV用ディスクリプタヒープ作成
-	srvDescriptorHeap_ = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	srvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
 
 
 	//rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV; // レンダーターゲットビュー用
 	//rtvDescriptorHeapDesc.NumDescriptors = 2;                    // ダブルバッファ用に2つ。多くてもかまわない
-	//hr_ = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap_));
+	//hr_ = device_->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap_));
 	//// ディスクリプタヒープがつくれなかったので起動できない
 	//assert(SUCCEEDED(hr_));
 	DXCInitialize();
@@ -229,31 +229,31 @@ void GameBase::WindowClear() {
 
 	// まず1つ目を作る。1つ目は最初のところに作る。作る場所をこちらで指定してあげる必要がある
 	rtvHandles[0] = rtvStartHandle;
-	device->CreateRenderTargetView(swapChainResources_[0], &rtvDesc, rtvHandles[0]);
+	device_->CreateRenderTargetView(swapChainResources_[0], &rtvDesc, rtvHandles[0]);
 	// 2つ目のディスクリプタハンドルを得る(自力で)
-	rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	rtvHandles[1].ptr = rtvHandles[0].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	// 2つ目を作る
-	device->CreateRenderTargetView(swapChainResources_[1], &rtvDesc, rtvHandles[1]);
+	device_->CreateRenderTargetView(swapChainResources_[1], &rtvDesc, rtvHandles[1]);
 
-	depthStenicilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+	depthStenicilResource = CreateDepthStencilTextureResource(device_, kClientWidth, kClientHeight);
 
-	dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	dsvDescriptorHeap = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 
-	device->CreateDepthStencilView(depthStenicilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	device_->CreateDepthStencilView(depthStenicilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
 	// ImGui 初期化はここで！
-	imguiM_.MInitialize(hwnd, device, swapChainDesc, rtvDesc, srvDescriptorHeap_);
+	imguiM_.MInitialize(hwnd, device_, swapChainDesc, rtvDesc, srvDescriptorHeap_);
 
 	if (srvDescriptorHeap_ == nullptr) {
 		assert(false);
 	}
-	texture_.Initialize(device, srvDescriptorHeap_);
+	texture_.Initialize(device_, srvDescriptorHeap_);
 	GPUHandle_ = texture_.GetGpuHandle();
 	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる
 
@@ -277,7 +277,7 @@ void GameBase::WindowClear() {
 
 	// Fenceを作る
 	fenceValue_ = 0;
-	hr_ = device->CreateFence(fenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
+	hr_ = device_->CreateFence(fenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
 	assert(SUCCEEDED(hr_));
 
 	fenceEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
@@ -317,7 +317,7 @@ void GameBase::DebugError() {
 #ifdef _DEBUG
 
 	ID3D12InfoQueue* infoQueue = nullptr;
-	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
+	if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
 	//ヤバいエラーの時に止まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
 	//エラー時に止まる
@@ -378,7 +378,7 @@ void GameBase::CrtvTransitionBarrier() {
 
 void GameBase::FenceEvent() {
 	// Fenceの作成
-	hr_ = device->CreateFence(fenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
+	hr_ = device_->CreateFence(fenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
 	assert(SUCCEEDED(hr_));
 
 	// ←ここ追加！！
@@ -416,13 +416,13 @@ void GameBase::ResourceRelease() {
 	}
 
 
-	if (transformResource) {
+	if (transformResource_) {
 		//transformResource->Unmap(0, nullptr); // ちゃんと最後だけUnmapする
 	}
 	
-	vertexResource->Release();
-	materialResource->Release(); 
-	transformResource->Release(); 
+	vertexResource_->Release();
+	materialResource_->Release(); 
+	transformResource_->Release(); 
 
 	graphicsPipelineState->Release();
 	signatureBlob->Release();
@@ -445,7 +445,7 @@ void GameBase::ResourceRelease() {
 	commandList_->Release();
 	commandAllocator->Release();
 	commandQueue_->Release();
-	device->Release();
+	device_->Release();
 	useAdapter->Release();
 	dxgiFactory->Release();
 
@@ -551,8 +551,8 @@ IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパ�
 
 void GameBase::PSO() {
 	Log("PSO() Start\n");
-	assert(device != nullptr);
-	Log("device is OK\n");
+	assert(device_ != nullptr);
+	Log("device_ is OK\n");
 
 	// RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -608,7 +608,7 @@ void GameBase::PSO() {
 	}
 
 	rootSignature = nullptr;
-	hr_ = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+	hr_ = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
 	
 
 	assert(SUCCEEDED(hr_));
@@ -687,20 +687,20 @@ void GameBase::PSO() {
 
 	// 実際に生成
 	graphicsPipelineState = nullptr;
-	hr_ = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	hr_ = device_->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr_));
 }
 
 void GameBase::VertexResource() {
 	// 頂点リソース作成
-	vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
-	assert(vertexResource != nullptr);
-	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * 6);
+	assert(vertexResource_ != nullptr);
+	vertexBufferView.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 	
 	VertexData* vertexData = nullptr;
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
 	// 左下
 	vertexData[0].position = {-0.5f, -0.5f, 0.0f, 1.0f};
@@ -728,7 +728,7 @@ void GameBase::VertexResource() {
 
 
 
-	vertexResource->Unmap(0, nullptr);
+	vertexResource_->Unmap(0, nullptr);
 
 
 	// ビューポートとシザー設定
@@ -747,14 +747,14 @@ void GameBase::VertexResource() {
 	scissorRect.bottom = kClientHeight;
 
 	// --- マテリアル用リソース ---
-	materialResource = CreateBufferResource(device, sizeof(Vector4));
+	materialResource_ = CreateBufferResource(device_, sizeof(Vector4));
 	Vector4* materialData = nullptr;
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 赤
 
 	// --- トランスフォーム用リソース ---
-	transformResource = CreateBufferResource(device, sizeof(Matrix4x4));
-	transformResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // ←ここ！！起動時にマップしっぱなし
+	transformResource_ = CreateBufferResource(device_, sizeof(Matrix4x4));
+	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // ←ここ！！起動時にマップしっぱなし
 	*transformationMatrixData = function.MakeIdentity(); // 初期値は単位行列
 	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
@@ -765,7 +765,7 @@ void GameBase::VertexResource() {
 	*transformationMatrixData = worldViewProjectionMatrix;
 
 	// --- Sprite用 頂点リソース ---
-	vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
+	vertexResourceSprite = CreateBufferResource(device_, sizeof(VertexData) * 6);
 	vertexBufferViewSprite={};
 	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
 	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
@@ -796,7 +796,7 @@ void GameBase::VertexResource() {
 
 	vertexResourceSprite->Unmap(0, nullptr);
 	// Sprite用の TransformationMatrix リソース作成（1個分）
-	transformationMatrixResourceSprite = CreateBufferResource(device, sizeof(Matrix4x4));
+	transformationMatrixResourceSprite = CreateBufferResource(device_, sizeof(Matrix4x4));
 
 	// データへのポインタ取得
 	transformationMatrixDataSprite = nullptr;
@@ -807,7 +807,7 @@ void GameBase::VertexResource() {
 
 	
 		//// 通常の三角形の初期化（もともとの処理）
-		//vertexResource = CreateBufferResource(device, sizeof(VertexData) * 3);
+		//vertexResource = CreateBufferResource(device_, sizeof(VertexData) * 3);
 		//vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 		//vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
 		//vertexBufferView.StrideInBytes = sizeof(VertexData);
@@ -830,7 +830,7 @@ void GameBase::VertexResource() {
 
 		const int kVertexCount = kSubdivision * kSubdivision * 6;
 	    kVertexCount_ = kVertexCount;
-		vertexResourceSphere = CreateBufferResource(device, sizeof(VertexData) * kVertexCount);
+		vertexResourceSphere = CreateBufferResource(device_, sizeof(VertexData) * kVertexCount);
 		vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
 		vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * kVertexCount;
 		vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
@@ -881,12 +881,12 @@ void GameBase::VertexResource() {
 		//viewport = {0.0f, 0.0f, static_cast<float>(kClientWidth), static_cast<float>(kClientHeight), 0.0f, 1.0f};
 		//scissorRect = {0, 0, kClientWidth, kClientHeight};
 
-		//materialResource = CreateBufferResource(device, sizeof(Vector4));
+		//materialResource = CreateBufferResource(device_, sizeof(Vector4));
 		//Vector4* materialData = nullptr;
 		//materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 		//*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
-		//transformResource = CreateBufferResource(device, sizeof(Matrix4x4));
+		//transformResource = CreateBufferResource(device_, sizeof(Matrix4x4));
 		//transformResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
 		//*transformationMatrixData = function.MakeIdentity();
 
@@ -901,7 +901,7 @@ void GameBase::VertexResource() {
 
 
 
-ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
+ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device_, size_t sizeInBytes) {
 	// バッファの設定（UPLOAD用に変更）
 	D3D12_HEAP_PROPERTIES heapProperties = {};
 	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -919,7 +919,7 @@ ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device, size_t size
 
 	ID3D12Resource* bufferResource = nullptr;
 
-	HRESULT hr_ = device->CreateCommittedResource(
+	HRESULT hr_ = device_->CreateCommittedResource(
 	    &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc,
 	    D3D12_RESOURCE_STATE_GENERIC_READ, // Uploadならこれ
 	    nullptr, IID_PPV_ARGS(&bufferResource));
@@ -1022,19 +1022,19 @@ void GameBase::FrameStart() {
 	assert(SUCCEEDED(hr_));
 }
 
-ID3D12DescriptorHeap* GameBase::CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
+ID3D12DescriptorHeap* GameBase::CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
 
 	ID3D12DescriptorHeap* descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
 	descriptorHeapDesc.Type = heapType;
 	descriptorHeapDesc.NumDescriptors = numDescriptors;
 	descriptorHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	hr_ = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+	hr_ = device_->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
 	assert(SUCCEEDED(hr_));
 
 	return descriptorHeap;
 }
-ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
+ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height) {
 
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = width;
@@ -1054,7 +1054,7 @@ ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	ID3D12Resource* resource = nullptr;
-	hr_ = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthClearValue, IID_PPV_ARGS(&resource));
+	hr_ = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthClearValue, IID_PPV_ARGS(&resource));
 	assert(SUCCEEDED(hr_));
 
 	
@@ -1101,8 +1101,8 @@ void GameBase::DrawCommandList() {
 	commandList_->SetGraphicsRootSignature(rootSignature);
 	commandList_->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());  // PixelShader側
-	commandList_->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress()); // VertexShader側
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());  // PixelShader側
+	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress()); // VertexShader側
 	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap_};
 	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 
@@ -1176,25 +1176,57 @@ void GameBase::EndFlame() {
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
 }
-void GameBase::DrawTriangle(const Vector3& v0, const Vector3& v1, const Vector3& v2, uint32_t color) {
-	if (currentVertexOffset_ + 3 > kMaxVertices_) {
-		// 頂点数が上限を超える場合は描画しない
-		return;
-	}
-
-	VertexData* vertexData = nullptr;
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-
-	vertexData[currentVertexOffset_ + 0].position = v0;
-	vertexData[currentVertexOffset_ + 1].position = v1;
-	vertexData[currentVertexOffset_ + 2].position = v2;
-
+void GameBase::DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle) {
+	// オフセットを今の位置で取得
+	UINT offsetVerts = currentVertexOffset_;
+	// 1) 頂点バッファをマップして、offset から書き込み
+	VertexData* vd = nullptr;
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vd));
+	vd += offsetVerts; // ← 3 頂点単位でずらす
 	for (int i = 0; i < 3; ++i) {
-		vertexData[currentVertexOffset_ + i].texcoord = {0.0f, 0.0f}; // UV不要なら 0 埋め
-		vertexData[currentVertexOffset_ + i].color = color;
+		vd[i].position = {positions[i].x, positions[i].y, positions[i].z, 1.0f};
+		vd[i].texcoord = texcoords[i];
 	}
+	vertexResource_->Unmap(0, nullptr);
 
-	vertexResource->Unmap(0, nullptr);
+	// 2) マテリアルカラーを更新
+	Vector4* mat = nullptr;
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
+	*mat = color;
+	materialResource_->Unmap(0, nullptr);
 
-	currentVertexOffset_ += 3; // 三角形分オフセットを進める
+	// 3) ワールドビュー射影行列は既に transformResource に書き込まれている前提
+
+	// 4) ルートパラメータ設定
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
+
+	// 5) テクスチャ用ディスクリプタ
+	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
+	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
+	commandList_->SetGraphicsRootDescriptorTable(2, texture.GetGpuHandle());
+
+	// 6) 頂点バッファビューを設定
+	// 頂点バッファビューを設定（オフセットを反映）
+
+	D3D12_VERTEX_BUFFER_VIEW vbv{};
+	vbv.BufferLocation = +vertexResource_->GetGPUVirtualAddress() + +offsetVerts * sizeof(VertexData);
+	vbv.SizeInBytes = sizeof(VertexData) * 3;
+	vbv.StrideInBytes = sizeof(VertexData);
+	commandList_->IASetVertexBuffers(0, 1, &vbv);
+
+	// 7) プリミティブ／ドロー
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->DrawInstanced(3, 1, 0, 0);
+
+	// ⑧ 次回のオフセットを進める
+	currentVertexOffset_ += 3;
+}
+
+int GameBase::LoadTexture(const std::string& fileName) {
+	// 新しいTextureオブジェクトをvectorに追加
+	textures_.emplace_back();
+	// Initializeのオーバーロードを利用してファイル名で読み込み
+	textures_.back().Initialize(device_, srvDescriptorHeap_, fileName);
+	return static_cast<int>(textures_.size() - 1);
 }

@@ -31,7 +31,7 @@ private:
 	HWND hwnd;
 	// 使用するアダプタ用の変数。最初にnullptrを入れておく
 	IDXGIAdapter4* useAdapter = nullptr;
-	ID3D12Device* device = nullptr;
+	ID3D12Device* device_ = nullptr;
 	ID3D12CommandQueue* commandQueue_;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc;
 	ID3D12CommandAllocator* commandAllocator;
@@ -82,10 +82,10 @@ private:
 	D3D12_HEAP_PROPERTIES heapProperties;
 	D3D12_RESOURCE_DESC resourceDesc;
 	// 実際に頂点リソースを作る
-	ID3D12Resource* vertexResource;
-	ID3D12Resource* materialResource;
+	ID3D12Resource* vertexResource_;
+	ID3D12Resource* materialResource_;
 	// --- 頂点用 (Transform行列) のリソース追加 ---
-	ID3D12Resource* transformResource = nullptr;
+	ID3D12Resource* transformResource_ = nullptr;
 	ID3D12Resource* vertexResourceSprite;
 	ID3D12Resource* transformationMatrixResourceSprite;
 	ID3D12Resource* vertexResourceSphere;
@@ -187,14 +187,14 @@ public:
 
 	void DrawCommandList();
 
-	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
-	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
-	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
+	ID3D12Resource* CreateBufferResource(ID3D12Device* device_, size_t sizeInBytes);
+	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height);
 
-
+	int LoadTexture(const std::string& fileName);
 
 	// 描画関数（好きなだけ呼べるように）
-	void DrawTriangle(const Vector3& v0, const Vector3& v1, const Vector3& v2, uint32_t color);
+	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
 	void DrawSphere(const Vector3& center, float radius, uint32_t color);
 	void DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color);
 };

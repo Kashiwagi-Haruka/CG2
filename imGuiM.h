@@ -9,7 +9,7 @@ class imGuiM {
 
 public:
 
-	void MInitialize(HWND hwnd, ID3D12Device* device, DXGI_SWAP_CHAIN_DESC1 swapChainDesc, D3D12_RENDER_TARGET_VIEW_DESC rtvDesc, ID3D12DescriptorHeap* srvDescriptorHeap_);
+	void MInitialize(HWND hwnd, ID3D12Device* device_, DXGI_SWAP_CHAIN_DESC1 swapChainDesc, D3D12_RENDER_TARGET_VIEW_DESC rtvDesc, ID3D12DescriptorHeap* srvDescriptorHeap_);
 	void NewFrame();
 	void Render(ID3D12DescriptorHeap* srvDescriptorHeap_, ID3D12GraphicsCommandList* commandList_);
 

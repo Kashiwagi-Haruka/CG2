@@ -1,11 +1,11 @@
 #include "Texture.h"
 
-void Texture::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* srvDescriptorHeap_) {
+void Texture::Initialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescriptorHeap_) {
 
 	// Textureを読んで転送する
 	DirectX::ScratchImage mipImages = LoadTexture("Resources/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	ID3D12Resource* textureResource = CreateTextureResource(device, metadata);
+	ID3D12Resource* textureResource = CreateTextureResource(device_, metadata);
 	UploadTextureData(textureResource, mipImages);
 
 
@@ -21,12 +21,12 @@ void Texture::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* srvDescript
 	textureSrvHandleGPU_ = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
 
 	// --- ImGuiが0番を使ってる場合、1つインクリメントして避ける ---
-	UINT descriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	UINT descriptorSize = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	textureSrvHandleCPU.ptr += descriptorSize;
 	textureSrvHandleGPU_.ptr += descriptorSize;
 
 	// --- SRV作成 ---
-	device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
+	device_->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
 	assert(metadata.format != DXGI_FORMAT_UNKNOWN);
 
 	OutputDebugStringA(std::format("GPU Handle: 0x{:X}\n", textureSrvHandleGPU_.ptr).c_str());
@@ -50,7 +50,7 @@ DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
 		return mipImages;
 }
 
-ID3D12Resource* Texture::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata) {
+ID3D12Resource* Texture::CreateTextureResource(ID3D12Device* device_, const DirectX::TexMetadata& metadata) {
 	
 	// metadataを基にResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
@@ -70,7 +70,7 @@ ID3D12Resource* Texture::CreateTextureResource(ID3D12Device* device, const Direc
 
 	// Resourceの生成
 	resource = nullptr;
-	HRESULT hr_ = device->CreateCommittedResource(
+	HRESULT hr_ = device_->CreateCommittedResource(
 	    &heapProperties,                   // Heapの設定
 	    D3D12_HEAP_FLAG_NONE,              // Heapの特殊な設定。特になし。
 	    &resourceDesc,                     // Resourceの設定
