@@ -35,17 +35,17 @@ private:
 	ID3D12CommandQueue* commandQueue;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc;
 	ID3D12CommandAllocator* commandAllocator;
-	ID3D12GraphicsCommandList* commandList;
-	IDXGISwapChain4* swapChain = nullptr;
-	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
+	ID3D12GraphicsCommandList* commandList_;
+	IDXGISwapChain4* swapChain_ = nullptr;
+	ID3D12DescriptorHeap* rtvDescriptorHeap_ = nullptr;
 	imGuiM imguiM;
 	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
 	// SwapChainからResourceを引っ張ってくる。
-	ID3D12Resource* swapChainResources[2] = {nullptr};
+	ID3D12Resource* swapChainResources_[2] = {nullptr};
 	// これから書き込むバックバッファのインデックスを取得
-	UINT backBufferIndex;
+	UINT backBufferIndex_;
 	// transitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
 
@@ -136,7 +136,9 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 public:
 	void FrameStart(); // フレーム最初の準備
 
-
+	
+	void BeginFlame(); // フレームの開始処理（commandListリセットなど）
+	void EndFlame();   // フレームの終了処理（Present、フェンス待ちなど）
 	
 
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
@@ -187,5 +189,12 @@ public:
 	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
+
+
+
+	// 描画関数（好きなだけ呼べるように）
+	void DrawTriangle(const Vector3& v0, const Vector3& v1, const Vector3& v2, uint32_t color);
+	void DrawSphere(const Vector3& center, float radius, uint32_t color);
+	void DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color);
 };
 

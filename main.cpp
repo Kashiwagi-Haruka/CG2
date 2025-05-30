@@ -20,11 +20,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			DispatchMessage(gameBase->GetMsg());
 		} else {
 
+			gameBase->BeginFlame();
+
+
 			gameBase->Update();
-			gameBase->Draw();
+			
 			//ゲームの処理
 
-
+			gameBase->EndFlame();
 		}
 
 

@@ -20,16 +20,16 @@ void imGuiM::NewFrame() {
 
 }
 
-void imGuiM::Render(ID3D12DescriptorHeap* srvDescriptorHeap, ID3D12GraphicsCommandList* commandList) {
-	if (!srvDescriptorHeap || !commandList) {
-		OutputDebugStringA("ImGui Render Error: srvDescriptorHeap or commandList is null\n");
+void imGuiM::Render(ID3D12DescriptorHeap* srvDescriptorHeap, ID3D12GraphicsCommandList* commandList_) {
+	if (!srvDescriptorHeap || !commandList_) {
+		OutputDebugStringA("ImGui Render Error: srvDescriptorHeap or commandList_ is null\n");
 		return;
 	}
 	ImGui::Render();
 	// 描画用のDescriptorHeapの設定
 	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap};
-	commandList->SetDescriptorHeaps(1, descriptorHeaps);
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
+	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_);
 }
 
 void imGuiM::Finalize() {

@@ -172,12 +172,12 @@ void GameBase::WindowClear() {
 	assert(SUCCEEDED(hr));
 
 	// コマンドリストを生成する
-	commandList = nullptr;
-	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList));
+	commandList_ = nullptr;
+	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList_));
 	// コマンドリストの生成がうまくいかなかったので起動できない
 	assert(SUCCEEDED(hr));
 
-	swapChain = nullptr;
+	swapChain_ = nullptr;
 	swapChainDesc = {};
 
 	swapChainDesc.Width = kClientWidth;
@@ -189,12 +189,12 @@ void GameBase::WindowClear() {
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	// コマンドキュー、ウィンドウハンドル、設定を渡して生成する
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
+	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain_));
 	assert(SUCCEEDED(hr));
 
 	// ディスクリプタヒープの生成
 
-	rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	rtvDescriptorHeap_ = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 	
 	// SRV用ディスクリプタヒープ作成
 	srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
@@ -203,21 +203,21 @@ void GameBase::WindowClear() {
 
 	//rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV; // レンダーターゲットビュー用
 	//rtvDescriptorHeapDesc.NumDescriptors = 2;                    // ダブルバッファ用に2つ。多くてもかまわない
-	//hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap));
+	//hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap_));
 	//// ディスクリプタヒープがつくれなかったので起動できない
 	//assert(SUCCEEDED(hr));
 	DXCInitialize();
 
-	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResources[0]));
+	hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	// 上手く取得できなければ起動できない
 	assert(SUCCEEDED(hr));
-	hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResources[1]));
+	hr = swapChain_->GetBuffer(1, IID_PPV_ARGS(&swapChainResources_[1]));
 	assert(SUCCEEDED(hr));
-	assert(backBufferIndex < 2);
+	assert(backBufferIndex_ < 2);
 	//
-	assert(swapChainResources[0] != nullptr);
-	assert(swapChainResources[1] != nullptr);
-	assert(swapChainResources[backBufferIndex] != nullptr);
+	assert(swapChainResources_[0] != nullptr);
+	assert(swapChainResources_[1] != nullptr);
+	assert(swapChainResources_[backBufferIndex_] != nullptr);
 	//
 
 	// RTVの設定
@@ -225,15 +225,15 @@ void GameBase::WindowClear() {
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;      // 出力結果をSRGBに変換して書き込む
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D; // 2dテクスチャとして書き込む
 	// ディスクリプタの先頭を取得する
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 
 	// まず1つ目を作る。1つ目は最初のところに作る。作る場所をこちらで指定してあげる必要がある
 	rtvHandles[0] = rtvStartHandle;
-	device->CreateRenderTargetView(swapChainResources[0], &rtvDesc, rtvHandles[0]);
+	device->CreateRenderTargetView(swapChainResources_[0], &rtvDesc, rtvHandles[0]);
 	// 2つ目のディスクリプタハンドルを得る(自力で)
 	rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	// 2つ目を作る
-	device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
+	device->CreateRenderTargetView(swapChainResources_[1], &rtvDesc, rtvHandles[1]);
 
 	depthStenicilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
 
@@ -245,7 +245,7 @@ void GameBase::WindowClear() {
 
 	device->CreateDepthStencilView(depthStenicilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
 	// ImGui 初期化はここで！
 	imguiM.MInitialize(hwnd, device, swapChainDesc, rtvDesc, srvDescriptorHeap);
@@ -264,16 +264,16 @@ void GameBase::WindowClear() {
 	
 
 	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
-	hr = commandList->Close();
+	hr = commandList_->Close();
 
 	assert(SUCCEEDED(hr));
 
 	// GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = {commandList};
+	ID3D12CommandList* commandLists[] = {commandList_};
 	commandQueue->ExecuteCommandLists(1, commandLists);
 	// GPUと05に画面の交換を行うよう通知する
 	// GPUとOSに画面の交換を行うよう通知する
-	swapChain->Present(1, 0);
+	swapChain_->Present(1, 0);
 
 	// Fenceを作る
 	fenceValue = 0;
@@ -373,7 +373,7 @@ void GameBase::CrtvTransitionBarrier() {
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	//TransitionBarrierを張る
-	commandList->ResourceBarrier(1, &barrier);
+	commandList_->ResourceBarrier(1, &barrier);
 }
 
 void GameBase::FenceEvent() {
@@ -438,11 +438,11 @@ void GameBase::ResourceRelease() {
 	dsvDescriptorHeap->Release();
 	depthStenicilResource->Release();
 	srvDescriptorHeap->Release();
-	rtvDescriptorHeap->Release();
-	swapChainResources[0]->Release();
-	swapChainResources[1]->Release();
-	swapChain->Release();
-	commandList->Release();
+	rtvDescriptorHeap_->Release();
+	swapChainResources_[0]->Release();
+	swapChainResources_[1]->Release();
+	swapChain_->Release();
+	commandList_->Release();
 	commandAllocator->Release();
 	commandQueue->Release();
 	device->Release();
@@ -962,10 +962,10 @@ void GameBase::Draw() {
 	// ★ここ！毎回リセットする
 	hr = commandAllocator->Reset();
 	assert(SUCCEEDED(hr));
-	hr = commandList->Reset(commandAllocator, nullptr);
+	hr = commandList_->Reset(commandAllocator, nullptr);
 	assert(SUCCEEDED(hr));
 
-	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
 	DrawcommandList();
 
@@ -981,25 +981,25 @@ void GameBase::Draw() {
 	//ImGui::ShowDemoWindow();
 
 	// ImGui 描画（SRVヒープとコマンドリストを渡す）
-	imguiM.Render(srvDescriptorHeap, commandList);
+	imguiM.Render(srvDescriptorHeap, commandList_);
 
 	// RenderTarget → Present に戻す
 	
 	CrtvTransitionBarrier();
 
 	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
-	hr = commandList->Close();
+	hr = commandList_->Close();
 
 	assert(SUCCEEDED(hr));
 
 	// GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = {commandList};
+	ID3D12CommandList* commandLists[] = {commandList_};
 	commandQueue->ExecuteCommandLists(1, commandLists);
 	// GPUと05に画面の交換を行うよう通知する
 	// GPUとOSに画面の交換を行うよう通知する
-	swapChain->Present(1, 0);
+	swapChain_->Present(1, 0);
 
-	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
 
 	// Fenceで同期
@@ -1018,7 +1018,7 @@ void GameBase::Draw() {
 void GameBase::FrameStart() {
 	hr = commandAllocator->Reset();
 	assert(SUCCEEDED(hr));
-	hr = commandList->Reset(commandAllocator, nullptr);
+	hr = commandList_->Reset(commandAllocator, nullptr);
 	assert(SUCCEEDED(hr));
 }
 
@@ -1075,58 +1075,104 @@ void GameBase::DrawcommandList() {
 	// Noneにしておく
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	// バリアを張る対象のリソース。現在のバックアップに対して行う
-	barrier.Transition.pResource = swapChainResources[backBufferIndex];
+	barrier.Transition.pResource = swapChainResources_[backBufferIndex_];
 	// 遷移前(現在)のResourceState
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	// 遷移後のResourceState
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	assert(commandList != nullptr);
+	assert(commandList_ != nullptr);
 
 	// TransitionBarrierを張る
-	commandList->ResourceBarrier(1, &barrier);
+	commandList_->ResourceBarrier(1, &barrier);
 
 	// 描画先のRTVを設定する
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+	commandList_->OMSetRenderTargets(1, &rtvHandles[backBufferIndex_], false, &dsvHandle);
 
 	// 指定した色で画面全体をクリアする
 	float clearColor[] = {0.1f, 0.25f, 0.5f, 1.0f}; // 青っぽい色。RGBAの順
-	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	commandList_->ClearRenderTargetView(rtvHandles[backBufferIndex_], clearColor, 0, nullptr);
+	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-	commandList->RSSetViewports(1, &viewport);       // Viewportを設定
-	commandList->RSSetScissorRects(1, &scissorRect); // Scissorを設定
+	commandList_->RSSetViewports(1, &viewport);       // Viewportを設定
+	commandList_->RSSetScissorRects(1, &scissorRect); // Scissorを設定
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	commandList->SetGraphicsRootSignature(rootSignature);
-	commandList->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
-	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());  // PixelShader側
-	commandList->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress()); // VertexShader側
+	commandList_->SetGraphicsRootSignature(rootSignature);
+	commandList_->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());  // PixelShader側
+	commandList_->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress()); // VertexShader側
 	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap};
-	commandList->SetDescriptorHeaps(1, descriptorHeaps);
+	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 
-	commandList->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
 
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	commandList->DrawInstanced(6, 1, 0, 0);
+	commandList_->DrawInstanced(6, 1, 0, 0);
 	
 	
 	// --- 球体描画 ---（追加すべき！）
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
-	commandList->DrawInstanced(kVertexCount_, 1, 0, 0);
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
+	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
 
 
 	    // VBV設定（スプライト用）
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 
 	// Transform（WVP）設定（ルートパラメータ1番目）
-	commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
 
 	// 描画（6頂点＝2枚三角形）
-	commandList->DrawInstanced(6, 1, 0, 0);
+	commandList_->DrawInstanced(6, 1, 0, 0);
 
+}
+void GameBase::BeginFlame() {
+	// ① 現在のバックバッファをフレーム毎に更新
+	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
+
+	// --- 安全チェック ---
+	assert(backBufferIndex_ < 2);
+	assert(swapChainResources_[backBufferIndex_] != nullptr); // 安全強化！
+
+	// ② 頂点オフセットリセット
+	currentVertexOffset_ = 0;
+
+	// ③ コマンドリストのリセット
+	FrameStart();
+
+	// ④ バックバッファへのバリア & RTV 設定 & クリア
+	DrawCommandList();
+
+	// ⑤ ImGui 準備
+	imguiM_.NewFrame();
+}
+
+// --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
+void GameBase::EndFlame() {
+
+	imguiM_.Render(srvDescriptorHeap_, commandList_);
+
+	// RenderTarget→Present に戻す
+	CrtvTransitionBarrier(); // バリア遷移 :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
+
+	// コマンドリストをクローズして実行
+	hr_ = commandList_->Close();
+	assert(SUCCEEDED(hr_));
+	ID3D12CommandList* lists[] = {commandList_};
+	commandQueue_->ExecuteCommandLists(1, lists);
+
+	// 画面を切り替え
+	swapChain_->Present(1, 0);
+
+	// フェンスで CPU/GPU 同期
+	fenceValue_++;
+	commandQueue_->Signal(fence_, fenceValue_);
+	if (fence_->GetCompletedValue() < fenceValue_) {
+		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
+		WaitForSingleObject(fenceEvent_, INFINITE);
+	}
 }
