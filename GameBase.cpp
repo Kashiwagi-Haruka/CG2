@@ -57,10 +57,10 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	// HRESULTはWindows系のエラーコードであり、
 	// 関数が成功したかどうかをSUCCEEDEDマクロで判定できる
 
-	hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
+	hr_ = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 
 	// 初期化の根本的な部分でエラーが出た場合はプログラムが間違っているか、どうにもできない場合が多いのでassertにしておく
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr_));
 
 	
 	// 良い順にアダプタを頼む
@@ -68,8 +68,8 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 		// アダプターの情報を取得する
 		DXGI_ADAPTER_DESC3 adapterDesc{};
-		hr = useAdapter->GetDesc3(&adapterDesc);
-		assert(SUCCEEDED(hr)); // 取得できないのは一大事
+		hr_ = useAdapter->GetDesc3(&adapterDesc);
+		assert(SUCCEEDED(hr_)); // 取得できないのは一大事
 		// ソフトウェアアダプタでなければ採用!
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
 
@@ -91,10 +91,10 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	for (size_t i = 0; i < _countof(featureLevels); ++i) {
 
 		// 採用したアダプターでデバイスを生成
-		hr = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device));
+		hr_ = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device));
 
 		// 指定した機能レベルでデバイスが生成できたかを確認
-		if (SUCCEEDED(hr)) {
+		if (SUCCEEDED(hr_)) {
 			// 生成できたのでログ出力を行ってループを抜ける
 			Log(std::format("FeatureLevel: {}\n", featureLevelStrings[i]));
 			break;
@@ -124,8 +124,8 @@ void GameBase::OutPutLog() {
 
 	// 出力ウィンドウへの文字出力
 	OutputDebugStringA("Hello,DirectX!\n");
-	if (FAILED(hr)) {
-		Log("Failed to create fence. HRESULT: " + std::to_string(hr));
+	if (FAILED(hr_)) {
+		Log("Failed to create fence_. HRESULT: " + std::to_string(hr_));
 	}
 	Log(CStr->ConvertString_(std::format(L"WSTRING {}\n", wstringValue)));
 }
@@ -156,26 +156,26 @@ LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 
 void GameBase::WindowClear() {
 	// コマンドキューを生成する
-	commandQueue = nullptr;
+	commandQueue_ = nullptr;
 	commandQueueDesc = {};
 	commandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT; // 主に描画用途
-	hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
+	hr_ = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue_));
 
 	// コマンドキューの生成がうまくいかなかったので起動できない
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr_));
 
 	// コマンドアロケータを生成する
 	commandAllocator = nullptr;
-	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
+	hr_ = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
 	// コマンドアロケータの生成がうまくいかなかったので起動できない
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr_));
 
 	// コマンドリストを生成する
 	commandList_ = nullptr;
-	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList_));
+	hr_ = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList_));
 	// コマンドリストの生成がうまくいかなかったので起動できない
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr_));
 
 	swapChain_ = nullptr;
 	swapChainDesc = {};
@@ -189,30 +189,30 @@ void GameBase::WindowClear() {
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	// コマンドキュー、ウィンドウハンドル、設定を渡して生成する
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain_));
-	assert(SUCCEEDED(hr));
+	hr_ = dxgiFactory->CreateSwapChainForHwnd(commandQueue_, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain_));
+	assert(SUCCEEDED(hr_));
 
 	// ディスクリプタヒープの生成
 
 	rtvDescriptorHeap_ = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 	
 	// SRV用ディスクリプタヒープ作成
-	srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	srvDescriptorHeap_ = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
 
 
 	//rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV; // レンダーターゲットビュー用
 	//rtvDescriptorHeapDesc.NumDescriptors = 2;                    // ダブルバッファ用に2つ。多くてもかまわない
-	//hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap_));
+	//hr_ = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap_));
 	//// ディスクリプタヒープがつくれなかったので起動できない
-	//assert(SUCCEEDED(hr));
+	//assert(SUCCEEDED(hr_));
 	DXCInitialize();
 
-	hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
+	hr_ = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	// 上手く取得できなければ起動できない
-	assert(SUCCEEDED(hr));
-	hr = swapChain_->GetBuffer(1, IID_PPV_ARGS(&swapChainResources_[1]));
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr_));
+	hr_ = swapChain_->GetBuffer(1, IID_PPV_ARGS(&swapChainResources_[1]));
+	assert(SUCCEEDED(hr_));
 	assert(backBufferIndex_ < 2);
 	//
 	assert(swapChainResources_[0] != nullptr);
@@ -248,49 +248,49 @@ void GameBase::WindowClear() {
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
 	// ImGui 初期化はここで！
-	imguiM.MInitialize(hwnd, device, swapChainDesc, rtvDesc, srvDescriptorHeap);
+	imguiM_.MInitialize(hwnd, device, swapChainDesc, rtvDesc, srvDescriptorHeap_);
 
-	if (srvDescriptorHeap == nullptr) {
+	if (srvDescriptorHeap_ == nullptr) {
 		assert(false);
 	}
-	texture_.Initialize(device, srvDescriptorHeap);
+	texture_.Initialize(device, srvDescriptorHeap_);
 	GPUHandle_ = texture_.GetGpuHandle();
 	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる
 
-	DrawcommandList();
+	DrawCommandList();
 
 
 	CrtvTransitionBarrier();
 	
 
 	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
-	hr = commandList_->Close();
+	hr_ = commandList_->Close();
 
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr_));
 
 	// GPUにコマンドリストの実行を行わせる
 	ID3D12CommandList* commandLists[] = {commandList_};
-	commandQueue->ExecuteCommandLists(1, commandLists);
+	commandQueue_->ExecuteCommandLists(1, commandLists);
 	// GPUと05に画面の交換を行うよう通知する
 	// GPUとOSに画面の交換を行うよう通知する
 	swapChain_->Present(1, 0);
 
 	// Fenceを作る
-	fenceValue = 0;
-	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-	assert(SUCCEEDED(hr));
+	fenceValue_ = 0;
+	hr_ = device->CreateFence(fenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
+	assert(SUCCEEDED(hr_));
 
-	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	assert(fenceEvent != nullptr);
+	fenceEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	assert(fenceEvent_ != nullptr);
 
 	// Fenceの値を更新
-	fenceValue++;
-	commandQueue->Signal(fence, fenceValue);
+	fenceValue_++;
+	commandQueue_->Signal(fence_, fenceValue_);
 
 	// Fenceの値が指定Signalに達してるか確認
-	if (fence->GetCompletedValue() < fenceValue) {
-		fence->SetEventOnCompletion(fenceValue, fenceEvent);
-		WaitForSingleObject(fenceEvent, INFINITE); // ★ここでちゃんとGPUが終わるまで待つ！
+	if (fence_->GetCompletedValue() < fenceValue_) {
+		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
+		WaitForSingleObject(fenceEvent_, INFINITE); // ★ここでちゃんとGPUが終わるまで待つ！
 	}
 
 }
@@ -378,12 +378,12 @@ void GameBase::CrtvTransitionBarrier() {
 
 void GameBase::FenceEvent() {
 	// Fenceの作成
-	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-	assert(SUCCEEDED(hr));
+	hr_ = device->CreateFence(fenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
+	assert(SUCCEEDED(hr_));
 
 	// ←ここ追加！！
-	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	assert(fenceEvent != nullptr);
+	fenceEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	assert(fenceEvent_ != nullptr);
 }
 
 
@@ -404,7 +404,7 @@ void GameBase::CheackResourceLeaks() {
 void GameBase::ResourceRelease() {
 	
 	texture_.Finalize();
-	imguiM.Finalize();
+	imguiM_.Finalize();
 	
 	vertexResourceSphere->Release();
 
@@ -433,18 +433,18 @@ void GameBase::ResourceRelease() {
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();
 
-	CloseHandle(fenceEvent);
-	fence->Release();
+	CloseHandle(fenceEvent_);
+	fence_->Release();
 	dsvDescriptorHeap->Release();
 	depthStenicilResource->Release();
-	srvDescriptorHeap->Release();
+	srvDescriptorHeap_->Release();
 	rtvDescriptorHeap_->Release();
 	swapChainResources_[0]->Release();
 	swapChainResources_[1]->Release();
 	swapChain_->Release();
 	commandList_->Release();
 	commandAllocator->Release();
-	commandQueue->Release();
+	commandQueue_->Release();
 	device->Release();
 	useAdapter->Release();
 	dxgiFactory->Release();
@@ -462,15 +462,15 @@ void GameBase::DXCInitialize() {
 	// dxcCompilerを初期化
 	dxcUtils = nullptr;
 	dxcCompiler = nullptr;
-	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
-	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
-	assert(SUCCEEDED(hr));
+	hr_ = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
+	assert(SUCCEEDED(hr_));
+	hr_ = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
+	assert(SUCCEEDED(hr_));
 
 	// 現時点でincludeはしないが、includeに対応するための設定を行っておく
 	includeHandler = nullptr;
-	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
-	assert(SUCCEEDED(hr));
+	hr_ = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
+	assert(SUCCEEDED(hr_));
 
 	PSO();
 	VertexResource();
@@ -488,10 +488,10 @@ IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパ�
 
 	// hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
-	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+	HRESULT hr_ = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 
 	// 読めなかったら止める
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr_));
 
 	// 読み込んだファイルの内容を設定する
 	DxcBuffer shaderSourceBuffer;
@@ -513,7 +513,7 @@ IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパ�
 
 	// 実際にShaderをコンパイルする
 	IDxcResult* shaderResult = nullptr;
-	hr = dxcCompiler->Compile(
+	hr_ = dxcCompiler->Compile(
 	    &shaderSourceBuffer,        // 読み込んだファイル
 	    arguments,                  // コンパイルオプション
 	    _countof(arguments),        // コンパイルオプションの数
@@ -522,7 +522,7 @@ IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパ�
 	);
 
 	// コンパイルエラーではなくdxcが起動できないなど致命的な状況
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr_));
 	// 3. 警告・エラーがでていないか確認する
 	// // 警告・エラーが出たらログに出して止める
 	IDxcBlobUtf8* shaderError = nullptr;
@@ -535,8 +535,8 @@ IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパ�
 	// 4. Compile結果を受け取って返す
 	// コンパイル結果から実行用のバイナリ部分を取得
 	IDxcBlob* shaderBlob = nullptr;
-	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-	assert(SUCCEEDED(hr));
+	hr_ = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+	assert(SUCCEEDED(hr_));
 
 	// 成功したログを出す
 	Log(CStr->ConvertString_(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
@@ -601,17 +601,17 @@ void GameBase::PSO() {
 
 	signatureBlob = nullptr;
 	errorBlob = nullptr;
-	hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-	if (FAILED(hr)) {
+	hr_ = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	if (FAILED(hr_)) {
 		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 
 	rootSignature = nullptr;
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+	hr_ = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
 	
 
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr_));
 
 	// InputLayout
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
@@ -687,8 +687,8 @@ void GameBase::PSO() {
 
 	// 実際に生成
 	graphicsPipelineState = nullptr;
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
-	assert(SUCCEEDED(hr));
+	hr_ = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	assert(SUCCEEDED(hr_));
 }
 
 void GameBase::VertexResource() {
@@ -919,12 +919,12 @@ ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device, size_t size
 
 	ID3D12Resource* bufferResource = nullptr;
 
-	HRESULT hr = device->CreateCommittedResource(
+	HRESULT hr_ = device->CreateCommittedResource(
 	    &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc,
 	    D3D12_RESOURCE_STATE_GENERIC_READ, // Uploadならこれ
 	    nullptr, IID_PPV_ARGS(&bufferResource));
 
-	if (FAILED(hr)) {
+	if (FAILED(hr_)) {
 		return nullptr;
 	}
 
@@ -960,18 +960,18 @@ void GameBase::Update() {
 
 void GameBase::Draw() {
 	// ★ここ！毎回リセットする
-	hr = commandAllocator->Reset();
-	assert(SUCCEEDED(hr));
-	hr = commandList_->Reset(commandAllocator, nullptr);
-	assert(SUCCEEDED(hr));
+	hr_ = commandAllocator->Reset();
+	assert(SUCCEEDED(hr_));
+	hr_ = commandList_->Reset(commandAllocator, nullptr);
+	assert(SUCCEEDED(hr_));
 
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
-	DrawcommandList();
+	DrawCommandList();
 
 	
 	// ImGui フレーム開始
-	imguiM.NewFrame();
+	imguiM_.NewFrame();
 
 	// --- ImGui ウィンドウ記述 ---
 	ImGui::Begin("Debug Window");
@@ -981,20 +981,20 @@ void GameBase::Draw() {
 	//ImGui::ShowDemoWindow();
 
 	// ImGui 描画（SRVヒープとコマンドリストを渡す）
-	imguiM.Render(srvDescriptorHeap, commandList_);
+	imguiM_.Render(srvDescriptorHeap_, commandList_);
 
 	// RenderTarget → Present に戻す
 	
 	CrtvTransitionBarrier();
 
 	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
-	hr = commandList_->Close();
+	hr_ = commandList_->Close();
 
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr_));
 
 	// GPUにコマンドリストの実行を行わせる
 	ID3D12CommandList* commandLists[] = {commandList_};
-	commandQueue->ExecuteCommandLists(1, commandLists);
+	commandQueue_->ExecuteCommandLists(1, commandLists);
 	// GPUと05に画面の交換を行うよう通知する
 	// GPUとOSに画面の交換を行うよう通知する
 	swapChain_->Present(1, 0);
@@ -1003,12 +1003,12 @@ void GameBase::Draw() {
 
 
 	// Fenceで同期
-	fenceValue++;
-	commandQueue->Signal(fence, fenceValue);
+	fenceValue_++;
+	commandQueue_->Signal(fence_, fenceValue_);
 
-	if (fence->GetCompletedValue() < fenceValue) {
-		fence->SetEventOnCompletion(fenceValue, fenceEvent);
-		WaitForSingleObject(fenceEvent, INFINITE);
+	if (fence_->GetCompletedValue() < fenceValue_) {
+		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
+		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
 
 }
@@ -1016,10 +1016,10 @@ void GameBase::Draw() {
 
 
 void GameBase::FrameStart() {
-	hr = commandAllocator->Reset();
-	assert(SUCCEEDED(hr));
-	hr = commandList_->Reset(commandAllocator, nullptr);
-	assert(SUCCEEDED(hr));
+	hr_ = commandAllocator->Reset();
+	assert(SUCCEEDED(hr_));
+	hr_ = commandList_->Reset(commandAllocator, nullptr);
+	assert(SUCCEEDED(hr_));
 }
 
 ID3D12DescriptorHeap* GameBase::CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
@@ -1029,8 +1029,8 @@ ID3D12DescriptorHeap* GameBase::CreateDescriptorHeap(ID3D12Device* device, D3D12
 	descriptorHeapDesc.Type = heapType;
 	descriptorHeapDesc.NumDescriptors = numDescriptors;
 	descriptorHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
-	assert(SUCCEEDED(hr));
+	hr_ = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+	assert(SUCCEEDED(hr_));
 
 	return descriptorHeap;
 }
@@ -1054,8 +1054,8 @@ ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	ID3D12Resource* resource = nullptr;
-	hr = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthClearValue, IID_PPV_ARGS(&resource));
-	assert(SUCCEEDED(hr));
+	hr_ = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthClearValue, IID_PPV_ARGS(&resource));
+	assert(SUCCEEDED(hr_));
 
 	
 	return resource;
@@ -1063,7 +1063,7 @@ ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device
 
 }
 
-void GameBase::DrawcommandList() {
+void GameBase::DrawCommandList() {
 
 
 	
@@ -1103,7 +1103,7 @@ void GameBase::DrawcommandList() {
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());  // PixelShader側
 	commandList_->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress()); // VertexShader側
-	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap};
+	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap_};
 	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 
 	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);

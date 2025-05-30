@@ -27,19 +27,19 @@ private:
 
 	ID3D12Debug1* debugController = nullptr;
 	IDXGIFactory7* dxgiFactory;
-	HRESULT hr;
+	HRESULT hr_;
 	HWND hwnd;
 	// 使用するアダプタ用の変数。最初にnullptrを入れておく
 	IDXGIAdapter4* useAdapter = nullptr;
 	ID3D12Device* device = nullptr;
-	ID3D12CommandQueue* commandQueue;
+	ID3D12CommandQueue* commandQueue_;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc;
 	ID3D12CommandAllocator* commandAllocator;
 	ID3D12GraphicsCommandList* commandList_;
 	IDXGISwapChain4* swapChain_ = nullptr;
 	ID3D12DescriptorHeap* rtvDescriptorHeap_ = nullptr;
-	imGuiM imguiM;
-	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
+	imGuiM imguiM_;
+	ID3D12DescriptorHeap* srvDescriptorHeap_ = nullptr;
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
 	// SwapChainからResourceを引っ張ってくる。
@@ -50,10 +50,10 @@ private:
 	D3D12_RESOURCE_BARRIER barrier{};
 
 	// 初期値0でFenceをつくる
-	ID3D12Fence* fence = nullptr;
-	uint64_t fenceValue = 0;
+	ID3D12Fence* fence_ = nullptr;
+	uint64_t fenceValue_ = 0;
 	// FenceのSignalを持つためのイベントを作成する
-	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	HANDLE fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 
 	int32_t kClientWidth = 1280;
@@ -184,7 +184,7 @@ public:
 
 	void VertexResource();
 
-	void DrawcommandList();
+	void DrawCommandList();
 
 	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);

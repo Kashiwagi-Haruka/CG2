@@ -1,6 +1,6 @@
 #include "Texture.h"
 
-void Texture::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* srvDescriptorHeap) {
+void Texture::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* srvDescriptorHeap_) {
 
 	// Textureを読んで転送する
 	DirectX::ScratchImage mipImages = LoadTexture("Resources/uvChecker.png");
@@ -17,8 +17,8 @@ void Texture::Initialize(ID3D12Device* device, ID3D12DescriptorHeap* srvDescript
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 	// --- ヒープの位置を取得 ---
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	textureSrvHandleGPU_ = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	textureSrvHandleGPU_ = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
 
 	// --- ImGuiが0番を使ってる場合、1つインクリメントして避ける ---
 	UINT descriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -38,13 +38,13 @@ DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
 		// テクスチャファイルを読んでプログラムで使えるようにする
 		DirectX::ScratchImage image{};
 		std::wstring filePathW = Cstr.ConvertString_(filePath);
-		HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
-		assert(SUCCEEDED(hr));
+		HRESULT hr_ = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+		assert(SUCCEEDED(hr_));
 
 		// ミップマップの作成
 		DirectX::ScratchImage mipImages{};
-		hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
-		assert(SUCCEEDED(hr));
+		hr_ = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+		assert(SUCCEEDED(hr_));
 
 		// ミップマップ付きテクスチャを返す
 		return mipImages;
@@ -70,14 +70,14 @@ ID3D12Resource* Texture::CreateTextureResource(ID3D12Device* device, const Direc
 
 	// Resourceの生成
 	resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
+	HRESULT hr_ = device->CreateCommittedResource(
 	    &heapProperties,                   // Heapの設定
 	    D3D12_HEAP_FLAG_NONE,              // Heapの特殊な設定。特になし。
 	    &resourceDesc,                     // Resourceの設定
 	    D3D12_RESOURCE_STATE_GENERIC_READ, // 初回のResourceState。Textureは基本読むだけ
 	    nullptr,                           // Clear最適値。使わないのでnullptr
 	    IID_PPV_ARGS(&resource));          // 作成するResourceポインタへのポインタ
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr_));
 	return resource;
 }
 
@@ -95,13 +95,13 @@ void Texture::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchI
 		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
 
 		// Textureに転送
-		HRESULT hr = texture->WriteToSubresource(
+		HRESULT hr_ = texture->WriteToSubresource(
 		    UINT(mipLevel),      // 全領域へコピー
 		    nullptr,             // 元データアドレス
 		    img->pixels,         // 1ラインサイズ
 		    UINT(img->rowPitch), // 1枚サイズ
 		    UINT(img->slicePitch));
-		assert(SUCCEEDED(hr));
+		assert(SUCCEEDED(hr_));
 	}
 }
 void Texture::Finalize() {
