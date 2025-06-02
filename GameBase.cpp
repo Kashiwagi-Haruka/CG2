@@ -1204,7 +1204,7 @@ void GameBase::DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[
 	// 5) テクスチャ用ディスクリプタ
 	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
 	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
-	commandList_->SetGraphicsRootDescriptorTable(2, texture.GetGpuHandle());
+	commandList_->SetGraphicsRootDescriptorTable(2, texture_.GetGpuHandle());
 
 	// 6) 頂点バッファビューを設定
 	// 頂点バッファビューを設定（オフセットを反映）
