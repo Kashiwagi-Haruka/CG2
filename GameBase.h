@@ -55,6 +55,7 @@ private:
 	// FenceのSignalを持つためのイベントを作成する
 	HANDLE fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
 
+	std::vector<Texture> textures_;
 
 	int32_t kClientWidth = 1280;
 	int32_t kClientHeight = 720;
