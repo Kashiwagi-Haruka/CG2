@@ -68,7 +68,7 @@ private:
 	// 実際に生成
 	ID3D12PipelineState* graphicsPipelineState;
 	// 頂点バッファビューを作成する
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 
 	// シリアライズしてバイナリにする
 	ID3DBlob* signatureBlob;
@@ -137,28 +137,43 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	UINT currentSphereVertexOffset_ = 0;
 	UINT currentSpriteVertexOffset_ = 0;
 	static constexpr UINT kMaxVertices_ = 1024; // 十分な大きさで定義しておく
-public:
+
 	void FrameStart(); // フレーム最初の準備
 
-	
+public:	
+
 	void BeginFlame(); // フレームの開始処理（commandListリセットなど）
 	void EndFlame();   // フレームの終了処理（Present、フェンス待ちなど）
-	
-
-	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-
-	void Log(const std::string& message);
-
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
-
-	void Update();
-	
 
 	bool IsMsgQuit();
 
 	void OutPutLog();
 
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
+
+	MSG* GetMsg() { return &msg; };
+	void Update();
+
+	void CheackResourceLeaks();
+
+	void ResourceRelease();
+
+	// 描画関数（好きなだけ呼べるように）
+	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
+	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle);
+	void DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle);
+
+private:
+
+	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+	void Log(const std::string& message);
+
+	
+	
+
+	
 
 	void WindowClear();
 
@@ -170,11 +185,6 @@ public:
 
 	void FenceEvent();
 
-	void CheackResourceLeaks();
-
-	void ResourceRelease();
-
-	MSG* GetMsg() { return &msg; };
 
 
 	void DXCInitialize();
@@ -196,9 +206,6 @@ public:
 
 	int LoadTexture(const std::string& fileName);
 
-	// 描画関数（好きなだけ呼べるように）
-	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
-	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle);
-	void DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle);
+	
 };
 

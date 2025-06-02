@@ -11,8 +11,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 	SetUnhandledExceptionFilter(gameBase->ExportDump);
 
+	Vector3 position[3]{
+		{-20,0,0,},
+		{20,0,0},
+		{0,20,0}
+	};
+	Vector2 texcoord[3] = {{0.0f, 1.0f}, {0.5f, 0.0f},{1.0f, 1.0f}};
 	
-
+	
 	while (gameBase->IsMsgQuit())
 	{
 		if (PeekMessage(gameBase->GetMsg(), NULL, 0, 0, PM_REMOVE)) {
@@ -25,6 +31,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			gameBase->Update();
 			
+			
+
 			//ゲームの処理
 
 			gameBase->EndFlame();

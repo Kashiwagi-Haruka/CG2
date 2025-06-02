@@ -693,42 +693,41 @@ void GameBase::PSO() {
 
 void GameBase::VertexResource() {
 	// 頂点リソース作成
-	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * 6);
-	assert(vertexResource_ != nullptr);
-	vertexBufferView.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
-	vertexBufferView.StrideInBytes = sizeof(VertexData);
+	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * kMaxVertices_);
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * kMaxVertices_;
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	
-	VertexData* vertexData = nullptr;
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	//VertexData* vertexData = nullptr;
+	//vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
-	// 左下
-	vertexData[0].position = {-0.5f, -0.5f, 0.0f, 1.0f};
-	vertexData[0].texcoord = {0.0f, 1.0f};
+	//// 左下
+	//vertexData[0].position = {-0.5f, -0.5f, 0.0f, 1.0f};
+	//vertexData[0].texcoord = {0.0f, 1.0f};
 
-	// 上
-	vertexData[1].position = {0.0f, 0.5f, 0.0f, 1.0f};
-	vertexData[1].texcoord = {0.5f, 0.0f};
+	//// 上
+	//vertexData[1].position = {0.0f, 0.5f, 0.0f, 1.0f};
+	//vertexData[1].texcoord = {0.5f, 0.0f};
 
-	// 右下
-	vertexData[2].position = {0.5f, -0.5f, 0.0f, 1.0f};
-	vertexData[2].texcoord = {1.0f, 1.0f};
+	//// 右下
+	//vertexData[2].position = {0.5f, -0.5f, 0.0f, 1.0f};
+	//vertexData[2].texcoord = {1.0f, 1.0f};
 
-	// 左下2
-	vertexData[3].position = {-0.5f, -0.5f, 0.5f, 1.0f};
-	vertexData[3].texcoord = {0.0f, 1.0f};
+	//// 左下2
+	//vertexData[3].position = {-0.5f, -0.5f, 0.5f, 1.0f};
+	//vertexData[3].texcoord = {0.0f, 1.0f};
 
-	// 上2
-	vertexData[4].position = {0.0f, 0.0f, 0.0f, 1.0f};
-	vertexData[4].texcoord = {0.5f, 0.0f};
+	//// 上2
+	//vertexData[4].position = {0.0f, 0.0f, 0.0f, 1.0f};
+	//vertexData[4].texcoord = {0.5f, 0.0f};
 
-	// 右下2
-	vertexData[5].position = {0.5f, -0.5f, -0.5f, 1.0f};
-	vertexData[5].texcoord = {1.0f, 1.0f};
+	//// 右下2
+	//vertexData[5].position = {0.5f, -0.5f, -0.5f, 1.0f};
+	//vertexData[5].texcoord = {1.0f, 1.0f};
 
 
 
-	vertexResource_->Unmap(0, nullptr);
+	//vertexResource_->Unmap(0, nullptr);
 
 
 	// ビューポートとシザー設定
@@ -1006,7 +1005,7 @@ void GameBase::DrawCommandList() {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	commandList_->SetGraphicsRootSignature(rootSignature);
 	commandList_->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView);                                     // VBVを設定
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);                                     // VBVを設定
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());  // PixelShader側
 	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress()); // VertexShader側
 	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap_};
