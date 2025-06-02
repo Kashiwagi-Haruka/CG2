@@ -253,7 +253,7 @@ void GameBase::WindowClear() {
 	if (srvDescriptorHeap_ == nullptr) {
 		assert(false);
 	}
-	texture_.Initialize(device_, srvDescriptorHeap_);
+	texture_.Initialize(device_, srvDescriptorHeap_ ,"C:/Class/Program/DirectXGame/Resources/uvChecker.png");
 	GPUHandle_ = texture_.GetGpuHandle();
 	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる
 
