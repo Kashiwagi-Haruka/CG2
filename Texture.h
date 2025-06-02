@@ -8,7 +8,7 @@ class Texture{
 
 	public:
 
-	void Initialize(ID3D12Device* device_,ID3D12DescriptorHeap* srvDescriptorHeap_);
+	void Initialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescriptorHeap_, const std::string& fileName);
 
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 	ID3D12Resource* CreateTextureResource(ID3D12Device* device_, const DirectX::TexMetadata& metadata);
