@@ -133,7 +133,9 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 
 	Texture texture_;
 	D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle_;
-	UINT currentVertexOffset_ = 0;              // 追加：次に書き込む頂点のオフセット（頂点数単位）
+	UINT currentTriangleVertexOffset_ = 0;  // 追加：次に書き込む頂点のオフセット（頂点数単位）
+	UINT currentSphereVertexOffset_ = 0;
+	UINT currentSpriteVertexOffset_ = 0;
 	static constexpr UINT kMaxVertices_ = 1024; // 十分な大きさで定義しておく
 public:
 	void FrameStart(); // フレーム最初の準備
@@ -150,7 +152,7 @@ public:
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
 
 	void Update();
-	void Draw();
+	
 
 	bool IsMsgQuit();
 
@@ -196,7 +198,7 @@ public:
 
 	// 描画関数（好きなだけ呼べるように）
 	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
-	void DrawSphere(const Vector3& center, float radius, uint32_t color);
-	void DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color);
+	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle);
+	void DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle);
 };
 

@@ -806,21 +806,7 @@ void GameBase::VertexResource() {
 	*transformationMatrixDataSprite = function.MakeIdentity();
 
 	
-		//// 通常の三角形の初期化（もともとの処理）
-		//vertexResource = CreateBufferResource(device_, sizeof(VertexData) * 3);
-		//vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-		//vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
-		//vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-		//VertexData* vertexData = nullptr;
-		//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-		//vertexData[0].position = {0.0f, 0.5f, 0.0f, 1.0f};
-		//vertexData[0].texcoord = {0.5f, 0.0f};
-		//vertexData[1].position = {0.5f, -0.5f, 0.0f, 1.0f};
-		//vertexData[1].texcoord = {1.0f, 1.0f};
-		//vertexData[2].position = {-0.5f, -0.5f, 0.0f, 1.0f};
-		//vertexData[2].texcoord = {0.0f, 1.0f};
-		//vertexResource->Unmap(0, nullptr);
 
 		// 球体メッシュの追加（新規追加）
 		const int kSubdivision = 16;
@@ -877,30 +863,7 @@ void GameBase::VertexResource() {
 		}
 		vertexResourceSphere->Unmap(0, nullptr);
 
-		//// その他の初期化（もともとの処理）
-		//viewport = {0.0f, 0.0f, static_cast<float>(kClientWidth), static_cast<float>(kClientHeight), 0.0f, 1.0f};
-		//scissorRect = {0, 0, kClientWidth, kClientHeight};
-
-		//materialResource = CreateBufferResource(device_, sizeof(Vector4));
-		//Vector4* materialData = nullptr;
-		//materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-		//*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-
-		//transformResource = CreateBufferResource(device_, sizeof(Matrix4x4));
-		//transformResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
-		//*transformationMatrixData = function.MakeIdentity();
-
-		//Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-		//Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-		//Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
-		//Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
-		//Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
-		//*transformationMatrixData = worldViewProjectionMatrix;
-	
 }
-
-
-
 ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device_, size_t sizeInBytes) {
 	// バッファの設定（UPLOAD用に変更）
 	D3D12_HEAP_PROPERTIES heapProperties = {};
@@ -958,62 +921,6 @@ void GameBase::Update() {
 	*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 }
 
-void GameBase::Draw() {
-	// ★ここ！毎回リセットする
-	hr_ = commandAllocator->Reset();
-	assert(SUCCEEDED(hr_));
-	hr_ = commandList_->Reset(commandAllocator, nullptr);
-	assert(SUCCEEDED(hr_));
-
-	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
-
-	DrawCommandList();
-
-	
-	// ImGui フレーム開始
-	imguiM_.NewFrame();
-
-	// --- ImGui ウィンドウ記述 ---
-	ImGui::Begin("Debug Window");
-	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-	ImGui::End();
-
-	//ImGui::ShowDemoWindow();
-
-	// ImGui 描画（SRVヒープとコマンドリストを渡す）
-	imguiM_.Render(srvDescriptorHeap_, commandList_);
-
-	// RenderTarget → Present に戻す
-	
-	CrtvTransitionBarrier();
-
-	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
-	hr_ = commandList_->Close();
-
-	assert(SUCCEEDED(hr_));
-
-	// GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = {commandList_};
-	commandQueue_->ExecuteCommandLists(1, commandLists);
-	// GPUと05に画面の交換を行うよう通知する
-	// GPUとOSに画面の交換を行うよう通知する
-	swapChain_->Present(1, 0);
-
-	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
-
-
-	// Fenceで同期
-	fenceValue_++;
-	commandQueue_->Signal(fence_, fenceValue_);
-
-	if (fence_->GetCompletedValue() < fenceValue_) {
-		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
-		WaitForSingleObject(fenceEvent_, INFINITE);
-	}
-
-}
-
-
 
 void GameBase::FrameStart() {
 	hr_ = commandAllocator->Reset();
@@ -1021,7 +928,6 @@ void GameBase::FrameStart() {
 	hr_ = commandList_->Reset(commandAllocator, nullptr);
 	assert(SUCCEEDED(hr_));
 }
-
 ID3D12DescriptorHeap* GameBase::CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
 
 	ID3D12DescriptorHeap* descriptorHeap = nullptr;
@@ -1139,7 +1045,9 @@ void GameBase::BeginFlame() {
 	assert(swapChainResources_[backBufferIndex_] != nullptr); // 安全強化！
 
 	// ② 頂点オフセットリセット
-	currentVertexOffset_ = 0;
+	currentTriangleVertexOffset_ = 0;
+	currentSpriteVertexOffset_ = 0;
+	currentSphereVertexOffset_ = 0;
 
 	// ③ コマンドリストのリセット
 	FrameStart();
@@ -1178,7 +1086,7 @@ void GameBase::EndFlame() {
 }
 void GameBase::DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle) {
 	// オフセットを今の位置で取得
-	UINT offsetVerts = currentVertexOffset_;
+	UINT offsetVerts = currentTriangleVertexOffset_;
 	// 1) 頂点バッファをマップして、offset から書き込み
 	VertexData* vd = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vd));
@@ -1220,7 +1128,70 @@ void GameBase::DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[
 	commandList_->DrawInstanced(3, 1, 0, 0);
 
 	// ⑧ 次回のオフセットを進める
-	currentVertexOffset_ += 3;
+	currentTriangleVertexOffset_ += 3;
+}
+void GameBase::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle) {
+	// マテリアルカラー設定（uint32_t → Vector4 に変換必要ならここで変換）
+	Vector4* mat = nullptr;
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
+	*mat = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
+	materialResource_->Unmap(0, nullptr);
+
+	// トランスフォーム（ワールドビュー射影行列）計算
+	Matrix4x4 worldMatrix = function.MakeAffineMatrix({radius, radius, radius}, {0.0f, 0.0f, 0.0f}, center);
+
+	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
+	Matrix4x4 wvp = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+
+	// 書き込み
+	*transformationMatrixData = wvp;
+
+	// ディスクリプタヒープ設定
+	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
+	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
+	commandList_->SetGraphicsRootDescriptorTable(2, texture_.GetGpuHandle());
+
+	// ルートパラメータ設定
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
+
+	// 頂点バッファ設定
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
+	
+}
+
+void GameBase::DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle) {
+	// マテリアルカラー設定
+	Vector4* mat = nullptr;
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
+	*mat = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
+	materialResource_->Unmap(0, nullptr);
+
+	// トランスフォーム計算（Z=0）
+	Matrix4x4 world = function.MakeAffineMatrix({scale, scale, 1.0f}, {0.0f, 0.0f, rotate}, {pos.x, pos.y, 0.0f});
+
+	Matrix4x4 view = function.MakeIdentity();
+	Matrix4x4 proj = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
+	Matrix4x4 wvp = function.Multiply(world, function.Multiply(view, proj));
+	*transformationMatrixDataSprite = wvp;
+
+	// ディスクリプタ設定
+	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
+	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
+	commandList_->SetGraphicsRootDescriptorTable(2, textures_[texHandle].GetGpuHandle());
+
+	// ルートパラメータ設定
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+
+	// 頂点バッファ設定
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->DrawInstanced(6, 1, 0, 0);
 }
 
 int GameBase::LoadTexture(const std::string& fileName) {
