@@ -12,13 +12,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	SetUnhandledExceptionFilter(gameBase->ExportDump);
 
 	Vector3 position[3]{
-		{-20,0,0,},
-		{20,0,0},
-		{0,20,0}
+		{-1,0,0,},
+		{1,0,0},
+		{0,1,0}
 	};
 	Vector2 texcoord[3] = {{0.0f, 1.0f}, {0.5f, 0.0f},{1.0f, 1.0f}};
 	
+	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	
+	/*int tex=gameBase->LoadTexture("C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/uvChecker.png");*/
 	while (gameBase->IsMsgQuit())
 	{
 		if (PeekMessage(gameBase->GetMsg(), NULL, 0, 0, PM_REMOVE)) {
@@ -31,7 +33,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			gameBase->Update();
 			
-			
+
+
 
 			//ゲームの処理
 

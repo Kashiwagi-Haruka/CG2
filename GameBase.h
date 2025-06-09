@@ -168,7 +168,8 @@ public:
 	// 描画関数（好きなだけ呼べるように）
 	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
 	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle);
-	void DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle);
+	void DrawSprite(const Vector2& pos, float scale, float rotate, uint32_t color, int texHandle);
+	int LoadTexture(const std::string& fileName);
 
 private:
 
@@ -205,7 +206,7 @@ private:
 	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height);
 
-	int LoadTexture(const std::string& fileName);
+	
 
 };
 

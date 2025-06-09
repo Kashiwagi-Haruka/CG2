@@ -409,6 +409,7 @@ void GameBase::CheackResourceLeaks() {
 void GameBase::ResourceRelease() {
 	
 	texture_.Finalize();
+	texture2_.Finalize();
 	imguiM_.Finalize();
 	
 	vertexResourceSphere->Release();
@@ -905,29 +906,9 @@ void GameBase::Update() {
 	 
 
 	// --- 回転角度を更新（Y軸回転だけ）
-	transform.rotate.y += 0.03f;
+	 transform.rotate.y += 0.03f;
 
-	// --- ワールド行列を作成（スケール → 回転 → 移動）
-	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-
-	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
-	*transformationMatrixData = worldViewProjectionMatrix;
-	// Sprite用のワールド行列（スケール・回転・移動から生成）
-	Matrix4x4 worldMatrixSprite = function.MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
-
-	// View行列（カメラ、今回は単位行列で固定）
-	Matrix4x4 viewMatrixSprite = function.MakeIdentity();
-
-	// 射影行列（平行投影、画面サイズで生成）
-	Matrix4x4 projectionMatrixSprite = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
-
-	// 最終WVP行列の計算と書き込み
-	Matrix4x4 worldViewProjectionMatrixSprite = function.Multiply(worldMatrixSprite, function.Multiply(viewMatrixSprite, projectionMatrixSprite));
-
-	*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
+	
 }
 
 
@@ -981,9 +962,6 @@ ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device
 void GameBase::DrawCommandList() {
 
 
-	
-
-
 	// TransitionBarrierの設定
 	// 今回のバリアはTransition
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -1028,26 +1006,7 @@ void GameBase::DrawCommandList() {
 	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
 	}
 
-	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	commandList_->DrawInstanced(6, 1, 0, 0);
-	
-	
-	// --- 球体描画 ---（追加すべき！）
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
-	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
-
-
-	    // VBV設定（スプライト用）
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-
-	// Transform（WVP）設定（ルートパラメータ1番目）
-	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
-
-	// 描画（6頂点＝2枚三角形）
-	commandList_->DrawInstanced(6, 1, 0, 0);
 
 }
 void GameBase::BeginFlame() {
@@ -1075,7 +1034,27 @@ void GameBase::BeginFlame() {
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
 void GameBase::EndFlame() {
+	// --- ワールド行列を作成（スケール → 回転 → 移動）
+	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
+	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
+	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+	*transformationMatrixData = worldViewProjectionMatrix;
+	// Sprite用のワールド行列（スケール・回転・移動から生成）
+	Matrix4x4 worldMatrixSprite = function.MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
+
+	// View行列（カメラ、今回は単位行列で固定）
+	Matrix4x4 viewMatrixSprite = function.MakeIdentity();
+
+	// 射影行列（平行投影、画面サイズで生成）
+	Matrix4x4 projectionMatrixSprite = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
+
+	// 最終WVP行列の計算と書き込み
+	Matrix4x4 worldViewProjectionMatrixSprite = function.Multiply(worldMatrixSprite, function.Multiply(viewMatrixSprite, projectionMatrixSprite));
+
+	*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 	imguiM_.Render(srvDescriptorHeap_, commandList_);
 
 	// RenderTarget→Present に戻す
@@ -1177,8 +1156,7 @@ void GameBase::DrawSphere(const Vector3& center, float radius, uint32_t color, i
 	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
 	
 }
-
-void GameBase::DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle) {
+void GameBase::DrawSprite(const Vector2& pos, float scale, float rotate, uint32_t color, int texHandle) {
 	// マテリアルカラー設定
 	Vector4* mat = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
