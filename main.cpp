@@ -47,6 +47,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	gameBase->ResourceRelease();
 	gameBase->CheackResourceLeaks();
 	CoUninitialize();
+	delete gameBase;
 	return 0;
 
 }

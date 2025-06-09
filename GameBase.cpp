@@ -409,6 +409,7 @@ void GameBase::CheackResourceLeaks() {
 void GameBase::ResourceRelease() {
 	
 	texture_.Finalize();
+	texture2_.Finalize();
 	imguiM_.Finalize();
 	
 	vertexResourceSphere->Release();
