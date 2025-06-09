@@ -245,6 +245,8 @@ void GameBase::WindowClear() {
 
 	device_->CreateDepthStencilView(depthStenicilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
+
+
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
 	// ImGui 初期化はここで！
@@ -253,8 +255,11 @@ void GameBase::WindowClear() {
 	if (srvDescriptorHeap_ == nullptr) {
 		assert(false);
 	}
-	texture_.Initialize(device_, srvDescriptorHeap_ ,"C:/Class/Program/DirectXGame/Resources/uvChecker.png");
+	texture_.Initialize(device_, srvDescriptorHeap_ ,"C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/uvChecker.png",1);
 	GPUHandle_ = texture_.GetGpuHandle();
+	texture2_.Initialize(device_, srvDescriptorHeap_, "C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/monsterBall.png",2);
+
+	GPUHandle2_ = texture2_.GetGpuHandle();
 	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる
 
 	DrawCommandList();
@@ -894,6 +899,11 @@ ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device_, size_t siz
 }
 
 void GameBase::Update() {
+
+	 ImGui::Checkbox("useMonsterBall", &useMonsterBall_);
+
+	 
+
 	// --- 回転角度を更新（Y軸回転だけ）
 	transform.rotate.y += 0.03f;
 
@@ -1010,8 +1020,13 @@ void GameBase::DrawCommandList() {
 	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress()); // VertexShader側
 	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap_};
 	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
-
+	if (useMonsterBall_) {
+	
+	commandList_->SetGraphicsRootDescriptorTable(2,GPUHandle2_);
+	} else {
+	
 	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+	}
 
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1193,10 +1208,13 @@ void GameBase::DrawSprite(int texHandle, const Vector2& pos, float scale, float 
 	commandList_->DrawInstanced(6, 1, 0, 0);
 }
 
+
+
+
 int GameBase::LoadTexture(const std::string& fileName) {
 	// 新しいTextureオブジェクトをvectorに追加
 	textures_.emplace_back();
 	// Initializeのオーバーロードを利用してファイル名で読み込み
-	textures_.back().Initialize(device_, srvDescriptorHeap_, fileName);
+	textures_.back().Initialize(device_, srvDescriptorHeap_, fileName,1);
 	return static_cast<int>(textures_.size() - 1);
 }

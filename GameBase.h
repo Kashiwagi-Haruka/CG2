@@ -132,11 +132,17 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	Matrix4x4* transformationMatrixData = nullptr;
 
 	Texture texture_;
+	Texture texture2_;
 	D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle_;
+	D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle2_;
+	
 	UINT currentTriangleVertexOffset_ = 0;  // 追加：次に書き込む頂点のオフセット（頂点数単位）
 	UINT currentSphereVertexOffset_ = 0;
 	UINT currentSpriteVertexOffset_ = 0;
 	static constexpr UINT kMaxVertices_ = 1024; // 十分な大きさで定義しておく
+
+
+	   bool useMonsterBall_ = true;
 
 	void FrameStart(); // フレーム最初の準備
 
@@ -170,11 +176,6 @@ private:
 
 	void Log(const std::string& message);
 
-	
-	
-
-	
-
 	void WindowClear();
 
 	void DebugLayer();
@@ -206,6 +207,5 @@ private:
 
 	int LoadTexture(const std::string& fileName);
 
-	
 };
 

@@ -1,8 +1,10 @@
 #include "Texture.h"
 
 
-void Texture::Initialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescriptorHeap_, const std::string& fileName) {
-
+void Texture::Initialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescriptorHeap_, const std::string& fileName,uint32_t index) {
+	descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	// Textureを読んで転送する
 	DirectX::ScratchImage mipImages = LoadTexture(fileName); // ←これが正しい
 
@@ -18,13 +20,15 @@ void Texture::Initialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescrip
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 	// --- ヒープの位置を取得 ---
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_,descriptorSizeSRV,index)
+		
+		= srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	textureSrvHandleGPU_ = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
 
 	// --- ImGuiが0番を使ってる場合、1つインクリメントして避ける ---
 	UINT descriptorSize = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureSrvHandleCPU.ptr += descriptorSize;
-	textureSrvHandleGPU_.ptr += descriptorSize;
+	textureSrvHandleCPU.ptr += descriptorSize*index;
+	textureSrvHandleGPU_.ptr += descriptorSize*index;
 
 	// --- SRV作成 ---
 	device_->CreateShaderResourceView(textureResource_, &srvDesc, textureSrvHandleCPU);
@@ -108,4 +112,14 @@ void Texture::Finalize() {
 		textureResource_->Release();
 		
 	}
+}
+D3D12_CPU_DESCRIPTOR_HANDLE Texture::GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index) {
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	handleCPU.ptr += (descriptorSize * index);
+	return handleCPU;
+}
+D3D12_GPU_DESCRIPTOR_HANDLE Texture::GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index) {
+	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	handleGPU.ptr += (descriptorSize * index);
+	return handleGPU;
 }
