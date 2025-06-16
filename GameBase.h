@@ -107,6 +107,12 @@ private:
 	ID3D12Resource* materialResourceSprite_;
 	Material materialDataSprite_;
 
+	struct TransformationMatrix {
+		Matrix4x4 WVP;
+		Matrix4x4 World;
+	
+	};
+
 	struct Transform {
 
 		Vector3 scale;
