@@ -107,6 +107,16 @@ private:
 	ID3D12Resource* materialResourceSprite_;
 	Material materialDataSprite_;
 
+	struct DirectionalLight{
+		Vector4 color;
+		Vector3 direction;
+		float intensity;
+	};
+
+	ID3D12Resource* directionalLightResource_ = nullptr;
+	DirectionalLight* directionalLightData_ = nullptr;
+
+
 	struct TransformationMatrix {
 		Matrix4x4 WVP;
 		Matrix4x4 World;

@@ -425,7 +425,13 @@ void GameBase::ResourceRelease() {
 	if (transformResource_) {
 		//transformResource->Unmap(0, nullptr); // ちゃんと最後だけUnmapする
 	}
-	
+	if (directionalLightResource_) {
+		directionalLightResource_->Unmap(0, nullptr);
+		directionalLightResource_->Release();
+		directionalLightResource_ = nullptr;
+		directionalLightData_ = nullptr;
+	}
+
 	vertexResource_->Release();
 	materialResourceSprite_->Release();
 	materialResource_->Release(); 
@@ -566,7 +572,7 @@ void GameBase::PSO() {
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	// RootParameter作成。Material(PixelShader用)とTransform(VertexShader用)
-	D3D12_ROOT_PARAMETER rootParameters[3] = {};
+	D3D12_ROOT_PARAMETER rootParameters[4] = {};
 
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
@@ -589,6 +595,30 @@ void GameBase::PSO() {
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+
+	//Light用
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[3].Descriptor.ShaderRegister = 3;
+
+// DirectionalLight用バッファ生成＆Map
+	directionalLightResource_ = CreateBufferResource(device_, sizeof(DirectionalLight));
+	if (!directionalLightResource_) {
+		OutputDebugStringA("directionalLightResource_ 作成失敗\n");
+		assert(false);
+	}
+	directionalLightData_ = nullptr;
+	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+	if (!directionalLightData_) {
+		OutputDebugStringA("directionalLightResource_ Map失敗\n");
+		assert(false);
+	}
+	*directionalLightData_ = {
+	    {1.0f, 1.0f, 1.0f, 1.0f},
+        {0.0f, -1.0f, 0.0f},
+        1.0f
+    };
+
 
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
@@ -701,9 +731,11 @@ void GameBase::PSO() {
 	graphicsPipelineState = nullptr;
 	hr_ = device_->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr_));
+	Log("PSO END \n");
 }
 
 void GameBase::VertexResource() {
+	Log("VertexResource Start\n");
 	// 頂点リソース作成
 	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * kMaxVertices_);
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
@@ -758,13 +790,16 @@ void GameBase::VertexResource() {
 	scissorRect.bottom = kClientHeight;
 
 	// --- マテリアル用リソース ---
-	materialResource_ = CreateBufferResource(device_, sizeof(Vector4));
-	Vector4* materialData = nullptr;
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	*materialData = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 赤
+	// 3D用（球など陰影つけたいもの）
+	materialResource_ = CreateBufferResource(device_, sizeof(Material));
+	Material* mat3d = nullptr;
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
+	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	mat3d->enableLighting = 1;
+	materialResource_->Unmap(0, nullptr);
 
 	// --- トランスフォーム用リソース ---
-	transformResource_ = CreateBufferResource(device_, sizeof(Matrix4x4));
+	transformResource_ = CreateBufferResource(device_, sizeof(Matrix4x4)*2);
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // ←ここ！！起動時にマップしっぱなし
 	*transformationMatrixData = function.MakeIdentity(); // 初期値は単位行列
 	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -773,7 +808,10 @@ void GameBase::VertexResource() {
 	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
 	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
-	*transformationMatrixData = worldViewProjectionMatrix;
+	// 2個分書き込む
+	transformationMatrixData[0] = worldViewProjectionMatrix; // WVP
+	transformationMatrixData[1] = worldMatrix;               // World
+
 
 	// --- Sprite用 頂点リソース ---
 	vertexResourceSprite = CreateBufferResource(device_, sizeof(VertexData) * 6);
@@ -783,12 +821,13 @@ void GameBase::VertexResource() {
 	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 
 
-	materialResourceSprite_ = CreateBufferResource(device_, sizeof(Vector4));
-	Vector4* materialDataSprite = nullptr;
-	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
-	*materialDataSprite = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白
-
-	materialDataSprite_.enableLighting = false;
+// スプライト用（陰影つけたくないもの）
+	materialResourceSprite_ = CreateBufferResource(device_, sizeof(Material));
+	Material* matSprite = nullptr;
+	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
+	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
+	matSprite->enableLighting = 0;
+	materialResourceSprite_->Unmap(0, nullptr);
 
 	VertexData* vertexDataSprite = nullptr;
 	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
@@ -821,7 +860,7 @@ void GameBase::VertexResource() {
 
 	vertexResourceSprite->Unmap(0, nullptr);
 	// Sprite用の TransformationMatrix リソース作成（1個分）
-	transformationMatrixResourceSprite = CreateBufferResource(device_, sizeof(Matrix4x4));
+	transformationMatrixResourceSprite = CreateBufferResource(device_, sizeof(Matrix4x4)*2);
 
 	// データへのポインタ取得
 	transformationMatrixDataSprite = nullptr;
@@ -903,7 +942,7 @@ void GameBase::VertexResource() {
 			}
 		}
 		vertexResourceSphere->Unmap(0, nullptr);
-
+	    Log("VertexResource END\n");
 }
 ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device_, size_t sizeInBytes) {
 	// バッファの設定（UPLOAD用に変更）
@@ -951,7 +990,9 @@ void GameBase::Update() {
 	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
 	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
-	*transformationMatrixData = worldViewProjectionMatrix;
+	transformationMatrixData[0] = worldViewProjectionMatrix;
+	transformationMatrixData[1] = worldMatrix;
+
 	// Sprite用のワールド行列（スケール・回転・移動から生成）
 	Matrix4x4 worldMatrixSprite = function.MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
 
@@ -964,7 +1005,8 @@ void GameBase::Update() {
 	// 最終WVP行列の計算と書き込み
 	Matrix4x4 worldViewProjectionMatrixSprite = function.Multiply(worldMatrixSprite, function.Multiply(viewMatrixSprite, projectionMatrixSprite));
 
-	*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
+	transformationMatrixDataSprite[0] = worldViewProjectionMatrixSprite;
+	transformationMatrixDataSprite[1] = worldMatrix;
 }
 
 
@@ -1053,8 +1095,10 @@ void GameBase::DrawCommandList() {
 	commandList_->SetGraphicsRootSignature(rootSignature);
 	commandList_->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);                                     // VBVを設定
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());  // PixelShader側
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());  // PixelShader側
 	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress()); // VertexShader側
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+
 	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap_};
 	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 	if (useMonsterBall_) {
@@ -1081,7 +1125,7 @@ void GameBase::DrawCommandList() {
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 
 	// Transform（WVP）設定（ルートパラメータ1番目）
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
 
 	// 描画（6頂点＝2枚三角形）
