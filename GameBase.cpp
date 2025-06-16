@@ -433,6 +433,8 @@ void GameBase::ResourceRelease() {
 	}
 
 	vertexResource_->Release();
+	indexResourceSprite_->Unmap(0, nullptr);
+	indexResourceSprite_->Release();
 	materialResourceSprite_->Release();
 	materialResource_->Release(); 
 	transformResource_->Release(); 
@@ -820,6 +822,24 @@ void GameBase::VertexResource() {
 	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
 	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 
+	// --- ここにインデックスバッファの生成を追加 ---
+	// --- ここにインデックスバッファの生成を追加 ---
+	// 6個のインデックス（2枚の三角形でスプライト）
+	indexResourceSprite_ = CreateBufferResource(device_, sizeof(uint32_t) * 6);
+
+	uint32_t indices[6] = {0, 1, 2, 1, 3, 2}; // ← 正しいインデックス配列
+	void* mapped = nullptr;
+	indexResourceSprite_->Map(0, nullptr, &mapped);
+	memcpy(mapped, indices, sizeof(indices));
+	indexResourceSprite_->Unmap(0, nullptr);
+
+	// インデックスバッファビューの作成
+	indexBufferViewSprite_.BufferLocation = indexResourceSprite_->GetGPUVirtualAddress();
+	indexBufferViewSprite_.SizeInBytes = sizeof(uint32_t) * 6;
+	indexBufferViewSprite_.Format = DXGI_FORMAT_R32_UINT;
+
+	
+
 
 // スプライト用（陰影つけたくないもの）
 	materialResourceSprite_ = CreateBufferResource(device_, sizeof(Material));
@@ -1122,14 +1142,15 @@ void GameBase::DrawCommandList() {
 
 
 	    // VBV設定（スプライト用）
+	// 頂点バッファビューだけセット
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-
-	// Transform（WVP）設定（ルートパラメータ1番目）
+	// 必要ならテクスチャやCBVもセット
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
-
-	// 描画（6頂点＝2枚三角形）
+	// ここをDrawInstanced(6,1,0,0)に！
 	commandList_->DrawInstanced(6, 1, 0, 0);
+
+
 
 }
 void GameBase::BeginFlame() {

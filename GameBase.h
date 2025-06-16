@@ -148,7 +148,10 @@ Transform cameraTransform = {
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f}
     };
-Matrix4x4* transformationMatrixDataSprite;
+
+	ID3D12Resource* indexResourceSprite_ = nullptr;
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite_{};
+	Matrix4x4* transformationMatrixDataSprite;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite;
 	
 D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
