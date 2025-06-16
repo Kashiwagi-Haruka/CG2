@@ -620,7 +620,7 @@ void GameBase::PSO() {
 	assert(SUCCEEDED(hr_));
 
 	// InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 
 	// POSITION（float4）
 	inputElementDescs[0].SemanticName = "POSITION";
@@ -639,6 +639,11 @@ void GameBase::PSO() {
 	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	inputElementDescs[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
 	inputElementDescs[1].InstanceDataStepRate = 0;
+
+	inputElementDescs[2].SemanticName = "NORMAL";
+	inputElementDescs[2].SemanticIndex = 0;
+	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
 
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
@@ -799,6 +804,11 @@ void GameBase::VertexResource() {
 	vertexDataSprite[5].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
 	vertexDataSprite[5].texcoord = {1.0f, 1.0f};
 
+	for (int i = 0; i < 6; ++i) {
+		vertexDataSprite[i].normal = {0.0f, 0.0f, -1.0f};
+	}
+
+
 	vertexResourceSprite->Unmap(0, nullptr);
 	// Sprite用の TransformationMatrix リソース作成（1個分）
 	transformationMatrixResourceSprite = CreateBufferResource(device_, sizeof(Matrix4x4));
@@ -846,24 +856,40 @@ void GameBase::VertexResource() {
 				float u = float(lonIndex) / float(kSubdivision);
 				float v = 1.0f - float(latIndex) / float(kSubdivision);
 
-				sphereVertexData[start + 0] = {
-				    a, {u, v}
+				// 上の球体生成for文の直前に追加
+			    auto calcNormal = [](const Vector4& v) -> Vector3 {
+				    float len = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+				    if (len == 0)
+					    return {0, 0, 1};
+				    return {v.x / len, v.y / len, v.z / len};
+			    };
+
+			    // ループ内
+			    sphereVertexData[start + 0] = {
+			        a, {u, v},
+                     calcNormal(a)
                 };
-				sphereVertexData[start + 1] = {
-				    b, {u, v - (1.0f / kSubdivision)}
+			    sphereVertexData[start + 1] = {
+			        b, {u, v - (1.0f / kSubdivision)},
+                     calcNormal(b)
                 };
-				sphereVertexData[start + 2] = {
-				    c, {u + (1.0f / kSubdivision), v}
+			    sphereVertexData[start + 2] = {
+			        c, {u + (1.0f / kSubdivision), v},
+                     calcNormal(c)
                 };
-				sphereVertexData[start + 3] = {
-				    c, {u + (1.0f / kSubdivision), v}
+			    sphereVertexData[start + 3] = {
+			        c, {u + (1.0f / kSubdivision), v},
+                     calcNormal(c)
                 };
-				sphereVertexData[start + 4] = {
-				    b, {u, v - (1.0f / kSubdivision)}
+			    sphereVertexData[start + 4] = {
+			        b, {u, v - (1.0f / kSubdivision)},
+                     calcNormal(b)
                 };
-				sphereVertexData[start + 5] = {
-				    d, {u + (1.0f / kSubdivision), v - (1.0f / kSubdivision)}
+			    sphereVertexData[start + 5] = {
+			        d, {u + (1.0f / kSubdivision), v - (1.0f / kSubdivision)},
+                     calcNormal(d)
                 };
+
 			}
 		}
 		vertexResourceSphere->Unmap(0, nullptr);
