@@ -427,6 +427,7 @@ void GameBase::ResourceRelease() {
 	}
 	
 	vertexResource_->Release();
+	materialResourceSprite_->Release();
 	materialResource_->Release(); 
 	transformResource_->Release(); 
 
@@ -781,6 +782,14 @@ void GameBase::VertexResource() {
 	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
 	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 
+
+	materialResourceSprite_ = CreateBufferResource(device_, sizeof(Vector4));
+	Vector4* materialDataSprite = nullptr;
+	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
+	*materialDataSprite = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白
+
+	materialDataSprite_.enableLighting = false;
+
 	VertexData* vertexDataSprite = nullptr;
 	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
 
@@ -807,6 +816,7 @@ void GameBase::VertexResource() {
 	for (int i = 0; i < 6; ++i) {
 		vertexDataSprite[i].normal = {0.0f, 0.0f, -1.0f};
 	}
+
 
 
 	vertexResourceSprite->Unmap(0, nullptr);
@@ -1043,7 +1053,7 @@ void GameBase::DrawCommandList() {
 	commandList_->SetGraphicsRootSignature(rootSignature);
 	commandList_->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);                                     // VBVを設定
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());  // PixelShader側
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());  // PixelShader側
 	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress()); // VertexShader側
 	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap_};
 	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
@@ -1071,6 +1081,7 @@ void GameBase::DrawCommandList() {
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 
 	// Transform（WVP）設定（ルートパラメータ1番目）
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
 
 	// 描画（6頂点＝2枚三角形）

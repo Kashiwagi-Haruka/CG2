@@ -97,6 +97,16 @@ private:
 	ID3D12DescriptorHeap* dsvDescriptorHeap;
 	Function function;
 
+	struct Material{
+
+		Vector4 color;
+		int enableLighting;
+
+	};
+
+	ID3D12Resource* materialResourceSprite_;
+	Material materialDataSprite_;
+
 	struct Transform {
 
 		Vector3 scale;
