@@ -18,7 +18,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	};
 	Vector2 texcoord[3] = {{0.0f, 1.0f}, {0.5f, 0.0f},{1.0f, 1.0f}};
 	
-	
 	while (gameBase->IsMsgQuit())
 	{
 		if (PeekMessage(gameBase->GetMsg(), NULL, 0, 0, PM_REMOVE)) {
