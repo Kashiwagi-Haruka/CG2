@@ -1,6 +1,6 @@
 #include "imGuiM.h"
 #include <dxgi1_6.h>
-
+#include <format>
 void imGuiM::MInitialize(HWND hwnd, ID3D12Device* device_, DXGI_SWAP_CHAIN_DESC1 swapChainDesc, D3D12_RENDER_TARGET_VIEW_DESC rtvDesc, ID3D12DescriptorHeap* srvDescriptorHeap_) {
 
 	IMGUI_CHECKVERSION();
@@ -8,6 +8,7 @@ void imGuiM::MInitialize(HWND hwnd, ID3D12Device* device_, DXGI_SWAP_CHAIN_DESC1
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX12_Init(device_, swapChainDesc.BufferCount, rtvDesc.Format, srvDescriptorHeap_, srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart());
+	
 }
 
 void imGuiM::NewFrame() {

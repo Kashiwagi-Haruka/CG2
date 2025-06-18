@@ -251,7 +251,7 @@ void GameBase::WindowClear() {
 
 	// ImGui 初期化はここで！
 	imguiM_.MInitialize(hwnd, device_, swapChainDesc, rtvDesc, srvDescriptorHeap_);
-
+	
 	if (srvDescriptorHeap_ == nullptr) {
 		assert(false);
 	}
@@ -831,7 +831,37 @@ void GameBase::VertexResource() {
 	// 6個のインデックス（2枚の三角形でスプライト）
 	indexResourceSprite_ = CreateBufferResource(device_, sizeof(uint32_t) * 6);
 
-	uint32_t indices[6] = {0, 1, 2, 1, 3, 2}; // ← 正しいインデックス配列
+	VertexData* vertexDataSprite = nullptr;
+	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+
+// 1枚目の三角形（左下 → 左上 → 右下）
+	vertexDataSprite[0].position = {0.0f, 360.0f, 0.0f, 1.0f}; // 左下
+	vertexDataSprite[0].texcoord = {0.0f, 1.0f};
+	
+
+	vertexDataSprite[1].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
+	vertexDataSprite[1].texcoord = {0.0f, 0.0f};
+
+	vertexDataSprite[2].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
+	vertexDataSprite[2].texcoord = {1.0f, 1.0f};
+
+	// 2枚目の三角形（左上 → 右上 → 右下）
+	vertexDataSprite[3].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
+	vertexDataSprite[3].texcoord = {0.0f, 0.0f};
+
+	vertexDataSprite[4].position = {640.0f, 0.0f, 0.0f, 1.0f}; // 右上
+	vertexDataSprite[4].texcoord = {1.0f, 0.0f};
+
+	vertexDataSprite[5].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
+	vertexDataSprite[5].texcoord = {1.0f, 1.0f};
+
+	for (int i = 0; i < 6; i++) {
+		vertexDataSprite[i].normal = {0.0f, 0.0f, -1.0f};
+	}
+
+	vertexResourceSprite->Unmap(0, nullptr);
+	uint32_t indices[6] = {0, 1, 2, 1, 4, 2};
+
 	void* mapped = nullptr;
 	indexResourceSprite_->Map(0, nullptr, &mapped);
 	memcpy(mapped, indices, sizeof(indices));
@@ -854,36 +884,7 @@ void GameBase::VertexResource() {
 	matSprite->uvTransform = function.MakeIdentity();
 	materialResourceSprite_->Unmap(0, nullptr);
 
-	VertexData* vertexDataSprite = nullptr;
-	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
 
-	// 1枚目の三角形（左下 → 左上 → 右下）
-	vertexDataSprite[0].position = {0.0f, 360.0f, 0.0f, 1.0f}; // 左下
-	vertexDataSprite[0].texcoord = {0.0f, 1.0f};
-
-	vertexDataSprite[1].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
-	vertexDataSprite[1].texcoord = {0.0f, 0.0f};
-
-	vertexDataSprite[2].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
-	vertexDataSprite[2].texcoord = {1.0f, 1.0f};
-
-	// 2枚目の三角形（左上 → 右上 → 右下）
-	vertexDataSprite[3].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
-	vertexDataSprite[3].texcoord = {0.0f, 0.0f};
-
-	vertexDataSprite[4].position = {640.0f, 0.0f, 0.0f, 1.0f}; // 右上
-	vertexDataSprite[4].texcoord = {1.0f, 0.0f};
-
-	vertexDataSprite[5].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
-	vertexDataSprite[5].texcoord = {1.0f, 1.0f};
-
-	for (int i = 0; i < 6; ++i) {
-		vertexDataSprite[i].normal = {0.0f, 0.0f, -1.0f};
-	}
-
-
-
-	vertexResourceSprite->Unmap(0, nullptr);
 	// Sprite用の TransformationMatrix リソース作成（1個分）
 	transformationMatrixResourceSprite = CreateBufferResource(device_, sizeof(Matrix4x4)*2);
 
@@ -1016,10 +1017,12 @@ void GameBase::Update() {
 
 	 
 
+	materialDataSprite_.color = {1.0f, 1.0f, 1.0f, 1.0f}; // 赤で描画
 	 Material* matSprite = nullptr;
 	 materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
 	 *matSprite = materialDataSprite_;
 	 materialResourceSprite_->Unmap(0, nullptr);
+
 
 
 	// --- 回転角度を更新（Y軸回転だけ）
@@ -1165,16 +1168,20 @@ void GameBase::DrawCommandList() {
 	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
 
 
-	    // VBV設定（スプライト用）
-	// 頂点バッファビューだけセット
-	/*commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);*/
+// --- スプライト描画 ---
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite); // ★絶対にここでVBVをセット
 	commandList_->IASetIndexBuffer(&indexBufferViewSprite_);
-	// 必要ならテクスチャやCBVもセット
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
-	// ここをDrawInstanced(6,1,0,0)に！
-	commandList_->DrawInstanced(6, 1, 0, 0);
-
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	commandList_->SetDescriptorHeaps(1, &srvDescriptorHeap_);
+	if (useMonsterBall_) {
+		commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle2_);
+	} else {
+		commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+	}
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 	Log("DrawCommandList End");
 }
