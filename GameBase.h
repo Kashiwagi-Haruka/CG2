@@ -101,7 +101,8 @@ private:
 
 		Vector4 color;
 		int enableLighting;
-
+		float padding[3];
+		Matrix4x4 uvTransform;
 	};
 
 	ID3D12Resource* materialResourceSprite_;
@@ -136,6 +137,12 @@ private:
 	    {1.0f, 1.0f, 1.0f}, // scale
 	    {0.0f, 0.0f, 0.0f}, // rotate
 	    {0.0f, 0.0f, 0.0f}  // translate
+	};
+
+	Transform uvTransformSprite_{
+	    {1.0f, 1.0f, 1.0f},
+	    {0.0f, 0.0f, 0.0f},
+	    {0.0f, 0.0f, 0.0f},
 	};
 
 Transform cameraTransform = {

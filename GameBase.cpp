@@ -433,7 +433,7 @@ void GameBase::ResourceRelease() {
 	}
 
 	vertexResource_->Release();
-	indexResourceSprite_->Unmap(0, nullptr);
+	
 	indexResourceSprite_->Release();
 	materialResourceSprite_->Release();
 	materialResource_->Release(); 
@@ -793,11 +793,15 @@ void GameBase::VertexResource() {
 
 	// --- マテリアル用リソース ---
 	// 3D用（球など陰影つけたいもの）
-	materialResource_ = CreateBufferResource(device_, sizeof(Material));
+	// 必ず256バイト単位で切り上げる
+	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
+	materialResource_ = CreateBufferResource(device_, alignedSize);
 	Material* mat3d = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
 	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	mat3d->enableLighting = 1;
+	mat3d->uvTransform = function.MakeIdentity();
+
 	materialResource_->Unmap(0, nullptr);
 
 	// --- トランスフォーム用リソース ---
@@ -837,16 +841,17 @@ void GameBase::VertexResource() {
 	indexBufferViewSprite_.BufferLocation = indexResourceSprite_->GetGPUVirtualAddress();
 	indexBufferViewSprite_.SizeInBytes = sizeof(uint32_t) * 6;
 	indexBufferViewSprite_.Format = DXGI_FORMAT_R32_UINT;
-
+	
 	
 
 
 // スプライト用（陰影つけたくないもの）
-	materialResourceSprite_ = CreateBufferResource(device_, sizeof(Material));
+	materialResourceSprite_ = CreateBufferResource(device_, alignedSize);
 	Material* matSprite = nullptr;
 	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
 	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
 	matSprite->enableLighting = 0;
+	matSprite->uvTransform = function.MakeIdentity();
 	materialResourceSprite_->Unmap(0, nullptr);
 
 	VertexData* vertexDataSprite = nullptr;
@@ -995,10 +1000,27 @@ ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device_, size_t siz
 }
 
 void GameBase::Update() {
-
+	Log("UPDATE START");
 	 ImGui::Checkbox("useMonsterBall", &useMonsterBall_);
 
+	 ImGui::DragFloat2("UVTranslate", &uvTransformSprite_.translate.x, 0.01f, -10.0f, 10.0f);
+	 ImGui::DragFloat2("UVScale", &uvTransformSprite_.scale.x, 0.01f, -10.0f, 10.0f);
+	 ImGui::SliderAngle("UVRotate", &uvTransformSprite_.rotate.z);
+
+
+	 Matrix4x4 uvTransformMatrix = function.MakeIdentity();
+	 uvTransformMatrix = function.MakeScaleMatrix(uvTransformSprite_.scale);
+	 uvTransformMatrix = function.Multiply(uvTransformMatrix, function.MakeRotateZMatrix(uvTransformSprite_.rotate.z));
+	 uvTransformMatrix = function.Multiply(uvTransformMatrix, function.MakeTranslateMatrix(uvTransformSprite_.translate));
+	 materialDataSprite_.uvTransform = uvTransformMatrix;
+
 	 
+
+	 Material* matSprite = nullptr;
+	 materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
+	 *matSprite = materialDataSprite_;
+	 materialResourceSprite_->Unmap(0, nullptr);
+
 
 	// --- 回転角度を更新（Y軸回転だけ）
 	transform.rotate.y += 0.03f;
@@ -1027,10 +1049,12 @@ void GameBase::Update() {
 
 	transformationMatrixDataSprite[0] = worldViewProjectionMatrixSprite;
 	transformationMatrixDataSprite[1] = worldMatrix;
+	Log("UPDATE END");
 }
 
 
 void GameBase::FrameStart() {
+	Log("Frame START");
 	hr_ = commandAllocator->Reset();
 	assert(SUCCEEDED(hr_));
 	hr_ = commandList_->Reset(commandAllocator, nullptr);
@@ -1078,7 +1102,7 @@ ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device
 }
 
 void GameBase::DrawCommandList() {
-
+	Log("DrawCommandList START");
 
 	
 
@@ -1143,7 +1167,8 @@ void GameBase::DrawCommandList() {
 
 	    // VBV設定（スプライト用）
 	// 頂点バッファビューだけセット
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+	/*commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);*/
+	commandList_->IASetIndexBuffer(&indexBufferViewSprite_);
 	// 必要ならテクスチャやCBVもセット
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
@@ -1151,9 +1176,10 @@ void GameBase::DrawCommandList() {
 	commandList_->DrawInstanced(6, 1, 0, 0);
 
 
-
+	Log("DrawCommandList End");
 }
 void GameBase::BeginFlame() {
+	Log("BeginFlame START");
 	// ① 現在のバックバッファをフレーム毎に更新
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
@@ -1174,6 +1200,7 @@ void GameBase::BeginFlame() {
 
 	// ⑤ ImGui 準備
 	imguiM_.NewFrame();
+	Log("BeginFlame END");
 }
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
