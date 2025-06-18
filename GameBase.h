@@ -155,7 +155,10 @@ Transform cameraTransform = {
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f}
     };
-
+struct ModelData {
+	std::vector<VertexData> vertices;
+};
+ModelData modelData;
 	ID3D12Resource* indexResourceSprite_ = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite_{};
 	Matrix4x4* transformationMatrixDataSprite;
@@ -241,7 +244,9 @@ private:
 	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height);
 
-	int LoadTexture(const std::string& fileName);
+	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 
+	int LoadTexture(const std::string& fileName);
+	
 };
 

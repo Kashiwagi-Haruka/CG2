@@ -2,6 +2,9 @@
 #include <DbgHelp.h>
 #include <strsafe.h>
 #include <dxgidebug.h>
+#include <fstream>
+#include <sstream>
+
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "Dbghelp.lib")
@@ -739,42 +742,18 @@ void GameBase::PSO() {
 void GameBase::VertexResource() {
 	Log("VertexResource Start\n");
 	// 頂点リソース作成
-	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * kMaxVertices_);
+
+	modelData = LoadObjFile("Resources", "plane.obj");
+
+	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * modelData.vertices.size());
+
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * kMaxVertices_;
+	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	
-	//VertexData* vertexData = nullptr;
-	//vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-
-	//// 左下
-	//vertexData[0].position = {-0.5f, -0.5f, 0.0f, 1.0f};
-	//vertexData[0].texcoord = {0.0f, 1.0f};
-
-	//// 上
-	//vertexData[1].position = {0.0f, 0.5f, 0.0f, 1.0f};
-	//vertexData[1].texcoord = {0.5f, 0.0f};
-
-	//// 右下
-	//vertexData[2].position = {0.5f, -0.5f, 0.0f, 1.0f};
-	//vertexData[2].texcoord = {1.0f, 1.0f};
-
-	//// 左下2
-	//vertexData[3].position = {-0.5f, -0.5f, 0.5f, 1.0f};
-	//vertexData[3].texcoord = {0.0f, 1.0f};
-
-	//// 上2
-	//vertexData[4].position = {0.0f, 0.0f, 0.0f, 1.0f};
-	//vertexData[4].texcoord = {0.5f, 0.0f};
-
-	//// 右下2
-	//vertexData[5].position = {0.5f, -0.5f, -0.5f, 1.0f};
-	//vertexData[5].texcoord = {1.0f, 1.0f};
-
-
-
-	//vertexResource_->Unmap(0, nullptr);
-
+	VertexData* vertexData = nullptr;
+	vertexResource_->Map(0,nullptr,reinterpret_cast<void**>(&vertexData));
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
 
 	// ビューポートとシザー設定
 	viewport = {};
@@ -1160,12 +1139,12 @@ void GameBase::DrawCommandList() {
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	commandList_->DrawInstanced(6, 1, 0, 0);
+	commandList_->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 	
 	
-	// --- 球体描画 ---（追加すべき！）
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
-	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
+	//// --- 球体描画 ---（追加すべき！）
+	//commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
+	//commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
 
 
 // --- スプライト描画 ---
@@ -1345,7 +1324,71 @@ void GameBase::DrawSprite(int texHandle, const Vector2& pos, float scale, float 
 	commandList_->DrawInstanced(6, 1, 0, 0);
 }
 
+//objfileを読む関数
+GameBase::ModelData GameBase::LoadObjFile(const std::string& directoryPath, const std::string& filename){
 
+	//1.中で必要になる変数の宣言
+	 
+	ModelData modelData;//構築するModelData
+	std::vector<Vector4> positions;
+	std::vector<Vector3> normals;
+	std::vector<Vector2> texcoords;
+	std::string line;
+	
+	//2.ファイルを開く
+	
+	std::ifstream file(directoryPath + "/" + filename);
+	assert(file.is_open());
+
+
+	//3.実際にファイルを読みModelDataを構築していく
+	
+	while(std::getline(file, line)){
+		std::string identifier;
+		std::istringstream s(line);
+		s >> identifier;
+
+		if (identifier == "v") {
+			Vector4 position;
+			s >> position.x >> position.y >> position.z;
+			position.w = 1.0f;
+			positions.push_back(position);
+		} else if (identifier == "vt") {
+			Vector2 texcoord;
+			s >> texcoord.x >> texcoord.y;
+			texcoords.push_back(texcoord);
+		} else if (identifier == "vn") {
+			Vector3 normal;
+			s >> normal.x >> normal.y >> normal.z;
+			normals.push_back(normal);
+		} else if (identifier == "f") {
+			// 面は三角形限定。他の形は未対応
+			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
+				std::string vertexDefinition;
+				s >> vertexDefinition;
+				// 頂点の要素へのIndexは「位置/UV/法線」で格納されているので、分解してIndexを取得する
+				std::istringstream v(vertexDefinition);
+				uint32_t elementIndices[3];
+				for (int32_t element = 0; element < 3; ++element) {
+					std::string index;
+					std::getline(v, index, '/'); // 区切りでインデックスを読んでいく
+					elementIndices[element] = std::stoi(index);
+				}
+				// 要素へのIndexから、実際の要素の値を取得して、頂点を構築する
+				Vector4 position = positions[elementIndices[0] - 1];
+				Vector2 texcoord = texcoords[elementIndices[1] - 1];
+				Vector3 normal = normals[elementIndices[2] - 1];
+				VertexData vertex = {position, texcoord, normal};
+				modelData.vertices.push_back(vertex);
+			}
+		}
+	}
+
+
+
+	//4.ModelDataを返す
+	return modelData;
+}
 
 
 int GameBase::LoadTexture(const std::string& fileName) {
