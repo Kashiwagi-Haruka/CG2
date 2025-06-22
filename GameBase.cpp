@@ -258,10 +258,16 @@ void GameBase::WindowClear() {
 	if (srvDescriptorHeap_ == nullptr) {
 		assert(false);
 	}
-	texture_.Initialize(device_, srvDescriptorHeap_ ,"C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/uvChecker.png",1);
-	GPUHandle_ = texture_.GetGpuHandle();
-	texture2_.Initialize(device_, srvDescriptorHeap_, "C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/monsterBall.png",2);
 
+	modelData = LoadObjFile("Resources", "plane.obj");
+	// ↓ テクスチャも読み込んで、indexを取得
+	
+	
+
+	texture_.Initialize(device_, srvDescriptorHeap_, /*"C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/uvChecker.png"*/ modelData.material.textureFilePath, 1);
+	GPUHandle_ = texture_.GetGpuHandle();
+	texture2_.Initialize(device_, srvDescriptorHeap_,/* "C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/monsterBall.png"*/modelData.material.textureFilePath,2);
+	OutputDebugStringA(("TexPath: " + modelData.material.textureFilePath + "\n").c_str());
 	GPUHandle2_ = texture2_.GetGpuHandle();
 	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる
 
@@ -980,7 +986,7 @@ ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device_, size_t siz
 }
 
 void GameBase::Update() {
-	Log("UPDATE START");
+	
 	 ImGui::Checkbox("useMonsterBall", &useMonsterBall_);
 
 	 ImGui::DragFloat2("UVTranslate", &uvTransformSprite_.translate.x, 0.01f, -10.0f, 10.0f);
@@ -1031,7 +1037,7 @@ void GameBase::Update() {
 
 	transformationMatrixDataSprite[0] = worldViewProjectionMatrixSprite;
 	transformationMatrixDataSprite[1] = worldMatrix;
-	Log("UPDATE END");
+	
 }
 
 
@@ -1085,10 +1091,6 @@ ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device
 
 void GameBase::DrawCommandList() {
 	Log("DrawCommandList START");
-
-	
-
-
 	// TransitionBarrierの設定
 	// 今回のバリアはTransition
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -1125,7 +1127,7 @@ void GameBase::DrawCommandList() {
 	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress()); // VertexShader側
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 
-	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap_};
+	/*ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap_};
 	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 	if (useMonsterBall_) {
 	
@@ -1133,7 +1135,16 @@ void GameBase::DrawCommandList() {
 	} else {
 	
 	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
-	}
+	}*/
+	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap_};
+	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
+	// 描画直前で確認
+	/*OutputDebugStringA(std::format("Current texIndex={}, GPU Handle ptr={}\n", texIndex, textures_[texIndex].GetGpuHandle().ptr).c_str());*/
+
+	// ここで、モデルが持つtexIndex番のSRVを使う
+	
+	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle2_);
+
 
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1148,24 +1159,24 @@ void GameBase::DrawCommandList() {
 
 
 // --- スプライト描画 ---
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite); // ★絶対にここでVBVをセット
-	commandList_->IASetIndexBuffer(&indexBufferViewSprite_);
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-	commandList_->SetDescriptorHeaps(1, &srvDescriptorHeap_);
-	if (useMonsterBall_) {
-		commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle2_);
-	} else {
-		commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
-	}
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	//commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite); // ★絶対にここでVBVをセット
+	//commandList_->IASetIndexBuffer(&indexBufferViewSprite_);
+	//commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
+	//commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+	//commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	//commandList_->SetDescriptorHeaps(1, &srvDescriptorHeap_);
+	//if (useMonsterBall_) {
+	//	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle2_);
+	//} else {
+	//	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+	//}
+	//commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 	Log("DrawCommandList End");
 }
 void GameBase::BeginFlame() {
-	Log("BeginFlame START");
+	
 	// ① 現在のバックバッファをフレーム毎に更新
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
@@ -1186,7 +1197,7 @@ void GameBase::BeginFlame() {
 
 	// ⑤ ImGui 準備
 	imguiM_.NewFrame();
-	Log("BeginFlame END");
+	
 }
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
@@ -1325,25 +1336,17 @@ void GameBase::DrawSprite(int texHandle, const Vector2& pos, float scale, float 
 }
 
 //objfileを読む関数
-GameBase::ModelData GameBase::LoadObjFile(const std::string& directoryPath, const std::string& filename){
-
-	//1.中で必要になる変数の宣言
-	 
-	ModelData modelData;//構築するModelData
+GameBase::ModelData GameBase::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
+	ModelData modelData;
 	std::vector<Vector4> positions;
 	std::vector<Vector3> normals;
 	std::vector<Vector2> texcoords;
 	std::string line;
-	
-	//2.ファイルを開く
-	
+
 	std::ifstream file(directoryPath + "/" + filename);
 	assert(file.is_open());
 
-
-	//3.実際にファイルを読みModelDataを構築していく
-	
-	while(std::getline(file, line)){
+	while (std::getline(file, line)) {
 		std::string identifier;
 		std::istringstream s(line);
 		s >> identifier;
@@ -1352,49 +1355,92 @@ GameBase::ModelData GameBase::LoadObjFile(const std::string& directoryPath, cons
 			Vector4 position;
 			s >> position.x >> position.y >> position.z;
 			position.w = 1.0f;
+			// ここでx反転
+			position.x *= -1.0f;
+			
 			positions.push_back(position);
 		} else if (identifier == "vt") {
 			Vector2 texcoord;
 			s >> texcoord.x >> texcoord.y;
+			texcoord.y=1.0f-texcoord.y;
 			texcoords.push_back(texcoord);
 		} else if (identifier == "vn") {
 			Vector3 normal;
 			s >> normal.x >> normal.y >> normal.z;
+			// ここで法線もx反転
+			
 			normals.push_back(normal);
 		} else if (identifier == "f") {
-			// 面は三角形限定。他の形は未対応
+			VertexData triangle[3];
 			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
 				std::string vertexDefinition;
 				s >> vertexDefinition;
-				// 頂点の要素へのIndexは「位置/UV/法線」で格納されているので、分解してIndexを取得する
 				std::istringstream v(vertexDefinition);
 				uint32_t elementIndices[3];
 				for (int32_t element = 0; element < 3; ++element) {
 					std::string index;
-					std::getline(v, index, '/'); // 区切りでインデックスを読んでいく
+					std::getline(v, index, '/');
 					elementIndices[element] = std::stoi(index);
 				}
-				// 要素へのIndexから、実際の要素の値を取得して、頂点を構築する
 				Vector4 position = positions[elementIndices[0] - 1];
 				Vector2 texcoord = texcoords[elementIndices[1] - 1];
 				Vector3 normal = normals[elementIndices[2] - 1];
-				VertexData vertex = {position, texcoord, normal};
-				modelData.vertices.push_back(vertex);
+				triangle[faceVertex] = {position, texcoord, normal};
 			}
+			// 回り順を逆にしてpush_back
+			modelData.vertices.push_back(triangle[2]);
+			modelData.vertices.push_back(triangle[1]);
+			modelData.vertices.push_back(triangle[0]);
+		} else if (identifier == "mtllib") {
+			std::string mtlFile;
+			s >> mtlFile;
+			modelData.material = LoadMaterialTemplateFile(directoryPath, mtlFile);
 		}
+
 	}
 
+	OutputDebugStringA(("TexPath: " + modelData.material.textureFilePath + "\n").c_str());
+	for (size_t i = 0; i < modelData.vertices.size(); ++i) {
+		auto& v = modelData.vertices[i];
+		OutputDebugStringA(std::format("v{}: texcoord=({}, {})\n", i, v.texcoord.x, v.texcoord.y).c_str());
+	}
 
-
-	//4.ModelDataを返す
 	return modelData;
 }
 
+GameBase::MaterialData GameBase::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
+	MaterialData matData;
+	std::ifstream file(directoryPath + "/" + filename);
+	std::string line;
+	assert(file.is_open());
+	while (std::getline(file, line)) {
+		std::istringstream s(line);
+		std::string identifier;
+		s >> identifier;
+		if (identifier == "map_Kd") {
+			std::string textureFilePaths;
+			s >> textureFilePaths;
+			matData.textureFilePath = directoryPath + "/" + textureFilePaths;
+			
+		}
+	}
+	return matData;
+}
 
+
+
+// ファイル名からSRVヒープ内のテクスチャindexを返す（なければ追加ロード）
 int GameBase::LoadTexture(const std::string& fileName) {
-	// 新しいTextureオブジェクトをvectorに追加
-	textures_.emplace_back();
-	// Initializeのオーバーロードを利用してファイル名で読み込み
-	textures_.back().Initialize(device_, srvDescriptorHeap_, fileName,1);
+	for (size_t i = 0; i < textures_.size(); ++i) {
+		if (textures_[i].GetFilePath() == fileName) {
+			return static_cast<int>(i); // すでにロード済み
+		}
+	}
+	// 未ロードなら新しくロードしてpush_back
+	Texture tex;
+	tex.Initialize(device_, srvDescriptorHeap_, fileName, (uint32_t)textures_.size());
+	tex.SetFilePath(fileName); // Textureクラスにファイルパス保持用メンバ追加して
+	textures_.push_back(tex);
+	OutputDebugStringA(std::format("Texture loaded: {}, GPU Handle ptr={}\n", fileName, tex.GetGpuHandle().ptr).c_str());
 	return static_cast<int>(textures_.size() - 1);
 }

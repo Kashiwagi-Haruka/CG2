@@ -155,10 +155,16 @@ Transform cameraTransform = {
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f}
     };
+struct MaterialData {
+	std::string textureFilePath;
+};
 struct ModelData {
 	std::vector<VertexData> vertices;
+	MaterialData material;
 };
 ModelData modelData;
+
+
 	ID3D12Resource* indexResourceSprite_ = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite_{};
 	Matrix4x4* transformationMatrixDataSprite;
@@ -184,8 +190,10 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	   bool useMonsterBall_ = true;
 
 	void FrameStart(); // フレーム最初の準備
+	   
 
-public:	
+
+   public:	
 
 	void BeginFlame(); // フレームの開始処理（commandListリセットなど）
 	void EndFlame();   // フレームの終了処理（Present、フェンス待ちなど）
@@ -208,6 +216,8 @@ public:
 	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
 	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle);
 	void DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle);
+	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 private:
 
@@ -244,7 +254,7 @@ private:
 	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height);
 
-	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+	
 
 	int LoadTexture(const std::string& fileName);
 	
