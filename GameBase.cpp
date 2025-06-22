@@ -259,7 +259,7 @@ void GameBase::WindowClear() {
 		assert(false);
 	}
 
-	modelData = LoadObjFile("Resources", "plane.obj");
+	modelData = LoadObjFile("Resources", "axis.obj");
 	// ↓ テクスチャも読み込んで、indexを取得
 	
 	
@@ -498,6 +498,8 @@ void GameBase::DXCInitialize() {
 
 	PSO();
 	VertexResource();
+	/*CreateModelVertexBuffer();
+	CreateSpriteVertexBuffer();*/
 }
 
 IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパス*/const std::wstring& filePath,
@@ -749,7 +751,7 @@ void GameBase::VertexResource() {
 	Log("VertexResource Start\n");
 	// 頂点リソース作成
 
-	modelData = LoadObjFile("Resources", "plane.obj");
+	modelData = LoadObjFile("Resources", "axis.obj");
 
 	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * modelData.vertices.size());
 
@@ -984,6 +986,137 @@ ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device_, size_t siz
 
 	return bufferResource;
 }
+void GameBase::CreateModelVertexBuffer() {
+	Log("VertexResource Start\n");
+	// 頂点リソース作成
+
+	
+
+	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * modelData.vertices.size());
+
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+
+	VertexData* vertexData = nullptr;
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
+
+	// ビューポートとシザー設定
+	viewport = {};
+	viewport.Width = float(kClientWidth);
+	viewport.Height = float(kClientHeight);
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+
+	scissorRect = {};
+	scissorRect.left = 0;
+	scissorRect.right = kClientWidth;
+	scissorRect.top = 0;
+	scissorRect.bottom = kClientHeight;
+
+	// --- マテリアル用リソース ---
+	// 3D用（球など陰影つけたいもの）
+	// 必ず256バイト単位で切り上げる
+	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
+	materialResource_ = CreateBufferResource(device_, alignedSize);
+	Material* mat3d = nullptr;
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
+	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	mat3d->enableLighting = 1;
+	mat3d->uvTransform = function.MakeIdentity();
+
+	materialResource_->Unmap(0, nullptr);
+
+	// --- トランスフォーム用リソース ---
+	transformResource_ = CreateBufferResource(device_, sizeof(Matrix4x4) * 2);
+	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // ←ここ！！起動時にマップしっぱなし
+	*transformationMatrixData = function.MakeIdentity();                                      // 初期値は単位行列
+	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+
+	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
+	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+	// 2個分書き込む
+	transformationMatrixData[0] = worldViewProjectionMatrix; // WVP
+	transformationMatrixData[1] = worldMatrix;               // World
+}
+void GameBase::CreateSpriteVertexBuffer() {
+	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
+	// --- Sprite用 頂点リソース ---
+	vertexResourceSprite = CreateBufferResource(device_, sizeof(VertexData) * 6);
+	vertexBufferViewSprite = {};
+	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
+	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
+
+	// --- ここにインデックスバッファの生成を追加 ---
+	// --- ここにインデックスバッファの生成を追加 ---
+	// 6個のインデックス（2枚の三角形でスプライト）
+	indexResourceSprite_ = CreateBufferResource(device_, sizeof(uint32_t) * 6);
+
+	VertexData* vertexDataSprite = nullptr;
+	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+
+	// 1枚目の三角形（左下 → 左上 → 右下）
+	vertexDataSprite[0].position = {0.0f, 360.0f, 0.0f, 1.0f}; // 左下
+	vertexDataSprite[0].texcoord = {0.0f, 1.0f};
+
+	vertexDataSprite[1].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
+	vertexDataSprite[1].texcoord = {0.0f, 0.0f};
+
+	vertexDataSprite[2].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
+	vertexDataSprite[2].texcoord = {1.0f, 1.0f};
+
+	// 2枚目の三角形（左上 → 右上 → 右下）
+	vertexDataSprite[3].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
+	vertexDataSprite[3].texcoord = {0.0f, 0.0f};
+
+	vertexDataSprite[4].position = {640.0f, 0.0f, 0.0f, 1.0f}; // 右上
+	vertexDataSprite[4].texcoord = {1.0f, 0.0f};
+
+	vertexDataSprite[5].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
+	vertexDataSprite[5].texcoord = {1.0f, 1.0f};
+
+	for (int i = 0; i < 6; i++) {
+		vertexDataSprite[i].normal = {0.0f, 0.0f, -1.0f};
+	}
+
+	vertexResourceSprite->Unmap(0, nullptr);
+	uint32_t indices[6] = {0, 1, 2, 1, 4, 2};
+
+	void* mapped = nullptr;
+	indexResourceSprite_->Map(0, nullptr, &mapped);
+	memcpy(mapped, indices, sizeof(indices));
+	indexResourceSprite_->Unmap(0, nullptr);
+
+	// インデックスバッファビューの作成
+	indexBufferViewSprite_.BufferLocation = indexResourceSprite_->GetGPUVirtualAddress();
+	indexBufferViewSprite_.SizeInBytes = sizeof(uint32_t) * 6;
+	indexBufferViewSprite_.Format = DXGI_FORMAT_R32_UINT;
+
+	// スプライト用（陰影つけたくないもの）
+	materialResourceSprite_ = CreateBufferResource(device_, alignedSize);
+	Material* matSprite = nullptr;
+	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
+	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
+	matSprite->enableLighting = 0;
+	matSprite->uvTransform = function.MakeIdentity();
+	materialResourceSprite_->Unmap(0, nullptr);
+
+	// Sprite用の TransformationMatrix リソース作成（1個分）
+	transformationMatrixResourceSprite = CreateBufferResource(device_, sizeof(Matrix4x4) * 2);
+
+	// データへのポインタ取得
+	transformationMatrixDataSprite = nullptr;
+	transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+
+	// 単位行列を書き込んでおく（初期状態）
+	*transformationMatrixDataSprite = function.MakeIdentity();
+}
 
 void GameBase::Update() {
 	
@@ -1148,6 +1281,9 @@ void GameBase::DrawCommandList() {
 
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	OutputDebugStringA(std::format("modelData.vertices.size() = {}\n", modelData.vertices.size()).c_str());
+	OutputDebugStringA(std::format("vertexBufferView_.SizeInBytes = {}\n", vertexBufferView_.SizeInBytes).c_str());
+	OutputDebugStringA(std::format("sizeof(VertexData) = {}\n", sizeof(VertexData)).c_str());
 
 	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
 	commandList_->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
@@ -1225,115 +1361,115 @@ void GameBase::EndFlame() {
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
 }
-void GameBase::DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle) {
-	// オフセットを今の位置で取得
-	UINT offsetVerts = currentTriangleVertexOffset_;
-	// 1) 頂点バッファをマップして、offset から書き込み
-	VertexData* vd = nullptr;
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vd));
-	vd += offsetVerts; // ← 3 頂点単位でずらす
-	for (int i = 0; i < 3; ++i) {
-		vd[i].position = {positions[i].x, positions[i].y, positions[i].z, 1.0f};
-		vd[i].texcoord = texcoords[i];
-	}
-	vertexResource_->Unmap(0, nullptr);
-
-	// 2) マテリアルカラーを更新
-	Vector4* mat = nullptr;
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
-	*mat = color;
-	materialResource_->Unmap(0, nullptr);
-
-	// 3) ワールドビュー射影行列は既に transformResource に書き込まれている前提
-
-	// 4) ルートパラメータ設定
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
-
-	// 5) テクスチャ用ディスクリプタ
-	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
-	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
-	commandList_->SetGraphicsRootDescriptorTable(2, texture_.GetGpuHandle());
-
-	// 6) 頂点バッファビューを設定
-	// 頂点バッファビューを設定（オフセットを反映）
-
-	D3D12_VERTEX_BUFFER_VIEW vbv{};
-	vbv.BufferLocation = +vertexResource_->GetGPUVirtualAddress() + +offsetVerts * sizeof(VertexData);
-	vbv.SizeInBytes = sizeof(VertexData) * 3;
-	vbv.StrideInBytes = sizeof(VertexData);
-	commandList_->IASetVertexBuffers(0, 1, &vbv);
-
-	// 7) プリミティブ／ドロー
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->DrawInstanced(3, 1, 0, 0);
-
-	// ⑧ 次回のオフセットを進める
-	currentTriangleVertexOffset_ += 3;
-}
-void GameBase::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle) {
-	// マテリアルカラー設定（uint32_t → Vector4 に変換必要ならここで変換）
-	Vector4* mat = nullptr;
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
-	*mat = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
-	materialResource_->Unmap(0, nullptr);
-
-	// トランスフォーム（ワールドビュー射影行列）計算
-	Matrix4x4 worldMatrix = function.MakeAffineMatrix({radius, radius, radius}, {0.0f, 0.0f, 0.0f}, center);
-
-	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
-	Matrix4x4 wvp = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
-
-	// 書き込み
-	*transformationMatrixData = wvp;
-
-	// ディスクリプタヒープ設定
-	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
-	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
-	commandList_->SetGraphicsRootDescriptorTable(2, texture_.GetGpuHandle());
-
-	// ルートパラメータ設定
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
-
-	// 頂点バッファ設定
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
-	
-}
-
-void GameBase::DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle) {
-	// マテリアルカラー設定
-	Vector4* mat = nullptr;
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
-	*mat = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
-	materialResource_->Unmap(0, nullptr);
-
-	// トランスフォーム計算（Z=0）
-	Matrix4x4 world = function.MakeAffineMatrix({scale, scale, 1.0f}, {0.0f, 0.0f, rotate}, {pos.x, pos.y, 0.0f});
-
-	Matrix4x4 view = function.MakeIdentity();
-	Matrix4x4 proj = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
-	Matrix4x4 wvp = function.Multiply(world, function.Multiply(view, proj));
-	*transformationMatrixDataSprite = wvp;
-
-	// ディスクリプタ設定
-	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
-	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
-	commandList_->SetGraphicsRootDescriptorTable(2, textures_[texHandle].GetGpuHandle());
-
-	// ルートパラメータ設定
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
-
-	// 頂点バッファ設定
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->DrawInstanced(6, 1, 0, 0);
-}
+//void GameBase::DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle) {
+//	// オフセットを今の位置で取得
+//	UINT offsetVerts = currentTriangleVertexOffset_;
+//	// 1) 頂点バッファをマップして、offset から書き込み
+//	VertexData* vd = nullptr;
+//	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vd));
+//	vd += offsetVerts; // ← 3 頂点単位でずらす
+//	for (int i = 0; i < 3; ++i) {
+//		vd[i].position = {positions[i].x, positions[i].y, positions[i].z, 1.0f};
+//		vd[i].texcoord = texcoords[i];
+//	}
+//	vertexResource_->Unmap(0, nullptr);
+//
+//	// 2) マテリアルカラーを更新
+//	Vector4* mat = nullptr;
+//	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
+//	*mat = color;
+//	materialResource_->Unmap(0, nullptr);
+//
+//	// 3) ワールドビュー射影行列は既に transformResource に書き込まれている前提
+//
+//	// 4) ルートパラメータ設定
+//	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+//	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
+//
+//	// 5) テクスチャ用ディスクリプタ
+//	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
+//	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
+//	commandList_->SetGraphicsRootDescriptorTable(2, texture_.GetGpuHandle());
+//
+//	// 6) 頂点バッファビューを設定
+//	// 頂点バッファビューを設定（オフセットを反映）
+//
+//	D3D12_VERTEX_BUFFER_VIEW vbv{};
+//	vbv.BufferLocation = +vertexResource_->GetGPUVirtualAddress() + +offsetVerts * sizeof(VertexData);
+//	vbv.SizeInBytes = sizeof(VertexData) * 3;
+//	vbv.StrideInBytes = sizeof(VertexData);
+//	commandList_->IASetVertexBuffers(0, 1, &vbv);
+//
+//	// 7) プリミティブ／ドロー
+//	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+//	commandList_->DrawInstanced(3, 1, 0, 0);
+//
+//	// ⑧ 次回のオフセットを進める
+//	currentTriangleVertexOffset_ += 3;
+//}
+//void GameBase::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle) {
+//	// マテリアルカラー設定（uint32_t → Vector4 に変換必要ならここで変換）
+//	Vector4* mat = nullptr;
+//	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
+//	*mat = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
+//	materialResource_->Unmap(0, nullptr);
+//
+//	// トランスフォーム（ワールドビュー射影行列）計算
+//	Matrix4x4 worldMatrix = function.MakeAffineMatrix({radius, radius, radius}, {0.0f, 0.0f, 0.0f}, center);
+//
+//	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+//	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
+//	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
+//	Matrix4x4 wvp = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+//
+//	// 書き込み
+//	*transformationMatrixData = wvp;
+//
+//	// ディスクリプタヒープ設定
+//	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
+//	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
+//	commandList_->SetGraphicsRootDescriptorTable(2, texture_.GetGpuHandle());
+//
+//	// ルートパラメータ設定
+//	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+//	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
+//
+//	// 頂点バッファ設定
+//	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
+//	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+//	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
+//	
+//}
+//
+//void GameBase::DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle) {
+//	// マテリアルカラー設定
+//	Vector4* mat = nullptr;
+//	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
+//	*mat = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
+//	materialResource_->Unmap(0, nullptr);
+//
+//	// トランスフォーム計算（Z=0）
+//	Matrix4x4 world = function.MakeAffineMatrix({scale, scale, 1.0f}, {0.0f, 0.0f, rotate}, {pos.x, pos.y, 0.0f});
+//
+//	Matrix4x4 view = function.MakeIdentity();
+//	Matrix4x4 proj = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
+//	Matrix4x4 wvp = function.Multiply(world, function.Multiply(view, proj));
+//	*transformationMatrixDataSprite = wvp;
+//
+//	// ディスクリプタ設定
+//	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
+//	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
+//	commandList_->SetGraphicsRootDescriptorTable(2, textures_[texHandle].GetGpuHandle());
+//
+//	// ルートパラメータ設定
+//	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+//	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+//
+//	// 頂点バッファ設定
+//	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+//	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+//	commandList_->DrawInstanced(6, 1, 0, 0);
+//}
 
 //objfileを読む関数
 GameBase::ModelData GameBase::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
