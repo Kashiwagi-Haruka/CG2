@@ -4,6 +4,7 @@
 #include "ConvertString.h"
 #include <d3d12.h>
 #include <format>
+#include <wrl.h>
 class Texture{
 
 	public:
@@ -11,7 +12,7 @@ class Texture{
 	void Initialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescriptorHeap_, const std::string& fileName,uint32_t index);
 
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
-	ID3D12Resource* CreateTextureResource(ID3D12Device* device_, const DirectX::TexMetadata& metadata);
+	Microsoft::WRL::ComPtr <ID3D12Resource> CreateTextureResource(ID3D12Device* device_, const DirectX::TexMetadata& metadata);
 	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 	void Finalize();
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuHandle();
@@ -30,7 +31,7 @@ private:
 	ConvertString Cstr;
 	std::string filePath_;
 	
-	ID3D12Resource* textureResource_;
+	Microsoft::WRL::ComPtr < ID3D12Resource> textureResource_;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_{}; // SRV用GPUハンドル
 	
 };

@@ -10,7 +10,7 @@ void Texture::Initialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescrip
 
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	textureResource_ = CreateTextureResource(device_, metadata);
-	UploadTextureData(textureResource_, mipImages);
+	UploadTextureData(textureResource_.Get(), mipImages);
 
 	// --- SRV作成用にmeta情報を使ってView記述 ---
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -31,7 +31,7 @@ void Texture::Initialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescrip
 	textureSrvHandleGPU_.ptr += descriptorSize*index;
 
 	// --- SRV作成 ---
-	device_->CreateShaderResourceView(textureResource_, &srvDesc, textureSrvHandleCPU);
+	device_->CreateShaderResourceView(textureResource_.Get(), &srvDesc, textureSrvHandleCPU);
 	assert(metadata.format != DXGI_FORMAT_UNKNOWN);
 
 	OutputDebugStringA(std::format("GPU Handle: 0x{:X}\n", textureSrvHandleGPU_.ptr).c_str());
@@ -53,7 +53,7 @@ DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
 		return mipImages;
 }
 
-ID3D12Resource* Texture::CreateTextureResource(ID3D12Device* device_, const DirectX::TexMetadata& metadata) {
+Microsoft::WRL::ComPtr < ID3D12Resource> Texture::CreateTextureResource(ID3D12Device* device_, const DirectX::TexMetadata& metadata) {
 	
 	// metadataを基にResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
@@ -109,7 +109,7 @@ void Texture::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchI
 }
 void Texture::Finalize() {
 	if (textureResource_) {
-		textureResource_->Release();
+		textureResource_.Reset();
 		
 	}
 }

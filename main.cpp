@@ -1,11 +1,11 @@
 #include"GameBase.h"
-
+#include "ResourceObject.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	CoInitializeEx(0, COINITBASE_MULTITHREADED);
 	GameBase* gameBase=new GameBase;
-
+	ResourceObject resourceObject;
 	//エンジンの初期化
 	gameBase->Initialize(L"CG2", 1280, 720);
 	
@@ -43,10 +43,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//出力ウィンドウへの文字出力
 	gameBase->OutPutLog();
-	gameBase->ResourceRelease();
-	gameBase->CheackResourceLeaks();
-	CoUninitialize();
 	delete gameBase;
+	resourceObject.LeakChecker();
+	CoUninitialize();
+
 	return 0;
 
 }

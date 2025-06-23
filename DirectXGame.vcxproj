@@ -107,6 +107,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="GameBase.cpp" />
     <ClCompile Include="imGuiM.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ResourceObject.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +129,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="GameBase.h" />
     <ClInclude Include="imGuiM.h" />
     <ClInclude Include="Matrix4x4.h" />
+    <ClInclude Include="ResourceObject.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />

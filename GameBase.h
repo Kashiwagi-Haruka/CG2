@@ -12,6 +12,7 @@
 #include "imGuiM.h"
 #include "Texture.h"
 #include "VertexData.h"
+#include <wrl.h>
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
 
 class GameBase {
@@ -25,35 +26,35 @@ private:
 	ConvertString* CStr{};
 	std::wstring wstringValue = L"k";
 
-	ID3D12Debug1* debugController = nullptr;
-	IDXGIFactory7* dxgiFactory;
+	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
 	HRESULT hr_;
 	HWND hwnd;
 	// 使用するアダプタ用の変数。最初にnullptrを入れておく
-	IDXGIAdapter4* useAdapter = nullptr;
-	ID3D12Device* device_ = nullptr;
-	ID3D12CommandQueue* commandQueue_;
+	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
+	Microsoft::WRL::ComPtr < ID3D12Device> device_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc;
-	ID3D12CommandAllocator* commandAllocator;
-	ID3D12GraphicsCommandList* commandList_;
-	IDXGISwapChain4* swapChain_ = nullptr;
-	ID3D12DescriptorHeap* rtvDescriptorHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
 	imGuiM imguiM_;
-	ID3D12DescriptorHeap* srvDescriptorHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
 	// SwapChainからResourceを引っ張ってくる。
-	ID3D12Resource* swapChainResources_[2] = {nullptr};
+	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = {nullptr};
 	// これから書き込むバックバッファのインデックスを取得
 	UINT backBufferIndex_;
 	// transitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
 
 	// 初期値0でFenceをつくる
-	ID3D12Fence* fence_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
 	uint64_t fenceValue_ = 0;
 	// FenceのSignalを持つためのイベントを作成する
-	HANDLE fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
+	HANDLE fenceEvent_;
 
 	std::vector<Texture> textures_;
 
@@ -64,37 +65,37 @@ private:
 	D3D12_VIEWPORT viewport;
 	// シザー矩形
 	D3D12_RECT scissorRect;
-	ID3D12RootSignature* rootSignature;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 	// 実際に生成
-	ID3D12PipelineState* graphicsPipelineState;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState;
 	// 頂点バッファビューを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 
 	// シリアライズしてバイナリにする
-	ID3DBlob* signatureBlob;
-	ID3DBlob* errorBlob;
-	IDxcBlob* pixelShaderBlob;
-	IDxcBlob* vertexShaderBlob;
-	IDxcUtils* dxcUtils;
-	IDxcCompiler3* dxcCompiler;
-	IDxcIncludeHandler* includeHandler;
+	Microsoft::WRL::ComPtr < ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob;
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob;
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils;
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler;
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
 
 		// バッファの設定
 	D3D12_HEAP_PROPERTIES heapProperties;
 	D3D12_RESOURCE_DESC resourceDesc;
 	// 実際に頂点リソースを作る
-	ID3D12Resource* vertexResource_;
-	ID3D12Resource* materialResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	// --- 頂点用 (Transform行列) のリソース追加 ---
-	ID3D12Resource* transformResource_ = nullptr;
-	ID3D12Resource* vertexResourceSprite;
-	ID3D12Resource* transformationMatrixResourceSprite;
-	ID3D12Resource* vertexResourceSphere;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSphere;
 
 		// RTVを2つ作るのでディスクリプタを2つ用意
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-	ID3D12Resource* depthStenicilResource=nullptr;
-	ID3D12DescriptorHeap* dsvDescriptorHeap;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStenicilResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
 	Function function;
 
 	struct Material{
@@ -105,7 +106,7 @@ private:
 		Matrix4x4 uvTransform;
 	};
 
-	ID3D12Resource* materialResourceSprite_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite_;
 	Material materialDataSprite_;
 
 	struct DirectionalLight{
@@ -114,7 +115,7 @@ private:
 		float intensity;
 	};
 
-	ID3D12Resource* directionalLightResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 
 
@@ -165,7 +166,7 @@ struct ModelData {
 ModelData modelData;
 
 
-	ID3D12Resource* indexResourceSprite_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite_ = nullptr;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite_{};
 	Matrix4x4* transformationMatrixDataSprite;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite;
@@ -189,11 +190,18 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 
 	   bool useMonsterBall_ = true;
 
+	   
+	   
+
+
+
 	void FrameStart(); // フレーム最初の準備
 	   
 
 
    public:	
+
+	   ~GameBase();
 
 	void BeginFlame(); // フレームの開始処理（commandListリセットなど）
 	void EndFlame();   // フレームの終了処理（Present、フェンス待ちなど）
@@ -238,7 +246,7 @@ private:
 
 
 	void DXCInitialize();
-	IDxcBlob* CompileShader(// CompilerするShaderファイルへのパス
+	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(// CompilerするShaderファイルへのパス
 	    const std::wstring& filePath,
 	    // Compilerに使用するProfile
 	    const wchar_t* profile,
@@ -251,11 +259,11 @@ private:
 	void DrawCommandList();
 	void CreateModelVertexBuffer();
 	void CreateSpriteVertexBuffer();
-	ID3D12Resource* CreateBufferResource(ID3D12Device* device_, size_t sizeInBytes);
-	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
-	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(ID3D12Device* device_, size_t sizeInBytes);
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height);
 
-	
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const DirectX::TexMetadata& metdata);
 
 	int LoadTexture(const std::string& fileName);
 	

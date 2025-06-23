@@ -11,6 +11,16 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dxcompiler.lib")
 
+GameBase::~GameBase(){
+
+
+	ResourceRelease();
+
+
+
+}
+
+
 LRESULT CALLBACK GameBase::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
@@ -94,7 +104,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	for (size_t i = 0; i < _countof(featureLevels); ++i) {
 
 		// 採用したアダプターでデバイスを生成
-		hr_ = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device_));
+		hr_ = D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(&device_));
 
 		// 指定した機能レベルでデバイスが生成できたかを確認
 		if (SUCCEEDED(hr_)) {
@@ -176,7 +186,7 @@ void GameBase::WindowClear() {
 
 	// コマンドリストを生成する
 	commandList_ = nullptr;
-	hr_ = device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList_));
+	hr_ = device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList_));
 	// コマンドリストの生成がうまくいかなかったので起動できない
 	assert(SUCCEEDED(hr_));
 
@@ -192,15 +202,16 @@ void GameBase::WindowClear() {
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	// コマンドキュー、ウィンドウハンドル、設定を渡して生成する
-	hr_ = dxgiFactory->CreateSwapChainForHwnd(commandQueue_, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain_));
+
+	hr_ = dxgiFactory->CreateSwapChainForHwnd(commandQueue_.Get(), hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain_.GetAddressOf()));
 	assert(SUCCEEDED(hr_));
 
 	// ディスクリプタヒープの生成
 
-	rtvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	rtvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 	
 	// SRV用ディスクリプタヒープ作成
-	srvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	srvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
 
 
@@ -232,28 +243,28 @@ void GameBase::WindowClear() {
 
 	// まず1つ目を作る。1つ目は最初のところに作る。作る場所をこちらで指定してあげる必要がある
 	rtvHandles[0] = rtvStartHandle;
-	device_->CreateRenderTargetView(swapChainResources_[0], &rtvDesc, rtvHandles[0]);
+	device_->CreateRenderTargetView(swapChainResources_[0].Get(), &rtvDesc, rtvHandles[0]);
 	// 2つ目のディスクリプタハンドルを得る(自力で)
 	rtvHandles[1].ptr = rtvHandles[0].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	// 2つ目を作る
-	device_->CreateRenderTargetView(swapChainResources_[1], &rtvDesc, rtvHandles[1]);
+	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc, rtvHandles[1]);
 
-	depthStenicilResource = CreateDepthStencilTextureResource(device_, kClientWidth, kClientHeight);
+	depthStenicilResource = CreateDepthStencilTextureResource(device_.Get(), kClientWidth, kClientHeight);
 
-	dsvDescriptorHeap = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	dsvDescriptorHeap = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 
-	device_->CreateDepthStencilView(depthStenicilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	device_->CreateDepthStencilView(depthStenicilResource.Get(), &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 
 
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
 	// ImGui 初期化はここで！
-	imguiM_.MInitialize(hwnd, device_, swapChainDesc, rtvDesc, srvDescriptorHeap_);
+	imguiM_.MInitialize(hwnd, device_.Get(), swapChainDesc, rtvDesc, srvDescriptorHeap_.Get());
 	
 	if (srvDescriptorHeap_ == nullptr) {
 		assert(false);
@@ -264,9 +275,9 @@ void GameBase::WindowClear() {
 	
 	
 
-	texture_.Initialize(device_, srvDescriptorHeap_, /*"C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/uvChecker.png"*/ modelData.material.textureFilePath, 1);
+	texture_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), /*"C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/uvChecker.png"*/ modelData.material.textureFilePath, 1);
 	GPUHandle_ = texture_.GetGpuHandle();
-	texture2_.Initialize(device_, srvDescriptorHeap_,/* "C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/monsterBall.png"*/modelData.material.textureFilePath,2);
+	texture2_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), /* "C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/monsterBall.png"*/ modelData.material.textureFilePath, 2);
 	OutputDebugStringA(("TexPath: " + modelData.material.textureFilePath + "\n").c_str());
 	GPUHandle2_ = texture2_.GetGpuHandle();
 	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる
@@ -283,8 +294,8 @@ void GameBase::WindowClear() {
 	assert(SUCCEEDED(hr_));
 
 	// GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = {commandList_};
-	commandQueue_->ExecuteCommandLists(1, commandLists);
+	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = {commandList_.Get()};
+	commandQueue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
 	// GPUと05に画面の交換を行うよう通知する
 	// GPUとOSに画面の交換を行うよう通知する
 	swapChain_->Present(1, 0);
@@ -299,7 +310,7 @@ void GameBase::WindowClear() {
 
 	// Fenceの値を更新
 	fenceValue_++;
-	commandQueue_->Signal(fence_, fenceValue_);
+	commandQueue_->Signal(fence_.Get(), fenceValue_);
 
 	// Fenceの値が指定Signalに達してるか確認
 	if (fence_->GetCompletedValue() < fenceValue_) {
@@ -330,7 +341,7 @@ void GameBase::DebugError() {
 
 #ifdef _DEBUG
 
-	ID3D12InfoQueue* infoQueue = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
 	if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
 	//ヤバいエラーの時に止まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
@@ -361,7 +372,7 @@ void GameBase::DebugError() {
 
 
 	//解放
-		infoQueue->Release();
+		infoQueue.Reset();
 
 	
 	}
@@ -403,7 +414,7 @@ void GameBase::FenceEvent() {
 
 void GameBase::CheackResourceLeaks() {
 
-	IDXGIDebug1* debug;
+	Microsoft::WRL::ComPtr <IDXGIDebug1> debug;
 	
 	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
 
@@ -420,46 +431,85 @@ void GameBase::ResourceRelease() {
 	texture_.Finalize();
 	texture2_.Finalize();
 	imguiM_.Finalize();
-	
-	vertexResourceSphere->Release();
+	for (auto& tex : textures_) {
+		tex.Finalize();
+	}
+	textures_.clear(); // 念のため解放
+	/*vertexResourceSphere->Release();*/
 
-	if (vertexResourceSprite) {
+	/*if (vertexResourceSprite) {
 		vertexResourceSprite->Release();
 	}
 	if (transformationMatrixResourceSprite) {
 		transformationMatrixResourceSprite->Release();
+	}*/
+
+	
+	if (fenceEvent_) {
+		CloseHandle(fenceEvent_);
+		fenceEvent_ = nullptr;
 	}
-
-
 	if (transformResource_) {
-		//transformResource->Unmap(0, nullptr); // ちゃんと最後だけUnmapする
+		transformResource_->Unmap(0, nullptr); // ちゃんと最後だけunmapする
 	}
 	if (directionalLightResource_) {
 		directionalLightResource_->Unmap(0, nullptr);
-		directionalLightResource_->Release();
+		/*directionalLightResource_->Release();*/
 		directionalLightResource_ = nullptr;
 		directionalLightData_ = nullptr;
 	}
+	vertexResource_.Reset();
+	materialResource_.Reset();
+	transformResource_.Reset();
+	vertexResourceSprite.Reset();
+	transformationMatrixResourceSprite.Reset();
+	vertexResourceSphere.Reset();
+	swapChainResources_[0].Reset();
+	swapChainResources_[1].Reset();
+	swapChain_.Reset();
+	commandQueue_.Reset();
+	commandAllocator.Reset();
+	commandList_.Reset();
+	rootSignature.Reset();
+	graphicsPipelineState.Reset();
+	fence_.Reset();
+	signatureBlob.Reset();
+	errorBlob.Reset();
+	pixelShaderBlob.Reset();
+	vertexShaderBlob.Reset();
+	dxcUtils.Reset();
+	dxcCompiler.Reset();
+	includeHandler.Reset();
 
-	vertexResource_->Release();
-	
-	indexResourceSprite_->Release();
-	materialResourceSprite_->Release();
-	materialResource_->Release(); 
-	transformResource_->Release(); 
+	depthStenicilResource.Reset();
+	dsvDescriptorHeap.Reset();
+	rtvDescriptorHeap_.Reset();
+	srvDescriptorHeap_.Reset();
 
-	graphicsPipelineState->Release();
-	signatureBlob->Release();
-	if (errorBlob) {
-		errorBlob->Release();
-	}
-	rootSignature->Release();
-	pixelShaderBlob->Release();
-	vertexShaderBlob->Release();
+	dxgiFactory.Reset();
+	debugController.Reset();
+	useAdapter.Reset();
+	device_.Reset();
 
-	CloseHandle(fenceEvent_);
-	fence_->Release();
-	dsvDescriptorHeap->Release();
+	//vertexResource_->Release();
+	//
+	//indexResourceSprite_->Release();
+	//materialResourceSprite_->Release();
+	//materialResource_->Release(); 
+	//transformResource_->Release(); 
+
+	/*graphicsPipelineState->Release();*/
+	//signatureBlob->Release();
+	//if (errorBlob) {
+	//	errorBlob->Release();
+	//}
+	///*rootSignature->Release();*/
+	//pixelShaderBlob->Release();
+	//vertexShaderBlob->Release();
+
+	/*CloseHandle(fenceEvent_);*/
+	/*fence_->Release();*/
+	/*dsvDescriptorHeap->Release();
 	depthStenicilResource->Release();
 	srvDescriptorHeap_->Release();
 	rtvDescriptorHeap_->Release();
@@ -471,11 +521,11 @@ void GameBase::ResourceRelease() {
 	commandQueue_->Release();
 	device_->Release();
 	useAdapter->Release();
-	dxgiFactory->Release();
+	dxgiFactory->Release();*/
 
-//#ifdef _DEBUG
-//	debugController->Release();
-//#endif
+#ifdef _DEBUG
+	/*debugController->Release();*/
+#endif
 
 	CloseWindow(hwnd);
 }
@@ -502,7 +552,7 @@ void GameBase::DXCInitialize() {
 	CreateSpriteVertexBuffer();*/
 }
 
-IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパス*/const std::wstring& filePath,
+Microsoft::WRL::ComPtr<IDxcBlob> GameBase::CompileShader(/* CompilerするShaderファイルへのパス*/const std::wstring& filePath,
     // Compilerに使用するProfile
     const wchar_t* profile,
     // 初期化で生成したものをつかう
@@ -513,7 +563,7 @@ IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパ�
 	Log(CStr->ConvertString_(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
 
 	// hlslファイルを読む
-	IDxcBlobEncoding* shaderSource = nullptr;
+	Microsoft::WRL::ComPtr < IDxcBlobEncoding> shaderSource = nullptr;
 	HRESULT hr_ = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 
 	// 読めなかったら止める
@@ -538,7 +588,7 @@ IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパ�
 	};
 
 	// 実際にShaderをコンパイルする
-	IDxcResult* shaderResult = nullptr;
+	Microsoft::WRL::ComPtr<IDxcResult> shaderResult = nullptr;
 	hr_ = dxcCompiler->Compile(
 	    &shaderSourceBuffer,        // 読み込んだファイル
 	    arguments,                  // コンパイルオプション
@@ -560,7 +610,7 @@ IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパ�
 	}
 	// 4. Compile結果を受け取って返す
 	// コンパイル結果から実行用のバイナリ部分を取得
-	IDxcBlob* shaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
 	hr_ = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr_));
 
@@ -568,8 +618,8 @@ IDxcBlob* GameBase::CompileShader(/* CompilerするShaderファイルへのパ�
 	Log(CStr->ConvertString_(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
 
 	// もう使わないリソースを解放
-	shaderSource->Release();
-	shaderResult->Release();
+	shaderSource.Reset();
+	shaderResult.Reset();
 
 	// 実行用のバイナリを返却
 	return shaderBlob;
@@ -615,7 +665,7 @@ void GameBase::PSO() {
 	rootParameters[3].Descriptor.ShaderRegister = 3;
 
 // DirectionalLight用バッファ生成＆Map
-	directionalLightResource_ = CreateBufferResource(device_, sizeof(DirectionalLight));
+	directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
 	if (!directionalLightResource_) {
 		OutputDebugStringA("directionalLightResource_ 作成失敗\n");
 		assert(false);
@@ -706,13 +756,13 @@ void GameBase::PSO() {
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	// Shaderをコンパイルする
-	 vertexShaderBlob = CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	vertexShaderBlob = CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vertexShaderBlob != nullptr);
 
-	pixelShaderBlob = CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	pixelShaderBlob = CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(pixelShaderBlob != nullptr);
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = rootSignature;                                                 // RootSignature
+	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();                                                 // RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;                                                  // InputLayout
 	graphicsPipelineStateDesc.VS = {vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize()}; // VertexShader
 	graphicsPipelineStateDesc.PS = {pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize()};   // PixelShader
@@ -753,7 +803,7 @@ void GameBase::VertexResource() {
 
 	modelData = LoadObjFile("Resources", "axis.obj");
 
-	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * modelData.vertices.size());
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * modelData.vertices.size());
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
@@ -782,7 +832,7 @@ void GameBase::VertexResource() {
 	// 3D用（球など陰影つけたいもの）
 	// 必ず256バイト単位で切り上げる
 	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
-	materialResource_ = CreateBufferResource(device_, alignedSize);
+	materialResource_ = CreateBufferResource(device_.Get(), alignedSize);
 	Material* mat3d = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
 	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -792,7 +842,7 @@ void GameBase::VertexResource() {
 	materialResource_->Unmap(0, nullptr);
 
 	// --- トランスフォーム用リソース ---
-	transformResource_ = CreateBufferResource(device_, sizeof(Matrix4x4)*2);
+	transformResource_ = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // ←ここ！！起動時にマップしっぱなし
 	*transformationMatrixData = function.MakeIdentity(); // 初期値は単位行列
 	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -807,7 +857,7 @@ void GameBase::VertexResource() {
 
 
 	// --- Sprite用 頂点リソース ---
-	vertexResourceSprite = CreateBufferResource(device_, sizeof(VertexData) * 6);
+	vertexResourceSprite = CreateBufferResource(device_.Get(), sizeof(VertexData) * 6);
 	vertexBufferViewSprite={};
 	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
 	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
@@ -816,7 +866,7 @@ void GameBase::VertexResource() {
 	// --- ここにインデックスバッファの生成を追加 ---
 	// --- ここにインデックスバッファの生成を追加 ---
 	// 6個のインデックス（2枚の三角形でスプライト）
-	indexResourceSprite_ = CreateBufferResource(device_, sizeof(uint32_t) * 6);
+	indexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
 
 	VertexData* vertexDataSprite = nullptr;
 	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
@@ -863,7 +913,7 @@ void GameBase::VertexResource() {
 
 
 // スプライト用（陰影つけたくないもの）
-	materialResourceSprite_ = CreateBufferResource(device_, alignedSize);
+	materialResourceSprite_ = CreateBufferResource(device_.Get(), alignedSize);
 	Material* matSprite = nullptr;
 	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
 	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
@@ -873,7 +923,7 @@ void GameBase::VertexResource() {
 
 
 	// Sprite用の TransformationMatrix リソース作成（1個分）
-	transformationMatrixResourceSprite = CreateBufferResource(device_, sizeof(Matrix4x4)*2);
+	transformationMatrixResourceSprite = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
 
 	// データへのポインタ取得
 	transformationMatrixDataSprite = nullptr;
@@ -893,7 +943,7 @@ void GameBase::VertexResource() {
 
 		const int kVertexCount = kSubdivision * kSubdivision * 6;
 	    kVertexCount_ = kVertexCount;
-		vertexResourceSphere = CreateBufferResource(device_, sizeof(VertexData) * kVertexCount);
+	    vertexResourceSphere = CreateBufferResource(device_.Get(), sizeof(VertexData) * kVertexCount);
 		vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
 		vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * kVertexCount;
 		vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
@@ -957,7 +1007,7 @@ void GameBase::VertexResource() {
 		vertexResourceSphere->Unmap(0, nullptr);
 	    Log("VertexResource END\n");
 }
-ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device_, size_t sizeInBytes) {
+Microsoft::WRL::ComPtr <ID3D12Resource> GameBase::CreateBufferResource(ID3D12Device* device_, size_t sizeInBytes) {
 	// バッファの設定（UPLOAD用に変更）
 	D3D12_HEAP_PROPERTIES heapProperties = {};
 	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -973,7 +1023,7 @@ ID3D12Resource* GameBase::CreateBufferResource(ID3D12Device* device_, size_t siz
 	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	ID3D12Resource* bufferResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource = nullptr;
 
 	HRESULT hr_ = device_->CreateCommittedResource(
 	    &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc,
@@ -992,7 +1042,7 @@ void GameBase::CreateModelVertexBuffer() {
 
 	
 
-	vertexResource_ = CreateBufferResource(device_, sizeof(VertexData) * modelData.vertices.size());
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * modelData.vertices.size());
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
@@ -1021,7 +1071,7 @@ void GameBase::CreateModelVertexBuffer() {
 	// 3D用（球など陰影つけたいもの）
 	// 必ず256バイト単位で切り上げる
 	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
-	materialResource_ = CreateBufferResource(device_, alignedSize);
+	materialResource_ = CreateBufferResource(device_.Get(), alignedSize);
 	Material* mat3d = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
 	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -1031,7 +1081,7 @@ void GameBase::CreateModelVertexBuffer() {
 	materialResource_->Unmap(0, nullptr);
 
 	// --- トランスフォーム用リソース ---
-	transformResource_ = CreateBufferResource(device_, sizeof(Matrix4x4) * 2);
+	transformResource_ = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // ←ここ！！起動時にマップしっぱなし
 	*transformationMatrixData = function.MakeIdentity();                                      // 初期値は単位行列
 	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -1047,7 +1097,7 @@ void GameBase::CreateModelVertexBuffer() {
 void GameBase::CreateSpriteVertexBuffer() {
 	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
 	// --- Sprite用 頂点リソース ---
-	vertexResourceSprite = CreateBufferResource(device_, sizeof(VertexData) * 6);
+	vertexResourceSprite = CreateBufferResource(device_.Get(), sizeof(VertexData) * 6);
 	vertexBufferViewSprite = {};
 	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
 	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
@@ -1056,7 +1106,7 @@ void GameBase::CreateSpriteVertexBuffer() {
 	// --- ここにインデックスバッファの生成を追加 ---
 	// --- ここにインデックスバッファの生成を追加 ---
 	// 6個のインデックス（2枚の三角形でスプライト）
-	indexResourceSprite_ = CreateBufferResource(device_, sizeof(uint32_t) * 6);
+	indexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
 
 	VertexData* vertexDataSprite = nullptr;
 	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
@@ -1099,7 +1149,7 @@ void GameBase::CreateSpriteVertexBuffer() {
 	indexBufferViewSprite_.Format = DXGI_FORMAT_R32_UINT;
 
 	// スプライト用（陰影つけたくないもの）
-	materialResourceSprite_ = CreateBufferResource(device_, alignedSize);
+	materialResourceSprite_ = CreateBufferResource(device_.Get(), alignedSize);
 	Material* matSprite = nullptr;
 	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
 	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
@@ -1108,7 +1158,7 @@ void GameBase::CreateSpriteVertexBuffer() {
 	materialResourceSprite_->Unmap(0, nullptr);
 
 	// Sprite用の TransformationMatrix リソース作成（1個分）
-	transformationMatrixResourceSprite = CreateBufferResource(device_, sizeof(Matrix4x4) * 2);
+	transformationMatrixResourceSprite = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
 
 	// データへのポインタ取得
 	transformationMatrixDataSprite = nullptr;
@@ -1178,12 +1228,12 @@ void GameBase::FrameStart() {
 	Log("Frame START");
 	hr_ = commandAllocator->Reset();
 	assert(SUCCEEDED(hr_));
-	hr_ = commandList_->Reset(commandAllocator, nullptr);
+	hr_ = commandList_->Reset(commandAllocator.Get(), nullptr);
 	assert(SUCCEEDED(hr_));
 }
-ID3D12DescriptorHeap* GameBase::CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
+Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GameBase::CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
 
-	ID3D12DescriptorHeap* descriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
 	descriptorHeapDesc.Type = heapType;
 	descriptorHeapDesc.NumDescriptors = numDescriptors;
@@ -1193,7 +1243,7 @@ ID3D12DescriptorHeap* GameBase::CreateDescriptorHeap(ID3D12Device* device_, D3D1
 
 	return descriptorHeap;
 }
-ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height) {
+Microsoft::WRL::ComPtr <ID3D12Resource> GameBase::CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height) {
 
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = width;
@@ -1212,7 +1262,7 @@ ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device
 	depthClearValue.DepthStencil.Depth = 1.0f;
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	ID3D12Resource* resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	hr_ = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthClearValue, IID_PPV_ARGS(&resource));
 	assert(SUCCEEDED(hr_));
 
@@ -1223,14 +1273,14 @@ ID3D12Resource* GameBase::CreateDepthStencilTextureResource(ID3D12Device* device
 }
 
 void GameBase::DrawCommandList() {
-	Log("DrawCommandList START");
+	
 	// TransitionBarrierの設定
 	// 今回のバリアはTransition
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	// Noneにしておく
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	// バリアを張る対象のリソース。現在のバックアップに対して行う
-	barrier.Transition.pResource = swapChainResources_[backBufferIndex_];
+	barrier.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
 	// 遷移前(現在)のResourceState
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	// 遷移後のResourceState
@@ -1253,8 +1303,8 @@ void GameBase::DrawCommandList() {
 	commandList_->RSSetScissorRects(1, &scissorRect); // Scissorを設定
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	commandList_->SetGraphicsRootSignature(rootSignature);
-	commandList_->SetPipelineState(graphicsPipelineState);                                         // PSOを設定
+	commandList_->SetGraphicsRootSignature(rootSignature.Get());
+	commandList_->SetPipelineState(graphicsPipelineState.Get());                                         // PSOを設定
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);                                     // VBVを設定
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());  // PixelShader側
 	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress()); // VertexShader側
@@ -1269,8 +1319,8 @@ void GameBase::DrawCommandList() {
 	
 	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
 	}*/
-	ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap_};
-	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
+	Microsoft::WRL::ComPtr < ID3D12DescriptorHeap> descriptorHeaps[] = {srvDescriptorHeap_.Get()};
+	commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 	// 描画直前で確認
 	/*OutputDebugStringA(std::format("Current texIndex={}, GPU Handle ptr={}\n", texIndex, textures_[texIndex].GetGpuHandle().ptr).c_str());*/
 
@@ -1309,7 +1359,7 @@ void GameBase::DrawCommandList() {
 	//commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-	Log("DrawCommandList End");
+	
 }
 void GameBase::BeginFlame() {
 	
@@ -1339,7 +1389,7 @@ void GameBase::BeginFlame() {
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
 void GameBase::EndFlame() {
 
-	imguiM_.Render(srvDescriptorHeap_, commandList_);
+	imguiM_.Render(srvDescriptorHeap_.Get(), commandList_.Get());
 
 	// RenderTarget→Present に戻す
 	CrtvTransitionBarrier(); // バリア遷移 :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
@@ -1347,15 +1397,15 @@ void GameBase::EndFlame() {
 	// コマンドリストをクローズして実行
 	hr_ = commandList_->Close();
 	assert(SUCCEEDED(hr_));
-	ID3D12CommandList* lists[] = {commandList_};
-	commandQueue_->ExecuteCommandLists(1, lists);
+	Microsoft::WRL::ComPtr < ID3D12CommandList> lists[] = {commandList_.Get()};
+	commandQueue_->ExecuteCommandLists(1, lists->GetAddressOf());
 
 	// 画面を切り替え
 	swapChain_->Present(1, 0);
 
 	// フェンスで CPU/GPU 同期
 	fenceValue_++;
-	commandQueue_->Signal(fence_, fenceValue_);
+	commandQueue_->Signal(fence_.Get(), fenceValue_);
 	if (fence_->GetCompletedValue() < fenceValue_) {
 		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
 		WaitForSingleObject(fenceEvent_, INFINITE);
@@ -1574,7 +1624,7 @@ int GameBase::LoadTexture(const std::string& fileName) {
 	}
 	// 未ロードなら新しくロードしてpush_back
 	Texture tex;
-	tex.Initialize(device_, srvDescriptorHeap_, fileName, (uint32_t)textures_.size());
+	tex.Initialize(device_.Get(), srvDescriptorHeap_.Get(), fileName, (uint32_t)textures_.size());
 	tex.SetFilePath(fileName); // Textureクラスにファイルパス保持用メンバ追加して
 	textures_.push_back(tex);
 	OutputDebugStringA(std::format("Texture loaded: {}, GPU Handle ptr={}\n", fileName, tex.GetGpuHandle().ptr).c_str());
