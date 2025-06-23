@@ -13,6 +13,7 @@
 #include "Texture.h"
 #include "VertexData.h"
 #include <wrl.h>
+#include "Audio.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
 
 class GameBase {
@@ -21,7 +22,7 @@ private:
 
 	WNDCLASS wc{};
 	RECT wrc;
-	
+	Audio audio;
 	MSG msg{};
 	ConvertString* CStr{};
 	std::wstring wstringValue = L"k";
@@ -187,7 +188,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	UINT currentSpriteVertexOffset_ = 0;
 	static constexpr UINT kMaxVertices_ = 1024; // 十分な大きさで定義しておく
 
-
+		
 	   bool useMonsterBall_ = true;
 
 	   
@@ -226,6 +227,10 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	void DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle);
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+
+	SoundData SoundLoadWave(const char* filename);
+	void SoundUnload(SoundData* soundData);
+	void SoundPlayWave(const SoundData& sounddata);
 
 private:
 

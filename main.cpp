@@ -18,6 +18,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	};
 	Vector2 texcoord[3] = {{0.0f, 1.0f}, {0.5f, 0.0f},{1.0f, 1.0f}};
 	
+	SoundData soundData1 = gameBase->SoundLoadWave("Resources/Alarm01.wav");
+
+	gameBase->SoundPlayWave(soundData1);
+
 	while (gameBase->IsMsgQuit())
 	{
 		if (PeekMessage(gameBase->GetMsg(), NULL, 0, 0, PM_REMOVE)) {
@@ -43,6 +47,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//出力ウィンドウへの文字出力
 	gameBase->OutPutLog();
+	gameBase->SoundUnload(&soundData1);
 	delete gameBase;
 	resourceObject.LeakChecker();
 	CoUninitialize();

@@ -13,7 +13,7 @@
 
 GameBase::~GameBase(){
 
-
+	
 	ResourceRelease();
 
 
@@ -119,7 +119,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	DebugError();
 
 	WindowClear();
-	
+	audio.InitializeIXAudio();
 }
 
 bool GameBase::IsMsgQuit() {
@@ -1585,11 +1585,7 @@ GameBase::ModelData GameBase::LoadObjFile(const std::string& directoryPath, cons
 
 	}
 
-	OutputDebugStringA(("TexPath: " + modelData.material.textureFilePath + "\n").c_str());
-	for (size_t i = 0; i < modelData.vertices.size(); ++i) {
-		auto& v = modelData.vertices[i];
-		OutputDebugStringA(std::format("v{}: texcoord=({}, {})\n", i, v.texcoord.x, v.texcoord.y).c_str());
-	}
+	
 
 	return modelData;
 }
@@ -1629,4 +1625,18 @@ int GameBase::LoadTexture(const std::string& fileName) {
 	textures_.push_back(tex);
 	OutputDebugStringA(std::format("Texture loaded: {}, GPU Handle ptr={}\n", fileName, tex.GetGpuHandle().ptr).c_str());
 	return static_cast<int>(textures_.size() - 1);
+}
+SoundData GameBase::SoundLoadWave(const char* filename){
+
+	return audio.SoundLoadWave(filename);
+
+}
+void GameBase::SoundUnload(SoundData* soundData){
+
+	audio.SoundUnload(soundData);
+
+}
+void GameBase::SoundPlayWave(const SoundData& sounddata) {
+	assert(audio.GetIXAudio2() != nullptr); // 安全のため追加
+	audio.SoundPlayWave(audio.GetIXAudio2().Get(), sounddata);
 }
