@@ -97,6 +97,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
   <ItemGroup>
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="ConvertString.cpp" />
+    <ClCompile Include="DirectInput.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
@@ -119,6 +120,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
   <ItemGroup>
     <ClInclude Include="Audio.h" />
     <ClInclude Include="ConvertString.h" />
+    <ClInclude Include="DirectInput.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />

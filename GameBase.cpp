@@ -221,7 +221,7 @@ void GameBase::WindowClear() {
 	//// ディスクリプタヒープがつくれなかったので起動できない
 	//assert(SUCCEEDED(hr_));
 	DXCInitialize();
-
+	DInput.Initialize(wc,hwnd);
 	hr_ = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	// 上手く取得できなければ起動できない
 	assert(SUCCEEDED(hr_));
@@ -1363,6 +1363,7 @@ void GameBase::DrawCommandList() {
 }
 void GameBase::BeginFlame() {
 	
+	DInput.Update();
 	// ① 現在のバックバッファをフレーム毎に更新
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 

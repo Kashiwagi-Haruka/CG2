@@ -21,9 +21,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	SoundData soundData1 = gameBase->SoundLoadWave("Resources/Alarm01.wav");
 
 	gameBase->SoundPlayWave(soundData1);
-
-	while (gameBase->IsMsgQuit())
-	{
+	
+	while (gameBase->IsMsgQuit()) {
+		memcpy(preKey, key, sizeof(key));
 		if (PeekMessage(gameBase->GetMsg(), NULL, 0, 0, PM_REMOVE)) {
 			TranslateMessage(gameBase->GetMsg());
 			DispatchMessage(gameBase->GetMsg());

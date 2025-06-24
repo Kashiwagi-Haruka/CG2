@@ -14,6 +14,7 @@
 #include "VertexData.h"
 #include <wrl.h>
 #include "Audio.h"
+#include "DirectInput.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
 
 class GameBase {
@@ -98,7 +99,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStenicilResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
 	Function function;
-
+	
 	struct Material{
 
 		Vector4 color;
@@ -231,6 +232,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	SoundData SoundLoadWave(const char* filename);
 	void SoundUnload(SoundData* soundData);
 	void SoundPlayWave(const SoundData& sounddata);
+	DirectInput DInput;
 
 private:
 
