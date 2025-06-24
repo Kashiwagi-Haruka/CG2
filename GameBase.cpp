@@ -1194,7 +1194,7 @@ void GameBase::Update() {
 
 
 	// --- 回転角度を更新（Y軸回転だけ）
-	transform.rotate.y += 0.03f;
+	/*transform.rotate.y += 0.03f;*/
 
 	// --- ワールド行列を作成（スケール → 回転 → 移動）
 	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);

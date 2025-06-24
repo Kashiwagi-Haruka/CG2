@@ -66,7 +66,9 @@ void DebugCamera::Update(uint8_t* key, uint8_t* preKey) {
 		rotation_.y -= rotateSpeed;
 	}
 
-// ビュー行列を更新
+
+	pivot_ = translation_;
+	// ビュー行列を更新
 	// ビュー行列の更新（DebugCamera.cpp より）
 	Matrix4x4 pivotMat = function.MakeTranslateMatrix(pivot_);   
 	 Vector3 invScale=scale_;
