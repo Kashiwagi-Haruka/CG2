@@ -16,8 +16,9 @@ class DebugCamera {
 	// DebugCamera.h
 	Matrix4x4 GetViewMatrix() const { return viewMatrix_; }
 	Matrix4x4 GetProjectionMatrix() const { return projectionMatrix_; }
+	Vector3 pivot_ = {0, 0, 0};  
 	Vector3 rotation_ = {0, 0, 0};
-
+	Vector3 scale_ = {1, 1, 1}; 
 	Vector3 translation_ = {0, 0, -50};
 	
 };

@@ -24,6 +24,8 @@ void DebugCamera::Update(uint8_t* key, uint8_t* preKey) {
 
 
 	ImGui::Begin("DebugCamera");
+	ImGui::SliderFloat3("Pivot", &pivot_.x, -100.0f, 100.0f); // ← 追加
+	ImGui::SliderFloat3("Scale", &scale_.x, 0.1f, 10.0f);  
 	ImGui::SliderFloat3("Translation", &translation_.x, -100.0f, 100.0f);
 	ImGui::SliderFloat3("Rotation", &rotation_.x, -3.14f, 3.14f);
 	ImGui::End();
@@ -65,16 +67,20 @@ void DebugCamera::Update(uint8_t* key, uint8_t* preKey) {
 	}
 
 // ビュー行列を更新
-	Matrix4x4 cameraMatrix = function.MakeAffineMatrix({1, 1, 1}, rotation_, translation_);
-	viewMatrix_ = function.Inverse(cameraMatrix);
+	// ビュー行列の更新（DebugCamera.cpp より）
+	Matrix4x4 pivotMat = function.MakeTranslateMatrix(pivot_);   
+	 Vector3 invScale=scale_;
+	if (scale_.x > 0.0f || scale_.y > 0.0f || scale_.z > 0.0f) {
+	
+	 invScale = {1.0f / scale_.x, 1.0f / scale_.y, scale_.z  };
+	}
+	// Pivot へ移動
+	Matrix4x4 camMat = function.MakeAffineMatrix(invScale, rotation_, translation_); // Scale→Rotate→Translate をまとめて
+	Matrix4x4 worldCam = function.Multiply(pivotMat, camMat);                      // Pivot→(S→R→T)
+	viewMatrix_ = function.Inverse(worldCam);                                      // ワールド→ビュー
+	viewProjectionMatrix_ = function.Multiply(viewMatrix_, projectionMatrix_);     // ビュー×プロジェクション
+  
 
-
-
-	// viewProjectionMatrix_ に viewMatrix_ を代入
-	viewProjectionMatrix_ = viewMatrix_; // これで OK（単純なコピー）
-
-	// もし viewMatrix_ と projectionMatrix_ を掛け合わせて viewProjection を作るなら以下のように：
-	viewProjectionMatrix_ = function.Multiply(viewMatrix_, projectionMatrix_);
 
 	
 }
