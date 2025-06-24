@@ -1361,9 +1361,9 @@ void GameBase::DrawCommandList() {
 
 	
 }
-void GameBase::BeginFlame() {
+void GameBase::BeginFlame(char* keys,char*preKeys) {
 	
-	DInput.Update();
+
 	// ① 現在のバックバッファをフレーム毎に更新
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
@@ -1384,7 +1384,7 @@ void GameBase::BeginFlame() {
 
 	// ⑤ ImGui 準備
 	imguiM_.NewFrame();
-	
+	DInput.Update((uint8_t*)keys, (uint8_t*)preKeys);
 }
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---

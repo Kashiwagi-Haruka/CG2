@@ -136,11 +136,7 @@ private:
 
 	};
 
-	Transform transform = {
-	    {1.0f, 1.0f, 1.0f}, // scale
-	    {0.0f, 0.0f, 0.0f}, // rotate
-	    {0.0f, 0.0f, 0.0f}  // translate
-	};
+	
 
 	Transform uvTransformSprite_{
 	    {1.0f, 1.0f, 1.0f},
@@ -205,7 +201,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 
 	   ~GameBase();
 
-	void BeginFlame(); // フレームの開始処理（commandListリセットなど）
+	void BeginFlame(char* keys, char* preKeys); // フレームの開始処理（commandListリセットなど）
 	void EndFlame();   // フレームの終了処理（Present、フェンス待ちなど）
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
 
@@ -233,6 +229,17 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	void SoundUnload(SoundData* soundData);
 	void SoundPlayWave(const SoundData& sounddata);
 	DirectInput DInput;
+	// GameBase.h の public に追加
+	// GameBase.h の public に追加
+	Matrix4x4* GetTransformationMatrixData() const { return transformationMatrixData; }
+
+	Transform transform = {
+	    {1.0f, 1.0f, 1.0f}, // scale
+	    {0.0f, 0.0f, 0.0f}, // rotate
+	    {0.0f, 0.0f, 0.0f}  // translate
+	};
+
+	Transform GetCameraTransform() const{ return cameraTransform; };
 
 private:
 

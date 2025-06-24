@@ -6,8 +6,7 @@
 class DirectInput {
 
 	HRESULT result_;
-	WNDCLASS wc_;
-	HWND hwnd_;
+
 	IDirectInputDevice8* keyboard;
 
 	
@@ -18,15 +17,15 @@ class DirectInput {
 	
 
 	void Initialize(WNDCLASS wc, HWND hwnd);
-	void Update();
+	    void Update(uint8_t* key, uint8_t* preKey);
 	
 
 	
 };
 
-BYTE key[256]{};
-BYTE preKey[256]{};
-bool KeyDown(uint8_t KeyNumber);
-bool KeyUp(uint8_t KeyNumber);
-bool KeyTriggerDown(uint8_t KeyNumber);
-bool KeyTriggerUp(uint8_t KeyNumber);
+
+bool KeyDown(uint8_t KeyNumber, const uint8_t* key);
+bool KeyUp(uint8_t KeyNumber, const uint8_t* key);
+bool KeyTriggerDown(uint8_t KeyNumber, const uint8_t* key, const uint8_t* preKey);
+bool KeyTriggerUp(uint8_t KeyNumber, const uint8_t* key, const uint8_t* preKey);
+
