@@ -18,72 +18,53 @@ void DebugCamera::Initialize() {
 	float farClip = 1000.0f;
 
 	projectionMatrix_ = function.MakePerspectiveFovMatrix(fovY, aspectRatio, nearClip, farClip);
+	matRot_ = function.MakeIdentity();
 }
 
-void DebugCamera::Update(uint8_t* key, uint8_t* preKey) {
-
-
+void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
+	// ── ImGui でパラメータをいじれるように ──
 	ImGui::Begin("DebugCamera");
-	ImGui::SliderFloat3("Pivot", &pivot_.x, -100.0f, 100.0f); // ← 追加
-	ImGui::SliderFloat3("Scale", &scale_.x, 0.1f, 10.0f);  
-	ImGui::SliderFloat3("Translation", &translation_.x, -100.0f, 100.0f);
-	ImGui::SliderFloat3("Rotation", &rotation_.x, -3.14f, 3.14f);
+	ImGui::SliderFloat3("Pivot", &pivot_.x, -100.0f, 100.0f);
+	ImGui::SliderFloat3("Offset", &translation_.x, -100.0f, 100.0f);
+	ImGui::SliderFloat3("Zoom (Scale)", &scale_.x, 0.1f, 10.0f);
 	ImGui::End();
 
-	// キーボード操作（WASD + 矢印キー）
-	const float moveSpeed = 0.5f;
-	const float rotateSpeed = 0.05f;
+	// ── キー操作でフレーム毎の回転デルタを得る ──
+	const float rotSpeed = 0.02f; // rad/frame
+	float dPitch = 0, dYaw = 0;
+	if (key[DIK_UP] & 0x80)
+		dPitch = -rotSpeed;
+	if (key[DIK_DOWN] & 0x80)
+		dPitch = rotSpeed;
+	if (key[DIK_LEFT] & 0x80)
+		dYaw = -rotSpeed;
+	if (key[DIK_RIGHT] & 0x80)
+		dYaw = rotSpeed;
 
-	if (KeyDown(DIK_W,key)) {
-		translation_.z += moveSpeed;
-	}
-	if (KeyDown(DIK_S,key)) {
-		translation_.z -= moveSpeed;
-	}
-	if (KeyDown(DIK_A,key)) {
-		translation_.x -= moveSpeed;
-	}
-	if (KeyDown(DIK_D,key)) {
-		translation_.x += moveSpeed;
-	}
-	if (KeyDown(DIK_Q,key)) {
-		translation_.y -= moveSpeed;
-	}
-	if (KeyDown(DIK_E,key)) {
-		translation_.y += moveSpeed;
-	}
+	// ── 累積回転行列に今回フレーム分の回転を乗算 ──
+	Matrix4x4 matRotDelta = function.MakeIdentity();
+	matRotDelta = function.Multiply(matRotDelta,function.MakeRotateXMatrix(dPitch));
+	matRotDelta = function.Multiply(matRotDelta,function.MakeRotateYMatrix(dYaw));
+	matRot_ = function.Multiply(matRotDelta , matRot_); // ★資料「回転行列の累積」と同じ
 
-	if (KeyDown(DIK_UP,key)) {
-		rotation_.x += rotateSpeed;
-	}
-	if (KeyDown(DIK_DOWN,key)) {
-		rotation_.x -= rotateSpeed;
-	}
-	if (KeyDown(DIK_LEFT,key)) {
-		rotation_.y += rotateSpeed;
-	}
-	if (KeyDown(DIK_RIGHT,key)) {
-		rotation_.y -= rotateSpeed;
-	}
+	// ── scale は GUI 値が大きいほどズームインにしたいので逆数を使う ──
+	Vector3 invScale = {1.0f / scale_.x, 1.0f / scale_.y, 1.0f / scale_.z};
 
+	// ── 行列合成：Pivot→累積回転→Scale→Offset（Pivot→(R→S→T)）─
+	Matrix4x4 pivotMat = function.MakeTranslateMatrix(pivot_);
+	Matrix4x4 scaleMat = function.MakeScaleMatrix(invScale);
+	Matrix4x4 offsetMat = function.MakeTranslateMatrix(translation_);
 
-	pivot_ = translation_;
-	// ビュー行列を更新
-	// ビュー行列の更新（DebugCamera.cpp より）
-	Matrix4x4 pivotMat = function.MakeTranslateMatrix(pivot_);   
-	 Vector3 invScale=scale_;
-	if (scale_.x > 0.0f || scale_.y > 0.0f || scale_.z > 0.0f) {
-	
-	 invScale = {1.0f / scale_.x, 1.0f / scale_.y, scale_.z  };
-	}
-	// Pivot へ移動
-	Matrix4x4 camMat = function.MakeAffineMatrix(invScale, rotation_, translation_); // Scale→Rotate→Translate をまとめて
-	Matrix4x4 worldCam = function.Multiply(pivotMat, camMat);                      // Pivot→(S→R→T)
-	viewMatrix_ = function.Inverse(worldCam);                                      // ワールド→ビュー
-	viewProjectionMatrix_ = function.Multiply(viewMatrix_, projectionMatrix_);     // ビュー×プロジェクション
-  
+	// world→camera 行列
+	//    ① pivot へ
+	//    ② 回転（累積）
+	//    ③ スケール（ズーム）
+	//    ④ オフセット（距離）
+	Matrix4x4 worldCam = function.Multiply(function.Multiply(function.Multiply(pivotMat , matRot_) , scaleMat) , offsetMat);
 
+	// ── ビュー行列は逆行列を取ってセット ──
+	viewMatrix_ = function.Inverse(worldCam);
 
-	
+	// ── ビュー×プロジェクション行列を更新 ──
+	viewProjectionMatrix_ = function.Multiply(viewMatrix_, projectionMatrix_);
 }
-
