@@ -31,7 +31,7 @@ void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
 
 	// ── キー操作でフレーム毎の回転デルタを得る ──
 	const float rotSpeed = 0.02f; // rad/frame
-	float dPitch = 0, dYaw = 0;
+	float dPitch = 0, dYaw = 0,dZ=0;
 	if (key[DIK_UP] & 0x80)
 		dPitch =-rotSpeed;
 	if (key[DIK_DOWN] & 0x80)
@@ -40,11 +40,16 @@ void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
 		dYaw = -rotSpeed;
 	if (key[DIK_RIGHT] & 0x80)
 		dYaw = rotSpeed;
+	if (key[DIK_RSHIFT] & 0x80)
+		dZ = -rotSpeed;
+	if (key[DIK_END] & 0x80)
+		dZ = rotSpeed;
 
 	// ── 累積回転行列に今回フレーム分の回転を乗算 ──
 	Matrix4x4 matRotDelta = function.MakeIdentity();
 	matRotDelta = function.Multiply(matRotDelta,function.MakeRotateXMatrix(dPitch));
 	matRotDelta = function.Multiply(matRotDelta,function.MakeRotateYMatrix(dYaw));
+	matRotDelta = function.Multiply(matRotDelta, function.MakeRotateZMatrix(dZ));
 	matRot_ = function.Multiply(matRotDelta , matRot_); // ★資料「回転行列の累積」と同じ
 
 	// ── scale は GUI 値が大きいほどズームインにしたいので逆数を使う ──
