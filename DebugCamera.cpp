@@ -33,7 +33,7 @@ void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
 	const float rotSpeed = 0.02f; // rad/frame
 	float dPitch = 0, dYaw = 0;
 	if (key[DIK_UP] & 0x80)
-		dPitch = -rotSpeed;
+		dPitch =-rotSpeed;
 	if (key[DIK_DOWN] & 0x80)
 		dPitch = rotSpeed;
 	if (key[DIK_LEFT] & 0x80)
