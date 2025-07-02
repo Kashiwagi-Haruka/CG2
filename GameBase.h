@@ -15,6 +15,7 @@
 #include <wrl.h>
 #include "Audio.h"
 #include "DirectInput.h"
+#include <dinput.h>
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
 
 class GameBase {
@@ -90,8 +91,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	// --- 頂点用 (Transform行列) のリソース追加 ---
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSphere;
 
 		// RTVを2つ作るのでディスクリプタを2つ用意
@@ -188,14 +189,17 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 		
 	   bool useMonsterBall_ = true;
 
-	   
-	   
-
+	static const UINT kMaxSpriteVertices = 6 * 1000; // フレーム最大 1000 スプライト分
+	
 
 
 	void FrameStart(); // フレーム最初の準備
-	   
-
+	Microsoft::WRL::ComPtr<IDirectInput8> directInput_;
+		Microsoft::WRL::ComPtr<IDirectInputDevice8> mouseDevice_;
+	DIMOUSESTATE2 mouseState_{};
+	DIMOUSESTATE2 prevMouseState_{};
+	LONG mouseX_ = 0;
+	LONG mouseY_ = 0;
 
    public:	
 
@@ -221,7 +225,8 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	// 描画関数（好きなだけ呼べるように）
 	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
 	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle);
-	void DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle);
+	void DrawSprite(const Vector2& pos, float scale, float rotate, uint32_t color, int texHandle);
+	void DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color);
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
@@ -240,6 +245,14 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	};
 
 	Transform GetCameraTransform() const{ return cameraTransform; };
+	// マウス入力関連
+	void InitializeMouse(HWND hwnd);
+	void UpdateMouse();
+	bool IsMouseDown(int btn) const;
+	bool IsMousePressed(int btn) const;
+	LONG GetMouseX() const { return mouseX_; }
+	LONG GetMouseY() const { return mouseY_; }
+
 
 private:
 
@@ -280,6 +293,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const DirectX::TexMetadata& metdata);
 
 	int LoadTexture(const std::string& fileName);
-	
+
 };
 

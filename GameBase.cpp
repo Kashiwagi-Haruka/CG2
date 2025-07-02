@@ -120,6 +120,16 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 	WindowClear();
 	audio.InitializeIXAudio();
+
+	HRESULT hr = DirectInput8Create(
+	    wc.hInstance,           // WinMain から渡した HINSTANCE
+	    DIRECTINPUT_VERSION, // DirectInput のバージョン
+	    IID_IDirectInput8,   // ← ここを使う
+	    reinterpret_cast<void**>(directInput_.GetAddressOf()), nullptr);
+	assert(SUCCEEDED(hr));  
+
+	InitializeMouse(hwnd);
+
 }
 
 bool GameBase::IsMsgQuit() {
@@ -275,7 +285,7 @@ void GameBase::WindowClear() {
 	
 	
 
-	texture_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), /*"C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/uvChecker.png"*/ modelData.material.textureFilePath, 1);
+	texture_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), "C:/Class/Program/DirectXGame/Resources/Water2.png", 1);
 	GPUHandle_ = texture_.GetGpuHandle();
 	texture2_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), /* "C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/monsterBall.png"*/ modelData.material.textureFilePath, 2);
 	OutputDebugStringA(("TexPath: " + modelData.material.textureFilePath + "\n").c_str());
@@ -437,11 +447,11 @@ void GameBase::ResourceRelease() {
 	textures_.clear(); // 念のため解放
 	/*vertexResourceSphere->Release();*/
 
-	/*if (vertexResourceSprite) {
-		vertexResourceSprite->Release();
+	/*if (vertexResourceSprite_) {
+		vertexResourceSprite_->Release();
 	}
-	if (transformationMatrixResourceSprite) {
-		transformationMatrixResourceSprite->Release();
+	if (transformationMatrixResourceSprite_) {
+		transformationMatrixResourceSprite_->Release();
 	}*/
 
 	
@@ -461,8 +471,8 @@ void GameBase::ResourceRelease() {
 	vertexResource_.Reset();
 	materialResource_.Reset();
 	transformResource_.Reset();
-	vertexResourceSprite.Reset();
-	transformationMatrixResourceSprite.Reset();
+	vertexResourceSprite_.Reset();
+	transformationMatrixResourceSprite_.Reset();
 	vertexResourceSphere.Reset();
 	swapChainResources_[0].Reset();
 	swapChainResources_[1].Reset();
@@ -857,10 +867,10 @@ void GameBase::VertexResource() {
 
 
 	// --- Sprite用 頂点リソース ---
-	vertexResourceSprite = CreateBufferResource(device_.Get(), sizeof(VertexData) * 6);
+	vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * kMaxSpriteVertices);
 	vertexBufferViewSprite={};
-	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
-	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferViewSprite.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
+	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * kMaxSpriteVertices;
 	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 
 	// --- ここにインデックスバッファの生成を追加 ---
@@ -869,7 +879,7 @@ void GameBase::VertexResource() {
 	indexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
 
 	VertexData* vertexDataSprite = nullptr;
-	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
 
 // 1枚目の三角形（左下 → 左上 → 右下）
 	vertexDataSprite[0].position = {0.0f, 360.0f, 0.0f, 1.0f}; // 左下
@@ -896,7 +906,7 @@ void GameBase::VertexResource() {
 		vertexDataSprite[i].normal = {0.0f, 0.0f, -1.0f};
 	}
 
-	vertexResourceSprite->Unmap(0, nullptr);
+	vertexResourceSprite_->Unmap(0, nullptr);
 	uint32_t indices[6] = {0, 1, 2, 1, 4, 2};
 
 	void* mapped = nullptr;
@@ -923,11 +933,11 @@ void GameBase::VertexResource() {
 
 
 	// Sprite用の TransformationMatrix リソース作成（1個分）
-	transformationMatrixResourceSprite = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
+	transformationMatrixResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
 
 	// データへのポインタ取得
 	transformationMatrixDataSprite = nullptr;
-	transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+	transformationMatrixResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 
 	// 単位行列を書き込んでおく（初期状態）
 	*transformationMatrixDataSprite = function.MakeIdentity();
@@ -1097,9 +1107,9 @@ void GameBase::CreateModelVertexBuffer() {
 void GameBase::CreateSpriteVertexBuffer() {
 	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
 	// --- Sprite用 頂点リソース ---
-	vertexResourceSprite = CreateBufferResource(device_.Get(), sizeof(VertexData) * 6);
+	vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 6);
 	vertexBufferViewSprite = {};
-	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
+	vertexBufferViewSprite.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
 	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
 	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 
@@ -1109,7 +1119,7 @@ void GameBase::CreateSpriteVertexBuffer() {
 	indexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
 
 	VertexData* vertexDataSprite = nullptr;
-	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
 
 	// 1枚目の三角形（左下 → 左上 → 右下）
 	vertexDataSprite[0].position = {0.0f, 360.0f, 0.0f, 1.0f}; // 左下
@@ -1135,7 +1145,7 @@ void GameBase::CreateSpriteVertexBuffer() {
 		vertexDataSprite[i].normal = {0.0f, 0.0f, -1.0f};
 	}
 
-	vertexResourceSprite->Unmap(0, nullptr);
+	vertexResourceSprite_->Unmap(0, nullptr);
 	uint32_t indices[6] = {0, 1, 2, 1, 4, 2};
 
 	void* mapped = nullptr;
@@ -1158,11 +1168,11 @@ void GameBase::CreateSpriteVertexBuffer() {
 	materialResourceSprite_->Unmap(0, nullptr);
 
 	// Sprite用の TransformationMatrix リソース作成（1個分）
-	transformationMatrixResourceSprite = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
+	transformationMatrixResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
 
 	// データへのポインタ取得
 	transformationMatrixDataSprite = nullptr;
-	transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+	transformationMatrixResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 
 	// 単位行列を書き込んでおく（初期状態）
 	*transformationMatrixDataSprite = function.MakeIdentity();
@@ -1348,7 +1358,7 @@ void GameBase::DrawCommandList() {
 	//commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite); // ★絶対にここでVBVをセット
 	//commandList_->IASetIndexBuffer(&indexBufferViewSprite_);
 	//commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
-	//commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+	//commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite_->GetGPUVirtualAddress());
 	//commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	//commandList_->SetDescriptorHeaps(1, &srvDescriptorHeap_);
 	//if (useMonsterBall_) {
@@ -1492,35 +1502,113 @@ void GameBase::EndFlame() {
 //	
 //}
 //
-//void GameBase::DrawSprite(int texHandle, const Vector2& pos, float scale, float rotate, uint32_t color, int textureHandle) {
-//	// マテリアルカラー設定
-//	Vector4* mat = nullptr;
-//	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
-//	*mat = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
-//	materialResource_->Unmap(0, nullptr);
-//
-//	// トランスフォーム計算（Z=0）
-//	Matrix4x4 world = function.MakeAffineMatrix({scale, scale, 1.0f}, {0.0f, 0.0f, rotate}, {pos.x, pos.y, 0.0f});
-//
-//	Matrix4x4 view = function.MakeIdentity();
-//	Matrix4x4 proj = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
-//	Matrix4x4 wvp = function.Multiply(world, function.Multiply(view, proj));
-//	*transformationMatrixDataSprite = wvp;
-//
-//	// ディスクリプタ設定
-//	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
-//	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
-//	commandList_->SetGraphicsRootDescriptorTable(2, textures_[texHandle].GetGpuHandle());
-//
-//	// ルートパラメータ設定
-//	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-//	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
-//
-//	// 頂点バッファ設定
-//	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-//	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-//	commandList_->DrawInstanced(6, 1, 0, 0);
-//}
+void GameBase::DrawSprite(const Vector2& pos, float scale, float rotate, uint32_t color, int texHandle) {
+	// 1) スプライト用マテリアル更新
+	Material* matSprite = nullptr;
+	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
+	matSprite->color = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
+	materialResourceSprite_->Unmap(0, nullptr);
+
+	// 2) WVP 行列更新
+	Matrix4x4 world = function.MakeAffineMatrix({scale, scale, 1.0f}, {0.0f, 0.0f, rotate}, {pos.x, pos.y, 0.0f});
+	Matrix4x4 view = function.MakeIdentity();
+	Matrix4x4 proj = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
+	*transformationMatrixDataSprite = function.Multiply(world, function.Multiply(view, proj));
+
+	// 3) ディスクリプタヒープをバインド
+	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_.Get()};
+	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
+
+	// 4) ルートパラメータ設定
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(2, textures_[texHandle].GetGpuHandle());
+
+	// 5) 頂点＆インデックスバッファ設定
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+	commandList_->IASetIndexBuffer(&indexBufferViewSprite_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// 6) 描画
+	commandList_->DrawIndexedInstanced(
+	    6, // index count
+	    1, // instance count
+	    0, // start index
+	    0, // base vertex
+	    0  // start instance
+	);
+}
+
+// GameBase.cpp に追加／編集してください。
+// 頂点構造体は既に VertexData.h で定義済みです :contentReference[oaicite:0]{index=0}
+
+// GameBase.cpp より
+
+// GameBase.cpp より
+
+void GameBase::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color) {
+	// --- 1) マテリアル更新 ---
+	Material* mat = nullptr;
+	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
+	mat->color = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
+	materialResourceSprite_->Unmap(0, nullptr);
+
+	// --- 2) WVP 行列更新（スクリーン直投影） ---
+	Matrix4x4 view = function.MakeIdentity();
+	Matrix4x4 proj = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
+	*transformationMatrixDataSprite = function.Multiply(view, proj);
+
+	// --- 3) 動的頂点バッファに６頂点を書き込む ---
+	VertexData* vtx = nullptr;
+	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vtx));
+	vtx += currentSpriteVertexOffset_; // 次の空き領域へ
+	// 三角形１：左上→右上→左下
+	vtx[0] = {
+	    {pos[0].x, pos[0].y, pos[0].z, 1.0f},
+        texturePos[0], {0, 0, -1}
+    };
+	vtx[1] = {
+	    {pos[1].x, pos[1].y, pos[1].z, 1.0f},
+        texturePos[1], {0, 0, -1}
+    };
+	vtx[2] = {
+	    {pos[3].x, pos[3].y, pos[3].z, 1.0f},
+        texturePos[3], {0, 0, -1}
+    };
+	// 三角形２：右上→右下→左下
+	vtx[3] = vtx[1];
+	vtx[4] = {
+	    {pos[2].x, pos[2].y, pos[2].z, 1.0f},
+        texturePos[2], {0, 0, -1}
+    };
+	vtx[5] = vtx[2];
+	vertexResourceSprite_->Unmap(0, nullptr);
+
+	// --- 4) VBV をオフセット付きでセット ---
+	D3D12_VERTEX_BUFFER_VIEW vbv{};
+	vbv.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress() + SIZE_T(currentSpriteVertexOffset_) * sizeof(VertexData);
+	vbv.SizeInBytes = sizeof(VertexData) * 6;
+	vbv.StrideInBytes = sizeof(VertexData);
+	commandList_->IASetVertexBuffers(0, 1, &vbv);
+
+	// --- 5) インデックスバッファ & プリミティブ設定 ---
+	commandList_->IASetIndexBuffer(&indexBufferViewSprite_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// --- 6) ルートパラメータ & SRV バインド ---
+	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_.Get()};
+	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+
+	// --- 7) 描画 & オフセット進める ---
+	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	currentSpriteVertexOffset_ += 6;
+}
+
+
+
 
 //objfileを読む関数
 GameBase::ModelData GameBase::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
@@ -1641,3 +1729,45 @@ void GameBase::SoundPlayWave(const SoundData& sounddata) {
 	assert(audio.GetIXAudio2() != nullptr); // 安全のため追加
 	audio.SoundPlayWave(audio.GetIXAudio2().Get(), sounddata);
 }
+void GameBase::InitializeMouse(HWND hwnd) {
+
+	// directInput_ は既に DirectInput8Create で作成済み
+	// マウスデバイスを作成
+	HRESULT hr = directInput_->CreateDevice(GUID_SysMouse, &mouseDevice_, nullptr);
+	if (FAILED(hr))
+		return;
+
+	// データフォーマットを設定（拡張マウス状態）
+	hr = mouseDevice_->SetDataFormat(&c_dfDIMouse2);
+	if (FAILED(hr))
+		return;
+
+	// 協調レベル：フォアグラウンドかつ他アプリと共有
+	hr = mouseDevice_->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	if (FAILED(hr))
+		return;
+
+	// 最初の Acquire
+	mouseDevice_->Acquire();
+}
+void GameBase::UpdateMouse() {
+	// １）前フレームの状態を保存
+	prevMouseState_ = mouseState_;
+
+	// ２）DirectInput で相対移動だけ取得（マウスホイールやボタンは要るなら使う）
+	if (mouseDevice_) {
+		mouseDevice_->Acquire();
+		mouseDevice_->GetDeviceState(sizeof(mouseState_), &mouseState_);
+	}
+	// （相対移動は今ここでは使わないので無視してOK）
+
+	// ３）Windows API でマウスの絶対位置を取得
+	POINT pt;
+	GetCursorPos(&pt);          // スクリーン座標
+	ScreenToClient(hwnd, &pt); // クライアント座標に変換
+	mouseX_ = pt.x;             // ここではクランプせずそのまま代入
+	mouseY_ = pt.y;
+}
+bool GameBase::IsMouseDown(int btn) const { return (mouseState_.rgbButtons[btn] & 0x80u) != 0; }
+
+bool GameBase::IsMousePressed(int btn) const { return (mouseState_.rgbButtons[btn] & 0x80u) != 0 && !(prevMouseState_.rgbButtons[btn] & 0x80u); }

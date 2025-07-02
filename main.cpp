@@ -16,12 +16,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256]={0};
 
 
-	Vector3 position[3]{
-		{-20,0,0,},
-		{20,0,0},
-		{0,20,0}
+	Vector3 position[4]{
+	    {100, 100, 0}, // 左上 (100,100)
+	    {300, 100, 0}, // 右上
+	    {300, 300, 0}, // 右下
+	    {100, 300, 0}  // 左下
 	};
-	Vector2 texcoord[3] = {{0.0f, 1.0f}, {0.5f, 0.0f},{1.0f, 1.0f}};
+	Vector3 position2[4]{
+	    {200, 200, 0}, // 左上 (100,100)
+	    {400, 200, 0}, // 右上
+	    {400, 400, 0}, // 右下
+	    {200, 400, 0}  // 左下
+	};
+	Vector2 texcoord[4] = {
+	    {0.0f, 0.0f},
+        {1.0f, 0.0f},
+        {1.0f, 1.0f},
+        {0.0f, 1.0f}
+    };
+	
+
 	
 	SoundData soundData1 = gameBase->SoundLoadWave("Resources/Alarm01.wav");
 
@@ -39,9 +53,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			gameBase->BeginFlame(keys,preKeys);
 			memcpy(preKeys, keys, 256);
-
+			LONG mx = gameBase->GetMouseX();
+			LONG my = gameBase->GetMouseY();
 			gameBase->Update();
-			// DebugCamera の更新
+			gameBase->UpdateMouse();
+#pragma region 
+				// DebugCamera の更新
 			debugCamera.Update((uint8_t*)keys, (uint8_t*)preKeys);
 
 			// DebugCameraの行列を取得
@@ -53,12 +70,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			    {1, 1, 1},
                 debugCamera.rotation_, debugCamera.translation_
             };
-		// WVP行列を作成
+			// WVP行列を作成
 			Matrix4x4 wvpMatrix = function.Multiply(worldMatrix, viewProjectionMatrix);
-			
+
 			// 書き込む
 			*gameBase->GetTransformationMatrixData() = wvpMatrix;
+#pragma endregion
 
+		
+			
+
+
+
+			gameBase->DrawSpriteSheet(position, texcoord, 0xffffffff);
+			
+
+			  // 4) マウス追従スプライト
+			const float half = 50.0f; // スプライトの半幅／半高（32x32 なら 16）
+			Vector3 followPos[4] = {
+			    {float(mx) - half, float(my) - half, 0.0f},
+			    {float(mx) + half, float(my) - half, 0.0f},
+			    {float(mx) + half, float(my) + half, 0.0f},
+			    {float(mx) - half, float(my) + half, 0.0f},
+			};
+			
+			
+				gameBase->DrawSpriteSheet(followPos, texcoord, 0xFFFFFFFF);
+		
 
 
 
