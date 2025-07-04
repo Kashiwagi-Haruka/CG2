@@ -59,7 +59,7 @@ private:
 	// FenceのSignalを持つためのイベントを作成する
 	HANDLE fenceEvent_;
 
-	std::vector<Texture> textures_;
+	/*std::vector<Texture> textures_;*/
 
 	int32_t kClientWidth = 1280;
 	int32_t kClientHeight = 720;
@@ -189,7 +189,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 		
 	   bool useMonsterBall_ = true;
 
-	static const UINT kMaxSpriteVertices = 6 * 1000; // フレーム最大 1000 スプライト分
+	static const UINT kMaxSpriteVertices = 6 * 10000; // フレーム最大 1000 スプライト分
 	
 
 
@@ -285,14 +285,14 @@ private:
 
 	void DrawCommandList();
 	void CreateModelVertexBuffer();
-	void CreateSpriteVertexBuffer();
+	/*void CreateSpriteVertexBuffer();*/
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(ID3D12Device* device_, size_t sizeInBytes);
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const DirectX::TexMetadata& metdata);
 
-	int LoadTexture(const std::string& fileName);
+	/*int LoadTexture(const std::string& fileName);*/
 
 };
 

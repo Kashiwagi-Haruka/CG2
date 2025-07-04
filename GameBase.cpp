@@ -280,7 +280,7 @@ void GameBase::WindowClear() {
 		assert(false);
 	}
 
-	modelData = LoadObjFile("Resources", "axis.obj");
+	modelData = LoadObjFile("Resources", "WaterBall.obj");
 	// ↓ テクスチャも読み込んで、indexを取得
 	
 	
@@ -441,10 +441,10 @@ void GameBase::ResourceRelease() {
 	texture_.Finalize();
 	texture2_.Finalize();
 	imguiM_.Finalize();
-	for (auto& tex : textures_) {
-		tex.Finalize();
-	}
-	textures_.clear(); // 念のため解放
+	//for (auto& tex : textures_) {
+	//	tex.Finalize();
+	//}
+	//textures_.clear(); // 念のため解放
 	/*vertexResourceSphere->Release();*/
 
 	/*if (vertexResourceSprite_) {
@@ -558,8 +558,7 @@ void GameBase::DXCInitialize() {
 
 	PSO();
 	VertexResource();
-	/*CreateModelVertexBuffer();
-	CreateSpriteVertexBuffer();*/
+
 }
 
 Microsoft::WRL::ComPtr<IDxcBlob> GameBase::CompileShader(/* CompilerするShaderファイルへのパス*/const std::wstring& filePath,
@@ -754,14 +753,23 @@ void GameBase::PSO() {
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
-	// BlendStateの設定
+// BlendStateの設定（アルファブレンド有効化）
 	D3D12_BLEND_DESC blendDesc{};
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	auto& rtBlend = blendDesc.RenderTarget[0];
+	rtBlend.BlendEnable = TRUE;
+	rtBlend.LogicOpEnable = FALSE;
+	rtBlend.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	rtBlend.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	rtBlend.BlendOp = D3D12_BLEND_OP_ADD;
+	rtBlend.SrcBlendAlpha = D3D12_BLEND_ONE;
+	rtBlend.DestBlendAlpha = D3D12_BLEND_ZERO;
+	rtBlend.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	rtBlend.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 	// RasiterzerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	// 裏面（時計回り）を表示しない
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE; /*D3D12_CULL_MODE_BACK;*/
 	// 三角形の中を塗りつぶす
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
@@ -786,7 +794,7 @@ void GameBase::PSO() {
 	// DepthStencil の設定
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	depthStencilDesc.DepthEnable = true;                           // Depth 有効化
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;  // 書き込みON
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO; // Depth 書き込みマスクをゼロに設定（書き込まない）
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 近いほど前に表示
 
 	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
@@ -811,10 +819,10 @@ void GameBase::VertexResource() {
 	Log("VertexResource Start\n");
 	// 頂点リソース作成
 
-	modelData = LoadObjFile("Resources", "axis.obj");
+	modelData = LoadObjFile("Resources", "WaterBall.obj");
 
 	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * modelData.vertices.size());
-
+	
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
@@ -907,7 +915,11 @@ void GameBase::VertexResource() {
 	}
 
 	vertexResourceSprite_->Unmap(0, nullptr);
-	uint32_t indices[6] = {0, 1, 2, 1, 4, 2};
+	// インデックスバッファ作成部分
+	// 四角形（クワッド）を2枚の三角形に分割
+	uint32_t indices[6] = {0, 1, 2, 0, 2, 3};
+	// この内容で indexResourceSprite_ を初期化してください
+
 
 	void* mapped = nullptr;
 	indexResourceSprite_->Map(0, nullptr, &mapped);
@@ -1104,79 +1116,79 @@ void GameBase::CreateModelVertexBuffer() {
 	transformationMatrixData[0] = worldViewProjectionMatrix; // WVP
 	transformationMatrixData[1] = worldMatrix;               // World
 }
-void GameBase::CreateSpriteVertexBuffer() {
-	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
-	// --- Sprite用 頂点リソース ---
-	vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 6);
-	vertexBufferViewSprite = {};
-	vertexBufferViewSprite.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
-	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
-	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
-
-	// --- ここにインデックスバッファの生成を追加 ---
-	// --- ここにインデックスバッファの生成を追加 ---
-	// 6個のインデックス（2枚の三角形でスプライト）
-	indexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
-
-	VertexData* vertexDataSprite = nullptr;
-	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
-
-	// 1枚目の三角形（左下 → 左上 → 右下）
-	vertexDataSprite[0].position = {0.0f, 360.0f, 0.0f, 1.0f}; // 左下
-	vertexDataSprite[0].texcoord = {0.0f, 1.0f};
-
-	vertexDataSprite[1].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
-	vertexDataSprite[1].texcoord = {0.0f, 0.0f};
-
-	vertexDataSprite[2].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
-	vertexDataSprite[2].texcoord = {1.0f, 1.0f};
-
-	// 2枚目の三角形（左上 → 右上 → 右下）
-	vertexDataSprite[3].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
-	vertexDataSprite[3].texcoord = {0.0f, 0.0f};
-
-	vertexDataSprite[4].position = {640.0f, 0.0f, 0.0f, 1.0f}; // 右上
-	vertexDataSprite[4].texcoord = {1.0f, 0.0f};
-
-	vertexDataSprite[5].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
-	vertexDataSprite[5].texcoord = {1.0f, 1.0f};
-
-	for (int i = 0; i < 6; i++) {
-		vertexDataSprite[i].normal = {0.0f, 0.0f, -1.0f};
-	}
-
-	vertexResourceSprite_->Unmap(0, nullptr);
-	uint32_t indices[6] = {0, 1, 2, 1, 4, 2};
-
-	void* mapped = nullptr;
-	indexResourceSprite_->Map(0, nullptr, &mapped);
-	memcpy(mapped, indices, sizeof(indices));
-	indexResourceSprite_->Unmap(0, nullptr);
-
-	// インデックスバッファビューの作成
-	indexBufferViewSprite_.BufferLocation = indexResourceSprite_->GetGPUVirtualAddress();
-	indexBufferViewSprite_.SizeInBytes = sizeof(uint32_t) * 6;
-	indexBufferViewSprite_.Format = DXGI_FORMAT_R32_UINT;
-
-	// スプライト用（陰影つけたくないもの）
-	materialResourceSprite_ = CreateBufferResource(device_.Get(), alignedSize);
-	Material* matSprite = nullptr;
-	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
-	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
-	matSprite->enableLighting = 0;
-	matSprite->uvTransform = function.MakeIdentity();
-	materialResourceSprite_->Unmap(0, nullptr);
-
-	// Sprite用の TransformationMatrix リソース作成（1個分）
-	transformationMatrixResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
-
-	// データへのポインタ取得
-	transformationMatrixDataSprite = nullptr;
-	transformationMatrixResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
-
-	// 単位行列を書き込んでおく（初期状態）
-	*transformationMatrixDataSprite = function.MakeIdentity();
-}
+//void GameBase::CreateSpriteVertexBuffer() {
+//	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
+//	// --- Sprite用 頂点リソース ---
+//	vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 6);
+//	vertexBufferViewSprite = {};
+//	vertexBufferViewSprite.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
+//	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
+//	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
+//
+//	// --- ここにインデックスバッファの生成を追加 ---
+//	// --- ここにインデックスバッファの生成を追加 ---
+//	// 6個のインデックス（2枚の三角形でスプライト）
+//	indexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
+//
+//	VertexData* vertexDataSprite = nullptr;
+//	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+//
+//	// 1枚目の三角形（左下 → 左上 → 右下）
+//	vertexDataSprite[0].position = {0.0f, 360.0f, 0.0f, 1.0f}; // 左下
+//	vertexDataSprite[0].texcoord = {0.0f, 1.0f};
+//
+//	vertexDataSprite[1].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
+//	vertexDataSprite[1].texcoord = {0.0f, 0.0f};
+//
+//	vertexDataSprite[2].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
+//	vertexDataSprite[2].texcoord = {1.0f, 1.0f};
+//
+//	// 2枚目の三角形（左上 → 右上 → 右下）
+//	vertexDataSprite[3].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
+//	vertexDataSprite[3].texcoord = {0.0f, 0.0f};
+//
+//	vertexDataSprite[4].position = {640.0f, 0.0f, 0.0f, 1.0f}; // 右上
+//	vertexDataSprite[4].texcoord = {1.0f, 0.0f};
+//
+//	vertexDataSprite[5].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
+//	vertexDataSprite[5].texcoord = {1.0f, 1.0f};
+//
+//	for (int i = 0; i < 6; i++) {
+//		vertexDataSprite[i].normal = {0.0f, 0.0f, -1.0f};
+//	}
+//
+//	vertexResourceSprite_->Unmap(0, nullptr);
+//	uint32_t indices[6] = {0, 1, 2, 1, 4, 2};
+//
+//	void* mapped = nullptr;
+//	indexResourceSprite_->Map(0, nullptr, &mapped);
+//	memcpy(mapped, indices, sizeof(indices));
+//	indexResourceSprite_->Unmap(0, nullptr);
+//
+//	// インデックスバッファビューの作成
+//	indexBufferViewSprite_.BufferLocation = indexResourceSprite_->GetGPUVirtualAddress();
+//	indexBufferViewSprite_.SizeInBytes = sizeof(uint32_t) * 6;
+//	indexBufferViewSprite_.Format = DXGI_FORMAT_R32_UINT;
+//
+//	// スプライト用（陰影つけたくないもの）
+//	materialResourceSprite_ = CreateBufferResource(device_.Get(), alignedSize);
+//	Material* matSprite = nullptr;
+//	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
+//	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
+//	matSprite->enableLighting = 0;
+//	matSprite->uvTransform = function.MakeIdentity();
+//	materialResourceSprite_->Unmap(0, nullptr);
+//
+//	// Sprite用の TransformationMatrix リソース作成（1個分）
+//	transformationMatrixResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
+//
+//	// データへのポインタ取得
+//	transformationMatrixDataSprite = nullptr;
+//	transformationMatrixResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+//
+//	// 単位行列を書き込んでおく（初期状態）
+//	*transformationMatrixDataSprite = function.MakeIdentity();
+//}
 
 void GameBase::Update() {
 	
@@ -1422,189 +1434,65 @@ void GameBase::EndFlame() {
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
 }
-//void GameBase::DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle) {
-//	// オフセットを今の位置で取得
-//	UINT offsetVerts = currentTriangleVertexOffset_;
-//	// 1) 頂点バッファをマップして、offset から書き込み
-//	VertexData* vd = nullptr;
-//	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vd));
-//	vd += offsetVerts; // ← 3 頂点単位でずらす
-//	for (int i = 0; i < 3; ++i) {
-//		vd[i].position = {positions[i].x, positions[i].y, positions[i].z, 1.0f};
-//		vd[i].texcoord = texcoords[i];
-//	}
-//	vertexResource_->Unmap(0, nullptr);
-//
-//	// 2) マテリアルカラーを更新
-//	Vector4* mat = nullptr;
-//	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
-//	*mat = color;
-//	materialResource_->Unmap(0, nullptr);
-//
-//	// 3) ワールドビュー射影行列は既に transformResource に書き込まれている前提
-//
-//	// 4) ルートパラメータ設定
-//	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-//	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
-//
-//	// 5) テクスチャ用ディスクリプタ
-//	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
-//	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
-//	commandList_->SetGraphicsRootDescriptorTable(2, texture_.GetGpuHandle());
-//
-//	// 6) 頂点バッファビューを設定
-//	// 頂点バッファビューを設定（オフセットを反映）
-//
-//	D3D12_VERTEX_BUFFER_VIEW vbv{};
-//	vbv.BufferLocation = +vertexResource_->GetGPUVirtualAddress() + +offsetVerts * sizeof(VertexData);
-//	vbv.SizeInBytes = sizeof(VertexData) * 3;
-//	vbv.StrideInBytes = sizeof(VertexData);
-//	commandList_->IASetVertexBuffers(0, 1, &vbv);
-//
-//	// 7) プリミティブ／ドロー
-//	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-//	commandList_->DrawInstanced(3, 1, 0, 0);
-//
-//	// ⑧ 次回のオフセットを進める
-//	currentTriangleVertexOffset_ += 3;
-//}
-//void GameBase::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle) {
-//	// マテリアルカラー設定（uint32_t → Vector4 に変換必要ならここで変換）
-//	Vector4* mat = nullptr;
-//	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
-//	*mat = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
-//	materialResource_->Unmap(0, nullptr);
-//
-//	// トランスフォーム（ワールドビュー射影行列）計算
-//	Matrix4x4 worldMatrix = function.MakeAffineMatrix({radius, radius, radius}, {0.0f, 0.0f, 0.0f}, center);
-//
-//	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-//	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
-//	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
-//	Matrix4x4 wvp = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
-//
-//	// 書き込み
-//	*transformationMatrixData = wvp;
-//
-//	// ディスクリプタヒープ設定
-//	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_};
-//	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
-//	commandList_->SetGraphicsRootDescriptorTable(2, texture_.GetGpuHandle());
-//
-//	// ルートパラメータ設定
-//	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-//	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
-//
-//	// 頂点バッファ設定
-//	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
-//	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-//	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
-//	
-//}
-//
-void GameBase::DrawSprite(const Vector2& pos, float scale, float rotate, uint32_t color, int texHandle) {
-	// 1) スプライト用マテリアル更新
-	Material* matSprite = nullptr;
-	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
-	matSprite->color = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
-	materialResourceSprite_->Unmap(0, nullptr);
 
-	// 2) WVP 行列更新
-	Matrix4x4 world = function.MakeAffineMatrix({scale, scale, 1.0f}, {0.0f, 0.0f, rotate}, {pos.x, pos.y, 0.0f});
-	Matrix4x4 view = function.MakeIdentity();
-	Matrix4x4 proj = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
-	*transformationMatrixDataSprite = function.Multiply(world, function.Multiply(view, proj));
 
-	// 3) ディスクリプタヒープをバインド
-	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_.Get()};
-	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
-
-	// 4) ルートパラメータ設定
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, textures_[texHandle].GetGpuHandle());
-
-	// 5) 頂点＆インデックスバッファ設定
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-	commandList_->IASetIndexBuffer(&indexBufferViewSprite_);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// 6) 描画
-	commandList_->DrawIndexedInstanced(
-	    6, // index count
-	    1, // instance count
-	    0, // start index
-	    0, // base vertex
-	    0  // start instance
-	);
-}
-
-// GameBase.cpp に追加／編集してください。
-// 頂点構造体は既に VertexData.h で定義済みです :contentReference[oaicite:0]{index=0}
-
-// GameBase.cpp より
-
-// GameBase.cpp より
 
 void GameBase::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color) {
-	// --- 1) マテリアル更新 ---
-	Material* mat = nullptr;
-	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
-	mat->color = Vector4(((color >> 24) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f);
-	materialResourceSprite_->Unmap(0, nullptr);
+	// 頂点バッファに6頂点分追記
+	VertexData* vertexData = nullptr;
+	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	UINT offset = currentSpriteVertexOffset_;
 
-	// --- 2) WVP 行列更新（スクリーン直投影） ---
-	Matrix4x4 view = function.MakeIdentity();
-	Matrix4x4 proj = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
-	*transformationMatrixDataSprite = function.Multiply(view, proj);
-
-	// --- 3) 動的頂点バッファに６頂点を書き込む ---
-	VertexData* vtx = nullptr;
-	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vtx));
-	vtx += currentSpriteVertexOffset_; // 次の空き領域へ
-	// 三角形１：左上→右上→左下
-	vtx[0] = {
-	    {pos[0].x, pos[0].y, pos[0].z, 1.0f},
-        texturePos[0], {0, 0, -1}
+	// 2枚の三角形で四角形を描画（インデックス: 0,1,2, 1,3,2）
+	// 0: 左上, 1: 右上, 2: 右下, 3: 左下
+	vertexData[offset + 0] = {
+	    {pos[0].x, pos[0].y, 0, 1},
+        {texturePos[0].x, texturePos[0].y},
+        {0, 0, -1}
     };
-	vtx[1] = {
-	    {pos[1].x, pos[1].y, pos[1].z, 1.0f},
-        texturePos[1], {0, 0, -1}
+	vertexData[offset + 1] = {
+	    {pos[1].x, pos[1].y, 0, 1},
+        {texturePos[1].x, texturePos[1].y},
+        {0, 0, -1}
     };
-	vtx[2] = {
-	    {pos[3].x, pos[3].y, pos[3].z, 1.0f},
-        texturePos[3], {0, 0, -1}
+	vertexData[offset + 2] = {
+	    {pos[2].x, pos[2].y, 0, 1},
+        {texturePos[2].x, texturePos[2].y},
+        {0, 0, -1}
     };
-	// 三角形２：右上→右下→左下
-	vtx[3] = vtx[1];
-	vtx[4] = {
-	    {pos[2].x, pos[2].y, pos[2].z, 1.0f},
-        texturePos[2], {0, 0, -1}
+	vertexData[offset + 3] = {
+	    {pos[3].x, pos[3].y, 0, 1},
+        {texturePos[3].x, texturePos[3].y},
+        {0, 0, -1}
     };
-	vtx[5] = vtx[2];
+	// 1枚スプライト用のインデックス
+	// 三角形1: 0,1,2  三角形2: 0,2,3
 	vertexResourceSprite_->Unmap(0, nullptr);
 
-	// --- 4) VBV をオフセット付きでセット ---
-	D3D12_VERTEX_BUFFER_VIEW vbv{};
-	vbv.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress() + SIZE_T(currentSpriteVertexOffset_) * sizeof(VertexData);
-	vbv.SizeInBytes = sizeof(VertexData) * 6;
-	vbv.StrideInBytes = sizeof(VertexData);
-	commandList_->IASetVertexBuffers(0, 1, &vbv);
+	// 頂点バッファビューとインデックスバッファビューをセット（オフセット指定）
+	D3D12_VERTEX_BUFFER_VIEW vbv = vertexBufferViewSprite;
+	vbv.BufferLocation += sizeof(VertexData) * offset;
+	vbv.SizeInBytes = sizeof(VertexData) * 4; // 4頂点分
 
-	// --- 5) インデックスバッファ & プリミティブ設定 ---
-	commandList_->IASetIndexBuffer(&indexBufferViewSprite_);
+	D3D12_INDEX_BUFFER_VIEW ibv = indexBufferViewSprite_;
+	// インデックスバッファは使いまわしでOK（インデックス: 0,1,2, 0,2,3 など4頂点分用を用意）
+
+	commandList_->IASetVertexBuffers(0, 1, &vbv);
+	commandList_->IASetIndexBuffer(&ibv);
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// --- 6) ルートパラメータ & SRV バインド ---
+	// ヒープ、ルートパラメータ等をセット（すでにやってる場合は不要）
 	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_.Get()};
 	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
 
-	// --- 7) 描画 & オフセット進める ---
+	// 描画（1スプライト分）
 	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	currentSpriteVertexOffset_ += 6;
+
+	// 次のスプライト用にオフセットを進める
+	currentSpriteVertexOffset_ += 4; // 4頂点分進める
 }
 
 
@@ -1701,20 +1589,20 @@ GameBase::MaterialData GameBase::LoadMaterialTemplateFile(const std::string& dir
 
 
 // ファイル名からSRVヒープ内のテクスチャindexを返す（なければ追加ロード）
-int GameBase::LoadTexture(const std::string& fileName) {
-	for (size_t i = 0; i < textures_.size(); ++i) {
-		if (textures_[i].GetFilePath() == fileName) {
-			return static_cast<int>(i); // すでにロード済み
-		}
-	}
-	// 未ロードなら新しくロードしてpush_back
-	Texture tex;
-	tex.Initialize(device_.Get(), srvDescriptorHeap_.Get(), fileName, (uint32_t)textures_.size());
-	tex.SetFilePath(fileName); // Textureクラスにファイルパス保持用メンバ追加して
-	textures_.push_back(tex);
-	OutputDebugStringA(std::format("Texture loaded: {}, GPU Handle ptr={}\n", fileName, tex.GetGpuHandle().ptr).c_str());
-	return static_cast<int>(textures_.size() - 1);
-}
+//int GameBase::LoadTexture(const std::string& fileName) {
+//	for (size_t i = 0; i < textures_.size(); ++i) {
+//		if (textures_[i].GetFilePath() == fileName) {
+//			return static_cast<int>(i); // すでにロード済み
+//		}
+//	}
+//	// 未ロードなら新しくロードしてpush_back
+//	Texture tex;
+//	tex.Initialize(device_.Get(), srvDescriptorHeap_.Get(), fileName, (uint32_t)textures_.size());
+//	tex.SetFilePath(fileName); // Textureクラスにファイルパス保持用メンバ追加して
+//	textures_.push_back(tex);
+//	OutputDebugStringA(std::format("Texture loaded: {}, GPU Handle ptr={}\n", fileName, tex.GetGpuHandle().ptr).c_str());
+//	return static_cast<int>(textures_.size() - 1);
+//}
 SoundData GameBase::SoundLoadWave(const char* filename){
 
 	return audio.SoundLoadWave(filename);

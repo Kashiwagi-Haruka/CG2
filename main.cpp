@@ -1,6 +1,7 @@
 #include"GameBase.h"
 #include "ResourceObject.h"
 #include "DebugCamera.h"
+#include "WaterController.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -44,6 +45,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DebugCamera debugCamera;
 	debugCamera.Initialize();
 	Function function;
+	WaterController water;
+	water.Initialize();
+	int PrePressMouse = 0;
 	while (gameBase->IsMsgQuit()) {
 		
 		if (PeekMessage(gameBase->GetMsg(), NULL, 0, 0, PM_REMOVE)) {
@@ -82,23 +86,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-			gameBase->DrawSpriteSheet(position, texcoord, 0xffffffff);
-			
+			// 押し始め判定
+			    bool justPressed = (gameBase->IsMousePressed(0) && PrePressMouse == 0);
 
-			  // 4) マウス追従スプライト
-			const float half = 50.0f; // スプライトの半幅／半高（32x32 なら 16）
-			Vector3 followPos[4] = {
-			    {float(mx) - half, float(my) - half, 0.0f},
-			    {float(mx) + half, float(my) - half, 0.0f},
-			    {float(mx) + half, float(my) + half, 0.0f},
-			    {float(mx) - half, float(my) + half, 0.0f},
-			};
-			
-			
-				gameBase->DrawSpriteSheet(followPos, texcoord, 0xFFFFFFFF);
+			// チャージ処理
+			if (gameBase->IsMousePressed(0)) {
+				water.StartCharge({(float)mx, (float)my}, justPressed);
+			}
+			// 発射処理
+			if (!gameBase->IsMousePressed(0) && PrePressMouse == 1) {
+				water.Fire();
+			}
+
+			water.Update();
+			water.Draw(*gameBase);
+
+			//gameBase->DrawSpriteSheet(position, texcoord, 0xffffffff);
+			//gameBase->DrawSpriteSheet(position2, texcoord, 0xffffffff);
+
+			PrePressMouse = gameBase->IsMousePressed(0);
 		
 
-
+			/*gameBase->DrawSpriteSheet(position, texcoord, 0xffffffff);*/
 
 			//ゲームの処理
 
