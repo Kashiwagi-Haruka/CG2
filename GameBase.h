@@ -92,6 +92,7 @@ private:
 	// --- 頂点用 (Transform行列) のリソース追加 ---
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSphere;
 
@@ -121,6 +122,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 
+	// GameBase.h
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceMetaball_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceMetaball_;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewMetaball_;
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewMetaball_;
+
 
 	struct TransformationMatrix {
 		Matrix4x4 WVP;
@@ -137,7 +144,9 @@ private:
 
 	};
 
-	
+	// 例: 最大確保サイズ（初期化時に使った値を定数などで保持しておく）
+	const size_t kMaxVertexCount = 200000;    // 実際の最大確保頂点数
+	const size_t kMaxIndexCount = 200000 * 3; // 実際の最大確保インデックス数
 
 	Transform uvTransformSprite_{
 	    {1.0f, 1.0f, 1.0f},
@@ -244,6 +253,17 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	    {0.0f, 0.0f, 0.0f}  // translate
 	};
 
+	enum BlendMode{
+
+		kBlendModeNone = 0, // ブレンドなし
+		kBlendModeAlpha,    // アルファブレンド
+		kBlendModeAdd,      // 加算ブレンド
+		kBlendModeSub, // 減算ブレンド
+		kBlendModeMul,      // 乗算ブレンド
+		kBlendScreen,       // スクリーンブレンド
+		kCountOfBlendMode       // ブレンドモードの数.使用禁止
+	};
+
 	Transform GetCameraTransform() const{ return cameraTransform; };
 	// マウス入力関連
 	void InitializeMouse(HWND hwnd);
@@ -253,6 +273,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	LONG GetMouseX() const { return mouseX_; }
 	LONG GetMouseY() const { return mouseY_; }
 
+	void DrawMesh(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices, uint32_t color, int textureHandle = -1);
 
 private:
 

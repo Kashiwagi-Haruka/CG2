@@ -8,6 +8,7 @@ class Function {
 
 	public:
 	
+		Vector3 Normalize(const Vector3& v);
 
 	Matrix4x4 MakeRotateXMatrix(float radian);
 	Matrix4x4 MakeRotateYMatrix(float radian);
@@ -30,3 +31,8 @@ class Function {
 	Matrix4x4 Transpose(const Matrix4x4& m);
 	Matrix4x4 MakeIdentity();
 };
+
+Vector3 operator+(const Vector3& v1, const Vector3& v2);
+Vector3 operator-(const Vector3& v1, const Vector3& v2);
+Vector3 operator*(const Vector3& v, float scalar);
+inline float LengthSquared(const Vector3& v) { return v.x * v.x + v.y * v.y + v.z * v.z; }

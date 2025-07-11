@@ -47,7 +47,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Function function;
 	WaterController water;
 	water.Initialize();
-	int PrePressMouse = 0;
+	/*int PrePressMouse = 0;*/
 	while (gameBase->IsMsgQuit()) {
 		
 		if (PeekMessage(gameBase->GetMsg(), NULL, 0, 0, PM_REMOVE)) {
@@ -57,11 +57,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			gameBase->BeginFlame(keys,preKeys);
 			memcpy(preKeys, keys, 256);
-			LONG mx = gameBase->GetMouseX();
+		/*	LONG mx = gameBase->GetMouseX();
 			LONG my = gameBase->GetMouseY();
 			gameBase->Update();
-			gameBase->UpdateMouse();
+			gameBase->UpdateMouse();*/
 #pragma region 
+			
 				// DebugCamera の更新
 			debugCamera.Update((uint8_t*)keys, (uint8_t*)preKeys);
 
@@ -83,28 +84,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		
 			
-
+			water.Update();
 
 
 			// 押し始め判定
-			    bool justPressed = (gameBase->IsMousePressed(0) && PrePressMouse == 0);
+			    /*bool justPressed = (gameBase->IsMousePressed(0) && PrePressMouse == 0);*/
 
-			// チャージ処理
-			if (gameBase->IsMousePressed(0)) {
-				water.StartCharge({(float)mx, (float)my}, justPressed);
-			}
-			// 発射処理
-			if (!gameBase->IsMousePressed(0) && PrePressMouse == 1) {
-				water.Fire();
-			}
+			//// チャージ処理
+			//if (gameBase->IsMousePressed(0)) {
+			//	water.StartCharge({(float)mx, (float)my}, justPressed);
+			//}
+			//// 発射処理
+			//if (!gameBase->IsMousePressed(0) && PrePressMouse == 1) {
+			//	water.Fire();
+			//}
 
-			water.Update();
+			
 			water.Draw(*gameBase);
 
 			//gameBase->DrawSpriteSheet(position, texcoord, 0xffffffff);
 			//gameBase->DrawSpriteSheet(position2, texcoord, 0xffffffff);
 
-			PrePressMouse = gameBase->IsMousePressed(0);
+			/*PrePressMouse = gameBase->IsMousePressed(0);*/
 		
 
 			/*gameBase->DrawSpriteSheet(position, texcoord, 0xffffffff);*/

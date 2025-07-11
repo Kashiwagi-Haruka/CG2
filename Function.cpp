@@ -215,3 +215,13 @@ Matrix4x4 Function::Transpose(const Matrix4x4& m) {
 	return result;
 }
 Matrix4x4 Function::MakeIdentity() { return {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}; }
+Vector3 Function::Normalize(const Vector3& v) {
+	float len = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	if (len > 1e-6f)
+		return {v.x / len, v.y / len, v.z / len};
+	else
+		return {0.0f, 0.0f, 0.0f};
+}
+Vector3 operator+ (const Vector3& v1, const Vector3& v2) { return {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
+Vector3 operator-(const Vector3& v1, const Vector3& v2) {return {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};}
+Vector3 operator*(const Vector3& v, float scalar) { return {v.x * scalar, v.y * scalar, v.z * scalar}; }

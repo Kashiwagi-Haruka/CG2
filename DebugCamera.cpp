@@ -1,3 +1,5 @@
+#define NOMINMAX
+#include <algorithm>
 #include "DebugCamera.h"
 #include "DirectInput.h"
 #include "imGuiM.h"
@@ -24,14 +26,19 @@ void DebugCamera::Initialize() {
 void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
 	// ── ImGui でパラメータをいじれるように ──
 	ImGui::Begin("DebugCamera");
-	ImGui::SliderFloat3("Pivot", &pivot_.x, -100.0f, 100.0f);
-	ImGui::SliderFloat3("Offset", &translation_.x, -100.0f, 100.0f);
-	ImGui::SliderFloat3("Zoom (Scale)", &scale_.x, 0.1f, 10.0f);
+	ImGui::SliderFloat3("Offset", &translation_.x, -100.0f, 1000.0f);
+	ImGui::SliderFloat3("Pivot", &pivot_.x, 0.0f, 1000.0f);
 	ImGui::End();
 
-	// ── キー操作でフレーム毎の回転デルタを得る ──
-	const float rotSpeed = 0.02f; // rad/frame
-	float dPitch = 0, dYaw = 0,dZ=0;
+	const float rotSpeed = 0.02f;
+	float dPitch = 0, dYaw = 0, dZ = 0;
+
+	// キー入力処理...
+
+	
+
+
+
 	if (key[DIK_UP] & 0x80)
 		dPitch =-rotSpeed;
 	if (key[DIK_DOWN] & 0x80)
@@ -45,6 +52,7 @@ void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
 	if (key[DIK_END] & 0x80)
 		dZ = rotSpeed;
 
+
 	// ── 累積回転行列に今回フレーム分の回転を乗算 ──
 	Matrix4x4 matRotDelta = function.MakeIdentity();
 	matRotDelta = function.Multiply(matRotDelta,function.MakeRotateXMatrix(dPitch));
@@ -53,7 +61,7 @@ void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
 	matRot_ = function.Multiply(matRotDelta , matRot_); // ★資料「回転行列の累積」と同じ
 
 	// ── scale は GUI 値が大きいほどズームインにしたいので逆数を使う ──
-	Vector3 invScale = {1.0f / scale_.x, 1.0f / scale_.y, 1.0f / scale_.z};
+	Vector3 invScale = {scale_.x, scale_.y, scale_.z};
 
 	// ── 行列合成：Pivot→累積回転→Scale→Offset（Pivot→(R→S→T)）─
 	Matrix4x4 pivotMat = function.MakeTranslateMatrix(pivot_);

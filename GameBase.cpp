@@ -285,7 +285,7 @@ void GameBase::WindowClear() {
 	
 	
 
-	texture_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), "C:/Class/Program/DirectXGame/Resources/Water2.png", 1);
+	texture_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), "C:/Class/Program/DirectXGame/Resources/uvChecker.png", 1);
 	GPUHandle_ = texture_.GetGpuHandle();
 	texture2_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), /* "C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/monsterBall.png"*/ modelData.material.textureFilePath, 2);
 	OutputDebugStringA(("TexPath: " + modelData.material.textureFilePath + "\n").c_str());
@@ -756,7 +756,7 @@ void GameBase::PSO() {
 // BlendStateの設定（アルファブレンド有効化）
 	D3D12_BLEND_DESC blendDesc{};
 	auto& rtBlend = blendDesc.RenderTarget[0];
-	rtBlend.BlendEnable = TRUE;
+	rtBlend.BlendEnable = FALSE;
 	rtBlend.LogicOpEnable = FALSE;
 	rtBlend.SrcBlend = D3D12_BLEND_SRC_ALPHA;
 	rtBlend.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
@@ -768,8 +768,8 @@ void GameBase::PSO() {
 
 	// RasiterzerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	// 裏面（時計回り）を表示しない
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE; /*D3D12_CULL_MODE_BACK;*/
+	//裏面表示
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	// 三角形の中を塗りつぶす
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
@@ -1064,7 +1064,8 @@ void GameBase::CreateModelVertexBuffer() {
 
 	
 
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * modelData.vertices.size());
+	const int MaxVertexCount = 655360;
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * MaxVertexCount);
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
@@ -1332,15 +1333,7 @@ void GameBase::DrawCommandList() {
 	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress()); // VertexShader側
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 
-	/*ID3D12DescriptorHeap* descriptorHeaps[] = {srvDescriptorHeap_};
-	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
-	if (useMonsterBall_) {
-	
-	commandList_->SetGraphicsRootDescriptorTable(2,GPUHandle2_);
-	} else {
-	
-	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
-	}*/
+
 	Microsoft::WRL::ComPtr < ID3D12DescriptorHeap> descriptorHeaps[] = {srvDescriptorHeap_.Get()};
 	commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 	// 描画直前で確認
@@ -1351,14 +1344,14 @@ void GameBase::DrawCommandList() {
 	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle2_);
 
 
-	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	OutputDebugStringA(std::format("modelData.vertices.size() = {}\n", modelData.vertices.size()).c_str());
-	OutputDebugStringA(std::format("vertexBufferView_.SizeInBytes = {}\n", vertexBufferView_.SizeInBytes).c_str());
-	OutputDebugStringA(std::format("sizeof(VertexData) = {}\n", sizeof(VertexData)).c_str());
+	//// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
+	//commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	////OutputDebugStringA(std::format("modelData.vertices.size() = {}\n", modelData.vertices.size()).c_str());
+	////OutputDebugStringA(std::format("vertexBufferView_.SizeInBytes = {}\n", vertexBufferView_.SizeInBytes).c_str());
+	////OutputDebugStringA(std::format("sizeof(VertexData) = {}\n", sizeof(VertexData)).c_str());
 
-	// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	commandList_->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+	//// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
+	//commandList_->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 	
 	
 	//// --- 球体描画 ---（追加すべき！）
@@ -1495,6 +1488,50 @@ void GameBase::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color)
 	currentSpriteVertexOffset_ += 4; // 4頂点分進める
 }
 
+void GameBase::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle) {
+	// 1. マテリアル設定（色やテクスチャ）
+	Material* mat = nullptr;
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
+	mat->color = Vector4(((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, ((color >> 24) & 0xFF) / 255.0f);
+	mat->enableLighting = 1;
+	mat->uvTransform = function.MakeIdentity();
+	materialResource_->Unmap(0, nullptr);
+
+	// 2. トランスフォーム設定（スケールと位置に変換）
+	Matrix4x4 world = function.MakeAffineMatrix(
+	    {radius, radius, radius}, // スケール
+	    {0, 0, 0},                // 回転
+	    center                    // 移動
+	);
+
+	Matrix4x4 camera = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 view = function.Inverse(camera);
+	Matrix4x4 proj = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
+	Matrix4x4 wvp = function.Multiply(world, function.Multiply(view, proj));
+
+	// WVPとWorld行列をtransformResource_に書き込み
+	transformationMatrixData[0] = wvp;
+	transformationMatrixData[1] = world;
+
+	// 3. 頂点バッファ/インデックスバッファ設定
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// 4. テクスチャ
+
+	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+	
+
+	// 5. マテリアル
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	// 6. トランスフォーム
+	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
+	// 7. ライト
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+
+	// 8. 描画
+	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
+}
 
 
 
@@ -1659,3 +1696,71 @@ void GameBase::UpdateMouse() {
 bool GameBase::IsMouseDown(int btn) const { return (mouseState_.rgbButtons[btn] & 0x80u) != 0; }
 
 bool GameBase::IsMousePressed(int btn) const { return (mouseState_.rgbButtons[btn] & 0x80u) != 0 && !(prevMouseState_.rgbButtons[btn] & 0x80u); }
+
+void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices, uint32_t color, int textureHandle) {
+	//if (vertices.empty() || indices.empty())
+	//	return;
+
+vertexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices.size());
+	vertexBufferViewMetaball_.BufferLocation = vertexResourceMetaball_->GetGPUVirtualAddress();
+	vertexBufferViewMetaball_.SizeInBytes = sizeof(VertexData) * static_cast<UINT>(vertices.size());
+	vertexBufferViewMetaball_.StrideInBytes = sizeof(VertexData);
+
+	indexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * indices.size());
+	indexBufferViewMetaball_.BufferLocation = indexResourceMetaball_->GetGPUVirtualAddress();
+	indexBufferViewMetaball_.SizeInBytes = sizeof(uint32_t) * static_cast<UINT>(indices.size());
+	indexBufferViewMetaball_.Format = DXGI_FORMAT_R32_UINT;
+
+
+	OutputDebugStringA(std::format("vertexBufferView_.SizeInBytes={} useVertex={} 1vertex={} bytes\n", vertexBufferViewMetaball_.SizeInBytes, vertices.size(), sizeof(VertexData)).c_str());
+	assert(vertices.size() * sizeof(VertexData) <= vertexBufferViewMetaball_.SizeInBytes);
+
+	// バッファオーバーチェック
+	if (vertices.size() > kMaxVertexCount) {
+		OutputDebugStringA("DrawMesh: 頂点バッファサイズ超過！\n");
+		assert(false && "DrawMesh: 頂点バッファサイズ超過！");
+		return;
+	}
+	if (indices.size() > kMaxIndexCount) {
+		OutputDebugStringA("DrawMesh: インデックスバッファサイズ超過！\n");
+		assert(false && "DrawMesh: インデックスバッファサイズ超過！");
+		return;
+	}
+
+
+
+
+
+	// 転送
+	{
+		VertexData* vtxData = nullptr;
+		vertexResourceMetaball_->Map(0, nullptr, reinterpret_cast<void**>(&vtxData));
+		memcpy(vtxData, vertices.data(), sizeof(VertexData) * vertices.size());
+		vertexResourceMetaball_->Unmap(0, nullptr);
+	}
+	{
+		uint32_t* idxData = nullptr;
+		indexResourceMetaball_->Map(0, nullptr, reinterpret_cast<void**>(&idxData));
+		memcpy(idxData, indices.data(), sizeof(uint32_t) * indices.size());
+		indexResourceMetaball_->Unmap(0, nullptr);
+	}
+
+
+	// 描画時
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewMetaball_);
+	commandList_->IASetIndexBuffer(&indexBufferViewMetaball_);
+
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// シェーダやテクスチャは各自合わせてください
+	// マテリアルや行列リソースなどセット
+	// ここはDrawTriangleやDrawSphereの実装と同じでOK
+	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_.Get()};
+	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
+
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_); // ここは用途に合わせて
+
+	commandList_->DrawIndexedInstanced(static_cast<UINT>(indices.size()), 1, 0, 0, 0);
+}

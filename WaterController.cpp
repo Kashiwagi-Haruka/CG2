@@ -1,12 +1,312 @@
 #define NOMINMAX
+#include <algorithm>
+#include <map>
 #include "WaterController.h"
 #include <cmath>
 #include <string>
 #include "Vector2.h"
 #include "Vector3.h"
 #include "imGuiM.h"
+#include "format"
+#include "windows.h"
 
-// スクリーン投影
+const int edgeTable[256] = {
+    0x0,0x109,0x203,0x30a,0x406,0x50f,0x605,0x70c,0x80c,0x905,0xa0f,0xb06,0xc0a,0xd03,0xe09,0xf00, 0x190,0x99,0x393,0x29a,0x596,0x49f,0x795,0x69c, 0x99c,0x895,0xb9f,0xa96,0xd9a,0xc93,0xf99,0xe90, 0x230,0x339,0x33,0x13a,0x636,0x73f,0x435,0x53c, 0xa3c,0xb35,0x83f,0x936,0xe3a,0xf33,0xc39,0xd30, 0x3a0,
+    0x2a9,
+    0x1a3,
+    0xaa,
+    0x7a6,
+    0x6af,
+    0x5a5,
+    0x4ac,
+    0xbac,0xaa5,0x9af,0x8a6,0xfaa,0xea3,0xda9,0xca0, 0x460,0x569,0x663,0x76a,0x66,0x16f,0x265,0x36c, 0xc6c,0xd65,0xe6f,0xf66,0x86a,0x963,0xa69,0xb60, 0x5f0,0x4f9,0x7f3,0x6fa,0x1f6,0xff,0x3f5,0x2fc,0xdfc,0xcf5,0xfff,0xef6,0x9fa,0x8f3,0xbf9,0xaf0, 0x650,
+    0x759,
+    0x453,
+    0x55a,
+    0x256,
+    0x35f,
+    0x55,
+    0x15c,
+    0xe5c,0xf55,0xc5f,0xd56,0xa5a,0xb53,0x859,0x950, 0x7c0,
+    0x6c9,
+    0x5c3,
+    0x4ca,
+    0x3c6,
+    0x2cf,
+    0x1c5,
+    0xcc,
+    0xfcc,0xec5,0xdcf,0xcc6,0xbca,0xac3,0x9c9,0x8c0, 0x8c0,0x9c9,0xac3,0xbca,0xcc6,0xdcf,0xec5,0xfcc, 0xcc,0x1c5,0x2cf,0x3c6,0x4ca,0x5c3,0x6c9,0x7c0, 0x950,0x859,0xb53,0xa5a,0xd56,0xc5f,0xf55,0xe5c, 0x15c,0x55,0x35f,0x256,0x55a,0x453,0x759,0x650, 0xaf0,0xbf9,0x8f3,0x9fa,0xef6,0xfff,0xcf5,0xdfc, 0x2fc,0x3f5,0xff,0x1f6,0x6fa,0x7f3,0x4f9,0x5f0, 0xb60,0xa69,0x963,0x86a,0xf66,0xe6f,0xd65,0xc6c, 0x36c,0x265,0x16f,0x66,0x76a,0x663,0x569,0x460, 0xca0,
+    0xda9,
+    0xea3,
+    0xfaa,
+    0x8a6,
+    0x9af,
+    0xaa5,
+    0xbac,
+    0x4ac,0x5a5,0x6af,0x7a6,0xaa,0x1a3,0x2a9,0x3a0, 0xd30,0xc39,0xf33,0xe3a,0x936,0x83f,0xb35,0xa3c, 
+    0x53c,0x435,0x73f,0x636,0x13a,0x33,0x339,0x230, 0xe90,0xf99,0xc93,0xd9a,0xa96,0xb9f,0x895,0x99c, 0x69c,0x795,0x49f,0x596,0x29a,0x393,0x99,0x190, 0xf00,0xe09,0xd03,0xc0a,0xb06,0xa0f,0x905,0x80c, 0x70c,0x605,0x50f,0x406,0x30a,0x203,0x109,0x0};
+const int triTable[256][16] = {
+    {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  8,  3,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  1,  9,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {1,  8,  3,  9,  8,  1,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {1,  2,  10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  8,  3,  1,  2,  10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {9,  2,  10, 0,  2,  9,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {2,  8,  3,  2,  10, 8,  10, 9,  8,  -1, -1, -1, -1, -1, -1, -1},
+    {3,  11, 2,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  11, 2,  8,  11, 0,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {1,  9,  0,  2,  3,  11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {1,  11, 2,  1,  9,  11, 9,  8,  11, -1, -1, -1, -1, -1, -1, -1},
+    {3,  10, 1,  11, 10, 3,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  10, 1,  0,  8,  10, 8,  11, 10, -1, -1, -1, -1, -1, -1, -1},
+    {3,  9,  0,  3,  11, 9,  11, 10, 9,  -1, -1, -1, -1, -1, -1, -1},
+    {9,  8,  10, 10, 8,  11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {4,  7,  8,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {4,  3,  0,  7,  3,  4,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  1,  9,  8,  4,  7,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {4,  1,  9,  4,  7,  1,  7,  3,  1,  -1, -1, -1, -1, -1, -1, -1},
+    {1,  2,  10, 8,  4,  7,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {3,  4,  7,  3,  0,  4,  1,  2,  10, -1, -1, -1, -1, -1, -1, -1},
+    {9,  2,  10, 9,  0,  2,  8,  4,  7,  -1, -1, -1, -1, -1, -1, -1},
+    {2,  10, 9,  2,  9,  7,  2,  7,  3,  7,  9,  4,  -1, -1, -1, -1},
+    {8,  4,  7,  3,  11, 2,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {11, 4,  7,  11, 2,  4,  2,  0,  4,  -1, -1, -1, -1, -1, -1, -1},
+    {9,  0,  1,  8,  4,  7,  2,  3,  11, -1, -1, -1, -1, -1, -1, -1},
+    {4,  7,  11, 9,  4,  11, 9,  11, 2,  9,  2,  1,  -1, -1, -1, -1},
+    {3,  10, 1,  3,  11, 10, 7,  8,  4,  -1, -1, -1, -1, -1, -1, -1},
+    {1,  11, 10, 1,  4,  11, 1,  0,  4,  7,  11, 4,  -1, -1, -1, -1},
+    {4,  7,  8,  9,  0,  11, 9,  11, 10, 11, 0,  3,  -1, -1, -1, -1},
+    {4,  7,  11, 4,  11, 9,  9,  11, 10, -1, -1, -1, -1, -1, -1, -1},
+    {9,  5,  4,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {9,  5,  4,  0,  8,  3,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  5,  4,  1,  5,  0,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {8,  5,  4,  8,  3,  5,  3,  1,  5,  -1, -1, -1, -1, -1, -1, -1},
+    {1,  2,  10, 9,  5,  4,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {3,  0,  8,  1,  2,  10, 4,  9,  5,  -1, -1, -1, -1, -1, -1, -1},
+    {5,  2,  10, 5,  4,  2,  4,  0,  2,  -1, -1, -1, -1, -1, -1, -1},
+    {2,  10, 5,  3,  2,  5,  3,  5,  4,  3,  4,  8,  -1, -1, -1, -1},
+    {9,  5,  4,  2,  3,  11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  11, 2,  0,  8,  11, 4,  9,  5,  -1, -1, -1, -1, -1, -1, -1},
+    {0,  5,  4,  0,  1,  5,  2,  3,  11, -1, -1, -1, -1, -1, -1, -1},
+    {2,  1,  5,  2,  5,  8,  2,  8,  11, 4,  8,  5,  -1, -1, -1, -1},
+    {10, 3,  11, 10, 1,  3,  9,  5,  4,  -1, -1, -1, -1, -1, -1, -1},
+    {4,  9,  5,  0,  8,  1,  8,  10, 1,  8,  11, 10, -1, -1, -1, -1},
+    {5,  4,  0,  5,  0,  11, 5,  11, 10, 11, 0,  3,  -1, -1, -1, -1},
+    {5,  4,  8,  5,  8,  10, 10, 8,  11, -1, -1, -1, -1, -1, -1, -1},
+    {9,  7,  8,  5,  7,  9,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {9,  3,  0,  9,  5,  3,  5,  7,  3,  -1, -1, -1, -1, -1, -1, -1},
+    {0,  7,  8,  0,  1,  7,  1,  5,  7,  -1, -1, -1, -1, -1, -1, -1},
+    {1,  5,  3,  3,  5,  7,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {9,  7,  8,  9,  5,  7,  10, 1,  2,  -1, -1, -1, -1, -1, -1, -1},
+    {10, 1,  2,  9,  5,  0,  5,  3,  0,  5,  7,  3,  -1, -1, -1, -1},
+    {8,  0,  2,  8,  2,  5,  8,  5,  7,  10, 5,  2,  -1, -1, -1, -1},
+    {2,  10, 5,  2,  5,  3,  3,  5,  7,  -1, -1, -1, -1, -1, -1, -1},
+    {7,  9,  5,  7,  8,  9,  3,  11, 2,  -1, -1, -1, -1, -1, -1, -1},
+    {9,  5,  7,  9,  7,  2,  9,  2,  0,  2,  7,  11, -1, -1, -1, -1},
+    {2,  3,  11, 0,  1,  8,  1,  7,  8,  1,  5,  7,  -1, -1, -1, -1},
+    {11, 2,  1,  11, 1,  7,  7,  1,  5,  -1, -1, -1, -1, -1, -1, -1},
+    {9,  5,  8,  8,  5,  7,  10, 1,  3,  10, 3,  11, -1, -1, -1, -1},
+    {5,  7,  0,  5,  0,  9,  7,  11, 0,  1,  0,  10, 11, 10, 0,  -1},
+    {11, 10, 0,  11, 0,  3,  10, 5,  0,  8,  0,  7,  5,  7,  0,  -1},
+    {11, 10, 5,  7,  11, 5,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {10, 6,  5,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  8,  3,  5,  10, 6,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {9,  0,  1,  5,  10, 6,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {1,  8,  3,  1,  9,  8,  5,  10, 6,  -1, -1, -1, -1, -1, -1, -1},
+    {1,  6,  5,  2,  6,  1,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {1,  6,  5,  1,  2,  6,  3,  0,  8,  -1, -1, -1, -1, -1, -1, -1},
+    {9,  6,  5,  9,  0,  6,  0,  2,  6,  -1, -1, -1, -1, -1, -1, -1},
+    {5,  9,  8,  5,  8,  2,  5,  2,  6,  3,  2,  8,  -1, -1, -1, -1},
+    {2,  3,  11, 10, 6,  5,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {11, 0,  8,  11, 2,  0,  10, 6,  5,  -1, -1, -1, -1, -1, -1, -1},
+    {0,  1,  9,  2,  3,  11, 5,  10, 6,  -1, -1, -1, -1, -1, -1, -1},
+    {5,  10, 6,  1,  9,  2,  9,  11, 2,  9,  8,  11, -1, -1, -1, -1},
+    {6,  3,  11, 6,  5,  3,  5,  1,  3,  -1, -1, -1, -1, -1, -1, -1},
+    {0,  8,  11, 0,  11, 5,  0,  5,  1,  5,  11, 6,  -1, -1, -1, -1},
+    {3,  11, 6,  3,  6,  0,  0,  6,  5,  0,  5,  9,  -1, -1, -1, -1},
+    {6,  5,  9,  6,  9,  11, 11, 9,  8,  -1, -1, -1, -1, -1, -1, -1},
+    {5,  10, 6,  4,  7,  8,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {4,  3,  0,  4,  7,  3,  6,  5,  10, -1, -1, -1, -1, -1, -1, -1},
+    {1,  9,  0,  5,  10, 6,  8,  4,  7,  -1, -1, -1, -1, -1, -1, -1},
+    {10, 6,  5,  1,  9,  7,  1,  7,  3,  7,  9,  4,  -1, -1, -1, -1},
+    {6,  1,  2,  6,  5,  1,  4,  7,  8,  -1, -1, -1, -1, -1, -1, -1},
+    {1,  2,  5,  5,  2,  6,  3,  0,  4,  3,  4,  7,  -1, -1, -1, -1},
+    {8,  4,  7,  9,  0,  5,  0,  6,  5,  0,  2,  6,  -1, -1, -1, -1},
+    {7,  3,  9,  7,  9,  4,  3,  2,  9,  5,  9,  6,  2,  6,  9,  -1},
+    {3,  11, 2,  7,  8,  4,  10, 6,  5,  -1, -1, -1, -1, -1, -1, -1},
+    {5,  10, 6,  4,  7,  2,  4,  2,  0,  2,  7,  11, -1, -1, -1, -1},
+    {0,  1,  9,  4,  7,  8,  2,  3,  11, 5,  10, 6,  -1, -1, -1, -1},
+    {9,  2,  1,  9,  11, 2,  9,  4,  11, 7,  11, 4,  5,  10, 6,  -1},
+    {8,  4,  7,  3,  11, 5,  3,  5,  1,  5,  11, 6,  -1, -1, -1, -1},
+    {5,  1,  11, 5,  11, 6,  1,  0,  11, 7,  11, 4,  0,  4,  11, -1},
+    {0,  5,  9,  0,  6,  5,  0,  3,  6,  11, 6,  3,  8,  4,  7,  -1},
+    {6,  5,  9,  6,  9,  11, 4,  7,  9,  7,  11, 9,  -1, -1, -1, -1},
+    {10, 4,  9,  6,  4,  10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {4,  10, 6,  4,  9,  10, 0,  8,  3,  -1, -1, -1, -1, -1, -1, -1},
+    {10, 0,  1,  10, 6,  0,  6,  4,  0,  -1, -1, -1, -1, -1, -1, -1},
+    {8,  3,  1,  8,  1,  6,  8,  6,  4,  6,  1,  10, -1, -1, -1, -1},
+    {1,  4,  9,  1,  2,  4,  2,  6,  4,  -1, -1, -1, -1, -1, -1, -1},
+    {3,  0,  8,  1,  2,  9,  2,  4,  9,  2,  6,  4,  -1, -1, -1, -1},
+    {0,  2,  4,  4,  2,  6,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {8,  3,  2,  8,  2,  4,  4,  2,  6,  -1, -1, -1, -1, -1, -1, -1},
+    {10, 4,  9,  10, 6,  4,  11, 2,  3,  -1, -1, -1, -1, -1, -1, -1},
+    {0,  8,  2,  2,  8,  11, 4,  9,  10, 4,  10, 6,  -1, -1, -1, -1},
+    {3,  11, 2,  0,  1,  6,  0,  6,  4,  6,  1,  10, -1, -1, -1, -1},
+    {6,  4,  1,  6,  1,  10, 4,  8,  1,  2,  1,  11, 8,  11, 1,  -1},
+    {9,  6,  4,  9,  3,  6,  9,  1,  3,  11, 6,  3,  -1, -1, -1, -1},
+    {8,  11, 1,  8,  1,  0,  11, 6,  1,  9,  1,  4,  6,  4,  1,  -1},
+    {3,  11, 6,  3,  6,  0,  0,  6,  4,  -1, -1, -1, -1, -1, -1, -1},
+    {6,  4,  8,  11, 6,  8,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {7,  10, 6,  7,  8,  10, 8,  9,  10, -1, -1, -1, -1, -1, -1, -1},
+    {0,  7,  3,  0,  10, 7,  0,  9,  10, 6,  7,  10, -1, -1, -1, -1},
+    {10, 6,  7,  1,  10, 7,  1,  7,  8,  1,  8,  0,  -1, -1, -1, -1},
+    {10, 6,  7,  10, 7,  1,  1,  7,  3,  -1, -1, -1, -1, -1, -1, -1},
+    {1,  2,  6,  1,  6,  8,  1,  8,  9,  8,  6,  7,  -1, -1, -1, -1},
+    {2,  6,  9,  2,  9,  1,  6,  7,  9,  0,  9,  3,  7,  3,  9,  -1},
+    {7,  8,  0,  7,  0,  6,  6,  0,  2,  -1, -1, -1, -1, -1, -1, -1},
+    {7,  3,  2,  6,  7,  2,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {2,  3,  11, 10, 6,  8,  10, 8,  9,  8,  6,  7,  -1, -1, -1, -1},
+    {2,  0,  7,  2,  7,  11, 0,  9,  7,  6,  7,  10, 9,  10, 7,  -1},
+    {1,  8,  0,  1,  7,  8,  1,  10, 7,  6,  7,  10, 2,  3,  11, -1},
+    {11, 2,  1,  11, 1,  7,  10, 6,  1,  6,  7,  1,  -1, -1, -1, -1},
+    {8,  9,  6,  8,  6,  7,  9,  1,  6,  11, 6,  3,  1,  3,  6,  -1},
+    {0,  9,  1,  11, 6,  7,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {7,  8,  0,  7,  0,  6,  3,  11, 0,  11, 6,  0,  -1, -1, -1, -1},
+    {7,  11, 6,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {7,  6,  11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {3,  0,  8,  11, 7,  6,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  1,  9,  11, 7,  6,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {8,  1,  9,  8,  3,  1,  11, 7,  6,  -1, -1, -1, -1, -1, -1, -1},
+    {10, 1,  2,  6,  11, 7,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {1,  2,  10, 3,  0,  8,  6,  11, 7,  -1, -1, -1, -1, -1, -1, -1},
+    {2,  9,  0,  2,  10, 9,  6,  11, 7,  -1, -1, -1, -1, -1, -1, -1},
+    {6,  11, 7,  2,  10, 3,  10, 8,  3,  10, 9,  8,  -1, -1, -1, -1},
+    {7,  2,  3,  6,  2,  7,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {7,  0,  8,  7,  6,  0,  6,  2,  0,  -1, -1, -1, -1, -1, -1, -1},
+    {2,  7,  6,  2,  3,  7,  0,  1,  9,  -1, -1, -1, -1, -1, -1, -1},
+    {1,  6,  2,  1,  8,  6,  1,  9,  8,  8,  7,  6,  -1, -1, -1, -1},
+    {10, 7,  6,  10, 1,  7,  1,  3,  7,  -1, -1, -1, -1, -1, -1, -1},
+    {10, 7,  6,  1,  7,  10, 1,  8,  7,  1,  0,  8,  -1, -1, -1, -1},
+    {0,  3,  7,  0,  7,  10, 0,  10, 9,  6,  10, 7,  -1, -1, -1, -1},
+    {7,  6,  10, 7,  10, 8,  8,  10, 9,  -1, -1, -1, -1, -1, -1, -1},
+    {6,  8,  4,  11, 8,  6,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {3,  6,  11, 3,  0,  6,  0,  4,  6,  -1, -1, -1, -1, -1, -1, -1},
+    {8,  6,  11, 8,  4,  6,  9,  0,  1,  -1, -1, -1, -1, -1, -1, -1},
+    {9,  4,  6,  9,  6,  3,  9,  3,  1,  11, 3,  6,  -1, -1, -1, -1},
+    {6,  8,  4,  6,  11, 8,  2,  10, 1,  -1, -1, -1, -1, -1, -1, -1},
+    {1,  2,  10, 3,  0,  11, 0,  6,  11, 0,  4,  6,  -1, -1, -1, -1},
+    {4,  11, 8,  4,  6,  11, 0,  2,  9,  2,  10, 9,  -1, -1, -1, -1},
+    {10, 9,  3,  10, 3,  2,  9,  4,  3,  11, 3,  6,  4,  6,  3,  -1},
+    {8,  2,  3,  8,  4,  2,  4,  6,  2,  -1, -1, -1, -1, -1, -1, -1},
+    {0,  4,  2,  4,  6,  2,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {1,  9,  0,  2,  3,  4,  2,  4,  6,  4,  3,  8,  -1, -1, -1, -1},
+    {1,  9,  4,  1,  4,  2,  2,  4,  6,  -1, -1, -1, -1, -1, -1, -1},
+    {8,  1,  3,  8,  6,  1,  8,  4,  6,  6,  10, 1,  -1, -1, -1, -1},
+    {10, 1,  0,  10, 0,  6,  6,  0,  4,  -1, -1, -1, -1, -1, -1, -1},
+    {4,  6,  3,  4,  3,  8,  6,  10, 3,  0,  3,  9,  10, 9,  3,  -1},
+    {10, 9,  4,  6,  10, 4,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {4,  9,  5,  7,  6,  11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  8,  3,  4,  9,  5,  11, 7,  6,  -1, -1, -1, -1, -1, -1, -1},
+    {5,  0,  1,  5,  4,  0,  7,  6,  11, -1, -1, -1, -1, -1, -1, -1},
+    {11, 7,  6,  8,  3,  4,  3,  5,  4,  3,  1,  5,  -1, -1, -1, -1},
+    {9,  5,  4,  10, 1,  2,  7,  6,  11, -1, -1, -1, -1, -1, -1, -1},
+    {6,  11, 7,  1,  2,  10, 0,  8,  3,  4,  9,  5,  -1, -1, -1, -1},
+    {7,  6,  11, 5,  4,  10, 4,  2,  10, 4,  0,  2,  -1, -1, -1, -1},
+    {3,  4,  8,  3,  5,  4,  3,  2,  5,  10, 5,  2,  11, 7,  6,  -1},
+    {7,  2,  3,  7,  6,  2,  5,  4,  9,  -1, -1, -1, -1, -1, -1, -1},
+    {9,  5,  4,  0,  8,  6,  0,  6,  2,  6,  8,  7,  -1, -1, -1, -1},
+    {3,  6,  2,  3,  7,  6,  1,  5,  0,  5,  4,  0,  -1, -1, -1, -1},
+    {6,  2,  8,  6,  8,  7,  2,  1,  8,  4,  8,  5,  1,  5,  8,  -1},
+    {9,  5,  4,  10, 1,  6,  1,  7,  6,  1,  3,  7,  -1, -1, -1, -1},
+    {1,  6,  10, 1,  7,  6,  1,  0,  7,  8,  7,  0,  9,  5,  4,  -1},
+    {4,  0,  10, 4,  10, 5,  0,  3,  10, 6,  10, 7,  3,  7,  10, -1},
+    {7,  6,  10, 7,  10, 8,  5,  4,  10, 4,  8,  10, -1, -1, -1, -1},
+    {6,  9,  5,  6,  11, 9,  11, 8,  9,  -1, -1, -1, -1, -1, -1, -1},
+    {3,  6,  11, 0,  6,  3,  0,  5,  6,  0,  9,  5,  -1, -1, -1, -1},
+    {0,  11, 8,  0,  5,  11, 0,  1,  5,  5,  6,  11, -1, -1, -1, -1},
+    {6,  11, 3,  6,  3,  5,  5,  3,  1,  -1, -1, -1, -1, -1, -1, -1},
+    {1,  2,  10, 9,  5,  11, 9,  11, 8,  11, 5,  6,  -1, -1, -1, -1},
+    {0,  11, 3,  0,  6,  11, 0,  9,  6,  5,  6,  9,  1,  2,  10, -1},
+    {11, 8,  5,  11, 5,  6,  8,  0,  5,  10, 5,  2,  0,  2,  5,  -1},
+    {6,  11, 3,  6,  3,  5,  2,  10, 3,  10, 5,  3,  -1, -1, -1, -1},
+    {5,  8,  9,  5,  2,  8,  5,  6,  2,  3,  8,  2,  -1, -1, -1, -1},
+    {9,  5,  6,  9,  6,  0,  0,  6,  2,  -1, -1, -1, -1, -1, -1, -1},
+    {1,  5,  8,  1,  8,  0,  5,  6,  8,  3,  8,  2,  6,  2,  8,  -1},
+    {1,  5,  6,  2,  1,  6,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {1,  3,  6,  1,  6,  10, 3,  8,  6,  5,  6,  9,  8,  9,  6,  -1},
+    {10, 1,  0,  10, 0,  6,  9,  5,  0,  5,  6,  0,  -1, -1, -1, -1},
+    {0,  3,  8,  5,  6,  10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {10, 5,  6,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {11, 5,  10, 7,  5,  11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {11, 5,  10, 11, 7,  5,  8,  3,  0,  -1, -1, -1, -1, -1, -1, -1},
+    {5,  11, 7,  5,  10, 11, 1,  9,  0,  -1, -1, -1, -1, -1, -1, -1},
+    {10, 7,  5,  10, 11, 7,  9,  8,  1,  8,  3,  1,  -1, -1, -1, -1},
+    {11, 1,  2,  11, 7,  1,  7,  5,  1,  -1, -1, -1, -1, -1, -1, -1},
+    {0,  8,  3,  1,  2,  7,  1,  7,  5,  7,  2,  11, -1, -1, -1, -1},
+    {9,  7,  5,  9,  2,  7,  9,  0,  2,  2,  11, 7,  -1, -1, -1, -1},
+    {7,  5,  2,  7,  2,  11, 5,  9,  2,  3,  2,  8,  9,  8,  2,  -1},
+    {2,  5,  10, 2,  3,  5,  3,  7,  5,  -1, -1, -1, -1, -1, -1, -1},
+    {8,  2,  0,  8,  5,  2,  8,  7,  5,  10, 2,  5,  -1, -1, -1, -1},
+    {9,  0,  1,  5,  10, 3,  5,  3,  7,  3,  10, 2,  -1, -1, -1, -1},
+    {9,  8,  2,  9,  2,  1,  8,  7,  2,  10, 2,  5,  7,  5,  2,  -1},
+    {1,  3,  5,  3,  7,  5,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  8,  7,  0,  7,  1,  1,  7,  5,  -1, -1, -1, -1, -1, -1, -1},
+    {9,  0,  3,  9,  3,  5,  5,  3,  7,  -1, -1, -1, -1, -1, -1, -1},
+    {9,  8,  7,  5,  9,  7,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {5,  8,  4,  5,  10, 8,  10, 11, 8,  -1, -1, -1, -1, -1, -1, -1},
+    {5,  0,  4,  5,  11, 0,  5,  10, 11, 11, 3,  0,  -1, -1, -1, -1},
+    {0,  1,  9,  8,  4,  10, 8,  10, 11, 10, 4,  5,  -1, -1, -1, -1},
+    {10, 11, 4,  10, 4,  5,  11, 3,  4,  9,  4,  1,  3,  1,  4,  -1},
+    {2,  5,  1,  2,  8,  5,  2,  11, 8,  4,  5,  8,  -1, -1, -1, -1},
+    {0,  4,  11, 0,  11, 3,  4,  5,  11, 2,  11, 1,  5,  1,  11, -1},
+    {0,  2,  5,  0,  5,  9,  2,  11, 5,  4,  5,  8,  11, 8,  5,  -1},
+    {9,  4,  5,  2,  11, 3,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {2,  5,  10, 3,  5,  2,  3,  4,  5,  3,  8,  4,  -1, -1, -1, -1},
+    {5,  10, 2,  5,  2,  4,  4,  2,  0,  -1, -1, -1, -1, -1, -1, -1},
+    {3,  10, 2,  3,  5,  10, 3,  8,  5,  4,  5,  8,  0,  1,  9,  -1},
+    {5,  10, 2,  5,  2,  4,  1,  9,  2,  9,  4,  2,  -1, -1, -1, -1},
+    {8,  4,  5,  8,  5,  3,  3,  5,  1,  -1, -1, -1, -1, -1, -1, -1},
+    {0,  4,  5,  1,  0,  5,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {8,  4,  5,  8,  5,  3,  9,  0,  5,  0,  3,  5,  -1, -1, -1, -1},
+    {9,  4,  5,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {4,  11, 7,  4,  9,  11, 9,  10, 11, -1, -1, -1, -1, -1, -1, -1},
+    {0,  8,  3,  4,  9,  7,  9,  11, 7,  9,  10, 11, -1, -1, -1, -1},
+    {1,  10, 11, 1,  11, 4,  1,  4,  0,  7,  4,  11, -1, -1, -1, -1},
+    {3,  1,  4,  3,  4,  8,  1,  10, 4,  7,  4,  11, 10, 11, 4,  -1},
+    {4,  11, 7,  9,  11, 4,  9,  2,  11, 9,  1,  2,  -1, -1, -1, -1},
+    {9,  7,  4,  9,  11, 7,  9,  1,  11, 2,  11, 1,  0,  8,  3,  -1},
+    {11, 7,  4,  11, 4,  2,  2,  4,  0,  -1, -1, -1, -1, -1, -1, -1},
+    {11, 7,  4,  11, 4,  2,  8,  3,  4,  3,  2,  4,  -1, -1, -1, -1},
+    {2,  9,  10, 2,  7,  9,  2,  3,  7,  7,  4,  9,  -1, -1, -1, -1},
+    {9,  10, 7,  9,  7,  4,  10, 2,  7,  8,  7,  0,  2,  0,  7,  -1},
+    {3,  7,  10, 3,  10, 2,  7,  4,  10, 1,  10, 0,  4,  0,  10, -1},
+    {1,  10, 2,  8,  7,  4,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {4,  9,  1,  4,  1,  7,  7,  1,  3,  -1, -1, -1, -1, -1, -1, -1},
+    {4,  9,  1,  4,  1,  7,  0,  8,  1,  8,  7,  1,  -1, -1, -1, -1},
+    {4,  0,  3,  7,  4,  3,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {4,  8,  7,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {9,  10, 8,  10, 11, 8,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {3,  0,  9,  3,  9,  11, 11, 9,  10, -1, -1, -1, -1, -1, -1, -1},
+    {0,  1,  10, 0,  10, 8,  8,  10, 11, -1, -1, -1, -1, -1, -1, -1},
+    {3,  1,  10, 11, 3,  10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {1,  2,  11, 1,  11, 9,  9,  11, 8,  -1, -1, -1, -1, -1, -1, -1},
+    {3,  0,  9,  3,  9,  11, 1,  2,  9,  2,  11, 9,  -1, -1, -1, -1},
+    {0,  2,  11, 8,  0,  11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {3,  2,  11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {2,  3,  8,  2,  8,  10, 10, 8,  9,  -1, -1, -1, -1, -1, -1, -1},
+    {9,  10, 2,  0,  9,  2,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {2,  3,  8,  2,  8,  10, 0,  1,  8,  1,  10, 8,  -1, -1, -1, -1},
+    {1,  10, 2,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {1,  3,  8,  9,  1,  8,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  9,  1,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {0,  3,  8,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+    {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+const int altTriTable[256][16]{};
+
+
+    // スクリーン投影
 Vector2 WaterController::ProjectToScreen(const Vector3& w, const Vector3& cam, const Vector3& tgt) {
 	// カメラ座標変換
 	Vector3 fwd = {tgt.x - cam.x, tgt.y - cam.y, tgt.z - cam.z};
@@ -39,10 +339,12 @@ void WaterController::Initialize() {
 	isCharging_ = false;
 	isFired_ = false;
 
-	camDistance_ = 800.0f;
-	camAzimuth_ = 0.0f;
-	camElevation_ = 0.2f;
+// 例：WaterControllerのカメラ初期化やDraw内
 	camTarget_ = {0.0f, 0.0f, 0.0f};
+	camDistance_ = 400.0f;
+	camElevation_ = 0.0f;
+	camAzimuth_ = 0.0f;
+
 	// 格子初期化
 	gridPoints3D_.resize(kRowCount + 1);
 	for (int i = 0; i <= kRowCount; ++i) {
@@ -50,237 +352,237 @@ void WaterController::Initialize() {
 	}
 }
 
-void WaterController::StartCharge(const Vector2& mousePos, bool justPressed) {
-	if (justPressed) {
+
+const int edgeToVertex[12][2] = {
+    {0, 1},
+    {1, 2},
+    {2, 3},
+    {3, 0}, // x-y面下
+    {4, 5},
+    {5, 6},
+    {6, 7},
+    {7, 4}, // x-y面上
+    {0, 4},
+    {1, 5},
+    {2, 6},
+    {3, 7}  // z方向
+};
+
+// エッジがどの格子点座標・どの向きか（0=x, 1=y, 2=z）を決定
+struct EdgeInfo {
+	int base[3]; // x, y, z
+	int dir;     // 0:x, 1:y, 2:z
+};
+
+const EdgeInfo edgeInfoTable[12] = {
+    {{0, 0, 0}, 0},
+    {{1, 0, 0}, 1},
+    {{1, 1, 0}, 0},
+    {{0, 1, 0}, 1},
+    {{0, 0, 1}, 0},
+    {{1, 0, 1}, 1},
+    {{1, 1, 1}, 0},
+    {{0, 1, 1}, 1},
+    {{0, 0, 0}, 2},
+    {{1, 0, 0}, 2},
+    {{1, 1, 0}, 2},
+    {{0, 1, 0}, 2}
+};
+void WaterController::DrawMetaballImGui() {
+
+	ImGui::Begin("Metaball Control");
+	ImGui::SliderFloat("Connect Threshold", &metaBallConnectThreshold, 10.0f, 100.0f);
+	for (size_t i = 0; i < balls.size(); ++i) {
+		ImGui::PushID((int)i);
+		ImGui::SliderFloat3("Position", &balls[i].pos.x, -100.0f, 100, "%.1f");
+		ImGui::SliderFloat("Radius", &balls[i].radius, 1.0f, 20.0f, "%.1f");
+		ImGui::PopID();
 	}
-	mousePos_ = mousePos;
-	isCharging_ = true;
-	isFired_ = false;
-	// マウスで環の中心を動かす
-	camTarget_.x = mousePos.x - 640.0f;
-	camTarget_.z = mousePos.y - 360.0f;
-}
-
-void WaterController::Update() {}
-
-void WaterController::Fire() {
-	isFired_ = true;
-	isCharging_ = false;
-}
-// Catmull-Rom補間（0<=t<=1、4点 p0-p1-p2-p3 からp1-p2間をなめらかに補間）
-Vector3 CatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t) {
-	float t2 = t * t;
-	float t3 = t2 * t;
-	return {
-	    0.5f * ((2.0f * p1.x) + (-p0.x + p2.x) * t + (2.0f * p0.x - 5.0f * p1.x + 4.0f * p2.x - p3.x) * t2 + (-p0.x + 3.0f * p1.x - 3.0f * p2.x + p3.x) * t3),
-	    0.5f * ((2.0f * p1.y) + (-p0.y + p2.y) * t + (2.0f * p0.y - 5.0f * p1.y + 4.0f * p2.y - p3.y) * t2 + (-p0.y + 3.0f * p1.y - 3.0f * p2.y + p3.y) * t3),
-	    0.5f * ((2.0f * p1.z) + (-p0.z + p2.z) * t + (2.0f * p0.z - 5.0f * p1.z + 4.0f * p2.z - p3.z) * t2 + (-p0.z + 3.0f * p1.z - 3.0f * p2.z + p3.z) * t3)};
-}
-void WaterController::Draw(GameBase& gameBase) {
-	// --- ImGuiカメラ操作 ---
-	ImGui::Begin("Camera Orbit");
-	ImGui::SliderFloat("Distance", &camDistance_, 100.0f, 3000.0f);
-	ImGui::SliderAngle("Azimuth", &camAzimuth_, 0.0f, 360.0f);
-	ImGui::SliderAngle("Elevation", &camElevation_, -89.0f, 89.0f);
-	ImGui::SliderFloat3("Target", &camTarget_.x, -2000.0f, 2000.0f);
 	ImGui::End();
+}
+void WaterController::Update(){
+    
+       DrawMetaballImGui(); 
+    
+    }
+    
+   void WaterController::CreateMetaballMesh(std::vector<VertexData>& outVertices, std::vector<uint32_t>& outIndices) {
 
-	// 軌道カメラ計算
-	camPos_.x = camTarget_.x + camDistance_ * cosf(camElevation_) * cosf(camAzimuth_);
-	camPos_.y = camTarget_.y + camDistance_ * sinf(camElevation_);
-	camPos_.z = camTarget_.z + camDistance_ * cosf(camElevation_) * sinf(camAzimuth_);
+         const int GRID_SIZE = 70;
+	   const float GRID_STEP = 2.0f;
+	   Vector3 GRID_ORIGIN = {0.0f, 0.0f, 0.0f};
 
-	float time = static_cast<float>(clock()) / CLOCKS_PER_SEC;
-
-	int nodeCount = 9;
-	int sectionCount = 180; // ←多いほどなめらか＆隙間なし
-	float ribbonWidth = 40.0f;
-	float radius = 250.0f;
-
-// --- 螺旋状水流ノード列 ---
-	std::vector<Vector3> nodes;
-	float spiralTurns = 2.2f; // 螺旋の回転数
-	float spiralTight = 1.0f; // 渦の締まり具合
-	for (int n = 0; n < nodeCount; ++n) {
-		float t = float(n) / (nodeCount - 1); // 0～1
-		float angle = t * spiralTurns * 2.0f * 3.1415f + time * 0.5f;
-		float spiralRadius = radius * (1.0f - t * 0.30f); // 外ほど太い→細く
-		float z = -t * 350.0f + sinf(time * 0.7f + t * 7.0f) * 30.0f;
-		nodes.push_back({cosf(angle) * spiralRadius, sinf(angle) * spiralRadius, z});
-	}
+	   const float ISOLEVEL = 1.0f;
 
 
-	// スプラインで中心列
-	std::vector<Vector3> centerList;
-	for (int i = 0; i <= sectionCount; ++i) {
-		float t = float(i) / sectionCount;
-		float tNode = t * (nodeCount - 1);
-		int idx = int(tNode);
-		float localT = tNode - idx;
-		int idx0 = std::max(0, idx - 1);
-		int idx1 = idx;
-		int idx2 = std::min(nodeCount - 1, idx + 1);
-		int idx3 = std::min(nodeCount - 1, idx + 2);
-		centerList.push_back(CatmullRom(nodes[idx0], nodes[idx1], nodes[idx2], nodes[idx3], localT));
-	}
+const int N = GRID_SIZE + 2;
+	   std::vector<float> field(N * N * N, 0.0f); // 1次元配列に確保
 
-	std::vector<Vector3> leftList, rightList;
-	for (int i = 0; i <= sectionCount; ++i) {
-		// 進行方向
-		Vector3 tangent;
-		if (i < sectionCount) {
-			Vector3& p0 = centerList[i];
-			Vector3& p1 = centerList[i + 1];
-			tangent = {p1.x - p0.x, p1.y - p0.y, p1.z - p0.z};
-		} else {
-			Vector3& p0 = centerList[i - 1];
-			Vector3& p1 = centerList[i];
-			tangent = {p1.x - p0.x, p1.y - p0.y, p1.z - p0.z};
-		}
-		float len = std::sqrt(tangent.x * tangent.x + tangent.y * tangent.y + tangent.z * tangent.z);
-		tangent.x /= len;
-		tangent.y /= len;
-		tangent.z /= len;
+	   auto field_at = [&](int x, int y, int z) -> float& { return field[x + N * (y + N * z)]; };
 
-		// XY平面直交法線
-		Vector3 normal = {-tangent.y, tangent.x, 0.0f};
-		float nlen = std::sqrt(normal.x * normal.x + normal.y * normal.y);
-		normal.x /= nlen;
-		normal.y /= nlen;
-
-		// ★ここで水らしい“凹凸”を与える★
-		// sectionCount・i・timeを使い、sin/cos/ノイズ混ぜてOK！
-		float tWave = float(i) / sectionCount;
-		float wave = sinf(i * 0.3f + time * 2.0f) * 1.95f    // ゆるい波
-		             + sinf(i * 1.4f - time * 3.0f) * 0.9f  // 細かい波
-		             + cosf(i * 0.85f + time * 1.7f) * 0.5f // さらにノイズ
-		             + (rand() % 100 - 50) * 0.001f;         // 軽いランダム
-
-		// 左右で異なるバリエーションを付けるとより水感アップ
-		float leftWidth = ribbonWidth * (1.00f + 0.19f * wave + 0.05f * sinf(i + time * 1.1f));
-		float rightWidth = ribbonWidth * (1.00f - 0.19f * wave + 0.05f * cosf(i - time * 0.6f));
-
-		leftList.push_back({centerList[i].x + normal.x * leftWidth, centerList[i].y + normal.y * leftWidth, centerList[i].z});
-		rightList.push_back({centerList[i].x - normal.x * rightWidth, centerList[i].y - normal.y * rightWidth, centerList[i].z});
-	}
-
-	// --- 端点列から必ず隣同士の点でQuadを構成 ---
-	for (int i = 0; i < sectionCount; ++i) {
-		// スクリーン座標
-		Vector2 s_left0 = ProjectToScreen(leftList[i], camPos_, camTarget_);
-		Vector2 s_right0 = ProjectToScreen(rightList[i], camPos_, camTarget_);
-		Vector2 s_left1 = ProjectToScreen(leftList[i + 1], camPos_, camTarget_);
-		Vector2 s_right1 = ProjectToScreen(rightList[i + 1], camPos_, camTarget_);
-
-		Vector3 quadPos[4] = {
-		    {s_left0.x,  s_left0.y,  0},
-            {s_right0.x, s_right0.y, 0},
-            {s_right1.x, s_right1.y, 0},
-            {s_left1.x,  s_left1.y,  0}
-        };
-
-		// UV
-		float t0 = float(i) / sectionCount;
-		float t1 = float(i + 1) / sectionCount;
-		float uvScroll = std::fmod(time * 0.13f, 1.0f);
-		Vector2 quadUV[4] = {
-		    {0, t0 + uvScroll},
-            {1, t0 + uvScroll},
-            {1, t1 + uvScroll},
-            {0, t1 + uvScroll}
-        };
-
-		uint32_t color = 0x99C0FFFF;
-
-		gameBase.DrawSpriteSheet(quadPos, quadUV, color);
-	}
+	   // --- スカラー場生成 ---
+	   for (int z = 0; z < N; ++z)
+		   for (int y = 0; y < N; ++y)
+			   for (int x = 0; x < N; ++x) {
+				   Vector3 p = {GRID_ORIGIN.x + x * GRID_STEP, GRID_ORIGIN.y + y * GRID_STEP, GRID_ORIGIN.z + z * GRID_STEP};
+				   float val = 0.0f;
+				   for (const auto& ball : balls) {
+					   float d2 = LengthSquared(p - ball.pos);
+					   if (d2 < 1e-6f)
+						   d2 = 1e-6f; // 0割防止
+					   val += (ball.radius * ball.radius) / d2;
+				   }
+				   field_at(x, y, z) = val;
+			   }
 
 
+	// --- 頂点キャッシュ --- (一意に割り当て)
+	std::vector<std::vector<std::vector<std::array<int, 3>>>> vertexCache(
+	    GRID_SIZE + 2, std::vector<std::vector<std::array<int, 3>>>(GRID_SIZE + 2, std::vector<std::array<int, 3>>(GRID_SIZE + 2, {-1, -1, -1})));
 
+	outVertices.clear();
+	outIndices.clear();
 
+	// --- メインループ ---
+	for (int z = 0; z < GRID_SIZE; ++z){
+		for (int y = 0; y < GRID_SIZE; ++y){
+			for (int x = 0; x < GRID_SIZE; ++x) {
+				// --- セル8頂点取得 ---
+				float cubeVal[8];
+				Vector3 cubePos[8];
+				for (int i = 0; i < 8; ++i) {
+					int dx = (i & 1) ? 1 : 0;
+					int dy = (i & 2) ? 1 : 0;
+					int dz = (i & 4) ? 1 : 0;
+					cubeVal[i] = field_at(x + dx,y + dy,z + dz);
+					cubePos[i] = {GRID_ORIGIN.x + (x + dx) * GRID_STEP, GRID_ORIGIN.y + (y + dy) * GRID_STEP, GRID_ORIGIN.z + (z + dz) * GRID_STEP};
+				}
 
+				// --- ケースインデックス ---
+				int cubeIdx = 0;
+				for (int i = 0; i < 8; ++i){
+					if (cubeVal[i] > ISOLEVEL)
+						cubeIdx |= (1 << i);
+                }
 
+				if (cubeIdx == 0 || cubeIdx == 255)
+					continue;
 
+				// --- ambiguous case face test（シンプル例）---
+				// 詳細な全パターン対応は省略しますが、例として3,6,12番ケースのみface test
+				bool useAlt = false;
+				if (cubeIdx == 3 || cubeIdx == 6 || cubeIdx == 12) {
+					float centerVal = 0;
+					for (int i = 0; i < 8; ++i)
+						centerVal += cubeVal[i];
+					centerVal /= 8.0f;
+					useAlt = (centerVal > ISOLEVEL);
+				}
 
+				const int* tri = triTable[cubeIdx]; // ここにface test結果で分岐可能
 
+				// --- 三角形ごとに頂点生成 ---
+				for (int t = 0; tri[t] != -1; t += 3) {
+					uint32_t idx[3];
+					for (int vi = 0; vi < 3; ++vi) {
+						int edge = tri[t + vi];
 
-	// // 3Dしぶきパーティクル生成
-	//if (splashes.size() < 80) {
-	//	for (int tryCount = 0; tryCount < 2; ++tryCount) {
-	//		int i = mt() % (kRowCount + 1);
-	//		int j = mt() % (kColCount + 1);
-	//		Vector3 base = gridPoints3D_[i][j];
-	//		float angH = (mt() % 360) * 3.14159f / 180.0f;
-	//		float angV = (mt() % 180) * 3.14159f / 180.0f - 3.14159f / 2.0f;
-	//		float speed = 3.0f + (mt() % 30) / 10.0f;
+						// --- 頂点キャッシュ ---
+						EdgeInfo e = edgeInfoTable[edge];
+						int vx = x + e.base[0];
+						int vy = y + e.base[1];
+						int vz = z + e.base[2];
+						int edir = e.dir;
+						int& cached = vertexCache[vx][vy][vz][edir];
 
-	//		SplashParticle sp;
-	//		sp.pos3 = base;
-	//		sp.vel3 = {cosf(angH) * cosf(angV) * speed, sinf(angV) * speed - 2.0f, sinf(angH) * cosf(angV) * speed};
-	//		sp.lifetime = 0.4f + (mt() % 40) / 100.0f;
-	//		sp.age = 0.0f;
-	//		// ← ここを大きめの値に変更
-	//		sp.scale = 0.1f + (mt() % 50) / 400.0f;
-	//		sp.angle = angH;
-	//		splashes.push_back(sp);
-	//	}
-	//}
+						if (cached < 0) {
+							// --- 頂点補間 ---
+							int v0 = edgeToVertex[edge][0], v1 = edgeToVertex[edge][1];
+							float val0 = cubeVal[v0], val1 = cubeVal[v1];
+							Vector3 p0 = cubePos[v0], p1 = cubePos[v1];
+							float tval = (fabs(val1 - val0) > 1e-6f) ? (ISOLEVEL - val0) / (val1 - val0) : 0.5f;
+							tval = std::clamp(tval, 0.0f, 1.0f);
+							Vector3 pos = p0 + (p1 - p0) * tval;
 
-	//// 3Dしぶきパーティクル描画
-	//for (auto it = splashes.begin(); it != splashes.end();) {
-	//	// --- 物理更新 ---
-	//	it->age += 1.0f / 60.0f;
-	//	it->pos3.x += it->vel3.x;
-	//	it->pos3.y += it->vel3.y;
-	//	it->pos3.z += it->vel3.z;
-	//	it->vel3.y += 0.4f; // 重力
+							// --- 法線計算 ---
+							Vector3 n = {0, 0, 0};
+							{
+								// 中心差分・境界安全
+								int ix = std::clamp(vx, 1, GRID_SIZE);
+								int iy = std::clamp(vy, 1, GRID_SIZE);
+								int iz = std::clamp(vz, 1, GRID_SIZE);
+								float dx = field_at(ix + 1, iy, iz) - field_at(ix - 1, iy, iz);
+								float dy = field_at(ix, iy + 1, iz) - field_at(ix, iy - 1, iz);
+								float dz = field_at(ix, iy, iz + 1) - field_at(ix, iy, iz - 1);
 
-	//	// α計算
-	//	float alpha = 1.0f - (it->age / it->lifetime);
-	//	if (alpha < 0.0f)
-	//		alpha = 0.0f;
-	//	uint32_t color = ((int)(220 * alpha) << 24) | 0x00FFFFFF;
+								n = fn.Normalize({dx, dy, dz});
+				
+							// 頂点データ格納
+							VertexData vtx;
+							vtx.position = Vector4(pos.x, pos.y, pos.z, 1.0f);
+							vtx.normal = n;
+							vtx.texcoord = {0, 0}; // テクスチャ不要なら0でOK
+							cached = (int)outVertices.size();
+							// balls = メタボール配列
+							Vector3 center = {0, 0, 0};
+							for (const auto& ball : balls)
+								center = center + ball.pos;
+							if (!balls.empty())
+								center = center * (1.0f / balls.size());
 
-	//	// スクリーン投影
-	//	Vector2 splash2D = ProjectToScreen(it->pos3, camPos_, camTarget_);
-	//	Vector2 spritePos{splash2D.x, splash2D.y};
+							
 
-	//	// --- スプライトシートの UV 計算 (3x3 枚と仮定) ---
-	//	const int sheetCols = 3, sheetRows = 3;
-	//	const float du = 1.0f / sheetCols;
-	//	const float dv = 1.0f / sheetRows;
-	//	// 表示したいセル番号 (0～8)。ランダムにするなら mt() % (sheetCols*sheetRows)
-	//	int cellIndex = 0;
-	//	int uIndex = cellIndex % sheetCols;
-	//	int vIndex = cellIndex / sheetCols;
-	//	float u0 = uIndex * du;
-	//	float v0 = vIndex * dv;
-	//	Vector2 uvQuad[4] = {
-	//	    {u0,      v0     },
-	//	    {u0 + du, v0     },
-	//	    {u0,      v0 + dv},
-	//	    {u0 + du, v0 + dv},
-	//	};
+							// ▼ここでUV生成！（球体投影）
+							Vector3 dir = fn.Normalize(pos - center);
+							float u = 0.5f + atan2f(dir.z, dir.x) / (2.0f * 3.1415926535f);
+							float v = 0.5f - asinf(dir.y) / 3.1415926535f;
+							vtx.texcoord = {u, v};
 
-	//	// --- 頂点クアッドの計算 ---
-	//	float halfW = pieceW_ * it->scale * 0.5f;
-	//	float halfH = pieceH_ * it->scale * 0.5f;
-	//	Vector3 posQuad[4] = {
-	//	    {spritePos.x - halfW, spritePos.y - halfH, 0.0f},
-	//	    {spritePos.x + halfW, spritePos.y - halfH, 0.0f},
-	//	    {spritePos.x + halfW, spritePos.y + halfH, 0.0f},
-	//	    {spritePos.x - halfW, spritePos.y + halfH, 0.0f},
-	//	};
+							outVertices.push_back(vtx);
 
-	//	// --- 描画 ---
-	//	gameBase.DrawSpriteSheet(posQuad, uvQuad, color);
+							outVertices.push_back(vtx);
+						    }
+						idx[vi] = cached;
+					    }
+					// インデックス格納
+					outIndices.push_back(idx[0]);
+					outIndices.push_back(idx[1]);
+					outIndices.push_back(idx[2]);
+				    }
+			    }
+            }
+           }
+        }
+}
 
-	//	// --- 寿命終了チェック ---
-	//	if (it->age > it->lifetime) {
-	//		it = splashes.erase(it);
-	//	} else {
-	//		++it;
-	//	}
-	//
-	//}
+void WaterController::Draw(GameBase& gamebase)
+{
+    // ボール同士の最小距離を調べる
+    float minDist = std::numeric_limits<float>::max();
+    for (size_t i = 0; i < balls.size(); ++i) {
+        for (size_t j = i + 1; j < balls.size(); ++j) {
+            float dx = balls[i].pos.x - balls[j].pos.x;
+            float dy = balls[i].pos.y - balls[j].pos.y;
+            float dz = balls[i].pos.z - balls[j].pos.z;
+            float dist = std::sqrt(dx * dx + dy * dy + dz * dz);
+            if (dist < minDist) minDist = dist;
+        }
+    }
+
+    // 閾値判定
+    if (minDist < metaBallConnectThreshold) {
+        // ---- メタボール描画 ----
+        std::vector<VertexData> metaballVertices;
+        std::vector<uint32_t> metaballIndices;
+        CreateMetaballMesh(metaballVertices, metaballIndices);
+        // テクスチャ指定や色指定も必要に応じてセット
+        gamebase.DrawMesh(metaballVertices, metaballIndices, 0xFFFFFFFF, -1); // textureHandleはWaterControllerに持たせておく
+    }
+    else {
+        // ---- 普通の球体描画 ----
+        for (const auto& ball : balls) {
+            // 必要に応じてテクスチャ・色を指定
+            gamebase.DrawSphere(ball.pos, ball.radius, 0xFFFFFFFF, -1);
+        }
+    }
 }

@@ -20,6 +20,6 @@ class DebugCamera {
 	    Matrix4x4 matRot_ = {};  
 	Vector3 rotation_ = {0, 0, 0};
 	Vector3 scale_ = {1, 1, 1}; 
-	Vector3 translation_ = {0, 0, -50};
+	Vector3 translation_ = {50, 50, -30};
 	
 };
