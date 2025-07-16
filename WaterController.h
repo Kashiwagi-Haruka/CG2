@@ -11,13 +11,12 @@ public:
 
   void Initialize();  
   void Update();  
-  void Draw(GameBase& gamebase);  
+  void Draw(GameBase& gamebase, const Matrix4x4& viewProj);
   void StartCharge(const Vector2& mousePos, bool justPressed);  
   void Fire();  
   Vector2 ProjectToScreen(const Vector3& w, const Vector3& cam, const Vector3& tgt);  
   void CreateMetaballMesh(std::vector<VertexData>& outVertices, std::vector<uint32_t>& outIndices);  
   void DrawMetaballImGui();
-
   private:  
 
     Function fn; 
@@ -66,5 +65,12 @@ public:
   };
 
   std::vector<SplashParticle> splashes;  
-  float metaBallConnectThreshold = 35.0f; // 合成/分離のしきい値（例）
+  float metaBallConnectThreshold = 5.0f; // 合成/分離のしきい値（例）
+
+           const int GRID_SIZE = 70;
+  const float GRID_STEP = 2.0f;
+  Vector3 GRID_ORIGIN = {0.0f, 0.0f, 0.0f};
+
+  const float ISOLEVEL = 1.0f;
+
 };

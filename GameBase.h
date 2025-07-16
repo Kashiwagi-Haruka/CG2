@@ -129,11 +129,14 @@ private:
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewMetaball_;
 
 
-	struct TransformationMatrix {
-		Matrix4x4 WVP;
-		Matrix4x4 World;
-	
+// GameBase.h
+	struct alignas(256) TransformationMatrix {
+		Matrix4x4 WVP;   // 64 バイト
+		Matrix4x4 World; // 64 バイト
+		// ここで自動的に 128 バイト分のパディングが入って、
+		// sizeof(TransformationMatrix) == 256 になる
 	};
+
 
 	struct Transform {
 
@@ -183,7 +186,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	int kVertexCount_;
 
 	//Matrix4x4* wvpData = nullptr; // ← transformResource用のポインタをメンバに持つ
-	Matrix4x4* transformationMatrixData = nullptr;
+	TransformationMatrix* transformationMatrixData = nullptr;
 
 	Texture texture_;
 	Texture texture2_;
@@ -194,6 +197,10 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	UINT currentSphereVertexOffset_ = 0;
 	UINT currentSpriteVertexOffset_ = 0;
 	static constexpr UINT kMaxVertices_ = 1024; // 十分な大きさで定義しておく
+	int sphereDrawCallCount_ = 0;
+	int transformSlotOffset = 0; // slot=0,1使用
+	const int kMaxSpheres = 30;  // 複数球体用の最大数（例）
+	const int kMaxTransformSlots = 32; // 例えば最大32スロット（用途に合わせて）
 
 		
 	   bool useMonsterBall_ = true;
@@ -233,8 +240,8 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 
 	// 描画関数（好きなだけ呼べるように）
 	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
-	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle);
-	void DrawSprite(const Vector2& pos, float scale, float rotate, uint32_t color, int texHandle);
+	
+	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
 	void DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color);
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
@@ -245,7 +252,8 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	DirectInput DInput;
 	// GameBase.h の public に追加
 	// GameBase.h の public に追加
-	Matrix4x4* GetTransformationMatrixData() const { return transformationMatrixData; }
+	TransformationMatrix* GetTransformationMatrixData() const { return transformationMatrixData; }
+	void SetTransformMatrixWVP(Matrix4x4 transformationmatrix, int i) { transformationMatrixData[i].WVP = transformationmatrix; };
 
 	Transform transform = {
 	    {1.0f, 1.0f, 1.0f}, // scale

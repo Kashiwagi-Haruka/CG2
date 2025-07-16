@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "GameBase.h"
 #include <DbgHelp.h>
 #include <strsafe.h>
@@ -441,18 +442,6 @@ void GameBase::ResourceRelease() {
 	texture_.Finalize();
 	texture2_.Finalize();
 	imguiM_.Finalize();
-	//for (auto& tex : textures_) {
-	//	tex.Finalize();
-	//}
-	//textures_.clear(); // 念のため解放
-	/*vertexResourceSphere->Release();*/
-
-	/*if (vertexResourceSprite_) {
-		vertexResourceSprite_->Release();
-	}
-	if (transformationMatrixResourceSprite_) {
-		transformationMatrixResourceSprite_->Release();
-	}*/
 
 	
 	if (fenceEvent_) {
@@ -468,74 +457,7 @@ void GameBase::ResourceRelease() {
 		directionalLightResource_ = nullptr;
 		directionalLightData_ = nullptr;
 	}
-	vertexResource_.Reset();
-	materialResource_.Reset();
-	transformResource_.Reset();
-	vertexResourceSprite_.Reset();
-	transformationMatrixResourceSprite_.Reset();
-	vertexResourceSphere.Reset();
-	swapChainResources_[0].Reset();
-	swapChainResources_[1].Reset();
-	swapChain_.Reset();
-	commandQueue_.Reset();
-	commandAllocator.Reset();
-	commandList_.Reset();
-	rootSignature.Reset();
-	graphicsPipelineState.Reset();
-	fence_.Reset();
-	signatureBlob.Reset();
-	errorBlob.Reset();
-	pixelShaderBlob.Reset();
-	vertexShaderBlob.Reset();
-	dxcUtils.Reset();
-	dxcCompiler.Reset();
-	includeHandler.Reset();
-
-	depthStenicilResource.Reset();
-	dsvDescriptorHeap.Reset();
-	rtvDescriptorHeap_.Reset();
-	srvDescriptorHeap_.Reset();
-
-	dxgiFactory.Reset();
-	debugController.Reset();
-	useAdapter.Reset();
-	device_.Reset();
-
-	//vertexResource_->Release();
-	//
-	//indexResourceSprite_->Release();
-	//materialResourceSprite_->Release();
-	//materialResource_->Release(); 
-	//transformResource_->Release(); 
-
-	/*graphicsPipelineState->Release();*/
-	//signatureBlob->Release();
-	//if (errorBlob) {
-	//	errorBlob->Release();
-	//}
-	///*rootSignature->Release();*/
-	//pixelShaderBlob->Release();
-	//vertexShaderBlob->Release();
-
-	/*CloseHandle(fenceEvent_);*/
-	/*fence_->Release();*/
-	/*dsvDescriptorHeap->Release();
-	depthStenicilResource->Release();
-	srvDescriptorHeap_->Release();
-	rtvDescriptorHeap_->Release();
-	swapChainResources_[0]->Release();
-	swapChainResources_[1]->Release();
-	swapChain_->Release();
-	commandList_->Release();
-	commandAllocator->Release();
-	commandQueue_->Release();
-	device_->Release();
-	useAdapter->Release();
-	dxgiFactory->Release();*/
-
-#ifdef _DEBUG
-	/*debugController->Release();*/
-#endif
+	
 
 	CloseWindow(hwnd);
 }
@@ -860,18 +782,29 @@ void GameBase::VertexResource() {
 	materialResource_->Unmap(0, nullptr);
 
 	// --- トランスフォーム用リソース ---
-	transformResource_ = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
-	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // ←ここ！！起動時にマップしっぱなし
-	*transformationMatrixData = function.MakeIdentity(); // 初期値は単位行列
-	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	// 配列サイズ: [0]=モデル/デバッグ, [1]=未使用, [2]～=球体用
+	
+	constexpr UINT kCBAlign = 256;
+	UINT matrixAlignedSize = (sizeof(TransformationMatrix) + kCBAlign - 1) & ~(kCBAlign - 1);
+	transformResource_ = CreateBufferResource(device_.Get(), matrixAlignedSize * kMaxTransformSlots);
 
+	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // 構造体配列として使う
+
+	// 初期化は必ず構造体単位で
+	for (int i = 0; i < kMaxTransformSlots; ++i) {
+		transformationMatrixData[i].WVP = function.MakeIdentity();
+		transformationMatrixData[i].World = function.MakeIdentity();
+	}
+
+	// [0]=モデル描画用で使う
+	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
 	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
-	// 2個分書き込む
-	transformationMatrixData[0] = worldViewProjectionMatrix; // WVP
-	transformationMatrixData[1] = worldMatrix;               // World
+	transformationMatrixData[0].WVP = worldViewProjectionMatrix;
+	transformationMatrixData[0].World = worldMatrix;
+
 
 
 	// --- Sprite用 頂点リソース ---
@@ -965,6 +898,7 @@ void GameBase::VertexResource() {
 
 		const int kVertexCount = kSubdivision * kSubdivision * 6;
 	    kVertexCount_ = kVertexCount;
+	    vertexBufferViewSphere = {};
 	    vertexResourceSphere = CreateBufferResource(device_.Get(), sizeof(VertexData) * kVertexCount);
 		vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
 		vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * kVertexCount;
@@ -1026,6 +960,18 @@ void GameBase::VertexResource() {
 
 			}
 		}
+	    // 球体メッシュの範囲を出力
+	    float minX = 9999, maxX = -9999, minY = 9999, maxY = -9999, minZ = 9999, maxZ = -9999;
+	    for (int i = 0; i < kVertexCount; ++i) {
+		    minX = std::min(minX, sphereVertexData[i].position.x);
+		    maxX = std::max(maxX, sphereVertexData[i].position.x);
+		    minY = std::min(minY, sphereVertexData[i].position.y);
+		    maxY = std::max(maxY, sphereVertexData[i].position.y);
+		    minZ = std::min(minZ, sphereVertexData[i].position.z);
+		    maxZ = std::max(maxZ, sphereVertexData[i].position.z);
+	    }
+	    OutputDebugStringA(std::format("Sphere mesh range X:{:.2f}~{:.2f} Y:{:.2f}~{:.2f} Z:{:.2f}~{:.2f}\n", minX, maxX, minY, maxY, minZ, maxZ).c_str());
+
 		vertexResourceSphere->Unmap(0, nullptr);
 	    Log("VertexResource END\n");
 }
@@ -1104,92 +1050,37 @@ void GameBase::CreateModelVertexBuffer() {
 	materialResource_->Unmap(0, nullptr);
 
 	// --- トランスフォーム用リソース ---
-	transformResource_ = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
-	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // ←ここ！！起動時にマップしっぱなし
-	*transformationMatrixData = function.MakeIdentity();                                      // 初期値は単位行列
+	
+constexpr UINT kCBAlign = 256;
+	UINT matrixAlignedSize = (sizeof(TransformationMatrix) + kCBAlign - 1) & ~(kCBAlign - 1);
+	transformResource_ = CreateBufferResource(device_.Get(), matrixAlignedSize * kMaxTransformSlots);
+
+	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // 構造体配列で取得
+	                                                                                          // ←ここ！！起動時にマップしっぱなし
+	                                                                                          // すべて単位行列で初期化（任意）
+	for (int i = 0; i < kMaxTransformSlots; ++i) {
+		transformationMatrixData[i].WVP = function.MakeIdentity();
+		transformationMatrixData[i].World = function.MakeIdentity();
+	} // 初期値は単位行列
 	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
 	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
+	// ProjectionMatrixの作成（FOV: 0.45f * π、アスペクト比: 16:9、近クリップ: 0.1f、遠クリップ: 1000.0f）
+	float fovY = 0.45f * 3.14159265f; // ラジアン
+	float aspectRatio = 16.0f / 9.0f;
+	float nearClip = 0.1f;
+	float farClip = 1000.0f;
+
+	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(fovY, aspectRatio, nearClip, farClip);
 	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
 	// 2個分書き込む
-	transformationMatrixData[0] = worldViewProjectionMatrix; // WVP
-	transformationMatrixData[1] = worldMatrix;               // World
+	//transformationMatrixData[0].WVP = worldViewProjectionMatrix; // WVP
+	//transformationMatrixData[1].World = worldMatrix;               // World
+	//transformationMatrixData[1].WVP = worldViewProjectionMatrix; // WVP
+	//transformationMatrixData[2].World = worldMatrix;             // World
 }
-//void GameBase::CreateSpriteVertexBuffer() {
-//	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
-//	// --- Sprite用 頂点リソース ---
-//	vertexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 6);
-//	vertexBufferViewSprite = {};
-//	vertexBufferViewSprite.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
-//	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
-//	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
-//
-//	// --- ここにインデックスバッファの生成を追加 ---
-//	// --- ここにインデックスバッファの生成を追加 ---
-//	// 6個のインデックス（2枚の三角形でスプライト）
-//	indexResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
-//
-//	VertexData* vertexDataSprite = nullptr;
-//	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
-//
-//	// 1枚目の三角形（左下 → 左上 → 右下）
-//	vertexDataSprite[0].position = {0.0f, 360.0f, 0.0f, 1.0f}; // 左下
-//	vertexDataSprite[0].texcoord = {0.0f, 1.0f};
-//
-//	vertexDataSprite[1].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
-//	vertexDataSprite[1].texcoord = {0.0f, 0.0f};
-//
-//	vertexDataSprite[2].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
-//	vertexDataSprite[2].texcoord = {1.0f, 1.0f};
-//
-//	// 2枚目の三角形（左上 → 右上 → 右下）
-//	vertexDataSprite[3].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
-//	vertexDataSprite[3].texcoord = {0.0f, 0.0f};
-//
-//	vertexDataSprite[4].position = {640.0f, 0.0f, 0.0f, 1.0f}; // 右上
-//	vertexDataSprite[4].texcoord = {1.0f, 0.0f};
-//
-//	vertexDataSprite[5].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
-//	vertexDataSprite[5].texcoord = {1.0f, 1.0f};
-//
-//	for (int i = 0; i < 6; i++) {
-//		vertexDataSprite[i].normal = {0.0f, 0.0f, -1.0f};
-//	}
-//
-//	vertexResourceSprite_->Unmap(0, nullptr);
-//	uint32_t indices[6] = {0, 1, 2, 1, 4, 2};
-//
-//	void* mapped = nullptr;
-//	indexResourceSprite_->Map(0, nullptr, &mapped);
-//	memcpy(mapped, indices, sizeof(indices));
-//	indexResourceSprite_->Unmap(0, nullptr);
-//
-//	// インデックスバッファビューの作成
-//	indexBufferViewSprite_.BufferLocation = indexResourceSprite_->GetGPUVirtualAddress();
-//	indexBufferViewSprite_.SizeInBytes = sizeof(uint32_t) * 6;
-//	indexBufferViewSprite_.Format = DXGI_FORMAT_R32_UINT;
-//
-//	// スプライト用（陰影つけたくないもの）
-//	materialResourceSprite_ = CreateBufferResource(device_.Get(), alignedSize);
-//	Material* matSprite = nullptr;
-//	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
-//	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
-//	matSprite->enableLighting = 0;
-//	matSprite->uvTransform = function.MakeIdentity();
-//	materialResourceSprite_->Unmap(0, nullptr);
-//
-//	// Sprite用の TransformationMatrix リソース作成（1個分）
-//	transformationMatrixResourceSprite_ = CreateBufferResource(device_.Get(), sizeof(Matrix4x4) * 2);
-//
-//	// データへのポインタ取得
-//	transformationMatrixDataSprite = nullptr;
-//	transformationMatrixResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
-//
-//	// 単位行列を書き込んでおく（初期状態）
-//	*transformationMatrixDataSprite = function.MakeIdentity();
-//}
+
 
 void GameBase::Update() {
 	
@@ -1219,30 +1110,36 @@ void GameBase::Update() {
 	// --- 回転角度を更新（Y軸回転だけ）
 	/*transform.rotate.y += 0.03f;*/
 
-	// --- ワールド行列を作成（スケール → 回転 → 移動）
-	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	//// --- ワールド行列を作成（スケール → 回転 → 移動）
+	 Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
-	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
-	transformationMatrixData[0] = worldViewProjectionMatrix;
-	transformationMatrixData[1] = worldMatrix;
+	//Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	//Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
+	//float fovY = 0.45f * 3.14159265f; // ラジアン
+	//float aspectRatio = 16.0f / 9.0f;
+	//float nearClip = 0.1f;
+	//float farClip = 1000.0f;
 
-	// Sprite用のワールド行列（スケール・回転・移動から生成）
-	Matrix4x4 worldMatrixSprite = function.MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
+	//Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(fovY, aspectRatio, nearClip, farClip);
+	//Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+	//transformationMatrixData[0].WVP = worldViewProjectionMatrix;
+	//transformationMatrixData[1].WVP = worldViewProjectionMatrix;
+	//transformationMatrixData[0].World = worldMatrix;
 
-	// View行列（カメラ、今回は単位行列で固定）
-	Matrix4x4 viewMatrixSprite = function.MakeIdentity();
+	//// Sprite用のワールド行列（スケール・回転・移動から生成）
+	//Matrix4x4 worldMatrixSprite = function.MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
 
-	// 射影行列（平行投影、画面サイズで生成）
-	Matrix4x4 projectionMatrixSprite = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
+	//// View行列（カメラ、今回は単位行列で固定）
+	//Matrix4x4 viewMatrixSprite = function.MakeIdentity();
 
-	// 最終WVP行列の計算と書き込み
-	Matrix4x4 worldViewProjectionMatrixSprite = function.Multiply(worldMatrixSprite, function.Multiply(viewMatrixSprite, projectionMatrixSprite));
+	//// 射影行列（平行投影、画面サイズで生成）
+	//Matrix4x4 projectionMatrixSprite = function.MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
 
-	transformationMatrixDataSprite[0] = worldViewProjectionMatrixSprite;
-	transformationMatrixDataSprite[1] = worldMatrix;
+	//// 最終WVP行列の計算と書き込み
+	//Matrix4x4 worldViewProjectionMatrixSprite = function.Multiply(worldMatrixSprite, function.Multiply(viewMatrixSprite, projectionMatrixSprite));
+
+	//transformationMatrixDataSprite[0] = worldViewProjectionMatrixSprite;
+	//transformationMatrixDataSprite[1] = worldMatrix;
 	
 }
 
@@ -1390,6 +1287,8 @@ void GameBase::BeginFlame(char* keys,char*preKeys) {
 	currentTriangleVertexOffset_ = 0;
 	currentSpriteVertexOffset_ = 0;
 	currentSphereVertexOffset_ = 0;
+	sphereDrawCallCount_ = 0;
+
 
 	// ③ コマンドリストのリセット
 	FrameStart();
@@ -1488,52 +1387,81 @@ void GameBase::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color)
 	currentSpriteVertexOffset_ += 4; // 4頂点分進める
 }
 
-void GameBase::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle) {
-	// 1. マテリアル設定（色やテクスチャ）
-	Material* mat = nullptr;
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
-	mat->color = Vector4(((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, ((color >> 24) & 0xFF) / 255.0f);
-	mat->enableLighting = 1;
-	mat->uvTransform = function.MakeIdentity();
-	materialResource_->Unmap(0, nullptr);
+void GameBase::DrawSphere(
+    const Vector3& center,
+    float radius,
+    uint32_t color,
+    int textureHandle,
+    const Matrix4x4& viewProj)
+{
 
-	// 2. トランスフォーム設定（スケールと位置に変換）
-	Matrix4x4 world = function.MakeAffineMatrix(
-	    {radius, radius, radius}, // スケール
-	    {0, 0, 0},                // 回転
-	    center                    // 移動
-	);
+    // 1. マテリアル設定
+    Material* mat = nullptr;
+    materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
+    mat->color = Vector4(
+        ((color >> 16) & 0xFF) / 255.0f,
+        ((color >> 8) & 0xFF) / 255.0f,
+        (color & 0xFF) / 255.0f,
+        ((color >> 24) & 0xFF) / 255.0f);
+    mat->enableLighting = 1;
+    mat->uvTransform = function.MakeIdentity();
+    materialResource_->Unmap(0, nullptr);
 
-	Matrix4x4 camera = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	Matrix4x4 view = function.Inverse(camera);
-	Matrix4x4 proj = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
-	Matrix4x4 wvp = function.Multiply(world, function.Multiply(view, proj));
-
-	// WVPとWorld行列をtransformResource_に書き込み
-	transformationMatrixData[0] = wvp;
-	transformationMatrixData[1] = world;
-
-	// 3. 頂点バッファ/インデックスバッファ設定
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// 4. テクスチャ
-
-	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+    // 2. ワールド行列とWVP
+    Matrix4x4 world = function.MakeAffineMatrix(
+        {radius, radius, radius},   // スケール
+        {0, 0, 0},                  // 回転
+        center                      // 平行移動
+    );
+    Matrix4x4 wvp = function.Multiply(world, viewProj);
+	Log(std::format("WVP = "));
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			Log(std::format("{},", wvp.m[i][j]));
+		}
+		Log(std::format("\n"));
+	}
 	
+    // 3. slotを自動管理
+    int slot = sphereDrawCallCount_; // 0から順に
+        // 次回のためにカウンタ進める
+	sphereDrawCallCount_++;
+	assert(slot < kMaxTransformSlots); // slotは最大数を超えていないか？
+    // 4. 定数バッファへの書き込み（slot番目に格納）
+    transformationMatrixData[slot].WVP   = wvp;
+    transformationMatrixData[slot].World = world;
+	// WaterController.cpp のループ内
+	OutputDebugStringA(std::format("Sphere #(slot){}: center=({:.2f},{:.2f},{:.2f}), r={:.2f}, viewProj[0][0]={:.2f}\n", slot, center.x, center.y, center.z, radius, viewProj.m[0][0]).c_str());
 
-	// 5. マテリアル
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	// 6. トランスフォーム
-	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
-	// 7. ライト
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 
-	// 8. 描画
-	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
+    // 5. 頂点バッファ
+    D3D12_VERTEX_BUFFER_VIEW vbv = vertexBufferViewSphere;
+    commandList_->IASetVertexBuffers(0, 1, &vbv);
+    commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    // 6. テクスチャ
+    commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+
+    // 7. マテリアル
+    commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+
+    // 8. 定数バッファ（球体ごとにアドレスをずらしてバインド！）
+	constexpr UINT kCBAlign = 256;
+	UINT matrixAlignedSize = (sizeof(TransformationMatrix) + kCBAlign - 1) & ~(kCBAlign - 1);
+
+	D3D12_GPU_VIRTUAL_ADDRESS cbAddress = transformResource_->GetGPUVirtualAddress() + slot * matrixAlignedSize;
+	commandList_->SetGraphicsRootConstantBufferView(1, cbAddress);
+
+
+    // 9. ライト
+    commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+
+    // 10. 描画
+    commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
+	auto& tr = transformationMatrixData[1].World;
+	Log(std::format("\n World matrix scale = ({}, {}, {})\n", tr.m[0][0], tr.m[1][1], tr.m[2][2])); // 実装に合わせて要調整
+
 }
-
-
 
 //objfileを読む関数
 GameBase::ModelData GameBase::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
@@ -1623,8 +1551,6 @@ GameBase::MaterialData GameBase::LoadMaterialTemplateFile(const std::string& dir
 	return matData;
 }
 
-
-
 // ファイル名からSRVヒープ内のテクスチャindexを返す（なければ追加ロード）
 //int GameBase::LoadTexture(const std::string& fileName) {
 //	for (size_t i = 0; i < textures_.size(); ++i) {
@@ -1712,7 +1638,7 @@ vertexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(VertexData)
 	indexBufferViewMetaball_.Format = DXGI_FORMAT_R32_UINT;
 
 
-	OutputDebugStringA(std::format("vertexBufferView_.SizeInBytes={} useVertex={} 1vertex={} bytes\n", vertexBufferViewMetaball_.SizeInBytes, vertices.size(), sizeof(VertexData)).c_str());
+	/*OutputDebugStringA(std::format("vertexBufferView_.SizeInBytes={} useVertex={} 1vertex={} bytes\n", vertexBufferViewMetaball_.SizeInBytes, vertices.size(), sizeof(VertexData)).c_str());*/
 	assert(vertices.size() * sizeof(VertexData) <= vertexBufferViewMetaball_.SizeInBytes);
 
 	// バッファオーバーチェック
@@ -1726,9 +1652,6 @@ vertexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(VertexData)
 		assert(false && "DrawMesh: インデックスバッファサイズ超過！");
 		return;
 	}
-
-
-
 
 
 	// 転送

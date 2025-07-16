@@ -39,18 +39,18 @@ void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
 
 
 
-	if (key[DIK_UP] & 0x80)
-		dPitch =-rotSpeed;
-	if (key[DIK_DOWN] & 0x80)
-		dPitch = rotSpeed;
-	if (key[DIK_LEFT] & 0x80)
-		dYaw = -rotSpeed;
-	if (key[DIK_RIGHT] & 0x80)
-		dYaw = rotSpeed;
-	if (key[DIK_RSHIFT] & 0x80)
-		dZ = -rotSpeed;
-	if (key[DIK_END] & 0x80)
-		dZ = rotSpeed;
+	//if (key[DIK_UP] & 0x80)
+	//	dPitch =-rotSpeed;
+	//if (key[DIK_DOWN] & 0x80)
+	//	dPitch = rotSpeed;
+	//if (key[DIK_LEFT] & 0x80)
+	//	dYaw = -rotSpeed;
+	//if (key[DIK_RIGHT] & 0x80)
+	//	dYaw = rotSpeed;
+	//if (key[DIK_RSHIFT] & 0x80)
+	//	dZ = -rotSpeed;
+	//if (key[DIK_END] & 0x80)
+	//	dZ = rotSpeed;
 
 
 	// ── 累積回転行列に今回フレーム分の回転を乗算 ──

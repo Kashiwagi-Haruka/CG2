@@ -336,6 +336,12 @@ Vector2 WaterController::ProjectToScreen(const Vector3& w, const Vector3& cam, c
 
 void WaterController::Initialize() {
 	
+        balls = {
+	    {{50, 50, 50}, 10.0f},
+        {{55, 50, 50}, 10.0f}
+    };
+	metaBallConnectThreshold = 0.5f;
+
 	isCharging_ = false;
 	isFired_ = false;
 
@@ -405,14 +411,12 @@ void WaterController::Update(){
        DrawMetaballImGui(); 
     
     }
-    
-   void WaterController::CreateMetaballMesh(std::vector<VertexData>& outVertices, std::vector<uint32_t>& outIndices) {
 
-         const int GRID_SIZE = 70;
-	   const float GRID_STEP = 2.0f;
-	   Vector3 GRID_ORIGIN = {0.0f, 0.0f, 0.0f};
+  
+	void WaterController::CreateMetaballMesh(std::vector<VertexData> & outVertices, std::vector<uint32_t> & outIndices) {
+	
 
-	   const float ISOLEVEL = 1.0f;
+
 
 
 const int N = GRID_SIZE + 2;
@@ -555,7 +559,7 @@ const int N = GRID_SIZE + 2;
         }
 }
 
-void WaterController::Draw(GameBase& gamebase)
+void WaterController::Draw(GameBase& gamebase, const Matrix4x4& viewProj)
 {
     // ボール同士の最小距離を調べる
     float minDist = std::numeric_limits<float>::max();
@@ -579,10 +583,18 @@ void WaterController::Draw(GameBase& gamebase)
         gamebase.DrawMesh(metaballVertices, metaballIndices, 0xFFFFFFFF, -1); // textureHandleはWaterControllerに持たせておく
     }
     else {
-        // ---- 普通の球体描画 ----
-        for (const auto& ball : balls) {
-            // 必要に応じてテクスチャ・色を指定
-            gamebase.DrawSphere(ball.pos, ball.radius, 0xFFFFFFFF, -1);
-        }
+
+		// 分離球体描画時
+		for (const auto& ball : balls) {
+			Vector3 center = ball.pos;
+			float radius = ball.radius;
+			
+			gamebase.DrawSphere(center, radius, 0xff00ff00, -1, viewProj); // viewProjはmain.cppから渡ってきたもの
+			// デバッグ用
+			
+		}
+
+
+
     }
 }

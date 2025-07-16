@@ -57,10 +57,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			gameBase->BeginFlame(keys,preKeys);
 			memcpy(preKeys, keys, 256);
-		/*	LONG mx = gameBase->GetMouseX();
-			LONG my = gameBase->GetMouseY();
-			gameBase->Update();
-			gameBase->UpdateMouse();*/
+
 #pragma region 
 			
 				// DebugCamera の更新
@@ -79,7 +76,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			Matrix4x4 wvpMatrix = function.Multiply(worldMatrix, viewProjectionMatrix);
 
 			// 書き込む
-			*gameBase->GetTransformationMatrixData() = wvpMatrix;
+			//gameBase->GetTransformationMatrixData()[0].WVP = wvpMatrix;
+			//gameBase->GetTransformationMatrixData()[1].WVP = wvpMatrix;
+			gameBase->SetTransformMatrixWVP(viewProjectionMatrix, 0);
+			gameBase->SetTransformMatrixWVP(viewProjectionMatrix, 1);
+			
 #pragma endregion
 
 		
@@ -87,28 +88,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			water.Update();
 
 
-			// 押し始め判定
-			    /*bool justPressed = (gameBase->IsMousePressed(0) && PrePressMouse == 0);*/
 
-			//// チャージ処理
-			//if (gameBase->IsMousePressed(0)) {
-			//	water.StartCharge({(float)mx, (float)my}, justPressed);
-			//}
-			//// 発射処理
-			//if (!gameBase->IsMousePressed(0) && PrePressMouse == 1) {
-			//	water.Fire();
-			//}
+			water.Draw(*gameBase,wvpMatrix);
 
-			
-			water.Draw(*gameBase);
-
-			//gameBase->DrawSpriteSheet(position, texcoord, 0xffffffff);
-			//gameBase->DrawSpriteSheet(position2, texcoord, 0xffffffff);
-
-			/*PrePressMouse = gameBase->IsMousePressed(0);*/
-		
-
-			/*gameBase->DrawSpriteSheet(position, texcoord, 0xffffffff);*/
+	
 
 			//ゲームの処理
 
