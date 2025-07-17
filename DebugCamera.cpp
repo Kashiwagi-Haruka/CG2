@@ -25,10 +25,10 @@ void DebugCamera::Initialize() {
 
 void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
 	// ── ImGui でパラメータをいじれるように ──
-	ImGui::Begin("DebugCamera");
-	ImGui::SliderFloat3("Offset", &translation_.x, -100.0f, 1000.0f);
-	ImGui::SliderFloat3("Pivot", &pivot_.x, 0.0f, 1000.0f);
-	ImGui::End();
+	//ImGui::Begin("DebugCamera");
+	//ImGui::SliderFloat3("Offset", &translation_.x, -100.0f, 1000.0f);
+	//ImGui::SliderFloat3("Pivot", &pivot_.x, 0.0f, 1000.0f);
+	//ImGui::End();
 
 	const float rotSpeed = 0.02f;
 	float dPitch = 0, dYaw = 0, dZ = 0;

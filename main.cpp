@@ -16,7 +16,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256]={0};
 	char preKeys[256]={0};
 
-
+	#pragma region c
 	Vector3 position[4]{
 	    {100, 100, 0}, // 左上 (100,100)
 	    {300, 100, 0}, // 右上
@@ -35,16 +35,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         {1.0f, 1.0f},
         {0.0f, 1.0f}
     };
-	
 
-	
 	SoundData soundData1 = gameBase->SoundLoadWave("Resources/Alarm01.wav");
 
 	gameBase->SoundPlayWave(soundData1);
 
-	DebugCamera debugCamera;
-	debugCamera.Initialize();
+	DebugCamera camera;
+	camera.Initialize();
 	Function function;
+#pragma endregion
+
+	
+
+
 	WaterController water;
 	water.Initialize();
 	/*int PrePressMouse = 0;*/
@@ -58,19 +61,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			gameBase->BeginFlame(keys,preKeys);
 			memcpy(preKeys, keys, 256);
 
-#pragma region 
+#pragma region c
 			
-				// DebugCamera の更新
-			debugCamera.Update((uint8_t*)keys, (uint8_t*)preKeys);
+				
+			camera.Update((uint8_t*)keys, (uint8_t*)preKeys);
 
-			// DebugCameraの行列を取得
-			Matrix4x4 viewProjectionMatrix = debugCamera.GetViewProjectionMatrix();
+			
+			Matrix4x4 viewProjectionMatrix = camera.GetViewProjectionMatrix();
 
 			// World行列を作る（必要に応じてGameBaseからTransformを使ってもよい）
 			Matrix4x4 worldMatrix = function.MakeAffineMatrix(gameBase->transform.scale, gameBase->transform.rotate, gameBase->transform.translate);
 			gameBase->GetCameraTransform() = {
 			    {1, 1, 1},
-                debugCamera.rotation_, debugCamera.translation_
+                camera.rotation_, camera.translation_
             };
 			// WVP行列を作成
 			Matrix4x4 wvpMatrix = function.Multiply(worldMatrix, viewProjectionMatrix);

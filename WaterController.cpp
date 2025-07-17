@@ -340,7 +340,7 @@ void WaterController::Initialize() {
 	    {{50, 50, 50}, 10.0f},
         {{55, 50, 50}, 10.0f}
     };
-	metaBallConnectThreshold = 0.5f;
+	metaBallConnectThreshold = 30.0f;
 
 	isCharging_ = false;
 	isFired_ = false;
@@ -397,7 +397,7 @@ const EdgeInfo edgeInfoTable[12] = {
 void WaterController::DrawMetaballImGui() {
 
 	ImGui::Begin("Metaball Control");
-	ImGui::SliderFloat("Connect Threshold", &metaBallConnectThreshold, 10.0f, 100.0f);
+	/*ImGui::SliderFloat("Connect Threshold", &metaBallConnectThreshold, 10.0f, 100.0f);*/
 	for (size_t i = 0; i < balls.size(); ++i) {
 		ImGui::PushID((int)i);
 		ImGui::SliderFloat3("Position", &balls[i].pos.x, -100.0f, 100, "%.1f");
