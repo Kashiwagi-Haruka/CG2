@@ -344,8 +344,8 @@ void WaterController::Initialize() {
 
 	isCharging_ = false;
 	isFired_ = false;
-
-// 例：WaterControllerのカメラ初期化やDraw内
+#pragma region c
+	// 例：WaterControllerのカメラ初期化やDraw内
 	camTarget_ = {0.0f, 0.0f, 0.0f};
 	camDistance_ = 400.0f;
 	camElevation_ = 0.0f;
@@ -356,6 +356,9 @@ void WaterController::Initialize() {
 	for (int i = 0; i <= kRowCount; ++i) {
 		gridPoints3D_[i].resize(kColCount + 1);
 	}
+#pragma endregion
+
+
 }
 
 
@@ -397,7 +400,9 @@ const EdgeInfo edgeInfoTable[12] = {
 void WaterController::DrawMetaballImGui() {
 
 	ImGui::Begin("Metaball Control");
-	/*ImGui::SliderFloat("Connect Threshold", &metaBallConnectThreshold, 10.0f, 100.0f);*/
+	ImGui::SliderFloat("Connect Threshold", &metaBallConnectThreshold, 10.0f, 100.0f);
+	ImGui::SliderInt("Grid Size", &GRID_SIZE, 10, 200);
+	ImGui::SliderFloat("Grid Step", &GRID_STEP, 1.0f, 5);
 	for (size_t i = 0; i < balls.size(); ++i) {
 		ImGui::PushID((int)i);
 		ImGui::SliderFloat3("Position", &balls[i].pos.x, -100.0f, 100, "%.1f");

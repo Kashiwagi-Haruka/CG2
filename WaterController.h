@@ -67,8 +67,8 @@ public:
   std::vector<SplashParticle> splashes;  
   float metaBallConnectThreshold = 5.0f; // 合成/分離のしきい値（例）
 
-           const int GRID_SIZE = 70;
-  const float GRID_STEP = 2.0f;
+  int GRID_SIZE = 70;
+  float GRID_STEP = 1.0f;
   Vector3 GRID_ORIGIN = {0.0f, 0.0f, 0.0f};
 
   const float ISOLEVEL = 1.0f;
