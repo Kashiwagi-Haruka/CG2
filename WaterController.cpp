@@ -405,7 +405,7 @@ void WaterController::DrawMetaballImGui() {
 	ImGui::SliderFloat("Grid Step", &GRID_STEP, 1.0f, 5);
 	for (size_t i = 0; i < balls.size(); ++i) {
 		ImGui::PushID((int)i);
-		ImGui::SliderFloat3("Position", &balls[i].pos.x, -100.0f, 100, "%.1f");
+		ImGui::SliderFloat3("Position", &balls[i].pos.x, -100.0f, 50, "%.1f");
 		ImGui::SliderFloat("Radius", &balls[i].radius, 1.0f, 20.0f, "%.1f");
 		ImGui::PopID();
 	}

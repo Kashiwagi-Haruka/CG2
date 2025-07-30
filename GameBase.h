@@ -293,7 +293,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	LONG GetMouseY() const { return mouseY_; }
 
 	void DrawMesh(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices, uint32_t color, int textureHandle = -1);
-	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle);
+	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world);
 	void SetIsMetaBall(bool IsMetaBall) { IsMetaBall_ = IsMetaBall; };
 
 	ModelData GetPlaneModelData() const { return modelData; }

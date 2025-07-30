@@ -24,14 +24,9 @@ void ObjDraw::Initialize(GameBase& gameBase) {
 	sphere.directionalLight.direction = {1.0f, -1.0f, -1.0f};
 	sphere.directionalLight.intensity = 1.5f;
 	planeModel = gameBase.GetPlaneModelData();
-	for (int i = 0; i < planeModel.vertices.size(); ++i) {
-		// 頂点の位置を調整
-		planeModel.vertices[i].position.z = 5.0f; // X軸方向に-0.5f
-		planeModel.vertices[i].position.x += 50.0f;
-		planeModel.vertices[i].position.y += 50.0f; // Y軸方向に+0.5f
-	}
+
 	// ObjDraw::Initialize
-	object.transform.scale = {10.0f, 10.0f, 10.0f};
+	object.transform.scale = {1.0f, 1.0f, 1.0f};
 	object.transform.rotate = {0.0f, 0.0f, 0.0f};
 	object.transform.translate = {0.0f, 0.0f, 0.0f};
 }
@@ -70,49 +65,31 @@ void ObjDraw::DrawObjSprite(GameBase& gameBase, const Matrix4x4 viewProj){
 	spritePos[3] = {
 	    sprite.transform.translate.x - sprite.transform.scale.x, sprite.transform.translate.y - sprite.transform.scale.y,
 	    sprite.transform.translate.z};
-	/*gameBase.DrawSpriteSheet(spritePos, sprite.UV, 0xffffffff);*/
+	gameBase.DrawSpriteSheet(spritePos, sprite.UV, 0xffffffff);
 
+	// 1) ワールド行列を作成
+	Matrix4x4 S = fn.MakeScaleMatrix(object.transform.scale);
+	Matrix4x4 R = fn.MakeRotateXMatrix(object.transform.rotate.x);
+	R = fn.Multiply(R, fn.MakeRotateYMatrix(object.transform.rotate.y));
+	R = fn.Multiply(R, fn.MakeRotateZMatrix(object.transform.rotate.z));
+	Matrix4x4 T = fn.MakeTranslateMatrix(object.transform.translate);
+	Matrix4x4 world = fn.Multiply(S, fn.Multiply(R, T));
 
+	// 2) viewProj は already 「ビュー×射影」が来ている想定なので
+	//    world * viewProj で最終 WVP を得る
+	Matrix4x4 wvp = fn.Multiply(world, viewProj);
 
+	// 3) スロット 1（VertexShader用 CBV）に書き込む
+	//    ※ GameBase 側でスロット番号は適宜合わせてください
+	gameBase.SetTransformMatrixWVP(wvp, 1);
 
+	// 4) ObjDraw::Initialize で取得しておいた ModelData を再取得
+	//    （planeModel は Initialize() で gameBase.GetPlaneModelData() してあるはず）
+	const auto& md = planeModel;
 
-
-	
-		// --- (ImGuiまわりやUV計算は省略・今のまま維持でOK) ---
-
-		// 1. ワールド行列を作成
-		Matrix4x4 S = fn.MakeScaleMatrix(object.transform.scale);
-		Matrix4x4 R = fn.MakeRotateXMatrix(object.transform.rotate.x);
-		R = fn.Multiply(R, fn.MakeRotateYMatrix(object.transform.rotate.y));
-		R = fn.Multiply(R, fn.MakeRotateZMatrix(object.transform.rotate.z));
-		Matrix4x4 T = fn.MakeTranslateMatrix(object.transform.translate);
-		Matrix4x4 world = fn.Multiply(S, fn.Multiply(R, T));
-
-		// 2. ビュー行列
-		auto cam = gameBase.GetCameraTransform();
-		Matrix4x4 camMat = fn.MakeAffineMatrix(cam.scale, cam.rotate, cam.translate);
-		Matrix4x4 view = fn.Inverse(camMat);
-
-		// 3. 投影行列
-		Matrix4x4 proj = fn.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
-
-		// 4. 最終 WVP
-		Matrix4x4 wvp = fn.Multiply(world, fn.Multiply(view, proj));
-		gameBase.SetTransformMatrixWVP(wvp, 2);
-
-		// 5. plane.objの頂点・インデックス取得
-		ModelData md = gameBase.GetPlaneModelData();
-		std::vector<uint32_t> indices;
-		if (!md.indices.empty()) {
-			indices = md.indices;
-		} else {
-			// もしobjのindicesが空なら [0,1,2,3,4,5] を作成
-			indices.resize(md.vertices.size());
-			std::iota(indices.begin(), indices.end(), 0);
-		}
-
-		// 6. インデックス付きでメッシュ描画
-		gameBase.DrawMesh(md.vertices, indices, 0xffffffff, 1); // uvChecker.png: tex=1
+	// 5) DrawMesh を呼んで頂点＋テクスチャを一発描画
+	//    引数は (頂点リスト, RGBA カラー, テクスチャスロット番号)
+	gameBase.DrawMesh(md.vertices, 0xffffffff, /*uvCheckerを１番スロットにロードしている*/ 1,wvp,world);
 
 		// --- ImGuiデバッグ出力（省略せずに残してOK） ---
 		ImGui::Begin("ObjSprite");
@@ -133,9 +110,15 @@ void ObjDraw::DrawObjSprite(GameBase& gameBase, const Matrix4x4 viewProj){
 		ImGui::Text("plane vertices: %d", (int)planeModel.vertices.size());
 		for (int i = 0; i < planeModel.vertices.size(); ++i) {
 			ImGui::Text("Vertex %d: (%f, %f, %f)", i, md.vertices[i].position.x, md.vertices[i].position.y, md.vertices[i].position.z);
-			ImGui::Text("Normal %d: (%f, %f, %f)", i, planeModel.vertices[i].normal.x, planeModel.vertices[i].normal.y, planeModel.vertices[i].normal.z);
-			ImGui::Text("Texcoord %d: (%f, %f)", i, planeModel.vertices[i].texcoord.x, planeModel.vertices[i].texcoord.y);
+		    ImGui::Text("SCALE: (%f, %f, %f)", object.transform.scale.x, object.transform.scale.y, object.transform.scale.z);
+		    ImGui::Text("ROTATE: (%f, %f, %f)", object.transform.rotate.x, object.transform.rotate.y, object.transform.rotate.z);
+		    ImGui::Text("TRANSLATE: (%f, %f, %f)", object.transform.translate.x, object.transform.translate.y, object.transform.translate.z);
+		    
 		}
+	    ImGui::Text("WVP[0][i]: (%f,%f,%f,%f)", wvp.m[0][0], wvp.m[0][1], wvp.m[0][2], wvp.m[0][3]);
+	    ImGui::Text("WVP[1][i]: (%f,%f,%f,%f)", wvp.m[1][0], wvp.m[1][1], wvp.m[1][2], wvp.m[1][3]);
+	    ImGui::Text("WVP[2][i]: (%f,%f,%f,%f)", wvp.m[2][0], wvp.m[2][1], wvp.m[2][2], wvp.m[2][3]);
+	    ImGui::Text("WVP[3][i]: (%f,%f,%f,%f)", wvp.m[3][0], wvp.m[3][1], wvp.m[3][2], wvp.m[3][3]);
 		ImGui::End();
 	}
 

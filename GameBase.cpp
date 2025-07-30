@@ -693,7 +693,7 @@ void GameBase::PSO() {
 	psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
 	psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK; // 裏面カリング
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK/*D3D12_CULL_MODE_NONE*/; // 裏面カリング
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 	psoDesc.RasterizerState = rasterizerDesc;
 	hr_ = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&graphicsPipelineState));
@@ -1747,7 +1747,7 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vect
 
 	commandList_->DrawIndexedInstanced(static_cast<UINT>(indices.size()), 1, 0, 0, 0);
 }
-void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle) {
+void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world) {
 	commandList_->SetGraphicsRootSignature(rootSignature.Get()); 
 	// 0. PSO切り替え
 	if (IsMetaBall_) {
@@ -1778,13 +1778,13 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color,
 	}
 
 	// WVP行列のセット（スロット2を使用）
-	Matrix4x4 worldMatrix = function.MakeAffineMatrix({1, 1, 1}, {0, 0, 0}, {0, 0, 0});
+	
 	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
 	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / kClientHeight, 0.1f, 100.0f);
-	Matrix4x4 wvpMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+	Matrix4x4 wvpMatrix = function.Multiply(world, function.Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData[2].WVP = wvpMatrix;
-	transformationMatrixData[2].World = worldMatrix;
+	transformationMatrixData[2].World = world;
 
 	// パイプライン設定
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewMetaball_);
