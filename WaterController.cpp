@@ -580,6 +580,7 @@ void WaterController::Draw(GameBase& gamebase, const Matrix4x4& viewProj)
 
     // 閾値判定
     if (minDist < metaBallConnectThreshold) {
+		
         // ---- メタボール描画 ----
         std::vector<VertexData> metaballVertices;
         std::vector<uint32_t> metaballIndices;
@@ -588,7 +589,7 @@ void WaterController::Draw(GameBase& gamebase, const Matrix4x4& viewProj)
         gamebase.DrawMesh(metaballVertices, metaballIndices, 0xFFFFFFFF, -1); // textureHandleはWaterControllerに持たせておく
     }
     else {
-
+		
 		// 分離球体描画時
 		for (const auto& ball : balls) {
 			Vector3 center = ball.pos;

@@ -111,6 +111,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="GameBase.cpp" />
     <ClCompile Include="imGuiM.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObjDraw.cpp" />
     <ClCompile Include="ResourceObject.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="WaterController.cpp" />
@@ -138,6 +139,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="imGuiM.h" />
     <ClInclude Include="LookUpTable.h" />
     <ClInclude Include="Matrix4x4.h" />
+    <ClInclude Include="ObjDraw.h" />
     <ClInclude Include="ResourceObject.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vector2.h" />
@@ -158,6 +160,10 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="WhitePS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

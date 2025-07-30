@@ -2,6 +2,7 @@
 #include "ResourceObject.h"
 #include "DebugCamera.h"
 #include "WaterController.h"
+#include "ObjDraw.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -46,10 +47,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma endregion
 
 	
+	enum class SceneName{
 
+		objSprite,//スプライトと平面オブジェクト描画
+		Sphere,//球の描画
+		LambertianReflectance,//ライト
+		HarfLambert,//ハーフライト
+		UVtransform,//UVトランスフォーム
+		Models,//複数モデル描画
+		UtahTeapot,//Teapot.objの描画
+		StanfordBunny,//bunny.objの描画
+		MultiMesh,//multiMesh.objの描画
+		MultiMaterial,//multiMaterial.objの描画
+		MetaBall,//メタボールの描画
+	};
+
+	SceneName scene=SceneName::objSprite;
 
 	WaterController water;
 	water.Initialize();
+	ObjDraw objDraw;
+	objDraw.Initialize(*gameBase);
 	/*int PrePressMouse = 0;*/
 	while (gameBase->IsMsgQuit()) {
 		
@@ -86,13 +104,79 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 #pragma endregion
 
+			ImGui::Begin("SceneChange");
+
+			if (ImGui::Button("objSprite")) {
+				scene = SceneName::objSprite;
+			}
+			if (ImGui::Button("Sphere")) {
+				scene = SceneName::Sphere;
+			}
+			if (ImGui::Button("LambertianReflectance")) {
+				scene = SceneName::LambertianReflectance;
+			}
+			if (ImGui::Button("HarfLambert")) {
+				scene = SceneName::HarfLambert;
+			}
+
+
+
+			if (ImGui::Button("MetaBall")) {
+				scene = SceneName::MetaBall;
+			}
+			ImGui::End();
+
+
+			if (scene == SceneName::MetaBall) {
+				gameBase->SetIsMetaBall(true);
+			} else {
+				gameBase->SetIsMetaBall(false);}
+
+			switch (scene) {
+
+			case SceneName::objSprite:
+
+				objDraw.DrawObjSprite(*gameBase, wvpMatrix);
+
+				break;
+			case SceneName::Sphere:
+
+
+				objDraw.DrawSphere(*gameBase, wvpMatrix);
+
+
+				break;
+			case SceneName::LambertianReflectance:
+				break;
+			case SceneName::HarfLambert:
+				break;
+			case SceneName::UVtransform:
+				break;
+			case SceneName::Models:
+				break;
+			case SceneName::UtahTeapot:
+				break;
+			case SceneName::StanfordBunny:
+				break;
+			case SceneName::MultiMesh:
+				break;
+			case SceneName::MultiMaterial:
+				break;
+			case SceneName::MetaBall:
+
+				
+				water.Update();
+
+				water.Draw(*gameBase, wvpMatrix);
+
+
+				break;
+			default:
+				break;
+			}
 		
 			
-			water.Update();
-
-
-
-			water.Draw(*gameBase,wvpMatrix);
+			
 
 	
 

@@ -18,6 +18,14 @@
 #include <dinput.h>
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
 
+struct MaterialData {
+	std::string textureFilePath;
+};
+struct ModelData {
+	std::vector<VertexData> vertices;
+	MaterialData material;
+};
+
 class GameBase {
 
 private:
@@ -167,13 +175,8 @@ Transform cameraTransform = {
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f}
     };
-struct MaterialData {
-	std::string textureFilePath;
-};
-struct ModelData {
-	std::vector<VertexData> vertices;
-	MaterialData material;
-};
+
+
 ModelData modelData;
 
 
@@ -217,6 +220,13 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	LONG mouseX_ = 0;
 	LONG mouseY_ = 0;
 
+	
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateWhite; // 完全白用
+
+	bool IsMetaBall_ = false; // メタボール描画フラグ
+	
+	
+
    public:	
 
 	   ~GameBase();
@@ -242,6 +252,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
 	
 	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
+	void DrawSphere(const Vector3& center, const Vector3& radius, const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
 	void DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color);
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
@@ -282,6 +293,10 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	LONG GetMouseY() const { return mouseY_; }
 
 	void DrawMesh(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices, uint32_t color, int textureHandle = -1);
+	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle);
+	void SetIsMetaBall(bool IsMetaBall) { IsMetaBall_ = IsMetaBall; };
+
+	ModelData GetPlaneModelData() const { return modelData; }
 
 private:
 

@@ -281,7 +281,7 @@ void GameBase::WindowClear() {
 		assert(false);
 	}
 
-	modelData = LoadObjFile("Resources", "WaterBall.obj");
+	modelData = LoadObjFile("Resources", "plane.obj");
 	// ↓ テクスチャも読み込んで、indexを取得
 	
 	
@@ -555,69 +555,40 @@ Microsoft::WRL::ComPtr<IDxcBlob> GameBase::CompileShader(/* CompilerするShader
 	// 実行用のバイナリを返却
 	return shaderBlob;
 }
-
 void GameBase::PSO() {
 	Log("PSO() Start\n");
 	assert(device_ != nullptr);
-	Log("device_ is OK\n");
 
-	// RootSignature作成
+	// --- RootSignature ---
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-	// RootParameter作成。Material(PixelShader用)とTransform(VertexShader用)
 	D3D12_ROOT_PARAMETER rootParameters[4] = {};
-
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
 	descriptorRange[0].NumDescriptors = 1;
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	// 0番目: PixelShader用のMaterial
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
 
-	// 1番目: VertexShader用のTransform
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[1].Descriptor.ShaderRegister = 1;
-
 
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
 
-	//Light用
 	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[3].Descriptor.ShaderRegister = 3;
 
-// DirectionalLight用バッファ生成＆Map
-	directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	if (!directionalLightResource_) {
-		OutputDebugStringA("directionalLightResource_ 作成失敗\n");
-		assert(false);
-	}
-	directionalLightData_ = nullptr;
-	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-	if (!directionalLightData_) {
-		OutputDebugStringA("directionalLightResource_ Map失敗\n");
-		assert(false);
-	}
-	*directionalLightData_ = {
-	    {1.0f, 1.0f, 1.0f, 1.0f},
-        {0.0f, -1.0f, 0.0f},
-        1.0f
-    };
-
-
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
 
-	//Sampler
 	D3D12_STATIC_SAMPLER_DESC staticSampler[1] = {};
 	staticSampler[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
 	staticSampler[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -627,9 +598,22 @@ void GameBase::PSO() {
 	staticSampler[0].MaxLOD = D3D12_FLOAT32_MAX;
 	staticSampler[0].ShaderRegister = 0;
 	staticSampler[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	descriptionRootSignature.pStaticSamplers=staticSampler;
+	descriptionRootSignature.pStaticSamplers = staticSampler;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSampler);
 
+	// Lightバッファ
+	directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	assert(directionalLightResource_);
+	directionalLightData_ = nullptr;
+	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+	assert(directionalLightData_);
+	*directionalLightData_ = {
+	    {1.0f, 1.0f, 1.0f, 1.0f},
+        {0.0f, -1.0f, 0.0f},
+        1.0f
+    };
+
+	// --- RootSignature作成 ---
 	signatureBlob = nullptr;
 	errorBlob = nullptr;
 	hr_ = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
@@ -637,17 +621,12 @@ void GameBase::PSO() {
 		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
-
 	rootSignature = nullptr;
 	hr_ = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
-	
-
 	assert(SUCCEEDED(hr_));
 
-	// InputLayout
+	// --- InputLayout ---
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-
-	// POSITION（float4）
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -656,7 +635,6 @@ void GameBase::PSO() {
 	inputElementDescs[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
 	inputElementDescs[0].InstanceDataStepRate = 0;
 
-	// TEXCOORD（float2）
 	inputElementDescs[1].SemanticName = "TEXCOORD";
 	inputElementDescs[1].SemanticIndex = 0;
 	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
@@ -670,12 +648,11 @@ void GameBase::PSO() {
 	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
-
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
-// BlendStateの設定（アルファブレンド有効化）
+	// --- Blend ---
 	D3D12_BLEND_DESC blendDesc{};
 	auto& rtBlend = blendDesc.RenderTarget[0];
 	rtBlend.BlendEnable = FALSE;
@@ -688,60 +665,64 @@ void GameBase::PSO() {
 	rtBlend.BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	rtBlend.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
-	// RasiterzerStateの設定
-	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	//裏面表示
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-	// 三角形の中を塗りつぶす
-	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-
-	// Shaderをコンパイルする
-	vertexShaderBlob = CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
-	assert(vertexShaderBlob != nullptr);
-
-	pixelShaderBlob = CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
-	assert(pixelShaderBlob != nullptr);
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();                                                 // RootSignature
-	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;                                                  // InputLayout
-	graphicsPipelineStateDesc.VS = {vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize()}; // VertexShader
-	graphicsPipelineStateDesc.PS = {pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize()};   // PixelShader
-	graphicsPipelineStateDesc.BlendState = blendDesc;                                                         // BlendState
-	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;                                               // RasterizerState
-
-	// 書き込むRTVの情報
-	graphicsPipelineStateDesc.NumRenderTargets = 1;
-	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-
-	// DepthStencil の設定
+	// --- DepthStencil ---
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-	depthStencilDesc.DepthEnable = true;                           // Depth 有効化
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO; // Depth 書き込みマスクをゼロに設定（書き込まない）
-	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 近いほど前に表示
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
-	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT; // DSV のフォーマットを指定
+	// --- 共通設定 ---
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
+	baseDesc.pRootSignature = rootSignature.Get();
+	baseDesc.InputLayout = inputLayoutDesc;
+	baseDesc.BlendState = blendDesc;
+	baseDesc.NumRenderTargets = 1;
+	baseDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	baseDesc.DepthStencilState = depthStencilDesc;
+	baseDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	baseDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	baseDesc.SampleDesc.Count = 1;
+	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
+	// --- 通常PSO（裏面カリング） ---
+	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+	assert(vsBlob && psBlob);
 
-	// 利用するポリゴン（形状）のタイプ。三角形
-	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
-	// どのように画面に色を打ち込むかの設定（気にしなくて良い）
-	graphicsPipelineStateDesc.SampleDesc.Count = 1;
-	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-
-	// 実際に生成
-	graphicsPipelineState = nullptr;
-	hr_ = device_->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = baseDesc;
+	psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
+	psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
+	D3D12_RASTERIZER_DESC rasterizerDesc{};
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK; // 裏面カリング
+	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+	psoDesc.RasterizerState = rasterizerDesc;
+	hr_ = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&graphicsPipelineState));
 	assert(SUCCEEDED(hr_));
+
+	// --- メタボール用PSO（両面描画＋真っ白PS） ---
+	Microsoft::WRL::ComPtr<IDxcBlob> whitePSBlob = CompileShader(L"WhitePS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+	assert(whitePSBlob);
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC metaballPsoDesc = baseDesc;
+	metaballPsoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
+	metaballPsoDesc.PS = {whitePSBlob->GetBufferPointer(), whitePSBlob->GetBufferSize()};
+	D3D12_RASTERIZER_DESC rasterizerDescMetaball{};
+	rasterizerDescMetaball.CullMode = D3D12_CULL_MODE_NONE; // 両面描画
+	rasterizerDescMetaball.FillMode = D3D12_FILL_MODE_SOLID;
+	metaballPsoDesc.RasterizerState = rasterizerDescMetaball;
+	hr_ = device_->CreateGraphicsPipelineState(&metaballPsoDesc, IID_PPV_ARGS(&graphicsPipelineStateWhite));
+	assert(SUCCEEDED(hr_));
+
 	Log("PSO END \n");
 }
+
+
 
 void GameBase::VertexResource() {
 	Log("VertexResource Start\n");
 	// 頂点リソース作成
 
-	modelData = LoadObjFile("Resources", "WaterBall.obj");
+	modelData = LoadObjFile("Resources", "plane.obj");
 
 	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * modelData.vertices.size());
 	
@@ -1330,6 +1311,7 @@ void GameBase::EndFlame() {
 
 
 void GameBase::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color) {
+	commandList_->SetPipelineState(graphicsPipelineState.Get()); // 通常
 	// 頂点バッファに6頂点分追記
 	VertexData* vertexData = nullptr;
 	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
@@ -1394,7 +1376,12 @@ void GameBase::DrawSphere(
     int textureHandle,
     const Matrix4x4& viewProj)
 {
-
+	// 0. まずここでPSO切り替え
+	if (IsMetaBall_) {
+		commandList_->SetPipelineState(graphicsPipelineStateWhite.Get()); // 白単色
+	} else {
+		commandList_->SetPipelineState(graphicsPipelineState.Get()); // 通常
+	}
     // 1. マテリアル設定
     Material* mat = nullptr;
     materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
@@ -1462,9 +1449,76 @@ void GameBase::DrawSphere(
 	Log(std::format("\n World matrix scale = ({}, {}, {})\n", tr.m[0][0], tr.m[1][1], tr.m[2][2])); // 実装に合わせて要調整
 
 }
+void GameBase::DrawSphere(const Vector3& center,const Vector3& radius,const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj) {
+	// 0. まずここでPSO切り替え
+	if (IsMetaBall_) {
+		commandList_->SetPipelineState(graphicsPipelineStateWhite.Get()); // 白単色
+	} else {
+		commandList_->SetPipelineState(graphicsPipelineState.Get()); // 通常
+	}
 
+	// 1. マテリアル設定
+	Material* mat = nullptr;
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
+	mat->color = Vector4(((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, ((color >> 24) & 0xFF) / 255.0f);
+	mat->enableLighting = 1;
+	mat->uvTransform = function.MakeIdentity();
+	materialResource_->Unmap(0, nullptr);
+
+	// 2. ワールド行列とWVP
+	Matrix4x4 world = function.MakeAffineMatrix(
+	    radius, // スケール
+	    rotation,                // 回転
+	    center                    // 平行移動
+	);
+	Matrix4x4 wvp = function.Multiply(world, viewProj);
+	Log(std::format("WVP = "));
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			Log(std::format("{},", wvp.m[i][j]));
+		}
+		Log(std::format("\n"));
+	}
+
+	// 3. slotを自動管理
+	int slot = sphereDrawCallCount_; // 0から順に
+	                                 // 次回のためにカウンタ進める
+	sphereDrawCallCount_++;
+	assert(slot < kMaxTransformSlots); // slotは最大数を超えていないか？
+	// 4. 定数バッファへの書き込み（slot番目に格納）
+	transformationMatrixData[slot].WVP = wvp;
+	transformationMatrixData[slot].World = world;
+	// WaterController.cpp のループ内
+	/*OutputDebugStringA(std::format("Sphere #(slot){}: center=({:.2f},{:.2f},{:.2f}), r={:.2f}, viewProj[0][0]={:.2f}\n", slot, center.x, center.y, center.z, radius, viewProj.m[0][0]).c_str());*/
+
+	// 5. 頂点バッファ
+	D3D12_VERTEX_BUFFER_VIEW vbv = vertexBufferViewSphere;
+	commandList_->IASetVertexBuffers(0, 1, &vbv);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// 6. テクスチャ
+	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+
+	// 7. マテリアル
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+
+	// 8. 定数バッファ（球体ごとにアドレスをずらしてバインド！）
+	constexpr UINT kCBAlign = 256;
+	UINT matrixAlignedSize = (sizeof(TransformationMatrix) + kCBAlign - 1) & ~(kCBAlign - 1);
+
+	D3D12_GPU_VIRTUAL_ADDRESS cbAddress = transformResource_->GetGPUVirtualAddress() + slot * matrixAlignedSize;
+	commandList_->SetGraphicsRootConstantBufferView(1, cbAddress);
+
+	// 9. ライト
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+
+	// 10. 描画
+	commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
+	auto& tr = transformationMatrixData[1].World;
+	Log(std::format("\n World matrix scale = ({}, {}, {})\n", tr.m[0][0], tr.m[1][1], tr.m[2][2])); // 実装に合わせて要調整
+}
 //objfileを読む関数
-GameBase::ModelData GameBase::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
+ModelData GameBase::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
 	ModelData modelData;
 	std::vector<Vector4> positions;
 	std::vector<Vector3> normals;
@@ -1532,7 +1586,7 @@ GameBase::ModelData GameBase::LoadObjFile(const std::string& directoryPath, cons
 	return modelData;
 }
 
-GameBase::MaterialData GameBase::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
+MaterialData GameBase::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
 	MaterialData matData;
 	std::ifstream file(directoryPath + "/" + filename);
 	std::string line;
@@ -1627,7 +1681,13 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vect
 	//if (vertices.empty() || indices.empty())
 	//	return;
 
-vertexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices.size());
+	// 0. まずここでPSO切り替え
+	if (IsMetaBall_) {
+		commandList_->SetPipelineState(graphicsPipelineStateWhite.Get()); // 白単色
+	} else {
+		commandList_->SetPipelineState(graphicsPipelineState.Get()); // 通常
+	}
+	vertexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices.size());
 	vertexBufferViewMetaball_.BufferLocation = vertexResourceMetaball_->GetGPUVirtualAddress();
 	vertexBufferViewMetaball_.SizeInBytes = sizeof(VertexData) * static_cast<UINT>(vertices.size());
 	vertexBufferViewMetaball_.StrideInBytes = sizeof(VertexData);
@@ -1686,4 +1746,58 @@ vertexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(VertexData)
 	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_); // ここは用途に合わせて
 
 	commandList_->DrawIndexedInstanced(static_cast<UINT>(indices.size()), 1, 0, 0, 0);
+}
+void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle) {
+	commandList_->SetGraphicsRootSignature(rootSignature.Get()); 
+	// 0. PSO切り替え
+	if (IsMetaBall_) {
+		commandList_->SetPipelineState(graphicsPipelineStateWhite.Get()); // 白単色
+	} else {
+		commandList_->SetPipelineState(graphicsPipelineState.Get()); // 通常
+	}
+	
+	// 頂点リソース作成
+	vertexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices.size());
+	vertexBufferViewMetaball_.BufferLocation = vertexResourceMetaball_->GetGPUVirtualAddress();
+	vertexBufferViewMetaball_.SizeInBytes = sizeof(VertexData) * static_cast<UINT>(vertices.size());
+	vertexBufferViewMetaball_.StrideInBytes = sizeof(VertexData);
+
+	// バッファオーバーチェック
+	if (vertices.size() > kMaxVertexCount) {
+		OutputDebugStringA("DrawMesh: 頂点バッファサイズ超過！\n");
+		assert(false && "DrawMesh: 頂点バッファサイズ超過！");
+		return;
+	}
+
+	// 頂点データ転送
+	{
+		VertexData* vtxData = nullptr;
+		vertexResourceMetaball_->Map(0, nullptr, reinterpret_cast<void**>(&vtxData));
+		memcpy(vtxData, vertices.data(), sizeof(VertexData) * vertices.size());
+		vertexResourceMetaball_->Unmap(0, nullptr);
+	}
+
+	// WVP行列のセット（スロット2を使用）
+	Matrix4x4 worldMatrix = function.MakeAffineMatrix({1, 1, 1}, {0, 0, 0}, {0, 0, 0});
+	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / kClientHeight, 0.1f, 100.0f);
+	Matrix4x4 wvpMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+	transformationMatrixData[2].WVP = wvpMatrix;
+	transformationMatrixData[2].World = worldMatrix;
+
+	// パイプライン設定
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewMetaball_);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// ディスクリプタヒープとリソースの設定
+	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_.Get()};
+	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
+
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress() + sizeof(TransformationMatrix) * 2); // スロット2を使用
+	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);                                                                       // テクスチャ
+
+	// 描画コマンド
+	commandList_->DrawInstanced(static_cast<UINT>(vertices.size()), 1, 0, 0);
 }
