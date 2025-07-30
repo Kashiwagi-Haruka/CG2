@@ -25,7 +25,11 @@ struct ModelData {
 	std::vector<VertexData> vertices;
 	MaterialData material;
 };
-
+struct DirectionalLight {
+	Vector4 color;
+	Vector3 direction;
+	float intensity;
+};
 class GameBase {
 
 private:
@@ -121,14 +125,14 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite_;
 	Material materialDataSprite_;
 
-	struct DirectionalLight{
-		Vector4 color;
-		Vector3 direction;
-		float intensity;
-	};
+
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
+
+public:
 	DirectionalLight* directionalLightData_ = nullptr;
+
+private:
 
 	// GameBase.h
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceMetaball_;
@@ -297,6 +301,14 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	void SetIsMetaBall(bool IsMetaBall) { IsMetaBall_ = IsMetaBall; };
 
 	ModelData GetPlaneModelData() const { return modelData; }
+	DirectionalLight* GetDirectionalLightData() const { return directionalLightData_; }
+	void SetDirectionalLightData(const DirectionalLight& directionalLight) {
+		if (directionalLightResource_) {
+			directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+			*directionalLightData_ = directionalLight;
+			directionalLightResource_->Unmap(0, nullptr);
+		}
+	}
 
 private:
 

@@ -130,7 +130,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			if (scene == SceneName::MetaBall) {
 				gameBase->SetIsMetaBall(true);
 			} else {
-				gameBase->SetIsMetaBall(false);}
+				gameBase->SetIsMetaBall(false);
+				objDraw.HarfLightControl(*gameBase);
+			}
+
+			
 
 			switch (scene) {
 

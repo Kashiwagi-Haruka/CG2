@@ -29,6 +29,7 @@ void ObjDraw::Initialize(GameBase& gameBase) {
 	object.transform.scale = {1.0f, 1.0f, 1.0f};
 	object.transform.rotate = {0.0f, 0.0f, 0.0f};
 	object.transform.translate = {0.0f, 0.0f, 0.0f};
+	
 }
 
 void ObjDraw::DrawObjSprite(GameBase& gameBase, const Matrix4x4 viewProj){
@@ -107,18 +108,7 @@ void ObjDraw::DrawObjSprite(GameBase& gameBase, const Matrix4x4 viewProj){
 		ImGui::DragFloat3("Translate obj", &object.transform.translate.x, 0.1f);
 		ImGui::DragFloat3("Rotate obj", &object.transform.rotate.x, 0.1f);
 		ImGui::DragFloat3("Scale obj", &object.transform.scale.x, 0.1f, 0.5f);
-		ImGui::Text("plane vertices: %d", (int)planeModel.vertices.size());
-		for (int i = 0; i < planeModel.vertices.size(); ++i) {
-			ImGui::Text("Vertex %d: (%f, %f, %f)", i, md.vertices[i].position.x, md.vertices[i].position.y, md.vertices[i].position.z);
-		    ImGui::Text("SCALE: (%f, %f, %f)", object.transform.scale.x, object.transform.scale.y, object.transform.scale.z);
-		    ImGui::Text("ROTATE: (%f, %f, %f)", object.transform.rotate.x, object.transform.rotate.y, object.transform.rotate.z);
-		    ImGui::Text("TRANSLATE: (%f, %f, %f)", object.transform.translate.x, object.transform.translate.y, object.transform.translate.z);
-		    
-		}
-	    ImGui::Text("WVP[0][i]: (%f,%f,%f,%f)", wvp.m[0][0], wvp.m[0][1], wvp.m[0][2], wvp.m[0][3]);
-	    ImGui::Text("WVP[1][i]: (%f,%f,%f,%f)", wvp.m[1][0], wvp.m[1][1], wvp.m[1][2], wvp.m[1][3]);
-	    ImGui::Text("WVP[2][i]: (%f,%f,%f,%f)", wvp.m[2][0], wvp.m[2][1], wvp.m[2][2], wvp.m[2][3]);
-	    ImGui::Text("WVP[3][i]: (%f,%f,%f,%f)", wvp.m[3][0], wvp.m[3][1], wvp.m[3][2], wvp.m[3][3]);
+
 		ImGui::End();
 	}
 
@@ -141,17 +131,42 @@ void ObjDraw::DrawSphere(GameBase& gameBase, const Matrix4x4 viewProj){
 	ImGui::DragFloat3("Scale", &sphere.transform.scale.x, 0.1f,1.0f);
 	ImGui::TreePop();
 	}
-	ImGui::Separator();
-
-	if (ImGui::TreeNode("DirectionalLight")) {
 	
-	ImGui::ColorEdit4("Color", &sphere.directionalLight.color.x);
-	ImGui::DragFloat3("Direction", &sphere.directionalLight.direction.x, 0.1f);
-	ImGui::DragFloat("Intensity", &sphere.directionalLight.intensity, 0.1f, 0.0f, 10.0f);
-	ImGui::TreePop();
-	}
+
+
 	ImGui::End();
 	
 	gameBase.DrawSphere(sphere.transform.translate, sphere.transform.scale, sphere.transform.rotate,0xffffffff, -1,viewProj);
 
+}
+
+void ObjDraw::HarfLightControl(GameBase& gameBase) {
+	if (!gameBase.GetDirectionalLightData())
+		return;
+
+	
+    
+    
+	ImGui::Begin("Half Lambert Light");
+
+	ImGui::ColorEdit3("Light Color", &gameBase.directionalLightData_->color.x);
+	ImGui::DragFloat3("Light Direction", &gameBase.directionalLightData_->direction.x, 0.01f, -1.0f, 1.0f);
+	ImGui::DragFloat("Intensity", &gameBase.directionalLightData_->intensity, 0.01f, 0.0f, 10.0f);
+
+	if (ImGui::Button("RESET")) {
+		gameBase.directionalLightData_->color = {1.0f, 1.0f, 1.0f, 1.0f};
+		gameBase.directionalLightData_->direction = {0.0f, -1.0f, 0.0f};
+		gameBase.directionalLightData_->intensity = 1.0f;
+	}
+
+	// 方向ベクトルの正規化
+	Vector3& dir = gameBase.directionalLightData_->direction;
+	float len = sqrtf(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z);
+	if (len > 0.0001f) {
+		dir.x /= len;
+		dir.y /= len;
+		dir.z /= len;
+	}
+
+	ImGui::End();
 }

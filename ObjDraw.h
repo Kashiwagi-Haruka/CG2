@@ -44,13 +44,13 @@ class ObjDraw {
 	Sprite sprite;
 	Sphere sphere;
 	Object object;
-
+	
 	public:
 
 
 	void Initialize(GameBase& gameBase);
 	void DrawObjSprite(GameBase& gameBase,const Matrix4x4 viewProj);
 	void DrawSphere(GameBase& gameBase, const Matrix4x4 viewProj);
-
+	void HarfLightControl(GameBase& gameBase);
 
 };
