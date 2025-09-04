@@ -286,9 +286,9 @@ void GameBase::WindowClear() {
 	
 	
 
-	texture_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), "C:/Class/Program/DirectXGame/Resources/uvChecker.png", 1);
+	texture_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), "Resources/uvChecker.png", 1);
 	GPUHandle_ = texture_.GetGpuHandle();
-	texture2_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), /* "C:/Users/K024G/source/repos/AL3_KamataEngine3D/DirectXGame/Resources/monsterBall.png"*/ modelData.material.textureFilePath, 2);
+	texture2_.Initialize(device_.Get(), srvDescriptorHeap_.Get(),modelData.material.textureFilePath, 2);
 	OutputDebugStringA(("TexPath: " + modelData.material.textureFilePath + "\n").c_str());
 	GPUHandle2_ = texture2_.GetGpuHandle();
 	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる

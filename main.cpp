@@ -112,13 +112,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			if (ImGui::Button("Sphere")) {
 				scene = SceneName::Sphere;
 			}
-			if (ImGui::Button("LambertianReflectance")) {
-				scene = SceneName::LambertianReflectance;
-			}
-			if (ImGui::Button("HarfLambert")) {
-				scene = SceneName::HarfLambert;
-			}
-
+		
 
 
 			if (ImGui::Button("MetaBall")) {

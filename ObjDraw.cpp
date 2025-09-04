@@ -29,7 +29,9 @@ void ObjDraw::Initialize(GameBase& gameBase) {
 	object.transform.scale = {1.0f, 1.0f, 1.0f};
 	object.transform.rotate = {0.0f, 0.0f, 0.0f};
 	object.transform.translate = {0.0f, 0.0f, 0.0f};
-	
+	gameBase.directionalLightData_->direction = {0.0f, -1.0f, 0.0f}; // ライトの方向
+	gameBase.directionalLightData_->color = {1.0f, 1.0f, 1.0f, 1.0f}; // ライトの色
+	gameBase.directionalLightData_->intensity = 1.0f;                 // ライトの強度
 }
 
 void ObjDraw::DrawObjSprite(GameBase& gameBase, const Matrix4x4 viewProj){
