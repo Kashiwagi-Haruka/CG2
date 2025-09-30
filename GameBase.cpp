@@ -17,8 +17,6 @@ GameBase::~GameBase(){
 	
 	ResourceRelease();
 
-
-
 }
 
 
