@@ -279,12 +279,12 @@ void GameBase::WindowClear() {
 		assert(false);
 	}
 
-	modelData = LoadObjFile("Resources", "plane.obj");
+	modelData = LoadObjFile("Resources/3d", "plane.obj");
 	// ↓ テクスチャも読み込んで、indexを取得
 	
 	
 
-	texture_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), "Resources/uvChecker.png", 1);
+	texture_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), "Resources/3d/uvChecker.png", 1);
 	GPUHandle_ = texture_.GetGpuHandle();
 	texture2_.Initialize(device_.Get(), srvDescriptorHeap_.Get(),modelData.material.textureFilePath, 2);
 	OutputDebugStringA(("TexPath: " + modelData.material.textureFilePath + "\n").c_str());
@@ -683,8 +683,8 @@ void GameBase::PSO() {
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	// --- 通常PSO（裏面カリング） ---
-	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = CompileShader(L"Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
-	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = CompileShader(L"Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = CompileShader(L"Resources/shader/Object3d.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = CompileShader(L"Resources/shader/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vsBlob && psBlob);
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = baseDesc;
@@ -698,7 +698,7 @@ void GameBase::PSO() {
 	assert(SUCCEEDED(hr_));
 
 	// --- メタボール用PSO（両面描画＋真っ白PS） ---
-	Microsoft::WRL::ComPtr<IDxcBlob> whitePSBlob = CompileShader(L"WhitePS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
+	Microsoft::WRL::ComPtr<IDxcBlob> whitePSBlob = CompileShader(L"Resources/shader/WhitePS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(whitePSBlob);
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC metaballPsoDesc = baseDesc;
@@ -720,7 +720,7 @@ void GameBase::VertexResource() {
 	Log("VertexResource Start\n");
 	// 頂点リソース作成
 
-	modelData = LoadObjFile("Resources", "plane.obj");
+	modelData = LoadObjFile("Resources/3d", "plane.obj");
 
 	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * modelData.vertices.size());
 	

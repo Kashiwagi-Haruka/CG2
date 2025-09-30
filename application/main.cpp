@@ -37,7 +37,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         {0.0f, 1.0f}
     };
 
-	SoundData soundData1 = gameBase->SoundLoadWave("Resources/Alarm01.wav");
+	SoundData soundData1 = gameBase->SoundLoadWave("Resources/audio/Alarm01.wav");
 
 	gameBase->SoundPlayWave(soundData1);
 
