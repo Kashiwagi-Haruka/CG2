@@ -1,6 +1,0 @@
-﻿cl : コマンド ライン  warning D9002: 不明なオプション '/ignore:4049' を無視します。
-cl : コマンド ライン  warning D9002: 不明なオプション '/ignore:4098' を無視します。
-  enemy.cpp
-  DirectXGame.vcxproj -> C:\Class\Program\DirectXGame\x64\Debug\CG2.exe
-          1 file(s) copied.
-          1 file(s) copied.
