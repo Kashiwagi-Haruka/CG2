@@ -93,6 +93,7 @@
     <ClInclude Include="Matrix4x4.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+
     <ClInclude Include="Vector3.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -166,5 +167,6 @@
     <Text Include="externals\imgui\LICENSE.txt">
       <Filter>imgui</Filter>
     </Text>
+
   </ItemGroup>
 </Project>
