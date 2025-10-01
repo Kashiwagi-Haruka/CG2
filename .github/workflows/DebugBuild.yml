@@ -5,9 +5,9 @@ on:
       -master
 env:
 # リポジトリのルートディレクトリを起点としたソリューションファイルのパス
-SOLUTION_FILE_PATH: project/CG2.sln
+  SOLUTION_FILE_PATH: project/CG2.sln
 # Visual Studio の構成(Debug / Release )
-CONFIGURATION: Debug
+  CONFIGURATION: Debug
 jobs:
   build:
     runs-on: windows-2022
