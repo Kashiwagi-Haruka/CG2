@@ -15,12 +15,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: true
-
-      - name: Install vcpkg
-        uses: lukka/run-vcpkg@v11
-
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2
         with:
