@@ -138,6 +138,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 			gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
 
+			ImGui::Begin("Plane");
+
+
+
+
+
+			ImGui::End();
+
 		
 	
 
