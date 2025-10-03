@@ -81,12 +81,6 @@
     <ClCompile Include="application\Engine\Texture\Texture.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="application\ObjDraw.cpp">
-      <Filter>ソース ファイル\application</Filter>
-    </ClCompile>
-    <ClCompile Include="application\WaterController.cpp">
-      <Filter>ソース ファイル\application</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -160,15 +154,6 @@
     </ClInclude>
     <ClInclude Include="application\Engine\Texture\VertexData.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="application\LookUpTable.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\WaterController.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\ObjDraw.h">
-      <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

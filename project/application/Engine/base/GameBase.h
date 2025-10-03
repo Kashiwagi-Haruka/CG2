@@ -30,7 +30,7 @@ struct DirectionalLight {
 	Vector3 direction;
 	float intensity;
 };
-class GameBase {
+class GameBase :Texture {
 
 private:
 
@@ -195,10 +195,10 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	//Matrix4x4* wvpData = nullptr; // ← transformResource用のポインタをメンバに持つ
 	TransformationMatrix* transformationMatrixData = nullptr;
 
-	Texture texture_;
-	Texture texture2_;
-	D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle_;
-	D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle2_;
+	//Texture texture_;
+	//Texture texture2_;
+	D3D12_GPU_DESCRIPTOR_HANDLE TextureGPUHandle_[10000];
+	D3D12_GPU_DESCRIPTOR_HANDLE ModelGPUHandle_[10000];
 	
 	UINT currentTriangleVertexOffset_ = 0;  // 追加：次に書き込む頂点のオフセット（頂点数単位）
 	UINT currentSphereVertexOffset_ = 0;
@@ -234,7 +234,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
    public:	
 
 	   ~GameBase();
-
+	void CreateResource();
 	void BeginFlame(char* keys, char* preKeys); // フレームの開始処理（commandListリセットなど）
 	void EndFlame();   // フレームの終了処理（Present、フェンス待ちなど）
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
@@ -252,12 +252,12 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 
 	void ResourceRelease();
 
-	// 描画関数（好きなだけ呼べるように）
+	// 描画
 	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
 	
 	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
 	void DrawSphere(const Vector3& center, const Vector3& radius, const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
-	void DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color);
+	void DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color,int textureHandle);
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
@@ -265,8 +265,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	void SoundUnload(SoundData* soundData);
 	void SoundPlayWave(const SoundData& sounddata);
 	DirectInput DInput;
-	// GameBase.h の public に追加
-	// GameBase.h の public に追加
+
 	TransformationMatrix* GetTransformationMatrixData() const { return transformationMatrixData; }
 	void SetTransformMatrixWVP(Matrix4x4 transformationmatrix, int i) { transformationMatrixData[i].WVP = transformationmatrix; };
 
@@ -310,6 +309,23 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 		}
 	}
 
+	int LoadTextures(const std::string& fileName) {
+
+		int handles = TexInitialize(device_.Get(), srvDescriptorHeap_.Get(), fileName);
+		TextureGPUHandle_[GetTextureToTal()-1] = GetTexGpuHandle();
+		assert(TextureGPUHandle_[GetmodelTexTotal()-1].ptr != 0);
+		return handles;
+	};
+	int ModelTextures(const std::string& fileName) {
+
+		int handles = ModelTexInitialize(device_.Get(), srvDescriptorHeap_.Get(), fileName);
+		ModelGPUHandle_[GetmodelTexTotal()-1] = GetModelGpuHandle();
+		assert(ModelGPUHandle_[GetmodelTexTotal()-1].ptr != 0);
+
+
+		return handles;
+	};
+
 private:
 
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
@@ -348,7 +364,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const DirectX::TexMetadata& metdata);
 
-	/*int LoadTexture(const std::string& fileName);*/
+
 
 };
 

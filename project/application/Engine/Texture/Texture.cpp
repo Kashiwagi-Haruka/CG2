@@ -1,12 +1,14 @@
 #include "Texture.h"
 
 
-void Texture::Initialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescriptorHeap_, const std::string& fileName,uint32_t index) {
+int Texture::TexInitialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescriptorHeap_, const std::string& fileName) {
+	uint32_t index = TextureTotal + 1;
+
 	descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	descriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	// Textureを読んで転送する
-	DirectX::ScratchImage mipImages = LoadTexture(fileName); // ←これが正しい
+	DirectX::ScratchImage mipImages = LoadTextureName(fileName); // ←これが正しい
 
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	textureResource_ = CreateTextureResource(device_, metadata);
@@ -20,14 +22,14 @@ void Texture::Initialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescrip
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 	// --- ヒープの位置を取得 ---
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_,descriptorSizeSRV,index)
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, index);
 		
-		= srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+		
 	textureSrvHandleGPU_ = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
 
 	// --- ImGuiが0番を使ってる場合、1つインクリメントして避ける ---
 	UINT descriptorSize = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureSrvHandleCPU.ptr += descriptorSize*index;
+	
 	textureSrvHandleGPU_.ptr += descriptorSize*index;
 
 	// --- SRV作成 ---
@@ -35,9 +37,55 @@ void Texture::Initialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescrip
 	assert(metadata.format != DXGI_FORMAT_UNKNOWN);
 
 	OutputDebugStringA(std::format("GPU Handle: 0x{:X}\n", textureSrvHandleGPU_.ptr).c_str());
+	TextureTotal++;
+	return TextureTotal - 1;
 }
 
-DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
+int Texture::ModelTexInitialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescriptorHeap_, const std::string& fileName){
+
+		uint32_t index = TextureTotal+ modelTexTotal+10000 + 1;
+
+	descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	// Textureを読んで転送する
+	DirectX::ScratchImage mipImages = LoadTextureName(fileName); // ←これが正しい
+
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	textureResource_ = CreateTextureResource(device_, metadata);
+	UploadTextureData(textureResource_.Get(), mipImages);
+
+	// --- SRV作成用にmeta情報を使ってView記述 ---
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+	// --- ヒープの位置を取得 ---
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, index);
+
+	modelTexSrvHandleGPU_ = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
+
+	// --- ImGuiが0番を使ってる場合、1つインクリメントして避ける ---
+	UINT descriptorSize = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	
+	modelTexSrvHandleGPU_.ptr += descriptorSize * index;
+
+	// --- SRV作成 ---
+	device_->CreateShaderResourceView(textureResource_.Get(), &srvDesc, textureSrvHandleCPU);
+	assert(metadata.format != DXGI_FORMAT_UNKNOWN);
+
+	OutputDebugStringA(std::format("GPU Handle: 0x{:X}\n", textureSrvHandleGPU_.ptr).c_str());
+	modelTexTotal++;
+	return modelTexTotal - 1;
+
+
+
+}
+
+
+DirectX::ScratchImage Texture::LoadTextureName(const std::string& filePath) {
 		// テクスチャファイルを読んでプログラムで使えるようにする
 		DirectX::ScratchImage image{};
 		std::wstring filePathW = Cstr.ConvertString_(filePath);
@@ -84,9 +132,11 @@ Microsoft::WRL::ComPtr < ID3D12Resource> Texture::CreateTextureResource(ID3D12De
 	return textureResource_;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE Texture::GetGpuHandle() { 
+D3D12_GPU_DESCRIPTOR_HANDLE Texture::GetTexGpuHandle() { 
 	
 	return textureSrvHandleGPU_; }
+
+D3D12_GPU_DESCRIPTOR_HANDLE Texture::GetModelGpuHandle(){ return modelTexSrvHandleGPU_; }
 
 void Texture::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages) {
 	// Meta情報を取得

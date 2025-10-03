@@ -1,8 +1,8 @@
 #include"GameBase.h"
 #include "ResourceObject.h"
 #include "DebugCamera.h"
-#include "WaterController.h"
-#include "ObjDraw.h"
+
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -11,7 +11,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ResourceObject resourceObject;
 	//エンジンの初期化
 	gameBase->Initialize(L"CG2", 1280, 720);
+
+	gameBase->CreateResource();
+
+		
+	ModelData modelData = gameBase->LoadObjFile("Resources/3d", "plane.obj");
+	int textureHandle = gameBase->LoadTextures("Resources/2d/uvChecker.png");
+
 	
+
+	
+
+
 	SetUnhandledExceptionFilter(gameBase->ExportDump);
 
 	char keys[256]={0};
@@ -49,25 +60,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 	enum class SceneName{
 
-		objSprite,//スプライトと平面オブジェクト描画
-		Sphere,//球の描画
-		LambertianReflectance,//ライト
-		HarfLambert,//ハーフライト
-		UVtransform,//UVトランスフォーム
-		Models,//複数モデル描画
-		UtahTeapot,//Teapot.objの描画
-		StanfordBunny,//bunny.objの描画
-		MultiMesh,//multiMesh.objの描画
-		MultiMaterial,//multiMaterial.objの描画
-		MetaBall,//メタボールの描画
+		Title,
+		Game,
+
 	};
 
-	SceneName scene=SceneName::objSprite;
+	SceneName scene=SceneName::Title;
 
-	WaterController water;
-	water.Initialize();
-	ObjDraw objDraw;
-	objDraw.Initialize(*gameBase);
+	#ifdef NDEBUG
+
+		scene = SceneName::Game;
+
+	#endif // DEBUG
+
+	
+
+
+	
 	/*int PrePressMouse = 0;*/
 	while (gameBase->IsMsgQuit()) {
 		
@@ -104,70 +113,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 #pragma endregion
 
-			ImGui::Begin("SceneChange");
-
-			if (ImGui::Button("objSprite")) {
-				scene = SceneName::objSprite;
-			}
-			if (ImGui::Button("Sphere")) {
-				scene = SceneName::Sphere;
-			}
-		
-
-
-			if (ImGui::Button("MetaBall")) {
-				scene = SceneName::MetaBall;
-			}
-			ImGui::End();
-
-
-			if (scene == SceneName::MetaBall) {
-				gameBase->SetIsMetaBall(true);
-			} else {
-				gameBase->SetIsMetaBall(false);
-				objDraw.HarfLightControl(*gameBase);
-			}
+	
 
 			
 
 			switch (scene) {
 
-			case SceneName::objSprite:
-
-				objDraw.DrawObjSprite(*gameBase, wvpMatrix);
-
-				break;
-			case SceneName::Sphere:
-
-
-				objDraw.DrawSphere(*gameBase, wvpMatrix);
-
-
-				break;
-			case SceneName::LambertianReflectance:
-				break;
-			case SceneName::HarfLambert:
-				break;
-			case SceneName::UVtransform:
-				break;
-			case SceneName::Models:
-				break;
-			case SceneName::UtahTeapot:
-				break;
-			case SceneName::StanfordBunny:
-				break;
-			case SceneName::MultiMesh:
-				break;
-			case SceneName::MultiMaterial:
-				break;
-			case SceneName::MetaBall:
+			case SceneName::Title:
 
 				
-				water.Update();
 
-				water.Draw(*gameBase, wvpMatrix);
+				break;
 
+			case SceneName::Game:
 
+				
 				break;
 			default:
 				break;
@@ -175,7 +135,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 			
 			
+		
+			gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
 
+		
 	
 
 			//ゲームの処理

@@ -118,16 +118,8 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	DebugError();
 
 	WindowClear();
-	audio.InitializeIXAudio();
+	
 
-	HRESULT hr = DirectInput8Create(
-	    wc.hInstance,           // WinMain から渡した HINSTANCE
-	    DIRECTINPUT_VERSION, // DirectInput のバージョン
-	    IID_IDirectInput8,   // ← ここを使う
-	    reinterpret_cast<void**>(directInput_.GetAddressOf()), nullptr);
-	assert(SUCCEEDED(hr));  
-
-	InitializeMouse(hwnd);
 
 }
 
@@ -279,23 +271,16 @@ void GameBase::WindowClear() {
 		assert(false);
 	}
 
-	modelData = LoadObjFile("Resources/3d", "plane.obj");
-	// ↓ テクスチャも読み込んで、indexを取得
-	
-	
 
-	texture_.Initialize(device_.Get(), srvDescriptorHeap_.Get(), "Resources/3d/uvChecker.png", 1);
-	GPUHandle_ = texture_.GetGpuHandle();
-	texture2_.Initialize(device_.Get(), srvDescriptorHeap_.Get(),modelData.material.textureFilePath, 2);
-	OutputDebugStringA(("TexPath: " + modelData.material.textureFilePath + "\n").c_str());
-	GPUHandle2_ = texture2_.GetGpuHandle();
-	assert(GPUHandle_.ptr != 0); // もし0なら SRV 作成に失敗してる
+
+}
+
+void GameBase::CreateResource(){
+
 
 	DrawCommandList();
 
-
 	CrtvTransitionBarrier();
-	
 
 	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
 	hr_ = commandList_->Close();
@@ -327,10 +312,22 @@ void GameBase::WindowClear() {
 		WaitForSingleObject(fenceEvent_, INFINITE); // ★ここでちゃんとGPUが終わるまで待つ！
 	}
 
+	audio.InitializeIXAudio();
+
+	
+	HRESULT hr = DirectInput8Create(
+	    wc.hInstance,        // WinMain から渡した HINSTANCE
+	    DIRECTINPUT_VERSION, // DirectInput のバージョン
+	    IID_IDirectInput8,   // ← ここを使う
+	    reinterpret_cast<void**>(directInput_.GetAddressOf()), nullptr);
+	assert(SUCCEEDED(hr));
+
+	InitializeMouse(hwnd);
 }
+
 void GameBase::DebugLayer() {
 
-#ifdef _DEBUG
+#ifdef NDEBUG
 
 
 
@@ -348,7 +345,7 @@ void GameBase::DebugLayer() {
 
 void GameBase::DebugError() {
 
-#ifdef _DEBUG
+#ifdef NDEBUG
 
 	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
 	if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
@@ -437,8 +434,8 @@ void GameBase::CheackResourceLeaks() {
 }
 void GameBase::ResourceRelease() {
 	
-	texture_.Finalize();
-	texture2_.Finalize();
+	//texture_.Finalize();
+	//texture2_.Finalize();
 	imguiM_.Finalize();
 
 	
@@ -1212,45 +1209,7 @@ void GameBase::DrawCommandList() {
 
 	Microsoft::WRL::ComPtr < ID3D12DescriptorHeap> descriptorHeaps[] = {srvDescriptorHeap_.Get()};
 	commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-	// 描画直前で確認
-	/*OutputDebugStringA(std::format("Current texIndex={}, GPU Handle ptr={}\n", texIndex, textures_[texIndex].GetGpuHandle().ptr).c_str());*/
 
-	// ここで、モデルが持つtexIndex番のSRVを使う
-	
-	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle2_);
-
-
-	//// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	//commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	////OutputDebugStringA(std::format("modelData.vertices.size() = {}\n", modelData.vertices.size()).c_str());
-	////OutputDebugStringA(std::format("vertexBufferView_.SizeInBytes = {}\n", vertexBufferView_.SizeInBytes).c_str());
-	////OutputDebugStringA(std::format("sizeof(VertexData) = {}\n", sizeof(VertexData)).c_str());
-
-	//// 描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	//commandList_->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-	
-	
-	//// --- 球体描画 ---（追加すべき！）
-	//commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
-	//commandList_->DrawInstanced(kVertexCount_, 1, 0, 0);
-
-
-// --- スプライト描画 ---
-	//commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewSprite); // ★絶対にここでVBVをセット
-	//commandList_->IASetIndexBuffer(&indexBufferViewSprite_);
-	//commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
-	//commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite_->GetGPUVirtualAddress());
-	//commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-	//commandList_->SetDescriptorHeaps(1, &srvDescriptorHeap_);
-	//if (useMonsterBall_) {
-	//	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle2_);
-	//} else {
-	//	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
-	//}
-	//commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
-
-	
 }
 void GameBase::BeginFlame(char* keys,char*preKeys) {
 	
@@ -1308,7 +1267,7 @@ void GameBase::EndFlame() {
 
 
 
-void GameBase::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color) {
+void GameBase::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color,int textureHandle) {
 	commandList_->SetPipelineState(graphicsPipelineState.Get()); // 通常
 	// 頂点バッファに6頂点分追記
 	VertexData* vertexData = nullptr;
@@ -1358,7 +1317,7 @@ void GameBase::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color)
 	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+	commandList_->SetGraphicsRootDescriptorTable(2, TextureGPUHandle_[textureHandle]);
 
 	// 描画（1スプライト分）
 	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
@@ -1425,7 +1384,7 @@ void GameBase::DrawSphere(
     commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     // 6. テクスチャ
-    commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+	commandList_->SetGraphicsRootDescriptorTable(2, TextureGPUHandle_[textureHandle]);
 
     // 7. マテリアル
     commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
@@ -1495,7 +1454,7 @@ void GameBase::DrawSphere(const Vector3& center,const Vector3& radius,const Vect
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// 6. テクスチャ
-	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);
+	commandList_->SetGraphicsRootDescriptorTable(2, TextureGPUHandle_[textureHandle]);
 
 	// 7. マテリアル
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
@@ -1741,7 +1700,7 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vect
 
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_); // ここは用途に合わせて
+	commandList_->SetGraphicsRootDescriptorTable(2, TextureGPUHandle_[textureHandle]); // ここは用途に合わせて
 
 	commandList_->DrawIndexedInstanced(static_cast<UINT>(indices.size()), 1, 0, 0, 0);
 }
@@ -1794,7 +1753,7 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color,
 
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress() + sizeof(TransformationMatrix) * 2); // スロット2を使用
-	commandList_->SetGraphicsRootDescriptorTable(2, GPUHandle_);                                                                       // テクスチャ
+	commandList_->SetGraphicsRootDescriptorTable(2, TextureGPUHandle_[textureHandle]);                                                              // テクスチャ
 
 	// 描画コマンド
 	commandList_->DrawInstanced(static_cast<UINT>(vertices.size()), 1, 0, 0);
