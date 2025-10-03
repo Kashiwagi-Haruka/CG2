@@ -30,6 +30,12 @@ struct DirectionalLight {
 	Vector3 direction;
 	float intensity;
 };
+struct Transform {
+
+	Vector3 scale;
+	Vector3 rotate;
+	Vector3 translate;
+};
 class GameBase :Texture {
 
 private:
@@ -150,14 +156,7 @@ private:
 	};
 
 
-	struct Transform {
 
-		Vector3 scale;
-		Vector3 rotate;
-		Vector3 translate;
-
-
-	};
 
 	// 例: 最大確保サイズ（初期化時に使った値を定数などで保持しておく）
 	const size_t kMaxVertexCount = 200000;    // 実際の最大確保頂点数

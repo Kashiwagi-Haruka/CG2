@@ -133,16 +133,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				break;
 			}
 		
-			
-			
+			Transform planeTransform{
+			    .scale{1, 1, 1},
+                .rotate{0, 0, 0},
+                .translate{0, 0, 0}
+			};
+			Vector4 Color{1, 1, 1, 1};
 		
 			gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
-
+			
 			ImGui::Begin("Plane");
-
-
-
-
+			ImGui::Text("Transform");
+			ImGui::DragFloat3("Scale", &planeTransform.scale.x);
+			ImGui::DragFloat3("Rotate", &planeTransform.rotate.x);
+			ImGui::DragFloat3("Translate", &planeTransform.translate.x);
+			ImGui::ColorEdit4("Color", &Color.x);
+			
+			
 
 			ImGui::End();
 
