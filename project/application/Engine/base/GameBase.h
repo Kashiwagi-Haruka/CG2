@@ -16,6 +16,7 @@
 #include "Audio.h"
 #include "DirectInput.h"
 #include <dinput.h>
+#include "PSO.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
 
 struct MaterialData {
@@ -36,6 +37,17 @@ struct Transform {
 	Vector3 rotate;
 	Vector3 translate;
 };
+//enum BlendMode {
+//
+//	kBlendModeNone = 0, // ブレンドなし
+//	kBlendModeAlpha,    // アルファブレンド
+//	kBlendModeAdd,      // 加算ブレンド
+//	kBlendModeSub,      // 減算ブレンド
+//	kBlendModeMul,      // 乗算ブレンド
+//	kBlendScreen,       // スクリーンブレンド
+//	kCountOfBlendMode   // ブレンドモードの数.使用禁止
+//};
+
 class GameBase :Texture {
 
 private:
@@ -88,7 +100,8 @@ private:
 	D3D12_RECT scissorRect;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 	// 実際に生成
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState[6];
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateWhite; // 完全白用
 	// 頂点バッファビューを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 
@@ -224,16 +237,18 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	LONG mouseY_ = 0;
 
 	
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateWhite; // 完全白用
+	
 
 	bool IsMetaBall_ = false; // メタボール描画フラグ
 	
-	
+	PSO::BlendMode blendMode_= PSO::BlendMode::kBlendModeAlpha;
+
+	PSO pso_;
 
    public:	
 
 	   ~GameBase();
-	void CreateResource();
+	
 	void BeginFlame(char* keys, char* preKeys); // フレームの開始処理（commandListリセットなど）
 	void EndFlame();   // フレームの終了処理（Present、フェンス待ちなど）
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
@@ -274,16 +289,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	    {0.0f, 0.0f, 0.0f}  // translate
 	};
 
-	enum BlendMode{
-
-		kBlendModeNone = 0, // ブレンドなし
-		kBlendModeAlpha,    // アルファブレンド
-		kBlendModeAdd,      // 加算ブレンド
-		kBlendModeSub, // 減算ブレンド
-		kBlendModeMul,      // 乗算ブレンド
-		kBlendScreen,       // スクリーンブレンド
-		kCountOfBlendMode       // ブレンドモードの数.使用禁止
-	};
+	
 
 	Transform GetCameraTransform() const{ return cameraTransform; };
 	// マウス入力関連
@@ -325,6 +331,8 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 		return handles;
 	};
 
+	void SetBlendMode(PSO::BlendMode blendMode);
+
 private:
 
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
@@ -332,7 +340,7 @@ private:
 	void Log(const std::string& message);
 
 	void WindowClear();
-
+	void CreateResource();
 	void DebugLayer();
 	void DebugError();
 	void TransitionBarrier();
@@ -350,7 +358,7 @@ private:
 	    const wchar_t* profile,
 	    // 初期化で生成したものをつかう
 	    IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
-	void PSO();
+	void SetupPSO();
 
 	void VertexResource();
 

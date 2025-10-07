@@ -12,7 +12,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//エンジンの初期化
 	gameBase->Initialize(L"CG2", 1280, 720);
 
-	gameBase->CreateResource();
+	
 
 		
 	ModelData modelData = gameBase->LoadObjFile("Resources/3d", "plane.obj");
@@ -74,8 +74,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	#endif // DEBUG
 
 	
+		Transform planeTransform{
+	        .scale{1, 1, 1},
+            .rotate{0, 0, 0},
+            .translate{0, 0, 0}
+        };
+	    Vector4 Color{1, 1, 1, 1};
 
-
+		DirectionalLight Light{
+	        .color{1, 1, 1, 1},
+            .direction{0, 0, -2},
+            .intensity{0}
+        };
 	
 	/*int PrePressMouse = 0;*/
 	while (gameBase->IsMsgQuit()) {
@@ -133,14 +143,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				break;
 			}
 		
-			Transform planeTransform{
-			    .scale{1, 1, 1},
-                .rotate{0, 0, 0},
-                .translate{0, 0, 0}
-			};
-			Vector4 Color{1, 1, 1, 1};
+		
 		
 			gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
+			
 			
 			ImGui::Begin("Plane");
 			ImGui::Text("Transform");
@@ -148,7 +154,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::DragFloat3("Rotate", &planeTransform.rotate.x);
 			ImGui::DragFloat3("Translate", &planeTransform.translate.x);
 			ImGui::ColorEdit4("Color", &Color.x);
-			
+			ImGui::Text("Light");
+			ImGui::DragFloat3("Direction", &Light.direction.x);
+			ImGui::DragFloat("Intensity", &Light.intensity);
 			
 
 			ImGui::End();

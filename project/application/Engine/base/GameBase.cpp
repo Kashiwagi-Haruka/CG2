@@ -119,7 +119,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 	WindowClear();
 	
-
+	CreateResource();
 
 }
 
@@ -473,7 +473,7 @@ void GameBase::DXCInitialize() {
 	hr_ = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 	assert(SUCCEEDED(hr_));
 
-	PSO();
+	SetupPSO();
 	VertexResource();
 
 }
@@ -550,8 +550,8 @@ Microsoft::WRL::ComPtr<IDxcBlob> GameBase::CompileShader(/* CompilerするShader
 	// 実行用のバイナリを返却
 	return shaderBlob;
 }
-void GameBase::PSO() {
-	Log("PSO() Start\n");
+void GameBase::SetupPSO() {
+	Log("SetupPSO() Start\n");
 	assert(device_ != nullptr);
 
 	// --- RootSignature ---
@@ -685,13 +685,13 @@ void GameBase::PSO() {
 	assert(vsBlob && psBlob);
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = baseDesc;
-	psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
-	psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
-	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK/*D3D12_CULL_MODE_NONE*/; // 裏面カリング
-	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-	psoDesc.RasterizerState = rasterizerDesc;
-	hr_ = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&graphicsPipelineState));
+		psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
+		psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
+		D3D12_RASTERIZER_DESC rasterizerDesc{};
+		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK /*D3D12_CULL_MODE_NONE*/; // 裏面カリング
+		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+		psoDesc.RasterizerState = rasterizerDesc;
+	hr_ = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&graphicsPipelineState[PSO::BlendMode::kBlendModeAlpha]));
 	assert(SUCCEEDED(hr_));
 
 	// --- メタボール用PSO（両面描画＋真っ白PS） ---
@@ -708,7 +708,7 @@ void GameBase::PSO() {
 	hr_ = device_->CreateGraphicsPipelineState(&metaballPsoDesc, IID_PPV_ARGS(&graphicsPipelineStateWhite));
 	assert(SUCCEEDED(hr_));
 
-	Log("PSO END \n");
+	Log("SetupPSO END \n");
 }
 
 
@@ -1200,7 +1200,7 @@ void GameBase::DrawCommandList() {
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	commandList_->SetGraphicsRootSignature(rootSignature.Get());
-	commandList_->SetPipelineState(graphicsPipelineState.Get());                                         // PSOを設定
+	commandList_->SetPipelineState(graphicsPipelineState[blendMode_].Get());                                  // PSOを設定
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);                                     // VBVを設定
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());  // PixelShader側
 	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress()); // VertexShader側
@@ -1268,7 +1268,7 @@ void GameBase::EndFlame() {
 
 
 void GameBase::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color,int textureHandle) {
-	commandList_->SetPipelineState(graphicsPipelineState.Get()); // 通常
+	commandList_->SetPipelineState(graphicsPipelineState[blendMode_].Get()); // 通常
 	// 頂点バッファに6頂点分追記
 	VertexData* vertexData = nullptr;
 	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
@@ -1337,7 +1337,7 @@ void GameBase::DrawSphere(
 	if (IsMetaBall_) {
 		commandList_->SetPipelineState(graphicsPipelineStateWhite.Get()); // 白単色
 	} else {
-		commandList_->SetPipelineState(graphicsPipelineState.Get()); // 通常
+		commandList_->SetPipelineState(graphicsPipelineState[blendMode_].Get()); // 通常
 	}
     // 1. マテリアル設定
     Material* mat = nullptr;
@@ -1411,7 +1411,7 @@ void GameBase::DrawSphere(const Vector3& center,const Vector3& radius,const Vect
 	if (IsMetaBall_) {
 		commandList_->SetPipelineState(graphicsPipelineStateWhite.Get()); // 白単色
 	} else {
-		commandList_->SetPipelineState(graphicsPipelineState.Get()); // 通常
+		commandList_->SetPipelineState(graphicsPipelineState[blendMode_].Get()); // 通常
 	}
 
 	// 1. マテリアル設定
@@ -1642,7 +1642,8 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vect
 	if (IsMetaBall_) {
 		commandList_->SetPipelineState(graphicsPipelineStateWhite.Get()); // 白単色
 	} else {
-		commandList_->SetPipelineState(graphicsPipelineState.Get()); // 通常
+		
+		commandList_->SetPipelineState(graphicsPipelineState[blendMode_].Get()); // 通常
 	}
 	vertexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices.size());
 	vertexBufferViewMetaball_.BufferLocation = vertexResourceMetaball_->GetGPUVirtualAddress();
@@ -1705,12 +1706,13 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vect
 	commandList_->DrawIndexedInstanced(static_cast<UINT>(indices.size()), 1, 0, 0, 0);
 }
 void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world) {
+	
 	commandList_->SetGraphicsRootSignature(rootSignature.Get()); 
 	// 0. PSO切り替え
 	if (IsMetaBall_) {
 		commandList_->SetPipelineState(graphicsPipelineStateWhite.Get()); // 白単色
 	} else {
-		commandList_->SetPipelineState(graphicsPipelineState.Get()); // 通常
+		commandList_->SetPipelineState(graphicsPipelineState[blendMode_].Get()); // 通常
 	}
 	
 	// 頂点リソース作成
@@ -1757,4 +1759,10 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color,
 
 	// 描画コマンド
 	commandList_->DrawInstanced(static_cast<UINT>(vertices.size()), 1, 0, 0);
+}
+
+void GameBase::SetBlendMode(PSO::BlendMode blendMode){
+
+	blendMode_ = blendMode;
+
 }
