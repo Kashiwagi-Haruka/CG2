@@ -169,6 +169,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\main.cpp" />
     <ClCompile Include="application\Engine\base\ResourceObj\ResourceObject.cpp" />
     <ClCompile Include="application\Engine\Texture\Texture.cpp" />
+    <ClCompile Include="application\Engine\base\WinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -199,6 +200,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Engine\math\Vector3.h" />
     <ClInclude Include="application\Engine\math\Vector4.h" />
     <ClInclude Include="application\Engine\Texture\VertexData.h" />
+    <ClInclude Include="application\Engine\base\WinApp.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

@@ -6,7 +6,6 @@
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-	CoInitializeEx(0, COINITBASE_MULTITHREADED);
 	GameBase* gameBase=new GameBase;
 	ResourceObject resourceObject;
 	//エンジンの初期化
@@ -92,160 +91,151 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	    bool IsKeyboard = true;
 
 	/*int PrePressMouse = 0;*/
-	while (gameBase->IsMsgQuit()) {
+	while (gameBase->ProcessMessage()) {
 		
-		if (PeekMessage(gameBase->GetMsg(), NULL, 0, 0, PM_REMOVE)) {
-			TranslateMessage(gameBase->GetMsg());
-			DispatchMessage(gameBase->GetMsg());
-		} else {
 
-			gameBase->BeginFlame(keys,preKeys);
+		gameBase->BeginFlame(keys,preKeys);
 			
 
 #pragma region c
 			
 				
-			camera.Update((uint8_t*)keys, (uint8_t*)preKeys);
+		camera.Update((uint8_t*)keys, (uint8_t*)preKeys);
 
 			
-			Matrix4x4 viewProjectionMatrix = camera.GetViewProjectionMatrix();
+		Matrix4x4 viewProjectionMatrix = camera.GetViewProjectionMatrix();
 
-			// World行列を作る（必要に応じてGameBaseからTransformを使ってもよい）
-			Matrix4x4 worldMatrix = function.MakeAffineMatrix(planeTransform.scale, planeTransform.rotate, planeTransform.translate);
-			gameBase->GetCameraTransform() = {
-			    {1, 1, 1},
-                camera.rotation_, camera.translation_
-            };
-			// WVP行列を作成
-			Matrix4x4 wvpMatrix = function.Multiply(worldMatrix, viewProjectionMatrix);
+		// World行列を作る（必要に応じてGameBaseからTransformを使ってもよい）
+		Matrix4x4 worldMatrix = function.MakeAffineMatrix(planeTransform.scale, planeTransform.rotate, planeTransform.translate);
+		gameBase->GetCameraTransform() = {
+		    {1, 1, 1},
+            camera.rotation_, camera.translation_
+        };
+		// WVP行列を作成
+		Matrix4x4 wvpMatrix = function.Multiply(worldMatrix, viewProjectionMatrix);
 
-			// 書き込む
-			//gameBase->GetTransformationMatrixData()[0].WVP = wvpMatrix;
-			//gameBase->GetTransformationMatrixData()[1].WVP = wvpMatrix;
-			gameBase->SetTransformMatrixWVP(viewProjectionMatrix, 0);
-			gameBase->SetTransformMatrixWVP(viewProjectionMatrix, 1);
+		// 書き込む
+		//gameBase->GetTransformationMatrixData()[0].WVP = wvpMatrix;
+		//gameBase->GetTransformationMatrixData()[1].WVP = wvpMatrix;
+		gameBase->SetTransformMatrixWVP(viewProjectionMatrix, 0);
+		gameBase->SetTransformMatrixWVP(viewProjectionMatrix, 1);
 			
 #pragma endregion
 
 
-			switch (scene) {
+		switch (scene) {
 
-			case SceneName::Title:
-
-				
-
-				break;
-
-			case SceneName::Game:
+		case SceneName::Title:
 
 				
-				break;
-			default:
-				break;
-			}
+
+			break;
+
+		case SceneName::Game:
+
+				
+			break;
+		default:
+			break;
+		}
 		
-			ImGui::Begin("Plane");
-			ImGui::Text("Transform");
-			ImGui::DragFloat3("Scale", &planeTransform.scale.x,0.01f);
-			ImGui::DragFloat3("Rotate", &planeTransform.rotate.x,0.01f);
-			ImGui::DragFloat3("Translate", &planeTransform.translate.x,0.01f);
-		/*	ImGui::ColorEdit4("Color", &Color.x);
-			ImGui::Text("Light");
-			ImGui::DragFloat3("Direction", &Light.direction.x);
-			ImGui::DragFloat("Intensity", &Light.intensity);*/
-			ImGui::End();
+		ImGui::Begin("Plane");
+		ImGui::Text("Transform");
+		ImGui::DragFloat3("Scale", &planeTransform.scale.x,0.01f);
+		ImGui::DragFloat3("Rotate", &planeTransform.rotate.x,0.01f);
+		ImGui::DragFloat3("Translate", &planeTransform.translate.x,0.01f);
+	/*	ImGui::ColorEdit4("Color", &Color.x);
+		ImGui::Text("Light");
+		ImGui::DragFloat3("Direction", &Light.direction.x);
+		ImGui::DragFloat("Intensity", &Light.intensity);*/
+		ImGui::End();
 
-			worldMatrix = function.MakeAffineMatrix(planeTransform.scale, planeTransform.rotate, planeTransform.translate);
+		worldMatrix = function.MakeAffineMatrix(planeTransform.scale, planeTransform.rotate, planeTransform.translate);
 
-			ImGui::Begin("PadorKey");
-			if (ImGui::Button("Keyboard")) {
-				IsKeyboard = true;
-				IsPKey = false;
-			}
-			if (ImGui::Button("Pad")) {
-				IsXButton = false;
-				IsKeyboard = false;
-			}
+		ImGui::Begin("PadorKey");
+		if (ImGui::Button("Keyboard")) {
+			IsKeyboard = true;
+			IsPKey = false;
+		}
+		if (ImGui::Button("Pad")) {
+			IsXButton = false;
+			IsKeyboard = false;
+		}
 
-			if (IsKeyboard) {
-				ImGui::Text("Input = Keyboard");
-			} else {
-				ImGui::Text("Input = Pad");
-			}
+		if (IsKeyboard) {
+			ImGui::Text("Input = Keyboard");
+		} else {
+			ImGui::Text("Input = Pad");
+		}
 			
 
 
-			ImGui::End();
+		ImGui::End();
 
-			if (IsKeyboard) {
-				if (gameBase->TriggerKey(DIK_P)) {
-					IsPKey = !IsPKey;
-				}
-				if (!IsPKey) {
-					if (!gameBase->PushKey(DIK_SPACE)) {
-						if (gameBase->PushKey(DIK_W)||gameBase->PushKey(DIK_A)||gameBase->PushKey(DIK_D)||gameBase->PushKey(DIK_S)) {
+		if (IsKeyboard) {
+			if (gameBase->TriggerKey(DIK_P)) {
+				IsPKey = !IsPKey;
+			}
+			if (!IsPKey) {
+				if (!gameBase->PushKey(DIK_SPACE)) {
+					if (gameBase->PushKey(DIK_W)||gameBase->PushKey(DIK_A)||gameBase->PushKey(DIK_D)||gameBase->PushKey(DIK_S)) {
 
-							if (gameBase->PushKey(DIK_W)) {
-								planeTransform.translate.y += 0.1f;
-							}
-							if (gameBase->PushKey(DIK_S)) {
-								planeTransform.translate.y -= 0.1f;
-							}
-							if (gameBase->PushKey(DIK_A)) {
-								planeTransform.translate.x -= 0.1f;
-							}
-							if (gameBase->PushKey(DIK_D)) {
-								planeTransform.translate.x += 0.1f;
-							}
-
+						if (gameBase->PushKey(DIK_W)) {
+							planeTransform.translate.y += 0.1f;
 						}
-						gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
-					}
-				}
-			} else {
-				if (gameBase->TriggerButton(Input::PadButton::kButtonX)) {
-					IsXButton = !IsXButton;
-				}
-				if (!IsXButton) {
-				
-					if (!gameBase->PushButton(Input::PadButton::kButtonA)) {
-
-						if (gameBase->PushButton(Input::PadButton::kButtonUp)|| gameBase->PushButton(Input::PadButton::kButtonDown) || gameBase->PushButton(Input::PadButton::kButtonLeft) || gameBase->PushButton(Input::PadButton::kButtonRight)) {
-							if (gameBase->PushButton(Input::PadButton::kButtonUp)) {
-								planeTransform.translate.y += 0.1f;
-							}
-							if (gameBase->PushButton(Input::PadButton::kButtonDown)) {
-								planeTransform.translate.y -= 0.1f;
-							}
-							if (gameBase->PushButton(Input::PadButton::kButtonLeft)) {
-								planeTransform.translate.x -= 0.1f;
-							}
-							if (gameBase->PushButton(Input::PadButton::kButtonRight)) {
-								planeTransform.translate.x += 0.1f;
-							}
+						if (gameBase->PushKey(DIK_S)) {
+							planeTransform.translate.y -= 0.1f;
+						}
+						if (gameBase->PushKey(DIK_A)) {
+							planeTransform.translate.x -= 0.1f;
+						}
+						if (gameBase->PushKey(DIK_D)) {
+							planeTransform.translate.x += 0.1f;
 						}
 
-						planeTransform.translate.x += gameBase->GetJoyStickLX() * 0.1f;
-						planeTransform.translate.y += gameBase->GetJoyStickLY() * 0.1f;
-
-						planeTransform.rotate.y += gameBase->GetJoyStickRX() * 0.1f;
-						planeTransform.rotate.x += gameBase->GetJoyStickRY() * 0.1f;
-						gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
 					}
+					gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
 				}
 			}
+		} else {
+			if (gameBase->TriggerButton(Input::PadButton::kButtonX)) {
+				IsXButton = !IsXButton;
+			}
+			if (!IsXButton) {
 			
-			
-		
+				if (!gameBase->PushButton(Input::PadButton::kButtonA)) {
 
+					if (gameBase->PushButton(Input::PadButton::kButtonUp)|| gameBase->PushButton(Input::PadButton::kButtonDown) || gameBase->PushButton(Input::PadButton::kButtonLeft) || gameBase->PushButton(Input::PadButton::kButtonRight)) {
+						if (gameBase->PushButton(Input::PadButton::kButtonUp)) {
+							planeTransform.translate.y += 0.1f;
+						}
+						if (gameBase->PushButton(Input::PadButton::kButtonDown)) {
+							planeTransform.translate.y -= 0.1f;
+						}
+						if (gameBase->PushButton(Input::PadButton::kButtonLeft)) {
+							planeTransform.translate.x -= 0.1f;
+						}
+						if (gameBase->PushButton(Input::PadButton::kButtonRight)) {
+							planeTransform.translate.x += 0.1f;
+						}
+					}
+
+					planeTransform.translate.x += gameBase->GetJoyStickLX() * 0.1f;
+					planeTransform.translate.y += gameBase->GetJoyStickLY() * 0.1f;
+
+					planeTransform.rotate.y += gameBase->GetJoyStickRX() * 0.1f;
+					planeTransform.rotate.x += gameBase->GetJoyStickRY() * 0.1f;
+					gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
+				}
+			}
+		}
+			
+			
 		
 			//ゲームの処理
 
 			gameBase->EndFlame();
-		}
-
-
-
+		
 	}
 
 	//出力ウィンドウへの文字出力

@@ -5,6 +5,7 @@
 #include <dinput.h>
 #include <wrl.h>
 #include "Vector2.h"
+#include "WinApp.h"
 
 class Input {
 
@@ -13,6 +14,7 @@ class Input {
 	ComPtr<IDirectInput8> directInput = nullptr;
 	ComPtr<IDirectInputDevice8> keyboard;
 	ComPtr<IDirectInputDevice8> gamePadDevice_;
+	ComPtr<IDirectInputDevice8> mouseDevice_;
 
 	BYTE key[256] = {0};
 	BYTE preKey[256] = {0};
@@ -22,6 +24,13 @@ class Input {
 
 	float deadZone_ = 0.2f; // デッドゾーン(0.0f～1.0f)
 	
+	DIMOUSESTATE2 mouseState_{};
+	DIMOUSESTATE2 prevMouseState_{};
+	LONG mouseX_ = 0;
+	LONG mouseY_ = 0;
+	int noPadCounter = 0;
+
+	WinApp* winApp_ = nullptr;
 
 public:
 
@@ -46,12 +55,18 @@ public:
 		kMaxButtons
 	};
 
+	enum class MouseButton {
+		kLeft = 0,
+		kRight,
+		kMiddle,
+		kMaxButtons };
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name="wc"></param>
 	/// <param name="hwnd"></param>
-	void Initialize(WNDCLASS wc, HWND hwnd);
+	void Initialize(WinApp* winApp);
 
 	/// <summary>
 	/// 更新
@@ -103,6 +118,12 @@ public:
 	float GetJoyStickRY() const;
 	Vector2 GetJoyStickRXY() const;
 
+	// マウス
+	float GetMouseX() const; // マウスのX座標を取得
+	float GetMouseY() const; // マウスのY座標を取得
+	Vector2 GetMouseMove()const; // マウスの移動量を取得
+	bool PushMouseButton(MouseButton button) const; // マウスボタンが押されているか
+	bool TriggerMouseButton(MouseButton button) const; // マウスボタンが押された瞬間か
 
 	/// <summary>
 	/// デッドゾーンの設定

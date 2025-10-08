@@ -17,22 +17,7 @@ GameBase::~GameBase(){
 	
 	ResourceRelease();
 	delete DInput;
-}
-
-
-LRESULT CALLBACK GameBase::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
-		return true;
-	}
-
-	switch (msg) {
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-	}
-
-	return DefWindowProc(hwnd, msg, wparam, lparam);
+	delete winApp_;
 }
 
 
@@ -43,26 +28,8 @@ void GameBase::Log(const std::string& message) {
 
 void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight) {
 
-	wc.lpfnWndProc = WindowProc;
-
-	wc.lpszClassName = L"CG2WindowClass";
-
-	wc.hInstance = GetModuleHandle(nullptr);
-
-	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-
-	RegisterClass(&wc);
-
-
-	wrc = {0, 0, WindowWidth, WindowHeight};
-
-	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-	hwnd = CreateWindow(wc.lpszClassName, TitleName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, wrc.right - wrc.left, wrc.bottom - wrc.top, nullptr, nullptr, wc.hInstance, nullptr);
-	///Debuglayer
-	DebugLayer();
-
-	ShowWindow(hwnd, SW_SHOW);
+	winApp_ = new WinApp();
+	winApp_->Initialize();
 
 	// DXGIファクトリーの生成
 	dxgiFactory = nullptr;
@@ -123,14 +90,9 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 }
 
-bool GameBase::IsMsgQuit() {
+bool GameBase::ProcessMessage() {
 
-	if (msg.message != WM_QUIT) {
-	
-		return true;
-	}
-
-	return false;
+	return winApp_->ProcessMessage();
 }
 
 void GameBase::OutPutLog() {
@@ -194,8 +156,8 @@ void GameBase::WindowClear() {
 	swapChain_ = nullptr;
 	swapChainDesc = {};
 
-	swapChainDesc.Width = kClientWidth;
-	swapChainDesc.Height = kClientHeight;
+	swapChainDesc.Width = WinApp::kClientWidth;
+	swapChainDesc.Height = WinApp::kClientHeight;
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -204,7 +166,7 @@ void GameBase::WindowClear() {
 
 	// コマンドキュー、ウィンドウハンドル、設定を渡して生成する
 
-	hr_ = dxgiFactory->CreateSwapChainForHwnd(commandQueue_.Get(), hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain_.GetAddressOf()));
+	hr_ = dxgiFactory->CreateSwapChainForHwnd(commandQueue_.Get(), winApp_->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain_.GetAddressOf()));
 	assert(SUCCEEDED(hr_));
 
 	// ディスクリプタヒープの生成
@@ -222,8 +184,11 @@ void GameBase::WindowClear() {
 	//// ディスクリプタヒープがつくれなかったので起動できない
 	//assert(SUCCEEDED(hr_));
 	DXCInitialize();
+
 	DInput = new Input();
-	DInput->Initialize(wc,hwnd);
+	DInput->Initialize(winApp_);
+
+
 	hr_ = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	// 上手く取得できなければ起動できない
 	assert(SUCCEEDED(hr_));
@@ -251,7 +216,7 @@ void GameBase::WindowClear() {
 	// 2つ目を作る
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc, rtvHandles[1]);
 
-	depthStenicilResource = CreateDepthStencilTextureResource(device_.Get(), kClientWidth, kClientHeight);
+	depthStenicilResource = CreateDepthStencilTextureResource(device_.Get(), WinApp::kClientWidth, WinApp::kClientHeight);
 
 	dsvDescriptorHeap = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
@@ -266,7 +231,7 @@ void GameBase::WindowClear() {
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
 	// ImGui 初期化はここで！
-	imguiM_.MInitialize(hwnd, device_.Get(), swapChainDesc, rtvDesc, srvDescriptorHeap_.Get());
+	imguiM_.MInitialize(winApp_->GetHwnd(), device_.Get(), swapChainDesc, rtvDesc, srvDescriptorHeap_.Get());
 	
 	if (srvDescriptorHeap_ == nullptr) {
 		assert(false);
@@ -316,37 +281,12 @@ void GameBase::CreateResource(){
 	audio.InitializeIXAudio();
 
 	
-	HRESULT hr = DirectInput8Create(
-	    wc.hInstance,        // WinMain から渡した HINSTANCE
-	    DIRECTINPUT_VERSION, // DirectInput のバージョン
-	    IID_IDirectInput8,   // ← ここを使う
-	    reinterpret_cast<void**>(directInput_.GetAddressOf()), nullptr);
-	assert(SUCCEEDED(hr));
-
-	InitializeMouse(hwnd);
 }
 
-void GameBase::DebugLayer() {
-
-#ifdef NDEBUG
-
-
-
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
-	//デバッグレイヤー
-		debugController->EnableDebugLayer();
-		//更にGPU側でもチェックを行うようにする
-		debugController->SetEnableGPUBasedValidation(TRUE);
-	}
-	
-
-#endif // DEBUG
-
-}
 
 void GameBase::DebugError() {
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 
 	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
 	if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
@@ -435,8 +375,7 @@ void GameBase::CheackResourceLeaks() {
 }
 void GameBase::ResourceRelease() {
 	
-	//texture_.Finalize();
-	//texture2_.Finalize();
+
 	imguiM_.Finalize();
 
 	
@@ -455,7 +394,7 @@ void GameBase::ResourceRelease() {
 	}
 	
 
-	CloseWindow(hwnd);
+	winApp_->Finalize();
 }
 
 
@@ -732,8 +671,8 @@ void GameBase::VertexResource() {
 
 	// ビューポートとシザー設定
 	viewport = {};
-	viewport.Width = float(kClientWidth);
-	viewport.Height = float(kClientHeight);
+	viewport.Width = float(WinApp::kClientWidth);
+	viewport.Height = float(WinApp::kClientHeight);
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	viewport.MinDepth = 0.0f;
@@ -741,9 +680,9 @@ void GameBase::VertexResource() {
 
 	scissorRect = {};
 	scissorRect.left = 0;
-	scissorRect.right = kClientWidth;
+	scissorRect.right = WinApp::kClientWidth;
 	scissorRect.top = 0;
-	scissorRect.bottom = kClientHeight;
+	scissorRect.bottom = WinApp::kClientHeight;
 
 	// --- マテリアル用リソース ---
 	// 3D用（球など陰影つけたいもの）
@@ -1000,8 +939,8 @@ void GameBase::CreateModelVertexBuffer() {
 
 	// ビューポートとシザー設定
 	viewport = {};
-	viewport.Width = float(kClientWidth);
-	viewport.Height = float(kClientHeight);
+	viewport.Width = float(WinApp::kClientWidth);
+	viewport.Height = float(WinApp::kClientHeight);
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	viewport.MinDepth = 0.0f;
@@ -1009,9 +948,9 @@ void GameBase::CreateModelVertexBuffer() {
 
 	scissorRect = {};
 	scissorRect.left = 0;
-	scissorRect.right = kClientWidth;
+	scissorRect.right = WinApp::kClientWidth;
 	scissorRect.top = 0;
-	scissorRect.bottom = kClientHeight;
+	scissorRect.bottom = WinApp::kClientHeight;
 
 	// --- マテリアル用リソース ---
 	// 3D用（球など陰影つけたいもの）
@@ -1592,48 +1531,14 @@ void GameBase::SoundPlayWave(const SoundData& sounddata) {
 	assert(audio.GetIXAudio2() != nullptr); // 安全のため追加
 	audio.SoundPlayWave(audio.GetIXAudio2().Get(), sounddata);
 }
-void GameBase::InitializeMouse(HWND hwnd) {
 
-	// directInput_ は既に DirectInput8Create で作成済み
-	// マウスデバイスを作成
-	HRESULT hr = directInput_->CreateDevice(GUID_SysMouse, &mouseDevice_, nullptr);
-	if (FAILED(hr))
-		return;
+bool GameBase::PushMouseButton(Input::MouseButton button) const { return DInput->PushMouseButton(button); }
 
-	// データフォーマットを設定（拡張マウス状態）
-	hr = mouseDevice_->SetDataFormat(&c_dfDIMouse2);
-	if (FAILED(hr))
-		return;
+bool GameBase::TriggerMouseButton(Input::MouseButton button) const { return DInput->TriggerMouseButton(button); }
 
-	// 協調レベル：フォアグラウンドかつ他アプリと共有
-	hr = mouseDevice_->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-	if (FAILED(hr))
-		return;
-
-	// 最初の Acquire
-	mouseDevice_->Acquire();
-}
-void GameBase::UpdateMouse() {
-	// １）前フレームの状態を保存
-	prevMouseState_ = mouseState_;
-
-	// ２）DirectInput で相対移動だけ取得（マウスホイールやボタンは要るなら使う）
-	if (mouseDevice_) {
-		mouseDevice_->Acquire();
-		mouseDevice_->GetDeviceState(sizeof(mouseState_), &mouseState_);
-	}
-	// （相対移動は今ここでは使わないので無視してOK）
-
-	// ３）Windows API でマウスの絶対位置を取得
-	POINT pt;
-	GetCursorPos(&pt);          // スクリーン座標
-	ScreenToClient(hwnd, &pt); // クライアント座標に変換
-	mouseX_ = pt.x;             // ここではクランプせずそのまま代入
-	mouseY_ = pt.y;
-}
-bool GameBase::IsMouseDown(int btn) const { return (mouseState_.rgbButtons[btn] & 0x80u) != 0; }
-
-bool GameBase::IsMousePressed(int btn) const { return (mouseState_.rgbButtons[btn] & 0x80u) != 0 && !(prevMouseState_.rgbButtons[btn] & 0x80u); }
+float GameBase::GetMouseX() const { return DInput->GetMouseX(); };
+float GameBase::GetMouseY() const { return DInput->GetMouseY(); };
+Vector2 GameBase::GetMouseMove() const { return DInput->GetMouseMove(); };
 
 void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices, uint32_t color, int textureHandle) {
 	//if (vertices.empty() || indices.empty())
@@ -1739,7 +1644,7 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color,
 	
 	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / kClientHeight, 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / WinApp::kClientHeight, 0.1f, 100.0f);
 	Matrix4x4 wvpMatrix = function.Multiply(world, function.Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData[2].WVP = wvpMatrix;
 	transformationMatrixData[2].World = world;

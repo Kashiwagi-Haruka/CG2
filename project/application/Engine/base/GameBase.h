@@ -17,7 +17,8 @@
 #include "Input.h"
 #include <dinput.h>
 #include "PSO.h"
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
+#include "WinApp.h"
+
 
 struct MaterialData {
 	std::string textureFilePath;
@@ -52,6 +53,8 @@ class GameBase :Texture {
 
 private:
 
+	WinApp* winApp_ = nullptr;
+
 	WNDCLASS wc{};
 	RECT wrc;
 	Audio audio;
@@ -62,7 +65,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
 	HRESULT hr_;
-	HWND hwnd;
+	
 	// 使用するアダプタ用の変数。最初にnullptrを入れておく
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
 	Microsoft::WRL::ComPtr < ID3D12Device> device_ = nullptr;
@@ -91,8 +94,7 @@ private:
 
 	/*std::vector<Texture> textures_;*/
 
-	int32_t kClientWidth = 1280;
-	int32_t kClientHeight = 720;
+
 
 
 	D3D12_VIEWPORT viewport;
@@ -226,18 +228,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 
 	static const UINT kMaxSpriteVertices = 6 * 10000; // フレーム最大 1000 スプライト分
 	
-
-
 	void FrameStart(); // フレーム最初の準備
-	Microsoft::WRL::ComPtr<IDirectInput8> directInput_;
-		Microsoft::WRL::ComPtr<IDirectInputDevice8> mouseDevice_;
-	DIMOUSESTATE2 mouseState_{};
-	DIMOUSESTATE2 prevMouseState_{};
-	LONG mouseX_ = 0;
-	LONG mouseY_ = 0;
-
-	
-	
 
 	bool IsMetaBall_ = false; // メタボール描画フラグ
 	
@@ -255,7 +246,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	void EndFlame();   // フレームの終了処理（Present、フェンス待ちなど）
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
 
-	bool IsMsgQuit();
+	bool ProcessMessage();
 
 	void OutPutLog();
 
@@ -291,16 +282,8 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	    {0.0f, 0.0f, 0.0f}  // translate
 	};
 
-	
-
 	Transform GetCameraTransform() const{ return cameraTransform; };
-	// マウス入力関連
-	void InitializeMouse(HWND hwnd);
-	void UpdateMouse();
-	bool IsMouseDown(int btn) const;
-	bool IsMousePressed(int btn) const;
-	LONG GetMouseX() const { return mouseX_; }
-	LONG GetMouseY() const { return mouseY_; }
+
 
 	void DrawMesh(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices, uint32_t color, int textureHandle = -1);
 	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world);
@@ -386,15 +369,23 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	/// <param name="deadZone">初期値は0.2f</param>
 	void SetDeadZone(float deadZone);
 
+	// マウス入力関連
+
+	bool PushMouseButton(Input::MouseButton button) const;
+	bool TriggerMouseButton(Input::MouseButton button) const;
+	float GetMouseX() const;
+	float GetMouseY() const;
+	Vector2 GetMouseMove() const;
+
 private:
 
-	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	
 
 	void Log(const std::string& message);
 
 	void WindowClear();
 	void CreateResource();
-	void DebugLayer();
+	
 	void DebugError();
 	void TransitionBarrier();
 

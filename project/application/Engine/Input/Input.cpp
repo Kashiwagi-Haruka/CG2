@@ -17,11 +17,14 @@ BOOL CALLBACK Input::EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
 	return DIENUM_STOP;
 }
 
-void Input::Initialize(WNDCLASS wc, HWND hwnd) {
+void Input::Initialize(WinApp* winApp) {
+
+	winApp_ = winApp;
+
 	HRESULT result;
 
 	// DirectInput 作成
-	result = DirectInput8Create(wc.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+	result = DirectInput8Create(winApp_->GetHinstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
 	assert(SUCCEEDED(result));
 
 	// キーボード
@@ -29,7 +32,7 @@ void Input::Initialize(WNDCLASS wc, HWND hwnd) {
 	assert(SUCCEEDED(result));
 	result = keyboard->SetDataFormat(&c_dfDIKeyboard);
 	assert(SUCCEEDED(result));
-	result = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	result = keyboard->SetCooperativeLevel(winApp_->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(result));
 
 	// ゲームパッド列挙 → 最初の1台を使用
@@ -38,9 +41,20 @@ void Input::Initialize(WNDCLASS wc, HWND hwnd) {
 	if (gamePadDevice_) {
 		result = gamePadDevice_->SetDataFormat(&c_dfDIJoystick);
 		assert(SUCCEEDED(result));
-		result = gamePadDevice_->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		result = gamePadDevice_->SetCooperativeLevel(winApp_->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 		assert(SUCCEEDED(result));
 	}
+
+	result = directInput->CreateDevice(GUID_SysMouse, &mouseDevice_, nullptr);
+	assert(SUCCEEDED(result));
+
+	
+	result = mouseDevice_->SetDataFormat(&c_dfDIMouse2);
+	assert(SUCCEEDED(result));
+
+	
+	result = mouseDevice_->SetCooperativeLevel(winApp_->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	assert(SUCCEEDED(result));
 }
 
 
@@ -55,20 +69,34 @@ void Input::Update() {
 	// ゲームパッド
 	prePadState_ = padState_;
 
+	
+	
 	if (gamePadDevice_) {
 		HRESULT hr = gamePadDevice_->Acquire();
 		if (SUCCEEDED(hr)) {
 			hr = gamePadDevice_->GetDeviceState(sizeof(DIJOYSTATE), &padState_);
 			if (FAILED(hr)) {
-				// デバイスが切断されたか、状態が取れない
-				gamePadDevice_.Reset();
+				if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED) {
+					// 再度 Acquire を試みる
+					gamePadDevice_->Acquire();
+				} else {
+					// 本当にダメな場合だけリセット
+					gamePadDevice_.Reset();
+				}
 			}
 		} else {
-			// Acquire 自体失敗 → デバイスなしとみなす
-			gamePadDevice_.Reset();
+			if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED) {
+				// 未取得なら再度 Acquire を試みる
+				gamePadDevice_->Acquire();
+			} else {
+				// それ以外の致命的なエラーならリセット
+				gamePadDevice_.Reset();
+			}
 		}
 	}
 
+	if (winApp_->GetIsPad()) {
+		
 	// --- もしデバイスが切れていたら再列挙 ---
 	if (!gamePadDevice_) {
 		directInput->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, this, DIEDFL_ATTACHEDONLY);
@@ -77,6 +105,24 @@ void Input::Update() {
 			gamePadDevice_->SetCooperativeLevel(GetActiveWindow(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 		}
 	}
+	winApp_->SetIsPad(false);
+	}
+
+	prevMouseState_ = mouseState_;
+
+	// ２）DirectInput で相対移動だけ取得（マウスホイールやボタンは要るなら使う）
+	if (mouseDevice_) {
+		mouseDevice_->Acquire();
+		mouseDevice_->GetDeviceState(sizeof(mouseState_), &mouseState_);
+	}
+	
+
+	// ３）Windows API でマウスの絶対位置を取得
+	POINT pt;
+	GetCursorPos(&pt);                       // スクリーン座標
+	ScreenToClient(winApp_->GetHwnd(), &pt); // クライアント座標に変換
+	mouseX_ = pt.x;                          // ここではクランプせずそのまま代入
+	mouseY_ = pt.y;
 }
 
 
@@ -101,6 +147,8 @@ bool Input::TriggerKey(BYTE keyNumber) {
 }
 
 bool Input::PushButton(PadButton button) {
+	if (!gamePadDevice_)
+		return false;
 	int index = static_cast<int>(button);
 
 	if (index <= static_cast<int>(PadButton::kButtonRightThumb)) {
@@ -123,6 +171,8 @@ bool Input::PushButton(PadButton button) {
 
 
 bool Input::TriggerButton(PadButton button) {
+	if (!gamePadDevice_)
+		return false;
 	int index = static_cast<int>(button);
 
 	if (index <= static_cast<int>(PadButton::kButtonRightThumb)) {
@@ -148,7 +198,8 @@ bool Input::TriggerButton(PadButton button) {
 }
 
 float Input::GetJoyStickLX() const {
-	// 中央 32767 を基準に正規化
+	if (!gamePadDevice_)
+		return 0.0f;
 	float norm = (padState_.lX - 32767.0f) / 32767.0f;
 	if (fabs(norm) < deadZone_)
 		norm = 0.0f;
@@ -156,6 +207,8 @@ float Input::GetJoyStickLX() const {
 }
 
 float Input::GetJoyStickLY() const {
+	if (!gamePadDevice_)
+		return 0.0f;
 	float norm = (padState_.lY - 32767.0f) / 32767.0f;
 	if (fabs(norm) < deadZone_)
 		norm = 0.0f;
@@ -164,10 +217,13 @@ float Input::GetJoyStickLY() const {
 }
 
 Vector2 Input::GetJoyStickLXY() const {
+
 	return Vector2(GetJoyStickLX(), GetJoyStickLY()); 
 }
 
 float Input::GetJoyStickRX() const {
+	if (!gamePadDevice_)
+		return 0.0f;
 	float norm = (padState_.lRx - 32767.0f) / 32767.0f; // 右スティックX
 	if (fabs(norm) < deadZone_)
 		norm = 0.0f;
@@ -175,6 +231,8 @@ float Input::GetJoyStickRX() const {
 }
 
 float Input::GetJoyStickRY() const {
+	if (!gamePadDevice_)
+		return 0.0f;
 	float norm = (padState_.lRy - 32767.0f) / 32767.0f; // 右スティックY
 	if (fabs(norm) < deadZone_)
 		norm = 0.0f;
@@ -183,7 +241,6 @@ float Input::GetJoyStickRY() const {
 
 Vector2 Input::GetJoyStickRXY() const { return Vector2(GetJoyStickRX(), GetJoyStickRY()); }
 
-
 void Input::SetDeadZone(float deadZone){
 	if (deadZone < 0.0f)
 		deadZone = 0.0f;
@@ -191,4 +248,31 @@ void Input::SetDeadZone(float deadZone){
 		deadZone = 1.0f;
 	
 	deadZone_ = deadZone;
+}
+
+float Input::GetMouseX() const { return static_cast<float>(mouseX_); }
+
+float Input::GetMouseY() const { return static_cast<float>(mouseY_); }
+
+Vector2 Input::GetMouseMove() const {
+	// DIMOUSESTATE2 の lX, lY は相対移動量
+	return Vector2(static_cast<float>(mouseState_.lX), static_cast<float>(mouseState_.lY));
+}
+
+bool Input::PushMouseButton(MouseButton button) const {
+	int index = static_cast<int>(button);
+	if (index < 0 || index >= static_cast<int>(MouseButton::kMaxButtons)) {
+		return false;
+	}
+	return (mouseState_.rgbButtons[index] & 0x80) != 0;
+}
+
+bool Input::TriggerMouseButton(MouseButton button) const {
+	int index = static_cast<int>(button);
+	if (index < 0 || index >= static_cast<int>(MouseButton::kMaxButtons)) {
+		return false;
+	}
+	bool now = (mouseState_.rgbButtons[index] & 0x80) != 0;
+	bool prev = (prevMouseState_.rgbButtons[index] & 0x80) != 0;
+	return (now && !prev);
 }
