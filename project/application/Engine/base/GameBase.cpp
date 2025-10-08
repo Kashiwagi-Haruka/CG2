@@ -1646,10 +1646,10 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vect
 		
 		commandList_->SetPipelineState(graphicsPipelineState[blendMode_].Get()); // 通常
 	}
-	vertexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices.size());
-	vertexBufferViewMetaball_.BufferLocation = vertexResourceMetaball_->GetGPUVirtualAddress();
-	vertexBufferViewMetaball_.SizeInBytes = sizeof(VertexData) * static_cast<UINT>(vertices.size());
-	vertexBufferViewMetaball_.StrideInBytes = sizeof(VertexData);
+	vertexResourceMesh_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices.size());
+	vertexBufferViewMesh_.BufferLocation = vertexResourceMesh_->GetGPUVirtualAddress();
+	vertexBufferViewMesh_.SizeInBytes = sizeof(VertexData) * static_cast<UINT>(vertices.size());
+	vertexBufferViewMesh_.StrideInBytes = sizeof(VertexData);
 
 	indexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * indices.size());
 	indexBufferViewMetaball_.BufferLocation = indexResourceMetaball_->GetGPUVirtualAddress();
@@ -1657,8 +1657,8 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vect
 	indexBufferViewMetaball_.Format = DXGI_FORMAT_R32_UINT;
 
 
-	/*OutputDebugStringA(std::format("vertexBufferView_.SizeInBytes={} useVertex={} 1vertex={} bytes\n", vertexBufferViewMetaball_.SizeInBytes, vertices.size(), sizeof(VertexData)).c_str());*/
-	assert(vertices.size() * sizeof(VertexData) <= vertexBufferViewMetaball_.SizeInBytes);
+	/*OutputDebugStringA(std::format("vertexBufferView_.SizeInBytes={} useVertex={} 1vertex={} bytes\n", vertexBufferViewMesh_.SizeInBytes, vertices.size(), sizeof(VertexData)).c_str());*/
+	assert(vertices.size() * sizeof(VertexData) <= vertexBufferViewMesh_.SizeInBytes);
 
 	// バッファオーバーチェック
 	if (vertices.size() > kMaxVertexCount) {
@@ -1676,9 +1676,9 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vect
 	// 転送
 	{
 		VertexData* vtxData = nullptr;
-		vertexResourceMetaball_->Map(0, nullptr, reinterpret_cast<void**>(&vtxData));
+		vertexResourceMesh_->Map(0, nullptr, reinterpret_cast<void**>(&vtxData));
 		memcpy(vtxData, vertices.data(), sizeof(VertexData) * vertices.size());
-		vertexResourceMetaball_->Unmap(0, nullptr);
+		vertexResourceMesh_->Unmap(0, nullptr);
 	}
 	{
 		uint32_t* idxData = nullptr;
@@ -1689,7 +1689,7 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vect
 
 
 	// 描画時
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewMetaball_);
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewMesh_);
 	commandList_->IASetIndexBuffer(&indexBufferViewMetaball_);
 
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1710,17 +1710,15 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color,
 	
 	commandList_->SetGraphicsRootSignature(rootSignature.Get()); 
 	// 0. PSO切り替え
-	if (IsMetaBall_) {
-		commandList_->SetPipelineState(graphicsPipelineStateWhite.Get()); // 白単色
-	} else {
-		commandList_->SetPipelineState(graphicsPipelineState[blendMode_].Get()); // 通常
-	}
+
+	commandList_->SetPipelineState(graphicsPipelineState[blendMode_].Get()); // 通常
+	
 	
 	// 頂点リソース作成
-	vertexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices.size());
-	vertexBufferViewMetaball_.BufferLocation = vertexResourceMetaball_->GetGPUVirtualAddress();
-	vertexBufferViewMetaball_.SizeInBytes = sizeof(VertexData) * static_cast<UINT>(vertices.size());
-	vertexBufferViewMetaball_.StrideInBytes = sizeof(VertexData);
+	vertexResourceMesh_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices.size());
+	vertexBufferViewMesh_.BufferLocation = vertexResourceMesh_->GetGPUVirtualAddress();
+	vertexBufferViewMesh_.SizeInBytes = sizeof(VertexData) * static_cast<UINT>(vertices.size());
+	vertexBufferViewMesh_.StrideInBytes = sizeof(VertexData);
 
 	// バッファオーバーチェック
 	if (vertices.size() > kMaxVertexCount) {
@@ -1732,9 +1730,9 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color,
 	// 頂点データ転送
 	{
 		VertexData* vtxData = nullptr;
-		vertexResourceMetaball_->Map(0, nullptr, reinterpret_cast<void**>(&vtxData));
+		vertexResourceMesh_->Map(0, nullptr, reinterpret_cast<void**>(&vtxData));
 		memcpy(vtxData, vertices.data(), sizeof(VertexData) * vertices.size());
-		vertexResourceMetaball_->Unmap(0, nullptr);
+		vertexResourceMesh_->Unmap(0, nullptr);
 	}
 
 	// WVP行列のセット（スロット2を使用）
@@ -1747,7 +1745,7 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color,
 	transformationMatrixData[2].World = world;
 
 	// パイプライン設定
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewMetaball_);
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewMesh_);
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// ディスクリプタヒープとリソースの設定
@@ -1771,3 +1769,22 @@ bool GameBase::PushKey(BYTE keyNumber){ return DInput->PushKey(keyNumber); }
 bool GameBase::TriggerKey(BYTE keyNumber) { return DInput->TriggerKey(keyNumber); }
 bool GameBase::PushButton(Input::PadButton button) { return DInput->PushButton(button); }
 bool GameBase::TriggerButton(Input::PadButton button) { return DInput->TriggerButton(button); }
+// ジョイスティック
+
+float GameBase::GetJoyStickLX() const { return DInput->GetJoyStickLX(); };
+
+
+float GameBase::GetJoyStickLY() const { return DInput->GetJoyStickLY(); };
+
+Vector2 GameBase::GetJoyStickLXY() const { return DInput->GetJoyStickLXY(); };
+
+float GameBase::GetJoyStickRX() const { return DInput->GetJoyStickRX(); };
+float GameBase::GetJoyStickRY() const { return DInput->GetJoyStickRY(); };
+Vector2 GameBase::GetJoyStickRXY() const { return DInput->GetJoyStickRXY(); };
+
+
+/// <summary>
+/// デッドゾーンの設定
+/// </summary>
+/// <param name="deadZone">初期値は0.2f</param>
+void GameBase::SetDeadZone(float deadZone) { DInput->SetDeadZone(deadZone); };

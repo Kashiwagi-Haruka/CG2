@@ -154,9 +154,9 @@ public:
 private:
 
 	// GameBase.h
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceMetaball_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceMesh_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceMetaball_;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewMetaball_;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewMesh_;
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewMetaball_;
 
 
@@ -245,6 +245,8 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 
 	PSO pso_;
 
+	Input* DInput;
+
    public:	
 
 	   ~GameBase();
@@ -278,7 +280,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	SoundData SoundLoadWave(const char* filename);
 	void SoundUnload(SoundData* soundData);
 	void SoundPlayWave(const SoundData& sounddata);
-	Input* DInput;
+
 
 	TransformationMatrix* GetTransformationMatrixData() const { return transformationMatrixData; }
 	void SetTransformMatrixWVP(Matrix4x4 transformationmatrix, int i) { transformationMatrixData[i].WVP = transformationmatrix; };
@@ -337,6 +339,52 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	bool TriggerKey(BYTE keyNumber);
 	bool PushButton(Input::PadButton buttonNumber);
 	bool TriggerButton(Input::PadButton buttonNumber);
+
+	// ジョイスティック
+
+	/// <summary>
+	/// 左ジョイスティックのX軸を取得
+	/// </summary>
+	/// <returns></returns>
+	float GetJoyStickLX() const;
+
+	/// <summary>
+	/// 左ジョイスティックのY軸を取得
+	/// </summary>
+	/// <returns></returns>
+	float GetJoyStickLY() const;
+	/// <summary>
+	/// Vector2で左ジョイスティックのXYを取得
+	/// </summary>
+	/// <returns></returns>
+	Vector2 GetJoyStickLXY() const;
+
+	// 右スティック
+
+	/// <summary>
+	/// 右ジョイスティックのX軸を取得
+	/// </summary>
+	/// <returns></returns>
+	float GetJoyStickRX() const;
+
+	/// <summary>
+	/// 右ジョイスティックのY軸を取得
+	/// </summary>
+	/// <returns></returns>
+	float GetJoyStickRY() const;
+
+	/// <summary>
+	/// Vector2で右ジョイスティックのXYを取得
+	/// </summary>
+	/// <returns></returns>
+	Vector2 GetJoyStickRXY() const;
+
+
+	/// <summary>
+	/// デッドゾーンの設定
+	/// </summary>
+	/// <param name="deadZone">初期値は0.2f</param>
+	void SetDeadZone(float deadZone);
 
 private:
 

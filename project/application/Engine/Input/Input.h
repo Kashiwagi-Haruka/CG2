@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <dinput.h>
 #include <wrl.h>
+#include "Vector2.h"
 
 class Input {
 
@@ -19,7 +20,7 @@ class Input {
 	DIJOYSTATE padState_{};    // ゲームパッドの現在の状態
 	DIJOYSTATE prePadState_{}; // 前フレームの状態
 
-
+	float deadZone_ = 0.2f; // デッドゾーン(0.0f～1.0f)
 	
 
 public:
@@ -45,21 +46,71 @@ public:
 		kMaxButtons
 	};
 
-
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	/// <param name="wc"></param>
+	/// <param name="hwnd"></param>
 	void Initialize(WNDCLASS wc, HWND hwnd);
+
+	/// <summary>
+	/// 更新
+	/// </summary>
 	void Update();
 
 	// キーボード
+	
+	/// <summary>
+	/// キーが押されているか
+	/// </summary>
+	/// <param name="keyNumber">キーコード</param>
+	/// <returns></returns>
 	bool PushKey(BYTE keyNumber);
+
+	/// <summary>
+	/// キーが押された瞬間か
+	/// </summary>
+	/// <param name="keyNumber"></param>
+	/// <returns></returns>
 	bool TriggerKey(BYTE keyNumber);
 
 	// ゲームパッド
 	bool PushButton(PadButton button);                    // ボタンが押されているか
 	bool TriggerButton(PadButton button);                 // ボタンが押された瞬間か
-	LONG GetStickX() const { return padState_.lX; } // アナログスティックX
-	LONG GetStickY() const { return padState_.lY; } // アナログスティックY
 
-	private:
+	//ジョイスティック
+
+	/// <summary>
+	/// ジョイスティックのX軸を取得
+	/// </summary>
+	/// <returns></returns>
+	float GetJoyStickLX() const;
+
+	/// <summary>
+	/// ジョイスティックのY軸を取得
+	/// </summary>
+	/// <returns></returns>
+	float GetJoyStickLY() const;
+	/// <summary>
+	/// Vector2でジョイスティックのXYを取得
+	/// </summary>
+	/// <returns></returns>
+	Vector2 GetJoyStickLXY() const;
+
+
+	// 右スティック
+	float GetJoyStickRX() const;
+	float GetJoyStickRY() const;
+	Vector2 GetJoyStickRXY() const;
+
+
+	/// <summary>
+	/// デッドゾーンの設定
+	/// </summary>
+	/// <param name="deadZone">初期値は0.2f</param>
+	void SetDeadZone(float deadZone);
+
+private:
 	// デバイス列挙用の static コールバック
 	static BOOL CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext);
 };

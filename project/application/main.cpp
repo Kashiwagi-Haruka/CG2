@@ -100,7 +100,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		} else {
 
 			gameBase->BeginFlame(keys,preKeys);
-			/*memcpy(preKeys, keys, 256);*/
+			
 
 #pragma region c
 			
@@ -111,7 +111,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			Matrix4x4 viewProjectionMatrix = camera.GetViewProjectionMatrix();
 
 			// World行列を作る（必要に応じてGameBaseからTransformを使ってもよい）
-			Matrix4x4 worldMatrix = function.MakeAffineMatrix(gameBase->transform.scale, gameBase->transform.rotate, gameBase->transform.translate);
+			Matrix4x4 worldMatrix = function.MakeAffineMatrix(planeTransform.scale, planeTransform.rotate, planeTransform.translate);
 			gameBase->GetCameraTransform() = {
 			    {1, 1, 1},
                 camera.rotation_, camera.translation_
@@ -127,9 +127,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 #pragma endregion
 
-	
-
-			
 
 			switch (scene) {
 
@@ -147,6 +144,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				break;
 			}
 		
+			ImGui::Begin("Plane");
+			ImGui::Text("Transform");
+			ImGui::DragFloat3("Scale", &planeTransform.scale.x,0.01f);
+			ImGui::DragFloat3("Rotate", &planeTransform.rotate.x,0.01f);
+			ImGui::DragFloat3("Translate", &planeTransform.translate.x,0.01f);
+		/*	ImGui::ColorEdit4("Color", &Color.x);
+			ImGui::Text("Light");
+			ImGui::DragFloat3("Direction", &Light.direction.x);
+			ImGui::DragFloat("Intensity", &Light.intensity);*/
+			ImGui::End();
+
+			worldMatrix = function.MakeAffineMatrix(planeTransform.scale, planeTransform.rotate, planeTransform.translate);
+
 			ImGui::Begin("PadorKey");
 			if (ImGui::Button("Keyboard")) {
 				IsKeyboard = true;
@@ -173,6 +183,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 				if (!IsPKey) {
 					if (!gameBase->PushKey(DIK_SPACE)) {
+						if (gameBase->PushKey(DIK_W)||gameBase->PushKey(DIK_A)||gameBase->PushKey(DIK_D)||gameBase->PushKey(DIK_S)) {
+
+							if (gameBase->PushKey(DIK_W)) {
+								planeTransform.translate.y += 0.1f;
+							}
+							if (gameBase->PushKey(DIK_S)) {
+								planeTransform.translate.y -= 0.1f;
+							}
+							if (gameBase->PushKey(DIK_A)) {
+								planeTransform.translate.x -= 0.1f;
+							}
+							if (gameBase->PushKey(DIK_D)) {
+								planeTransform.translate.x += 0.1f;
+							}
+
+						}
 						gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
 					}
 				}
@@ -183,28 +209,36 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				if (!IsXButton) {
 				
 					if (!gameBase->PushButton(Input::PadButton::kButtonA)) {
+
+						if (gameBase->PushButton(Input::PadButton::kButtonUp)|| gameBase->PushButton(Input::PadButton::kButtonDown) || gameBase->PushButton(Input::PadButton::kButtonLeft) || gameBase->PushButton(Input::PadButton::kButtonRight)) {
+							if (gameBase->PushButton(Input::PadButton::kButtonUp)) {
+								planeTransform.translate.y += 0.1f;
+							}
+							if (gameBase->PushButton(Input::PadButton::kButtonDown)) {
+								planeTransform.translate.y -= 0.1f;
+							}
+							if (gameBase->PushButton(Input::PadButton::kButtonLeft)) {
+								planeTransform.translate.x -= 0.1f;
+							}
+							if (gameBase->PushButton(Input::PadButton::kButtonRight)) {
+								planeTransform.translate.x += 0.1f;
+							}
+						}
+
+						planeTransform.translate.x += gameBase->GetJoyStickLX() * 0.1f;
+						planeTransform.translate.y += gameBase->GetJoyStickLY() * 0.1f;
+
+						planeTransform.rotate.y += gameBase->GetJoyStickRX() * 0.1f;
+						planeTransform.rotate.x += gameBase->GetJoyStickRY() * 0.1f;
 						gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
 					}
 				}
 			}
 			
 			
-			ImGui::Begin("Plane");
-			ImGui::Text("Transform");
-			ImGui::DragFloat3("Scale", &planeTransform.scale.x);
-			ImGui::DragFloat3("Rotate", &planeTransform.rotate.x);
-			ImGui::DragFloat3("Translate", &planeTransform.translate.x);
-			ImGui::ColorEdit4("Color", &Color.x);
-			ImGui::Text("Light");
-			ImGui::DragFloat3("Direction", &Light.direction.x);
-			ImGui::DragFloat("Intensity", &Light.intensity);
-			
-
-			ImGui::End();
+		
 
 		
-	
-
 			//ゲームの処理
 
 			gameBase->EndFlame();
