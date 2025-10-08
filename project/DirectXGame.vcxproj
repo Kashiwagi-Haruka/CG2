@@ -153,7 +153,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Engine\Audio\Audio.cpp" />
     <ClCompile Include="application\Engine\base\Cstr\ConvertString.cpp" />
     <ClCompile Include="application\Engine\Camera\DebugCamera.cpp" />
-    <ClCompile Include="application\Engine\Input\DirectInput.cpp" />
+    <ClCompile Include="application\Engine\Input\Input.cpp" />
     <ClCompile Include="application\Engine\Camera\Camera.cpp" />
     <ClCompile Include="application\Engine\Texture\PSO.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -178,7 +178,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Engine\Audio\Audio.h" />
     <ClInclude Include="application\Engine\base\Cstr\ConvertString.h" />
     <ClInclude Include="application\Engine\Camera\DebugCamera.h" />
-    <ClInclude Include="application\Engine\Input\DirectInput.h" />
+    <ClInclude Include="application\Engine\Input\Input.h" />
     <ClInclude Include="application\Engine\Camera\Camera.h" />
     <ClInclude Include="application\Engine\Texture\PSO.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />

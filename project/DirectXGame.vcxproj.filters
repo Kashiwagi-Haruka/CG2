@@ -63,7 +63,7 @@
     <ClCompile Include="application\Engine\Camera\DebugCamera.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="application\Engine\Input\DirectInput.cpp">
+    <ClCompile Include="application\Engine\Input\Input.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
     <ClCompile Include="application\Engine\math\Function.cpp">
@@ -128,7 +128,7 @@
     <ClInclude Include="application\Engine\Camera\DebugCamera.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="application\Engine\Input\DirectInput.h">
+    <ClInclude Include="application\Engine\Input\Input.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
     <ClInclude Include="application\Engine\math\Function.h">

@@ -86,7 +86,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             .direction{0, 0, -2},
             .intensity{0}
         };
-	
+		
+		bool IsPKey = false;
+	    bool IsXButton = false;
+	    bool IsKeyboard = true;
+
 	/*int PrePressMouse = 0;*/
 	while (gameBase->IsMsgQuit()) {
 		
@@ -96,7 +100,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		} else {
 
 			gameBase->BeginFlame(keys,preKeys);
-			memcpy(preKeys, keys, 256);
+			/*memcpy(preKeys, keys, 256);*/
 
 #pragma region c
 			
@@ -143,9 +147,46 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				break;
 			}
 		
-		
-		
-			gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
+			ImGui::Begin("PadorKey");
+			if (ImGui::Button("Keyboard")) {
+				IsKeyboard = true;
+				IsPKey = false;
+			}
+			if (ImGui::Button("Pad")) {
+				IsXButton = false;
+				IsKeyboard = false;
+			}
+
+			if (IsKeyboard) {
+				ImGui::Text("Input = Keyboard");
+			} else {
+				ImGui::Text("Input = Pad");
+			}
+			
+
+
+			ImGui::End();
+
+			if (IsKeyboard) {
+				if (gameBase->TriggerKey(DIK_P)) {
+					IsPKey = !IsPKey;
+				}
+				if (!IsPKey) {
+					if (!gameBase->PushKey(DIK_SPACE)) {
+						gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
+					}
+				}
+			} else {
+				if (gameBase->TriggerButton(Input::PadButton::kButtonX)) {
+					IsXButton = !IsXButton;
+				}
+				if (!IsXButton) {
+				
+					if (!gameBase->PushButton(Input::PadButton::kButtonA)) {
+						gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
+					}
+				}
+			}
 			
 			
 			ImGui::Begin("Plane");

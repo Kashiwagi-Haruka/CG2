@@ -1,0 +1,65 @@
+#pragma once
+#define DIRECTINPUT_VERSION 0x0800
+#include <Windows.h>
+#include <cstdint>
+#include <dinput.h>
+#include <wrl.h>
+
+class Input {
+
+	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+	ComPtr<IDirectInput8> directInput = nullptr;
+	ComPtr<IDirectInputDevice8> keyboard;
+	ComPtr<IDirectInputDevice8> gamePadDevice_;
+
+	BYTE key[256] = {0};
+	BYTE preKey[256] = {0};
+
+	DIJOYSTATE padState_{};    // ゲームパッドの現在の状態
+	DIJOYSTATE prePadState_{}; // 前フレームの状態
+
+
+	
+
+public:
+
+	enum class PadButton {
+		kButtonA = 0,         // rgbButtons[0]
+		kButtonB,             // rgbButtons[1]
+		kButtonX,             // rgbButtons[2]
+		kButtonY,             // rgbButtons[3]
+		kButtonLeftShoulder,  // rgbButtons[4]
+		kButtonRightShoulder, // rgbButtons[5]
+		kButtonBack,          // rgbButtons[6]
+		kButtonStart,         // rgbButtons[7]
+		kButtonLeftThumb,     // rgbButtons[8]
+		kButtonRightThumb,    // rgbButtons[9]
+
+		// 十字キーは POV（rgdwPOV[0]）を別判定で扱う
+		kButtonUp,
+		kButtonDown,
+		kButtonLeft,
+		kButtonRight,
+
+		kMaxButtons
+	};
+
+
+	void Initialize(WNDCLASS wc, HWND hwnd);
+	void Update();
+
+	// キーボード
+	bool PushKey(BYTE keyNumber);
+	bool TriggerKey(BYTE keyNumber);
+
+	// ゲームパッド
+	bool PushButton(PadButton button);                    // ボタンが押されているか
+	bool TriggerButton(PadButton button);                 // ボタンが押された瞬間か
+	LONG GetStickX() const { return padState_.lX; } // アナログスティックX
+	LONG GetStickY() const { return padState_.lY; } // アナログスティックY
+
+	private:
+	// デバイス列挙用の static コールバック
+	static BOOL CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext);
+};

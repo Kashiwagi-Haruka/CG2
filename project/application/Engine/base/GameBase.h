@@ -14,7 +14,7 @@
 #include "VertexData.h"
 #include <wrl.h>
 #include "Audio.h"
-#include "DirectInput.h"
+#include "Input.h"
 #include <dinput.h>
 #include "PSO.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
@@ -278,7 +278,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	SoundData SoundLoadWave(const char* filename);
 	void SoundUnload(SoundData* soundData);
 	void SoundPlayWave(const SoundData& sounddata);
-	DirectInput DInput;
+	Input* DInput;
 
 	TransformationMatrix* GetTransformationMatrixData() const { return transformationMatrixData; }
 	void SetTransformMatrixWVP(Matrix4x4 transformationmatrix, int i) { transformationMatrixData[i].WVP = transformationmatrix; };
@@ -332,6 +332,11 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	};
 
 	void SetBlendMode(PSO::BlendMode blendMode);
+
+	bool PushKey(BYTE keyNumber);
+	bool TriggerKey(BYTE keyNumber);
+	bool PushButton(Input::PadButton buttonNumber);
+	bool TriggerButton(Input::PadButton buttonNumber);
 
 private:
 

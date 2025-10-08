@@ -16,7 +16,7 @@ GameBase::~GameBase(){
 
 	
 	ResourceRelease();
-
+	delete DInput;
 }
 
 
@@ -222,7 +222,8 @@ void GameBase::WindowClear() {
 	//// ディスクリプタヒープがつくれなかったので起動できない
 	//assert(SUCCEEDED(hr_));
 	DXCInitialize();
-	DInput.Initialize(wc,hwnd);
+	DInput = new Input();
+	DInput->Initialize(wc,hwnd);
 	hr_ = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
 	// 上手く取得できなければ起動できない
 	assert(SUCCEEDED(hr_));
@@ -1236,7 +1237,7 @@ void GameBase::BeginFlame(char* keys,char*preKeys) {
 
 	// ⑤ ImGui 準備
 	imguiM_.NewFrame();
-	DInput.Update((uint8_t*)keys, (uint8_t*)preKeys);
+	DInput->Update();
 }
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
@@ -1766,3 +1767,7 @@ void GameBase::SetBlendMode(PSO::BlendMode blendMode){
 	blendMode_ = blendMode;
 
 }
+bool GameBase::PushKey(BYTE keyNumber){ return DInput->PushKey(keyNumber); }
+bool GameBase::TriggerKey(BYTE keyNumber) { return DInput->TriggerKey(keyNumber); }
+bool GameBase::PushButton(Input::PadButton button) { return DInput->PushButton(button); }
+bool GameBase::TriggerButton(Input::PadButton button) { return DInput->TriggerButton(button); }

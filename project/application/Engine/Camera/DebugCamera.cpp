@@ -1,7 +1,7 @@
 #define NOMINMAX
 #include <algorithm>
 #include "DebugCamera.h"
-#include "DirectInput.h"
+#include "Input.h"
 #include "imGuiM.h"
 void DebugCamera::Initialize() {
 	// ViewMatrixの作成
