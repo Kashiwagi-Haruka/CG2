@@ -100,6 +100,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	    bool IsXButton = false;
 	    bool IsKeyboard = true;
 
+		gameBase->SetBlendMode(kBlendModeNone);
+
 	/*int PrePressMouse = 0;*/
 	while (gameBase->ProcessMessage()) {
 		
@@ -167,6 +169,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::ColorEdit3("Light Color", &gameBase->directionalLightData_->color.x);
 		}
 
+		
 		// --- ブレンドモード選択 ---
 		static int blendModeIndex = 0;
 		const char* blendModes[] = {"None", "Alpha", "Add", "Sub", "Mul", "Screen"};
