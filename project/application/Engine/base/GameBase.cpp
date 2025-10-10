@@ -587,30 +587,32 @@ void GameBase::SetupPSO() {
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
-	// --- Blend ---
-	D3D12_BLEND_DESC blendDesc{};
-	auto& rtBlend = blendDesc.RenderTarget[0];
-	rtBlend.BlendEnable = FALSE;
-	rtBlend.LogicOpEnable = FALSE;
-	rtBlend.SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	rtBlend.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-	rtBlend.BlendOp = D3D12_BLEND_OP_ADD;
-	rtBlend.SrcBlendAlpha = D3D12_BLEND_ONE;
-	rtBlend.DestBlendAlpha = D3D12_BLEND_ZERO;
-	rtBlend.BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	rtBlend.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	//// --- Blend ---
+	//D3D12_BLEND_DESC blendDesc{};
+	//auto& rtBlend = blendDesc.RenderTarget[0];
+	//rtBlend.BlendEnable = FALSE;
+	//rtBlend.LogicOpEnable = FALSE;
+	//rtBlend.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	//rtBlend.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	//rtBlend.BlendOp = D3D12_BLEND_OP_ADD;
+	//rtBlend.SrcBlendAlpha = D3D12_BLEND_ONE;
+	//rtBlend.DestBlendAlpha = D3D12_BLEND_ZERO;
+	//rtBlend.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	//rtBlend.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 	// --- DepthStencil ---
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;  // 深度書き込みを有効
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 手前なら描画
+	//depthStencilDesc.StencilEnable = false;                        // ステンシル不要なら false
+
 
 	// --- 共通設定 ---
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
 	baseDesc.pRootSignature = rootSignature.Get();
 	baseDesc.InputLayout = inputLayoutDesc;
-	baseDesc.BlendState = blendDesc;
+	baseDesc.BlendState = blendModeManeger_.SetBlendMode(blendMode_);
 	baseDesc.NumRenderTargets = 1;
 	baseDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	baseDesc.DepthStencilState = depthStencilDesc;
@@ -624,15 +626,19 @@ void GameBase::SetupPSO() {
 	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = CompileShader(L"Resources/shader/Object3d.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
 	assert(vsBlob && psBlob);
 
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = baseDesc;
+	for (int i = 0; i < BlendMode::kCountOfBlendMode; i++) {
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = baseDesc;
+		psoDesc.BlendState = blendModeManeger_.SetBlendMode(static_cast<BlendMode>(i));
 		psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
 		psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
 		D3D12_RASTERIZER_DESC rasterizerDesc{};
-		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK /*D3D12_CULL_MODE_NONE*/; // 裏面カリング
+		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
 		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 		psoDesc.RasterizerState = rasterizerDesc;
-	hr_ = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&graphicsPipelineState[PSO::BlendMode::kBlendModeAlpha]));
-	assert(SUCCEEDED(hr_));
+		hr_ = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&graphicsPipelineState[i]));
+		assert(SUCCEEDED(hr_));
+	}
+
 
 	// --- メタボール用PSO（両面描画＋真っ白PS） ---
 	Microsoft::WRL::ComPtr<IDxcBlob> whitePSBlob = CompileShader(L"Resources/shader/WhitePS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get());
@@ -657,7 +663,7 @@ void GameBase::VertexResource() {
 	Log("VertexResource Start\n");
 	// 頂点リソース作成
 
-	modelData = LoadObjFile("Resources/3d", "plane.obj");
+	modelData = LoadObjFile("Resources/3d", "fence.obj");
 
 	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * modelData.vertices.size());
 	
@@ -920,82 +926,7 @@ Microsoft::WRL::ComPtr <ID3D12Resource> GameBase::CreateBufferResource(ID3D12Dev
 
 	return bufferResource;
 }
-void GameBase::CreateModelVertexBuffer() {
-	Log("VertexResource Start\n");
-	// 頂点リソース作成
 
-	
-
-	const int MaxVertexCount = 655360;
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * MaxVertexCount);
-
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
-
-	VertexData* vertexData = nullptr;
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
-
-	// ビューポートとシザー設定
-	viewport = {};
-	viewport.Width = float(WinApp::kClientWidth);
-	viewport.Height = float(WinApp::kClientHeight);
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-
-	scissorRect = {};
-	scissorRect.left = 0;
-	scissorRect.right = WinApp::kClientWidth;
-	scissorRect.top = 0;
-	scissorRect.bottom = WinApp::kClientHeight;
-
-	// --- マテリアル用リソース ---
-	// 3D用（球など陰影つけたいもの）
-	// 必ず256バイト単位で切り上げる
-	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
-	materialResource_ = CreateBufferResource(device_.Get(), alignedSize);
-	Material* mat3d = nullptr;
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
-	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	mat3d->enableLighting = 1;
-	mat3d->uvTransform = function.MakeIdentity();
-
-	materialResource_->Unmap(0, nullptr);
-
-	// --- トランスフォーム用リソース ---
-	
-constexpr UINT kCBAlign = 256;
-	UINT matrixAlignedSize = (sizeof(TransformationMatrix) + kCBAlign - 1) & ~(kCBAlign - 1);
-	transformResource_ = CreateBufferResource(device_.Get(), matrixAlignedSize * kMaxTransformSlots);
-
-	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData)); // 構造体配列で取得
-	                                                                                          // ←ここ！！起動時にマップしっぱなし
-	                                                                                          // すべて単位行列で初期化（任意）
-	for (int i = 0; i < kMaxTransformSlots; ++i) {
-		transformationMatrixData[i].WVP = function.MakeIdentity();
-		transformationMatrixData[i].World = function.MakeIdentity();
-	} // 初期値は単位行列
-	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-
-	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
-	// ProjectionMatrixの作成（FOV: 0.45f * π、アスペクト比: 16:9、近クリップ: 0.1f、遠クリップ: 1000.0f）
-	float fovY = 0.45f * 3.14159265f; // ラジアン
-	float aspectRatio = 16.0f / 9.0f;
-	float nearClip = 0.1f;
-	float farClip = 1000.0f;
-
-	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(fovY, aspectRatio, nearClip, farClip);
-	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
-	// 2個分書き込む
-	//transformationMatrixData[0].WVP = worldViewProjectionMatrix; // WVP
-	//transformationMatrixData[1].World = worldMatrix;               // World
-	//transformationMatrixData[1].WVP = worldViewProjectionMatrix; // WVP
-	//transformationMatrixData[2].World = worldMatrix;             // World
-}
 
 
 void GameBase::Update() {
@@ -1502,21 +1433,6 @@ MaterialData GameBase::LoadMaterialTemplateFile(const std::string& directoryPath
 	return matData;
 }
 
-// ファイル名からSRVヒープ内のテクスチャindexを返す（なければ追加ロード）
-//int GameBase::LoadTexture(const std::string& fileName) {
-//	for (size_t i = 0; i < textures_.size(); ++i) {
-//		if (textures_[i].GetFilePath() == fileName) {
-//			return static_cast<int>(i); // すでにロード済み
-//		}
-//	}
-//	// 未ロードなら新しくロードしてpush_back
-//	Texture tex;
-//	tex.Initialize(device_.Get(), srvDescriptorHeap_.Get(), fileName, (uint32_t)textures_.size());
-//	tex.SetFilePath(fileName); // Textureクラスにファイルパス保持用メンバ追加して
-//	textures_.push_back(tex);
-//	OutputDebugStringA(std::format("Texture loaded: {}, GPU Handle ptr={}\n", fileName, tex.GetGpuHandle().ptr).c_str());
-//	return static_cast<int>(textures_.size() - 1);
-//}
 SoundData GameBase::SoundLoadWave(const char* filename){
 
 	return audio.SoundLoadWave(filename);
@@ -1640,6 +1556,22 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color,
 		vertexResourceMesh_->Unmap(0, nullptr);
 	}
 
+	    // ---- ここで color を Material に反映 ----
+	Vector4 colorVec = {
+	    ((color >> 16) & 0xFF) / 255.0f, // R
+	    ((color >> 8) & 0xFF) / 255.0f,  // G
+	    (color & 0xFF) / 255.0f,         // B
+	    ((color >> 24) & 0xFF) / 255.0f  // A
+	};
+
+	Material* matData = nullptr;
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&matData));
+	matData->color = colorVec; // 引数 color を RGBA に変換して設定
+	matData->enableLighting = 1;
+	matData->uvTransform = function.MakeIdentity();
+	materialResource_->Unmap(0, nullptr);
+
+
 	// WVP行列のセット（スロット2を使用）
 	
 	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
@@ -1665,11 +1597,12 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color,
 	commandList_->DrawInstanced(static_cast<UINT>(vertices.size()), 1, 0, 0);
 }
 
-void GameBase::SetBlendMode(PSO::BlendMode blendMode){
-
-	blendMode_ = blendMode;
-
+void GameBase::SetBlendMode(BlendMode mode) {
+	blendMode_ = mode;
+	// コマンドリストに適用するPSOをセット
+	commandList_->SetPipelineState(graphicsPipelineState[blendMode_].Get());
 }
+
 bool GameBase::PushKey(BYTE keyNumber){ return DInput->PushKey(keyNumber); }
 bool GameBase::TriggerKey(BYTE keyNumber) { return DInput->TriggerKey(keyNumber); }
 bool GameBase::PushButton(Input::PadButton button) { return DInput->PushButton(button); }

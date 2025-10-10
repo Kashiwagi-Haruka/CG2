@@ -14,10 +14,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 
 		
-	ModelData modelData = gameBase->LoadObjFile("Resources/3d", "plane.obj");
-	int textureHandle = gameBase->LoadTextures("Resources/2d/uvChecker.png");
+	//ModelData modelData = gameBase->LoadObjFile("Resources/3d", "plane.obj");
+	//int textureHandle = gameBase->LoadTextures("Resources/2d/uvChecker.png");
 
-	
+	ModelData fenceModel = gameBase->LoadObjFile("Resources/3d", "fence.obj");
+	int fenceHandle = gameBase->LoadTextures("Resources/3d/fence.png");
 
 	
 
@@ -78,7 +79,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             .rotate{0, 0, 0},
             .translate{0, 0, 0}
         };
-	    Vector4 Color{1, 1, 1, 1};
+
+		Transform fenceTransform{
+	        .scale{1, 1, 1},
+            .rotate{0, 0, 0},
+            .translate{0, 0, 0}
+        };
+	    
+		// ループの外側で保持する色変数
+	    static ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白
+
 
 		DirectionalLight Light{
 	        .color{1, 1, 1, 1},
@@ -107,12 +117,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// World行列を作る（必要に応じてGameBaseからTransformを使ってもよい）
 		Matrix4x4 worldMatrix = function.MakeAffineMatrix(planeTransform.scale, planeTransform.rotate, planeTransform.translate);
+		Matrix4x4 fenceWorldMatrix = function.MakeAffineMatrix(fenceTransform.scale, fenceTransform.rotate, fenceTransform.translate);
 		gameBase->GetCameraTransform() = {
 		    {1, 1, 1},
             camera.rotation_, camera.translation_
         };
 		// WVP行列を作成
 		Matrix4x4 wvpMatrix = function.Multiply(worldMatrix, viewProjectionMatrix);
+		Matrix4x4 fenceWvpMatrix = function.Multiply(fenceWorldMatrix, viewProjectionMatrix);
 
 		// 書き込む
 		//gameBase->GetTransformationMatrixData()[0].WVP = wvpMatrix;
@@ -144,13 +156,29 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("Scale", &planeTransform.scale.x,0.01f);
 		ImGui::DragFloat3("Rotate", &planeTransform.rotate.x,0.01f);
 		ImGui::DragFloat3("Translate", &planeTransform.translate.x,0.01f);
-	/*	ImGui::ColorEdit4("Color", &Color.x);
-		ImGui::Text("Light");
-		ImGui::DragFloat3("Direction", &Light.direction.x);
-		ImGui::DragFloat("Intensity", &Light.intensity);*/
+		ImGui::ColorEdit4("Color", (float*)&meshColor);
+		
+		if (ImGui::CollapsingHeader("Light Settings")) {
+			// 方向
+			ImGui::DragFloat3("Light Direction", &gameBase->directionalLightData_->direction.x, 0.1f, -1.0f, 1.0f);
+			// 明るさ
+			ImGui::SliderFloat("Light Intensity", &gameBase->directionalLightData_->intensity, 0.0f, 5.0f);
+			// 色
+			ImGui::ColorEdit3("Light Color", &gameBase->directionalLightData_->color.x);
+		}
+
+		// --- ブレンドモード選択 ---
+		static int blendModeIndex = 0;
+		const char* blendModes[] = {"None", "Alpha", "Add", "Sub", "Mul", "Screen"};
+		if (ImGui::Combo("Blend Mode", &blendModeIndex, blendModes, IM_ARRAYSIZE(blendModes))) {
+			gameBase->SetBlendMode(static_cast<BlendMode>(blendModeIndex));
+		}
+
 		ImGui::End();
 
 		worldMatrix = function.MakeAffineMatrix(planeTransform.scale, planeTransform.rotate, planeTransform.translate);
+
+		
 
 		ImGui::Begin("PadorKey");
 		if (ImGui::Button("Keyboard")) {
@@ -172,7 +200,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::End();
 
-		if (IsKeyboard) {
+		uint32_t color = (uint8_t(meshColor.w * 255) << 24) | // A
+		                 (uint8_t(meshColor.x * 255) << 16) | // R
+		                 (uint8_t(meshColor.y * 255) << 8) |  // G
+		                 (uint8_t(meshColor.z * 255));        // B
+
+		
+
+		/*if (IsKeyboard) {
 			if (gameBase->TriggerKey(DIK_P)) {
 				IsPKey = !IsPKey;
 			}
@@ -194,7 +229,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 						}
 
 					}
-					gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
+					gameBase->DrawMesh(modelData.vertices, color, textureHandle, wvpMatrix, worldMatrix);
 				}
 			}
 		} else {
@@ -225,12 +260,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 					planeTransform.rotate.y += gameBase->GetJoyStickRX() * 0.1f;
 					planeTransform.rotate.x += gameBase->GetJoyStickRY() * 0.1f;
-					gameBase->DrawMesh(modelData.vertices, 0xffffffff, textureHandle, wvpMatrix, worldMatrix);
+					
+					gameBase->DrawMesh(modelData.vertices, color, textureHandle, wvpMatrix, worldMatrix);
 				}
 			}
-		}
+		}*/
 			
-			
+			gameBase->DrawMesh(fenceModel.vertices, color, fenceHandle, wvpMatrix, worldMatrix);
 		
 			//ゲームの処理
 

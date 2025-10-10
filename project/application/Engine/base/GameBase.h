@@ -16,7 +16,7 @@
 #include "Audio.h"
 #include "Input.h"
 #include <dinput.h>
-#include "PSO.h"
+#include "BlendModeManeger.h"
 #include "WinApp.h"
 
 
@@ -44,7 +44,7 @@ struct Transform {
 //	kBlendModeAlpha,    // アルファブレンド
 //	kBlendModeAdd,      // 加算ブレンド
 //	kBlendModeSub,      // 減算ブレンド
-//	kBlendModeMul,      // 乗算ブレンド
+//	kBlendModeMultipy,      // 乗算ブレンド
 //	kBlendScreen,       // スクリーンブレンド
 //	kCountOfBlendMode   // ブレンドモードの数.使用禁止
 //};
@@ -232,9 +232,9 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 
 	bool IsMetaBall_ = false; // メタボール描画フラグ
 	
-	PSO::BlendMode blendMode_= PSO::BlendMode::kBlendModeAlpha;
+	BlendMode blendMode_= BlendMode::kBlendModeAlpha;
 
-	PSO pso_;
+	BlendModeManeger blendModeManeger_;
 
 	Input* DInput;
 
@@ -316,7 +316,7 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 		return handles;
 	};
 
-	void SetBlendMode(PSO::BlendMode blendMode);
+	void SetBlendMode(BlendMode blendMode);
 
 	bool PushKey(BYTE keyNumber);
 	bool TriggerKey(BYTE keyNumber);
@@ -407,7 +407,7 @@ private:
 	void VertexResource();
 
 	void DrawCommandList();
-	void CreateModelVertexBuffer();
+	
 	/*void CreateSpriteVertexBuffer();*/
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(ID3D12Device* device_, size_t sizeInBytes);
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);

@@ -84,11 +84,14 @@
     <ClCompile Include="application\Engine\Camera\Camera.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="application\Engine\Texture\PSO.cpp">
+    <ClCompile Include="application\Engine\Texture\BlendModeManeger.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
     <ClCompile Include="application\Engine\base\WinApp.cpp">
       <Filter>ソース ファイル\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Engine\Texture\Model.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -167,11 +170,14 @@
     <ClInclude Include="application\Engine\Camera\Camera.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="application\Engine\Texture\PSO.h">
+    <ClInclude Include="application\Engine\Texture\BlendModeManeger.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
     <ClInclude Include="application\Engine\base\WinApp.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Engine\Texture\Model.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
