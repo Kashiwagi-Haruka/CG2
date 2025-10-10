@@ -76,7 +76,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 		Transform planeTransform{
 	        .scale{1, 1, 1},
-            .rotate{0, 0, 0},
+            .rotate{0, 3, 0},
             .translate{0, 0, 0}
         };
 
