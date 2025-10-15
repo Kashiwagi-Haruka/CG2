@@ -72,9 +72,6 @@
     <ClCompile Include="application\Engine\ImGui\imGuiM.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="application\Engine\base\ResourceObj\ResourceObject.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="application\Engine\Texture\Texture.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
@@ -93,10 +90,13 @@
     <ClCompile Include="application\Engine\base\DirectXCommon.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Logger.cpp">
+    <ClCompile Include="application\Engine\Log\Logger.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="StringUtility.cpp">
+    <ClCompile Include="application\Engine\stringUtillity\StringUtility.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Engine\LeakChecker\D3DResourceLeakChecker.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -153,9 +153,6 @@
     <ClInclude Include="application\Engine\math\Matrix4x4.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="application\Engine\base\ResourceObj\ResourceObject.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="application\Engine\Texture\Texture.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
@@ -186,10 +183,13 @@
     <ClInclude Include="application\Engine\base\DirectXCommon.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Logger.h">
+    <ClInclude Include="application\Engine\Log\Logger.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="StringUtility.h">
+    <ClInclude Include="application\Engine\stringUtillity\StringUtility.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Engine\LeakChecker\D3DResourceLeakChecker.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

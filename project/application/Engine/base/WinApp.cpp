@@ -3,6 +3,7 @@
 #include <strsafe.h>
 #include <dbt.h> 
 
+#pragma comment(lib, "winmm.lib")
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
 
@@ -54,6 +55,8 @@ void WinApp::Initialize() {
 
 	ShowWindow(hwnd_, SW_SHOW);
 	SetWindowLongPtr(hwnd_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+
+	timeBeginPeriod(1); // タイマーの精度を1msに設定
 }
 
 void WinApp::Update() {

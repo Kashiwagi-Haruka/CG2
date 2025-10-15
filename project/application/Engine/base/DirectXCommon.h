@@ -13,6 +13,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include "WinApp.h"
 #include "imGuiM.h"
@@ -213,11 +214,16 @@ class DirectXCommon {
 	WinApp* winApp_ = nullptr;
 	imGuiM imguiM_;
 
+	std::chrono::steady_clock::time_point reference_;
 
 public:
 
 	void initialize(WinApp* winApp);
 	
+	void InitializeFixFPS();
+
+	void UpdateFixFPS();
+
 	void PreDraw();
 	void PostDraw();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);

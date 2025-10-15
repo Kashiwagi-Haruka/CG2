@@ -5,6 +5,7 @@
 #include "StringUtility.h"
 #include <format>
 #include <dxcapi.h>
+#include <thread>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -17,6 +18,8 @@ using namespace Microsoft::WRL;
 void DirectXCommon::initialize(WinApp* winApp) {
 	assert(winApp);
 	winApp_ = winApp;
+
+	InitializeFixFPS();
 
 	// デバイスの初期化
 	DeviceInitialize();
@@ -68,6 +71,39 @@ void DirectXCommon::initialize(WinApp* winApp) {
 		WaitForSingleObject(fenceEvent_, INFINITE); // ★ここでちゃんとGPUが終わるまで待つ！
 	}
 }
+
+void DirectXCommon::InitializeFixFPS() {
+
+	reference_ = std::chrono::steady_clock::now();
+
+
+}
+void DirectXCommon::UpdateFixFPS() {
+
+	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
+
+	const std::chrono::microseconds kMinCheckTime(uint64_t(1000000.0f / 65.0f));
+
+	//　現在時刻を取得する
+	
+	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+
+	// 　前回時刻からの経過時間を取得する
+	std::chrono::microseconds elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
+
+	// 1/60秒　(よりわずかに短い時間)経ってない場合
+	if (elapsed < kMinCheckTime) {
+		// 1/60秒になるまでスリープする
+		while (std::chrono::steady_clock::now() - reference_ < kMinTime) {
+			//1マイクロスリープ
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+		}
+	}
+
+	reference_ = std::chrono::steady_clock::now();
+
+}
+
 void DirectXCommon::DebugLayer() {
 
 #ifdef _DEBUG
@@ -440,6 +476,8 @@ void DirectXCommon::PostDraw() {
 	assert(SUCCEEDED(hr_));
 	Microsoft::WRL::ComPtr<ID3D12CommandList> lists[] = {commandList_.Get()};
 	commandQueue_->ExecuteCommandLists(1, lists->GetAddressOf());
+
+	UpdateFixFPS();
 
 	// 画面を切り替え
 	swapChain_->Present(1, 0);

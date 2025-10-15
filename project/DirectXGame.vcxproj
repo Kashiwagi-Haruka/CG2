@@ -81,7 +81,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)application\Engine\base;$(ProjectDir)application\Engine\base\ResourceObj;$(ProjectDir)application\Engine\base\Cstr;$(ProjectDir)application\Engine\math;$(ProjectDir)application\Engine\Camera;$(ProjectDir)application\Engine\Audio;$(ProjectDir)application\Engine\ImGui;$(ProjectDir)application\Engine\Input;$(ProjectDir)application\Engine\Texture;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)application\Engine\base;$(ProjectDir)application\Engine\base\ResourceObj;$(ProjectDir)application\Engine\base\Cstr;$(ProjectDir)application\Engine\math;$(ProjectDir)application\Engine\Camera;$(ProjectDir)application\Engine\Audio;$(ProjectDir)application\Engine\ImGui;$(ProjectDir)application\Engine\Input;$(ProjectDir)application\Engine\Texture;$(ProjectDir)application\Engine\LeakChecker;$(ProjectDir)application\Engine\Log;$(ProjectDir)application\Engine\stringUtillity;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -107,7 +107,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)application\Engine\base;$(ProjectDir)application\Engine\base\ResourceObj;$(ProjectDir)application\Engine\base\Cstr;$(ProjectDir)application\Engine\math;$(ProjectDir)application\Engine\Camera;$(ProjectDir)application\Engine\Audio;$(ProjectDir)application\Engine\ImGui;$(ProjectDir)application\Engine\Input;$(ProjectDir)application\Engine\Texture;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)application\Engine\base;$(ProjectDir)application\Engine\base\ResourceObj;$(ProjectDir)application\Engine\base\Cstr;$(ProjectDir)application\Engine\math;$(ProjectDir)application\Engine\Camera;$(ProjectDir)application\Engine\Audio;$(ProjectDir)application\Engine\ImGui;$(ProjectDir)application\Engine\Input;$(ProjectDir)application\Engine\Texture;$(ProjectDir)application\Engine\LeakChecker;$(ProjectDir)application\Engine\Log;$(ProjectDir)application\Engine\stringUtillity;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -134,7 +134,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)application\Engine\base;$(ProjectDir)application\Engine\base\ResourceObj;$(ProjectDir)application\Engine\base\Cstr;$(ProjectDir)application\Engine\math;$(ProjectDir)application\Engine\Camera;$(ProjectDir)application\Engine\Audio;$(ProjectDir)application\Engine\ImGui;$(ProjectDir)application\Engine\Input;$(ProjectDir)application\Engine\Texture;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)application\Engine\base;$(ProjectDir)application\Engine\base\ResourceObj;$(ProjectDir)application\Engine\base\Cstr;$(ProjectDir)application\Engine\math;$(ProjectDir)application\Engine\Camera;$(ProjectDir)application\Engine\Audio;$(ProjectDir)application\Engine\ImGui;$(ProjectDir)application\Engine\Input;$(ProjectDir)application\Engine\Texture;$(ProjectDir)application\Engine\LeakChecker;$(ProjectDir)application\Engine\Log;$(ProjectDir)application\Engine\stringUtillity;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
@@ -159,6 +159,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Engine\Camera\Camera.cpp" />
     <ClCompile Include="application\Engine\Texture\BlendModeManeger.cpp" />
     <ClCompile Include="application\Engine\base\DirectXCommon.cpp" />
+    <ClCompile Include="application\Engine\LeakChecker\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -170,12 +171,11 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Engine\base\GameBase.cpp" />
     <ClCompile Include="application\Engine\ImGui\imGuiM.cpp" />
     <ClCompile Include="application\main.cpp" />
-    <ClCompile Include="application\Engine\base\ResourceObj\ResourceObject.cpp" />
     <ClCompile Include="application\Engine\Texture\Texture.cpp" />
     <ClCompile Include="application\Engine\base\WinApp.cpp" />
     <ClCompile Include="application\Engine\Texture\Model.cpp" />
-    <ClCompile Include="Logger.cpp" />
-    <ClCompile Include="StringUtility.cpp" />
+    <ClCompile Include="application\Engine\Log\Logger.cpp" />
+    <ClCompile Include="application\Engine\stringUtillity\StringUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -196,6 +196,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Engine\Camera\Camera.h" />
     <ClInclude Include="application\Engine\Texture\BlendModeManeger.h" />
     <ClInclude Include="application\Engine\base\DirectXCommon.h" />
+    <ClInclude Include="application\Engine\LeakChecker\D3DResourceLeakChecker.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -208,7 +209,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Engine\base\GameBase.h" />
     <ClInclude Include="application\Engine\ImGui\imGuiM.h" />
     <ClInclude Include="application\Engine\math\Matrix4x4.h" />
-    <ClInclude Include="application\Engine\base\ResourceObj\ResourceObject.h" />
     <ClInclude Include="application\Engine\Texture\Texture.h" />
     <ClInclude Include="application\Engine\math\Vector2.h" />
     <ClInclude Include="application\Engine\math\Vector3.h" />
@@ -216,8 +216,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Engine\Texture\VertexData.h" />
     <ClInclude Include="application\Engine\base\WinApp.h" />
     <ClInclude Include="application\Engine\Texture\Model.h" />
-    <ClInclude Include="Logger.h" />
-    <ClInclude Include="StringUtility.h" />
+    <ClInclude Include="application\Engine\Log\Logger.h" />
+    <ClInclude Include="application\Engine\stringUtillity\StringUtility.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

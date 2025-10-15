@@ -1,5 +1,5 @@
 #include"GameBase.h"
-#include "ResourceObject.h"
+#include "D3DResourceLeakChecker.h"
 #include "DebugCamera.h"
 
 
@@ -7,7 +7,9 @@
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	GameBase* gameBase=new GameBase;
-	ResourceObject resourceObject;
+	D3DResourceLeakChecker* d3dResourceLeakChecker = new D3DResourceLeakChecker();
+	
+	
 	//エンジンの初期化
 	gameBase->Initialize(L"CG2", 1280, 720);
 
@@ -279,7 +281,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//出力ウィンドウへの文字出力
 	gameBase->SoundUnload(&soundData1);
 	delete gameBase;
-	resourceObject.LeakChecker();
+	delete d3dResourceLeakChecker;
 	CoUninitialize();
 
 	return 0;

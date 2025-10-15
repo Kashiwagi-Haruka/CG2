@@ -1,11 +1,10 @@
-#include "ResourceObject.h"
-#include <wrl.h>
+#include "D3DResourceLeakChecker.h"
 #include <dxgidebug.h>
+#include <d3d12.h>
 #include <dxgi1_6.h>
+#include <wrl.h>
 
-
-void ResourceObject::LeakChecker(){
-
+D3DResourceLeakChecker::~D3DResourceLeakChecker() {
 #ifdef _DEBUG
 	Microsoft::WRL::ComPtr<IDXGIDebug1> debug = nullptr;
 	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
@@ -14,7 +13,5 @@ void ResourceObject::LeakChecker(){
 		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
 	}
 #endif
-
-
-
+	
 }
