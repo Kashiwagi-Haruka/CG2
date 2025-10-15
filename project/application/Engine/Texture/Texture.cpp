@@ -1,5 +1,5 @@
 #include "Texture.h"
-
+#include "StringUtility.h"
 
 int Texture::TexInitialize(ID3D12Device* device_, ID3D12DescriptorHeap* srvDescriptorHeap_, const std::string& fileName) {
 	uint32_t index = TextureTotal + 1;
@@ -88,7 +88,7 @@ int Texture::ModelTexInitialize(ID3D12Device* device_, ID3D12DescriptorHeap* srv
 DirectX::ScratchImage Texture::LoadTextureName(const std::string& filePath) {
 		// テクスチャファイルを読んでプログラムで使えるようにする
 		DirectX::ScratchImage image{};
-		std::wstring filePathW = Cstr.ConvertString_(filePath);
+		std::wstring filePathW = StringUtility::ConvertString_(filePath);
 		HRESULT hr_ = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 		assert(SUCCEEDED(hr_));
 

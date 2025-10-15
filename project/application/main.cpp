@@ -14,13 +14,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 
 		
-	//ModelData modelData = gameBase->LoadObjFile("Resources/3d", "plane.obj");
-	//int textureHandle = gameBase->LoadTextures("Resources/2d/uvChecker.png");
+	ModelData modelData = gameBase->LoadObjFile("Resources/3d", "plane.obj");
+	int textureHandle = gameBase->LoadTextures("Resources/2d/uvChecker.png");
 
-	ModelData fenceModel = gameBase->LoadObjFile("Resources/3d", "fence.obj");
-	int fenceHandle = gameBase->LoadTextures("Resources/3d/fence.png");
-
-	
+	/*ModelData fenceModel = gameBase->LoadObjFile("Resources/3d", "fence.obj");
+	int fenceHandle = gameBase->LoadTextures("Resources/3d/fence.png");*/
 
 
 	SetUnhandledExceptionFilter(gameBase->ExportDump);
@@ -76,7 +74,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 		Transform planeTransform{
 	        .scale{1, 1, 1},
-            .rotate{0, 3, 0},
+            .rotate{0, 0, 0},
             .translate{0, 0, 0}
         };
 
@@ -90,23 +88,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	    static ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白
 
 
-		DirectionalLight Light{
+		DirectionalLight light{
 	        .color{1, 1, 1, 1},
-            .direction{0, 0, -2},
-            .intensity{0}
+            .direction{0, 0, 1},
+            .intensity{1}
         };
 		
 		bool IsPKey = false;
 	    bool IsXButton = false;
 	    bool IsKeyboard = true;
 
-		gameBase->SetBlendMode(kBlendModeNone);
+		/*gameBase->SetBlendMode(kBlendModeNone);*/
 
+
+		
 	/*int PrePressMouse = 0;*/
 	while (gameBase->ProcessMessage()) {
 		
 
-		gameBase->BeginFlame(keys,preKeys);
+		gameBase->BeginFlame();
 			
 
 #pragma region c
@@ -128,11 +128,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 wvpMatrix = function.Multiply(worldMatrix, viewProjectionMatrix);
 		Matrix4x4 fenceWvpMatrix = function.Multiply(fenceWorldMatrix, viewProjectionMatrix);
 
-		// 書き込む
-		//gameBase->GetTransformationMatrixData()[0].WVP = wvpMatrix;
-		//gameBase->GetTransformationMatrixData()[1].WVP = wvpMatrix;
-		gameBase->SetTransformMatrixWVP(viewProjectionMatrix, 0);
-		gameBase->SetTransformMatrixWVP(viewProjectionMatrix, 1);
+
 			
 #pragma endregion
 
@@ -160,15 +156,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("Translate", &planeTransform.translate.x,0.01f);
 		ImGui::ColorEdit4("Color", (float*)&meshColor);
 		
-		if (ImGui::CollapsingHeader("Light Settings")) {
+		if (ImGui::CollapsingHeader("light Settings")) {
 			// 方向
-			ImGui::DragFloat3("Light Direction", &gameBase->directionalLightData_->direction.x, 0.1f, -1.0f, 1.0f);
+			ImGui::DragFloat3("light Direction", &light.direction.x, 0.1f, -1.0f, 1.0f);
 			// 明るさ
-			ImGui::SliderFloat("Light Intensity", &gameBase->directionalLightData_->intensity, 0.0f, 5.0f);
+			ImGui::SliderFloat("light Intensity", &light.intensity, 0.0f, 5.0f);
 			// 色
-			ImGui::ColorEdit3("Light Color", &gameBase->directionalLightData_->color.x);
+			ImGui::ColorEdit3("light Color", &light.color.x);
 		}
 
+		gameBase->SetDirectionalLightData(light);
 		
 		// --- ブレンドモード選択 ---
 		static int blendModeIndex = 0;
@@ -269,7 +266,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}*/
 			
-			gameBase->DrawMesh(fenceModel.vertices, color, fenceHandle, wvpMatrix, worldMatrix);
+
+		gameBase->DrawParticle(modelData.vertices, color, textureHandle, wvpMatrix, worldMatrix, 10);
+			
 		
 			//ゲームの処理
 
@@ -278,7 +277,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	//出力ウィンドウへの文字出力
-	gameBase->OutPutLog();
 	gameBase->SoundUnload(&soundData1);
 	delete gameBase;
 	resourceObject.LeakChecker();

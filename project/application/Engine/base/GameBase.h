@@ -1,53 +1,15 @@
 #pragma once
-#include <Windows.h>
-#include <cstdint>
-#include <format>
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <cassert>
-#include "ConvertString.h"
-#include <dxcapi.h>
 #include "Function.h"
 #include "Vector4.h"
-#include "imGuiM.h"
 #include "Texture.h"
 #include "VertexData.h"
-#include <wrl.h>
 #include "Audio.h"
 #include "Input.h"
-#include <dinput.h>
 #include "BlendModeManeger.h"
 #include "WinApp.h"
+#include "DirectXCommon.h"
 
 
-struct MaterialData {
-	std::string textureFilePath;
-};
-struct ModelData {
-	std::vector<VertexData> vertices;
-	MaterialData material;
-};
-struct DirectionalLight {
-	Vector4 color;
-	Vector3 direction;
-	float intensity;
-};
-struct Transform {
-
-	Vector3 scale;
-	Vector3 rotate;
-	Vector3 translate;
-};
-//enum BlendMode {
-//
-//	kBlendModeNone = 0, // ブレンドなし
-//	kBlendModeAlpha,    // アルファブレンド
-//	kBlendModeAdd,      // 加算ブレンド
-//	kBlendModeSub,      // 減算ブレンド
-//	kBlendModeMultipy,      // 乗算ブレンド
-//	kBlendScreen,       // スクリーンブレンド
-//	kCountOfBlendMode   // ブレンドモードの数.使用禁止
-//};
 
 class GameBase :Texture {
 
@@ -55,205 +17,41 @@ private:
 
 	WinApp* winApp_ = nullptr;
 
-	WNDCLASS wc{};
-	RECT wrc;
+	DirectXCommon* dxCommon_ = nullptr;
+	
 	Audio audio;
-	MSG msg{};
-	ConvertString* CStr{};
-	std::wstring wstringValue = L"k";
+	
 
-	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
-	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
+	
 	HRESULT hr_;
 	
-	// 使用するアダプタ用の変数。最初にnullptrを入れておく
-	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
-	Microsoft::WRL::ComPtr < ID3D12Device> device_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
-	D3D12_COMMAND_QUEUE_DESC commandQueueDesc;
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
-	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
-	imGuiM imguiM_;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
-
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
-	// SwapChainからResourceを引っ張ってくる。
-	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = {nullptr};
-	// これから書き込むバックバッファのインデックスを取得
-	UINT backBufferIndex_;
-	// transitionBarrierの設定
-	D3D12_RESOURCE_BARRIER barrier{};
-
-	// 初期値0でFenceをつくる
-	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
-	uint64_t fenceValue_ = 0;
-	// FenceのSignalを持つためのイベントを作成する
-	HANDLE fenceEvent_;
-
-	/*std::vector<Texture> textures_;*/
-
-
-
-
-	D3D12_VIEWPORT viewport;
-	// シザー矩形
-	D3D12_RECT scissorRect;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-	// 実際に生成
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState[6];
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateWhite; // 完全白用
-	// 頂点バッファビューを作成する
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-
-	// シリアライズしてバイナリにする
-	Microsoft::WRL::ComPtr < ID3DBlob> signatureBlob;
-	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob;
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob;
-	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils;
-	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler;
-	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
 
 		// バッファの設定
 	D3D12_HEAP_PROPERTIES heapProperties;
 	D3D12_RESOURCE_DESC resourceDesc;
-	// 実際に頂点リソースを作る
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
-	// --- 頂点用 (Transform行列) のリソース追加 ---
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSphere;
 
-		// RTVを2つ作るのでディスクリプタを2つ用意
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-	Microsoft::WRL::ComPtr<ID3D12Resource> depthStenicilResource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
+
+
 	Function function;
+
+	ModelData modelData;
+
+
 	
-	struct Material{
-
-		Vector4 color;
-		int enableLighting;
-		float padding[3];
-		Matrix4x4 uvTransform;
-	};
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite_;
-	Material materialDataSprite_;
-
-
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-
-public:
-	DirectionalLight* directionalLightData_ = nullptr;
-
-private:
-
-	// GameBase.h
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceMesh_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceMetaball_;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewMesh_;
-	D3D12_INDEX_BUFFER_VIEW indexBufferViewMetaball_;
-
-
-// GameBase.h
-	struct alignas(256) TransformationMatrix {
-		Matrix4x4 WVP;   // 64 バイト
-		Matrix4x4 World; // 64 バイト
-		// ここで自動的に 128 バイト分のパディングが入って、
-		// sizeof(TransformationMatrix) == 256 になる
-	};
-
-
-
-
-	// 例: 最大確保サイズ（初期化時に使った値を定数などで保持しておく）
-	const size_t kMaxVertexCount = 200000;    // 実際の最大確保頂点数
-	const size_t kMaxIndexCount = 200000 * 3; // 実際の最大確保インデックス数
-
-	Transform uvTransformSprite_{
-	    {1.0f, 1.0f, 1.0f},
-	    {0.0f, 0.0f, 0.0f},
-	    {0.0f, 0.0f, 0.0f},
-	};
-
-Transform cameraTransform = {
-	    {1.0f, 1.0f,       1.0f }, // スケール
-	    {0.0f, 0, 0.0f }, // ←Y軸180度回転！
-	    {0.0f, 0.0f,-10.0f}  // Zマイナス方向に下げる
-	};
-	Transform transformSprite{
-	    {1.0f, 1.0f, 1.0f},
-        {0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f}
-    };
-
-
-ModelData modelData;
-
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite_ = nullptr;
-	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite_{};
-	Matrix4x4* transformationMatrixDataSprite;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite;
-	
-D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
-	int kVertexCount_;
-
-	//Matrix4x4* wvpData = nullptr; // ← transformResource用のポインタをメンバに持つ
-	TransformationMatrix* transformationMatrixData = nullptr;
-
-	//Texture texture_;
-	//Texture texture2_;
-	D3D12_GPU_DESCRIPTOR_HANDLE TextureGPUHandle_[10000];
-	D3D12_GPU_DESCRIPTOR_HANDLE ModelGPUHandle_[10000];
-	
-	UINT currentTriangleVertexOffset_ = 0;  // 追加：次に書き込む頂点のオフセット（頂点数単位）
-	UINT currentSphereVertexOffset_ = 0;
-	UINT currentSpriteVertexOffset_ = 0;
-	static constexpr UINT kMaxVertices_ = 1024; // 十分な大きさで定義しておく
-	int sphereDrawCallCount_ = 0;
-	int transformSlotOffset = 0; // slot=0,1使用
-	const int kMaxSpheres = 30;  // 複数球体用の最大数（例）
-	const int kMaxTransformSlots = 32; // 例えば最大32スロット（用途に合わせて）
-
-		
-	   bool useMonsterBall_ = true;
-
-	static const UINT kMaxSpriteVertices = 6 * 10000; // フレーム最大 1000 スプライト分
-	
-	void FrameStart(); // フレーム最初の準備
-
-	bool IsMetaBall_ = false; // メタボール描画フラグ
-	
-	BlendMode blendMode_= BlendMode::kBlendModeAlpha;
-
-	BlendModeManeger blendModeManeger_;
-
 	Input* DInput;
 
    public:	
 
 	   ~GameBase();
 	
-	void BeginFlame(char* keys, char* preKeys); // フレームの開始処理（commandListリセットなど）
-	void EndFlame();   // フレームの終了処理（Present、フェンス待ちなど）
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
+
+	void BeginFlame(); // フレームの開始処理（commandListリセットなど）
+	void EndFlame();   // フレームの終了処理（Present、フェンス待ちなど）
 
 	bool ProcessMessage();
 
-	void OutPutLog();
-
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
-
-	MSG* GetMsg() { return &msg; };
-	void Update();
 
 	void CheackResourceLeaks();
 
@@ -262,9 +60,6 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	// 描画
 	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
 	
-	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
-	void DrawSphere(const Vector3& center, const Vector3& radius, const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
-	void DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color,int textureHandle);
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
@@ -273,48 +68,24 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 	void SoundPlayWave(const SoundData& sounddata);
 
 
-	TransformationMatrix* GetTransformationMatrixData() const { return transformationMatrixData; }
-	void SetTransformMatrixWVP(Matrix4x4 transformationmatrix, int i) { transformationMatrixData[i].WVP = transformationmatrix; };
+	
 
-	Transform transform = {
-	    {1.0f, 1.0f, 1.0f}, // scale
-	    {0.0f, 0.0f, 0.0f}, // rotate
-	    {0.0f, 0.0f, 0.0f}  // translate
-	};
+	
 
-	Transform GetCameraTransform() const{ return cameraTransform; };
+	Transform GetCameraTransform() const { return dxCommon_->GetCameraTransform(); };
 
+	void DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color, int textureHandle);
 
-	void DrawMesh(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices, uint32_t color, int textureHandle = -1);
+	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
+	void DrawSphere(const Vector3& center, const Vector3& radius, const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
 	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world);
-	void SetIsMetaBall(bool IsMetaBall) { IsMetaBall_ = IsMetaBall; };
-
+	void DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount);
 	ModelData GetPlaneModelData() const { return modelData; }
-	DirectionalLight* GetDirectionalLightData() const { return directionalLightData_; }
-	void SetDirectionalLightData(const DirectionalLight& directionalLight) {
-		if (directionalLightResource_) {
-			directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-			*directionalLightData_ = directionalLight;
-			directionalLightResource_->Unmap(0, nullptr);
-		}
-	}
+	
+	void SetDirectionalLightData(const DirectionalLight& directionalLight);
 
-	int LoadTextures(const std::string& fileName) {
-
-		int handles = TexInitialize(device_.Get(), srvDescriptorHeap_.Get(), fileName);
-		TextureGPUHandle_[GetTextureToTal()-1] = GetTexGpuHandle();
-		assert(TextureGPUHandle_[GetmodelTexTotal()-1].ptr != 0);
-		return handles;
-	};
-	int ModelTextures(const std::string& fileName) {
-
-		int handles = ModelTexInitialize(device_.Get(), srvDescriptorHeap_.Get(), fileName);
-		ModelGPUHandle_[GetmodelTexTotal()-1] = GetModelGpuHandle();
-		assert(ModelGPUHandle_[GetmodelTexTotal()-1].ptr != 0);
-
-
-		return handles;
-	};
+	int LoadTextures(const std::string& fileName);
+	int ModelTextures(const std::string& fileName);
 
 	void SetBlendMode(BlendMode blendMode);
 
@@ -379,43 +150,18 @@ D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere;
 
 private:
 
+
+	void CreateSpriteResources();
+	void CreateModelResources();
 	
-
-	void Log(const std::string& message);
-
-	void WindowClear();
-	void CreateResource();
 	
-	void DebugError();
-	void TransitionBarrier();
-
-	void CrtvTransitionBarrier();
-
-	void FenceEvent();
-
-
-
-	void DXCInitialize();
-	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(// CompilerするShaderファイルへのパス
-	    const std::wstring& filePath,
-	    // Compilerに使用するProfile
-	    const wchar_t* profile,
-	    // 初期化で生成したものをつかう
-	    IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
 	void SetupPSO();
 
-	void VertexResource();
-
-	void DrawCommandList();
+	
 	
 	/*void CreateSpriteVertexBuffer();*/
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(ID3D12Device* device_, size_t sizeInBytes);
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height);
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const DirectX::TexMetadata& metdata);
-
-
+	
+	
 
 };
 

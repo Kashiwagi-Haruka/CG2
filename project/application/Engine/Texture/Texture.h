@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <DirectXTex.h>
-#include "ConvertString.h"
 #include <d3d12.h>
 #include <format>
 #include <wrl.h>
@@ -34,7 +33,7 @@ private:
 	uint32_t descriptorSizeRTV = 0;
 	uint32_t descriptorSizeDSV = 0;
 
-	ConvertString Cstr;
+	
 	std::string filePath_;
 	
 	Microsoft::WRL::ComPtr < ID3D12Resource> textureResource_;

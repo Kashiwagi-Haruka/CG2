@@ -50,8 +50,7 @@ void WinApp::Initialize() {
 	AdjustWindowRect(&wrc_, WS_OVERLAPPEDWINDOW, false);
 
 	hwnd_ = CreateWindow(wc_.lpszClassName, TitleName_, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, wrc_.right - wrc_.left, wrc_.bottom - wrc_.top, nullptr, nullptr, wc_.hInstance, nullptr);
-	/// Debuglayer
-	DebugLayer();
+	
 
 	ShowWindow(hwnd_, SW_SHOW);
 	SetWindowLongPtr(hwnd_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
@@ -86,16 +85,3 @@ bool WinApp::ProcessMessage() {
 	return true;
 }
 
-void WinApp::DebugLayer() {
-
-#ifdef _DEBUG
-
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_)))) {
-		// デバッグレイヤー
-		debugController_->EnableDebugLayer();
-		// 更にGPU側でもチェックを行うようにする
-		debugController_->SetEnableGPUBasedValidation(TRUE);
-	}
-
-#endif // DEBUG
-}
