@@ -1,4 +1,4 @@
-#include "Object3d.hlsli"
+#include "Particle.hlsli"
 struct Material
 {
     float4 color;
@@ -6,14 +6,9 @@ struct Material
     
     float4x4 uvTransform;
 };
-struct DirectionalLight
-{
-    float4 color;
-    float3 direction;
-    float intensity;
-};
+
 ConstantBuffer<Material> gMaterial : register(b0);
-ConstantBuffer<DirectionalLight> gDirectionalLight : register(b3);
+
 
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);

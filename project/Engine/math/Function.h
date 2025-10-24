@@ -4,11 +4,9 @@
 #include <cstdint>
 
 
-class Function {
-
-	public:
+namespace Function {
 	
-		Vector3 Normalize(const Vector3& v);
+	Vector3 Normalize(const Vector3& v);
 
 	Matrix4x4 MakeRotateXMatrix(float radian);
 	Matrix4x4 MakeRotateYMatrix(float radian);
@@ -17,7 +15,7 @@ class Function {
 	Vector3 Cross(const Vector3& v1, const Vector3& v2);
 	
 
-	Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix4x4);
+	Vector3 TransformVM(const Vector3& vector, const Matrix4x4& matrix4x4);
 	Matrix4x4 Inverse(const Matrix4x4& m);
 	Matrix4x4 MakeTranslateMatrix(Vector3 translate);
 	Matrix4x4 MakeScaleMatrix(Vector3 scale);
@@ -29,10 +27,11 @@ class Function {
 
 	Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);
 	Matrix4x4 Transpose(const Matrix4x4& m);
-	Matrix4x4 MakeIdentity();
-};
+    Matrix4x4 MakeIdentity4x4();
+	}
 
 Vector3 operator+(const Vector3& v1, const Vector3& v2);
 Vector3 operator-(const Vector3& v1, const Vector3& v2);
 Vector3 operator*(const Vector3& v, float scalar);
 inline float LengthSquared(const Vector3& v) { return v.x * v.x + v.y * v.y + v.z * v.z; }
+

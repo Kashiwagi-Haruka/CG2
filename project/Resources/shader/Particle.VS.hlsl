@@ -1,11 +1,11 @@
-#include "Object3d.hlsli"
+#include "Particle.hlsli"
 struct TransformationMatrix
 {
     float4x4 WVP;
     float4x4 World;
 };
 
-StructuredBuffer<TransformationMatrix> gTransformationMatrices : register(t0);
+StructuredBuffer<TransformationMatrix> gTransformationMatrices : register(t1);
 
 struct VertexShaderInput
 {
@@ -13,7 +13,7 @@ struct VertexShaderInput
     float2 texcoord : TEXCOORD0;
     float3 normal : NORMAL0;
 };
-VertexShaderOutput main(VertexShaderInput input,int instanceId : SV_InstanceID)
+VertexShaderOutput main(VertexShaderInput input,uint instanceId : SV_InstanceID)
 {
     VertexShaderOutput output;
     output.position = mul(input.position, gTransformationMatrices[instanceId].WVP);

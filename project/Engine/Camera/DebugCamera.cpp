@@ -5,13 +5,13 @@
 #include "imGuiM.h"
 void DebugCamera::Initialize() {
 	// ViewMatrixの作成
-	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(
+	Matrix4x4 cameraMatrix = Function::MakeAffineMatrix(
 	    {1, 1, 1},   // スケールは1
 	    rotation_,   // 初期回転（デフォルト: {0, 0, 0}）
 	    translation_ // 初期位置（デフォルト: {0, 0, -50}）
 	);
 
-	viewMatrix_ = function.Inverse(cameraMatrix);
+	viewMatrix_ = Function::Inverse(cameraMatrix);
 
 	// ProjectionMatrixの作成（FOV: 0.45f * π、アスペクト比: 16:9、近クリップ: 0.1f、遠クリップ: 1000.0f）
 	float fovY = 0.45f * 3.14159265f; // ラジアン
@@ -19,8 +19,8 @@ void DebugCamera::Initialize() {
 	float nearClip = 0.1f;
 	float farClip = 1000.0f;
 
-	projectionMatrix_ = function.MakePerspectiveFovMatrix(fovY, aspectRatio, nearClip, farClip);
-	matRot_ = function.MakeIdentity();
+	projectionMatrix_ = Function::MakePerspectiveFovMatrix(fovY, aspectRatio, nearClip, farClip);
+	matRot_ = Function::MakeIdentity4x4();
 }
 
 void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
@@ -54,30 +54,30 @@ void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
 
 
 	// ── 累積回転行列に今回フレーム分の回転を乗算 ──
-	Matrix4x4 matRotDelta = function.MakeIdentity();
-	matRotDelta = function.Multiply(matRotDelta,function.MakeRotateXMatrix(dPitch));
-	matRotDelta = function.Multiply(matRotDelta,function.MakeRotateYMatrix(dYaw));
-	matRotDelta = function.Multiply(matRotDelta, function.MakeRotateZMatrix(dZ));
-	matRot_ = function.Multiply(matRotDelta , matRot_); // ★資料「回転行列の累積」と同じ
+	Matrix4x4 matRotDelta = Function::MakeIdentity4x4();
+	matRotDelta = Function::Multiply(matRotDelta, Function::MakeRotateXMatrix(dPitch));
+	matRotDelta = Function::Multiply(matRotDelta, Function::MakeRotateYMatrix(dYaw));
+	matRotDelta = Function::Multiply(matRotDelta, Function::MakeRotateZMatrix(dZ));
+	matRot_ = Function::Multiply(matRotDelta, matRot_); // ★資料「回転行列の累積」と同じ
 
 	// ── scale は GUI 値が大きいほどズームインにしたいので逆数を使う ──
 	Vector3 invScale = {scale_.x, scale_.y, scale_.z};
 
 	// ── 行列合成：Pivot→累積回転→Scale→Offset（Pivot→(R→S→T)）─
-	Matrix4x4 pivotMat = function.MakeTranslateMatrix(pivot_);
-	Matrix4x4 scaleMat = function.MakeScaleMatrix(invScale);
-	Matrix4x4 offsetMat = function.MakeTranslateMatrix(translation_);
+	Matrix4x4 pivotMat = Function::MakeTranslateMatrix(pivot_);
+	Matrix4x4 scaleMat = Function::MakeScaleMatrix(invScale);
+	Matrix4x4 offsetMat = Function::MakeTranslateMatrix(translation_);
 
 	// world→camera 行列
 	//    ① pivot へ
 	//    ② 回転（累積）
 	//    ③ スケール（ズーム）
 	//    ④ オフセット（距離）
-	Matrix4x4 worldCam = function.Multiply(function.Multiply(function.Multiply(pivotMat , matRot_) , scaleMat) , offsetMat);
+	Matrix4x4 worldCam = Function::Multiply(Function::Multiply(Function::Multiply(pivotMat, matRot_), scaleMat), offsetMat);
 
 	// ── ビュー行列は逆行列を取ってセット ──
-	viewMatrix_ = function.Inverse(worldCam);
+	viewMatrix_ = Function::Inverse(worldCam);
 
 	// ── ビュー×プロジェクション行列を更新 ──
-	viewProjectionMatrix_ = function.Multiply(viewMatrix_, projectionMatrix_);
+	viewProjectionMatrix_ = Function::Multiply(viewMatrix_, projectionMatrix_);
 }

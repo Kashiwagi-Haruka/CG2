@@ -7,6 +7,7 @@
 #include <dxcapi.h>
 #include <thread>
 
+
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "Dbghelp.lib")
@@ -14,6 +15,7 @@
 #pragma comment(lib, "dxcompiler.lib")
 
 using namespace Microsoft::WRL;
+const uint32_t DirectXCommon::kMaxSRVCount = 512;
 
 void DirectXCommon::initialize(WinApp* winApp) {
 	assert(winApp);
@@ -308,7 +310,7 @@ void DirectXCommon::DescriptorHeapCreate() {
 	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	// SRV用ディスクリプタヒープ作成
-	srvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	srvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
 
 	dsvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
@@ -406,7 +408,6 @@ void DirectXCommon::FenceCreate() {
 	hr_ = commandQueue_->Signal(fence_.Get(), fenceValue_);
 	assert(SUCCEEDED(hr_));
 }
-
 void DirectXCommon::ViewportRectInitialize(){
 
 	// ビューポートとシザー設定
@@ -854,22 +855,138 @@ void DirectXCommon::SetupPSO() {
 		assert(SUCCEEDED(hr_));
 	}
 
-	// --- メタボール用PSO（両面描画＋真っ白PS） ---
-	Microsoft::WRL::ComPtr<IDxcBlob> whitePSBlob = CompileShader(L"Resources/shader/WhitePS.hlsl", L"ps_6_0");
-	assert(whitePSBlob);
+	//// --- メタボール用PSO（両面描画＋真っ白PS） ---
+	//Microsoft::WRL::ComPtr<IDxcBlob> whitePSBlob = CompileShader(L"Resources/shader/WhitePS.hlsl", L"ps_6_0");
+	//assert(whitePSBlob);
 
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC metaballPsoDesc = baseDesc;
-	metaballPsoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
-	metaballPsoDesc.PS = {whitePSBlob->GetBufferPointer(), whitePSBlob->GetBufferSize()};
-	D3D12_RASTERIZER_DESC rasterizerDescMetaball{};
-	rasterizerDescMetaball.CullMode = D3D12_CULL_MODE_NONE; // 両面描画
-	rasterizerDescMetaball.FillMode = D3D12_FILL_MODE_SOLID;
-	metaballPsoDesc.RasterizerState = rasterizerDescMetaball;
-	hr_ = device_->CreateGraphicsPipelineState(&metaballPsoDesc, IID_PPV_ARGS(&graphicsPipelineStateWhite_));
-	assert(SUCCEEDED(hr_));
+	//D3D12_GRAPHICS_PIPELINE_STATE_DESC metaballPsoDesc = baseDesc;
+	//metaballPsoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
+	//metaballPsoDesc.PS = {whitePSBlob->GetBufferPointer(), whitePSBlob->GetBufferSize()};
+	//D3D12_RASTERIZER_DESC rasterizerDescMetaball{};
+	//rasterizerDescMetaball.CullMode = D3D12_CULL_MODE_NONE; // 両面描画
+	//rasterizerDescMetaball.FillMode = D3D12_FILL_MODE_SOLID;
+	//metaballPsoDesc.RasterizerState = rasterizerDescMetaball;
+	//hr_ = device_->CreateGraphicsPipelineState(&metaballPsoDesc, IID_PPV_ARGS(&graphicsPipelineStateWhite_));
+	//assert(SUCCEEDED(hr_));
+
+	SetupParticlePSO();
 
 	Logger::Log("SetupPSO END \n");
 }
+void DirectXCommon::SetupParticlePSO() {
+	// RootParameter 配列を用意 (Material, Texture, Instancing)
+	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+
+	// b0 : Material (PS)
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[0].Descriptor.ShaderRegister = 0;
+
+	// t0 : Texture (PS)
+	D3D12_DESCRIPTOR_RANGE rangeTexture{};
+	rangeTexture.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	rangeTexture.NumDescriptors = 1;
+	rangeTexture.BaseShaderRegister = 0; // t0
+	rangeTexture.RegisterSpace = 0;      // space0
+	rangeTexture.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &rangeTexture;
+
+	// t0, space1 : InstancingData (VS)
+	D3D12_DESCRIPTOR_RANGE rangeInstancing{};
+	rangeInstancing.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	rangeInstancing.NumDescriptors = 1;
+	rangeInstancing.BaseShaderRegister = 1; // t0
+	rangeInstancing.RegisterSpace = 0;      // space1
+	rangeInstancing.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &rangeInstancing;
+
+	// b1 : Transform (VS)
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[3].Descriptor.ShaderRegister = 1; // b1
+
+	// Sampler s0 : PS
+	D3D12_STATIC_SAMPLER_DESC sampler = {};
+	sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	sampler.AddressU = sampler.AddressV = sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	sampler.MaxLOD = D3D12_FLOAT32_MAX;
+	sampler.ShaderRegister = 0;
+	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	// RootSignature
+	D3D12_ROOT_SIGNATURE_DESC descRootSig{};
+	descRootSig.pParameters = rootParameters;
+	descRootSig.NumParameters = _countof(rootParameters);
+	descRootSig.pStaticSamplers = &sampler;
+	descRootSig.NumStaticSamplers = 1;
+	descRootSig.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	hr_ = D3D12SerializeRootSignature(&descRootSig, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
+	if (FAILED(hr_)) {
+		Logger::Log(reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
+		assert(false);
+	}
+
+	hr_ = device_->CreateRootSignature(0, signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&particleRootSignature_));
+	assert(SUCCEEDED(hr_));
+
+	// InputLayout
+	D3D12_INPUT_ELEMENT_DESC inputElements[3] = {};
+	inputElements[0] = {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0};
+	inputElements[1] = {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0};
+	inputElements[2] = {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0};
+
+	D3D12_INPUT_LAYOUT_DESC inputLayout{};
+	inputLayout.pInputElementDescs = inputElements;
+	inputLayout.NumElements = _countof(inputElements);
+
+	// DepthStencil
+	D3D12_DEPTH_STENCIL_DESC depthDesc{};
+	depthDesc.DepthEnable = true;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+	// Shader
+	auto vsBlob = CompileShader(L"Resources/shader/Particle.VS.hlsl", L"vs_6_0");
+	auto psBlob = CompileShader(L"Resources/shader/Particle.PS.hlsl", L"ps_6_0");
+
+	// PSO
+	for (int i = 0; i < BlendMode::kCountOfBlendMode; i++) {
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
+		psoDesc.pRootSignature = particleRootSignature_.Get();
+		psoDesc.InputLayout = inputLayout;
+		psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
+		psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
+		D3D12_RASTERIZER_DESC rasterizerDesc{};
+		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+		psoDesc.RasterizerState = rasterizerDesc;
+		psoDesc.BlendState = blendModeManeger_.SetBlendMode(static_cast<BlendMode>(i));
+		psoDesc.NumRenderTargets = 1;
+		psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		psoDesc.DepthStencilState = depthDesc;
+		psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		psoDesc.SampleDesc.Count = 1;
+		psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+		hr_ = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&particlePipelineState_[i]));
+		assert(SUCCEEDED(hr_));
+	}
+
+	Logger::Log("SetupParticlePSO END\n");
+}
+
+
 
 void DirectXCommon::CreateSphereResources() {
 	const int kSubdivision = 16;
@@ -1020,7 +1137,7 @@ void DirectXCommon::CreateSpriteResources() {
 	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
 	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
 	matSprite->enableLighting = 0;
-	matSprite->uvTransform = function.MakeIdentity();
+	matSprite->uvTransform = Function::MakeIdentity4x4();
 	materialResourceSprite_->Unmap(0, nullptr);
 
 	// Sprite用の TransformationMatrix リソース作成（1個分）
@@ -1031,7 +1148,7 @@ void DirectXCommon::CreateSpriteResources() {
 	transformationMatrixResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 
 	// 単位行列を書き込んでおく（初期状態）
-	*transformationMatrixDataSprite = function.MakeIdentity();
+	*transformationMatrixDataSprite = Function::MakeIdentity4x4();
 }
 void DirectXCommon::CreateModelResources(){
 	vertexResource_ = CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
@@ -1053,16 +1170,16 @@ void DirectXCommon::CreateModelResources(){
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
 	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	mat3d->enableLighting = 1;
-	mat3d->uvTransform = function.MakeIdentity();
+	mat3d->uvTransform = Function::MakeIdentity4x4();
 
 	materialResource_->Unmap(0, nullptr);
 
 	// [0]=モデル描画用で使う
-	Matrix4x4 worldMatrix = function.MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = function.Multiply(worldMatrix, function.Multiply(viewMatrix, projectionMatrix));
+	Matrix4x4 worldMatrix = Function::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	Matrix4x4 cameraMatrix = Function::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 viewMatrix = Function::Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = Function::MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
+	Matrix4x4 worldViewProjectionMatrix = Function::Multiply(worldMatrix, Function::Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData[0].WVP = worldViewProjectionMatrix;
 	transformationMatrixData[0].World = worldMatrix;
 }
@@ -1083,9 +1200,40 @@ void DirectXCommon::VertexResource() {
 
 	// 初期化は必ず構造体単位で
 	for (int i = 0; i < kMaxTransformSlots; ++i) {
-		transformationMatrixData[i].WVP = function.MakeIdentity();
-		transformationMatrixData[i].World = function.MakeIdentity();
+		transformationMatrixData[i].WVP = Function::MakeIdentity4x4();
+		transformationMatrixData[i].World = Function::MakeIdentity4x4();
 	}
+	// インスタンシング用 TransformationMatrix リソース作成
+	instancingResource_ = CreateBufferResource(sizeof(TransformationMatrix) * kNumInstance);
+
+	// 書き込むためのポインタをマップ
+	hr_ = instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
+	assert(SUCCEEDED(hr_) && instancingData_);
+
+	// 単位行列を初期化
+	for (uint32_t index = 0; index < kNumInstance; ++index) {
+		instancingData_[index].WVP = Function::MakeIdentity4x4();
+		instancingData_[index].World = Function::MakeIdentity4x4();
+	}
+
+	// ==================================================
+	// Instancing用 SRV 作成
+	// ==================================================
+	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
+	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	instancingSrvDesc.Buffer.FirstElement = 0;
+	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	instancingSrvDesc.Buffer.NumElements = kNumInstance; // インスタンス数
+	instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix128);
+
+	// 例えば Heap の 3 番目を使用（空きスロットならどこでもOK）
+	instancingSrvHandleCPU = GetCpuDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV_, 3);
+	instancingSrvHandleGPU = GetGpuDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV_, 3);
+
+	device_->CreateShaderResourceView(instancingResource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU);
+	
 
 	CreateSphereResources();
 	CreateSpriteResources();
@@ -1093,7 +1241,7 @@ void DirectXCommon::VertexResource() {
 }
 
 
-void DirectXCommon::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color, int textureHandle) {
+void DirectXCommon::DrawSpriteSheet(Vector3 pos1, Vector3 pos2, Vector3 pos3, Vector3 pos4, Vector2 texturePos[4], int color, int textureHandle) {
 	commandList_->SetPipelineState(graphicsPipelineState_[blendMode_].Get()); // 通常
 	// 頂点バッファに6頂点分追記
 	VertexData* vertexData = nullptr;
@@ -1103,22 +1251,22 @@ void DirectXCommon::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int c
 	// 2枚の三角形で四角形を描画（インデックス: 0,1,2, 1,3,2）
 	// 0: 左上, 1: 右上, 2: 右下, 3: 左下
 	vertexData[offset + 0] = {
-	    {pos[0].x, pos[0].y, 0, 1},
+	    {pos1.x, pos1.y, 0, 1},
         {texturePos[0].x, texturePos[0].y},
         {0, 0, -1}
     };
 	vertexData[offset + 1] = {
-	    {pos[1].x, pos[1].y, 0, 1},
+	    {pos2.x, pos2.y, 0, 1},
         {texturePos[1].x, texturePos[1].y},
         {0, 0, -1}
     };
 	vertexData[offset + 2] = {
-	    {pos[2].x, pos[2].y, 0, 1},
+	    {pos3.x, pos3.y, 0, 1},
         {texturePos[2].x, texturePos[2].y},
         {0, 0, -1}
     };
 	vertexData[offset + 3] = {
-	    {pos[3].x, pos[3].y, 0, 1},
+	    {pos4.x, pos4.y, 0, 1},
         {texturePos[3].x, texturePos[3].y},
         {0, 0, -1}
     };
@@ -1161,16 +1309,16 @@ void DirectXCommon::DrawSphere(const Vector3& center, float radius, uint32_t col
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
 	mat->color = Vector4(((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, ((color >> 24) & 0xFF) / 255.0f);
 	mat->enableLighting = 1;
-	mat->uvTransform = function.MakeIdentity();
+	mat->uvTransform = Function::MakeIdentity4x4();
 	materialResource_->Unmap(0, nullptr);
 
 	// 2. ワールド行列とWVP
-	Matrix4x4 world = function.MakeAffineMatrix(
+	Matrix4x4 world = Function::MakeAffineMatrix(
 	    {radius, radius, radius}, // スケール
 	    {0, 0, 0},                // 回転
 	    center                    // 平行移動
 	);
-	Matrix4x4 wvp = function.Multiply(world, viewProj);
+	Matrix4x4 wvp = Function::Multiply(world, viewProj);
 	Logger::Log(std::format("WVP = "));
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -1226,16 +1374,16 @@ void DirectXCommon::DrawSphere(const Vector3& center, const Vector3& radius, con
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat));
 	mat->color = Vector4(((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, ((color >> 24) & 0xFF) / 255.0f);
 	mat->enableLighting = 1;
-	mat->uvTransform = function.MakeIdentity();
+	mat->uvTransform = Function::MakeIdentity4x4();
 	materialResource_->Unmap(0, nullptr);
 
 	// 2. ワールド行列とWVP
-	Matrix4x4 world = function.MakeAffineMatrix(
+	Matrix4x4 world = Function::MakeAffineMatrix(
 	    radius,   // スケール
 	    rotation, // 回転
 	    center    // 平行移動
 	);
-	Matrix4x4 wvp = function.Multiply(world, viewProj);
+	Matrix4x4 wvp = Function::Multiply(world, viewProj);
 	Logger::Log(std::format("WVP = "));
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -1321,15 +1469,15 @@ void DirectXCommon::DrawMesh(const std::vector<VertexData>& vertices, uint32_t c
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&matData));
 	matData->color = colorVec; // 引数 color を RGBA に変換して設定
 	matData->enableLighting = 1;
-	matData->uvTransform = function.MakeIdentity();
+	matData->uvTransform = Function::MakeIdentity4x4();
 	materialResource_->Unmap(0, nullptr);
 
 	// WVP行列のセット（スロット2を使用）
 
-	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / WinApp::kClientHeight, 0.1f, 100.0f);
-	Matrix4x4 wvpMatrix = function.Multiply(world, function.Multiply(viewMatrix, projectionMatrix));
+	Matrix4x4 cameraMatrix = Function::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 viewMatrix = Function::Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = Function::MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / WinApp::kClientHeight, 0.1f, 100.0f);
+	Matrix4x4 wvpMatrix = Function::Multiply(world, Function::Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData[2].WVP = wvpMatrix;
 	transformationMatrixData[2].World = world;
 
@@ -1351,10 +1499,9 @@ void DirectXCommon::DrawMesh(const std::vector<VertexData>& vertices, uint32_t c
 
 void DirectXCommon::DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount) {
 
-	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-	// 0. PSO切り替え
-
-	commandList_->SetPipelineState(graphicsPipelineState_[blendMode_].Get()); // 通常
+	// パーティクル専用の RootSignature と PSO を使う（修正）
+	commandList_->SetGraphicsRootSignature(particleRootSignature_.Get());
+	commandList_->SetPipelineState(particlePipelineState_[blendMode_].Get()); // particle 用 PSO を使用
 
 	// 頂点リソース作成
 	vertexResourceMesh_ = CreateBufferResource(sizeof(VertexData) * vertices.size());
@@ -1389,15 +1536,15 @@ void DirectXCommon::DrawParticle(const std::vector<VertexData>& vertices, uint32
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&matData));
 	matData->color = colorVec; // 引数 color を RGBA に変換して設定
 	matData->enableLighting = 1;
-	matData->uvTransform = function.MakeIdentity();
+	matData->uvTransform = Function::MakeIdentity4x4();
 	materialResource_->Unmap(0, nullptr);
 
 	// WVP行列のセット（スロット2を使用）
 
-	Matrix4x4 cameraMatrix = function.MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	Matrix4x4 viewMatrix = function.Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = function.MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / WinApp::kClientHeight, 0.1f, 100.0f);
-	Matrix4x4 wvpMatrix = function.Multiply(world, function.Multiply(viewMatrix, projectionMatrix));
+	Matrix4x4 cameraMatrix = Function::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 viewMatrix = Function::Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = Function::MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / WinApp::kClientHeight, 0.1f, 100.0f);
+	Matrix4x4 wvpMatrix = Function::Multiply(world, Function::Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData[2].WVP = wvpMatrix;
 	transformationMatrixData[2].World = world;
 
@@ -1409,9 +1556,18 @@ void DirectXCommon::DrawParticle(const std::vector<VertexData>& vertices, uint32
 	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_.Get()};
 	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
 
+// RootParameter[0] : Material
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress() + sizeof(TransformationMatrix) * 2); // スロット2を使用
-	commandList_->SetGraphicsRootDescriptorTable(2, TextureGPUHandle_[textureHandle]);                                                 // テクスチャ
+
+	// RootParameter[3] : Transform
+	commandList_->SetGraphicsRootConstantBufferView(3, transformResource_->GetGPUVirtualAddress() + sizeof(TransformationMatrix128) * 2);
+
+	// RootParameter[1] : Texture
+	commandList_->SetGraphicsRootDescriptorTable(1, TextureGPUHandle_[textureHandle]);
+
+	// RootParameter[2] : InstancingData
+	commandList_->SetGraphicsRootDescriptorTable(2, instancingSrvHandleGPU);
+	// インスタンシング用 SRV（particle 用 root sig では Vertex 用）
 
 	// 描画コマンド
 	commandList_->DrawInstanced(static_cast<UINT>(vertices.size()), instanceCount, 0, 0);

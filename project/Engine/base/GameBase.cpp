@@ -5,6 +5,8 @@
 #include <dxgidebug.h>
 #include <fstream>
 #include <sstream>
+#include "SpriteCommon.h"
+#include "TextureManager.h" 
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -14,7 +16,9 @@
 
 GameBase::~GameBase(){
 	ResourceRelease();
+	delete spriteCommon_;
 	delete DInput;
+	TextureManager::GetInstance()->Finalize();
 	delete dxCommon_;
 	delete winApp_;
 }
@@ -28,13 +32,16 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	modelData = LoadObjFile("Resources/3d", "plane.obj");
 	dxCommon_->SetModelData(modelData);
 	dxCommon_->initialize(winApp_);
-
-		
+	TextureManager::GetInstance()->Initialize(dxCommon_);
+	
 	
 	DInput = new Input();
 	DInput->Initialize(winApp_);
 
 	audio.InitializeIXAudio();
+
+	spriteCommon_ = new SpriteCommon();
+	spriteCommon_->Initialize(dxCommon_);
 
 }
 
@@ -84,6 +91,7 @@ void GameBase::CheackResourceLeaks() {
 }
 void GameBase::ResourceRelease() {
 	
+	TextureManager::GetInstance()->Finalize();
 	dxCommon_->Finalize();
 
 	winApp_->Finalize();
@@ -92,7 +100,7 @@ void GameBase::ResourceRelease() {
 
 void GameBase::SetDirectionalLightData(const DirectionalLight& directionalLight) { dxCommon_->SetDirectionalLightData(directionalLight); }
 
-
+void GameBase::SpriteCommonSet() { spriteCommon_->DrawCommon(); }
 
 // 球体用リソース
 void GameBase::BeginFlame() { 
@@ -215,96 +223,10 @@ float GameBase::GetMouseX() const { return DInput->GetMouseX(); };
 float GameBase::GetMouseY() const { return DInput->GetMouseY(); };
 Vector2 GameBase::GetMouseMove() const { return DInput->GetMouseMove(); };
 
-//void GameBase::DrawMesh(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices, uint32_t color, int textureHandle) {
-//	//if (vertices.empty() || indices.empty())
-//	//	return;
-//
-//	// 0. まずここでPSO切り替え
-//	if (IsMetaBall_) {
-//		commandList_->SetPipelineState(graphicsPipelineStateWhite.Get()); // 白単色
-//	} else {
-//		
-//		commandList_->SetPipelineState(graphicsPipelineState[blendMode_].Get()); // 通常
-//	}
-//	vertexResourceMesh_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices.size());
-//	vertexBufferViewMesh_.BufferLocation = vertexResourceMesh_->GetGPUVirtualAddress();
-//	vertexBufferViewMesh_.SizeInBytes = sizeof(VertexData) * static_cast<UINT>(vertices.size());
-//	vertexBufferViewMesh_.StrideInBytes = sizeof(VertexData);
-//
-//	indexResourceMetaball_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * indices.size());
-//	indexBufferViewMetaball_.BufferLocation = indexResourceMetaball_->GetGPUVirtualAddress();
-//	indexBufferViewMetaball_.SizeInBytes = sizeof(uint32_t) * static_cast<UINT>(indices.size());
-//	indexBufferViewMetaball_.Format = DXGI_FORMAT_R32_UINT;
-//
-//
-//	/*OutputDebugStringA(std::format("vertexBufferView_.SizeInBytes={} useVertex={} 1vertex={} bytes\n", vertexBufferViewMesh_.SizeInBytes, vertices.size(), sizeof(VertexData)).c_str());*/
-//	assert(vertices.size() * sizeof(VertexData) <= vertexBufferViewMesh_.SizeInBytes);
-//
-//	// バッファオーバーチェック
-//	if (vertices.size() > kMaxVertexCount) {
-//		OutputDebugStringA("DrawMesh: 頂点バッファサイズ超過！\n");
-//		assert(false && "DrawMesh: 頂点バッファサイズ超過！");
-//		return;
-//	}
-//	if (indices.size() > kMaxIndexCount) {
-//		OutputDebugStringA("DrawMesh: インデックスバッファサイズ超過！\n");
-//		assert(false && "DrawMesh: インデックスバッファサイズ超過！");
-//		return;
-//	}
-//
-//
-//	// 転送
-//	{
-//		VertexData* vtxData = nullptr;
-//		vertexResourceMesh_->Map(0, nullptr, reinterpret_cast<void**>(&vtxData));
-//		memcpy(vtxData, vertices.data(), sizeof(VertexData) * vertices.size());
-//		vertexResourceMesh_->Unmap(0, nullptr);
-//	}
-//	{
-//		uint32_t* idxData = nullptr;
-//		indexResourceMetaball_->Map(0, nullptr, reinterpret_cast<void**>(&idxData));
-//		memcpy(idxData, indices.data(), sizeof(uint32_t) * indices.size());
-//		indexResourceMetaball_->Unmap(0, nullptr);
-//	}
-//
-//
-//	// 描画時
-//	commandList_->IASetVertexBuffers(0, 1, &vertexBufferViewMesh_);
-//	commandList_->IASetIndexBuffer(&indexBufferViewMetaball_);
-//
-//	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-//
-//	// シェーダやテクスチャは各自合わせてください
-//	// マテリアルや行列リソースなどセット
-//	// ここはDrawTriangleやDrawSphereの実装と同じでOK
-//	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_.Get()};
-//	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
-//
-//	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-//	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
-//	commandList_->SetGraphicsRootDescriptorTable(2, TextureGPUHandle_[textureHandle]); // ここは用途に合わせて
-//
-//	commandList_->DrawIndexedInstanced(static_cast<UINT>(indices.size()), 1, 0, 0, 0);
-//}
-
-
-
-
 int GameBase::LoadTextures(const std::string& fileName) {
 
-	int handles = TexInitialize(dxCommon_->GetDevice(), dxCommon_->GetSrvDescriptorHeap(), fileName);
-	dxCommon_->SetTextureGPUHanle(GetTextureToTal() - 1, GetTexGpuHandle());
-	assert(dxCommon_->GetTextureGPUHanle(GetTextureToTal()-1).ptr != 0);
-	return handles;
-};
-int GameBase::ModelTextures(const std::string& fileName) {
+	return TextureManager::GetInstance()->GetTextureIndexByfilePath(fileName); };
 
-	int handles = ModelTexInitialize(dxCommon_->GetDevice(), dxCommon_->GetSrvDescriptorHeap(), fileName);
-	dxCommon_->SetModelGPUHanle(GetmodelTexTotal() - 1, GetModelGpuHandle());
-	assert(dxCommon_->GetModelGPUHanle(GetmodelTexTotal()-1).ptr != 0);
-
-	return handles;
-};
 
 void GameBase::SetBlendMode(BlendMode mode) { dxCommon_->SetBlendMode(mode); }
 
@@ -342,6 +264,6 @@ void GameBase::DrawParticle(const std::vector<VertexData>& vertices, uint32_t co
 void GameBase::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj) {
 	dxCommon_->DrawSphere(center, radius, color, textureHandle, viewProj);
 }
-void GameBase::DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color, int textureHandle) { 
-	dxCommon_->DrawSpriteSheet(pos, texturePos, color, textureHandle); 
+void GameBase::DrawSpriteSheet(Vector3 pos1, Vector3 pos2, Vector3 pos3, Vector3 pos4, Vector2 texturePos[4], int color, int textureHandle) { 
+	dxCommon_->DrawSpriteSheet(pos1,pos2,pos3,pos4, texturePos, color, textureHandle); 
 }

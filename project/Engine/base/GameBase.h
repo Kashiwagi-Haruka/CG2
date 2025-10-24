@@ -1,7 +1,6 @@
 #pragma once
 #include "Function.h"
 #include "Vector4.h"
-#include "Texture.h"
 #include "VertexData.h"
 #include "Audio.h"
 #include "Input.h"
@@ -10,8 +9,9 @@
 #include "DirectXCommon.h"
 
 
+class SpriteCommon;
 
-class GameBase :Texture {
+class GameBase{
 
 private:
 
@@ -21,6 +21,7 @@ private:
 	
 	Audio audio;
 	
+	SpriteCommon* spriteCommon_ = nullptr;
 
 	
 	HRESULT hr_;
@@ -32,7 +33,6 @@ private:
 
 
 
-	Function function;
 
 	ModelData modelData;
 
@@ -68,13 +68,13 @@ private:
 	void SoundPlayWave(const SoundData& sounddata);
 
 
-	
+	void SpriteCommonSet();
 
 	
 
 	Transform GetCameraTransform() const { return dxCommon_->GetCameraTransform(); };
 
-	void DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color, int textureHandle);
+	void DrawSpriteSheet(Vector3 pos1, Vector3 pos2, Vector3 pos3, Vector3 pos4, Vector2 texturePos[4], int color, int textureHandle);
 
 	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
 	void DrawSphere(const Vector3& center, const Vector3& radius, const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
@@ -85,7 +85,7 @@ private:
 	void SetDirectionalLightData(const DirectionalLight& directionalLight);
 
 	int LoadTextures(const std::string& fileName);
-	int ModelTextures(const std::string& fileName);
+	
 
 	void SetBlendMode(BlendMode blendMode);
 
@@ -147,6 +147,8 @@ private:
 	float GetMouseX() const;
 	float GetMouseY() const;
 	Vector2 GetMouseMove() const;
+
+	SpriteCommon* GetSpriteCommon() { return spriteCommon_; };
 
 private:
 

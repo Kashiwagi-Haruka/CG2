@@ -7,7 +7,7 @@ class DebugCamera {
 	Matrix4x4 viewMatrix_;
 	Matrix4x4 projectionMatrix_;
 	Matrix4x4 viewProjectionMatrix_;
-	Function function;
+	
 	public:
 	void Initialize();
 	    void Update(uint8_t* key, uint8_t* preKey);

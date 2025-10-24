@@ -25,7 +25,6 @@
 #include "Function.h"
 #include "BlendModeManeger.h"
 
-
 struct MaterialData {
 	std::string textureFilePath;
 };
@@ -45,6 +44,8 @@ struct DirectionalLight {
 	Vector3 direction;
 	float intensity;
 };
+
+class BlendModeManeger;
 
 class DirectXCommon {
 
@@ -95,8 +96,13 @@ class DirectXCommon {
 	// シザー矩形
 	D3D12_RECT scissorRect_;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> particleRootSignature_;
+	
+		// パーティクル用
+
 	// 実際に生成
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_[6];
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> particlePipelineState_[BlendMode::kCountOfBlendMode];
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateWhite_; // 完全白用
 	// 頂点バッファビューを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
@@ -129,6 +135,8 @@ class DirectXCommon {
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite_;
 	
+	
+
 
 	struct Material {
 
@@ -154,7 +162,12 @@ class DirectXCommon {
 		                 // ここで自動的に 128 バイト分のパディングが入って、
 		                 // sizeof(TransformationMatrix) == 256 になる
 	};
-
+	struct TransformationMatrix128 {
+		Matrix4x4 WVP;   // 64 バイト
+		Matrix4x4 World; // 64 バイト
+		                 
+		                 
+	};
 	// 例: 最大確保サイズ（初期化時に使った値を定数などで保持しておく）
 	const size_t kMaxVertexCount = 200000;    // 実際の最大確保頂点数
 	const size_t kMaxIndexCount = 200000 * 3; // 実際の最大確保インデックス数
@@ -188,7 +201,8 @@ class DirectXCommon {
 	// Texture texture2_;
 	D3D12_GPU_DESCRIPTOR_HANDLE TextureGPUHandle_[10000];
 	D3D12_GPU_DESCRIPTOR_HANDLE ModelGPUHandle_[10000];
-
+	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU;
+	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU;
 	static constexpr UINT kMaxVertices_ = 1024; // 十分な大きさで定義しておく
 
 	int transformSlotOffset = 0; // slot=0,1使用
@@ -209,14 +223,22 @@ class DirectXCommon {
 	    {0.0f, 0.0f, 0.0f}, // rotate
 	    {0.0f, 0.0f, 0.0f}  // translate
 	};
-	Function function;
+	
 	BlendModeManeger blendModeManeger_;
 	WinApp* winApp_ = nullptr;
 	imGuiM imguiM_;
 
 	std::chrono::steady_clock::time_point reference_;
 
+	// Particle instancing用
+	static const uint32_t kNumInstance = 10;
+	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
+	TransformationMatrix* instancingData_ = nullptr;
+
+
 public:
+
+	static const uint32_t kMaxSRVCount;
 
 	void initialize(WinApp* winApp);
 	
@@ -260,7 +282,7 @@ public:
 
 	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
 	void DrawSphere(const Vector3& center, const Vector3& radius, const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
-	void DrawSpriteSheet(Vector3 pos[4], Vector2 texturePos[4], int color, int textureHandle);
+	void DrawSpriteSheet(Vector3 pos1, Vector3 pos2, Vector3 pos3, Vector3 pos4, Vector2 texturePos[4], int color, int textureHandle);
 
 	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world);
 	void DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount);
@@ -292,7 +314,7 @@ private:
 	void CrtvTransitionBarrier();
 
 	void SetupPSO();
-	
+	void SetupParticlePSO();
 	
 	static D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 	static D3D12_CPU_DESCRIPTOR_HANDLE GetCpuDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);

@@ -5,7 +5,7 @@ class Model {
 
 	public:
 
-	/*void CreateModelVertexBuffer();*/
+	void Initialize();
 
 
 
