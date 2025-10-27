@@ -223,11 +223,6 @@ float GameBase::GetMouseX() const { return DInput->GetMouseX(); };
 float GameBase::GetMouseY() const { return DInput->GetMouseY(); };
 Vector2 GameBase::GetMouseMove() const { return DInput->GetMouseMove(); };
 
-int GameBase::LoadTextures(const std::string& fileName) {
-
-	return TextureManager::GetInstance()->GetTextureIndexByfilePath(fileName); };
-
-
 void GameBase::SetBlendMode(BlendMode mode) { dxCommon_->SetBlendMode(mode); }
 
 bool GameBase::PushKey(BYTE keyNumber){ return DInput->PushKey(keyNumber); }
@@ -263,7 +258,4 @@ void GameBase::DrawParticle(const std::vector<VertexData>& vertices, uint32_t co
 }
 void GameBase::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj) {
 	dxCommon_->DrawSphere(center, radius, color, textureHandle, viewProj);
-}
-void GameBase::DrawSpriteSheet(Vector3 pos1, Vector3 pos2, Vector3 pos3, Vector3 pos4, Vector2 texturePos[4], int color, int textureHandle) { 
-	dxCommon_->DrawSpriteSheet(pos1,pos2,pos3,pos4, texturePos, color, textureHandle); 
 }

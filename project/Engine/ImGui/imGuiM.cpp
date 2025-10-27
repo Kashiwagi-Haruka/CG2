@@ -1,6 +1,7 @@
 #include "imGuiM.h"
 #include <dxgi1_6.h>
 #include <format>
+#include <string>
 void imGuiM::MInitialize(HWND hwnd, ID3D12Device* device_, DXGI_SWAP_CHAIN_DESC1 swapChainDesc, D3D12_RENDER_TARGET_VIEW_DESC rtvDesc, ID3D12DescriptorHeap* srvDescriptorHeap_) {
 
 	IMGUI_CHECKVERSION();
@@ -8,7 +9,14 @@ void imGuiM::MInitialize(HWND hwnd, ID3D12Device* device_, DXGI_SWAP_CHAIN_DESC1
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX12_Init(device_, swapChainDesc.BufferCount, rtvDesc.Format, srvDescriptorHeap_, srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart());
-	
+	// ★ デバッグログ出力（ImGui が使う SRV のスロット確認）
+	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
+
+	std::string log = "[ImGui Init] SRV Heap Start -> "
+	                  "CPU Handle: " +
+	                  std::to_string(cpuHandle.ptr) + " | GPU Handle: " + std::to_string(gpuHandle.ptr) + "\n";
+	OutputDebugStringA(log.c_str());
 }
 
 void imGuiM::NewFrame() {

@@ -3,14 +3,19 @@
 GameScene::~GameScene(){
 
 	delete sprite;
-
+	delete sprite2_;
 
 }
 
 void GameScene::Initialize(GameBase* gameBase) {
 
+	uint32_t spriteHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png");
+	uint32_t spriteHandle2 = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/monsterBall.png");
+
 	sprite = new Sprite();
-	sprite->Initialize(gameBase->GetSpriteCommon(),"Resources/2d/uvChecker.png");
+	sprite->Initialize(gameBase->GetSpriteCommon(),spriteHandle);
+	sprite2_ = new Sprite();
+	sprite2_->Initialize(gameBase->GetSpriteCommon(), spriteHandle2);
 
 	camera.Initialize();
 
@@ -22,7 +27,9 @@ void GameScene::Initialize(GameBase* gameBase) {
 	        (uint8_t(meshColor.z * 255));        // B
 
 	modelData = gameBase->LoadObjFile("Resources/3d", "plane.obj");
-	
+	spriteTexSize = {200,200};
+	spriteTexSize2 = {200, 500};
+
 }
 
 void GameScene::Update(GameBase* gameBase) {
@@ -57,36 +64,36 @@ void GameScene::Update(GameBase* gameBase) {
 	camera.Update((uint8_t*)keys, (uint8_t*)preKeys);
 
 
-	ImGui::Begin("Plane");
-	ImGui::Text("Transform");
-	ImGui::DragFloat3("Scale", &planeTransform.scale.x, 0.01f);
-	ImGui::DragFloat3("Rotate", &planeTransform.rotate.x, 0.01f);
-	ImGui::DragFloat3("Translate", &planeTransform.translate.x, 0.01f);
-	ImGui::ColorEdit4("Color", (float*)&meshColor);
+	//ImGui::Begin("Plane");
+	//ImGui::Text("Transform");
+	//ImGui::DragFloat3("Scale", &planeTransform.scale.x, 0.01f);
+	//ImGui::DragFloat3("Rotate", &planeTransform.rotate.x, 0.01f);
+	//ImGui::DragFloat3("Translate", &planeTransform.translate.x, 0.01f);
+	//ImGui::ColorEdit4("Color", (float*)&meshColor);
 
-	if (ImGui::CollapsingHeader("light Settings")) {
-		// 方向
-		ImGui::DragFloat3("light Direction", &light.direction.x, 0.1f, -1.0f, 1.0f);
-		// 明るさ
-		ImGui::SliderFloat("light Intensity", &light.intensity, 0.0f, 5.0f);
-		// 色
-		ImGui::ColorEdit3("light Color", &light.color.x);
-	}
+	//if (ImGui::CollapsingHeader("light Settings")) {
+	//	// 方向
+	//	ImGui::DragFloat3("light Direction", &light.direction.x, 0.1f, -1.0f, 1.0f);
+	//	// 明るさ
+	//	ImGui::SliderFloat("light Intensity", &light.intensity, 0.0f, 5.0f);
+	//	// 色
+	//	ImGui::ColorEdit3("light Color", &light.color.x);
+	//}
 
-	gameBase->SetDirectionalLightData(light);
+	//gameBase->SetDirectionalLightData(light);
 
-	// --- ブレンドモード選択 ---
-	static int blendModeIndex = 0;
-	const char* blendModes[] = {"None", "Alpha", "Add", "Sub", "Mul", "Screen"};
-	if (ImGui::Combo("Blend Mode", &blendModeIndex, blendModes, IM_ARRAYSIZE(blendModes))) {
-		gameBase->SetBlendMode(static_cast<BlendMode>(blendModeIndex));
-	}
+	//// --- ブレンドモード選択 ---
+	//static int blendModeIndex = 0;
+	//const char* blendModes[] = {"None", "Alpha", "Add", "Sub", "Mul", "Screen"};
+	//if (ImGui::Combo("Blend Mode", &blendModeIndex, blendModes, IM_ARRAYSIZE(blendModes))) {
+	//	gameBase->SetBlendMode(static_cast<BlendMode>(blendModeIndex));
+	//}
 
-	ImGui::End();
+	//ImGui::End();
 
 	worldMatrix = Function::MakeAffineMatrix(planeTransform.scale, planeTransform.rotate, planeTransform.translate);
 
-	ImGui::Begin("PadorKey");
+	/*ImGui::Begin("PadorKey");
 	if (ImGui::Button("Keyboard")) {
 		IsKeyboard = true;
 		IsPKey = false;
@@ -102,7 +109,7 @@ void GameScene::Update(GameBase* gameBase) {
 		ImGui::Text("Input = Pad");
 	}
 
-	ImGui::End();
+	ImGui::End();*/
 }
 
 void GameScene::Draw(GameBase* gameBase) {
@@ -177,17 +184,34 @@ void GameScene::Draw(GameBase* gameBase) {
 		ImGui::DragFloat3("Scale", &spriteTransform.scale.x, 1.0f, 0.1f, 10000.0f);
 		ImGui::DragFloat3("Rotation", &spriteTransform.rotate.x, 0.01f);
 		ImGui::DragFloat3("Position", &spriteTransform.translate.x, 1.0f);
+		ImGui::DragFloat2("TextureSize", &spriteTexSize.x, 1.0f);
 	}
 	    ImGui::End();
-
+	sprite->SetTextureRange({0.0f, 0.0f}, spriteTexSize);
 	sprite->SetScale(spriteTransform.scale);
 	sprite->SetRotation(spriteTransform.rotate);
 	sprite->SetPosition(spriteTransform.translate);
 
+	if (ImGui::Begin("Sprite2 Debug")) {
+
+		ImGui::DragFloat3("Scale2", &sprite2Transform.scale.x, 1.0f, 0.1f, 10000.0f);
+		ImGui::DragFloat3("Rotation2", &sprite2Transform.rotate.x, 0.01f);
+		ImGui::DragFloat3("Position2", &sprite2Transform.translate.x, 1.0f);
+		ImGui::DragFloat2("TextureSize2", &spriteTexSize2.x, 1.0f);
+	}
+	ImGui::End();
+	
 		sprite->Update();
 
 	gameBase->SpriteCommonSet();
 
 	sprite->Draw();
-	 
+	sprite2_->SetTextureRange({0.0f, 0.0f}, spriteTexSize2);
+	sprite2_->SetScale(sprite2Transform.scale);
+	sprite2_->SetRotation(sprite2Transform.rotate);
+	sprite2_->SetPosition(sprite2Transform.translate);
+
+	sprite2_->Update();
+
+	sprite2_->Draw();
 }

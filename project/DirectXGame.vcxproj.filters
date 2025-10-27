@@ -118,6 +118,7 @@
       <Filter>リソース ファイル</Filter>
     </None>
     <None Include="Resources\shader\Particle.hlsli" />
+    <None Include="Resources\shader\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -229,6 +230,8 @@
     </FxCompile>
     <FxCompile Include="Resources\shader\Particle.PS.hlsl" />
     <FxCompile Include="Resources\shader\Particle.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Sprite.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Sprite.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">

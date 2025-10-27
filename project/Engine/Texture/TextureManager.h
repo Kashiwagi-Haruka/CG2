@@ -33,7 +33,7 @@ class TextureManager {
 	    TextureManager& operator=(TextureManager&) = delete;
 
 	    Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(DirectX::TexMetadata& metadata);
-
+	    void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 
 		DirectXCommon* dxCommon_ = nullptr;
 
@@ -45,8 +45,10 @@ class TextureManager {
 		//初期化
 	    void Initialize(DirectXCommon* dxCommon);
 	    void LoadTextureName(const std::string& filePath);
+		
 	    uint32_t GetTextureIndexByfilePath(const std::string& filePath);
 	    D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(uint32_t textureIndex);
+	    DirectX::TexMetadata& GetMetaData(uint32_t textureIndex);
 		//終了
 	    void Finalize();
 

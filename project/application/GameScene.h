@@ -30,6 +30,11 @@ public:
             .rotate{0, 0, 0},
             .translate{0, 0, 0}
         };
+	    Transform sprite2Transform{
+	        .scale{1, 1, 1},
+            .rotate{0, 0, 0},
+            .translate{0, 0, 0}
+        };
 	    Matrix4x4 ParticleWorldMatrix{};
 	    Matrix4x4 ParticleWVPMatrix{};
 			Vector3 position[4]{
@@ -54,7 +59,10 @@ public:
 		DebugCamera camera;
 
 		Sprite* sprite = nullptr;
-	    
+	    Sprite* sprite2_ = nullptr;
+		
+		Vector2 spriteTexSize {};
+	    Vector2 spriteTexSize2{};
 		
 	
 

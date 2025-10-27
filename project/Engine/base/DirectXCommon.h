@@ -131,9 +131,9 @@ class DirectXCommon {
 	const int kMaxSpheres = 30; // 複数球体用の最大数（例）
 
 	
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_;
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite_;
+
 	
 	
 
@@ -146,8 +146,7 @@ class DirectXCommon {
 		Matrix4x4 uvTransform;
 	};
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite_;
-	Material materialDataSprite_;
+
 
 	// GameBase.h
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceMesh_;
@@ -189,10 +188,7 @@ class DirectXCommon {
         {0.0f, 0.0f, 0.0f}
     };
 	
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite_ = nullptr;
-	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite_{};
-	Matrix4x4* transformationMatrixDataSprite;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite;
+
 
 	// Matrix4x4* wvpData = nullptr; // ← transformResource用のポインタをメンバに持つ
 	TransformationMatrix* transformationMatrixData = nullptr;
@@ -209,7 +205,7 @@ class DirectXCommon {
 
 	const int kMaxTransformSlots = 32; // 例えば最大32スロット（用途に合わせて）
 
-	static const UINT kMaxSpriteVertices = 6 * 10000; // フレーム最大 1000 スプライト分
+
 	
 
 
@@ -271,7 +267,7 @@ public:
 	void SetDirectionalLightData(const DirectionalLight& directionalLight);
 
 	void CreateSphereResources();
-	void CreateSpriteResources();
+
 	void CreateModelResources();
 
 	void VertexResource();
@@ -282,7 +278,7 @@ public:
 
 	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
 	void DrawSphere(const Vector3& center, const Vector3& radius, const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
-	void DrawSpriteSheet(Vector3 pos1, Vector3 pos2, Vector3 pos3, Vector3 pos4, Vector2 texturePos[4], int color, int textureHandle);
+	
 
 	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world);
 	void DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount);

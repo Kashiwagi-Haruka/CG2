@@ -39,8 +39,19 @@ class Sprite {
 
 
 
-	Transform transform_;
+	Transform transform_ {
+		transform_.scale = {1.0f, 1.0f, 1.0f},
+		transform_.rotate = {0.0f, 0.0f, 0.0f},
+		transform_.translate = {0.0f, 0.0f, 0.0f},
+	};
 	Material materialData_;
+
+
+	Vector2 anchorPoint = {0,0};
+
+	Vector2 textureLeftTop = {0, 0};
+	Vector2 textureSize{};
+	Vector2 textureCutSize{};
 
 
 	int handle_ = 0;
@@ -62,7 +73,7 @@ class Sprite {
 	VertexData* vertexData = nullptr;
 	uint32_t* indexData = nullptr;
 	Material* material = nullptr;
-	Matrix4x4* transformData = nullptr;
+	TransformationMatrix* transformData = nullptr;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView;
@@ -71,7 +82,7 @@ class Sprite {
 
 public:
 
-	void Initialize(SpriteCommon* spriteCommon,std::string textureFilePath);
+	void Initialize(SpriteCommon* spriteCommon,uint32_t Handle);
 
 	void Update();
 
@@ -80,6 +91,8 @@ public:
 	 void SetPosition(const Vector3& pos) { transform_.translate = pos; }
 	void SetScale(const Vector3& scale) { transform_.scale = scale; }
 	void SetRotation(const Vector3& rot) { transform_.rotate = rot; }
-
-
+	void SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize);
+	void AdjustTextureSize();
+	const Vector2& GetAnchorPoint() const { return anchorPoint; };
+	void SetAnchorPoint(const Vector2 anchorPoint) { this->anchorPoint; };
 };

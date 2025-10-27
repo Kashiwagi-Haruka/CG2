@@ -81,9 +81,11 @@ void SpriteCommon::CreateGraphicsPipeline(){
 	
 	// --- InputLayout ---
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
+
+	// POSITION : float4 (★ここを4成分に)
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
-	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT; // ★修正
 	inputElementDescs[0].InputSlot = 0;
 	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	inputElementDescs[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
@@ -108,10 +110,10 @@ void SpriteCommon::CreateGraphicsPipeline(){
 
 	// --- DepthStencil ---
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthEnable = false;
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;  // 深度書き込みを有効
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 手前なら描画
-	// depthStencilDesc.StencilEnable = false;                        // ステンシル不要なら false
+	 depthStencilDesc.StencilEnable = false;                        // ステンシル不要なら false
 
 	// --- 共通設定 ---
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
@@ -127,8 +129,8 @@ void SpriteCommon::CreateGraphicsPipeline(){
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	// --- 通常PSO（裏面カリング） ---
-	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d.VS.hlsl", L"vs_6_0");
-	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d.PS.hlsl", L"ps_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(L"Resources/shader/Sprite.VS.hlsl", L"vs_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Sprite.PS.hlsl", L"ps_6_0");
 	assert(vsBlob && psBlob);
 
     // 修正案: IID_PPV_ARGSの引数にgraphicsPipelineState_[i].ReleaseAndGetAddressOf()を使う
@@ -138,7 +140,7 @@ void SpriteCommon::CreateGraphicsPipeline(){
         psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
         psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
         D3D12_RASTERIZER_DESC rasterizerDesc{};
-        rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+        rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
         rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
         psoDesc.RasterizerState = rasterizerDesc;
         hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(

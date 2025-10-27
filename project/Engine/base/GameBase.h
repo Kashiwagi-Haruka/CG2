@@ -7,7 +7,7 @@
 #include "BlendModeManeger.h"
 #include "WinApp.h"
 #include "DirectXCommon.h"
-
+#include "TextureManager.h"
 
 class SpriteCommon;
 
@@ -74,7 +74,7 @@ private:
 
 	Transform GetCameraTransform() const { return dxCommon_->GetCameraTransform(); };
 
-	void DrawSpriteSheet(Vector3 pos1, Vector3 pos2, Vector3 pos3, Vector3 pos4, Vector2 texturePos[4], int color, int textureHandle);
+	
 
 	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
 	void DrawSphere(const Vector3& center, const Vector3& radius, const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
@@ -84,7 +84,7 @@ private:
 	
 	void SetDirectionalLightData(const DirectionalLight& directionalLight);
 
-	int LoadTextures(const std::string& fileName);
+
 	
 
 	void SetBlendMode(BlendMode blendMode);
@@ -153,7 +153,7 @@ private:
 private:
 
 
-	void CreateSpriteResources();
+	
 	void CreateModelResources();
 	
 	

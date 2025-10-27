@@ -1069,87 +1069,7 @@ void DirectXCommon::CreateSphereResources() {
 	}
 	vertexResourceSphere_->Unmap(0, nullptr);
 }
-void DirectXCommon::CreateSpriteResources() {
-	vertexResourceSprite_ = CreateBufferResource(sizeof(VertexData) * kMaxSpriteVertices);
-	vertexBufferViewSprite.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
-	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * kMaxSpriteVertices;
-	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
 
-	// 頂点データ
-	VertexData* vertexDataSprite = nullptr;
-	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
-	// ……スプライトの頂点6つ設定……
-	// 1枚目の三角形（左下 → 左上 → 右下）
-	vertexDataSprite[0].position = {0.0f, 360.0f, 0.0f, 1.0f}; // 左下
-	vertexDataSprite[0].texcoord = {0.0f, 1.0f};
-
-	vertexDataSprite[1].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
-	vertexDataSprite[1].texcoord = {0.0f, 0.0f};
-
-	vertexDataSprite[2].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
-	vertexDataSprite[2].texcoord = {1.0f, 1.0f};
-
-	// 2枚目の三角形（左上 → 右上 → 右下）
-	vertexDataSprite[3].position = {0.0f, 0.0f, 0.0f, 1.0f}; // 左上
-	vertexDataSprite[3].texcoord = {0.0f, 0.0f};
-
-	vertexDataSprite[4].position = {640.0f, 0.0f, 0.0f, 1.0f}; // 右上
-	vertexDataSprite[4].texcoord = {1.0f, 0.0f};
-
-	vertexDataSprite[5].position = {640.0f, 360.0f, 0.0f, 1.0f}; // 右下
-	vertexDataSprite[5].texcoord = {1.0f, 1.0f};
-
-	for (int i = 0; i < 6; i++) {
-		vertexDataSprite[i].normal = {0.0f, 0.0f, -1.0f};
-	}
-	vertexResourceSprite_->Unmap(0, nullptr);
-
-	// インデックスデータ
-	uint32_t indices[6] = {0, 1, 2, 0, 2, 3};
-	indexResourceSprite_ = CreateBufferResource(sizeof(indices));
-	void* mapped = nullptr;
-	indexResourceSprite_->Map(0, nullptr, &mapped);
-	memcpy(mapped, indices, sizeof(indices));
-	indexResourceSprite_->Unmap(0, nullptr);
-
-	indexBufferViewSprite_.BufferLocation = indexResourceSprite_->GetGPUVirtualAddress();
-	indexBufferViewSprite_.SizeInBytes = sizeof(indices);
-	indexBufferViewSprite_.Format = DXGI_FORMAT_R32_UINT;
-
-	
-	// --- Sprite用 頂点リソース ---
-	vertexResourceSprite_ = CreateBufferResource(sizeof(VertexData) * kMaxSpriteVertices);
-	vertexBufferViewSprite = {};
-	vertexBufferViewSprite.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
-	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * kMaxSpriteVertices;
-	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
-
-	// --- ここにインデックスバッファの生成を追加 ---
-	// --- ここにインデックスバッファの生成を追加 ---
-	// 6個のインデックス（2枚の三角形でスプライト）
-	indexResourceSprite_ = CreateBufferResource(sizeof(uint32_t) * 6);
-
-	
-	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
-	// スプライト用（陰影つけたくないもの）
-	materialResourceSprite_ = CreateBufferResource(alignedSize);
-	Material* matSprite = nullptr;
-	materialResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
-	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
-	matSprite->enableLighting = 0;
-	matSprite->uvTransform = Function::MakeIdentity4x4();
-	materialResourceSprite_->Unmap(0, nullptr);
-
-	// Sprite用の TransformationMatrix リソース作成（1個分）
-	transformationMatrixResourceSprite_ = CreateBufferResource(sizeof(Matrix4x4) * 2);
-
-	// データへのポインタ取得
-	transformationMatrixDataSprite = nullptr;
-	transformationMatrixResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
-
-	// 単位行列を書き込んでおく（初期状態）
-	*transformationMatrixDataSprite = Function::MakeIdentity4x4();
-}
 void DirectXCommon::CreateModelResources(){
 	vertexResource_ = CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
@@ -1236,69 +1156,9 @@ void DirectXCommon::VertexResource() {
 	
 
 	CreateSphereResources();
-	CreateSpriteResources();
 	CreateModelResources();
 }
 
-
-void DirectXCommon::DrawSpriteSheet(Vector3 pos1, Vector3 pos2, Vector3 pos3, Vector3 pos4, Vector2 texturePos[4], int color, int textureHandle) {
-	commandList_->SetPipelineState(graphicsPipelineState_[blendMode_].Get()); // 通常
-	// 頂点バッファに6頂点分追記
-	VertexData* vertexData = nullptr;
-	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	UINT offset = currentSpriteVertexOffset_;
-
-	// 2枚の三角形で四角形を描画（インデックス: 0,1,2, 1,3,2）
-	// 0: 左上, 1: 右上, 2: 右下, 3: 左下
-	vertexData[offset + 0] = {
-	    {pos1.x, pos1.y, 0, 1},
-        {texturePos[0].x, texturePos[0].y},
-        {0, 0, -1}
-    };
-	vertexData[offset + 1] = {
-	    {pos2.x, pos2.y, 0, 1},
-        {texturePos[1].x, texturePos[1].y},
-        {0, 0, -1}
-    };
-	vertexData[offset + 2] = {
-	    {pos3.x, pos3.y, 0, 1},
-        {texturePos[2].x, texturePos[2].y},
-        {0, 0, -1}
-    };
-	vertexData[offset + 3] = {
-	    {pos4.x, pos4.y, 0, 1},
-        {texturePos[3].x, texturePos[3].y},
-        {0, 0, -1}
-    };
-	// 1枚スプライト用のインデックス
-	// 三角形1: 0,1,2  三角形2: 0,2,3
-	vertexResourceSprite_->Unmap(0, nullptr);
-
-	// 頂点バッファビューとインデックスバッファビューをセット（オフセット指定）
-	D3D12_VERTEX_BUFFER_VIEW vbv = vertexBufferViewSprite;
-	vbv.BufferLocation += sizeof(VertexData) * offset;
-	vbv.SizeInBytes = sizeof(VertexData) * 4; // 4頂点分
-
-	D3D12_INDEX_BUFFER_VIEW ibv = indexBufferViewSprite_;
-	// インデックスバッファは使いまわしでOK（インデックス: 0,1,2, 0,2,3 など4頂点分用を用意）
-
-	commandList_->IASetVertexBuffers(0, 1, &vbv);
-	commandList_->IASetIndexBuffer(&ibv);
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// ヒープ、ルートパラメータ等をセット（すでにやってる場合は不要）
-	ID3D12DescriptorHeap* heaps[] = {srvDescriptorHeap_.Get()};
-	commandList_->SetDescriptorHeaps(_countof(heaps), heaps);
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResourceSprite_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootDescriptorTable(2, TextureGPUHandle_[textureHandle]);
-
-	// 描画（1スプライト分）
-	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
-
-	// 次のスプライト用にオフセットを進める
-	currentSpriteVertexOffset_ += 4; // 4頂点分進める
-}
 void DirectXCommon::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj) {
 	// 0. まずここでPSO切り替え
 

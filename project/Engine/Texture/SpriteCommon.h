@@ -18,7 +18,7 @@ class SpriteCommon {
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob_;
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
 
-	BlendMode blendMode_;
+	BlendMode blendMode_ = BlendMode::kBlendModeAlpha;
 	BlendModeManeger blendModeManeger_;
 
 	HRESULT hr_;
