@@ -53,6 +53,9 @@ class Sprite {
 	Vector2 textureSize{};
 	Vector2 textureCutSize{};
 
+	bool isFlipX_ = false;
+	bool isFripY_ = false;
+
 
 	int handle_ = 0;
 	
@@ -91,7 +94,12 @@ public:
 	 void SetPosition(const Vector3& pos) { transform_.translate = pos; }
 	void SetScale(const Vector3& scale) { transform_.scale = scale; }
 	void SetRotation(const Vector3& rot) { transform_.rotate = rot; }
+	void SetColor(const Vector4& color);
 	void SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize);
+	bool GetIsFlipX() { return isFlipX_; };
+	void SetIsFlipX(const bool isFlipX);
+	bool GetIsFlipY() { return isFripY_; };
+	void SetIsFlipY(const bool isFlipY);
 	void AdjustTextureSize();
 	const Vector2& GetAnchorPoint() const { return anchorPoint; };
 	void SetAnchorPoint(const Vector2 anchorPoint) { this->anchorPoint; };

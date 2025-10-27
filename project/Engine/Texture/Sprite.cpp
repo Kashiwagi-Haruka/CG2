@@ -124,6 +124,15 @@ void Sprite::Update() {
 	float top = 0.0f - anchorPoint.y;
 	float bottom = 1.0f - anchorPoint.y;
 
+	if (isFlipX_) {
+		left = -left;
+		right = -right;
+	}
+	if (isFripY_) {
+		top = -top;
+		bottom = -bottom;
+	}
+
 	vertexData[0].position = {left, top, 0.0f, 1.0f};
 	vertexData[1].position = {right, top, 0.0f, 1.0f};
 	vertexData[2].position = {left, bottom, 0.0f, 1.0f};
@@ -150,6 +159,8 @@ void Sprite::Update() {
     transformData->World = world;
 }
 
+void Sprite::SetColor(const Vector4& color) { material->color = color; };
+
 void Sprite::SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize) {
 
 		const DirectX::TexMetadata& metaData = TextureManager::GetInstance()->GetMetaData(textureIndex);
@@ -163,6 +174,13 @@ void Sprite::SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize)
 	vertexData[2].texcoord = {tex_left, tex_bottom};
 	vertexData[3].texcoord = {tex_right, tex_bottom};
 }
+
+void Sprite::SetIsFlipX(const bool isFlipX) { 
+	isFlipX_ = isFlipX;
+
+}
+
+void Sprite::SetIsFlipY(const bool isFlipY) { isFripY_ = isFlipY; }
 
 void Sprite::AdjustTextureSize() {
 	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
