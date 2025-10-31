@@ -3,9 +3,8 @@
 #include <DbgHelp.h>
 #include <strsafe.h>
 #include <dxgidebug.h>
-#include <fstream>
-#include <sstream>
 #include "SpriteCommon.h"
+#include "Object3dCommon.h"
 #include "TextureManager.h" 
 
 #pragma comment(lib, "d3d12.lib")
@@ -17,6 +16,7 @@
 GameBase::~GameBase(){
 	ResourceRelease();
 	delete spriteCommon_;
+	delete modelCommon_;
 	delete DInput;
 	TextureManager::GetInstance()->Finalize();
 	delete dxCommon_;
@@ -29,8 +29,6 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	winApp_->Initialize();
 
 	dxCommon_ = new DirectXCommon();
-	modelData = LoadObjFile("Resources/3d", "plane.obj");
-	dxCommon_->SetModelData(modelData);
 	dxCommon_->initialize(winApp_);
 	TextureManager::GetInstance()->Initialize(dxCommon_);
 	
@@ -40,6 +38,8 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 	audio.InitializeIXAudio();
 
+	modelCommon_ = new Object3dCommon();
+	modelCommon_->Initialize(dxCommon_);
 	spriteCommon_ = new SpriteCommon();
 	spriteCommon_->Initialize(dxCommon_);
 
@@ -101,6 +101,7 @@ void GameBase::ResourceRelease() {
 void GameBase::SetDirectionalLightData(const DirectionalLight& directionalLight) { dxCommon_->SetDirectionalLightData(directionalLight); }
 
 void GameBase::SpriteCommonSet() { spriteCommon_->DrawCommon(); }
+void GameBase::ModelCommonSet() { modelCommon_->DrawCommon(); }
 
 // 球体用リソース
 void GameBase::BeginFlame() { 
@@ -110,95 +111,6 @@ void GameBase::BeginFlame() {
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
 void GameBase::EndFlame() { dxCommon_->PostDraw(); }
-
-
-//objfileを読む関数
-ModelData GameBase::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
-	ModelData modelData;
-	std::vector<Vector4> positions;
-	std::vector<Vector3> normals;
-	std::vector<Vector2> texcoords;
-	std::string line;
-
-	std::ifstream file(directoryPath + "/" + filename);
-	assert(file.is_open());
-
-	while (std::getline(file, line)) {
-		std::string identifier;
-		std::istringstream s(line);
-		s >> identifier;
-
-		if (identifier == "v") {
-			Vector4 position;
-			s >> position.x >> position.y >> position.z;
-			position.w = 1.0f;
-			// ここでx反転
-			position.x *= -1.0f;
-			
-			positions.push_back(position);
-		} else if (identifier == "vt") {
-			Vector2 texcoord;
-			s >> texcoord.x >> texcoord.y;
-			texcoord.y=1.0f-texcoord.y;
-			texcoords.push_back(texcoord);
-		} else if (identifier == "vn") {
-			Vector3 normal;
-			s >> normal.x >> normal.y >> normal.z;
-			// ここで法線もx反転
-			
-			normals.push_back(normal);
-		} else if (identifier == "f") {
-			VertexData triangle[3];
-			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-				std::string vertexDefinition;
-				s >> vertexDefinition;
-				std::istringstream v(vertexDefinition);
-				uint32_t elementIndices[3];
-				for (int32_t element = 0; element < 3; ++element) {
-					std::string index;
-					std::getline(v, index, '/');
-					elementIndices[element] = std::stoi(index);
-				}
-				Vector4 position = positions[elementIndices[0] - 1];
-				Vector2 texcoord = texcoords[elementIndices[1] - 1];
-				Vector3 normal = normals[elementIndices[2] - 1];
-				triangle[faceVertex] = {position, texcoord, normal};
-			}
-			// 回り順を逆にしてpush_back
-			modelData.vertices.push_back(triangle[2]);
-			modelData.vertices.push_back(triangle[1]);
-			modelData.vertices.push_back(triangle[0]);
-		} else if (identifier == "mtllib") {
-			std::string mtlFile;
-			s >> mtlFile;
-			modelData.material = LoadMaterialTemplateFile(directoryPath, mtlFile);
-		}
-
-	}
-
-	
-
-	return modelData;
-}
-
-MaterialData GameBase::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
-	MaterialData matData;
-	std::ifstream file(directoryPath + "/" + filename);
-	std::string line;
-	assert(file.is_open());
-	while (std::getline(file, line)) {
-		std::istringstream s(line);
-		std::string identifier;
-		s >> identifier;
-		if (identifier == "map_Kd") {
-			std::string textureFilePaths;
-			s >> textureFilePaths;
-			matData.textureFilePath = directoryPath + "/" + textureFilePaths;
-			
-		}
-	}
-	return matData;
-}
 
 SoundData GameBase::SoundLoadWave(const char* filename){
 
@@ -253,7 +165,7 @@ void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color,
 
 	dxCommon_->DrawMesh(vertices, color, textureHandle, wvp, world);
 }
-void GameBase::DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount) {
+void GameBase::DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, uint32_t textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount) {
 	dxCommon_->DrawParticle(vertices, color, textureHandle, wvp, world, instanceCount);
 }
 void GameBase::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj) {

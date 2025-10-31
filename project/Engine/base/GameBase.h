@@ -10,6 +10,7 @@
 #include "TextureManager.h"
 
 class SpriteCommon;
+class Object3dCommon;
 
 class GameBase{
 
@@ -22,6 +23,7 @@ private:
 	Audio audio;
 	
 	SpriteCommon* spriteCommon_ = nullptr;
+	Object3dCommon* modelCommon_ = nullptr;
 
 	
 	HRESULT hr_;
@@ -31,13 +33,6 @@ private:
 	D3D12_HEAP_PROPERTIES heapProperties;
 	D3D12_RESOURCE_DESC resourceDesc;
 
-
-
-
-	ModelData modelData;
-
-
-	
 	Input* DInput;
 
    public:	
@@ -60,8 +55,7 @@ private:
 	// 描画
 	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
 	
-	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
-	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+	
 
 	SoundData SoundLoadWave(const char* filename);
 	void SoundUnload(SoundData* soundData);
@@ -69,7 +63,7 @@ private:
 
 
 	void SpriteCommonSet();
-
+	void ModelCommonSet();
 	
 
 	Transform GetCameraTransform() const { return dxCommon_->GetCameraTransform(); };
@@ -79,8 +73,8 @@ private:
 	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
 	void DrawSphere(const Vector3& center, const Vector3& radius, const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
 	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world);
-	void DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount);
-	ModelData GetPlaneModelData() const { return modelData; }
+	void DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, uint32_t textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount);
+	
 	
 	void SetDirectionalLightData(const DirectionalLight& directionalLight);
 
@@ -149,6 +143,7 @@ private:
 	Vector2 GetMouseMove() const;
 
 	SpriteCommon* GetSpriteCommon() { return spriteCommon_; };
+	Object3dCommon* GetModelCommon() { return modelCommon_; };
 
 private:
 

@@ -81,7 +81,7 @@
     <ClCompile Include="Engine\base\WinApp.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\Model.cpp">
+    <ClCompile Include="Engine\Texture\Object3d.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\base\DirectXCommon.cpp">
@@ -105,7 +105,7 @@
     <ClCompile Include="application\GameScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\ModelCommon.cpp">
+    <ClCompile Include="Engine\Texture\Object3dCommon.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Texture\TextureManager.cpp">
@@ -187,7 +187,7 @@
     <ClInclude Include="Engine\base\WinApp.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Model.h">
+    <ClInclude Include="Engine\Texture\Object3d.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\base\DirectXCommon.h">
@@ -211,7 +211,7 @@
     <ClInclude Include="application\GameScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\ModelCommon.h">
+    <ClInclude Include="Engine\Texture\Object3dCommon.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\TextureManager.h">

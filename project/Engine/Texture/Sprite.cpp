@@ -98,7 +98,6 @@ void Sprite::Draw(){
 
 	spriteCommon_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vbv);
 	spriteCommon_->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&ibv);
-	spriteCommon_->GetDxCommon()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// ヒープ、ルートパラメータ等をセット（すでにやってる場合は不要）
 	ID3D12DescriptorHeap* heaps[] = {spriteCommon_->GetDxCommon()->GetSrvDescriptorHeap()};

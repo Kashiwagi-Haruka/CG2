@@ -172,11 +172,11 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\ImGui\imGuiM.cpp" />
     <ClCompile Include="application\main.cpp" />
     <ClCompile Include="Engine\base\WinApp.cpp" />
-    <ClCompile Include="Engine\Texture\Model.cpp" />
+    <ClCompile Include="Engine\Texture\Object3d.cpp" />
     <ClCompile Include="Engine\Log\Logger.cpp" />
     <ClCompile Include="Engine\stringUtillity\StringUtility.cpp" />
     <ClCompile Include="application\GameScene.cpp" />
-    <ClCompile Include="Engine\Texture\ModelCommon.cpp" />
+    <ClCompile Include="Engine\Texture\Object3dCommon.cpp" />
     <ClCompile Include="Engine\Texture\Sprite.cpp" />
     <ClCompile Include="Engine\Texture\SpriteCommon.cpp" />
     <ClCompile Include="Engine\Texture\TextureManager.cpp" />
@@ -219,11 +219,11 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\math\Vector4.h" />
     <ClInclude Include="Engine\Texture\VertexData.h" />
     <ClInclude Include="Engine\base\WinApp.h" />
-    <ClInclude Include="Engine\Texture\Model.h" />
+    <ClInclude Include="Engine\Texture\Object3d.h" />
     <ClInclude Include="Engine\Log\Logger.h" />
     <ClInclude Include="Engine\stringUtillity\StringUtility.h" />
     <ClInclude Include="application\GameScene.h" />
-    <ClInclude Include="Engine\Texture\ModelCommon.h" />
+    <ClInclude Include="Engine\Texture\Object3dCommon.h" />
     <ClInclude Include="Engine\Texture\Sprite.h" />
     <ClInclude Include="Engine\Texture\SpriteCommon.h" />
     <ClInclude Include="Engine\Texture\TextureManager.h" />

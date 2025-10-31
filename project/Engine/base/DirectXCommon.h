@@ -171,24 +171,11 @@ class DirectXCommon {
 	const size_t kMaxVertexCount = 200000;    // 実際の最大確保頂点数
 	const size_t kMaxIndexCount = 200000 * 3; // 実際の最大確保インデックス数
 
-	Transform uvTransformSprite_{
-	    {1.0f, 1.0f, 1.0f},
-	    {0.0f, 0.0f, 0.0f},
-	    {0.0f, 0.0f, 0.0f},
-	};
-
 	Transform cameraTransform = {
 	    {1.0f, 1.0f, 1.0f  }, // スケール
-	    {0.0f, 0,    0.0f  }, // ←Y軸180度回転！
-	    {0.0f, 0.0f, -10.0f}  // Zマイナス方向に下げる
+	    {0.0f, 0,    0.0f  }, // 
+	    {0.0f, 0.0f, -10.0f}  //
 	};
-	Transform transformSprite{
-	    {1.0f, 1.0f, 1.0f},
-        {0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f}
-    };
-	
-
 
 	// Matrix4x4* wvpData = nullptr; // ← transformResource用のポインタをメンバに持つ
 	TransformationMatrix* transformationMatrixData = nullptr;
@@ -268,7 +255,7 @@ public:
 
 	void CreateSphereResources();
 
-	void CreateModelResources();
+	/*void CreateModelResources();*/
 
 	void VertexResource();
 
@@ -281,9 +268,9 @@ public:
 	
 
 	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world);
-	void DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount);
+	void DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, uint32_t textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount);
 
-	void SetModelData(ModelData model) { modelData_ = model; };
+	
 
 private:
 

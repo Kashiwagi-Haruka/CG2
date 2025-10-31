@@ -1,18 +1,12 @@
-#include "SpriteCommon.h"
+#include "Object3dCommon.h"
 #include "DirectXCommon.h"
 #include "Logger.h"
-
-void SpriteCommon::Initialize(DirectXCommon* dxCommon) {
-
+void Object3dCommon::Initialize(DirectXCommon* dxCommon){ 
 	dxCommon_ = dxCommon;
-
-	
-	
 	CreateGraphicsPipeline();
-
 }
 
-void SpriteCommon::DrawCommon() {
+void Object3dCommon::DrawCommon() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[blendMode_].Get()); // 通常
@@ -20,8 +14,7 @@ void SpriteCommon::DrawCommon() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-void SpriteCommon::CreateRootSignatures(){
-
+void Object3dCommon::CreateRootsignature(){
 	// --- RootSignature ---
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -63,6 +56,9 @@ void SpriteCommon::CreateRootSignatures(){
 	staticSampler[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	descriptionRootSignature.pStaticSamplers = staticSampler;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSampler);
+
+	
+
 	// --- RootSignature作成 ---
 	signatureBlob_ = nullptr;
 	errorBlob_ = nullptr;
@@ -72,21 +68,20 @@ void SpriteCommon::CreateRootSignatures(){
 		assert(false);
 	}
 	rootSignature_ = nullptr;
-	hr_ = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(), IID_PPV_ARGS(rootSignature_.GetAddressOf()));
+	hr_ = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr_));
+
 }
 
-void SpriteCommon::CreateGraphicsPipeline() {
+void Object3dCommon::CreateGraphicsPipeline(){
 
-	CreateRootSignatures();
-	
+	CreateRootsignature();
+
 	// --- InputLayout ---
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-
-	// POSITION : float4 (★ここを4成分に)
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
-	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT; // ★修正
+	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs[0].InputSlot = 0;
 	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	inputElementDescs[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
@@ -111,10 +106,10 @@ void SpriteCommon::CreateGraphicsPipeline() {
 
 	// --- DepthStencil ---
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-	depthStencilDesc.DepthEnable = false;
+	depthStencilDesc.DepthEnable = true;
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;  // 深度書き込みを有効
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 手前なら描画
-	 depthStencilDesc.StencilEnable = false;                        // ステンシル不要なら false
+	// depthStencilDesc.StencilEnable = false;                        // ステンシル不要なら false
 
 	// --- 共通設定 ---
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
@@ -130,29 +125,26 @@ void SpriteCommon::CreateGraphicsPipeline() {
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	// --- 通常PSO（裏面カリング） ---
-	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(L"Resources/shader/Sprite.VS.hlsl", L"vs_6_0");
-	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Sprite.PS.hlsl", L"ps_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d.VS.hlsl", L"vs_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d.PS.hlsl", L"ps_6_0");
 	assert(vsBlob && psBlob);
 
-    // 修正案: IID_PPV_ARGSの引数にgraphicsPipelineState_[i].ReleaseAndGetAddressOf()を使う
-    for (int i = 0; i < BlendMode::kCountOfBlendMode; i++) {
-        D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = baseDesc;
-        psoDesc.BlendState = blendModeManeger_.SetBlendMode(static_cast<BlendMode>(i));
-        psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
-        psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
-        D3D12_RASTERIZER_DESC rasterizerDesc{};
-        rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-        rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-        psoDesc.RasterizerState = rasterizerDesc;
-        hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(
-            &psoDesc,
-            IID_PPV_ARGS(graphicsPipelineState_[i].GetAddressOf())
-        );
-        assert(SUCCEEDED(hr_));
-    }
-	
+	for (int i = 0; i < BlendMode::kCountOfBlendMode; i++) {
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = baseDesc;
+		psoDesc.BlendState = blendModeManeger_.SetBlendMode(static_cast<BlendMode>(i));
+		psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
+		psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
+		D3D12_RASTERIZER_DESC rasterizerDesc{};
+		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+		psoDesc.RasterizerState = rasterizerDesc;
+		hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&graphicsPipelineState_[i]));
+		assert(SUCCEEDED(hr_));
+	}
+
 }
-Microsoft::WRL::ComPtr<ID3D12Resource> SpriteCommon::CreateBufferResource(size_t sizeInBytes) {
+
+Microsoft::WRL::ComPtr<ID3D12Resource> Object3dCommon::CreateBufferResource(size_t sizeInBytes) {
 	// バッファの設定（UPLOAD用に変更）
 	D3D12_HEAP_PROPERTIES heapProperties = {};
 	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;

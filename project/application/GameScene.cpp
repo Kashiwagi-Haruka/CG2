@@ -4,7 +4,7 @@ GameScene::~GameScene(){
 
 	delete sprite;
 	delete sprite2_;
-
+	delete model_;
 }
 
 void GameScene::Initialize(GameBase* gameBase) {
@@ -12,10 +12,16 @@ void GameScene::Initialize(GameBase* gameBase) {
 	uint32_t spriteHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png");
 	uint32_t spriteHandle2 = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/monsterBall.png");
 
+
 	sprite = new Sprite();
 	sprite->Initialize(gameBase->GetSpriteCommon(),spriteHandle);
 	sprite2_ = new Sprite();
 	sprite2_->Initialize(gameBase->GetSpriteCommon(), spriteHandle2);
+
+	model_ = new Object3d();
+	model_->LoadObjFile("Resources/3d", "plane");
+	model_->Initialize(gameBase->GetModelCommon());
+
 
 	camera.Initialize();
 
@@ -26,7 +32,7 @@ void GameScene::Initialize(GameBase* gameBase) {
 	        (uint8_t(meshColor.y * 255) << 8) |  // G
 	        (uint8_t(meshColor.z * 255));        // B
 
-	modelData = gameBase->LoadObjFile("Resources/3d", "plane.obj");
+	
 	spriteTexSize = {200,200};
 	spriteTexSize2 = {200, 500};
 
@@ -110,12 +116,40 @@ void GameScene::Update(GameBase* gameBase) {
 	}
 
 	ImGui::End();*/
+
+		if (ImGui::Begin("Sprite Debug")) {
+
+		ImGui::DragFloat3("Scale", &spriteTransform.scale.x, 1.0f, 0.1f, 10000.0f);
+		ImGui::DragFloat3("Rotation", &spriteTransform.rotate.x, 0.01f);
+		ImGui::DragFloat3("Position", &spriteTransform.translate.x, 1.0f);
+		ImGui::DragFloat2("TextureSize", &spriteTexSize.x, 1.0f);
+	}
+	ImGui::End();
+	sprite->SetTextureRange({0.0f, 0.0f}, spriteTexSize);
+	sprite->SetScale(spriteTransform.scale);
+	sprite->SetRotation(spriteTransform.rotate);
+	sprite->SetPosition(spriteTransform.translate);
+
+	if (ImGui::Begin("Sprite2 Debug")) {
+
+		ImGui::DragFloat3("Scale2", &sprite2Transform.scale.x, 1.0f, 0.1f, 10000.0f);
+		ImGui::DragFloat3("Rotation2", &sprite2Transform.rotate.x, 0.01f);
+		ImGui::DragFloat3("Position2", &sprite2Transform.translate.x, 1.0f);
+		ImGui::DragFloat2("TextureSize2", &spriteTexSize2.x, 1.0f);
+	}
+	ImGui::End();
+	
+	sprite->Update();
+	sprite2_->Update();
 }
 
 void GameScene::Draw(GameBase* gameBase) {
 
 
 
+	gameBase->ModelCommonSet();
+	model_->Draw();
+	/*gameBase->DrawParticle(modelData.vertices, color, ModelTextureHandle, ParticleWVPMatrix, ParticleWorldMatrix, 10);*/
 
 		
 
@@ -177,31 +211,10 @@ void GameScene::Draw(GameBase* gameBase) {
 	    }
 	}*/
 
-	/*gameBase->DrawParticle(modelData.vertices, color, textureHandle, ParticleWVPMatrix, ParticleWorldMatrix, 10);*/
-
-	if (ImGui::Begin("Sprite Debug")) {
-		    
-		ImGui::DragFloat3("Scale", &spriteTransform.scale.x, 1.0f, 0.1f, 10000.0f);
-		ImGui::DragFloat3("Rotation", &spriteTransform.rotate.x, 0.01f);
-		ImGui::DragFloat3("Position", &spriteTransform.translate.x, 1.0f);
-		ImGui::DragFloat2("TextureSize", &spriteTexSize.x, 1.0f);
-	}
-	    ImGui::End();
-	sprite->SetTextureRange({0.0f, 0.0f}, spriteTexSize);
-	sprite->SetScale(spriteTransform.scale);
-	sprite->SetRotation(spriteTransform.rotate);
-	sprite->SetPosition(spriteTransform.translate);
-
-	if (ImGui::Begin("Sprite2 Debug")) {
-
-		ImGui::DragFloat3("Scale2", &sprite2Transform.scale.x, 1.0f, 0.1f, 10000.0f);
-		ImGui::DragFloat3("Rotation2", &sprite2Transform.rotate.x, 0.01f);
-		ImGui::DragFloat3("Position2", &sprite2Transform.translate.x, 1.0f);
-		ImGui::DragFloat2("TextureSize2", &spriteTexSize2.x, 1.0f);
-	}
-	ImGui::End();
 	
-		sprite->Update();
+
+
+	
 
 	gameBase->SpriteCommonSet();
 
@@ -210,8 +223,8 @@ void GameScene::Draw(GameBase* gameBase) {
 	sprite2_->SetScale(sprite2Transform.scale);
 	sprite2_->SetRotation(sprite2Transform.rotate);
 	sprite2_->SetPosition(sprite2Transform.translate);
-
-	sprite2_->Update();
-
 	sprite2_->Draw();
+
+	
+
 }

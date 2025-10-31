@@ -531,16 +531,10 @@ void DirectXCommon::DrawCommandList() {
 	commandList_->RSSetViewports(1, &viewport_);       // Viewportを設定
 	commandList_->RSSetScissorRects(1, &scissorRect_); // Scissorを設定
 
-	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-	commandList_->SetPipelineState(graphicsPipelineState_[1].Get());                        // PSOを設定
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);                                     // VBVを設定
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());  // PixelShader側
-	commandList_->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress()); // VertexShader側
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = {srvDescriptorHeap_.Get()};
-	commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = {srvDescriptorHeap_.Get()};
+	//commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 }
 
 void DirectXCommon::CrtvTransitionBarrier() {
@@ -986,8 +980,6 @@ void DirectXCommon::SetupParticlePSO() {
 	Logger::Log("SetupParticlePSO END\n");
 }
 
-
-
 void DirectXCommon::CreateSphereResources() {
 	const int kSubdivision = 16;
 	const float pi = 3.14159265f;
@@ -1070,39 +1062,39 @@ void DirectXCommon::CreateSphereResources() {
 	vertexResourceSphere_->Unmap(0, nullptr);
 }
 
-void DirectXCommon::CreateModelResources(){
-	vertexResource_ = CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
-
-	VertexData* vertexData = nullptr;
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
-	vertexResource_->Unmap(0, nullptr);
-
-	// --- マテリアル用リソース ---
-	// 3D用（球など陰影つけたいもの）
-	// 必ず256バイト単位で切り上げる
-	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
-	materialResource_ = CreateBufferResource(alignedSize);
-	Material* mat3d = nullptr;
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
-	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	mat3d->enableLighting = 1;
-	mat3d->uvTransform = Function::MakeIdentity4x4();
-
-	materialResource_->Unmap(0, nullptr);
-
-	// [0]=モデル描画用で使う
-	Matrix4x4 worldMatrix = Function::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	Matrix4x4 cameraMatrix = Function::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	Matrix4x4 viewMatrix = Function::Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = Function::MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = Function::Multiply(worldMatrix, Function::Multiply(viewMatrix, projectionMatrix));
-	transformationMatrixData[0].WVP = worldViewProjectionMatrix;
-	transformationMatrixData[0].World = worldMatrix;
-}
+//void DirectXCommon::CreateModelResources(){
+//	vertexResource_ = CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+//	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+//	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
+//	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+//
+//	VertexData* vertexData = nullptr;
+//	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+//	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
+//	vertexResource_->Unmap(0, nullptr);
+//
+//	// --- マテリアル用リソース ---
+//	// 3D用（球など陰影つけたいもの）
+//	// 必ず256バイト単位で切り上げる
+//	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
+//	materialResource_ = CreateBufferResource(alignedSize);
+//	Material* mat3d = nullptr;
+//	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
+//	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+//	mat3d->enableLighting = 1;
+//	mat3d->uvTransform = Function::MakeIdentity4x4();
+//
+//	materialResource_->Unmap(0, nullptr);
+//
+//	// [0]=モデル描画用で使う
+//	Matrix4x4 worldMatrix = Function::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+//	Matrix4x4 cameraMatrix = Function::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+//	Matrix4x4 viewMatrix = Function::Inverse(cameraMatrix);
+//	Matrix4x4 projectionMatrix = Function::MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
+//	Matrix4x4 worldViewProjectionMatrix = Function::Multiply(worldMatrix, Function::Multiply(viewMatrix, projectionMatrix));
+//	transformationMatrixData[0].WVP = worldViewProjectionMatrix;
+//	transformationMatrixData[0].World = worldMatrix;
+//}
 
 void DirectXCommon::VertexResource() {
 
@@ -1156,7 +1148,7 @@ void DirectXCommon::VertexResource() {
 	
 
 	CreateSphereResources();
-	CreateModelResources();
+	/*CreateModelResources();*/
 }
 
 void DirectXCommon::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj) {
@@ -1357,7 +1349,7 @@ void DirectXCommon::DrawMesh(const std::vector<VertexData>& vertices, uint32_t c
 	commandList_->DrawInstanced(static_cast<UINT>(vertices.size()), 1, 0, 0);
 }
 
-void DirectXCommon::DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount) {
+void DirectXCommon::DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, uint32_t textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount) {
 
 	// パーティクル専用の RootSignature と PSO を使う（修正）
 	commandList_->SetGraphicsRootSignature(particleRootSignature_.Get());

@@ -2,7 +2,7 @@
 #include "DebugCamera.h"
 #include "GameBase.h"
 #include "Sprite.h"
-
+#include "Object3d.h"
 
 class GameScene {
 
@@ -61,6 +61,8 @@ public:
 		Sprite* sprite = nullptr;
 	    Sprite* sprite2_ = nullptr;
 		
+		Object3d* model_ = nullptr;
+
 		Vector2 spriteTexSize {};
 	    Vector2 spriteTexSize2{};
 		
@@ -75,6 +77,7 @@ public:
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
+	uint32_t ModelTextureHandle = 0;
 	
 	
     // 修正: staticメンバーの初期化はconstでなければならないため、constを追加
