@@ -1,43 +1,62 @@
-#include "Object3d.h"
-#include "Object3dCommon.h"
+#include "Model.h"
+#include "ModelCommon.h"
 #include "DirectXCommon.h"
 #include <fstream>
 #include <sstream>
 #include <cassert>
-#include "Function.h"
 #include "TextureManager.h"
+#include "Function.h"
+void Model::Initialize(ModelCommon* modelCommon) {
 
-void Object3d::Initialize(Object3dCommon* modelCommon){ 
 	modelCommon_ = modelCommon;
-	CreateResources();
+
+	vertexResource_ = modelCommon_->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+
+	VertexData* vertexData = nullptr;
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
+	vertexResource_->Unmap(0, nullptr);
+
+	// --- マテリアル用リソース ---
+	// 3D用（球など陰影つけたいもの）
+	// 必ず256バイト単位で切り上げる
+	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
+	materialResource_ = modelCommon_->CreateBufferResource(alignedSize);
+	Material* mat3d = nullptr;
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
+	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	mat3d->enableLighting = false;
+	mat3d->uvTransform = Function::MakeIdentity4x4();
+
+	materialResource_->Unmap(0, nullptr);
+
 	TextureManager::GetInstance()->LoadTextureName(modelData_.material.textureFilePath);
 	modelData_.material.textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath(modelData_.material.textureFilePath);
 }
 
-void Object3d::Draw() {
+void Model::Draw() {
 
 	// --- SRVヒープをバインド ---
 	ID3D12DescriptorHeap* descriptorHeaps[] = {modelCommon_->GetDxCommon()->GetSrvDescriptorHeap()};
 	modelCommon_->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-
 	// --- VertexBufferViewを設定 ---
 	modelCommon_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	
 
 	// --- マテリアルCBufferの場所を設定 ---
 	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
-	// --- 座標変換行列CBufferの場所を設定 ---
-	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
+	
 
 	// --- SRVのDescriptorTableの先頭を設定 ---
 	// TextureManagerからSRVのGPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex);
 	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvHandle);
 
-	// --- 平行光源CBufferの場所を設定 ---
-	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	
 
 	// --- 描画！（DrawCall）---
 	modelCommon_->GetDxCommon()->GetCommandList()->DrawInstanced(
@@ -49,7 +68,7 @@ void Object3d::Draw() {
 }
 
 // objfileを読む関数
-void Object3d::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
+void Model::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
 	ModelData modelData;
 	std::vector<Vector4> positions;
 	std::vector<Vector3> normals;
@@ -113,8 +132,7 @@ void Object3d::LoadObjFile(const std::string& directoryPath, const std::string& 
 
 	modelData_ = modelData;
 }
-
-Object3d::MaterialData Object3d::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
+Model::MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
 	MaterialData matData;
 	std::ifstream file(directoryPath + "/" + filename);
 	std::string line;
@@ -130,52 +148,4 @@ Object3d::MaterialData Object3d::LoadMaterialTemplateFile(const std::string& dir
 		}
 	}
 	return matData;
-}
-
-void Object3d::CreateResources() {
-	vertexResource_ = modelCommon_->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
-
-	VertexData* vertexData = nullptr;
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
-	vertexResource_->Unmap(0, nullptr);
-
-	// --- マテリアル用リソース ---
-	// 3D用（球など陰影つけたいもの）
-	// 必ず256バイト単位で切り上げる
-	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
-	materialResource_ = modelCommon_->CreateBufferResource(alignedSize);
-	Material* mat3d = nullptr;
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
-	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	mat3d->enableLighting = false;
-	mat3d->uvTransform = Function::MakeIdentity4x4();
-
-	materialResource_->Unmap(0, nullptr);
-
-	// [0]=モデル描画用で使う
-	Matrix4x4 worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	Matrix4x4 cameraMatrix = Function::MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
-	Matrix4x4 viewMatrix = Function::Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = Function::MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = Function::Multiply(worldMatrix, Function::Multiply(viewMatrix, projectionMatrix));
-	transformResource_ = modelCommon_->CreateBufferResource(sizeof(TransformationMatrix));
-	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
-	transformationMatrixData_->WVP = worldViewProjectionMatrix;
-	transformationMatrixData_->World = worldMatrix;
-
-	// Lightバッファ
-	directionalLightResource_ = modelCommon_->CreateBufferResource(sizeof(DirectionalLight));
-	assert(directionalLightResource_);
-	directionalLightData_ = nullptr;
-	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-	assert(directionalLightData_);
-	*directionalLightData_ = {
-	    {1.0f, 1.0f, 1.0f, 1.0f},
-        {0.0f, -1.0f, 0.0f},
-        1.0f
-    };
 }

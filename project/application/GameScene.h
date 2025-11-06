@@ -61,8 +61,9 @@ public:
 		Sprite* sprite = nullptr;
 	    Sprite* sprite2_ = nullptr;
 		
-		Object3d* model_ = nullptr;
-
+		Object3d* planeObject_ = nullptr;
+	    Object3d* axisObject_ = nullptr;
+		
 		Vector2 spriteTexSize {};
 	    Vector2 spriteTexSize2{};
 		
@@ -96,7 +97,5 @@ public:
 	// WVP行列を作成
 	Matrix4x4 wvpMatrix;
 	Matrix4x4 fenceWvpMatrix;
-
-	ModelData modelData;
 	
 };

@@ -5,6 +5,7 @@
 #include <dxgidebug.h>
 #include "SpriteCommon.h"
 #include "Object3dCommon.h"
+#include "ModelManeger.h"
 #include "TextureManager.h" 
 
 #pragma comment(lib, "d3d12.lib")
@@ -16,8 +17,9 @@
 GameBase::~GameBase(){
 	ResourceRelease();
 	delete spriteCommon_;
-	delete modelCommon_;
+	delete obj3dCommon_;
 	delete DInput;
+	ModelManeger::GetInstance()->Finalize();
 	TextureManager::GetInstance()->Finalize();
 	delete dxCommon_;
 	delete winApp_;
@@ -38,11 +40,12 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 	audio.InitializeIXAudio();
 
-	modelCommon_ = new Object3dCommon();
-	modelCommon_->Initialize(dxCommon_);
+	ModelManeger::GetInstance()->Initialize(dxCommon_);
+	obj3dCommon_ = new Object3dCommon();
+	obj3dCommon_->Initialize(dxCommon_);
 	spriteCommon_ = new SpriteCommon();
 	spriteCommon_->Initialize(dxCommon_);
-
+	
 }
 
 bool GameBase::ProcessMessage() {
@@ -101,7 +104,7 @@ void GameBase::ResourceRelease() {
 void GameBase::SetDirectionalLightData(const DirectionalLight& directionalLight) { dxCommon_->SetDirectionalLightData(directionalLight); }
 
 void GameBase::SpriteCommonSet() { spriteCommon_->DrawCommon(); }
-void GameBase::ModelCommonSet() { modelCommon_->DrawCommon(); }
+void GameBase::ModelCommonSet() { obj3dCommon_->DrawCommon(); }
 
 // 球体用リソース
 void GameBase::BeginFlame() { 

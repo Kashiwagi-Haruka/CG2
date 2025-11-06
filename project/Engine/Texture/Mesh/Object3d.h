@@ -1,33 +1,19 @@
 #pragma once
-#include <string>
-#include <vector>
+
 #include "VertexData.h"
 #include <Windows.h>
 #include <wrl.h>
 #include <d3d12.h>
 #include "Matrix4x4.h"
 #include "Vector4.h"
-
+#include <string>
 
 class Object3dCommon;
-
+class Model;
 class Object3d {
 
-	struct MaterialData {
-		std::string textureFilePath;
-		uint32_t textureIndex = 0;
-	};
-	struct ModelData {
-		std::vector<VertexData> vertices;
-		MaterialData material;
-	};
-	struct Material {
-
-		Vector4 color;
-		int enableLighting;
-		float padding[3];
-		Matrix4x4 uvTransform;
-	};
+	
+	
 	struct Transform {
 
 		Vector3 scale;
@@ -64,26 +50,32 @@ class Object3d {
 
 
 
-	Object3dCommon* modelCommon_;
-	ModelData modelData_;
+	Object3dCommon* obj3dCommon_;
 	DirectionalLight* directionalLightData_ = nullptr;
-	VertexData* vertexData = nullptr;
+	
 	TransformationMatrix* transformationMatrixData_;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 
 
-	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+	Model* model_ = nullptr;
 
 	public:
 
 	void Initialize(Object3dCommon* modelCommon);
+	    void Update();
 	void Draw();
-	void LoadObjFile(const std::string& directoryPath, const std::string& filename);
+	
 	void CreateResources();
+	void SetModel(const std::string& filePath);
 
+	void SetTranslate(Vector3 translate);
+	void SetRotate(Vector3 Rotate);
+	void SetScale(Vector3 Scale);
+
+	Vector3 GetTranslate() { return transform_.translate; }
+	Vector3 GetRotate() { return transform_.rotate; }
+	Vector3 GetScale() { return transform_.scale; }
 };

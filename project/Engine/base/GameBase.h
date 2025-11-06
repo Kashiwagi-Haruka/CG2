@@ -11,6 +11,7 @@
 
 class SpriteCommon;
 class Object3dCommon;
+class ModelCommon;
 
 class GameBase{
 
@@ -23,8 +24,8 @@ private:
 	Audio audio;
 	
 	SpriteCommon* spriteCommon_ = nullptr;
-	Object3dCommon* modelCommon_ = nullptr;
-
+	Object3dCommon* obj3dCommon_ = nullptr;
+	
 	
 	HRESULT hr_;
 	
@@ -143,13 +144,10 @@ private:
 	Vector2 GetMouseMove() const;
 
 	SpriteCommon* GetSpriteCommon() { return spriteCommon_; };
-	Object3dCommon* GetModelCommon() { return modelCommon_; };
+	Object3dCommon* GetObject3dCommon() { return obj3dCommon_; };
+	
 
 private:
-
-
-	
-	void CreateModelResources();
 	
 	
 	void SetupPSO();

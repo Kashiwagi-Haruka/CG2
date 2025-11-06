@@ -1,10 +1,11 @@
 #include "GameScene.h"
-
+#include "ModelManeger.h"
 GameScene::~GameScene(){
 
 	delete sprite;
 	delete sprite2_;
-	delete model_;
+	delete planeObject_;
+	delete axisObject_;
 }
 
 void GameScene::Initialize(GameBase* gameBase) {
@@ -18,10 +19,14 @@ void GameScene::Initialize(GameBase* gameBase) {
 	sprite2_ = new Sprite();
 	sprite2_->Initialize(gameBase->GetSpriteCommon(), spriteHandle2);
 
-	model_ = new Object3d();
-	model_->LoadObjFile("Resources/3d", "plane");
-	model_->Initialize(gameBase->GetModelCommon());
-
+	planeObject_ = new Object3d();
+	axisObject_ = new Object3d();
+	ModelManeger::GetInstance()->LoadModel("plane");
+	ModelManeger::GetInstance()->LoadModel("axis");
+	axisObject_->Initialize(gameBase->GetObject3dCommon());
+	planeObject_->Initialize(gameBase->GetObject3dCommon());
+	planeObject_->SetModel("plane");
+	axisObject_->SetModel("axis");
 
 	camera.Initialize();
 
@@ -117,7 +122,7 @@ void GameScene::Update(GameBase* gameBase) {
 
 	ImGui::End();*/
 
-		if (ImGui::Begin("Sprite Debug")) {
+	if (ImGui::Begin("Sprite Debug")) {
 
 		ImGui::DragFloat3("Scale", &spriteTransform.scale.x, 1.0f, 0.1f, 10000.0f);
 		ImGui::DragFloat3("Rotation", &spriteTransform.rotate.x, 0.01f);
@@ -138,9 +143,21 @@ void GameScene::Update(GameBase* gameBase) {
 		ImGui::DragFloat2("TextureSize2", &spriteTexSize2.x, 1.0f);
 	}
 	ImGui::End();
-	
+
+	if (ImGui::Begin("plane")) {
+		ImGui::DragFloat3("planeScale", &planeTransform.scale.x, 1.0f, 0.1f, 10000.0f);
+		ImGui::DragFloat3("planeRotation", &planeTransform.rotate.x, 0.01f);
+		ImGui::DragFloat3("planePosition", &planeTransform.translate.x, 1.0f);
+	}
+	ImGui::End();
+	planeObject_->SetScale(planeTransform.scale);
+	planeObject_->SetRotate(planeTransform.rotate);
+	planeObject_->SetTranslate(planeTransform.translate);
+
+
 	sprite->Update();
 	sprite2_->Update();
+	planeObject_->Update();
 }
 
 void GameScene::Draw(GameBase* gameBase) {
@@ -148,7 +165,8 @@ void GameScene::Draw(GameBase* gameBase) {
 
 
 	gameBase->ModelCommonSet();
-	model_->Draw();
+	planeObject_->Draw();
+	axisObject_->Draw();
 	/*gameBase->DrawParticle(modelData.vertices, color, ModelTextureHandle, ParticleWVPMatrix, ParticleWorldMatrix, 10);*/
 
 		
