@@ -7,19 +7,13 @@
 #include "Matrix4x4.h"
 #include "Vector4.h"
 #include <string>
+#include "Transform.h"
 
+class Camera;
 class Object3dCommon;
 class Model;
 class Object3d {
 
-	
-	
-	struct Transform {
-
-		Vector3 scale;
-		Vector3 rotate;
-		Vector3 translate;
-	};
 
 	struct alignas(256) TransformationMatrix {
 		Matrix4x4 WVP;   // 64 バイト
@@ -48,7 +42,7 @@ class Object3d {
 	int color = 0xffffffff;
 
 
-
+	Camera* camera_;
 
 	Object3dCommon* obj3dCommon_;
 	DirectionalLight* directionalLightData_ = nullptr;
@@ -70,6 +64,8 @@ class Object3d {
 	
 	void CreateResources();
 	void SetModel(const std::string& filePath);
+
+	void SetCamera(Camera* camera);
 
 	void SetTranslate(Vector3 translate);
 	void SetRotate(Vector3 Rotate);

@@ -24,6 +24,7 @@
 #include "Matrix4x4.h"
 #include "Function.h"
 #include "BlendModeManeger.h"
+#include "Transform.h"
 
 struct MaterialData {
 	std::string textureFilePath;
@@ -33,12 +34,7 @@ struct ModelData {
 	MaterialData material;
 };
 
-struct Transform {
 
-	Vector3 scale;
-	Vector3 rotate;
-	Vector3 translate;
-};
 struct DirectionalLight {
 	Vector4 color;
 	Vector3 direction;

@@ -8,19 +8,13 @@
 #include <d3d12.h>
 #include <string>
 #include "VertexData.h"
-
+#include "Transform.h"
 class SpriteCommon;
 
 class Sprite {
 
 	/*----------------------------------*/
 
-	struct Transform {
-
-		Vector3 scale;
-		Vector3 rotate;
-		Vector3 translate;
-	};
 
 	struct alignas(256) TransformationMatrix {
 		Matrix4x4 WVP;   // 64 バイト

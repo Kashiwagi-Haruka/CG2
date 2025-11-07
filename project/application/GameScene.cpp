@@ -19,6 +19,10 @@ void GameScene::Initialize(GameBase* gameBase) {
 	sprite2_ = new Sprite();
 	sprite2_->Initialize(gameBase->GetSpriteCommon(), spriteHandle2);
 
+
+	camera = new Camera();
+	camera->SetTranslate({0, 0, -10});
+	gameBase->SetDefaultCamera(camera);
 	planeObject_ = new Object3d();
 	axisObject_ = new Object3d();
 	ModelManeger::GetInstance()->LoadModel("plane");
@@ -28,8 +32,7 @@ void GameScene::Initialize(GameBase* gameBase) {
 	planeObject_->SetModel("plane");
 	axisObject_->SetModel("axis");
 
-	camera.Initialize();
-
+	
 
 
 	color = (uint8_t(meshColor.w * 255) << 24) | // A
@@ -45,17 +48,9 @@ void GameScene::Initialize(GameBase* gameBase) {
 
 void GameScene::Update(GameBase* gameBase) {
 
-	viewProjectionMatrix = camera.GetViewProjectionMatrix();
 
-	// World行列を作る（必要に応じてGameBaseからTransformを使ってもよい）
-	worldMatrix = Function::MakeAffineMatrix(planeTransform.scale, planeTransform.rotate, planeTransform.translate);
-	fenceWorldMatrix = Function::MakeAffineMatrix(fenceTransform.scale, fenceTransform.rotate, fenceTransform.translate);
-	gameBase->GetCameraTransform() = {
-	    {1, 1, 1},
-        camera.rotation_, camera.translation_
-    };
 	// WVP行列を作成
-	wvpMatrix = Function::Multiply(worldMatrix, viewProjectionMatrix);
+	
 	Transform transforms[10];
 	for (uint32_t index = 0; index < 10; ++index) {
 		transforms[index].scale = {0.5f, 0.5f, 0.5f};
@@ -63,16 +58,11 @@ void GameScene::Update(GameBase* gameBase) {
 		transforms[index].translate = {index * 0.1f, index * 0.1f, index * 0.1f};
 	}
 
-	for (uint32_t index = 0; index < 10; ++index) {
+
+
 	
-		ParticleWorldMatrix = Function::MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
-		ParticleWVPMatrix = Function::Multiply(ParticleWorldMatrix, ParticleWVPMatrix);
 
-	}
-
-	fenceWvpMatrix = Function::Multiply(fenceWorldMatrix, viewProjectionMatrix);
-
-	camera.Update((uint8_t*)keys, (uint8_t*)preKeys);
+	camera->Update();
 
 
 	//ImGui::Begin("Plane");
@@ -102,7 +92,7 @@ void GameScene::Update(GameBase* gameBase) {
 
 	//ImGui::End();
 
-	worldMatrix = Function::MakeAffineMatrix(planeTransform.scale, planeTransform.rotate, planeTransform.translate);
+	
 
 	/*ImGui::Begin("PadorKey");
 	if (ImGui::Button("Keyboard")) {
@@ -153,11 +143,20 @@ void GameScene::Update(GameBase* gameBase) {
 	planeObject_->SetScale(planeTransform.scale);
 	planeObject_->SetRotate(planeTransform.rotate);
 	planeObject_->SetTranslate(planeTransform.translate);
-
+	if (ImGui::Begin("axis")) {
+		ImGui::DragFloat3("axisScale", &axisTransform.scale.x, 1.0f, 0.1f, 10000.0f);
+		ImGui::DragFloat3("axisRotation", &axisTransform.rotate.x, 0.01f);
+		ImGui::DragFloat3("axisPosition", &axisTransform.translate.x, 1.0f);
+	}
+	ImGui::End();
+	axisObject_->SetScale(axisTransform.scale);
+	axisObject_->SetRotate(axisTransform.rotate);
+	axisObject_->SetTranslate(axisTransform.translate);
 
 	sprite->Update();
 	sprite2_->Update();
 	planeObject_->Update();
+	axisObject_->Update();
 }
 
 void GameScene::Draw(GameBase* gameBase) {

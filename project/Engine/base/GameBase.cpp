@@ -100,6 +100,7 @@ void GameBase::ResourceRelease() {
 	winApp_->Finalize();
 }
 
+void GameBase::SetDefaultCamera(Camera* camera) { obj3dCommon_->SetDefaultCamera(camera); }
 
 void GameBase::SetDirectionalLightData(const DirectionalLight& directionalLight) { dxCommon_->SetDirectionalLightData(directionalLight); }
 

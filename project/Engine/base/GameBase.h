@@ -8,6 +8,7 @@
 #include "WinApp.h"
 #include "DirectXCommon.h"
 #include "TextureManager.h"
+#include "Camera.h"
 
 class SpriteCommon;
 class Object3dCommon;
@@ -80,7 +81,7 @@ private:
 	void SetDirectionalLightData(const DirectionalLight& directionalLight);
 
 
-	
+	void SetDefaultCamera(Camera* camera);
 
 	void SetBlendMode(BlendMode blendMode);
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "DebugCamera.h"
+#include "Camera.h"
 #include "GameBase.h"
 #include "Sprite.h"
 #include "Object3d.h"
@@ -19,7 +19,11 @@ public:
             .rotate{0, 0, 0},
             .translate{0, 0, 0}
         };
-
+	    Transform axisTransform{
+	        .scale{1, 1, 1},
+            .rotate{0, 0, 0},
+            .translate{0, 0, 0}
+        };
 	    Transform fenceTransform{
 	        .scale{1, 1, 1},
             .rotate{0, 0, 0},
@@ -37,26 +41,9 @@ public:
         };
 	    Matrix4x4 ParticleWorldMatrix{};
 	    Matrix4x4 ParticleWVPMatrix{};
-			Vector3 position[4]{
-	        {100, 100, 0}, // 左上 (100,100)
-	        {300, 100, 0}, // 右上
-	        {300, 300, 0}, // 右下
-	        {100, 300, 0}  // 左下
-	    };
-	    Vector3 position2[4]{
-	        {200, 200, 0}, // 左上 (100,100)
-	        {400, 200, 0}, // 右上
-	        {400, 400, 0}, // 右下
-	        {200, 400, 0}  // 左下
-	    };
-	    Vector2 texcoord[4] = {
-	        {0.0f, 0.0f},
-            {1.0f, 0.0f},
-            {1.0f, 1.0f},
-            {0.0f, 1.0f}
-        };
+	
 
-		DebugCamera camera;
+		Camera* camera = nullptr;
 
 		Sprite* sprite = nullptr;
 	    Sprite* sprite2_ = nullptr;
