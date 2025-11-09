@@ -7,6 +7,7 @@
 #include "Object3dCommon.h"
 #include "ModelManeger.h"
 #include "TextureManager.h" 
+#include "SrvManager.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -21,6 +22,7 @@ GameBase::~GameBase(){
 	delete DInput;
 	ModelManeger::GetInstance()->Finalize();
 	TextureManager::GetInstance()->Finalize();
+	delete srvManager_;
 	delete dxCommon_;
 	delete winApp_;
 }
@@ -32,8 +34,10 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 	dxCommon_ = new DirectXCommon();
 	dxCommon_->initialize(winApp_);
-	TextureManager::GetInstance()->Initialize(dxCommon_);
-	
+	srvManager_ = new SrvManager();
+	srvManager_->Initialize(dxCommon_);
+	TextureManager::GetInstance()->Initialize(dxCommon_,srvManager_);
+	dxCommon_->CreateInstancingSRV(srvManager_);
 	
 	DInput = new Input();
 	DInput->Initialize(winApp_);

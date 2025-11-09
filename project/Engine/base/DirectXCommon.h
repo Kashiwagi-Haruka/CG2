@@ -42,6 +42,7 @@ struct DirectionalLight {
 };
 
 class BlendModeManeger;
+class SrvManager;
 
 class DirectXCommon {
 
@@ -205,7 +206,7 @@ class DirectXCommon {
 	
 	BlendModeManeger blendModeManeger_;
 	WinApp* winApp_ = nullptr;
-	imGuiM imguiM_;
+	/*imGuiM imguiM_;*/
 
 	std::chrono::steady_clock::time_point reference_;
 
@@ -217,14 +218,14 @@ class DirectXCommon {
 
 public:
 
-	static const uint32_t kMaxSRVCount;
+	
 
 	void initialize(WinApp* winApp);
 	
 	void InitializeFixFPS();
 
 	void UpdateFixFPS();
-
+	void CreateInstancingSRV(SrvManager* srvManager);
 	void PreDraw();
 	void PostDraw();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
@@ -266,7 +267,7 @@ public:
 	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world);
 	void DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, uint32_t textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount);
 
-	
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 private:
 
@@ -277,7 +278,7 @@ private:
 	void SwapChainInitialize();
 	void DepthBufferCreate();
 	void DescriptorHeapCreate();
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+	
 	void RenderTargetViewInitialize();
 	void DepthStencilViewInitialize();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height);

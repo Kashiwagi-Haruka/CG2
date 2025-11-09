@@ -6,7 +6,7 @@
 #include <format>
 #include <dxcapi.h>
 #include <thread>
-
+#include "SrvManager.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -15,7 +15,7 @@
 #pragma comment(lib, "dxcompiler.lib")
 
 using namespace Microsoft::WRL;
-const uint32_t DirectXCommon::kMaxSRVCount = 512;
+
 
 void DirectXCommon::initialize(WinApp* winApp) {
 	assert(winApp);
@@ -45,7 +45,7 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	// DXCコンパイラの生成
 	DXCCompilerCreate();
 	// ImGuiの初期化
-	ImGuiInitialize();
+	/*ImGuiInitialize();*/
 
 	// Build PSO and root signature now (required before recording draw calls)
 	SetupPSO();
@@ -301,7 +301,7 @@ void DirectXCommon::DepthBufferCreate() {
 void DirectXCommon::DescriptorHeapCreate() {
 
 	descriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	descriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	
 	descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 
@@ -309,8 +309,7 @@ void DirectXCommon::DescriptorHeapCreate() {
 
 	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
-	// SRV用ディスクリプタヒープ作成
-	srvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
+
 
 	dsvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
@@ -435,7 +434,7 @@ void DirectXCommon::ImGuiInitialize(){
 
 
 	// ImGui 初期化はここで！
-	imguiM_.MInitialize(winApp_->GetHwnd(), device_.Get(), swapChainDesc_, rtvDesc_, srvDescriptorHeap_.Get());
+	/*imguiM_.MInitialize(winApp_->GetHwnd(), device_.Get(), swapChainDesc_, rtvDesc_, srvDescriptorHeap_.Get());*/
 
 
 }
@@ -462,12 +461,12 @@ void DirectXCommon::PreDraw() {
 	DrawCommandList();
 
 	// ⑤ ImGui 準備
-	imguiM_.NewFrame();
+	/*imguiM_.NewFrame();*/
 	
 }
 void DirectXCommon::PostDraw() {
 
-	imguiM_.Render(srvDescriptorHeap_.Get(), commandList_.Get());
+	/*imguiM_.Render(srvDescriptorHeap_.Get(), commandList_.Get());*/
 
 	// RenderTarget→Present に戻す
 	CrtvTransitionBarrier(); // バリア遷移 :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
@@ -698,7 +697,7 @@ void DirectXCommon::SetDirectionalLightData(const DirectionalLight& directionalL
 	}
 }
 void DirectXCommon::Finalize() {
-	imguiM_.Finalize();
+	/*imguiM_.Finalize();*/
 
 	if (fenceEvent_) {
 		CloseHandle(fenceEvent_);
@@ -1062,39 +1061,6 @@ void DirectXCommon::CreateSphereResources() {
 	vertexResourceSphere_->Unmap(0, nullptr);
 }
 
-//void DirectXCommon::CreateModelResources(){
-//	vertexResource_ = CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
-//	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-//	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
-//	vertexBufferView_.StrideInBytes = sizeof(VertexData);
-//
-//	VertexData* vertexData = nullptr;
-//	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-//	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
-//	vertexResource_->Unmap(0, nullptr);
-//
-//	// --- マテリアル用リソース ---
-//	// 3D用（球など陰影つけたいもの）
-//	// 必ず256バイト単位で切り上げる
-//	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
-//	materialResource_ = CreateBufferResource(alignedSize);
-//	Material* mat3d = nullptr;
-//	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
-//	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-//	mat3d->enableLighting = 1;
-//	mat3d->uvTransform = Function::MakeIdentity4x4();
-//
-//	materialResource_->Unmap(0, nullptr);
-//
-//	// [0]=モデル描画用で使う
-//	Matrix4x4 worldMatrix = Function::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-//	Matrix4x4 cameraMatrix = Function::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-//	Matrix4x4 viewMatrix = Function::Inverse(cameraMatrix);
-//	Matrix4x4 projectionMatrix = Function::MakePerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
-//	Matrix4x4 worldViewProjectionMatrix = Function::Multiply(worldMatrix, Function::Multiply(viewMatrix, projectionMatrix));
-//	transformationMatrixData[0].WVP = worldViewProjectionMatrix;
-//	transformationMatrixData[0].World = worldMatrix;
-//}
 
 void DirectXCommon::VertexResource() {
 
@@ -1128,27 +1094,27 @@ void DirectXCommon::VertexResource() {
 		instancingData_[index].World = Function::MakeIdentity4x4();
 	}
 
-	// ==================================================
-	// Instancing用 SRV 作成
-	// ==================================================
-	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
-	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
-	instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-	instancingSrvDesc.Buffer.FirstElement = 0;
-	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	instancingSrvDesc.Buffer.NumElements = kNumInstance; // インスタンス数
-	instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix128);
-
-	// 例えば Heap の 3 番目を使用（空きスロットならどこでもOK）
-	instancingSrvHandleCPU = GetCpuDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV_, 3);
-	instancingSrvHandleGPU = GetGpuDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV_, 3);
-
-	device_->CreateShaderResourceView(instancingResource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU);
-	
 
 	CreateSphereResources();
 	/*CreateModelResources();*/
+}
+void DirectXCommon::CreateInstancingSRV(SrvManager* srvManager) {
+	assert(srvManager);
+
+	uint32_t index = srvManager->Allocate();
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC desc{};
+	desc.Format = DXGI_FORMAT_UNKNOWN;
+	desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	desc.Buffer.FirstElement = 0;
+	desc.Buffer.NumElements = kNumInstance;
+	desc.Buffer.StructureByteStride = sizeof(TransformationMatrix128);
+
+	instancingSrvHandleCPU = srvManager->GetCPUDescriptorHandle(index);
+	instancingSrvHandleGPU = srvManager->GetGPUDescriptorHandle(index);
+
+	device_->CreateShaderResourceView(instancingResource_.Get(), &desc, instancingSrvHandleCPU);
 }
 
 void DirectXCommon::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj) {

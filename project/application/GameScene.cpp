@@ -112,20 +112,20 @@ void GameScene::Update(GameBase* gameBase) {
 
 	ImGui::End();*/
 
-	if (ImGui::Begin("Sprite Debug")) {
+	/*if (ImGui::Begin("Sprite Debug")) {
 
 		ImGui::DragFloat3("Scale", &spriteTransform.scale.x, 1.0f, 0.1f, 10000.0f);
 		ImGui::DragFloat3("Rotation", &spriteTransform.rotate.x, 0.01f);
 		ImGui::DragFloat3("Position", &spriteTransform.translate.x, 1.0f);
 		ImGui::DragFloat2("TextureSize", &spriteTexSize.x, 1.0f);
 	}
-	ImGui::End();
+	ImGui::End();*/
 	sprite->SetTextureRange({0.0f, 0.0f}, spriteTexSize);
 	sprite->SetScale(spriteTransform.scale);
 	sprite->SetRotation(spriteTransform.rotate);
 	sprite->SetPosition(spriteTransform.translate);
 
-	if (ImGui::Begin("Sprite2 Debug")) {
+	/*if (ImGui::Begin("Sprite2 Debug")) {
 
 		ImGui::DragFloat3("Scale2", &sprite2Transform.scale.x, 1.0f, 0.1f, 10000.0f);
 		ImGui::DragFloat3("Rotation2", &sprite2Transform.rotate.x, 0.01f);
@@ -139,16 +139,16 @@ void GameScene::Update(GameBase* gameBase) {
 		ImGui::DragFloat3("planeRotation", &planeTransform.rotate.x, 0.01f);
 		ImGui::DragFloat3("planePosition", &planeTransform.translate.x, 1.0f);
 	}
-	ImGui::End();
+	ImGui::End();*/
 	planeObject_->SetScale(planeTransform.scale);
 	planeObject_->SetRotate(planeTransform.rotate);
 	planeObject_->SetTranslate(planeTransform.translate);
-	if (ImGui::Begin("axis")) {
+	/*if (ImGui::Begin("axis")) {
 		ImGui::DragFloat3("axisScale", &axisTransform.scale.x, 1.0f, 0.1f, 10000.0f);
 		ImGui::DragFloat3("axisRotation", &axisTransform.rotate.x, 0.01f);
 		ImGui::DragFloat3("axisPosition", &axisTransform.translate.x, 1.0f);
 	}
-	ImGui::End();
+	ImGui::End();*/
 	axisObject_->SetScale(axisTransform.scale);
 	axisObject_->SetRotate(axisTransform.rotate);
 	axisObject_->SetTranslate(axisTransform.translate);

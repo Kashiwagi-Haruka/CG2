@@ -6,6 +6,7 @@
 #include <cassert>
 #include "TextureManager.h"
 #include "Function.h"
+#include "SrvManager.h"
 void Model::Initialize(ModelCommon* modelCommon) {
 
 	modelCommon_ = modelCommon;
@@ -40,7 +41,8 @@ void Model::Initialize(ModelCommon* modelCommon) {
 void Model::Draw() {
 
 	// --- SRVヒープをバインド ---
-	ID3D12DescriptorHeap* descriptorHeaps[] = {modelCommon_->GetDxCommon()->GetSrvDescriptorHeap()};
+	ID3D12DescriptorHeap* descriptorHeaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
+
 	modelCommon_->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	// --- VertexBufferViewを設定 ---

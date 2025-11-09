@@ -3,7 +3,7 @@
 #include "Function.h"
 #include "DirectXCommon.h"
 #include "TextureManager.h"
-
+#include "SrvManager.h"
 void Sprite::Initialize(SpriteCommon* spriteCommon,uint32_t Handle){
 
 	spriteCommon_ = spriteCommon;
@@ -100,7 +100,7 @@ void Sprite::Draw(){
 	spriteCommon_->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&ibv);
 
 	// ヒープ、ルートパラメータ等をセット（すでにやってる場合は不要）
-	ID3D12DescriptorHeap* heaps[] = {spriteCommon_->GetDxCommon()->GetSrvDescriptorHeap()};
+	ID3D12DescriptorHeap* heaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
 	spriteCommon_->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(heaps), heaps);
 	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress());
@@ -182,7 +182,7 @@ void Sprite::SetIsFlipX(const bool isFlipX) {
 void Sprite::SetIsFlipY(const bool isFlipY) { isFripY_ = isFlipY; }
 
 void Sprite::AdjustTextureSize() {
-	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
+	DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
 
 	textureCutSize.x = static_cast<float>(metadata.width);
 	textureCutSize.y = static_cast<float>(metadata.height);

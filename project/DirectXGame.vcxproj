@@ -183,6 +183,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\Mesh\Model.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\ModelCommon.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\ModelManeger.cpp" />
+    <ClCompile Include="Engine\Texture\SrvManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -234,6 +235,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\Mesh\Model.h" />
     <ClInclude Include="Engine\Texture\Mesh\ModelCommon.h" />
     <ClInclude Include="Engine\Texture\Mesh\ModelManeger.h" />
+    <ClInclude Include="Engine\Texture\SrvManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

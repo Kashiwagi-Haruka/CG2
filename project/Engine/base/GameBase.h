@@ -10,6 +10,7 @@
 #include "TextureManager.h"
 #include "Camera.h"
 
+class SrvManager;
 class SpriteCommon;
 class Object3dCommon;
 class ModelCommon;
@@ -21,7 +22,8 @@ private:
 	WinApp* winApp_ = nullptr;
 
 	DirectXCommon* dxCommon_ = nullptr;
-	
+	SrvManager* srvManager_ = nullptr;
+
 	Audio audio;
 	
 	SpriteCommon* spriteCommon_ = nullptr;
