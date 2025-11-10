@@ -1,11 +1,13 @@
 #include "GameScene.h"
 #include "ModelManeger.h"
+#include "ParticleManager.h"
 GameScene::~GameScene(){
 
 	delete sprite;
 	delete sprite2_;
 	delete planeObject_;
 	delete axisObject_;
+	delete particle;
 }
 
 void GameScene::Initialize(GameBase* gameBase) {
@@ -31,8 +33,9 @@ void GameScene::Initialize(GameBase* gameBase) {
 	planeObject_->Initialize(gameBase->GetObject3dCommon());
 	planeObject_->SetModel("plane");
 	axisObject_->SetModel("axis");
+	ParticleManager::GetInstance()->CreateParticleGroup("test", "Resources/2d/uvChecker.png");
 
-	
+	particle = new ParticleEmitter("test", {0, 0, 0}, 10, 5);
 
 
 	color = (uint8_t(meshColor.w * 255) << 24) | // A
@@ -157,6 +160,12 @@ void GameScene::Update(GameBase* gameBase) {
 	sprite2_->Update();
 	planeObject_->Update();
 	axisObject_->Update();
+	particle->Update({
+	    {1, 1, 1},
+        {0, 0, 0},
+        {0, 0, 0}
+    });
+	ParticleManager::GetInstance()->Update(camera);
 }
 
 void GameScene::Draw(GameBase* gameBase) {
@@ -164,10 +173,10 @@ void GameScene::Draw(GameBase* gameBase) {
 
 
 	gameBase->ModelCommonSet();
-	planeObject_->Draw();
-	axisObject_->Draw();
+	//planeObject_->Draw();
+	//axisObject_->Draw();
 	/*gameBase->DrawParticle(modelData.vertices, color, ModelTextureHandle, ParticleWVPMatrix, ParticleWorldMatrix, 10);*/
-
+	ParticleManager::GetInstance()->Draw();
 		
 
 		/*if (IsKeyboard) {
@@ -241,7 +250,7 @@ void GameScene::Draw(GameBase* gameBase) {
 	sprite2_->SetRotation(sprite2Transform.rotate);
 	sprite2_->SetPosition(sprite2Transform.translate);
 	sprite2_->Draw();
-
+	
 	
 
 }

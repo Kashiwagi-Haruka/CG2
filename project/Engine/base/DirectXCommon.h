@@ -215,6 +215,7 @@ class DirectXCommon {
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
 	TransformationMatrix* instancingData_ = nullptr;
 
+	
 
 public:
 
@@ -243,7 +244,11 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetModelGPUHanle(int index) { return ModelGPUHandle_[index]; }
 	Transform& GetCameraTransform() { return cameraTransform; }
 	
-
+	// DirectXCommon.h
+	ID3D12RootSignature* GetParticleRootSignature() const { return particleRootSignature_.Get(); }
+	ID3D12PipelineState* GetParticlePipelineState(BlendMode mode) const { return particlePipelineState_[static_cast<int>(mode)].Get(); }
+	D3D12_GPU_VIRTUAL_ADDRESS GetMaterialResourceGPUVA() const { return materialResource_->GetGPUVirtualAddress(); }
+	ID3D12DescriptorHeap* GetSrvHeap() const { return srvDescriptorHeap_.Get(); }
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader( // CompilerするShaderファイルへのパス
 	    const std::wstring& filePath,
 	    // Compilerに使用するProfile

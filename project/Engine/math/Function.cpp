@@ -58,6 +58,20 @@ Matrix4x4 MakeTranslateMatrix(Vector3 translate) {
 
 	return result;
 }
+Matrix4x4 Function::MakeTranslateMatrix(float x, float y, float z) {
+	Matrix4x4 result{};
+
+	result.m[0][0] = 1.0f;
+	result.m[1][1] = 1.0f;
+	result.m[2][2] = 1.0f;
+	result.m[3][3] = 1.0f;
+
+	result.m[3][0] = x;
+	result.m[3][1] = y;
+	result.m[3][2] = z;
+
+	return result;
+}
 
 Matrix4x4 MakeScaleMatrix(Vector3 scale) {
 	Matrix4x4 result{};

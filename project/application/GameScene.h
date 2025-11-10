@@ -3,6 +3,7 @@
 #include "GameBase.h"
 #include "Sprite.h"
 #include "Object3d.h"
+#include "ParticleEmitter.h"
 
 class GameScene {
 
@@ -51,6 +52,8 @@ public:
 		Object3d* planeObject_ = nullptr;
 	    Object3d* axisObject_ = nullptr;
 		
+		ParticleEmitter* particle = nullptr;
+
 		Vector2 spriteTexSize {};
 	    Vector2 spriteTexSize2{};
 		
@@ -62,8 +65,7 @@ public:
 
 	uint32_t color;
 
-	char keys[256] = {0};
-	char preKeys[256] = {0};
+
 
 	uint32_t ModelTextureHandle = 0;
 	

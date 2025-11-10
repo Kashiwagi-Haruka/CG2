@@ -7,6 +7,7 @@
 #include <dxcapi.h>
 #include <thread>
 #include "SrvManager.h"
+#include "ParticleManager.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -47,7 +48,7 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	// ImGuiの初期化
 	/*ImGuiInitialize();*/
 
-	// Build PSO and root signature now (required before recording draw calls)
+	
 	SetupPSO();
 
 	VertexResource();
@@ -490,6 +491,8 @@ void DirectXCommon::PostDraw() {
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
 }
+
+
 void DirectXCommon::FrameStart() {
 
 // FrameStart
@@ -879,8 +882,8 @@ void DirectXCommon::SetupParticlePSO() {
 	D3D12_DESCRIPTOR_RANGE rangeTexture{};
 	rangeTexture.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	rangeTexture.NumDescriptors = 1;
-	rangeTexture.BaseShaderRegister = 0; // t0
-	rangeTexture.RegisterSpace = 0;      // space0
+	rangeTexture.BaseShaderRegister = 0; // 
+	rangeTexture.RegisterSpace = 0;      // 
 	rangeTexture.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
@@ -892,8 +895,8 @@ void DirectXCommon::SetupParticlePSO() {
 	D3D12_DESCRIPTOR_RANGE rangeInstancing{};
 	rangeInstancing.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	rangeInstancing.NumDescriptors = 1;
-	rangeInstancing.BaseShaderRegister = 1; // t0
-	rangeInstancing.RegisterSpace = 0;      // space1
+	rangeInstancing.BaseShaderRegister = 1; // 
+	rangeInstancing.RegisterSpace = 0;      // 
 	rangeInstancing.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
