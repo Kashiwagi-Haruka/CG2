@@ -37,7 +37,6 @@ void GameScene::Initialize(GameBase* gameBase) {
 
 	particle = new ParticleEmitter("test", {0, 0, 0}, 10, 5);
 
-
 	color = (uint8_t(meshColor.w * 255) << 24) | // A
 	        (uint8_t(meshColor.x * 255) << 16) | // R
 	        (uint8_t(meshColor.y * 255) << 8) |  // G
