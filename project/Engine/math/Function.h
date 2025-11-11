@@ -6,6 +6,8 @@
 
 namespace Function {
 	
+	float Dot(const Vector3& v1, const Vector3& v2);
+
 	Vector3 Normalize(const Vector3& v);
 
 	Matrix4x4 MakeRotateXMatrix(float radian);

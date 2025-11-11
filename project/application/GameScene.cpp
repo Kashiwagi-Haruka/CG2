@@ -3,6 +3,7 @@
 #include "ParticleManager.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "CameraController.h"
 GameScene::~GameScene(){
 	delete enemy;
 	delete player;
@@ -11,7 +12,7 @@ GameScene::~GameScene(){
 	delete planeObject_;
 	delete axisObject_;
 	delete particle;
-	delete camera;
+	delete cameraController;
 }
 
 void GameScene::Initialize(GameBase* gameBase) {
@@ -24,10 +25,11 @@ void GameScene::Initialize(GameBase* gameBase) {
 	sprite2_ = new Sprite();
 	sprite2_->Initialize(gameBase->GetSpriteCommon(), spriteHandle2);
 
-
-	camera = new Camera();
-	camera->SetTranslate({0, 0, -50});
-	gameBase->SetDefaultCamera(camera);
+	
+	cameraController = new CameraController();
+	cameraController->Initialize();
+	
+	gameBase->SetDefaultCamera(cameraController->GetCamera());
 	planeObject_ = new Object3d();
 	axisObject_ = new Object3d();
 	ModelManeger::GetInstance()->LoadModel("plane");
@@ -51,9 +53,9 @@ void GameScene::Initialize(GameBase* gameBase) {
 
 
 	player = new Player();
-	player->Initialize(gameBase,camera);
+	player->Initialize(gameBase,cameraController->GetCamera());
 	enemy = new Enemy();
-	enemy->Initialize(gameBase, camera);
+	enemy->Initialize(gameBase, cameraController->GetCamera());
 }
 
 void GameScene::Update(GameBase* gameBase) {
@@ -72,7 +74,7 @@ void GameScene::Update(GameBase* gameBase) {
 
 	
 
-	camera->Update();
+	cameraController->Update();
 
 
 	//ImGui::Begin("Plane");
@@ -172,7 +174,7 @@ void GameScene::Update(GameBase* gameBase) {
         {0, 0, 0},
         {0, 0, 0}
     });
-	ParticleManager::GetInstance()->Update(camera);
+	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
 	player->Update(gameBase);
 	enemy->Update(gameBase);
 }

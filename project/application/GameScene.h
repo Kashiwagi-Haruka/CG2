@@ -1,5 +1,4 @@
 #pragma once
-#include "Camera.h"
 #include "GameBase.h"
 #include "Sprite.h"
 #include "Object3d.h"
@@ -7,6 +6,7 @@
 
 class Player;
 class Enemy;
+class CameraController;
 
 class GameScene {
 
@@ -45,9 +45,6 @@ public:
         };
 	    Matrix4x4 ParticleWorldMatrix{};
 	    Matrix4x4 ParticleWVPMatrix{};
-	
-
-		Camera* camera = nullptr;
 
 		Sprite* sprite = nullptr;
 	    Sprite* sprite2_ = nullptr;
@@ -74,6 +71,7 @@ public:
 
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
+	CameraController* cameraController = nullptr;
     
     ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白
 	DirectionalLight light{

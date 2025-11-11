@@ -19,13 +19,13 @@ class Player {
 	State state_;
 
 	float accelationRate = 0.1f;
-	float accelationMax = 0.5f;
+	float accelationMax = 0.25f;
 	float decelerationRate = 0.15f;
 
 	float jumpPower = 0.7f;
 	float jumpDuration = 0.5f;
 	float jumpTimer = 0.0f;
-	float jumpTimerMax = 0.02f;
+	float jumpTimerMax = 0.01f;
 	float gravity = 0.98f/10.0f;
 
 

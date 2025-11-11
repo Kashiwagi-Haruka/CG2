@@ -154,10 +154,12 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application\Enemy.cpp" />
+    <ClCompile Include="application\CameraController.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
+    <ClCompile Include="Engine\math\AABB.cpp" />
     <ClCompile Include="Engine\Texture\BlendModeManeger.cpp" />
     <ClCompile Include="Engine\base\DirectXCommon.cpp" />
     <ClCompile Include="Engine\LeakChecker\D3DResourceLeakChecker.cpp" />
@@ -205,10 +207,12 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Enemy.h" />
+    <ClInclude Include="application\CameraController.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\Input\Input.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
+    <ClInclude Include="Engine\math\AABB.h" />
     <ClInclude Include="Engine\math\Transform.h" />
     <ClInclude Include="Engine\Texture\BlendModeManeger.h" />
     <ClInclude Include="Engine\base\DirectXCommon.h" />
