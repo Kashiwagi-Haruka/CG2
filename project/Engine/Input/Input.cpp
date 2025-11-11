@@ -146,6 +146,16 @@ bool Input::TriggerKey(BYTE keyNumber) {
 	return false;
 }
 
+bool Input::ReleaseKey(BYTE keyNumber) {
+	
+	if (!key[keyNumber] && preKey[keyNumber]) {
+		
+		return true;
+	}
+	
+	return false;
+}
+
 bool Input::PushButton(PadButton button) {
 	if (!gamePadDevice_)
 		return false;

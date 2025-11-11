@@ -89,6 +89,7 @@ private:
 
 	bool PushKey(BYTE keyNumber);
 	bool TriggerKey(BYTE keyNumber);
+	bool ReleaseKey(BYTE keyNumber);
 	bool PushButton(Input::PadButton buttonNumber);
 	bool TriggerButton(Input::PadButton buttonNumber);
 

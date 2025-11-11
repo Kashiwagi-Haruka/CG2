@@ -150,6 +150,7 @@ void GameBase::SetBlendMode(BlendMode mode) { dxCommon_->SetBlendMode(mode); }
 
 bool GameBase::PushKey(BYTE keyNumber){ return DInput->PushKey(keyNumber); }
 bool GameBase::TriggerKey(BYTE keyNumber) { return DInput->TriggerKey(keyNumber); }
+bool GameBase::ReleaseKey(BYTE keyNumber) { return DInput->ReleaseKey(keyNumber); }
 bool GameBase::PushButton(Input::PadButton button) { return DInput->PushButton(button); }
 bool GameBase::TriggerButton(Input::PadButton button) { return DInput->TriggerButton(button); }
 // ジョイスティック

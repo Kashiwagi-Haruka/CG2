@@ -5,6 +5,9 @@
 #include "Object3d.h"
 #include "ParticleEmitter.h"
 
+class Player;
+class Enemy;
+
 class GameScene {
 
 public:
@@ -68,9 +71,10 @@ public:
 
 
 	uint32_t ModelTextureHandle = 0;
-	
-	
-    // 修正: staticメンバーの初期化はconstでなければならないため、constを追加
+
+	Player* player = nullptr;
+	Enemy* enemy = nullptr;
+    
     ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白
 	DirectionalLight light{
 	    .color{1, 1, 1, 1},

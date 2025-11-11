@@ -89,6 +89,13 @@ public:
 	/// <returns></returns>
 	bool TriggerKey(BYTE keyNumber);
 
+	/// <summary>
+	/// キーが離された瞬間か
+	/// </summary>
+	/// <param name="keyNumber">キーコード</param>
+	/// <returns></returns>
+	bool ReleaseKey(BYTE keyNumber);
+
 	// ゲームパッド
 	bool PushButton(PadButton button);                    // ボタンが押されているか
 	bool TriggerButton(PadButton button);                 // ボタンが押された瞬間か

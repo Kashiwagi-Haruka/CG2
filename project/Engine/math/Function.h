@@ -34,5 +34,6 @@ namespace Function {
 Vector3 operator+(const Vector3& v1, const Vector3& v2);
 Vector3 operator-(const Vector3& v1, const Vector3& v2);
 Vector3 operator*(const Vector3& v, float scalar);
+Vector3 operator+=(Vector3& v1, const Vector3& v2);
 inline float LengthSquared(const Vector3& v) { return v.x * v.x + v.y * v.y + v.z * v.z; }
 

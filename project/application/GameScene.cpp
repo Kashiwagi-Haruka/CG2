@@ -1,8 +1,11 @@
 #include "GameScene.h"
 #include "ModelManeger.h"
 #include "ParticleManager.h"
+#include "Player.h"
+#include "Enemy.h"
 GameScene::~GameScene(){
 
+	delete player;
 	delete sprite;
 	delete sprite2_;
 	delete planeObject_;
@@ -15,7 +18,6 @@ void GameScene::Initialize(GameBase* gameBase) {
 	uint32_t spriteHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png");
 	uint32_t spriteHandle2 = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/monsterBall.png");
 
-
 	sprite = new Sprite();
 	sprite->Initialize(gameBase->GetSpriteCommon(),spriteHandle);
 	sprite2_ = new Sprite();
@@ -23,7 +25,7 @@ void GameScene::Initialize(GameBase* gameBase) {
 
 
 	camera = new Camera();
-	camera->SetTranslate({0, 0, -10});
+	camera->SetTranslate({0, 0, -50});
 	gameBase->SetDefaultCamera(camera);
 	planeObject_ = new Object3d();
 	axisObject_ = new Object3d();
@@ -46,6 +48,11 @@ void GameScene::Initialize(GameBase* gameBase) {
 	spriteTexSize = {200,200};
 	spriteTexSize2 = {200, 500};
 
+
+	player = new Player();
+	player->Initialize(gameBase,camera);
+	enemy = new Enemy();
+	enemy->Initialize(gameBase, camera);
 }
 
 void GameScene::Update(GameBase* gameBase) {
@@ -165,17 +172,20 @@ void GameScene::Update(GameBase* gameBase) {
         {0, 0, 0}
     });
 	ParticleManager::GetInstance()->Update(camera);
+	player->Update(gameBase);
+	enemy->Update(gameBase);
 }
 
 void GameScene::Draw(GameBase* gameBase) {
 
-
-
 	gameBase->ModelCommonSet();
+	player->Draw(gameBase);
+	enemy->Draw(gameBase);
+	
 	//planeObject_->Draw();
 	//axisObject_->Draw();
 	/*gameBase->DrawParticle(modelData.vertices, color, ModelTextureHandle, ParticleWVPMatrix, ParticleWorldMatrix, 10);*/
-	ParticleManager::GetInstance()->Draw();
+	/*ParticleManager::GetInstance()->Draw();*/
 		
 
 		/*if (IsKeyboard) {

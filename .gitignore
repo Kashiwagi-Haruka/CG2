@@ -324,3 +324,5 @@ FodyWeavers.xsd
 
 *.dmp
 /dmp
+*.Dumps
+/Dumps
