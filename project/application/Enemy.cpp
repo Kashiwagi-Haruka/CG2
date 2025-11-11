@@ -7,7 +7,7 @@
 Enemy::~Enemy() {
 
 	delete object_; 
-	delete camera_;
+	
 }
 
 void Enemy::Initialize(GameBase* gameBase,Camera* camera) {

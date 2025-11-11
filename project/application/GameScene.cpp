@@ -4,13 +4,14 @@
 #include "Player.h"
 #include "Enemy.h"
 GameScene::~GameScene(){
-
+	delete enemy;
 	delete player;
 	delete sprite;
 	delete sprite2_;
 	delete planeObject_;
 	delete axisObject_;
 	delete particle;
+	delete camera;
 }
 
 void GameScene::Initialize(GameBase* gameBase) {

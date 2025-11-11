@@ -5,9 +5,11 @@
 #include <algorithm>
 #include "PlayerBullet.h"
 Player::~Player(){
+	if (bullet_) {
 	delete bullet_;
+	}
 	delete object_;
-	delete camera_;
+	
 	
 }
 void Player::Initialize(GameBase* gameBase,Camera* camera){

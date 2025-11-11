@@ -7,7 +7,7 @@
 
 PlayerBullet::~PlayerBullet() { 
 	delete object_;
-	delete camera_;
+	
 }
 
 void PlayerBullet::Initialize(GameBase* gameBase,Camera* camera, Vector3 emitPos, Vector3 direction) {
