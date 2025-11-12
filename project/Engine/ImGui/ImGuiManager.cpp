@@ -1,8 +1,10 @@
 #include "ImGuiManager.h"
 #include <dxgi1_6.h>
+#ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
+#endif
 #include <format>
 #include <string>
 #include "WinApp.h"
@@ -11,28 +13,9 @@
 
 
 
-void ImGuiManager::Initialize(WinApp* winApp, DirectXCommon* dxCommon,SrvManager* srvManager) {
-	//assert(srvManager->GetDescriptorHeap().Get() && "ImGuiManager::Initialize() srvDescriptorHeap_ is null");
-	//assert(dxCommon->GetDevice() && "ImGuiManager::Initialize() device_ is null");
-	//IMGUI_CHECKVERSION();
-	//ImGui::CreateContext();
-	//ImGui::StyleColorsDark();
-	//ImGui_ImplWin32_Init(winApp->GetHwnd());
-	//ImGui_ImplDX12_Init(
-	//    dxCommon->GetDevice(), static_cast<int>(dxCommon->GetSwapChainResourcesNum()), dxCommon->GetRtvDesc().Format, srvManager->GetDescriptorHeap().Get(),
-	//    srvManager->GetDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(),
-	//    srvManager->GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
-	//// ★ デバッグログ出力（ImGui が使う SRV のスロット確認）
-	//D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = srvManager->GetDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-	//D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srvManager->GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
-
-	//std::string log = "[ImGui Init] SRV Heap Start -> "
-	//                  "CPU Handle: " +
-	//                  std::to_string(cpuHandle.ptr) + " | GPU Handle: " + std::to_string(gpuHandle.ptr) + "\n";
-	//OutputDebugStringA(log.c_str());
-	//  Setup Dear ImGui context
-	
-		IMGUI_CHECKVERSION();
+void ImGuiManager::Initialize([[maybe_unused]] WinApp* winApp, [[maybe_unused]] DirectXCommon* dxCommon, [[maybe_unused]] SrvManager* srvManager) {	
+	#ifdef USE_IMGUI	
+	IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
 
@@ -67,26 +50,27 @@ void ImGuiManager::Initialize(WinApp* winApp, DirectXCommon* dxCommon,SrvManager
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-	
+	#endif
 }
 
 void ImGuiManager::Begin() {
-	
+#ifdef USE_IMGUI	
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 
 	ImGui::NewFrame();
-
+#endif
 
 }
 
 void ImGuiManager::End() {
-	
+#ifdef USE_IMGUI	
 	ImGui::Render();
-	
+#endif
 }
 
-void ImGuiManager::Draw(SrvManager* srvManager,DirectXCommon* dxCommon) {
+void ImGuiManager::Draw([[maybe_unused]] SrvManager* srvManager, [[maybe_unused]] DirectXCommon* dxCommon) {
+#ifdef USE_IMGUI	
 	if (!srvManager->GetDescriptorHeap().Get() || !dxCommon->GetCommandList()) {
 		OutputDebugStringA("ImGui Render Error: srvDescriptorHeap_ or commandList_ is null\n");
 		return;
@@ -96,14 +80,14 @@ void ImGuiManager::Draw(SrvManager* srvManager,DirectXCommon* dxCommon) {
 	dxCommon->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
 
-
+	#endif
 }
 
 void ImGuiManager::Finalize() {
-
+#ifdef USE_IMGUI	
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-
+	#endif
 }
