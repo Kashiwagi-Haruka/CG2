@@ -250,6 +250,8 @@ public:
 	ID3D12PipelineState* GetParticlePipelineState(BlendMode mode) const { return particlePipelineState_[static_cast<int>(mode)].Get(); }
 	D3D12_GPU_VIRTUAL_ADDRESS GetMaterialResourceGPUVA() const { return materialResource_->GetGPUVirtualAddress(); }
 	size_t GetSwapChainResourcesNum() const { return swapChainResources_.size(); }
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue_; }
+
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader( // CompilerするShaderファイルへのパス
 	    const std::wstring& filePath,
 	    // Compilerに使用するProfile

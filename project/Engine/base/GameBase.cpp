@@ -41,15 +41,15 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	dxCommon_->initialize(winApp_);
 	srvManager_ = new SrvManager();
 	srvManager_->Initialize(dxCommon_);
-	imguiM_ = new ImGuiManager();
-	imguiM_->Initialize(winApp_, dxCommon_, srvManager_);
 	TextureManager::GetInstance()->Initialize(dxCommon_,srvManager_);
 	ParticleManager::GetInstance()->Initialize(dxCommon_, srvManager_);
 	dxCommon_->CreateInstancingSRV(srvManager_);
 	
+
 	DInput = new Input();
 	DInput->Initialize(winApp_);
-
+	imguiM_ = new ImGuiManager();
+	imguiM_->Initialize(winApp_, dxCommon_, srvManager_);
 	audio.InitializeIXAudio();
 
 	ModelManeger::GetInstance()->Initialize(dxCommon_);
@@ -119,16 +119,18 @@ void GameBase::SetDirectionalLightData(const DirectionalLight& directionalLight)
 void GameBase::SpriteCommonSet() { spriteCommon_->DrawCommon(); }
 void GameBase::ModelCommonSet() { obj3dCommon_->DrawCommon(); }
 
-// 球体用リソース
 void GameBase::BeginFlame() { 
+
 	dxCommon_->PreDraw();
-	/*imguiM_->NewFrame();*/
+	imguiM_->Begin();
 	DInput->Update();
+	
 }
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
 void GameBase::EndFlame() { 
-	/*imguiM_->Render(srvManager_, dxCommon_);*/
+	imguiM_->End();
+	imguiM_->Draw(srvManager_, dxCommon_);
 	dxCommon_->PostDraw(); 
 }
 

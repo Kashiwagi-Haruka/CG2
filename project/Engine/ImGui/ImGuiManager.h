@@ -15,8 +15,9 @@ class ImGuiManager {
 public:
 
 	void Initialize(WinApp* winapp, DirectXCommon* dxCommon, SrvManager* srvManager );
-	void NewFrame();
-	void Render(SrvManager* srvManager,DirectXCommon* dxCommon);
+	void Begin();
+	void End();
+	void Draw(SrvManager* srvManager,DirectXCommon* dxCommon);
 
 	void Finalize();
 };

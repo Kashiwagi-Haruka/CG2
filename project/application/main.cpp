@@ -9,8 +9,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	gameBase->Initialize(L"CG2", 1280, 720);
 	GameScene* gameScene = new GameScene();
 	gameScene->Initialize(gameBase);
-	/*ModelData fenceModel = gameBase->LoadObjFile("Resources/3d", "fence.obj");
-	int fenceHandle = gameBase->LoadTextures("Resources/3d/fence.png");*/
 	SetUnhandledExceptionFilter(gameBase->ExportDump);
 	SoundData soundData1 = gameBase->SoundLoadWave("Resources/audio/Alarm01.wav");
 	gameBase->SoundPlayWave(soundData1);
@@ -27,6 +25,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	/*int PrePressMouse = 0;*/
 	while (gameBase->ProcessMessage()) {
 		gameBase->BeginFlame();
+
+		//update
 		switch (scene) {
 		case SceneName::Title:
 			break;
@@ -36,6 +36,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		default:
 			break;
 		}
+		//draw
 		switch (scene) {
 		case SceneName::Title:
 			break;
