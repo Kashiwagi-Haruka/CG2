@@ -74,7 +74,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;USE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 /ignore:4049 /ignore:4098 %(AdditionalOptions)</AdditionalOptions>
@@ -128,7 +128,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;USE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -172,7 +172,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Engine\math\Function.cpp" />
     <ClCompile Include="Engine\base\GameBase.cpp" />
-    <ClCompile Include="Engine\ImGui\imGuiM.cpp" />
+    <ClCompile Include="Engine\ImGui\ImGuiManager.cpp" />
     <ClCompile Include="application\main.cpp" />
     <ClCompile Include="Engine\base\WinApp.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Object3d.cpp" />
@@ -228,7 +228,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Engine\math\Function.h" />
     <ClInclude Include="Engine\base\GameBase.h" />
-    <ClInclude Include="Engine\ImGui\imGuiM.h" />
+    <ClInclude Include="Engine\ImGui\ImGuiManager.h" />
     <ClInclude Include="Engine\math\Matrix4x4.h" />
     <ClInclude Include="Engine\math\Vector2.h" />
     <ClInclude Include="Engine\math\Vector3.h" />

@@ -7,7 +7,8 @@ class Object3d;
 
 class PlayerBullet {
 
-	Transform transform_;
+	Transform bulletTransform_;
+	Transform lineTransform_;
 
 	Camera* camera_ = nullptr;
 	Object3d* bulletObject_ = nullptr;
@@ -20,6 +21,7 @@ class PlayerBullet {
 	~PlayerBullet();
 	void Initialize(GameBase* gameBase,Camera* camera, Vector3 emitPos, Vector3 direction);
 	void Update(GameBase* gameBase);
+	void Charge(Vector3 playerPos);
 	void Fire();
 	void Draw(GameBase* gameBase);
 

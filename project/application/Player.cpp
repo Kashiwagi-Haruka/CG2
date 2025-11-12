@@ -31,6 +31,7 @@ void Player::Initialize(GameBase* gameBase,Camera* camera){
 	
 	camera_ = camera;
 	playerObject_->SetCamera(camera_);
+	bullet_ = new PlayerBullet();
 	
 }
 void Player::Move(GameBase* gameBase){
@@ -94,15 +95,24 @@ void Player::Move(GameBase* gameBase){
 
 }
 void Player::Attack(GameBase* gameBase){
+	
 	if (gameBase->TriggerKey(DIK_J)) {
-		
-		if (gameBase->TriggerKey(DIK_J)) {
-			Vector3 direction = {1.0f, 0.0f, 0.0f}; // 前方方向
-			bullet_ = new PlayerBullet();
+			Vector3 direction = {1.0f, 0.0f, 0.0f};
+			
 			bullet_->Initialize(gameBase, camera_, transform_.translate, direction);
-		}
-		
 	}
+	if (gameBase->PushKey(DIK_J)) {
+	
+		if (bullet_) {
+			bullet_->Charge(transform_.translate);
+		}
+	}
+	if (gameBase->ReleaseKey(DIK_J)) {
+		if (bullet_) {
+			bullet_->Fire();
+		}
+	}
+		
 	
 }
 void Player::Update(GameBase* gameBase){
@@ -117,16 +127,16 @@ void Player::Update(GameBase* gameBase){
 	playerObject_->SetTranslate(transform_.translate);
 	playerObject_->Update();
 	playerObject_->SetCamera(camera_);
-	if (bullet_) {
-		bullet_->Update(gameBase);
-	}
+	//if (bullet_) {
+	//	bullet_->Update(gameBase);
+	//}
 
 }
 void Player::Draw(GameBase* gameBase) {
 	
 	gameBase->ModelCommonSet();
 	playerObject_->Draw();
-	if (bullet_) {
-	bullet_->Draw(gameBase);
-	}
+	//if (bullet_) {
+	//bullet_->Draw(gameBase);
+	//}
 }

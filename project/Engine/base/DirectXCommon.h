@@ -16,7 +16,7 @@
 #include <chrono>
 
 #include "WinApp.h"
-#include "imGuiM.h"
+
 #include "Vector4.h"
 #include "Vector3.h"
 #include "Vector2.h"
@@ -206,7 +206,7 @@ class DirectXCommon {
 	
 	BlendModeManeger blendModeManeger_;
 	WinApp* winApp_ = nullptr;
-	/*imGuiM imguiM_;*/
+	
 
 	std::chrono::steady_clock::time_point reference_;
 
@@ -235,6 +235,7 @@ public:
 	ID3D12Device* GetDevice() { return device_.Get(); };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
 	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return srvDescriptorHeap_.Get(); };
+	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc_; }
 	
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCpuDescriptorHandle(uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGpuDescriptorHandle(uint32_t index);
@@ -248,7 +249,7 @@ public:
 	ID3D12RootSignature* GetParticleRootSignature() const { return particleRootSignature_.Get(); }
 	ID3D12PipelineState* GetParticlePipelineState(BlendMode mode) const { return particlePipelineState_[static_cast<int>(mode)].Get(); }
 	D3D12_GPU_VIRTUAL_ADDRESS GetMaterialResourceGPUVA() const { return materialResource_->GetGPUVirtualAddress(); }
-	ID3D12DescriptorHeap* GetSrvHeap() const { return srvDescriptorHeap_.Get(); }
+	size_t GetSwapChainResourcesNum() const { return swapChainResources_.size(); }
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader( // CompilerするShaderファイルへのパス
 	    const std::wstring& filePath,
 	    // Compilerに使用するProfile
@@ -300,6 +301,7 @@ private:
 
 	void SetupPSO();
 	void SetupParticlePSO();
+	
 	
 	static D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 	static D3D12_CPU_DESCRIPTOR_HANDLE GetCpuDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);

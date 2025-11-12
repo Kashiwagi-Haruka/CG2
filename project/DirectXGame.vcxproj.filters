@@ -69,7 +69,7 @@
     <ClCompile Include="Engine\base\GameBase.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ImGui\imGuiM.cpp">
+    <ClCompile Include="Engine\ImGui\ImGuiManager.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Camera\Camera.cpp">
@@ -196,7 +196,7 @@
     <ClInclude Include="Engine\base\GameBase.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ImGui\imGuiM.h">
+    <ClInclude Include="Engine\ImGui\ImGuiManager.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\math\Matrix4x4.h">

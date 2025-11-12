@@ -14,6 +14,7 @@ class SrvManager;
 class SpriteCommon;
 class Object3dCommon;
 class ModelCommon;
+class ImGuiManager;
 
 class GameBase{
 
@@ -29,6 +30,7 @@ private:
 	SpriteCommon* spriteCommon_ = nullptr;
 	Object3dCommon* obj3dCommon_ = nullptr;
 	
+	ImGuiManager* imguiM_ = nullptr;
 	
 	HRESULT hr_;
 	

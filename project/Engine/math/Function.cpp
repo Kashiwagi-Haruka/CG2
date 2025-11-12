@@ -248,7 +248,9 @@ Matrix4x4 MakeIdentity4x4() {
 }
 float Dot(const Vector3& v1, const Vector3& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;}
 
-}
+Vector3 Distance(const Vector3& pos1, const Vector3& pos2) { return {pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z}; }
+
+} // namespace Function
 Vector3 operator+ (const Vector3& v1, const Vector3& v2) { return {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
 Vector3 operator-(const Vector3& v1, const Vector3& v2) {return {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};}
 Vector3 operator*(const Vector3& v, float scalar) { return {v.x * scalar, v.y * scalar, v.z * scalar}; }

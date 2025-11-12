@@ -23,8 +23,9 @@ void PlayerBullet::Initialize(GameBase* gameBase,Camera* camera, Vector3 emitPos
 	camera_ = camera;
 	bulletObject_->SetCamera(camera_);
 	lineObject_->SetCamera(camera_);
-	transform_.translate = emitPos;
-	bulletObject_->SetTranslate(transform_.translate);
+	bulletTransform_.translate = emitPos;
+	lineTransform_.translate = emitPos;
+	bulletObject_->SetTranslate(bulletTransform_.translate);
 	direction_ = direction;
 	bulletObject_->Update();
 	lineObject_->Update();
@@ -34,20 +35,31 @@ void PlayerBullet::Update(GameBase* gameBase) {
 	
 	
 }
+void PlayerBullet::Charge(Vector3 playerPos) {
+	bulletTransform_.translate += direction_ * 0.1f;
+	bulletObject_->SetTranslate(bulletTransform_.translate);
+
+	bulletObject_->Update();
+	lineTransform_.scale = {Function::Distance(playerPos, bulletTransform_.translate).x, 0.1f, 0.1f};
+	lineTransform_.translate = playerPos + Function::Distance(playerPos, bulletTransform_.translate) * 0.5f;
+
+	lineObject_->SetScale(lineTransform_.scale);
+	lineObject_->SetRotate(lineTransform_.rotate);
+	lineObject_->SetTranslate(lineTransform_.translate);
+	lineObject_->Update();
+
+
+}
 void PlayerBullet::Fire(){
 
-
-
-	transform_.translate += direction_ * 0.1f;
-	bulletObject_->SetTranslate(transform_.translate);
+	bulletTransform_.translate += direction_ * 0.1f;
+	bulletObject_->SetTranslate(bulletTransform_.translate);
 
 	bulletObject_->Update();
 }
 
-
-
 void PlayerBullet::Draw(GameBase* gameBase) {
 
 	bulletObject_->Draw();
-	
+	lineObject_->Draw();
 }

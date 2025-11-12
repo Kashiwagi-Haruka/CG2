@@ -431,14 +431,7 @@ void DirectXCommon::ScissorRectInitialize(){
 	scissorRect_.bottom = WinApp::kClientHeight;
 
 }
-void DirectXCommon::ImGuiInitialize(){
 
-
-	// ImGui 初期化はここで！
-	/*imguiM_.MInitialize(winApp_->GetHwnd(), device_.Get(), swapChainDesc_, rtvDesc_, srvDescriptorHeap_.Get());*/
-
-
-}
 
 void DirectXCommon::PreDraw() {
 
@@ -460,14 +453,11 @@ void DirectXCommon::PreDraw() {
 
 	// ④ バックバッファへのバリア & RTV 設定 & クリア
 	DrawCommandList();
-
-	// ⑤ ImGui 準備
-	/*imguiM_.NewFrame();*/
 	
 }
 void DirectXCommon::PostDraw() {
 
-	/*imguiM_.Render(srvDescriptorHeap_.Get(), commandList_.Get());*/
+	
 
 	// RenderTarget→Present に戻す
 	CrtvTransitionBarrier(); // バリア遷移 :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
@@ -700,7 +690,7 @@ void DirectXCommon::SetDirectionalLightData(const DirectionalLight& directionalL
 	}
 }
 void DirectXCommon::Finalize() {
-	/*imguiM_.Finalize();*/
+	
 
 	if (fenceEvent_) {
 		CloseHandle(fenceEvent_);

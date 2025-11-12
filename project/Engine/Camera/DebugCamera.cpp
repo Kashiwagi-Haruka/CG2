@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "DebugCamera.h"
 #include "Input.h"
-#include "imGuiM.h"
+#include "ImGuiManager.h"
 void DebugCamera::Initialize() {
 	// ViewMatrixの作成
 	Matrix4x4 cameraMatrix = Function::MakeAffineMatrix(

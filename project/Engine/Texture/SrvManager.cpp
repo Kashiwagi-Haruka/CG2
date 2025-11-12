@@ -1,5 +1,6 @@
 #include "SrvManager.h"
 #include "DirectXCommon.h"
+#include <cassert>
 const uint32_t SrvManager::kMaxSRVCount_ = 512;
 void SrvManager::Initialize(DirectXCommon* dxCommon){ 
 	directXCommon_ = dxCommon; 

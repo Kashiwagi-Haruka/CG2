@@ -1,6 +1,7 @@
 #include "Object3dCommon.h"
 #include "DirectXCommon.h"
 #include "Logger.h"
+#include <cassert>
 void Object3dCommon::Initialize(DirectXCommon* dxCommon){ 
 	dxCommon_ = dxCommon;
 	CreateGraphicsPipeline();

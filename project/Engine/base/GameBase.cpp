@@ -9,6 +9,7 @@
 #include "TextureManager.h" 
 #include "SrvManager.h"
 #include "ParticleManager.h"
+#include "ImGuiManager.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -24,6 +25,8 @@ GameBase::~GameBase(){
 	ModelManeger::GetInstance()->Finalize();
 	ParticleManager::GetInstance()->Finalize();
 	TextureManager::GetInstance()->Finalize();
+	imguiM_->Finalize();
+	delete imguiM_;
 	delete srvManager_;
 	delete dxCommon_;
 	delete winApp_;
@@ -38,6 +41,8 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	dxCommon_->initialize(winApp_);
 	srvManager_ = new SrvManager();
 	srvManager_->Initialize(dxCommon_);
+	imguiM_ = new ImGuiManager();
+	imguiM_->Initialize(winApp_, dxCommon_, srvManager_);
 	TextureManager::GetInstance()->Initialize(dxCommon_,srvManager_);
 	ParticleManager::GetInstance()->Initialize(dxCommon_, srvManager_);
 	dxCommon_->CreateInstancingSRV(srvManager_);
@@ -117,11 +122,15 @@ void GameBase::ModelCommonSet() { obj3dCommon_->DrawCommon(); }
 // 球体用リソース
 void GameBase::BeginFlame() { 
 	dxCommon_->PreDraw();
+	/*imguiM_->NewFrame();*/
 	DInput->Update();
 }
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
-void GameBase::EndFlame() { dxCommon_->PostDraw(); }
+void GameBase::EndFlame() { 
+	/*imguiM_->Render(srvManager_, dxCommon_);*/
+	dxCommon_->PostDraw(); 
+}
 
 SoundData GameBase::SoundLoadWave(const char* filename){
 

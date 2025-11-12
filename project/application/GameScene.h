@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "Object3d.h"
 #include "ParticleEmitter.h"
+#include <imgui.h>
 
 class Player;
 class Enemy;
