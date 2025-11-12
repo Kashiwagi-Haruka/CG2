@@ -16,6 +16,7 @@ void Enemy::Initialize(GameBase* gameBase,Camera* camera) {
 	object_->Initialize(gameBase->GetObject3dCommon());
 	object_->SetModel("Enemy");
 	camera_ = camera;
+	object_->SetTranslate({1.0f, 0.0f, 0.0f});
 	object_->SetCamera(camera_);
 }
 

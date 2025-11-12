@@ -51,6 +51,7 @@ public:
 		
 		Object3d* planeObject_ = nullptr;
 	    Object3d* axisObject_ = nullptr;
+	    
 		
 		ParticleEmitter* particle = nullptr;
 

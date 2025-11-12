@@ -33,7 +33,8 @@ class Player {
 
 	Transform transform_;
 
-	Object3d* object_;
+	Object3d* playerObject_ = nullptr;
+	
 	Camera* camera_;
 	PlayerBullet* bullet_;
 

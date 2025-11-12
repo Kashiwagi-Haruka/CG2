@@ -6,33 +6,47 @@
 #include "Camera.h"
 
 PlayerBullet::~PlayerBullet() { 
-	delete object_;
+	delete bulletObject_;
 	
 }
 
 void PlayerBullet::Initialize(GameBase* gameBase,Camera* camera, Vector3 emitPos, Vector3 direction) {
 	ModelManeger::GetInstance()->LoadModel("playerBullet");
-	object_ = new Object3d();
-	object_->Initialize(gameBase->GetObject3dCommon());
-	object_->SetModel("playerBullet");
+	ModelManeger::GetInstance()->LoadModel("Cube");
+	bulletObject_ = new Object3d();
+	lineObject_ = new Object3d();
+	bulletObject_->Initialize(gameBase->GetObject3dCommon());
+	lineObject_->Initialize(gameBase->GetObject3dCommon());
+	bulletObject_->SetModel("playerBullet");
+	lineObject_->SetModel("Cube");
 	camera_ = camera;
-	object_->SetCamera(camera_);
+	bulletObject_->SetCamera(camera_);
+	lineObject_->SetCamera(camera_);
 	transform_.translate = emitPos;
-	object_->SetTranslate(transform_.translate);
+	bulletObject_->SetTranslate(transform_.translate);
 	direction_ = direction;
-	object_->Update();
+	bulletObject_->Update();
+	lineObject_->Update();
 }
 
 void PlayerBullet::Update(GameBase* gameBase) { 
 	
-	transform_.translate += direction_ * 0.1f;
-	object_->SetTranslate(transform_.translate);
 	
-	object_->Update();
 }
+void PlayerBullet::Fire(){
+
+
+
+	transform_.translate += direction_ * 0.1f;
+	bulletObject_->SetTranslate(transform_.translate);
+
+	bulletObject_->Update();
+}
+
+
 
 void PlayerBullet::Draw(GameBase* gameBase) {
 
-	object_->Draw();
-
+	bulletObject_->Draw();
+	
 }

@@ -34,10 +34,13 @@ void GameScene::Initialize(GameBase* gameBase) {
 	axisObject_ = new Object3d();
 	ModelManeger::GetInstance()->LoadModel("plane");
 	ModelManeger::GetInstance()->LoadModel("axis");
+	
 	axisObject_->Initialize(gameBase->GetObject3dCommon());
 	planeObject_->Initialize(gameBase->GetObject3dCommon());
+	
 	planeObject_->SetModel("plane");
 	axisObject_->SetModel("axis");
+	
 	ParticleManager::GetInstance()->CreateParticleGroup("test", "Resources/2d/uvChecker.png");
 
 	particle = new ParticleEmitter("test", {0, 0, 0}, 10, 5);

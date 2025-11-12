@@ -8,7 +8,7 @@ Player::~Player(){
 	if (bullet_) {
 	delete bullet_;
 	}
-	delete object_;
+	delete playerObject_;
 	
 	
 }
@@ -22,11 +22,15 @@ void Player::Initialize(GameBase* gameBase,Camera* camera){
 		.translate{0.0f, 0.0f, 0.0f}
 	};
 	ModelManeger::GetInstance()->LoadModel("playerModel");
-	object_ = new Object3d();
-	object_->Initialize(gameBase->GetObject3dCommon());
-	object_->SetModel("playerModel");
+	
+	playerObject_ = new Object3d();
+	
+	playerObject_->Initialize(gameBase->GetObject3dCommon());
+	
+	playerObject_->SetModel("playerModel");
+	
 	camera_ = camera;
-	object_->SetCamera(camera_);
+	playerObject_->SetCamera(camera_);
 	
 }
 void Player::Move(GameBase* gameBase){
@@ -108,11 +112,11 @@ void Player::Update(GameBase* gameBase){
 	Attack(gameBase);
 	
 	
-	object_->SetScale(transform_.scale);
-	object_->SetRotate(transform_.rotate);
-	object_->SetTranslate(transform_.translate);
-	object_->Update();
-	object_->SetCamera(camera_);
+	playerObject_->SetScale(transform_.scale);
+	playerObject_->SetRotate(transform_.rotate);
+	playerObject_->SetTranslate(transform_.translate);
+	playerObject_->Update();
+	playerObject_->SetCamera(camera_);
 	if (bullet_) {
 		bullet_->Update(gameBase);
 	}
@@ -121,7 +125,7 @@ void Player::Update(GameBase* gameBase){
 void Player::Draw(GameBase* gameBase) {
 	
 	gameBase->ModelCommonSet();
-	object_->Draw();
+	playerObject_->Draw();
 	if (bullet_) {
 	bullet_->Draw(gameBase);
 	}

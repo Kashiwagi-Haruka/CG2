@@ -7,7 +7,7 @@ CameraController::~CameraController() {
 void CameraController::Initialize() {
 
 	camera_ = new Camera();
-	camera_->SetTranslate({0, 0, -50});
+	camera_->SetTranslate({0, 10, -50});
 }
 void CameraController::Update() {
 
