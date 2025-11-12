@@ -6,6 +6,7 @@
 #include "Camera.h"
 
 PlayerBullet::~PlayerBullet() { 
+	delete lineObject_;
 	delete bulletObject_;
 	
 }
