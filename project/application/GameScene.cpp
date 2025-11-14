@@ -4,9 +4,11 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "CameraController.h"
+#include "Skydome.h"
 GameScene::~GameScene(){
 	delete enemy;
 	delete player;
+	delete skydome;
 	delete sprite;
 	delete sprite2_;
 	delete planeObject_;
@@ -54,7 +56,8 @@ void GameScene::Initialize(GameBase* gameBase) {
 	spriteTexSize = {200,200};
 	spriteTexSize2 = {200, 500};
 
-
+	skydome = new Skydome();
+	skydome->Initialize(gameBase, cameraController->GetCamera());
 	player = new Player();
 	player->Initialize(gameBase,cameraController->GetCamera());
 	enemy = new Enemy();
@@ -63,23 +66,9 @@ void GameScene::Initialize(GameBase* gameBase) {
 
 void GameScene::Update(GameBase* gameBase) {
 
-
-	// WVP行列を作成
-	
-	Transform transforms[10];
-	for (uint32_t index = 0; index < 10; ++index) {
-		transforms[index].scale = {0.5f, 0.5f, 0.5f};
-		transforms[index].rotate = {0.0f, 0.0f, 0.0f};
-		transforms[index].translate = {index * 0.1f, index * 0.1f, index * 0.1f};
-	}
-
-
-
-	
-
 	cameraController->Update();
-
-
+	skydome->Update();
+#ifdef USE_IMGUI
 	//ImGui::Begin("Plane");
 	//ImGui::Text("Transform");
 	//ImGui::DragFloat3("Scale", &planeTransform.scale.x, 0.01f);
@@ -127,20 +116,20 @@ void GameScene::Update(GameBase* gameBase) {
 
 	ImGui::End();*/
 
-	/*if (ImGui::Begin("Sprite Debug")) {
-
-		ImGui::DragFloat3("Scale", &spriteTransform.scale.x, 1.0f, 0.1f, 10000.0f);
-		ImGui::DragFloat3("Rotation", &spriteTransform.rotate.x, 0.01f);
-		ImGui::DragFloat3("Position", &spriteTransform.translate.x, 1.0f);
+	if (ImGui::Begin("Sprite Debug")) {
+		ImGui::SetWindowSize(ImVec2(500, 100));
+		ImGui::DragFloat3("Scale", &spriteTransform.scale.x, 1.0f, 0.1f, 9999.0f, "%4.1f");
+		ImGui::DragFloat3("Rotation", &spriteTransform.rotate.x, 0.01f, 0.1f, 9999.0f, "%4.1f");
+		ImGui::DragFloat3("Position", &spriteTransform.translate.x, 1.0f, 0.1f, 9999.0f, "%4.1f");
 		ImGui::DragFloat2("TextureSize", &spriteTexSize.x, 1.0f);
 	}
-	ImGui::End();*/
+	ImGui::End();
 	sprite->SetTextureRange({0.0f, 0.0f}, spriteTexSize);
 	sprite->SetScale(spriteTransform.scale);
 	sprite->SetRotation(spriteTransform.rotate);
 	sprite->SetPosition(spriteTransform.translate);
 
-	/*if (ImGui::Begin("Sprite2 Debug")) {
+	if (ImGui::Begin("Sprite2 Debug")) {
 
 		ImGui::DragFloat3("Scale2", &sprite2Transform.scale.x, 1.0f, 0.1f, 10000.0f);
 		ImGui::DragFloat3("Rotation2", &sprite2Transform.rotate.x, 0.01f);
@@ -149,7 +138,7 @@ void GameScene::Update(GameBase* gameBase) {
 	}
 	ImGui::End();
 
-	if (ImGui::Begin("plane")) {
+	/*if (ImGui::Begin("plane")) {
 		ImGui::DragFloat3("planeScale", &planeTransform.scale.x, 1.0f, 0.1f, 10000.0f);
 		ImGui::DragFloat3("planeRotation", &planeTransform.rotate.x, 0.01f);
 		ImGui::DragFloat3("planePosition", &planeTransform.translate.x, 1.0f);
@@ -158,12 +147,13 @@ void GameScene::Update(GameBase* gameBase) {
 	planeObject_->SetScale(planeTransform.scale);
 	planeObject_->SetRotate(planeTransform.rotate);
 	planeObject_->SetTranslate(planeTransform.translate);
-	/*if (ImGui::Begin("axis")) {
+	if (ImGui::Begin("axis")) {
 		ImGui::DragFloat3("axisScale", &axisTransform.scale.x, 1.0f, 0.1f, 10000.0f);
 		ImGui::DragFloat3("axisRotation", &axisTransform.rotate.x, 0.01f);
 		ImGui::DragFloat3("axisPosition", &axisTransform.translate.x, 1.0f);
 	}
-	ImGui::End();*/
+	ImGui::End();
+	#endif
 	axisObject_->SetScale(axisTransform.scale);
 	axisObject_->SetRotate(axisTransform.rotate);
 	axisObject_->SetTranslate(axisTransform.translate);
@@ -185,13 +175,13 @@ void GameScene::Update(GameBase* gameBase) {
 void GameScene::Draw(GameBase* gameBase) {
 
 	gameBase->ModelCommonSet();
+	skydome->Draw(gameBase);
 	player->Draw(gameBase);
 	enemy->Draw(gameBase);
 	
 	//planeObject_->Draw();
 	//axisObject_->Draw();
-	/*gameBase->DrawParticle(modelData.vertices, color, ModelTextureHandle, ParticleWVPMatrix, ParticleWorldMatrix, 10);*/
-	/*ParticleManager::GetInstance()->Draw();*/
+	ParticleManager::GetInstance()->Draw();
 		
 
 		/*if (IsKeyboard) {

@@ -8,6 +8,7 @@
 class Player;
 class Enemy;
 class CameraController;
+class Skydome;
 
 class GameScene {
 
@@ -35,9 +36,9 @@ public:
             .translate{0, 0, 0}
         };
 	    Transform spriteTransform{
-	        .scale{1, 1, 1},
+	        .scale{500, 500, 1},
             .rotate{0, 0, 0},
-            .translate{0, 0, 0}
+            .translate{100, 100, 0}
         };
 	    Transform sprite2Transform{
 	        .scale{1, 1, 1},
@@ -74,6 +75,7 @@ public:
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
 	CameraController* cameraController = nullptr;
+	Skydome* skydome = nullptr;
     
     ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白
 	DirectionalLight light{
