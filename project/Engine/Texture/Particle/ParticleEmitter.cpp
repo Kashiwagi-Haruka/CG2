@@ -4,8 +4,9 @@
 // -----------------------------------------
 // コンストラクタ
 // -----------------------------------------
-ParticleEmitter::ParticleEmitter(const std::string& groupName, const Vector3& pos, float emitFrequency, uint32_t emitCount)
-    : name(groupName), position(pos), frequency(emitFrequency), count(emitCount), timer(0.0f) // 明示する
+ParticleEmitter::ParticleEmitter(
+    const std::string& groupName, const Vector3& pos, float emitFrequency, uint32_t emitCount, Vector3 acceleration, Vector3 areaMin, Vector3 areaMax)
+    : name(groupName), position(pos), frequency(emitFrequency), count(emitCount), acceleration_(acceleration),areaMin_(areaMin),areaMax_(areaMax), timer(0.0f) // 明示する
 {}
 
 void ParticleEmitter::Update(const Transform& transform) {
@@ -14,6 +15,8 @@ void ParticleEmitter::Update(const Transform& transform) {
 
 	// === 2. 発生条件チェック ===
 	while (timer >= 1.0f) {
+		ParticleManager::GetInstance()->SetFieldAcceleration(acceleration_); 
+		ParticleManager::GetInstance()->SetFieldArea(AABB(areaMin_, areaMax_));
 
 		// === 3. Emit（座標は transform.translate を使用）===
 		ParticleManager::GetInstance()->Emit(name, transform.translate, count);

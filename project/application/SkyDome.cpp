@@ -1,0 +1,28 @@
+#include "SkyDome.h"
+#include "GameBase.h"
+#include "ModelManeger.h"
+#include "Camera.h"
+
+SkyDome::~SkyDome() {
+	delete skyDomeObject_; }
+
+void SkyDome::Initialize(GameBase* gameBase, Camera* camera) {
+	ModelManeger::GetInstance()->LoadModel("skyDome");
+	skyDomeObject_ = new Object3d();
+	skyDomeObject_->Initialize(gameBase->GetObject3dCommon());
+	skyDomeObject_->SetModel("skyDome");
+	camera_ = camera;
+	skyDomeObject_->SetCamera(camera_);
+	transform_.scale = {100.0f, 100.0f, 100.0f};
+	transform_.rotate = {0.0f, 0.0f, 0.0f};
+	transform_.translate = {0.0f, 30.0f, 0.0f};
+	skyDomeObject_->SetTransform(transform_);
+	skyDomeObject_->Update();
+}
+void SkyDome::Update(GameBase* gameBase) {
+	skyDomeObject_->SetCamera(camera_);
+	
+	skyDomeObject_->Update();
+}
+void SkyDome::Draw() {
+	skyDomeObject_->Draw(); }

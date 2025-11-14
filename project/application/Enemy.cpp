@@ -22,6 +22,7 @@ void Enemy::Initialize(GameBase* gameBase,Camera* camera) {
 
 void Enemy::Update(GameBase* gameBase) {
 	// 敵の更新処理
+	object_->SetCamera(camera_);
 	object_->Update();
 }
 

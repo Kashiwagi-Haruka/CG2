@@ -195,7 +195,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Player.cpp" />
     <ClCompile Include="application\PlayerBullet.cpp" />
     <ClCompile Include="application\MapchipField.cpp" />
-    <ClCompile Include="Skydome.cpp" />
+    <ClCompile Include="application\SkyDome.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -256,7 +256,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Player.h" />
     <ClInclude Include="application\PlayerBullet.h" />
     <ClInclude Include="application\MapchipField.h" />
-    <ClInclude Include="Skydome.h" />
+    <ClInclude Include="application\SkyDome.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

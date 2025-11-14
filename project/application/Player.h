@@ -34,6 +34,7 @@ class Player {
 	Transform transform_;
 
 	Object3d* playerObject_ = nullptr;
+
 	
 	Camera* camera_;
 	PlayerBullet* bullet_;
@@ -46,5 +47,6 @@ class Player {
 	void Attack(GameBase* gameBase);
 	void Update(GameBase* gameBase);
 	void Draw(GameBase* gameBase);
+	void SetCamera(Camera* camera) { camera_ = camera;}
 
 };

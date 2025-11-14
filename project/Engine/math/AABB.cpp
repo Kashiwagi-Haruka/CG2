@@ -3,9 +3,11 @@
 #include "Function.h"
 #include <algorithm>
 
-
-
-bool AABBox::isCollision(const AABB& aabb1, const AABB& aabb2) {
+namespace AABBox {
+bool IsCollision(const AABB& aabb, const Vector3& point) {
+	return (point.x >= aabb.min.x && point.x <= aabb.max.x && point.y >= aabb.min.y && point.y <= aabb.max.y && point.z >= aabb.min.z && point.z <= aabb.max.z);
+}
+bool isCollision(const AABB& aabb1, const AABB& aabb2) {
 	// 各軸で重なっているか確認（Separating Axis Theoremの基本）
 	if (aabb1.max.x < aabb2.min.x || aabb1.min.x > aabb2.max.x) {
 	
@@ -23,7 +25,7 @@ bool AABBox::isCollision(const AABB& aabb1, const AABB& aabb2) {
 	// 全軸で重なっているので当たっている
 	return true;
 }
-bool AABBox::isCollision(const AABB& aabb, const Sphere& sphere) {
+bool isCollision(const AABB& aabb, const Sphere& sphere) {
 	// 最近接点をAABB内から計算（クランプ）
 	Vector3 closestPoint;
 
@@ -39,7 +41,7 @@ bool AABBox::isCollision(const AABB& aabb, const Sphere& sphere) {
 	// 球の半径の2乗と比較
 	return distanceSquared <= (sphere.radius * sphere.radius);
 }
-bool AABBox::isCollision(const AABB& aabb, const Segment& segment) {
+bool isCollision(const AABB& aabb, const Segment& segment) {
 	// 線分の始点と終点
 	Vector3 p0 = segment.origin;
 	Vector3 p1 = segment.diff;
@@ -79,7 +81,7 @@ bool AABBox::isCollision(const AABB& aabb, const Segment& segment) {
 	return true;
 }
 
-void AABBox::DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
 	
 
 	// 8頂点定義（ワールド座標）
@@ -123,4 +125,5 @@ void AABBox::DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, c
 	//	const Vector3& v1 = vertices[lines[i][1]];
 	//	Novice::DrawLine(static_cast<int>(v0.x), static_cast<int>(v0.y), static_cast<int>(v1.x), static_cast<int>(v1.y), color);
 	//}
+}
 }

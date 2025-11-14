@@ -27,6 +27,7 @@ public:
 	
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
+	void SetTransform(const Transform& transform) { transform_ = transform; }
 	void SetFovY(float fovY) { this->fovY = fovY; }
 	void SetAspectRatio(float aspectRatio) { this->aspectRatio = aspectRatio; }
 	void SetNearClip(float nearZ) { this->nearZ = nearZ; }
@@ -40,4 +41,5 @@ public:
 
 	const Vector3& GetRotate() const { return transform_.rotate; }
 	const Vector3& GetTranslate() const { return transform_.translate; }
+	const Transform& GetTransform() const { return transform_; }
 };

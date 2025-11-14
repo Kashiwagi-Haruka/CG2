@@ -14,7 +14,6 @@ class Object3dCommon;
 class Model;
 class Object3d {
 
-
 	struct alignas(256) TransformationMatrix {
 		Matrix4x4 WVP;   // 64 バイト
 		Matrix4x4 World; // 64 バイト
@@ -23,9 +22,9 @@ class Object3d {
 	};
 
 	Transform transform_ = {
-	{1.0f,1.0f,1.0f},
-	{0.0f,0.0f,0.0f},
-	{0.0f,0.0f,0.0f},
+	    {1.0f, 1.0f, 1.0f},
+	    {0.0f, 0.0f, 0.0f},
+	    {0.0f, 0.0f, 0.0f},
 	};
 	Transform cameraTransform_ = {
 	    {1.0f, 1.0f, 1.0f  }, // スケール
@@ -38,30 +37,26 @@ class Object3d {
 		float intensity;
 	};
 
-
 	int color = 0xffffffff;
-
 
 	Camera* camera_;
 
 	Object3dCommon* obj3dCommon_;
 	DirectionalLight* directionalLightData_ = nullptr;
-	
+
 	TransformationMatrix* transformationMatrixData_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 
-
 	Model* model_ = nullptr;
 
-	public:
-
+public:
 	void Initialize(Object3dCommon* modelCommon);
-	    void Update();
+	void Update();
 	void Draw();
-	
+
 	void CreateResources();
 	void SetModel(const std::string& filePath);
 
@@ -70,8 +65,10 @@ class Object3d {
 	void SetTranslate(Vector3 translate);
 	void SetRotate(Vector3 Rotate);
 	void SetScale(Vector3 Scale);
+	void SetTransform(Transform transform) { transform_ = transform; }
 
 	Vector3 GetTranslate() { return transform_.translate; }
 	Vector3 GetRotate() { return transform_.rotate; }
 	Vector3 GetScale() { return transform_.scale; }
+	Transform GetTransform() { return transform_; }
 };

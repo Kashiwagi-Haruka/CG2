@@ -32,13 +32,12 @@ struct AABB {
 };
 
 
-class AABBox {
+namespace AABBox {
 
-	
-	
-
-
-public:
+	// -----------------------------------------
+	// AABB と 点 の当たり判定
+	// -----------------------------------------
+bool IsCollision(const AABB& aabb, const Vector3& point);
 
 	bool isCollision(const AABB& aabb1, const AABB& aabb2);
 	bool isCollision(const AABB& aabb, const Sphere& sphere);

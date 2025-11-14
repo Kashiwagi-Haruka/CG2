@@ -4,7 +4,7 @@
 #include "SrvManager.h"
 #include "VertexData.h"
 #include "Camera.h"
-
+#include <numbers>
 
 ParticleManager* ParticleManager::instance = nullptr;
 
@@ -122,18 +122,19 @@ void ParticleManager::Update(Camera* camera) {
 	const Matrix4x4& view = camera->GetViewMatrix();
 	const Matrix4x4& proj = camera->GetProjectionMatrix();
 
-	// ==== ビルボード行列計算 ====
-	// view の回転成分だけ抜き取り正規化したものを使う
-	Matrix4x4 billboard{};
-	{
-		billboard = view;
-		billboard.m[3][0] = 0.0f;
-		billboard.m[3][1] = 0.0f;
-		billboard.m[3][2] = 0.0f;
-		billboard.m[3][3] = 1.0f;
-		// 逆行列を使う（回転のみ）
-		billboard = Function::Inverse(billboard);
-	}
+	
+	Matrix4x4 backToFrontMatrix = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
+	// ==== カメラの向きだけを取り出す（平行移動なし逆行列） ====
+	Matrix4x4 camWorld = Function::Inverse(camera->GetViewMatrix());
+
+	// 平行移動を消す
+	camWorld.m[3][0] = 0.0f;
+	camWorld.m[3][1] = 0.0f;
+	camWorld.m[3][2] = 0.0f;
+	
+
+	// ==== これが正しいビルボード行列 ====
+	Matrix4x4 billboard = camWorld;
 
 	// ==== 全てのパーティクルグループを処理 ====
 	for (auto& [name, group] : particleGroups) {
@@ -156,23 +157,22 @@ void ParticleManager::Update(Camera* camera) {
 				it = group.particles.erase(it);
 				continue;
 			}
-
-			// --- 重力処理 ---
-			p.vel[1] -= 0.02f;
-
+			if (AABBox::IsCollision(accelerationField.area, {it->pos[0], it->pos[1], it->pos[2]})) {
+			p.vel[0] += accelerationField.Acceleation.x;
+			p.vel[1] += accelerationField.Acceleation.y;
+			p.vel[2] += accelerationField.Acceleation.z;
+			}
 			// --- 移動処理 ---
 			p.pos[0] += p.vel[0];
 			p.pos[1] += p.vel[1];
 			p.pos[2] += p.vel[2];
 
-			// --- 経路計算（必要なら後で差し替える場所） ---
-			// 例：カーブ、揺れ、スケール変化とか
-			// p.pos[0] += sin(p.life * 0.1f) * 0.01f;
+
 
 			// ---- ワールド行列計算（ビルボード適用）----
 			Matrix4x4 translate = Function::MakeTranslateMatrix(p.pos[0], p.pos[1], p.pos[2]);
 
-			Matrix4x4 world = Function::Multiply(billboard, translate); // ビルボードを先に掛ける
+			Matrix4x4 world = Function::Multiply(billboard,translate); // ビルボードを先に掛ける
 
 			// --- WVP計算 ---
 			Matrix4x4 wvp = Function::Multiply(Function::Multiply(world, view), proj);
@@ -286,14 +286,10 @@ void ParticleManager::Emit(const std::string& name, const Vector3& position, uin
 		Particle p{};
 
 		// 初期位置
-		p.pos[0] = position.x;
-		p.pos[1] = position.y;
-		p.pos[2] = position.z;
+		p.pos[0] = position.x+((float(rand()) / float(RAND_MAX))* 5.0f);
+		p.pos[1] = position.y + ((float(rand()) / float(RAND_MAX)) * 5.0f);
+		p.pos[2] = position.z+((float(rand()) / float(RAND_MAX)) * 5.0f);
 
-		// 速度（ランダム：仕様どおり）
-		p.vel[0] = (float(rand()) / float(RAND_MAX) - 0.5f) * 0.1f;
-		p.vel[1] = (float(rand()) / float(RAND_MAX)) * 0.2f + 0.1f;
-		p.vel[2] = (float(rand()) / float(RAND_MAX) - 0.5f) * 0.1f;
 
 		// 寿命（仕様書の指定）
 		p.life = 60.0f;

@@ -16,6 +16,6 @@ public:
 	void Initialize(GameBase* gameBase,Camera* camera);
 	void Update(GameBase* gameBase);
 	void Draw(GameBase* gameBase);
-
+	void SetCamera(Camera* camera) { camera_ = camera;}
 
 };

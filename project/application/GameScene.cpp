@@ -4,11 +4,11 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "CameraController.h"
-#include "Skydome.h"
+#include "SkyDome.h"
 GameScene::~GameScene(){
 	delete enemy;
 	delete player;
-	delete skydome;
+	delete skyDome;
 	delete sprite;
 	delete sprite2_;
 	delete planeObject_;
@@ -31,6 +31,7 @@ void GameScene::Initialize(GameBase* gameBase) {
 	cameraController = new CameraController();
 	cameraController->Initialize();
 	
+
 	gameBase->SetDefaultCamera(cameraController->GetCamera());
 	planeObject_ = new Object3d();
 	axisObject_ = new Object3d();
@@ -45,7 +46,7 @@ void GameScene::Initialize(GameBase* gameBase) {
 	
 	ParticleManager::GetInstance()->CreateParticleGroup("test", "Resources/2d/uvChecker.png");
 
-	particle = new ParticleEmitter("test", {0, 0, 0}, 10, 5);
+	particle = new ParticleEmitter("test", {0, 0, 0}, 1, 1);
 
 	color = (uint8_t(meshColor.w * 255) << 24) | // A
 	        (uint8_t(meshColor.x * 255) << 16) | // R
@@ -56,8 +57,9 @@ void GameScene::Initialize(GameBase* gameBase) {
 	spriteTexSize = {200,200};
 	spriteTexSize2 = {200, 500};
 
-	skydome = new Skydome();
-	skydome->Initialize(gameBase, cameraController->GetCamera());
+	
+	skyDome = new SkyDome();
+	skyDome->Initialize(gameBase, cameraController->GetCamera());
 	player = new Player();
 	player->Initialize(gameBase,cameraController->GetCamera());
 	enemy = new Enemy();
@@ -67,7 +69,11 @@ void GameScene::Initialize(GameBase* gameBase) {
 void GameScene::Update(GameBase* gameBase) {
 
 	cameraController->Update();
-	skydome->Update();
+	skyDome->SetCamera(cameraController->GetCamera());
+	player->SetCamera(cameraController->GetCamera());
+	enemy->SetCamera(cameraController->GetCamera());
+	
+	
 #ifdef USE_IMGUI
 	//ImGui::Begin("Plane");
 	//ImGui::Text("Transform");
@@ -115,6 +121,7 @@ void GameScene::Update(GameBase* gameBase) {
 	}
 
 	ImGui::End();*/
+	
 
 	if (ImGui::Begin("Sprite Debug")) {
 		ImGui::SetWindowSize(ImVec2(500, 100));
@@ -167,7 +174,10 @@ void GameScene::Update(GameBase* gameBase) {
         {0, 0, 0},
         {0, 0, 0}
     });
+	
+
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
+	skyDome->Update(gameBase);
 	player->Update(gameBase);
 	enemy->Update(gameBase);
 }
@@ -175,7 +185,7 @@ void GameScene::Update(GameBase* gameBase) {
 void GameScene::Draw(GameBase* gameBase) {
 
 	gameBase->ModelCommonSet();
-	skydome->Draw(gameBase);
+	skyDome->Draw();
 	player->Draw(gameBase);
 	enemy->Draw(gameBase);
 	
@@ -249,7 +259,7 @@ void GameScene::Draw(GameBase* gameBase) {
 
 	gameBase->SpriteCommonSet();
 
-	sprite->Draw();
+	/*sprite->Draw();*/
 	sprite2_->SetTextureRange({0.0f, 0.0f}, spriteTexSize2);
 	sprite2_->SetScale(sprite2Transform.scale);
 	sprite2_->SetRotation(sprite2Transform.rotate);

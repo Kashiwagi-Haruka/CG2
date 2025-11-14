@@ -22,15 +22,20 @@ void Player::Initialize(GameBase* gameBase,Camera* camera){
 		.translate{0.0f, 0.0f, 0.0f}
 	};
 	ModelManeger::GetInstance()->LoadModel("playerModel");
+	ModelManeger::GetInstance()->LoadModel("skyDome");
 	
 	playerObject_ = new Object3d();
 	
+	
 	playerObject_->Initialize(gameBase->GetObject3dCommon());
+	
 	
 	playerObject_->SetModel("playerModel");
 	
+	
 	camera_ = camera;
 	playerObject_->SetCamera(camera_);
+	
 	bullet_ = new PlayerBullet();
 	
 }
@@ -120,13 +125,15 @@ void Player::Update(GameBase* gameBase){
 	Move(gameBase);
 	
 	Attack(gameBase);
-	
+	playerObject_->SetCamera(camera_);
 	
 	playerObject_->SetScale(transform_.scale);
 	playerObject_->SetRotate(transform_.rotate);
 	playerObject_->SetTranslate(transform_.translate);
 	playerObject_->Update();
-	playerObject_->SetCamera(camera_);
+
+	
+	
 	//if (bullet_) {
 	//	bullet_->Update(gameBase);
 	//}
@@ -136,6 +143,7 @@ void Player::Draw(GameBase* gameBase) {
 	
 	gameBase->ModelCommonSet();
 	playerObject_->Draw();
+	
 	//if (bullet_) {
 	//bullet_->Draw(gameBase);
 	//}

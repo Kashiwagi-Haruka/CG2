@@ -8,7 +8,7 @@
 class Player;
 class Enemy;
 class CameraController;
-class Skydome;
+class SkyDome;
 
 class GameScene {
 
@@ -45,6 +45,7 @@ public:
             .rotate{0, 0, 0},
             .translate{0, 0, 0}
         };
+		
 	    Matrix4x4 ParticleWorldMatrix{};
 	    Matrix4x4 ParticleWVPMatrix{};
 
@@ -74,8 +75,9 @@ public:
 
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
+	SkyDome* skyDome = nullptr;
 	CameraController* cameraController = nullptr;
-	Skydome* skydome = nullptr;
+	
     
     ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白
 	DirectionalLight light{
@@ -83,14 +85,8 @@ public:
         .direction{0, 0, 1},
         .intensity{1}
     };
-	Matrix4x4 viewProjectionMatrix;
-
-	// World行列を作る（必要に応じてGameBaseからTransformを使ってもよい）
-	Matrix4x4 worldMatrix;
-	Matrix4x4 fenceWorldMatrix;
 	
-	// WVP行列を作成
-	Matrix4x4 wvpMatrix;
-	Matrix4x4 fenceWvpMatrix;
+
+
 	
 };

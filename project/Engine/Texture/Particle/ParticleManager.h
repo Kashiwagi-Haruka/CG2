@@ -8,12 +8,13 @@
 #include "Matrix4x4.h"
 #include <cstdint>
 #include "BlendModeManeger.h"
-
+#include "Transform.h"
+#include "AABB.h"
 struct Particle {
 	// 各パーティクルの情報（必要に応じて拡張）
-	float pos[3];
-	float vel[3];
-	float life;
+	float pos[3]{};
+	float vel[3]{};
+	float life{};
 };
 
 class SrvManager;
@@ -54,12 +55,25 @@ public:
 	void Update(Camera* camera);
 	void Draw();
 	void Finalize();
+	
+	void SetFieldAcceleration(const Vector3& accel) { accelerationField.Acceleation = accel; }
+
+	void SetFieldArea(const AABB& area) { accelerationField.area = area; }
+
+	const Vector3& GetFieldAcceleration() const { return accelerationField.Acceleation; }
+
+	const AABB& GetFieldArea() const { return accelerationField.area; }
 
 private:
 	struct TransformationMatrix {
 		Matrix4x4 WVP;
 		Matrix4x4 World;
 	};
+	struct AccelerationField {
+		Vector3 Acceleation; // 加速度
+		AABB area;         // 範囲
+	};
+	AccelerationField accelerationField{}; // フィールド
 
 	static ParticleManager* instance;
 	DirectXCommon* dxCommon_ = nullptr;
