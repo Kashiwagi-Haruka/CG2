@@ -7,56 +7,32 @@ const float MapchipField::kTileSize = 1.0f;
 
 MapchipField::MapchipField() {
 
-	// 壁データ
-	for (int y = 0; y < kHeight; y++) {
-		for (int x = 0; x < kWidth; x++) {
-			if (x == 0 || y == 0 || x == kWidth - 1 || y == kHeight - 1) {
-				field[y][x] = 1;
-			} else {
-				field[y][x] = 0;
-			}
-		}
-	}
+	
 
 	// モデル読み込み（map.obj）
 	ModelManeger::GetInstance()->LoadModel("map");
+	fieldObj = new Object3d();
+	
 }
 
-MapchipField::~MapchipField() {
-	for (auto t : tiles)
-		delete t;
-	tiles.clear();
-}
+MapchipField::~MapchipField() { delete fieldObj; }
 
 void MapchipField::Initialize(GameBase* gameBase, Camera* camera) {
 
 	camera_ = camera;
 
-	// ★ 壁タイルだけ Object3d を生成
-	for (int y = 0; y < kHeight; y++) {
-		for (int x = 0; x < kWidth; x++) {
+	transform_ = {
+		.scale{5.0f, 5.0f, 0.0f},
+		.rotate{0.0f, 0.0f, 0.0f},
+		.translate{0.0f, 0.0f, 0.0f}
+    };
 
-			if (field[y][x] == 1) {
-
-				Object3d* obj = new Object3d();
-				obj->Initialize(gameBase->GetObject3dCommon());
-				obj->SetCamera(camera_);
-				obj->SetModel("map");
-
-				// ★ タイルの位置へ移動
-				Transform t;
-				t.scale = {1, 1, 1};
-				t.rotate = {0, 0, 0};
-				t.translate = {x * kTileSize, 0.0f, -y * kTileSize};
-
-				obj->SetScale(t.scale);
-				obj->SetRotate(t.rotate);
-				obj->SetTranslate(t.translate);
-
-				tiles.push_back(obj);
-			}
-		}
-	}
+	
+	fieldObj->Initialize(gameBase->GetObject3dCommon());
+	fieldObj->SetModel("map");
+	fieldObj->SetCamera(camera_);
+	fieldObj->SetTransform(transform_);
+	
 }
 void MapchipField::LoadFromCSV(const std::string& filename) {
 	CSVManager::GetInstance()->LoadCSV(filename);
@@ -73,17 +49,15 @@ void MapchipField::LoadFromCSV(const std::string& filename) {
 	}
 }
 
-void MapchipField::Update() {
-	for (auto t : tiles) {
-		t->Update();
-	}
+void MapchipField::Update() { 
+
+	fieldObj->Update(); 
+
 }
 
 void MapchipField::Draw(GameBase* gameBase) {
 	gameBase->ModelCommonSet();
-	for (auto t : tiles) {
-		t->Draw();
-	}
+	fieldObj->Draw();
 }
 
 bool MapchipField::IsWall(int x, int y) const {
@@ -93,6 +67,10 @@ bool MapchipField::IsWall(int x, int y) const {
 }
 
 void MapchipField::WorldToTile(const Vector3& pos, int& tx, int& ty) {
+
+	// x=横 (右+)
 	tx = (int)floor(pos.x / kTileSize);
-	ty = (int)floor(-pos.z / kTileSize);
+
+	// y=縦 (上+)
+	ty = (int)floor(pos.y / kTileSize);
 }

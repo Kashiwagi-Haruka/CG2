@@ -28,5 +28,5 @@ public:
 	void Update(GameBase* gameBase);
 	void Draw(GameBase* gameBase);
 	void SetCamera(Camera* camera) { camera_ = camera;}
-
+	void BulletCollision();
 };

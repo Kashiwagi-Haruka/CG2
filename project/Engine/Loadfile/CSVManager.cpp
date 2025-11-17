@@ -1,7 +1,7 @@
 #include "CSVManager.h"
 #include <fstream>
 #include <sstream>
-
+#include "Logger.h"
 CSVManager* CSVManager::GetInstance() {
 	static CSVManager instance;
 	return &instance;
@@ -13,7 +13,7 @@ void CSVManager::LoadCSV(const std::string& filename) {
 
 	std::ifstream file(filename);
 	if (!file.is_open()) {
-		printf("CSV ファイルを開けません: %s\n", filename.c_str());
+		Logger::Log("CSV ファイルを開けません\n");
 		return;
 	}
 
@@ -28,8 +28,11 @@ void CSVManager::LoadCSV(const std::string& filename) {
 		while (std::getline(ss, cell, ',')) {
 			if (cell.size() > 0) {
 				row.push_back(std::stoi(cell));
+			} else {
+				row.push_back(0); // ← 空セルでも 0 として扱う
 			}
 		}
+
 
 		if (!row.empty()) {
 			data_.push_back(row);

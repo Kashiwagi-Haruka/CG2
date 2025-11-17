@@ -20,10 +20,9 @@ void CameraController::Update() {
 	#ifdef USE_IMGUI
 
 	if (ImGui::Begin("CameraController")) {
-		ImGui::Text("Transform");
-		ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
-		ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
-		ImGui::DragFloat3("Translate", &transform_.translate.x, 0.1f);
+		ImGui::DragFloat3("CameraScale", &transform_.scale.x, 0.01f);
+		ImGui::DragFloat3("CameraRotate", &transform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("CameraTranslate", &transform_.translate.x, 0.1f);
 	}
 	ImGui::End();
 	

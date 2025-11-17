@@ -23,7 +23,7 @@ GameScene::GameScene() {
 	player = new Player();
 	enemy = new Enemy();
 	field = new MapchipField();
-	field->LoadFromCSV("Resources/MapChip_stage1.csv");
+	
 }
 GameScene::~GameScene(){
 
@@ -70,19 +70,19 @@ void GameScene::Initialize(GameBase* gameBase) {
 	skyDome->Initialize(gameBase, cameraController->GetCamera());
 	player->Initialize(gameBase,cameraController->GetCamera());
 	enemy->Initialize(gameBase, cameraController->GetCamera());
+	field->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field->Initialize(gameBase, cameraController->GetCamera());
 
-	// ★マップ参照を渡す
-	player->SetMap(field);
+
 }
 
 void GameScene::Update(GameBase* gameBase) {
 
-	cameraController->Update();
+	
 	skyDome->SetCamera(cameraController->GetCamera());
 	player->SetCamera(cameraController->GetCamera());
 	enemy->SetCamera(cameraController->GetCamera());
-	field->Update();
+	field->SetCamera(cameraController->GetCamera());
 
 	
 #ifdef USE_IMGUI
@@ -191,6 +191,7 @@ void GameScene::Update(GameBase* gameBase) {
 	skyDome->Update(gameBase);
 	player->Update(gameBase);
 	enemy->Update(gameBase);
+	field->Update();
 	cameraController->SetTranslate({player->GetPosition().x, player->GetPosition().y + 5, cameraController->GetTransform().translate.z});
 	cameraController->Update();
 }
@@ -205,7 +206,7 @@ void GameScene::Draw(GameBase* gameBase) {
 
 	//planeObject_->Draw();
 	//axisObject_->Draw();
-	ParticleManager::GetInstance()->Draw();
+	/*ParticleManager::GetInstance()->Draw();*/
 		
 
 		/*if (IsKeyboard) {

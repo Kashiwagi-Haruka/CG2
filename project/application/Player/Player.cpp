@@ -30,7 +30,7 @@ void Player::Initialize(GameBase* gameBase,Camera* camera){
 	transform_ = {
 		.scale{1.0f, 1.0f, 1.0f},
 		.rotate{0.0f, 0.0f, 0.0f},
-		.translate{0.0f, 0.0f, 0.0f}
+		.translate{0.0f, 2.0f, 0.0f}
 	};
 	bulletVelocity_ = {0, 0, 0};
 	
@@ -51,6 +51,7 @@ void Player::Initialize(GameBase* gameBase,Camera* camera){
 void Player::Move(GameBase* gameBase){
 	switch (state_) {
 	case Player::State::kIdle:
+		
 		if (gameBase->PushKey(DIK_A) || gameBase->PushKey(DIK_D)) {
 			state_ = State::kRunning;
 		}
@@ -85,8 +86,8 @@ void Player::Move(GameBase* gameBase){
 		break;
 	case Player::State::kFalling:
 		velocity_.y -= gravity;
-		if (transform_.translate.y <= 0.0f) {
-			transform_.translate.y = 0.0f;
+		if (transform_.translate.y <= 1.5f) {
+			transform_.translate.y = 1.5f;
 			velocity_.y = 0.0f;
 			state_ = State::kIdle;
 		}
@@ -114,21 +115,7 @@ void Player::Move(GameBase* gameBase){
 	}
 	bulletVelocity_.x = std::clamp(bulletVelocity_.x, -1.0f,1.0f);
 	bulletVelocity_.y = std::clamp(bulletVelocity_.y, 0.0f, 1.0f);
-	// ---- マップチップ当たり判定 ----
-	if (map_) {
-		// 移動後の予測位置
-		Vector3 nextPos = transform_.translate + velocity_;
-
-		// タイル座標へ変換
-		int tx, ty;
-		MapchipField::WorldToTile(nextPos, tx, ty);
-
-		// 壁なら進行を阻止
-		if (map_->IsWall(tx, ty)) {
-			velocity_.x = 0;
-			velocity_.z = 0;
-		}
-	}
+	
 }
 void Player::Attack(GameBase* gameBase){
 	

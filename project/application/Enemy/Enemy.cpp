@@ -46,3 +46,6 @@ void Enemy::Draw(GameBase* gameBase) {
 	// 敵の描画処理
 	object_->Draw();
 }
+void Enemy::BulletCollision(){
+
+}

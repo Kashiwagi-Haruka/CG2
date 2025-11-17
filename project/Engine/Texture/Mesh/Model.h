@@ -42,5 +42,7 @@ class Model {
 	void Initialize(ModelCommon* modelCommon);
 	void LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	void Draw();
-
-};
+	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() { return vertexBufferView_; }
+	Microsoft::WRL::ComPtr<ID3D12Resource> GetMaterialResource() { return materialResource_; }
+	ModelData& GetModelData() { return modelData_; }
+	};
