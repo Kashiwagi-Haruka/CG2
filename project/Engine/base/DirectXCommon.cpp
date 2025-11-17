@@ -65,7 +65,7 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	ID3D12CommandList* commandLists[] = {commandList_.Get()};
 	commandQueue_->ExecuteCommandLists(1, commandLists);
 
-	// GPUとOSに画面の交換を行うよう通知する
+	//// GPUとOSに画面の交換を行うよう通知する
 	swapChain_->Present(1, 0);
 
 	// Fenceの値が指定Signalに達してるか確認
@@ -75,6 +75,7 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	}
 }
 
+#pragma region FixFPS
 void DirectXCommon::InitializeFixFPS() {
 
 	reference_ = std::chrono::steady_clock::now();
@@ -106,7 +107,9 @@ void DirectXCommon::UpdateFixFPS() {
 	reference_ = std::chrono::steady_clock::now();
 
 }
+#pragma endregion
 
+#pragma region DeviceInitialize
 void DirectXCommon::DebugLayer() {
 
 #ifdef _DEBUG
@@ -431,7 +434,7 @@ void DirectXCommon::ScissorRectInitialize(){
 	scissorRect_.bottom = WinApp::kClientHeight;
 
 }
-
+#pragma endregion
 
 void DirectXCommon::PreDraw() {
 
@@ -456,9 +459,6 @@ void DirectXCommon::PreDraw() {
 	
 }
 void DirectXCommon::PostDraw() {
-
-	
-
 	// RenderTarget→Present に戻す
 	CrtvTransitionBarrier(); // バリア遷移 :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
 

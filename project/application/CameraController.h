@@ -15,5 +15,5 @@ class CameraController {
 	Camera* GetCamera();
 	Transform GetTransform() { return transform_;}
 	void SetTransform(Transform transform) { transform_ = transform; }
-
+	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
 };

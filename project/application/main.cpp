@@ -1,6 +1,6 @@
 #include"GameBase.h"
 #include "D3DResourceLeakChecker.h"
-#include "GameScene.h"
+#include "Scene/GameScene.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	GameBase* gameBase=new GameBase;
@@ -32,6 +32,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			break;
 		case SceneName::Game:
 			gameScene->Update(gameBase);
+			if (gameScene->IsSceneEnd()) {
+				scene = SceneName::Title;
+				
+			}
 			break;
 		default:
 			break;

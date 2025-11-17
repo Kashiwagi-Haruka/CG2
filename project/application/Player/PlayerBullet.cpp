@@ -36,7 +36,7 @@ void PlayerBullet::Update(GameBase* gameBase) {
 	
 }
 void PlayerBullet::Charge(Vector3 playerPos) {
-	bulletTransform_.translate += direction_ * 0.1f;
+	bulletTransform_.translate += velocity_ * 0.1f;
 	bulletObject_->SetTranslate(bulletTransform_.translate);
 
 	bulletObject_->Update();
@@ -63,3 +63,5 @@ void PlayerBullet::Draw(GameBase* gameBase) {
 	bulletObject_->Draw();
 	lineObject_->Draw();
 }
+
+void PlayerBullet::SetVelocity(Vector3 verocity){ velocity_ = verocity; }

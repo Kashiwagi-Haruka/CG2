@@ -17,11 +17,11 @@ void Object3d::Initialize(Object3dCommon* modelCommon){
 void Object3d::Update(){
 	// [0]=モデル描画用で使う
 	
-	Matrix4x4 worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	Matrix4x4 worldViewProjectionMatrix;
+	worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	worldViewProjectionMatrix;
 
 	if (camera_) {
-		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+		viewProjectionMatrix = camera_->GetViewProjectionMatrix();
 		worldViewProjectionMatrix = Function::Multiply(worldMatrix, viewProjectionMatrix);
 	} else {
 		worldViewProjectionMatrix = worldMatrix;
@@ -32,6 +32,7 @@ void Object3d::Update(){
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
+	transformResource_->Unmap(0, nullptr);
 
 }
 void Object3d::Draw() {
@@ -69,4 +70,5 @@ void Object3d::CreateResources() {
         {0.0f, -1.0f, 0.0f},
         1.0f
     };
+	directionalLightResource_->Unmap(0, nullptr);
 }

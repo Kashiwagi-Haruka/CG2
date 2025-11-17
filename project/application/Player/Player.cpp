@@ -4,6 +4,17 @@
 #include "ModelManeger.h"
 #include <algorithm>
 #include "PlayerBullet.h"
+#include "Camera.h"
+#include "MapchipField.h"
+#include <numbers>
+
+Player::Player(){
+	ModelManeger::GetInstance()->LoadModel("playerModel");
+	ModelManeger::GetInstance()->LoadModel("skyDome");
+
+	playerObject_ = new Object3d();
+	bullet_ = new PlayerBullet();
+}
 Player::~Player(){
 	if (bullet_) {
 	delete bullet_;
@@ -21,10 +32,8 @@ void Player::Initialize(GameBase* gameBase,Camera* camera){
 		.rotate{0.0f, 0.0f, 0.0f},
 		.translate{0.0f, 0.0f, 0.0f}
 	};
-	ModelManeger::GetInstance()->LoadModel("playerModel");
-	ModelManeger::GetInstance()->LoadModel("skyDome");
+	bulletVelocity_ = {0, 0, 0};
 	
-	playerObject_ = new Object3d();
 	
 	
 	playerObject_->Initialize(gameBase->GetObject3dCommon());
@@ -36,7 +45,7 @@ void Player::Initialize(GameBase* gameBase,Camera* camera){
 	camera_ = camera;
 	playerObject_->SetCamera(camera_);
 	
-	bullet_ = new PlayerBullet();
+	
 	
 }
 void Player::Move(GameBase* gameBase){
@@ -97,7 +106,29 @@ void Player::Move(GameBase* gameBase){
 	}
 	velocity_.x = std::clamp(velocity_.x, -accelationMax, accelationMax);
 	transform_.translate += velocity_;
+	if (gameBase->PushKey(DIK_A)) {
+		bulletVelocity_.x -= bulletRadius;
+	}
+	if (gameBase->PushKey(DIK_D)) {
+		bulletVelocity_.x += bulletRadius;
+	}
+	bulletVelocity_.x = std::clamp(bulletVelocity_.x, -1.0f,1.0f);
+	bulletVelocity_.y = std::clamp(bulletVelocity_.y, 0.0f, 1.0f);
+	// ---- マップチップ当たり判定 ----
+	if (map_) {
+		// 移動後の予測位置
+		Vector3 nextPos = transform_.translate + velocity_;
 
+		// タイル座標へ変換
+		int tx, ty;
+		MapchipField::WorldToTile(nextPos, tx, ty);
+
+		// 壁なら進行を阻止
+		if (map_->IsWall(tx, ty)) {
+			velocity_.x = 0;
+			velocity_.z = 0;
+		}
+	}
 }
 void Player::Attack(GameBase* gameBase){
 	
@@ -110,11 +141,13 @@ void Player::Attack(GameBase* gameBase){
 	
 		if (bullet_) {
 			bullet_->Charge(transform_.translate);
+			state_ = State::kAttacking;
 		}
 	}
 	if (gameBase->ReleaseKey(DIK_J)) {
 		if (bullet_) {
 			bullet_->Fire();
+			state_ = State::kIdle;
 		}
 	}
 		
@@ -122,9 +155,10 @@ void Player::Attack(GameBase* gameBase){
 }
 void Player::Update(GameBase* gameBase){
 
+	Attack(gameBase);
 	Move(gameBase);
 	
-	Attack(gameBase);
+	
 	playerObject_->SetCamera(camera_);
 	
 	playerObject_->SetScale(transform_.scale);

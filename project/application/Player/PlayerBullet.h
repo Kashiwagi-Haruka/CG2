@@ -14,7 +14,7 @@ class PlayerBullet {
 	Object3d* bulletObject_ = nullptr;
 	Object3d* lineObject_ = nullptr;
 	Vector3 direction_;
-
+	Vector3 velocity_;
 
 	public:
 
@@ -24,5 +24,5 @@ class PlayerBullet {
 	void Charge(Vector3 playerPos);
 	void Fire();
 	void Draw(GameBase* gameBase);
-
+	void SetVelocity(Vector3 velocity);
 };

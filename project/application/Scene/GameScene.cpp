@@ -1,11 +1,34 @@
 #include "GameScene.h"
 #include "ModelManeger.h"
 #include "ParticleManager.h"
-#include "Player.h"
-#include "Enemy.h"
+#include "Player/Player.h"
+#include "Enemy/Enemy.h"
 #include "CameraController.h"
 #include "SkyDome.h"
+
+GameScene::GameScene() {
+
+	spriteHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png");
+	spriteHandle2 = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/monsterBall.png");
+	ModelManeger::GetInstance()->LoadModel("plane");
+	ModelManeger::GetInstance()->LoadModel("axis");
+	sprite = new Sprite();
+	sprite2_ = new Sprite();
+	cameraController = new CameraController();
+	planeObject_ = new Object3d();
+	axisObject_ = new Object3d();
+	ParticleManager::GetInstance()->CreateParticleGroup("test", "Resources/2d/uvChecker.png");
+	particle = new ParticleEmitter("test", {0, 0, 0}, 1, 1);
+	skyDome = new SkyDome();
+	player = new Player();
+	enemy = new Enemy();
+	field = new MapchipField();
+	field->LoadFromCSV("Resources/MapChip_stage1.csv");
+}
 GameScene::~GameScene(){
+
+	delete field;
+	
 	delete enemy;
 	delete player;
 	delete skyDome;
@@ -19,24 +42,14 @@ GameScene::~GameScene(){
 
 void GameScene::Initialize(GameBase* gameBase) {
 
-	uint32_t spriteHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png");
-	uint32_t spriteHandle2 = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/monsterBall.png");
-
-	sprite = new Sprite();
+	sceneEnd = false;
+	
 	sprite->Initialize(gameBase->GetSpriteCommon(),spriteHandle);
-	sprite2_ = new Sprite();
 	sprite2_->Initialize(gameBase->GetSpriteCommon(), spriteHandle2);
 
-	
-	cameraController = new CameraController();
 	cameraController->Initialize();
 	
-
 	gameBase->SetDefaultCamera(cameraController->GetCamera());
-	planeObject_ = new Object3d();
-	axisObject_ = new Object3d();
-	ModelManeger::GetInstance()->LoadModel("plane");
-	ModelManeger::GetInstance()->LoadModel("axis");
 	
 	axisObject_->Initialize(gameBase->GetObject3dCommon());
 	planeObject_->Initialize(gameBase->GetObject3dCommon());
@@ -44,10 +57,6 @@ void GameScene::Initialize(GameBase* gameBase) {
 	planeObject_->SetModel("plane");
 	axisObject_->SetModel("axis");
 	
-	ParticleManager::GetInstance()->CreateParticleGroup("test", "Resources/2d/uvChecker.png");
-
-	particle = new ParticleEmitter("test", {0, 0, 0}, 1, 1);
-
 	color = (uint8_t(meshColor.w * 255) << 24) | // A
 	        (uint8_t(meshColor.x * 255) << 16) | // R
 	        (uint8_t(meshColor.y * 255) << 8) |  // G
@@ -58,12 +67,13 @@ void GameScene::Initialize(GameBase* gameBase) {
 	spriteTexSize2 = {200, 500};
 
 	
-	skyDome = new SkyDome();
 	skyDome->Initialize(gameBase, cameraController->GetCamera());
-	player = new Player();
 	player->Initialize(gameBase,cameraController->GetCamera());
-	enemy = new Enemy();
 	enemy->Initialize(gameBase, cameraController->GetCamera());
+	field->Initialize(gameBase, cameraController->GetCamera());
+
+	// ★マップ参照を渡す
+	player->SetMap(field);
 }
 
 void GameScene::Update(GameBase* gameBase) {
@@ -72,7 +82,8 @@ void GameScene::Update(GameBase* gameBase) {
 	skyDome->SetCamera(cameraController->GetCamera());
 	player->SetCamera(cameraController->GetCamera());
 	enemy->SetCamera(cameraController->GetCamera());
-	
+	field->Update();
+
 	
 #ifdef USE_IMGUI
 	//ImGui::Begin("Plane");
@@ -180,6 +191,8 @@ void GameScene::Update(GameBase* gameBase) {
 	skyDome->Update(gameBase);
 	player->Update(gameBase);
 	enemy->Update(gameBase);
+	cameraController->SetTranslate({player->GetPosition().x, player->GetPosition().y + 5, cameraController->GetTransform().translate.z});
+	cameraController->Update();
 }
 
 void GameScene::Draw(GameBase* gameBase) {
@@ -188,7 +201,8 @@ void GameScene::Draw(GameBase* gameBase) {
 	skyDome->Draw();
 	player->Draw(gameBase);
 	enemy->Draw(gameBase);
-	
+	field->Draw(gameBase);
+
 	//planeObject_->Draw();
 	//axisObject_->Draw();
 	ParticleManager::GetInstance()->Draw();

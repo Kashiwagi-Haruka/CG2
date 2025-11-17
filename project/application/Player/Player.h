@@ -6,6 +6,7 @@
 class GameBase;
 class Camera;
 class PlayerBullet;
+class MapchipField;
 class Player {
 	
 	enum class State {
@@ -27,9 +28,10 @@ class Player {
 	float jumpTimer = 0.0f;
 	float jumpTimerMax = 0.01f;
 	float gravity = 0.98f/10.0f;
-
-
+	float bulletRadius = 0.01f;
+	
 	Vector3 velocity_;
+	Vector3 bulletVelocity_;
 
 	Transform transform_;
 
@@ -38,9 +40,11 @@ class Player {
 	
 	Camera* camera_;
 	PlayerBullet* bullet_;
+	MapchipField* map_ = nullptr;
 
 	public:
 
+	Player();
 	~Player();
 	void Initialize(GameBase* gameBase,Camera* camera);
 	void Move(GameBase* gameBase);
@@ -48,5 +52,6 @@ class Player {
 	void Update(GameBase* gameBase);
 	void Draw(GameBase* gameBase);
 	void SetCamera(Camera* camera) { camera_ = camera;}
-
-};
+	void SetMap(MapchipField* map) { map_ = map; }
+	Vector3 GetPosition() { return transform_.translate; }
+	};

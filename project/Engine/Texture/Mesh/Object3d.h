@@ -51,6 +51,9 @@ class Object3d {
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 
 	Model* model_ = nullptr;
+	Matrix4x4 worldMatrix;
+	Matrix4x4 worldViewProjectionMatrix;
+	Matrix4x4 viewProjectionMatrix;
 
 public:
 	void Initialize(Object3dCommon* modelCommon);
