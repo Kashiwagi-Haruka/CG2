@@ -49,30 +49,30 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	/*ImGuiInitialize();*/
 
 	
-	SetupPSO();
+	/*SetupPSO();*/
 
-	VertexResource();
+	//VertexResource();
 
-	DrawCommandList();
+	//DrawCommandList();
 
-	CrtvTransitionBarrier();
+	//CrtvTransitionBarrier();
 
-	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
-	hr_ = commandList_->Close();
-	assert(SUCCEEDED(hr_));
+	//// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
+	//hr_ = commandList_->Close();
+	//assert(SUCCEEDED(hr_));
 
-	// GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = {commandList_.Get()};
-	commandQueue_->ExecuteCommandLists(1, commandLists);
+	//// GPUにコマンドリストの実行を行わせる
+	//ID3D12CommandList* commandLists[] = {commandList_.Get()};
+	//commandQueue_->ExecuteCommandLists(1, commandLists);
 
-	//// GPUとOSに画面の交換を行うよう通知する
-	swapChain_->Present(1, 0);
+	////// GPUとOSに画面の交換を行うよう通知する
+	//swapChain_->Present(1, 0);
 
-	// Fenceの値が指定Signalに達してるか確認
-	if (fence_->GetCompletedValue() < fenceValue_) {
-		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
-		WaitForSingleObject(fenceEvent_, INFINITE); // ★ここでちゃんとGPUが終わるまで待つ！
-	}
+	//// Fenceの値が指定Signalに達してるか確認
+	//if (fence_->GetCompletedValue() < fenceValue_) {
+	//	fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
+	//	WaitForSingleObject(fenceEvent_, INFINITE); // ★ここでちゃんとGPUが終わるまで待つ！
+	//}
 }
 
 #pragma region FixFPS
@@ -468,8 +468,6 @@ void DirectXCommon::PostDraw() {
 	Microsoft::WRL::ComPtr<ID3D12CommandList> lists[] = {commandList_.Get()};
 	commandQueue_->ExecuteCommandLists(1, lists->GetAddressOf());
 
-	UpdateFixFPS();
-
 	// 画面を切り替え
 	swapChain_->Present(1, 0);
 
@@ -480,6 +478,11 @@ void DirectXCommon::PostDraw() {
 		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
+	UpdateFixFPS();
+	hr_ = commandAllocators_[frameIndex_]->Reset();
+	assert(SUCCEEDED(hr_));
+	hr_ = commandList_->Reset(commandAllocators_[frameIndex_].Get(), nullptr);
+	assert(SUCCEEDED(hr_));
 }
 
 
@@ -487,10 +490,8 @@ void DirectXCommon::FrameStart() {
 
 // FrameStart
 	frameIndex_ = swapChain_->GetCurrentBackBufferIndex();
-	hr_ = commandAllocators_[frameIndex_]->Reset();
-	assert(SUCCEEDED(hr_));
-	hr_ = commandList_->Reset(commandAllocators_[frameIndex_].Get(), nullptr);
-	assert(SUCCEEDED(hr_));
+
+	
 }
 
 void DirectXCommon::DrawCommandList() {
