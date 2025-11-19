@@ -7,7 +7,7 @@ class Object3d;
 
 class Enemy {
 
-	int HP = 1;
+	int HP = 2;
 	bool isAlive = true; // 生きているか
 	bool isHit = false;//踏まれたか
 
@@ -22,11 +22,15 @@ class Enemy {
 	Camera* camera_ = nullptr;
 
 public:
-
+	Enemy();
 	~Enemy();
 	void Initialize(GameBase* gameBase,Camera* camera);
 	void Update(GameBase* gameBase);
 	void Draw(GameBase* gameBase);
+	void Stun(); // ★追加
+	void SetHP(int hp) { HP = hp; }
+	bool GetIsAlive() { return isAlive; }
 	void SetCamera(Camera* camera) { camera_ = camera;}
+	Vector3 GetPosition() { return transform_.translate; }
 	void BulletCollision();
 };

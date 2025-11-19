@@ -7,7 +7,11 @@
 namespace Function {
 	
 	float Dot(const Vector3& v1, const Vector3& v2);
+	float Length(const Vector3& v);
 
+	// direction（向きたい方向）から回転角を計算する
+	// forwardAxis：モデルの前方向（Cube は X 軸→ {1,0,0}）
+	Vector3 DirectionToRotation(const Vector3& direction, const Vector3& forwardAxis);
 	Vector3 Normalize(const Vector3& v);
 
 	Matrix4x4 MakeRotateXMatrix(float radian);

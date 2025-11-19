@@ -7,13 +7,17 @@
 #include "Camera.h"
 #include "MapchipField.h"
 #include <numbers>
+#ifdef USE_IMGUI
+#include <imgui.h>
+#endif // USE_IMGUI
+
 
 Player::Player(){
 	ModelManeger::GetInstance()->LoadModel("playerModel");
-	ModelManeger::GetInstance()->LoadModel("skyDome");
+	
 
 	playerObject_ = new Object3d();
-	bullet_ = new PlayerBullet();
+	
 }
 Player::~Player(){
 	if (bullet_) {
@@ -32,7 +36,7 @@ void Player::Initialize(GameBase* gameBase,Camera* camera){
 		.rotate{0.0f, 0.0f, 0.0f},
 		.translate{0.0f, 2.0f, 0.0f}
 	};
-	bulletVelocity_ = {0, 0, 0};
+	
 	
 	
 	
@@ -45,7 +49,9 @@ void Player::Initialize(GameBase* gameBase,Camera* camera){
 	camera_ = camera;
 	playerObject_->SetCamera(camera_);
 	
-	
+	isAlive = true;
+	hp_ = hpMax_;
+	bulletVelocity_ = {0, 0, 0};
 	
 }
 void Player::Move(GameBase* gameBase){
@@ -108,38 +114,65 @@ void Player::Move(GameBase* gameBase){
 	velocity_.x = std::clamp(velocity_.x, -accelationMax, accelationMax);
 	transform_.translate += velocity_;
 	if (gameBase->PushKey(DIK_A)) {
-		bulletVelocity_.x -= bulletRadius;
+		bulletVelocity_.x = -1;
 	}
 	if (gameBase->PushKey(DIK_D)) {
-		bulletVelocity_.x += bulletRadius;
+		bulletVelocity_.x = 1;
 	}
-	bulletVelocity_.x = std::clamp(bulletVelocity_.x, -1.0f,1.0f);
-	bulletVelocity_.y = std::clamp(bulletVelocity_.y, 0.0f, 1.0f);
+	if (gameBase->PushKey(DIK_W)) {
+		bulletVelocity_.y = 1;
+	}
+	
 	
 }
-void Player::Attack(GameBase* gameBase){
-	
-	if (gameBase->TriggerKey(DIK_J)) {
-			Vector3 direction = {1.0f, 0.0f, 0.0f};
-			
-			bullet_->Initialize(gameBase, camera_, transform_.translate, direction);
+void Player::Attack(GameBase* gameBase) {
+
+	// --- 発射方向入力 ---
+	Vector3 shotDir = {0, 0, 0};
+	if (gameBase->PushKey(DIK_A))
+		shotDir.x = -1;
+	if (gameBase->PushKey(DIK_D))
+		shotDir.x = 1;
+	if (gameBase->PushKey(DIK_W))
+		shotDir.y = 1;
+
+	// 正規化（0ベクトルの場合は右向き）
+	if (Function::Length(shotDir) > 0.0f) {
+		shotDir = Function::Normalize(shotDir);
+	} else {
+		shotDir = {1, 0, 0}; // デフォルト＝右
 	}
+
+	// --- チャージ開始 ---
+	if (gameBase->TriggerKey(DIK_J)) {
+		if (bullet_)
+			delete bullet_;
+		bullet_ = new PlayerBullet();
+		bullet_->Initialize(gameBase, camera_);
+	}
+
+	// --- チャージ中（弾をプレイヤー前に配置） ---
 	if (gameBase->PushKey(DIK_J)) {
-	
 		if (bullet_) {
-			bullet_->Charge(transform_.translate);
+			bullet_->SetVelocity(shotDir * 0.5f); // 発射方向を渡す
+			bullet_->Charge(transform_.translate, shotDir);
 			state_ = State::kAttacking;
 		}
 	}
+
+	// --- 発射 ---
 	if (gameBase->ReleaseKey(DIK_J)) {
 		if (bullet_) {
 			bullet_->Fire();
-			state_ = State::kIdle;
 		}
+		state_ = State::kIdle;
 	}
-		
-	
+
+	if (bullet_) {
+		bullet_->Update(camera_);
+	}
 }
+
 void Player::Update(GameBase* gameBase){
 
 	Attack(gameBase);
@@ -154,10 +187,34 @@ void Player::Update(GameBase* gameBase){
 	playerObject_->Update();
 
 	
+	#ifdef USE_IMGUI
+
+	if (ImGui::Begin("Player")) {
+		
+	ImGui::DragInt("HP", &hp_);
+		ImGui::Text("J = FIRE , WASD = MOVE , SPACE = JUMP");
 	
-	//if (bullet_) {
-	//	bullet_->Update(gameBase);
-	//}
+	}
+	ImGui::End();
+
+	#endif // 
+
+	
+	
+	//死
+	if (hp_ <= 0) {
+		isAlive = false;
+	}
+	 
+	
+	//  --- ダメージ後の無敵時間 ---
+	if (isInvincible_) {
+		invincibleTimer_ -= 1.0f / 60.0f;
+		if (invincibleTimer_ <= 0.0f) {
+			isInvincible_ = false;
+		}
+	}
+	
 
 }
 void Player::Draw(GameBase* gameBase) {
@@ -165,7 +222,8 @@ void Player::Draw(GameBase* gameBase) {
 	gameBase->ModelCommonSet();
 	playerObject_->Draw();
 	
-	//if (bullet_) {
-	//bullet_->Draw(gameBase);
-	//}
+	if (bullet_) {
+	bullet_->Draw(gameBase);
+	}
 }
+Vector3 Player::GetBulletPosition() { return bullet_->GetPosition(); }

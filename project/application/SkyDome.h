@@ -13,6 +13,7 @@ class SkyDome {
 
 	Camera* camera_;
 	public:
+	SkyDome();
 	~SkyDome();
 	void Initialize(GameBase* gameBase, Camera* camera);
 	void Update(GameBase* gameBase);

@@ -3,6 +3,19 @@
 #include <assert.h>
 #pragma comment(lib, "xAudio2.lib")
 
+Audio* Audio::instance = nullptr;
+
+Audio* Audio::GetInstance(){
+	if (instance == nullptr) {
+		instance = new Audio;
+	}
+	return instance;
+}
+void Audio::Finalize(){
+	delete instance;
+	instance = nullptr;
+}
+
 void Audio::InitializeIXAudio() {
 	result_ = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	assert(SUCCEEDED(result_)); // ここ追加
@@ -11,7 +24,7 @@ void Audio::InitializeIXAudio() {
 }
 
 
-SoundData Audio::SoundLoadWave(const char* filename) {
+SoundData Audio::SoundLoadFile(const char* filename) {
 
 	std::ifstream file;
 
@@ -71,14 +84,15 @@ void Audio::SoundUnload(SoundData* soundData) {
 	soundData->wfex = {};
 }
 
-void Audio::SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData) {
-	if (!xAudio2) {
+
+void Audio::SoundPlayWave(const SoundData& soundData) {
+	if (!xAudio2_) {
 		OutputDebugStringA("SoundPlayWave: xAudio2 is null!\n");
 		return;
 	}
 
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
-	result_ = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
+	result_ = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(result_));
 
 	XAUDIO2_BUFFER buf{};

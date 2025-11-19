@@ -118,20 +118,16 @@ void Sprite::Draw(){
 
 void Sprite::Update() {
 
-	float left = 0.0f - anchorPoint.x;
-	float right = 1.0f - anchorPoint.x;
-	float top = 0.0f - anchorPoint.y;
-	float bottom = 1.0f - anchorPoint.y;
-
-	if (isFlipX_) {
-		left = -left;
-		right = -right;
+	if (isFlipX_ || isFripY_) {
+		if (isFlipX_) {
+			left = -left;
+			right = -right;
+		}
+		if (isFripY_) {
+			top = -top;
+			bottom = -bottom;
+		}
 	}
-	if (isFripY_) {
-		top = -top;
-		bottom = -bottom;
-	}
-
 	vertexData[0].position = {left, top, 0.0f, 1.0f};
 	vertexData[1].position = {right, top, 0.0f, 1.0f};
 	vertexData[2].position = {left, bottom, 0.0f, 1.0f};

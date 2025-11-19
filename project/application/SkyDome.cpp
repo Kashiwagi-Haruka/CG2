@@ -3,12 +3,16 @@
 #include "ModelManeger.h"
 #include "Camera.h"
 
+SkyDome::SkyDome(){
+	ModelManeger::GetInstance()->LoadModel("skyDome");
+	skyDomeObject_ = new Object3d();
+}
+
 SkyDome::~SkyDome() {
 	delete skyDomeObject_; }
 
 void SkyDome::Initialize(GameBase* gameBase, Camera* camera) {
-	ModelManeger::GetInstance()->LoadModel("skyDome");
-	skyDomeObject_ = new Object3d();
+	
 	skyDomeObject_->Initialize(gameBase->GetObject3dCommon());
 	skyDomeObject_->SetModel("skyDome");
 	camera_ = camera;

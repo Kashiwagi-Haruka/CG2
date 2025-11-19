@@ -23,6 +23,8 @@ struct SoundData {
 
 class Audio {
 
+	static Audio* instance;
+
 	Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
 
 	IXAudio2MasteringVoice* masterVoice_;
@@ -31,10 +33,12 @@ class Audio {
 
 public:
 
+	static Audio* GetInstance();
+	void Finalize();
 	void InitializeIXAudio();
-	SoundData SoundLoadWave(const char* filename);
+	SoundData SoundLoadFile(const char* filename);
 	void SoundUnload(SoundData* soundData);
-	void SoundPlayWave(IXAudio2* xAudio2, const SoundData& sounddata);
+	void SoundPlayWave(const SoundData& sounddata);
 	Microsoft::WRL::ComPtr<IXAudio2> GetIXAudio2() { return xAudio2_; };
 }
 ;

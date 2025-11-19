@@ -25,6 +25,7 @@ GameBase::~GameBase(){
 	ModelManeger::GetInstance()->Finalize();
 	ParticleManager::GetInstance()->Finalize();
 	TextureManager::GetInstance()->Finalize();
+	Audio::GetInstance()->Finalize();
 	imguiM_->Finalize();
 	delete imguiM_;
 	delete srvManager_;
@@ -50,7 +51,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	DInput->Initialize(winApp_);
 	imguiM_ = new ImGuiManager();
 	imguiM_->Initialize(winApp_, dxCommon_, srvManager_);
-	audio.InitializeIXAudio();
+	Audio::GetInstance()->InitializeIXAudio();
 
 	ModelManeger::GetInstance()->Initialize(dxCommon_);
 	obj3dCommon_ = new Object3dCommon();
@@ -134,20 +135,6 @@ void GameBase::EndFlame() {
 	dxCommon_->PostDraw(); 
 }
 
-SoundData GameBase::SoundLoadWave(const char* filename){
-
-	return audio.SoundLoadWave(filename);
-
-}
-void GameBase::SoundUnload(SoundData* soundData){
-
-	audio.SoundUnload(soundData);
-
-}
-void GameBase::SoundPlayWave(const SoundData& sounddata) {
-	assert(audio.GetIXAudio2() != nullptr); // 安全のため追加
-	audio.SoundPlayWave(audio.GetIXAudio2().Get(), sounddata);
-}
 
 bool GameBase::PushMouseButton(Input::MouseButton button) const { return DInput->PushMouseButton(button); }
 

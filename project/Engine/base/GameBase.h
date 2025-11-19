@@ -25,7 +25,7 @@ private:
 	DirectXCommon* dxCommon_ = nullptr;
 	SrvManager* srvManager_ = nullptr;
 
-	Audio audio;
+	
 	
 	SpriteCommon* spriteCommon_ = nullptr;
 	Object3dCommon* obj3dCommon_ = nullptr;
@@ -60,13 +60,6 @@ private:
 
 	// 描画
 	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
-	
-	
-
-	SoundData SoundLoadWave(const char* filename);
-	void SoundUnload(SoundData* soundData);
-	void SoundPlayWave(const SoundData& sounddata);
-
 
 	void SpriteCommonSet();
 	void ModelCommonSet();

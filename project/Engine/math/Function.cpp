@@ -9,6 +9,32 @@ static const int kRowHeight = 30;
 
 namespace Function {
 
+
+float Length(const Vector3& v) { return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z); }
+
+// direction = 向きたい方向（正規化推奨）
+// forwardAxis = モデルの前方向（Cube は X軸 {1,0,0}）
+// return = 回転角（x, y, z）
+Vector3 DirectionToRotation(const Vector3& direction, const Vector3& forwardAxis) {
+	// 方向を正規化
+	Vector3 dir = Normalize(direction);
+
+	// --- Yaw（水平回転）---
+	// atan2(y, x) ではなく、x, z を使用
+	float yaw = std::atan2(dir.z, dir.x);
+
+	// --- Pitch（上下の角度）---
+	float horizontalLen = std::sqrt(dir.x * dir.x + dir.z * dir.z);
+	float pitch = std::atan2(dir.y, horizontalLen);
+
+	// Roll は不要なので 0
+	float roll = 0.0f;
+
+	return {pitch, -yaw, roll};
+}
+
+
+
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
 	Matrix4x4 result{};
 	float f = 1.0f / std::tanf(fovY * 0.5f);

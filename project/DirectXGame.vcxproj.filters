@@ -28,6 +28,30 @@
     <Filter Include="ヘッダー ファイル\application">
       <UniqueIdentifier>{1de97790-a130-498c-999e-c5eae5e12caf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Math">
+      <UniqueIdentifier>{14c0230e-51bb-4b40-8399-80f30ede13f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Texture">
+      <UniqueIdentifier>{b4ac3e27-63ce-4737-a410-33196d1218c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Base">
+      <UniqueIdentifier>{7b2dbcb1-b0f6-4487-ba89-e685642a6181}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Camera">
+      <UniqueIdentifier>{b18be3c2-df47-456b-b1a9-1657c5174172}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Camera">
+      <UniqueIdentifier>{2dabda3e-c96c-401d-a0cb-c773fdfda96a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Math">
+      <UniqueIdentifier>{bb586158-55ba-4188-8c9d-a985e717bf0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Texture">
+      <UniqueIdentifier>{8eacb9ed-ede4-4732-a62b-deef7626ae13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Base">
+      <UniqueIdentifier>{e2d52732-d767-4257-87f7-9c9563aa862f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application\main.cpp">
@@ -57,43 +81,16 @@
     <ClCompile Include="Engine\Audio\Audio.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Camera\DebugCamera.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Input\Input.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\math\Function.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\base\GameBase.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\ImGui\ImGuiManager.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Camera\Camera.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\BlendModeManeger.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\base\WinApp.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\math\AABB.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\CameraController.cpp">
-      <Filter>ソース ファイル\application</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Loadfile\CSVManager.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\LeakChecker\D3DResourceLeakChecker.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\base\DirectXCommon.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
     <ClCompile Include="application\Enemy\Enemy.cpp">
@@ -111,27 +108,6 @@
     <ClCompile Include="application\MapchipField.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Model.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\ModelCommon.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\ModelManeger.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Object3d.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Object3dCommon.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Particle\ParticleEmitter.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Particle\ParticleManager.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="application\Player\Player.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
@@ -141,25 +117,79 @@
     <ClCompile Include="application\SkyDome.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\Sprite\Sprite.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Sprite\SpriteCommon.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\SrvManager.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\stringUtillity\StringUtility.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\TextureManager.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="application\Scene\ResultScene.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="application\Scene\TitleScene.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\CameraController.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Camera\Camera.cpp">
+      <Filter>ソース ファイル\Engine\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Camera\DebugCamera.cpp">
+      <Filter>ソース ファイル\Engine\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\math\AABB.cpp">
+      <Filter>ソース ファイル\Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\math\Function.cpp">
+      <Filter>ソース ファイル\Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\BlendModeManeger.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\base\DirectXCommon.cpp">
+      <Filter>ソース ファイル\Engine\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\base\GameBase.cpp">
+      <Filter>ソース ファイル\Engine\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\base\WinApp.cpp">
+      <Filter>ソース ファイル\Engine\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\TextureManager.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\SrvManager.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Sprite\SpriteCommon.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Sprite\Sprite.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Particle\ParticleManager.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Particle\ParticleEmitter.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Object3dCommon.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\ModelManeger.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Object3d.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\ModelCommon.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Model.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="application\UIManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Goal.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -199,127 +229,133 @@
     <ClInclude Include="Engine\Audio\Audio.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Camera\DebugCamera.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Input\Input.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\math\Function.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\base\GameBase.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\ImGui\ImGuiManager.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\math\Matrix4x4.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\math\Vector2.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\math\Vector3.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\math\Vector4.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\VertexData.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Camera\Camera.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\BlendModeManeger.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\base\WinApp.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Object3d.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\base\DirectXCommon.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Log\Logger.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\stringUtillity\StringUtility.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\LeakChecker\D3DResourceLeakChecker.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Sprite\SpriteCommon.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Sprite\Sprite.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Scene\GameScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Object3dCommon.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\TextureManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Model.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\ModelCommon.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\ModelManeger.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\math\Transform.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\SrvManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Particle\ParticleManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Particle\ParticleEmitter.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Player\Player.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Enemy\Enemy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Player\PlayerBullet.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\math\AABB.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\MapchipField.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\SkyDome.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Loadfile\CSVManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Enemy\EnemyManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="application\CameraController.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="application\Scene\ResultScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Engine\Loadfile\CSVManager.h">
+      <Filter>ヘッダー ファイル\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\LeakChecker\D3DResourceLeakChecker.h">
+      <Filter>ヘッダー ファイル\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Enemy\Enemy.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Enemy\EnemyManager.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\GameScene.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Log\Logger.h">
+      <Filter>ヘッダー ファイル\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\MapchipField.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Player\Player.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\BlendModeManeger.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\math\Function.h">
+      <Filter>ヘッダー ファイル\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\math\Matrix4x4.h">
+      <Filter>ヘッダー ファイル\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\math\Vector2.h">
+      <Filter>ヘッダー ファイル\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\math\Vector3.h">
+      <Filter>ヘッダー ファイル\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\math\Vector4.h">
+      <Filter>ヘッダー ファイル\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\VertexData.h">
+      <Filter>ヘッダー ファイル\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\base\GameBase.h">
+      <Filter>ヘッダー ファイル\Engine\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\base\DirectXCommon.h">
+      <Filter>ヘッダー ファイル\Engine\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\base\WinApp.h">
+      <Filter>ヘッダー ファイル\Engine\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Particle\ParticleEmitter.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Particle\ParticleManager.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Object3d.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Object3dCommon.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\ModelCommon.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\ModelManeger.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Model.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Camera\Camera.h">
+      <Filter>ヘッダー ファイル\Engine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Camera\DebugCamera.h">
+      <Filter>ヘッダー ファイル\Engine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Player\PlayerBullet.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Sprite\Sprite.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Sprite\SpriteCommon.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\SrvManager.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\TextureManager.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
     </ClInclude>
     <ClInclude Include="application\Scene\TitleScene.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\math\Transform.h">
+      <Filter>ヘッダー ファイル\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\stringUtillity\StringUtility.h">
+      <Filter>ヘッダー ファイル\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\ResultScene.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\SkyDome.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\math\AABB.h">
+      <Filter>ヘッダー ファイル\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="application\UIManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Goal.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

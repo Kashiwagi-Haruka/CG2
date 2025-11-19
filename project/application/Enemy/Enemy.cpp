@@ -5,6 +5,11 @@
 #include "Camera.h"
 #include <algorithm>
 
+Enemy::Enemy(){
+	ModelManeger::GetInstance()->LoadModel("Enemy");
+	object_ = new Object3d();
+}
+
 Enemy::~Enemy() {
 
 	delete object_; 
@@ -14,16 +19,15 @@ Enemy::~Enemy() {
 void Enemy::Initialize(GameBase* gameBase,Camera* camera) {
 	isAlive = true;
 	isHit = false;
-	HP = 1;
-	ModelManeger::GetInstance()->LoadModel("Enemy");
-	object_ = new Object3d();
+	HP = 2;
+	
 	object_->Initialize(gameBase->GetObject3dCommon());
 	object_->SetModel("Enemy");
 	camera_ = camera;
 	transform_ = {
 		.scale{1.0f,1.0f,1.0f},
 		.rotate{0.0f,0.0f,0.0f},
-		.translate{0.0f,0.0f,0.0f}
+		.translate{5.0f,2.0f,0.0f}
     };
 	object_->SetTransform(transform_);
 	object_->SetCamera(camera_);
@@ -40,6 +44,18 @@ void Enemy::Update(GameBase* gameBase) {
 	object_->SetCamera(camera_);
 	object_->SetTransform(transform_);
 	object_->Update();
+	if (HP <= 0) {
+		isAlive = false;
+	}
+}
+void Enemy::Stun() {
+	// ノックバック
+
+
+	HP -= 1; // ダメージ
+	if (HP <= 0) {
+		isAlive = false;
+	}
 }
 
 void Enemy::Draw(GameBase* gameBase) {

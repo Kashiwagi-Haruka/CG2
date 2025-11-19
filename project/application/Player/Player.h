@@ -29,6 +29,12 @@ class Player {
 	float jumpTimerMax = 0.01f;
 	float gravity = 0.98f/10.0f;
 	float bulletRadius = 0.01f;
+
+	int hp_; // プレイヤーHP
+	int hpMax_ = 100;
+	bool isAlive;
+	bool isInvincible_ = false;
+	float invincibleTimer_ = 0.0f;
 	
 	Vector3 velocity_;
 	Vector3 bulletVelocity_;
@@ -54,4 +60,23 @@ class Player {
 	void SetCamera(Camera* camera) { camera_ = camera;}
 	void SetMap(MapchipField* map) { map_ = map; }
 	Vector3 GetPosition() { return transform_.translate; }
+	Vector3 GetVelocity() { return velocity_; }
+	Vector3 GetBulletPosition();
+	bool GetIsAlive() { return isAlive; }
+	bool GetIsPlayerBullet() {
+		if (bullet_) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	void Damage(int amount) {
+		if (!isInvincible_) {
+			hp_ -= amount;
+			isInvincible_ = true;
+			invincibleTimer_ = 1.0f; // 1秒無敵
+		}
+	}
+	int GetHP() const { return hp_; }
+
 	};

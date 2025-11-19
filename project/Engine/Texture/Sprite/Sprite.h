@@ -47,6 +47,11 @@ class Sprite {
 	Vector2 textureSize{};
 	Vector2 textureCutSize{};
 
+	float left = 0.0f - anchorPoint.x;
+	float right = 1.0f - anchorPoint.x;
+	float top = 0.0f - anchorPoint.y;
+	float bottom = 1.0f - anchorPoint.y;
+
 	bool isFlipX_ = false;
 	bool isFripY_ = false;
 
@@ -85,9 +90,22 @@ public:
 
 	void Draw();
 
-	 void SetPosition(const Vector3& pos) { transform_.translate = pos; }
-	void SetScale(const Vector3& scale) { transform_.scale = scale; }
-	void SetRotation(const Vector3& rot) { transform_.rotate = rot; }
+	 void SetPosition(const Vector2& pos) {
+		transform_.translate.x = pos.x;
+		transform_.translate.y = pos.y;
+		transform_.translate.z = 0.0f;
+	 }
+	void SetScale(const Vector2& scale) {
+		transform_.scale.x = scale.x;
+		transform_.scale.y = scale.y;
+		transform_.scale.z = 1.0f;
+	}
+	void SetRotation(const Vector2& rot) {
+	
+		transform_.rotate.x = rot.x;
+		transform_.rotate.y = rot.y;
+		transform_.rotate.z = 0.0f;
+	}
 	void SetColor(const Vector4& color);
 	void SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize);
 	bool GetIsFlipX() { return isFlipX_; };
@@ -96,5 +114,11 @@ public:
 	void SetIsFlipY(const bool isFlipY);
 	void AdjustTextureSize();
 	const Vector2& GetAnchorPoint() const { return anchorPoint; };
-	void SetAnchorPoint(const Vector2 anchorPoint) { this->anchorPoint; };
+	void SetAnchorPoint(const Vector2 anchorPoint) {
+		this->anchorPoint;
+		left = 0.0f - anchorPoint.x;
+		right = 1.0f - anchorPoint.x;
+		top = 0.0f - anchorPoint.y;
+		bottom = 1.0f - anchorPoint.y;
+	};
 };
