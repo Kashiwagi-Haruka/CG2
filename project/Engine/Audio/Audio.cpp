@@ -1,7 +1,13 @@
 #include "Audio.h"
 #include "fstream"
 #include <assert.h>
+#include <mfapi.h>
+#include <mfidl.h>
+#include <mfreadwrite.h>
 #pragma comment(lib, "xAudio2.lib")
+#pragma comment(lib, "mfuuid.lib")
+#pragma comment(lib, "mfplat.lib")
+#pragma comment(lib, "mfreadwrite.lib")
 
 Audio* Audio::instance = nullptr;
 
@@ -12,11 +18,18 @@ Audio* Audio::GetInstance(){
 	return instance;
 }
 void Audio::Finalize(){
+
+	result_ = MFShutdown();
+	assert(SUCCEEDED(result_));
+
+
 	delete instance;
 	instance = nullptr;
 }
 
 void Audio::InitializeIXAudio() {
+	result_ = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
+	assert(SUCCEEDED(result_));
 	result_ = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	assert(SUCCEEDED(result_)); // ここ追加
 	result_ = xAudio2_->CreateMasteringVoice(&masterVoice_);
@@ -25,62 +38,92 @@ void Audio::InitializeIXAudio() {
 
 
 SoundData Audio::SoundLoadFile(const char* filename) {
-
-	std::ifstream file;
-
-	file.open(filename, std::ios_base::binary);
-	assert(file.is_open());
-
-	RiffHeader riff;
-	file.read((char*)&riff, sizeof(riff));
-	if (strncmp(riff.chunk.id, "RIFF", 4) != 0) {
-		assert(0);
-	}
-	if (strncmp(riff.type, "WAVE", 4) != 0) {
-		assert(0);
+	// フルパス → UTF-16 変換
+	std::wstring filePathW;
+	{
+		int size = MultiByteToWideChar(CP_UTF8, 0, filename, -1, nullptr, 0);
+		filePathW.resize(size);
+		MultiByteToWideChar(CP_UTF8, 0, filename, -1, &filePathW[0], size);
 	}
 
-	FormatChunk format = {};
-	// ヘッダーだけ読み取ってから、サイズぶんだけ読み込む（安全）
-	file.read((char*)&format.chunk, sizeof(ChunkHeader));
-	if (strncmp(format.chunk.id, "fmt ", 4) != 0) {
-		assert(0);
+	HRESULT hr;
+	Microsoft::WRL::ComPtr<IMFSourceReader> pReader;
+
+	// SourceReader 作成
+	hr = MFCreateSourceReaderFromURL(filePathW.c_str(), nullptr, &pReader);
+	assert(SUCCEEDED(hr));
+
+	// PCM にデコードする設定
+	Microsoft::WRL::ComPtr<IMFMediaType> pPCMType;
+	hr = MFCreateMediaType(&pPCMType);
+	assert(SUCCEEDED(hr));
+
+	hr = pPCMType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
+	assert(SUCCEEDED(hr));
+
+	hr = pPCMType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);
+	assert(SUCCEEDED(hr));
+
+	hr = pReader->SetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM, nullptr, pPCMType.Get());
+	assert(SUCCEEDED(hr));
+
+	// 実際に適用されたメディアタイプ
+	Microsoft::WRL::ComPtr<IMFMediaType> pOutType;
+	hr = pReader->GetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM, &pOutType);
+	assert(SUCCEEDED(hr));
+
+	// WAVEFORMATEX を取り出す
+	WAVEFORMATEX* waveFormat = nullptr;
+	hr = MFCreateWaveFormatExFromMFMediaType(pOutType.Get(), &waveFormat, nullptr);
+	assert(SUCCEEDED(hr));
+	// SoundData へ格納
+	SoundData soundData{};
+	soundData.wfex = *waveFormat; // WAVEFORMATEX コピー
+	CoTaskMemFree(waveFormat);
+	// 読み込んだ PCM データを格納するバッファ
+	std::vector<BYTE> buffer;
+
+	// 1フレームずつ読み込む
+	while (true) {
+		DWORD streamIndex = 0,flags = 0;
+		LONGLONG llTimeStamp = 0;
+		Microsoft::WRL::ComPtr<IMFSample> pSample;
+
+		hr = pReader->ReadSample(MF_SOURCE_READER_FIRST_AUDIO_STREAM, 0, &streamIndex, &flags, &llTimeStamp, &pSample);
+
+		assert(SUCCEEDED(hr));
+
+		if (flags & MF_SOURCE_READERF_ENDOFSTREAM)
+			break;
+
+		if (!pSample) {
+			continue;
+		} else {
+		Microsoft::WRL::ComPtr<IMFMediaBuffer> pBuffer;
+		hr = pSample->ConvertToContiguousBuffer(&pBuffer);
+		assert(SUCCEEDED(hr));
+
+		BYTE* pData = nullptr;
+		DWORD maxLength = 0, curLength = 0;
+
+		hr = pBuffer->Lock(&pData, &maxLength, &curLength);
+		assert(SUCCEEDED(hr));
+
+		soundData.buffer.insert(soundData.buffer.end(), pData, pData + curLength);
+ 
+		pBuffer->Unlock();
+		}
 	}
-	if (format.chunk.size > sizeof(WAVEFORMATEX)) {
-		OutputDebugStringA("format.chunk.size が大きすぎる\n");
-		assert(0);
-	}
-	
 
-	file.read((char*)&format.fmt, format.chunk.size);
-	ChunkHeader data;
-	file.read((char*)&data, sizeof(data));
+	// 必要ないので解放
 
-	if (strncmp(data.id, "JUNK", 4) == 0) {
-		file.seekg(data.size, std::ios_base::cur);
-		file.read((char*)&data, sizeof(data));
-	}
-	if (strncmp(data.id, "data", 4) != 0) {
-		assert(0);
-	}
-	char* pBuffer = new char[data.size];
-	file.read(pBuffer, data.size);
-
-	file.close();
-
-	SoundData soundData = {};
-
-	soundData.wfex = format.fmt;
-	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
-	soundData.BufferSize = data.size;
 
 	return soundData;
 }
+
 void Audio::SoundUnload(SoundData* soundData) {
 	xAudio2_.Reset();
-	delete[] soundData->pBuffer;
-	soundData->pBuffer = 0;
-	soundData->BufferSize = 0;
+	soundData->buffer.clear();
 	soundData->wfex = {};
 }
 
@@ -96,8 +139,9 @@ void Audio::SoundPlayWave(const SoundData& soundData) {
 	assert(SUCCEEDED(result_));
 
 	XAUDIO2_BUFFER buf{};
-	buf.pAudioData = soundData.pBuffer;
-	buf.AudioBytes = soundData.BufferSize;
+
+	buf.pAudioData = soundData.buffer.data();
+	buf.AudioBytes = static_cast < UINT32>(soundData.buffer.size());
 	buf.Flags = XAUDIO2_END_OF_STREAM;
 
 	result_ = pSourceVoice->SubmitSourceBuffer(&buf);

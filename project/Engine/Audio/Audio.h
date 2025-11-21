@@ -2,6 +2,7 @@
 #include <xaudio2.h>
 #include <cstdint>
 #include <wrl.h>
+#include <vector>
 struct ChunkHeader {
 	char id[4];
 	int32_t size;
@@ -17,8 +18,8 @@ struct FormatChunk {
 };
 struct SoundData {
 	WAVEFORMATEX wfex;
-	BYTE* pBuffer;
-	unsigned int BufferSize;
+	std::vector<BYTE> buffer;
+	
 };
 
 class Audio {
