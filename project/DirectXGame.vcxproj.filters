@@ -135,7 +135,7 @@
     <ClCompile Include="Engine\Camera\DebugCamera.cpp">
       <Filter>ソース ファイル\Engine\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\math\AABB.cpp">
+    <ClCompile Include="Engine\math\RigidBody.cpp">
       <Filter>ソース ファイル\Engine\Math</Filter>
     </ClCompile>
     <ClCompile Include="Engine\math\Function.cpp">
@@ -349,7 +349,7 @@
     <ClInclude Include="application\SkyDome.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\math\AABB.h">
+    <ClInclude Include="Engine\math\RigidBody.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
     <ClInclude Include="application\UIManager.h">

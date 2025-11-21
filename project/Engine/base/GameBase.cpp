@@ -42,17 +42,16 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	dxCommon_->initialize(winApp_);
 	srvManager_ = new SrvManager();
 	srvManager_->Initialize(dxCommon_);
-	TextureManager::GetInstance()->Initialize(dxCommon_,srvManager_);
-	ParticleManager::GetInstance()->Initialize(dxCommon_, srvManager_);
 	dxCommon_->CreateInstancingSRV(srvManager_);
-	
+
 
 	DInput = new Input();
 	DInput->Initialize(winApp_);
 	imguiM_ = new ImGuiManager();
 	imguiM_->Initialize(winApp_, dxCommon_, srvManager_);
 	Audio::GetInstance()->InitializeIXAudio();
-
+	TextureManager::GetInstance()->Initialize(dxCommon_, srvManager_);
+	ParticleManager::GetInstance()->Initialize(dxCommon_, srvManager_);
 	ModelManeger::GetInstance()->Initialize(dxCommon_);
 	obj3dCommon_ = new Object3dCommon();
 	obj3dCommon_->Initialize(dxCommon_);

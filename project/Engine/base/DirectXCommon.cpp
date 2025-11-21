@@ -49,7 +49,7 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	/*ImGuiInitialize();*/
 
 	
-	/*SetupPSO();*/
+	SetupPSO();
 
 	//VertexResource();
 

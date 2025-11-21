@@ -9,7 +9,7 @@
 #include <cstdint>
 #include "BlendModeManeger.h"
 #include "Transform.h"
-#include "AABB.h"
+#include "RigidBody.h"
 struct Particle {
 	// 各パーティクルの情報（必要に応じて拡張）
 	float pos[3]{};
@@ -60,9 +60,13 @@ public:
 
 	void SetFieldArea(const AABB& area) { accelerationField.area = area; }
 
+	void SetDrawArea(const AABB& area) { accelerationField.drawArea = area; }
+
 	const Vector3& GetFieldAcceleration() const { return accelerationField.Acceleation; }
 
 	const AABB& GetFieldArea() const { return accelerationField.area; }
+
+	const AABB& GetDrawArea() const { return accelerationField.drawArea; }
 
 private:
 	struct TransformationMatrix {
@@ -72,6 +76,7 @@ private:
 	struct AccelerationField {
 		Vector3 Acceleation; // 加速度
 		AABB area;         // 範囲
+		AABB drawArea;
 	};
 	AccelerationField accelerationField{}; // フィールド
 

@@ -11,7 +11,7 @@ GameScene::GameScene() {
 	cameraController = new CameraController();
 	
 	ParticleManager::GetInstance()->CreateParticleGroup("test", "Resources/2d/uvChecker.png");
-	particle = new ParticleEmitter("test", {0, 0, 0}, 1, 1);
+	particle = new ParticleEmitter("test", {0, 0, 0}, 1, 5, {0.01f, 0.01f, 0}, {0, 0, 0}, {5,10,1});
 	skyDome = new SkyDome();
 	player = new Player();
 	enemy = new Enemy();
@@ -49,7 +49,7 @@ void GameScene::Initialize(GameBase* gameBase) {
 	enemy->Initialize(gameBase, cameraController->GetCamera());
 	field->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field->Initialize(gameBase, cameraController->GetCamera());
-
+	
 	soundData = Audio::GetInstance()->SoundLoadFile("Resources/audio/Alarm01.wav");
 	Audio::GetInstance()->SoundPlayWave(soundData);
 }
@@ -194,7 +194,7 @@ void GameScene::Draw(GameBase* gameBase) {
 
 	//planeObject_->Draw();
 	//axisObject_->Draw();
-	/*ParticleManager::GetInstance()->Draw();*/
+	ParticleManager::GetInstance()->Draw();
 		
 
 		/*if (IsKeyboard) {

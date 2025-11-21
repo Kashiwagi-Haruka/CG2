@@ -164,7 +164,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
-    <ClCompile Include="Engine\math\AABB.cpp" />
+    <ClCompile Include="Engine\math\RigidBody.cpp" />
     <ClCompile Include="Engine\Texture\BlendModeManeger.cpp" />
     <ClCompile Include="Engine\base\DirectXCommon.cpp" />
     <ClCompile Include="Engine\LeakChecker\D3DResourceLeakChecker.cpp" />
@@ -239,7 +239,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\Input\Input.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
-    <ClInclude Include="Engine\math\AABB.h" />
+    <ClInclude Include="Engine\math\RigidBody.h" />
     <ClInclude Include="Engine\math\Transform.h" />
     <ClInclude Include="Engine\Texture\BlendModeManeger.h" />
     <ClInclude Include="Engine\base\DirectXCommon.h" />

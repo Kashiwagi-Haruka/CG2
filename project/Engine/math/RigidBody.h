@@ -32,7 +32,7 @@ struct AABB {
 };
 
 
-namespace AABBox {
+namespace RigidBody {
 
 	// -----------------------------------------
 	// AABB と 点 の当たり判定

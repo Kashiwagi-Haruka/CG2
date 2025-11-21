@@ -82,7 +82,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	//--------------------------------
 	// 6. インスタンシング用リソース作成
 	//--------------------------------
-	uint32_t maxInstance = 1000; // 初期容量
+	uint32_t maxInstance = 5000; // 初期容量
 	uint32_t elementSize = sizeof(TransformationMatrix);
 	uint32_t bufferSize = maxInstance * elementSize;
 
@@ -157,7 +157,7 @@ void ParticleManager::Update(Camera* camera) {
 				it = group.particles.erase(it);
 				continue;
 			}
-			if (AABBox::IsCollision(accelerationField.area, {it->pos[0], it->pos[1], it->pos[2]})) {
+			if (RigidBody::IsCollision(accelerationField.area, {it->pos[0], it->pos[1], it->pos[2]})) {
 			p.vel[0] += accelerationField.Acceleation.x;
 			p.vel[1] += accelerationField.Acceleation.y;
 			p.vel[2] += accelerationField.Acceleation.z;
@@ -285,10 +285,10 @@ void ParticleManager::Emit(const std::string& name, const Vector3& position, uin
 	for (uint32_t i = 0; i < count; ++i) {
 		Particle p{};
 
-		// 初期位置
-		p.pos[0] = position.x+((float(rand()) / float(RAND_MAX))* 5.0f);
-		p.pos[1] = position.y + ((float(rand()) / float(RAND_MAX)) * 5.0f);
-		p.pos[2] = position.z+((float(rand()) / float(RAND_MAX)) * 5.0f);
+		p.pos[0] = position.x + (float(rand()) / RAND_MAX) * (accelerationField.area.max.x - accelerationField.area.min.x) + accelerationField.area.min.x;
+		p.pos[1] = position.y + (float(rand()) / RAND_MAX) * (accelerationField.area.max.y - accelerationField.area.min.y) + accelerationField.area.min.y;
+		p.pos[2] = position.z + (float(rand()) / RAND_MAX) * (accelerationField.area.max.z - accelerationField.area.min.z) + accelerationField.area.min.z;
+
 
 
 		// 寿命（仕様書の指定）
