@@ -8,7 +8,7 @@ class ParticleEmitter {
 public:
 	// コンストラクタ
 	ParticleEmitter(
-	    const std::string& groupName, const Vector3& position, float emitFrequency, uint32_t emitCount, Vector3 acceleration = {0, 0, 0}, Vector3 areaMin = {0, 0, 0}, Vector3 areaMax = {1,1,1});
+	    const std::string& groupName, const Transform& transform, float emitFrequency, uint32_t emitCount, Vector3 acceleration = {0, 0, 0}, Vector3 areaMin = {0, 0, 0}, Vector3 areaMax = {1,1,1});
 
 	// 更新
 	void Update(const Transform& transform);
@@ -20,7 +20,7 @@ private:
 	
 	// メンバ変数（スライド仕様通り全てコンストラクタで設定）
 	std::string name;
-	Vector3 position;
+	Transform transform_;
 	float frequency;    // 秒間またはフレームごとの発生頻度
 	uint32_t count;     // 一回のEmitで発生する数
 	Vector3 acceleration_; // 加速度

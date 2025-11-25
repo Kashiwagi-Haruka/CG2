@@ -10,16 +10,22 @@ GameScene::GameScene() {
 
 	cameraController = new CameraController();
 	
-	ParticleManager::GetInstance()->CreateParticleGroup("test", "Resources/2d/uvChecker.png");
-	particle = new ParticleEmitter("test", {0, 0, 0}, 1, 5, {0.01f, 0.01f, 0}, {0, 0, 0}, {5,10,1});
+	ParticleManager::GetInstance()->CreateParticleGroup("test", "Resources/2d/defaultParticle.png");
+	particle = new ParticleEmitter("test", {{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0, 0, 0}}, 1, 5, {0.01f, 0.01f, 0}, {0, 0, 0}, {5,10,1});
 	skyDome = new SkyDome();
 	player = new Player();
 	enemy = new Enemy();
 	field = new MapchipField();
-	
+	goal = new Goal();
+	sceneTransition = new SceneTransition();
+	uimanager = new UIManager();
+	soundData = Audio::GetInstance()->SoundLoadFile("Resources/audio/Alarm01.wav");
 }
 GameScene::~GameScene(){
 	Audio::GetInstance()->SoundUnload(&soundData);
+	delete uimanager;
+	delete sceneTransition;
+	delete goal;  
 	delete field;
 	delete enemy;
 	delete player;
@@ -28,14 +34,14 @@ GameScene::~GameScene(){
 	delete cameraController;
 }
 
-void GameScene::Initialize(GameBase* gameBase) {
+void GameScene::Initialize() {
 
 	sceneEndClear = false;
 	sceneEndOver = false;
 
 	cameraController->Initialize();
 	
-	gameBase->SetDefaultCamera(cameraController->GetCamera());
+	GameBase::GetInstance()->SetDefaultCamera(cameraController->GetCamera());
 
 	
 	color = (uint8_t(meshColor.w * 255) << 24) | // A
@@ -44,24 +50,28 @@ void GameScene::Initialize(GameBase* gameBase) {
 	        (uint8_t(meshColor.z * 255));        // B
 
 	
-	skyDome->Initialize(gameBase, cameraController->GetCamera());
-	player->Initialize(gameBase,cameraController->GetCamera());
-	enemy->Initialize(gameBase, cameraController->GetCamera());
+	skyDome->Initialize(cameraController->GetCamera());
+	player->Initialize(cameraController->GetCamera());
+	enemy->Initialize(cameraController->GetCamera());
 	field->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
-	field->Initialize(gameBase, cameraController->GetCamera());
-	
-	soundData = Audio::GetInstance()->SoundLoadFile("Resources/audio/Alarm01.wav");
+	field->Initialize(cameraController->GetCamera());
+	goal->Initialize(cameraController->GetCamera());
+	sceneTransition->Initialize();
+	uimanager->SetPlayerHP(player->GetHP());
+	uimanager->SetPlayerPosition({player->GetPosition().x, player->GetPosition().y});
+	uimanager->Initialize();
 	Audio::GetInstance()->SoundPlayWave(soundData);
 }
 
-void GameScene::Update(GameBase* gameBase) {
+void GameScene::Update() {
 
 	
 	skyDome->SetCamera(cameraController->GetCamera());
 	player->SetCamera(cameraController->GetCamera());
 	enemy->SetCamera(cameraController->GetCamera());
 	field->SetCamera(cameraController->GetCamera());
-
+	goal->SetCamera(cameraController->GetCamera());
+	
 	
 #ifdef USE_IMGUI
 	//ImGui::Begin("Plane");
@@ -115,27 +125,41 @@ void GameScene::Update(GameBase* gameBase) {
 	
 	#endif
 	
-	particle->Update({
-	    {1, 1, 1},
-        {0, 0, 0},
-        {0, 0, 0}
-    });
+
 	
 
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
-	skyDome->Update(gameBase);
-	player->Update(gameBase);
+	skyDome->Update();
+	player->Update();
 	if (enemy->GetIsAlive()) {
-	enemy->Update(gameBase);
+	enemy->Update();
 	} else {
 		sceneEndClear = true;
 	}
+	goal->Update(); 
 	// ===== プレイヤーと敵の当たり判定 =====
 	Vector3 p = player->GetPosition();
 	Vector3 e = enemy->GetPosition();
-
+	particle->Update({
+	    {0.1f, 0.1f, 1.0f},
+        {0,    0,    0   },
+        {p.x,    p.y-0.5f,    p.z-1.0f   }
+    });
 	// 当たり判定サイズ（調整OK）
 	float hitSize = 1.0f;
+	// ===== プレイヤーとゴールの当たり判定 =====
+	{
+		Vector3 p = player->GetPosition();
+		Vector3 g = goal->GetTranslate();
+
+		float goalHitSize = 1.0f;
+
+		bool isGoalHit = fabs(p.x - g.x) < goalHitSize && fabs(p.y - g.y) < goalHitSize;
+
+		if (isGoalHit) {
+			sceneEndClear = true;
+		}
+	}
 
 	// AABBチェック
 	bool isColliding = fabs(p.x - e.x) < hitSize && fabs(p.y - e.y) < hitSize;
@@ -178,24 +202,29 @@ void GameScene::Update(GameBase* gameBase) {
 	}
 
 	field->Update();
+	uimanager->SetPlayerHP(player->GetHP());
+	uimanager->SetPlayerPosition({player->GetPosition().x, player->GetPosition().y});
+	uimanager->Update();
 	cameraController->SetTranslate({player->GetPosition().x, player->GetPosition().y + 5, cameraController->GetTransform().translate.z});
 	cameraController->Update();
 }
 
-void GameScene::Draw(GameBase* gameBase) {
+void GameScene::Draw() {
 
-	gameBase->ModelCommonSet();
+	GameBase::GetInstance()->ModelCommonSet();
 	skyDome->Draw();
-	player->Draw(gameBase);
+	player->Draw();
 	if (enemy->GetIsAlive()){
-	enemy->Draw(gameBase);
+	enemy->Draw();
 	}
-	field->Draw(gameBase);
-
+	field->Draw();
+	goal->Draw(); 
 	//planeObject_->Draw();
 	//axisObject_->Draw();
 	ParticleManager::GetInstance()->Draw();
-		
+	
+	GameBase::GetInstance()->SpriteCommonSet();
+	uimanager->Draw();
 
 		/*if (IsKeyboard) {
 	    if (gameBase->TriggerKey(DIK_P)) {

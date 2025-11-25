@@ -24,9 +24,9 @@ class Enemy {
 public:
 	Enemy();
 	~Enemy();
-	void Initialize(GameBase* gameBase,Camera* camera);
-	void Update(GameBase* gameBase);
-	void Draw(GameBase* gameBase);
+	void Initialize(Camera* camera);
+	void Update();
+	void Draw();
 	void Stun(); // ★追加
 	void SetHP(int hp) { HP = hp; }
 	bool GetIsAlive() { return isAlive; }

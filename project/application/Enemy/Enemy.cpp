@@ -16,12 +16,12 @@ Enemy::~Enemy() {
 	
 }
 
-void Enemy::Initialize(GameBase* gameBase,Camera* camera) {
+void Enemy::Initialize(Camera* camera) {
 	isAlive = true;
 	isHit = false;
 	HP = 2;
 	
-	object_->Initialize(gameBase->GetObject3dCommon());
+	object_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	object_->SetModel("Enemy");
 	camera_ = camera;
 	transform_ = {
@@ -34,7 +34,7 @@ void Enemy::Initialize(GameBase* gameBase,Camera* camera) {
 	object_->Update();
 }
 
-void Enemy::Update(GameBase* gameBase) {
+void Enemy::Update() {
 	// 敵の更新処理
 
 	velocity_.x -= 0.01f;
@@ -58,7 +58,7 @@ void Enemy::Stun() {
 	}
 }
 
-void Enemy::Draw(GameBase* gameBase) {
+void Enemy::Draw() {
 	// 敵の描画処理
 	object_->Draw();
 }

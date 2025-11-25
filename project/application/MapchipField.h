@@ -26,9 +26,9 @@ public:
 	MapchipField();
 	~MapchipField();
 
-	void Initialize(GameBase* gameBase, Camera* camera);
+	void Initialize(Camera* camera);
 	void Update();
-	void Draw(GameBase* gameBase);
+	void Draw();
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	bool IsWall(int x, int y) const;
 	void LoadFromCSV(const std::string& filename);

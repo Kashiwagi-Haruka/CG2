@@ -125,16 +125,22 @@ void ParticleManager::Update(Camera* camera) {
 	
 	Matrix4x4 backToFrontMatrix = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
 	// ==== カメラの向きだけを取り出す（平行移動なし逆行列） ====
-	Matrix4x4 camWorld = Function::Inverse(camera->GetViewMatrix());
+	// ==== カメラの向きだけを取り出す（平行移動なし逆行列） ====
+	Matrix4x4 camWorld = Function::Multiply(Function::Multiply(Function::MakeRotateXMatrix(camera->GetTransform().rotate.x),Function::MakeRotateYMatrix(camera->GetTransform().rotate.y)),Function::MakeRotateZMatrix(camera->GetTransform().rotate.z));
+	/*camWorld = Function::Inverse(camWorld);*/
+
+
 
 	// 平行移動を消す
 	camWorld.m[3][0] = 0.0f;
 	camWorld.m[3][1] = 0.0f;
 	camWorld.m[3][2] = 0.0f;
+
 	
 
-	// ==== これが正しいビルボード行列 ====
+	// これをビルボードに利用
 	Matrix4x4 billboard = camWorld;
+
 
 	// ==== 全てのパーティクルグループを処理 ====
 	for (auto& [name, group] : particleGroups) {
@@ -157,30 +163,73 @@ void ParticleManager::Update(Camera* camera) {
 				it = group.particles.erase(it);
 				continue;
 			}
-			if (RigidBody::IsCollision(accelerationField.area, {it->pos[0], it->pos[1], it->pos[2]})) {
-			p.vel[0] += accelerationField.Acceleation.x;
-			p.vel[1] += accelerationField.Acceleation.y;
-			p.vel[2] += accelerationField.Acceleation.z;
+
+			// 透明度減衰処理
+			p.color.w -= p.fadeSpeed;
+			if (p.color.w <= 0.0f) {
+				it = group.particles.erase(it);
+				continue;
+			}
+
+
+			if (RigidBody::IsCollision(accelerationField.area, {it->transform_.translate.x, it->transform_.translate.y, it->transform_.translate.z})) {
+			p.vel.x += accelerationField.Acceleation.x;
+			p.vel.y += accelerationField.Acceleation.y;
+			p.vel.z += accelerationField.Acceleation.z;
 			}
 			// --- 移動処理 ---
-			p.pos[0] += p.vel[0];
-			p.pos[1] += p.vel[1];
-			p.pos[2] += p.vel[2];
+			
+
+			p.transform_.translate.x += p.vel.x;
+			p.transform_.translate.y += p.vel.y;
+			p.transform_.translate.z += p.vel.z;
 
 
 
-			// ---- ワールド行列計算（ビルボード適用）----
-			Matrix4x4 translate = Function::MakeTranslateMatrix(p.pos[0], p.pos[1], p.pos[2]);
+		//--------------------------------------
+			// 1. ローカルスケール（カメラの影響を受けない）
+			//--------------------------------------
+			Matrix4x4 S = Function::MakeScaleMatrix(p.transform_.scale);
 
-			Matrix4x4 world = Function::Multiply(billboard,translate); // ビルボードを先に掛ける
+			//--------------------------------------
+			// 2. パーティクル自身の回転
+			//--------------------------------------
+			Matrix4x4 R = Function::MakeRotateXMatrix(p.transform_.rotate.x);
+			R = Function::Multiply(R, Function::MakeRotateYMatrix(p.transform_.rotate.y));
+			R = Function::Multiply(R, Function::MakeRotateZMatrix(p.transform_.rotate.z));
 
-			// --- WVP計算 ---
+			//--------------------------------------
+			// 3. 平行移動
+			//--------------------------------------
+			Matrix4x4 T = Function::MakeTranslateMatrix(p.transform_.translate.x, p.transform_.translate.y, p.transform_.translate.z);
+
+			//--------------------------------------
+			// 4. ビルボード（回転のみでOK）
+			//--------------------------------------
+			Matrix4x4 BB = billboard;
+			BB.m[3][0] = 0;
+			BB.m[3][1] = 0;
+			BB.m[3][2] = 0;
+
+			//--------------------------------------
+			// 5. 順番が最重要!!!
+			//    World = T × BB × R × S
+			//--------------------------------------
+			Matrix4x4 world = S;
+			world = Function::Multiply(R, world);
+			world = Function::Multiply(BB, world);
+			world = Function::Multiply(T, world);
+
+			//--------------------------------------
+			// 6. WVP
+			//--------------------------------------
 			Matrix4x4 wvp = Function::Multiply(Function::Multiply(world, view), proj);
 
-			// --- インスタンスデータ書き込み ---
+
+			// --- インスタンス書き込み ---
 			instPtr[idx].World = world;
 			instPtr[idx].WVP = wvp;
-
+			instPtr[idx].alpha = p.color.w;
 			idx++;
 			++it;
 		}
@@ -226,7 +275,13 @@ if (!cbResource_)
 	void* p = nullptr;
 	cbResource_->Map(0, nullptr, &p);
 	auto* m = reinterpret_cast<MaterialCB*>(p);
-	m->color[0] = m->color[1] = m->color[2] = m->color[3] = 1.0f;
+	// とりあえず代表粒子の alpha を使う（最小変更）
+	
+	m->color[0] = 1.0f;
+	m->color[1] = 1.0f;
+	m->color[2] = 1.0f;
+	m->color[3] = 1.0f;
+
 	m->enableLighting = 0;
 	m->pad[0] = m->pad[1] = m->pad[2] = 0.0f;
 	// 4x4 単位行列
@@ -270,7 +325,7 @@ if (!cbResource_)
 }
 
 
-void ParticleManager::Emit(const std::string& name, const Vector3& position, uint32_t count) {
+void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count) {
 	//---------------------------------------
 	// 1. グループ存在チェック
 	//---------------------------------------
@@ -285,15 +340,16 @@ void ParticleManager::Emit(const std::string& name, const Vector3& position, uin
 	for (uint32_t i = 0; i < count; ++i) {
 		Particle p{};
 
-		p.pos[0] = position.x + (float(rand()) / RAND_MAX) * (accelerationField.area.max.x - accelerationField.area.min.x) + accelerationField.area.min.x;
-		p.pos[1] = position.y + (float(rand()) / RAND_MAX) * (accelerationField.area.max.y - accelerationField.area.min.y) + accelerationField.area.min.y;
-		p.pos[2] = position.z + (float(rand()) / RAND_MAX) * (accelerationField.area.max.z - accelerationField.area.min.z) + accelerationField.area.min.z;
+		p.transform_.translate.x = transform.translate.x + (float(rand()) / RAND_MAX) * (accelerationField.area.max.x - accelerationField.area.min.x);
+		p.transform_.translate.y = transform.translate.y + (float(rand()) / RAND_MAX) * (accelerationField.area.max.y - accelerationField.area.min.y);
+		p.transform_.translate.z = transform.translate.z + (float(rand()) / RAND_MAX) * (accelerationField.area.max.z - accelerationField.area.min.z);
 
+		p.transform_.scale = transform.scale;
 
-
-		// 寿命（仕様書の指定）
-		p.life = 60.0f;
-
+		// 寿命
+		p.life = 120.0f;
+		p.color.w = 1.0f;
+		p.fadeSpeed = 0.02f;
 		// グループへ追加
 		group.particles.push_back(p);
 	}

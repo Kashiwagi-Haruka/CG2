@@ -19,10 +19,10 @@ PlayerBullet::~PlayerBullet() {
 	
 }
 
-void PlayerBullet::Initialize(GameBase* gameBase,Camera* camera) {
+void PlayerBullet::Initialize(Camera* camera) {
 	isCharge_ = false;
-	bulletObject_->Initialize(gameBase->GetObject3dCommon());
-	lineObject_->Initialize(gameBase->GetObject3dCommon());
+	bulletObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	lineObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	bulletObject_->SetModel("playerBullet");
 	lineObject_->SetModel("Cube");
 	camera_ = camera;
@@ -82,7 +82,7 @@ void PlayerBullet::Fire() {
 }
 
 
-void PlayerBullet::Draw(GameBase* gameBase) {
+void PlayerBullet::Draw() {
 
 	bulletObject_->Draw();
 	if (isCharge_)

@@ -52,11 +52,11 @@ class Player {
 
 	Player();
 	~Player();
-	void Initialize(GameBase* gameBase,Camera* camera);
-	void Move(GameBase* gameBase);
-	void Attack(GameBase* gameBase);
-	void Update(GameBase* gameBase);
-	void Draw(GameBase* gameBase);
+	void Initialize(Camera* camera);
+	void Move();
+	void Attack();
+	void Update();
+	void Draw();
 	void SetCamera(Camera* camera) { camera_ = camera;}
 	void SetMap(MapchipField* map) { map_ = map; }
 	Vector3 GetPosition() { return transform_.translate; }

@@ -11,9 +11,9 @@ SkyDome::SkyDome(){
 SkyDome::~SkyDome() {
 	delete skyDomeObject_; }
 
-void SkyDome::Initialize(GameBase* gameBase, Camera* camera) {
+void SkyDome::Initialize(Camera* camera) {
 	
-	skyDomeObject_->Initialize(gameBase->GetObject3dCommon());
+	skyDomeObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	skyDomeObject_->SetModel("skyDome");
 	camera_ = camera;
 	skyDomeObject_->SetCamera(camera_);
@@ -23,7 +23,7 @@ void SkyDome::Initialize(GameBase* gameBase, Camera* camera) {
 	skyDomeObject_->SetTransform(transform_);
 	skyDomeObject_->Update();
 }
-void SkyDome::Update(GameBase* gameBase) {
+void SkyDome::Update() {
 	skyDomeObject_->SetCamera(camera_);
 	
 	skyDomeObject_->Update();

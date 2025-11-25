@@ -5,18 +5,16 @@
 #include "Scene/TitleScene.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	GameBase* gameBase=new GameBase;
+	GameBase::GetInstance()->Initialize(L"CG2", 1280, 720);
 	D3DResourceLeakChecker* d3dResourceLeakChecker = new D3DResourceLeakChecker();
 	//エンジンの初期化
-	gameBase->Initialize(L"CG2", 1280, 720);
 	TitleScene* titleScene = new TitleScene();
 	titleScene->Initialize();
 	GameScene* gameScene = new GameScene();
-	gameScene->Initialize(gameBase);
+	gameScene->Initialize();
 	ResultScene* resultScene = new ResultScene();
-	resultScene->Initialize(gameBase);
-	SetUnhandledExceptionFilter(gameBase->ExportDump);
-	
+	resultScene->Initialize();
+	SetUnhandledExceptionFilter(GameBase::GetInstance()->ExportDump);
 	enum class SceneName {
 
 		Title,
@@ -29,28 +27,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		scene = SceneName::Game;
 	//#endif // DEBUG
 	/*int PrePressMouse = 0;*/
-	while (gameBase->ProcessMessage()) {
-		gameBase->BeginFlame();
+	while (GameBase::GetInstance()->ProcessMessage()) {
+		GameBase::GetInstance()->BeginFlame();
 
 		//update
 		switch (scene) {
 		case SceneName::Title:
-			titleScene->Update(gameBase);
+			titleScene->Update();
 			if (titleScene->GetIsSceneEnd()) {
 				scene = SceneName::Game;
-				gameScene->Initialize(gameBase);
+				gameScene->Initialize();
 			}
 
 			break;
 		case SceneName::Game:
-			gameScene->Update(gameBase);
+			gameScene->Update();
 			if (gameScene->IsSceneEnd_GameClear()||gameScene->IsSceneEnd_GameOver()) {
 				scene = SceneName::Result;
-				resultScene->Initialize(gameBase);
+				resultScene->Initialize();
 			}
 			break;
 		case SceneName::Result:
-			resultScene->Update(gameScene->IsSceneEnd_GameClear(), gameScene->IsSceneEnd_GameOver(), gameBase);
+			resultScene->Update(gameScene->IsSceneEnd_GameClear(), gameScene->IsSceneEnd_GameOver());
 			if (resultScene->GetIsSceneEnd()) {
 				scene = SceneName::Title;
 				titleScene->Initialize();
@@ -65,7 +63,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			titleScene->Draw();
 			break;
 		case SceneName::Game:
-			gameScene->Draw(gameBase);
+			gameScene->Draw();
 			break;
 		case SceneName::Result:
 			resultScene->Draw();
@@ -74,14 +72,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			break;
 		}
 		//ゲームの処理
-		gameBase->EndFlame();
+		GameBase::GetInstance()->EndFlame();
 		
 	}
 
 	delete resultScene;
 	delete gameScene;
 	delete titleScene;
-	delete gameBase;
+	GameBase::GetInstance()->Finalize();
 	delete d3dResourceLeakChecker;
 	CoUninitialize();
 

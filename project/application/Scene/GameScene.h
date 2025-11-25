@@ -6,6 +6,9 @@
 #include <imgui.h>
 #include "MapchipField.h"
 #include "Audio.h"
+#include "Goal.h"
+#include "SceneTransition.h"
+#include "UIManager.h"
 
 class Player;
 class Enemy;
@@ -26,6 +29,9 @@ class GameScene {
 
 	uint32_t color;
 
+	UIManager* uimanager = nullptr;
+	SceneTransition* sceneTransition = nullptr;
+	Goal* goal = nullptr;
 	Player* player = nullptr;
 	Enemy* enemy = nullptr;
 	SkyDome* skyDome = nullptr;
@@ -49,9 +55,9 @@ class GameScene {
 	GameScene();
 	~GameScene();
 
-	void Initialize(GameBase* gameBase);
-	void Update(GameBase* gameBase);
-	void Draw(GameBase* gameBase);
+	void Initialize();
+	void Update();
+	void Draw();
 	bool IsSceneEnd_GameClear() { return sceneEndClear; }
 	bool IsSceneEnd_GameOver() { return sceneEndOver; }
 

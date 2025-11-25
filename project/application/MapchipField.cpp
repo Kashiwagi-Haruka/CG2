@@ -17,7 +17,7 @@ MapchipField::MapchipField() {
 
 MapchipField::~MapchipField() { delete fieldObj; }
 
-void MapchipField::Initialize(GameBase* gameBase, Camera* camera) {
+void MapchipField::Initialize(Camera* camera) {
 
 	camera_ = camera;
 
@@ -28,7 +28,7 @@ void MapchipField::Initialize(GameBase* gameBase, Camera* camera) {
     };
 
 	
-	fieldObj->Initialize(gameBase->GetObject3dCommon());
+	fieldObj->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	fieldObj->SetModel("map");
 	fieldObj->SetCamera(camera_);
 	fieldObj->SetTransform(transform_);
@@ -55,8 +55,8 @@ void MapchipField::Update() {
 
 }
 
-void MapchipField::Draw(GameBase* gameBase) {
-	gameBase->ModelCommonSet();
+void MapchipField::Draw() {
+	GameBase::GetInstance()->ModelCommonSet();
 	fieldObj->Draw();
 }
 

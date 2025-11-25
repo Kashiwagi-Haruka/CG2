@@ -9,22 +9,26 @@ class UIManager {
 		Sprite* sprite = nullptr;
 		uint32_t handle = 0;
 		Vector2 size = {100,100};
-		Vector2 rotate = {100,100};
+		Vector2 rotate = {0,0};
 		Vector2 translate = {0,0};
 	};
 
-
 	SpriteData playerHpSPData;
-	SpriteData titleSPData;
-	SpriteData resultSPData;
+	SpriteData playerHPFlameSPData;
+
+	int playerHP;
+	int playerHPMax = 100;
+	Vector2 playerHPMaxSize = {20,50};
 
 	public:
 
 	UIManager();
 	~UIManager();
-	void Initialize(GameBase* gameBase);
+	void Initialize();
 	void Update();
-	void Draw(GameBase* gameBase);
+	void Draw();
 
+	void SetPlayerPosition(Vector2 playerPosition);
+	void SetPlayerHP(int HP);
 
 };

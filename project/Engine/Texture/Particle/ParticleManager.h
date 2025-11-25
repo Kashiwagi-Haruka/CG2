@@ -10,11 +10,20 @@
 #include "BlendModeManeger.h"
 #include "Transform.h"
 #include "RigidBody.h"
+#include "Vector4.h"
+
+
 struct Particle {
 	// 各パーティクルの情報（必要に応じて拡張）
-	float pos[3]{};
-	float vel[3]{};
+	Transform transform_{
+	    .scale = {1, 1, 1},
+          .rotate{0, 0, 0},
+          .translate{0, 0, 0}
+    };
+	Vector3 vel{};
 	float life{};
+	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+	float fadeSpeed = 0.02f;
 };
 
 class SrvManager;
@@ -39,15 +48,17 @@ public:
 
 		// 追加: インスタンス最大数
 		uint32_t maxInstance = 10000000;
+		
 	};
 
 public:
 	static ParticleManager* GetInstance();
 	void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager);
 	void CreateParticleGroup(const std::string& name, const std::string& textureFilePath);
-	void Emit(const std::string& name, const Vector3& position, uint32_t count);
+	void Emit(const std::string& name, const Transform& transform, uint32_t count);
 	void SetCamera(Camera* camera);
 	void SetBlendMode(BlendMode mode);
+	
 	//// グループの取得（なければ生成）
 	//ParticleGroup& GetGroup(const std::string& groupName);
 
@@ -61,6 +72,8 @@ public:
 	void SetFieldArea(const AABB& area) { accelerationField.area = area; }
 
 	void SetDrawArea(const AABB& area) { accelerationField.drawArea = area; }
+	
+	void SetScale(const Vector3& scale) { scale_ = scale; }
 
 	const Vector3& GetFieldAcceleration() const { return accelerationField.Acceleation; }
 
@@ -72,13 +85,19 @@ private:
 	struct TransformationMatrix {
 		Matrix4x4 WVP;
 		Matrix4x4 World;
+		float alpha;  // ★追加：インスタンスごとの透明度
+		float pad[3]; // 16バイトアラインメント
 	};
+
 	struct AccelerationField {
 		Vector3 Acceleation; // 加速度
 		AABB area;         // 範囲
 		AABB drawArea;
 	};
 	AccelerationField accelerationField{}; // フィールド
+
+	Vector3 scale_ = {1,1,1};
+	
 
 	static ParticleManager* instance;
 	DirectXCommon* dxCommon_ = nullptr;

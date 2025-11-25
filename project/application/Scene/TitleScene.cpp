@@ -8,8 +8,8 @@ TitleScene::~TitleScene(){
 void TitleScene::Initialize(){ 
 	isSceneEnd_ = false;
 }
-void TitleScene::Update(GameBase* gameBase){ 
-	if (gameBase->TriggerKey(DIK_SPACE)) {
+void TitleScene::Update(){ 
+	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
 	
 	isSceneEnd_ = true;
 	

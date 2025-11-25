@@ -12,7 +12,7 @@ class TitleScene {
 public: 
 	~TitleScene();
 	void Initialize();
-	void Update(GameBase*gameBase);
+	void Update();
 	void Draw();
 	bool GetIsSceneEnd() { return isSceneEnd_; }
 };

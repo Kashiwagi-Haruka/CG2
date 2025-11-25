@@ -15,8 +15,8 @@ class SkyDome {
 	public:
 	SkyDome();
 	~SkyDome();
-	void Initialize(GameBase* gameBase, Camera* camera);
-	void Update(GameBase* gameBase);
+	void Initialize(Camera* camera);
+	void Update();
 	void Draw();
 	void SetCamera(Camera* camera) { camera_ = camera; }
 

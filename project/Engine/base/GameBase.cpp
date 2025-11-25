@@ -17,7 +17,17 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dxcompiler.lib")
 
-GameBase::~GameBase(){
+GameBase* GameBase::instance = nullptr;
+
+GameBase* GameBase::GetInstance() {
+
+	if (instance == nullptr) {
+		instance = new GameBase;
+	}
+	return instance;
+}
+
+void GameBase::Finalize(){
 	ResourceRelease();
 	delete spriteCommon_;
 	delete obj3dCommon_;
@@ -31,6 +41,8 @@ GameBase::~GameBase(){
 	delete srvManager_;
 	delete dxCommon_;
 	delete winApp_;
+	delete instance;
+	instance = nullptr;
 }
 
 void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight) {

@@ -21,11 +21,11 @@ class PlayerBullet {
 	public:
 	PlayerBullet();
 	~PlayerBullet();
-	void Initialize(GameBase* gameBase,Camera* camera);
+	void Initialize(Camera* camera);
 	void Update(Camera* camera);
 	void Charge(Vector3 playerPos, Vector3 direction);
 	void Fire();
-	void Draw(GameBase* gameBase);
+	void Draw();
 	void SetVelocity(Vector3 velocity);
 	Vector3 GetPosition() { return bulletTransform_.translate; }
 };

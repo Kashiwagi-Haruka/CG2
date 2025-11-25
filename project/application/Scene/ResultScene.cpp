@@ -1,13 +1,13 @@
 #include "ResultScene.h"
 #include "GameBase.h"
-void ResultScene::Initialize(GameBase* gameBase) {
+void ResultScene::Initialize() {
 
 	isSceneEnd_ = false;
 
 }
-void ResultScene::Update(bool isGameClear, bool isGameOver,GameBase* gameBase) {
+void ResultScene::Update(bool isGameClear, bool isGameOver) {
 
-	if (gameBase->TriggerKey(DIK_SPACE)) {
+	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
 
 		isSceneEnd_ = true;
 		

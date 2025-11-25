@@ -27,7 +27,7 @@ Player::~Player(){
 	
 	
 }
-void Player::Initialize(GameBase* gameBase,Camera* camera){
+void Player::Initialize(Camera* camera){
 
 	state_ = State::kIdle;
 	velocity_ = { 0.0f, 0.0f, 0.0f };
@@ -40,7 +40,7 @@ void Player::Initialize(GameBase* gameBase,Camera* camera){
 	
 	
 	
-	playerObject_->Initialize(gameBase->GetObject3dCommon());
+	playerObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	
 	
 	playerObject_->SetModel("playerModel");
@@ -54,26 +54,26 @@ void Player::Initialize(GameBase* gameBase,Camera* camera){
 	bulletVelocity_ = {0, 0, 0};
 	
 }
-void Player::Move(GameBase* gameBase){
+void Player::Move(){
 	switch (state_) {
 	case Player::State::kIdle:
 		
-		if (gameBase->PushKey(DIK_A) || gameBase->PushKey(DIK_D)) {
+		if (GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_D)) {
 			state_ = State::kRunning;
 		}
-		if (gameBase->TriggerKey(DIK_SPACE)) {
+		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
 			state_ = State::kJumping;
 		}
 		break;
 	case Player::State::kRunning:
-		if (gameBase->PushKey(DIK_A)) {
+		if (GameBase::GetInstance()->PushKey(DIK_A)) {
 			velocity_.x += -accelationRate;
 		}
-		if (gameBase->PushKey(DIK_D)) {
+		if (GameBase::GetInstance()->PushKey(DIK_D)) {
 			velocity_.x += accelationRate;
 		}
 
-		if (gameBase->TriggerKey(DIK_SPACE)) {
+		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
 			state_ = State::kJumping;
 		}
 
@@ -102,7 +102,7 @@ void Player::Move(GameBase* gameBase){
 	default:
 		break;
 	}
-	if (!gameBase->PushKey(DIK_A) && !gameBase->PushKey(DIK_D)) {
+	if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D)) {
 		velocity_.x *= (1.0f - decelerationRate);
 		if (velocity_.x > -0.01f && velocity_.x < 0.01f) {
 			velocity_.x = 0.0f;
@@ -113,27 +113,27 @@ void Player::Move(GameBase* gameBase){
 	}
 	velocity_.x = std::clamp(velocity_.x, -accelationMax, accelationMax);
 	transform_.translate += velocity_;
-	if (gameBase->PushKey(DIK_A)) {
+	if (GameBase::GetInstance()->PushKey(DIK_A)) {
 		bulletVelocity_.x = -1;
 	}
-	if (gameBase->PushKey(DIK_D)) {
+	if (GameBase::GetInstance()->PushKey(DIK_D)) {
 		bulletVelocity_.x = 1;
 	}
-	if (gameBase->PushKey(DIK_W)) {
+	if (GameBase::GetInstance()->PushKey(DIK_W)) {
 		bulletVelocity_.y = 1;
 	}
 	
 	
 }
-void Player::Attack(GameBase* gameBase) {
+void Player::Attack() {
 
 	// --- 発射方向入力 ---
 	Vector3 shotDir = {0, 0, 0};
-	if (gameBase->PushKey(DIK_A))
+	if (GameBase::GetInstance()->PushKey(DIK_A))
 		shotDir.x = -1;
-	if (gameBase->PushKey(DIK_D))
+	if (GameBase::GetInstance()->PushKey(DIK_D))
 		shotDir.x = 1;
-	if (gameBase->PushKey(DIK_W))
+	if (GameBase::GetInstance()->PushKey(DIK_W))
 		shotDir.y = 1;
 
 	// 正規化（0ベクトルの場合は右向き）
@@ -144,15 +144,15 @@ void Player::Attack(GameBase* gameBase) {
 	}
 
 	// --- チャージ開始 ---
-	if (gameBase->TriggerKey(DIK_J)) {
+	if (GameBase::GetInstance()->TriggerKey(DIK_J)) {
 		if (bullet_)
 			delete bullet_;
 		bullet_ = new PlayerBullet();
-		bullet_->Initialize(gameBase, camera_);
+		bullet_->Initialize(camera_);
 	}
 
 	// --- チャージ中（弾をプレイヤー前に配置） ---
-	if (gameBase->PushKey(DIK_J)) {
+	if (GameBase::GetInstance()->PushKey(DIK_J)) {
 		if (bullet_) {
 			bullet_->SetVelocity(shotDir * 0.5f); // 発射方向を渡す
 			bullet_->Charge(transform_.translate, shotDir);
@@ -161,7 +161,7 @@ void Player::Attack(GameBase* gameBase) {
 	}
 
 	// --- 発射 ---
-	if (gameBase->ReleaseKey(DIK_J)) {
+	if (GameBase::GetInstance()->ReleaseKey(DIK_J)) {
 		if (bullet_) {
 			bullet_->Fire();
 		}
@@ -173,10 +173,10 @@ void Player::Attack(GameBase* gameBase) {
 	}
 }
 
-void Player::Update(GameBase* gameBase){
+void Player::Update(){
 
-	Attack(gameBase);
-	Move(gameBase);
+	Attack();
+	Move();
 	
 	
 	playerObject_->SetCamera(camera_);
@@ -217,13 +217,13 @@ void Player::Update(GameBase* gameBase){
 	
 
 }
-void Player::Draw(GameBase* gameBase) {
+void Player::Draw() {
 	
-	gameBase->ModelCommonSet();
+	GameBase::GetInstance()->ModelCommonSet();
 	playerObject_->Draw();
 	
 	if (bullet_) {
-	bullet_->Draw(gameBase);
+	bullet_->Draw();
 	}
 }
 Vector3 Player::GetBulletPosition() { return bullet_->GetPosition(); }

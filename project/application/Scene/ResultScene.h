@@ -7,8 +7,8 @@ class ResultScene {
 
 
 	public:
-	void Initialize(GameBase* gameBase);
-	void Update(bool isGameClear, bool isGameOver,GameBase* gameBase);
+	void Initialize();
+	void Update(bool isGameClear, bool isGameOver);
 	void Draw();
 	bool GetIsSceneEnd() { return isSceneEnd_; }
 };

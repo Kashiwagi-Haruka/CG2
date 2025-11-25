@@ -20,6 +20,8 @@ class GameBase{
 
 private:
 
+	static GameBase* instance;
+
 	WinApp* winApp_ = nullptr;
 
 	DirectXCommon* dxCommon_ = nullptr;
@@ -43,7 +45,9 @@ private:
 
    public:	
 
-	   ~GameBase();
+	static GameBase* GetInstance();
+
+	void Finalize();
 	
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
 
