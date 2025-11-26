@@ -60,9 +60,11 @@ void Player::Move(){
 		
 		if (GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_D)) {
 			state_ = State::kRunning;
+			hp_--;
 		}
 		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
 			state_ = State::kJumping;
+			hp_--;
 		}
 		break;
 	case Player::State::kRunning:

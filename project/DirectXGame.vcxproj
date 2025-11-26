@@ -159,6 +159,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Enemy\Enemy.cpp" />
     <ClCompile Include="application\CameraController.cpp" />
     <ClCompile Include="application\Enemy\EnemyManager.cpp" />
+    <ClCompile Include="application\Background\Background.cpp" />
     <ClCompile Include="Engine\Loadfile\CSVManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
@@ -211,12 +212,13 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Player\Player.cpp" />
     <ClCompile Include="application\Player\PlayerBullet.cpp" />
     <ClCompile Include="application\MapchipField.cpp" />
-    <ClCompile Include="application\SkyDome.cpp" />
+    <ClCompile Include="application\Background\SkyDome.cpp" />
     <ClCompile Include="application\Scene\ResultScene.cpp" />
     <ClCompile Include="application\Scene\TitleScene.cpp" />
     <ClCompile Include="application\Goal.cpp" />
     <ClCompile Include="application\UIManager.cpp" />
     <ClCompile Include="application\SceneTransition.cpp" />
+    <ClCompile Include="application\Particles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -235,6 +237,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Enemy\Enemy.h" />
     <ClInclude Include="application\CameraController.h" />
     <ClInclude Include="application\Enemy\EnemyManager.h" />
+    <ClInclude Include="application\Background\Background.h" />
     <ClInclude Include="Engine\Loadfile\CSVManager.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
@@ -279,12 +282,13 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Player\Player.h" />
     <ClInclude Include="application\Player\PlayerBullet.h" />
     <ClInclude Include="application\MapchipField.h" />
-    <ClInclude Include="application\SkyDome.h" />
+    <ClInclude Include="application\Background\SkyDome.h" />
     <ClInclude Include="application\Scene\ResultScene.h" />
     <ClInclude Include="application\Scene\TitleScene.h" />
     <ClInclude Include="application\Goal.h" />
     <ClInclude Include="application\UIManager.h" />
     <ClInclude Include="application\SceneTransition.h" />
+    <ClInclude Include="application\Particles.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

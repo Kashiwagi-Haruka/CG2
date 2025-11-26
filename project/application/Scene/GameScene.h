@@ -2,13 +2,14 @@
 #include "GameBase.h"
 #include "Sprite.h"
 #include "Object3d.h"
-#include "ParticleEmitter.h"
+#include "Particles.h"
 #include <imgui.h>
 #include "MapchipField.h"
 #include "Audio.h"
 #include "Goal.h"
 #include "SceneTransition.h"
 #include "UIManager.h"
+#include "Background/Background.h"
 
 class Player;
 class Enemy;
@@ -20,7 +21,6 @@ class GameScene {
 
 	private:
 		
-	ParticleEmitter* particle = nullptr;
 
 
 	bool IsPKey = false;
@@ -28,7 +28,7 @@ class GameScene {
 	bool IsKeyboard = true;
 
 	uint32_t color;
-
+	Particles* particles = nullptr;
 	UIManager* uimanager = nullptr;
 	SceneTransition* sceneTransition = nullptr;
 	Goal* goal = nullptr;
@@ -38,7 +38,8 @@ class GameScene {
 	CameraController* cameraController = nullptr;
 	MapchipField* field = nullptr;
 	SoundData soundData;
-    
+	Background* BG;
+
     ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白
 	DirectionalLight light{
 	    .color{1, 1, 1, 1},

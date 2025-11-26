@@ -52,11 +52,14 @@
     <Filter Include="ソース ファイル\Engine\Base">
       <UniqueIdentifier>{e2d52732-d767-4257-87f7-9c9563aa862f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\application\Player">
+      <UniqueIdentifier>{820bd1cf-53ed-4e12-91a5-3818988c5acd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\application\Player">
+      <UniqueIdentifier>{b4e1f078-b88d-4380-ba2c-7dde878c458e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="application\main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
@@ -108,13 +111,7 @@
     <ClCompile Include="application\MapchipField.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="application\Player\Player.cpp">
-      <Filter>ソース ファイル\application</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Player\PlayerBullet.cpp">
-      <Filter>ソース ファイル\application</Filter>
-    </ClCompile>
-    <ClCompile Include="application\SkyDome.cpp">
+    <ClCompile Include="application\Background\SkyDome.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="Engine\stringUtillity\StringUtility.cpp">
@@ -186,13 +183,28 @@
     <ClCompile Include="Engine\Texture\Mesh\Model.cpp">
       <Filter>ソース ファイル\Engine\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="application\UIManager.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="application\Background\Background.cpp">
+      <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="application\Goal.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\SceneTransition.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\UIManager.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Player\Player.cpp">
+      <Filter>ソース ファイル\application\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Player\PlayerBullet.cpp">
+      <Filter>ソース ファイル\application\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Particles.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -262,9 +274,6 @@
     <ClInclude Include="application\MapchipField.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="application\Player\Player.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Texture\BlendModeManeger.h">
       <Filter>ヘッダー ファイル\Engine\Texture</Filter>
     </ClInclude>
@@ -322,9 +331,6 @@
     <ClInclude Include="Engine\Camera\DebugCamera.h">
       <Filter>ヘッダー ファイル\Engine\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="application\Player\PlayerBullet.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Texture\Sprite\Sprite.h">
       <Filter>ヘッダー ファイル\Engine\Texture</Filter>
     </ClInclude>
@@ -349,19 +355,31 @@
     <ClInclude Include="application\Scene\ResultScene.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="application\SkyDome.h">
+    <ClInclude Include="application\Background\SkyDome.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="Engine\math\RigidBody.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="application\UIManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="application\Background\Background.h">
+      <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="application\Goal.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="application\SceneTransition.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\UIManager.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Player\PlayerBullet.h">
+      <Filter>ヘッダー ファイル\application\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Player\Player.h">
+      <Filter>ヘッダー ファイル\application\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Particles.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

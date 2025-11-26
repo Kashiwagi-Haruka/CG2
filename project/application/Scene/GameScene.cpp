@@ -4,14 +4,12 @@
 #include "Player/Player.h"
 #include "Enemy/Enemy.h"
 #include "CameraController.h"
-#include "SkyDome.h"
+#include "Background/SkyDome.h"
 
 GameScene::GameScene() {
 
 	cameraController = new CameraController();
-	
-	ParticleManager::GetInstance()->CreateParticleGroup("test", "Resources/2d/defaultParticle.png");
-	particle = new ParticleEmitter("test", {{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0, 0, 0}}, 1, 5, {0.01f, 0.01f, 0}, {0, 0, 0}, {5,10,1});
+	particles = new Particles();
 	skyDome = new SkyDome();
 	player = new Player();
 	enemy = new Enemy();
@@ -19,10 +17,12 @@ GameScene::GameScene() {
 	goal = new Goal();
 	sceneTransition = new SceneTransition();
 	uimanager = new UIManager();
+	BG = new Background();
 	soundData = Audio::GetInstance()->SoundLoadFile("Resources/audio/Alarm01.wav");
 }
 GameScene::~GameScene(){
 	Audio::GetInstance()->SoundUnload(&soundData);
+	delete BG;
 	delete uimanager;
 	delete sceneTransition;
 	delete goal;  
@@ -30,7 +30,7 @@ GameScene::~GameScene(){
 	delete enemy;
 	delete player;
 	delete skyDome;
-	delete particle;
+	delete particles;
 	delete cameraController;
 }
 
@@ -60,6 +60,9 @@ void GameScene::Initialize() {
 	uimanager->SetPlayerHP(player->GetHP());
 	uimanager->SetPlayerPosition({player->GetPosition().x, player->GetPosition().y});
 	uimanager->Initialize();
+	BG->SetCamera(cameraController->GetCamera());
+	BG->SetPosition(player->GetPosition());
+	BG->Initialize();
 	Audio::GetInstance()->SoundPlayWave(soundData);
 }
 
@@ -71,7 +74,7 @@ void GameScene::Update() {
 	enemy->SetCamera(cameraController->GetCamera());
 	field->SetCamera(cameraController->GetCamera());
 	goal->SetCamera(cameraController->GetCamera());
-	
+	BG->SetCamera(cameraController->GetCamera());
 	
 #ifdef USE_IMGUI
 	//ImGui::Begin("Plane");
@@ -126,8 +129,6 @@ void GameScene::Update() {
 	#endif
 	
 
-	
-
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
 	skyDome->Update();
 	player->Update();
@@ -137,14 +138,14 @@ void GameScene::Update() {
 		sceneEndClear = true;
 	}
 	goal->Update(); 
+
+	
+
 	// ===== プレイヤーと敵の当たり判定 =====
 	Vector3 p = player->GetPosition();
 	Vector3 e = enemy->GetPosition();
-	particle->Update({
-	    {0.1f, 0.1f, 1.0f},
-        {0,    0,    0   },
-        {p.x,    p.y-0.5f,    p.z-1.0f   }
-    });
+	
+
 	// 当たり判定サイズ（調整OK）
 	float hitSize = 1.0f;
 	// ===== プレイヤーとゴールの当たり判定 =====
@@ -201,10 +202,15 @@ void GameScene::Update() {
 		}
 	}
 
+	particles->SetPlayerPos(p);
+	particles->SetCameraPos(cameraController->GetTransform().translate);
+	particles->Update();
+
 	field->Update();
 	uimanager->SetPlayerHP(player->GetHP());
 	uimanager->SetPlayerPosition({player->GetPosition().x, player->GetPosition().y});
 	uimanager->Update();
+	BG->Update(player->GetVelocity());
 	cameraController->SetTranslate({player->GetPosition().x, player->GetPosition().y + 5, cameraController->GetTransform().translate.z});
 	cameraController->Update();
 }
@@ -219,8 +225,7 @@ void GameScene::Draw() {
 	}
 	field->Draw();
 	goal->Draw(); 
-	//planeObject_->Draw();
-	//axisObject_->Draw();
+	BG->Draw();
 	ParticleManager::GetInstance()->Draw();
 	
 	GameBase::GetInstance()->SpriteCommonSet();

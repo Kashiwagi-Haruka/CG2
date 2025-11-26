@@ -46,7 +46,7 @@ void UIManager::Draw(){
 
 	GameBase::GetInstance()->SpriteCommonSet();
 	playerHpSPData.sprite->Draw();
-
+	playerHPFlameSPData.sprite->Draw();
 }
 void UIManager::SetPlayerPosition(Vector2 playerPosition){ 
 	playerHpSPData.translate.x = playerPosition.x+600;
