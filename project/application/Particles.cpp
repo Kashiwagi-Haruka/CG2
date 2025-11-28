@@ -68,7 +68,7 @@ void Particles::Update() {
 	particlegoal->Update({
 	    {0.2f, 0.2f, 1.0f},
         {0.0f, 0.0f, 0.0f},
-        goalPos_ * 2.5f
+        {goalPos_.x * 2.5f,(goalPos_.y-0.5f)*2.5f,goalPos_.z*2.5f+1}
     });
 
 
@@ -76,6 +76,7 @@ void Particles::Update() {
 	// ============================
 	//   ★ IMGUI EDITOR ★
 	// ============================
+	#ifdef USE_IMGUI
 	if (ImGui::Begin("Particles Editor")) {
 
 		// ------- player -------
@@ -94,12 +95,13 @@ void Particles::Update() {
 
 	}
 	ImGui::End();
+	#endif
 }
 void Particles::SetPlayerPos(Vector3 playerPos){ playerPos_ = playerPos; }
 void Particles::SetCameraPos(Vector3 cameraPos) { cameraPos_ = cameraPos; }
 void Particles::SetGoalPos(Vector3 goalPos) { goalPos_ = goalPos; }
 void Particles::EditSingleEmitter(ParticleEmitter* e) {
-
+#ifdef USE_IMGUI
 	ImGui::PushID(e);
 
 	// ============================================
@@ -166,4 +168,7 @@ void Particles::EditSingleEmitter(ParticleEmitter* e) {
 	}
 
 	ImGui::PopID();
+#endif // USE_IMGUI
+
+	
 }

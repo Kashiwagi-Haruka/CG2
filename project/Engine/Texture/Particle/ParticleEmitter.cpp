@@ -30,6 +30,10 @@ void ParticleEmitter::Update(const Transform& parentTransform) {
 	}
 }
 
+// -----------------------------------------
+// EmitVisible
+// -----------------------------------------
+void ParticleEmitter::EmitVisible(bool v) { emitVisible_ = v; }
 
 
 
@@ -38,12 +42,13 @@ void ParticleEmitter::Update(const Transform& parentTransform) {
 // Emit
 // -----------------------------------------
 void ParticleEmitter::Emit() {
-	// ParticleManagerにEmitを投げるだけ
 	AABB fieldArea;
 	fieldArea.min = transform_.translate + areaMin_;
 	fieldArea.max = transform_.translate + areaMax_;
+
 	ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea);
 }
+
 
 void ParticleEmitter::SetAcceleration(Vector3 acceleration) { acceleration_ = acceleration; }
 void ParticleEmitter::SetCount(uint32_t cou){ count = cou; }

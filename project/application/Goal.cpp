@@ -19,9 +19,9 @@ void Goal::Initialize(Camera* camera){
 	object3d_->SetModel("goal");
 	object3d_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	transform_ = {
-	    {1, 1, 1},
+	    {2, 2, 2},
         {0, 0, 0},
-        {5, 2, 0}
+        {8, 1.5f, 0}
     };
 	object3d_->SetTransform(transform_);
 	

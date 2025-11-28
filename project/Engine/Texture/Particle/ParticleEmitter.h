@@ -15,6 +15,7 @@ public:
 
 	// 発生
 	void Emit();
+	void EmitVisible(bool v);
 
 	void SetFrequency(float frequency);
 	void SetCount(uint32_t count);
@@ -43,7 +44,7 @@ private:
 	Vector3 acceleration_; // 加速度
 	Vector3 areaMin_;      // 発生エリア最小座標
 	Vector3 areaMax_;      // 発生エリア最大座標
-	
+	bool emitVisible_ = true;   
 	float timer = 0.0f; // 発生管理用のタイマー
 
 };

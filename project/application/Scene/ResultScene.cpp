@@ -19,7 +19,7 @@ void ResultScene::Initialize() {
 	logoSP_.size = {16 * 20, 9 * 20};
 	logoSP_.translate = {640, 360};
 	logoSP_.sprite->SetScale(logoSP_.size);
-	logoSP_.translate = {logoSP_.translate};
+	logoSP_.sprite->SetPosition(logoSP_.translate);
 	logoSP_.sprite->Update();
 	isSceneEnd_ = false;
 

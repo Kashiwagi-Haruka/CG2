@@ -149,6 +149,13 @@ void ParticleManager::Update(Camera* camera) {
 				it = group.particles.erase(it);
 				continue;
 			}
+			// ---------------------
+			// 描画可否チェック
+			// ---------------------
+			if (!p.visible) {
+				++it;
+				continue;
+			}
 
 			// ---------------------
 			// 移動

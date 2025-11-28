@@ -153,7 +153,7 @@ void GameScene::Update() {
 		Vector3 p = player->GetPosition();
 		Vector3 g = goal->GetTranslate();
 
-		float goalHitSize = 1.0f;
+		float goalHitSize = 2.0f;
 
 		bool isGoalHit = fabs(p.x - g.x) < goalHitSize && fabs(p.y - g.y) < goalHitSize;
 

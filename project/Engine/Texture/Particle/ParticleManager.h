@@ -30,6 +30,7 @@ struct Particle {
 	// ★ 個別フィールド
 	Vector3 accel; // 個別加速度
 	AABB area;     // 個別発生エリア
+	bool visible = true;
 };
 
 
