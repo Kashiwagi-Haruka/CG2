@@ -32,18 +32,11 @@ Particles::Particles(){
             {0,    0,    0   }
     },
 	    1, 5, {0, 0.1f, 0}, {-10.0f, 0, -1}, {10.0f, 3, 0});
-	particlescreen = new ParticleEmitter(
-	    "screenEffect",
-	    {
-	        {1.0f, 1.0f, 1.0f},
-            {0.0f, 0.0f, 0.0f},
-            {0.0f, 0.0f, 0.0f}
-    },
-	    1, 5, {0.0f, 0.01f, 0}, {-30, 0, -1}, {30, 30, 0});
+	
 }
 Particles::~Particles(){
 
-	delete particlescreen;
+	
 	delete particlegoal;
 	delete particleleaf;
 	delete particleplayer;
@@ -78,11 +71,7 @@ void Particles::Update() {
         goalPos_ * 2.5f
     });
 
-	particlescreen->Update({
-	    {1.0f,         1.0f,         1.0f},
-        {0,            0,            0   },
-        {cameraPos_.x, cameraPos_.y, 0   }
-    });
+
 
 	// ============================
 	//   ★ IMGUI EDITOR ★
@@ -103,9 +92,6 @@ void Particles::Update() {
 		ImGui::Text("Goal Emitter");
 		EditSingleEmitter(particlegoal);
 
-		ImGui::Separator();
-		ImGui::Text("ScreenEffect Emitter");
-		EditSingleEmitter(particlescreen);
 	}
 	ImGui::End();
 }
