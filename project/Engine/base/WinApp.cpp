@@ -40,7 +40,7 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 }
 
 
-void WinApp::Initialize() { 
+void WinApp::Initialize(const wchar_t* TitleName) { 
 	HRESULT hr = CoInitializeEx(0, COINITBASE_MULTITHREADED);
 
 	wc_.lpfnWndProc = WindowProc;
@@ -57,7 +57,7 @@ void WinApp::Initialize() {
 
 	AdjustWindowRect(&wrc_, WS_OVERLAPPEDWINDOW, false);
 
-	hwnd_ = CreateWindow(wc_.lpszClassName, TitleName_, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, wrc_.right - wrc_.left, wrc_.bottom - wrc_.top, nullptr, nullptr, wc_.hInstance, nullptr);
+	hwnd_ = CreateWindow(wc_.lpszClassName, TitleName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, wrc_.right - wrc_.left, wrc_.bottom - wrc_.top, nullptr, nullptr, wc_.hInstance, nullptr);
 	
 
 	ShowWindow(hwnd_, SW_SHOW);

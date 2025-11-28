@@ -5,7 +5,7 @@
 #include "Scene/TitleScene.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	GameBase::GetInstance()->Initialize(L"CG2", 1280, 720);
+	GameBase::GetInstance()->Initialize(L"LE2A_04_カシワギハルカ", 1280, 720);
 	D3DResourceLeakChecker* d3dResourceLeakChecker = new D3DResourceLeakChecker();
 	//エンジンの初期化
 	TitleScene* titleScene = new TitleScene();

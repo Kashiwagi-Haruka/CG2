@@ -22,7 +22,7 @@ public:
 public: 
 
 	//初期化
-	void Initialize();
+	void Initialize(const wchar_t* TitleName);
 	// 更新
 	void Update();
 	// 終了
