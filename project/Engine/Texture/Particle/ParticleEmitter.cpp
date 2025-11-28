@@ -9,22 +9,29 @@ ParticleEmitter::ParticleEmitter(
     : name(groupName), transform_(transform), frequency(emitFrequency), count(emitCount), acceleration_(acceleration),areaMin_(areaMin),areaMax_(areaMax), timer(0.0f) // 明示する
 {}
 
-void ParticleEmitter::Update(const Transform& transform) {
-	// === 1. 時刻を進める ===
-	timer += frequency;
-	transform_.translate = transform.translate;
-	// === 2. 発生条件チェック ===
-	while (timer >= 1.0f) {
-		ParticleManager::GetInstance()->SetFieldAcceleration(acceleration_); 
-		ParticleManager::GetInstance()->SetFieldArea(AABB(transform_.translate-areaMin_, transform_.translate+areaMax_));
-		
-		// === 3. Emit（座標は transform.translate を使用）===
-		ParticleManager::GetInstance()->Emit(name, transform_, count);
+void ParticleEmitter::Update(const Transform& parentTransform) {
+	transform_ = parentTransform;
 
-		// === 4. 余り時間を保持して頻度計算を正しくする ===
+	timer += frequency;
+	while (timer >= 1.0f) {
+
+		// Emitter 専用の発生エリア
+		AABB fieldArea;
+		fieldArea.min = transform_.translate + areaMin_;
+		fieldArea.max = transform_.translate + areaMax_;
+
+		// ★ SetFieldAcceleration はもう使わない（全体共有なので）
+		// ★ SetFieldArea も使わない
+
+		// Emit() に emitter の個別フィールドを渡す
+		ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea);
+
 		timer -= 1.0f;
 	}
 }
+
+
+
 
 
 // -----------------------------------------
@@ -32,5 +39,18 @@ void ParticleEmitter::Update(const Transform& transform) {
 // -----------------------------------------
 void ParticleEmitter::Emit() {
 	// ParticleManagerにEmitを投げるだけ
-	ParticleManager::GetInstance()->Emit(name, transform_, count);
+	AABB fieldArea;
+	fieldArea.min = transform_.translate + areaMin_;
+	fieldArea.max = transform_.translate + areaMax_;
+	ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea);
+}
+
+void ParticleEmitter::SetAcceleration(Vector3 acceleration) { acceleration_ = acceleration; }
+void ParticleEmitter::SetCount(uint32_t cou){ count = cou; }
+void ParticleEmitter::SetFrequency(float fre){ frequency = fre; }
+void ParticleEmitter::SetAreaMin(Vector3 areamin){ areaMin_ = areamin; }
+void ParticleEmitter::SetAreaMax(Vector3 areamax) { areaMax_ = areamax;
+
+
+
 }

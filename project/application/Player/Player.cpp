@@ -34,7 +34,7 @@ void Player::Initialize(Camera* camera){
 	transform_ = {
 		.scale{1.0f, 1.0f, 1.0f},
 		.rotate{0.0f, 0.0f, 0.0f},
-		.translate{0.0f, 2.0f, 0.0f}
+		.translate{0.0f, 1.5f, 0.0f}
 	};
 	
 	
@@ -60,11 +60,11 @@ void Player::Move(){
 		
 		if (GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_D)) {
 			state_ = State::kRunning;
-			hp_--;
+			
 		}
 		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
 			state_ = State::kJumping;
-			hp_--;
+			
 		}
 		break;
 	case Player::State::kRunning:
@@ -194,6 +194,7 @@ void Player::Update(){
 	if (ImGui::Begin("Player")) {
 		
 	ImGui::DragInt("HP", &hp_);
+		ImGui::DragFloat3("plPos", &transform_.translate.x);
 		ImGui::Text("J = FIRE , WASD = MOVE , SPACE = JUMP");
 	
 	}

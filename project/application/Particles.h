@@ -6,9 +6,12 @@ class Particles {
 	ParticleEmitter* particleplayer = nullptr;
 	ParticleEmitter* particleleaf = nullptr;
 	ParticleEmitter* particlegoal = nullptr;
+	ParticleEmitter* particlescreen = nullptr;
 
 	Vector3 playerPos_;
 	Vector3 cameraPos_;
+	Vector3 goalPos_;
+	Transform playerEmitterTransform;
 
 	public:
 
@@ -17,4 +20,6 @@ class Particles {
 	void Update();
 	void SetPlayerPos(Vector3 playerPos);
 	void SetCameraPos(Vector3 cameraPos);
+	void SetGoalPos(Vector3 goalPos);
+	void EditSingleEmitter(ParticleEmitter* e);
 };

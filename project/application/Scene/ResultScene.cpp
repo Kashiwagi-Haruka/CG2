@@ -39,4 +39,7 @@ void ResultScene::Update(bool isGameClear, bool isGameOver) {
 
 }
 
-void ResultScene::Draw(){ logoSP_.sprite->Draw(); }
+void ResultScene::Draw(){ 
+	GameBase::GetInstance()->SpriteCommonSet();
+	logoSP_.sprite->Draw(); 
+}

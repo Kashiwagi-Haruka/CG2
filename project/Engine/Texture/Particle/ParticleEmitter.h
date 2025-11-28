@@ -16,6 +16,23 @@ public:
 	// 発生
 	void Emit();
 
+	void SetFrequency(float frequency);
+	void SetCount(uint32_t count);
+	void SetAcceleration(Vector3 acceleration);
+	void SetAreaMin(Vector3 areaMin);
+	void SetAreaMax(Vector3 areaMax);
+	float GetFrequency() { return frequency; }
+	uint32_t GetCount() { return count; }
+	Vector3 GetAcceleration() { return acceleration_; }
+	Vector3 GetAreaMin() { return areaMin_; }
+	Vector3 GetAreaMax() { return areaMax_; }
+	// === Transform Getter / Setter ===
+	Transform& GetTransformRef() { return transform_; }
+	const Transform& GetTransform() const { return transform_; }
+
+		void SetTransform(Transform& t) { transform_ = t; }
+	
+
 private:
 	
 	// メンバ変数（スライド仕様通り全てコンストラクタで設定）

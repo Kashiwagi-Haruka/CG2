@@ -11,20 +11,27 @@
 #include "Transform.h"
 #include "RigidBody.h"
 #include "Vector4.h"
-
+#include <array>
 
 struct Particle {
-	// 各パーティクルの情報（必要に応じて拡張）
 	Transform transform_{
 	    .scale = {1, 1, 1},
           .rotate{0, 0, 0},
           .translate{0, 0, 0}
     };
+
 	Vector3 vel{};
 	float life{};
-	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+	Vector4 color = {1, 1, 1, 1};
 	float fadeSpeed = 0.02f;
+
+	BlendMode blendmode = BlendMode::kBlendModeAlpha;
+
+	// ★ 個別フィールド
+	Vector3 accel; // 個別加速度
+	AABB area;     // 個別発生エリア
 };
+
 
 class SrvManager;
 class DirectXCommon;
@@ -35,27 +42,30 @@ class ParticleManager {
 public:
 
 	struct ParticleGroup {
-		std::string textureFilePath; // テクスチャファイル名
-		uint32_t textureSrvIndex;    // テクスチャ用 SRV Index（←TextureManagerのsrvIndex）
 
-		std::list<Particle> particles; // パーティクルのリスト
+		std::string textureFilePath;
+		uint32_t textureSrvIndex;
 
-		uint32_t instancingSrvIndex; // インスタンシングデータ用 SRV Index
-		Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource;
-		void* instancingDataPtr = nullptr;
+		std::list<Particle> particles;
 
-		uint32_t instanceCount = 0;
+		// ★ ブレンドモードごとのバッファ
+		struct BlendBucket {
+			uint32_t instancingSrvIndex = 0;
+			Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource;
+			void* instancingDataPtr = nullptr;
+			uint32_t instanceCount = 0;
+			uint32_t maxInstance = 1000;
+		};
 
-		// 追加: インスタンス最大数
-		uint32_t maxInstance = 10000000;
-		
+		std::array<BlendBucket, static_cast<int>(BlendMode::kCountOfBlendMode)> buckets;
 	};
+
 
 public:
 	static ParticleManager* GetInstance();
 	void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager);
 	void CreateParticleGroup(const std::string& name, const std::string& textureFilePath);
-	void Emit(const std::string& name, const Transform& transform, uint32_t count);
+	void Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area);
 	void SetCamera(Camera* camera);
 	void SetBlendMode(BlendMode mode);
 	
@@ -67,19 +77,19 @@ public:
 	void Draw();
 	void Finalize();
 	
-	void SetFieldAcceleration(const Vector3& accel) { accelerationField.Acceleation = accel; }
+	//void SetFieldAcceleration(const Vector3& accel) { accelerationField.Acceleation = accel; }
 
-	void SetFieldArea(const AABB& area) { accelerationField.area = area; }
+	//void SetFieldArea(const AABB& area) { accelerationField.area = area; }
 
-	void SetDrawArea(const AABB& area) { accelerationField.drawArea = area; }
-	
-	void SetScale(const Vector3& scale) { scale_ = scale; }
+	//void SetDrawArea(const AABB& area) { accelerationField.drawArea = area; }
+	//
+	//void SetScale(const Vector3& scale) { scale_ = scale; }
 
-	const Vector3& GetFieldAcceleration() const { return accelerationField.Acceleation; }
+	//const Vector3& GetFieldAcceleration() const { return accelerationField.Acceleation; }
 
-	const AABB& GetFieldArea() const { return accelerationField.area; }
+	//const AABB& GetFieldArea() const { return accelerationField.area; }
 
-	const AABB& GetDrawArea() const { return accelerationField.drawArea; }
+	//const AABB& GetDrawArea() const { return accelerationField.drawArea; }
 
 private:
 	struct TransformationMatrix {
@@ -89,12 +99,6 @@ private:
 		float pad[3]; // 16バイトアラインメント
 	};
 
-	struct AccelerationField {
-		Vector3 Acceleation; // 加速度
-		AABB area;         // 範囲
-		AABB drawArea;
-	};
-	AccelerationField accelerationField{}; // フィールド
 
 	Vector3 scale_ = {1,1,1};
 	
@@ -109,10 +113,10 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vbView_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_;
 
-	BlendMode blendmode = BlendMode::kBlendModeAlpha;
+	
 
 	// ... 既存のメンバ変数の下に追加
 	Microsoft::WRL::ComPtr<ID3D12Resource> cbResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vsTransformCB_; // ← 追加: VS用定数バッファ
-	void EnsureCapacity(ParticleGroup& group, uint32_t required);
+	void EnsureCapacityBucket(ParticleGroup::BlendBucket& bucket, uint32_t required);
 };

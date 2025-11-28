@@ -31,7 +31,7 @@ class Player {
 	float bulletRadius = 0.01f;
 
 	int hp_; // プレイヤーHP
-	int hpMax_ = 100;
+	int hpMax_ = 10000;
 	bool isAlive;
 	bool isInvincible_ = false;
 	float invincibleTimer_ = 0.0f;

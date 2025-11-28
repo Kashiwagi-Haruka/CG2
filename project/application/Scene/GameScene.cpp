@@ -202,15 +202,16 @@ void GameScene::Update() {
 		}
 	}
 
-	particles->SetPlayerPos(p);
+	particles->SetPlayerPos(player->GetPosition());
 	particles->SetCameraPos(cameraController->GetTransform().translate);
+	particles->SetGoalPos(goal->GetTranslate());
 	particles->Update();
 
 	field->Update();
 	uimanager->SetPlayerHP(player->GetHP());
 	uimanager->SetPlayerPosition({player->GetPosition().x, player->GetPosition().y});
 	uimanager->Update();
-	BG->Update(player->GetVelocity());
+	BG->Update(player->GetPosition());
 	cameraController->SetTranslate({player->GetPosition().x, player->GetPosition().y + 5, cameraController->GetTransform().translate.z});
 	cameraController->Update();
 }

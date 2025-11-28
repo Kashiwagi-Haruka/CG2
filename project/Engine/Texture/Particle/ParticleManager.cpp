@@ -86,30 +86,20 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	uint32_t elementSize = sizeof(TransformationMatrix);
 	uint32_t bufferSize = maxInstance * elementSize;
 
-	// GPU リソース作成（UPLOAD）
-	newGroup.instancingResource = dxCommon_->CreateBufferResource(bufferSize);
+for (int i = 0; i < (int)BlendMode::kCountOfBlendMode; i++) {
 
-	// CPU側から書き込むためにマップ
-	newGroup.instancingResource->Map(0, nullptr, &newGroup.instancingDataPtr);
+		auto& b = newGroup.buckets[i];
+		b.maxInstance = 1000;
 
-	// 初期値
-	newGroup.maxInstance = maxInstance;
-	newGroup.instanceCount = 0;
+		uint32_t bufferSize = sizeof(TransformationMatrix) * b.maxInstance;
 
-	//--------------------------------
-	// 7. SRV を確保してインデックス記録
-	//--------------------------------
-	newGroup.instancingSrvIndex = srvManager_->Allocate();
+		b.instancingResource = dxCommon_->CreateBufferResource(bufferSize);
+		b.instancingResource->Map(0, nullptr, &b.instancingDataPtr);
 
-	//--------------------------------
-	// 8. StructuredBuffer 用 SRV 生成
-	//--------------------------------
-	srvManager_->CreateSRVforStructuredBuffer(
-	    newGroup.instancingSrvIndex,       // 作成先インデックス
-	    newGroup.instancingResource.Get(), // 対象リソース
-	    maxInstance,                       // 要素数
-	    sizeof(TransformationMatrix)       // 1要素のサイズ
-	);
+		b.instancingSrvIndex = srvManager_->Allocate();
+		srvManager_->CreateSRVforStructuredBuffer(b.instancingSrvIndex, b.instancingResource.Get(), b.maxInstance, sizeof(TransformationMatrix));
+	}
+
 
 	//--------------------------------
 	// 9. グループ登録
@@ -118,129 +108,120 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 }
 
 void ParticleManager::Update(Camera* camera) {
-	// ==== カメラ行列取得 ====
+
 	const Matrix4x4& view = camera->GetViewMatrix();
 	const Matrix4x4& proj = camera->GetProjectionMatrix();
 
-	
-	Matrix4x4 backToFrontMatrix = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
-	// ==== カメラの向きだけを取り出す（平行移動なし逆行列） ====
-	// ==== カメラの向きだけを取り出す（平行移動なし逆行列） ====
-	Matrix4x4 camWorld = Function::Multiply(Function::Multiply(Function::MakeRotateXMatrix(camera->GetTransform().rotate.x),Function::MakeRotateYMatrix(camera->GetTransform().rotate.y)),Function::MakeRotateZMatrix(camera->GetTransform().rotate.z));
-	/*camWorld = Function::Inverse(camWorld);*/
+	Matrix4x4 camWorld = Function::MakeRotateXMatrix(camera->GetTransform().rotate.x);
+	camWorld = Function::Multiply(camWorld, Function::MakeRotateYMatrix(camera->GetTransform().rotate.y));
+	camWorld = Function::Multiply(camWorld, Function::MakeRotateZMatrix(camera->GetTransform().rotate.z));
 
+	camWorld.m[3][0] = camWorld.m[3][1] = camWorld.m[3][2] = 0;
 
-
-	// 平行移動を消す
-	camWorld.m[3][0] = 0.0f;
-	camWorld.m[3][1] = 0.0f;
-	camWorld.m[3][2] = 0.0f;
-
-	
-
-	// これをビルボードに利用
 	Matrix4x4 billboard = camWorld;
 
-
-	// ==== 全てのパーティクルグループを処理 ====
+	// ============================
+	//  全グループ更新
+	// ============================
 	for (auto& [name, group] : particleGroups) {
-		// 必要なら容量拡張
-		uint32_t required = (uint32_t)group.particles.size();
-		EnsureCapacity(group, required);
 
-		// インスタンス書き込み先
-		TransformationMatrix* instPtr = reinterpret_cast<TransformationMatrix*>(group.instancingDataPtr);
+		// ★ 各ブレンドモードの instanceCount をリセット
+		for (auto& bucket : group.buckets) {
+			bucket.instanceCount = 0;
+		}
 
-		uint32_t idx = 0;
-
-		// ==== グループ内の全パーティクルを一重ループで ====
 		for (auto it = group.particles.begin(); it != group.particles.end();) {
-			Particle& p = *it;
 
-			// --- 寿命処理 ---
+			Particle& p = *it;
+			
+
+			// ---------------------
+			// 寿命
+			// ---------------------
 			p.life -= 1.0f;
 			if (p.life <= 0.0f) {
 				it = group.particles.erase(it);
 				continue;
 			}
 
-			// 透明度減衰処理
 			p.color.w -= p.fadeSpeed;
 			if (p.color.w <= 0.0f) {
 				it = group.particles.erase(it);
 				continue;
 			}
 
+			// ---------------------
+			// 移動
+			// ---------------------
+			p.vel.x += p.accel.x;
+			p.vel.y += p.accel.y;
+			p.vel.z += p.accel.z;
 
-			if (RigidBody::IsCollision(accelerationField.area, {it->transform_.translate.x, it->transform_.translate.y, it->transform_.translate.z})) {
-			p.vel.x += accelerationField.Acceleation.x;
-			p.vel.y += accelerationField.Acceleation.y;
-			p.vel.z += accelerationField.Acceleation.z;
-			}
-			// --- 移動処理 ---
-			
 
 			p.transform_.translate.x += p.vel.x;
 			p.transform_.translate.y += p.vel.y;
 			p.transform_.translate.z += p.vel.z;
 
-
-
-		//--------------------------------------
-			// 1. ローカルスケール（カメラの影響を受けない）
-			//--------------------------------------
+			// ---------------------
+			// ワールド行列
+			// ---------------------
 			Matrix4x4 S = Function::MakeScaleMatrix(p.transform_.scale);
 
-			//--------------------------------------
-			// 2. パーティクル自身の回転
-			//--------------------------------------
 			Matrix4x4 R = Function::MakeRotateXMatrix(p.transform_.rotate.x);
 			R = Function::Multiply(R, Function::MakeRotateYMatrix(p.transform_.rotate.y));
 			R = Function::Multiply(R, Function::MakeRotateZMatrix(p.transform_.rotate.z));
 
-			//--------------------------------------
-			// 3. 平行移動
-			//--------------------------------------
 			Matrix4x4 T = Function::MakeTranslateMatrix(p.transform_.translate.x, p.transform_.translate.y, p.transform_.translate.z);
 
-			//--------------------------------------
-			// 4. ビルボード（回転のみでOK）
-			//--------------------------------------
 			Matrix4x4 BB = billboard;
-			BB.m[3][0] = 0;
-			BB.m[3][1] = 0;
-			BB.m[3][2] = 0;
+			BB.m[3][0] = BB.m[3][1] = BB.m[3][2] = 0;
 
-			//--------------------------------------
-			// 5. 順番が最重要!!!
-			//    World = T × BB × R × S
-			//--------------------------------------
 			Matrix4x4 world = S;
 			world = Function::Multiply(R, world);
 			world = Function::Multiply(BB, world);
 			world = Function::Multiply(T, world);
 
-			//--------------------------------------
-			// 6. WVP
-			//--------------------------------------
 			Matrix4x4 wvp = Function::Multiply(Function::Multiply(world, view), proj);
 
+			// ================================
+			// ブレンドモード別のバケットに追加
+			// ================================
+			int mode = (int)p.blendmode;
+			auto& bucket = group.buckets[mode];
 
-			// --- インスタンス書き込み ---
-			instPtr[idx].World = world;
-			instPtr[idx].WVP = wvp;
-			instPtr[idx].alpha = p.color.w;
-			idx++;
+			// 容量不足なら拡張
+			if (bucket.instanceCount >= bucket.maxInstance) {
+
+				uint32_t newSize = bucket.maxInstance * 2;
+				uint32_t bufferSize = sizeof(TransformationMatrix) * newSize;
+
+				Microsoft::WRL::ComPtr<ID3D12Resource> newRes = dxCommon_->CreateBufferResource(bufferSize);
+
+				void* newPtr = nullptr;
+				newRes->Map(0, nullptr, &newPtr);
+
+				memcpy(newPtr, bucket.instancingDataPtr, sizeof(TransformationMatrix) * bucket.instanceCount);
+
+				bucket.instancingResource = newRes;
+				bucket.instancingDataPtr = newPtr;
+				bucket.maxInstance = newSize;
+
+				srvManager_->CreateSRVforStructuredBuffer(bucket.instancingSrvIndex, bucket.instancingResource.Get(), bucket.maxInstance, sizeof(TransformationMatrix));
+			}
+
+			TransformationMatrix* instPtr = reinterpret_cast<TransformationMatrix*>(bucket.instancingDataPtr);
+
+			instPtr[bucket.instanceCount].World = world;
+			instPtr[bucket.instanceCount].WVP = wvp;
+			instPtr[bucket.instanceCount].alpha = p.color.w;
+
+			bucket.instanceCount++;
+
 			++it;
 		}
-
-		group.instanceCount = idx;
 	}
 }
 
-
-void ParticleManager::SetBlendMode(BlendMode mode) {
-	blendmode = mode; }
 
 
 void ParticleManager::Draw() {
@@ -293,7 +274,6 @@ if (!cbResource_)
 
 	// ① RootSig / ② PSO / ③ Heap / ④ CBV(b0) / ⑤ IA 設定
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(dxCommon_->GetParticleRootSignature());
-	dxCommon_->GetCommandList()->SetPipelineState(dxCommon_->GetParticlePipelineState(blendmode));
 	ID3D12DescriptorHeap* heaps[] = {srvManager_->GetDescriptorHeap().Get()};
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(1, heaps);
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, cbResource_->GetGPUVirtualAddress());
@@ -313,59 +293,69 @@ if (!cbResource_)
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(
 	    3, // rootParameters[3] = b1
 	    vsTransformCB_->GetGPUVirtualAddress());
+	// ==========================================
+	// ブレンドモード別に描画
+	// ==========================================
+	for (int mode = 0; mode < (int)BlendMode::kCountOfBlendMode; mode++) {
 
-	// グループごとの描画…
-	for (auto& [name, group] : particleGroups) {
-		if (group.instanceCount == 0)
-			continue;
-		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group.textureSrvIndex));
-		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(group.instancingSrvIndex));
-		dxCommon_->GetCommandList()->DrawInstanced(6, group.instanceCount, 0, 0);
+		dxCommon_->GetCommandList()->SetPipelineState(dxCommon_->GetParticlePipelineState((BlendMode)mode));
+
+		for (auto& [name, group] : particleGroups) {
+
+			auto& bucket = group.buckets[mode];
+			if (bucket.instanceCount == 0)
+				continue;
+
+			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group.textureSrvIndex));
+
+			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(bucket.instancingSrvIndex));
+
+			dxCommon_->GetCommandList()->DrawInstanced(6, bucket.instanceCount, 0, 0);
+		}
 	}
 }
 
+void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area) {
 
-void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count) {
-	//---------------------------------------
-	// 1. グループ存在チェック
-	//---------------------------------------
-	auto it = particleGroups.find(name);
-	assert(it != particleGroups.end() && "ParticleGroup name not found!");
+	auto& group = particleGroups[name];
 
-	ParticleGroup& group = it->second;
-
-	//---------------------------------------
-	// 2. パーティクルを生成して登録
-	//---------------------------------------
 	for (uint32_t i = 0; i < count; ++i) {
+
 		Particle p{};
 
-		p.transform_.translate.x = transform.translate.x + (float(rand()) / RAND_MAX) * (accelerationField.area.max.x - accelerationField.area.min.x);
-		p.transform_.translate.y = transform.translate.y + (float(rand()) / RAND_MAX) * (accelerationField.area.max.y - accelerationField.area.min.y);
-		p.transform_.translate.z = transform.translate.z + (float(rand()) / RAND_MAX) * (accelerationField.area.max.z - accelerationField.area.min.z);
+		// ★ Emitter の個別範囲でランダム発生
+		float rx = area.min.x + (rand() / (float)RAND_MAX) * (area.max.x - area.min.x);
+		float ry = area.min.y + (rand() / (float)RAND_MAX) * (area.max.y - area.min.y);
+		float rz = area.min.z + (rand() / (float)RAND_MAX) * (area.max.z - area.min.z);
+
+		p.transform_.translate = {transform.translate.x + rx, transform.translate.y + ry, transform.translate.z + rz};
 
 		p.transform_.scale = transform.scale;
 
-		// 寿命
 		p.life = 120.0f;
 		p.color.w = 1.0f;
-		p.fadeSpeed = 0.02f;
-		// グループへ追加
+
+		// ★ ここで個別フィールドを保存
+		p.accel = accel;
+		p.area = area;
+
 		group.particles.push_back(p);
 	}
 }
 
-void ParticleManager::EnsureCapacity(ParticleGroup& group, uint32_t required) {
-	if (required <= group.maxInstance)
+void ParticleManager::EnsureCapacityBucket(ParticleGroup::BlendBucket& bucket, uint32_t required) {
+	if (required <= bucket.maxInstance)
 		return;
 
-	uint32_t newSize = group.maxInstance;
+	// 新しいサイズに拡張（2倍ずつ増やす）
+	uint32_t newSize = bucket.maxInstance;
 	while (newSize < required) {
 		newSize *= 2;
 	}
 
 	uint32_t bufferSize = sizeof(TransformationMatrix) * newSize;
 
+	// 新しいバッファを生成
 	D3D12_HEAP_PROPERTIES heapProps{};
 	heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
 
@@ -382,31 +372,30 @@ void ParticleManager::EnsureCapacity(ParticleGroup& group, uint32_t required) {
 	Microsoft::WRL::ComPtr<ID3D12Resource> newRes;
 	dxCommon_->GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &resDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&newRes));
 
+	// 新バッファへマップ
 	void* newPtr = nullptr;
-	void* oldPtr = group.instancingDataPtr;
-	uint32_t oldSize = group.maxInstance;
-
-	// リソース新規作成後
 	newRes->Map(0, nullptr, &newPtr);
 
-	// 古いデータをコピー（生存している分だけ）
-	uint32_t toCopy = min(oldSize, group.instanceCount);
-	memcpy(newPtr, oldPtr, sizeof(TransformationMatrix) * toCopy);
+	// 古いデータをコピー（現存しているインスタンス数だけ）
+	uint32_t toCopy = bucket.instanceCount;
+	memcpy(newPtr, bucket.instancingDataPtr, sizeof(TransformationMatrix) * toCopy);
 
-	// 差し替え
-	group.instancingResource = newRes;
-	group.instancingDataPtr = newPtr;
-	group.maxInstance = newSize;
+	// バッファ差し替え
+	bucket.instancingResource = newRes;
+	bucket.instancingDataPtr = newPtr;
+	bucket.maxInstance = newSize;
 
-
-	
-	srvManager_->CreateSRVforStructuredBuffer(group.instancingSrvIndex, group.instancingResource.Get(), group.maxInstance, sizeof(TransformationMatrix));
+	// SRV を更新（同じ SRV index に新バッファを再登録）
+	srvManager_->CreateSRVforStructuredBuffer(bucket.instancingSrvIndex, bucket.instancingResource.Get(), bucket.maxInstance, sizeof(TransformationMatrix));
 }
+
 void ParticleManager::Finalize() {
 	for (auto& [name, group] : particleGroups) {
-		if (group.instancingResource) {
-			group.instancingResource->Unmap(0, nullptr);
-			group.instancingDataPtr = nullptr;
+		for (auto& b : group.buckets) {
+			if (b.instancingResource) {
+				b.instancingResource->Unmap(0, nullptr);
+				b.instancingDataPtr = nullptr;
+			}
 		}
 	}
 	particleGroups.clear();
