@@ -24,7 +24,7 @@ class Enemy {
 public:
 	Enemy();
 	~Enemy();
-	void Initialize(Camera* camera);
+	void Initialize(Camera* camera,Vector3 translate);
 	void Update();
 	void Draw();
 	void Stun(); // ★追加
@@ -32,5 +32,6 @@ public:
 	bool GetIsAlive() { return isAlive; }
 	void SetCamera(Camera* camera) { camera_ = camera;}
 	Vector3 GetPosition() { return transform_.translate; }
+	void SetPosition() { transform_.translate; }
 	void BulletCollision();
 };

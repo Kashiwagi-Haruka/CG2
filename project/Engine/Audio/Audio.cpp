@@ -128,7 +128,7 @@ void Audio::SoundUnload(SoundData* soundData) {
 }
 
 
-void Audio::SoundPlayWave(const SoundData& soundData) {
+void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	if (!xAudio2_) {
 		OutputDebugStringA("SoundPlayWave: xAudio2 is null!\n");
 		return;
@@ -139,10 +139,17 @@ void Audio::SoundPlayWave(const SoundData& soundData) {
 	assert(SUCCEEDED(result_));
 
 	XAUDIO2_BUFFER buf{};
-
 	buf.pAudioData = soundData.buffer.data();
-	buf.AudioBytes = static_cast < UINT32>(soundData.buffer.size());
-	buf.Flags = XAUDIO2_END_OF_STREAM;
+	buf.AudioBytes = static_cast<UINT32>(soundData.buffer.size());
+
+	if (isLoop) {
+		buf.LoopBegin = 0;                     // バッファ先頭から
+		buf.LoopLength = 0;                    // 0 = 全体をループ
+		buf.LoopCount = XAUDIO2_LOOP_INFINITE; // 無限ループ
+		buf.Flags = 0;                         // ループ時は END_OF_STREAM にしない
+	} else {
+		buf.Flags = XAUDIO2_END_OF_STREAM; // 1回再生のみ
+	}
 
 	result_ = pSourceVoice->SubmitSourceBuffer(&buf);
 	assert(SUCCEEDED(result_));

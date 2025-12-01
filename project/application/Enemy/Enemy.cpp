@@ -16,7 +16,7 @@ Enemy::~Enemy() {
 	
 }
 
-void Enemy::Initialize(Camera* camera) {
+void Enemy::Initialize(Camera* camera,Vector3 translates) {
 	isAlive = true;
 	isHit = false;
 	HP = 2;
@@ -27,7 +27,7 @@ void Enemy::Initialize(Camera* camera) {
 	transform_ = {
 		.scale{1.0f,1.0f,1.0f},
 		.rotate{0.0f,0.0f,0.0f},
-		.translate{5.0f,2.0f,0.0f}
+		.translate=translates
     };
 	object_->SetTransform(transform_);
 	object_->SetCamera(camera_);

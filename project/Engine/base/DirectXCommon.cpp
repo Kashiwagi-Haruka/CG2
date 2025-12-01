@@ -53,6 +53,7 @@ void DirectXCommon::initialize(WinApp* winApp) {
 
 	//VertexResource();
 
+
 	//DrawCommandList();
 
 	//CrtvTransitionBarrier();

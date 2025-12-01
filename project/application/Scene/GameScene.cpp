@@ -2,32 +2,34 @@
 #include "ModelManeger.h"
 #include "ParticleManager.h"
 #include "Player/Player.h"
-#include "Enemy/Enemy.h"
 #include "CameraController.h"
 #include "Background/SkyDome.h"
-
+#include "Enemy/EnemyManager.h"
 GameScene::GameScene() {
 
 	cameraController = new CameraController();
 	particles = new Particles();
 	skyDome = new SkyDome();
 	player = new Player();
-	enemy = new Enemy();
+	enemyManager = new EnemyManager();
+
 	field = new MapchipField();
 	goal = new Goal();
 	sceneTransition = new SceneTransition();
 	uimanager = new UIManager();
 	BG = new Background();
 	soundData = Audio::GetInstance()->SoundLoadFile("Resources/audio/Alarm01.wav");
+	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/昼下がり気分.mp3");
 }
 GameScene::~GameScene(){
+	Audio::GetInstance()->SoundUnload(&BGMData);
 	Audio::GetInstance()->SoundUnload(&soundData);
 	delete BG;
 	delete uimanager;
 	delete sceneTransition;
 	delete goal;  
 	delete field;
-	delete enemy;
+	delete enemyManager;
 	delete player;
 	delete skyDome;
 	delete particles;
@@ -52,7 +54,7 @@ void GameScene::Initialize() {
 	
 	skyDome->Initialize(cameraController->GetCamera());
 	player->Initialize(cameraController->GetCamera());
-	enemy->Initialize(cameraController->GetCamera());
+	enemyManager->Initialize(cameraController->GetCamera());
 	field->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field->Initialize(cameraController->GetCamera());
 	goal->Initialize(cameraController->GetCamera());
@@ -64,6 +66,7 @@ void GameScene::Initialize() {
 	BG->SetPosition(player->GetPosition());
 	BG->Initialize();
 	Audio::GetInstance()->SoundPlayWave(soundData);
+	Audio::GetInstance()->SoundPlayWave(BGMData,true);
 }
 
 void GameScene::Update() {
@@ -71,7 +74,6 @@ void GameScene::Update() {
 	
 	skyDome->SetCamera(cameraController->GetCamera());
 	player->SetCamera(cameraController->GetCamera());
-	enemy->SetCamera(cameraController->GetCamera());
 	field->SetCamera(cameraController->GetCamera());
 	goal->SetCamera(cameraController->GetCamera());
 	BG->SetCamera(cameraController->GetCamera());
@@ -132,20 +134,11 @@ void GameScene::Update() {
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
 	skyDome->Update();
 	player->Update();
-	if (enemy->GetIsAlive()) {
-	enemy->Update();
-	} else {
-		sceneEndClear = true;
-	}
+	enemyManager->Update(cameraController->GetCamera());
+
 	goal->Update(); 
 
 	
-
-	// ===== プレイヤーと敵の当たり判定 =====
-	Vector3 p = player->GetPosition();
-	Vector3 e = enemy->GetPosition();
-	
-
 	// 当たり判定サイズ（調整OK）
 	float hitSize = 1.0f;
 	// ===== プレイヤーとゴールの当たり判定 =====
@@ -162,45 +155,53 @@ void GameScene::Update() {
 		}
 	}
 
-	// AABBチェック
-	bool isColliding = fabs(p.x - e.x) < hitSize && fabs(p.y - e.y) < hitSize;
-
+	
 	if (!player->GetIsAlive()) {
+
 		sceneEndOver = true;
 	}
 
-	// 衝突した
-	if (isColliding) {
+// ===== プレイヤーと敵の当たり判定 =====
+	Vector3 p = player->GetPosition();
+	Vector3 v = player->GetVelocity();
+	
+	float bulletHitSize = 1.0f; // 弾の当たり判定
 
-		// --- 上から踏んだ判定 ---
-		bool isStomping = (p.y > e.y + 0.3f) &&          // プレイヤーが敵より上
-		                  (player->GetVelocity().y < 0); // 落下中
+	for (auto e : enemyManager->enemies) {
 
-		if (isStomping) {
-			// 敵をひるませる
-			enemy->Stun(); 
-		} else {
-			// それ以外はプレイヤーがダメージ
-			player->Damage(1);
+		if (!e->GetIsAlive())
+			continue; // 死んだ敵はスキップ
+
+		Vector3 ePos = e->GetPosition();
+
+		// ===== ① プレイヤーが敵と接触 =====
+		bool isCollidePlayer = fabs(p.x - ePos.x) < hitSize && fabs(p.y - ePos.y) < hitSize;
+
+		if (isCollidePlayer) {
+
+			// --- 上から踏んだ判定 ---
+			bool isStomp = (p.y > ePos.y + 0.3f) && // プレイヤーが上にいる
+			               (v.y < 0);               // 落下中
+
+			if (isStomp) {
+				e->Stun(); // 敵にダメージ（スタン）
+			} else {
+				player->Damage(1); // プレイヤーが被弾
+			}
+		}
+
+		// ===== ② プレイヤー弾と敵の当たり判定 =====
+		if (player->GetIsPlayerBullet()) {
+			Vector3 b = player->GetBulletPosition();
+
+			bool isBulletHit = fabs(b.x - ePos.x) < bulletHitSize && fabs(b.y - ePos.y) < bulletHitSize;
+
+			if (isBulletHit) {
+				e->SetHP(0); // 敵を即死させる
+			}
 		}
 	}
-	// ===== プレイヤー弾と敵の当たり判定 =====
-	if (player->GetIsPlayerBullet()&&enemy->GetIsAlive()) {
-		// 弾の位置
-		Vector3 b = player->GetBulletPosition();
-		// 敵の位置
-		Vector3 ePos = enemy->GetPosition();
 
-		// 当たり判定のサイズ
-		float bulletHitSize = 1.0f;
-
-		bool isBulletHit = fabs(b.x - ePos.x) < bulletHitSize && fabs(b.y - ePos.y) < bulletHitSize;
-
-		if (isBulletHit) {
-			enemy->SetHP(0);
-			
-		}
-	}
 
 	particles->SetPlayerPos(player->GetPosition());
 	particles->SetCameraPos(cameraController->GetTransform().translate);
@@ -221,9 +222,9 @@ void GameScene::Draw() {
 	GameBase::GetInstance()->ModelCommonSet();
 	skyDome->Draw();
 	player->Draw();
-	if (enemy->GetIsAlive()){
-	enemy->Draw();
-	}
+
+	enemyManager->Draw();
+
 	field->Draw();
 	goal->Draw(); 
 	BG->Draw();

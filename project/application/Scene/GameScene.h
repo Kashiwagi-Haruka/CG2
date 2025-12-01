@@ -15,6 +15,8 @@ class Player;
 class Enemy;
 class CameraController;
 class SkyDome;
+class EnemyManager;
+
 
 class GameScene {
 
@@ -33,11 +35,12 @@ class GameScene {
 	SceneTransition* sceneTransition = nullptr;
 	Goal* goal = nullptr;
 	Player* player = nullptr;
-	Enemy* enemy = nullptr;
+	EnemyManager* enemyManager = nullptr;
 	SkyDome* skyDome = nullptr;
 	CameraController* cameraController = nullptr;
 	MapchipField* field = nullptr;
 	SoundData soundData;
+	SoundData BGMData;
 	Background* BG;
 
     ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白

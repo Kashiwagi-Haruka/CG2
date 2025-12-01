@@ -28,7 +28,7 @@ void Object3d::Update(){
 	}
 
 
-	transformResource_ = obj3dCommon_->CreateBufferResource(sizeof(TransformationMatrix));
+
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
@@ -55,7 +55,7 @@ void Object3d::SetRotate(Vector3 rotate) { transform_.rotate = rotate; }
 void Object3d::SetTranslate(Vector3 translate) { transform_.translate = translate; }
 
 void Object3d::CreateResources() {
-	
+	transformResource_ = obj3dCommon_->CreateBufferResource(sizeof(TransformationMatrix));
 
 	Update();
 

@@ -39,7 +39,7 @@ public:
 	void InitializeIXAudio();
 	SoundData SoundLoadFile(const char* filename);
 	void SoundUnload(SoundData* soundData);
-	void SoundPlayWave(const SoundData& sounddata);
+	void SoundPlayWave(const SoundData& sounddata,bool isLoop=false);
 	Microsoft::WRL::ComPtr<IXAudio2> GetIXAudio2() { return xAudio2_; };
 }
 ;
