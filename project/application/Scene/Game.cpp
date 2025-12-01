@@ -1,6 +1,7 @@
 #include "Game.h"
 
 void Game::Initialize(){
+	FrameWork::Initialize();
 	GameBase::GetInstance()->Initialize(L"LE2A_04_カシワギハルカ", 1280, 720);
 	d3dResourceLeakChecker = new D3DResourceLeakChecker();
 	// エンジンの初期化
@@ -18,6 +19,7 @@ void Game::Initialize(){
 }
 
 void Game::Update(){
+	FrameWork::Update();
 	GameBase::GetInstance()->BeginFlame();
 
 	// update
@@ -48,7 +50,9 @@ void Game::Update(){
 		break;
 	}
 
-
+	if (!GameBase::GetInstance()->ProcessMessage()) {
+		endRequest_ = true;
+	}
 }
 
 void Game::Draw() {
@@ -79,4 +83,5 @@ void Game::Finalize() {
 	GameBase::GetInstance()->Finalize();
 	delete d3dResourceLeakChecker;
 	CoUninitialize();
+	FrameWork::Finalize();
 }

@@ -181,14 +181,3 @@ Vector2 GameBase::GetJoyStickRXY() const { return DInput->GetJoyStickRXY(); };
 /// </summary>
 /// <param name="deadZone">初期値は0.2f</param>
 void GameBase::SetDeadZone(float deadZone) { DInput->SetDeadZone(deadZone); };
-
-void GameBase::DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world){ 
-
-	dxCommon_->DrawMesh(vertices, color, textureHandle, wvp, world);
-}
-void GameBase::DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, uint32_t textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount) {
-	dxCommon_->DrawParticle(vertices, color, textureHandle, wvp, world, instanceCount);
-}
-void GameBase::DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj) {
-	dxCommon_->DrawSphere(center, radius, color, textureHandle, viewProj);
-}

@@ -1,10 +1,11 @@
 #pragma once
+#include "FrameWork.h"
 #include"GameBase.h"
 #include "D3DResourceLeakChecker.h"
 #include "Scene/GameScene.h"
 #include "Scene/ResultScene.h"
 #include "Scene/TitleScene.h"
-class Game {
+class Game :public FrameWork{
 	
 	enum class SceneName {
 
@@ -20,16 +21,16 @@ class Game {
 	ResultScene* resultScene = nullptr;
 	SceneName scene;
 
-	bool endReqest_ = false;
+	
 
 	public:
 
-	void Initialize();
-	void Update();
-	void Draw();
-	void Finalize();
+	void Initialize() override;
+	void Update() override;
+	void Draw() override;
+	void Finalize() override;
 
-	bool isEndRequest() { return endReqest_; }
+	
 
 
 

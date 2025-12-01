@@ -2,20 +2,11 @@
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
-	Game game;
-	game.Initialize();
-	while (GameBase::GetInstance()->ProcessMessage()) {
-		
-		game.Update();
+	FrameWork* game = new Game();
+	
+	game->Run();
 
-		if (game.isEndRequest()) {
-			break;
-		}
-		game.Draw();
-		
-	}
-
-	game.Finalize();
+	delete game;
 
 	return 0;
 

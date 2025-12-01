@@ -62,22 +62,13 @@ private:
 
 	void ResourceRelease();
 
-	// 描画
-	void DrawTriangle(const Vector3 positions[3], const Vector2 texcoords[3], const Vector4& color, int textureHandle);
+
 
 	void SpriteCommonSet();
 	void ModelCommonSet();
 	
 
 	Transform GetCameraTransform() const { return dxCommon_->GetCameraTransform(); };
-
-	
-
-	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
-	void DrawSphere(const Vector3& center, const Vector3& radius, const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
-	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world);
-	void DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, uint32_t textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount);
-	
 	
 	void SetDirectionalLightData(const DirectionalLight& directionalLight);
 
