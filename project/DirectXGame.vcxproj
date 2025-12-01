@@ -108,7 +108,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\imgui;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)Engine\base;$(ProjectDir)Engine\base\ResourceObj;$(ProjectDir)Engine\base\Cstr;$(ProjectDir)Engine\math;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\Audio;$(ProjectDir)Engine\ImGui;$(ProjectDir)Engine\Input;$(ProjectDir)Engine\Texture;$(ProjectDir)Engine\Texture\Mesh;$(ProjectDir)Engine\Texture\Sprite;$(ProjectDir)Engine\LeakChecker;$(ProjectDir)Engine\Log;$(ProjectDir)Engine\stringUtillity;$(ProjectDir)Engine\Texture\Particle;$(ProjectDir)Engine\LoadFile</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\imgui;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)Engine\base;$(ProjectDir)Engine\base\ResourceObj;$(ProjectDir)Engine\base\Cstr;$(ProjectDir)Engine\math;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\Audio;$(ProjectDir)Engine\ImGui;$(ProjectDir)Engine\Input;$(ProjectDir)Engine\Texture;$(ProjectDir)Engine\Texture\Mesh;$(ProjectDir)Engine\Texture\Sprite;$(ProjectDir)Engine\LeakChecker;$(ProjectDir)Engine\Log;$(ProjectDir)Engine\stringUtillity;$(ProjectDir)Engine\Texture\Particle;$(ProjectDir)Engine\LoadFile;$(ProjectDir)Engine\BaseScene</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -160,6 +160,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\CameraController.cpp" />
     <ClCompile Include="application\Enemy\EnemyManager.cpp" />
     <ClCompile Include="application\Background\Background.cpp" />
+    <ClCompile Include="Engine\BaseScene\BaseScene.cpp" />
     <ClCompile Include="Engine\Loadfile\CSVManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
@@ -219,6 +220,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\UIManager.cpp" />
     <ClCompile Include="application\SceneTransition.cpp" />
     <ClCompile Include="application\Particles.cpp" />
+    <ClCompile Include="Engine\BaseScene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -238,6 +240,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\CameraController.h" />
     <ClInclude Include="application\Enemy\EnemyManager.h" />
     <ClInclude Include="application\Background\Background.h" />
+    <ClInclude Include="Engine\BaseScene\BaseScene.h" />
     <ClInclude Include="Engine\Loadfile\CSVManager.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
@@ -289,6 +292,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\UIManager.h" />
     <ClInclude Include="application\SceneTransition.h" />
     <ClInclude Include="application\Particles.h" />
+    <ClInclude Include="Engine\BaseScene\SceneManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

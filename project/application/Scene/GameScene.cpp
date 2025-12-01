@@ -66,7 +66,7 @@ void GameScene::Initialize() {
 	BG->SetPosition(player->GetPosition());
 	BG->Initialize();
 	Audio::GetInstance()->SoundPlayWave(soundData);
-	Audio::GetInstance()->SoundPlayWave(BGMData,true);
+	Audio::GetInstance()->SoundPlayWave(BGMData);
 }
 
 void GameScene::Update() {

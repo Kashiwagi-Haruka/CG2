@@ -23,10 +23,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	};
 	SceneName scene=SceneName::Title;
-	/*#ifdef _DEBUG*/
+	#ifdef _DEBUG
 		scene = SceneName::Game;
-	//#endif // DEBUG
-	/*int PrePressMouse = 0;*/
+	#endif // DEBUG
+	
 	while (GameBase::GetInstance()->ProcessMessage()) {
 		GameBase::GetInstance()->BeginFlame();
 
