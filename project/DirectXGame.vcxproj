@@ -221,6 +221,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\SceneTransition.cpp" />
     <ClCompile Include="application\Particles.cpp" />
     <ClCompile Include="Engine\BaseScene\SceneManager.cpp" />
+    <ClCompile Include="Engine\BaseScene\FrameWork.cpp" />
+    <ClCompile Include="application\Scene\Game.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -293,6 +295,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\SceneTransition.h" />
     <ClInclude Include="application\Particles.h" />
     <ClInclude Include="Engine\BaseScene\SceneManager.h" />
+    <ClInclude Include="Engine\BaseScene\FrameWork.h" />
+    <ClInclude Include="application\Scene\Game.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

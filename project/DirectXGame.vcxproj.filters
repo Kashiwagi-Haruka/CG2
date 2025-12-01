@@ -225,6 +225,12 @@
     <ClCompile Include="Engine\BaseScene\BaseScene.cpp">
       <Filter>ソース ファイル\Engine\BaseScene</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\BaseScene\FrameWork.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Scene\Game.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -405,6 +411,12 @@
     </ClInclude>
     <ClInclude Include="Engine\BaseScene\SceneManager.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BaseScene\FrameWork.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\Game.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
