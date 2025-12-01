@@ -52,12 +52,19 @@ void Player::Initialize(Camera* camera){
 	isAlive = true;
 	hp_ = hpMax_;
 	bulletVelocity_ = {0, 0, 0};
-	
+	isDash = false;
 }
 void Player::Move(){
+	// --------- ダブルタップ判定 ---------
+	
 	switch (state_) {
 	case Player::State::kIdle:
+
+		lastTapTimeA_ ++;
+		lastTapTimeD_ ++;
+
 		
+
 		if (GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_D)) {
 			state_ = State::kRunning;
 			
@@ -68,11 +75,34 @@ void Player::Move(){
 		}
 		break;
 	case Player::State::kRunning:
+		// A ダブルタップ
+		if (!GameBase::GetInstance()->PushKey(DIK_D)) {
+		if (GameBase::GetInstance()->TriggerKey(DIK_A)) {
+			if (lastTapTimeA_ < doubleTapThreshold_) {
+				isDash = true;
+			}
+			
+			lastTapTimeA_ = 0.0f;
+		}
 		if (GameBase::GetInstance()->PushKey(DIK_A)) {
 			velocity_.x += -accelationRate;
 		}
-		if (GameBase::GetInstance()->PushKey(DIK_D)) {
-			velocity_.x += accelationRate;
+		}
+			
+		if (!GameBase::GetInstance()->PushKey(DIK_A)) {
+			// D ダブルタップ
+			if (GameBase::GetInstance()->TriggerKey(DIK_D)) {
+				if (lastTapTimeD_ < doubleTapThreshold_) {
+					isDash = true;
+				}
+				lastTapTimeD_ = 0.0f;
+			}
+			if (GameBase::GetInstance()->PushKey(DIK_D)) {
+				velocity_.x += accelationRate;
+			}
+		}
+		if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D)) {
+			isDash = false;
 		}
 
 		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
@@ -113,7 +143,11 @@ void Player::Move(){
 			}
 		}
 	}
+	
 	velocity_.x = std::clamp(velocity_.x, -accelationMax, accelationMax);
+	if (isDash) {
+		velocity_.x*= dashMagnification;
+	}
 	transform_.translate += velocity_;
 	if (GameBase::GetInstance()->PushKey(DIK_A)) {
 		bulletVelocity_.x = -1;
@@ -196,7 +230,7 @@ void Player::Update(){
 	ImGui::DragInt("HP", &hp_);
 		ImGui::DragFloat3("plPos", &transform_.translate.x);
 		ImGui::Text("J = FIRE , WASD = MOVE , SPACE = JUMP");
-	
+		ImGui::Text("%d", isDash);
 	}
 	ImGui::End();
 

@@ -36,6 +36,14 @@ class Player {
 	bool isInvincible_ = false;
 	float invincibleTimer_ = 0.0f;
 	
+	// ダブルタップ判定用
+	float lastTapTimeA_ = 0.0f;
+	float lastTapTimeD_ = 0.0f;
+	float dashMagnification = 2.0f;//ダッシュ倍率
+	bool isDash = false;
+	float doubleTapThreshold_ = 30.0f; //ダッシュの連打間隔
+
+
 	Vector3 velocity_;
 	Vector3 bulletVelocity_;
 
