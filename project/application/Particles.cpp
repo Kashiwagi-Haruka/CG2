@@ -40,7 +40,7 @@ Particles::~Particles(){
 	delete particlegoal;
 	delete particleleaf;
 	delete particleplayer;
-
+	ParticleManager::GetInstance()->Clear();
 
 
 }

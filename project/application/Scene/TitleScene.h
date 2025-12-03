@@ -1,7 +1,8 @@
 #pragma once
 #include "Sprite.h"
+#include "BaseScene.h"
 class GameBase;
-class TitleScene {
+class TitleScene : public BaseScene{
 	struct SpriteData {
 		Sprite* sprite = nullptr;
 		uint32_t handle = 0;
@@ -10,16 +11,17 @@ class TitleScene {
 		Vector2 translate = {0, 0};
 	};
 
-	bool isSceneEnd_;
+	
 	bool isGameEndRequest_;
 	SpriteData logoSP_;
 
 
 public: 
 	TitleScene();
-	~TitleScene();
-	void Initialize();
-	void Update();
-	void Draw();
+	~TitleScene() override;
+	void Initialize() override;
+	void Update() override;
+	void Draw() override;
+	void Finalize() override;
 	bool GetIsSceneEnd() { return isSceneEnd_; }
 };

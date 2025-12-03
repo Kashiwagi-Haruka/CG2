@@ -397,6 +397,11 @@ void ParticleManager::EnsureCapacityBucket(ParticleGroup::BlendBucket& bucket, u
 }
 
 void ParticleManager::Finalize() {
+	Clear();
+	delete instance;
+	instance = nullptr;
+}
+void ParticleManager::Clear(){
 	for (auto& [name, group] : particleGroups) {
 		for (auto& b : group.buckets) {
 			if (b.instancingResource) {
@@ -406,6 +411,5 @@ void ParticleManager::Finalize() {
 		}
 	}
 	particleGroups.clear();
-	delete instance;
-	instance = nullptr;
+
 }

@@ -2,6 +2,8 @@
 #include "GameBase.h"
 #include "TextureManager.h"
 #include <imgui.h>
+#include "SceneManager.h"
+#include "GameScene.h"
 TitleScene::TitleScene() {
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/title.png");
 	logoSP_.sprite = new Sprite();
@@ -9,8 +11,11 @@ TitleScene::TitleScene() {
 }
 
 TitleScene::~TitleScene(){ 
-	delete logoSP_.sprite;
+	
 
+}
+void TitleScene::Finalize(){ 
+	delete logoSP_.sprite; 
 }
 void TitleScene::Initialize(){ 
 
@@ -25,7 +30,8 @@ void TitleScene::Initialize(){
 void TitleScene::Update(){ 
 	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
 	
-	isSceneEnd_ = true;
+	BaseScene* scene = new GameScene();
+		SceneManager::GetInstance()->SetNextScene(scene);
 	
 	}
 

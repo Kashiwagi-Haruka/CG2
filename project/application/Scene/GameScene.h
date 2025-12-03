@@ -11,6 +11,7 @@
 #include "UIManager.h"
 #include "Object/Background/Background.h"
 #include "Object/CatchBlock.h"
+#include "BaseScene.h"
 
 class Player;
 class Enemy;
@@ -19,7 +20,7 @@ class SkyDome;
 class EnemyManager;
 
 
-class GameScene {
+class GameScene: public BaseScene{
 
 
 	private:
@@ -59,11 +60,12 @@ class GameScene {
 	public:
 
 	GameScene();
-	~GameScene();
+	~GameScene() override;
 
-	void Initialize();
-	void Update();
-	void Draw();
+	void Initialize() override;
+	void Update() override;
+	void Draw() override;
+	void Finalize() override;
 	bool IsSceneEnd_GameClear() { return sceneEndClear; }
 	bool IsSceneEnd_GameOver() { return sceneEndOver; }
 

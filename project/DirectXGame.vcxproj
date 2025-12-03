@@ -225,6 +225,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\BaseScene\SceneManager.cpp" />
     <ClCompile Include="Engine\BaseScene\FrameWork.cpp" />
     <ClCompile Include="application\Scene\Game.cpp" />
+    <ClCompile Include="application\Scene\GameOverScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -301,6 +302,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\BaseScene\SceneManager.h" />
     <ClInclude Include="Engine\BaseScene\FrameWork.h" />
     <ClInclude Include="application\Scene\Game.h" />
+    <ClInclude Include="application\Scene\GameOverScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

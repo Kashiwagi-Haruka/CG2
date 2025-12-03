@@ -5,6 +5,8 @@
 #include "CameraController.h"
 #include "Object/Background/SkyDome.h"
 #include "Object/Enemy/EnemyManager.h"
+#include "SceneManager.h"
+#include "ResultScene.h"
 GameScene::GameScene() {
 
 	cameraController = new CameraController();
@@ -22,20 +24,24 @@ GameScene::GameScene() {
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/昼下がり気分.mp3");
 }
 GameScene::~GameScene(){
+	
+}
+void GameScene::Finalize() {
+
 	Audio::GetInstance()->SoundUnload(&BGMData);
 	Audio::GetInstance()->SoundUnload(&soundData);
 	delete BG;
 	delete uimanager;
 	delete sceneTransition;
-	delete goal;  
+	delete goal;
 	delete field;
 	delete enemyManager;
 	delete player;
 	delete skyDome;
 	delete particles;
 	delete cameraController;
-}
 
+}
 void GameScene::Initialize() {
 
 	sceneEndClear = false;
@@ -153,7 +159,8 @@ void GameScene::Update() {
 		bool isGoalHit = fabs(p.x - g.x) < goalHitSize && fabs(p.y - g.y) < goalHitSize;
 
 		if (isGoalHit) {
-			sceneEndClear = true;
+			BaseScene* scene = new ResultScene();
+			SceneManager::GetInstance()->SetNextScene(scene);
 		}
 	}
 

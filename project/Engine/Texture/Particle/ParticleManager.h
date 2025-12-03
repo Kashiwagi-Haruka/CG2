@@ -76,6 +76,7 @@ public:
 	// 更新 / 描画
 	void Update(Camera* camera);
 	void Draw();
+	void Clear();
 	void Finalize();
 	
 	//void SetFieldAcceleration(const Vector3& accel) { accelerationField.Acceleation = accel; }
