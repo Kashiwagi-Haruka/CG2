@@ -156,12 +156,12 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application\Enemy\Enemy.cpp" />
+    <ClCompile Include="application\Object\Enemy\Enemy.cpp" />
     <ClCompile Include="application\CameraController.cpp" />
-    <ClCompile Include="application\Enemy\EnemyManager.cpp" />
-    <ClCompile Include="application\Background\Background.cpp" />
-    <ClCompile Include="application\CatchBlock.cpp" />
-    <ClCompile Include="application\Enemy\EnemyStun.cpp" />
+    <ClCompile Include="application\Object\Enemy\EnemyManager.cpp" />
+    <ClCompile Include="application\Object\Background\Background.cpp" />
+    <ClCompile Include="application\Object\CatchBlock.cpp" />
+    <ClCompile Include="application\Object\Enemy\EnemyStun.cpp" />
     <ClCompile Include="Engine\BaseScene\BaseScene.cpp" />
     <ClCompile Include="Engine\Loadfile\CSVManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
@@ -212,13 +212,13 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\SrvManager.cpp" />
     <ClCompile Include="Engine\Texture\Particle\ParticleManager.cpp" />
     <ClCompile Include="Engine\Texture\Particle\ParticleEmitter.cpp" />
-    <ClCompile Include="application\Player\Player.cpp" />
-    <ClCompile Include="application\Player\PlayerBullet.cpp" />
-    <ClCompile Include="application\MapchipField.cpp" />
-    <ClCompile Include="application\Background\SkyDome.cpp" />
+    <ClCompile Include="application\Object\Player\Player.cpp" />
+    <ClCompile Include="application\Object\Player\PlayerBullet.cpp" />
+    <ClCompile Include="application\Object\MapchipField.cpp" />
+    <ClCompile Include="application\Object\Background\SkyDome.cpp" />
     <ClCompile Include="application\Scene\ResultScene.cpp" />
     <ClCompile Include="application\Scene\TitleScene.cpp" />
-    <ClCompile Include="application\Goal.cpp" />
+    <ClCompile Include="application\Object\Goal.cpp" />
     <ClCompile Include="application\UIManager.cpp" />
     <ClCompile Include="application\SceneTransition.cpp" />
     <ClCompile Include="application\Particles.cpp" />
@@ -240,12 +240,12 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <None Include="Resources\shader\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="application\Enemy\Enemy.h" />
+    <ClInclude Include="application\Object\Enemy\Enemy.h" />
     <ClInclude Include="application\CameraController.h" />
-    <ClInclude Include="application\Enemy\EnemyManager.h" />
-    <ClInclude Include="application\Background\Background.h" />
-    <ClInclude Include="application\CatchBlock.h" />
-    <ClInclude Include="application\Enemy\EnemyStun.h" />
+    <ClInclude Include="application\Object\Enemy\EnemyManager.h" />
+    <ClInclude Include="application\Object\Background\Background.h" />
+    <ClInclude Include="application\Object\CatchBlock.h" />
+    <ClInclude Include="application\Object\Enemy\EnemyStun.h" />
     <ClInclude Include="Engine\BaseScene\BaseScene.h" />
     <ClInclude Include="Engine\Loadfile\CSVManager.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
@@ -288,13 +288,13 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\SrvManager.h" />
     <ClInclude Include="Engine\Texture\Particle\ParticleManager.h" />
     <ClInclude Include="Engine\Texture\Particle\ParticleEmitter.h" />
-    <ClInclude Include="application\Player\Player.h" />
-    <ClInclude Include="application\Player\PlayerBullet.h" />
-    <ClInclude Include="application\MapchipField.h" />
-    <ClInclude Include="application\Background\SkyDome.h" />
+    <ClInclude Include="application\Object\Player\Player.h" />
+    <ClInclude Include="application\Object\Player\PlayerBullet.h" />
+    <ClInclude Include="application\Object\MapchipField.h" />
+    <ClInclude Include="application\Object\Background\SkyDome.h" />
     <ClInclude Include="application\Scene\ResultScene.h" />
     <ClInclude Include="application\Scene\TitleScene.h" />
-    <ClInclude Include="application\Goal.h" />
+    <ClInclude Include="application\Object\Goal.h" />
     <ClInclude Include="application\UIManager.h" />
     <ClInclude Include="application\SceneTransition.h" />
     <ClInclude Include="application\Particles.h" />

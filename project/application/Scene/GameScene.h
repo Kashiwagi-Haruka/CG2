@@ -4,13 +4,13 @@
 #include "Object3d.h"
 #include "Particles.h"
 #include <imgui.h>
-#include "MapchipField.h"
+#include "Object/MapchipField.h"
 #include "Audio.h"
-#include "Goal.h"
+#include "Object/Goal.h"
 #include "SceneTransition.h"
 #include "UIManager.h"
-#include "Background/Background.h"
-#include "CatchBlock.h"
+#include "Object/Background/Background.h"
+#include "Object/CatchBlock.h"
 
 class Player;
 class Enemy;

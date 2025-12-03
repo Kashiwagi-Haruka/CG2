@@ -96,7 +96,7 @@
     <ClCompile Include="Engine\Audio\Audio.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="application\Enemy\EnemyManager.cpp">
+    <ClCompile Include="application\Object\Enemy\EnemyManager.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="Engine\stringUtillity\StringUtility.cpp">
@@ -171,25 +171,25 @@
     <ClCompile Include="application\UIManager.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="application\Player\Player.cpp">
+    <ClCompile Include="application\Object\Player\Player.cpp">
       <Filter>ソース ファイル\application\Object\Player</Filter>
     </ClCompile>
-    <ClCompile Include="application\Player\PlayerBullet.cpp">
+    <ClCompile Include="application\Object\Player\PlayerBullet.cpp">
       <Filter>ソース ファイル\application\Object\Player</Filter>
     </ClCompile>
     <ClCompile Include="application\Particles.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="application\Enemy\Enemy.cpp">
+    <ClCompile Include="application\Object\Enemy\Enemy.cpp">
       <Filter>ソース ファイル\application\Object</Filter>
     </ClCompile>
-    <ClCompile Include="application\Goal.cpp">
+    <ClCompile Include="application\Object\Goal.cpp">
       <Filter>ソース ファイル\application\Object</Filter>
     </ClCompile>
-    <ClCompile Include="application\Background\Background.cpp">
+    <ClCompile Include="application\Object\Background\Background.cpp">
       <Filter>ソース ファイル\application\Object\Background</Filter>
     </ClCompile>
-    <ClCompile Include="application\Background\SkyDome.cpp">
+    <ClCompile Include="application\Object\Background\SkyDome.cpp">
       <Filter>ソース ファイル\application\Object\Background</Filter>
     </ClCompile>
     <ClCompile Include="application\Scene\ResultScene.cpp">
@@ -201,7 +201,7 @@
     <ClCompile Include="application\Scene\TitleScene.cpp">
       <Filter>ソース ファイル\application\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="application\MapchipField.cpp">
+    <ClCompile Include="application\Object\MapchipField.cpp">
       <Filter>ソース ファイル\application\Object</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Loadfile\CSVManager.cpp">
@@ -231,10 +231,10 @@
     <ClCompile Include="application\Scene\Game.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\CatchBlock.cpp">
+    <ClCompile Include="application\Object\CatchBlock.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\Enemy\EnemyStun.cpp">
+    <ClCompile Include="application\Object\Enemy\EnemyStun.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -289,10 +289,10 @@
     <ClInclude Include="Engine\LeakChecker\D3DResourceLeakChecker.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="application\Enemy\Enemy.h">
+    <ClInclude Include="application\Object\Enemy\Enemy.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="application\Enemy\EnemyManager.h">
+    <ClInclude Include="application\Object\Enemy\EnemyManager.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="application\Scene\GameScene.h">
@@ -301,7 +301,7 @@
     <ClInclude Include="Engine\Log\Logger.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="application\MapchipField.h">
+    <ClInclude Include="application\Object\MapchipField.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\BlendModeManeger.h">
@@ -385,16 +385,16 @@
     <ClInclude Include="application\Scene\ResultScene.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="application\Background\SkyDome.h">
+    <ClInclude Include="application\Object\Background\SkyDome.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="Engine\math\RigidBody.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="application\Background\Background.h">
+    <ClInclude Include="application\Object\Background\Background.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="application\Goal.h">
+    <ClInclude Include="application\Object\Goal.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="application\SceneTransition.h">
@@ -403,10 +403,10 @@
     <ClInclude Include="application\UIManager.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="application\Player\PlayerBullet.h">
+    <ClInclude Include="application\Object\Player\PlayerBullet.h">
       <Filter>ヘッダー ファイル\application\Player</Filter>
     </ClInclude>
-    <ClInclude Include="application\Player\Player.h">
+    <ClInclude Include="application\Object\Player\Player.h">
       <Filter>ヘッダー ファイル\application\Player</Filter>
     </ClInclude>
     <ClInclude Include="application\Particles.h">
@@ -424,10 +424,10 @@
     <ClInclude Include="application\Scene\Game.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\CatchBlock.h">
+    <ClInclude Include="application\Object\CatchBlock.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\Enemy\EnemyStun.h">
+    <ClInclude Include="application\Object\Enemy\EnemyStun.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

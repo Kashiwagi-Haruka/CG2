@@ -1,10 +1,10 @@
 #include "GameScene.h"
 #include "ModelManeger.h"
 #include "ParticleManager.h"
-#include "Player/Player.h"
+#include "Object/Player/Player.h"
 #include "CameraController.h"
-#include "Background/SkyDome.h"
-#include "Enemy/EnemyManager.h"
+#include "Object/Background/SkyDome.h"
+#include "Object/Enemy/EnemyManager.h"
 GameScene::GameScene() {
 
 	cameraController = new CameraController();
