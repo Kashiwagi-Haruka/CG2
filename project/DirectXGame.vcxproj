@@ -160,6 +160,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\CameraController.cpp" />
     <ClCompile Include="application\Enemy\EnemyManager.cpp" />
     <ClCompile Include="application\Background\Background.cpp" />
+    <ClCompile Include="application\CatchBlock.cpp" />
+    <ClCompile Include="application\Enemy\EnemyStun.cpp" />
     <ClCompile Include="Engine\BaseScene\BaseScene.cpp" />
     <ClCompile Include="Engine\Loadfile\CSVManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
@@ -242,6 +244,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\CameraController.h" />
     <ClInclude Include="application\Enemy\EnemyManager.h" />
     <ClInclude Include="application\Background\Background.h" />
+    <ClInclude Include="application\CatchBlock.h" />
+    <ClInclude Include="application\Enemy\EnemyStun.h" />
     <ClInclude Include="Engine\BaseScene\BaseScene.h" />
     <ClInclude Include="Engine\Loadfile\CSVManager.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />

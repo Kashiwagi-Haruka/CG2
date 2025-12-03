@@ -11,7 +11,7 @@ class TitleScene {
 	};
 
 	bool isSceneEnd_;
-
+	bool isGameEndRequest_;
 	SpriteData logoSP_;
 
 

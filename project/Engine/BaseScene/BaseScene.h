@@ -1,6 +1,9 @@
 #pragma once
 class BaseScene {
 
+	protected:
+	bool isSceneEnd = false;
+
 	public: 
 
 	virtual ~BaseScene() = default;

@@ -8,17 +8,19 @@
 Enemy::Enemy(){
 	ModelManeger::GetInstance()->LoadModel("Enemy");
 	object_ = new Object3d();
+	enemyStun = new EnemyStun();
 }
 
 Enemy::~Enemy() {
 
+	delete enemyStun;
 	delete object_; 
 	
 }
 
 void Enemy::Initialize(Camera* camera,Vector3 translates) {
 	isAlive = true;
-	isHit = false;
+	isStun_ = false;
 	HP = 2;
 	
 	object_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
@@ -32,15 +34,28 @@ void Enemy::Initialize(Camera* camera,Vector3 translates) {
 	object_->SetTransform(transform_);
 	object_->SetCamera(camera_);
 	object_->Update();
+	enemyStun->Initialize();
 }
 
 void Enemy::Update() {
 	// 敵の更新処理
-
+	if (!isStun_) {
 	velocity_.x -= 0.01f;
 	velocity_.x = std::clamp(velocity_.x, -maxSpeed_, maxSpeed_);
-	transform_.translate += velocity_;
+	
+	}
 
+	if (isStun_) {
+		velocity_.x = 0;
+		stunTime++;
+		enemyStun->SetCamera(camera_);
+		enemyStun->SetTranslate(transform_.translate);
+		enemyStun->Update();
+		if (stunTime >= stunTimeMax) {
+			isStun_ = false;
+		}
+	}
+	transform_.translate += velocity_;
 	object_->SetCamera(camera_);
 	object_->SetTransform(transform_);
 	object_->Update();
@@ -49,10 +64,7 @@ void Enemy::Update() {
 	}
 }
 void Enemy::Stun() {
-	// ノックバック
-
-
-	HP -= 1; // ダメージ
+	isStun_ = true;
 	if (HP <= 0) {
 		isAlive = false;
 	}
@@ -61,7 +73,12 @@ void Enemy::Stun() {
 void Enemy::Draw() {
 	// 敵の描画処理
 	object_->Draw();
+	if (isStun_) {
+		enemyStun->Draw();
+	}
+
 }
 void Enemy::BulletCollision(){
 
 }
+void Enemy::SetIsStun(bool IsStun){ isStun_ = IsStun; }

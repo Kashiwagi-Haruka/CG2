@@ -5,6 +5,17 @@ class Sprite;
 class GameBase;
 class UIManager {
 
+	enum HowtoOperate{
+		kW,
+		kA,
+		kS,
+		kD,
+		kSpace,
+		kAttuckButton,
+		CountMAX,
+
+	};//操作方法
+
 	struct SpriteData {
 		Sprite* sprite = nullptr;
 		uint32_t handle = 0;
@@ -15,9 +26,10 @@ class UIManager {
 
 	SpriteData playerHpSPData;
 	SpriteData playerHPFlameSPData;
+	SpriteData HowtoOperateSPData[CountMAX];
 
 	int playerHP;
-	int playerHPMax = 100;
+	int playerHPMax;
 	Vector2 playerHPMaxSize = {20,50};
 
 	public:
@@ -30,5 +42,5 @@ class UIManager {
 
 	void SetPlayerPosition(Vector2 playerPosition);
 	void SetPlayerHP(int HP);
-
+	void SetPlayerHPMax(int HPMax);
 };

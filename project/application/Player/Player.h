@@ -86,5 +86,6 @@ class Player {
 		}
 	}
 	int GetHP() const { return hp_; }
+	int GetHPMax() const { return hpMax_; }
 
 	};

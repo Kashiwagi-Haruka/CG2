@@ -10,6 +10,7 @@
 #include "SceneTransition.h"
 #include "UIManager.h"
 #include "Background/Background.h"
+#include "CatchBlock.h"
 
 class Player;
 class Enemy;
@@ -42,6 +43,7 @@ class GameScene {
 	SoundData soundData;
 	SoundData BGMData;
 	Background* BG;
+	/*CatchBlock* catchBlock;*/
 
     ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白
 	DirectionalLight light{

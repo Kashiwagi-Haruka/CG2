@@ -22,7 +22,7 @@ void MapchipField::Initialize(Camera* camera) {
 	camera_ = camera;
 
 	transform_ = {
-		.scale{100.0f, 10.0f, 1.0f},
+		.scale{100.0f, 10.0f, 100.0f},
 		.rotate{0.0f, 0.0f, 0.0f},
 		.translate{0.0f, -9.5f, 0.0f}
     };

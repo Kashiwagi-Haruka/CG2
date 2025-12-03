@@ -59,12 +59,14 @@ void GameScene::Initialize() {
 	field->Initialize(cameraController->GetCamera());
 	goal->Initialize(cameraController->GetCamera());
 	sceneTransition->Initialize();
+	uimanager->SetPlayerHPMax(player->GetHPMax());
 	uimanager->SetPlayerHP(player->GetHP());
 	uimanager->SetPlayerPosition({player->GetPosition().x, player->GetPosition().y});
 	uimanager->Initialize();
 	BG->SetCamera(cameraController->GetCamera());
 	BG->SetPosition(player->GetPosition());
 	BG->Initialize();
+	
 	Audio::GetInstance()->SoundPlayWave(soundData);
 	Audio::GetInstance()->SoundPlayWave(BGMData);
 }

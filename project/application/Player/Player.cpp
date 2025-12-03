@@ -18,6 +18,7 @@ Player::Player(){
 
 	playerObject_ = new Object3d();
 	
+	
 }
 Player::~Player(){
 	if (bullet_) {
