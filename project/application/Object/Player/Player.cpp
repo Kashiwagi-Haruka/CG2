@@ -214,7 +214,10 @@ void Player::Update(){
 
 	Attack();
 	Move();
-	
+	if (parameters_.EXP >= parameters_.MaxEXP) {
+		parameters_.Level++;
+		parameters_.EXP -= parameters_.MaxEXP;
+	}
 	
 	playerObject_->SetCamera(camera_);
 	
