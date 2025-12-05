@@ -56,7 +56,7 @@ void Model::Draw() {
 	// --- SRVのDescriptorTableの先頭を設定 ---
 	// TextureManagerからSRVのGPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex);
-	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvHandle);
+	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(4, srvHandle);
 
 	
 

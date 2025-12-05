@@ -22,8 +22,8 @@ class Model {
 
 		Vector4 color;
 		int enableLighting;
-		float padding[3];
 		Matrix4x4 uvTransform;
+		float shininess;
 	};
 
 	ModelCommon* modelCommon_;

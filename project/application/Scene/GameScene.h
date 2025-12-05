@@ -50,7 +50,8 @@ class GameScene: public BaseScene{
 	DirectionalLight light{
 	    .color{1, 1, 1, 1},
         .direction{0, 0, 1},
-        .intensity{1}
+        .intensity{1},
+        .specularColor = {1,1,1}
     };
 	
 

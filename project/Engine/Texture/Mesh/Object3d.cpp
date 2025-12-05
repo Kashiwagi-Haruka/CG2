@@ -27,6 +27,15 @@ void Object3d::Update(){
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
+	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
+	
+    // 修正: camera_がnullptrでない場合のみアクセスする
+    if (camera_) {
+        cameraData_->worldPosition = camera_->GetTranslate();
+    } else {
+        cameraData_->worldPosition = {0.0f, 0.0f, 0.0f}; // デフォルト値を設定
+    }
+	cameraResource_->Unmap(0, nullptr);
 
 
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
@@ -34,6 +43,15 @@ void Object3d::Update(){
 	transformationMatrixData_->World = worldMatrix;
 	transformResource_->Unmap(0, nullptr);
 
+	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+	assert(directionalLightData_);
+	*directionalLightData_ = {
+	    {1.0f, 1.0f, 1.0f, 1.0f},
+        {0.0f, -1.0f, 0.0f},
+        1.0f,
+		1.0f,
+    };
+	directionalLightResource_->Unmap(0, nullptr);
 }
 void Object3d::Draw() {
 
@@ -41,6 +59,8 @@ void Object3d::Draw() {
 	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
 	// --- 平行光源CBufferの場所を設定 ---
 	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(2, cameraResource_->GetGPUVirtualAddress());
+
 
 	if (model_) {
 		model_->Draw();
@@ -56,19 +76,16 @@ void Object3d::SetTranslate(Vector3 translate) { transform_.translate = translat
 
 void Object3d::CreateResources() {
 	transformResource_ = obj3dCommon_->CreateBufferResource(sizeof(TransformationMatrix));
-
-	Update();
-
 	// Lightバッファ
 	directionalLightResource_ = obj3dCommon_->CreateBufferResource(sizeof(DirectionalLight));
 	assert(directionalLightResource_);
-	directionalLightData_ = nullptr;
-	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-	assert(directionalLightData_);
-	*directionalLightData_ = {
-	    {1.0f, 1.0f, 1.0f, 1.0f},
-        {0.0f, -1.0f, 0.0f},
-        1.0f
-    };
-	directionalLightResource_->Unmap(0, nullptr);
+	
+	cameraResource_ = obj3dCommon_->CreateBufferResource(sizeof(CameraforGPU));
+	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
+	cameraResource_->Unmap(0, nullptr);
+
+	Update();
+
+	
+	
 }

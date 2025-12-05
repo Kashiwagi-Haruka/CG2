@@ -20,7 +20,10 @@ class Object3d {
 		                 // ここで自動的に 128 バイト分のパディングが入って、
 		                 // sizeof(TransformationMatrix) == 256 になる
 	};
+	struct CameraforGPU{
+		Vector3 worldPosition;
 
+	};
 	Transform transform_ = {
 	    {1.0f, 1.0f, 1.0f},
 	    {0.0f, 0.0f, 0.0f},
@@ -32,11 +35,14 @@ class Object3d {
 	    {0.0f, 4.0f, -10.0f}  //
 	};
 	struct DirectionalLight {
-		Vector4 color;
-		Vector3 direction;
-		float intensity;
+		Vector4 color;         // 16
+		Vector3 direction;     // 12
+		float intensity;       // 4
+		Vector3 specularColor; // 12
+		float pad;             // 4 → 合計 48バイト (HLSLと一致)
 	};
 
+	
 	int color = 0xffffffff;
 
 	Camera* camera_;
@@ -49,6 +55,9 @@ class Object3d {
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_ = nullptr;
+	CameraforGPU* cameraData_ = nullptr;
+
 
 	Model* model_ = nullptr;
 	Matrix4x4 worldMatrix;
@@ -69,6 +78,7 @@ public:
 	void SetRotate(Vector3 Rotate);
 	void SetScale(Vector3 Scale);
 	void SetTransform(Transform transform) { transform_ = transform; }
+	void SetLight(DirectionalLight* light) { directionalLightData_ = light; }
 
 	Vector3 GetTranslate() { return transform_.translate; }
 	Vector3 GetRotate() { return transform_.rotate; }

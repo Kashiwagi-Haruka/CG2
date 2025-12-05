@@ -34,12 +34,14 @@ struct ModelData {
 	MaterialData material;
 };
 
-
 struct DirectionalLight {
-	Vector4 color;
-	Vector3 direction;
-	float intensity;
+	Vector4 color;         // 16
+	Vector3 direction;     // 12
+	float intensity;       // 4
+	Vector3 specularColor; // 12
+	float pad;             // 4 → 合計 48バイト (HLSLと一致)
 };
+
 
 class BlendModeManeger;
 class SrvManager;
