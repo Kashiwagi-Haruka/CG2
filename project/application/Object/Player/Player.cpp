@@ -51,7 +51,7 @@ void Player::Initialize(Camera* camera){
 	playerObject_->SetCamera(camera_);
 	
 	isAlive = true;
-	hp_ = hpMax_;
+	hp_ = parameters_.hpMax_;
 	bulletVelocity_ = {0, 0, 0};
 	isDash = false;
 }
@@ -79,27 +79,27 @@ void Player::Move(){
 		// A ダブルタップ
 		if (!GameBase::GetInstance()->PushKey(DIK_D)) {
 		if (GameBase::GetInstance()->TriggerKey(DIK_A)) {
-			if (lastTapTimeA_ < doubleTapThreshold_) {
+			if (lastTapTimeA_ < parameters_.doubleTapThreshold_) {
 				isDash = true;
 			}
 			
 			lastTapTimeA_ = 0.0f;
 		}
 		if (GameBase::GetInstance()->PushKey(DIK_A)) {
-			velocity_.x += -accelationRate;
+			velocity_.x += -parameters_.accelationRate;
 		}
 		}
 			
 		if (!GameBase::GetInstance()->PushKey(DIK_A)) {
 			// D ダブルタップ
 			if (GameBase::GetInstance()->TriggerKey(DIK_D)) {
-				if (lastTapTimeD_ < doubleTapThreshold_) {
+				if (lastTapTimeD_ < parameters_.doubleTapThreshold_) {
 					isDash = true;
 				}
 				lastTapTimeD_ = 0.0f;
 			}
 			if (GameBase::GetInstance()->PushKey(DIK_D)) {
-				velocity_.x += accelationRate;
+				velocity_.x += parameters_.accelationRate;
 			}
 		}
 		if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D)) {
@@ -113,9 +113,9 @@ void Player::Move(){
 		break;
 	case Player::State::kJumping:
 
-		velocity_.y = jumpPower;
+		velocity_.y = parameters_.jumpPower;
 
-		if (jumpTimer >= jumpTimerMax) {
+		if (jumpTimer >= parameters_.jumpTimerMax) {
 			jumpTimer = 0.0f;
 			state_ = State::kFalling;
 		} else {
@@ -124,7 +124,7 @@ void Player::Move(){
 
 		break;
 	case Player::State::kFalling:
-		velocity_.y -= gravity;
+		velocity_.y -= parameters_.gravity;
 		if (transform_.translate.y <= 1.5f) {
 			transform_.translate.y = 1.5f;
 			velocity_.y = 0.0f;
@@ -136,7 +136,7 @@ void Player::Move(){
 		break;
 	}
 	if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D)) {
-		velocity_.x *= (1.0f - decelerationRate);
+		velocity_.x *= (1.0f - parameters_.decelerationRate);
 		if (velocity_.x > -0.01f && velocity_.x < 0.01f) {
 			velocity_.x = 0.0f;
 			if (state_==State::kRunning) {
@@ -145,9 +145,9 @@ void Player::Move(){
 		}
 	}
 	
-	velocity_.x = std::clamp(velocity_.x, -accelationMax, accelationMax);
+	velocity_.x = std::clamp(velocity_.x, -parameters_.accelationMax, parameters_.accelationMax);
 	if (isDash) {
-		velocity_.x*= dashMagnification;
+		velocity_.x *= parameters_.dashMagnification;
 	}
 	transform_.translate += velocity_;
 	if (GameBase::GetInstance()->PushKey(DIK_A)) {

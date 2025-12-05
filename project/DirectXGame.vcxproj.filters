@@ -228,7 +228,7 @@
     <ClCompile Include="Engine\BaseScene\FrameWork.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\Scene\Game.cpp">
+    <ClCompile Include="application\Scene\Game\Game.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\Object\CatchBlock.cpp">
@@ -424,7 +424,7 @@
     <ClInclude Include="Engine\BaseScene\FrameWork.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\Scene\Game.h">
+    <ClInclude Include="application\Scene\Game\Game.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Object\CatchBlock.h">
@@ -434,6 +434,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Scene\GameOverScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Player\PlayerParameters.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
