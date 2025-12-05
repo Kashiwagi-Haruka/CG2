@@ -18,6 +18,9 @@ class PlayerBullet {
 	Object3d* lineObject_ = nullptr;
 	Vector3 velocity_;
 
+	bool isAir;
+	bool isAirBullet =false;
+
 	public:
 	PlayerBullet();
 	~PlayerBullet();
@@ -25,7 +28,9 @@ class PlayerBullet {
 	void Update(Camera* camera);
 	void Charge(Vector3 playerPos, Vector3 direction);
 	void Fire();
+	void AirBullet();
 	void Draw();
 	void SetVelocity(Vector3 velocity);
 	Vector3 GetPosition() { return bulletTransform_.translate; }
+	bool IsAirBullet() { return isAirBullet; }
 };

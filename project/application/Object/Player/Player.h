@@ -33,7 +33,8 @@ class Player {
 	float lastTapTimeD_ = 0.0f;
 	
 	bool isDash = false;
-	
+	bool isJump = false;
+	bool isfalling = false;
 
 	Vector3 velocity_;
 	Vector3 bulletVelocity_;
@@ -56,6 +57,9 @@ class Player {
 	void Attack();
 	void Update();
 	void Draw();
+	void Jump();
+	void Falling();
+
 	void SetCamera(Camera* camera) { camera_ = camera;}
 	void SetMap(MapchipField* map) { map_ = map; }
 	Vector3 GetPosition() { return transform_.translate; }

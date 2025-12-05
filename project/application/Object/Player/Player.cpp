@@ -54,94 +54,60 @@ void Player::Initialize(Camera* camera){
 	hp_ = parameters_.hpMax_;
 	bulletVelocity_ = {0, 0, 0};
 	isDash = false;
+	isJump = false;
+	isfalling = false;
 }
 void Player::Move(){
-	// --------- ダブルタップ判定 ---------
-	
-	switch (state_) {
-	case Player::State::kIdle:
+
 
 		lastTapTimeA_ ++;
 		lastTapTimeD_ ++;
-
 		
-
 		if (GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_D)) {
-			state_ = State::kRunning;
+		
+			if (!GameBase::GetInstance()->PushKey(DIK_D)) {
+				if (GameBase::GetInstance()->TriggerKey(DIK_A)) {
+					if (lastTapTimeA_ < parameters_.doubleTapThreshold_) {
+						isDash = true;
+					}
 			
-		}
-		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
-			state_ = State::kJumping;
-			
-		}
-		break;
-	case Player::State::kRunning:
-		// A ダブルタップ
-		if (!GameBase::GetInstance()->PushKey(DIK_D)) {
-		if (GameBase::GetInstance()->TriggerKey(DIK_A)) {
-			if (lastTapTimeA_ < parameters_.doubleTapThreshold_) {
-				isDash = true;
-			}
-			
-			lastTapTimeA_ = 0.0f;
-		}
-		if (GameBase::GetInstance()->PushKey(DIK_A)) {
-			velocity_.x += -parameters_.accelationRate;
-		}
-		}
-			
-		if (!GameBase::GetInstance()->PushKey(DIK_A)) {
-			// D ダブルタップ
-			if (GameBase::GetInstance()->TriggerKey(DIK_D)) {
-				if (lastTapTimeD_ < parameters_.doubleTapThreshold_) {
-					isDash = true;
+					lastTapTimeA_ = 0.0f;
 				}
-				lastTapTimeD_ = 0.0f;
+				if (GameBase::GetInstance()->PushKey(DIK_A)) {
+					velocity_.x += -parameters_.accelationRate;
+				}
 			}
-			if (GameBase::GetInstance()->PushKey(DIK_D)) {
+			
+			if (!GameBase::GetInstance()->PushKey(DIK_A)) {
+				// D ダブルタップ
+				if (GameBase::GetInstance()->TriggerKey(DIK_D)) {
+					if (lastTapTimeD_ < parameters_.doubleTapThreshold_) {
+						isDash = true;
+					}
+					lastTapTimeD_ = 0.0f;
+				}
+				if (GameBase::GetInstance()->PushKey(DIK_D)) {
 				velocity_.x += parameters_.accelationRate;
+				}
 			}
 		}
+
 		if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D)) {
 			isDash = false;
 		}
 
+
 		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
-			state_ = State::kJumping;
+			if (!isfalling&&!isJump) {
+				isJump = true;
+			}
 		}
 
-		break;
-	case Player::State::kJumping:
-
-		velocity_.y = parameters_.jumpPower;
-
-		if (jumpTimer >= parameters_.jumpTimerMax) {
-			jumpTimer = 0.0f;
-			state_ = State::kFalling;
-		} else {
-			jumpTimer += 0.1f * (1 / 60.0f);
-		}
-
-		break;
-	case Player::State::kFalling:
-		velocity_.y -= parameters_.gravity;
-		if (transform_.translate.y <= 1.5f) {
-			transform_.translate.y = 1.5f;
-			velocity_.y = 0.0f;
-			state_ = State::kIdle;
-		}
-		break;
-	case Player::State::kAttacking:
-	default:
-		break;
-	}
 	if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D)) {
 		velocity_.x *= (1.0f - parameters_.decelerationRate);
 		if (velocity_.x > -0.01f && velocity_.x < 0.01f) {
 			velocity_.x = 0.0f;
-			if (state_==State::kRunning) {
-			state_ = State::kIdle;
-			}
+	
 		}
 	}
 	
@@ -160,6 +126,33 @@ void Player::Move(){
 		bulletVelocity_.y = 1;
 	}
 	
+	
+}
+void Player::Jump(){
+
+	if (isJump) {
+		velocity_.y = parameters_.jumpPower;
+
+		if (jumpTimer >= parameters_.jumpTimerMax) {
+			jumpTimer = 0.0f;
+			isJump = false;
+			isfalling = true;
+		} else {
+			jumpTimer += 0.1f * (1 / 60.0f);
+		}
+
+	}
+}
+void Player::Falling(){
+
+	if (isfalling) {
+		velocity_.y -= parameters_.gravity;
+		if (transform_.translate.y <= 1.5f) {
+			transform_.translate.y = 1.5f;
+			velocity_.y = 0.0f;
+			isfalling = false;
+		}	
+	}
 	
 }
 void Player::Attack() {
@@ -214,6 +207,8 @@ void Player::Update(){
 
 	Attack();
 	Move();
+	Jump();
+	Falling();
 	if (parameters_.EXP >= parameters_.MaxEXP) {
 		parameters_.Level++;
 		parameters_.EXP -= parameters_.MaxEXP;

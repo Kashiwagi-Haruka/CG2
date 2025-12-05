@@ -42,6 +42,14 @@ void PlayerBullet::Update(Camera* camera) {
 
 
 }
+
+void PlayerBullet::AirBullet(){
+
+
+
+
+}
+
 void PlayerBullet::Charge(Vector3 playerPos, Vector3 direction) {
 	isCharge_ = true;
 	// direction はすでに正規化された入力方向
