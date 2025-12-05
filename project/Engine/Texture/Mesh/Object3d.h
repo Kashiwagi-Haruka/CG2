@@ -8,6 +8,7 @@
 #include "Vector4.h"
 #include <string>
 #include "Transform.h"
+#include "Light.h"
 
 class Camera;
 class Object3dCommon;
@@ -31,12 +32,7 @@ class Object3d {
 	    {0.3f, 0.0f, 0.0f  }, //
 	    {0.0f, 4.0f, -10.0f}  //
 	};
-	struct DirectionalLight {
-		Vector4 color;
-		Vector3 direction;
-		float intensity;
-	};
-
+	
 	int color = 0xffffffff;
 
 	Camera* camera_;

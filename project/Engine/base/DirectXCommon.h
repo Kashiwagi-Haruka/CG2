@@ -25,6 +25,7 @@
 #include "Function.h"
 #include "BlendModeManeger.h"
 #include "Transform.h"
+#include "Light.h"
 
 struct MaterialData {
 	std::string textureFilePath;
@@ -32,13 +33,6 @@ struct MaterialData {
 struct ModelData {
 	std::vector<VertexData> vertices;
 	MaterialData material;
-};
-
-
-struct DirectionalLight {
-	Vector4 color;
-	Vector3 direction;
-	float intensity;
 };
 
 class BlendModeManeger;
