@@ -23,6 +23,11 @@ class Player {
 	State state_;
 
 	Parameters parameters_;
+
+	struct Select{
+		
+	};
+
 	float jumpTimer = 0.0f;
 	int hp_; // プレイヤーHP
 
@@ -53,6 +58,8 @@ class Player {
 	bool isAirAttack = false;
 	int airAttackIndex = 0; // 今何発目か（0〜3）
 	float airAttackTimer = 0.0f;
+	bool isSelect_;
+	bool isLevelUP;
 
 	public:
 
@@ -81,7 +88,8 @@ class Player {
 			invincibleTimer_ = 1.0f; // 1秒無敵
 		}
 	}
+	bool GetSelect() { return isSelect_; };
 	int GetHP() const { return hp_; }
 	int GetHPMax() const { return parameters_.hpMax_; }
-
+	void EXPMath();
 };

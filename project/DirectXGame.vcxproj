@@ -164,6 +164,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\Enemy\EnemyStun.cpp" />
     <ClCompile Include="application\Object\Player\BulletLine.cpp" />
     <ClCompile Include="application\Object\Player\BulletManager.cpp" />
+    <ClCompile Include="application\Object\Player\PlayerParameters.cpp" />
     <ClCompile Include="Engine\BaseScene\BaseScene.cpp" />
     <ClCompile Include="Engine\Loadfile\CSVManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />

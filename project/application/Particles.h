@@ -6,7 +6,7 @@ class Particles {
 	ParticleEmitter* particleplayer = nullptr;
 	ParticleEmitter* particleleaf = nullptr;
 	ParticleEmitter* particlegoal = nullptr;
-	
+	ParticleEmitter* particleArrow = nullptr;
 
 	Vector3 playerPos_;
 	Vector3 cameraPos_;

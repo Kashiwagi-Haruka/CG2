@@ -21,7 +21,7 @@ Enemy::~Enemy() {
 void Enemy::Initialize(Camera* camera,Vector3 translates) {
 	isAlive = true;
 	isStun_ = false;
-	HP = 2;
+	HP = 3;
 	
 	object_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	object_->SetModel("Enemy");

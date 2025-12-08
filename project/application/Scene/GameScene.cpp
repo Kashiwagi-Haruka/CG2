@@ -21,7 +21,7 @@ GameScene::GameScene() {
 	sceneTransition = new SceneTransition();
 	uimanager = new UIManager();
 	BG = new Background();
-	soundData = Audio::GetInstance()->SoundLoadFile("Resources/audio/Alarm01.wav");
+	
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/昼下がり気分.mp3");
 }
 GameScene::~GameScene(){
@@ -30,7 +30,7 @@ GameScene::~GameScene(){
 void GameScene::Finalize() {
 
 	Audio::GetInstance()->SoundUnload(&BGMData);
-	Audio::GetInstance()->SoundUnload(&soundData);
+	
 	delete BG;
 	delete uimanager;
 	delete sceneTransition;
@@ -76,7 +76,7 @@ void GameScene::Initialize() {
 	BG->SetPosition(player->GetPosition());
 	BG->Initialize();
 	
-	Audio::GetInstance()->SoundPlayWave(soundData);
+	
 	Audio::GetInstance()->SoundPlayWave(BGMData);
 }
 
@@ -212,7 +212,11 @@ void GameScene::Update() {
 			
 
 			if (bulletManager_->Collision(ePos)) {
-				e->SetHP(0); // 敵撃破
+				e->SetHPSubtract(1*(player->GetParameters().AttuckUp+1)); 
+				if (e->GetHP() <= 0) {
+				    player->EXPMath();
+				}
+				
 			}
 		
 

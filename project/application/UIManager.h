@@ -44,7 +44,7 @@ class UIManager {
 	SpriteData HowtoOperateSPData[OperateCountMAX];
 	SpriteData LevelSPData;
 	SpriteData NumberSPData[NumbersCountMax];
-	SpriteData MaxSPData;
+	SpriteData MaxSPData[5];
 	SpriteData AttuckUpSPData;
 	SpriteData HealthUpSPData;
 	SpriteData SpeedUpSPData;

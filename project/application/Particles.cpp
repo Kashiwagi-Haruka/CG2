@@ -8,6 +8,7 @@ Particles::Particles(){
 	ParticleManager::GetInstance()->CreateParticleGroup("leaf", "Resources/2d/leaf.png");
 	ParticleManager::GetInstance()->CreateParticleGroup("goal", "Resources/2d/goalParticle.png");
 	ParticleManager::GetInstance()->CreateParticleGroup("screenEffect", "Resources/2d/defaultParticle.png");
+	ParticleManager::GetInstance()->CreateParticleGroup("Arrow", "Resources/2d/ArrowParticle.png");
 	particleplayer = new ParticleEmitter(
 	    "player",
 	    {

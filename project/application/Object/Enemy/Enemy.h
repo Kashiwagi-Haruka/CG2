@@ -34,8 +34,8 @@ public:
 	void Update();
 	void Draw();
 	void Stun(); // ★追加
-	void SetHP(int hp) { HP = hp; }
-
+	void SetHPSubtract(int hp) { HP -= hp; }
+	int GetHP() { return HP; }
 	bool GetIsAlive() { return isAlive; }
 	void SetCamera(Camera* camera) { camera_ = camera;}
 	Vector3 GetPosition() { return transform_.translate; }

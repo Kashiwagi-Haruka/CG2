@@ -49,11 +49,13 @@ void Player::Initialize(Camera* camera){
 	playerObject_->SetCamera(camera_);
 	
 	isAlive = true;
+	parameters_ = SetInit();
 	hp_ = parameters_.hpMax_;
 	bulletVelocity_ = {0, 0, 0};
 	isDash = false;
 	isJump = false;
 	isfalling = false;
+	isLevelUP = false;
 }
 void Player::Move(){
 
@@ -72,7 +74,7 @@ void Player::Move(){
 					lastTapTimeA_ = 0.0f;
 				}
 				if (GameBase::GetInstance()->PushKey(DIK_A)) {
-					velocity_.x += -parameters_.accelationRate;
+					velocity_.x += -parameters_.accelationRate*(parameters_.SpeedUp+1);
 				}
 			}
 			
@@ -85,7 +87,7 @@ void Player::Move(){
 					lastTapTimeD_ = 0.0f;
 				}
 				if (GameBase::GetInstance()->PushKey(DIK_D)) {
-				velocity_.x += parameters_.accelationRate;
+				velocity_.x += parameters_.accelationRate*(parameters_.SpeedUp+1);
 				}
 			}
 		}
@@ -233,11 +235,11 @@ void Player::Update(){
 	Move();
 	Jump();
 	Falling();
+	
 	if (parameters_.EXP >= parameters_.MaxEXP) {
 		parameters_.Level++;
 		parameters_.EXP -= parameters_.MaxEXP;
 	}
-	
 	playerObject_->SetCamera(camera_);
 	
 	playerObject_->SetScale(transform_.scale);
@@ -259,7 +261,8 @@ void Player::Update(){
 
 	#endif // 
 
-	
+	parameters_.hpMax_=parameters_.hpMax_*(1+parameters_.HPUp);
+
 	
 	//死
 	if (hp_ <= 0) {
@@ -277,6 +280,8 @@ void Player::Update(){
 	
 
 }
+
+void Player::EXPMath(){ parameters_.EXP += 50; }
 void Player::Draw() {
 	
 	GameBase::GetInstance()->ModelCommonSet();

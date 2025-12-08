@@ -19,9 +19,10 @@ struct Parameters{
 	int SpeedUp=0;
 	int AllowUp=0;
 
-	int MaxLevel=0;
-	int MaxEXP=0;
+	int MaxLevel=10;
+	int MaxEXP=200;
 	int Level=0;
 	int EXP=0;
 };
 
+Parameters SetInit();

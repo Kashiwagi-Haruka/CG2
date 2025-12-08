@@ -14,7 +14,7 @@ void EnemyManager::Initialize(Camera* camera) {
 
 	// ここで最初から15体出す例
 	for (int i = 0; i < 15; i++) {
-		Vector3 pos = {float(i * 1), 2.0f, 0.0f};
+		Vector3 pos = {float(i * 1)+10, 2.0f, 0.0f};
 		AddEnemy(camera, pos);
 	}
 }

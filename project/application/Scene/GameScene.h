@@ -42,7 +42,7 @@ class GameScene: public BaseScene{
 	SkyDome* skyDome = nullptr;
 	CameraController* cameraController = nullptr;
 	MapchipField* field = nullptr;
-	SoundData soundData;
+	
 	SoundData BGMData;
 	Background* BG;
 	BulletManager* bulletManager_ = nullptr;

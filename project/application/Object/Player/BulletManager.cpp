@@ -26,15 +26,25 @@ void BulletManager::Fire(const Vector3& pos, const Vector3& dir) {
 	bullets_.push_back(std::move(bullet));
 }
 
-bool BulletManager::Collision(Vector3 ePos){
-	bool isBulletHit=false;
-	float bulletHitSize = 1.0f; // 弾の当たり判定
-	for (auto& b : bullets_) {
-	Vector3 bPos = b->GetPosition();
+bool BulletManager::Collision(Vector3 ePos) {
+	bool isHit = false;
+	float bulletHitSize = 1.0f;
 
-	isBulletHit = fabs(bPos.x - ePos.x) < bulletHitSize && fabs(bPos.y - ePos.y) < bulletHitSize;
-	}
-	return isBulletHit;
+	bullets_.erase(
+	    std::remove_if(
+	        bullets_.begin(), bullets_.end(),
+	        [&](const std::unique_ptr<PlayerBullet>& b) {
+		        Vector3 p = b->GetPosition();
+		        bool hit = fabs(p.x - ePos.x) < bulletHitSize && fabs(p.y - ePos.y) < bulletHitSize;
+
+		        if (hit)
+			        isHit = true; // ★ 一つでも当たれば true
+
+		        return hit; // ★ hit した弾だけ削除される
+	        }),
+	    bullets_.end());
+
+	return isHit;
 }
 
 void BulletManager::Update() {

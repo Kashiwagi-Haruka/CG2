@@ -29,8 +29,9 @@ UIManager::UIManager() {
 	for (int i = 0; i < NumbersCountMax; i++) {
 		NumberSPData[i].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/No.png");
 	}
-
-	MaxSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Max.png");
+	for (int i = 0; i < 5; i++) {
+	MaxSPData[i].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Max.png");
+	}
 
 	// ステータスUPアイコン
 	AttuckUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/AttuckUp.png");
@@ -55,8 +56,10 @@ UIManager::UIManager() {
 
 	for (int i = 0; i < NumbersCountMax; i++)
 		NumberSPData[i].sprite = new Sprite();
+	for (int i = 0; i < 5; i++) {
+	MaxSPData[i].sprite = new Sprite();
+	}
 
-	MaxSPData.sprite = new Sprite();
 	AttuckUpSPData.sprite = new Sprite();
 	HealthUpSPData.sprite = new Sprite();
 	SpeedUpSPData.sprite = new Sprite();
@@ -75,8 +78,9 @@ UIManager::~UIManager() {
 
 	for (int i = 0; i < NumbersCountMax; i++)
 		delete NumberSPData[i].sprite;
-
-	delete MaxSPData.sprite;
+	for (int i = 0; i < 5; i++) {
+		delete MaxSPData[i].sprite;
+	}
 	delete AttuckUpSPData.sprite;
 	delete HealthUpSPData.sprite;
 	delete SpeedUpSPData.sprite;
@@ -107,6 +111,8 @@ void UIManager::Initialize() {
 	// ------------------ Level ------------------
 	LevelSPData.sprite->Initialize(spriteCommon, LevelSPData.handle);
 	LevelSPData.sprite->SetScale({50, 50});
+	LevelSPData.translate = {10, 10};
+	LevelSPData.sprite->SetPosition(LevelSPData.translate);
 
 	// ------------------ Number 0〜9 ------------------
 	for (int i = 0; i < NumbersCountMax; i++) {
@@ -114,10 +120,11 @@ void UIManager::Initialize() {
 		NumberSPData[i].sprite->SetTextureRange({0, 0}, numbersTextureSize);
 		NumberSPData[i].sprite->SetScale({32, 32});
 	}
+	for (int i = 0; i < 5; i++) {
+		MaxSPData[i].sprite->Initialize(spriteCommon, MaxSPData[i].handle);
 
-	MaxSPData.sprite->Initialize(spriteCommon, MaxSPData.handle);
-	MaxSPData.sprite->SetScale({48, 48});
-
+		MaxSPData[i].sprite->SetScale({48, 48});
+	}
 	// Up アイコン
 	AttuckUpSPData.sprite->Initialize(spriteCommon, AttuckUpSPData.handle);
 	AttuckUpSPData.sprite->SetScale({48, 48});
@@ -130,6 +137,7 @@ void UIManager::Initialize() {
 
 	AllowUpSPData.sprite->Initialize(spriteCommon, AllowUpSPData.handle);
 	AllowUpSPData.sprite->SetScale({48, 48});
+	
 }
 
 void UIManager::Update() {
@@ -193,25 +201,48 @@ void UIManager::Update() {
 
 	
 	NumberSPData[kLv].sprite->SetTextureRange({300.0f * parameters_.Level, 0}, numbersTextureSize);
-	NumberSPData[kAttuck].sprite->SetPosition({AttuckUpSPData.translate.x + 30, AttuckUpSPData.translate.y});
 	NumberSPData[kAttuck].sprite->SetTextureRange({300.0f * parameters_.AttuckUp, 0}, numbersTextureSize);
-	NumberSPData[kHealth].sprite->SetPosition({HealthUpSPData.translate.x + 30, HealthUpSPData.translate.y});
 	NumberSPData[kHealth].sprite->SetTextureRange({300.0f * parameters_.HPUp, 0}, numbersTextureSize);
-	NumberSPData[kSpeed].sprite->SetPosition({SpeedUpSPData.translate.x + 30, SpeedUpSPData.translate.y});
 	NumberSPData[kSpeed].sprite->SetTextureRange({300.0f * parameters_.SpeedUp, 0}, numbersTextureSize);
-	NumberSPData[kArrow].sprite->SetPosition({AllowUpSPData.translate.x + 30, AllowUpSPData.translate.y});
 	NumberSPData[kArrow].sprite->SetTextureRange({300.0f * parameters_.AllowUp, 0}, numbersTextureSize);
+
+	NumberSPData[kLv].translate = {LevelSPData.translate.x + 50, LevelSPData.translate.y +12};
+	NumberSPData[kLv].sprite->SetPosition(NumberSPData[kLv].translate);
+
+	NumberSPData[kAttuck].translate = {AttuckUpSPData.translate.x + 40, AttuckUpSPData.translate.y + 20};
+	NumberSPData[kAttuck].sprite->SetPosition(NumberSPData[kAttuck].translate);
+
+	NumberSPData[kHealth].translate = {HealthUpSPData.translate.x + 40, HealthUpSPData.translate.y + 20};
+	NumberSPData[kHealth].sprite->SetPosition(NumberSPData[kHealth].translate);
+
+	NumberSPData[kSpeed].translate = {SpeedUpSPData.translate.x + 40, SpeedUpSPData.translate.y + 20};
+	NumberSPData[kSpeed].sprite->SetPosition(NumberSPData[kSpeed].translate);
+
+	NumberSPData[kArrow].translate = {AllowUpSPData.translate.x + 40, AllowUpSPData.translate.y + 20};
+	NumberSPData[kArrow].sprite->SetPosition(NumberSPData[kArrow].translate);
+	
+
+	
 
 	for (int i = kExp100; i <= kExpMax1; i++) {
 
 		NumberSPData[i].sprite->SetPosition({i*50.0f+100,20});
 	}
 
-	for (int i = 0; i < NumbersCountMax; i++)
+	for (int i = 0; i < NumbersCountMax; i++){
 		NumberSPData[i].sprite->Update();
+	}
+	MaxSPData[0].translate = {NumberSPData[kLv].translate.x, NumberSPData[kLv].translate.y-10};
+	MaxSPData[1].translate = {NumberSPData[kAttuck].translate.x,NumberSPData[kAttuck].translate.y-10};
+	MaxSPData[2].translate = {NumberSPData[kHealth].translate.x, NumberSPData[kHealth].translate.y-10};
+	MaxSPData[3].translate = {NumberSPData[kSpeed].translate.x, NumberSPData[kSpeed].translate.y-10};
+	MaxSPData[4].translate = {NumberSPData[kArrow].translate.x,NumberSPData[kArrow].translate.y-10};
 
-	MaxSPData.sprite->Update();
-	
+	for (int i = 0; i < 5; i++) {
+
+	MaxSPData[i].sprite->SetPosition(MaxSPData[i].translate);
+	MaxSPData[i].sprite->Update();
+	}
 }
 
 void UIManager::Draw() {
@@ -221,20 +252,46 @@ void UIManager::Draw() {
 	playerHpSPData.sprite->Draw();
 	playerHPFlameSPData.sprite->Draw();
 
-	for (int i = 0; i < OperateCountMAX; i++)
+	for (int i = 0; i < kAttuckButton; i++)
 		HowtoOperateSPData[i].sprite->Draw();
 
 	LevelSPData.sprite->Draw();
 
-	
-
-	MaxSPData.sprite->Draw();
 	AttuckUpSPData.sprite->Draw();
 	HealthUpSPData.sprite->Draw();
 	SpeedUpSPData.sprite->Draw();
 	AllowUpSPData.sprite->Draw();
-	for (int i = 0; i < NumbersCountMax; i++)
+	for (int i = 0; i <= kExpMax1; i++) {
 		NumberSPData[i].sprite->Draw();
+	}
+	if (parameters_.Level < parameters_.MaxLevel) {
+	NumberSPData[kLv].sprite->Draw();
+	} else {
+		MaxSPData[0].sprite->Draw();
+	}
+	if (parameters_.AttuckUp < 10) {
+	NumberSPData[kAttuck].sprite->Draw();
+	} else {
+		MaxSPData[1].sprite->Draw();
+	}
+	if (parameters_.HPUp < 10) {
+	NumberSPData[kHealth].sprite->Draw();
+	} else {
+		MaxSPData[2].sprite->Draw();
+	}
+	if (parameters_.SpeedUp < 10) {
+	NumberSPData[kSpeed].sprite->Draw();
+	} else {
+		MaxSPData[3].sprite->Draw();
+	}
+	if (parameters_.AllowUp < 10) {
+	NumberSPData[kArrow].sprite->Draw();
+	} else {
+		MaxSPData[4].sprite->Draw();
+	}
+	
+	
+	
 }
 
 void UIManager::SetPlayerPosition(Vector2 playerPosition){ 
