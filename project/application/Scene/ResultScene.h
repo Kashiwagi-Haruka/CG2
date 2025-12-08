@@ -17,6 +17,10 @@ class ResultScene : public BaseScene{
 	SpriteData logoSP_;
 	bool isGameover_;
 	bool isGameClear_;
+	Sprite* pressSpaceSprite = nullptr;
+	uint32_t pressSpaceHandle = 0;
+	Vector2 pressSpacePos = {640, 420}; // 中央寄り & 360 より下
+	Vector2 pressSpaceSize = {300, 300};
 
 	public:
 	
