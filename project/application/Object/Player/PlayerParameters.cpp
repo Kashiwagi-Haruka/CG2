@@ -11,7 +11,7 @@ Parameters SetInit() {
 	p.jumpTimerMax = 0.01f;           // ジャンプ中状態を継続できる最大タイマー（非常に短く設定されている）
 	p.gravity = 0.98f / 10.0f / 2.0f; // 重力（毎フレーム下に加える値）
 	p.bulletRadius = 0.01f;           // 弾の当たり判定用の半径（小さい円）
-	p.hpMax_ = 10000;                 // プレイヤーの最大HP
+	p.hpMax_ = 5;                 // プレイヤーの最大HP
 	p.dashMagnification = 2.0f;       // ダッシュ時の速度倍率（通常速度に掛ける）
 	p.doubleTapThreshold_ = 30.0f;    // ダブルタップと判定するためのフレーム間隔（30フレーム以内）
 

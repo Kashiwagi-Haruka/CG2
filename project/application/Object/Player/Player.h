@@ -60,6 +60,7 @@ class Player {
 	float airAttackTimer = 0.0f;
 	bool isSelect_;
 	bool isLevelUP;
+	bool usedAirAttack = false;
 
 	public:
 
@@ -81,6 +82,8 @@ class Player {
 	Vector3 GetBulletPosition();
 	bool GetIsAlive() { return isAlive; }
 	Parameters GetParameters() { return parameters_; }
+	void SetParameters(const Parameters& p) { parameters_ = p; }
+
 	void Damage(int amount) {
 		if (!isInvincible_) {
 			hp_ -= amount;
@@ -91,5 +94,7 @@ class Player {
 	bool GetSelect() { return isSelect_; };
 	int GetHP() const { return hp_; }
 	int GetHPMax() const { return parameters_.hpMax_; }
+	void IsLevelUp(bool lv) { isLevelUP = lv; }
+	bool GetLv() { return isLevelUP; }
 	void EXPMath();
 };

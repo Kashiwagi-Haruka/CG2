@@ -7,6 +7,7 @@
 #include "Object/Enemy/EnemyManager.h"
 #include "SceneManager.h"
 #include "ResultScene.h"
+#include "GameOverScene.h"
 GameScene::GameScene() {
 
 	cameraController = new CameraController();
@@ -21,7 +22,9 @@ GameScene::GameScene() {
 	sceneTransition = new SceneTransition();
 	uimanager = new UIManager();
 	BG = new Background();
-	
+	house = new House();
+
+
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/昼下がり気分.mp3");
 }
 GameScene::~GameScene(){
@@ -30,7 +33,10 @@ GameScene::~GameScene(){
 void GameScene::Finalize() {
 
 	Audio::GetInstance()->SoundUnload(&BGMData);
-	
+	for (int i = 0; i < 4; i++) {
+		delete levelupIcons[i];
+	}
+	delete house;
 	delete BG;
 	delete uimanager;
 	delete sceneTransition;
@@ -75,12 +81,69 @@ void GameScene::Initialize() {
 	BG->SetCamera(cameraController->GetCamera());
 	BG->SetPosition(player->GetPosition());
 	BG->Initialize();
+	house->Initialize(cameraController->GetCamera());
+	// ==================
+	// ★ レベルアップ用スプライト画像読み込み
+	// ==================
 	
-	
+	int handle[4]{};
+	handle[0] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/levelup_attack.png");
+	handle[1] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/levelup_speed.png");
+	handle[2] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/levelup_hp.png");
+	handle[3] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/levelup_allow.png");
+
+	for (int i = 0; i < 4; i++) {
+	levelupIcons[i] = new Sprite();
+		levelupIcons[i]->Initialize(GameBase::GetInstance()->GetSpriteCommon(), handle[i]);
+
+		levelupIcons[i]->SetScale({256, 256});
+	}
+
 	Audio::GetInstance()->SoundPlayWave(BGMData);
 }
 
 void GameScene::Update() {
+	// ★ レベルアップ選択中は操作受付
+	if (isLevelSelecting) {
+
+		// A で左、D で右
+		if (GameBase::GetInstance()->TriggerKey(DIK_A)) {
+			cursorIndex = 0;
+		}
+		if (GameBase::GetInstance()->TriggerKey(DIK_D)) {
+			cursorIndex = 1;
+		}
+
+		// SPACEで決定
+		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
+
+			int choice = selectChoices[cursorIndex];
+			auto params = player->GetParameters();
+
+			switch (choice) {
+			case 0:
+				params.AttuckUp++;
+				break;
+			case 1:
+				params.SpeedUp++;
+				break;
+			case 2:
+				params.HPUp++;
+				break;
+			case 3:
+				params.AllowUp++;
+				break;
+			}
+
+			player->SetParameters(params);
+
+			player->IsLevelUp(false);
+			isLevelSelecting = false;
+		}
+
+		// 選択中はその他の更新停止
+		return;
+	}
 
 	
 	skyDome->SetCamera(cameraController->GetCamera());
@@ -148,8 +211,41 @@ void GameScene::Update() {
 	bulletManager_->Update();
 	player->SetBulletManager(bulletManager_);
 	player->Update();
+	// ===========================
+	// ★ レベルアップを検知して選択画面へ
+	// ===========================
+	if (player->GetLv() && !isLevelSelecting) {
+
+		isLevelSelecting = true;
+
+		// ランダムで 0〜3 から2個選ぶ
+		int a = rand() % 4;
+		int b = rand() % 4;
+		while (b == a) {
+			b = rand() % 4;
+		}
+
+		selectChoices[0] = a;
+		selectChoices[1] = b;
+
+		cursorIndex = 0; // 左から開始
+
+		// プレイヤーの動きを停止させたい場合はここで何もしない（GameScene が制御）
+	}
+
 	enemyManager->Update(cameraController->GetCamera());
-	
+	// ★★★ 敵が全滅したらゴールを表示・判定有効化 ★★★
+	bool allDead = true;
+
+	for (auto e : enemyManager->enemies) {
+		if (e->GetIsAlive()) {
+			allDead = false;
+			break;
+		}
+	}
+
+	goalActive = allDead;
+
 	goal->Update(); 
 	
 	
@@ -162,12 +258,15 @@ void GameScene::Update() {
 
 		float goalHitSize = 2.0f;
 
-		bool isGoalHit = fabs(p.x - g.x) < goalHitSize && fabs(p.y - g.y) < goalHitSize;
+if (goalActive) { // ★ 敵全滅してからしか処理しない
+			bool isGoalHit = fabs(p.x - g.x) < goalHitSize && fabs(p.y - g.y) < goalHitSize;
 
-		if (isGoalHit) {
-			BaseScene* scene = new ResultScene();
-			SceneManager::GetInstance()->SetNextScene(scene);
+			if (isGoalHit) {
+				BaseScene* scene = new ResultScene();
+				SceneManager::GetInstance()->SetNextScene(scene);
+			}
 		}
+
 	}
 
 	
@@ -180,7 +279,9 @@ void GameScene::Update() {
 	Vector3 p = player->GetPosition();
 	Vector3 v = player->GetVelocity();
 	
-	
+	Vector3 housePos = house->GetPosition();
+	float houseHitSize = 8.0f;
+
 
 	for (auto e : enemyManager->enemies) {
 
@@ -219,7 +320,19 @@ void GameScene::Update() {
 				
 			}
 		
+			  // ===== House と敵の当たり判定 =====
+		    bool hitHouse = fabs(ePos.x - housePos.x) < houseHitSize && fabs(ePos.y - housePos.y) < houseHitSize;
 
+		    if (hitHouse) {
+			    e->SetHPSubtract(10);      // ★ 敵を即死させる or 消す処理
+			    house->Damage(1); // ★ house にダメージ
+
+			    if (house->GetHP() <= 0) {
+				    BaseScene* scene = new GameOverScene();
+				    SceneManager::GetInstance()->SetNextScene(scene);
+			    }
+			    continue;
+		    }
 	}
 
 
@@ -232,8 +345,18 @@ void GameScene::Update() {
 	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
 	uimanager->SetPlayerPosition({player->GetPosition().x, player->GetPosition().y});
+	uimanager->SetHouseHP(house->GetHP());
+	uimanager->SetHouseHPMax(50); // House の最大HP（好きに変更）
+
 	uimanager->Update();
 	BG->Update(player->GetPosition());
+	house->Update(cameraController->GetCamera());
+
+	// どちらかの HP が 0 以下で GameOver
+	if (!player->GetIsAlive() || house->GetHP() <= 0) {
+		sceneEndOver = true;
+	}
+
 	cameraController->SetTranslate({player->GetPosition().x, player->GetPosition().y + 5, cameraController->GetTransform().translate.z});
 	cameraController->Update();
 }
@@ -245,14 +368,46 @@ void GameScene::Draw() {
 	player->Draw();
 	bulletManager_->Draw();
 	enemyManager->Draw();
+	house->Draw();
 
 	field->Draw();
-	goal->Draw(); 
+	if (goalActive) {
+		goal->Draw(); // ★ 敵全滅後だけ描画する
+	}
+
 	BG->Draw();
 	ParticleManager::GetInstance()->Draw();
 	
 	GameBase::GetInstance()->SpriteCommonSet();
 	uimanager->Draw();
+	// =============================
+	// ★ レベルアップ選択画面描画（別スプライト使用版）
+	// =============================
+	if (isLevelSelecting) {
+
+		GameBase::GetInstance()->SpriteCommonSet();
+
+		// 左と右の選択肢
+		int leftID = selectChoices[0];
+		int rightID = selectChoices[1];
+
+		// 表示位置（自由に調整可）
+		Vector2 leftPos = {350, 300};
+		Vector2 rightPos = {750, 300};
+
+		// 左アイコン描画
+		levelupIcons[leftID]->SetPosition(leftPos);
+		levelupIcons[leftID]->SetColor(cursorIndex == 0 ? Vector4(1, 1, 0, 1) : Vector4(1, 1, 1, 1));
+		levelupIcons[leftID]->Update();
+		levelupIcons[leftID]->Draw();
+
+		// 右アイコン描画
+		levelupIcons[rightID]->SetPosition(rightPos);
+		levelupIcons[rightID]->SetColor(cursorIndex == 1 ? Vector4(1, 1, 0, 1) : Vector4(1, 1, 1, 1));
+		levelupIcons[rightID]->Update();
+		levelupIcons[rightID]->Draw();
+	}
+
 
 		/*if (IsKeyboard) {
 	    if (gameBase->TriggerKey(DIK_P)) {

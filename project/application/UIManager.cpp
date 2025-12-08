@@ -64,10 +64,18 @@ UIManager::UIManager() {
 	HealthUpSPData.sprite = new Sprite();
 	SpeedUpSPData.sprite = new Sprite();
 	AllowUpSPData.sprite = new Sprite();
+	houseHpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/playerHP.png");
+
+	houseHpFlameSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/playerHPFlame.png");
+
+	houseHpSPData.sprite = new Sprite();
+	houseHpFlameSPData.sprite = new Sprite();
 }
 
 UIManager::~UIManager() {
 
+	delete houseHpSPData.sprite;
+	delete houseHpFlameSPData.sprite;
 	delete playerHpSPData.sprite;
 	delete playerHPFlameSPData.sprite;
 
@@ -138,6 +146,25 @@ void UIManager::Initialize() {
 	AllowUpSPData.sprite->Initialize(spriteCommon, AllowUpSPData.handle);
 	AllowUpSPData.sprite->SetScale({48, 48});
 	
+	// --- House HP Bar ---
+	houseHpSPData.sprite->Initialize(spriteCommon, houseHpSPData.handle);
+	houseHpSPData.size = {120, 20}; // ★ 横長に
+	houseHpSPData.sprite->SetScale(houseHpSPData.size);
+
+	// 位置（自由に調整）：画面左上あたり
+	houseHpSPData.translate = {50, 550};
+	houseHpSPData.sprite->SetPosition(houseHpSPData.translate);
+
+	// --- House HP Flame ---
+	houseHpFlameSPData.sprite->Initialize(spriteCommon, houseHpFlameSPData.handle);
+	houseHpFlameSPData.size = {130, 30};
+	houseHpFlameSPData.sprite->SetScale(houseHpFlameSPData.size);
+	houseHpFlameSPData.translate = {houseHpSPData.translate.x - 5, houseHpSPData.translate.y};
+	houseHpFlameSPData.sprite->SetPosition(houseHpFlameSPData.translate);
+
+	// ★ 90度回転（横ゲージ化）
+	houseHpSPData.sprite->SetRotation({90,0});
+	houseHpFlameSPData.sprite->SetRotation({90,0});
 }
 
 void UIManager::Update() {
@@ -243,6 +270,16 @@ void UIManager::Update() {
 	MaxSPData[i].sprite->SetPosition(MaxSPData[i].translate);
 	MaxSPData[i].sprite->Update();
 	}
+
+	// ---- House HP ----
+	if (houseHPMax > 0) {
+		float ratio = (float)houseHP / (float)houseHPMax;
+		houseHpSPData.size.x = 120 * ratio;
+		houseHpSPData.sprite->SetScale(houseHpSPData.size);
+	}
+
+	houseHpSPData.sprite->Update();
+	houseHpFlameSPData.sprite->Update();
 }
 
 void UIManager::Draw() {
@@ -290,7 +327,9 @@ void UIManager::Draw() {
 		MaxSPData[4].sprite->Draw();
 	}
 	
-	
+	houseHpFlameSPData.sprite->Draw();
+	houseHpSPData.sprite->Draw();
+
 	
 }
 

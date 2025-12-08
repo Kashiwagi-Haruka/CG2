@@ -13,6 +13,8 @@ class Particles {
 	Vector3 goalPos_;
 	Transform playerEmitterTransform;
 
+	bool isgoal;
+
 	public:
 
 	Particles();
@@ -22,4 +24,5 @@ class Particles {
 	void SetCameraPos(Vector3 cameraPos);
 	void SetGoalPos(Vector3 goalPos);
 	void EditSingleEmitter(ParticleEmitter* e);
+	bool Isgoal(bool isgoal);
 };

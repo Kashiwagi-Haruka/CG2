@@ -154,7 +154,10 @@ void Player::Falling(){
 			transform_.translate.y = 1.5f;
 			velocity_.y = 0.0f;
 			isfalling = false;
-		}	
+
+			// ★ 地面に着いたので空中攻撃回数をリセット
+			usedAirAttack = false;
+		}
 	}
 	
 }
@@ -162,18 +165,23 @@ void Player::Attack() {
 
 	if (!bulletManager_)
 		return;
-
 	// --- 空中攻撃開始 ---
-	if (isfalling && GameBase::GetInstance()->TriggerKey(DIK_J)) {
+	// 落下中 かつ まだ空中攻撃を使っていない時だけ発動
+	if (isfalling && !usedAirAttack && GameBase::GetInstance()->TriggerKey(DIK_J)) {
+
 		isAirAttack = true;
+		usedAirAttack = true; // ★ 空中攻撃を使ったことにする
+
 		airAttackIndex = 0;
 		airAttackTimer = 0.0f;
 
-		isfalling = false;  // ★ 空中攻撃中は落下しない（その場に停止）
-		velocity_.y = 0.0f; // ★ 落下速度リセット
+		isfalling = false; // 空中攻撃中は落下停止
+		velocity_.y = 0.0f;
 	}
 
 
+
+	// --- 空中攻撃中 ---
 	// --- 空中攻撃中 ---
 	if (isAirAttack) {
 
@@ -181,29 +189,35 @@ void Player::Attack() {
 
 		// ★ 0.1秒ごとに1発撃つ
 		if (airAttackTimer >= 0.1f) {
-
+			// ★ AllowUp の値で本数可変
+			int maxAirShots = parameters_.AllowUp + 1;
 			airAttackTimer = 0.0f;
 
-			// 縦に4つ並べた位置
+			// 縦に並べる位置
 			Vector3 pos = transform_.translate;
-			pos.y -= (float)airAttackIndex * 1.0f; // y-1, y-2, y-3
+			pos.y -= (float)airAttackIndex * 1.0f;
 
-			// 発射方向：右下方向（45°）
-			Vector3 dir = Function::Normalize({1, -1, 0});
+			// 発射方向：右下を基準に少し散らす
+			float offset = (airAttackIndex - (maxAirShots - 1) * 0.5f) * 0.15f;
+			Vector3 dir = {1, -1 + offset, 0};
+			dir = Function::Normalize(dir);
 
 			bulletManager_->Fire(pos, dir);
 
+
 			airAttackIndex++;
 
-			// ★ 4発撃ったら終了＆落下を再開
-			if (airAttackIndex >= 4) {
+			
+
+			if (airAttackIndex >= maxAirShots) {
 				isAirAttack = false;
 				isfalling = true; // ← 落下再開
 			}
 		}
 
-		return; // 空中攻撃中は通常攻撃処理しない
+		return;
 	}
+
 
 	// --- 通常の地上攻撃（今のあなたの処理） ---
 	Vector3 shotDir = {0, 0, 0};
@@ -223,23 +237,49 @@ void Player::Attack() {
 	bulletManager_->SetShotDir(shotDir);
 
 	if (GameBase::GetInstance()->ReleaseKey(DIK_J)) {
-		bulletManager_->Fire(transform_.translate, shotDir);
+
+		int arrowCount = parameters_.AllowUp+1; // 1 + AllowUp
+
+		for (int i = 0; i < arrowCount; i++) {
+
+			// 本数に応じて少し角度を散らす
+			float offset = (i - (arrowCount - 1) * 0.5f) * 0.15f; // 角度差
+
+			Vector3 dir2 = {shotDir.x, shotDir.y + offset, shotDir.z};
+			dir2 = Function::Normalize(dir2);
+
+			bulletManager_->Fire(transform_.translate, dir2);
+		}
 	}
 }
 
 
 
 void Player::Update(){
-
+	
 	Attack();
 	Move();
 	Jump();
 	Falling();
 	
-	if (parameters_.EXP >= parameters_.MaxEXP) {
-		parameters_.Level++;
-		parameters_.EXP -= parameters_.MaxEXP;
+// --- レベルアップ処理 ---
+	if (parameters_.Level < parameters_.MaxLevel) {
+
+		// ★ まだレベル上限に達していない場合だけレベルアップ判定する
+		if (parameters_.EXP >= parameters_.MaxEXP) {
+
+			parameters_.EXP -= parameters_.MaxEXP;
+			parameters_.Level++;
+
+			isLevelUP = true; // レベルアップ画面を出す
+		}
+	} else {
+		// ★ MAX レベルのときはEXPが入っても処理しない
+		if (parameters_.EXP > parameters_.MaxEXP) {
+			parameters_.EXP = parameters_.MaxEXP;
+		}
 	}
+
 	playerObject_->SetCamera(camera_);
 	
 	playerObject_->SetScale(transform_.scale);

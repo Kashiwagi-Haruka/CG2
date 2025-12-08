@@ -33,7 +33,7 @@ Particles::Particles(){
             {0,    0,    0   }
     },
 	    1, 5, {0, 0.1f, 0}, {-10.0f, 0, -1}, {10.0f, 3, 0});
-	
+	isgoal = false;
 }
 Particles::~Particles(){
 
@@ -66,12 +66,13 @@ void Particles::Update() {
         {cameraPos_.x, cameraPos_.y, 0   }
     });
 
+	if (isgoal) {
 	particlegoal->Update({
 	    {0.2f, 0.2f, 1.0f},
         {0.0f, 0.0f, 0.0f},
         {goalPos_.x * 2.5f,(goalPos_.y-0.5f)*2.5f,goalPos_.z*2.5f+1}
     });
-
+	}
 
 
 	// ============================

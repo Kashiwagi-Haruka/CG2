@@ -71,6 +71,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon,uint32_t Handle){
 	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
 	matSprite->enableLighting = 0;
 	matSprite->uvTransform = Function::MakeIdentity4x4();
+	material = matSprite;
 	materialResource->Unmap(0, nullptr);
 
 	transformResource = spriteCommon_->CreateBufferResource(sizeof(TransformationMatrix));

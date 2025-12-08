@@ -13,6 +13,7 @@
 #include "Object/CatchBlock.h"
 #include "BaseScene.h"
 #include "Object/Player/BulletManager.h"
+#include "Object/House/House.h"
 
 class Player;
 class Enemy;
@@ -42,11 +43,14 @@ class GameScene: public BaseScene{
 	SkyDome* skyDome = nullptr;
 	CameraController* cameraController = nullptr;
 	MapchipField* field = nullptr;
-	
+	House* house = nullptr;
+
 	SoundData BGMData;
 	Background* BG;
 	BulletManager* bulletManager_ = nullptr;
 	/*CatchBlock* catchBlock;*/
+	// レベルアップ選択専用スプライト
+	Sprite* levelupIcons[4]; // 0:Atk, 1:Speed, 2:HP, 3:Allow
 
     ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白
 	DirectionalLight light{
@@ -55,9 +59,16 @@ class GameScene: public BaseScene{
         .intensity{1}
     };
 	
+	bool goalActive = false; // 敵全滅後に true になる
 
 	bool sceneEndClear = false;
 	bool sceneEndOver = false;
+	// =====================
+	// レベルアップ選択用
+	// =====================
+	bool isLevelSelecting = false;
+	int selectChoices[2]; // 0:Atk, 1:Speed, 2:HP, 3:Allow
+	int cursorIndex = 0;  // 0 or 1
 
 	public:
 

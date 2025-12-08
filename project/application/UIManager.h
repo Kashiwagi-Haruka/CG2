@@ -49,6 +49,10 @@ class UIManager {
 	SpriteData HealthUpSPData;
 	SpriteData SpeedUpSPData;
 	SpriteData AllowUpSPData;
+	SpriteData houseHpSPData;
+	SpriteData houseHpFlameSPData;
+	int houseHP = 0;
+	int houseHPMax = 0;
 
 	int playerHP;
 	int playerHPMax;
@@ -68,4 +72,6 @@ class UIManager {
 	void SetPlayerHP(int HP);
 	void SetPlayerHPMax(int HPMax);
 	void SetPlayerParameters(Parameters parameters);
+	void SetHouseHP(int hp) { houseHP = hp; }
+	void SetHouseHPMax(int hpMax) { houseHPMax = hpMax; }
 };
