@@ -10,7 +10,7 @@
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
-
+#include "BulletManager.h"
 
 Player::Player(){
 	ModelManeger::GetInstance()->LoadModel("playerModel");
@@ -21,9 +21,7 @@ Player::Player(){
 	
 }
 Player::~Player(){
-	if (bullet_) {
-	delete bullet_;
-	}
+
 	delete playerObject_;
 	
 	
@@ -146,7 +144,10 @@ void Player::Jump(){
 void Player::Falling(){
 
 	if (isfalling) {
+		
 		velocity_.y -= parameters_.gravity;
+		
+
 		if (transform_.translate.y <= 1.5f) {
 			transform_.translate.y = 1.5f;
 			velocity_.y = 0.0f;
@@ -157,7 +158,52 @@ void Player::Falling(){
 }
 void Player::Attack() {
 
-	// --- 発射方向入力 ---
+	if (!bulletManager_)
+		return;
+
+	// --- 空中攻撃開始 ---
+	if (isfalling && GameBase::GetInstance()->TriggerKey(DIK_J)) {
+		isAirAttack = true;
+		airAttackIndex = 0;
+		airAttackTimer = 0.0f;
+
+		isfalling = false;  // ★ 空中攻撃中は落下しない（その場に停止）
+		velocity_.y = 0.0f; // ★ 落下速度リセット
+	}
+
+
+	// --- 空中攻撃中 ---
+	if (isAirAttack) {
+
+		airAttackTimer += 1.0f / 60.0f; // 毎フレームタイマー進む
+
+		// ★ 0.1秒ごとに1発撃つ
+		if (airAttackTimer >= 0.1f) {
+
+			airAttackTimer = 0.0f;
+
+			// 縦に4つ並べた位置
+			Vector3 pos = transform_.translate;
+			pos.y -= (float)airAttackIndex * 1.0f; // y-1, y-2, y-3
+
+			// 発射方向：右下方向（45°）
+			Vector3 dir = Function::Normalize({1, -1, 0});
+
+			bulletManager_->Fire(pos, dir);
+
+			airAttackIndex++;
+
+			// ★ 4発撃ったら終了＆落下を再開
+			if (airAttackIndex >= 4) {
+				isAirAttack = false;
+				isfalling = true; // ← 落下再開
+			}
+		}
+
+		return; // 空中攻撃中は通常攻撃処理しない
+	}
+
+	// --- 通常の地上攻撃（今のあなたの処理） ---
 	Vector3 shotDir = {0, 0, 0};
 	if (GameBase::GetInstance()->PushKey(DIK_A))
 		shotDir.x = -1;
@@ -166,42 +212,20 @@ void Player::Attack() {
 	if (GameBase::GetInstance()->PushKey(DIK_W))
 		shotDir.y = 1;
 
-	// 正規化（0ベクトルの場合は右向き）
-	if (Function::Length(shotDir) > 0.0f) {
+	if (Function::Length(shotDir) > 0.0f)
 		shotDir = Function::Normalize(shotDir);
-	} else {
-		shotDir = {1, 0, 0}; // デフォルト＝右
-	}
+	else
+		shotDir = {1, 0, 0};
 
-	// --- チャージ開始 ---
-	if (GameBase::GetInstance()->TriggerKey(DIK_J)) {
-		if (bullet_)
-			delete bullet_;
-		bullet_ = new PlayerBullet();
-		bullet_->Initialize(camera_);
-	}
+	bulletManager_->SetPlayerPos(transform_.translate);
+	bulletManager_->SetShotDir(shotDir);
 
-	// --- チャージ中（弾をプレイヤー前に配置） ---
-	if (GameBase::GetInstance()->PushKey(DIK_J)) {
-		if (bullet_) {
-			bullet_->SetVelocity(shotDir * 0.5f); // 発射方向を渡す
-			bullet_->Charge(transform_.translate, shotDir);
-			state_ = State::kAttacking;
-		}
-	}
-
-	// --- 発射 ---
 	if (GameBase::GetInstance()->ReleaseKey(DIK_J)) {
-		if (bullet_) {
-			bullet_->Fire();
-		}
-		state_ = State::kIdle;
-	}
-
-	if (bullet_) {
-		bullet_->Update(camera_);
+		bulletManager_->Fire(transform_.translate, shotDir);
 	}
 }
+
+
 
 void Player::Update(){
 
@@ -258,8 +282,5 @@ void Player::Draw() {
 	GameBase::GetInstance()->ModelCommonSet();
 	playerObject_->Draw();
 	
-	if (bullet_) {
-	bullet_->Draw();
-	}
+
 }
-Vector3 Player::GetBulletPosition() { return bullet_->GetPosition(); }

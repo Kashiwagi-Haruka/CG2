@@ -8,6 +8,8 @@ class GameBase;
 class Camera;
 class PlayerBullet;
 class MapchipField;
+class BulletManager;
+
 class Player {
 	
 	enum class State {
@@ -43,10 +45,14 @@ class Player {
 
 	Object3d* playerObject_ = nullptr;
 
-	
+	BulletManager* bulletManager_ = nullptr;
+
 	Camera* camera_;
-	PlayerBullet* bullet_;
+	
 	MapchipField* map_ = nullptr;
+	bool isAirAttack = false;
+	int airAttackIndex = 0; // 今何発目か（0〜3）
+	float airAttackTimer = 0.0f;
 
 	public:
 
@@ -59,6 +65,7 @@ class Player {
 	void Draw();
 	void Jump();
 	void Falling();
+	void SetBulletManager(BulletManager* manager) { bulletManager_ = manager; }
 
 	void SetCamera(Camera* camera) { camera_ = camera;}
 	void SetMap(MapchipField* map) { map_ = map; }
@@ -66,13 +73,7 @@ class Player {
 	Vector3 GetVelocity() { return velocity_; }
 	Vector3 GetBulletPosition();
 	bool GetIsAlive() { return isAlive; }
-	bool GetIsPlayerBullet() {
-		if (bullet_) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+	Parameters GetParameters() { return parameters_; }
 	void Damage(int amount) {
 		if (!isInvincible_) {
 			hp_ -= amount;
@@ -83,4 +84,4 @@ class Player {
 	int GetHP() const { return hp_; }
 	int GetHPMax() const { return parameters_.hpMax_; }
 
-	};
+};

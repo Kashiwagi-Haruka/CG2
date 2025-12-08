@@ -12,6 +12,7 @@
 #include "Object/Background/Background.h"
 #include "Object/CatchBlock.h"
 #include "BaseScene.h"
+#include "Object/Player/BulletManager.h"
 
 class Player;
 class Enemy;
@@ -44,6 +45,7 @@ class GameScene: public BaseScene{
 	SoundData soundData;
 	SoundData BGMData;
 	Background* BG;
+	BulletManager* bulletManager_ = nullptr;
 	/*CatchBlock* catchBlock;*/
 
     ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白

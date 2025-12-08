@@ -13,6 +13,7 @@ GameScene::GameScene() {
 	particles = new Particles();
 	skyDome = new SkyDome();
 	player = new Player();
+	bulletManager_ = new BulletManager();
 	enemyManager = new EnemyManager();
 
 	field = new MapchipField();
@@ -36,6 +37,7 @@ void GameScene::Finalize() {
 	delete goal;
 	delete field;
 	delete enemyManager;
+	delete bulletManager_;
 	delete player;
 	delete skyDome;
 	delete particles;
@@ -60,6 +62,7 @@ void GameScene::Initialize() {
 	
 	skyDome->Initialize(cameraController->GetCamera());
 	player->Initialize(cameraController->GetCamera());
+	bulletManager_->Initialize(cameraController->GetCamera());
 	enemyManager->Initialize(cameraController->GetCamera());
 	field->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field->Initialize(cameraController->GetCamera());
@@ -85,6 +88,7 @@ void GameScene::Update() {
 	field->SetCamera(cameraController->GetCamera());
 	goal->SetCamera(cameraController->GetCamera());
 	BG->SetCamera(cameraController->GetCamera());
+	bulletManager_->SetCamera(cameraController->GetCamera());
 	
 #ifdef USE_IMGUI
 	//ImGui::Begin("Plane");
@@ -141,11 +145,13 @@ void GameScene::Update() {
 
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
 	skyDome->Update();
+	bulletManager_->Update();
+	player->SetBulletManager(bulletManager_);
 	player->Update();
 	enemyManager->Update(cameraController->GetCamera());
-
+	
 	goal->Update(); 
-
+	
 	
 	// 当たり判定サイズ（調整OK）
 	float hitSize = 1.0f;
@@ -174,7 +180,7 @@ void GameScene::Update() {
 	Vector3 p = player->GetPosition();
 	Vector3 v = player->GetVelocity();
 	
-	float bulletHitSize = 1.0f; // 弾の当たり判定
+	
 
 	for (auto e : enemyManager->enemies) {
 
@@ -200,15 +206,16 @@ void GameScene::Update() {
 		}
 
 		// ===== ② プレイヤー弾と敵の当たり判定 =====
-		if (player->GetIsPlayerBullet()) {
-			Vector3 b = player->GetBulletPosition();
+		// ===== ② プレイヤー弾と敵の当たり判定 =====
+		
 
-			bool isBulletHit = fabs(b.x - ePos.x) < bulletHitSize && fabs(b.y - ePos.y) < bulletHitSize;
+			
 
-			if (isBulletHit) {
-				e->SetHP(0); // 敵を即死させる
+			if (bulletManager_->Collision(ePos)) {
+				e->SetHP(0); // 敵撃破
 			}
-		}
+		
+
 	}
 
 
@@ -218,6 +225,7 @@ void GameScene::Update() {
 	particles->Update();
 
 	field->Update();
+	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
 	uimanager->SetPlayerPosition({player->GetPosition().x, player->GetPosition().y});
 	uimanager->Update();
@@ -231,7 +239,7 @@ void GameScene::Draw() {
 	GameBase::GetInstance()->ModelCommonSet();
 	skyDome->Draw();
 	player->Draw();
-
+	bulletManager_->Draw();
 	enemyManager->Draw();
 
 	field->Draw();

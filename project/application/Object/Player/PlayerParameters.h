@@ -14,9 +14,14 @@ struct Parameters{
 	float dashMagnification = 2.0f;    // ダッシュ時の速度倍率（通常速度に掛ける）
 	float doubleTapThreshold_ = 30.0f; // ダブルタップと判定するためのフレーム間隔（30フレーム以内）
 
-	int MaxLevel;
-	int MaxEXP;
-	int Level;
-	int EXP;
+	int HPUp=0;
+	int AttuckUp=0;
+	int SpeedUp=0;
+	int AllowUp=0;
+
+	int MaxLevel=0;
+	int MaxEXP=0;
+	int Level=0;
+	int EXP=0;
 };
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "Vector2.h"
 #include <cstdint>
+#include "Object/Player/PlayerParameters.h"
 class Sprite;
 class GameBase;
 class UIManager {
@@ -12,10 +13,24 @@ class UIManager {
 		kD,
 		kSpace,
 		kAttuckButton,
-		CountMAX,
+		OperateCountMAX,
 
 	};//操作方法
+	enum Numbers {
 
+		kExp100,
+		kExp10,
+		kEexp1,
+		kExpMax100,
+		kExpMax10,
+		kExpMax1,
+		kLv,
+		kAttuck,
+		kHealth,
+		kSpeed,
+		kArrow,
+		NumbersCountMax
+	};
 	struct SpriteData {
 		Sprite* sprite = nullptr;
 		uint32_t handle = 0;
@@ -26,11 +41,20 @@ class UIManager {
 
 	SpriteData playerHpSPData;
 	SpriteData playerHPFlameSPData;
-	SpriteData HowtoOperateSPData[CountMAX];
+	SpriteData HowtoOperateSPData[OperateCountMAX];
+	SpriteData LevelSPData;
+	SpriteData NumberSPData[NumbersCountMax];
+	SpriteData MaxSPData;
+	SpriteData AttuckUpSPData;
+	SpriteData HealthUpSPData;
+	SpriteData SpeedUpSPData;
+	SpriteData AllowUpSPData;
 
 	int playerHP;
 	int playerHPMax;
 	Vector2 playerHPMaxSize = {20,50};
+	Vector2 numbersTextureSize = {300, 300};
+	Parameters parameters_;
 
 	public:
 
@@ -43,4 +67,5 @@ class UIManager {
 	void SetPlayerPosition(Vector2 playerPosition);
 	void SetPlayerHP(int HP);
 	void SetPlayerHPMax(int HPMax);
+	void SetPlayerParameters(Parameters parameters);
 };
