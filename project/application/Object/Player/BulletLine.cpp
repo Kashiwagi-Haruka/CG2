@@ -38,7 +38,7 @@ void BulletLine::Update() {
 	float angleY = std::atan2(dir.x, dir.z); // Y回転（左右）
 	float angleX = -std::asin(dir.y);        // X回転（上下）
 
-	lineTransform_.rotate = {angleX, angleY, 0.0f};
+	lineTransform_.rotate = {angleX, 0.0f, angleY};
 
 	// --- ④ プレイヤーから前へ（lineLength_/2）だけ前に出した位置 ---
 	lineTransform_.translate = playerPos_ + dir * (lineLength_ * 0.5f);
@@ -50,4 +50,4 @@ void BulletLine::Update() {
 	lineObject_->Update();
 }
 
-void BulletLine::Draw() { lineObject_->Draw(); }
+void BulletLine::Draw() { /*lineObject_->Draw();*/ }

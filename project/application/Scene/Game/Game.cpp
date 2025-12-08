@@ -12,10 +12,9 @@ void Game::Initialize(){
 
 	SetUnhandledExceptionFilter(GameBase::GetInstance()->ExportDump);
 	
-#ifdef _DEBUG
+
 	
-	BaseScene *scene_ = new GameScene();
-#endif // DEBUG
+	BaseScene *scene_ = new TitleScene();
 	SceneManager::GetInstance()->SetNextScene(scene_);
 }
 

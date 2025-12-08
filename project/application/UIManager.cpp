@@ -42,6 +42,10 @@ UIManager::UIManager() {
 
 	AllowUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/ArrowUp.png");
 
+	SlashSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Slash.png");
+
+	EXPSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Exp.png");
+
 	// ===========================
 	//      Sprite の生成
 	// ===========================
@@ -79,8 +83,10 @@ UIManager::~UIManager() {
 	delete playerHpSPData.sprite;
 	delete playerHPFlameSPData.sprite;
 
-	for (int i = 0; i < OperateCountMAX; i++)
+	for (int i = 0; i < OperateCountMAX; i++) {
+		if (HowtoOperateSPData[i].sprite)
 		delete HowtoOperateSPData[i].sprite;
+	}
 
 	delete LevelSPData.sprite;
 
@@ -99,6 +105,8 @@ void UIManager::Initialize() {
 
 	auto spriteCommon = GameBase::GetInstance()->GetSpriteCommon();
 
+	
+
 	// ------------------ HP Bar ------------------
 	playerHpSPData.sprite->Initialize(spriteCommon, playerHpSPData.handle);
 	playerHpSPData.size = playerHPMaxSize;
@@ -113,8 +121,13 @@ void UIManager::Initialize() {
 	// ------------------ WASD / SPACE / ATTACK ------------------
 	for (int i = 0; i < OperateCountMAX; i++) {
 		HowtoOperateSPData[i].sprite->Initialize(spriteCommon, HowtoOperateSPData[i].handle);
-		HowtoOperateSPData[i].sprite->SetScale({40, 40});
+		HowtoOperateSPData[i].sprite->SetScale({100, 100});
+		HowtoOperateSPData[i].sprite->SetTextureRange({0, 0}, {768, 768});
+		
 	}
+	HowtoOperateSPData[kW].sprite->SetPosition({10, 600});
+	HowtoOperateSPData[kSpace].sprite->SetPosition({130, 600});
+	HowtoOperateSPData[kAttuckButton].sprite->SetPosition({250, 600});
 
 	// ------------------ Level ------------------
 	LevelSPData.sprite->Initialize(spriteCommon, LevelSPData.handle);
@@ -289,8 +302,11 @@ void UIManager::Draw() {
 	playerHpSPData.sprite->Draw();
 	playerHPFlameSPData.sprite->Draw();
 
-	for (int i = 0; i < kAttuckButton; i++)
-		HowtoOperateSPData[i].sprite->Draw();
+
+	
+	HowtoOperateSPData[kW].sprite->Draw();
+	HowtoOperateSPData[kSpace].sprite->Draw();
+	HowtoOperateSPData[kAttuckButton].sprite->Draw();
 
 	LevelSPData.sprite->Draw();
 

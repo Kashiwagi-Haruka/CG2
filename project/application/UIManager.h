@@ -51,6 +51,9 @@ class UIManager {
 	SpriteData AllowUpSPData;
 	SpriteData houseHpSPData;
 	SpriteData houseHpFlameSPData;
+	SpriteData SlashSPData;
+	SpriteData EXPSPData;
+
 	int houseHP = 0;
 	int houseHPMax = 0;
 
