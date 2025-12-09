@@ -346,7 +346,7 @@ if (goalActive) { // ★ 敵全滅してからしか処理しない
 	uimanager->SetPlayerHP(player->GetHP());
 	uimanager->SetPlayerPosition({player->GetPosition().x, player->GetPosition().y});
 	uimanager->SetHouseHP(house->GetHP());
-	uimanager->SetHouseHPMax(50); // House の最大HP（好きに変更）
+	uimanager->SetHouseHPMax(30); // House の最大HP（好きに変更）
 
 	uimanager->Update();
 	BG->Update(player->GetPosition());
