@@ -20,7 +20,7 @@ UIManager::UIManager() {
 
 	HowtoOperateSPData[kSpace].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/SPACE.png");
 
-	HowtoOperateSPData[kAttuckButton].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png");
+	HowtoOperateSPData[kAttuckButton].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/J.png");
 
 	// Level
 	LevelSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Lv.png");

@@ -5,7 +5,7 @@
 #include "TitleScene.h"
 GameOverScene::GameOverScene() {
 
-	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/result.png");
+	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/over.png");
 	logoSP_.sprite = new Sprite();
 	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), logoSP_.handle);
 }
