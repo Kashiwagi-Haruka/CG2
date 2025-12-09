@@ -188,7 +188,7 @@ void Player::Attack() {
 		airAttackTimer += 1.0f / 60.0f; // 毎フレームタイマー進む
 
 		// ★ 0.1秒ごとに1発撃つ
-		if (airAttackTimer >= 0.1f) {
+		if (airAttackTimer >= 0.2f) {
 			// ★ AllowUp の値で本数可変
 			int maxAirShots = parameters_.AllowUp + 1;
 			airAttackTimer = 0.0f;
