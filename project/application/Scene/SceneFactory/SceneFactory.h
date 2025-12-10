@@ -1,0 +1,10 @@
+#pragma once
+#include "AbstractSceneFactory.h"
+class SceneFactory :public AbstractSceneFactory{
+
+
+	
+
+	BaseScene* CreateScene(const std::string& sceneName) override;
+
+};

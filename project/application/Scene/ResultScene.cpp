@@ -2,7 +2,7 @@
 #include "GameBase.h"
 #include "TextureManager.h"
 #include "SceneManager.h"
-#include "TitleScene.h"
+
 ResultScene::ResultScene() {
 
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/result.png");
@@ -49,9 +49,7 @@ void ResultScene::Initialize() {
 void ResultScene::Update() {
 
 	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
-		BaseScene* scene = new TitleScene();
-		SceneManager::GetInstance()->SetNextScene(scene);
-		
+		SceneManager::GetInstance()->ChangeScene("Title");
 	}
 #ifdef USE_IMGUI
 	ImGui::Begin("resultScene");

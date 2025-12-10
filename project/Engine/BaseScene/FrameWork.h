@@ -1,5 +1,8 @@
 #pragma once
+#include "AbstractSceneFactory.h"
 class FrameWork {
+
+	AbstractSceneFactory* sceneFactory_ = nullptr;
 
 	protected:
 	bool endRequest_ = false;

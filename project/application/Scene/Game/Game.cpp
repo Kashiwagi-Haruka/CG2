@@ -1,8 +1,7 @@
 #include "Game.h"
-#include "Scene/GameScene.h"
-#include "Scene/ResultScene.h"
-#include "Scene/TitleScene.h"
 #include "SceneManager.h"
+#include "Scene/SceneFactory/SceneFactory.h"
+
 void Game::Initialize(){
 	FrameWork::Initialize();
 	GameBase::GetInstance()->Initialize(L"LE2A_04_カシワギハルカ", 1280, 720);
@@ -13,9 +12,9 @@ void Game::Initialize(){
 	SetUnhandledExceptionFilter(GameBase::GetInstance()->ExportDump);
 	
 
-	
-	BaseScene *scene_ = new TitleScene();
-	SceneManager::GetInstance()->SetNextScene(scene_);
+	sceneFactory_ = new SceneFactory();
+	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_);
+	SceneManager::GetInstance()->ChangeScene("Title");
 }
 
 void Game::Update(){

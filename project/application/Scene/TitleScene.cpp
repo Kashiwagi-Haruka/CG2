@@ -3,7 +3,7 @@
 #include "TextureManager.h"
 #include <imgui.h>
 #include "SceneManager.h"
-#include "GameScene.h"
+
 TitleScene::TitleScene() {
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/title.png");
 	logoSP_.sprite = new Sprite();
@@ -48,9 +48,7 @@ void TitleScene::Initialize(){
 void TitleScene::Update(){ 
 	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
 	
-	BaseScene* scene = new GameScene();
-		SceneManager::GetInstance()->SetNextScene(scene);
-	
+	SceneManager::GetInstance()->ChangeScene("Game");
 	}
 
 	#ifdef USE_IMGUI

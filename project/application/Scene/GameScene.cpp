@@ -6,8 +6,7 @@
 #include "Object/Background/SkyDome.h"
 #include "Object/Enemy/EnemyManager.h"
 #include "SceneManager.h"
-#include "ResultScene.h"
-#include "GameOverScene.h"
+
 GameScene::GameScene() {
 
 	cameraController = new CameraController();
@@ -262,8 +261,8 @@ if (goalActive) { // ★ 敵全滅してからしか処理しない
 			bool isGoalHit = fabs(p.x - g.x) < goalHitSize && fabs(p.y - g.y) < goalHitSize;
 
 			if (isGoalHit) {
-				BaseScene* scene = new ResultScene();
-				SceneManager::GetInstance()->SetNextScene(scene);
+				
+				SceneManager::GetInstance()->ChangeScene("Result");
 			}
 		}
 
@@ -272,7 +271,7 @@ if (goalActive) { // ★ 敵全滅してからしか処理しない
 	
 	if (!player->GetIsAlive()) {
 
-		sceneEndOver = true;
+		SceneManager::GetInstance()->ChangeScene("GameOver");
 	}
 
 // ===== プレイヤーと敵の当たり判定 =====
@@ -328,8 +327,7 @@ if (goalActive) { // ★ 敵全滅してからしか処理しない
 			    house->Damage(1); // ★ house にダメージ
 
 			    if (house->GetHP() <= 0) {
-				    BaseScene* scene = new GameOverScene();
-				    SceneManager::GetInstance()->SetNextScene(scene);
+				    SceneManager::GetInstance()->ChangeScene("GameOver");
 			    }
 			    continue;
 		    }

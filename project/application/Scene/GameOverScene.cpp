@@ -2,7 +2,7 @@
 #include "GameBase.h"
 #include "TextureManager.h"
 #include "SceneManager.h"
-#include "TitleScene.h"
+
 GameOverScene::GameOverScene() {
 
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/over.png");
@@ -44,8 +44,7 @@ void GameOverScene::Initialize() {
 void GameOverScene::Update() {
 
 	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
-		BaseScene* scene = new TitleScene();
-		SceneManager::GetInstance()->SetNextScene(scene);
+		SceneManager::GetInstance()->ChangeScene("Title");
 	}
 #ifdef USE_IMGUI
 	ImGui::Begin("resultScene");
