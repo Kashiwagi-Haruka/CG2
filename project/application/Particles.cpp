@@ -2,63 +2,41 @@
 #include "ParticleManager.h"
 #include "Function.h"
 #include "imgui.h"
-Particles::Particles(){
+
+Particles::Particles() {
 
 	ParticleManager::GetInstance()->CreateParticleGroup("player", "Resources/2d/defaultParticle.png");
 	ParticleManager::GetInstance()->CreateParticleGroup("leaf", "Resources/2d/leaf.png");
 	ParticleManager::GetInstance()->CreateParticleGroup("goal", "Resources/2d/goalParticle.png");
 	ParticleManager::GetInstance()->CreateParticleGroup("screenEffect", "Resources/2d/defaultParticle.png");
 	ParticleManager::GetInstance()->CreateParticleGroup("Arrow", "Resources/2d/ArrowParticle.png");
-	particleplayer = new ParticleEmitter(
-	    "player",
-	    {
-	        {0.1f, 0.1f, 1.0f},
-            {0.0f, 0.0f, 0.0f},
-            {0,    0,    0   }
-    },
-	    1, 5, {-0.01f, 0.001f, 0}, {-10.0f, 0, -1}, {10.0f, 3, 0});
-	particleleaf = new ParticleEmitter(
-	    "leaf",
-	    {
-	        {0.5f, 0.5f, 1.0f},
-            {0.0f, 0.0f, 0.0f},
-            {0.0f, 0.0f, 0.0f}
-    },
-	    1, 5, {0.0f, -0.1f, 0}, {-640, 0, -1}, {640, 320, 0});
-	particlegoal = new ParticleEmitter(
-	    "goal",
-	    {
-	        {0.2f, 0.2f, 1.0f},
-            {0.0f, 0.0f, 0.0f},
-            {0,    0,    0   }
-    },
-	    1, 5, {0, 0.1f, 0}, {-10.0f, 0, -1}, {10.0f, 3, 0});
+
+	// ★ new → make_unique に変更
+	particleplayer = std::make_unique<ParticleEmitter>(
+	    "player", Transform{{0.1f, 0.1f, 1.0f},{0.0f, 0.0f, 0.0f} ,{0.0f, 0.0f, 0.0f}}, 1.0f, 5, Vector3{-0.01f, 0.001f, 0.0f}, Vector3{-10.0f, 0, -1}, Vector3{10.0f, 3, 0});
+
+	particleleaf = std::make_unique<ParticleEmitter>("leaf", Transform{{0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}, 1.0f, 5, Vector3{0.0f, -0.1f, 0}, Vector3{-640, 0, -1}, Vector3{640, 320, 0});
+
+	particlegoal = std::make_unique<ParticleEmitter>("goal", Transform{{0.2f, 0.2f, 1.0f}, {0.0f, 0.0f, 0.0f},{0.0f, 0.0f, 0.0f}}, 1.0f, 5, Vector3{0, 0.1f, 0.0f}, Vector3{-10.0f, 0, -1}, Vector3{10.0f, 3, 0});
+
 	isgoal = false;
 }
-Particles::~Particles(){
 
-	
-	delete particlegoal;
-	delete particleleaf;
-	delete particleplayer;
+Particles::~Particles() {
+
 	ParticleManager::GetInstance()->Clear();
-
-
 }
-constexpr float kParticlePosScale = 5.0f; // プレイヤー→パーティクル座標系
+
+constexpr float kParticlePosScale = 5.0f;
 
 void Particles::Update() {
+
 	playerEmitterTransform.scale = {0.1f, 0.1f, 1.0f};
 	playerEmitterTransform.rotate = {0, 0, 0};
 
-	// プレイヤー位置をパーティクル座標系に合わせて変換
-	playerEmitterTransform.translate = {
-	    playerPos_.x * kParticlePosScale, (playerPos_.y-0.9f) * kParticlePosScale,
-	    playerPos_.z // Z はそのままでもOKならそのまま
-	};
+	playerEmitterTransform.translate = {playerPos_.x * kParticlePosScale, (playerPos_.y - 0.9f) * kParticlePosScale, playerPos_.z};
 
 	particleplayer->Update(playerEmitterTransform);
-
 
 	particleleaf->Update({
 	    {0.5f,         0.5f,         1.0f},
@@ -67,38 +45,30 @@ void Particles::Update() {
     });
 
 	if (isgoal) {
-	particlegoal->Update({
-	    {0.2f, 0.2f, 1.0f},
-        {0.0f, 0.0f, 0.0f},
-        {goalPos_.x * 2.5f,(goalPos_.y-0.5f)*2.5f,goalPos_.z*2.5f+1}
-    });
+		particlegoal->Update({
+		    {0.2f,              0.2f,                       1.0f                 },
+            {0,                 0,                          0                    },
+            {goalPos_.x * 2.5f, (goalPos_.y - 0.5f) * 2.5f, goalPos_.z * 2.5f + 1}
+        });
 	}
 
-
-	// ============================
-	//   ★ IMGUI EDITOR ★
-	// ============================
-	#ifdef USE_IMGUI
+#ifdef USE_IMGUI
 	if (ImGui::Begin("Particles Editor")) {
-
-		// ------- player -------
 		ImGui::Text("Player Emitter");
-		EditSingleEmitter(particleplayer);
+		EditSingleEmitter(particleplayer.get());
 
-		// ------- leaf -------
 		ImGui::Separator();
 		ImGui::Text("Leaf Emitter");
-		EditSingleEmitter(particleleaf);
+		EditSingleEmitter(particleleaf.get());
 
-		// ------- goal -------
 		ImGui::Separator();
 		ImGui::Text("Goal Emitter");
-		EditSingleEmitter(particlegoal);
-
+		EditSingleEmitter(particlegoal.get());
 	}
 	ImGui::End();
-	#endif
+#endif
 }
+
 void Particles::SetPlayerPos(Vector3 playerPos){ playerPos_ = playerPos; }
 void Particles::SetCameraPos(Vector3 cameraPos) { cameraPos_ = cameraPos; }
 void Particles::SetGoalPos(Vector3 goalPos) { goalPos_ = goalPos; }

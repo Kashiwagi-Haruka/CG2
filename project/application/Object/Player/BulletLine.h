@@ -1,22 +1,24 @@
 #pragma once
 #include "Object3d.h"
 #include "Transform.h"
+#include <memory>
 
 class Camera;
+
 class BulletLine {
 
 private:
-	Object3d* lineObject_ = nullptr;
+	std::unique_ptr<Object3d> lineObject_;
 	Transform lineTransform_;
 	Camera* camera_ = nullptr;
 
 	Vector3 playerPos_{0, 0, 0};
-	Vector3 shotDir_{1, 0, 0}; // デフォルトは右向き
-	float lineLength_ = 5.0f;  // 予測線の長さ
+	Vector3 shotDir_{1, 0, 0};
+	float lineLength_ = 5.0f;
 
 public:
 	BulletLine();
-	~BulletLine();
+	~BulletLine() = default;
 
 	void Initialize();
 	void Update();

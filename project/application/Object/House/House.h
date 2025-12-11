@@ -1,23 +1,21 @@
 #pragma once
+#include "Camera.h"
 #include "Object3d.h"
 #include "Vector3.h"
-#include "Camera.h"
+#include <memory>
 
 class House {
 
-	Object3d* object_ = nullptr;
+	std::unique_ptr<Object3d> object_;
 	Vector3 position_ = {0, 1.5f, 0};
-	int hp_ = 50; // ★ house の最大HP（自由に調整可）
+	int hp_ = 50;
 
 public:
-
 	House();
-	~House() { delete object_; }
+	~House() = default;
 
 	void Initialize(Camera* camera);
-
 	void Update(Camera* camera);
-
 	void Draw();
 
 	Vector3 GetPosition() const { return position_; }

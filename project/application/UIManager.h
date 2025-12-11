@@ -2,6 +2,7 @@
 #include "Vector2.h"
 #include <cstdint>
 #include "Object/Player/PlayerParameters.h"
+#include <memory>
 class Sprite;
 class GameBase;
 class UIManager {
@@ -32,7 +33,7 @@ class UIManager {
 		NumbersCountMax
 	};
 	struct SpriteData {
-		Sprite* sprite = nullptr;
+		std::unique_ptr<Sprite> sprite;
 		uint32_t handle = 0;
 		Vector2 size = {100,100};
 		Vector2 rotate = {0,0};

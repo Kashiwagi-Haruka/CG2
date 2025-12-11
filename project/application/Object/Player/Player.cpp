@@ -12,17 +12,14 @@
 #endif // USE_IMGUI
 #include "BulletManager.h"
 
-Player::Player(){
+Player::Player() {
 	ModelManeger::GetInstance()->LoadModel("playerModel");
-	
-
-	playerObject_ = new Object3d();
-	
-	
+	playerObject_ = std::make_unique<Object3d>();
 }
+
 Player::~Player(){
 
-	delete playerObject_;
+	
 	
 	
 }
@@ -37,14 +34,9 @@ void Player::Initialize(Camera* camera){
 	};
 	
 	
-	
-	
-	playerObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
-	
-	
+playerObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	playerObject_->SetModel("playerModel");
-	
-	
+
 	camera_ = camera;
 	playerObject_->SetCamera(camera_);
 	

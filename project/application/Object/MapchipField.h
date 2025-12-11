@@ -3,7 +3,7 @@
 #include "Vector3.h"
 #include <vector>
 #include "CSVManager.h"
-
+#include <memory>
 class Object3d;
 class GameBase;
 class Camera;
@@ -17,7 +17,7 @@ class MapchipField {
 	int field[kHeight][kWidth];
 
 	// ★ タイル用の Object3d をまとめて持つ
-	Object3d* fieldObj = nullptr;
+	std::unique_ptr<Object3d> fieldObj = nullptr;
 
 	Camera* camera_ = nullptr;
 	Transform transform_;

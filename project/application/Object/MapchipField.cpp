@@ -11,11 +11,11 @@ MapchipField::MapchipField() {
 
 	// モデル読み込み（map.obj）
 	ModelManeger::GetInstance()->LoadModel("map");
-	fieldObj = new Object3d();
+	fieldObj = std::make_unique<Object3d>();
 	
 }
 
-MapchipField::~MapchipField() { delete fieldObj; }
+MapchipField::~MapchipField() {}
 
 void MapchipField::Initialize(Camera* camera) {
 

@@ -2,16 +2,12 @@
 #include "ModelManeger.h"
 #include "GameBase.h"
 
-EnemyStun::EnemyStun() { 
+EnemyStun::EnemyStun() {
 	ModelManeger::GetInstance()->LoadModel("EnemyStun");
-	object_ = new Object3d(); 
+	object_ = std::make_unique<Object3d>();
 	object_->SetModel("EnemyStun");
 }
 
-EnemyStun::~EnemyStun(){ 
-	delete object_;
-
-}
 void EnemyStun::SetCamera(Camera* camera) { camera_ = camera; }
 void EnemyStun::SetTranslate(Vector3 translate) { transform_.translate = translate; };
 void EnemyStun::Initialize() { 

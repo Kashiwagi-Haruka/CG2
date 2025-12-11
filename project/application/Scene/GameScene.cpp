@@ -9,46 +9,37 @@
 
 GameScene::GameScene() {
 
-	cameraController = new CameraController();
-	particles = new Particles();
-	skyDome = new SkyDome();
-	player = new Player();
-	bulletManager_ = new BulletManager();
-	enemyManager = new EnemyManager();
+	cameraController = std::make_unique<CameraController>();
+	particles = std::make_unique<Particles>();
+	skyDome = std::make_unique<SkyDome>();
+	player = std::make_unique<Player>();
+	bulletManager_ = std::make_unique<BulletManager>();
+	enemyManager = std::make_unique<EnemyManager>();
 
-	field = new MapchipField();
-	goal = new Goal();
-	sceneTransition = new SceneTransition();
-	uimanager = new UIManager();
-	BG = new Background();
-	house = new House();
-
+	field = std::make_unique<MapchipField>();
+	goal = std::make_unique<Goal>();
+	sceneTransition = std::make_unique<SceneTransition>();
+	uimanager = std::make_unique<UIManager>();
+	BG = std::make_unique<Background>();
+	house = std::make_unique<House>();
 
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/昼下がり気分.mp3");
 }
+
 GameScene::~GameScene(){
 	
 }
 void GameScene::Finalize() {
 
 	Audio::GetInstance()->SoundUnload(&BGMData);
+
+	// level up icons
 	for (int i = 0; i < 4; i++) {
-		delete levelupIcons[i];
+		levelupIcons[i].reset();
 	}
-	delete house;
-	delete BG;
-	delete uimanager;
-	delete sceneTransition;
-	delete goal;
-	delete field;
-	delete enemyManager;
-	delete bulletManager_;
-	delete player;
-	delete skyDome;
-	delete particles;
-	delete cameraController;
 
 }
+
 void GameScene::Initialize() {
 
 	sceneEndClear = false;
@@ -91,12 +82,13 @@ void GameScene::Initialize() {
 	handle[2] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/levelup_hp.png");
 	handle[3] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/levelup_allow.png");
 
-	for (int i = 0; i < 4; i++) {
-	levelupIcons[i] = new Sprite();
-		levelupIcons[i]->Initialize(GameBase::GetInstance()->GetSpriteCommon(), handle[i]);
+for (int i = 0; i < 4; i++) {
 
+		levelupIcons[i] = std::make_unique<Sprite>();
+		levelupIcons[i]->Initialize(GameBase::GetInstance()->GetSpriteCommon(), handle[i]);
 		levelupIcons[i]->SetScale({256, 256});
 	}
+
 
 	Audio::GetInstance()->SoundPlayWave(BGMData);
 }
@@ -208,7 +200,7 @@ void GameScene::Update() {
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
 	skyDome->Update();
 	bulletManager_->Update();
-	player->SetBulletManager(bulletManager_);
+	player->SetBulletManager(bulletManager_.get());
 	player->Update();
 	// ===========================
 	// ★ レベルアップを検知して選択画面へ
@@ -236,7 +228,7 @@ void GameScene::Update() {
 	// ★★★ 敵が全滅したらゴールを表示・判定有効化 ★★★
 	bool allDead = true;
 
-	for (auto e : enemyManager->enemies) {
+	for (auto& e : enemyManager->enemies) {
 		if (e->GetIsAlive()) {
 			allDead = false;
 			break;
@@ -282,7 +274,7 @@ if (goalActive) { // ★ 敵全滅してからしか処理しない
 	float houseHitSize = 8.0f;
 
 
-	for (auto e : enemyManager->enemies) {
+	for (auto& e : enemyManager->enemies) {
 
 		if (!e->GetIsAlive())
 			continue; // 死んだ敵はスキップ

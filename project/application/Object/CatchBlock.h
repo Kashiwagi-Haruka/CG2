@@ -2,9 +2,10 @@
 #include "Object3d.h"
 #include "Transform.h"
 #include "Camera.h"
+#include <memory>
 class CatchBlock {
 
-	Object3d* object3d_;
+	std::unique_ptr<Object3d> object3d_;
 	Transform transform_;
 	Camera* camera_;
 
@@ -13,7 +14,7 @@ class CatchBlock {
 public:
 	
 	CatchBlock();
-	~CatchBlock();
+	
 	void Initialize();
 	void Update();
 	void Draw();

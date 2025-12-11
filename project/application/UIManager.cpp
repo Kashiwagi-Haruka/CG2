@@ -50,55 +50,39 @@ UIManager::UIManager() {
 	//      Sprite の生成
 	// ===========================
 
-	playerHpSPData.sprite = new Sprite();
-	playerHPFlameSPData.sprite = new Sprite();
+	playerHpSPData.sprite = std::make_unique<Sprite>();
+	playerHPFlameSPData.sprite = std::make_unique<Sprite>();
 
 	for (int i = 0; i < OperateCountMAX; i++)
-		HowtoOperateSPData[i].sprite = new Sprite();
+		HowtoOperateSPData[i].sprite = std::make_unique<Sprite>();
 
-	LevelSPData.sprite = new Sprite();
+	LevelSPData.sprite = std::make_unique<Sprite>();
 
 	for (int i = 0; i < NumbersCountMax; i++)
-		NumberSPData[i].sprite = new Sprite();
+		NumberSPData[i].sprite = std::make_unique<Sprite>();
 	for (int i = 0; i < 5; i++) {
-	MaxSPData[i].sprite = new Sprite();
+		MaxSPData[i].sprite = std::make_unique<Sprite>();
 	}
 
-	AttuckUpSPData.sprite = new Sprite();
-	HealthUpSPData.sprite = new Sprite();
-	SpeedUpSPData.sprite = new Sprite();
-	AllowUpSPData.sprite = new Sprite();
+	AttuckUpSPData.sprite = std::make_unique<Sprite>();
+	HealthUpSPData.sprite = std::make_unique<Sprite>();
+	SpeedUpSPData.sprite = std::make_unique<Sprite>();
+	AllowUpSPData.sprite = std::make_unique<Sprite>();
 	houseHpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/playerHP.png");
 
 	houseHpFlameSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/playerHPFlame.png");
 
-	houseHpSPData.sprite = new Sprite();
-	houseHpFlameSPData.sprite = new Sprite();
+	houseHpSPData.sprite = std::make_unique<Sprite>();
+	houseHpFlameSPData.sprite = std::make_unique<Sprite>();
 }
 
 UIManager::~UIManager() {
 
-	delete houseHpSPData.sprite;
-	delete houseHpFlameSPData.sprite;
-	delete playerHpSPData.sprite;
-	delete playerHPFlameSPData.sprite;
+	
+	
+	
+	
 
-	for (int i = 0; i < OperateCountMAX; i++) {
-		if (HowtoOperateSPData[i].sprite)
-		delete HowtoOperateSPData[i].sprite;
-	}
-
-	delete LevelSPData.sprite;
-
-	for (int i = 0; i < NumbersCountMax; i++)
-		delete NumberSPData[i].sprite;
-	for (int i = 0; i < 5; i++) {
-		delete MaxSPData[i].sprite;
-	}
-	delete AttuckUpSPData.sprite;
-	delete HealthUpSPData.sprite;
-	delete SpeedUpSPData.sprite;
-	delete AllowUpSPData.sprite;
 }
 
 void UIManager::Initialize() {

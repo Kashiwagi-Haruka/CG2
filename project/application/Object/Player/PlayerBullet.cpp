@@ -4,33 +4,18 @@
 #include "ModelManeger.h"
 #include "Object3d.h"
 #include "Camera.h"
-
-PlayerBullet::PlayerBullet() {
-	
-	
-
-	
-
-
-}
-PlayerBullet::~PlayerBullet() { 
-
-	delete object_;
-	
-}
+PlayerBullet::PlayerBullet() {}
 
 void PlayerBullet::Initialize(Camera* camera) {
 	isCharge_ = false;
 	isAirBullet = false;
-	object_ = new Object3d();
+
+	object_ = std::make_unique<Object3d>();
 	object_->SetModel("playerBullet");
 	object_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
-	
-
 
 	camera_ = camera;
 	object_->SetCamera(camera_);
-
 }
 
 void PlayerBullet::Update(Camera* camera) { 

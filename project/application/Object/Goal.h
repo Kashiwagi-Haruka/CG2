@@ -1,6 +1,7 @@
 #pragma once
 #include "Transform.h"
 #include "Camera.h"
+#include <memory>
 class Object3d;
 class GameBase;
 class Goal {
@@ -8,7 +9,7 @@ class Goal {
 private:
 
 	Transform transform_={{1,1,1},{0,0,0},{10,3,0}};
-	Object3d* object3d_;
+	std::unique_ptr<Object3d> object3d_;
 	Camera* camera_;
 
 public:

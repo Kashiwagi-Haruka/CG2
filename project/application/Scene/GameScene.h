@@ -34,23 +34,23 @@ class GameScene: public BaseScene{
 	bool IsKeyboard = true;
 
 	uint32_t color;
-	Particles* particles = nullptr;
-	UIManager* uimanager = nullptr;
-	SceneTransition* sceneTransition = nullptr;
-	Goal* goal = nullptr;
-	Player* player = nullptr;
-	EnemyManager* enemyManager = nullptr;
-	SkyDome* skyDome = nullptr;
-	CameraController* cameraController = nullptr;
-	MapchipField* field = nullptr;
-	House* house = nullptr;
+	std::unique_ptr<Particles> particles;
+	std::unique_ptr<UIManager> uimanager;
+	std::unique_ptr<SceneTransition> sceneTransition;
+	std::unique_ptr<Goal> goal;
+	std::unique_ptr<Player> player;
+	std::unique_ptr<EnemyManager> enemyManager;
+	std::unique_ptr<SkyDome> skyDome;
+	std::unique_ptr<CameraController> cameraController;
+	std::unique_ptr<MapchipField> field;
+	std::unique_ptr<House> house;
+	std::unique_ptr<Background> BG;
+	std::unique_ptr<BulletManager> bulletManager_;
 
 	SoundData BGMData;
-	Background* BG;
-	BulletManager* bulletManager_ = nullptr;
-	/*CatchBlock* catchBlock;*/
+
 	// レベルアップ選択専用スプライト
-	Sprite* levelupIcons[4]; // 0:Atk, 1:Speed, 2:HP, 3:Allow
+	std::unique_ptr<Sprite> levelupIcons[4]; // 0:Atk, 1:Speed, 2:HP, 3:Allow
 
     ImVec4 meshColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 初期値: 白
 	DirectionalLight light{

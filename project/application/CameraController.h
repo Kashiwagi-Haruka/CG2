@@ -1,17 +1,18 @@
 #pragma once
 #include "Transform.h"
+#include <memory>
 class Camera;
 class CameraController {
 
 	Transform transform_{};
-	Camera* camera_ = nullptr;
+	std::unique_ptr<Camera> camera_;
 
 
 	public:
 	~CameraController();
 	void Initialize();
 	void Update();
-	void SetCamera(Camera* camera);
+	
 	Camera* GetCamera();
 	Transform GetTransform() { return transform_;}
 	void SetTransform(Transform transform) { transform_ = transform; }

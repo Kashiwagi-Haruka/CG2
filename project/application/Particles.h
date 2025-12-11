@@ -1,12 +1,12 @@
 #pragma once
 #include "ParticleEmitter.h"
-
+#include <memory>
 class Particles {
 
-	ParticleEmitter* particleplayer = nullptr;
-	ParticleEmitter* particleleaf = nullptr;
-	ParticleEmitter* particlegoal = nullptr;
-	ParticleEmitter* particleArrow = nullptr;
+	std::unique_ptr<ParticleEmitter> particleplayer = nullptr;
+	std::unique_ptr<ParticleEmitter> particleleaf = nullptr;
+	std::unique_ptr<ParticleEmitter> particlegoal = nullptr;
+	std::unique_ptr<ParticleEmitter> particleArrow = nullptr;
 
 	Vector3 playerPos_;
 	Vector3 cameraPos_;

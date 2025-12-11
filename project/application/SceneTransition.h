@@ -2,10 +2,11 @@
 #include "Sprite.h"
 #include "Vector2.h"
 #include <cstdint>
+#include <memory>
 class SceneTransition {
 
 	struct SpriteData {
-		Sprite* sprite = nullptr;
+		std::unique_ptr<Sprite> sprite = nullptr;
 		uint32_t handle = 0;
 		Vector2 size = {100, 100};
 		Vector2 rotate = {0, 0};

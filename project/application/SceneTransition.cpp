@@ -4,11 +4,11 @@
 SceneTransition::SceneTransition(){
 	
 	fadeSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png");
-	fadeSPData.sprite = new Sprite();
+	fadeSPData.sprite = std::make_unique<Sprite>();
 	fadeSPData.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), fadeSPData.handle);
 }
 SceneTransition::~SceneTransition(){ 
-	delete fadeSPData.sprite; 
+	
 }
 
 void SceneTransition::Initialize(){ 

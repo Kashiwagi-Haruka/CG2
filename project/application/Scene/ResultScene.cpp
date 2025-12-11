@@ -2,23 +2,15 @@
 #include "GameBase.h"
 #include "TextureManager.h"
 #include "SceneManager.h"
-
 ResultScene::ResultScene() {
 
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/result.png");
-	logoSP_.sprite = new Sprite();
+	logoSP_.sprite = std::make_unique<Sprite>();
 	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), logoSP_.handle);
-
-}
-
-ResultScene::~ResultScene(){
-
 }
 
 void ResultScene::Finalize() {
-
-	delete logoSP_.sprite; 
-delete pressSpaceSprite;
+	// delete 不要
 }
 
 void ResultScene::Initialize() {
@@ -32,7 +24,7 @@ void ResultScene::Initialize() {
 	// SPACE 画像読み込み
 	pressSpaceHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/SPACE.png");
 
-	pressSpaceSprite = new Sprite();
+	pressSpaceSprite = std::make_unique<Sprite>();
 	pressSpaceSprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), pressSpaceHandle);
 
 	// 中央寄せ

@@ -4,7 +4,8 @@
 #include "Object3d.h"
 #include "Input.h"
 #include "PlayerParameters.h"
-class GameBase;
+#include <memory>
+
 class Camera;
 class PlayerBullet;
 class MapchipField;
@@ -48,7 +49,8 @@ class Player {
 
 	Transform transform_;
 
-	Object3d* playerObject_ = nullptr;
+std::unique_ptr<Object3d> playerObject_;
+
 
 	BulletManager* bulletManager_ = nullptr;
 

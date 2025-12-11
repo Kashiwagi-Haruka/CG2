@@ -1,12 +1,9 @@
 #include "EnemyManager.h"
 
-EnemyManager::~EnemyManager() { Clear(); }
+
 
 void EnemyManager::Clear() {
-	for (auto e : enemies) {
-		delete e;
-	}
-	enemies.clear();
+	enemies.clear(); // unique_ptr が自動削除
 }
 
 void EnemyManager::Initialize(Camera* camera) {
@@ -51,19 +48,16 @@ void EnemyManager::Initialize(Camera* camera) {
 	}
 }
 
-
 void EnemyManager::AddEnemy(Camera* camera, const Vector3& pos) {
-	Enemy* e = new Enemy();
-	e->Initialize(camera,pos);
-	e->SetCamera(camera); // 念のため
-	
-	enemies.push_back(e);
+	auto e = std::make_unique<Enemy>();
+	e->Initialize(camera, pos);
+	e->SetCamera(camera);
+	enemies.push_back(std::move(e));
 }
 
 void EnemyManager::Update(Camera* camera) {
-	for (auto e : enemies) {
+	for (auto& e : enemies) { // ← unique_ptr 参照に変更
 		if (e->GetIsAlive()) {
-
 			e->SetCamera(camera);
 			e->Update();
 		}
@@ -71,7 +65,7 @@ void EnemyManager::Update(Camera* camera) {
 }
 
 void EnemyManager::Draw() {
-	for (auto e : enemies) {
+	for (auto& e : enemies) {
 		if (e->GetIsAlive()) {
 			e->Draw();
 		}

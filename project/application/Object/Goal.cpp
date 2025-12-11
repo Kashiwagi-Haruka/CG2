@@ -5,11 +5,11 @@
 Goal::Goal() { 
 	
 	ModelManeger::GetInstance()->LoadModel("goal");
-	object3d_ = new Object3d(); 
+	object3d_ = std::make_unique<Object3d>();
 
 }
 Goal::~Goal(){ 
-	delete object3d_;
+	
 
 
 }

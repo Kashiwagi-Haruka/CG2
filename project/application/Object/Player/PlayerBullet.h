@@ -2,7 +2,9 @@
 #include <vector>
 #include "Vector3.h"
 #include "Transform.h"
-class GameBase;
+#include <memory>
+
+
 class Camera;
 class Object3d;
 class Enemy;
@@ -11,7 +13,8 @@ class PlayerBullet {
 	int isCharge_;
 	Transform transform_;
 
-	Object3d* object_ = nullptr;
+	std::unique_ptr<Object3d> object_;
+
 	Camera* camera_ = nullptr;
 	Vector3 velocity_;
 
@@ -20,7 +23,7 @@ class PlayerBullet {
 
 	public:
 	PlayerBullet();
-	~PlayerBullet();
+	
 	void Initialize(Camera* camera);
 	void Update(Camera* camera);
 	void Charge(Vector3 playerPos, Vector3 direction);

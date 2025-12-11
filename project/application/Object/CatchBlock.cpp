@@ -3,15 +3,10 @@
 #include "GameBase.h"
 CatchBlock::CatchBlock(){
 
-	object3d_ = new Object3d();
+	object3d_ = std::make_unique<Object3d>();
 	ModelManeger::GetInstance()->LoadModel("Catch_Block");
 }
 
-CatchBlock::~CatchBlock(){
-
-	delete object3d_;
-
-}
 void CatchBlock::SetCamera(Camera* camera) {
 
 camera_ = camera;

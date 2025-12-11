@@ -5,16 +5,15 @@
 #include "Camera.h"
 BulletLine::BulletLine() {
 	ModelManeger::GetInstance()->LoadModel("Cube");
-	lineObject_ = new Object3d();
+	lineObject_ = std::make_unique<Object3d>();
 	lineObject_->SetModel("Cube");
 }
-
-BulletLine::~BulletLine() { delete lineObject_; }
 
 void BulletLine::Initialize() {
 	lineObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	lineObject_->SetCamera(camera_);
 }
+
 
 void BulletLine::Update() {
 

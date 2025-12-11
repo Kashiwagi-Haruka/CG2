@@ -5,18 +5,12 @@
 #include "Camera.h"
 #include <algorithm>
 
-Enemy::Enemy(){
+Enemy::Enemy() {
 	ModelManeger::GetInstance()->LoadModel("Enemy");
-	object_ = new Object3d();
-	enemyStun = new EnemyStun();
+	object_ = std::make_unique<Object3d>();
+	enemyStun = std::make_unique<EnemyStun>();
 }
 
-Enemy::~Enemy() {
-
-	delete enemyStun;
-	delete object_; 
-	
-}
 
 void Enemy::Initialize(Camera* camera,Vector3 translates) {
 	isAlive = true;

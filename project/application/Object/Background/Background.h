@@ -1,20 +1,21 @@
 #pragma once
 #include "Camera.h"
 #include "Object3d.h"
+#include <memory>
 
 class Background {
 
-	Object3d* object_ = nullptr;
-	Object3d* object2_ = nullptr;
+	std::unique_ptr<Object3d> object_ = nullptr;
+	std::unique_ptr<Object3d> object2_ = nullptr;
+
 	Camera* camera_ = nullptr;
 	Vector3 translate;
 	Vector3 translate2_;
 	float initPosX;
 
-	public:
-
+public:
 	Background();
-	~Background();
+	~Background() = default; // ← delete 不要
 	void Initialize();
 	void Update(Vector3 vector3);
 	void Draw();

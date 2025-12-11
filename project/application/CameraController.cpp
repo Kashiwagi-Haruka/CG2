@@ -2,7 +2,7 @@
 #include "Camera.h"
 #include <imgui.h>
 CameraController::~CameraController() {
-	delete camera_; 
+	
 }
 void CameraController::Initialize() {
 
@@ -12,7 +12,7 @@ void CameraController::Initialize() {
 		.translate{0.0f, 5.0f, -50.0f}
     };
 
-	camera_ = new Camera();
+	camera_ = std::make_unique<Camera>();
 	camera_->SetTransform(transform_);
 }
 void CameraController::Update() {
@@ -32,7 +32,6 @@ void CameraController::Update() {
 	camera_->Update();
 
 }
-void CameraController::SetCamera(Camera* camera) {
-	camera_ = camera; }
+
 Camera* CameraController::GetCamera() {
-	return camera_;}
+	return camera_.get();}

@@ -1,22 +1,20 @@
 #include "Background.h"
 #include "GameBase.h"
 #include "ModelManeger.h"
-Background::Background() { 
+
+Background::Background() {
 	ModelManeger::GetInstance()->LoadModel("gameBG");
-	object_ = new Object3d(); 
-	object2_ = new Object3d();
+
+	object_ = std::make_unique<Object3d>();
+	object2_ = std::make_unique<Object3d>();
+
 	object_->SetModel("gameBG");
 	object2_->SetModel("gameBG");
+
 	object_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	object2_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
-	
-
 }
-Background::~Background(){
 
-	delete object2_;
-	delete object_;
-}
 void Background::Initialize() { 
 	
 	translate = object_->GetTranslate();

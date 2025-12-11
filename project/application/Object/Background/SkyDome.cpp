@@ -3,13 +3,11 @@
 #include "ModelManeger.h"
 #include "Camera.h"
 
-SkyDome::SkyDome(){
+SkyDome::SkyDome() {
 	ModelManeger::GetInstance()->LoadModel("skyDome");
-	skyDomeObject_ = new Object3d();
+	skyDomeObject_ = std::make_unique<Object3d>();
 }
 
-SkyDome::~SkyDome() {
-	delete skyDomeObject_; }
 
 void SkyDome::Initialize(Camera* camera) {
 	
