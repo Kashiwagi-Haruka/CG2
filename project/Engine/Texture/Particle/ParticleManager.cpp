@@ -5,7 +5,8 @@
 #include "VertexData.h"
 #include "Camera.h"
 #include <numbers>
-
+#include <cassert>
+#include "Logger.h"
 std::unique_ptr <ParticleManager> ParticleManager::instance = nullptr;
 
 
@@ -17,6 +18,9 @@ ParticleManager* ParticleManager::GetInstance() {
 	return instance.get();
 }
 
+void ParticleManager::SetBlendMode(BlendMode mode) {
+	currentBlendMode_ = mode; }
+
 void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
 	// 1. 記録
 	dxCommon_ = dxCommon;
@@ -25,8 +29,8 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
 	// 2. ランダム初期化
 	srand((unsigned int)time(nullptr));
 
-	// 3. パーティクルPSOは DirectXCommon::initialize() 内で SetupParticlePSO が実行されている
-	//    → ここでは何もする必要なし
+	// 3. パーティクルPSO
+	CreateGraphicsPipeline();
 
 	// 4. 頂点データ初期化
 	VertexData vertices[6] = {
@@ -280,7 +284,7 @@ if (!cbResource_)
 // 既に root[0] = b0 にセットしているので、そのままでOK。:contentReference[oaicite:3]{index=3}
 
 	// ① RootSig / ② PSO / ③ Heap / ④ CBV(b0) / ⑤ IA 設定
-	dxCommon_->GetCommandList()->SetGraphicsRootSignature(dxCommon_->GetParticleRootSignature());
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	ID3D12DescriptorHeap* heaps[] = {srvManager_->GetDescriptorHeap().Get()};
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(1, heaps);
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, cbResource_->GetGPUVirtualAddress());
@@ -303,23 +307,23 @@ if (!cbResource_)
 	// ==========================================
 	// ブレンドモード別に描画
 	// ==========================================
-	for (int mode = 0; mode < (int)BlendMode::kCountOfBlendMode; mode++) {
+	
 
-		dxCommon_->GetCommandList()->SetPipelineState(dxCommon_->GetParticlePipelineState((BlendMode)mode));
+	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[currentBlendMode_].Get());
 
-		for (auto& [name, group] : particleGroups) {
+	for (auto& [name, group] : particleGroups) {
 
-			auto& bucket = group.buckets[mode];
-			if (bucket.instanceCount == 0)
-				continue;
+		auto& bucket = group.buckets[currentBlendMode_];
+		if (bucket.instanceCount == 0)
+			continue;
 
-			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group.textureSrvIndex));
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group.textureSrvIndex));
 
-			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(bucket.instancingSrvIndex));
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(bucket.instancingSrvIndex));
 
-			dxCommon_->GetCommandList()->DrawInstanced(6, bucket.instanceCount, 0, 0);
-		}
+		dxCommon_->GetCommandList()->DrawInstanced(6, bucket.instanceCount, 0, 0);
 	}
+	
 }
 
 void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area) {
@@ -412,3 +416,121 @@ void ParticleManager::Clear(){
 	particleGroups.clear();
 
 }
+void ParticleManager::CreateRootsignature() {
+	HRESULT hr_;
+	// RootParameter 配列を用意 (Material, Texture, Instancing)
+	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+
+	// b0 : Material (PS)
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[0].Descriptor.ShaderRegister = 0;
+
+	// t0 : Texture (PS)
+	D3D12_DESCRIPTOR_RANGE rangeTexture{};
+	rangeTexture.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	rangeTexture.NumDescriptors = 1;
+	rangeTexture.BaseShaderRegister = 0; //
+	rangeTexture.RegisterSpace = 0;      //
+	rangeTexture.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &rangeTexture;
+
+	// t0, space1 : InstancingData (VS)
+	D3D12_DESCRIPTOR_RANGE rangeInstancing{};
+	rangeInstancing.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	rangeInstancing.NumDescriptors = 1;
+	rangeInstancing.BaseShaderRegister = 1; //
+	rangeInstancing.RegisterSpace = 0;      //
+	rangeInstancing.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &rangeInstancing;
+
+	// b1 : Transform (VS)
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[3].Descriptor.ShaderRegister = 1; // b1
+
+	// Sampler s0 : PS
+	D3D12_STATIC_SAMPLER_DESC sampler = {};
+	sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	sampler.AddressU = sampler.AddressV = sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	sampler.MaxLOD = D3D12_FLOAT32_MAX;
+	sampler.ShaderRegister = 0;
+	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	// RootSignature
+	D3D12_ROOT_SIGNATURE_DESC descRootSig{};
+	descRootSig.pParameters = rootParameters;
+	descRootSig.NumParameters = _countof(rootParameters);
+	descRootSig.pStaticSamplers = &sampler;
+	descRootSig.NumStaticSamplers = 1;
+	descRootSig.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	hr_ = D3D12SerializeRootSignature(&descRootSig, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
+	if (FAILED(hr_)) {
+		Logger::Log(reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
+		assert(false);
+	}
+
+	hr_ = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
+	assert(SUCCEEDED(hr_));
+}
+void ParticleManager::CreateGraphicsPipeline() {
+	
+	CreateRootsignature();
+	HRESULT hr_;
+	// InputLayout
+	D3D12_INPUT_ELEMENT_DESC inputElements[3] = {};
+	inputElements[0] = {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0};
+	inputElements[1] = {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0};
+	inputElements[2] = {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0};
+
+	D3D12_INPUT_LAYOUT_DESC inputLayout{};
+	inputLayout.pInputElementDescs = inputElements;
+	inputLayout.NumElements = _countof(inputElements);
+
+	// DepthStencil
+	D3D12_DEPTH_STENCIL_DESC depthDesc{};
+	depthDesc.DepthEnable = true;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+	// Shader
+	auto vsBlob = dxCommon_->CompileShader(L"Resources/shader/Particle.VS.hlsl", L"vs_6_0");
+	auto psBlob = dxCommon_->CompileShader(L"Resources/shader/Particle.PS.hlsl", L"ps_6_0");
+
+	// PSO
+	for (int i = 0; i < BlendMode::kCountOfBlendMode; i++) {
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
+		psoDesc.pRootSignature = rootSignature_.Get();
+		psoDesc.InputLayout = inputLayout;
+		psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
+		psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
+		D3D12_RASTERIZER_DESC rasterizerDesc{};
+		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+		psoDesc.RasterizerState = rasterizerDesc;
+		psoDesc.BlendState = blendModeManeger_.SetBlendMode(static_cast<BlendMode>(i));
+		psoDesc.NumRenderTargets = 1;
+		psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		psoDesc.DepthStencilState = depthDesc;
+		psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		psoDesc.SampleDesc.Count = 1;
+		psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+		hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&graphicsPipelineState_[i]));
+		assert(SUCCEEDED(hr_));
+	}
+
+
+}
+

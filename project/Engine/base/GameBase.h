@@ -61,15 +61,9 @@ private:
 	void SpriteCommonSet();
 	void ModelCommonSet();
 	
-
-	Transform GetCameraTransform() const { return dxCommon_->GetCameraTransform(); };
-	
-	
-
-
 	void SetDefaultCamera(Camera* camera);
 
-	void SetBlendMode(BlendMode blendMode);
+	
 
 	bool PushKey(BYTE keyNumber);
 	bool TriggerKey(BYTE keyNumber);

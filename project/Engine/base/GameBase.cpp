@@ -52,7 +52,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	dxCommon_->initialize(winApp_.get());
 	srvManager_ = std::make_unique<SrvManager>();
 	srvManager_->Initialize(dxCommon_.get());
-	dxCommon_->CreateInstancingSRV(srvManager_.get());
+	
 
 
 	DInput = std::make_unique<Input>();
@@ -131,7 +131,7 @@ float GameBase::GetMouseX() const { return DInput->GetMouseX(); };
 float GameBase::GetMouseY() const { return DInput->GetMouseY(); };
 Vector2 GameBase::GetMouseMove() const { return DInput->GetMouseMove(); };
 
-void GameBase::SetBlendMode(BlendMode mode) { dxCommon_->SetBlendMode(mode); }
+
 
 bool GameBase::PushKey(BYTE keyNumber){ return DInput->PushKey(keyNumber); }
 bool GameBase::TriggerKey(BYTE keyNumber) { return DInput->TriggerKey(keyNumber); }

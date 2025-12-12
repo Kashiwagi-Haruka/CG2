@@ -94,16 +94,22 @@ private:
 	DirectXCommon* dxCommon_ = nullptr;
 	SrvManager* srvManager_ = nullptr;
 	
-	std::unordered_map<std::string, ParticleGroup> particleGroups;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+	std::unordered_map<std::string, ParticleGroup> particleGroups;	
 	D3D12_VERTEX_BUFFER_VIEW vbView_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_[6];
 
-	
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob_;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
+
+	BlendModeManeger blendModeManeger_;
+	BlendMode currentBlendMode_ = BlendMode::kBlendModeAlpha;
 
 	// ... 既存のメンバ変数の下に追加
 	Microsoft::WRL::ComPtr<ID3D12Resource> cbResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vsTransformCB_; // ← 追加: VS用定数バッファ
 	void EnsureCapacityBucket(ParticleGroup::BlendBucket& bucket, uint32_t required);
+	void CreateRootsignature();
+	void CreateGraphicsPipeline();
 };

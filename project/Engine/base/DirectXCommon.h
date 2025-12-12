@@ -92,9 +92,9 @@ class DirectXCommon {
 		// パーティクル用
 
 	// 実際に生成
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_[6];
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> particlePipelineState_[BlendMode::kCountOfBlendMode];
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateWhite_; // 完全白用
+	
+	
+	
 	// 頂点バッファビューを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	// transitionBarrierの設定
@@ -107,27 +107,7 @@ class DirectXCommon {
 	// 実際に頂点リソースを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
-	// --- 頂点用 (Transform行列) のリソース追加 ---
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-	DirectionalLight* directionalLightData_ = nullptr;
-	UINT currentTriangleVertexOffset_ = 0; // 追加：次に書き込む頂点のオフセット（頂点数単位）
-	UINT currentSphereVertexOffset_ = 0;
-	UINT currentSpriteVertexOffset_ = 0;
-	int sphereDrawCallCount_ = 0;
-
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSphere_;
-	int kVertexCount_;
-	const int kMaxSpheres = 30; // 複数球体用の最大数（例）
-
 	
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
-
-	
-	
-
 
 	struct Material {
 
@@ -136,9 +116,6 @@ class DirectXCommon {
 		float padding[3];
 		Matrix4x4 uvTransform;
 	};
-
-
-
 	// GameBase.h
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceMesh_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceMetaball_;
@@ -158,65 +135,26 @@ class DirectXCommon {
 		                 
 		                 
 	};
-	// 例: 最大確保サイズ（初期化時に使った値を定数などで保持しておく）
-	const size_t kMaxVertexCount = 200000;    // 実際の最大確保頂点数
-	const size_t kMaxIndexCount = 200000 * 3; // 実際の最大確保インデックス数
 
-	Transform cameraTransform = {
-	    {1.0f, 1.0f, 1.0f  }, // スケール
-	    {0.0f, 0,    0.0f  }, // 
-	    {0.0f, 0.0f, -10.0f}  //
-	};
-
-	// Matrix4x4* wvpData = nullptr; // ← transformResource用のポインタをメンバに持つ
-	TransformationMatrix* transformationMatrixData = nullptr;
-
-	// Texture texture_;
+	
+	
 	// Texture texture2_;
 	D3D12_GPU_DESCRIPTOR_HANDLE TextureGPUHandle_[10000];
 	D3D12_GPU_DESCRIPTOR_HANDLE ModelGPUHandle_[10000];
 	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU;
-	static constexpr UINT kMaxVertices_ = 1024; // 十分な大きさで定義しておく
 
-	int transformSlotOffset = 0; // slot=0,1使用
-
-	const int kMaxTransformSlots = 32; // 例えば最大32スロット（用途に合わせて）
-
-	ModelData modelData_;
-
-
-	BlendMode blendMode_ = BlendMode::kBlendModeAlpha;
-
-	Transform transform = {
-	    {1.0f, 1.0f, 1.0f}, // scale
-	    {0.0f, 0.0f, 0.0f}, // rotate
-	    {0.0f, 0.0f, 0.0f}  // translate
-	};
-	
-	BlendModeManeger blendModeManeger_;
 	WinApp* winApp_ = nullptr;
 	
 
 	std::chrono::steady_clock::time_point reference_;
 
-	// Particle instancing用
-	static const uint32_t kNumInstance = 10;
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
-	TransformationMatrix* instancingData_ = nullptr;
-
-	
-
 public:
 
-	
-
 	void initialize(WinApp* winApp);
-	
 	void InitializeFixFPS();
 
 	void UpdateFixFPS();
-	void CreateInstancingSRV(SrvManager* srvManager);
 	void PreDraw();
 	void PostDraw();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
@@ -224,21 +162,11 @@ public:
 
 	ID3D12Device* GetDevice() { return device_.Get(); };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
-	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return srvDescriptorHeap_.Get(); };
+	
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc_; }
+
 	
-	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCpuDescriptorHandle(uint32_t index);
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGpuDescriptorHandle(uint32_t index);
-	void SetTextureGPUHanle(int index, D3D12_GPU_DESCRIPTOR_HANDLE handle) { TextureGPUHandle_[index] = handle; }
-	void SetModelGPUHanle(int index, D3D12_GPU_DESCRIPTOR_HANDLE handle) { ModelGPUHandle_[index] = handle; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureGPUHanle(int index) { return TextureGPUHandle_[index]; }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetModelGPUHanle(int index) { return ModelGPUHandle_[index]; }
-	Transform& GetCameraTransform() { return cameraTransform; }
-	
-	// DirectXCommon.h
-	ID3D12RootSignature* GetParticleRootSignature() const { return particleRootSignature_.Get(); }
-	ID3D12PipelineState* GetParticlePipelineState(BlendMode mode) const { return particlePipelineState_[static_cast<int>(mode)].Get(); }
-	D3D12_GPU_VIRTUAL_ADDRESS GetMaterialResourceGPUVA() const { return materialResource_->GetGPUVirtualAddress(); }
+
 	size_t GetSwapChainResourcesNum() const { return swapChainResources_.size(); }
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue_; }
 
@@ -247,23 +175,6 @@ public:
 	    // Compilerに使用するProfile
 	    const wchar_t* profile);
 	
-
-	void CreateSphereResources();
-
-	/*void CreateModelResources();*/
-
-	void VertexResource();
-
-	void SetBlendMode(BlendMode blendmode);
-
-	
-
-	void DrawSphere(const Vector3& center, float radius, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
-	void DrawSphere(const Vector3& center, const Vector3& radius, const Vector3& rotation, uint32_t color, int textureHandle, const Matrix4x4& viewProj);
-	
-
-	void DrawMesh(const std::vector<VertexData>& vertices, uint32_t color, int textureHandle, const Matrix4x4& wvp, const Matrix4x4& world);
-	void DrawParticle(const std::vector<VertexData>& vertices, uint32_t color, uint32_t textureHandle, const Matrix4x4& wvp, const Matrix4x4& world, int instanceCount);
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
@@ -289,8 +200,7 @@ private:
 
 	void CrtvTransitionBarrier();
 
-	void SetupPSO();
-	void SetupParticlePSO();
+
 	
 	
 	static D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);

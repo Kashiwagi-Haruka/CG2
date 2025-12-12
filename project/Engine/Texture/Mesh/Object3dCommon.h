@@ -38,8 +38,8 @@ class Object3dCommon {
 
 	public:
 	void Initialize(DirectXCommon* dxCommon);
-	    void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
-	    Camera* GetDefaultCamera() const { return defaultCamera; };
+	void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
+	Camera* GetDefaultCamera() const { return defaultCamera; };
 	void DrawCommon();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	DirectXCommon* GetDxCommon() const { return dxCommon_; };
