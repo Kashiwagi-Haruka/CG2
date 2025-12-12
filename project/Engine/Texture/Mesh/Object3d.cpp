@@ -40,7 +40,8 @@ void Object3d::Draw() {
 	// --- 座標変換行列CBufferの場所を設定 ---
 	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
 	// --- 平行光源CBufferの場所を設定 ---
-	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, obj3dCommon_->GetDirectionalLightResource()->GetGPUVirtualAddress());
+
 
 	if (model_) {
 		model_->Draw();
@@ -59,16 +60,5 @@ void Object3d::CreateResources() {
 
 	Update();
 
-	// Lightバッファ
-	directionalLightResource_ = obj3dCommon_->CreateBufferResource(sizeof(DirectionalLight));
-	assert(directionalLightResource_);
-	directionalLightData_ = nullptr;
-	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-	assert(directionalLightData_);
-	*directionalLightData_ = {
-	    {1.0f, 1.0f, 1.0f, 1.0f},
-        {0.0f, -1.0f, 0.0f},
-        1.0f
-    };
-	directionalLightResource_->Unmap(0, nullptr);
+
 }

@@ -38,11 +38,10 @@ class Object3d {
 	Camera* camera_;
 
 	Object3dCommon* obj3dCommon_;
-	DirectionalLight* directionalLightData_ = nullptr;
+	
 
 	TransformationMatrix* transformationMatrixData_;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 

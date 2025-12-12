@@ -10,20 +10,3 @@ struct DirectionalLight {
 	float intensity;
 };
 
-class Object3dCommon;
-class DirectionalLightHelper {
-
-
-	DirectionalLight* directionalLightData_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-	Object3dCommon* obj3dCommon_ = nullptr;
-
-	public:
-
-	void Initialize();
-	void Update();
-	
-
-
-
-};

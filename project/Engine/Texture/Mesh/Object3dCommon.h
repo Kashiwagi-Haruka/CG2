@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <wrl.h>
 #include "BlendModeManeger.h"
-
+#include "Light/DirectionalLight.h"
 class Camera;
 class DirectXCommon;
 
@@ -12,7 +12,7 @@ class Object3dCommon {
 
 	Camera* defaultCamera = nullptr;
 
-	DirectXCommon* dxCommon_;
+	DirectXCommon* dxCommon_=nullptr;
 
 	HRESULT hr_;
 
@@ -26,7 +26,10 @@ class Object3dCommon {
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob_;
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
 
-	
+	// Directional Light（共通）
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
+	DirectionalLight* directionalLightData_ = nullptr;
+
 
 	private:
 
@@ -43,5 +46,8 @@ class Object3dCommon {
 	void DrawCommon();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	DirectXCommon* GetDxCommon() const { return dxCommon_; };
-
+	void SetBlendMode(BlendMode blendmode);
+	BlendMode GetBlendMode() const { return blendMode_;}
+	ID3D12Resource* GetDirectionalLightResource() const { return directionalLightResource_.Get(); }
+	void SetDirectionalLight(DirectionalLight& light);
 };

@@ -5,6 +5,19 @@
 void Object3dCommon::Initialize(DirectXCommon* dxCommon){ 
 	dxCommon_ = dxCommon;
 	CreateGraphicsPipeline();
+	// Directional Light の共通バッファ作成
+	directionalLightResource_ = CreateBufferResource(sizeof(DirectionalLight));
+	assert(directionalLightResource_);
+	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+	assert(directionalLightData_);
+
+	*directionalLightData_ = {
+	    {1.0f, 1.0f, 1.0f, 1.0f},
+        {0.0f, -1.0f, 0.0f},
+        1.0f
+    };
+
+	directionalLightResource_->Unmap(0, nullptr);
 }
 
 void Object3dCommon::DrawCommon() {
@@ -13,6 +26,12 @@ void Object3dCommon::DrawCommon() {
 	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[blendMode_].Get()); // 通常
 
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::SetDirectionalLight(DirectionalLight& light){
+	*directionalLightData_ = light; }	
+void Object3dCommon::SetBlendMode(BlendMode blendmode){
+	blendMode_=blendmode; 
+	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[blendMode_].Get()); // 通常
 }
 
 void Object3dCommon::CreateRootsignature(){
