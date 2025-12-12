@@ -52,8 +52,6 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	dxCommon_->initialize(winApp_.get());
 	srvManager_ = std::make_unique<SrvManager>();
 	srvManager_->Initialize(dxCommon_.get());
-	
-
 
 	DInput = std::make_unique<Input>();
 	DInput->Initialize(winApp_.get());

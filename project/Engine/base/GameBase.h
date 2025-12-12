@@ -36,11 +36,6 @@ private:
 	
 	HRESULT hr_;
 	
-
-		// バッファの設定
-	D3D12_HEAP_PROPERTIES heapProperties;
-	D3D12_RESOURCE_DESC resourceDesc;
-
 	std::unique_ptr<Input> DInput;
 
    public:	
@@ -127,12 +122,6 @@ private:
 
 	SpriteCommon* GetSpriteCommon() { return spriteCommon_.get(); };
 	Object3dCommon* GetObject3dCommon() { return obj3dCommon_.get(); };
-	
-
-private:
-	
-	
-	void SetupPSO();
 
 };
 
