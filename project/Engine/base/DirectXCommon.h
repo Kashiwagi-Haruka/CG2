@@ -27,13 +27,6 @@
 #include "Transform.h"
 #include "Light/DirectionalLight.h"
 
-struct MaterialData {
-	std::string textureFilePath;
-};
-struct ModelData {
-	std::vector<VertexData> vertices;
-	MaterialData material;
-};
 
 class BlendModeManeger;
 class SrvManager;
@@ -86,67 +79,14 @@ class DirectXCommon {
 	D3D12_VIEWPORT viewport_;
 	// シザー矩形
 	D3D12_RECT scissorRect_;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> particleRootSignature_;
-	
-		// パーティクル用
 
-	// 実際に生成
-	
-	
-	
-	// 頂点バッファビューを作成する
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
+
 	// transitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier_{};
-	// シリアライズしてバイナリにする
-	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob_;
-	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
-	// 実際に頂点リソースを作る
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
-	
 
-	struct Material {
 
-		Vector4 color;
-		int enableLighting;
-		float padding[3];
-		Matrix4x4 uvTransform;
-	};
-	// GameBase.h
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceMesh_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceMetaball_;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewMesh_;
-	D3D12_INDEX_BUFFER_VIEW indexBufferViewMetaball_;
-
-	// GameBase.h
-	struct alignas(256) TransformationMatrix {
-		Matrix4x4 WVP;   // 64 バイト
-		Matrix4x4 World; // 64 バイト
-		                 // ここで自動的に 128 バイト分のパディングが入って、
-		                 // sizeof(TransformationMatrix) == 256 になる
-	};
-	struct TransformationMatrix128 {
-		Matrix4x4 WVP;   // 64 バイト
-		Matrix4x4 World; // 64 バイト
-		                 
-		                 
-	};
-
-	
-	
-	// Texture texture2_;
-	D3D12_GPU_DESCRIPTOR_HANDLE TextureGPUHandle_[10000];
-	D3D12_GPU_DESCRIPTOR_HANDLE ModelGPUHandle_[10000];
-	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU;
-	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU;
 
 	WinApp* winApp_ = nullptr;
-	
-
 	std::chrono::steady_clock::time_point reference_;
 
 public:
@@ -203,6 +143,5 @@ private:
 
 	
 	
-	static D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
-	static D3D12_CPU_DESCRIPTOR_HANDLE GetCpuDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
+	
 };

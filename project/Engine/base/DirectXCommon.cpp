@@ -501,23 +501,7 @@ void DirectXCommon::CrtvTransitionBarrier() {
 	// TransitionBarrierを張る
 	commandList_->ResourceBarrier(1, &barrier_);
 }
-// CPUハンドルを取得
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetCpuDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index) {
-	// ヒープの先頭ハンドル
-	D3D12_CPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	// インデックス分だけオフセット
-	handle.ptr += static_cast<SIZE_T>(descriptorSize) * index;
-	return handle;
-}
 
-// GPUハンドルを取得
-D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGpuDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index) {
-	// ヒープの先頭ハンドル
-	D3D12_GPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	// インデックス分だけオフセット
-	handle.ptr += static_cast<UINT64>(descriptorSize) * index;
-	return handle;
-}
 Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(
     /* CompilerするShaderファイルへのパス*/ const std::wstring& filePath,
     // Compilerに使用するProfile
@@ -651,22 +635,7 @@ void DirectXCommon::Finalize() {
 	srvDescriptorHeap_.Reset();
 	dsvDescriptorHeap_.Reset();
 
-	// --- Buffers ---
 
-	vertexResource_.Reset();
-	materialResource_.Reset();
-	vertexResourceMesh_.Reset();
-	indexResourceMetaball_.Reset();
-	
-
-	rootSignature_.Reset();
-	particleRootSignature_.Reset();
-
-	// --- Shader blobs ---
-	signatureBlob_.Reset();
-	errorBlob_.Reset();
-	pixelShaderBlob_.Reset();
-	vertexShaderBlob_.Reset();
 
 	// --- Command ---
 	commandList_.Reset();
