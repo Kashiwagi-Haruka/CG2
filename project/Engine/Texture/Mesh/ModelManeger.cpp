@@ -1,17 +1,17 @@
 #include "ModelManeger.h"
 #include "ModelCommon.h"
 #include "Model.h"
-ModelManeger* ModelManeger::instance = nullptr;
+std::unique_ptr<ModelManeger> ModelManeger::instance = nullptr;
 
 ModelManeger* ModelManeger::GetInstance(){
 	if (instance == nullptr) {
-		instance = new ModelManeger;
+		instance = std::make_unique<ModelManeger>();
 	}
-	return instance;
+	return instance.get();
 }
 
 void ModelManeger::Initialize(DirectXCommon* dxCommon){
-	modelCommon_ = new ModelCommon();
+	modelCommon_ = std::make_unique<ModelCommon>();
 	modelCommon_->Initialize(dxCommon);
 }
 
@@ -23,7 +23,7 @@ void ModelManeger::LoadModel(const std::string& filePath){
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
 	model->LoadObjFile("Resources/3d", filePath);
-	model->Initialize(modelCommon_);
+	model->Initialize(modelCommon_.get());
 	models.insert(std::make_pair(filePath, std::move(model)));
 }
 
@@ -36,7 +36,7 @@ Model* ModelManeger::FindModel(const std::string& filePath){
 
 void ModelManeger::Finalize(){
 
-	delete instance;
-	instance = nullptr;
+	
+	
 
 }

@@ -12,6 +12,7 @@
 #include "RigidBody.h"
 #include "Vector4.h"
 #include <array>
+#include <memory>
 
 struct Particle {
 	Transform transform_{
@@ -69,29 +70,13 @@ public:
 	void Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area);
 	void SetCamera(Camera* camera);
 	void SetBlendMode(BlendMode mode);
-	
-	//// グループの取得（なければ生成）
-	//ParticleGroup& GetGroup(const std::string& groupName);
+
 
 	// 更新 / 描画
 	void Update(Camera* camera);
 	void Draw();
 	void Clear();
 	void Finalize();
-	
-	//void SetFieldAcceleration(const Vector3& accel) { accelerationField.Acceleation = accel; }
-
-	//void SetFieldArea(const AABB& area) { accelerationField.area = area; }
-
-	//void SetDrawArea(const AABB& area) { accelerationField.drawArea = area; }
-	//
-	//void SetScale(const Vector3& scale) { scale_ = scale; }
-
-	//const Vector3& GetFieldAcceleration() const { return accelerationField.Acceleation; }
-
-	//const AABB& GetFieldArea() const { return accelerationField.area; }
-
-	//const AABB& GetDrawArea() const { return accelerationField.drawArea; }
 
 private:
 	struct TransformationMatrix {
@@ -105,7 +90,7 @@ private:
 	Vector3 scale_ = {1,1,1};
 	
 
-	static ParticleManager* instance;
+	static std::unique_ptr<ParticleManager> instance;
 	DirectXCommon* dxCommon_ = nullptr;
 	SrvManager* srvManager_ = nullptr;
 	

@@ -9,18 +9,19 @@ class DirectXCommon;
 
 class ModelManeger {
 
-	static ModelManeger* instance;
+	static std::unique_ptr<ModelManeger> instance;
 
-	ModelManeger() = default;
-	~ModelManeger() = default;
+
 	ModelManeger(ModelManeger&) = delete;
 	ModelManeger& operator=(ModelManeger&) = delete;
 
 	std::map<std::string, std::unique_ptr<Model>> models;
-	ModelCommon* modelCommon_ = nullptr;
+	std::unique_ptr<ModelCommon> modelCommon_ = nullptr;
 
 	public:
 
+		ModelManeger() = default;
+	    ~ModelManeger() = default;
 		static ModelManeger* GetInstance();
 
 		void Initialize(DirectXCommon* dxCommon);

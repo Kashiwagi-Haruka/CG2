@@ -10,7 +10,7 @@ ResultScene::ResultScene() {
 }
 
 void ResultScene::Finalize() {
-	// delete 不要
+	
 }
 
 void ResultScene::Initialize() {

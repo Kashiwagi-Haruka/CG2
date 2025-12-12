@@ -5,5 +5,5 @@ class D3DResourceLeakChecker {
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~D3DResourceLeakChecker();
+	void LeakChecker();
 };

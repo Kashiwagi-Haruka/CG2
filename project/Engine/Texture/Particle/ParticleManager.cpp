@@ -6,15 +6,15 @@
 #include "Camera.h"
 #include <numbers>
 
-ParticleManager* ParticleManager::instance = nullptr;
+std::unique_ptr <ParticleManager> ParticleManager::instance = nullptr;
 
 
 ParticleManager* ParticleManager::GetInstance() {
 
 	if (instance == nullptr) {
-		instance = new ParticleManager;
+		instance = std::make_unique<ParticleManager>();
 	}
-	return instance;
+	return instance.get();
 }
 
 void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
@@ -398,7 +398,6 @@ void ParticleManager::EnsureCapacityBucket(ParticleGroup::BlendBucket& bucket, u
 
 void ParticleManager::Finalize() {
 	Clear();
-	delete instance;
 	instance = nullptr;
 }
 void ParticleManager::Clear(){

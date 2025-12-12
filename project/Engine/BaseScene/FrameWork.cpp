@@ -24,4 +24,4 @@ void FrameWork::Update() {
 
 }
 
-void FrameWork::Finalize() { delete sceneFactory_; }
+void FrameWork::Finalize() {}

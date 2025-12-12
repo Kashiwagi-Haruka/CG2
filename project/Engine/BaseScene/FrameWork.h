@@ -1,8 +1,9 @@
 #pragma once
 #include "AbstractSceneFactory.h"
+#include <memory>
 class FrameWork {
 
-	AbstractSceneFactory* sceneFactory_ = nullptr;
+	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
 
 	protected:
 	bool endRequest_ = false;

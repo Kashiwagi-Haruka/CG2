@@ -1,54 +1,58 @@
 #include "SceneManager.h"
 #include <cassert>
-SceneManager* SceneManager::instance_ = nullptr;
+
+std::unique_ptr<SceneManager> SceneManager::instance_ = nullptr;
+
 SceneManager* SceneManager::GetInstance() {
-
-	if (instance_ == nullptr) {
-		instance_ = new SceneManager();
+	if (!instance_) {
+		instance_ = std::make_unique<SceneManager>();
 	}
-	return instance_;
+	return instance_.get();
 }
 
-void SceneManager::Finalize(){
+void SceneManager::Finalize() {
 
-	
-	scene_->Finalize();
-	delete scene_;
-	delete instance_;
-	instance_ = nullptr;
+	if (scene_) {
+		scene_->Finalize();
+		scene_.reset();
+	}
+
+	nextscene_.reset();
+
+	// ★ Singleton の instance を解放
+	instance_.reset();
 }
 
+void SceneManager::Update() {
 
-void SceneManager::Update() { 
-	
+	// シーン切り替え
 	if (nextscene_) {
-	
+
 		if (scene_) {
 			scene_->Finalize();
-			delete scene_;
 		}
 
-		scene_ = nextscene_;
-		nextscene_ = nullptr;
+		scene_ = std::move(nextscene_);
 		scene_->SetSceneManager(this);
 		scene_->Initialize();
-		
 	}
 
-
-
-
-	scene_->Update(); 
-
-
+	if (scene_) {
+		scene_->Update();
+	}
 }
 
-void SceneManager::Draw() { scene_->Draw(); }
+void SceneManager::Draw() {
+	if (scene_) {
+		scene_->Draw();
+	}
+}
 
-void SceneManager::ChangeScene(const std::string& sceneName) { 
+void SceneManager::ChangeScene(const std::string& sceneName) {
 
 	assert(sceneFactory_);
-	assert(nextscene_==nullptr);
-	nextscene_=sceneFactory_->CreateScene(sceneName);	
+	assert(nextscene_ == nullptr);
 
+	// ★ unique_ptr を直接受け取る
+	nextscene_ = std::unique_ptr<BaseScene>(sceneFactory_->CreateScene(sceneName));
 }

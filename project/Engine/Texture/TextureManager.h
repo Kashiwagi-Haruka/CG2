@@ -6,6 +6,7 @@
 #include <string>
 #include <cstdint>
 #include <unordered_map>
+#include <memory>
 
 class DirectXCommon;
 class SrvManager;
@@ -28,10 +29,9 @@ class TextureManager {
 		std::unordered_map<std::string,TextureData> textureDatas;
 
 
-		static TextureManager* instance;
+		static std::unique_ptr<TextureManager> instance;
 	    static uint32_t kSRVIndexTop;
-	    TextureManager() = default;
-	    ~TextureManager() = default;
+	    
 	    TextureManager(TextureManager&) = delete;
 	    TextureManager& operator=(TextureManager&) = delete;
 
@@ -42,7 +42,8 @@ class TextureManager {
 	    SrvManager* srvManager_=nullptr;
 
 	public:
-
+	    TextureManager() = default;
+	    ~TextureManager() = default;
 		//シングルトンインスタンスの取得
 	    static TextureManager* GetInstance();
 

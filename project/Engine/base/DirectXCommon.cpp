@@ -119,7 +119,7 @@ void DirectXCommon::DebugLayer() {
 		// デバッグレイヤー
 		debugController_->EnableDebugLayer();
 		// 更にGPU側でもチェックを行うようにする
-		debugController_->SetEnableGPUBasedValidation(TRUE);
+		debugController_->SetEnableGPUBasedValidation(FALSE);
 	}
 
 #endif // DEBUG
@@ -691,23 +691,95 @@ void DirectXCommon::SetDirectionalLightData(const DirectionalLight& directionalL
 		directionalLightResource_->Unmap(0, nullptr);
 	}
 }
+//void DirectXCommon::Finalize() {
+//	
+//
+//	if (fenceEvent_) {
+//		CloseHandle(fenceEvent_);
+//		fenceEvent_ = nullptr;
+//	}
+//	if (transformResource_) {
+//		transformResource_->Unmap(0, nullptr); // ちゃんと最後だけunmapする
+//	}
+//	if (directionalLightResource_) {
+//		directionalLightResource_->Unmap(0, nullptr);
+//		/*directionalLightResource_->Release();*/
+//		directionalLightResource_ = nullptr;
+//		directionalLightData_ = nullptr;
+//	}
+//}
 void DirectXCommon::Finalize() {
-	
 
+	// --- GPU 完了待ち ---
+	if (commandQueue_ && fence_ && fenceEvent_) {
+		commandQueue_->Signal(fence_.Get(), fenceValue_);
+		if (fence_->GetCompletedValue() < fenceValue_) {
+			fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
+			WaitForSingleObject(fenceEvent_, INFINITE);
+		}
+		fenceValue_++;
+	}
+
+	// --- Fence Event ---
 	if (fenceEvent_) {
 		CloseHandle(fenceEvent_);
 		fenceEvent_ = nullptr;
 	}
-	if (transformResource_) {
-		transformResource_->Unmap(0, nullptr); // ちゃんと最後だけunmapする
+
+	// --- SwapChain Resources ---
+	for (auto& bb : swapChainResources_) {
+		bb.Reset();
 	}
-	if (directionalLightResource_) {
-		directionalLightResource_->Unmap(0, nullptr);
-		/*directionalLightResource_->Release();*/
-		directionalLightResource_ = nullptr;
-		directionalLightData_ = nullptr;
-	}
+
+	// --- DepthStencil ---
+	depthStenicilResource_.Reset();
+
+	// --- Descriptor Heaps ---
+	rtvDescriptorHeap_.Reset();
+	srvDescriptorHeap_.Reset();
+	dsvDescriptorHeap_.Reset();
+
+	// --- Buffers ---
+	transformResource_.Reset();
+	directionalLightResource_.Reset();
+	vertexResource_.Reset();
+	vertexResourceSphere_.Reset();
+	materialResource_.Reset();
+	vertexResourceMesh_.Reset();
+	indexResourceMetaball_.Reset();
+	instancingResource_.Reset();
+
+	// --- Pipeline / RootSignature ---
+	for (auto& p : graphicsPipelineState_)
+		p.Reset();
+	for (auto& p : particlePipelineState_)
+		p.Reset();
+	graphicsPipelineStateWhite_.Reset();
+	rootSignature_.Reset();
+	particleRootSignature_.Reset();
+
+	// --- Shader blobs ---
+	signatureBlob_.Reset();
+	errorBlob_.Reset();
+	pixelShaderBlob_.Reset();
+	vertexShaderBlob_.Reset();
+
+	// --- Command ---
+	commandList_.Reset();
+	for (auto& alloc : commandAllocators_)
+		alloc.Reset();
+	commandQueue_.Reset();
+
+	// --- Swap chain ---
+	swapChain_.Reset();
+
+	// --- Device ---
+	device_.Reset();
+	dxgiFactory_.Reset();
+	useAdapter_.Reset();
 }
+
+
 void DirectXCommon::SetupPSO() {
 	Logger::Log("SetupPSO() Start\n");
 	assert(device_ != nullptr);

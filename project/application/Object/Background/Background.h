@@ -15,7 +15,7 @@ class Background {
 
 public:
 	Background();
-	~Background() = default; // ← delete 不要
+	~Background() = default; 
 	void Initialize();
 	void Update(Vector3 vector3);
 	void Draw();

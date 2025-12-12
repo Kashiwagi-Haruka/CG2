@@ -10,7 +10,7 @@ TitleScene::TitleScene() {
 }
 
 void TitleScene::Finalize() {
-	// unique_ptr なので delete 不要
+	
 }
 
 void TitleScene::Initialize() {

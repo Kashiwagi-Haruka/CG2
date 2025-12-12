@@ -11,7 +11,7 @@ GameOverScene::GameOverScene() {
 }
 
 void GameOverScene::Finalize() {
-	// delete 不要
+	
 }
 
 void GameOverScene::Initialize() {

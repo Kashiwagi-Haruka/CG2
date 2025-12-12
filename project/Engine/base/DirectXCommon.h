@@ -183,10 +183,6 @@ class DirectXCommon {
 
 	const int kMaxTransformSlots = 32; // 例えば最大32スロット（用途に合わせて）
 
-
-	
-
-
 	ModelData modelData_;
 
 

@@ -1,19 +1,19 @@
 #include "Game.h"
 #include "SceneManager.h"
-#include "Scene/SceneFactory/SceneFactory.h"
+
 
 void Game::Initialize(){
 	FrameWork::Initialize();
 	GameBase::GetInstance()->Initialize(L"LE2A_04_カシワギハルカ", 1280, 720);
-	d3dResourceLeakChecker = new D3DResourceLeakChecker();
+
 
 	
 
 	SetUnhandledExceptionFilter(GameBase::GetInstance()->ExportDump);
 	
 
-	sceneFactory_ = new SceneFactory();
-	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_);
+	sceneFactory_ = std::make_unique<SceneFactory>();
+	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 	SceneManager::GetInstance()->ChangeScene("Title");
 }
 
@@ -41,7 +41,8 @@ void Game::Finalize() {
 	
 	SceneManager::GetInstance()->Finalize();
 	GameBase::GetInstance()->Finalize();
-	delete d3dResourceLeakChecker;
+	d3dResourceLeakChecker.LeakChecker();
 	CoUninitialize();
 	FrameWork::Finalize();
+
 }

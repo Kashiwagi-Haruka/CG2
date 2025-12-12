@@ -9,13 +9,13 @@
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "mfreadwrite.lib")
 
-Audio* Audio::instance = nullptr;
+std::unique_ptr<Audio> Audio::instance = nullptr;
 
 Audio* Audio::GetInstance(){
 	if (instance == nullptr) {
-		instance = new Audio;
+		instance = std::make_unique<Audio>();
 	}
-	return instance;
+	return instance.get();
 }
 void Audio::Finalize(){
 
@@ -23,7 +23,7 @@ void Audio::Finalize(){
 	assert(SUCCEEDED(result_));
 
 
-	delete instance;
+	
 	instance = nullptr;
 }
 

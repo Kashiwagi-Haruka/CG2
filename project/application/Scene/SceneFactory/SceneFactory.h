@@ -7,4 +7,8 @@ class SceneFactory :public AbstractSceneFactory{
 
 	BaseScene* CreateScene(const std::string& sceneName) override;
 
+	public:
+		SceneFactory() = default;
+	    ~SceneFactory() = default;
+
 };

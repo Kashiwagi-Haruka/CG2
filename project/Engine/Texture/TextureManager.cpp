@@ -2,16 +2,16 @@
 #include "DirectXCommon.h"
 #include "StringUtility.h"
 #include "SrvManager.h"
-TextureManager* TextureManager::instance = nullptr;
+std::unique_ptr<TextureManager> TextureManager::instance = nullptr;
 uint32_t TextureManager::kSRVIndexTop = 1;
 
 TextureManager* TextureManager::GetInstance(){
 
 	if (instance == nullptr) {
-		instance = new TextureManager;
+		instance = std::make_unique<TextureManager>();
 	
 	}
-	return instance;
+	return instance.get();
 
 }
 
@@ -24,9 +24,8 @@ void TextureManager::Initialize(DirectXCommon* dxCommon,SrvManager* srvManager){
 }
 
 void TextureManager::Finalize(){ 
-	delete instance;
-	instance = nullptr;
-}
+	
+	instance.reset(); }
 
 void TextureManager::LoadTextureName(const std::string& filePath) {
 

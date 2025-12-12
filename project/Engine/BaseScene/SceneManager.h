@@ -1,12 +1,13 @@
 #pragma once
 #include "BaseScene.h"
 #include  "AbstractSceneFactory.h"
+#include <memory>
 class SceneManager {
 
-	static SceneManager* instance_;
+	static std::unique_ptr<SceneManager> instance_;
 
-	BaseScene* scene_ = nullptr;
-	BaseScene* nextscene_ = nullptr;
+	std::unique_ptr<BaseScene> scene_ = nullptr;
+	std::unique_ptr<BaseScene> nextscene_ = nullptr;
 
 	AbstractSceneFactory* sceneFactory_ = nullptr;
 

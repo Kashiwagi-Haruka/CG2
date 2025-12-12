@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <wrl.h>
 #include <vector>
+#include <memory>
 struct ChunkHeader {
 	char id[4];
 	int32_t size;
@@ -24,7 +25,7 @@ struct SoundData {
 
 class Audio {
 
-	static Audio* instance;
+	static std::unique_ptr<Audio> instance;
 
 	Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
 

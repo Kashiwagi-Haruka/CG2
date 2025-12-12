@@ -17,58 +17,56 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dxcompiler.lib")
 
-GameBase* GameBase::instance = nullptr;
+std::unique_ptr<GameBase> GameBase::instance = nullptr;
 
 GameBase* GameBase::GetInstance() {
 
 	if (instance == nullptr) {
-		instance = new GameBase;
+		instance = std::make_unique<GameBase>();
 	}
-	return instance;
+	return instance.get();
+}
+void GameBase::Finalize() {
+
+	imguiM_->Finalize();
+	Audio::GetInstance()->Finalize();
+
+	// TextureManager は1回だけ！
+	TextureManager::GetInstance()->Finalize();
+
+	ParticleManager::GetInstance()->Finalize();
+	ModelManeger::GetInstance()->Finalize();
+
+	dxCommon_->Finalize();
+	winApp_->Finalize();
+	instance.reset();
 }
 
-void GameBase::Finalize(){
-	ResourceRelease();
-	delete spriteCommon_;
-	delete obj3dCommon_;
-	delete DInput;
-	ModelManeger::GetInstance()->Finalize();
-	ParticleManager::GetInstance()->Finalize();
-	TextureManager::GetInstance()->Finalize();
-	Audio::GetInstance()->Finalize();
-	imguiM_->Finalize();
-	delete imguiM_;
-	delete srvManager_;
-	delete dxCommon_;
-	delete winApp_;
-	delete instance;
-	instance = nullptr;
-}
 
 void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight) {
 
-	winApp_ = new WinApp();
+	winApp_ = std::make_unique <WinApp>();
 	winApp_->Initialize(TitleName);
 
-	dxCommon_ = new DirectXCommon();
-	dxCommon_->initialize(winApp_);
-	srvManager_ = new SrvManager();
-	srvManager_->Initialize(dxCommon_);
-	dxCommon_->CreateInstancingSRV(srvManager_);
+	dxCommon_ = std::make_unique<DirectXCommon>();
+	dxCommon_->initialize(winApp_.get());
+	srvManager_ = std::make_unique<SrvManager>();
+	srvManager_->Initialize(dxCommon_.get());
+	dxCommon_->CreateInstancingSRV(srvManager_.get());
 
 
-	DInput = new Input();
-	DInput->Initialize(winApp_);
-	imguiM_ = new ImGuiManager();
-	imguiM_->Initialize(winApp_, dxCommon_, srvManager_);
+	DInput = std::make_unique<Input>();
+	DInput->Initialize(winApp_.get());
+	imguiM_ = std::make_unique<ImGuiManager>();
+	imguiM_->Initialize(winApp_.get(), dxCommon_.get(), srvManager_.get());
 	Audio::GetInstance()->InitializeIXAudio();
-	TextureManager::GetInstance()->Initialize(dxCommon_, srvManager_);
-	ParticleManager::GetInstance()->Initialize(dxCommon_, srvManager_);
-	ModelManeger::GetInstance()->Initialize(dxCommon_);
-	obj3dCommon_ = new Object3dCommon();
-	obj3dCommon_->Initialize(dxCommon_);
-	spriteCommon_ = new SpriteCommon();
-	spriteCommon_->Initialize(dxCommon_);
+	TextureManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
+	ParticleManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
+	ModelManeger::GetInstance()->Initialize(dxCommon_.get());
+	obj3dCommon_ = std::make_unique < Object3dCommon>();
+	obj3dCommon_->Initialize(dxCommon_.get());
+	spriteCommon_ = std::make_unique < SpriteCommon>();
+	spriteCommon_->Initialize(dxCommon_.get());
 	
 }
 
@@ -102,28 +100,6 @@ LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
-void GameBase::CheackResourceLeaks() {
-
-	Microsoft::WRL::ComPtr <IDXGIDebug1> debug;
-	
-	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-
-		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-		debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
-		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-		debug->Release();
-	}
-
-
-}
-void GameBase::ResourceRelease() {
-	
-	TextureManager::GetInstance()->Finalize();
-	dxCommon_->Finalize();
-
-	winApp_->Finalize();
-}
-
 void GameBase::SetDefaultCamera(Camera* camera) { obj3dCommon_->SetDefaultCamera(camera); }
 
 void GameBase::SetDirectionalLightData(const DirectionalLight& directionalLight) { dxCommon_->SetDirectionalLightData(directionalLight); }
@@ -142,7 +118,7 @@ void GameBase::BeginFlame() {
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
 void GameBase::EndFlame() { 
 	imguiM_->End();
-	imguiM_->Draw(srvManager_, dxCommon_);
+	imguiM_->Draw(srvManager_.get(), dxCommon_.get());
 	dxCommon_->PostDraw(); 
 }
 

@@ -2,16 +2,16 @@
 #include "FrameWork.h"
 #include"GameBase.h"
 #include "D3DResourceLeakChecker.h"
-
-class SceneFactory;
+#include <memory>
+#include "Scene/SceneFactory/SceneFactory.h"
 class BaseScene;
 class Game :public FrameWork{
 	
 
 
-	D3DResourceLeakChecker* d3dResourceLeakChecker = nullptr;
+	D3DResourceLeakChecker d3dResourceLeakChecker;
 
-	SceneFactory* sceneFactory_ = nullptr;
+	std::unique_ptr<SceneFactory> sceneFactory_ = nullptr;
 
 
 	public:
@@ -20,7 +20,7 @@ class Game :public FrameWork{
 	void Update() override;
 	void Draw() override;
 	void Finalize() override;
-
+	~Game()=default;
 	
 
 

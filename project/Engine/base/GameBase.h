@@ -9,7 +9,7 @@
 #include "DirectXCommon.h"
 #include "TextureManager.h"
 #include "Camera.h"
-
+#include <memory>
 class SrvManager;
 class SpriteCommon;
 class Object3dCommon;
@@ -20,19 +20,19 @@ class GameBase{
 
 private:
 
-	static GameBase* instance;
+	static std::unique_ptr<GameBase> instance;
 
-	WinApp* winApp_ = nullptr;
+	std::unique_ptr<WinApp> winApp_ = nullptr;
 
-	DirectXCommon* dxCommon_ = nullptr;
-	SrvManager* srvManager_ = nullptr;
+	std::unique_ptr<DirectXCommon> dxCommon_ = nullptr;
+	std::unique_ptr<SrvManager> srvManager_ = nullptr;
 
 	
 	
-	SpriteCommon* spriteCommon_ = nullptr;
-	Object3dCommon* obj3dCommon_ = nullptr;
+	std::unique_ptr<SpriteCommon> spriteCommon_ = nullptr;
+	std::unique_ptr<Object3dCommon> obj3dCommon_ = nullptr;
 	
-	ImGuiManager* imguiM_ = nullptr;
+	std::unique_ptr<ImGuiManager> imguiM_ = nullptr;
 	
 	HRESULT hr_;
 	
@@ -41,7 +41,7 @@ private:
 	D3D12_HEAP_PROPERTIES heapProperties;
 	D3D12_RESOURCE_DESC resourceDesc;
 
-	Input* DInput;
+	std::unique_ptr<Input> DInput;
 
    public:	
 
@@ -57,12 +57,6 @@ private:
 	bool ProcessMessage();
 
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
-
-	void CheackResourceLeaks();
-
-	void ResourceRelease();
-
-
 
 	void SpriteCommonSet();
 	void ModelCommonSet();
@@ -137,20 +131,14 @@ private:
 	float GetMouseY() const;
 	Vector2 GetMouseMove() const;
 
-	SpriteCommon* GetSpriteCommon() { return spriteCommon_; };
-	Object3dCommon* GetObject3dCommon() { return obj3dCommon_; };
+	SpriteCommon* GetSpriteCommon() { return spriteCommon_.get(); };
+	Object3dCommon* GetObject3dCommon() { return obj3dCommon_.get(); };
 	
 
 private:
 	
 	
 	void SetupPSO();
-
-	
-	
-	/*void CreateSpriteVertexBuffer();*/
-	
-	
 
 };
 
