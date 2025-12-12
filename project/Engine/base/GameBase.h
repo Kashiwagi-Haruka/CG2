@@ -64,7 +64,7 @@ private:
 
 	Transform GetCameraTransform() const { return dxCommon_->GetCameraTransform(); };
 	
-	void SetDirectionalLightData(const DirectionalLight& directionalLight);
+	
 
 
 	void SetDefaultCamera(Camera* camera);

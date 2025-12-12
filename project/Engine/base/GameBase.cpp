@@ -102,7 +102,7 @@ LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 
 void GameBase::SetDefaultCamera(Camera* camera) { obj3dCommon_->SetDefaultCamera(camera); }
 
-void GameBase::SetDirectionalLightData(const DirectionalLight& directionalLight) { dxCommon_->SetDirectionalLightData(directionalLight); }
+
 
 void GameBase::SpriteCommonSet() { spriteCommon_->DrawCommon(); }
 void GameBase::ModelCommonSet() { obj3dCommon_->DrawCommon(); }

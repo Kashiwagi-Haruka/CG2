@@ -684,30 +684,8 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateDepthStencilTextureR
 
 	return depthResource;
 }
-void DirectXCommon::SetDirectionalLightData(const DirectionalLight& directionalLight) {
-	if (directionalLightResource_) {
-		directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-		*directionalLightData_ = directionalLight;
-		directionalLightResource_->Unmap(0, nullptr);
-	}
-}
-//void DirectXCommon::Finalize() {
-//	
-//
-//	if (fenceEvent_) {
-//		CloseHandle(fenceEvent_);
-//		fenceEvent_ = nullptr;
-//	}
-//	if (transformResource_) {
-//		transformResource_->Unmap(0, nullptr); // ちゃんと最後だけunmapする
-//	}
-//	if (directionalLightResource_) {
-//		directionalLightResource_->Unmap(0, nullptr);
-//		/*directionalLightResource_->Release();*/
-//		directionalLightResource_ = nullptr;
-//		directionalLightData_ = nullptr;
-//	}
-//}
+
+
 void DirectXCommon::Finalize() {
 
 	// --- GPU 完了待ち ---

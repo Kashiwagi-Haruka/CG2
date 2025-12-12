@@ -25,7 +25,7 @@
 #include "Function.h"
 #include "BlendModeManeger.h"
 #include "Transform.h"
-#include "Light.h"
+#include "Light/DirectionalLight.h"
 
 struct MaterialData {
 	std::string textureFilePath;
@@ -246,7 +246,7 @@ public:
 	    const std::wstring& filePath,
 	    // Compilerに使用するProfile
 	    const wchar_t* profile);
-	void SetDirectionalLightData(const DirectionalLight& directionalLight);
+	
 
 	void CreateSphereResources();
 
@@ -279,12 +279,10 @@ private:
 	
 	void RenderTargetViewInitialize();
 	void DepthStencilViewInitialize();
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device_, int32_t width, int32_t height);
 	void FenceCreate();
 	void ViewportRectInitialize();
 	void ScissorRectInitialize();
 	void DXCCompilerCreate();
-	void ImGuiInitialize();
 
 	void FrameStart(); // フレーム最初の準備
 	void DrawCommandList(); // 描画コマンドリスト

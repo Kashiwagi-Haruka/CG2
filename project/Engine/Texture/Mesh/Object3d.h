@@ -8,7 +8,7 @@
 #include "Vector4.h"
 #include <string>
 #include "Transform.h"
-#include "Light.h"
+#include "Light/DirectionalLight.h"
 
 class Camera;
 class Object3dCommon;
