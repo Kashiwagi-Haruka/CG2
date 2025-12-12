@@ -36,7 +36,7 @@ Model* ModelManeger::FindModel(const std::string& filePath){
 
 void ModelManeger::Finalize(){
 
-	
+	instance.reset();
 	
 
 }
