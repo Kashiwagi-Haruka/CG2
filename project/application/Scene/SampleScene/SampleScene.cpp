@@ -27,10 +27,12 @@ void SampleScene::Initialize() {
 	uvBallObj_->Initialize(GameBase::GetInstance()->GetObject3dCommon()); 
 	uvBallObj_->SetCamera(camera_.get());
 	uvBallObj_->SetModel("uvBall");
-	uvBallObj_->SetScale({1.0f, 1.0f, 1.0f});
-	uvBallObj_->SetRotate({0.0f, 0.0f, 0.0f});
-	uvBallObj_->SetTranslate({0.0f, 0.0f, 0.0f});
-	
+	uvBallTransform_ = {
+		.scale{1.0f, 1.0f, 1.0f  },
+		.rotate{0.0f, 0.0f, 0.0f  },
+		.translate{0.0f, 0.0f, 0.0f}
+    };
+	uvBallObj_->SetTransform(uvBallTransform_);
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
 	directionalLight_.intensity = 1.0f;
@@ -47,6 +49,13 @@ void SampleScene::Update() {
 		ImGui::End();
 	}
 	if (ImGui::Begin("SampleuvBall")) {
+		if (ImGui::TreeNode("Transform")) {
+		
+			ImGui::DragFloat3("Scale", &uvBallTransform_.scale.x, 0.1f);
+			ImGui::DragFloat3("Rotate", &uvBallTransform_.rotate.x, 0.1f);
+			ImGui::DragFloat3("Translate", &uvBallTransform_.translate.x, 0.1f);
+			ImGui::TreePop();
+		}
 		if (ImGui::TreeNode("Material")) {
 		ImGui::ColorEdit4("MaterialColor", &color.x);
 		ImGui::Checkbox("EnableLighting", &enableLighting);
@@ -62,6 +71,7 @@ void SampleScene::Update() {
 
 #endif // USE_IMGUI
 	camera_->Update();
+	uvBallObj_->SetTransform(uvBallTransform_);
 	uvBallObj_->Update();
 }
 void SampleScene::Draw() { 

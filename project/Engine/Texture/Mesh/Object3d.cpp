@@ -32,6 +32,7 @@ void Object3d::Update(){
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
+	transformationMatrixData_->WorldInverseTranspose = Function::Inverse(worldMatrix);
 	transformResource_->Unmap(0, nullptr);
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
 	if (camera_) {

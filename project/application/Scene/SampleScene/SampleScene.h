@@ -10,7 +10,7 @@ class SampleScene : public BaseScene{
 	std::unique_ptr<Object3d> uvBallObj_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
 	DirectionalLight directionalLight_{};
-
+	Transform uvBallTransform_{};
 	Transform cameraTransform_{};
 	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	bool enableLighting = true;
