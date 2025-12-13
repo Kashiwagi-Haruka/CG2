@@ -41,9 +41,19 @@ void SampleScene::Update() {
 
 	if (ImGui::Begin("SampleDirectionalLight")) {
 		ImGui::ColorEdit4("LightColor", &directionalLight_.color.x);
-		ImGui::DragFloat3("LightDirection", &directionalLight_.direction.x, 0.1f, -1.0f, 1.0f);
+		ImGui::DragFloat3("LightDirection", &directionalLight_.direction.x, 0.1f, -2.0f, 2.0f);
 		ImGui::DragFloat("LightIntensity", &directionalLight_.intensity, 0.1f, 0.0f, 10.0f);
 		GameBase::GetInstance()->GetObject3dCommon()->SetDirectionalLight(directionalLight_);
+		ImGui::End();
+	}
+	if (ImGui::Begin("SampleMaterial")) {
+
+		ImGui::ColorEdit4("MaterialColor", &color.x);
+		ImGui::Checkbox("EnableLighting", &enableLighting);
+		ImGui::DragFloat("Shininess", &shininess, 0.1f, 0.0f, 100.0f);
+		uvBallObj_->SetColor(color);
+		uvBallObj_->SetEnableLighting(enableLighting);
+		uvBallObj_->SetShininess(shininess);
 		ImGui::End();
 	}
 

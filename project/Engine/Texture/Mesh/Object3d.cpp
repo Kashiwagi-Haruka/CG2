@@ -65,7 +65,26 @@ void Object3d::SetCamera(Camera* camera) { camera_ = camera; }
 void Object3d::SetScale(Vector3 scale){ transform_.scale = scale; }
 void Object3d::SetRotate(Vector3 rotate) { transform_.rotate = rotate; }
 void Object3d::SetTranslate(Vector3 translate) { transform_.translate = translate; }
-
+void Object3d::SetColor(Vector4 color) {
+	if (model_) {
+		model_->SetColor(color);
+	}
+}
+void Object3d::SetEnableLighting(bool enable) {
+	if (model_) {
+		model_->SetEnableLighting(enable);
+	}
+}
+void Object3d::SetUvTransform(const Matrix4x4& uvTransform) {
+	if (model_) {
+		model_->SetUvTransform(uvTransform);
+	}
+}
+void Object3d::SetShininess(float shininess) {
+	if (model_) {
+		model_->SetShininess(shininess);
+	}
+}
 void Object3d::CreateResources() {
 	transformResource_ = obj3dCommon_->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = obj3dCommon_->CreateBufferResource(sizeof(Vector3));

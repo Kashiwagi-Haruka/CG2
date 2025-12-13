@@ -12,6 +12,9 @@ class SampleScene : public BaseScene{
 	DirectionalLight directionalLight_{};
 
 	Transform cameraTransform_{};
+	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+	bool enableLighting = true;
+	float shininess = 5.0f;
 
 	public:
 	SampleScene();
