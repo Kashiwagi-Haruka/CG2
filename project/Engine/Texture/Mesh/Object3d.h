@@ -27,13 +27,8 @@ class Object3d {
 	    {0.0f, 0.0f, 0.0f},
 	    {0.0f, 0.0f, 0.0f},
 	};
-	Transform cameraTransform_ = {
-	    {1.0f, 1.0f, 1.0f  }, // スケール
-	    {0.3f, 0.0f, 0.0f  }, //
-	    {0.0f, 4.0f, -10.0f}  //
-	};
+
 	
-	int color = 0xffffffff;
 
 	Camera* camera_;
 
@@ -44,6 +39,8 @@ class Object3d {
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
+	Vector3* cameraData_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 
 	Model* model_ = nullptr;
 	Matrix4x4 worldMatrix;
@@ -64,6 +61,11 @@ public:
 	void SetRotate(Vector3 Rotate);
 	void SetScale(Vector3 Scale);
 	void SetTransform(Transform transform) { transform_ = transform; }
+
+	void SetColor(Vector4 color);
+	void SetEnableLighting(bool enable);
+	void SetUvTransform(const Matrix4x4& uvTransform);
+	void SetShininess(float shininess);
 
 	Vector3 GetTranslate() { return transform_.translate; }
 	Vector3 GetRotate() { return transform_.rotate; }

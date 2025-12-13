@@ -233,6 +233,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\Light\DirectionalLight.cpp" />
     <ClCompile Include="application\Object\House\House.cpp" />
     <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp" />
+    <ClCompile Include="application\Scene\SampleScene\SampleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -259,6 +260,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\Player\BulletLine.h" />
     <ClInclude Include="application\Object\Player\BulletManager.h" />
     <ClInclude Include="Engine\BaseScene\BaseScene.h" />
+    <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\Loadfile\CSVManager.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
@@ -317,6 +319,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\Light\DirectionalLight.h" />
     <ClInclude Include="application\Object\House\House.h" />
     <ClInclude Include="application\Scene\SceneFactory\SceneFactory.h" />
+    <ClInclude Include="application\Scene\SampleScene\SampleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

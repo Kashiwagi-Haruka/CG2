@@ -38,8 +38,10 @@ public:
 	const Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
 	const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
 	const Matrix4x4& GetViewProjectionMatrix() const { return viewProjectionMatrix_; }
-
+	
 	const Vector3& GetRotate() const { return transform_.rotate; }
 	const Vector3& GetTranslate() const { return transform_.translate; }
+	Vector3 GetWorldTranslate() const { return {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]}; }
+
 	const Transform& GetTransform() const { return transform_; }
 };

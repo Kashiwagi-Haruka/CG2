@@ -1,11 +1,11 @@
 #pragma once
+#include "Matrix4x4.h"
+#include "VertexData.h"
+#include <Windows.h>
+#include <d3d12.h>
 #include <string>
 #include <vector>
-#include <Windows.h>
 #include <wrl.h>
-#include <d3d12.h>
-#include "VertexData.h"
-#include "Matrix4x4.h"                
 class ModelCommon;
 
 class Model {
@@ -24,6 +24,7 @@ class Model {
 		int enableLighting;
 		float padding[3];
 		Matrix4x4 uvTransform;
+		float shininess;
 	};
 
 	ModelCommon* modelCommon_;
@@ -35,14 +36,18 @@ class Model {
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	VertexData* vertexData = nullptr;
-
+	Material* mat3d = nullptr;
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
-	public:
+public:
 	void Initialize(ModelCommon* modelCommon);
 	void LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	void Draw();
+	void SetColor(Vector4 color);
+	void SetEnableLighting(bool enable);
+	void SetUvTransform(const Matrix4x4& uvTransform);
+	void SetShininess(float shininess);
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() { return vertexBufferView_; }
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetMaterialResource() { return materialResource_; }
 	ModelData& GetModelData() { return modelData_; }
-	};
+};

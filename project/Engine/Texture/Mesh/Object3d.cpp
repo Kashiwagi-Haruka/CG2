@@ -33,15 +33,26 @@ void Object3d::Update(){
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
 	transformResource_->Unmap(0, nullptr);
+	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
+	if (camera_) {
+		*cameraData_ = camera_->GetWorldTranslate();
+	} else {
+		*cameraData_ = {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+	}
+	
+	
+	cameraResource_->Unmap(0, nullptr);
 
 }
 void Object3d::Draw() {
+
+
 
 	// --- 座標変換行列CBufferの場所を設定 ---
 	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
 	// --- 平行光源CBufferの場所を設定 ---
 	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, obj3dCommon_->GetDirectionalLightResource()->GetGPUVirtualAddress());
-
+	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 
 	if (model_) {
 		model_->Draw();
@@ -57,8 +68,8 @@ void Object3d::SetTranslate(Vector3 translate) { transform_.translate = translat
 
 void Object3d::CreateResources() {
 	transformResource_ = obj3dCommon_->CreateBufferResource(sizeof(TransformationMatrix));
-
-	Update();
+	cameraResource_ = obj3dCommon_->CreateBufferResource(sizeof(Vector3));
+	
 
 
 }

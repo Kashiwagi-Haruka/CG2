@@ -26,18 +26,39 @@ void Model::Initialize(ModelCommon* modelCommon) {
 	// 必ず256バイト単位で切り上げる
 	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
 	materialResource_ = modelCommon_->CreateBufferResource(alignedSize);
-	Material* mat3d = nullptr;
+	mat3d = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
 	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	mat3d->enableLighting = false;
+	mat3d->enableLighting = true;
 	mat3d->uvTransform = Function::MakeIdentity4x4();
+	mat3d->shininess = 5.0f;
 
 	materialResource_->Unmap(0, nullptr);
 
 	TextureManager::GetInstance()->LoadTextureName(modelData_.material.textureFilePath);
 	modelData_.material.textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath(modelData_.material.textureFilePath);
 }
-
+void Model::SetColor(Vector4 color) {
+	
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
+	mat3d->color = color;
+	materialResource_->Unmap(0, nullptr);
+}
+void Model::SetEnableLighting(bool enable) {
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
+	mat3d->enableLighting = enable ? 1 : 0;
+	materialResource_->Unmap(0, nullptr);
+}
+void Model::SetUvTransform(const Matrix4x4& uvTransform) {
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
+	mat3d->uvTransform = uvTransform;
+	materialResource_->Unmap(0, nullptr);
+}
+void Model::SetShininess(float shininess) {
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
+	mat3d->shininess = shininess;
+	materialResource_->Unmap(0, nullptr);
+}
 void Model::Draw() {
 
 	// --- SRVヒープをバインド ---

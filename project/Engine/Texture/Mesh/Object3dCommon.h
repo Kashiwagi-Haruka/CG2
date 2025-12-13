@@ -30,6 +30,7 @@ class Object3dCommon {
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 
+	
 
 	private:
 
