@@ -31,7 +31,7 @@ void Model::Initialize(ModelCommon* modelCommon) {
 	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	mat3d->enableLighting = true;
 	mat3d->uvTransform = Function::MakeIdentity4x4();
-	mat3d->shininess = 5.0f;
+	mat3d->shininess = 40.0f;
 
 	materialResource_->Unmap(0, nullptr);
 
