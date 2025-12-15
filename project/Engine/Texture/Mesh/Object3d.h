@@ -9,6 +9,7 @@
 #include <string>
 #include "Transform.h"
 #include "Light/DirectionalLight.h"
+#include "Light/PointLight.h"
 
 class Camera;
 class Object3dCommon;
@@ -41,6 +42,7 @@ class Object3d {
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	Vector3* cameraData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+	
 
 	Model* model_ = nullptr;
 	Matrix4x4 worldMatrix;
@@ -66,7 +68,7 @@ public:
 	void SetEnableLighting(bool enable);
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetShininess(float shininess);
-
+	void SetPointLight(PointLight pointlight);
 	Vector3 GetTranslate() { return transform_.translate; }
 	Vector3 GetRotate() { return transform_.rotate; }
 	Vector3 GetScale() { return transform_.scale; }

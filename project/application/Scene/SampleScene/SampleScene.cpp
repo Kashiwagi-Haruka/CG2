@@ -10,6 +10,7 @@
 SampleScene::SampleScene() {
 	
 	uvBallObj_ = std::make_unique<Object3d>();
+	fieldObj_ = std::make_unique<Object3d>();
 	cameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -20,6 +21,7 @@ SampleScene::SampleScene() {
 	camera_->SetTransform(cameraTransform_);
 	
 	ModelManeger::GetInstance()->LoadModel("uvBall");
+	ModelManeger::GetInstance()->LoadModel("terrain");
 }
 void SampleScene::Initialize() {
 
@@ -27,12 +29,22 @@ void SampleScene::Initialize() {
 	uvBallObj_->Initialize(GameBase::GetInstance()->GetObject3dCommon()); 
 	uvBallObj_->SetCamera(camera_.get());
 	uvBallObj_->SetModel("uvBall");
+	fieldObj_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	fieldObj_->SetCamera(camera_.get());
+	fieldObj_->SetModel("terrain");
+
 	uvBallTransform_ = {
 		.scale{1.0f, 1.0f, 1.0f  },
 		.rotate{0.0f, 0.0f, 0.0f  },
 		.translate{0.0f, 0.0f, 0.0f}
     };
 	uvBallObj_->SetTransform(uvBallTransform_);
+	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	pointLight_.position = {0.0f, 5.0f, 0.0f};
+	pointLight_.intensity = 1.0f;
+	pointLight_.radius = 10.0f;	
+	pointLight_.decay = 1.0f;
+
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
 	directionalLight_.intensity = 1.0f;
@@ -41,13 +53,25 @@ void SampleScene::Initialize() {
 void SampleScene::Update() { 
 #ifdef USE_IMGUI
 
-	if (ImGui::Begin("SampleDirectionalLight")) {
+	if (ImGui::Begin("SampleLight")) {
+		if (ImGui::TreeNode("DirectionalLight")) {
 		ImGui::ColorEdit4("LightColor", &directionalLight_.color.x);
 		ImGui::DragFloat3("LightDirection", &directionalLight_.direction.x, 0.1f, -1.0f, 1.0f);
 		ImGui::DragFloat("LightIntensity", &directionalLight_.intensity, 0.1f, 0.0f, 10.0f);
-		GameBase::GetInstance()->GetObject3dCommon()->SetDirectionalLight(directionalLight_);
+		ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("PointLight")) {
+			ImGui::ColorEdit4("PointLightColor", &pointLight_.color.x);
+			ImGui::DragFloat("PointLightIntensity", &pointLight_.intensity,0.1f);
+			ImGui::DragFloat3("PointLightPosition", &pointLight_.position.x,0.1f);
+			ImGui::DragFloat("PointLightRadius", &pointLight_.radius,0.1f);
+			ImGui::DragFloat("PointLightDecay", &pointLight_.decay,0.1f);
+			ImGui::TreePop();
+		}
 		ImGui::End();
 	}
+	GameBase::GetInstance()->GetObject3dCommon()->SetDirectionalLight(directionalLight_);
+	GameBase::GetInstance()->GetObject3dCommon()->SetPointLight(pointLight_);
 	if (ImGui::Begin("SampleuvBall")) {
 		if (ImGui::TreeNode("Transform")) {
 		
@@ -65,19 +89,22 @@ void SampleScene::Update() {
 		uvBallObj_->SetShininess(shininess);
 		ImGui::TreePop();
 		}
+	
 		ImGui::End();
 	}
 
 
 #endif // USE_IMGUI
 	camera_->Update();
+	
 	uvBallObj_->SetTransform(uvBallTransform_);
 	uvBallObj_->Update();
+	fieldObj_->Update();
 }
 void SampleScene::Draw() { 
 	GameBase::GetInstance()->ModelCommonSet();
 	uvBallObj_->Draw();
-
+	fieldObj_->Draw();
 }
 void SampleScene::Finalize() {
 

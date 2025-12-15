@@ -40,10 +40,8 @@ void Object3d::Update(){
 	} else {
 		*cameraData_ = {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
 	}
-	
-	
 	cameraResource_->Unmap(0, nullptr);
-
+	
 }
 void Object3d::Draw() {
 
@@ -54,6 +52,7 @@ void Object3d::Draw() {
 	// --- 平行光源CBufferの場所を設定 ---
 	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, obj3dCommon_->GetDirectionalLightResource()->GetGPUVirtualAddress());
 	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, obj3dCommon_->GetPointLightResource()->GetGPUVirtualAddress());
 
 	if (model_) {
 		model_->Draw();
@@ -86,6 +85,7 @@ void Object3d::SetShininess(float shininess) {
 		model_->SetShininess(shininess);
 	}
 }
+
 void Object3d::CreateResources() {
 	transformResource_ = obj3dCommon_->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = obj3dCommon_->CreateBufferResource(sizeof(Vector3));

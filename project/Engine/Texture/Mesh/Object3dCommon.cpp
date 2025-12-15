@@ -16,8 +16,10 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon){
         {0.0f, -1.0f, 0.0f},
         1.0f
     };
-
 	directionalLightResource_->Unmap(0, nullptr);
+	pointLightResource_ = CreateBufferResource(sizeof(PointLight));
+	assert(pointLightResource_);
+
 }
 
 void Object3dCommon::DrawCommon() {
@@ -33,12 +35,20 @@ void Object3dCommon::SetBlendMode(BlendMode blendmode){
 	blendMode_=blendmode; 
 	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[blendMode_].Get()); // 通常
 }
-
+void Object3dCommon::SetPointLight(PointLight pointlight) {
+	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointlightData_));
+	pointlightData_->color = pointlight.color;
+	pointlightData_->position = pointlight.position;
+	pointlightData_->intensity = pointlight.intensity;
+	pointlightData_->radius = pointlight.radius;
+	pointlightData_->decay = pointlight.decay;
+	pointLightResource_->Unmap(0, nullptr);
+}
 void Object3dCommon::CreateRootsignature(){
 	// --- RootSignature ---
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	D3D12_ROOT_PARAMETER rootParameters[5] = {};
+	D3D12_ROOT_PARAMETER rootParameters[6] = {};
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
 	descriptorRange[0].NumDescriptors = 1;
@@ -65,6 +75,10 @@ void Object3dCommon::CreateRootsignature(){
 	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[4].Descriptor.ShaderRegister = 4;
+
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[5].Descriptor.ShaderRegister = 5;
 
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
