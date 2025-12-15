@@ -48,17 +48,36 @@ void SampleScene::Initialize() {
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
 	directionalLight_.intensity = 1.0f;
+
+	spotLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	spotLight_.position = {0.0f, 5.0f, 0.0f};
+	spotLight_.direction = {0.0f, -1.0f, 0.0f};
+	spotLight_.intensity = 1.0f;
+	spotLight_.distance = 20.0f;
+	spotLight_.decay = 1.0f;
+	spotLight_.cosAngle = 3.14f*(1.0f/4.0f);
+
 }
 
 void SampleScene::Update() { 
 #ifdef USE_IMGUI
-
+	if (ImGui::Begin("SampleCamera")) {
+		if (ImGui::TreeNode("Transform")) {
+		
+			ImGui::DragFloat3("Scale", &cameraTransform_.scale.x, 0.1f);
+			ImGui::DragFloat3("Rotate", &cameraTransform_.rotate.x, 0.1f);
+			ImGui::DragFloat3("Translate", &cameraTransform_.translate.x, 0.1f);
+			ImGui::TreePop();
+		}
+		ImGui::End();
+	}
+	camera_->SetTransform(cameraTransform_);
 	if (ImGui::Begin("SampleLight")) {
 		if (ImGui::TreeNode("DirectionalLight")) {
-		ImGui::ColorEdit4("LightColor", &directionalLight_.color.x);
-		ImGui::DragFloat3("LightDirection", &directionalLight_.direction.x, 0.1f, -1.0f, 1.0f);
-		ImGui::DragFloat("LightIntensity", &directionalLight_.intensity, 0.1f, 0.0f, 10.0f);
-		ImGui::TreePop();
+			ImGui::ColorEdit4("LightColor", &directionalLight_.color.x);
+			ImGui::DragFloat3("LightDirection", &directionalLight_.direction.x, 0.1f, -1.0f, 1.0f);
+			ImGui::DragFloat("LightIntensity", &directionalLight_.intensity, 0.1f, 0.0f, 10.0f);
+			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("PointLight")) {
 			ImGui::ColorEdit4("PointLightColor", &pointLight_.color.x);
@@ -68,10 +87,22 @@ void SampleScene::Update() {
 			ImGui::DragFloat("PointLightDecay", &pointLight_.decay,0.1f);
 			ImGui::TreePop();
 		}
+		if (ImGui::TreeNode("SpotLight")) {
+			ImGui::ColorEdit4("SpotLightColor", &spotLight_.color.x);
+			ImGui::DragFloat("SpotLightIntensity", &spotLight_.intensity, 0.1f);
+			ImGui::DragFloat3("SpotLightPosition", &spotLight_.position.x, 0.1f);
+			ImGui::DragFloat3("SpotLightDirection", &spotLight_.direction.x, 0.1f);
+			ImGui::DragFloat("SpotLightDistance", &spotLight_.distance, 0.1f);
+			ImGui::DragFloat("SpotLightDecay", &spotLight_.decay, 0.1f);
+			ImGui::DragFloat("SpotLightCosAngle", &spotLight_.cosAngle, 0.1f, 0.0f, 1.0f);
+
+			ImGui::TreePop();
+		}
 		ImGui::End();
 	}
 	GameBase::GetInstance()->GetObject3dCommon()->SetDirectionalLight(directionalLight_);
 	GameBase::GetInstance()->GetObject3dCommon()->SetPointLight(pointLight_);
+	GameBase::GetInstance()->GetObject3dCommon()->SetSpotLight(spotLight_);
 	if (ImGui::Begin("SampleuvBall")) {
 		if (ImGui::TreeNode("Transform")) {
 		

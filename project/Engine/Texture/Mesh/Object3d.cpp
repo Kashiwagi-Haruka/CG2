@@ -36,9 +36,10 @@ void Object3d::Update(){
 	transformResource_->Unmap(0, nullptr);
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
 	if (camera_) {
-		*cameraData_ = camera_->GetWorldTranslate();
+		*cameraData_ = camera_->GetTranslate();
+
 	} else {
-		*cameraData_ = {worldMatrix.m[3][0], worldMatrix.m[3][1], worldMatrix.m[3][2]};
+		*cameraData_ = {transform_.translate};
 	}
 	cameraResource_->Unmap(0, nullptr);
 	
@@ -53,7 +54,7 @@ void Object3d::Draw() {
 	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, obj3dCommon_->GetDirectionalLightResource()->GetGPUVirtualAddress());
 	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, obj3dCommon_->GetPointLightResource()->GetGPUVirtualAddress());
-
+	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(6, obj3dCommon_->GetSpotLightResource()->GetGPUVirtualAddress());
 	if (model_) {
 		model_->Draw();
 	}

@@ -167,7 +167,7 @@ Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) {
 	Matrix4x4 rotateX = MakeRotateXMatrix(rotate.x);
 	Matrix4x4 rotateY = MakeRotateYMatrix(rotate.y);
 	Matrix4x4 rotateZ = MakeRotateZMatrix(rotate.z);
-	Matrix4x4 rotateXYZ = Multiply(rotateX, Multiply(rotateY, rotateZ));
+	Matrix4x4 rotateXYZ = Multiply(rotateZ, Multiply(rotateX, rotateY));
 
 	Matrix4x4 ScaleRotateMatrix = Multiply(MakeScaleMatrix(scale), rotateXYZ);
 	result = Multiply(ScaleRotateMatrix, MakeTranslateMatrix(translate));

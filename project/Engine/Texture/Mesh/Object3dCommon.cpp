@@ -20,6 +20,8 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon){
 	pointLightResource_ = CreateBufferResource(sizeof(PointLight));
 	assert(pointLightResource_);
 
+	spotLightResource_ = CreateBufferResource(sizeof(SpotLight));
+	assert(spotLightResource_);
 }
 
 void Object3dCommon::DrawCommon() {
@@ -44,11 +46,24 @@ void Object3dCommon::SetPointLight(PointLight pointlight) {
 	pointlightData_->decay = pointlight.decay;
 	pointLightResource_->Unmap(0, nullptr);
 }
+void Object3dCommon::SetSpotLight(SpotLight spotlight) { 
+	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotlightData_));
+	spotlightData_->color = spotlight.color;
+	spotlightData_->position = spotlight.position;
+	spotlightData_->intensity = spotlight.intensity;
+	spotlightData_->direction = spotlight.direction;
+	spotlightData_->distance = spotlight.distance;
+	spotlightData_->decay = spotlight.decay;
+	spotlightData_->cosAngle = spotlight.cosAngle;
+	spotLightResource_->Unmap(0, nullptr);
+
+
+}
 void Object3dCommon::CreateRootsignature(){
 	// --- RootSignature ---
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	D3D12_ROOT_PARAMETER rootParameters[6] = {};
+	D3D12_ROOT_PARAMETER rootParameters[7] = {};
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
 	descriptorRange[0].NumDescriptors = 1;
@@ -80,6 +95,10 @@ void Object3dCommon::CreateRootsignature(){
 	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[5].Descriptor.ShaderRegister = 5;
 
+	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[6].Descriptor.ShaderRegister = 6;
+
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
 
@@ -110,7 +129,6 @@ void Object3dCommon::CreateRootsignature(){
 	assert(SUCCEEDED(hr_));
 
 }
-
 void Object3dCommon::CreateGraphicsPipeline(){
 
 	CreateRootsignature();
@@ -181,7 +199,6 @@ void Object3dCommon::CreateGraphicsPipeline(){
 	}
 
 }
-
 Microsoft::WRL::ComPtr<ID3D12Resource> Object3dCommon::CreateBufferResource(size_t sizeInBytes) {
 	// バッファの設定（UPLOAD用に変更）
 	D3D12_HEAP_PROPERTIES heapProperties = {};

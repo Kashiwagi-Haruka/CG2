@@ -4,22 +4,21 @@
 #include "BlendModeManeger.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
+#include "Light/SpotLight.h"
 class Camera;
 class DirectXCommon;
 
 class Object3dCommon {
 
-	private:
-
+private:
 	Camera* defaultCamera = nullptr;
 
-	DirectXCommon* dxCommon_=nullptr;
+	DirectXCommon* dxCommon_ = nullptr;
 
 	HRESULT hr_;
 
 	BlendMode blendMode_ = BlendMode::kBlendModeAlpha;
 	BlendModeManeger blendModeManeger_;
-
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_[6];
@@ -28,21 +27,19 @@ class Object3dCommon {
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
 
 	// Directional Light（共通）
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	PointLight* pointlightData_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_;
-	
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_ = nullptr;
+	SpotLight* spotlightData_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_ = nullptr;
 
-	private:
-
+private:
 	void CreateRootsignature();
 
 	void CreateGraphicsPipeline();
 
-	
-
-	public:
+public:
 	void Initialize(DirectXCommon* dxCommon);
 	void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
 	Camera* GetDefaultCamera() const { return defaultCamera; };
@@ -50,9 +47,11 @@ class Object3dCommon {
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	DirectXCommon* GetDxCommon() const { return dxCommon_; };
 	void SetBlendMode(BlendMode blendmode);
-	BlendMode GetBlendMode() const { return blendMode_;}
+	BlendMode GetBlendMode() const { return blendMode_; }
 	ID3D12Resource* GetDirectionalLightResource() const { return directionalLightResource_.Get(); }
 	ID3D12Resource* GetPointLightResource() const { return pointLightResource_.Get(); }
+	ID3D12Resource* GetSpotLightResource() const { return spotLightResource_.Get(); }
 	void SetDirectionalLight(DirectionalLight& light);
 	void SetPointLight(PointLight pointlight);
+	void SetSpotLight(SpotLight spotlight);
 };

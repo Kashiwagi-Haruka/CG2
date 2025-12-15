@@ -20,6 +20,16 @@ struct PointLight
     float radius;
     float decay; 
 };
+struct SpotLight
+{
+    float4 color;
+    float3 position;
+    float intensity;
+    float3 direction;
+    float distance;
+    float decay;
+    float cosAngle;
+};
 struct Camera
 {
     float3 worldPosition;
@@ -28,7 +38,7 @@ ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b3);
 ConstantBuffer<Camera> gCamera : register(b4);
 ConstantBuffer<PointLight> gPointLight : register(b5);
-
+ConstantBuffer<SpotLight> gSpotLight : register(b6);
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 struct PixelShaderOutput
@@ -57,10 +67,9 @@ PixelShaderOutput main(VertexShaderOutput input)
         
 // Point Light
         float3 N = normalize(input.normal);
-        float3 Lp = normalize(gPointLight.position - input.worldPosition); // 光方向
-        float3 V = normalize(gCamera.worldPosition - input.worldPosition); // 視線方向
-        float3 H = normalize(Lp + V); // ハーフベクトル
-
+        N.x = -N.x;
+        float3 Lp = normalize(gPointLight.position - input.worldPosition);
+        float3 H = normalize(Lp + toEye); // ハーフベクトル
         float distance = length(gPointLight.position - input.worldPosition);
         float attenuation = pow(saturate(1.0f - distance / gPointLight.radius), gPointLight.decay);
 

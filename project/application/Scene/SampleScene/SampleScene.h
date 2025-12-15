@@ -3,6 +3,8 @@
 #include "Object3d.h"
 #include "Camera.h"
 #include "Light/DirectionalLight.h"
+#include "Light/PointLight.h"
+#include "Light/SpotLight.h"
 #include <memory>
 #include "Transform.h"
 class SampleScene : public BaseScene{
@@ -11,12 +13,14 @@ class SampleScene : public BaseScene{
 	std::unique_ptr<Object3d> fieldObj_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
 	DirectionalLight directionalLight_{};
+	PointLight pointLight_{};
+	SpotLight spotLight_{};
 	Transform uvBallTransform_{};
 	Transform cameraTransform_{};
-	PointLight pointLight_{};
+	
 	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	bool enableLighting = true;
-	float shininess = 5.0f;
+	float shininess = 40.0f;
 
 	public:
 	SampleScene();
