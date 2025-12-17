@@ -29,6 +29,7 @@ struct SpotLight
     float distance;
     float decay;
     float cosAngle;
+    float cosFalloffStart;
 };
 struct Camera
 {
@@ -85,7 +86,18 @@ PixelShaderOutput main(VertexShaderOutput input)
         float3 specularP = gPointLight.color.rgb * gPointLight.intensity *
                    specularPowP * attenuation;
 
-        output.color.rgb = diffuse+specular+diffuseP+specularP;
+// Spot Light
+        float3 spotLightDirectionOnsurface = normalize(gSpotLight.position - input.worldPosition);
+        float3 spotDirection = normalize(gSpotLight.direction);
+        float specularPowS = pow(saturate(dot(N, normalize(spotLightDirectionOnsurface + toEye))), gMaterial.shininess);
+        float cosAngle = dot(spotLightDirectionOnsurface, spotDirection);
+        float falloffFactor = saturate((cosAngle - gSpotLight.cosAngle) / (gSpotLight.cosFalloffStart - gSpotLight.cosAngle));
+        float attenuationFactor = pow(saturate(1.0f - gSpotLight.distance / gSpotLight.cosAngle), gSpotLight.decay);
+        
+        float3 spotLightDiffuse = gMaterial.color.rgb * textureColor.rgb *gSpotLight.color.rgb * gSpotLight.intensity  * attenuation * falloffFactor;
+        float3 spotLightSpecular = gSpotLight.color.rgb * gSpotLight.intensity * attenuationFactor * falloffFactor;
+        
+        output.color.rgb = diffuse+specular+diffuseP+specularP+spotLightDiffuse+spotLightSpecular;
         output.color.a = gMaterial.color.a * textureColor.a;
     }
     else

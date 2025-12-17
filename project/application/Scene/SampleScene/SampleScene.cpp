@@ -5,6 +5,7 @@
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
+#include <numbers>
 
 
 SampleScene::SampleScene() {
@@ -50,13 +51,13 @@ void SampleScene::Initialize() {
 	directionalLight_.intensity = 1.0f;
 
 	spotLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	spotLight_.position = {0.0f, 5.0f, 0.0f};
-	spotLight_.direction = {0.0f, -1.0f, 0.0f};
-	spotLight_.intensity = 1.0f;
-	spotLight_.distance = 20.0f;
-	spotLight_.decay = 1.0f;
-	spotLight_.cosAngle = 3.14f*(1.0f/4.0f);
-
+	spotLight_.position = {2.0f, 1.25f, 0.0f};
+	spotLight_.direction = {-1.0f, -1.0f, 0.0f};
+	spotLight_.intensity = 4.0f;
+	spotLight_.distance = 7.0f;
+	spotLight_.decay = 2.0f;
+	spotLight_.cosAngle = std::cos(std::numbers::pi_v<float>/3.0f);
+	spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 }
 
 void SampleScene::Update() { 
@@ -95,7 +96,7 @@ void SampleScene::Update() {
 			ImGui::DragFloat("SpotLightDistance", &spotLight_.distance, 0.1f);
 			ImGui::DragFloat("SpotLightDecay", &spotLight_.decay, 0.1f);
 			ImGui::DragFloat("SpotLightCosAngle", &spotLight_.cosAngle, 0.1f, 0.0f, 1.0f);
-
+			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLight_.cosFalloffStart, 0.1f, 0.0f, 1.0f);
 			ImGui::TreePop();
 		}
 		ImGui::End();

@@ -55,6 +55,7 @@ void Object3dCommon::SetSpotLight(SpotLight spotlight) {
 	spotlightData_->distance = spotlight.distance;
 	spotlightData_->decay = spotlight.decay;
 	spotlightData_->cosAngle = spotlight.cosAngle;
+	spotlightData_->cosFalloffStart = spotlight.cosFalloffStart;
 	spotLightResource_->Unmap(0, nullptr);
 
 
