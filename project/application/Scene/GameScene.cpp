@@ -6,24 +6,27 @@
 #include "Object/Background/SkyDome.h"
 #include "Object/Enemy/EnemyManager.h"
 #include "SceneManager.h"
+#include "Object3dCommon.h"
+#include <numbers>
 
 GameScene::GameScene() {
 
 	cameraController = std::make_unique<CameraController>();
 	particles = std::make_unique<Particles>();
-	skyDome = std::make_unique<SkyDome>();
+	/*skyDome = std::make_unique<SkyDome>();*/
 	player = std::make_unique<Player>();
-	bulletManager_ = std::make_unique<BulletManager>();
 	enemyManager = std::make_unique<EnemyManager>();
 
 	field = std::make_unique<MapchipField>();
 	goal = std::make_unique<Goal>();
 	sceneTransition = std::make_unique<SceneTransition>();
 	uimanager = std::make_unique<UIManager>();
-	BG = std::make_unique<Background>();
+	/*BG = std::make_unique<Background>();*/
 	house = std::make_unique<House>();
 
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/昼下がり気分.mp3");
+
+
 }
 
 GameScene::~GameScene(){
@@ -49,16 +52,12 @@ void GameScene::Initialize() {
 	
 	GameBase::GetInstance()->SetDefaultCamera(cameraController->GetCamera());
 
-	
-	color = (uint8_t(meshColor.w * 255) << 24) | // A
-	        (uint8_t(meshColor.x * 255) << 16) | // R
-	        (uint8_t(meshColor.y * 255) << 8) |  // G
-	        (uint8_t(meshColor.z * 255));        // B
+
 
 	
-	skyDome->Initialize(cameraController->GetCamera());
+	/*skyDome->Initialize(cameraController->GetCamera());*/
 	player->Initialize(cameraController->GetCamera());
-	bulletManager_->Initialize(cameraController->GetCamera());
+
 	enemyManager->Initialize(cameraController->GetCamera());
 	field->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field->Initialize(cameraController->GetCamera());
@@ -66,11 +65,11 @@ void GameScene::Initialize() {
 	sceneTransition->Initialize();
 	uimanager->SetPlayerHPMax(player->GetHPMax());
 	uimanager->SetPlayerHP(player->GetHP());
-	uimanager->SetPlayerPosition({player->GetPosition().x, player->GetPosition().y});
+	
 	uimanager->Initialize();
-	BG->SetCamera(cameraController->GetCamera());
+	/*BG->SetCamera(cameraController->GetCamera());
 	BG->SetPosition(player->GetPosition());
-	BG->Initialize();
+	BG->Initialize();*/
 	house->Initialize(cameraController->GetCamera());
 	// ==================
 	// ★ レベルアップ用スプライト画像読み込み
@@ -91,7 +90,67 @@ for (int i = 0; i < 4; i++) {
 
 
 	Audio::GetInstance()->SoundPlayWave(BGMData);
+	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	pointLight_.position = {0.0f, 5.0f, 0.0f};
+	pointLight_.intensity = 0.0f;
+	pointLight_.radius = 10.0f;
+	pointLight_.decay = 1.0f;
+
+	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	directionalLight_.direction = {0.0f, -1.0f, 0.5f};
+	directionalLight_.intensity = 1.0f;
+
+	spotLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	spotLight_.position = {2.0f, 1.25f, 0.0f};
+	spotLight_.direction = {-1.0f, -1.0f, 0.0f};
+	spotLight_.intensity = 0.0f;
+	spotLight_.distance = 7.0f;
+	spotLight_.decay = 2.0f;
+	spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
+	spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 }
+void GameScene::DebugImGui(){
+
+#ifdef USE_IMGUI
+	if (ImGui::Begin("SampleLight")) {
+		if (ImGui::TreeNode("DirectionalLight")) {
+			ImGui::ColorEdit4("LightColor", &directionalLight_.color.x);
+			ImGui::DragFloat3("LightDirection", &directionalLight_.direction.x, 0.1f, -1.0f, 1.0f);
+			ImGui::DragFloat("LightIntensity", &directionalLight_.intensity, 0.1f, 0.0f, 10.0f);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("PointLight")) {
+			ImGui::ColorEdit4("PointLightColor", &pointLight_.color.x);
+			ImGui::DragFloat("PointLightIntensity", &pointLight_.intensity, 0.1f);
+			ImGui::DragFloat3("PointLightPosition", &pointLight_.position.x, 0.1f);
+			ImGui::DragFloat("PointLightRadius", &pointLight_.radius, 0.1f);
+			ImGui::DragFloat("PointLightDecay", &pointLight_.decay, 0.1f);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("SpotLight")) {
+			ImGui::ColorEdit4("SpotLightColor", &spotLight_.color.x);
+			ImGui::DragFloat("SpotLightIntensity", &spotLight_.intensity, 0.1f);
+			ImGui::DragFloat3("SpotLightPosition", &spotLight_.position.x, 0.1f);
+			ImGui::DragFloat3("SpotLightDirection", &spotLight_.direction.x, 0.1f);
+			ImGui::DragFloat("SpotLightDistance", &spotLight_.distance, 0.1f);
+			ImGui::DragFloat("SpotLightDecay", &spotLight_.decay, 0.1f);
+			ImGui::DragFloat("SpotLightCosAngle", &spotLight_.cosAngle, 0.1f, 0.0f, 1.0f);
+			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLight_.cosFalloffStart, 0.1f, 0.0f, 1.0f);
+			ImGui::TreePop();
+		}
+		ImGui::End();
+	}
+
+#endif // USE_IMGUI
+
+
+
+
+
+
+
+}
+
 
 void GameScene::Update() {
 	// ★ レベルアップ選択中は操作受付
@@ -136,71 +195,20 @@ void GameScene::Update() {
 		return;
 	}
 
-	
-	skyDome->SetCamera(cameraController->GetCamera());
+	DebugImGui();
+	GameBase::GetInstance()->GetObject3dCommon()->SetDirectionalLight(directionalLight_);
+	GameBase::GetInstance()->GetObject3dCommon()->SetPointLight(pointLight_);
+	GameBase::GetInstance()->GetObject3dCommon()->SetSpotLight(spotLight_);
+	/*skyDome->SetCamera(cameraController->GetCamera());*/
 	player->SetCamera(cameraController->GetCamera());
 	field->SetCamera(cameraController->GetCamera());
 	goal->SetCamera(cameraController->GetCamera());
-	BG->SetCamera(cameraController->GetCamera());
-	bulletManager_->SetCamera(cameraController->GetCamera());
-	
-#ifdef USE_IMGUI
-	//ImGui::Begin("Plane");
-	//ImGui::Text("Transform");
-	//ImGui::DragFloat3("Scale", &planeTransform.scale.x, 0.01f);
-	//ImGui::DragFloat3("Rotate", &planeTransform.rotate.x, 0.01f);
-	//ImGui::DragFloat3("Translate", &planeTransform.translate.x, 0.01f);
-	//ImGui::ColorEdit4("Color", (float*)&meshColor);
-
-	//if (ImGui::CollapsingHeader("light Settings")) {
-	//	// 方向
-	//	ImGui::DragFloat3("light Direction", &light.direction.x, 0.1f, -1.0f, 1.0f);
-	//	// 明るさ
-	//	ImGui::SliderFloat("light Intensity", &light.intensity, 0.0f, 5.0f);
-	//	// 色
-	//	ImGui::ColorEdit3("light Color", &light.color.x);
-	//}
-
-	//gameBase->SetDirectionalLightData(light);
-
-	//// --- ブレンドモード選択 ---
-	//static int blendModeIndex = 0;
-	//const char* blendModes[] = {"None", "Alpha", "Add", "Sub", "Mul", "Screen"};
-	//if (ImGui::Combo("Blend Mode", &blendModeIndex, blendModes, IM_ARRAYSIZE(blendModes))) {
-	//	gameBase->SetBlendMode(static_cast<BlendMode>(blendModeIndex));
-	//}
-
-	//ImGui::End();
-
-	
-
-	/*ImGui::Begin("PadorKey");
-	if (ImGui::Button("Keyboard")) {
-		IsKeyboard = true;
-		IsPKey = false;
-	}
-	if (ImGui::Button("Pad")) {
-		IsXButton = false;
-		IsKeyboard = false;
-	}
-
-	if (IsKeyboard) {
-		ImGui::Text("Input = Keyboard");
-	} else {
-		ImGui::Text("Input = Pad");
-	}
-
-	ImGui::End();*/
-	
-
-	
-	#endif
+	/*BG->SetCamera(cameraController->GetCamera());*/
 	
 
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
-	skyDome->Update();
-	bulletManager_->Update();
-	player->SetBulletManager(bulletManager_.get());
+	/*skyDome->Update();*/
+
 	player->Update();
 	// ===========================
 	// ★ レベルアップを検知して選択画面へ
@@ -224,7 +232,7 @@ void GameScene::Update() {
 		// プレイヤーの動きを停止させたい場合はここで何もしない（GameScene が制御）
 	}
 
-	enemyManager->Update(cameraController->GetCamera());
+	/*enemyManager->Update(cameraController->GetCamera());*/
 	// ★★★ 敵が全滅したらゴールを表示・判定有効化 ★★★
 	bool allDead = true;
 
@@ -297,20 +305,8 @@ if (goalActive) { // ★ 敵全滅してからしか処理しない
 			}
 		}
 
-		// ===== ② プレイヤー弾と敵の当たり判定 =====
-		// ===== ② プレイヤー弾と敵の当たり判定 =====
-		
 
-			
 
-			if (bulletManager_->Collision(ePos)) {
-				e->SetHPSubtract(1*(player->GetParameters().AttuckUp+1)); 
-				if (e->GetHP() <= 0) {
-				    player->EXPMath();
-				}
-				
-			}
-		
 			  // ===== House と敵の当たり判定 =====
 		    bool hitHouse = fabs(ePos.x - housePos.x) < houseHitSize && fabs(ePos.y - housePos.y) < houseHitSize;
 
@@ -334,12 +330,11 @@ if (goalActive) { // ★ 敵全滅してからしか処理しない
 	field->Update();
 	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
-	uimanager->SetPlayerPosition({player->GetPosition().x, player->GetPosition().y});
 	uimanager->SetHouseHP(house->GetHP());
 	uimanager->SetHouseHPMax(30); // House の最大HP（好きに変更）
 
 	uimanager->Update();
-	BG->Update(player->GetPosition());
+	/*BG->Update(player->GetPosition());*/
 	house->Update(cameraController->GetCamera());
 
 	// どちらかの HP が 0 以下で GameOver
@@ -347,16 +342,17 @@ if (goalActive) { // ★ 敵全滅してからしか処理しない
 		sceneEndOver = true;
 	}
 
-	cameraController->SetTranslate({player->GetPosition().x, player->GetPosition().y + 5, cameraController->GetTransform().translate.z});
+	cameraController->SetPlayerPos(player->GetPosition());
+	cameraController->SetPlayerYaw(player->GetRotate().y);
 	cameraController->Update();
+
 }
 
 void GameScene::Draw() {
 
 	GameBase::GetInstance()->ModelCommonSet();
-	skyDome->Draw();
+	/*skyDome->Draw();*/
 	player->Draw();
-	bulletManager_->Draw();
 	enemyManager->Draw();
 	house->Draw();
 
@@ -365,7 +361,7 @@ void GameScene::Draw() {
 		goal->Draw(); // ★ 敵全滅後だけ描画する
 	}
 
-	BG->Draw();
+	/*BG->Draw();*/
 	ParticleManager::GetInstance()->Draw();
 	
 	GameBase::GetInstance()->SpriteCommonSet();
@@ -399,64 +395,7 @@ void GameScene::Draw() {
 	}
 
 
-		/*if (IsKeyboard) {
-	    if (gameBase->TriggerKey(DIK_P)) {
-	        IsPKey = !IsPKey;
-	    }
-	    if (!IsPKey) {
-	        if (!gameBase->PushKey(DIK_SPACE)) {
-	            if (gameBase->PushKey(DIK_W)||gameBase->PushKey(DIK_A)||gameBase->PushKey(DIK_D)||gameBase->PushKey(DIK_S)) {
-
-	                if (gameBase->PushKey(DIK_W)) {
-	                    planeTransform.translate.y += 0.1f;
-	                }
-	                if (gameBase->PushKey(DIK_S)) {
-	                    planeTransform.translate.y -= 0.1f;
-	                }
-	                if (gameBase->PushKey(DIK_A)) {
-	                    planeTransform.translate.x -= 0.1f;
-	                }
-	                if (gameBase->PushKey(DIK_D)) {
-	                    planeTransform.translate.x += 0.1f;
-	                }
-
-	            }
-	            gameBase->DrawMesh(modelData.vertices, color, textureHandle, wvpMatrix, worldMatrix);
-	        }
-	    }
-	} else {
-	    if (gameBase->TriggerButton(Input::PadButton::kButtonX)) {
-	        IsXButton = !IsXButton;
-	    }
-	    if (!IsXButton) {
-
-	        if (!gameBase->PushButton(Input::PadButton::kButtonA)) {
-
-	            if (gameBase->PushButton(Input::PadButton::kButtonUp)|| gameBase->PushButton(Input::PadButton::kButtonDown) || gameBase->PushButton(Input::PadButton::kButtonLeft) ||
-	gameBase->PushButton(Input::PadButton::kButtonRight)) { if (gameBase->PushButton(Input::PadButton::kButtonUp)) { planeTransform.translate.y += 0.1f;
-	                }
-	                if (gameBase->PushButton(Input::PadButton::kButtonDown)) {
-	                    planeTransform.translate.y -= 0.1f;
-	                }
-	                if (gameBase->PushButton(Input::PadButton::kButtonLeft)) {
-	                    planeTransform.translate.x -= 0.1f;
-	                }
-	                if (gameBase->PushButton(Input::PadButton::kButtonRight)) {
-	                    planeTransform.translate.x += 0.1f;
-	                }
-	            }
-
-	            planeTransform.translate.x += gameBase->GetJoyStickLX() * 0.1f;
-	            planeTransform.translate.y += gameBase->GetJoyStickLY() * 0.1f;
-
-	            planeTransform.rotate.y += gameBase->GetJoyStickRX() * 0.1f;
-	            planeTransform.rotate.x += gameBase->GetJoyStickRY() * 0.1f;
-
-	            gameBase->DrawMesh(modelData.vertices, color, textureHandle, wvpMatrix, worldMatrix);
-	        }
-	    }
-	}*/
-
+	
 	
 
 }

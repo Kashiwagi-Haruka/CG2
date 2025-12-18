@@ -174,9 +174,6 @@
     <ClCompile Include="application\Object\Player\Player.cpp">
       <Filter>ソース ファイル\application\Object\Player</Filter>
     </ClCompile>
-    <ClCompile Include="application\Object\Player\PlayerBullet.cpp">
-      <Filter>ソース ファイル\application\Object\Player</Filter>
-    </ClCompile>
     <ClCompile Include="application\Particles.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
@@ -243,12 +240,6 @@
     <ClCompile Include="Engine\Texture\Light\DirectionalLight.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\Object\Player\BulletLine.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Object\Player\BulletManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="application\Object\Player\PlayerParameters.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -262,6 +253,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\Scene\SampleScene\SampleScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Object\Player\PlayerSword.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -430,9 +424,6 @@
     <ClInclude Include="application\UIManager.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="application\Object\Player\PlayerBullet.h">
-      <Filter>ヘッダー ファイル\application\Player</Filter>
-    </ClInclude>
     <ClInclude Include="application\Object\Player\Player.h">
       <Filter>ヘッダー ファイル\application\Player</Filter>
     </ClInclude>
@@ -466,12 +457,6 @@
     <ClInclude Include="Engine\Texture\Light\DirectionalLight.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\Object\Player\BulletLine.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Player\BulletManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="application\Object\House\House.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -491,6 +476,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\Light\SpotLight.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Player\PlayerSword.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

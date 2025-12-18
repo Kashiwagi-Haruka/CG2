@@ -163,8 +163,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\Background\Background.cpp" />
     <ClCompile Include="application\Object\CatchBlock.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyStun.cpp" />
-    <ClCompile Include="application\Object\Player\BulletLine.cpp" />
-    <ClCompile Include="application\Object\Player\BulletManager.cpp" />
     <ClCompile Include="application\Object\Player\PlayerParameters.cpp" />
     <ClCompile Include="Engine\BaseScene\BaseScene.cpp" />
     <ClCompile Include="Engine\Loadfile\CSVManager.cpp" />
@@ -217,7 +215,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\Particle\ParticleManager.cpp" />
     <ClCompile Include="Engine\Texture\Particle\ParticleEmitter.cpp" />
     <ClCompile Include="application\Object\Player\Player.cpp" />
-    <ClCompile Include="application\Object\Player\PlayerBullet.cpp" />
     <ClCompile Include="application\Object\MapchipField.cpp" />
     <ClCompile Include="application\Object\Background\SkyDome.cpp" />
     <ClCompile Include="application\Scene\ResultScene.cpp" />
@@ -234,6 +231,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\House\House.cpp" />
     <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp" />
     <ClCompile Include="application\Scene\SampleScene\SampleScene.cpp" />
+    <ClCompile Include="application\Object\Player\PlayerSword.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -257,8 +255,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\CatchBlock.h" />
     <ClInclude Include="application\Object\Enemy\EnemyStun.h" />
     <ClInclude Include="application\Object\Player\PlayerParameters.h" />
-    <ClInclude Include="application\Object\Player\BulletLine.h" />
-    <ClInclude Include="application\Object\Player\BulletManager.h" />
     <ClInclude Include="Engine\BaseScene\BaseScene.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\Loadfile\CSVManager.h" />
@@ -305,7 +301,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\Particle\ParticleManager.h" />
     <ClInclude Include="Engine\Texture\Particle\ParticleEmitter.h" />
     <ClInclude Include="application\Object\Player\Player.h" />
-    <ClInclude Include="application\Object\Player\PlayerBullet.h" />
     <ClInclude Include="application\Object\MapchipField.h" />
     <ClInclude Include="application\Object\Background\SkyDome.h" />
     <ClInclude Include="application\Scene\ResultScene.h" />
@@ -322,6 +317,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\House\House.h" />
     <ClInclude Include="application\Scene\SceneFactory\SceneFactory.h" />
     <ClInclude Include="application\Scene\SampleScene\SampleScene.h" />
+    <ClInclude Include="application\Object\Player\PlayerSword.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

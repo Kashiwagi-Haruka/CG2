@@ -3,18 +3,18 @@
 #include "GameBase.h"
 #include "ModelManeger.h"
 #include <algorithm>
-#include "PlayerBullet.h"
 #include "Camera.h"
 #include "Object/MapchipField.h"
 #include <numbers>
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
-#include "BulletManager.h"
+
 
 Player::Player() {
 	ModelManeger::GetInstance()->LoadModel("playerModel");
 	playerObject_ = std::make_unique<Object3d>();
+	sword_ = std::make_unique<PlayerSword>();
 }
 
 Player::~Player(){
@@ -39,7 +39,8 @@ playerObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 
 	camera_ = camera;
 	playerObject_->SetCamera(camera_);
-	
+	sword_->Initialize();
+	sword_->SetCamera(camera_);
 	isAlive = true;
 	parameters_ = SetInit();
 	hp_ = parameters_.hpMax_;
@@ -54,7 +55,11 @@ void Player::Move(){
 
 		lastTapTimeA_ ++;
 		lastTapTimeD_ ++;
+	    lastTapTimeS_++;
+	    lastTapTimeW_++;
+
 		
+
 		if (GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_D)) {
 		
 			if (!GameBase::GetInstance()->PushKey(DIK_D)) {
@@ -83,8 +88,35 @@ void Player::Move(){
 				}
 			}
 		}
+	    if (GameBase::GetInstance()->PushKey(DIK_W) || GameBase::GetInstance()->PushKey(DIK_S)) {
 
-		if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D)) {
+		    if (!GameBase::GetInstance()->PushKey(DIK_W)) {
+			    if (GameBase::GetInstance()->TriggerKey(DIK_S)) {
+				    if (lastTapTimeS_ < parameters_.doubleTapThreshold_) {
+					    isDash = true;
+				    }
+
+				    lastTapTimeS_ = 0.0f;
+			    }
+			    if (GameBase::GetInstance()->PushKey(DIK_S)) {
+				    velocity_.z += -parameters_.accelationRate * (parameters_.SpeedUp + 1);
+			    }
+		    }
+
+		    if (!GameBase::GetInstance()->PushKey(DIK_S)) {
+			    // D ダブルタップ
+			    if (GameBase::GetInstance()->TriggerKey(DIK_W)) {
+				    if (lastTapTimeW_ < parameters_.doubleTapThreshold_) {
+					    isDash = true;
+				    }
+				    lastTapTimeW_ = 0.0f;
+			    }
+			    if (GameBase::GetInstance()->PushKey(DIK_W)) {
+				    velocity_.z += parameters_.accelationRate * (parameters_.SpeedUp + 1);
+			    }
+		    }
+	    }
+		if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D)&&!GameBase::GetInstance()->PushKey(DIK_W)&&!GameBase::GetInstance()->PushKey(DIK_S)) {
 			isDash = false;
 		}
 
@@ -102,10 +134,18 @@ void Player::Move(){
 	
 		}
 	}
+	if (!GameBase::GetInstance()->PushKey(DIK_W) && !GameBase::GetInstance()->PushKey(DIK_S)) {
+		velocity_.z *= (1.0f - parameters_.decelerationRate);
+		if (velocity_.z > -0.01f && velocity_.z < 0.01f) {
+			velocity_.z = 0.0f;
+		}
+	}
 	
 	velocity_.x = std::clamp(velocity_.x, -parameters_.accelationMax, parameters_.accelationMax);
+	velocity_.z = std::clamp(velocity_.z, -parameters_.accelationMax, parameters_.accelationMax);
 	if (isDash) {
 		velocity_.x *= parameters_.dashMagnification;
+		velocity_.z *= parameters_.dashMagnification;
 	}
 	transform_.translate += velocity_;
 	if (GameBase::GetInstance()->PushKey(DIK_A)) {
@@ -114,9 +154,9 @@ void Player::Move(){
 	if (GameBase::GetInstance()->PushKey(DIK_D)) {
 		bulletVelocity_.x = 1;
 	}
-	if (GameBase::GetInstance()->PushKey(DIK_W)) {
-		bulletVelocity_.y = 1;
-	}
+	
+		
+	
 	
 	
 }
@@ -154,95 +194,44 @@ void Player::Falling(){
 	
 }
 void Player::Attack() {
-
-	if (!bulletManager_)
-		return;
-	// --- 空中攻撃開始 ---
-	// 落下中 かつ まだ空中攻撃を使っていない時だけ発動
-	if (isfalling && !usedAirAttack && GameBase::GetInstance()->TriggerKey(DIK_J)) {
-
-		isAirAttack = true;
-		usedAirAttack = true; // ★ 空中攻撃を使ったことにする
-
-		airAttackIndex = 0;
-		airAttackTimer = 0.0f;
-
-		isfalling = false; // 空中攻撃中は落下停止
-		velocity_.y = 0.0f;
+	// E キーでスキル攻撃へ
+	if (GameBase::GetInstance()->TriggerKey(DIK_E)) {
+		attackState_ = Player::AttackState::kSkillAttack;
 	}
-
-
-
-	// --- 空中攻撃中 ---
-	// --- 空中攻撃中 ---
-	if (isAirAttack) {
-
-		airAttackTimer += 1.0f / 60.0f; // 毎フレームタイマー進む
-
-		// ★ 0.1秒ごとに1発撃つ
-		if (airAttackTimer >= 0.2f) {
-			// ★ AllowUp の値で本数可変
-			int maxAirShots = parameters_.AllowUp + 1;
-			airAttackTimer = 0.0f;
-
-			// 縦に並べる位置
-			Vector3 pos = transform_.translate;
-			pos.y -= (float)airAttackIndex * 1.0f;
-
-			// 発射方向：右下を基準に少し散らす
-			float offset = (airAttackIndex - (maxAirShots - 1) * 0.5f) * 0.15f;
-			Vector3 dir = {1, -1 + offset, 0};
-			dir = Function::Normalize(dir);
-
-			bulletManager_->Fire(pos, dir);
-
-
-			airAttackIndex++;
-
-			
-
-			if (airAttackIndex >= maxAirShots) {
-				isAirAttack = false;
-				isfalling = true; // ← 落下再開
-			}
+	// Q キーで必殺技へ
+	if (GameBase::GetInstance()->TriggerKey(DIK_Q)) {
+		attackState_ = Player::AttackState::kSpecialAttack;
+	}
+	switch (attackState_) {
+	case Player::AttackState::kNone:
+		// J キーで弱攻撃1へ
+		if (GameBase::GetInstance()->TriggerKey(DIK_J)){
+			attackState_ = Player::AttackState::kWeakAttack1;
 		}
+		
 
-		return;
+		break;
+	case Player::AttackState::kWeakAttack1:
+		break;
+	case Player::AttackState::kWeakAttack2:
+		break;
+	case Player::AttackState::kWeakAttack3:
+		break;
+	case Player::AttackState::kWeakAttack4:
+		break;
+	case Player::AttackState::kStrongAttack:
+		break;
+	case Player::AttackState::kSkillAttack:
+		break;
+	case Player::AttackState::kSpecialAttack:
+		break;
+	default:
+		break;
 	}
 
 
-	// --- 通常の地上攻撃（今のあなたの処理） ---
-	Vector3 shotDir = {0, 0, 0};
-	if (GameBase::GetInstance()->PushKey(DIK_A))
-		shotDir.x = -1;
-	if (GameBase::GetInstance()->PushKey(DIK_D))
-		shotDir.x = 1;
-	if (GameBase::GetInstance()->PushKey(DIK_W))
-		shotDir.y = 1;
 
-	if (Function::Length(shotDir) > 0.0f)
-		shotDir = Function::Normalize(shotDir);
-	else
-		shotDir = {1, 0, 0};
 
-	bulletManager_->SetPlayerPos(transform_.translate);
-	bulletManager_->SetShotDir(shotDir);
-
-	if (GameBase::GetInstance()->ReleaseKey(DIK_J)) {
-
-		int arrowCount = parameters_.AllowUp+1; // 1 + AllowUp
-
-		for (int i = 0; i < arrowCount; i++) {
-
-			// 本数に応じて少し角度を散らす
-			float offset = (i - (arrowCount - 1) * 0.5f) * 0.15f; // 角度差
-
-			Vector3 dir2 = {shotDir.x, shotDir.y + offset, shotDir.z};
-			dir2 = Function::Normalize(dir2);
-
-			bulletManager_->Fire(transform_.translate, dir2);
-		}
-	}
 }
 
 
@@ -278,7 +267,8 @@ void Player::Update(){
 	playerObject_->SetRotate(transform_.rotate);
 	playerObject_->SetTranslate(transform_.translate);
 	playerObject_->Update();
-
+	sword_->SetCamera(camera_);
+	sword_->Update(transform_);
 	
 	#ifdef USE_IMGUI
 
@@ -318,6 +308,6 @@ void Player::Draw() {
 	
 	GameBase::GetInstance()->ModelCommonSet();
 	playerObject_->Draw();
-	
+	sword_->Draw();
 
 }

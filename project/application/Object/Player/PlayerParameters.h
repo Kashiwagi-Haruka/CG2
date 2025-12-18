@@ -2,8 +2,8 @@
 
 struct Parameters{
 
-	float accelationRate = 0.1f;       // 移動時の加速量（フレームごとに加速する値）
-	float accelationMax = 0.25f;       // 横移動の最大速度
+	float accelationRate = 0.01f;       // 移動時の加速量（フレームごとに加速する値）
+	float accelationMax = 0.1f;       // 移動の最大速度
 	float decelerationRate = 0.15f;    // キーを離した時の減速率
 	float jumpPower = 0.70f;            // ジャンプの初速（上方向の初速）
 	float jumpDuration = 0.5f;         // ジャンプを維持できる入力時間（未使用っぽいが意味はこれ）
@@ -23,6 +23,19 @@ struct Parameters{
 	int MaxEXP=200;
 	int Level=0;
 	int EXP=0;
+
+	int EP = 0;
+	int EPMax = 100;
+
+	int weakAttack1Damage = 1;
+	int weakAttack2Damage = 1;
+	int weakAttack3Damage = 2;
+	int weakAttack4Damage = 2;
+	int strongAttackDamage = 3;
+	int skillAttackDamage = 5;
+	int specialAttackDamage = 10;
+	int fallingAttackDamage = 4;
+
 };
 
 Parameters SetInit();

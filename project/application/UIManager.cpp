@@ -94,13 +94,19 @@ void UIManager::Initialize() {
 	// ------------------ HP Bar ------------------
 	playerHpSPData.sprite->Initialize(spriteCommon, playerHpSPData.handle);
 	playerHpSPData.size = playerHPMaxSize;
+	playerHpSPData.sprite->SetAnchorPoint({0.5f, 0.0f});
 	playerHpSPData.sprite->SetScale(playerHpSPData.size);
+	playerHpSPData.translate = {640, 600};
 	playerHpSPData.sprite->SetPosition(playerHpSPData.translate);
 
 	// ------------------ HP Flame ------------------
 	playerHPFlameSPData.sprite->Initialize(spriteCommon, playerHPFlameSPData.handle);
-	playerHPFlameSPData.size = {40, 70};
+	playerHPFlameSPData.size = playerHPMaxSize;
+	playerHPFlameSPData.translate = {playerHpSPData.translate.x, playerHpSPData.translate.y};
+	playerHPFlameSPData.sprite->SetAnchorPoint({0.5f, 0.0f});
+	playerHPFlameSPData.sprite->SetPosition(playerHPFlameSPData.translate);
 	playerHPFlameSPData.sprite->SetScale(playerHPFlameSPData.size);
+	
 
 	// ------------------ WASD / SPACE / ATTACK ------------------
 	for (int i = 0; i < OperateCountMAX; i++) {
@@ -167,11 +173,11 @@ void UIManager::Initialize() {
 void UIManager::Update() {
 
 	// ---- HP ----
-	playerHpSPData.size.y = (playerHPMaxSize.y / playerHPMax) * playerHP;
-	playerHpSPData.sprite->SetScale(playerHpSPData.size);
+	playerHPWidth = (playerHPWidthMax / playerHPMax) * playerHP;
+	playerHpSPData.size.x = (playerHPMaxSize.x / playerHPMax) * playerHP;
+	playerHpSPData.translate = {640 - (playerHPMaxSize.x - playerHpSPData.size.x) / 2, 600};
+	playerHpSPData.sprite->SetTextureRange({0,0},{playerHPWidth,300});
 
-	// Flame 位置調整
-	playerHPFlameSPData.sprite->SetPosition({playerHpSPData.translate.x - 10, playerHpSPData.translate.y - 10});
 
 	// 各スプライト Update
 	playerHpSPData.sprite->Update();
@@ -333,10 +339,7 @@ void UIManager::Draw() {
 	
 }
 
-void UIManager::SetPlayerPosition(Vector2 playerPosition){ 
-	playerHpSPData.translate.x = playerPosition.x+600;
-	playerHpSPData.translate.y = playerPosition.y + 500;
-}
+
 void UIManager::SetPlayerHP(int HP) { playerHP = HP; }
 void UIManager::SetPlayerHPMax(int HPMax) { playerHPMax = HPMax; }
 void UIManager::SetPlayerParameters(Parameters parameters) { parameters_ = parameters; }

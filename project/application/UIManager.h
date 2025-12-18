@@ -60,7 +60,9 @@ class UIManager {
 
 	int playerHP;
 	int playerHPMax;
-	Vector2 playerHPMaxSize = {20,50};
+	Vector2 playerHPMaxSize = {400,100};
+	float playerHPWidth = 1200.0f;
+	float playerHPWidthMax = 1200.0f;
 	Vector2 numbersTextureSize = {300, 300};
 	Parameters parameters_;
 
@@ -72,7 +74,7 @@ class UIManager {
 	void Update();
 	void Draw();
 
-	void SetPlayerPosition(Vector2 playerPosition);
+	
 	void SetPlayerHP(int HP);
 	void SetPlayerHPMax(int HPMax);
 	void SetPlayerParameters(Parameters parameters);
