@@ -1,33 +1,102 @@
 #include "PlayerSword.h"
 #include "GameBase.h"
 #include "ModelManeger.h"
-PlayerSword::PlayerSword(){ 
+
+PlayerSword::PlayerSword() {
 
 	ModelManeger::GetInstance()->LoadModel("playerSword");
 	ModelManeger::GetInstance()->LoadModel("debugBox");
 }
 
-void PlayerSword::Initialize(){
+void PlayerSword::Initialize() {
 	swordObject_ = std::make_unique<Object3d>();
 	swordObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	swordObject_->SetCamera(camera);
 	swordObject_->SetModel("playerSword");
 #ifdef _DEBUG
-	debugBox_ =  std::make_unique<Object3d>();
+	debugBox_ = std::make_unique<Object3d>();
 	debugBox_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	debugBox_->SetCamera(camera);
 	debugBox_->SetModel("debugBox");
 #endif // _DEBUG
 }
 
-void PlayerSword::Update(const Transform& playerTransform){
+void PlayerSword::StartAttack(int comboStep) {
+	isAttacking_ = true;
+	attackTimer_ = 0.0f;
+	currentComboStep_ = comboStep;
+
+	// コンボ段階ごとに攻撃時間を設定
+	switch (comboStep) {
+	case 1:
+		attackDuration_ = 0.25f; // 1段目: 速い
+		break;
+	case 2:
+		attackDuration_ = 0.28f; // 2段目: やや速い
+		break;
+	case 3:
+		attackDuration_ = 0.32f; // 3段目: 普通
+		break;
+	case 4:
+		attackDuration_ = 0.45f; // 4段目: フィニッシュで長め
+		break;
+	default:
+		attackDuration_ = 0.3f;
+		break;
+	}
+}
+
+Vector3 PlayerSword::GetPosition() const { return swordObject_->GetTransform().translate; }
+
+void PlayerSword::Update(const Transform& playerTransform) {
+
 	Transform swordTransform = playerTransform;
-	
-	swordTransform.scale = {1.0f, 1.0f, 1.0f};
-	swordTransform.translate.x += 1.0f;
+	swordTransform.translate.x += 1.0f; // 右手側
+
+	// 攻撃中は振る
+	if (isAttacking_) {
+		attackTimer_ += 1.0f / 60.0f;
+
+		// コンボ段階ごとに異なるモーション
+		switch (currentComboStep_) {
+		case 1: // 1段目: 横薙ぎ
+			swordTransform.rotate.y += attackTimer_ * 8.0f;
+			swordTransform.rotate.x -= attackTimer_ * 2.0f;
+			break;
+
+		case 2: // 2段目: 縦斬り
+			swordTransform.rotate.x -= attackTimer_ * 10.0f;
+			swordTransform.rotate.z -= attackTimer_ * 3.0f;
+			break;
+
+		case 3: // 3段目: 回転斬り
+			swordTransform.rotate.y += attackTimer_ * 12.0f;
+			swordTransform.rotate.z += attackTimer_ * 4.0f;
+			break;
+
+		case 4: // 4段目: 強烈な叩きつけ
+			swordTransform.rotate.x -= attackTimer_ * 15.0f;
+			swordTransform.rotate.z -= attackTimer_ * 8.0f;
+			swordTransform.translate.y += attackTimer_ * 2.0f; // 上から振り下ろす
+			break;
+
+		default:
+			swordTransform.rotate.x -= attackTimer_ * 3.0f;
+			swordTransform.rotate.z -= attackTimer_ * 6.0f;
+			break;
+		}
+
+		// 攻撃終了判定
+		if (attackTimer_ >= attackDuration_) {
+			isAttacking_ = false;
+			attackTimer_ = 0.0f;
+		}
+	}
+
 	swordObject_->SetTransform(swordTransform);
 	swordObject_->SetCamera(camera);
 	swordObject_->Update();
+
 #ifdef _DEBUG
 	debugBox_->SetTransform(swordTransform);
 	debugBox_->SetCamera(camera);
@@ -35,11 +104,9 @@ void PlayerSword::Update(const Transform& playerTransform){
 #endif // _DEBUG
 }
 
-void PlayerSword::Draw(){
-	swordObject_->Draw(); 
-	#ifdef _DEBUG
+void PlayerSword::Draw() {
+	swordObject_->Draw();
+#ifdef _DEBUG
 	debugBox_->Draw();
-	#endif // _DEBUG
+#endif // _DEBUG
 }
-
-	

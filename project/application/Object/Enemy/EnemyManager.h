@@ -6,8 +6,26 @@
 class EnemyManager {
 
 public:
-	std::vector<std::unique_ptr<Enemy>> enemies;
+	// ウェーブの状態
+	enum class WaveState {
+		kWaiting,  // 次のウェーブ待機中
+		kSpawning, // 敵生成中
+		kActive,   // ウェーブ進行中
+		kComplete  // ウェーブクリア
+	};
 
+private:
+	std::vector<std::unique_ptr<Enemy>> enemies;
+	Camera* camera_ = nullptr;
+
+	// ウェーブシステム
+	int currentWave_ = 0;        // 現在のウェーブ番号
+	WaveState waveState_;        // ウェーブの状態
+	float waveTimer_ = 0.0f;     // ウェーブタイマー
+	float waveDelay_ = 3.0f;     // ウェーブ間の待機時間（秒）
+	int totalEnemiesKilled_ = 0; // 倒した敵の総数
+
+public:
 	EnemyManager() {}
 	~EnemyManager() = default;
 
@@ -16,4 +34,24 @@ public:
 	void Update(Camera* camera);
 	void Draw();
 	void Clear();
+
+	// ウェーブシステム関連
+	void StartNextWave();     // 次のウェーブを開始
+	void SpawnWaveEnemies();  // ウェーブに応じた敵を生成
+	void CheckWaveComplete(); // ウェーブクリア判定
+
+	// ゲッター
+	int GetCurrentWave() const { return currentWave_; }
+	WaveState GetWaveState() const { return waveState_; }
+	int GetAliveEnemyCount() const; // 生存している敵の数
+	int GetTotalEnemiesKilled() const { return totalEnemiesKilled_; }
+	bool IsWaveActive() const;     // ウェーブ進行中か
+	bool IsWaveComplete() const;   // ウェーブクリアしたか
+	float GetWaveProgress() const; // ウェーブの進行度（0.0～1.0）
+
+	// セッター
+	void SetWaveDelay(float delay) { waveDelay_ = delay; }
+
+	// 敵リストへのアクセス（当たり判定用など）
+	std::vector<std::unique_ptr<Enemy>>& GetEnemies() { return enemies; }
 };

@@ -25,12 +25,12 @@ UIManager::UIManager() {
 	// Level
 	LevelSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Lv.png");
 
-	// 数字テクスチ
+	// 数字テクスチャ
 	for (int i = 0; i < NumbersCountMax; i++) {
 		NumberSPData[i].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/No.png");
 	}
 	for (int i = 0; i < 5; i++) {
-	MaxSPData[i].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Max.png");
+		MaxSPData[i].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Max.png");
 	}
 
 	// ステータスUPアイコン
@@ -76,44 +76,35 @@ UIManager::UIManager() {
 	houseHpFlameSPData.sprite = std::make_unique<Sprite>();
 }
 
-UIManager::~UIManager() {
-
-	
-	
-	
-	
-
-}
+UIManager::~UIManager() {}
 
 void UIManager::Initialize() {
 
 	auto spriteCommon = GameBase::GetInstance()->GetSpriteCommon();
 
-	
-
 	// ------------------ HP Bar ------------------
 	playerHpSPData.sprite->Initialize(spriteCommon, playerHpSPData.handle);
 	playerHpSPData.size = playerHPMaxSize;
-	playerHpSPData.sprite->SetAnchorPoint({0.5f, 0.0f});
+	// ★ アンカーポイントを左端に設定（左端固定）
+	playerHpSPData.sprite->SetAnchorPoint({0.0f, 0.0f});
 	playerHpSPData.sprite->SetScale(playerHpSPData.size);
-	playerHpSPData.translate = {640, 600};
+	// ★ 左端の位置を固定
+	playerHpSPData.translate = {640 - playerHPMaxSize.x / 2, 600};
 	playerHpSPData.sprite->SetPosition(playerHpSPData.translate);
 
 	// ------------------ HP Flame ------------------
 	playerHPFlameSPData.sprite->Initialize(spriteCommon, playerHPFlameSPData.handle);
 	playerHPFlameSPData.size = playerHPMaxSize;
-	playerHPFlameSPData.translate = {playerHpSPData.translate.x, playerHpSPData.translate.y};
+	playerHPFlameSPData.translate = {640, 600};
 	playerHPFlameSPData.sprite->SetAnchorPoint({0.5f, 0.0f});
 	playerHPFlameSPData.sprite->SetPosition(playerHPFlameSPData.translate);
 	playerHPFlameSPData.sprite->SetScale(playerHPFlameSPData.size);
-	
 
 	// ------------------ WASD / SPACE / ATTACK ------------------
 	for (int i = 0; i < OperateCountMAX; i++) {
 		HowtoOperateSPData[i].sprite->Initialize(spriteCommon, HowtoOperateSPData[i].handle);
 		HowtoOperateSPData[i].sprite->SetScale({100, 100});
 		HowtoOperateSPData[i].sprite->SetTextureRange({0, 0}, {768, 768});
-		
 	}
 	HowtoOperateSPData[kW].sprite->SetPosition({10, 600});
 	HowtoOperateSPData[kSpace].sprite->SetPosition({130, 600});
@@ -125,7 +116,7 @@ void UIManager::Initialize() {
 	LevelSPData.translate = {10, 10};
 	LevelSPData.sprite->SetPosition(LevelSPData.translate);
 
-	// ------------------ Number 0〜9 ------------------
+	// ------------------ Number 0～9 ------------------
 	for (int i = 0; i < NumbersCountMax; i++) {
 		NumberSPData[i].sprite->Initialize(spriteCommon, NumberSPData[i].handle);
 		NumberSPData[i].sprite->SetTextureRange({0, 0}, numbersTextureSize);
@@ -148,13 +139,13 @@ void UIManager::Initialize() {
 
 	AllowUpSPData.sprite->Initialize(spriteCommon, AllowUpSPData.handle);
 	AllowUpSPData.sprite->SetScale({48, 48});
-	
+
 	// --- House HP Bar ---
 	houseHpSPData.sprite->Initialize(spriteCommon, houseHpSPData.handle);
 	houseHpSPData.size = {120, 20}; // ★ 横長に
 	houseHpSPData.sprite->SetScale(houseHpSPData.size);
 
-	// 位置（自由に調整）：画面左上あたり
+	// 位置(自由に調整)：画面左上あたり
 	houseHpSPData.translate = {50, 550};
 	houseHpSPData.sprite->SetPosition(houseHpSPData.translate);
 
@@ -165,19 +156,30 @@ void UIManager::Initialize() {
 	houseHpFlameSPData.translate = {houseHpSPData.translate.x - 5, houseHpSPData.translate.y};
 	houseHpFlameSPData.sprite->SetPosition(houseHpFlameSPData.translate);
 
-	// ★ 90度回転（横ゲージ化）
-	houseHpSPData.sprite->SetRotation({90,0});
-	houseHpFlameSPData.sprite->SetRotation({90,0});
+	// ★ 90度回転(横ゲージ化)
+	houseHpSPData.sprite->SetRotation({90, 0});
+	houseHpFlameSPData.sprite->SetRotation({90, 0});
 }
 
 void UIManager::Update() {
 
-	// ---- HP ----
-	playerHPWidth = (playerHPWidthMax / playerHPMax) * playerHP;
-	playerHpSPData.size.x = (playerHPMaxSize.x / playerHPMax) * playerHP;
-	playerHpSPData.translate = {640 - (playerHPMaxSize.x - playerHpSPData.size.x) / 2, 600};
-	playerHpSPData.sprite->SetTextureRange({0,0},{playerHPWidth,300});
+	// ---- HP (左端固定、右端から減る) ----
+	if (playerHPMax > 0) {
+		// HP比率を計算
+		float hpRatio = (float)playerHP / (float)playerHPMax;
 
+		// スケールを更新（HPに応じて幅を変更）
+		playerHpSPData.size.x = playerHPMaxSize.x * hpRatio;
+		playerHpSPData.sprite->SetScale(playerHpSPData.size);
+
+		// テクスチャ範囲を更新（左端0から、HP比率分だけ表示）
+		playerHPWidth = playerHPWidthMax * hpRatio;
+		playerHpSPData.sprite->SetTextureRange({0, 0}, {playerHPWidth, 300});
+
+		// ★ 左端の位置は常に固定（ずれない）
+		playerHpSPData.translate = {640 - playerHPMaxSize.x / 2, 600};
+		playerHpSPData.sprite->SetPosition(playerHpSPData.translate);
+	}
 
 	// 各スプライト Update
 	playerHpSPData.sprite->Update();
@@ -202,7 +204,7 @@ void UIManager::Update() {
 	AllowUpSPData.sprite->Update();
 
 	// ===========================
-	//     EXP（3桁表示）
+	//     EXP(3桁表示)
 	// ===========================
 
 	int exp = parameters_.EXP;
@@ -216,7 +218,7 @@ void UIManager::Update() {
 	NumberSPData[kEexp1].sprite->SetTextureRange({300.0f * exp1, 0}, numbersTextureSize);
 
 	// ===========================
-	//     MaxEXP（3桁表示）
+	//     MaxEXP(3桁表示)
 	// ===========================
 
 	int expMax = parameters_.MaxEXP;
@@ -229,14 +231,13 @@ void UIManager::Update() {
 	NumberSPData[kExpMax10].sprite->SetTextureRange({300.0f * expMax10, 0}, numbersTextureSize);
 	NumberSPData[kExpMax1].sprite->SetTextureRange({300.0f * expMax1, 0}, numbersTextureSize);
 
-	
 	NumberSPData[kLv].sprite->SetTextureRange({300.0f * parameters_.Level, 0}, numbersTextureSize);
 	NumberSPData[kAttuck].sprite->SetTextureRange({300.0f * parameters_.AttuckUp, 0}, numbersTextureSize);
 	NumberSPData[kHealth].sprite->SetTextureRange({300.0f * parameters_.HPUp, 0}, numbersTextureSize);
 	NumberSPData[kSpeed].sprite->SetTextureRange({300.0f * parameters_.SpeedUp, 0}, numbersTextureSize);
 	NumberSPData[kArrow].sprite->SetTextureRange({300.0f * parameters_.AllowUp, 0}, numbersTextureSize);
 
-	NumberSPData[kLv].translate = {LevelSPData.translate.x + 50, LevelSPData.translate.y +12};
+	NumberSPData[kLv].translate = {LevelSPData.translate.x + 50, LevelSPData.translate.y + 12};
 	NumberSPData[kLv].sprite->SetPosition(NumberSPData[kLv].translate);
 
 	NumberSPData[kAttuck].translate = {AttuckUpSPData.translate.x + 40, AttuckUpSPData.translate.y + 20};
@@ -250,28 +251,25 @@ void UIManager::Update() {
 
 	NumberSPData[kArrow].translate = {AllowUpSPData.translate.x + 40, AllowUpSPData.translate.y + 20};
 	NumberSPData[kArrow].sprite->SetPosition(NumberSPData[kArrow].translate);
-	
-
-	
 
 	for (int i = kExp100; i <= kExpMax1; i++) {
 
-		NumberSPData[i].sprite->SetPosition({i*50.0f+100,20});
+		NumberSPData[i].sprite->SetPosition({i * 50.0f + 100, 20});
 	}
 
-	for (int i = 0; i < NumbersCountMax; i++){
+	for (int i = 0; i < NumbersCountMax; i++) {
 		NumberSPData[i].sprite->Update();
 	}
-	MaxSPData[0].translate = {NumberSPData[kLv].translate.x, NumberSPData[kLv].translate.y-10};
-	MaxSPData[1].translate = {NumberSPData[kAttuck].translate.x,NumberSPData[kAttuck].translate.y-10};
-	MaxSPData[2].translate = {NumberSPData[kHealth].translate.x, NumberSPData[kHealth].translate.y-10};
-	MaxSPData[3].translate = {NumberSPData[kSpeed].translate.x, NumberSPData[kSpeed].translate.y-10};
-	MaxSPData[4].translate = {NumberSPData[kArrow].translate.x,NumberSPData[kArrow].translate.y-10};
+	MaxSPData[0].translate = {NumberSPData[kLv].translate.x, NumberSPData[kLv].translate.y - 10};
+	MaxSPData[1].translate = {NumberSPData[kAttuck].translate.x, NumberSPData[kAttuck].translate.y - 10};
+	MaxSPData[2].translate = {NumberSPData[kHealth].translate.x, NumberSPData[kHealth].translate.y - 10};
+	MaxSPData[3].translate = {NumberSPData[kSpeed].translate.x, NumberSPData[kSpeed].translate.y - 10};
+	MaxSPData[4].translate = {NumberSPData[kArrow].translate.x, NumberSPData[kArrow].translate.y - 10};
 
 	for (int i = 0; i < 5; i++) {
 
-	MaxSPData[i].sprite->SetPosition(MaxSPData[i].translate);
-	MaxSPData[i].sprite->Update();
+		MaxSPData[i].sprite->SetPosition(MaxSPData[i].translate);
+		MaxSPData[i].sprite->Update();
 	}
 
 	// ---- House HP ----
@@ -292,8 +290,6 @@ void UIManager::Draw() {
 	playerHpSPData.sprite->Draw();
 	playerHPFlameSPData.sprite->Draw();
 
-
-	
 	HowtoOperateSPData[kW].sprite->Draw();
 	HowtoOperateSPData[kSpace].sprite->Draw();
 	HowtoOperateSPData[kAttuckButton].sprite->Draw();
@@ -308,37 +304,34 @@ void UIManager::Draw() {
 		NumberSPData[i].sprite->Draw();
 	}
 	if (parameters_.Level < parameters_.MaxLevel) {
-	NumberSPData[kLv].sprite->Draw();
+		NumberSPData[kLv].sprite->Draw();
 	} else {
 		MaxSPData[0].sprite->Draw();
 	}
 	if (parameters_.AttuckUp < 10) {
-	NumberSPData[kAttuck].sprite->Draw();
+		NumberSPData[kAttuck].sprite->Draw();
 	} else {
 		MaxSPData[1].sprite->Draw();
 	}
 	if (parameters_.HPUp < 10) {
-	NumberSPData[kHealth].sprite->Draw();
+		NumberSPData[kHealth].sprite->Draw();
 	} else {
 		MaxSPData[2].sprite->Draw();
 	}
 	if (parameters_.SpeedUp < 10) {
-	NumberSPData[kSpeed].sprite->Draw();
+		NumberSPData[kSpeed].sprite->Draw();
 	} else {
 		MaxSPData[3].sprite->Draw();
 	}
 	if (parameters_.AllowUp < 10) {
-	NumberSPData[kArrow].sprite->Draw();
+		NumberSPData[kArrow].sprite->Draw();
 	} else {
 		MaxSPData[4].sprite->Draw();
 	}
-	
+
 	houseHpFlameSPData.sprite->Draw();
 	houseHpSPData.sprite->Draw();
-
-	
 }
-
 
 void UIManager::SetPlayerHP(int HP) { playerHP = HP; }
 void UIManager::SetPlayerHPMax(int HPMax) { playerHPMax = HPMax; }

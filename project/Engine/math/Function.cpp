@@ -10,6 +10,7 @@ static const int kRowHeight = 30;
 namespace Function {
 
 
+
 float Length(const Vector3& v) { return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z); }
 
 // direction = 向きたい方向（正規化推奨）
@@ -71,7 +72,15 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 	return result;
 }
 
-
+Vector3 Lerp(const Vector3& start, const Vector3& end, float ratio) {
+	Vector3 result;
+	result.x = start.x + (end.x - start.x) * ratio;
+	result.y = start.y + (end.y - start.y) * ratio;
+	result.z = start.z + (end.z - start.z) * ratio;
+	return result;
+}
+float Lerp(float start, float end, float ratio) {
+	return start + (end - start) * ratio; }
 Matrix4x4 MakeTranslateMatrix(Vector3 translate) {
 	Matrix4x4 result{};
 	result.m[0][0] = 1.0f;

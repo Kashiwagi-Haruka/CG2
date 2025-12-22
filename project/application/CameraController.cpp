@@ -40,8 +40,8 @@ void CameraController::Update() {
 		transform_.rotate.x += cameraSpeed_;
 	}
 #endif
-	const float distance = 20.0f; 
-	const float height = 5.0f;   
+	const float distance = 40.0f; 
+	const float height = 10.0f;   
 
 	Vector3 backDir = {sinf(playerYaw), 0.0f, cosf(playerYaw)};
 

@@ -42,7 +42,7 @@ class GameScene: public BaseScene{
 	std::unique_ptr<Goal> goal;
 	std::unique_ptr<Player> player;
 	std::unique_ptr<EnemyManager> enemyManager;
-	/*std::unique_ptr<SkyDome> skyDome;*/
+	std::unique_ptr<SkyDome> skyDome;
 	std::unique_ptr<CameraController> cameraController;
 	std::unique_ptr<MapchipField> field;
 	std::unique_ptr<House> house;

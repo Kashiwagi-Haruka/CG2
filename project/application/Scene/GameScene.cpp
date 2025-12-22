@@ -1,19 +1,19 @@
 #include "GameScene.h"
-#include "ModelManeger.h"
-#include "ParticleManager.h"
-#include "Object/Player/Player.h"
 #include "CameraController.h"
+#include "ModelManeger.h"
 #include "Object/Background/SkyDome.h"
 #include "Object/Enemy/EnemyManager.h"
-#include "SceneManager.h"
+#include "Object/Player/Player.h"
 #include "Object3dCommon.h"
+#include "ParticleManager.h"
+#include "SceneManager.h"
 #include <numbers>
 
 GameScene::GameScene() {
 
 	cameraController = std::make_unique<CameraController>();
 	particles = std::make_unique<Particles>();
-	/*skyDome = std::make_unique<SkyDome>();*/
+	skyDome = std::make_unique<SkyDome>();
 	player = std::make_unique<Player>();
 	enemyManager = std::make_unique<EnemyManager>();
 
@@ -25,13 +25,10 @@ GameScene::GameScene() {
 	house = std::make_unique<House>();
 
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/昼下がり気分.mp3");
-
-
 }
 
-GameScene::~GameScene(){
-	
-}
+GameScene::~GameScene() {}
+
 void GameScene::Finalize() {
 
 	Audio::GetInstance()->SoundUnload(&BGMData);
@@ -40,7 +37,6 @@ void GameScene::Finalize() {
 	for (int i = 0; i < 4; i++) {
 		levelupIcons[i].reset();
 	}
-
 }
 
 void GameScene::Initialize() {
@@ -49,13 +45,10 @@ void GameScene::Initialize() {
 	sceneEndOver = false;
 
 	cameraController->Initialize();
-	
+
 	GameBase::GetInstance()->SetDefaultCamera(cameraController->GetCamera());
 
-
-
-	
-	/*skyDome->Initialize(cameraController->GetCamera());*/
+	skyDome->Initialize(cameraController->GetCamera());
 	player->Initialize(cameraController->GetCamera());
 
 	enemyManager->Initialize(cameraController->GetCamera());
@@ -65,7 +58,7 @@ void GameScene::Initialize() {
 	sceneTransition->Initialize();
 	uimanager->SetPlayerHPMax(player->GetHPMax());
 	uimanager->SetPlayerHP(player->GetHP());
-	
+
 	uimanager->Initialize();
 	/*BG->SetCamera(cameraController->GetCamera());
 	BG->SetPosition(player->GetPosition());
@@ -74,20 +67,19 @@ void GameScene::Initialize() {
 	// ==================
 	// ★ レベルアップ用スプライト画像読み込み
 	// ==================
-	
+
 	int handle[4]{};
 	handle[0] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/levelup_attack.png");
 	handle[1] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/levelup_speed.png");
 	handle[2] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/levelup_hp.png");
 	handle[3] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/levelup_allow.png");
 
-for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 
 		levelupIcons[i] = std::make_unique<Sprite>();
 		levelupIcons[i]->Initialize(GameBase::GetInstance()->GetSpriteCommon(), handle[i]);
 		levelupIcons[i]->SetScale({256, 256});
 	}
-
 
 	Audio::GetInstance()->SoundPlayWave(BGMData);
 	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -109,7 +101,8 @@ for (int i = 0; i < 4; i++) {
 	spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 }
-void GameScene::DebugImGui(){
+
+void GameScene::DebugImGui() {
 
 #ifdef USE_IMGUI
 	if (ImGui::Begin("SampleLight")) {
@@ -141,16 +134,26 @@ void GameScene::DebugImGui(){
 		ImGui::End();
 	}
 
+	// ★ ウェーブ情報の表示
+	if (ImGui::Begin("Wave Info")) {
+		ImGui::Text("Current Wave: %d", enemyManager->GetCurrentWave());
+		ImGui::Text("Alive Enemies: %d", enemyManager->GetAliveEnemyCount());
+		ImGui::Text("Total Killed: %d", enemyManager->GetTotalEnemiesKilled());
+		ImGui::ProgressBar(enemyManager->GetWaveProgress(), ImVec2(0.0f, 0.0f));
+
+		const char* stateNames[] = {"Waiting", "Spawning", "Active", "Complete"};
+		int stateIndex = static_cast<int>(enemyManager->GetWaveState());
+		ImGui::Text("Wave State: %s", stateNames[stateIndex]);
+
+		float waveDelay = 3.0f;
+		if (ImGui::DragFloat("Wave Delay", &waveDelay, 0.1f, 0.5f, 10.0f)) {
+			enemyManager->SetWaveDelay(waveDelay);
+		}
+		ImGui::End();
+	}
+
 #endif // USE_IMGUI
-
-
-
-
-
-
-
 }
-
 
 void GameScene::Update() {
 	// ★ レベルアップ選択中は操作受付
@@ -199,15 +202,14 @@ void GameScene::Update() {
 	GameBase::GetInstance()->GetObject3dCommon()->SetDirectionalLight(directionalLight_);
 	GameBase::GetInstance()->GetObject3dCommon()->SetPointLight(pointLight_);
 	GameBase::GetInstance()->GetObject3dCommon()->SetSpotLight(spotLight_);
-	/*skyDome->SetCamera(cameraController->GetCamera());*/
+	skyDome->SetCamera(cameraController->GetCamera());
 	player->SetCamera(cameraController->GetCamera());
 	field->SetCamera(cameraController->GetCamera());
 	goal->SetCamera(cameraController->GetCamera());
 	/*BG->SetCamera(cameraController->GetCamera());*/
-	
 
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
-	/*skyDome->Update();*/
+	skyDome->Update();
 
 	player->Update();
 	// ===========================
@@ -217,7 +219,7 @@ void GameScene::Update() {
 
 		isLevelSelecting = true;
 
-		// ランダムで 0〜3 から2個選ぶ
+		// ランダムで 0～3 から2個選ぶ
 		int a = rand() % 4;
 		int b = rand() % 4;
 		while (b == a) {
@@ -229,26 +231,21 @@ void GameScene::Update() {
 
 		cursorIndex = 0; // 左から開始
 
-		// プレイヤーの動きを停止させたい場合はここで何もしない（GameScene が制御）
+		// プレイヤーの動きを停止させたい場合はここで何もしない(GameScene が制御)
 	}
 
-	/*enemyManager->Update(cameraController->GetCamera());*/
-	// ★★★ 敵が全滅したらゴールを表示・判定有効化 ★★★
-	bool allDead = true;
+	// ★ ウェーブシステムの更新
+	enemyManager->Update(cameraController->GetCamera());
 
-	for (auto& e : enemyManager->enemies) {
-		if (e->GetIsAlive()) {
-			allDead = false;
-			break;
-		}
+	// ★ ウェーブクリア判定でゴールを有効化
+	// 全ウェーブクリア後にゴールを出すなど、条件は自由に変更可能
+	if (enemyManager->GetCurrentWave() >= 5 && enemyManager->IsWaveComplete()) {
+		goalActive = true;
 	}
 
-	goalActive = allDead;
+	goal->Update();
 
-	goal->Update(); 
-	
-	
-	// 当たり判定サイズ（調整OK）
+	// 当たり判定サイズ(調整OK)
 	float hitSize = 1.0f;
 	// ===== プレイヤーとゴールの当たり判定 =====
 	{
@@ -257,32 +254,29 @@ void GameScene::Update() {
 
 		float goalHitSize = 2.0f;
 
-if (goalActive) { // ★ 敵全滅してからしか処理しない
+		if (goalActive) { // ★ 条件クリア後だけ処理しない
 			bool isGoalHit = fabs(p.x - g.x) < goalHitSize && fabs(p.y - g.y) < goalHitSize;
 
 			if (isGoalHit) {
-				
+
 				SceneManager::GetInstance()->ChangeScene("Result");
 			}
 		}
-
 	}
 
-	
 	if (!player->GetIsAlive()) {
 
 		SceneManager::GetInstance()->ChangeScene("GameOver");
 	}
 
-// ===== プレイヤーと敵の当たり判定 =====
+	// ===== プレイヤーと敵の当たり判定 =====
 	Vector3 p = player->GetPosition();
 	Vector3 v = player->GetVelocity();
-	
+
 	Vector3 housePos = house->GetPosition();
 	float houseHitSize = 8.0f;
 
-
-	for (auto& e : enemyManager->enemies) {
+	for (auto& e : enemyManager->GetEnemies()) {
 
 		if (!e->GetIsAlive())
 			continue; // 死んだ敵はスキップ
@@ -299,28 +293,43 @@ if (goalActive) { // ★ 敵全滅してからしか処理しない
 			               (v.y < 0);               // 落下中
 
 			if (isStomp) {
-				e->Stun(); // 敵にダメージ（スタン）
+				e->Stun(); // 敵にダメージ(スタン)
 			} else {
 				player->Damage(1); // プレイヤーが被弾
 			}
 		}
 
+		// ===== ② 剣との当たり判定 =====
+		if (player->GetIsAlive() && player->GetSword()->IsAttacking()) {
 
+			Vector3 swordPos = player->GetSword()->GetPosition();
+			float swordHit = player->GetSword()->GetHitSize();
 
-			  // ===== House と敵の当たり判定 =====
-		    bool hitHouse = fabs(ePos.x - housePos.x) < houseHitSize && fabs(ePos.y - housePos.y) < houseHitSize;
+			bool hitSword = fabs(swordPos.x - ePos.x) < swordHit && fabs(swordPos.y - ePos.y) < swordHit;
 
-		    if (hitHouse) {
-			    e->SetHPSubtract(10);      // ★ 敵を即死させる or 消す処理
-			    house->Damage(1); // ★ house にダメージ
+			if (hitSword) {
+				e->SetHPSubtract(1); // ダメージ
 
-			    if (house->GetHP() <= 0) {
-				    SceneManager::GetInstance()->ChangeScene("GameOver");
-			    }
-			    continue;
-		    }
+				// 敵を倒したらEXP獲得
+				if (!e->GetIsAlive()) {
+					player->EXPMath();
+				}
+			}
+		}
+
+		// ===== ③ House と敵の当たり判定 =====
+		bool hitHouse = fabs(ePos.x - housePos.x) < houseHitSize && fabs(ePos.y - housePos.y) < houseHitSize;
+
+		if (hitHouse) {
+			e->SetHPSubtract(10); // ★ 敵を即死させる or 消す処理
+			house->Damage(1);     // ★ house にダメージ
+
+			if (house->GetHP() <= 0) {
+				SceneManager::GetInstance()->ChangeScene("GameOver");
+			}
+			continue;
+		}
 	}
-
 
 	particles->SetPlayerPos(player->GetPosition());
 	particles->SetCameraPos(cameraController->GetTransform().translate);
@@ -331,7 +340,7 @@ if (goalActive) { // ★ 敵全滅してからしか処理しない
 	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
 	uimanager->SetHouseHP(house->GetHP());
-	uimanager->SetHouseHPMax(30); // House の最大HP（好きに変更）
+	uimanager->SetHouseHPMax(30); // House の最大HP(好きに変更)
 
 	uimanager->Update();
 	/*BG->Update(player->GetPosition());*/
@@ -343,31 +352,30 @@ if (goalActive) { // ★ 敵全滅してからしか処理しない
 	}
 
 	cameraController->SetPlayerPos(player->GetPosition());
-	cameraController->SetPlayerYaw(player->GetRotate().y);
-	cameraController->Update();
 
+	cameraController->Update();
 }
 
 void GameScene::Draw() {
 
 	GameBase::GetInstance()->ModelCommonSet();
-	/*skyDome->Draw();*/
+	skyDome->Draw();
 	player->Draw();
 	enemyManager->Draw();
 	house->Draw();
 
 	field->Draw();
 	if (goalActive) {
-		goal->Draw(); // ★ 敵全滅後だけ描画する
+		goal->Draw(); // ★ 条件クリア後だけ描画する
 	}
 
 	/*BG->Draw();*/
 	ParticleManager::GetInstance()->Draw();
-	
+
 	GameBase::GetInstance()->SpriteCommonSet();
 	uimanager->Draw();
 	// =============================
-	// ★ レベルアップ選択画面描画（別スプライト使用版）
+	// ★ レベルアップ選択画面描画(別スプライト使用版)
 	// =============================
 	if (isLevelSelecting) {
 
@@ -377,7 +385,7 @@ void GameScene::Draw() {
 		int leftID = selectChoices[0];
 		int rightID = selectChoices[1];
 
-		// 表示位置（自由に調整可）
+		// 表示位置(自由に調整可)
 		Vector2 leftPos = {350, 300};
 		Vector2 rightPos = {750, 300};
 
@@ -393,9 +401,4 @@ void GameScene::Draw() {
 		levelupIcons[rightID]->Update();
 		levelupIcons[rightID]->Draw();
 	}
-
-
-	
-	
-
 }

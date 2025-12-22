@@ -34,6 +34,8 @@ namespace Function {
 
 	Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);
 	Matrix4x4 Transpose(const Matrix4x4& m);
+    Vector3 Lerp(const Vector3& start, const Vector3& end, float ratio);
+    float Lerp(float start, float end, float ratio);
     Matrix4x4 MakeIdentity4x4();
     
 	}
