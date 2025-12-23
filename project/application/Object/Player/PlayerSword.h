@@ -16,6 +16,9 @@ class PlayerSword {
 	float attackTimer_ = 0.0f;
 	float attackDuration_ = 0.3f; // 攻撃の持続時間
 	int currentComboStep_ = 0;    // 現在のコンボ段階
+	float distanceFromPlayer_ = -1.5f; // プレイヤーからの距離
+	float playerYaw_ = 0.0f;          // プレイヤーの向き（ヨー角）
+
 
 public:
 	PlayerSword();
@@ -24,12 +27,14 @@ public:
 	void Update(const Transform& playerTransform);
 	void Draw();
 
-	void StartAttack(int comboStep = 1); // コンボ段階を受け取る
+	void StartAttack(int comboStep = 1); // コンボ段階を受け取る (1-4:通常攻撃, 5:落下攻撃, 6:重撃)
+	void EndAttack();                    // 攻撃を強制終了
 	bool IsAttacking() const { return isAttacking_; }
 
 	Vector3 GetPosition() const;
-	float GetHitSize() const { return 1.2f; }
+	float GetHitSize() const { return 2.2f; }
 	int GetComboStep() const { return currentComboStep_; }
 
 	void SetCamera(Camera* cam) { camera = cam; }
+	void SetPlayerYaw(float yaw) { playerYaw_ = yaw; }
 };

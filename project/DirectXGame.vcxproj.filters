@@ -222,9 +222,6 @@
     <ClCompile Include="Engine\BaseScene\BaseScene.cpp">
       <Filter>ソース ファイル\Engine\BaseScene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\BaseScene\FrameWork.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="application\Scene\Game\Game.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -240,9 +237,6 @@
     <ClCompile Include="Engine\Texture\Light\DirectionalLight.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\Object\Player\PlayerParameters.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="application\Object\House\House.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -256,7 +250,19 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\Object\Player\PlayerSword.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\application\Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Object\Player\PlayerSpecialAttack.cpp">
+      <Filter>ソース ファイル\application\Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Object\Player\PlayerSkill.cpp">
+      <Filter>ソース ファイル\application\Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Object\Player\PlayerParameters.cpp">
+      <Filter>ソース ファイル\application\Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\BaseScene\FrameWork.cpp">
+      <Filter>ソース ファイル\Engine\BaseScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -479,6 +485,12 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Object\Player\PlayerSword.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Player\PlayerSkill.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Player\PlayerSpecialAttack.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

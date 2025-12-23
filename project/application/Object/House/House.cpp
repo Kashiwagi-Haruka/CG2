@@ -12,7 +12,7 @@ void House::Initialize(Camera* camera) {
 	object_->SetModel("house");
 
 	object_->SetCamera(camera);
-	object_->SetScale({8, 8, 8});
+	object_->SetScale({4, 4, 4});
 	position_ = {-12, 1.5f, 2.5f};
 	object_->SetTranslate(position_);
 }

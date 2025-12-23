@@ -206,7 +206,30 @@ bool Input::TriggerButton(PadButton button) {
 	}
 	return false;
 }
-
+bool Input::ReleaseButton(PadButton button) {
+	if (!gamePadDevice_)
+		return false;
+	int index = static_cast<int>(button);
+	if (index <= static_cast<int>(PadButton::kButtonRightThumb)) {
+		// 通常ボタン
+		bool now = (padState_.rgbButtons[index] & 0x80) != 0;
+		bool prev = (prePadState_.rgbButtons[index] & 0x80) != 0;
+		return (!now && prev);
+	} else {
+		// POV（十字キー）
+		DWORD povNow = padState_.rgdwPOV[0];
+		DWORD povPrev = prePadState_.rgdwPOV[0];
+		if (button == PadButton::kButtonUp)
+			return (povNow != 0 && povPrev == 0);
+		if (button == PadButton::kButtonRight)
+			return (povNow != 9000 && povPrev == 9000);
+		if (button == PadButton::kButtonDown)
+			return (povNow != 18000 && povPrev == 18000);
+		if (button == PadButton::kButtonLeft)
+			return (povNow != 27000 && povPrev == 27000);
+	}
+	return false;
+}
 float Input::GetJoyStickLX() const {
 	if (!gamePadDevice_)
 		return 0.0f;

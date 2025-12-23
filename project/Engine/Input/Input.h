@@ -99,6 +99,7 @@ public:
 	// ゲームパッド
 	bool PushButton(PadButton button);                    // ボタンが押されているか
 	bool TriggerButton(PadButton button);                 // ボタンが押された瞬間か
+	bool ReleaseButton(PadButton button);                 // ボタンが離されているか
 
 	//ジョイスティック
 

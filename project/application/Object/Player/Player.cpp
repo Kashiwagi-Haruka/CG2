@@ -15,6 +15,8 @@ Player::Player() {
 	ModelManeger::GetInstance()->LoadModel("playerModel");
 	playerObject_ = std::make_unique<Object3d>();
 	sword_ = std::make_unique<PlayerSword>();
+	skill_ = std::make_unique<PlayerSkill>();
+	specialAttack_ = std::make_unique<PlayerSpecialAttack>();
 }
 
 Player::~Player() {}
@@ -24,9 +26,9 @@ void Player::Initialize(Camera* camera) {
 	state_ = State::kIdle;
 	velocity_ = {0.0f, 0.0f, 0.0f};
 	transform_ = {
-	    .scale{1.0f, 1.0f, 1.0f},
+	    .scale{2.0f, 2.0f, 2.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{0.0f, 1.5f, 0.0f}
+        .translate{0.0f, 3.0f, 0.0f}
     };
 
 	playerObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
@@ -36,6 +38,10 @@ void Player::Initialize(Camera* camera) {
 	playerObject_->SetCamera(camera_);
 	sword_->Initialize();
 	sword_->SetCamera(camera_);
+	skill_->Initialize();
+	skill_->SetCamera(camera_);
+	specialAttack_->Initialize();
+	specialAttack_->SetCamera(camera_); 
 	isAlive = true;
 	parameters_ = SetInit();
 	hp_ = parameters_.hpMax_;
@@ -52,9 +58,19 @@ void Player::Initialize(Camera* camera) {
 	comboWindow_ = 0.6f; // コンボ受付時間（秒）
 	isAttacking_ = false;
 	canCombo_ = false;
+
+	// 重撃・落下攻撃関連
+	attackHoldTimer_ = 0.0f;
+	heavyAttackThreshold_ = 0.3f; // 長押し判定時間（秒）
+	isFallingAttack_ = false;
 }
 
 void Player::Move() {
+
+	// ★ 落下攻撃中は移動できない
+	if (isFallingAttack_) {
+		return;
+	}
 
 	lastTapTimeA_++;
 	lastTapTimeD_++;
@@ -177,7 +193,7 @@ void Player::Move() {
 		velocity_.x *= parameters_.dashMagnification;
 		velocity_.z *= parameters_.dashMagnification;
 	}
-	transform_.translate += velocity_;
+
 	if (GameBase::GetInstance()->PushKey(DIK_A)) {
 		bulletVelocity_.x = -1;
 	}
@@ -199,18 +215,38 @@ void Player::Jump() {
 			jumpTimer += 0.1f * (1 / 60.0f);
 		}
 	}
+
+	// ★ 落下攻撃を開始したら即座に落下状態に
+	if (isFallingAttack_ && isJump) {
+		isJump = false;
+		isfalling = true;
+		jumpTimer = 0.0f;
+	}
 }
 
 void Player::Falling() {
 
 	if (isfalling) {
 
-		velocity_.y -= parameters_.gravity;
+		// ★ 落下攻撃中は急降下
+		if (isFallingAttack_) {
+			velocity_.y -= parameters_.gravity * 3.0f; // 通常の3倍の速度で落下
+			
+		} else {
+			velocity_.y -= parameters_.gravity;
+		}
 
-		if (transform_.translate.y <= 1.5f) {
-			transform_.translate.y = 1.5f;
+		if (transform_.translate.y <= 3.0f) {
+			transform_.translate.y = 3.0f;
 			velocity_.y = 0.0f;
 			isfalling = false;
+
+			// ★ 落下攻撃が地面に着いたら終了
+			if (isFallingAttack_) {
+				isFallingAttack_ = false;
+				isAttacking_ = false;
+				sword_->EndAttack(); // 攻撃を終了
+			}
 
 			usedAirAttack = false;
 		}
@@ -218,6 +254,11 @@ void Player::Falling() {
 }
 
 void Player::Attack() {
+
+	// ★ 落下攻撃中は他の攻撃不可
+	if (isFallingAttack_) {
+		return;
+	}
 
 	// コンボタイマーの更新
 	if (comboTimer_ > 0.0f) {
@@ -229,10 +270,30 @@ void Player::Attack() {
 		}
 	}
 
-	// 攻撃入力の処理
-	if (GameBase::GetInstance()->TriggerKey(DIK_J)) {
+	// ===== Jキー長押し判定 =====
+	if (GameBase::GetInstance()->PushKey(DIK_J)||GameBase::GetInstance()->PushButton(Input::PadButton::kButtonLeftThumb)) {
+		attackHoldTimer_ += 1.0f / 60.0f;
+	}
 
-		// 攻撃中でない、またはコンボ可能な状態の場合
+	// ===== 攻撃入力の処理 =====
+	if (GameBase::GetInstance()->TriggerKey(DIK_J)||GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonLeftThumb)) {
+
+		// ★ 空中にいる場合は落下攻撃
+		if (isfalling || isJump) {
+			isFallingAttack_ = true;
+			isAttacking_ = true;
+			attackState_ = AttackState::kFallingAttack;
+			sword_->StartAttack(5); // 5=落下攻撃
+
+			// コンボリセット
+			comboStep_ = 0;
+			canCombo_ = false;
+			comboTimer_ = 0.0f;
+			attackHoldTimer_ = 0.0f;
+			return;
+		}
+
+		// 地上での通常攻撃
 		if (!isAttacking_ || canCombo_) {
 
 			// 次のコンボ段階に進む
@@ -268,6 +329,23 @@ void Player::Attack() {
 		}
 	}
 
+	// ===== Jキーを離したとき =====
+	if (GameBase::GetInstance()->ReleaseKey(DIK_J) || GameBase::GetInstance()->ReleaseButton(Input::PadButton::kButtonLeftThumb)) {
+
+		// ★ 長押ししていた場合は重撃に変更
+		if (attackHoldTimer_ >= heavyAttackThreshold_ && isAttacking_) {
+			attackState_ = AttackState::kStrongAttack;
+			sword_->StartAttack(6); // 6=重撃
+
+			// コンボリセット
+			comboStep_ = 0;
+			canCombo_ = false;
+			comboTimer_ = 0.0f;
+		}
+
+		attackHoldTimer_ = 0.0f; // タイマーリセット
+	}
+
 	// 攻撃モーションが終了したか確認
 	if (isAttacking_ && !sword_->IsAttacking()) {
 		isAttacking_ = false;
@@ -275,6 +353,13 @@ void Player::Attack() {
 
 		// 4段階目が終わったらコンボリセット
 		if (comboStep_ >= 4) {
+			comboStep_ = 0;
+			canCombo_ = false;
+			comboTimer_ = 0.0f;
+		}
+
+		// 重撃が終わったらリセット
+		if (attackState_ == AttackState::kStrongAttack) {
 			comboStep_ = 0;
 			canCombo_ = false;
 			comboTimer_ = 0.0f;
@@ -306,11 +391,16 @@ void Player::Update() {
 	}
 
 	playerObject_->SetCamera(camera_);
-
+	transform_.translate += velocity_;
 	playerObject_->SetTransform(transform_);
 	playerObject_->Update();
 	sword_->SetCamera(camera_);
+	sword_->SetPlayerYaw(transform_.rotate.y);
 	sword_->Update(transform_);
+	skill_->SetCamera(camera_);
+	skill_->Update(transform_);
+	specialAttack_->SetCamera(camera_);
+	specialAttack_->Update(transform_);
 
 #ifdef USE_IMGUI
 
@@ -321,11 +411,14 @@ void Player::Update() {
 		ImGui::DragFloat3("plRot", &transform_.rotate.x);
 		ImGui::DragFloat("rotateSpeed", &rotateTimer, 0.01f, 0.0f, 1.0f);
 		ImGui::DragFloat("comboWindow", &comboWindow_, 0.01f, 0.1f, 2.0f);
+		ImGui::DragFloat("heavyAttackThreshold", &heavyAttackThreshold_, 0.01f, 0.1f, 2.0f);
 		ImGui::Text("J = FIRE , WASD = MOVE , SPACE = JUMP");
 		ImGui::Text("isDash: %d", isDash);
 		ImGui::Text("Combo Step: %d / 4", comboStep_);
 		ImGui::Text("Combo Timer: %.2f", comboTimer_);
 		ImGui::Text("Can Combo: %s", canCombo_ ? "YES" : "NO");
+		ImGui::Text("Hold Timer: %.2f", attackHoldTimer_);
+		ImGui::Text("Falling Attack: %s", isFallingAttack_ ? "YES" : "NO");
 	}
 	ImGui::End();
 
@@ -354,4 +447,6 @@ void Player::Draw() {
 	GameBase::GetInstance()->ModelCommonSet();
 	playerObject_->Draw();
 	sword_->Draw();
+	skill_->Draw();
+	specialAttack_->Draw();
 }

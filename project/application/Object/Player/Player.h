@@ -3,6 +3,8 @@
 #include "Object3d.h"
 #include "PlayerParameters.h"
 #include "PlayerSword.h"
+#include "PlayerSkill.h"
+#include "PlayerSpecialAttack.h"
 #include "Transform.h"
 #include "Vector3.h"
 #include <memory>
@@ -59,6 +61,11 @@ class Player {
 	bool isAttacking_ = false; // 攻撃中フラグ
 	bool canCombo_ = false;    // 次のコンボ入力可能フラグ
 
+	// 重撃・落下攻撃用
+	float attackHoldTimer_ = 0.0f;      // 長押し時間
+	float heavyAttackThreshold_ = 0.3f; // 重撃判定時間（秒）
+	bool isFallingAttack_ = false;      // 落下攻撃中フラグ
+
 	bool isDash = false;
 	bool isJump = false;
 	bool isfalling = false;
@@ -71,6 +78,8 @@ class Player {
 	std::unique_ptr<Object3d> playerObject_;
 
 	std::unique_ptr<PlayerSword> sword_;
+	std::unique_ptr<PlayerSkill> skill_;
+	std::unique_ptr<PlayerSpecialAttack> specialAttack_;
 
 	Camera* camera_;
 
@@ -103,6 +112,7 @@ public:
 	Parameters GetParameters() { return parameters_; }
 	void SetParameters(const Parameters& p) { parameters_ = p; }
 	Vector3 GetRotate() { return transform_.rotate; }
+	Vector3 GetScale() { return transform_.scale; }
 	void Damage(int amount) {
 		if (!isInvincible_) {
 			hp_ -= amount;
@@ -117,5 +127,6 @@ public:
 	bool GetLv() { return isLevelUP; }
 	void EXPMath();
 	PlayerSword* GetSword() { return sword_.get(); }
-	int GetComboStep() const { return comboStep_; } // コンボ段階取得用
+	int GetComboStep() const { return comboStep_; }           // コンボ段階取得用
+	bool IsFallingAttack() const { return isFallingAttack_; } // 落下攻撃中か
 };

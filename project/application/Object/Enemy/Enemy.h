@@ -41,6 +41,7 @@ public:
 	bool GetIsAlive() { return isAlive; }
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	Vector3 GetPosition() { return transform_.translate; }
+	Vector3 GetScale() { return transform_.scale; }
 	void SetPosition() { transform_.translate; }
 	void BulletCollision();
 };

@@ -1,7 +1,7 @@
 #include "PlayerSword.h"
 #include "GameBase.h"
 #include "ModelManeger.h"
-
+#include "Function.h"
 PlayerSword::PlayerSword() {
 
 	ModelManeger::GetInstance()->LoadModel("playerSword");
@@ -40,18 +40,31 @@ void PlayerSword::StartAttack(int comboStep) {
 	case 4:
 		attackDuration_ = 0.45f; // 4段目: フィニッシュで長め
 		break;
+	case 5:
+		attackDuration_ = 0.6f; // 落下攻撃: 長め
+		break;
+	case 6:
+		attackDuration_ = 0.5f; // 重撃: 強力で長め
+		break;
 	default:
 		attackDuration_ = 0.3f;
 		break;
 	}
 }
 
+void PlayerSword::EndAttack() {
+	isAttacking_ = false;
+	attackTimer_ = 0.0f;
+}
+
 Vector3 PlayerSword::GetPosition() const { return swordObject_->GetTransform().translate; }
 
 void PlayerSword::Update(const Transform& playerTransform) {
 
+	
+	Vector3 backDir = {sinf(playerYaw_), 0.0f, cosf(playerYaw_)};
 	Transform swordTransform = playerTransform;
-	swordTransform.translate.x += 1.0f; // 右手側
+	swordTransform.translate = playerTransform.translate - backDir * distanceFromPlayer_;
 
 	// 攻撃中は振る
 	if (isAttacking_) {
@@ -78,6 +91,19 @@ void PlayerSword::Update(const Transform& playerTransform) {
 			swordTransform.rotate.x -= attackTimer_ * 15.0f;
 			swordTransform.rotate.z -= attackTimer_ * 8.0f;
 			swordTransform.translate.y += attackTimer_ * 2.0f; // 上から振り下ろす
+			break;
+
+		case 5:                                 // 落下攻撃: 真下に突き刺す
+			swordTransform.rotate.x -= 90.0f;   // 真下に向ける
+			swordTransform.translate.y -= 1.0f; // 下に伸ばす
+			// 回転エフェクト
+			swordTransform.rotate.y += attackTimer_ * 20.0f;
+			break;
+
+		case 6: // 重撃: 大振りの横薙ぎ
+			swordTransform.rotate.y += attackTimer_ * 18.0f;
+			swordTransform.rotate.z += attackTimer_ * 10.0f;
+			swordTransform.translate.x += attackTimer_ * 3.0f; // 大きく振る
 			break;
 
 		default:

@@ -19,6 +19,7 @@ public:
 	void Draw();
 
 	Vector3 GetPosition() const { return position_; }
+	Vector3 GetScale() const { return object_->GetTransform().scale; }
 	int GetHP() const { return hp_; }
 	void Damage(int amount) { hp_ -= amount; }
 };

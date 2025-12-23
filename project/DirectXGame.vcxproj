@@ -232,6 +232,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp" />
     <ClCompile Include="application\Scene\SampleScene\SampleScene.cpp" />
     <ClCompile Include="application\Object\Player\PlayerSword.cpp" />
+    <ClCompile Include="application\Object\Player\PlayerSkill.cpp" />
+    <ClCompile Include="application\Object\Player\PlayerSpecialAttack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -318,6 +320,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Scene\SceneFactory\SceneFactory.h" />
     <ClInclude Include="application\Scene\SampleScene\SampleScene.h" />
     <ClInclude Include="application\Object\Player\PlayerSword.h" />
+    <ClInclude Include="application\Object\Player\PlayerSkill.h" />
+    <ClInclude Include="application\Object\Player\PlayerSpecialAttack.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

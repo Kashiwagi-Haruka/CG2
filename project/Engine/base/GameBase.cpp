@@ -1,15 +1,15 @@
 #define NOMINMAX
 #include "GameBase.h"
-#include <DbgHelp.h>
-#include <strsafe.h>
-#include <dxgidebug.h>
-#include "SpriteCommon.h"
-#include "Object3dCommon.h"
-#include "ModelManeger.h"
-#include "TextureManager.h" 
-#include "SrvManager.h"
-#include "ParticleManager.h"
 #include "ImGuiManager.h"
+#include "ModelManeger.h"
+#include "Object3dCommon.h"
+#include "ParticleManager.h"
+#include "SpriteCommon.h"
+#include "SrvManager.h"
+#include "TextureManager.h"
+#include <DbgHelp.h>
+#include <dxgidebug.h>
+#include <strsafe.h>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -31,7 +31,7 @@ void GameBase::Finalize() {
 	imguiM_->Finalize();
 	Audio::GetInstance()->Finalize();
 
-	// TextureManager は1回だけ！
+	// TextureManager は1回だけ
 	TextureManager::GetInstance()->Finalize();
 
 	ParticleManager::GetInstance()->Finalize();
@@ -42,10 +42,9 @@ void GameBase::Finalize() {
 	instance.reset();
 }
 
-
 void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight) {
 
-	winApp_ = std::make_unique <WinApp>();
+	winApp_ = std::make_unique<WinApp>();
 	winApp_->Initialize(TitleName);
 
 	dxCommon_ = std::make_unique<DirectXCommon>();
@@ -61,18 +60,13 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	TextureManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
 	ParticleManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
 	ModelManeger::GetInstance()->Initialize(dxCommon_.get());
-	obj3dCommon_ = std::make_unique < Object3dCommon>();
+	obj3dCommon_ = std::make_unique<Object3dCommon>();
 	obj3dCommon_->Initialize(dxCommon_.get());
-	spriteCommon_ = std::make_unique < SpriteCommon>();
+	spriteCommon_ = std::make_unique<SpriteCommon>();
 	spriteCommon_->Initialize(dxCommon_.get());
-	
 }
 
-bool GameBase::ProcessMessage() {
-
-	return winApp_->ProcessMessage();
-}
-
+bool GameBase::ProcessMessage() { return winApp_->ProcessMessage(); }
 
 LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 	// 時刻を取得して、時刻に名前を入れたファイルを作成。Dumpsディレクトリ以下に出力
@@ -100,26 +94,22 @@ LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 
 void GameBase::SetDefaultCamera(Camera* camera) { obj3dCommon_->SetDefaultCamera(camera); }
 
-
-
 void GameBase::SpriteCommonSet() { spriteCommon_->DrawCommon(); }
 void GameBase::ModelCommonSet() { obj3dCommon_->DrawCommon(); }
 
-void GameBase::BeginFlame() { 
+void GameBase::BeginFlame() {
 
 	dxCommon_->PreDraw();
 	imguiM_->Begin();
 	DInput->Update();
-	
 }
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
-void GameBase::EndFlame() { 
+void GameBase::EndFlame() {
 	imguiM_->End();
 	imguiM_->Draw(srvManager_.get(), dxCommon_.get());
-	dxCommon_->PostDraw(); 
+	dxCommon_->PostDraw();
 }
-
 
 bool GameBase::PushMouseButton(Input::MouseButton button) const { return DInput->PushMouseButton(button); }
 
@@ -129,17 +119,23 @@ float GameBase::GetMouseX() const { return DInput->GetMouseX(); };
 float GameBase::GetMouseY() const { return DInput->GetMouseY(); };
 Vector2 GameBase::GetMouseMove() const { return DInput->GetMouseMove(); };
 
-
-
-bool GameBase::PushKey(BYTE keyNumber){ return DInput->PushKey(keyNumber); }
+bool GameBase::PushKey(BYTE keyNumber) { return DInput->PushKey(keyNumber); }
 bool GameBase::TriggerKey(BYTE keyNumber) { return DInput->TriggerKey(keyNumber); }
 bool GameBase::ReleaseKey(BYTE keyNumber) { return DInput->ReleaseKey(keyNumber); }
-bool GameBase::PushButton(Input::PadButton button) { return DInput->PushButton(button); }
-bool GameBase::TriggerButton(Input::PadButton button) { return DInput->TriggerButton(button); }
+bool GameBase::PushButton(Input::PadButton button) { 
+
+	return DInput->PushButton(button); }
+bool GameBase::TriggerButton(Input::PadButton button) {
+
+	return DInput->TriggerButton(button);
+}
+bool GameBase::ReleaseButton(Input::PadButton button) {
+
+	return DInput->ReleaseButton(button);
+}
 // ジョイスティック
 
 float GameBase::GetJoyStickLX() const { return DInput->GetJoyStickLX(); };
-
 
 float GameBase::GetJoyStickLY() const { return DInput->GetJoyStickLY(); };
 
@@ -150,8 +146,10 @@ float GameBase::GetJoyStickRY() const { return DInput->GetJoyStickRY(); };
 Vector2 GameBase::GetJoyStickRXY() const { return DInput->GetJoyStickRXY(); };
 
 
+
 /// <summary>
 /// デッドゾーンの設定
 /// </summary>
 /// <param name="deadZone">初期値は0.2f</param>
 void GameBase::SetDeadZone(float deadZone) { DInput->SetDeadZone(deadZone); };
+

@@ -245,8 +245,7 @@ void GameScene::Update() {
 
 	goal->Update();
 
-	// 当たり判定サイズ(調整OK)
-	float hitSize = 1.0f;
+
 	// ===== プレイヤーとゴールの当たり判定 =====
 	{
 		Vector3 p = player->GetPosition();
@@ -274,7 +273,7 @@ void GameScene::Update() {
 	Vector3 v = player->GetVelocity();
 
 	Vector3 housePos = house->GetPosition();
-	float houseHitSize = 8.0f;
+	float houseHitSize = house->GetScale().x;
 
 	for (auto& e : enemyManager->GetEnemies()) {
 
@@ -284,7 +283,7 @@ void GameScene::Update() {
 		Vector3 ePos = e->GetPosition();
 
 		// ===== ① プレイヤーが敵と接触 =====
-		bool isCollidePlayer = fabs(p.x - ePos.x) < hitSize && fabs(p.y - ePos.y) < hitSize;
+		bool isCollidePlayer = fabs(p.x - ePos.x) < player->GetScale().x && fabs(p.y - ePos.y) < e->GetScale().x;
 
 		if (isCollidePlayer) {
 
