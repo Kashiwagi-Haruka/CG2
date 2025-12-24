@@ -68,7 +68,10 @@ void Particles::Update() {
 	ImGui::End();
 #endif
 }
+void Particles::Draw() {
 
+	ParticleManager::GetInstance()->Draw();
+}
 void Particles::SetPlayerPos(Vector3 playerPos){ playerPos_ = playerPos; }
 void Particles::SetCameraPos(Vector3 cameraPos) { cameraPos_ = cameraPos; }
 void Particles::SetGoalPos(Vector3 goalPos) { goalPos_ = goalPos; }

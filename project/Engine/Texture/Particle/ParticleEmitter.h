@@ -12,7 +12,7 @@ public:
 
 	// 更新
 	void Update(const Transform& transform);
-
+	void Draw();
 	// 発生
 	void Emit();
 	void EmitVisible(bool v);

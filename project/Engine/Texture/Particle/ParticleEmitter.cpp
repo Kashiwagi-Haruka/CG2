@@ -29,8 +29,12 @@ void ParticleEmitter::Update(const Transform& parentTransform) {
 		timer -= 1.0f;
 	}
 }
+void ParticleEmitter::Draw(){
 
-// -----------------------------------------
+
+
+}
+    // -----------------------------------------
 // EmitVisible
 // -----------------------------------------
 void ParticleEmitter::EmitVisible(bool v) { emitVisible_ = v; }

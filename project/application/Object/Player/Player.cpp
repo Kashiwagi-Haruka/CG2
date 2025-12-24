@@ -7,13 +7,16 @@
 #include "Object/MapchipField.h"
 #include <algorithm>
 #include <numbers>
+#include "Object3dCommon.h"
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
 
 Player::Player() {
 	ModelManeger::GetInstance()->LoadModel("playerModel");
+	ModelManeger::GetInstance()->LoadModel("FallingEffect");
 	playerObject_ = std::make_unique<Object3d>();
+	fallingEffectObject_ = std::make_unique<Object3d>();
 	sword_ = std::make_unique<PlayerSword>();
 	skill_ = std::make_unique<PlayerSkill>();
 	specialAttack_ = std::make_unique<PlayerSpecialAttack>();
@@ -28,11 +31,13 @@ void Player::Initialize(Camera* camera) {
 	transform_ = {
 	    .scale{2.0f, 2.0f, 2.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{0.0f, 3.0f, 0.0f}
+        .translate{0.0f, 2.5f, 0.0f}
     };
 
 	playerObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	playerObject_->SetModel("playerModel");
+	fallingEffectObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	fallingEffectObject_->SetModel("FallingEffect");
 
 	camera_ = camera;
 	playerObject_->SetCamera(camera_);
@@ -236,8 +241,8 @@ void Player::Falling() {
 			velocity_.y -= parameters_.gravity;
 		}
 
-		if (transform_.translate.y <= 3.0f) {
-			transform_.translate.y = 3.0f;
+		if (transform_.translate.y <= 2.5f) {
+			transform_.translate.y = 2.5f;
 			velocity_.y = 0.0f;
 			isfalling = false;
 
@@ -406,6 +411,13 @@ void Player::Update() {
 	transform_.translate += velocity_;
 	playerObject_->SetTransform(transform_);
 	playerObject_->Update();
+	fallingEffectTransform_.scale = transform_.scale;
+	fallingEffectTransform_.translate = transform_.translate;
+	fallingEffectTransform_.translate.y -= 1.0f;
+	fallingEffectTransform_.rotate.y += 0.2f;
+	fallingEffectObject_->SetCamera(camera_);
+	fallingEffectObject_->SetTransform(fallingEffectTransform_);
+	fallingEffectObject_->Update();
 	sword_->SetCamera(camera_);
 	sword_->SetPlayerYaw(transform_.rotate.y);
 	sword_->Update(transform_);
@@ -458,6 +470,11 @@ void Player::Draw() {
 
 	GameBase::GetInstance()->ModelCommonSet();
 	playerObject_->Draw();
+	if (isFallingAttack_) {
+	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAdd);
+	fallingEffectObject_->Draw();
+	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAlpha);
+	}
 	sword_->Draw();
 	skill_->Draw();
 	specialAttack_->Draw();

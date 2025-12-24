@@ -1,14 +1,13 @@
 #include "ParticleManager.h"
-#include "TextureManager.h"
-#include "DirectXCommon.h"
-#include "SrvManager.h"
-#include "VertexData.h"
 #include "Camera.h"
-#include <numbers>
-#include <cassert>
+#include "DirectXCommon.h"
 #include "Logger.h"
-std::unique_ptr <ParticleManager> ParticleManager::instance = nullptr;
-
+#include "SrvManager.h"
+#include "TextureManager.h"
+#include "VertexData.h"
+#include <cassert>
+#include <numbers>
+std::unique_ptr<ParticleManager> ParticleManager::instance = nullptr;
 
 ParticleManager* ParticleManager::GetInstance() {
 
@@ -18,8 +17,7 @@ ParticleManager* ParticleManager::GetInstance() {
 	return instance.get();
 }
 
-void ParticleManager::SetBlendMode(BlendMode mode) {
-	currentBlendMode_ = mode; }
+void ParticleManager::SetBlendMode(BlendMode mode) { currentBlendMode_ = mode; }
 
 void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
 	// 1. 記録
@@ -74,7 +72,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	newGroup.textureFilePath = textureFilePath;
 
 	//--------------------------------
-	// 4. テクスチャ読み込み（TextureManagerは二重読込防止）
+	// 4. テクスチャ読み込み(TextureManagerは二重読込防止)
 	//--------------------------------
 	uint32_t texSrvIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath(textureFilePath);
 
@@ -86,11 +84,7 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 	//--------------------------------
 	// 6. インスタンシング用リソース作成
 	//--------------------------------
-	uint32_t maxInstance = 5000; // 初期容量
-	uint32_t elementSize = sizeof(TransformationMatrix);
-	uint32_t bufferSize = maxInstance * elementSize;
-
-for (int i = 0; i < (int)BlendMode::kCountOfBlendMode; i++) {
+	for (int i = 0; i < (int)BlendMode::kCountOfBlendMode; i++) {
 
 		auto& b = newGroup.buckets[i];
 		b.maxInstance = 1000;
@@ -103,7 +97,6 @@ for (int i = 0; i < (int)BlendMode::kCountOfBlendMode; i++) {
 		b.instancingSrvIndex = srvManager_->Allocate();
 		srvManager_->CreateSRVforStructuredBuffer(b.instancingSrvIndex, b.instancingResource.Get(), b.maxInstance, sizeof(TransformationMatrix));
 	}
-
 
 	//--------------------------------
 	// 9. グループ登録
@@ -122,6 +115,8 @@ void ParticleManager::Update(Camera* camera) {
 
 	camWorld.m[3][0] = camWorld.m[3][1] = camWorld.m[3][2] = 0;
 
+	camWorld = Function::Inverse(camWorld);
+
 	Matrix4x4 billboard = camWorld;
 
 	// ============================
@@ -137,7 +132,6 @@ void ParticleManager::Update(Camera* camera) {
 		for (auto it = group.particles.begin(); it != group.particles.end();) {
 
 			Particle& p = *it;
-			
 
 			// ---------------------
 			// 寿命
@@ -167,7 +161,6 @@ void ParticleManager::Update(Camera* camera) {
 			p.vel.x += p.accel.x;
 			p.vel.y += p.accel.y;
 			p.vel.z += p.accel.z;
-
 
 			p.transform_.translate.x += p.vel.x;
 			p.transform_.translate.y += p.vel.y;
@@ -233,55 +226,37 @@ void ParticleManager::Update(Camera* camera) {
 	}
 }
 
-
-
 void ParticleManager::Draw() {
-	// 必要に応じて CB を作る（1度だけ）
-	//if (!cbResource_) {
-	//	struct alignas(256) ParticleCB {
-	//		float dummy[16];
-	//	};
-	//	cbResource_ = dxCommon_->CreateBufferResource(sizeof(ParticleCB));
-	//}
 
-	//// CB を毎フレーム更新（ここでは内容空）
-	//{
-	//	void* p = nullptr;
-	//	cbResource_->Map(0, nullptr, &p);
-	//	memset(p, 0, sizeof(float) * 16);
-	//	cbResource_->Unmap(0, nullptr);
-	//}
 	struct alignas(256) MaterialCB {
-	float color[4];     // {1,1,1,1}
-	int enableLighting; // 0
-	float pad[3];
-	float uvTransform[16]; // 単位行列
+		float color[4];     // {1,1,1,1}
+		int enableLighting; // 0
+		float pad[3];
+		float uvTransform[16]; // 単位行列
 	};
 
-// 作成は一度だけ
-if (!cbResource_)
-	cbResource_ = dxCommon_->CreateBufferResource(sizeof(MaterialCB));
+	// 作成は一度だけ
+	if (!cbResource_)
+		cbResource_ = dxCommon_->CreateBufferResource(sizeof(MaterialCB));
 
-// 毎フレーム更新
-{
-	void* p = nullptr;
-	cbResource_->Map(0, nullptr, &p);
-	auto* m = reinterpret_cast<MaterialCB*>(p);
-	// とりあえず代表粒子の alpha を使う（最小変更）
-	
-	m->color[0] = 1.0f;
-	m->color[1] = 1.0f;
-	m->color[2] = 1.0f;
-	m->color[3] = 1.0f;
+	// 毎フレーム更新
+	{
+		void* p = nullptr;
+		cbResource_->Map(0, nullptr, &p);
+		auto* m = reinterpret_cast<MaterialCB*>(p);
 
-	m->enableLighting = 0;
-	m->pad[0] = m->pad[1] = m->pad[2] = 0.0f;
-	// 4x4 単位行列
-	for (int i = 0; i < 16; i++)
-		m->uvTransform[i] = (i % 5 == 0) ? 1.0f : 0.0f;
-	cbResource_->Unmap(0, nullptr);
-}
-// 既に root[0] = b0 にセットしているので、そのままでOK。:contentReference[oaicite:3]{index=3}
+		m->color[0] = 1.0f;
+		m->color[1] = 1.0f;
+		m->color[2] = 1.0f;
+		m->color[3] = 1.0f;
+
+		m->enableLighting = 0;
+		m->pad[0] = m->pad[1] = m->pad[2] = 0.0f;
+		// 4x4 単位行列
+		for (int i = 0; i < 16; i++)
+			m->uvTransform[i] = (i % 5 == 0) ? 1.0f : 0.0f;
+		cbResource_->Unmap(0, nullptr);
+	}
 
 	// ① RootSig / ② PSO / ③ Heap / ④ CBV(b0) / ⑤ IA 設定
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
@@ -291,7 +266,6 @@ if (!cbResource_)
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vbView_);
 
-	
 	if (!vsTransformCB_) {
 		vsTransformCB_ = dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
 		void* p = nullptr;
@@ -304,26 +278,34 @@ if (!cbResource_)
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(
 	    3, // rootParameters[3] = b1
 	    vsTransformCB_->GetGPUVirtualAddress());
+
 	// ==========================================
-	// ブレンドモード別に描画
+	// ★ 全ブレンドモードをループして描画
 	// ==========================================
-	
+	for (int blendMode = 0; blendMode < (int)BlendMode::kCountOfBlendMode; blendMode++) {
 
-	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[currentBlendMode_].Get());
+		// PSO設定
+		dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[blendMode].Get());
 
-	for (auto& [name, group] : particleGroups) {
+		// 全グループをループ
+		for (auto& [name, group] : particleGroups) {
 
-		auto& bucket = group.buckets[currentBlendMode_];
-		if (bucket.instanceCount == 0)
-			continue;
+			auto& bucket = group.buckets[blendMode];
 
-		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group.textureSrvIndex));
+			// このブレンドモードで描画するパーティクルがない場合はスキップ
+			if (bucket.instanceCount == 0)
+				continue;
 
-		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(bucket.instancingSrvIndex));
+			// テクスチャ設定
+			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group.textureSrvIndex));
 
-		dxCommon_->GetCommandList()->DrawInstanced(6, bucket.instanceCount, 0, 0);
+			// インスタンシングデータ設定
+			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(bucket.instancingSrvIndex));
+
+			// 描画
+			dxCommon_->GetCommandList()->DrawInstanced(6, bucket.instanceCount, 0, 0);
+		}
 	}
-	
 }
 
 void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area) {
@@ -358,7 +340,7 @@ void ParticleManager::EnsureCapacityBucket(ParticleGroup::BlendBucket& bucket, u
 	if (required <= bucket.maxInstance)
 		return;
 
-	// 新しいサイズに拡張（2倍ずつ増やす）
+	// 新しいサイズに拡張(2倍ずつ増やす)
 	uint32_t newSize = bucket.maxInstance;
 	while (newSize < required) {
 		newSize *= 2;
@@ -387,7 +369,7 @@ void ParticleManager::EnsureCapacityBucket(ParticleGroup::BlendBucket& bucket, u
 	void* newPtr = nullptr;
 	newRes->Map(0, nullptr, &newPtr);
 
-	// 古いデータをコピー（現存しているインスタンス数だけ）
+	// 古いデータをコピー(現存しているインスタンス数だけ)
 	uint32_t toCopy = bucket.instanceCount;
 	memcpy(newPtr, bucket.instancingDataPtr, sizeof(TransformationMatrix) * toCopy);
 
@@ -396,7 +378,7 @@ void ParticleManager::EnsureCapacityBucket(ParticleGroup::BlendBucket& bucket, u
 	bucket.instancingDataPtr = newPtr;
 	bucket.maxInstance = newSize;
 
-	// SRV を更新（同じ SRV index に新バッファを再登録）
+	// SRV を更新(同じ SRV index に新バッファを再登録)
 	srvManager_->CreateSRVforStructuredBuffer(bucket.instancingSrvIndex, bucket.instancingResource.Get(), bucket.maxInstance, sizeof(TransformationMatrix));
 }
 
@@ -404,7 +386,7 @@ void ParticleManager::Finalize() {
 	Clear();
 	instance = nullptr;
 }
-void ParticleManager::Clear(){
+void ParticleManager::Clear() {
 	for (auto& [name, group] : particleGroups) {
 		for (auto& b : group.buckets) {
 			if (b.instancingResource) {
@@ -414,7 +396,6 @@ void ParticleManager::Clear(){
 		}
 	}
 	particleGroups.clear();
-
 }
 void ParticleManager::CreateRootsignature() {
 	HRESULT hr_;
@@ -430,8 +411,8 @@ void ParticleManager::CreateRootsignature() {
 	D3D12_DESCRIPTOR_RANGE rangeTexture{};
 	rangeTexture.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	rangeTexture.NumDescriptors = 1;
-	rangeTexture.BaseShaderRegister = 0; //
-	rangeTexture.RegisterSpace = 0;      //
+	rangeTexture.BaseShaderRegister = 0;
+	rangeTexture.RegisterSpace = 0;
 	rangeTexture.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
@@ -439,12 +420,12 @@ void ParticleManager::CreateRootsignature() {
 	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
 	rootParameters[1].DescriptorTable.pDescriptorRanges = &rangeTexture;
 
-	// t0, space1 : InstancingData (VS)
+	// t1 : InstancingData (VS)
 	D3D12_DESCRIPTOR_RANGE rangeInstancing{};
 	rangeInstancing.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	rangeInstancing.NumDescriptors = 1;
-	rangeInstancing.BaseShaderRegister = 1; //
-	rangeInstancing.RegisterSpace = 0;      //
+	rangeInstancing.BaseShaderRegister = 1;
+	rangeInstancing.RegisterSpace = 0;
 	rangeInstancing.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
@@ -484,7 +465,7 @@ void ParticleManager::CreateRootsignature() {
 	assert(SUCCEEDED(hr_));
 }
 void ParticleManager::CreateGraphicsPipeline() {
-	
+
 	CreateRootsignature();
 	HRESULT hr_;
 	// InputLayout
@@ -500,7 +481,7 @@ void ParticleManager::CreateGraphicsPipeline() {
 	// DepthStencil
 	D3D12_DEPTH_STENCIL_DESC depthDesc{};
 	depthDesc.DepthEnable = true;
-	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO; // ★ 深度書き込みOFF
 	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	// Shader
@@ -515,7 +496,7 @@ void ParticleManager::CreateGraphicsPipeline() {
 		psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
 		psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
 		D3D12_RASTERIZER_DESC rasterizerDesc{};
-		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+		rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE; // ★ カリングOFF
 		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 		psoDesc.RasterizerState = rasterizerDesc;
 		psoDesc.BlendState = blendModeManeger_.SetBlendMode(static_cast<BlendMode>(i));
@@ -530,7 +511,4 @@ void ParticleManager::CreateGraphicsPipeline() {
 		hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&graphicsPipelineState_[i]));
 		assert(SUCCEEDED(hr_));
 	}
-
-
 }
-

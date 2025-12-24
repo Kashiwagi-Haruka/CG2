@@ -3,6 +3,7 @@
 #include "ModelManeger.h"
 #include <numbers>
 #include "Function.h"
+#include "Object3dCommon.h"
 PlayerSpecialAttack::PlayerSpecialAttack() { 
 	ModelManeger::GetInstance()->LoadModel("iceFlower"); 
 }
@@ -54,8 +55,10 @@ void PlayerSpecialAttack::Update(const Transform& playerTransform) {
 	debugBox_->Update();
 }
 void PlayerSpecialAttack::Draw() {
+	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAdd);
 	for (size_t i = 0; i < iceFlowers_->size(); i++) {
 		(*iceFlowers_)[i].Draw();
 	}
+	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAlpha);
 	debugBox_->Draw(); 
 }

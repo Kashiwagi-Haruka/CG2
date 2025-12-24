@@ -20,6 +20,7 @@ class Particles {
 	Particles();
 	~Particles();
 	void Update();
+	void Draw();
 	void SetPlayerPos(Vector3 playerPos);
 	void SetCameraPos(Vector3 cameraPos);
 	void SetGoalPos(Vector3 goalPos);
