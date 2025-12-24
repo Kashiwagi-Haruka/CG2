@@ -10,6 +10,9 @@ class PlayerSpecialAttack {
 	std::unique_ptr<Object3d> debugBox_;
 	Camera* camera_ = nullptr;
 	Transform transform_;
+	float rotateTimer = 0.0f;
+	float radiusTimer = 0.0f;
+	float radius = 3.0f;
 
 public:
 	PlayerSpecialAttack();

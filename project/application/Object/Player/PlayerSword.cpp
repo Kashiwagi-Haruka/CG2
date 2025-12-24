@@ -94,7 +94,7 @@ void PlayerSword::Update(const Transform& playerTransform) {
 			break;
 
 		case 5:                                 // 落下攻撃: 真下に突き刺す
-			swordTransform.rotate.x -= 90.0f;   // 真下に向ける
+			swordTransform.rotate.x -= 3.14f;   // 真下に向ける
 			swordTransform.translate.y -= 1.0f; // 下に伸ばす
 			// 回転エフェクト
 			swordTransform.rotate.y += attackTimer_ * 20.0f;

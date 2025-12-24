@@ -14,6 +14,7 @@ class CameraController {
 	~CameraController();
 	void Initialize();
 	void Update();
+	void SpecialAttackUpdate();
 	
 	Camera* GetCamera();
 	Transform GetTransform() { return transform_;}

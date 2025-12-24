@@ -47,12 +47,28 @@ void CameraController::Update() {
 
 	transform_.translate = playerPos - backDir * distance + Vector3{0.0f, height, 0.0f};
 
-	
+	if (GameBase::GetInstance()->PushKey(DIK_LEFT)) {
+		transform_.rotate.y += cameraSpeed_;
+	}
+	if (GameBase::GetInstance()->PushKey(DIK_RIGHT)) {
+		transform_.rotate.y -= cameraSpeed_;
+	}
+	if (GameBase::GetInstance()->PushKey(DIK_UP)) {
+		transform_.rotate.x -= cameraSpeed_;
+	}
+	if (GameBase::GetInstance()->PushKey(DIK_DOWN)) {
+		transform_.rotate.x += cameraSpeed_;
+	}
 
 	camera_->SetTransform(transform_);
 	camera_->Update();
 
 }
+void CameraController::SpecialAttackUpdate() {
+	
 
-Camera* CameraController::GetCamera() {
+	
+
+}
+	Camera* CameraController::GetCamera() {
 	return camera_.get();}
