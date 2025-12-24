@@ -109,15 +109,8 @@ void ParticleManager::Update(Camera* camera) {
 	const Matrix4x4& view = camera->GetViewMatrix();
 	const Matrix4x4& proj = camera->GetProjectionMatrix();
 
-	Matrix4x4 camWorld = Function::MakeRotateXMatrix(camera->GetTransform().rotate.x);
-	camWorld = Function::Multiply(camWorld, Function::MakeRotateYMatrix(camera->GetTransform().rotate.y));
-	camWorld = Function::Multiply(camWorld, Function::MakeRotateZMatrix(camera->GetTransform().rotate.z));
-
-	camWorld.m[3][0] = camWorld.m[3][1] = camWorld.m[3][2] = 0;
-
-	camWorld = Function::Inverse(camWorld);
-
-	Matrix4x4 billboard = camWorld;
+	Matrix4x4 billboard = Function::Inverse(view);
+	billboard.m[3][0] = billboard.m[3][1] = billboard.m[3][2] = 0;
 
 	// ============================
 	//  全グループ更新
