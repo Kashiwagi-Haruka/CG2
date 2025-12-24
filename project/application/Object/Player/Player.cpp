@@ -271,12 +271,12 @@ void Player::Attack() {
 	}
 
 	// ===== Jキー長押し判定 =====
-	if (GameBase::GetInstance()->PushKey(DIK_J)||GameBase::GetInstance()->PushButton(Input::PadButton::kButtonLeftThumb)) {
+	if (GameBase::GetInstance()->PushKey(DIK_J)||GameBase::GetInstance()->PushButton(Input::PadButton::kButtonB)) {
 		attackHoldTimer_ += 1.0f / 60.0f;
 	}
 
 	// ===== 攻撃入力の処理 =====
-	if (GameBase::GetInstance()->TriggerKey(DIK_J)||GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonLeftThumb)) {
+	if (GameBase::GetInstance()->TriggerKey(DIK_J)||GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonB)) {
 
 		// ★ 空中にいる場合は落下攻撃
 		if (isfalling || isJump) {
@@ -330,7 +330,7 @@ void Player::Attack() {
 	}
 
 	// ===== Jキーを離したとき =====
-	if (GameBase::GetInstance()->ReleaseKey(DIK_J) || GameBase::GetInstance()->ReleaseButton(Input::PadButton::kButtonLeftThumb)) {
+	if (GameBase::GetInstance()->ReleaseKey(DIK_J) || GameBase::GetInstance()->ReleaseButton(Input::PadButton::kButtonB)) {
 
 		// ★ 長押ししていた場合は重撃に変更
 		if (attackHoldTimer_ >= heavyAttackThreshold_ && isAttacking_) {
@@ -360,6 +360,18 @@ void Player::Attack() {
 
 		// 重撃が終わったらリセット
 		if (attackState_ == AttackState::kStrongAttack) {
+			comboStep_ = 0;
+			canCombo_ = false;
+			comboTimer_ = 0.0f;
+		}
+	}
+	if (GameBase::GetInstance()->TriggerKey(DIK_E)||GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonY)) {
+		// スキル攻撃
+		if (!isSkillAttack) {
+			isSkillAttack = true;
+			attackState_ = AttackState::kSkillAttack;
+			skill_->StartAttack();
+			// コンボリセット
 			comboStep_ = 0;
 			canCombo_ = false;
 			comboTimer_ = 0.0f;

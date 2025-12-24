@@ -8,6 +8,11 @@ void PlayerSkill::Initialize() {
 	debugBox_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	debugBox_->SetCamera(camera_);
 	debugBox_->SetModel("debugBox");
+	transform_ = {
+		.scale{2.0f, 2.0f, 2.0f},
+		.rotate{0.0f, 0.0f, 0.0f},
+		.translate{0.0f, 0.0f, 0.0f}
+    };
 }
 void PlayerSkill::Update(const Transform& playerTransform) {
 	transform_ = playerTransform;
@@ -17,8 +22,11 @@ void PlayerSkill::Update(const Transform& playerTransform) {
 	debugBox_->SetTransform(transform_);
 	debugBox_->Update();
 }
+void PlayerSkill::StartAttack() { isSkillAttack = true; }
 void PlayerSkill::Draw() {
+	if (isSkillAttack) {
 	debugBox_->Draw(); 
+	}
 }
 
 

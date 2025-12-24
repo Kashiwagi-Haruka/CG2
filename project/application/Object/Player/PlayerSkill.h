@@ -11,6 +11,8 @@ class PlayerSkill {
 	Transform transform_;
 	Camera* camera_ = nullptr;
 
+	bool isSkillAttack = false;
+
 	public:
 
 		PlayerSkill();
@@ -18,5 +20,5 @@ class PlayerSkill {
 	    void Update(const Transform& playerTransform);
 	    void Draw();
 	    void SetCamera(Camera* camera) { camera_ = camera; }
-
+	    void StartAttack();
 };

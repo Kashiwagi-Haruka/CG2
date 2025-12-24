@@ -66,6 +66,9 @@ class Player {
 	float heavyAttackThreshold_ = 0.3f; // 重撃判定時間（秒）
 	bool isFallingAttack_ = false;      // 落下攻撃中フラグ
 
+	//スキル攻撃用
+	bool isSkillAttack = false;
+
 	bool isDash = false;
 	bool isJump = false;
 	bool isfalling = false;
@@ -84,13 +87,12 @@ class Player {
 	Camera* camera_;
 
 	MapchipField* map_ = nullptr;
-	bool isAirAttack = false;
-	int airAttackIndex = 0; // 今何発目か（0〜3）
-	float airAttackTimer = 0.0f;
+
 	bool isSelect_;
 	bool isLevelUP;
-	bool usedAirAttack = false;
 	float rotateTimer = 0.0f;
+
+	bool usedAirAttack = false;
 
 public:
 	Player();
