@@ -46,7 +46,7 @@ class GameScene: public BaseScene{
 	std::unique_ptr<CameraController> cameraController;
 	std::unique_ptr<MapchipField> field;
 	std::unique_ptr<House> house;
-	/*std::unique_ptr<Background> BG;*/
+	
 	
 
 	

@@ -206,7 +206,7 @@ void GameScene::Update() {
 	player->SetCamera(cameraController->GetCamera());
 	field->SetCamera(cameraController->GetCamera());
 	goal->SetCamera(cameraController->GetCamera());
-	/*BG->SetCamera(cameraController->GetCamera());*/
+	
 
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
 	skyDome->Update();
@@ -339,16 +339,13 @@ void GameScene::Update() {
 	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
 	uimanager->SetHouseHP(house->GetHP());
-	uimanager->SetHouseHPMax(30); // House の最大HP(好きに変更)
+	
 
 	uimanager->Update();
-	/*BG->Update(player->GetPosition());*/
+	
 	house->Update(cameraController->GetCamera());
 
-	// どちらかの HP が 0 以下で GameOver
-	if (!player->GetIsAlive() || house->GetHP() <= 0) {
-		sceneEndOver = true;
-	}
+
 
 	cameraController->SetPlayerPos(player->GetPosition());
 
@@ -358,18 +355,20 @@ void GameScene::Update() {
 void GameScene::Draw() {
 
 	GameBase::GetInstance()->ModelCommonSet();
-	skyDome->Draw();
+	/*skyDome->Draw();*/
+	field->Draw();
+	house->Draw();
 	player->Draw();
 	enemyManager->Draw();
-	house->Draw();
+	
 
-	field->Draw();
+
 	if (goalActive) {
 		goal->Draw(); // ★ 条件クリア後だけ描画する
 	}
 
-	/*BG->Draw();*/
-	ParticleManager::GetInstance()->Draw();
+	
+	
 
 	GameBase::GetInstance()->SpriteCommonSet();
 	uimanager->Draw();

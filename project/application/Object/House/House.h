@@ -8,7 +8,7 @@ class House {
 
 	std::unique_ptr<Object3d> object_;
 	Vector3 position_ = {0, 1.5f, 0};
-	int hp_ = 50;
+	int hp_ = 500000;
 
 public:
 	House();

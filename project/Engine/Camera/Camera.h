@@ -15,7 +15,7 @@ class Camera {
 	float fovY = 0.45f;                   // 視野角（縦方向）
 	float aspectRatio = 1280.0f / 720.0f; // アスペクト比
 	float nearZ = 0.1f;                   // ニアクリップ距離
-	float farZ = 100.0f;                  // ファークリップ距離
+	float farZ = 1000.0f;                  // ファークリップ距離
 
 public:
 	
