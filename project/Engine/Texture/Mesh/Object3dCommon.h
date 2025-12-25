@@ -17,7 +17,7 @@ private:
 
 	HRESULT hr_;
 
-	BlendMode blendMode_ = BlendMode::kBlendModeAlpha;
+	BlendMode blendMode_ = BlendMode::kBlendModeNone;
 	BlendModeManeger blendModeManeger_;
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;

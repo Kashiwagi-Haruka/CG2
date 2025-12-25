@@ -183,9 +183,6 @@
     <ClCompile Include="application\Object\Goal.cpp">
       <Filter>ソース ファイル\application\Object</Filter>
     </ClCompile>
-    <ClCompile Include="application\Object\Background\Background.cpp">
-      <Filter>ソース ファイル\application\Object\Background</Filter>
-    </ClCompile>
     <ClCompile Include="application\Object\Background\SkyDome.cpp">
       <Filter>ソース ファイル\application\Object\Background</Filter>
     </ClCompile>
@@ -417,9 +414,6 @@
     </ClInclude>
     <ClInclude Include="Engine\math\RigidBody.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Background\Background.h">
-      <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="application\Object\Goal.h">
       <Filter>ヘッダー ファイル\application</Filter>

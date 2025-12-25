@@ -9,7 +9,6 @@
 #include "Object/Goal.h"
 #include "SceneTransition.h"
 #include "UIManager.h"
-#include "Object/Background/Background.h"
 #include "Object/CatchBlock.h"
 #include "BaseScene.h"
 #include "Object/House/House.h"
