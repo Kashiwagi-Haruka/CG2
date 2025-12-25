@@ -8,7 +8,7 @@
 #include "ParticleManager.h"
 #include "SceneManager.h"
 #include <numbers>
-
+#include "RigidBody.h"
 GameScene::GameScene() {
 
 	cameraController = std::make_unique<CameraController>();
@@ -131,9 +131,9 @@ void GameScene::DebugImGui() {
 			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLight_.cosFalloffStart, 0.1f, 0.0f, 1.0f);
 			ImGui::TreePop();
 		}
-		ImGui::End();
+		
 	}
-
+	ImGui::End();
 	// ★ ウェーブ情報の表示
 	if (ImGui::Begin("Wave Info")) {
 		ImGui::Text("Current Wave: %d", enemyManager->GetCurrentWave());
@@ -154,8 +154,14 @@ void GameScene::DebugImGui() {
 
 #endif // USE_IMGUI
 }
-
 void GameScene::Update() {
+	auto makeAabb = [](const Vector3& center, const Vector3& halfSize) {
+		AABB aabb;
+		aabb.min = {center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z};
+		aabb.max = {center.x + halfSize.x, center.y + halfSize.y, center.z + halfSize.z};
+		return aabb;
+	};
+
 	// ★ レベルアップ選択中は操作受付
 	if (isLevelSelecting) {
 
@@ -210,7 +216,8 @@ void GameScene::Update() {
 
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
 	skyDome->Update();
-
+	field->Update();
+	house->Update(cameraController->GetCamera());
 	player->Update();
 	// ===========================
 	// ★ レベルアップを検知して選択画面へ
@@ -254,7 +261,9 @@ void GameScene::Update() {
 		float goalHitSize = 2.0f;
 
 		if (goalActive) { // ★ 条件クリア後だけ処理しない
-			bool isGoalHit = fabs(p.x - g.x) < goalHitSize && fabs(p.y - g.y) < goalHitSize;
+			AABB playerAabb = makeAabb(p, player->GetScale());
+			AABB goalAabb = makeAabb(g, {goalHitSize, goalHitSize, goalHitSize});
+			bool isGoalHit = RigidBody::isCollision(playerAabb, goalAabb);
 
 			if (isGoalHit) {
 
@@ -271,9 +280,10 @@ void GameScene::Update() {
 	// ===== プレイヤーと敵の当たり判定 =====
 	Vector3 p = player->GetPosition();
 	Vector3 v = player->GetVelocity();
+	AABB playerAabb = makeAabb(p, player->GetScale());
 
 	Vector3 housePos = house->GetPosition();
-	float houseHitSize = house->GetScale().x;
+	AABB houseAabb = makeAabb(housePos, house->GetScale());
 
 	for (auto& e : enemyManager->GetEnemies()) {
 
@@ -281,9 +291,10 @@ void GameScene::Update() {
 			continue; // 死んだ敵はスキップ
 
 		Vector3 ePos = e->GetPosition();
+		AABB enemyAabb = makeAabb(ePos, e->GetScale());
 
 		// ===== ① プレイヤーが敵と接触 =====
-		bool isCollidePlayer = fabs(p.x - ePos.x) < player->GetScale().x && fabs(p.y - ePos.y) < e->GetScale().x;
+		bool isCollidePlayer = RigidBody::isCollision(playerAabb, enemyAabb);
 
 		if (isCollidePlayer) {
 
@@ -304,7 +315,8 @@ void GameScene::Update() {
 			Vector3 swordPos = player->GetSword()->GetPosition();
 			float swordHit = player->GetSword()->GetHitSize();
 
-			bool hitSword = fabs(swordPos.x - ePos.x) < swordHit && fabs(swordPos.y - ePos.y) < swordHit;
+			AABB swordAabb = makeAabb(swordPos, {swordHit, swordHit, swordHit});
+			bool hitSword = RigidBody::isCollision(swordAabb, enemyAabb);
 
 			if (hitSword) {
 				e->SetHPSubtract(1); // ダメージ
@@ -317,8 +329,7 @@ void GameScene::Update() {
 		}
 
 		// ===== ③ House と敵の当たり判定 =====
-		bool hitHouse = fabs(ePos.x - housePos.x) < houseHitSize && fabs(ePos.y - housePos.y) < houseHitSize;
-
+		bool hitHouse = RigidBody::isCollision(houseAabb, enemyAabb);
 		if (hitHouse) {
 			e->SetHPSubtract(10); // ★ 敵を即死させる or 消す処理
 			house->Damage(1);     // ★ house にダメージ
@@ -335,7 +346,7 @@ void GameScene::Update() {
 	particles->SetGoalPos(goal->GetTranslate());
 	particles->Update();
 
-	field->Update();
+
 	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
 	uimanager->SetHouseHP(house->GetHP());
@@ -343,7 +354,7 @@ void GameScene::Update() {
 
 	uimanager->Update();
 	
-	house->Update(cameraController->GetCamera());
+	
 
 
 

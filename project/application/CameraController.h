@@ -6,7 +6,7 @@ class CameraController {
 
 	Transform transform_{};
 	std::unique_ptr<Camera> camera_;
-	float cameraSpeed_ = 0.1f;
+	float cameraSpeed_ = 0.01f;
 	Vector3 playerPos = {0.0f, 0.0f, 0.0f};
 	float orbitYaw_ = 0.0f;
 	float orbitPitch_ = 0.15f;

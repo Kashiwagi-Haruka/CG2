@@ -166,7 +166,7 @@ void Object3dCommon::CreateGraphicsPipeline(){
 	depthStencilDesc.DepthEnable = true;
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;  // 深度書き込みを有効
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 手前なら描画
-	// depthStencilDesc.StencilEnable = false;                        // ステンシル不要なら false
+
 
 	// --- 共通設定 ---
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
