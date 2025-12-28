@@ -7,6 +7,9 @@
 #include "TextureManager.h"
 #include "Function.h"
 #include "SrvManager.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 void Model::Initialize(ModelCommon* modelCommon) {
 
 	modelCommon_ = modelCommon;
@@ -171,4 +174,56 @@ Model::MaterialData Model::LoadMaterialTemplateFile(const std::string& directory
 		}
 	}
 	return matData;
+}
+void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::string& filename) {
+	std::string path = directoryPath + "/" + filename + ".obj";
+
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(path,aiProcess_FlipWindingOrder|aiProcess_FlipUVs);
+
+	assert(scene && scene->HasMeshes());
+
+	
+
+	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
+		aiMesh* mesh = scene->mMeshes[meshIndex]; // OBJは1メッシュ想定
+		assert(mesh->HasNormals());
+		assert(mesh->HasTextureCoords(0));
+	
+		for(uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex){
+			aiFace& face = mesh->mFaces[faceIndex];
+			assert(face.mNumIndices == 3);
+			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
+			
+				uint32_t vertexIndex = face.mIndices[element];
+				aiVector3D& position = mesh->mVertices[vertexIndex];
+				aiVector3D& normal = mesh->mNormals[vertexIndex];
+				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+				VertexData vertex;
+				vertex.position = {position.x, position.y, position.z, 1.0f};
+				vertex.normal = {normal.x, normal.y, normal.z};
+				vertex.texcoord = {texcoord.x, texcoord.y};
+
+				vertex.position.x *= -1.0f;
+				vertex.normal.x *= -1.0f;
+
+				modelData_.vertices.push_back(vertex);	
+			}
+		}
+
+		
+	}
+
+	// --- Material & Texture ---
+	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
+	
+		aiMaterial* material = scene->mMaterials[materialIndex];
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+			aiString textureFilepath;
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilepath);
+			modelData_.material.textureFilePath = directoryPath + "/" + textureFilepath.C_Str();
+		}
+
+	}
+	
 }

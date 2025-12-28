@@ -42,6 +42,7 @@ class Model {
 public:
 	void Initialize(ModelCommon* modelCommon);
 	void LoadObjFile(const std::string& directoryPath, const std::string& filename);
+	void LoadObjFileAssimp(const std::string& directoryPath, const std::string& filename);
 	void Draw();
 	void SetColor(Vector4 color);
 	void SetEnableLighting(bool enable);

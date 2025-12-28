@@ -1,6 +1,7 @@
 #include "ModelManeger.h"
 #include "ModelCommon.h"
 #include "Model.h"
+
 std::unique_ptr<ModelManeger> ModelManeger::instance = nullptr;
 
 ModelManeger* ModelManeger::GetInstance(){
@@ -22,7 +23,7 @@ void ModelManeger::LoadModel(const std::string& filePath){
 	}
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->LoadObjFile("Resources/3d", filePath);
+	model->LoadObjFileAssimp("Resources/3d", filePath);
 	model->Initialize(modelCommon_.get());
 	models.insert(std::make_pair(filePath, std::move(model)));
 }
