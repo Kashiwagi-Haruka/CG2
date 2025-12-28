@@ -81,14 +81,14 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\imgui;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)Engine\base;$(ProjectDir)Engine\base\ResourceObj;$(ProjectDir)Engine\base\Cstr;$(ProjectDir)Engine\math;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\Audio;$(ProjectDir)Engine\ImGui;$(ProjectDir)Engine\Input;$(ProjectDir)Engine\Texture;$(ProjectDir)Engine\Texture\Mesh;$(ProjectDir)Engine\Texture\Sprite;$(ProjectDir)Engine\LeakChecker;$(ProjectDir)Engine\Log;$(ProjectDir)Engine\stringUtillity;$(ProjectDir)Engine\Texture\Particle;$(ProjectDir)Engine\LoadFile;$(ProjectDir)Engine\BaseScene</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\imgui;$(ProjectDir)externals\assimp\include;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)Engine\base;$(ProjectDir)Engine\base\ResourceObj;$(ProjectDir)Engine\base\Cstr;$(ProjectDir)Engine\math;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\Audio;$(ProjectDir)Engine\ImGui;$(ProjectDir)Engine\Input;$(ProjectDir)Engine\Texture;$(ProjectDir)Engine\Texture\Mesh;$(ProjectDir)Engine\Texture\Sprite;$(ProjectDir)Engine\LeakChecker;$(ProjectDir)Engine\Log;$(ProjectDir)Engine\stringUtillity;$(ProjectDir)Engine\Texture\Particle;$(ProjectDir)Engine\LoadFile;$(ProjectDir)Engine\BaseScene</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>imgui.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\Generated\outputs\$(Configuration)\imgui\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>imgui.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Generated\outputs\$(Configuration)\imgui\;$(Project Dir)externals\assimp\lib\Debug</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)\dxcompiler.dll"
@@ -108,15 +108,15 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\imgui;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)Engine\base;$(ProjectDir)Engine\base\ResourceObj;$(ProjectDir)Engine\base\Cstr;$(ProjectDir)Engine\math;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\Audio;$(ProjectDir)Engine\ImGui;$(ProjectDir)Engine\Input;$(ProjectDir)Engine\Texture;$(ProjectDir)Engine\Texture\Mesh;$(ProjectDir)Engine\Texture\Sprite;$(ProjectDir)Engine\LeakChecker;$(ProjectDir)Engine\Log;$(ProjectDir)Engine\stringUtillity;$(ProjectDir)Engine\Texture\Particle;$(ProjectDir)Engine\LoadFile;$(ProjectDir)Engine\BaseScene</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\imgui;$(ProjectDir)externals\assimp\include;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)Engine\base;$(ProjectDir)Engine\base\ResourceObj;$(ProjectDir)Engine\base\Cstr;$(ProjectDir)Engine\math;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\Audio;$(ProjectDir)Engine\ImGui;$(ProjectDir)Engine\Input;$(ProjectDir)Engine\Texture;$(ProjectDir)Engine\Texture\Mesh;$(ProjectDir)Engine\Texture\Sprite;$(ProjectDir)Engine\LeakChecker;$(ProjectDir)Engine\Log;$(ProjectDir)Engine\stringUtillity;$(ProjectDir)Engine\Texture\Particle;$(ProjectDir)Engine\LoadFile;$(ProjectDir)Engine\BaseScene</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\Generated\outputs\$(Configuration)\imgui\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Generated\outputs\$(Configuration)\imgui\;$(ProjectDir)externals\assimp\lib\Release</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)\dxcompiler.dll"
@@ -136,7 +136,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\imgui;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)Engine\base;$(ProjectDir)Engine\base\ResourceObj;$(ProjectDir)Engine\base\Cstr;$(ProjectDir)Engine\math;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\Audio;$(ProjectDir)Engine\ImGui;$(ProjectDir)Engine\Input;$(ProjectDir)Engine\Texture;$(ProjectDir)Engine\Texture\Mesh;$(ProjectDir)Engine\Texture\Sprite;$(ProjectDir)Engine\LeakChecker;$(ProjectDir)Engine\Log;$(ProjectDir)Engine\stringUtillity;$(ProjectDir)Engine\Texture\Particle;$(ProjectDir)Engine\LoadFile;$(ProjectDir)Engine\BaseScene</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\imgui;$(ProjectDir)externals\assimp\include;$(ProjectDir);$(ProjectDir)application;$(ProjectDir)Engine\base;$(ProjectDir)Engine\base\ResourceObj;$(ProjectDir)Engine\base\Cstr;$(ProjectDir)Engine\math;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\Audio;$(ProjectDir)Engine\ImGui;$(ProjectDir)Engine\Input;$(ProjectDir)Engine\Texture;$(ProjectDir)Engine\Texture\Mesh;$(ProjectDir)Engine\Texture\Sprite;$(ProjectDir)Engine\LeakChecker;$(ProjectDir)Engine\Log;$(ProjectDir)Engine\stringUtillity;$(ProjectDir)Engine\Texture\Particle;$(ProjectDir)Engine\LoadFile;$(ProjectDir)Engine\BaseScene</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
@@ -146,8 +146,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration />
-      <AdditionalDependencies>imgui.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\Generated\outputs\$(Configuration)\imgui\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>imgui.lib;assimp-vc143-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Generated\outputs\$(Configuration)\imgui\;$(ProjectDir)externals\assimp\lib\Release</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)\dxcompiler.dll"
