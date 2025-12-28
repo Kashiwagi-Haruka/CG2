@@ -1,5 +1,6 @@
 #include "Audio.h"
 #include "fstream"
+#include <algorithm>
 #include <assert.h>
 #include <mfapi.h>
 #include <mfidl.h>
@@ -17,7 +18,13 @@ Audio* Audio::GetInstance(){
 	}
 	return instance.get();
 }
-void Audio::Finalize(){
+void Audio::Finalize() {
+	StopAllVoices();
+	if (masterVoice_) {
+		masterVoice_->DestroyVoice();
+		masterVoice_ = nullptr;
+	}
+	xAudio2_.Reset();
 
 	result_ = MFShutdown();
 	assert(SUCCEEDED(result_));
@@ -36,6 +43,29 @@ void Audio::InitializeIXAudio() {
 	assert(SUCCEEDED(result_)); // ここも追加
 }
 
+void Audio::Update() {
+	if (activeVoices_.empty()) {
+		return;
+	}
+
+	for (auto& active : activeVoices_) {
+		if (!active.voice) {
+			continue;
+		}
+		if (active.isLoop) {
+			continue;
+		}
+
+		XAUDIO2_VOICE_STATE state{};
+		active.voice->GetState(&state);
+		if (state.BuffersQueued == 0) {
+			active.voice->DestroyVoice();
+			active.voice = nullptr;
+		}
+	}
+
+	activeVoices_.erase(std::remove_if(activeVoices_.begin(), activeVoices_.end(), [](const ActiveVoice& active) { return active.voice == nullptr; }), activeVoices_.end());
+}
 
 SoundData Audio::SoundLoadFile(const char* filename) {
 	// フルパス → UTF-16 変換
@@ -122,18 +152,23 @@ SoundData Audio::SoundLoadFile(const char* filename) {
 }
 
 void Audio::SoundUnload(SoundData* soundData) {
-	xAudio2_.Reset();
+	if (!soundData) {
+		return;
+	}
+	StopVoicesForSound(*soundData);
 	soundData->buffer.clear();
 	soundData->wfex = {};
 }
-
 
 void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	if (!xAudio2_) {
 		OutputDebugStringA("SoundPlayWave: xAudio2 is null!\n");
 		return;
 	}
-
+	if (soundData.buffer.empty()) {
+		OutputDebugStringA("SoundPlayWave: sound buffer is empty!\n");
+		return;
+	}
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
 	result_ = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(result_));
@@ -156,4 +191,33 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 
 	result_ = pSourceVoice->Start();
 	assert(SUCCEEDED(result_));
+	activeVoices_.push_back({pSourceVoice, soundData.buffer.data(), isLoop});
+}
+
+void Audio::StopVoicesForSound(const SoundData& soundData) {
+	const BYTE* targetData = soundData.buffer.data();
+	if (!targetData) {
+		return;
+	}
+
+	for (auto& active : activeVoices_) {
+		if (active.voice && active.audioData == targetData) {
+			active.voice->Stop();
+			active.voice->DestroyVoice();
+			active.voice = nullptr;
+		}
+	}
+
+	activeVoices_.erase(std::remove_if(activeVoices_.begin(), activeVoices_.end(), [](const ActiveVoice& active) { return active.voice == nullptr; }), activeVoices_.end());
+}
+
+void Audio::StopAllVoices() {
+	for (auto& active : activeVoices_) {
+		if (active.voice) {
+			active.voice->Stop();
+			active.voice->DestroyVoice();
+			active.voice = nullptr;
+		}
+	}
+	activeVoices_.clear();
 }

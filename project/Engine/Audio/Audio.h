@@ -32,9 +32,19 @@ class Audio {
 	IXAudio2MasteringVoice* masterVoice_;
 
 	HRESULT result_;
+	struct ActiveVoice {
+		IXAudio2SourceVoice* voice;
+		const BYTE* audioData;
+		bool isLoop;
+	};
+
+	std::vector<ActiveVoice> activeVoices_;
+
+	void StopVoicesForSound(const SoundData& soundData);
+	void StopAllVoices();
 
 public:
-
+	void Update();
 	static Audio* GetInstance();
 	void Finalize();
 	void InitializeIXAudio();

@@ -102,6 +102,7 @@ void GameBase::BeginFlame() {
 	dxCommon_->PreDraw();
 	imguiM_->Begin();
 	DInput->Update();
+	Audio::GetInstance()->Update();
 }
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---

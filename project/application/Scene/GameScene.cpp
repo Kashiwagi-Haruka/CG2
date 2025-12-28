@@ -81,7 +81,7 @@ void GameScene::Initialize() {
 		levelupIcons[i]->SetScale({256, 256});
 	}
 
-	Audio::GetInstance()->SoundPlayWave(BGMData);
+	
 	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLight_.position = {0.0f, 5.0f, 0.0f};
 	pointLight_.intensity = 0.0f;
@@ -155,6 +155,7 @@ void GameScene::DebugImGui() {
 #endif // USE_IMGUI
 }
 void GameScene::Update() {
+	Audio::GetInstance()->SoundPlayWave(BGMData, true);
 	auto makeAabb = [](const Vector3& center, const Vector3& halfSize) {
 		AABB aabb;
 		aabb.min = {center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z};
