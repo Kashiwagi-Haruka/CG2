@@ -31,7 +31,7 @@ void Player::Initialize(Camera* camera) {
 	transform_ = {
 	    .scale{2.0f, 2.0f, 2.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{0.0f, 2.5f, 0.0f}
+        .translate{-50.0f, 2.5f, -50.0f}
     };
 
 	playerObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());

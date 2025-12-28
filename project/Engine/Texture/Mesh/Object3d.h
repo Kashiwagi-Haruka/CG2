@@ -10,7 +10,7 @@
 #include "Transform.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
-
+#include "CameraForGPU.h"
 class Camera;
 class Object3dCommon;
 class Model;
@@ -40,14 +40,14 @@ class Object3d {
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
-	Vector3* cameraData_;
+	CameraForGpu* cameraData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 	
 
 	Model* model_ = nullptr;
 	Matrix4x4 worldMatrix;
 	Matrix4x4 worldViewProjectionMatrix;
-	Matrix4x4 viewProjectionMatrix;
+	
 
 public:
 	void Initialize(Object3dCommon* modelCommon);

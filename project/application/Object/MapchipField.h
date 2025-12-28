@@ -21,6 +21,7 @@ class MapchipField {
 
 	Camera* camera_ = nullptr;
 	Transform transform_;
+	Vector3 initPos_ = {50, 50, 0};
 
 public:
 	MapchipField();

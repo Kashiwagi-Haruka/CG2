@@ -45,23 +45,23 @@ void EnemyManager::SpawnWaveEnemies() {
 
 	switch (currentWave_) {
 	case 1: // ウェーブ1: 少数、低い位置、広い間隔
-		config = {5, 10.0f, 30.0f, 1.5f, 2.0f, false};
+		config = {5, -40.0f, 30.0f, 1.5f, 2.0f, false};
 		break;
 
 	case 2: // ウェーブ2: 中数、やや高い位置
-		config = {8, 10.0f, 40.0f, 1.5f, 3.0f, true};
+		config = {8, -40.0f, 40.0f, 1.5f, 3.0f, true};
 		break;
 
 	case 3: // ウェーブ3: 多数、バラバラの高さ
-		config = {12, 10.0f, 50.0f, 1.5f, 4.0f, true};
+		config = {12, -40.0f, 50.0f, 1.5f, 4.0f, true};
 		break;
 
 	case 4: // ウェーブ4: 密集、高低差大
-		config = {15, 10.0f, 45.0f, 1.0f, 5.0f, true};
+		config = {15, -40.0f, 45.0f, 1.0f, 5.0f, true};
 		break;
 
 	case 5: // ウェーブ5: 大量、ランダム配置
-		config = {20, 10.0f, 60.0f, 1.0f, 6.0f, true};
+		config = {20, -40.0f, 60.0f, 1.0f, 6.0f, true};
 		break;
 
 	default: // ウェーブ6以降: どんどん増える
@@ -91,7 +91,7 @@ void EnemyManager::SpawnWaveEnemies() {
 		}
 
 		// ランダムなZ位置のバリエーション
-		float z = -2.0f + ((float)rand() / RAND_MAX) * 4.0f;
+		float z = -52.0f + ((float)rand() / RAND_MAX) * 4.0f;
 
 		Vector3 pos = {x, y, z};
 		AddEnemy(camera_, pos);

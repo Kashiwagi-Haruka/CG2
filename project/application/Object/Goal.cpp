@@ -21,7 +21,7 @@ void Goal::Initialize(Camera* camera){
 	transform_ = {
 	    {2, 2, 2},
         {0, 0, 0},
-        {8, 1.5f, 0}
+        {-42, 1.5f, -50}
     };
 	object3d_->SetTransform(transform_);
 	

@@ -8,6 +8,7 @@
 #include "Model.h"
 #include "Camera.h"
 
+
 void Object3d::Initialize(Object3dCommon* modelCommon){ 
 	obj3dCommon_ = modelCommon;
 	camera_ = obj3dCommon_->GetDefaultCamera();
@@ -18,14 +19,13 @@ void Object3d::Update(){
 	// [0]=モデル描画用で使う
 	
 	worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	worldViewProjectionMatrix;
 
-	if (camera_) {
-		viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix = Function::Multiply(worldMatrix, viewProjectionMatrix);
-	} else {
-		worldViewProjectionMatrix = worldMatrix;
-	}
+	
+		
+	worldViewProjectionMatrix = Function::Multiply(Function::Multiply(worldMatrix,camera_->GetViewMatrix()),camera_->GetProjectionMatrix());
+	
+		
+	
 
 
 
@@ -36,10 +36,10 @@ void Object3d::Update(){
 	transformResource_->Unmap(0, nullptr);
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
 	if (camera_) {
-		*cameraData_ = camera_->GetTranslate();
+		cameraData_->worldPosition = camera_->GetWorldTranslate();
 
 	} else {
-		*cameraData_ = {transform_.translate};
+		cameraData_->worldPosition = {transform_.translate};
 	}
 	cameraResource_->Unmap(0, nullptr);
 	
@@ -89,7 +89,7 @@ void Object3d::SetShininess(float shininess) {
 
 void Object3d::CreateResources() {
 	transformResource_ = obj3dCommon_->CreateBufferResource(sizeof(TransformationMatrix));
-	cameraResource_ = obj3dCommon_->CreateBufferResource(sizeof(Vector3));
+	cameraResource_ = obj3dCommon_->CreateBufferResource(sizeof(CameraForGpu));
 	
 
 

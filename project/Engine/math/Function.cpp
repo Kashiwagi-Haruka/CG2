@@ -36,15 +36,28 @@ Vector3 DirectionToRotation(const Vector3& direction, const Vector3& forwardAxis
 
 
 
-Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
+//Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
+//	Matrix4x4 result{};
+//	float f = 1.0f / std::tanf(fovY * 0.5f);
+//	result.m[0][0] = f / aspectRatio;
+//	result.m[1][1] = f;
+//	result.m[2][2] = farClip / (farClip - nearClip);
+//	result.m[2][3] = 1.0f;
+//	result.m[3][2] = (-nearClip * farClip) / (farClip - nearClip);
+//	result.m[3][3] = 0.0f;
+//	return result;
+//}
+Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspect, float nearZ, float farZ) {
 	Matrix4x4 result{};
-	float f = 1.0f / std::tanf(fovY * 0.5f);
-	result.m[0][0] = f / aspectRatio;
+	float f = 1.0f / tanf(fovY * 0.5f);
+
+	result.m[0][0] = f / aspect;
 	result.m[1][1] = f;
-	result.m[2][2] = farClip / (farClip - nearClip);
+	result.m[2][2] = farZ / (farZ - nearZ);
 	result.m[2][3] = 1.0f;
-	result.m[3][2] = (-nearClip * farClip) / (farClip - nearClip);
+	result.m[3][2] = (-nearZ * farZ) / (farZ - nearZ);
 	result.m[3][3] = 0.0f;
+
 	return result;
 }
 

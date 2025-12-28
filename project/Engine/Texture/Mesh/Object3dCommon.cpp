@@ -2,7 +2,7 @@
 #include "DirectXCommon.h"
 #include "Logger.h"
 #include <cassert>
-void Object3dCommon::Initialize(DirectXCommon* dxCommon){ 
+void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	CreateGraphicsPipeline();
 	// Directional Light の共通バッファ作成
@@ -27,15 +27,14 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon){
 void Object3dCommon::DrawCommon() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
-	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[blendMode_].Get()); // 通常
+	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[blendMode_].Get());
 
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
-void Object3dCommon::SetDirectionalLight(DirectionalLight& light){
-	*directionalLightData_ = light; }	
-void Object3dCommon::SetBlendMode(BlendMode blendmode){
-	blendMode_=blendmode; 
-	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[blendMode_].Get()); // 通常
+void Object3dCommon::SetDirectionalLight(DirectionalLight& light) { *directionalLightData_ = light; }
+void Object3dCommon::SetBlendMode(BlendMode blendmode) {
+	blendMode_ = blendmode;
+	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[blendMode_].Get());
 }
 void Object3dCommon::SetPointLight(PointLight pointlight) {
 	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointlightData_));
@@ -46,7 +45,7 @@ void Object3dCommon::SetPointLight(PointLight pointlight) {
 	pointlightData_->decay = pointlight.decay;
 	pointLightResource_->Unmap(0, nullptr);
 }
-void Object3dCommon::SetSpotLight(SpotLight spotlight) { 
+void Object3dCommon::SetSpotLight(SpotLight spotlight) {
 	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotlightData_));
 	spotlightData_->color = spotlight.color;
 	spotlightData_->position = spotlight.position;
@@ -57,10 +56,8 @@ void Object3dCommon::SetSpotLight(SpotLight spotlight) {
 	spotlightData_->cosAngle = spotlight.cosAngle;
 	spotlightData_->cosFalloffStart = spotlight.cosFalloffStart;
 	spotLightResource_->Unmap(0, nullptr);
-
-
 }
-void Object3dCommon::CreateRootsignature(){
+void Object3dCommon::CreateRootsignature() {
 	// --- RootSignature ---
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -115,8 +112,6 @@ void Object3dCommon::CreateRootsignature(){
 	descriptionRootSignature.pStaticSamplers = staticSampler;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSampler);
 
-	
-
 	// --- RootSignature作成 ---
 	signatureBlob_ = nullptr;
 	errorBlob_ = nullptr;
@@ -128,9 +123,8 @@ void Object3dCommon::CreateRootsignature(){
 	rootSignature_ = nullptr;
 	hr_ = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr_));
-
 }
-void Object3dCommon::CreateGraphicsPipeline(){
+void Object3dCommon::CreateGraphicsPipeline() {
 
 	CreateRootsignature();
 
@@ -164,9 +158,8 @@ void Object3dCommon::CreateGraphicsPipeline(){
 	// --- DepthStencil ---
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;  // 深度書き込みを有効
-	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 手前なら描画
-
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;  // ★ 深度書き込みを有効
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // ★ 手前なら描画
 
 	// --- 共通設定 ---
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
@@ -181,7 +174,7 @@ void Object3dCommon::CreateGraphicsPipeline(){
 	baseDesc.SampleDesc.Count = 1;
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-	// --- 通常PSO（裏面カリング） ---
+	// --- シェーダーコンパイル ---
 	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d.VS.hlsl", L"vs_6_0");
 	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d.PS.hlsl", L"ps_6_0");
 	assert(vsBlob && psBlob);
@@ -191,17 +184,23 @@ void Object3dCommon::CreateGraphicsPipeline(){
 		psoDesc.BlendState = blendModeManeger_.SetBlendMode(static_cast<BlendMode>(i));
 		psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
 		psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
+
 		D3D12_RASTERIZER_DESC rasterizerDesc{};
+		// ★ 背面カリングを有効化（裏面は描画しない）
 		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
 		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+		// ★ 深度クリッピングを有効化
+		rasterizerDesc.DepthClipEnable = TRUE;
+		// ★ 反時計回りを表面に設定
+		rasterizerDesc.FrontCounterClockwise = FALSE;
+
 		psoDesc.RasterizerState = rasterizerDesc;
 		hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&graphicsPipelineState_[i]));
 		assert(SUCCEEDED(hr_));
 	}
-
 }
 Microsoft::WRL::ComPtr<ID3D12Resource> Object3dCommon::CreateBufferResource(size_t sizeInBytes) {
-	// バッファの設定（UPLOAD用に変更）
+	// バッファの設定(UPLOAD用に変更)
 	D3D12_HEAP_PROPERTIES heapProperties = {};
 	heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 
