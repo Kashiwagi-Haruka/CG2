@@ -48,7 +48,7 @@ class GameScene: public BaseScene{
 	
 	
 
-	
+		bool isBGMPlaying = false;
 
 	SoundData BGMData;
 

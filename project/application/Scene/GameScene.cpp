@@ -43,7 +43,7 @@ void GameScene::Initialize() {
 
 	sceneEndClear = false;
 	sceneEndOver = false;
-
+	isBGMPlaying = false;
 	cameraController->Initialize();
 
 	GameBase::GetInstance()->SetDefaultCamera(cameraController->GetCamera());
@@ -155,7 +155,10 @@ void GameScene::DebugImGui() {
 #endif // USE_IMGUI
 }
 void GameScene::Update() {
-	Audio::GetInstance()->SoundPlayWave(BGMData, true);
+	if (!isBGMPlaying) {
+		Audio::GetInstance()->SoundPlayWave(BGMData, true);
+		isBGMPlaying = true;
+	}
 	auto makeAabb = [](const Vector3& center, const Vector3& halfSize) {
 		AABB aabb;
 		aabb.min = {center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z};
