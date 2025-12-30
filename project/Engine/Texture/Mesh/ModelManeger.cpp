@@ -23,9 +23,21 @@ void ModelManeger::LoadModel(const std::string& filePath){
 	}
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->LoadObjFileAssimp("Resources/3d", filePath);
+	model->LoadObjFileAssimp("Resources/3d", filePath + ".obj");
 	model->Initialize(modelCommon_.get());
 	models.insert(std::make_pair(filePath, std::move(model)));
+}
+void ModelManeger::LoadGltfModel(const std::string& filePath) {
+	if (models.contains(filePath)) {
+		return;
+	}
+
+	std::unique_ptr<Model> model = std::make_unique<Model>();
+	model->LoadObjFileAssimp("Resources/3d", filePath +".gltf");
+	model->Initialize(modelCommon_.get());
+	models.insert(std::make_pair(filePath, std::move(model)));
+
+
 }
 
 Model* ModelManeger::FindModel(const std::string& filePath){

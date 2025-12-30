@@ -18,20 +18,22 @@ void Object3d::Initialize(Object3dCommon* modelCommon){
 void Object3d::Update(){
 	// [0]=モデル描画用で使う
 	
-	worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	worldMatrix = Function::Multiply(model_->GetModelData().rootnode.localMatrix ,Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
 
+	
+	
+	worldViewProjectionMatrix = Function::Multiply(model_->GetModelData().rootnode.localMatrix , Function::Multiply(Function::Multiply(worldMatrix,camera_->GetViewMatrix()),camera_->GetProjectionMatrix()));
 	
 		
-	worldViewProjectionMatrix = Function::Multiply(Function::Multiply(worldMatrix,camera_->GetViewMatrix()),camera_->GetProjectionMatrix());
-	
-		
 	
 
-
+	
 
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
+
 	transformationMatrixData_->WorldInverseTranspose = Function::Inverse(worldMatrix);
 	transformResource_->Unmap(0, nullptr);
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));

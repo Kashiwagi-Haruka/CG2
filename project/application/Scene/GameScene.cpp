@@ -359,8 +359,10 @@ void GameScene::Update() {
 	uimanager->Update();
 	
 	
-
-
+	particles->SetCameraPos(cameraController->GetCamera()->GetTranslate());
+	particles->SetPlayerPos(player->GetPosition());
+	particles->SetGoalPos(goal->GetTranslate());
+	particles->Update();
 
 	cameraController->SetPlayerPos(player->GetPosition());
 
@@ -372,7 +374,7 @@ void GameScene::Draw() {
 	GameBase::GetInstance()->ModelCommonSet();
 	/*skyDome->Draw();*/
 	field->Draw();
-	house->Draw();
+	/*house->Draw();*/
 	player->Draw();
 	enemyManager->Draw();
 	
@@ -382,7 +384,7 @@ void GameScene::Draw() {
 		goal->Draw(); // ★ 条件クリア後だけ描画する
 	}
 
-	
+	particles->Draw();
 	
 
 	GameBase::GetInstance()->SpriteCommonSet();

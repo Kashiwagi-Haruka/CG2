@@ -68,6 +68,7 @@ class Player {
 
 	//スキル攻撃用
 	bool isSkillAttack = false;
+	bool isSpecialAttack = false;
 
 	bool isDash = false;
 	bool isJump = false;

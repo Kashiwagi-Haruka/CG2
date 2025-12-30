@@ -111,18 +111,7 @@ void ParticleManager::Update(Camera* camera) {
 
 	Matrix4x4 billboard = Function::Inverse(view);
 	billboard.m[3][0] = billboard.m[3][1] = billboard.m[3][2] = 0;
-	Vector3 right = Function::Normalize({billboard.m[0][0], billboard.m[1][0], billboard.m[2][0]});
-	Vector3 up = Function::Normalize({billboard.m[0][1], billboard.m[1][1], billboard.m[2][1]});
-	Vector3 forward = Function::Normalize({billboard.m[0][2], billboard.m[1][2], billboard.m[2][2]});
-	billboard.m[0][0] = right.x;
-	billboard.m[1][0] = right.y;
-	billboard.m[2][0] = right.z;
-	billboard.m[0][1] = up.x;
-	billboard.m[1][1] = up.y;
-	billboard.m[2][1] = up.z;
-	billboard.m[0][2] = forward.x;
-	billboard.m[1][2] = forward.y;
-	billboard.m[2][2] = forward.z;
+
 	// ============================
 	//  全グループ更新
 	// ============================
@@ -173,14 +162,15 @@ void ParticleManager::Update(Camera* camera) {
 			// ---------------------
 			// ワールド行列
 			// ---------------------
-		
-			Matrix4x4 world = Function::MakeAffineMatrix(p.transform_.scale, p.transform_.rotate, p.transform_.translate);
+			Matrix4x4 c = camera->GetWorldMatrix();
+			c.m[3][0] = c.m[3][1] = c.m[3][2] = 0;
+			Matrix4x4 world = Function::Multiply(c,Function::MakeAffineMatrix(p.transform_.scale, p.transform_.rotate, p.transform_.translate));
 			Matrix4x4 backToFrontMatrix = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
-			Matrix4x4 billboardMatrix = Function::Multiply(backToFrontMatrix, camera->GetWorldMatrix());
-			billboardMatrix.m[3][0] = 0.0f;
+			Matrix4x4 billboardMatrix = Function::Multiply(billboard,backToFrontMatrix);
+	/*		billboardMatrix.m[3][0] = 0.0f;
 			billboardMatrix.m[3][1] = 0.0f;
-			billboardMatrix.m[3][2] = 0.0f;
-			world = Function::Multiply(world, billboardMatrix);
+			billboardMatrix.m[3][2] = 0.0f;*/
+			/*world = Function::Multiply(world, billboardMatrix);*/
 			Matrix4x4 wvp = Function::Multiply(Function::Multiply(world, view), proj);
 
 			// ================================

@@ -7,9 +7,7 @@
 #include "TextureManager.h"
 #include "Function.h"
 #include "SrvManager.h"
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+
 void Model::Initialize(ModelCommon* modelCommon) {
 
 	modelCommon_ = modelCommon;
@@ -101,7 +99,7 @@ void Model::LoadObjFile(const std::string& directoryPath, const std::string& fil
 	std::vector<Vector2> texcoords;
 	std::string line;
 
-	std::ifstream file(directoryPath + "/" + filename + ".obj");
+	std::ifstream file(directoryPath + "/" + filename);
 	assert(file.is_open());
 
 	while (std::getline(file, line)) {
@@ -156,6 +154,8 @@ void Model::LoadObjFile(const std::string& directoryPath, const std::string& fil
 		}
 	}
 
+	
+
 	modelData_ = modelData;
 }
 Model::MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
@@ -176,7 +176,7 @@ Model::MaterialData Model::LoadMaterialTemplateFile(const std::string& directory
 	return matData;
 }
 void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::string& filename) {
-	std::string path = directoryPath + "/" + filename + ".obj";
+	std::string path = directoryPath + "/" + filename;
 
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path,aiProcess_FlipWindingOrder|aiProcess_FlipUVs);
@@ -225,5 +225,72 @@ void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::strin
 		}
 
 	}
+
+	modelData_.rootnode.localMatrix = Function::MakeIdentity4x4();
 	
+}
+void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string& filename) {
+	std::string path = directoryPath + "/" + filename;
+
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(path, aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+
+	assert(scene && scene->HasMeshes());
+
+	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
+		aiMesh* mesh = scene->mMeshes[meshIndex]; // OBJは1メッシュ想定
+		assert(mesh->HasNormals());
+		assert(mesh->HasTextureCoords(0));
+
+		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
+			aiFace& face = mesh->mFaces[faceIndex];
+			assert(face.mNumIndices == 3);
+			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
+
+				uint32_t vertexIndex = face.mIndices[element];
+				aiVector3D& position = mesh->mVertices[vertexIndex];
+				aiVector3D& normal = mesh->mNormals[vertexIndex];
+				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+				VertexData vertex;
+				vertex.position = {position.x, position.y, position.z, 1.0f};
+				vertex.normal = {normal.x, normal.y, normal.z};
+				vertex.texcoord = {texcoord.x, texcoord.y};
+
+				vertex.position.x *= -1.0f;
+				vertex.normal.x *= -1.0f;
+
+				modelData_.vertices.push_back(vertex);
+			}
+		}
+	}
+
+	// --- Material & Texture ---
+	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
+
+		aiMaterial* material = scene->mMaterials[materialIndex];
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+			aiString textureFilepath;
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilepath);
+			modelData_.material.textureFilePath = directoryPath + "/" + textureFilepath.C_Str();
+		}
+	}
+
+	modelData_.rootnode = NodeRead(scene->mRootNode);
+}
+Model::Node Model::NodeRead(aiNode* node){ 
+	Node result;
+	aiMatrix4x4 aiLocalMatrix4x4 = node->mTransformation;
+	aiLocalMatrix4x4.Transpose();
+	for (int i = 0; i < 4; i++) {
+		for (int j=0;j<4;j++){
+			result.localMatrix.m[i][j] = aiLocalMatrix4x4[i][j];
+		}
+	}
+	result.name = node->mName.C_Str();
+	result.childlen.resize(node->mNumChildren);
+	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
+		result.childlen[childIndex] = NodeRead(node->mChildren[childIndex]);
+	}
+
+	return result;
 }

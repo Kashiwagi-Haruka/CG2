@@ -68,6 +68,9 @@ void Player::Initialize(Camera* camera) {
 	attackHoldTimer_ = 0.0f;
 	heavyAttackThreshold_ = 0.3f; // 長押し判定時間（秒）
 	isFallingAttack_ = false;
+
+	isSkillAttack = false;
+	isSpecialAttack = false;
 }
 
 void Player::Move() {
@@ -264,6 +267,12 @@ void Player::Attack() {
 	if (isFallingAttack_) {
 		return;
 	}
+	if (isSkillAttack) {
+		return;
+	}
+	if (isSpecialAttack) {
+		return;
+	}
 
 	// コンボタイマーの更新
 	if (comboTimer_ > 0.0f) {
@@ -375,12 +384,25 @@ void Player::Attack() {
 		if (!isSkillAttack) {
 			isSkillAttack = true;
 			attackState_ = AttackState::kSkillAttack;
-			skill_->StartAttack();
+			skill_->StartAttack(transform_);
 			// コンボリセット
 			comboStep_ = 0;
 			canCombo_ = false;
 			comboTimer_ = 0.0f;
 		}
+	}
+	if (GameBase::GetInstance()->TriggerKey(DIK_Q)||GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonX)) {
+		//必殺技
+		if (!isSpecialAttack) {
+			isSpecialAttack = true;
+			attackState_ = AttackState::kSpecialAttack;
+
+			// コンボリセット
+			comboStep_ = 0;
+			canCombo_ = false;
+			comboTimer_ = 0.0f;
+		}
+
 	}
 }
 
@@ -421,10 +443,21 @@ void Player::Update() {
 	sword_->SetCamera(camera_);
 	sword_->SetPlayerYaw(transform_.rotate.y);
 	sword_->Update(transform_);
+	if (isSkillAttack) {
 	skill_->SetCamera(camera_);
-	skill_->Update(transform_);
+	skill_->Update();
+		if (skill_->IsSkillEnd()) {
+		isSkillAttack = false;
+		}
+	}
+
+	if (isSpecialAttack) {
 	specialAttack_->SetCamera(camera_);
 	specialAttack_->Update(transform_);
+	if (specialAttack_->IsSpecialEnd()) {
+		isSpecialAttack = false;
+	}
+	}
 
 #ifdef USE_IMGUI
 
@@ -476,6 +509,10 @@ void Player::Draw() {
 	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAlpha);
 	}
 	sword_->Draw();
+	if (isSkillAttack) {
 	skill_->Draw();
+	}
+	if (isSpecialAttack) {
 	specialAttack_->Draw();
+	}
 }

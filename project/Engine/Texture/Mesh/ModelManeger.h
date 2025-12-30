@@ -26,6 +26,7 @@ class ModelManeger {
 
 		void Initialize(DirectXCommon* dxCommon);
 	    void LoadModel(const std::string& filePath);
+	    void LoadGltfModel(const std::string& filePath);
 	    Model* FindModel(const std::string& filePath);
 		void Finalize();
 

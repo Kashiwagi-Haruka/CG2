@@ -11,7 +11,7 @@ void PlayerSpecialAttack::Initialize() {
 	debugBox_ = std::make_unique<Object3d>();
 	debugBox_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	debugBox_->SetCamera(camera_);
-	debugBox_->SetModel("deBugBox");
+	debugBox_->SetModel("debugBox");
 	iceFlowers_ = std::make_unique<std::vector<Object3d>>();
 	iceFlowers_->resize(6);
 	iceFlowerTransforms_.resize(6);
@@ -49,10 +49,21 @@ void PlayerSpecialAttack::Update(const Transform& playerTransform) {
 		(*iceFlowers_)[i].SetTransform(iceFlowerTransforms_[i]);
 		(*iceFlowers_)[i].Update();
 	}
+	if (specialTime_ > specialTimeMax_) {
+		isSpecialEnd_ = true;
+		specialTime_ = 0;
+	} else {
+		specialTime_++;
+	}
 	debugBox_->SetColor({1.0f, 0.0f, 1.0f, 0.5f});
 	debugBox_->SetCamera(camera_);
 	debugBox_->SetTransform(transform_);
 	debugBox_->Update();
+}
+void PlayerSpecialAttack::StartAttack() { 
+	isSpecialEnd_ = true;
+	specialTime_ = 0;
+
 }
 void PlayerSpecialAttack::Draw() {
 	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAdd);

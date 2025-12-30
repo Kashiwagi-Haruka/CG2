@@ -13,6 +13,9 @@ class PlayerSpecialAttack {
 	float rotateTimer = 0.0f;
 	float radiusTimer = 0.0f;
 	float radius = 3.0f;
+	bool isSpecialEnd_;
+	int specialTime_=0;
+	int specialTimeMax_ = 60;
 
 public:
 	PlayerSpecialAttack();
@@ -20,5 +23,6 @@ public:
 	void Update(const Transform& playerTransform);
 	void Draw();
 	void SetCamera(Camera* camera) { camera_ = camera; }
-
+	void StartAttack();
+	bool IsSpecialEnd() { return isSpecialEnd_; }
 };

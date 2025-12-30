@@ -6,10 +6,18 @@
 #include <string>
 #include <vector>
 #include <wrl.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 class ModelCommon;
 
 class Model {
 
+	struct Node {
+		Matrix4x4 localMatrix;
+		std::string name;
+		std::vector<Node> childlen;
+	};
 	struct MaterialData {
 		std::string textureFilePath;
 		uint32_t textureIndex = 0;
@@ -17,6 +25,7 @@ class Model {
 	struct ModelData {
 		std::vector<VertexData> vertices;
 		MaterialData material;
+		Node rootnode;
 	};
 	struct Material {
 
@@ -26,6 +35,7 @@ class Model {
 		Matrix4x4 uvTransform;
 		float shininess;
 	};
+
 
 	ModelCommon* modelCommon_;
 
@@ -38,11 +48,13 @@ class Model {
 	VertexData* vertexData = nullptr;
 	Material* mat3d = nullptr;
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+	Node NodeRead(aiNode* node);
 
 public:
 	void Initialize(ModelCommon* modelCommon);
 	void LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	void LoadObjFileAssimp(const std::string& directoryPath, const std::string& filename);
+	void LoadObjFileGltf(const std::string& directoryPath, const std::string& filename);
 	void Draw();
 	void SetColor(Vector4 color);
 	void SetEnableLighting(bool enable);

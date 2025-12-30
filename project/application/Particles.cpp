@@ -18,7 +18,14 @@ Particles::Particles() {
 	particleleaf = std::make_unique<ParticleEmitter>("leaf", Transform{{0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}, 1.0f, 5, Vector3{0.0f, -0.1f, 0}, Vector3{-640, 0, -1}, Vector3{640, 320, 0});
 
 	particlegoal = std::make_unique<ParticleEmitter>("goal", Transform{{0.2f, 0.2f, 1.0f}, {0.0f, 0.0f, 0.0f},{0.0f, 0.0f, 0.0f}}, 1.0f, 5, Vector3{0, 0.1f, 0.0f}, Vector3{-10.0f, 0, -1}, Vector3{10.0f, 3, 0});
-
+	particleArrow = std::make_unique<ParticleEmitter>(
+	    "Arrow",
+	    Transform{
+	        {1, 1, 1},
+            {0, 0, 0},
+            {25, 0, 25}
+    },
+	    1.0f, 5, Vector3{0, 0, 0}, Vector3{-1, -1, -1}, Vector3{1, 1, 1});
 	isgoal = false;
 }
 
@@ -35,6 +42,9 @@ void Particles::Update() {
 	playerEmitterTransform.rotate = {0, 0, 0};
 
 	playerEmitterTransform.translate = {playerPos_.x * kParticlePosScale, (playerPos_.y - 0.9f) * kParticlePosScale, playerPos_.z};
+
+	particleArrow
+	    ->Update({{1,1,1},{0,0,0},{-25,3,-25}});
 
 	particleplayer->Update(playerEmitterTransform);
 
