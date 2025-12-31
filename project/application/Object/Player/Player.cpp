@@ -15,11 +15,15 @@
 Player::Player() {
 	ModelManeger::GetInstance()->LoadModel("playerModel");
 	ModelManeger::GetInstance()->LoadModel("FallingEffect");
+	ModelManeger::GetInstance()->LoadModel("playerSkillUp");
+	ModelManeger::GetInstance()->LoadModel("playerSkillUnder");
 	playerObject_ = std::make_unique<Object3d>();
 	fallingEffectObject_ = std::make_unique<Object3d>();
 	sword_ = std::make_unique<PlayerSword>();
 	skill_ = std::make_unique<PlayerSkill>();
 	specialAttack_ = std::make_unique<PlayerSpecialAttack>();
+	attackSE = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/normalAttack.mp3");
+	attackEndSE = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/endAttack.mp3");
 }
 
 Player::~Player() {}
@@ -326,18 +330,22 @@ void Player::Attack() {
 			case 1:
 				attackState_ = AttackState::kWeakAttack1;
 				sword_->StartAttack(1); // 1段階目
+				Audio::GetInstance()->SoundPlayWave(attackSE, false);
 				break;
 			case 2:
 				attackState_ = AttackState::kWeakAttack2;
 				sword_->StartAttack(2); // 2段階目
+				Audio::GetInstance()->SoundPlayWave(attackSE, false);
 				break;
 			case 3:
 				attackState_ = AttackState::kWeakAttack3;
 				sword_->StartAttack(3); // 3段階目
+				Audio::GetInstance()->SoundPlayWave(attackSE, false);
 				break;
 			case 4:
 				attackState_ = AttackState::kWeakAttack4;
 				sword_->StartAttack(4); // 4段階目（フィニッシュ）
+				Audio::GetInstance()->SoundPlayWave(attackEndSE, false);
 				break;
 			}
 		}

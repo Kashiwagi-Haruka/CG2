@@ -8,7 +8,7 @@
 #include "Transform.h"
 #include "Vector3.h"
 #include <memory>
-
+#include "Audio.h"
 class Camera;
 class PlayerBullet;
 class MapchipField;
@@ -96,6 +96,13 @@ class Player {
 	float rotateTimer = 0.0f;
 
 	bool usedAirAttack = false;
+
+	//SE
+	bool isAttackSE = false;
+	bool isAttackEndSE = false;
+
+	SoundData attackSE;
+	SoundData attackEndSE;
 
 public:
 	Player();

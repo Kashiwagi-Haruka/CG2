@@ -1,7 +1,8 @@
 #include "PlayerSkill.h"
 #include "GameBase.h"
+#include "Object3dCommon.h"
 PlayerSkill::PlayerSkill() {
-
+	
 }
 void PlayerSkill::Initialize() {
 	debugBox_ = std::make_unique<Object3d>();
@@ -16,6 +17,15 @@ void PlayerSkill::Initialize() {
 	debugDamageBox2_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	debugDamageBox2_->SetCamera(camera_);
 	debugDamageBox2_->SetModel("debugBox");
+	skillUpObject_ = std::make_unique<Object3d>();
+	skillUpObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	skillUpObject_->SetCamera(camera_);
+	skillUpObject_->SetModel("playerSkillUp");
+
+	skillUnderObject_ = std::make_unique<Object3d>();
+	skillUnderObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	skillUnderObject_->SetCamera(camera_);
+	skillUnderObject_->SetModel("playerSkillUnder");
 	transform_ = {
 		.scale{2.0f, 2.0f, 2.0f},
 		.rotate{0.0f, 0.0f, 0.0f},
@@ -63,7 +73,7 @@ void PlayerSkill::Update() {
 		}
 		break;
 	case PlayerSkill::damage:
-		damageTransform2_.translate.y = 0.0f;
+		
 		damageTransform2_.scale.x = Function::Lerp(0, 3, damageTime);
 		damageTransform2_.scale.y = Function::Lerp(0, 3, damageTime);
 		damageTransform2_.scale.z = Function::Lerp(0, 3, damageTime);
@@ -88,11 +98,20 @@ void PlayerSkill::Update() {
 	debugDamageBox2_->SetCamera(camera_);
 	debugDamageBox2_->SetTransform(damageTransform2_);
 	debugDamageBox2_->Update();
+
+	skillUpObject_->SetCamera(camera_);
+	skillUpObject_->SetTransform(damageTransform1_);
+	skillUpObject_->Update();
+
+	skillUnderObject_->SetCamera(camera_);
+	skillUnderObject_->SetTransform(damageTransform2_);
+	skillUnderObject_->Update();
 }
 void PlayerSkill::StartAttack(const Transform& playerTransform) {
 	transform_ = playerTransform;
 	damageTransform1_ = playerTransform;
 	damageTransform2_ = playerTransform;
+	damageTransform2_.translate.y = 0.0f;
 	isSkillEnd = false;
 	skillTime = 0;
 	state = up;
@@ -106,6 +125,10 @@ void PlayerSkill::Draw() {
 	debugBox_->Draw(); 
 	debugDamageBox1_->Draw();
 	debugDamageBox2_->Draw();
+	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendScreen);
+	skillUpObject_->Draw();
+	skillUnderObject_->Draw();
+	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAlpha);
 }
 
 

@@ -10,6 +10,8 @@ class PlayerSkill {
 	std::unique_ptr<Object3d> debugBox_;
 	std::unique_ptr<Object3d> debugDamageBox1_;
 	std::unique_ptr<Object3d> debugDamageBox2_;
+	std::unique_ptr<Object3d> skillUpObject_;
+	std::unique_ptr<Object3d> skillUnderObject_;
 	
 	Transform transform_;
 	Transform damageTransform1_;
