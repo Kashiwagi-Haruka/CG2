@@ -50,7 +50,8 @@ class TextureManager {
 		//初期化
 	    void Initialize(DirectXCommon* dxCommon,SrvManager* srvManager);
 	    void LoadTextureName(const std::string& filePath);
-		
+	    void LoadTextureFromMemory(const std::string& key, const uint8_t* data, size_t size);
+	    void LoadTextureFromRGBA8(const std::string& key, uint32_t width, uint32_t height, const uint8_t* data);
 	    uint32_t GetTextureIndexByfilePath(const std::string& filePath);
 	    D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(const std::string& filePath);
 	    uint32_t GetsrvIndex(const std::string& filePath);

@@ -33,7 +33,7 @@ void ModelManeger::LoadGltfModel(const std::string& filePath) {
 	}
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->LoadObjFileAssimp("Resources/3d", filePath +".gltf");
+	model->LoadObjFileAssimp("Resources/3d", filePath +".glb");
 	model->Initialize(modelCommon_.get());
 	models.insert(std::make_pair(filePath, std::move(model)));
 

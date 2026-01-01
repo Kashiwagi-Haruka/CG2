@@ -13,6 +13,7 @@
 #endif // USE_IMGUI
 
 Player::Player() {
+	ModelManeger::GetInstance()->LoadGltfModel("astralPlayer");
 	ModelManeger::GetInstance()->LoadModel("playerModel");
 	ModelManeger::GetInstance()->LoadModel("FallingEffect");
 	ModelManeger::GetInstance()->LoadModel("playerSkillUp");
@@ -39,7 +40,7 @@ void Player::Initialize(Camera* camera) {
     };
 
 	playerObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
-	playerObject_->SetModel("playerModel");
+	playerObject_->SetModel("astralPlayer");
 	fallingEffectObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	fallingEffectObject_->SetModel("FallingEffect");
 

@@ -221,7 +221,21 @@ void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::strin
 		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
 			aiString textureFilepath;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilepath);
-			modelData_.material.textureFilePath = directoryPath + "/" + textureFilepath.C_Str();
+			std::string texturePath = textureFilepath.C_Str();
+			if (!texturePath.empty() && texturePath[0] == '*') {
+				const aiTexture* embeddedTexture = scene->GetEmbeddedTexture(textureFilepath.C_Str());
+				if (embeddedTexture != nullptr) {
+					if (embeddedTexture->mHeight == 0) {
+						TextureManager::GetInstance()->LoadTextureFromMemory(texturePath, reinterpret_cast<const uint8_t*>(embeddedTexture->pcData), embeddedTexture->mWidth);
+					} else {
+						TextureManager::GetInstance()->LoadTextureFromRGBA8(texturePath, embeddedTexture->mWidth, embeddedTexture->mHeight, reinterpret_cast<const uint8_t*>(embeddedTexture->pcData));
+					}
+					modelData_.material.textureFilePath = texturePath;
+					modelData_.material.textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
+				}
+			} else if (!texturePath.empty()) {
+				modelData_.material.textureFilePath = directoryPath + "/" + texturePath;
+			}
 		}
 
 	}

@@ -72,7 +72,83 @@ void TextureManager::LoadTextureName(const std::string& filePath) {
 	OutputDebugStringA(log.c_str());
 
 }
+void TextureManager::LoadTextureFromMemory(const std::string& key, const uint8_t* data, size_t size) {
+	if (textureDatas.contains(key)) {
+		return;
+	}
+	assert(srvManager_->CanAllocate());
 
+	DirectX::ScratchImage image{};
+	HRESULT hr_ = DirectX::LoadFromWICMemory(data, size, DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+	assert(SUCCEEDED(hr_));
+
+	DirectX::ScratchImage mipImages{};
+	hr_ = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+	assert(SUCCEEDED(hr_));
+
+	TextureData& textureData = textureDatas[key];
+	textureData.filePath = key;
+	textureData.metadata = mipImages.GetMetadata();
+	textureData.resource = CreateTextureResource(textureData.metadata);
+
+	UploadTextureData(textureData.resource.Get(), mipImages);
+
+	textureData.srvIndex = srvManager_->Allocate();
+	textureData.srvHandleCPU = srvManager_->GetCPUDescriptorHandle(textureData.srvIndex);
+	textureData.srvHandleGPU = srvManager_->GetGPUDescriptorHandle(textureData.srvIndex);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = textureData.metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
+
+	dxCommon_->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
+
+	std::string log = "Embedded Texture Loaded: " + key + " | SRV Index: " + std::to_string(textureData.srvIndex) + " | GPU Handle: " + std::to_string(textureData.srvHandleGPU.ptr) + "\n";
+	OutputDebugStringA(log.c_str());
+}
+
+void TextureManager::LoadTextureFromRGBA8(const std::string& key, uint32_t width, uint32_t height, const uint8_t* data) {
+	if (textureDatas.contains(key)) {
+		return;
+	}
+	assert(srvManager_->CanAllocate());
+
+	DirectX::ScratchImage image{};
+	HRESULT hr_ = image.Initialize2D(DXGI_FORMAT_B8G8R8A8_UNORM, width, height, 1, 1);
+	assert(SUCCEEDED(hr_));
+
+	const DirectX::Image* img = image.GetImage(0, 0, 0);
+	assert(img != nullptr);
+	std::memcpy(img->pixels, data, static_cast<size_t>(width) * height * 4);
+
+	DirectX::ScratchImage mipImages{};
+	hr_ = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+	assert(SUCCEEDED(hr_));
+
+	TextureData& textureData = textureDatas[key];
+	textureData.filePath = key;
+	textureData.metadata = mipImages.GetMetadata();
+	textureData.resource = CreateTextureResource(textureData.metadata);
+
+	UploadTextureData(textureData.resource.Get(), mipImages);
+
+	textureData.srvIndex = srvManager_->Allocate();
+	textureData.srvHandleCPU = srvManager_->GetCPUDescriptorHandle(textureData.srvIndex);
+	textureData.srvHandleGPU = srvManager_->GetGPUDescriptorHandle(textureData.srvIndex);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = textureData.metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
+
+	dxCommon_->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
+
+	std::string log = "Embedded Texture Loaded (RGBA8): " + key + " | SRV Index: " + std::to_string(textureData.srvIndex) + " | GPU Handle: " + std::to_string(textureData.srvHandleGPU.ptr) + "\n";
+	OutputDebugStringA(log.c_str());
+}
 Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(DirectX::TexMetadata& metadata) {
 
 	// metadataを基にResourceの設定
