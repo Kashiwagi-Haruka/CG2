@@ -115,15 +115,15 @@ void PlayerSkill::Update() {
 	skillUnderObject_->SetCamera(camera_);
 	skillUnderObject_->SetTransform(damageTransform2_);
 	skillUnderObject_->Update();
-	
+	skillUnderObject_->SetTransform(damageTransform2_);
 	skillEmitter_->Update(particle_);
 }
 void PlayerSkill::StartAttack(const Transform& playerTransform) {
 	transform_ = playerTransform;
 	damageTransform1_ = playerTransform;
 	damageTransform2_ = playerTransform;
-	particle_.translate = {transform_.translate.x, 0, transform_.translate.z};
-	skillUnderObject_->SetTransform(damageTransform2_);
+	particle_.translate = {transform_.translate.x, transform_.translate.y - (transform_.scale.y * 0.5f), transform_.translate.z};
+	
 	damageTransform2_.translate.y = -5.0f;
 	isSkillEnd = false;
 	skillTime = 0;
@@ -139,9 +139,13 @@ void PlayerSkill::Draw() {
 	debugBox_->Draw(); 
 	debugDamageBox1_->Draw();
 	debugDamageBox2_->Draw();
+	if (skillEmitter_) {
+		skillEmitter_->Draw();
+	}
 	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendScreen);
 	skillUpObject_->Draw();
 	skillUnderObject_->Draw();
+
 	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAlpha);
 }
 

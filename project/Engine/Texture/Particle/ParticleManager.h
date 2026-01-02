@@ -74,7 +74,7 @@ public:
 
 	// 更新 / 描画
 	void Update(Camera* camera);
-	void Draw();
+	void Draw(const std::string& name);
 	void Clear();
 	void Finalize();
 

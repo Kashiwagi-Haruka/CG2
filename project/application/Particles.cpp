@@ -80,8 +80,18 @@ void Particles::Update() {
 #endif
 }
 void Particles::Draw() {
-
-	ParticleManager::GetInstance()->Draw();
+	if (particleplayer) {
+		particleplayer->Draw();
+	}
+	if (particleleaf) {
+		particleleaf->Draw();
+	}
+	if (particlegoal) {
+		particlegoal->Draw();
+	}
+	if (particleArrow) {
+		particleArrow->Draw();
+	}
 }
 void Particles::SetPlayerPos(Vector3 playerPos){ playerPos_ = playerPos; }
 void Particles::SetCameraPos(Vector3 cameraPos) { cameraPos_ = cameraPos; }

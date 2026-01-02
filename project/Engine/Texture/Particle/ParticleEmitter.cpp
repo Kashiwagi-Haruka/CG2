@@ -30,9 +30,10 @@ void ParticleEmitter::Update(const Transform& parentTransform) {
 	}
 }
 void ParticleEmitter::Draw(){
-
-
-
+	if (!emitVisible_) {
+		return;
+	}
+	ParticleManager::GetInstance()->Draw(name);
 }
     // -----------------------------------------
 // EmitVisible

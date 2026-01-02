@@ -212,7 +212,7 @@ void ParticleManager::Update(Camera* camera) {
 	}
 }
 
-void ParticleManager::Draw() {
+void ParticleManager::Draw(const std::string& name) {
 
 	struct alignas(256) MaterialCB {
 		float color[4];     // {1,1,1,1}
@@ -238,9 +238,9 @@ void ParticleManager::Draw() {
 
 		m->enableLighting = 0;
 		m->pad[0] = m->pad[1] = m->pad[2] = 0.0f;
-		// 4x4 単位行列
-		for (int i = 0; i < 16; i++)
-			m->uvTransform[i] = (i % 5 == 0) ? 1.0f : 0.0f;
+		for (int i = 0; i < 16; i++) {
+		m->uvTransform[i] = (i % 5 == 0) ? 1.0f : 0.0f;
+		}
 		cbResource_->Unmap(0, nullptr);
 	}
 
@@ -265,6 +265,13 @@ void ParticleManager::Draw() {
 	    3, // rootParameters[3] = b1
 	    vsTransformCB_->GetGPUVirtualAddress());
 
+	auto it = particleGroups.find(name);
+	if (it == particleGroups.end()) {
+		return;
+	}
+
+	auto& group = it->second;
+
 	// ==========================================
 	// ★ 全ブレンドモードをループして描画
 	// ==========================================
@@ -273,24 +280,20 @@ void ParticleManager::Draw() {
 		// PSO設定
 		dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_[blendMode].Get());
 
-		// 全グループをループ
-		for (auto& [name, group] : particleGroups) {
+		auto& bucket = group.buckets[blendMode];
 
-			auto& bucket = group.buckets[blendMode];
+		// このブレンドモードで描画するパーティクルがない場合はスキップ
+		if (bucket.instanceCount == 0)
+			continue;
 
-			// このブレンドモードで描画するパーティクルがない場合はスキップ
-			if (bucket.instanceCount == 0)
-				continue;
+		// テクスチャ設定
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group.textureSrvIndex));
 
-			// テクスチャ設定
-			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(group.textureSrvIndex));
+		// インスタンシングデータ設定
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(bucket.instancingSrvIndex));
 
-			// インスタンシングデータ設定
-			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(bucket.instancingSrvIndex));
-
-			// 描画
-			dxCommon_->GetCommandList()->DrawInstanced(6, bucket.instanceCount, 0, 0);
-		}
+		// 描画
+		dxCommon_->GetCommandList()->DrawInstanced(6, bucket.instanceCount, 0, 0);
 	}
 }
 
