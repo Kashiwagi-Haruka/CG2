@@ -3,6 +3,7 @@
 #include <memory>
 #include "Transform.h"
 #include "Camera.h"
+#include "ParticleEmitter.h"
 class PlayerSkill {
 
 	private:
@@ -12,7 +13,8 @@ class PlayerSkill {
 	std::unique_ptr<Object3d> debugDamageBox2_;
 	std::unique_ptr<Object3d> skillUpObject_;
 	std::unique_ptr<Object3d> skillUnderObject_;
-	
+	std::unique_ptr<ParticleEmitter> skillEmitter_;
+	Transform particle_;
 	Transform transform_;
 	Transform damageTransform1_;
 	Transform damageTransform2_;
@@ -27,6 +29,7 @@ class PlayerSkill {
 	float middleTime = 0;
 	float downTime = 0;
 	float damageTime = 0;
+	float endTime = 0;
 
 	enum State{
 		up,

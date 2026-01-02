@@ -10,6 +10,7 @@ Particles::Particles() {
 	ParticleManager::GetInstance()->CreateParticleGroup("goal", "Resources/2d/goalParticle.png");
 	ParticleManager::GetInstance()->CreateParticleGroup("screenEffect", "Resources/2d/defaultParticle.png");
 	ParticleManager::GetInstance()->CreateParticleGroup("Arrow", "Resources/2d/ArrowParticle.png");
+	ParticleManager::GetInstance()->CreateParticleGroup("skill", "Resources/2d/ArrowParticle.png");
 
 	// ★ new → make_unique に変更
 	particleplayer = std::make_unique<ParticleEmitter>(
@@ -43,8 +44,8 @@ void Particles::Update() {
 
 	playerEmitterTransform.translate = {playerPos_.x * kParticlePosScale, (playerPos_.y - 0.9f) * kParticlePosScale, playerPos_.z};
 
-	particleArrow
-	    ->Update({{1,1,1},{0,0,0},{-25,3,-25}});
+	//particleArrow
+	//    ->Update({{1,1,1},{0,0,0},{-25,3,-25}});
 
 	particleplayer->Update(playerEmitterTransform);
 

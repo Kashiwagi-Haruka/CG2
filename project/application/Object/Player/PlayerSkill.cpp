@@ -37,13 +37,18 @@ void PlayerSkill::Initialize() {
         .translate{0.0f, 0.0f, 0.0f}
     };
 	damageTransform2_ = {
-	    .scale{1.0f, 1.0f, 1.0f},
+	    .scale{0.0f, 0.0f,0.0f},
         .rotate{0.0f, 0.0f, 0.0f},
         .translate{0.0f, 0.0f, 0.0f}
     };
+	particle_ = {
+	    .scale{1, 1, 1},
+        .rotate{0, 0, 0},
+        .translate{0, 0, 0}
+    };
+	skillEmitter_ = std::make_unique<ParticleEmitter>("skill", particle_, 10.0f, 1, Vector3{0, 1, 0}, Vector3{-transform_.scale.x / 2.0f, 0, -transform_.scale.z / 2.0f}, Vector3{transform_.scale.x / 2.0f, 0, transform_.scale.z / 2.0f});
 }
 void PlayerSkill::Update() {
-	
 	
 
 	switch (state) {
@@ -73,14 +78,18 @@ void PlayerSkill::Update() {
 		}
 		break;
 	case PlayerSkill::damage:
-		
+		damageTransform2_.translate.y = 0.0f;
 		damageTransform2_.scale.x = Function::Lerp(0, 3, damageTime);
 		damageTransform2_.scale.y = Function::Lerp(0, 3, damageTime);
 		damageTransform2_.scale.z = Function::Lerp(0, 3, damageTime);
 		if (damageTime < 1.0f) {
 			damageTime += 0.1f;
 		} else {
-			isSkillEnd = true;	
+			if (endTime < 30.0f) {
+				endTime++;
+			} else {
+				isSkillEnd = true;
+			}
 		}
 		break;
 	default:
@@ -106,12 +115,16 @@ void PlayerSkill::Update() {
 	skillUnderObject_->SetCamera(camera_);
 	skillUnderObject_->SetTransform(damageTransform2_);
 	skillUnderObject_->Update();
+	
+	skillEmitter_->Update(particle_);
 }
 void PlayerSkill::StartAttack(const Transform& playerTransform) {
 	transform_ = playerTransform;
 	damageTransform1_ = playerTransform;
 	damageTransform2_ = playerTransform;
-	damageTransform2_.translate.y = 0.0f;
+	particle_.translate = {transform_.translate.x, 0, transform_.translate.z};
+	skillUnderObject_->SetTransform(damageTransform2_);
+	damageTransform2_.translate.y = -5.0f;
 	isSkillEnd = false;
 	skillTime = 0;
 	state = up;
@@ -119,6 +132,7 @@ void PlayerSkill::StartAttack(const Transform& playerTransform) {
 	middleTime = 0;
 	downTime = 0;
 	damageTime = 0;
+	endTime = 0;
 }
 void PlayerSkill::Draw() {
 	

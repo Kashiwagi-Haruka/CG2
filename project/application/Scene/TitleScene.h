@@ -2,7 +2,7 @@
 #include "BaseScene.h"
 #include "Sprite.h"
 #include <memory>
-
+#include "Audio.h"
 class GameBase;
 
 class TitleScene : public BaseScene {
@@ -20,6 +20,8 @@ class TitleScene : public BaseScene {
 	uint32_t pressSpaceHandle = 0;
 	Vector2 pressSpacePos = {640, 420};
 	Vector2 pressSpaceSize = {300, 300};
+	SoundData BGMData;
+	bool isBGMPlaying;
 
 public:
 	TitleScene();

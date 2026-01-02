@@ -7,11 +7,10 @@ TitleScene::TitleScene() {
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/title.png");
 	logoSP_.sprite = std::make_unique<Sprite>();
 	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), logoSP_.handle);
+	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Rendez-vous_2.mp3");
 }
 
-void TitleScene::Finalize() {
-	
-}
+void TitleScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGMData); }
 
 void TitleScene::Initialize() {
 
@@ -31,9 +30,14 @@ void TitleScene::Initialize() {
 	pressSpaceSprite->SetScale(pressSpaceSize);
 	pressSpaceSprite->SetPosition(pressSpacePos);
 	pressSpaceSprite->Update();
+	isBGMPlaying = false;
 }
 
 void TitleScene::Update(){ 
+	if (!isBGMPlaying) {
+		Audio::GetInstance()->SoundPlayWave(BGMData, true);
+		isBGMPlaying = true;
+	}
 	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
 	
 	SceneManager::GetInstance()->ChangeScene("Game");

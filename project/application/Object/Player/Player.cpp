@@ -40,7 +40,7 @@ void Player::Initialize(Camera* camera) {
     };
 
 	playerObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
-	playerObject_->SetModel("astralPlayer");
+	playerObject_->SetModel("playerModel");
 	fallingEffectObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	fallingEffectObject_->SetModel("FallingEffect");
 

@@ -24,7 +24,7 @@ GameScene::GameScene() {
 	/*BG = std::make_unique<Background>();*/
 	house = std::make_unique<House>();
 
-	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/昼下がり気分.mp3");
+	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Tailshaft.mp3");
 }
 
 GameScene::~GameScene() {}
@@ -345,10 +345,7 @@ void GameScene::Update() {
 		}
 	}
 
-	particles->SetPlayerPos(player->GetPosition());
-	particles->SetCameraPos(cameraController->GetTransform().translate);
-	particles->SetGoalPos(goal->GetTranslate());
-	particles->Update();
+
 
 
 	uimanager->SetPlayerParameters(player->GetParameters());
