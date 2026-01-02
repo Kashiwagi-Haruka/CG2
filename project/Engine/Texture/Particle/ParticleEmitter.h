@@ -32,6 +32,7 @@ public:
 	const Transform& GetTransform() const { return transform_; }
 
 		void SetTransform(Transform& t) { transform_ = t; }
+	void SetLife(float life) {}
 	
 
 private:
@@ -46,5 +47,5 @@ private:
 	Vector3 areaMax_;      // 発生エリア最大座標
 	bool emitVisible_ = true;   
 	float timer = 0.0f; // 発生管理用のタイマー
-
+	float life = 10;
 };

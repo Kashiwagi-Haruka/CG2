@@ -46,7 +46,8 @@ void PlayerSkill::Initialize() {
         .rotate{0, 0, 0},
         .translate{0, 0, 0}
     };
-	skillEmitter_ = std::make_unique<ParticleEmitter>("skill", particle_, 1.0f, 10, Vector3{0, 1, 0}, Vector3{-transform_.scale.x / 2.0f, 0, -transform_.scale.z / 2.0f}, Vector3{transform_.scale.x / 2.0f, 0.1f, transform_.scale.z / 2.0f});
+	skillEmitter_ = std::make_unique<ParticleEmitter>("skill", particle_, 1.0f, 10, Vector3{0, 0.01f, 0}, Vector3{-transform_.scale.x, 0, -transform_.scale.z}, Vector3{transform_.scale.x, 1.0f, transform_.scale.z});
+	
 }
 void PlayerSkill::Update() {
 	
@@ -139,9 +140,12 @@ void PlayerSkill::Draw() {
 	debugBox_->Draw(); 
 	debugDamageBox1_->Draw();
 	debugDamageBox2_->Draw();
+	if (state==State::damage) {
 	if (skillEmitter_) {
 		skillEmitter_->Draw();
 	}
+	}
+	GameBase::GetInstance()->ModelCommonSet();
 	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendScreen);
 	skillUpObject_->Draw();
 	skillUnderObject_->Draw();

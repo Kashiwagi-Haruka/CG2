@@ -239,7 +239,7 @@ void ParticleManager::Draw(const std::string& name) {
 		m->enableLighting = 0;
 		m->pad[0] = m->pad[1] = m->pad[2] = 0.0f;
 		for (int i = 0; i < 16; i++) {
-		m->uvTransform[i] = (i % 5 == 0) ? 1.0f : 0.0f;
+			m->uvTransform[i] = (i % 5 == 0) ? 1.0f : 0.0f;
 		}
 		cbResource_->Unmap(0, nullptr);
 	}
@@ -296,7 +296,6 @@ void ParticleManager::Draw(const std::string& name) {
 		dxCommon_->GetCommandList()->DrawInstanced(6, bucket.instanceCount, 0, 0);
 	}
 }
-
 void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area) {
 
 	auto& group = particleGroups[name];
