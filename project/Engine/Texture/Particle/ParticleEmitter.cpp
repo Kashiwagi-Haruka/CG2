@@ -17,8 +17,8 @@ void ParticleEmitter::Update(const Transform& parentTransform) {
 
 		// Emitter 専用の発生エリア
 		AABB fieldArea;
-		fieldArea.min = transform_.translate + areaMin_;
-		fieldArea.max = transform_.translate + areaMax_;
+		fieldArea.min = areaMin_;
+		fieldArea.max = areaMax_;
 
 		// ★ SetFieldAcceleration はもう使わない（全体共有なので）
 		// ★ SetFieldArea も使わない
@@ -47,8 +47,8 @@ void ParticleEmitter::EmitVisible(bool v) { emitVisible_ = v; }
 // -----------------------------------------
 void ParticleEmitter::Emit() {
 	AABB fieldArea;
-	fieldArea.min = transform_.translate + areaMin_;
-	fieldArea.max = transform_.translate + areaMax_;
+	fieldArea.min = areaMin_;
+	fieldArea.max = areaMax_;
 
 	ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea);
 }

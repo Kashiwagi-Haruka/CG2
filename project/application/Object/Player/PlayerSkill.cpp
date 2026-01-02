@@ -42,11 +42,11 @@ void PlayerSkill::Initialize() {
         .translate{0.0f, 0.0f, 0.0f}
     };
 	particle_ = {
-	    .scale{1, 1, 1},
+	    .scale{0.1f, 0.1f, 0.1f},
         .rotate{0, 0, 0},
         .translate{0, 0, 0}
     };
-	skillEmitter_ = std::make_unique<ParticleEmitter>("skill", particle_, 10.0f, 1, Vector3{0, 1, 0}, Vector3{-transform_.scale.x / 2.0f, 0, -transform_.scale.z / 2.0f}, Vector3{transform_.scale.x / 2.0f, 0, transform_.scale.z / 2.0f});
+	skillEmitter_ = std::make_unique<ParticleEmitter>("skill", particle_, 1.0f, 10, Vector3{0, 1, 0}, Vector3{-transform_.scale.x / 2.0f, 0, -transform_.scale.z / 2.0f}, Vector3{transform_.scale.x / 2.0f, 0.1f, transform_.scale.z / 2.0f});
 }
 void PlayerSkill::Update() {
 	
