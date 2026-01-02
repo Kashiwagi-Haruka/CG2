@@ -24,7 +24,7 @@ void ParticleEmitter::Update(const Transform& parentTransform) {
 		// ★ SetFieldArea も使わない
 
 		// Emit() に emitter の個別フィールドを渡す
-		ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea);
+		ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea,life);
 
 		timer -= 1.0f;
 	}
@@ -51,7 +51,7 @@ void ParticleEmitter::Emit() {
 	fieldArea.min = areaMin_;
 	fieldArea.max = areaMax_;
 
-	ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea);
+	ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea,life);
 }
 
 

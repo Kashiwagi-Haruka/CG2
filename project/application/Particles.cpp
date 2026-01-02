@@ -162,6 +162,10 @@ void Particles::EditSingleEmitter(ParticleEmitter* e) {
 	if (ImGui::Button("Emit Now##emit")) {
 		e->Emit();
 	}
+	float life = e->GetLife();
+	if (ImGui::DragFloat("Life##life", &life, 1.0f, 0.0f, 10000.0f)) {
+		e->SetLife(life);
+	}
 
 	ImGui::PopID();
 #endif // USE_IMGUI

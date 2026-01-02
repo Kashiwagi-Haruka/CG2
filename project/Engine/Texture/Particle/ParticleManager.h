@@ -67,7 +67,7 @@ public:
 	static ParticleManager* GetInstance();
 	void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager);
 	void CreateParticleGroup(const std::string& name, const std::string& textureFilePath);
-	void Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area);
+	void Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life);
 	void SetCamera(Camera* camera);
 	void SetBlendMode(BlendMode mode);
 

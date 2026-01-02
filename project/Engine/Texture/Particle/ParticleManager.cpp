@@ -296,7 +296,7 @@ void ParticleManager::Draw(const std::string& name) {
 		dxCommon_->GetCommandList()->DrawInstanced(6, bucket.instanceCount, 0, 0);
 	}
 }
-void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area) {
+void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life) {
 
 	auto& group = particleGroups[name];
 
@@ -313,7 +313,7 @@ void ParticleManager::Emit(const std::string& name, const Transform& transform, 
 
 		p.transform_.scale = transform.scale;
 
-		p.life = 120.0f;
+		p.life = life;
 		p.color.w = 1.0f;
 
 		// ★ ここで個別フィールドを保存
