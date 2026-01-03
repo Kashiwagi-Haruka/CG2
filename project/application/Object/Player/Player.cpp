@@ -92,6 +92,7 @@ void Player::Move() {
 
 	// 入力方向を記録する変数
 	Vector3 inputDirection = {0.0f, 0.0f, 0.0f};
+	Vector3 inputAxis = {0.0f, 0.0f, 0.0f};
 	bool hasInput = false;
 
 	if (GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_D)) {
@@ -105,8 +106,8 @@ void Player::Move() {
 				lastTapTimeA_ = 0.0f;
 			}
 			if (GameBase::GetInstance()->PushKey(DIK_A)) {
-				velocity_.x += -parameters_.accelationRate * (parameters_.SpeedUp + 1);
-				inputDirection.x = -1.0f;
+
+				inputAxis.x = -1.0f;
 				hasInput = true;
 			}
 		}
@@ -119,8 +120,7 @@ void Player::Move() {
 				lastTapTimeD_ = 0.0f;
 			}
 			if (GameBase::GetInstance()->PushKey(DIK_D)) {
-				velocity_.x += parameters_.accelationRate * (parameters_.SpeedUp + 1);
-				inputDirection.x = 1.0f;
+				inputAxis.x = 1.0f;
 				hasInput = true;
 			}
 		}
@@ -136,8 +136,8 @@ void Player::Move() {
 				lastTapTimeS_ = 0.0f;
 			}
 			if (GameBase::GetInstance()->PushKey(DIK_S)) {
-				velocity_.z += -parameters_.accelationRate * (parameters_.SpeedUp + 1);
-				inputDirection.z = -1.0f;
+				
+				inputAxis.z = -1.0f;
 				hasInput = true;
 			}
 		}
@@ -150,8 +150,7 @@ void Player::Move() {
 				lastTapTimeW_ = 0.0f;
 			}
 			if (GameBase::GetInstance()->PushKey(DIK_W)) {
-				velocity_.z += parameters_.accelationRate * (parameters_.SpeedUp + 1);
-				inputDirection.z = 1.0f;
+				inputAxis.z = 1.0f;
 				hasInput = true;
 			}
 		}
@@ -159,6 +158,19 @@ void Player::Move() {
 
 	// 入力がある場合、その方向に向きを回転
 	if (hasInput) {
+		const float inputLength = std::sqrt(inputAxis.x * inputAxis.x + inputAxis.z * inputAxis.z);
+		if (inputLength > 0.0f) {
+			inputAxis.x /= inputLength;
+			inputAxis.z /= inputLength;
+		}
+
+		const float cameraYaw = camera_ ? camera_->GetRotate().y : 0.0f;
+		const Vector3 forward = {std::sinf(cameraYaw), 0.0f, std::cosf(cameraYaw)};
+		const Vector3 right = {std::cosf(cameraYaw), 0.0f, -std::sinf(cameraYaw)};
+		inputDirection = forward * inputAxis.z + right * inputAxis.x;
+
+		velocity_.x += inputDirection.x * parameters_.accelationRate * (parameters_.SpeedUp + 1);
+		velocity_.z += inputDirection.z * parameters_.accelationRate * (parameters_.SpeedUp + 1);
 		// 入力方向から目標角度を計算
 		float targetAngle = std::atan2(inputDirection.x, inputDirection.z);
 
