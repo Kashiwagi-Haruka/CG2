@@ -3,7 +3,7 @@
 #include "GameBase.h"
 SceneTransition::SceneTransition(){
 	
-	fadeSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png");
+	fadeSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/transition.png");
 	fadeSPData.sprite = std::make_unique<Sprite>();
 	fadeSPData.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), fadeSPData.handle);
 }
@@ -11,19 +11,20 @@ SceneTransition::~SceneTransition(){
 	
 }
 
-void SceneTransition::Initialize(){ 
+void SceneTransition::Initialize(bool isIn){ 
 	
 	fadeSPData.size = {1280, 720};
 	fadeSPData.translate = {0, 0}; 
 	fadeSPData.sprite->SetScale(fadeSPData.size);
 	fadeSPData.sprite->SetPosition(fadeSPData.translate);
 	fadeSPData.sprite->Update();
+	isIn_ = isIn;
 	isEnd = false;
 }
-void SceneTransition::Update(bool isIn) { 
+void SceneTransition::Update() { 
 
 	fadeSPData.sprite->SetColor({0, 0, 0, color});
-	if (isIn) {
+	if (isIn_) {
 		color -= 0.01f;
 		if (color <= 0.0f) {
 			color = 0.0f;

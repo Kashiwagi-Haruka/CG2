@@ -46,7 +46,8 @@ class GameScene: public BaseScene{
 	std::unique_ptr<MapchipField> field;
 	std::unique_ptr<House> house;
 	
-	
+	bool isTransitionIn = true;
+	bool isTransitionOut = false;
 
 		bool isBGMPlaying = false;
 

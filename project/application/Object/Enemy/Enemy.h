@@ -1,6 +1,7 @@
 #pragma once
 #include "EnemyStun.h"
 #include "Transform.h"
+#include "EnemyAttack.h"
 #include "Vector3.h"
 #include <memory>
 
@@ -17,6 +18,11 @@ class Enemy {
 	int stunTime;
 	int stunTimeMax = 60 * 3;
 
+		float attackTimer_ = 0.0f;
+	float attackCooldown_ = 1.0f;
+	float attackRange_ = 1.5f;
+	float attackHitSize_ = 1.2f;
+
 	Vector3 direction_;
 	Vector3 velocity_;
 	Transform transform_;
@@ -24,6 +30,7 @@ class Enemy {
 
 	std::unique_ptr<Object3d> object_;
 	std::unique_ptr<EnemyStun> enemyStun;
+	std::unique_ptr<EnemyAttack> enemyAttack_;
 
 	Camera* camera_ = nullptr;
 
@@ -42,6 +49,10 @@ public:
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	Vector3 GetPosition() { return transform_.translate; }
 	Vector3 GetScale() { return transform_.scale; }
+	float GetAttackRange() const { return attackRange_; }
+	float GetAttackHitSize() const { return attackHitSize_; }
+	bool IsAttackReady() const { return attackTimer_ >= attackCooldown_; }
+	void ResetAttackTimer() { attackTimer_ = 0.0f; }
 	void SetPosition() { transform_.translate; }
 	void BulletCollision();
 };

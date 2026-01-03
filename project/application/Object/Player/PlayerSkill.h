@@ -47,5 +47,8 @@ class PlayerSkill {
 	    void SetCamera(Camera* camera) { camera_ = camera; }
 	    void StartAttack(const Transform& playerTransform);
 	    bool IsSkillEnd() { return isSkillEnd; }
+	    bool IsDamaging() const { return state == State::damage && !isSkillEnd; }
+	    Vector3 GetDamagePosition() const { return damageTransform2_.translate; }
+	    Vector3 GetDamageScale() const { return damageTransform2_.scale; }
 };
 

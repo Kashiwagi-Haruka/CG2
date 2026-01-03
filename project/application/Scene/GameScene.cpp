@@ -55,7 +55,9 @@ void GameScene::Initialize() {
 	field->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field->Initialize(cameraController->GetCamera());
 	goal->Initialize(cameraController->GetCamera());
-	sceneTransition->Initialize();
+	sceneTransition->Initialize(false);
+	isTransitionIn = true;
+	isTransitionOut = false;
 	uimanager->SetPlayerHPMax(player->GetHPMax());
 	uimanager->SetPlayerHP(player->GetHP());
 
@@ -277,8 +279,10 @@ void GameScene::Update() {
 	}
 
 	if (!player->GetIsAlive()) {
-
-		SceneManager::GetInstance()->ChangeScene("GameOver");
+		if (!isTransitionOut) {
+			isTransitionOut = true;
+		}
+		
 	}
 
 	// ===== プレイヤーと敵の当たり判定 =====
@@ -297,23 +301,7 @@ void GameScene::Update() {
 		Vector3 ePos = e->GetPosition();
 		AABB enemyAabb = makeAabb(ePos, e->GetScale());
 
-		// ===== ① プレイヤーが敵と接触 =====
-		bool isCollidePlayer = RigidBody::isCollision(playerAabb, enemyAabb);
-
-		if (isCollidePlayer) {
-
-			// --- 上から踏んだ判定 ---
-			bool isStomp = (p.y > ePos.y + 0.3f) && // プレイヤーが上にいる
-			               (v.y < 0);               // 落下中
-
-			if (isStomp) {
-				e->Stun(); // 敵にダメージ(スタン)
-			} else {
-				player->Damage(1); // プレイヤーが被弾
-			}
-		}
-
-		// ===== ② 剣との当たり判定 =====
+		// ===== ① 剣との当たり判定 =====
 		if (player->GetIsAlive() && player->GetSword()->IsAttacking()) {
 
 			Vector3 swordPos = player->GetSword()->GetPosition();
@@ -331,18 +319,34 @@ void GameScene::Update() {
 				}
 			}
 		}
+		// ===== ② スキル攻撃との当たり判定 =====
+		if (player->GetIsAlive() && player->GetSkill() && player->GetSkill()->IsDamaging()) {
+			AABB skillAabb = makeAabb(player->GetSkill()->GetDamagePosition(), player->GetSkill()->GetDamageScale());
+			bool hitSkill = RigidBody::isCollision(skillAabb, enemyAabb);
+
+			if (hitSkill) {
+				e->SetHPSubtract(1);
+				if (!e->GetIsAlive()) {
+					player->EXPMath();
+				}
+			}
+		}
+
+		// ===== ③ 敵の攻撃判定 =====
+		Vector3 toPlayer = p - ePos;
+		float dist2 = toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z;
+		float attackRange = e->GetAttackRange();
+		if (dist2 <= attackRange * attackRange && e->IsAttackReady()) {
+			AABB enemyAttackAabb = makeAabb(ePos, {e->GetAttackHitSize(), e->GetAttackHitSize(), e->GetAttackHitSize()});
+			bool hitEnemyAttack = RigidBody::isCollision(enemyAttackAabb, playerAabb);
+			if (hitEnemyAttack) {
+				player->Damage(1);
+				e->ResetAttackTimer();
+			}
+		}
 
 		// ===== ③ House と敵の当たり判定 =====
-		bool hitHouse = RigidBody::isCollision(houseAabb, enemyAabb);
-		if (hitHouse) {
-			e->SetHPSubtract(10); // ★ 敵を即死させる or 消す処理
-			house->Damage(1);     // ★ house にダメージ
-
-			if (house->GetHP() <= 0) {
-				SceneManager::GetInstance()->ChangeScene("GameOver");
-			}
-			continue;
-		}
+	
 	}
 
 
@@ -364,6 +368,13 @@ void GameScene::Update() {
 	cameraController->SetPlayerPos(player->GetPosition());
 
 	cameraController->Update();
+
+	if (isTransitionIn||isTransitionOut) {
+		sceneTransition->Update();
+		if (sceneTransition->IsEnd()) {
+			SceneManager::GetInstance()->ChangeScene("GameOver");
+		}
+	}
 }
 
 void GameScene::Draw() {
@@ -412,5 +423,8 @@ void GameScene::Draw() {
 		levelupIcons[rightID]->SetColor(cursorIndex == 1 ? Vector4(1, 1, 0, 1) : Vector4(1, 1, 1, 1));
 		levelupIcons[rightID]->Update();
 		levelupIcons[rightID]->Draw();
+	}
+	if (isTransitionIn || isTransitionOut) {
+		sceneTransition->Draw();
 	}
 }

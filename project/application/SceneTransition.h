@@ -15,15 +15,16 @@ class SceneTransition {
 
 	SpriteData fadeSPData;
 	float color = 0.0f;
+	bool isIn_ = true;
 	bool isEnd;
 
 public:
 	SceneTransition();
 	~SceneTransition();
 
-	void Initialize();
-	void Update(bool isIn);
+	void Initialize(bool isIn);
+	void Update();
 	void Draw();
-
+	bool IsEnd() { return isEnd; };
 
 };

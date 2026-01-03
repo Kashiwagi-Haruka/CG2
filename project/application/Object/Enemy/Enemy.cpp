@@ -29,9 +29,12 @@ void Enemy::Initialize(Camera* camera,Vector3 translates) {
 	object_->SetCamera(camera_);
 	object_->Update();
 	enemyStun->Initialize();
+	enemyAttack_ = std::make_unique<EnemyAttack>();
+	enemyAttack_->Initialize(camera_);
 }
 
 void Enemy::Update() {
+	attackTimer_ += 1.0f / 60.0f;
 	// 敵の更新処理
 	if (!isStun_) {
 	velocity_.x -= 0.01f;
@@ -53,6 +56,17 @@ void Enemy::Update() {
 	object_->SetCamera(camera_);
 	object_->SetTransform(transform_);
 	object_->Update();
+	// 攻撃タイマー更新
+	attackTimer_ += 1.0f / 60.0f;
+
+	// 攻撃開始条件
+	if (!isStun_ && IsAttackReady()) {
+		enemyAttack_->Start(transform_);
+		ResetAttackTimer();
+	}
+
+	enemyAttack_->Update();
+
 	if (HP <= 0) {
 		isAlive = false;
 	}
@@ -67,9 +81,15 @@ void Enemy::Stun() {
 void Enemy::Draw() {
 	// 敵の描画処理
 	object_->Draw();
+
+	if (enemyAttack_) {
+		enemyAttack_->Draw();
+	}
+
 	if (isStun_) {
 		enemyStun->Draw();
 	}
+
 
 }
 void Enemy::BulletCollision(){

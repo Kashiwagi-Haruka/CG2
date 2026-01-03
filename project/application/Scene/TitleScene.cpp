@@ -8,6 +8,7 @@ TitleScene::TitleScene() {
 	logoSP_.sprite = std::make_unique<Sprite>();
 	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), logoSP_.handle);
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Rendez-vous_2.mp3");
+	transition = std::make_unique<SceneTransition>();
 }
 
 void TitleScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGMData); }
@@ -31,6 +32,7 @@ void TitleScene::Initialize() {
 	pressSpaceSprite->SetPosition(pressSpacePos);
 	pressSpaceSprite->Update();
 	isBGMPlaying = false;
+	isTransition = false;
 }
 
 void TitleScene::Update(){ 
@@ -39,10 +41,16 @@ void TitleScene::Update(){
 		isBGMPlaying = true;
 	}
 	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
-	
-	SceneManager::GetInstance()->ChangeScene("Game");
+		transition->Initialize(true);
+		isTransition = true;
 	}
+	if (isTransition) {
+		transition->Update();
+	}
+	if (transition->IsEnd()) {
 
+		SceneManager::GetInstance()->ChangeScene("Game");
+	}
 	#ifdef USE_IMGUI
 	ImGui::Begin("titleScene");
 	ImGui::End();
@@ -54,6 +62,8 @@ void TitleScene::Draw(){
 	GameBase::GetInstance()->SpriteCommonSet();
 	logoSP_.sprite->Draw();
 	pressSpaceSprite->Draw();
-
+	if (isTransition) {
+		transition->Draw();
+	}
 
 }

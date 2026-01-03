@@ -2,7 +2,8 @@
 #include "GameBase.h"
 #include "Object3dCommon.h"
 PlayerSkill::PlayerSkill() {
-	
+	state = up;
+	isSkillEnd = true;
 }
 void PlayerSkill::Initialize() {
 	debugBox_ = std::make_unique<Object3d>();

@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include <memory>
 #include "Audio.h"
+#include "SceneTransition.h"
 class GameBase;
 
 class TitleScene : public BaseScene {
@@ -22,6 +23,8 @@ class TitleScene : public BaseScene {
 	Vector2 pressSpaceSize = {300, 300};
 	SoundData BGMData;
 	bool isBGMPlaying;
+	bool isTransition = false;
+	std::unique_ptr<SceneTransition> transition=nullptr;
 
 public:
 	TitleScene();
