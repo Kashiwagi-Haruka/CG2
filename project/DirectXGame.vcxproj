@@ -234,6 +234,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\Player\PlayerSword.cpp" />
     <ClCompile Include="application\Object\Player\PlayerSkill.cpp" />
     <ClCompile Include="application\Object\Player\PlayerSpecialAttack.cpp" />
+    <ClCompile Include="application\Object\Player\PlayerModels.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -322,6 +323,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\Player\PlayerSword.h" />
     <ClInclude Include="application\Object\Player\PlayerSkill.h" />
     <ClInclude Include="application\Object\Player\PlayerSpecialAttack.h" />
+    <ClInclude Include="application\Object\Player\PlayerModels.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

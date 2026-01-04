@@ -9,6 +9,7 @@
 #include "Vector3.h"
 #include <memory>
 #include "Audio.h"
+#include "PlayerModels.h"
 class Camera;
 class PlayerBullet;
 class MapchipField;
@@ -38,6 +39,7 @@ class Player {
 	AttackState attackState_;
 
 	Parameters parameters_;
+	std::unique_ptr<PlayerModels> models_;
 
 	struct Select {};
 

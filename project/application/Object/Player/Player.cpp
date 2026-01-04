@@ -25,6 +25,8 @@ Player::Player() {
 	specialAttack_ = std::make_unique<PlayerSpecialAttack>();
 	attackSE = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/normalAttack.mp3");
 	attackEndSE = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/endAttack.mp3");
+	models_ = std::make_unique<PlayerModels>();
+	
 }
 
 Player::~Player() {}
@@ -54,6 +56,9 @@ void Player::Initialize(Camera* camera) {
 	specialAttack_->SetCamera(camera_); 
 	isAlive = true;
 	parameters_ = SetInit();
+	models_->SetCamera(camera_);
+	models_->SetPlayerTransform(transform_);
+	models_->Initialize();
 	hp_ = parameters_.hpMax_;
 	bulletVelocity_ = {0, 0, 0};
 	isDash = false;
@@ -464,6 +469,10 @@ void Player::Update() {
 	sword_->SetCamera(camera_);
 	sword_->SetPlayerYaw(transform_.rotate.y);
 	sword_->Update(transform_);
+	models_->SetCamera(camera_);
+	models_->SetPlayerTransform(transform_);
+	models_->Update();
+	
 	if (isSkillAttack) {
 	skill_->SetCamera(camera_);
 	skill_->Update();
@@ -524,6 +533,7 @@ void Player::Draw() {
 
 	GameBase::GetInstance()->ModelCommonSet();
 	playerObject_->Draw();
+	models_->Draw();
 	if (isFallingAttack_) {
 	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAdd);
 	fallingEffectObject_->Draw();

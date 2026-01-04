@@ -13,13 +13,16 @@ void Object3d::Initialize(Object3dCommon* modelCommon){
 	obj3dCommon_ = modelCommon;
 	camera_ = obj3dCommon_->GetDefaultCamera();
 	CreateResources();
-	
+	isUseSetWorld = false;
 }
 void Object3d::Update(){
 	// [0]=モデル描画用で使う
 	
+	if (!isUseSetWorld) {
 	worldMatrix = Function::Multiply(model_->GetModelData().rootnode.localMatrix ,Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
-
+	} else {
+		worldMatrix = Function::Multiply(model_->GetModelData().rootnode.localMatrix, worldMatrix);
+	}
 	
 	
 	worldViewProjectionMatrix = Function::Multiply(model_->GetModelData().rootnode.localMatrix , Function::Multiply(Function::Multiply(worldMatrix,camera_->GetViewMatrix()),camera_->GetProjectionMatrix()));
@@ -65,9 +68,18 @@ void Object3d::Draw() {
 
 void Object3d::SetModel(const std::string& filePath) { model_ = ModelManeger::GetInstance()->FindModel(filePath); }
 void Object3d::SetCamera(Camera* camera) { camera_ = camera; }
-void Object3d::SetScale(Vector3 scale){ transform_.scale = scale; }
-void Object3d::SetRotate(Vector3 rotate) { transform_.rotate = rotate; }
-void Object3d::SetTranslate(Vector3 translate) { transform_.translate = translate; }
+void Object3d::SetScale(Vector3 scale) {
+	transform_.scale = scale;
+	isUseSetWorld = false;
+}
+void Object3d::SetRotate(Vector3 rotate) {
+	transform_.rotate = rotate;
+	isUseSetWorld = false;
+}
+void Object3d::SetTranslate(Vector3 translate) {
+	transform_.translate = translate;
+	isUseSetWorld = false;
+}
 void Object3d::SetColor(Vector4 color) {
 	if (model_) {
 		model_->SetColor(color);

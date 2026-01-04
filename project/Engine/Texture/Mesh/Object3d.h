@@ -47,7 +47,7 @@ class Object3d {
 	Model* model_ = nullptr;
 	Matrix4x4 worldMatrix;
 	Matrix4x4 worldViewProjectionMatrix;
-	
+	bool isUseSetWorld;
 
 public:
 	void Initialize(Object3dCommon* modelCommon);
@@ -62,8 +62,14 @@ public:
 	void SetTranslate(Vector3 translate);
 	void SetRotate(Vector3 Rotate);
 	void SetScale(Vector3 Scale);
-	void SetTransform(Transform transform) { transform_ = transform; }
-
+	void SetTransform(Transform transform) {
+		transform_ = transform;
+		isUseSetWorld = false;
+	}
+	void SetWorldMatrix(Matrix4x4 matrix) {
+		worldMatrix = matrix;
+		isUseSetWorld = true;
+	}
 	void SetColor(Vector4 color);
 	void SetEnableLighting(bool enable);
 	void SetUvTransform(const Matrix4x4& uvTransform);
