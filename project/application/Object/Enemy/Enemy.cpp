@@ -33,17 +33,31 @@ void Enemy::Initialize(Camera* camera,Vector3 translates) {
 	enemyAttack_->Initialize(camera_);
 }
 
-void Enemy::Update() {
+void Enemy::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive) {
 	attackTimer_ += 1.0f / 60.0f;
 	// 敵の更新処理
 	if (!isStun_) {
-	velocity_.x -= 0.01f;
-	velocity_.x = std::clamp(velocity_.x, -maxSpeed_, maxSpeed_);
+		Vector3 target = housePos;
+		if (isPlayerAlive) {
+			Vector3 toPlayer = playerPos - transform_.translate;
+			if (LengthSquared(toPlayer) <= playerChaseRange_ * playerChaseRange_) {
+				target = playerPos;
+			}
+		}
+
+		Vector3 toTarget = target - transform_.translate;
+		toTarget.y = 0.0f;
+		if (LengthSquared(toTarget) > 0.0001f) {
+			Vector3 direction = Function::Normalize(toTarget);
+			velocity_ = direction * maxSpeed_;
+		} else {
+			velocity_ = {0.0f, 0.0f, 0.0f};
+		}
 	
 	}
 
 	if (isStun_) {
-		velocity_.x = 0;
+		velocity_ = {0.0f, 0.0f, 0.0f};
 		stunTime++;
 		enemyStun->SetCamera(camera_);
 		enemyStun->SetTranslate(transform_.translate);

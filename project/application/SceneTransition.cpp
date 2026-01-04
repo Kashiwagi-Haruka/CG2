@@ -13,30 +13,39 @@ SceneTransition::~SceneTransition(){
 
 void SceneTransition::Initialize(bool isIn){ 
 	
-	fadeSPData.size = {1280, 720};
+	isIn_ = isIn;
+	if (isIn_) {
+		fadeSPData.size = {0, 720};
+	} else {
+		fadeSPData.size = {1500, 720};
+	}
 	fadeSPData.translate = {0, 0}; 
 	fadeSPData.sprite->SetScale(fadeSPData.size);
 	fadeSPData.sprite->SetPosition(fadeSPData.translate);
 	fadeSPData.sprite->Update();
-	isIn_ = isIn;
+	
 	isEnd = false;
 }
 void SceneTransition::Update() { 
 
-	fadeSPData.sprite->SetColor({0, 0, 0, color});
+	
 	if (isIn_) {
-		color -= 0.01f;
-		if (color <= 0.0f) {
-			color = 0.0f;
+		fadeSPData.size.x += 10.0f;
+		fadeSPData.translate.x -= 10.0f;
+		if (fadeSPData.size.x >= 1500.0f) {
+			fadeSPData.size.x = 1500.0f;
 			isEnd = true;
 		}
 	} else {
-		color += 0.01f;
-		if (color >= 1.0f) {
-			color = 1.0f;
+		fadeSPData.size.x -= 10.0f;
+		fadeSPData.translate.x += 10.0f;
+		if (fadeSPData.size.x <=  0.0f) {
+			fadeSPData.size.x = 0.0f;
 			isEnd = true;
 		}
 	}
-
+	fadeSPData.sprite->SetScale(fadeSPData.size);
+	fadeSPData.sprite->SetPosition(fadeSPData.translate);
+	fadeSPData.sprite->Update();
 }
 void SceneTransition::Draw() { fadeSPData.sprite->Draw(); }

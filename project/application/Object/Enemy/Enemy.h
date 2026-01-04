@@ -33,6 +33,7 @@ class Enemy {
 	std::unique_ptr<EnemyAttack> enemyAttack_;
 
 	Camera* camera_ = nullptr;
+	float playerChaseRange_ = 8.0f;
 
 public:
 	Enemy();
@@ -40,7 +41,7 @@ public:
 
 	void Initialize(Camera* camera, Vector3 translate);
 	void SetIsStun(bool isStun);
-	void Update();
+	void Update(const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive);
 	void Draw();
 	void Stun();
 	void SetHPSubtract(int hp) { HP -= hp; }

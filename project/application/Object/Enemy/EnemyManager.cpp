@@ -39,29 +39,31 @@ void EnemyManager::SpawnWaveEnemies() {
 		float minY;        // 最小Y位置
 		float maxY;        // 最大Y位置
 		bool randomHeight; // ランダムな高さにするか
+		float minZ;        // Z最小
+		float maxZ;        // Z最大
 	};
 
 	WaveConfig config;
 
-	switch (currentWave_) {
+		switch (currentWave_) {
 	case 1: // ウェーブ1: 少数、低い位置、広い間隔
-		config = {5, -40.0f, 30.0f, 1.5f, 2.0f, false};
+		config = {5, -40.0f, 30.0f, 1.5f, 2.0f, false, -60.0f, -20.0f};
 		break;
 
 	case 2: // ウェーブ2: 中数、やや高い位置
-		config = {8, -40.0f, 40.0f, 1.5f, 3.0f, true};
+		config = {8, -40.0f, 40.0f, 1.5f, 3.0f, true, -60.0f, -20.0f};
 		break;
 
 	case 3: // ウェーブ3: 多数、バラバラの高さ
-		config = {12, -40.0f, 50.0f, 1.5f, 4.0f, true};
+		config = {12, -40.0f, 50.0f, 1.5f, 4.0f, true, -60.0f, -20.0f};
 		break;
 
 	case 4: // ウェーブ4: 密集、高低差大
-		config = {15, -40.0f, 45.0f, 1.0f, 5.0f, true};
+		config = {15, -40.0f, 45.0f, 1.0f, 5.0f, true, -60.0f, -20.0f};
 		break;
 
 	case 5: // ウェーブ5: 大量、ランダム配置
-		config = {20, -40.0f, 60.0f, 1.0f, 6.0f, true};
+		config = {20, -40.0f, 60.0f, 1.0f, 6.0f, true, -60.0f, -20.0f};
 		break;
 
 	default: // ウェーブ6以降: どんどん増える
@@ -71,7 +73,9 @@ void EnemyManager::SpawnWaveEnemies() {
 		    50.0f + (currentWave_ - 5) * 5.0f,
 		    1.0f,
 		    6.0f,
-		    true};
+		    true,
+		    -60.0f,
+		    -20.0f};
 		break;
 	}
 
@@ -91,7 +95,7 @@ void EnemyManager::SpawnWaveEnemies() {
 		}
 
 		// ランダムなZ位置のバリエーション
-		float z = -52.0f + ((float)rand() / RAND_MAX) * 4.0f;
+		float z = config.minZ + ((float)rand() / RAND_MAX) * (config.maxZ - config.minZ);
 
 		Vector3 pos = {x, y, z};
 		AddEnemy(camera_, pos);
@@ -107,7 +111,7 @@ void EnemyManager::AddEnemy(Camera* camera, const Vector3& pos) {
 	enemies.push_back(std::move(e));
 }
 
-void EnemyManager::Update(Camera* camera) {
+void EnemyManager::Update(Camera* camera, const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive) {
 
 	// ウェーブの状態管理
 	switch (waveState_) {
@@ -138,7 +142,7 @@ void EnemyManager::Update(Camera* camera) {
 	for (auto& e : enemies) {
 		if (e->GetIsAlive()) {
 			e->SetCamera(camera);
-			e->Update();
+			e->Update(housePos, playerPos, isPlayerAlive);
 		}
 	}
 }

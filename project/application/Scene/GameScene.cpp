@@ -248,7 +248,7 @@ void GameScene::Update() {
 	}
 
 	// ★ ウェーブシステムの更新
-	enemyManager->Update(cameraController->GetCamera());
+	enemyManager->Update(cameraController->GetCamera(), house->GetPosition(), player->GetPosition(), player->GetIsAlive());
 
 	// ★ ウェーブクリア判定でゴールを有効化
 	// 全ウェーブクリア後にゴールを出すなど、条件は自由に変更可能
@@ -371,7 +371,7 @@ void GameScene::Update() {
 
 	if (isTransitionIn||isTransitionOut) {
 		sceneTransition->Update();
-		if (sceneTransition->IsEnd()) {
+		if (sceneTransition->IsEnd()&&isTransitionOut) {
 			SceneManager::GetInstance()->ChangeScene("GameOver");
 		}
 	}
@@ -382,7 +382,7 @@ void GameScene::Draw() {
 	GameBase::GetInstance()->ModelCommonSet();
 	/*skyDome->Draw();*/
 	field->Draw();
-	/*house->Draw();*/
+	house->Draw();
 	player->Draw();
 	enemyManager->Draw();
 	
