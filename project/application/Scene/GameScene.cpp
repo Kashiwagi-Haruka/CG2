@@ -304,7 +304,23 @@ void GameScene::Update() {
 
 		Vector3 ePos = e->GetPosition();
 		AABB enemyAabb = makeAabb(ePos, e->GetScale());
-
+		bool hitHouseBody = RigidBody::isCollision(enemyAabb, houseAabb);
+		if (hitHouseBody) {
+			Vector3 toEnemy = ePos - housePos;
+			toEnemy.y = 0.0f;
+			if (LengthSquared(toEnemy) < 0.0001f) {
+				toEnemy = {1.0f, 0.0f, 0.0f};
+			}
+			Vector3 pushDir = Function::Normalize(toEnemy);
+			Vector3 houseScale = house->GetScale();
+			Vector3 enemyScale = e->GetScale();
+			float minDistance = houseScale.x + enemyScale.x;
+			Vector3 correctedPos = housePos + pushDir * minDistance;
+			correctedPos.y = ePos.y;
+			e->SetPosition(correctedPos);
+			ePos = correctedPos;
+			enemyAabb = makeAabb(ePos, e->GetScale());
+		}
 		// ===== ① 剣との当たり判定 =====
 		if (player->GetIsAlive() && player->GetSword()->IsAttacking()) {
 
@@ -343,6 +359,10 @@ void GameScene::Update() {
 			bool hitEnemyAttack = RigidBody::isCollision(enemyAttackAabb, playerAabb);
 			if (hitEnemyAttack) {
 				player->Damage(1);
+			}
+			bool hitHouseAttack = RigidBody::isCollision(enemyAttackAabb, houseAabb);
+			if (hitHouseAttack) {
+				house->Damage(1);
 			}
 		}
 

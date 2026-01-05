@@ -51,6 +51,7 @@ public:
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	Vector3 GetPosition() { return transform_.translate; }
 	Vector3 GetScale() { return transform_.scale; }
+	void SetPosition(const Vector3& position) { transform_.translate = position; }
 	float GetAttackRange() const { return attackRange_; }
 	float GetAttackHitSize() const;
 	Vector3 GetAttackPosition() const;
