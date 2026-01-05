@@ -1,6 +1,6 @@
 #include "EnemyManager.h"
 #include <cstdlib>
-
+#include "Function.h"
 void EnemyManager::Clear() {
 	enemies.clear(); // unique_ptr が自動削除
 	hitEffects.clear();
@@ -82,23 +82,58 @@ void EnemyManager::SpawnWaveEnemies() {
 
 	// 敵を生成
 	float spacing = (config.endX - config.startX) / config.enemyCount;
+	const float minDistance = 2.0f;
+	const float minDistanceSq = minDistance * minDistance;
+	const int maxAttempts = 40;
+	std::vector<Vector3> spawnPositions;
+	spawnPositions.reserve(config.enemyCount);
 
 	for (int i = 0; i < config.enemyCount; i++) {
-		float x = config.startX + i * spacing;
+		Vector3 pos = {};
+		bool placed = false;
+		const float baseX = config.startX + i * spacing;
 
-		float y;
-		if (config.randomHeight) {
-			// ランダムな高さ
-			y = config.minY + ((float)rand() / RAND_MAX) * (config.maxY - config.minY);
-		} else {
-			// 固定の高さ
-			y = config.minY;
+		for (int attempt = 0; attempt < maxAttempts; ++attempt) {
+			float x = baseX;
+			if (attempt > 0) {
+				x = config.startX + ((float)rand() / RAND_MAX) * (config.endX - config.startX);
+			}
+
+			float y;
+			if (config.randomHeight) {
+				// ランダムな高さ
+				y = config.minY + ((float)rand() / RAND_MAX) * (config.maxY - config.minY);
+			} else {
+				// 固定の高さ
+				y = config.minY;
+			}
+
+			// ランダムなZ位置のバリエーション
+			float z = config.minZ + ((float)rand() / RAND_MAX) * (config.maxZ - config.minZ);
+
+			Vector3 candidate = {x, y, z};
+			bool overlaps = false;
+			for (const auto& existing : spawnPositions) {
+				Vector3 delta = candidate - existing;
+				float distanceSq = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
+				if (distanceSq < minDistanceSq) {
+					overlaps = true;
+					break;
+				}
+			}
+
+			if (!overlaps) {
+				pos = candidate;
+				placed = true;
+				break;
+			}
 		}
 
-		// ランダムなZ位置のバリエーション
-		float z = config.minZ + ((float)rand() / RAND_MAX) * (config.maxZ - config.minZ);
+		if (!placed) {
+			pos = {baseX, config.minY, (config.minZ + config.maxZ) * 0.5f};
+		}
 
-		Vector3 pos = {x, y, z};
+		spawnPositions.push_back(pos);
 		AddEnemy(camera_, pos);
 	}
 
