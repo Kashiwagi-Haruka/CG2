@@ -210,7 +210,12 @@ void Audio::StopVoicesForSound(const SoundData& soundData) {
 
 	activeVoices_.erase(std::remove_if(activeVoices_.begin(), activeVoices_.end(), [](const ActiveVoice& active) { return active.voice == nullptr; }), activeVoices_.end());
 }
-
+void Audio::SetSoundVolume(SoundData* soundData, float volume) {
+	if (!soundData) {
+		return;
+	}
+	soundData->volume = std::clamp(volume, 0.0f, 1.0f);
+}
 void Audio::StopAllVoices() {
 	for (auto& active : activeVoices_) {
 		if (active.voice) {

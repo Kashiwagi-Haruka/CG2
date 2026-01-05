@@ -11,7 +11,7 @@ class Object3d;
 
 class Enemy {
 
-	int HP = 2;
+	int HP = 5;
 	bool isAlive = true;
 	bool isStun_ = false;
 

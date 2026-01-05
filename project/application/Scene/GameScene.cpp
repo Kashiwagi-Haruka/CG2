@@ -9,6 +9,8 @@
 #include "SceneManager.h"
 #include <numbers>
 #include "RigidBody.h"
+#include "GameTimer.h"
+
 GameScene::GameScene() {
 
 	cameraController = std::make_unique<CameraController>();
@@ -25,6 +27,7 @@ GameScene::GameScene() {
 	house = std::make_unique<House>();
 
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Tailshaft.mp3");
+	GameTimer::GetInstance()->Reset();
 }
 
 GameScene::~GameScene() {}
@@ -157,6 +160,7 @@ void GameScene::DebugImGui() {
 #endif // USE_IMGUI
 }
 void GameScene::Update() {
+	GameTimer::GetInstance()->Update();
 	if (!isBGMPlaying) {
 		Audio::GetInstance()->SoundPlayWave(BGMData, true);
 		isBGMPlaying = true;

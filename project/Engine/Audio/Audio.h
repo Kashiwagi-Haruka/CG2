@@ -20,7 +20,7 @@ struct FormatChunk {
 struct SoundData {
 	WAVEFORMATEX wfex;
 	std::vector<BYTE> buffer;
-	
+	float volume = 1.0f;
 };
 
 class Audio {
@@ -51,6 +51,7 @@ public:
 	SoundData SoundLoadFile(const char* filename);
 	void SoundUnload(SoundData* soundData);
 	void SoundPlayWave(const SoundData& sounddata,bool isLoop=false);
+	void SetSoundVolume(SoundData* soundData, float volume);
 	Microsoft::WRL::ComPtr<IXAudio2> GetIXAudio2() { return xAudio2_; };
 }
 ;
