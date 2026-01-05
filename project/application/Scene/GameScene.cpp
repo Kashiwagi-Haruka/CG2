@@ -88,19 +88,19 @@ void GameScene::Initialize() {
 
 	
 	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLight_.position = {0.0f, 5.0f, 0.0f};
-	pointLight_.intensity = 0.0f;
-	pointLight_.radius = 10.0f;
-	pointLight_.decay = 1.0f;
+	pointLight_.position = {-25.0f, 5.0f, -25.0f};
+	pointLight_.intensity = 1.0f;
+	pointLight_.radius = 20.0f;
+	pointLight_.decay = 0.7f;
 
 	directionalLight_.color = {0.3725f, 0.2667f, 0.7882f,1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.5f};
 	directionalLight_.intensity = 1.0f;
 
 	spotLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	spotLight_.position = {2.0f, 1.25f, 0.0f};
-	spotLight_.direction = {-1.0f, -1.0f, 0.0f};
-	spotLight_.intensity = 1.0f;
+	spotLight_.position = {-50.0f, 5.0f, -50.0f};
+	spotLight_.direction = {0.0f, 1.0f, 0.0f};
+	spotLight_.intensity = 0.0f;
 	spotLight_.distance = 7.0f;
 	spotLight_.decay = 2.0f;
 	spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
@@ -393,9 +393,7 @@ void GameScene::Draw() {
 	
 
 
-	if (goalActive) {
-		goal->Draw(); // ★ 条件クリア後だけ描画する
-	}
+
 
 	particles->Draw();
 	
