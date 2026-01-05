@@ -469,6 +469,18 @@ void Player::Update() {
 
 	playerObject_->SetCamera(camera_);
 	transform_.translate += velocity_;
+	{
+		const float radius = movementLimitRadius_;
+		const float dx = transform_.translate.x - movementLimitCenter_.x;
+		const float dz = transform_.translate.z - movementLimitCenter_.z;
+		const float distSquared = dx * dx + dz * dz;
+		if (distSquared > radius * radius) {
+			const float dist = std::sqrt(distSquared);
+			const float scale = radius / dist;
+			transform_.translate.x = movementLimitCenter_.x + dx * scale;
+			transform_.translate.z = movementLimitCenter_.z + dz * scale;
+		}
+	}
 	playerObject_->SetTransform(transform_);
 	playerObject_->Update();
 	fallingEffectTransform_.scale = transform_.scale;

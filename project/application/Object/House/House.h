@@ -7,8 +7,10 @@
 class House {
 
 	std::unique_ptr<Object3d> object_;
+	std::unique_ptr<Object3d> hpbar_;
+	std::unique_ptr<Object3d> hpflame_;
 	Vector3 position_ = {0, 1.5f, 0};
-	int hp_ = 500000;
+	int hp_ = 50;
 
 public:
 	House();

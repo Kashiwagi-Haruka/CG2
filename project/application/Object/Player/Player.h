@@ -106,6 +106,9 @@ class Player {
 	SoundData attackSE;
 	SoundData attackEndSE;
 
+	Vector3 movementLimitCenter_{};
+	float movementLimitRadius_ = 20.0f;
+
 public:
 	Player();
 	~Player();
