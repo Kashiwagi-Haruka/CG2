@@ -36,6 +36,7 @@ void EnemyHitEffect::Update() {
 	}
 
 	hitTransform_.translate = enemyPosition_;
+	hitTransform_.rotate.y = std::numbers::pi_v<float>;
 
 	Matrix4x4 c = camera_->GetWorldMatrix();
 	c.m[3][0] = c.m[3][1] = c.m[3][2] = 0;

@@ -2,6 +2,7 @@
 #include "GameBase.h"
 #include "ModelManeger.h"
 #include "Function.h"
+#include <numbers>
 House::House() {}
 
 void House::Initialize(Camera* camera) {
@@ -39,8 +40,7 @@ void House::Initialize(Camera* camera) {
         .rotate{0, 0, 0},
         .translate{0, 0, 0}
     };
-	hpFlameT_.translate = {position_.x, position_.y + 1.0f, position_.z};
-	hpBarT_.translate = hpFlameT_.translate;
+
 }
 
 void House::Update(Camera* camera) {
@@ -48,11 +48,17 @@ void House::Update(Camera* camera) {
 	object_->SetTranslate(position_);
 	object_->Update();
 
-	Matrix4x4 c = camera->GetWorldMatrix();
-	c.m[3][0] = c.m[3][1] = c.m[3][2] = 0;
+		const float kHpOffsetY = 3.0f;
+	Vector3 hpBasePos = {position_.x, position_.y + kHpOffsetY, position_.z};
+	hpBarT_.translate = hpBasePos;
+	hpFlameT_.translate = hpBasePos;
+	hpBarT_.rotate.y = std::numbers::pi_v<float>;
+	hpFlameT_.rotate.y = std::numbers::pi_v<float>;
+	Matrix4x4 billboard = camera->GetWorldMatrix();
+	billboard.m[3][0] = billboard.m[3][1] = billboard.m[3][2] = 0;
 
-	Matrix4x4 BarW = Function::Multiply(c,Function::MakeAffineMatrix(hpBarT_.scale, hpBarT_.rotate, hpBarT_.translate));
-	Matrix4x4 FlameW = Function::Multiply(c,Function::MakeAffineMatrix(hpFlameT_.scale, hpFlameT_.rotate, hpFlameT_.translate));
+	Matrix4x4 BarW = Function::Multiply(billboard, Function::MakeAffineMatrix(hpBarT_.scale, hpBarT_.rotate, hpBarT_.translate));
+	Matrix4x4 FlameW = Function::Multiply(billboard, Function::MakeAffineMatrix(hpFlameT_.scale, hpFlameT_.rotate, hpFlameT_.translate));
 
 	hpflame_->SetCamera(camera);
 	hpflame_->SetWorldMatrix(FlameW);
