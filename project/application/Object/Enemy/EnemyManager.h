@@ -2,7 +2,7 @@
 #include "Enemy.h"
 #include <memory>
 #include <vector>
-
+#include "EnemyHitEffect.h"
 class EnemyManager {
 
 public:
@@ -16,6 +16,7 @@ public:
 
 private:
 	std::vector<std::unique_ptr<Enemy>> enemies;
+	std::vector<std::unique_ptr<EnemyHitEffect>> hitEffects;
 	Camera* camera_ = nullptr;
 
 	// ウェーブシステム

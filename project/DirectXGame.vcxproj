@@ -157,6 +157,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application\Object\Enemy\EnemyAttack.cpp" />
+    <ClCompile Include="application\Object\Enemy\EnemyHitEffect.cpp" />
     <ClCompile Include="Engine\BaseScene\AbstractSceneFactory.cpp" />
     <ClCompile Include="application\Object\Enemy\Enemy.cpp" />
     <ClCompile Include="application\CameraController.cpp" />
@@ -251,6 +252,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Object\Enemy\EnemyAttack.h" />
+    <ClInclude Include="application\Object\Enemy\EnemyHitEffect.h" />
     <ClInclude Include="Engine\BaseScene\AbstractSceneFactory.h" />
     <ClInclude Include="application\Object\Enemy\Enemy.h" />
     <ClInclude Include="application\CameraController.h" />

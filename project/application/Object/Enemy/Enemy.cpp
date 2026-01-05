@@ -9,6 +9,7 @@ Enemy::Enemy() {
 	ModelManeger::GetInstance()->LoadModel("Enemy");
 	object_ = std::make_unique<Object3d>();
 	enemyStun = std::make_unique<EnemyStun>();
+	
 }
 
 
@@ -28,6 +29,7 @@ void Enemy::Initialize(Camera* camera,Vector3 translates) {
 	object_->SetTransform(transform_);
 	object_->SetCamera(camera_);
 	object_->Update();
+
 	enemyStun->Initialize();
 	enemyAttack_ = std::make_unique<EnemyAttack>();
 	enemyAttack_->Initialize(camera_);

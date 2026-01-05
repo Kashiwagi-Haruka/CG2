@@ -167,10 +167,7 @@ void ParticleManager::Update(Camera* camera) {
 			Matrix4x4 world = Function::Multiply(c,Function::MakeAffineMatrix(p.transform_.scale, p.transform_.rotate, p.transform_.translate));
 			Matrix4x4 backToFrontMatrix = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
 			Matrix4x4 billboardMatrix = Function::Multiply(billboard,backToFrontMatrix);
-	/*		billboardMatrix.m[3][0] = 0.0f;
-			billboardMatrix.m[3][1] = 0.0f;
-			billboardMatrix.m[3][2] = 0.0f;*/
-			/*world = Function::Multiply(world, billboardMatrix);*/
+
 			Matrix4x4 wvp = Function::Multiply(Function::Multiply(world, view), proj);
 
 			// ================================

@@ -18,7 +18,7 @@ class Enemy {
 	int stunTime;
 	int stunTimeMax = 60 * 3;
 
-		float attackTimer_ = 0.0f;
+	float attackTimer_ = 0.0f;
 	float attackCooldown_ = 1.0f;
 	float attackRange_ = 1.5f;
 	float attackHitSize_ = 1.2f;
@@ -31,6 +31,7 @@ class Enemy {
 	std::unique_ptr<Object3d> object_;
 	std::unique_ptr<EnemyStun> enemyStun;
 	std::unique_ptr<EnemyAttack> enemyAttack_;
+	
 
 	Camera* camera_ = nullptr;
 	float playerChaseRange_ = 8.0f;

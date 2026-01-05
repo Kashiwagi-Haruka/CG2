@@ -380,7 +380,7 @@ void GameScene::Update() {
 void GameScene::Draw() {
 
 	GameBase::GetInstance()->ModelCommonSet();
-	/*skyDome->Draw();*/
+	skyDome->Draw();
 	field->Draw();
 	house->Draw();
 	player->Draw();

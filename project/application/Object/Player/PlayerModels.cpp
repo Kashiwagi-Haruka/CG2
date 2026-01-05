@@ -40,43 +40,65 @@ void PlayerModels::Initialize() {
 	headT_ = {
 	    .scale{1,    1,    1   },
         .rotate{0,    0,    0   },
-        .translate = {0.0f, 0.35f, 0.0f}
+        .translate = {0.0f, 0.17f, 0.0f}
     };
 
 	armRT_ = {
 	    .scale{1,    1,    1   },
         .rotate{0,    0,    0   },
-        .translate = {0.4f, 1.2f, 0.0f}
+        .translate = {-0.18f, 0.6f, 0.0f}
     };
 	armLT_={
 	    .scale{1,1,1},
         .rotate{0,0,0},
-        .translate{-0.4f, 1.2f, 0.0f}
+        .translate{0.18f, 0.6f, 0.0f}
     };
 
 	legRT_ = {
 	    .scale{1,1,1},
-        .rotate{0,0,0},
-        .translate{0.2f, 0.3f, 0.0f}
+        .rotate{0,0,0.2f},
+        .translate{0.06f, 0.06f, 0.0f}
     };
 	legLT_ = {
 		.scale{1, 1, 1},
-        .rotate{0,0,0},
-		.translate{-0.2f, 0.3f, 0.0f}};
+        .rotate{0,0,-0.2f},
+		.translate{-0.08f, 0.06f, 0.0f}};
 }
 
 void PlayerModels::Update() {
 
 	static float t = 0.0f;
 	t += 0.1f;
+	switch (state_) {
+	case PlayerModels::idle:
+		break;
+	case PlayerModels::walk:
+		
+			armRT_.rotate.x = std::sin(t) * 0.5f;
+			armLT_.rotate.x = -std::sin(t) * 0.5f;
 
-	if (state_ == walk) {
-		armRT_.rotate.x = std::sin(t) * 0.5f;
-		armLT_.rotate.x = -std::sin(t) * 0.5f;
-
-		legRT_.rotate.x = -std::sin(t) * 0.5f;
-		legLT_.rotate.x = std::sin(t) * 0.5f;
+			legRT_.rotate.x = -std::sin(t) * 0.5f;
+			legLT_.rotate.x = std::sin(t) * 0.5f;
+		
+		break;
+	case PlayerModels::attack1:
+		break;
+	case PlayerModels::attack2:
+		break;
+	case PlayerModels::attack3:
+		break;
+	case PlayerModels::attack4:
+		break;
+	case PlayerModels::fallingAttack:
+		break;
+	case PlayerModels::skillAttack:
+		break;
+	case PlayerModels::damage:
+		break;
+	default:
+		break;
 	}
+
 	#ifdef USE_IMGUI
 	if (!ImGui::Begin("Player Parts Adjust")) {
 		ImGui::End();
@@ -134,31 +156,31 @@ void PlayerModels::Draw() {
 
 
 	// head
-	head_->SetWorldMatrix(Function::Multiply(playerWorld, bodyM));
+	head_->SetWorldMatrix(Function::Multiply(bodyM, playerWorld));
 	head_->SetCamera(camera_);
 	head_->Update();
 	head_->Draw();
 
 	// 右腕
-	armR_->SetWorldMatrix(Function::Multiply(playerWorld, armRM));
+	armR_->SetWorldMatrix(Function::Multiply(armRM, playerWorld));
 	armR_->SetCamera(camera_);
 	armR_->Update();
 	armR_->Draw();
 
 	// 左腕
-	armL_->SetWorldMatrix(Function::Multiply(playerWorld, armLM));
+	armL_->SetWorldMatrix(Function::Multiply(armLM, playerWorld));
 	armL_->SetCamera(camera_);
 	armL_->Update();
 	armL_->Draw();
 
 	// 右脚
-	legR_->SetWorldMatrix(Function::Multiply(playerWorld, legRM));
+	legR_->SetWorldMatrix(Function::Multiply(legRM, playerWorld));
 	legR_->SetCamera(camera_);
 	legR_->Update();
 	legR_->Draw();
 
 	// 左脚
-	legL_->SetWorldMatrix(Function::Multiply(playerWorld, legLM));
+	legL_->SetWorldMatrix(Function::Multiply(legLM, playerWorld));
 	legL_->SetCamera(camera_);
 	legL_->Update();
 	legL_->Draw();

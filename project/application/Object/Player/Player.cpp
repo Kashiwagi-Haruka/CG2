@@ -114,6 +114,7 @@ void Player::Move() {
 
 				inputAxis.x = -1.0f;
 				hasInput = true;
+				models_->SetStateM(PlayerModels::StateM::walk);
 			}
 		}
 
@@ -127,6 +128,7 @@ void Player::Move() {
 			if (GameBase::GetInstance()->PushKey(DIK_D)) {
 				inputAxis.x = 1.0f;
 				hasInput = true;
+				models_->SetStateM(PlayerModels::StateM::walk);
 			}
 		}
 	}
@@ -141,7 +143,7 @@ void Player::Move() {
 				lastTapTimeS_ = 0.0f;
 			}
 			if (GameBase::GetInstance()->PushKey(DIK_S)) {
-				
+				models_->SetStateM(PlayerModels::StateM::walk);
 				inputAxis.z = -1.0f;
 				hasInput = true;
 			}
@@ -157,6 +159,7 @@ void Player::Move() {
 			if (GameBase::GetInstance()->PushKey(DIK_W)) {
 				inputAxis.z = 1.0f;
 				hasInput = true;
+				models_->SetStateM(PlayerModels::StateM::walk);
 			}
 		}
 	}
@@ -261,7 +264,7 @@ void Player::Falling() {
 		// ★ 落下攻撃中は急降下
 		if (isFallingAttack_) {
 			velocity_.y -= parameters_.gravity * 3.0f; // 通常の3倍の速度で落下
-			
+			models_->SetStateM(PlayerModels::StateM::fallingAttack);
 		} else {
 			velocity_.y -= parameters_.gravity;
 		}
@@ -275,6 +278,7 @@ void Player::Falling() {
 			if (isFallingAttack_) {
 				isFallingAttack_ = false;
 				isAttacking_ = false;
+				models_->SetStateM(PlayerModels::StateM::idle);
 				sword_->EndAttack(); // 攻撃を終了
 			}
 
@@ -290,9 +294,11 @@ void Player::Attack() {
 		return;
 	}
 	if (isSkillAttack) {
+		models_->SetStateM(PlayerModels::StateM::skillAttack);
 		return;
 	}
 	if (isSpecialAttack) {
+		models_->SetStateM(PlayerModels::StateM::idle);
 		return;
 	}
 
@@ -349,21 +355,25 @@ void Player::Attack() {
 				attackState_ = AttackState::kWeakAttack1;
 				sword_->StartAttack(1); // 1段階目
 				Audio::GetInstance()->SoundPlayWave(attackSE, false);
+				models_->SetStateM(PlayerModels::StateM::attack1);
 				break;
 			case 2:
 				attackState_ = AttackState::kWeakAttack2;
 				sword_->StartAttack(2); // 2段階目
 				Audio::GetInstance()->SoundPlayWave(attackSE, false);
+				models_->SetStateM(PlayerModels::StateM::attack2);
 				break;
 			case 3:
 				attackState_ = AttackState::kWeakAttack3;
 				sword_->StartAttack(3); // 3段階目
 				Audio::GetInstance()->SoundPlayWave(attackSE, false);
+				models_->SetStateM(PlayerModels::StateM::attack3);
 				break;
 			case 4:
 				attackState_ = AttackState::kWeakAttack4;
 				sword_->StartAttack(4); // 4段階目（フィニッシュ）
 				Audio::GetInstance()->SoundPlayWave(attackEndSE, false);
+				models_->SetStateM(PlayerModels::StateM::attack4);
 				break;
 			}
 		}
@@ -396,6 +406,8 @@ void Player::Attack() {
 			comboStep_ = 0;
 			canCombo_ = false;
 			comboTimer_ = 0.0f;
+			
+			
 		}
 
 		// 重撃が終わったらリセット
@@ -532,7 +544,7 @@ void Player::EXPMath() { parameters_.EXP += 50; }
 void Player::Draw() {
 
 	GameBase::GetInstance()->ModelCommonSet();
-	playerObject_->Draw();
+	/*playerObject_->Draw();*/
 	models_->Draw();
 	if (isFallingAttack_) {
 	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAdd);

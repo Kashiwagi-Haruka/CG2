@@ -5,7 +5,8 @@
 #include <memory>
 class PlayerModels {
 
-	enum State { 
+	public:
+	enum StateM {
 		idle,
 		walk,
 		attack1,
@@ -16,7 +17,10 @@ class PlayerModels {
 		skillAttack,
 		damage,
 
-	}state_;
+	};
+
+	private:
+	StateM state_;
 
 	std::unique_ptr<Object3d> head_;
 	std::unique_ptr<Object3d> armR_;
@@ -38,6 +42,7 @@ public:
 	~PlayerModels();
 	void SetCamera(Camera* camera) { camera_ = camera; };
 	void SetPlayerTransform(Transform player) { player_ = player; };
+	void SetStateM(StateM state) { state_ = state; }
 	void Initialize();
 	void Update();
 	void Draw();
