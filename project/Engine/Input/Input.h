@@ -33,6 +33,8 @@ class Input {
 	WinApp* winApp_ = nullptr;
 
 	bool isCursorStability = false;
+	bool isCursorVisibleRequested_ = true;
+	bool isCursorVisible_ = true;
 
 public:
 
@@ -136,6 +138,7 @@ public:
 	bool TriggerMouseButton(MouseButton button) const; // マウスボタンが押された瞬間か
 	bool ReleaseMouseButton(MouseButton button) const; // マウスボタンが離された瞬間か
 	void SetIsCursor(bool isCursor) { isCursorStability=isCursor; }
+	void SetIsCursorVisible(bool isVisible);
 	/// <summary>
 	/// デッドゾーンの設定
 	/// </summary>

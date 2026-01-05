@@ -145,7 +145,7 @@ Vector2 GameBase::GetJoyStickLXY() const { return DInput->GetJoyStickLXY(); };
 float GameBase::GetJoyStickRX() const { return DInput->GetJoyStickRX(); };
 float GameBase::GetJoyStickRY() const { return DInput->GetJoyStickRY(); };
 Vector2 GameBase::GetJoyStickRXY() const { return DInput->GetJoyStickRXY(); };
-
+void GameBase::SetIsCursorVisible(bool isVisible) { DInput->SetIsCursorVisible(isVisible); }
 
 
 /// <summary>

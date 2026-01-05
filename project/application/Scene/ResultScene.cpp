@@ -37,6 +37,8 @@ void ResultScene::Initialize() {
 	pressSpaceSprite->SetPosition(pressSpacePos);
 
 	pressSpaceSprite->Update();
+	GameBase::GetInstance()->SetIsCursorStablity(false);
+	GameBase::GetInstance()->SetIsCursorVisible(true);
 }
 void ResultScene::Update() {
 

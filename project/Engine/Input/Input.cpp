@@ -57,8 +57,18 @@ void Input::Initialize(WinApp* winApp) {
 	assert(SUCCEEDED(result));
 }
 
-
+void Input::SetIsCursorVisible(bool isVisible) { isCursorVisibleRequested_ = isVisible; }
 void Input::Update() {
+	if (isCursorVisible_ != isCursorVisibleRequested_) {
+		if (isCursorVisibleRequested_) {
+			while (ShowCursor(TRUE) < 0) {
+			}
+		} else {
+			while (ShowCursor(FALSE) >= 0) {
+			}
+		}
+		isCursorVisible_ = isCursorVisibleRequested_;
+	}
 	// 前のフレームのキー入力を保存
 	memcpy(preKey, key, sizeof(key));
 

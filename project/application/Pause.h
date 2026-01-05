@@ -11,6 +11,16 @@ class Pause {
 	uint32_t SelectHandle_;
 	uint32_t ButtonHandle_;
 
+	float startTime = 0;
+
+	bool isStart = false;
+	bool isSelect = false;
+
+	bool isGameBack = false;
+	bool isTitleBack = false;
+
+	public:
+	Pause();
 	void Initialize();
 	void Update(bool isPause);
 	void Draw();

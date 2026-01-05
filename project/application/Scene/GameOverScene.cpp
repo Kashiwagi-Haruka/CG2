@@ -33,6 +33,7 @@ void GameOverScene::Initialize() {
 	pressSpaceSprite->SetTextureRange({0, 0}, {768, 768});
 	pressSpaceSprite->Update();
 	GameBase::GetInstance()->SetIsCursorStablity(false);
+	GameBase::GetInstance()->SetIsCursorVisible(true);
 }
 
 void GameOverScene::Update() {

@@ -41,6 +41,7 @@ void TitleScene::Initialize() {
 	isBGMPlaying = false;
 	isTransition = false;
 	GameBase::GetInstance()->SetIsCursorStablity(false);
+	GameBase::GetInstance()->SetIsCursorVisible(true);
 }
 
 void TitleScene::Update(){ 
