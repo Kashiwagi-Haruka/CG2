@@ -1,8 +1,19 @@
 #pragma once
 #include "Sprite.h"
+#include "Vector2.h"
+#include <array>
 #include <memory>
+
 class Pause {
 
+public:
+	enum class Action {
+		kNone,
+		kResume,
+		kTitle,
+	};
+
+private:
 	std::unique_ptr<Sprite> BG_;
 	std::unique_ptr<Sprite> Select_;
 	std::unique_ptr<Sprite> Button_;
@@ -11,19 +22,28 @@ class Pause {
 	uint32_t SelectHandle_;
 	uint32_t ButtonHandle_;
 
-	float startTime = 0;
+	Vector2 bgBasePos_{0.0f, 0.0f};
+	Vector2 selectBasePos_{0.0f, 0.0f};
+	std::array<Vector2, 2> buttonBasePos_{};
 
-	bool isStart = false;
-	bool isSelect = false;
+	Vector2 bgSize_{1280.0f, 720.0f};
+	Vector2 selectSize_{640.0f, 640.0f};
+	Vector2 buttonSize_{80.0f, 80.0f};
 
-	bool isGameBack = false;
-	bool isTitleBack = false;
+	float startTime = 0.0f;
+	int selectIndex_ = 1;
 
-	public:
+	bool isActive_ = false;
+	bool isStart_ = false;
+	bool isEnd_ = false;
+
+	Action action_ = Action::kNone;
+
+public:
 	Pause();
 	void Initialize();
 	void Update(bool isPause);
 	void Draw();
-
-
+	bool IsVisible() const { return isActive_ || isStart_ || isEnd_; }
+	Action ConsumeAction();
 };

@@ -26,6 +26,7 @@ GameScene::GameScene() {
 	/*BG = std::make_unique<Background>();*/
 	house = std::make_unique<House>();
 
+	pause = std::make_unique<Pause>();
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Tailshaft.mp3");
 	GameTimer::GetInstance()->Reset();
 	GameBase::GetInstance()->SetIsCursorStablity(true);
@@ -107,6 +108,7 @@ void GameScene::Initialize() {
 	spotLight_.decay = 2.0f;
 	spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+	pause->Initialize();
 }
 
 void GameScene::DebugImGui() {
@@ -167,6 +169,26 @@ void GameScene::Update() {
 		Audio::GetInstance()->SoundPlayWave(BGMData, true);
 		isBGMPlaying = true;
 	}
+	if (!isLevelSelecting && !isTransitionIn && !isTransitionOut) {
+		bool togglePause = GameBase::GetInstance()->TriggerKey(DIK_ESCAPE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonStart);
+		if (togglePause) {
+			isPause = !isPause;
+		}
+	}
+
+	pause->Update(isPause);
+	Pause::Action pauseAction = pause->ConsumeAction();
+	if (pauseAction == Pause::Action::kResume) {
+		isPause = false;
+	} else if (pauseAction == Pause::Action::kTitle) {
+		SceneManager::GetInstance()->ChangeScene("Title");
+		return;
+	}
+
+	if (isPause) {
+		return;
+	}
+
 	auto makeAabb = [](const Vector3& center, const Vector3& halfSize) {
 		AABB aabb;
 		aabb.min = {center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z};
@@ -394,6 +416,9 @@ void GameScene::Update() {
 
 	if (isTransitionIn||isTransitionOut) {
 		sceneTransition->Update();
+		if (sceneTransition->IsEnd() && isTransitionIn) {
+			isTransitionIn = false;
+		}
 		if (sceneTransition->IsEnd()&&isTransitionOut) {
 			SceneManager::GetInstance()->ChangeScene("GameOver");
 		}
@@ -445,6 +470,7 @@ void GameScene::Draw() {
 		levelupIcons[rightID]->Update();
 		levelupIcons[rightID]->Draw();
 	}
+	pause->Draw();
 	if (isTransitionIn || isTransitionOut) {
 		sceneTransition->Draw();
 	}

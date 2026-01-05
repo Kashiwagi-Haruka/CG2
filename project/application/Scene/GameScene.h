@@ -15,7 +15,7 @@
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
-
+#include "Pause.h"
 
 class Player;
 class Enemy;
@@ -46,12 +46,14 @@ class GameScene: public BaseScene{
 	std::unique_ptr<CameraController> cameraController;
 	std::unique_ptr<MapchipField> field;
 	std::unique_ptr<House> house;
-	
+	std::unique_ptr<Pause> pause;
+
 	bool isTransitionIn = true;
 	bool isTransitionOut = false;
 
-		bool isBGMPlaying = false;
-
+	bool isBGMPlaying = false;
+	bool isPause = false;
+			
 	SoundData BGMData;
 
 	// レベルアップ選択専用スプライト
