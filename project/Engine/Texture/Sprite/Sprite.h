@@ -100,11 +100,11 @@ public:
 		transform_.scale.y = scale.y;
 		transform_.scale.z = 1.0f;
 	}
-	void SetRotation(const Vector2& rot) {
+	void SetRotation(const float& rot) {
 	
-		transform_.rotate.x = rot.x;
-		transform_.rotate.y = rot.y;
-		transform_.rotate.z = 0.0f;
+		transform_.rotate.x = 0.0f;
+		transform_.rotate.y = 0.0f;
+		transform_.rotate.z = rot;
 	}
 	void SetColor(const Vector4& color);
 	void SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize);

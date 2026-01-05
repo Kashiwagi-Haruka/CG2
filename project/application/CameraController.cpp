@@ -57,18 +57,21 @@ void CameraController::Update() {
 	ImGui::End();
 
 #endif
-	if (GameBase::GetInstance()->PushKey(DIK_LEFT)) {
-		orbitYaw_ -= cameraSpeed_;
-	}
-	if (GameBase::GetInstance()->PushKey(DIK_RIGHT)) {
-		orbitYaw_ += cameraSpeed_;
-	}
-	if (GameBase::GetInstance()->PushKey(DIK_UP)) {
-		orbitPitch_ += cameraSpeed_;
-	}
-	if (GameBase::GetInstance()->PushKey(DIK_DOWN)) {
-		orbitPitch_ -= cameraSpeed_;
-	}
+	const Vector2 mouseMove = GameBase::GetInstance()->GetMouseMove();
+	orbitYaw_ += mouseMove.x * mouseSensitivity_;
+	orbitPitch_ += mouseMove.y * mouseSensitivity_;
+	//if (GameBase::GetInstance()->PushKey(DIK_LEFT)) {
+	//	orbitYaw_ -= cameraSpeed_;
+	//}
+	//if (GameBase::GetInstance()->PushKey(DIK_RIGHT)) {
+	//	orbitYaw_ += cameraSpeed_;
+	//}
+	//if (GameBase::GetInstance()->PushKey(DIK_UP)) {
+	//	orbitPitch_ += cameraSpeed_;
+	//}
+	//if (GameBase::GetInstance()->PushKey(DIK_DOWN)) {
+	//	orbitPitch_ -= cameraSpeed_;
+	//}
 	//if (GameBase::GetInstance()->PushKey(DIK_LEFT)) {
 	//	transform_.rotate.y -= cameraSpeed_;
 	//}

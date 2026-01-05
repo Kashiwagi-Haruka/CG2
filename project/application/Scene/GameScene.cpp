@@ -28,6 +28,7 @@ GameScene::GameScene() {
 
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Tailshaft.mp3");
 	GameTimer::GetInstance()->Reset();
+	GameBase::GetInstance()->SetIsCursorStablity(true);
 }
 
 GameScene::~GameScene() {}

@@ -32,6 +32,8 @@ class Input {
 
 	WinApp* winApp_ = nullptr;
 
+	bool isCursorStability = false;
+
 public:
 
 	enum class PadButton {
@@ -132,7 +134,8 @@ public:
 	Vector2 GetMouseMove()const; // マウスの移動量を取得
 	bool PushMouseButton(MouseButton button) const; // マウスボタンが押されているか
 	bool TriggerMouseButton(MouseButton button) const; // マウスボタンが押された瞬間か
-
+	bool ReleaseMouseButton(MouseButton button) const; // マウスボタンが離された瞬間か
+	void SetIsCursor(bool isCursor) { isCursorStability=isCursor; }
 	/// <summary>
 	/// デッドゾーンの設定
 	/// </summary>

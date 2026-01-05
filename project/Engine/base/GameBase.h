@@ -148,6 +148,8 @@ public:
 
 	bool PushMouseButton(Input::MouseButton button) const;
 	bool TriggerMouseButton(Input::MouseButton button) const;
+	bool ReleaseMouseButton(Input::MouseButton button) const;
+	void SetIsCursorStablity(bool isCursor);
 	float GetMouseX() const;
 	float GetMouseY() const;
 	Vector2 GetMouseMove() const;

@@ -115,11 +115,11 @@ void GameBase::EndFlame() {
 bool GameBase::PushMouseButton(Input::MouseButton button) const { return DInput->PushMouseButton(button); }
 
 bool GameBase::TriggerMouseButton(Input::MouseButton button) const { return DInput->TriggerMouseButton(button); }
-
+bool GameBase::ReleaseMouseButton(Input::MouseButton button) const { return DInput->ReleaseMouseButton(button); }
 float GameBase::GetMouseX() const { return DInput->GetMouseX(); };
 float GameBase::GetMouseY() const { return DInput->GetMouseY(); };
 Vector2 GameBase::GetMouseMove() const { return DInput->GetMouseMove(); };
-
+void GameBase::SetIsCursorStablity(bool iscursor) { DInput->SetIsCursor(iscursor); }
 bool GameBase::PushKey(BYTE keyNumber) { return DInput->PushKey(keyNumber); }
 bool GameBase::TriggerKey(BYTE keyNumber) { return DInput->TriggerKey(keyNumber); }
 bool GameBase::ReleaseKey(BYTE keyNumber) { return DInput->ReleaseKey(keyNumber); }

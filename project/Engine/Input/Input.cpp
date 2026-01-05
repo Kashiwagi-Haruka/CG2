@@ -123,6 +123,19 @@ void Input::Update() {
 	ScreenToClient(winApp_->GetHwnd(), &pt); // クライアント座標に変換
 	mouseX_ = pt.x;                          // ここではクランプせずそのまま代入
 	mouseY_ = pt.y;
+	if (isCursorStability) {
+	if (GetForegroundWindow() == winApp_->GetHwnd()) {
+		RECT clientRect{};
+		if (GetClientRect(winApp_->GetHwnd(), &clientRect)) {
+			POINT center{(clientRect.right - clientRect.left) / 2, (clientRect.bottom - clientRect.top) / 2};
+			POINT screenCenter = center;
+			ClientToScreen(winApp_->GetHwnd(), &screenCenter);
+			SetCursorPos(screenCenter.x, screenCenter.y);
+			mouseX_ = center.x;
+			mouseY_ = center.y;
+		}
+	}
+	}
 }
 
 
@@ -308,4 +321,13 @@ bool Input::TriggerMouseButton(MouseButton button) const {
 	bool now = (mouseState_.rgbButtons[index] & 0x80) != 0;
 	bool prev = (prevMouseState_.rgbButtons[index] & 0x80) != 0;
 	return (now && !prev);
+}
+bool Input::ReleaseMouseButton(MouseButton button) const {
+	int index = static_cast<int>(button);
+	if (index < 0 || index >= static_cast<int>(MouseButton::kMaxButtons)) {
+		return false;
+	}
+	bool now = (mouseState_.rgbButtons[index] & 0x80) != 0;
+	bool prev = (prevMouseState_.rgbButtons[index] & 0x80) != 0;
+	return (!now && prev);
 }

@@ -157,8 +157,8 @@ void UIManager::Initialize() {
 	houseHpFlameSPData.sprite->SetPosition(houseHpFlameSPData.translate);
 
 	// ★ 90度回転(横ゲージ化)
-	houseHpSPData.sprite->SetRotation({90, 0});
-	houseHpFlameSPData.sprite->SetRotation({90, 0});
+	houseHpSPData.sprite->SetRotation({90});
+	houseHpFlameSPData.sprite->SetRotation({90});
 }
 
 void UIManager::Update() {

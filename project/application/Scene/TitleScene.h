@@ -12,10 +12,11 @@ class TitleScene : public BaseScene {
 		std::unique_ptr<Sprite> sprite = nullptr;
 		uint32_t handle = 0;
 		Vector2 size = {100, 100};
-		Vector2 rotate = {0, 0};
+		float rotate = {0};
 		Vector2 translate = {0, 0};
 	};
 
+	SpriteData BGSP_;
 	SpriteData logoSP_;
 	std::unique_ptr<Sprite> pressSpaceSprite = nullptr;
 	uint32_t pressSpaceHandle = 0;

@@ -312,13 +312,13 @@ void Player::Attack() {
 		}
 	}
 
-	// ===== Jキー長押し判定 =====
-	if (GameBase::GetInstance()->PushKey(DIK_J)||GameBase::GetInstance()->PushButton(Input::PadButton::kButtonB)) {
+	// ===== 左クリック長押し判定 =====
+	if (GameBase::GetInstance()->PushMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->PushButton(Input::PadButton::kButtonB)) {
 		attackHoldTimer_ += 1.0f / 60.0f;
 	}
 
 	// ===== 攻撃入力の処理 =====
-	if (GameBase::GetInstance()->TriggerKey(DIK_J)||GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonB)) {
+	if (GameBase::GetInstance()->TriggerMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonB)) {
 
 		// ★ 空中にいる場合は落下攻撃
 		if (isfalling || isJump) {
@@ -379,8 +379,8 @@ void Player::Attack() {
 		}
 	}
 
-	// ===== Jキーを離したとき =====
-	if (GameBase::GetInstance()->ReleaseKey(DIK_J) || GameBase::GetInstance()->ReleaseButton(Input::PadButton::kButtonB)) {
+		// ===== 左クリックを離したとき =====
+	if (GameBase::GetInstance()->ReleaseMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->ReleaseButton(Input::PadButton::kButtonB)) {
 
 		// ★ 長押ししていた場合は重撃に変更
 		if (attackHoldTimer_ >= heavyAttackThreshold_ && isAttacking_) {
@@ -523,7 +523,7 @@ void Player::Update() {
 		ImGui::DragFloat("rotateSpeed", &rotateTimer, 0.01f, 0.0f, 1.0f);
 		ImGui::DragFloat("comboWindow", &comboWindow_, 0.01f, 0.1f, 2.0f);
 		ImGui::DragFloat("heavyAttackThreshold", &heavyAttackThreshold_, 0.01f, 0.1f, 2.0f);
-		ImGui::Text("J = FIRE , WASD = MOVE , SPACE = JUMP");
+		ImGui::Text("LMB = FIRE , WASD = MOVE , SPACE = JUMP");
 		ImGui::Text("isDash: %d", isDash);
 		ImGui::Text("Combo Step: %d / 4", comboStep_);
 		ImGui::Text("Combo Timer: %.2f", comboTimer_);
