@@ -52,7 +52,9 @@ public:
 	Vector3 GetPosition() { return transform_.translate; }
 	Vector3 GetScale() { return transform_.scale; }
 	float GetAttackRange() const { return attackRange_; }
-	float GetAttackHitSize() const { return attackHitSize_; }
+	float GetAttackHitSize() const;
+	Vector3 GetAttackPosition() const;
+	bool IsAttackHitActive() const;
 	bool IsAttackReady() const { return attackTimer_ >= attackCooldown_; }
 	void ResetAttackTimer() { attackTimer_ = 0.0f; }
 	void SetPosition() { transform_.translate; }

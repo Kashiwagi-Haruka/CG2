@@ -2,8 +2,8 @@
 
 struct Parameters{
 
-	float accelationRate = 0.01f;       // 移動時の加速量（フレームごとに加速する値）
-	float accelationMax = 0.1f;       // 移動の最大速度
+	float accelationRate = 0.005f;       // 移動時の加速量（フレームごとに加速する値）
+	float accelationMax = 0.05f;       // 移動の最大速度
 	float decelerationRate = 0.15f;    // キーを離した時の減速率
 	float jumpPower = 0.70f;            // ジャンプの初速（上方向の初速）
 	float jumpDuration = 0.5f;         // ジャンプを維持できる入力時間（未使用っぽいが意味はこれ）

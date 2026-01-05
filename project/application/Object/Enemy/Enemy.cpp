@@ -111,4 +111,21 @@ void Enemy::Draw() {
 void Enemy::BulletCollision(){
 
 }
-void Enemy::SetIsStun(bool IsStun){ isStun_ = IsStun; }
+
+void Enemy::SetIsStun(bool IsStun) { isStun_ = IsStun; }
+
+float Enemy::GetAttackHitSize() const {
+	if (enemyAttack_) {
+		return enemyAttack_->GetHitSize();
+	}
+	return attackHitSize_;
+}
+
+Vector3 Enemy::GetAttackPosition() const {
+	if (enemyAttack_) {
+		return enemyAttack_->GetPosition();
+	}
+	return transform_.translate;
+}
+
+bool Enemy::IsAttackHitActive() const { return enemyAttack_ && enemyAttack_->IsHitActive(); }

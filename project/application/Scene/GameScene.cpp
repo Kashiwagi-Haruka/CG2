@@ -338,15 +338,11 @@ void GameScene::Update() {
 		}
 
 		// ===== ③ 敵の攻撃判定 =====
-		Vector3 toPlayer = p - ePos;
-		float dist2 = toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z;
-		float attackRange = e->GetAttackRange();
-		if (dist2 <= attackRange * attackRange && e->IsAttackReady()) {
-			AABB enemyAttackAabb = makeAabb(ePos, {e->GetAttackHitSize(), e->GetAttackHitSize(), e->GetAttackHitSize()});
+		if (e->IsAttackHitActive()) {
+			AABB enemyAttackAabb = makeAabb(e->GetAttackPosition(), {e->GetAttackHitSize(), e->GetAttackHitSize(), e->GetAttackHitSize()});
 			bool hitEnemyAttack = RigidBody::isCollision(enemyAttackAabb, playerAabb);
 			if (hitEnemyAttack) {
 				player->Damage(1);
-				e->ResetAttackTimer();
 			}
 		}
 
