@@ -15,8 +15,12 @@ public:
 	};
 
 private:
+	struct HitEffectEntry {
+		Enemy* enemy;
+		std::unique_ptr<EnemyHitEffect> effect;
+	};
 	std::vector<std::unique_ptr<Enemy>> enemies;
-	std::vector<std::unique_ptr<EnemyHitEffect>> hitEffects;
+	std::vector<HitEffectEntry> hitEffects;
 	Camera* camera_ = nullptr;
 
 	// ウェーブシステム
@@ -35,7 +39,7 @@ public:
 	void Update(Camera* camera, const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive);
 	void Draw();
 	void Clear();
-
+	void OnEnemyDamaged(Enemy* enemy);
 	// ウェーブシステム関連
 	void StartNextWave();     // 次のウェーブを開始
 	void SpawnWaveEnemies();  // ウェーブに応じた敵を生成

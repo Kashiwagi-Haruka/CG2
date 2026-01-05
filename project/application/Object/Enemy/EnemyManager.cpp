@@ -3,6 +3,7 @@
 
 void EnemyManager::Clear() {
 	enemies.clear(); // unique_ptr が自動削除
+	hitEffects.clear();
 }
 
 void EnemyManager::Initialize(Camera* camera) {
@@ -108,9 +109,14 @@ void EnemyManager::AddEnemy(Camera* camera, const Vector3& pos) {
 	auto e = std::make_unique<Enemy>();
 	e->Initialize(camera, pos);
 	e->SetCamera(camera);
+	Enemy* enemyPtr = e.get();
 	enemies.push_back(std::move(e));
-}
 
+	auto hitEffect = std::make_unique<EnemyHitEffect>();
+	hitEffect->SetCamera(camera);
+	hitEffect->Initialize();
+	hitEffects.push_back({enemyPtr, std::move(hitEffect)});
+}
 void EnemyManager::Update(Camera* camera, const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive) {
 
 	// ウェーブの状態管理
@@ -145,6 +151,12 @@ void EnemyManager::Update(Camera* camera, const Vector3& housePos, const Vector3
 			e->Update(housePos, playerPos, isPlayerAlive);
 		}
 	}
+	for (auto& entry : hitEffects) {
+		if (entry.enemy && entry.enemy->GetIsAlive()) {
+			entry.effect->SetPosition(entry.enemy->GetPosition());
+		}
+		entry.effect->Update();
+	}
 }
 
 void EnemyManager::CheckWaveComplete() {
@@ -170,6 +182,19 @@ void EnemyManager::Draw() {
 	for (auto& e : enemies) {
 		if (e->GetIsAlive()) {
 			e->Draw();
+		}
+	}
+
+	for (auto& entry : hitEffects) {
+		entry.effect->Draw();
+	}
+}
+
+void EnemyManager::OnEnemyDamaged(Enemy* enemy) {
+	for (auto& entry : hitEffects) {
+		if (entry.enemy == enemy) {
+			entry.effect->Activate(enemy->GetPosition());
+			break;
 		}
 	}
 }

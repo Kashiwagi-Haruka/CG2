@@ -93,7 +93,7 @@ void GameScene::Initialize() {
 	pointLight_.radius = 10.0f;
 	pointLight_.decay = 1.0f;
 
-	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	directionalLight_.color = {0.3725f, 0.2667f, 0.7882f,1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.5f};
 	directionalLight_.intensity = 1.0f;
 
@@ -316,7 +316,7 @@ void GameScene::Update() {
 
 			if (hitSword) {
 				e->SetHPSubtract(1); // ダメージ
-
+				enemyManager->OnEnemyDamaged(e.get());
 				// 敵を倒したらEXP獲得
 				if (!e->GetIsAlive()) {
 					player->EXPMath();
@@ -330,6 +330,7 @@ void GameScene::Update() {
 
 			if (hitSkill) {
 				e->SetHPSubtract(1);
+				enemyManager->OnEnemyDamaged(e.get());
 				if (!e->GetIsAlive()) {
 					player->EXPMath();
 				}

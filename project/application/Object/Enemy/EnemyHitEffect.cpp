@@ -15,10 +15,27 @@ void EnemyHitEffect::Initialize() {
         .rotate{0, 0, 0},
         .translate{0, 0, 0}
     };
+	enemyPosition_ = {0.0f, 0.0f, 0.0f};
 }
 
-void EnemyHitEffect::Update(){
-	hitTransform_.translate = enemyTransform_.translate;
+void EnemyHitEffect::Activate(const Vector3& position) {
+	isActive_ = true;
+	activeTimer_ = activeDuration_;
+	enemyPosition_ = position;
+}
+
+void EnemyHitEffect::Update() {
+	if (!isActive_) {
+		return;
+	}
+
+	activeTimer_ -= 1.0f / 60.0f;
+	if (activeTimer_ <= 0.0f) {
+		isActive_ = false;
+		return;
+	}
+
+	hitTransform_.translate = enemyPosition_;
 
 	Matrix4x4 c = camera_->GetWorldMatrix();
 	c.m[3][0] = c.m[3][1] = c.m[3][2] = 0;
@@ -29,6 +46,10 @@ void EnemyHitEffect::Update(){
 	hitEffect_->Update();
 }
 
-void EnemyHitEffect::Draw() { 
-	hitEffect_->Draw(); 
+void EnemyHitEffect::Draw() {
+	if (!isActive_) {
+		return;
+	}
+
+	hitEffect_->Draw();
 }
