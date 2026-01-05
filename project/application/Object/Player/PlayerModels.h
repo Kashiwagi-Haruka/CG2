@@ -33,7 +33,11 @@ class PlayerModels {
 	Transform armLT_;
 	Transform legRT_;
 	Transform legLT_;
-
+	Transform headBaseT_;
+	Transform armRBaseT_;
+	Transform armLBaseT_;
+	Transform legRBaseT_;
+	Transform legLBaseT_;
 	Transform player_;
 	Camera* camera_;
 

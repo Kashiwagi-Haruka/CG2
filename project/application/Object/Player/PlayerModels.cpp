@@ -82,18 +82,57 @@ void PlayerModels::Update() {
 		
 		break;
 	case PlayerModels::attack1:
+		armRT_.rotate.x = -1.2f + std::sin(t * 1.5f) * 0.2f;
+		armRT_.rotate.y = 0.4f;
+		armLT_.rotate.x = 0.2f;
+		headT_.rotate.y = 0.2f;
 		break;
 	case PlayerModels::attack2:
+		armLT_.rotate.x = -1.2f + std::sin(t * 1.5f) * 0.2f;
+		armLT_.rotate.y = -0.4f;
+		armRT_.rotate.x = 0.2f;
+		headT_.rotate.y = -0.2f;
 		break;
 	case PlayerModels::attack3:
+		armRT_.rotate.x = -1.0f;
+		armLT_.rotate.x = -1.0f;
+		armRT_.rotate.y = 0.3f;
+		armLT_.rotate.y = -0.3f;
+		headT_.rotate.x = -0.2f;
+		legRT_.rotate.x = 0.2f;
+		legLT_.rotate.x = 0.2f;
 		break;
 	case PlayerModels::attack4:
+		armRT_.rotate.y = std::sin(t * 2.0f) * 0.8f;
+		armLT_.rotate.y = -std::sin(t * 2.0f) * 0.8f;
+		legRT_.rotate.x = -0.3f;
+		legLT_.rotate.x = 0.3f;
+		headT_.rotate.y = std::sin(t * 2.0f) * 0.2f;
 		break;
 	case PlayerModels::fallingAttack:
+		armRT_.rotate.x = 1.0f;
+		armLT_.rotate.x = 1.0f;
+		legRT_.rotate.x = -0.8f;
+		legLT_.rotate.x = -0.8f;
+		headT_.rotate.x = 0.4f;
 		break;
 	case PlayerModels::skillAttack:
+		armRT_.rotate.z = std::sin(t * 3.0f) * 0.6f;
+		armLT_.rotate.z = -std::sin(t * 3.0f) * 0.6f;
+		armRT_.rotate.x = -0.6f;
+		armLT_.rotate.x = -0.6f;
+		legRT_.rotate.y = std::sin(t * 3.0f) * 0.3f;
+		legLT_.rotate.y = -std::sin(t * 3.0f) * 0.3f;
+		headT_.rotate.y = std::sin(t * 3.0f) * 0.3f;
 		break;
 	case PlayerModels::damage:
+		headT_.rotate.x = 0.5f;
+		armRT_.rotate.x = 0.6f;
+		armLT_.rotate.x = 0.6f;
+		armRT_.rotate.y = -0.3f;
+		armLT_.rotate.y = 0.3f;
+		legRT_.rotate.x = -0.2f;
+		legLT_.rotate.x = -0.2f;
 		break;
 	default:
 		break;

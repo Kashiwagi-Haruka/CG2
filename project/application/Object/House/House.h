@@ -3,7 +3,7 @@
 #include "Object3d.h"
 #include "Vector3.h"
 #include <memory>
-
+#include "Transform.h"
 class House {
 
 	std::unique_ptr<Object3d> object_;
@@ -11,6 +11,9 @@ class House {
 	std::unique_ptr<Object3d> hpflame_;
 	Vector3 position_ = {0, 1.5f, 0};
 	int hp_ = 50;
+
+	Transform hpBarT_;
+	Transform hpFlameT_;
 
 public:
 	House();

@@ -1,6 +1,7 @@
 #include "House.h"
 #include "GameBase.h"
 #include "ModelManeger.h"
+#include "Function.h"
 House::House() {}
 
 void House::Initialize(Camera* camera) {
@@ -28,6 +29,18 @@ void House::Initialize(Camera* camera) {
 	hpflame_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	hpflame_->SetCamera(camera);
 
+	hpBarT_ = {
+	    .scale{1, 1, 1},
+        .rotate{0, 0, 0},
+        .translate{0, 0, 0}
+    };
+	hpFlameT_ = {
+	    .scale{1, 1, 1},
+        .rotate{0, 0, 0},
+        .translate{0, 0, 0}
+    };
+	hpFlameT_.translate = {position_.x, position_.y + 1.0f, position_.z};
+	hpBarT_.translate = hpFlameT_.translate;
 }
 
 void House::Update(Camera* camera) {
@@ -35,10 +48,18 @@ void House::Update(Camera* camera) {
 	object_->SetTranslate(position_);
 	object_->Update();
 
+	Matrix4x4 c = camera->GetWorldMatrix();
+	c.m[3][0] = c.m[3][1] = c.m[3][2] = 0;
+
+	Matrix4x4 BarW = Function::Multiply(c,Function::MakeAffineMatrix(hpBarT_.scale, hpBarT_.rotate, hpBarT_.translate));
+	Matrix4x4 FlameW = Function::Multiply(c,Function::MakeAffineMatrix(hpFlameT_.scale, hpFlameT_.rotate, hpFlameT_.translate));
+
 	hpflame_->SetCamera(camera);
+	hpflame_->SetWorldMatrix(FlameW);
 	hpflame_->Update();
 
 	hpbar_->SetCamera(camera);
+	hpbar_->SetWorldMatrix(BarW);
 	hpbar_->Update();
 }
 
