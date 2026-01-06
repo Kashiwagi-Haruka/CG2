@@ -33,9 +33,9 @@ void Pause::Initialize() {
 	action_ = Action::kNone;
 	selectIndex_ = 1;
 
-	selectBasePos_ = {(1280.0f - selectSize_.x) / 2.0f, (720.0f - selectSize_.y) / 2.0f};
-	buttonBasePos_[0] = {selectBasePos_.x + 60.0f, selectBasePos_.y + 180.0f};
-	buttonBasePos_[1] = {selectBasePos_.x + 60.0f, selectBasePos_.y + 400.0f};
+	selectBasePos_ = {(1700.0f - selectSize_.x) / 2.0f, (900.0f - selectSize_.y) / 2.0f};
+	buttonBasePos_[0] = {selectBasePos_.x - 60.0f, selectBasePos_.y + 60.0f};
+	buttonBasePos_[1] = {selectBasePos_.x - 60.0f, selectBasePos_.y + 260.0f};
 
 	BG_->SetScale(bgSize_);
 	Select_->SetScale(selectSize_);

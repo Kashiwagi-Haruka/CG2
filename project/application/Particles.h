@@ -3,9 +3,7 @@
 #include <memory>
 class Particles {
 
-	std::unique_ptr<ParticleEmitter> particleplayer = nullptr;
-	std::unique_ptr<ParticleEmitter> particleleaf = nullptr;
-	std::unique_ptr<ParticleEmitter> particlegoal = nullptr;
+
 	std::unique_ptr<ParticleEmitter> particleArrow = nullptr;
 
 	Vector3 playerPos_;

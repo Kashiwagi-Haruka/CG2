@@ -27,7 +27,7 @@ private:
 	std::array<Vector2, 2> buttonBasePos_{};
 
 	Vector2 bgSize_{1280.0f, 720.0f};
-	Vector2 selectSize_{640.0f, 640.0f};
+	Vector2 selectSize_{400.0f, 400.0f};
 	Vector2 buttonSize_{80.0f, 80.0f};
 
 	float startTime = 0.0f;
