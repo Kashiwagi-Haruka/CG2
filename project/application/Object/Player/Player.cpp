@@ -25,11 +25,15 @@ Player::Player() {
 	specialAttack_ = std::make_unique<PlayerSpecialAttack>();
 	attackSE = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/normalAttack.mp3");
 	attackEndSE = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/endAttack.mp3");
+	skillAttackSE = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/magic.mp3");
 	models_ = std::make_unique<PlayerModels>();
 	
 }
 
-Player::~Player() {}
+Player::~Player() { Audio::GetInstance()->SoundUnload(&attackSE);
+	Audio::GetInstance()->SoundUnload(&attackEndSE);
+	Audio::GetInstance()->SoundUnload(&skillAttackSE);
+}
 
 void Player::Initialize(Camera* camera) {
 
@@ -399,6 +403,7 @@ void Player::Attack() {
 			isSkillAttack = true;
 			attackState_ = AttackState::kSkillAttack;
 			skill_->StartAttack(transform_);
+			Audio::GetInstance()->SoundPlayWave(skillAttackSE, false);
 			if (parameters_.AllowUp > 0) {
 				isSpecialAttack = true;
 				attackState_ = AttackState::kSpecialAttack;
