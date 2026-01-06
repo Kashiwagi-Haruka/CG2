@@ -4,6 +4,7 @@
 #include "BaseScene.h"
 #include <memory>
 #include "SceneTransition.h"
+#include "Audio.h"
 class GameBase;
 
 class ResultScene : public BaseScene {
@@ -41,6 +42,8 @@ class ResultScene : public BaseScene {
 		std::unique_ptr<SceneTransition> transition = nullptr;
 	bool isTransitionIn = false;
 	bool isTransitionOut = false;
+
+	SoundData BGM_;
 
 public:
 	ResultScene();
