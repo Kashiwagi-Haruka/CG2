@@ -34,7 +34,7 @@ UIManager::UIManager() {
 	}
 
 	// ステータスUPアイコン
-	AttuckUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/AttuckUp.png");
+	AttackUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/AttuckUp.png");
 
 	HealthUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/HealthUp.png");
 
@@ -64,16 +64,11 @@ UIManager::UIManager() {
 		MaxSPData[i].sprite = std::make_unique<Sprite>();
 	}
 
-	AttuckUpSPData.sprite = std::make_unique<Sprite>();
+	AttackUpSPData.sprite = std::make_unique<Sprite>();
 	HealthUpSPData.sprite = std::make_unique<Sprite>();
 	SpeedUpSPData.sprite = std::make_unique<Sprite>();
 	AllowUpSPData.sprite = std::make_unique<Sprite>();
-	houseHpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/playerHP.png");
 
-	houseHpFlameSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/playerHPFlame.png");
-
-	houseHpSPData.sprite = std::make_unique<Sprite>();
-	houseHpFlameSPData.sprite = std::make_unique<Sprite>();
 }
 
 UIManager::~UIManager() {}
@@ -128,8 +123,8 @@ void UIManager::Initialize() {
 		MaxSPData[i].sprite->SetScale({48, 48});
 	}
 	// Up アイコン
-	AttuckUpSPData.sprite->Initialize(spriteCommon, AttuckUpSPData.handle);
-	AttuckUpSPData.sprite->SetScale({48, 48});
+	AttackUpSPData.sprite->Initialize(spriteCommon, AttackUpSPData.handle);
+	AttackUpSPData.sprite->SetScale({48, 48});
 
 	HealthUpSPData.sprite->Initialize(spriteCommon, HealthUpSPData.handle);
 	HealthUpSPData.sprite->SetScale({48, 48});
@@ -140,25 +135,7 @@ void UIManager::Initialize() {
 	AllowUpSPData.sprite->Initialize(spriteCommon, AllowUpSPData.handle);
 	AllowUpSPData.sprite->SetScale({48, 48});
 
-	// --- House HP Bar ---
-	houseHpSPData.sprite->Initialize(spriteCommon, houseHpSPData.handle);
-	houseHpSPData.size = {120, 20}; // ★ 横長に
-	houseHpSPData.sprite->SetScale(houseHpSPData.size);
-
-	// 位置(自由に調整)：画面左上あたり
-	houseHpSPData.translate = {50, 550};
-	houseHpSPData.sprite->SetPosition(houseHpSPData.translate);
-
-	// --- House HP Flame ---
-	houseHpFlameSPData.sprite->Initialize(spriteCommon, houseHpFlameSPData.handle);
-	houseHpFlameSPData.size = {130, 30};
-	houseHpFlameSPData.sprite->SetScale(houseHpFlameSPData.size);
-	houseHpFlameSPData.translate = {houseHpSPData.translate.x - 5, houseHpSPData.translate.y};
-	houseHpFlameSPData.sprite->SetPosition(houseHpFlameSPData.translate);
-
-	// ★ 90度回転(横ゲージ化)
-	houseHpSPData.sprite->SetRotation({90});
-	houseHpFlameSPData.sprite->SetRotation({90});
+	
 }
 
 void UIManager::Update() {
@@ -190,10 +167,10 @@ void UIManager::Update() {
 
 	LevelSPData.sprite->Update();
 
-	AttuckUpSPData.translate = {10, 70};
-	AttuckUpSPData.sprite->SetPosition(AttuckUpSPData.translate);
-	AttuckUpSPData.sprite->Update();
-	HealthUpSPData.translate = {10, AttuckUpSPData.translate.y + 70};
+	AttackUpSPData.translate = {10, 70};
+	AttackUpSPData.sprite->SetPosition(AttackUpSPData.translate);
+	AttackUpSPData.sprite->Update();
+	HealthUpSPData.translate = {10, AttackUpSPData.translate.y + 70};
 	HealthUpSPData.sprite->SetPosition(HealthUpSPData.translate);
 	HealthUpSPData.sprite->Update();
 	SpeedUpSPData.translate = {10, HealthUpSPData.translate.y + 70};
@@ -240,7 +217,7 @@ void UIManager::Update() {
 	NumberSPData[kLv].translate = {LevelSPData.translate.x + 50, LevelSPData.translate.y + 12};
 	NumberSPData[kLv].sprite->SetPosition(NumberSPData[kLv].translate);
 
-	NumberSPData[kAttuck].translate = {AttuckUpSPData.translate.x + 40, AttuckUpSPData.translate.y + 20};
+	NumberSPData[kAttuck].translate = {AttackUpSPData.translate.x + 40, AttackUpSPData.translate.y + 20};
 	NumberSPData[kAttuck].sprite->SetPosition(NumberSPData[kAttuck].translate);
 
 	NumberSPData[kHealth].translate = {HealthUpSPData.translate.x + 40, HealthUpSPData.translate.y + 20};
@@ -272,15 +249,7 @@ void UIManager::Update() {
 		MaxSPData[i].sprite->Update();
 	}
 
-	// ---- House HP ----
-	if (houseHPMax > 0) {
-		float ratio = (float)houseHP / (float)houseHPMax;
-		houseHpSPData.size.x = 120 * ratio;
-		houseHpSPData.sprite->SetScale(houseHpSPData.size);
-	}
 
-	houseHpSPData.sprite->Update();
-	houseHpFlameSPData.sprite->Update();
 }
 
 void UIManager::Draw() {
@@ -296,7 +265,7 @@ void UIManager::Draw() {
 
 	LevelSPData.sprite->Draw();
 
-	AttuckUpSPData.sprite->Draw();
+	AttackUpSPData.sprite->Draw();
 	HealthUpSPData.sprite->Draw();
 	SpeedUpSPData.sprite->Draw();
 	AllowUpSPData.sprite->Draw();
@@ -329,8 +298,7 @@ void UIManager::Draw() {
 		MaxSPData[4].sprite->Draw();
 	}
 
-	houseHpFlameSPData.sprite->Draw();
-	houseHpSPData.sprite->Draw();
+
 }
 
 void UIManager::SetPlayerHP(int HP) { playerHP = HP; }

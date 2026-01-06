@@ -48,7 +48,7 @@ void House::Update(Camera* camera) {
 	object_->SetTranslate(position_);
 	object_->Update();
 
-		const float kHpOffsetY = 3.0f;
+		const float kHpOffsetY = 5.0f;
 	Vector3 hpBasePos = {position_.x, position_.y + kHpOffsetY, position_.z};
 	hpBarT_.translate = hpBasePos;
 	hpFlameT_.translate = hpBasePos;

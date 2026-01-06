@@ -452,9 +452,7 @@ void GameScene::Update() {
 
 	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
-	uimanager->SetHouseHP(house->GetHP());
 	
-
 	uimanager->Update();
 	
 	
