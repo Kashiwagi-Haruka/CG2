@@ -1,7 +1,7 @@
 #pragma once
-#include <memory>
 #include "Object3d.h"
 #include "Transform.h"
+#include <memory>
 #include <vector>
 class PlayerSpecialAttack {
 
@@ -10,12 +10,14 @@ class PlayerSpecialAttack {
 	std::unique_ptr<Object3d> debugBox_;
 	Camera* camera_ = nullptr;
 	Transform transform_;
-	float rotateTimer = 0.0f;
-	float radiusTimer = 0.0f;
 	float radius = 3.0f;
+	float fallSpeed_ = 0.25f;
+	float startHeight_ = 6.0f;
 	bool isSpecialEnd_;
-	int specialTime_=0;
+	int specialTime_ = 0;
 	int specialTimeMax_ = 60;
+
+	void EnsureIceFlowerCount(int count);
 
 public:
 	PlayerSpecialAttack();
@@ -23,6 +25,6 @@ public:
 	void Update(const Transform& playerTransform);
 	void Draw();
 	void SetCamera(Camera* camera) { camera_ = camera; }
-	void StartAttack();
+	void StartAttack(const Transform& playerTransform, int iceCount);
 	bool IsSpecialEnd() { return isSpecialEnd_; }
 };

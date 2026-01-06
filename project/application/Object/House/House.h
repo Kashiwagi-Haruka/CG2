@@ -10,7 +10,7 @@ class House {
 	std::unique_ptr<Object3d> hpbar_;
 	std::unique_ptr<Object3d> hpflame_;
 	Vector3 position_ = {0, 1.5f, 0};
-	int hp_ = 50;
+	int hp_ = 100;
 
 	Transform hpBarT_;
 	Transform hpFlameT_;

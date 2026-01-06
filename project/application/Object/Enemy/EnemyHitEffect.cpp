@@ -9,6 +9,7 @@ void EnemyHitEffect::Initialize() {
 	hitEffect_ = std::make_unique<Object3d>();
 	hitEffect_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
 	hitEffect_->SetModel("HitEffect");
+	
 	hitEffect_->SetCamera(camera_);
 	hitTransform_ = {
 	    .scale{1, 1, 1},

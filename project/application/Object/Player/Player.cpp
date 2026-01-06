@@ -423,6 +423,11 @@ void Player::Attack() {
 			isSkillAttack = true;
 			attackState_ = AttackState::kSkillAttack;
 			skill_->StartAttack(transform_);
+			if (parameters_.AllowUp > 0) {
+				isSpecialAttack = true;
+				attackState_ = AttackState::kSpecialAttack;
+				specialAttack_->StartAttack(transform_, parameters_.AllowUp);
+			}
 			// コンボリセット
 			comboStep_ = 0;
 			canCombo_ = false;

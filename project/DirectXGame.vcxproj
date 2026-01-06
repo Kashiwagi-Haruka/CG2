@@ -238,6 +238,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\Player\PlayerModels.cpp" />
     <ClCompile Include="application\GameTimer.cpp" />
     <ClCompile Include="application\Pause.cpp" />
+    <ClCompile Include="application\Object\House\HouseHP.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -330,6 +331,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\Player\PlayerModels.h" />
     <ClInclude Include="application\GameTimer.h" />
     <ClInclude Include="application\Pause.h" />
+    <ClInclude Include="application\Object\House\HouseHP.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">
