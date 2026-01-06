@@ -90,10 +90,6 @@ void Player::Move() {
 		return;
 	}
 
-	lastTapTimeA_++;
-	lastTapTimeD_++;
-	lastTapTimeS_++;
-	lastTapTimeW_++;
 
 	// 入力方向を記録する変数
 	Vector3 inputDirection = {0.0f, 0.0f, 0.0f};
@@ -103,13 +99,7 @@ void Player::Move() {
 	if (GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_D)) {
 
 		if (!GameBase::GetInstance()->PushKey(DIK_D)) {
-			if (GameBase::GetInstance()->TriggerKey(DIK_A)) {
-				if (lastTapTimeA_ < parameters_.doubleTapThreshold_) {
-					isDash = true;
-				}
-
-				lastTapTimeA_ = 0.0f;
-			}
+			
 			if (GameBase::GetInstance()->PushKey(DIK_A)) {
 
 				inputAxis.x = -1.0f;
@@ -119,12 +109,7 @@ void Player::Move() {
 		}
 
 		if (!GameBase::GetInstance()->PushKey(DIK_A)) {
-			if (GameBase::GetInstance()->TriggerKey(DIK_D)) {
-				if (lastTapTimeD_ < parameters_.doubleTapThreshold_) {
-					isDash = true;
-				}
-				lastTapTimeD_ = 0.0f;
-			}
+			
 			if (GameBase::GetInstance()->PushKey(DIK_D)) {
 				inputAxis.x = 1.0f;
 				hasInput = true;
@@ -135,13 +120,7 @@ void Player::Move() {
 	if (GameBase::GetInstance()->PushKey(DIK_W) || GameBase::GetInstance()->PushKey(DIK_S)) {
 
 		if (!GameBase::GetInstance()->PushKey(DIK_W)) {
-			if (GameBase::GetInstance()->TriggerKey(DIK_S)) {
-				if (lastTapTimeS_ < parameters_.doubleTapThreshold_) {
-					isDash = true;
-				}
-
-				lastTapTimeS_ = 0.0f;
-			}
+		
 			if (GameBase::GetInstance()->PushKey(DIK_S)) {
 				models_->SetStateM(PlayerModels::StateM::walk);
 				inputAxis.z = -1.0f;
@@ -150,12 +129,7 @@ void Player::Move() {
 		}
 
 		if (!GameBase::GetInstance()->PushKey(DIK_S)) {
-			if (GameBase::GetInstance()->TriggerKey(DIK_W)) {
-				if (lastTapTimeW_ < parameters_.doubleTapThreshold_) {
-					isDash = true;
-				}
-				lastTapTimeW_ = 0.0f;
-			}
+			
 			if (GameBase::GetInstance()->PushKey(DIK_W)) {
 				inputAxis.z = 1.0f;
 				hasInput = true;
@@ -199,6 +173,8 @@ void Player::Move() {
 
 	if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D) && !GameBase::GetInstance()->PushKey(DIK_W) && !GameBase::GetInstance()->PushKey(DIK_S)) {
 		isDash = false;
+	} else {
+		isDash = GameBase::GetInstance()->PushKey(DIK_LSHIFT) || GameBase::GetInstance()->PushKey(DIK_RSHIFT);
 	}
 
 	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {

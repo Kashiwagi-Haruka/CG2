@@ -103,5 +103,5 @@ void PlayerSpecialAttack::Draw() {
 		(*iceFlowers_)[i].Draw();
 	}
 	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAlpha);
-	debugBox_->Draw();
+	
 }

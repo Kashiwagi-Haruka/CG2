@@ -138,9 +138,13 @@ void PlayerSkill::StartAttack(const Transform& playerTransform) {
 }
 void PlayerSkill::Draw() {
 	
-	debugBox_->Draw(); 
+	#ifdef _DEBUG
+	debugBox_->Draw();
 	debugDamageBox1_->Draw();
 	debugDamageBox2_->Draw();
+#endif // _DEBUG
+
+
 	if (state==State::damage) {
 	if (skillEmitter_) {
 		skillEmitter_->Draw();

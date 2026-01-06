@@ -50,11 +50,7 @@ class Player {
 	bool isInvincible_ = false;
 	float invincibleTimer_ = 0.0f;
 
-	// ダブルタップ判定用
-	float lastTapTimeA_ = 0.0f;
-	float lastTapTimeD_ = 0.0f;
-	float lastTapTimeW_ = 0.0f;
-	float lastTapTimeS_ = 0.0f;
+
 
 	// コンボ攻撃用
 	int comboStep_ = 0;        // 現在のコンボ段階 (0〜4)
