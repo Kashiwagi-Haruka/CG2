@@ -16,7 +16,7 @@
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
 #include "Pause.h"
-
+#include "Vector2.h"
 class Player;
 class Enemy;
 class CameraController;
@@ -58,6 +58,15 @@ class GameScene: public BaseScene{
 
 	// レベルアップ選択専用スプライト
 	std::unique_ptr<Sprite> levelupIcons[4]; // 0:Atk, 1:Speed, 2:HP, 3:Allow
+	std::unique_ptr<Sprite> phaseSprites_[5];
+	int currentPhaseSpriteIndex_ = 0;
+	int lastWave_ = 0;
+	bool isPhaseSpriteActive_ = false;
+	bool isPhaseSpritePaused_ = false;
+	float phaseSpriteX_ = 0.0f;
+	float phaseSpriteStopTimer_ = 0.0f;
+	Vector2 phaseSpriteSize_ = {400.0f, 120.0f};
+	float phaseSpriteY_ = 80.0f;
 
     
 	DirectionalLight directionalLight_{};

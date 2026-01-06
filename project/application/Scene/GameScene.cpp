@@ -10,6 +10,8 @@
 #include <numbers>
 #include "RigidBody.h"
 #include "GameTimer.h"
+#include "TextureManager.h"
+#include <algorithm>
 
 GameScene::GameScene() {
 
@@ -88,6 +90,22 @@ void GameScene::Initialize() {
 		levelupIcons[i]->Initialize(GameBase::GetInstance()->GetSpriteCommon(), handle[i]);
 		levelupIcons[i]->SetScale({256, 256});
 	}
+
+	uint32_t phaseHandles[5] = {
+	    TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/phase1.png"), TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/phase2.png"),
+	    TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/phase3.png"), TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/phase4.png"),
+	    TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/phase5.png"),
+	};
+
+	for (int i = 0; i < 5; i++) {
+		phaseSprites_[i] = std::make_unique<Sprite>();
+		phaseSprites_[i]->Initialize(GameBase::GetInstance()->GetSpriteCommon(), phaseHandles[i]);
+		phaseSprites_[i]->SetScale(phaseSpriteSize_);
+	}
+
+	lastWave_ = 0;
+	isPhaseSpriteActive_ = false;
+	isPhaseSpritePaused_ = false;
 
 	
 	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -277,6 +295,44 @@ void GameScene::Update() {
 
 	// ★ ウェーブシステムの更新
 	enemyManager->Update(cameraController->GetCamera(), house->GetPosition(), player->GetPosition(), player->GetIsAlive());
+	int currentWave = enemyManager->GetCurrentWave();
+	if (currentWave != lastWave_) {
+		lastWave_ = currentWave;
+		currentPhaseSpriteIndex_ = std::clamp(currentWave, 1, 5) - 1;
+		isPhaseSpriteActive_ = true;
+		isPhaseSpritePaused_ = false;
+		phaseSpriteStopTimer_ = 0.0f;
+		phaseSpriteX_ = 1280.0f + phaseSpriteSize_.x;
+	}
+
+	if (isPhaseSpriteActive_) {
+		const float deltaTime = 1.0f / 60.0f;
+		const float moveSpeed = 500.0f;
+		const float stopDuration = 0.8f;
+		const float centerX = 640.0f - phaseSpriteSize_.x / 2.0f;
+
+		if (isPhaseSpritePaused_) {
+			phaseSpriteStopTimer_ += deltaTime;
+			if (phaseSpriteStopTimer_ >= stopDuration) {
+				isPhaseSpritePaused_ = false;
+			}
+		} else {
+			phaseSpriteX_ -= moveSpeed * deltaTime;
+			if (phaseSpriteX_ <= centerX) {
+				phaseSpriteX_ = centerX;
+				isPhaseSpritePaused_ = true;
+				phaseSpriteStopTimer_ = 0.0f;
+			}
+		}
+
+		if (!isPhaseSpritePaused_ && phaseSpriteX_ <= -phaseSpriteSize_.x) {
+			isPhaseSpriteActive_ = false;
+		}
+
+		auto* phaseSprite = phaseSprites_[currentPhaseSpriteIndex_].get();
+		phaseSprite->SetPosition({phaseSpriteX_, phaseSpriteY_});
+		phaseSprite->Update();
+	}
 
 	// ★ ウェーブクリア判定でゴールを有効化
 	// 全ウェーブクリア後にゴールを出すなど、条件は自由に変更可能
@@ -443,6 +499,10 @@ void GameScene::Draw() {
 
 	GameBase::GetInstance()->SpriteCommonSet();
 	uimanager->Draw();
+	if (isPhaseSpriteActive_) {
+		GameBase::GetInstance()->SpriteCommonSet();
+		phaseSprites_[currentPhaseSpriteIndex_]->Draw();
+	}
 	// =============================
 	// ★ レベルアップ選択画面描画(別スプライト使用版)
 	// =============================
