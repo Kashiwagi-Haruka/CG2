@@ -7,16 +7,7 @@ class Sprite;
 class GameBase;
 class UIManager {
 
-	enum HowtoOperate{
-		kW,
-		kA,
-		kS,
-		kD,
-		kSpace,
-		kAttuckButton,
-		OperateCountMAX,
 
-	};//操作方法
 	enum Numbers {
 
 		kExp100,
@@ -42,7 +33,7 @@ class UIManager {
 
 	SpriteData playerHpSPData;
 	SpriteData playerHPFlameSPData;
-	SpriteData HowtoOperateSPData[OperateCountMAX];
+	SpriteData HowtoOperateSPData;
 	SpriteData LevelSPData;
 	SpriteData NumberSPData[NumbersCountMax];
 	SpriteData MaxSPData[5];

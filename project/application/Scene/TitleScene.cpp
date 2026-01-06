@@ -10,6 +10,9 @@ TitleScene::TitleScene() {
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/logo.png");
 	logoSP_.sprite = std::make_unique<Sprite>();
 	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(),logoSP_.handle);
+	ruleSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/rule.png");
+	ruleSP_.sprite = std::make_unique<Sprite>();
+	ruleSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), ruleSP_.handle);
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Rendez-vous_2.mp3");
 	transition = std::make_unique<SceneTransition>();
 }
@@ -28,7 +31,10 @@ void TitleScene::Initialize() {
 	logoSP_.sprite->SetPosition({640, 300});
 	logoSP_.sprite->SetScale({500, 500});
 	logoSP_.sprite->Update();
-
+	ruleSP_.sprite->SetAnchorPoint({0.5f, 0.5f});
+	ruleSP_.sprite->SetScale({640, 360});
+	ruleSP_.sprite->SetPosition({640, 300});
+	ruleSP_.sprite->Update();
 	pressSpaceHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/SPACE.png");
 
 	pressSpaceSprite = std::make_unique<Sprite>();
@@ -87,5 +93,9 @@ void TitleScene::Draw(){
 	if (isTransitionIn || isTransitionOut) {
 		transition->Draw();
 	}
-
+	
+	if (isTransitionOut) {
+	ruleSP_.sprite->Draw();
+	}
+	
 }

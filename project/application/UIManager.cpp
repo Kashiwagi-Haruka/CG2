@@ -15,12 +15,8 @@ UIManager::UIManager() {
 	playerHPFlameSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/playerHPFlame.png");
 
 	// WASD / SPACE / ATTACK
-	HowtoOperateSPData[kW].handle = HowtoOperateSPData[kA].handle = HowtoOperateSPData[kS].handle = HowtoOperateSPData[kD].handle =
-	    TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/WASD.png");
+	HowtoOperateSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/option.png");
 
-	HowtoOperateSPData[kSpace].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/SPACE.png");
-
-	HowtoOperateSPData[kAttuckButton].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/J.png");
 
 	// Level
 	LevelSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Lv.png");
@@ -55,8 +51,8 @@ UIManager::UIManager() {
 	playerHpSPData.sprite = std::make_unique<Sprite>();
 	playerHPFlameSPData.sprite = std::make_unique<Sprite>();
 
-	for (int i = 0; i < OperateCountMAX; i++)
-		HowtoOperateSPData[i].sprite = std::make_unique<Sprite>();
+	
+	HowtoOperateSPData.sprite = std::make_unique<Sprite>();
 
 	LevelSPData.sprite = std::make_unique<Sprite>();
 
@@ -88,26 +84,23 @@ void UIManager::Initialize() {
 	playerHpSPData.sprite->SetAnchorPoint({0.0f, 0.0f});
 	playerHpSPData.sprite->SetScale(playerHpSPData.size);
 	// ★ 左端の位置を固定
-	playerHpSPData.translate = {640 - playerHPMaxSize.x / 2, 600};
+	playerHpSPData.translate = {640 - playerHPMaxSize.x / 2, 500};
 	playerHpSPData.sprite->SetPosition(playerHpSPData.translate);
 
 	// ------------------ HP Flame ------------------
 	playerHPFlameSPData.sprite->Initialize(spriteCommon, playerHPFlameSPData.handle);
 	playerHPFlameSPData.size = playerHPMaxSize;
-	playerHPFlameSPData.translate = {640, 600};
+	playerHPFlameSPData.translate = {640, 500};
 	playerHPFlameSPData.sprite->SetAnchorPoint({0.5f, 0.0f});
 	playerHPFlameSPData.sprite->SetPosition(playerHPFlameSPData.translate);
 	playerHPFlameSPData.sprite->SetScale(playerHPFlameSPData.size);
 
 	// ------------------ WASD / SPACE / ATTACK ------------------
-	for (int i = 0; i < OperateCountMAX; i++) {
-		HowtoOperateSPData[i].sprite->Initialize(spriteCommon, HowtoOperateSPData[i].handle);
-		HowtoOperateSPData[i].sprite->SetScale({100, 100});
-		HowtoOperateSPData[i].sprite->SetTextureRange({0, 0}, {768, 768});
-	}
-	HowtoOperateSPData[kW].sprite->SetPosition({10, 600});
-	HowtoOperateSPData[kSpace].sprite->SetPosition({130, 600});
-	HowtoOperateSPData[kAttuckButton].sprite->SetPosition({250, 600});
+	
+	HowtoOperateSPData.sprite->Initialize(spriteCommon, HowtoOperateSPData.handle);
+	HowtoOperateSPData.sprite->SetScale({700, 100});
+	HowtoOperateSPData.sprite->SetPosition({10, 600});
+	
 
 	// ------------------ Level ------------------
 	LevelSPData.sprite->Initialize(spriteCommon, LevelSPData.handle);
@@ -164,7 +157,7 @@ void UIManager::Update() {
 		playerHpSPData.sprite->SetTextureRange({0, 0}, {playerHPWidth, 300});
 
 		// ★ 左端の位置は常に固定（ずれない）
-		playerHpSPData.translate = {640 - playerHPMaxSize.x / 2, 600};
+		playerHpSPData.translate = {640 - playerHPMaxSize.x / 2, 500};
 		playerHpSPData.sprite->SetPosition(playerHpSPData.translate);
 	}
 
@@ -172,8 +165,8 @@ void UIManager::Update() {
 	playerHpSPData.sprite->Update();
 	playerHPFlameSPData.sprite->Update();
 
-	for (int i = 0; i < OperateCountMAX; i++)
-		HowtoOperateSPData[i].sprite->Update();
+	
+	HowtoOperateSPData.sprite->Update();
 
 	LevelSPData.sprite->Update();
 
@@ -269,9 +262,9 @@ void UIManager::Draw() {
 	playerHpSPData.sprite->Draw();
 	playerHPFlameSPData.sprite->Draw();
 
-	HowtoOperateSPData[kW].sprite->Draw();
-	HowtoOperateSPData[kSpace].sprite->Draw();
-	HowtoOperateSPData[kAttuckButton].sprite->Draw();
+	HowtoOperateSPData.sprite->Draw();
+	
+	
 
 	LevelSPData.sprite->Draw();
 

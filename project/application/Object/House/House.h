@@ -10,7 +10,8 @@ class House {
 	std::unique_ptr<Object3d> hpbar_;
 	std::unique_ptr<Object3d> hpflame_;
 	Vector3 position_ = {0, 1.5f, 0};
-	int hp_ = 200;
+	static constexpr int kMaxHP = 200;
+	int hp_ = kMaxHP;
 
 	Transform hpBarT_;
 	Transform hpFlameT_;
