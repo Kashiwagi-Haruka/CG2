@@ -162,7 +162,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\Enemy\Enemy.cpp" />
     <ClCompile Include="application\CameraController.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyManager.cpp" />
-    <ClCompile Include="application\Object\CatchBlock.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyStun.cpp" />
     <ClCompile Include="application\Object\Player\PlayerParameters.cpp" />
     <ClCompile Include="Engine\BaseScene\BaseScene.cpp" />
@@ -220,7 +219,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\Background\SkyDome.cpp" />
     <ClCompile Include="application\Scene\ResultScene.cpp" />
     <ClCompile Include="application\Scene\TitleScene.cpp" />
-    <ClCompile Include="application\Object\Goal.cpp" />
     <ClCompile Include="application\UIManager.cpp" />
     <ClCompile Include="application\SceneTransition.cpp" />
     <ClCompile Include="application\Particles.cpp" />
@@ -260,7 +258,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\Enemy\Enemy.h" />
     <ClInclude Include="application\CameraController.h" />
     <ClInclude Include="application\Object\Enemy\EnemyManager.h" />
-    <ClInclude Include="application\Object\CatchBlock.h" />
     <ClInclude Include="application\Object\Enemy\EnemyStun.h" />
     <ClInclude Include="application\Object\Player\PlayerParameters.h" />
     <ClInclude Include="Engine\BaseScene\BaseScene.h" />
@@ -313,7 +310,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\Background\SkyDome.h" />
     <ClInclude Include="application\Scene\ResultScene.h" />
     <ClInclude Include="application\Scene\TitleScene.h" />
-    <ClInclude Include="application\Object\Goal.h" />
     <ClInclude Include="application\UIManager.h" />
     <ClInclude Include="application\SceneTransition.h" />
     <ClInclude Include="application\Particles.h" />

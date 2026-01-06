@@ -120,6 +120,9 @@ public:
 	void Jump();
 	void Falling();
 	PlayerSkill* GetSkill() { return skill_.get(); }
+
+	PlayerSpecialAttack* GetSpecialAttack() { return specialAttack_.get(); }
+
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	void SetMap(MapchipField* map) { map_ = map; }
 	Vector3 GetPosition() { return transform_.translate; }

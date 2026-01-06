@@ -6,10 +6,8 @@
 #include <imgui.h>
 #include "Object/MapchipField.h"
 #include "Audio.h"
-#include "Object/Goal.h"
 #include "SceneTransition.h"
 #include "UIManager.h"
-#include "Object/CatchBlock.h"
 #include "BaseScene.h"
 #include "Object/House/House.h"
 #include "Light/DirectionalLight.h"
@@ -39,7 +37,6 @@ class GameScene: public BaseScene{
 	std::unique_ptr<Particles> particles;
 	std::unique_ptr<UIManager> uimanager;
 	std::unique_ptr<SceneTransition> sceneTransition;
-	std::unique_ptr<Goal> goal;
 	std::unique_ptr<Player> player;
 	std::unique_ptr<EnemyManager> enemyManager;
 	std::unique_ptr<SkyDome> skyDome;

@@ -11,7 +11,7 @@ class Object3d;
 
 class Enemy {
 
-	int HP = 5;
+	int HP = 10;
 	bool isAlive = true;
 	bool isStun_ = false;
 
@@ -45,7 +45,12 @@ public:
 	void Update(const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive);
 	void Draw();
 	void Stun();
-	void SetHPSubtract(int hp) { HP -= hp; }
+	void SetHPSubtract(int hp) {
+		HP -= hp;
+		if (HP <= 0) {
+			isAlive = false;
+		}
+	}
 	int GetHP() { return HP; }
 	bool GetIsAlive() { return isAlive; }
 	void SetCamera(Camera* camera) { camera_ = camera; }

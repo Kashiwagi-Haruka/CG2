@@ -22,7 +22,6 @@ GameScene::GameScene() {
 	enemyManager = std::make_unique<EnemyManager>();
 
 	field = std::make_unique<MapchipField>();
-	goal = std::make_unique<Goal>();
 	sceneTransition = std::make_unique<SceneTransition>();
 	uimanager = std::make_unique<UIManager>();
 	/*BG = std::make_unique<Background>();*/
@@ -62,7 +61,6 @@ void GameScene::Initialize() {
 	enemyManager->Initialize(cameraController->GetCamera());
 	field->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field->Initialize(cameraController->GetCamera());
-	goal->Initialize(cameraController->GetCamera());
 	sceneTransition->Initialize(false);
 	isTransitionIn = true;
 	isTransitionOut = false;
@@ -109,7 +107,7 @@ void GameScene::Initialize() {
 
 	
 	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLight_.position = {-25.0f, 5.0f, -25.0f};
+	pointLight_.position = {-75.0f, 5.0f, -75.0f};
 	pointLight_.intensity = 1.0f;
 	pointLight_.radius = 20.0f;
 	pointLight_.decay = 0.7f;
@@ -263,7 +261,7 @@ void GameScene::Update() {
 	skyDome->SetCamera(cameraController->GetCamera());
 	player->SetCamera(cameraController->GetCamera());
 	field->SetCamera(cameraController->GetCamera());
-	goal->SetCamera(cameraController->GetCamera());
+	
 	
 
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
@@ -340,27 +338,6 @@ void GameScene::Update() {
 		goalActive = true;
 	}
 
-	goal->Update();
-
-
-	// ===== プレイヤーとゴールの当たり判定 =====
-	{
-		Vector3 p = player->GetPosition();
-		Vector3 g = goal->GetTranslate();
-
-		float goalHitSize = 2.0f;
-
-		if (goalActive) { // ★ 条件クリア後だけ処理しない
-			AABB playerAabb = makeAabb(p, player->GetScale());
-			AABB goalAabb = makeAabb(g, {goalHitSize, goalHitSize, goalHitSize});
-			bool isGoalHit = RigidBody::isCollision(playerAabb, goalAabb);
-
-			if (isGoalHit) {
-
-				SceneManager::GetInstance()->ChangeScene("Result");
-			}
-		}
-	}
 
 	if (!player->GetIsAlive()) {
 		if (!isTransitionOut) {
@@ -433,7 +410,27 @@ void GameScene::Update() {
 			}
 		}
 
-		// ===== ③ 敵の攻撃判定 =====
+				// ===== ③ 必殺技との当たり判定 =====
+		if (player->GetIsAlive() && player->GetSpecialAttack() && player->GetSpecialAttack()->IsDamaging()) {
+			bool hitSpecial = false;
+			for (const auto& specialTransform : player->GetSpecialAttack()->GetIceFlowerTransforms()) {
+				AABB specialAabb = makeAabb(specialTransform.translate, specialTransform.scale);
+				if (RigidBody::isCollision(specialAabb, enemyAabb)) {
+					hitSpecial = true;
+					break;
+				}
+			}
+
+			if (hitSpecial) {
+				e->SetHPSubtract(1);
+				enemyManager->OnEnemyDamaged(e.get());
+				if (!e->GetIsAlive()) {
+					player->EXPMath();
+				}
+			}
+		}
+
+		// ===== ④ 敵の攻撃判定 =====
 		if (e->IsAttackHitActive()) {
 			AABB enemyAttackAabb = makeAabb(e->GetAttackPosition(), {e->GetAttackHitSize(), e->GetAttackHitSize(), e->GetAttackHitSize()});
 			bool hitEnemyAttack = RigidBody::isCollision(enemyAttackAabb, playerAabb);
@@ -463,7 +460,6 @@ void GameScene::Update() {
 	
 	particles->SetCameraPos(cameraController->GetCamera()->GetTranslate());
 	particles->SetPlayerPos(player->GetPosition());
-	particles->SetGoalPos(goal->GetTranslate());
 	particles->Update();
 
 	cameraController->SetPlayerPos(player->GetPosition());

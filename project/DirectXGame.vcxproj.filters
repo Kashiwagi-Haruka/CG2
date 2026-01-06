@@ -180,9 +180,6 @@
     <ClCompile Include="application\Object\Enemy\Enemy.cpp">
       <Filter>ソース ファイル\application\Object</Filter>
     </ClCompile>
-    <ClCompile Include="application\Object\Goal.cpp">
-      <Filter>ソース ファイル\application\Object</Filter>
-    </ClCompile>
     <ClCompile Include="application\Object\Background\SkyDome.cpp">
       <Filter>ソース ファイル\application\Object\Background</Filter>
     </ClCompile>
@@ -220,9 +217,6 @@
       <Filter>ソース ファイル\Engine\BaseScene</Filter>
     </ClCompile>
     <ClCompile Include="application\Scene\Game\Game.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Object\CatchBlock.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\Object\Enemy\EnemyStun.cpp">
@@ -433,9 +427,6 @@
     <ClInclude Include="Engine\math\RigidBody.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="application\Object\Goal.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
     <ClInclude Include="application\SceneTransition.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
@@ -458,9 +449,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Scene\Game\Game.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\CatchBlock.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Object\Enemy\EnemyStun.h">

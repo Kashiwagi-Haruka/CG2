@@ -27,4 +27,6 @@ public:
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	void StartAttack(const Transform& playerTransform, int iceCount);
 	bool IsSpecialEnd() { return isSpecialEnd_; }
+	bool IsDamaging() const { return !isSpecialEnd_; }
+	const std::vector<Transform>& GetIceFlowerTransforms() const { return iceFlowerTransforms_; }
 };
