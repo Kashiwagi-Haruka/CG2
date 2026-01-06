@@ -15,6 +15,7 @@
 #include "Light/SpotLight.h"
 #include "Pause.h"
 #include "Vector2.h"
+#include <string>
 class Player;
 class Enemy;
 class CameraController;
@@ -47,7 +48,7 @@ class GameScene: public BaseScene{
 
 	bool isTransitionIn = true;
 	bool isTransitionOut = false;
-
+	std::string nextSceneName;
 	bool isBGMPlaying = false;
 	bool isPause = false;
 			

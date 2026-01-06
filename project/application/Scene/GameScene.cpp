@@ -64,6 +64,7 @@ void GameScene::Initialize() {
 	sceneTransition->Initialize(false);
 	isTransitionIn = true;
 	isTransitionOut = false;
+	nextSceneName.clear();
 	uimanager->SetPlayerHPMax(player->GetHPMax());
 	uimanager->SetPlayerHP(player->GetHP());
 
@@ -197,13 +198,19 @@ void GameScene::Update() {
 	if (pauseAction == Pause::Action::kResume) {
 		isPause = false;
 	} else if (pauseAction == Pause::Action::kTitle) {
-		SceneManager::GetInstance()->ChangeScene("Title");
+		if (!isTransitionOut) {
+			nextSceneName = "Title";
+			sceneTransition->Initialize(true);
+			isTransitionOut = true;
+			isPause = false;
+		}
 		return;
 	}
 
-	if (isPause) {
+	if (isPause && !isTransitionOut) {
 		return;
 	}
+
 
 	auto makeAabb = [](const Vector3& center, const Vector3& halfSize) {
 		AABB aabb;
@@ -341,9 +348,10 @@ void GameScene::Update() {
 
 	if (!player->GetIsAlive()) {
 		if (!isTransitionOut) {
+			nextSceneName = "GameOver";
+			sceneTransition->Initialize(true);
 			isTransitionOut = true;
 		}
-		
 	}
 
 	// ===== プレイヤーと敵の当たり判定 =====
@@ -470,7 +478,7 @@ void GameScene::Update() {
 			isTransitionIn = false;
 		}
 		if (sceneTransition->IsEnd()&&isTransitionOut) {
-			SceneManager::GetInstance()->ChangeScene("GameOver");
+			SceneManager::GetInstance()->ChangeScene(nextSceneName);
 		}
 	}
 }

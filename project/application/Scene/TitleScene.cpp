@@ -39,7 +39,9 @@ void TitleScene::Initialize() {
 	pressSpaceSprite->SetPosition(pressSpacePos);
 	pressSpaceSprite->Update();
 	isBGMPlaying = false;
-	isTransition = false;
+	isTransitionIn = true;
+	isTransitionOut = false;
+	transition->Initialize(false);
 	GameBase::GetInstance()->SetIsCursorStablity(false);
 	GameBase::GetInstance()->SetIsCursorVisible(true);
 }
@@ -56,14 +58,16 @@ void TitleScene::Update(){
 	BGSP_.sprite->Update();
 	
 
-	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
+	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
 		transition->Initialize(true);
-		isTransition = true;
+		isTransitionOut = true;
 	}
-	if (isTransition) {
+	if (isTransitionIn || isTransitionOut) {
 		transition->Update();
-		if (transition->IsEnd()) {
-
+		if (transition->IsEnd() && isTransitionIn) {
+			isTransitionIn = false;
+		}
+		if (transition->IsEnd() && isTransitionOut) {
 			SceneManager::GetInstance()->ChangeScene("Game");
 		}
 	}
@@ -80,7 +84,7 @@ void TitleScene::Draw(){
 	BGSP_.sprite->Draw();
 	logoSP_.sprite->Draw();
 	pressSpaceSprite->Draw();
-	if (isTransition) {
+	if (isTransitionIn || isTransitionOut) {
 		transition->Draw();
 	}
 

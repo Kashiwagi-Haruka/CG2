@@ -26,7 +26,7 @@ void PlayerSpecialAttack::EnsureIceFlowerCount(int count) {
 		(*iceFlowers_)[i].SetModel("iceFlower");
 		iceFlowerTransforms_[i] = {
 		    .scale{1.0f, 1.0f, 1.0f},
-            .rotate{0.0f, 0.0f, 0.0f},
+            .rotate{std::numbers::pi_v<float>/2.0f, 0.0f, 0.0f},
             .translate{0.0f, 0.0f, 0.0f}
         };
 		(*iceFlowers_)[i].SetTransform(iceFlowerTransforms_[i]);

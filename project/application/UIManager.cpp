@@ -33,6 +33,8 @@ UIManager::UIManager() {
 		MaxSPData[i].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Max.png");
 	}
 
+		
+
 	// ステータスUPアイコン
 	AttackUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/AttuckUp.png");
 
@@ -42,7 +44,7 @@ UIManager::UIManager() {
 
 	AllowUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/ArrowUp.png");
 
-	SlashSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Slash.png");
+	SlashSPData[0].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Slash.png");
 
 	EXPSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Exp.png");
 
@@ -63,7 +65,9 @@ UIManager::UIManager() {
 	for (int i = 0; i < 5; i++) {
 		MaxSPData[i].sprite = std::make_unique<Sprite>();
 	}
-
+	for (int i = 0; i < 2; i++) {
+		SlashSPData[i].sprite = std::make_unique<Sprite>();
+	}
 	AttackUpSPData.sprite = std::make_unique<Sprite>();
 	HealthUpSPData.sprite = std::make_unique<Sprite>();
 	SpeedUpSPData.sprite = std::make_unique<Sprite>();
@@ -122,6 +126,12 @@ void UIManager::Initialize() {
 
 		MaxSPData[i].sprite->SetScale({48, 48});
 	}
+
+	for (int i = 0; i < 2; i++) {
+		SlashSPData[i].sprite->Initialize(spriteCommon, SlashSPData[0].handle);
+
+	}
+
 	// Up アイコン
 	AttackUpSPData.sprite->Initialize(spriteCommon, AttackUpSPData.handle);
 	AttackUpSPData.sprite->SetScale({48, 48});

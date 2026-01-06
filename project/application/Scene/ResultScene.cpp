@@ -7,6 +7,7 @@ ResultScene::ResultScene() {
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/result.png");
 	logoSP_.sprite = std::make_unique<Sprite>();
 	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), logoSP_.handle);
+	transition = std::make_unique<SceneTransition>();
 }
 
 void ResultScene::Finalize() {
@@ -18,6 +19,7 @@ void ResultScene::Initialize() {
 	logoSP_.size = {1280, 720};
 	logoSP_.translate = {640, 360};
 	logoSP_.sprite->SetScale(logoSP_.size);
+	
 	logoSP_.sprite->SetPosition(logoSP_.translate);
 	logoSP_.sprite->Update();
 	isSceneEnd_ = false;
@@ -39,11 +41,25 @@ void ResultScene::Initialize() {
 	pressSpaceSprite->Update();
 	GameBase::GetInstance()->SetIsCursorStablity(false);
 	GameBase::GetInstance()->SetIsCursorVisible(true);
+	transition->Initialize(false);
+	isTransitionIn = true;
+	isTransitionOut = false;
 }
 void ResultScene::Update() {
 
-	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
-		SceneManager::GetInstance()->ChangeScene("Title");
+	logoSP_.sprite->Update();
+	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
+		transition->Initialize(true);
+		isTransitionOut = true;
+	}
+	if (isTransitionIn || isTransitionOut) {
+		transition->Update();
+		if (transition->IsEnd() && isTransitionIn) {
+			isTransitionIn = false;
+		}
+		if (transition->IsEnd() && isTransitionOut) {
+			SceneManager::GetInstance()->ChangeScene("Title");
+		}
 	}
 #ifdef USE_IMGUI
 	ImGui::Begin("resultScene");
@@ -57,4 +73,7 @@ void ResultScene::Draw(){
 	GameBase::GetInstance()->SpriteCommonSet();
 	logoSP_.sprite->Draw(); 
 	pressSpaceSprite->Draw();
+	if (isTransitionIn || isTransitionOut) {
+		transition->Draw();
+	}
 }

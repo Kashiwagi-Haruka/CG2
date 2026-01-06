@@ -8,6 +8,7 @@ GameOverScene::GameOverScene() {
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/over.png");
 	logoSP_.sprite = std::make_unique<Sprite>();
 	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), logoSP_.handle);
+	transition = std::make_unique<SceneTransition>();
 }
 
 void GameOverScene::Finalize() {
@@ -34,12 +35,25 @@ void GameOverScene::Initialize() {
 	pressSpaceSprite->Update();
 	GameBase::GetInstance()->SetIsCursorStablity(false);
 	GameBase::GetInstance()->SetIsCursorVisible(true);
+	transition->Initialize(false);
+	isTransitionIn = true;
+	isTransitionOut = false;
 }
 
 void GameOverScene::Update() {
 
-	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
-		SceneManager::GetInstance()->ChangeScene("Title");
+		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
+		transition->Initialize(true);
+		isTransitionOut = true;
+	}
+	if (isTransitionIn || isTransitionOut) {
+		transition->Update();
+		if (transition->IsEnd() && isTransitionIn) {
+			isTransitionIn = false;
+		}
+		if (transition->IsEnd() && isTransitionOut) {
+			SceneManager::GetInstance()->ChangeScene("Title");
+		}
 	}
 #ifdef USE_IMGUI
 	ImGui::Begin("resultScene");
@@ -49,6 +63,7 @@ void GameOverScene::Update() {
 
 void GameOverScene::Draw() {
 	GameBase::GetInstance()->SpriteCommonSet();
-	logoSP_.sprite->Draw();
-	pressSpaceSprite->Draw();
+	if (isTransitionIn || isTransitionOut) {
+		transition->Draw();
+	}
 }

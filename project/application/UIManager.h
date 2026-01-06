@@ -51,9 +51,9 @@ class UIManager {
 	SpriteData SpeedUpSPData;
 	SpriteData AllowUpSPData;
 
-	SpriteData SlashSPData;
+	SpriteData SlashSPData[2];
 	SpriteData EXPSPData;
-	SpriteData slashSPData[2];
+	
 
 	int playerHP;
 	int playerHPMax;

@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "BaseScene.h"
 #include <memory>
+#include "SceneTransition.h"
 class GameBase;
 
 class ResultScene : public BaseScene {
@@ -22,6 +23,10 @@ class ResultScene : public BaseScene {
 
 	Vector2 pressSpacePos = {640, 420};
 	Vector2 pressSpaceSize = {300, 300};
+
+		std::unique_ptr<SceneTransition> transition = nullptr;
+	bool isTransitionIn = false;
+	bool isTransitionOut = false;
 
 public:
 	ResultScene();

@@ -3,7 +3,7 @@
 #include "Sprite.h"
 #include <imgui.h>
 #include <memory>
-
+#include "SceneTransition.h"
 
 class GameBase;
 class GameOverScene : public BaseScene {
@@ -21,6 +21,9 @@ class GameOverScene : public BaseScene {
 	uint32_t pressSpaceHandle = 0;
 	Vector2 pressSpacePos = {640, 420};
 	Vector2 pressSpaceSize = {300, 300};
+	std::unique_ptr<SceneTransition> transition = nullptr;
+	bool isTransitionIn = false;
+	bool isTransitionOut = false;
 
 public:
 	GameOverScene();

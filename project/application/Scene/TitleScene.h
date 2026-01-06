@@ -24,8 +24,11 @@ class TitleScene : public BaseScene {
 	Vector2 pressSpaceSize = {300, 300};
 	SoundData BGMData;
 	bool isBGMPlaying;
-	bool isTransition = false;
-	std::unique_ptr<SceneTransition> transition=nullptr;
+	bool isTransitionIn = false;
+	bool isTransitionOut = false;
+	std::unique_ptr<SceneTransition> transition = nullptr;
+	
+
 
 public:
 	TitleScene();
