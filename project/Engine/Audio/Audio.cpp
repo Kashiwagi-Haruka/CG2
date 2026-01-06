@@ -172,7 +172,7 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
 	result_ = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(result_));
-
+	pSourceVoice->SetVolume(soundData.volume);
 	XAUDIO2_BUFFER buf{};
 	buf.pAudioData = soundData.buffer.data();
 	buf.AudioBytes = static_cast<UINT32>(soundData.buffer.size());
@@ -215,6 +215,16 @@ void Audio::SetSoundVolume(SoundData* soundData, float volume) {
 		return;
 	}
 	soundData->volume = std::clamp(volume, 0.0f, 1.0f);
+	const BYTE* targetData = soundData->buffer.data();
+	if (!targetData) {
+		return;
+	}
+
+	for (auto& active : activeVoices_) {
+		if (active.voice && active.audioData == targetData) {
+			active.voice->SetVolume(soundData->volume);
+		}
+	}
 }
 void Audio::StopAllVoices() {
 	for (auto& active : activeVoices_) {

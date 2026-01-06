@@ -14,6 +14,7 @@ TitleScene::TitleScene() {
 	ruleSP_.sprite = std::make_unique<Sprite>();
 	ruleSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), ruleSP_.handle);
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Rendez-vous_2.mp3");
+	Audio::GetInstance()->SetSoundVolume(&BGMData, 0.3f);
 	transition = std::make_unique<SceneTransition>();
 }
 

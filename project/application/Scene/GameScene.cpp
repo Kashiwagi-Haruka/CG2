@@ -29,6 +29,7 @@ GameScene::GameScene() {
 
 	pause = std::make_unique<Pause>();
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Tailshaft.mp3");
+	Audio::GetInstance()->SetSoundVolume(&BGMData, 0.3f);
 	GameTimer::GetInstance()->Reset();
 	GameBase::GetInstance()->SetIsCursorStablity(true);
 	GameBase::GetInstance()->SetIsCursorVisible(false);
