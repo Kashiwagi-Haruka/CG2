@@ -9,11 +9,10 @@ GameOverScene::GameOverScene() {
 	logoSP_.sprite = std::make_unique<Sprite>();
 	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), logoSP_.handle);
 	transition = std::make_unique<SceneTransition>();
+	BGM_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/おそろい.mp3");
 }
 
-void GameOverScene::Finalize() {
-	
-}
+void GameOverScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGM_); }
 
 void GameOverScene::Initialize() {
 
@@ -38,10 +37,14 @@ void GameOverScene::Initialize() {
 	transition->Initialize(false);
 	isTransitionIn = true;
 	isTransitionOut = false;
+	isBGMPlaying = false;
 }
-
 void GameOverScene::Update() {
 
+	if (!isBGMPlaying) {
+		Audio::GetInstance()->SoundPlayWave(BGM_, true);
+		isBGMPlaying = true;
+	}
 		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;

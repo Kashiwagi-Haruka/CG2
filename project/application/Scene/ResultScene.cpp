@@ -31,7 +31,7 @@ ResultScene::ResultScene() {
 	starOnHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/StarOn.png");
 	starOffHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/StarOff.png");
 	numberHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/No.png");
-	
+	BGM_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/アンドロイドの涙.mp3");
 
 	for (int i = 0; i < 4; ++i) {
 		timeDigitSP_[i].handle = numberHandle_;
@@ -42,9 +42,7 @@ ResultScene::ResultScene() {
 	transition = std::make_unique<SceneTransition>();
 }
 
-void ResultScene::Finalize() {
-	
-}
+void ResultScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGM_); }
 
 void ResultScene::Initialize() {
 	logoSP_.sprite->SetAnchorPoint({0.5f, 0.5f});
@@ -116,9 +114,13 @@ void ResultScene::Initialize() {
 	transition->Initialize(false);
 	isTransitionIn = true;
 	isTransitionOut = false;
+	isBGMPlaying = false;
 }
 void ResultScene::Update() {
-
+	if (!isBGMPlaying) {
+		Audio::GetInstance()->SoundPlayWave(BGM_, true);
+		isBGMPlaying = true;
+	}
 	logoSP_.sprite->Update();
 	for (int i = 0; i < 3; ++i) {
 		starSP_[i].sprite->Update();
