@@ -10,7 +10,7 @@ class House {
 	std::unique_ptr<Object3d> hpbar_;
 	std::unique_ptr<Object3d> hpflame_;
 	Vector3 position_ = {0, 1.5f, 0};
-	int hp_ = 100;
+	int hp_ = 200;
 
 	Transform hpBarT_;
 	Transform hpFlameT_;
@@ -26,5 +26,5 @@ public:
 	Vector3 GetPosition() const { return position_; }
 	Vector3 GetScale() const { return object_->GetTransform().scale; }
 	int GetHP() const { return hp_; }
-	void Damage(int amount) { hp_ -= amount; }
+	void Damage(int amount);
 };

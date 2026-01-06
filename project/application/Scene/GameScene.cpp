@@ -350,6 +350,16 @@ void GameScene::Update() {
 		isTransitionOut = true;
 	}
 
+	#ifdef _DEBUG
+	if (GameBase::GetInstance()->TriggerKey(DIK_P)) {
+		nextSceneName = "Result";
+		sceneTransition->Initialize(true);
+		isTransitionOut = true;
+	}
+#endif // _DEBUG
+
+
+
 
 	if (!player->GetIsAlive()) {
 		if (!isTransitionOut) {

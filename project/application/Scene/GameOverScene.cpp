@@ -63,6 +63,8 @@ void GameOverScene::Update() {
 
 void GameOverScene::Draw() {
 	GameBase::GetInstance()->SpriteCommonSet();
+	logoSP_.sprite->Draw();
+	pressSpaceSprite->Draw();
 	if (isTransitionIn || isTransitionOut) {
 		transition->Draw();
 	}

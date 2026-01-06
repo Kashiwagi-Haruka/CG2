@@ -16,10 +16,12 @@ void SceneTransition::Initialize(bool isIn){
 	isIn_ = isIn;
 	if (isIn_) {
 		fadeSPData.size = {0, 720};
+		fadeSPData.translate = {-1500, 0}; 
 	} else {
 		fadeSPData.size = {1500, 720};
+		fadeSPData.translate = {0, 0}; 
 	}
-	fadeSPData.translate = {0, 0}; 
+	
 	fadeSPData.sprite->SetScale(fadeSPData.size);
 	fadeSPData.sprite->SetPosition(fadeSPData.translate);
 	fadeSPData.sprite->Update();

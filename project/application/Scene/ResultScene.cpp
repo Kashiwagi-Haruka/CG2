@@ -2,11 +2,43 @@
 #include "GameBase.h"
 #include "TextureManager.h"
 #include "SceneManager.h"
+#include "GameTimer.h"
+#include "Object/House/HouseHP.h"
+#include <algorithm>
+
+namespace {
+constexpr float kGoodTimeSeconds = 120.0f;
+constexpr float kOkTimeSeconds = 180.0f;
+constexpr float kHighHpRatio = 0.8f;
+constexpr float kMidHpRatio = 0.5f;
+} // namespace
+
+int CalculateStarCount(float timeSeconds, int houseHp) {
+	float hpRatio = std::clamp(houseHp / 100.0f, 0.0f, 1.0f);
+	int stars = 1;
+	if (timeSeconds <= kGoodTimeSeconds && hpRatio >= kHighHpRatio) {
+		stars = 3;
+	} else if (timeSeconds <= kOkTimeSeconds && hpRatio >= kMidHpRatio) {
+		stars = 2;
+	}
+	return stars;
+}
 ResultScene::ResultScene() {
 
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/result.png");
 	logoSP_.sprite = std::make_unique<Sprite>();
 	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), logoSP_.handle);
+	starOnHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/StarOn.png");
+	starOffHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/StarOff.png");
+	numberHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/No.png");
+	
+
+	for (int i = 0; i < 4; ++i) {
+		timeDigitSP_[i].handle = numberHandle_;
+		timeDigitSP_[i].sprite = std::make_unique<Sprite>();
+		timeDigitSP_[i].sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), timeDigitSP_[i].handle);
+	}
+	
 	transition = std::make_unique<SceneTransition>();
 }
 
@@ -22,6 +54,7 @@ void ResultScene::Initialize() {
 	
 	logoSP_.sprite->SetPosition(logoSP_.translate);
 	logoSP_.sprite->Update();
+
 	isSceneEnd_ = false;
 	// SPACE 画像読み込み
 	pressSpaceHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/SPACE.png");
@@ -39,6 +72,45 @@ void ResultScene::Initialize() {
 	pressSpaceSprite->SetPosition(pressSpacePos);
 
 	pressSpaceSprite->Update();
+	float totalSeconds = GameTimer::GetInstance()->GetTimer();
+	resultMinutes_ = static_cast<int>(totalSeconds) / 60;
+	resultSeconds_ = static_cast<int>(totalSeconds) % 60;
+	resultStars_ = CalculateStarCount(totalSeconds, HouseHP::GetInstance()->GetHP());
+
+	Vector2 starStart = {460, 360};
+	float starSpacing = 180.0f;
+	for (int i = 0; i < 3; ++i) {
+		starSP_[i].handle = (i < resultStars_) ? starOnHandle_ : starOffHandle_;
+		starSP_[i].sprite = std::make_unique<Sprite>();
+		starSP_[i].sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), starSP_[i].handle);
+		starSP_[i].sprite->SetAnchorPoint({0.5f, 0.5f});
+		starSP_[i].size = starSize_;
+		starSP_[i].translate = {starStart.x + starSpacing * i, starStart.y};
+		starSP_[i].sprite->SetScale(starSP_[i].size);
+		starSP_[i].sprite->SetPosition(starSP_[i].translate);
+		starSP_[i].sprite->Update();
+	}
+
+	int minuteTens = (resultMinutes_ / 10) % 10;
+	int minuteOnes = resultMinutes_ % 10;
+	int secondTens = (resultSeconds_ / 10) % 10;
+	int secondOnes = resultSeconds_ % 10;
+
+	int digits[4] = {minuteTens, minuteOnes, secondTens, secondOnes};
+	Vector2 digitStart = {580, 280};
+	float digitSpacing = 50.0f;
+	for (int i = 0; i < 4; ++i) {
+		timeDigitSP_[i].sprite->SetAnchorPoint({0.5f, 0.5f});
+		timeDigitSP_[i].size = timeDigitSize_;
+		timeDigitSP_[i].translate = {digitStart.x + digitSpacing * i, digitStart.y};
+		timeDigitSP_[i].sprite->SetScale(timeDigitSP_[i].size);
+		timeDigitSP_[i].sprite->SetPosition(timeDigitSP_[i].translate);
+		timeDigitSP_[i].sprite->SetTextureRange({300.0f * digits[i], 0}, numberTextureSize_);
+		timeDigitSP_[i].sprite->Update();
+	}
+
+	
+
 	GameBase::GetInstance()->SetIsCursorStablity(false);
 	GameBase::GetInstance()->SetIsCursorVisible(true);
 	transition->Initialize(false);
@@ -48,6 +120,13 @@ void ResultScene::Initialize() {
 void ResultScene::Update() {
 
 	logoSP_.sprite->Update();
+	for (int i = 0; i < 3; ++i) {
+		starSP_[i].sprite->Update();
+	}
+	for (int i = 0; i < 4; ++i) {
+		timeDigitSP_[i].sprite->Update();
+	}
+	
 	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;
@@ -69,9 +148,16 @@ void ResultScene::Update() {
 
 }
 
-void ResultScene::Draw(){ 
+void ResultScene::Draw() {
 	GameBase::GetInstance()->SpriteCommonSet();
-	logoSP_.sprite->Draw(); 
+	logoSP_.sprite->Draw();
+	for (int i = 0; i < 3; ++i) {
+		starSP_[i].sprite->Draw();
+	}
+	for (int i = 0; i < 4; ++i) {
+		timeDigitSP_[i].sprite->Draw();
+	}
+	
 	pressSpaceSprite->Draw();
 	if (isTransitionIn || isTransitionOut) {
 		transition->Draw();

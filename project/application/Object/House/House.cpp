@@ -1,8 +1,12 @@
+#define NOMINMAX
 #include "House.h"
 #include "GameBase.h"
 #include "ModelManeger.h"
 #include "Function.h"
 #include <numbers>
+#include "Object/House/HouseHP.h"
+#include <algorithm>
+
 House::House() {}
 
 void House::Initialize(Camera* camera) {
@@ -17,7 +21,7 @@ void House::Initialize(Camera* camera) {
 
 	object_->SetCamera(camera);
 	object_->SetScale({1, 1, 1});
-	position_ = {-75.0f, 2.5f, -75.0f};
+	position_ = {-75.0f, 1.5f, -75.0f};
 	object_->SetTranslate(position_);
 
 	hpbar_ = std::make_unique<Object3d>();
@@ -40,9 +44,12 @@ void House::Initialize(Camera* camera) {
         .rotate{0, 0, 0},
         .translate{0, 0, 0}
     };
-
+	HouseHP::GetInstance()->SetHP(hp_);
 }
-
+void House::Damage(int amount) {
+	hp_ = std::max(0, hp_ - amount);
+	HouseHP::GetInstance()->SetHP(hp_);
+}
 void House::Update(Camera* camera) {
 	object_->SetCamera(camera);
 	object_->SetTranslate(position_);
