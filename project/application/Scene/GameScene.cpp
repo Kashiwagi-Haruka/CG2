@@ -344,6 +344,11 @@ void GameScene::Update() {
 	if (enemyManager->GetCurrentWave() >= 5 && enemyManager->IsWaveComplete()) {
 		goalActive = true;
 	}
+	if (goalActive && player->GetIsAlive() && !isTransitionOut) {
+		nextSceneName = "Result";
+		sceneTransition->Initialize(true);
+		isTransitionOut = true;
+	}
 
 
 	if (!player->GetIsAlive()) {
