@@ -2,14 +2,14 @@
 #include <Windows.h>
 #include <wrl.h>
 #include "BlendMode/BlendModeManager.h"
+#include <memory>
 class DirectXCommon;
-
-class BlendmodeManager;
 
 class SpriteCommon {
 
 	private:
 
+	static std::unique_ptr<SpriteCommon> instance_;
 	
 	DirectXCommon* dxCommon_;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
@@ -24,6 +24,7 @@ class SpriteCommon {
 	HRESULT hr_;
 
 	public:
+	static SpriteCommon* GetInstance();
 	void Initialize(DirectXCommon* dxCommon);
 	void DrawCommon();
 

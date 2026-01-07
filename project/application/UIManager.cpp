@@ -75,10 +75,10 @@ UIManager::~UIManager() {}
 
 void UIManager::Initialize() {
 
-	auto spriteCommon = GameBase::GetInstance()->GetSpriteCommon();
+	
 
 	// ------------------ HP Bar ------------------
-	playerHpSPData.sprite->Initialize(spriteCommon, playerHpSPData.handle);
+	playerHpSPData.sprite->Initialize(playerHpSPData.handle);
 	playerHpSPData.size = playerHPMaxSize;
 	// ★ アンカーポイントを左端に設定（左端固定）
 	playerHpSPData.sprite->SetAnchorPoint({0.0f, 0.0f});
@@ -88,7 +88,7 @@ void UIManager::Initialize() {
 	playerHpSPData.sprite->SetPosition(playerHpSPData.translate);
 
 	// ------------------ HP Flame ------------------
-	playerHPFlameSPData.sprite->Initialize(spriteCommon, playerHPFlameSPData.handle);
+	playerHPFlameSPData.sprite->Initialize(playerHPFlameSPData.handle);
 	playerHPFlameSPData.size = playerHPMaxSize;
 	playerHPFlameSPData.translate = {640, 500};
 	playerHPFlameSPData.sprite->SetAnchorPoint({0.5f, 0.0f});
@@ -97,45 +97,45 @@ void UIManager::Initialize() {
 
 	// ------------------ WASD / SPACE / ATTACK ------------------
 	
-	HowtoOperateSPData.sprite->Initialize(spriteCommon, HowtoOperateSPData.handle);
+	HowtoOperateSPData.sprite->Initialize(HowtoOperateSPData.handle);
 	HowtoOperateSPData.sprite->SetScale({700, 100});
 	HowtoOperateSPData.sprite->SetPosition({10, 600});
 	
 
 	// ------------------ Level ------------------
-	LevelSPData.sprite->Initialize(spriteCommon, LevelSPData.handle);
+	LevelSPData.sprite->Initialize(LevelSPData.handle);
 	LevelSPData.sprite->SetScale({50, 50});
 	LevelSPData.translate = {10, 10};
 	LevelSPData.sprite->SetPosition(LevelSPData.translate);
 
 	// ------------------ Number 0～9 ------------------
 	for (int i = 0; i < NumbersCountMax; i++) {
-		NumberSPData[i].sprite->Initialize(spriteCommon, NumberSPData[i].handle);
+		NumberSPData[i].sprite->Initialize(NumberSPData[i].handle);
 		NumberSPData[i].sprite->SetTextureRange({0, 0}, numbersTextureSize);
 		NumberSPData[i].sprite->SetScale({32, 32});
 	}
 	for (int i = 0; i < 5; i++) {
-		MaxSPData[i].sprite->Initialize(spriteCommon, MaxSPData[i].handle);
+		MaxSPData[i].sprite->Initialize(MaxSPData[i].handle);
 
 		MaxSPData[i].sprite->SetScale({48, 48});
 	}
 
 	for (int i = 0; i < 2; i++) {
-		SlashSPData[i].sprite->Initialize(spriteCommon, SlashSPData[0].handle);
+		SlashSPData[i].sprite->Initialize(SlashSPData[0].handle);
 
 	}
 
 	// Up アイコン
-	AttackUpSPData.sprite->Initialize(spriteCommon, AttackUpSPData.handle);
+	AttackUpSPData.sprite->Initialize(AttackUpSPData.handle);
 	AttackUpSPData.sprite->SetScale({48, 48});
 
-	HealthUpSPData.sprite->Initialize(spriteCommon, HealthUpSPData.handle);
+	HealthUpSPData.sprite->Initialize(HealthUpSPData.handle);
 	HealthUpSPData.sprite->SetScale({48, 48});
 
-	SpeedUpSPData.sprite->Initialize(spriteCommon, SpeedUpSPData.handle);
+	SpeedUpSPData.sprite->Initialize(SpeedUpSPData.handle);
 	SpeedUpSPData.sprite->SetScale({48, 48});
 
-	AllowUpSPData.sprite->Initialize(spriteCommon, AllowUpSPData.handle);
+	AllowUpSPData.sprite->Initialize(AllowUpSPData.handle);
 	AllowUpSPData.sprite->SetScale({48, 48});
 
 	

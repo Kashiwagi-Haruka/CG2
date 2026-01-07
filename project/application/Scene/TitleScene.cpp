@@ -6,13 +6,13 @@
 TitleScene::TitleScene() {
 	BGSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/title.png");
 	BGSP_.sprite = std::make_unique<Sprite>();
-	BGSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), BGSP_.handle);
+	BGSP_.sprite->Initialize(BGSP_.handle);
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/logo.png");
 	logoSP_.sprite = std::make_unique<Sprite>();
-	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(),logoSP_.handle);
+	logoSP_.sprite->Initialize(logoSP_.handle);
 	ruleSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/rule.png");
 	ruleSP_.sprite = std::make_unique<Sprite>();
-	ruleSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), ruleSP_.handle);
+	ruleSP_.sprite->Initialize(ruleSP_.handle);
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Rendez-vous_2.mp3");
 	Audio::GetInstance()->SetSoundVolume(&BGMData, 0.3f);
 	transition = std::make_unique<SceneTransition>();
@@ -39,7 +39,7 @@ void TitleScene::Initialize() {
 	pressSpaceHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/SPACE.png");
 
 	pressSpaceSprite = std::make_unique<Sprite>();
-	pressSpaceSprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), pressSpaceHandle);
+	pressSpaceSprite->Initialize(pressSpaceHandle);
 	pressSpaceSprite->SetAnchorPoint({0.5f, 0.5f});
 	pressSpaceSprite->SetTextureRange({0, 0}, {768, 768});
 	pressSpaceSprite->SetScale(pressSpaceSize);

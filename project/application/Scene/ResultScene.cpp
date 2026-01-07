@@ -27,7 +27,7 @@ ResultScene::ResultScene() {
 
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/result.png");
 	logoSP_.sprite = std::make_unique<Sprite>();
-	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), logoSP_.handle);
+	logoSP_.sprite->Initialize(logoSP_.handle);
 	starOnHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/StarOn.png");
 	starOffHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/StarOff.png");
 	numberHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/No.png");
@@ -36,7 +36,7 @@ ResultScene::ResultScene() {
 	for (int i = 0; i < 4; ++i) {
 		timeDigitSP_[i].handle = numberHandle_;
 		timeDigitSP_[i].sprite = std::make_unique<Sprite>();
-		timeDigitSP_[i].sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), timeDigitSP_[i].handle);
+		timeDigitSP_[i].sprite->Initialize(timeDigitSP_[i].handle);
 	}
 	
 	transition = std::make_unique<SceneTransition>();
@@ -58,7 +58,7 @@ void ResultScene::Initialize() {
 	pressSpaceHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/SPACE.png");
 
 	pressSpaceSprite = std::make_unique<Sprite>();
-	pressSpaceSprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), pressSpaceHandle);
+	pressSpaceSprite->Initialize(pressSpaceHandle);
 
 	// 中央寄せ
 	pressSpaceSprite->SetAnchorPoint({0.5f, 0.5f});
@@ -80,7 +80,7 @@ void ResultScene::Initialize() {
 	for (int i = 0; i < 3; ++i) {
 		starSP_[i].handle = (i < resultStars_) ? starOnHandle_ : starOffHandle_;
 		starSP_[i].sprite = std::make_unique<Sprite>();
-		starSP_[i].sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), starSP_[i].handle);
+		starSP_[i].sprite->Initialize(starSP_[i].handle);
 		starSP_[i].sprite->SetAnchorPoint({0.5f, 0.5f});
 		starSP_[i].size = starSize_;
 		starSP_[i].translate = {starStart.x + starSpacing * i, starStart.y};

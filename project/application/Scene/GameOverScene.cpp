@@ -7,7 +7,7 @@ GameOverScene::GameOverScene() {
 
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/over.png");
 	logoSP_.sprite = std::make_unique<Sprite>();
-	logoSP_.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), logoSP_.handle);
+	logoSP_.sprite->Initialize(logoSP_.handle);
 	transition = std::make_unique<SceneTransition>();
 	BGM_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/おそろい.mp3");
 }
@@ -26,7 +26,7 @@ void GameOverScene::Initialize() {
 	pressSpaceHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/SPACE.png");
 
 	pressSpaceSprite = std::make_unique<Sprite>();
-	pressSpaceSprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), pressSpaceHandle);
+	pressSpaceSprite->Initialize(pressSpaceHandle);
 	pressSpaceSprite->SetAnchorPoint({0.5f, 0.5f});
 	pressSpaceSprite->SetScale(pressSpaceSize);
 	pressSpaceSprite->SetPosition(pressSpacePos);

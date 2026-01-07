@@ -4,15 +4,15 @@
 #include "DirectXCommon.h"
 #include "TextureManager.h"
 #include "SrvManager/SrvManager.h"
-void Sprite::Initialize(SpriteCommon* spriteCommon,uint32_t Handle){
+void Sprite::Initialize(uint32_t Handle){
 
-	spriteCommon_ = spriteCommon;
+	
 
 	 
 
 	textureIndex = Handle;
 
-	vertexResource = spriteCommon_->CreateBufferResource(sizeof(VertexData) * kMaxSpriteVertices);
+	vertexResource = SpriteCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * kMaxSpriteVertices);
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexBufferView.SizeInBytes = sizeof(VertexData) * kMaxSpriteVertices;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
@@ -50,7 +50,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon,uint32_t Handle){
 
 	// インデックスデータ
 	uint32_t indices[6] = {0, 1, 2, 2, 1, 3};
-	indexResource = spriteCommon_->CreateBufferResource(sizeof(uint32_t) * 6);
+	indexResource = SpriteCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * 6);
 	void* mapped = nullptr;
 	indexResource->Map(0, nullptr, &mapped);
 	memcpy(mapped, indices, sizeof(indices));
@@ -65,7 +65,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon,uint32_t Handle){
 
 	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
 	// スプライト用（陰影つけたくないもの）
-	materialResource = spriteCommon_->CreateBufferResource(alignedSize);
+	materialResource = SpriteCommon::GetInstance()->CreateBufferResource(alignedSize);
 	Material* matSprite = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
 	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
@@ -74,7 +74,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon,uint32_t Handle){
 	material = matSprite;
 	materialResource->Unmap(0, nullptr);
 
-	transformResource = spriteCommon_->CreateBufferResource(sizeof(TransformationMatrix));
+	transformResource = SpriteCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	transformResource->Map(0, nullptr, reinterpret_cast<void**>(&transformData));
 	transformData->WVP = Function::MakeIdentity4x4();
 	transformData->World = Function::MakeIdentity4x4();
@@ -97,18 +97,18 @@ void Sprite::Draw(){
 	D3D12_INDEX_BUFFER_VIEW ibv = indexBufferView;
 	// インデックスバッファは使いまわしでOK（インデックス: 0,1,2, 0,2,3 など4頂点分用を用意）
 
-	spriteCommon_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vbv);
-	spriteCommon_->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&ibv);
+	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vbv);
+	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&ibv);
 
 	// ヒープ、ルートパラメータ等をセット（すでにやってる場合は不要）
 	ID3D12DescriptorHeap* heaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
-	spriteCommon_->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(heaps), heaps);
-	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress());
-	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex));
+	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(heaps), heaps);
+	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress());
+	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex));
 
 	// 描画（1スプライト分）
-	spriteCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 	// 次のスプライト用にオフセットを進める
 

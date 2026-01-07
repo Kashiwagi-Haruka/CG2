@@ -5,7 +5,7 @@ SceneTransition::SceneTransition(){
 	
 	fadeSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/transition.png");
 	fadeSPData.sprite = std::make_unique<Sprite>();
-	fadeSPData.sprite->Initialize(GameBase::GetInstance()->GetSpriteCommon(), fadeSPData.handle);
+	fadeSPData.sprite->Initialize(fadeSPData.handle);
 }
 SceneTransition::~SceneTransition(){ 
 	

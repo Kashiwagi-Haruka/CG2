@@ -3,6 +3,17 @@
 #include "Logger.h"
 #include <cassert>
 
+std::unique_ptr<SpriteCommon> SpriteCommon::instance_ = nullptr;
+
+SpriteCommon* SpriteCommon::GetInstance() {
+
+	if (instance_ == nullptr) {
+		instance_ = std::make_unique<SpriteCommon>();
+	}
+	return instance_.get();
+
+}
+
 void SpriteCommon::Initialize(DirectXCommon* dxCommon) {
 
 	dxCommon_ = dxCommon;

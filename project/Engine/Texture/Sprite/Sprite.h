@@ -9,7 +9,7 @@
 #include <string>
 #include "VertexData.h"
 #include "Transform.h"
-class SpriteCommon;
+
 
 class Sprite {
 
@@ -63,7 +63,7 @@ class Sprite {
 
 	UINT currentSpriteVertexOffset_ = 0;
 	static const UINT kMaxSpriteVertices = 6 * 10000; // フレーム最大 1000 スプライト分
-	SpriteCommon* spriteCommon_ = nullptr;
+
 
 	//バッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
@@ -84,7 +84,7 @@ class Sprite {
 
 public:
 
-	void Initialize(SpriteCommon* spriteCommon,uint32_t Handle);
+	void Initialize(uint32_t Handle);
 
 	void Update();
 

@@ -87,7 +87,7 @@ void GameScene::Initialize() {
 	for (int i = 0; i < 4; i++) {
 
 		levelupIcons[i] = std::make_unique<Sprite>();
-		levelupIcons[i]->Initialize(GameBase::GetInstance()->GetSpriteCommon(), handle[i]);
+		levelupIcons[i]->Initialize(handle[i]);
 		levelupIcons[i]->SetScale({256, 256});
 	}
 
@@ -99,7 +99,7 @@ void GameScene::Initialize() {
 
 	for (int i = 0; i < 5; i++) {
 		phaseSprites_[i] = std::make_unique<Sprite>();
-		phaseSprites_[i]->Initialize(GameBase::GetInstance()->GetSpriteCommon(), phaseHandles[i]);
+		phaseSprites_[i]->Initialize( phaseHandles[i]);
 		phaseSprites_[i]->SetScale(phaseSpriteSize_);
 	}
 
