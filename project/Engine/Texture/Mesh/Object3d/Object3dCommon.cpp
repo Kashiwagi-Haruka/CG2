@@ -2,6 +2,25 @@
 #include "DirectXCommon.h"
 #include "Logger.h"
 #include <cassert>
+
+std::unique_ptr<Object3dCommon> Object3dCommon::instance = nullptr;
+
+Object3dCommon::Object3dCommon(){
+
+}
+Object3dCommon::~Object3dCommon(){
+
+}
+
+Object3dCommon* Object3dCommon::GetInstance(){
+
+
+	if (instance == nullptr) {
+		instance = std::make_unique<Object3dCommon>();
+	}
+	return instance.get();
+}
+
 void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	pso_ = std::make_unique<CreatePSO>(dxCommon_);

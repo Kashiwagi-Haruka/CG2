@@ -11,7 +11,7 @@ SkyDome::SkyDome() {
 
 void SkyDome::Initialize(Camera* camera) {
 	
-	skyDomeObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	skyDomeObject_->Initialize();
 	skyDomeObject_->SetModel("skyDome");
 	camera_ = camera;
 	skyDomeObject_->SetCamera(camera_);

@@ -9,9 +9,9 @@
 #include "Camera.h"
 
 
-void Object3d::Initialize(Object3dCommon* modelCommon){ 
-	obj3dCommon_ = modelCommon;
-	camera_ = obj3dCommon_->GetDefaultCamera();
+void Object3d::Initialize(){ 
+	
+	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	CreateResources();
 	isUseSetWorld = false;
 }
@@ -54,12 +54,12 @@ void Object3d::Draw() {
 
 
 	// --- 座標変換行列CBufferの場所を設定 ---
-	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
+	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
 	// --- 平行光源CBufferの場所を設定 ---
-	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, obj3dCommon_->GetDirectionalLightResource()->GetGPUVirtualAddress());
-	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
-	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, obj3dCommon_->GetPointLightResource()->GetGPUVirtualAddress());
-	obj3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(6, obj3dCommon_->GetSpotLightResource()->GetGPUVirtualAddress());
+	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Object3dCommon::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
+	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, Object3dCommon::GetInstance()->GetPointLightResource()->GetGPUVirtualAddress());
+	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(6, Object3dCommon::GetInstance()->GetSpotLightResource()->GetGPUVirtualAddress());
 	if (model_) {
 		model_->Draw();
 	}
@@ -102,8 +102,8 @@ void Object3d::SetShininess(float shininess) {
 }
 
 void Object3d::CreateResources() {
-	transformResource_ = obj3dCommon_->CreateBufferResource(sizeof(TransformationMatrix));
-	cameraResource_ = obj3dCommon_->CreateBufferResource(sizeof(CameraForGpu));
+	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
+	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
 	
 
 

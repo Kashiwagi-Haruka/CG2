@@ -60,8 +60,8 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	TextureManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
 	ParticleManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
 	ModelManeger::GetInstance()->Initialize(dxCommon_.get());
-	obj3dCommon_ = std::make_unique<Object3dCommon>();
-	obj3dCommon_->Initialize(dxCommon_.get());
+	
+	Object3dCommon::GetInstance()->Initialize(dxCommon_.get());
 	spriteCommon_ = std::make_unique<SpriteCommon>();
 	spriteCommon_->Initialize(dxCommon_.get());
 }
@@ -92,10 +92,10 @@ LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
-void GameBase::SetDefaultCamera(Camera* camera) { obj3dCommon_->SetDefaultCamera(camera); }
+
 
 void GameBase::SpriteCommonSet() { spriteCommon_->DrawCommon(); }
-void GameBase::ModelCommonSet() { obj3dCommon_->DrawCommon(); }
+
 
 void GameBase::BeginFlame() {
 

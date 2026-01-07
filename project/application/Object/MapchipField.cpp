@@ -28,7 +28,7 @@ void MapchipField::Initialize(Camera* camera) {
     };
 
 	
-	fieldObj->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	fieldObj->Initialize();
 	fieldObj->SetModel("map");
 	fieldObj->SetCamera(camera_);
 	fieldObj->SetTransform(transform_);
@@ -56,7 +56,7 @@ void MapchipField::Update() {
 }
 
 void MapchipField::Draw() {
-	GameBase::GetInstance()->ModelCommonSet();
+	
 	fieldObj->Draw();
 }
 

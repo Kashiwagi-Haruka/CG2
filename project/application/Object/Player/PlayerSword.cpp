@@ -10,12 +10,12 @@ PlayerSword::PlayerSword() {
 
 void PlayerSword::Initialize() {
 	swordObject_ = std::make_unique<Object3d>();
-	swordObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	swordObject_->Initialize();
 	swordObject_->SetCamera(camera);
 	swordObject_->SetModel("playerSword");
 #ifdef _DEBUG
 	debugBox_ = std::make_unique<Object3d>();
-	debugBox_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	debugBox_->Initialize();
 	debugBox_->SetCamera(camera);
 	debugBox_->SetModel("debugBox");
 #endif // _DEBUG

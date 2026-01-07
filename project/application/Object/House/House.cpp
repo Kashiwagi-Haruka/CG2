@@ -1,6 +1,6 @@
 #define NOMINMAX
 #include "House.h"
-#include "GameBase.h"
+#include "Object3d/Object3dCommon.h"
 #include "Model/ModelManeger.h"
 #include "Function.h"
 #include <numbers>
@@ -16,7 +16,7 @@ void House::Initialize(Camera* camera) {
 	ModelManeger::GetInstance()->LoadModel("HPFlame");
 	object_ = std::make_unique<Object3d>();
 
-	object_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	object_->Initialize();
 	object_->SetModel("house");
 
 	object_->SetCamera(camera);
@@ -26,12 +26,12 @@ void House::Initialize(Camera* camera) {
 
 	hpbar_ = std::make_unique<Object3d>();
 	hpbar_->SetModel("HPBar");
-	hpbar_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	hpbar_->Initialize();
 	hpbar_->SetCamera(camera);
 
 	hpflame_ = std::make_unique<Object3d>();
 	hpflame_->SetModel("HPFlame");
-	hpflame_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	hpflame_->Initialize();
 	hpflame_->SetCamera(camera);
 
 	hpBarT_ = {
@@ -81,7 +81,7 @@ void House::Update(Camera* camera) {
 }
 
 void House::Draw() {
-	GameBase::GetInstance()->ModelCommonSet();
+
 	object_->Draw();
 	hpflame_->Draw();
 	hpbar_->Draw();

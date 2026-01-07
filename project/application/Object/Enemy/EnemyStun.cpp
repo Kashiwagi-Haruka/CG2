@@ -13,7 +13,7 @@ void EnemyStun::SetTranslate(Vector3 translate) { transform_.translate = transla
 void EnemyStun::Initialize() { 
 	
 	object_->SetCamera(camera_);
-	object_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	object_->Initialize();
 	object_->SetTransform(transform_);
 	object_->Update();
 

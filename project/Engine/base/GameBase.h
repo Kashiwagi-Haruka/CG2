@@ -12,7 +12,6 @@
 #include <memory>
 class SrvManager;
 class SpriteCommon;
-class Object3dCommon;
 class ModelCommon;
 class ImGuiManager;
 
@@ -27,7 +26,7 @@ private:
 	std::unique_ptr<SrvManager> srvManager_ = nullptr;
 
 	std::unique_ptr<SpriteCommon> spriteCommon_ = nullptr;
-	std::unique_ptr<Object3dCommon> obj3dCommon_ = nullptr;
+	
 
 	std::unique_ptr<ImGuiManager> imguiM_ = nullptr;
 
@@ -50,10 +49,7 @@ public:
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
 
 	void SpriteCommonSet();
-	void ModelCommonSet();
-
-	void SetDefaultCamera(Camera* camera);
-
+	
 	bool PushKey(BYTE keyNumber);
 	bool TriggerKey(BYTE keyNumber);
 	bool ReleaseKey(BYTE keyNumber);
@@ -156,5 +152,5 @@ public:
 	Vector2 GetMouseMove() const;
 
 	SpriteCommon* GetSpriteCommon() { return spriteCommon_.get(); };
-	Object3dCommon* GetObject3dCommon() { return obj3dCommon_.get(); };
+	
 };

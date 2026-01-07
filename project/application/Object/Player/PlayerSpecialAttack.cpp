@@ -21,7 +21,7 @@ void PlayerSpecialAttack::EnsureIceFlowerCount(int count) {
 	iceFlowerTransforms_.resize(static_cast<size_t>(count));
 	for (size_t i = 0; i < iceFlowers_->size(); i++) {
 		(*iceFlowers_)[i] = Object3d();
-		(*iceFlowers_)[i].Initialize(GameBase::GetInstance()->GetObject3dCommon());
+		(*iceFlowers_)[i].Initialize();
 		(*iceFlowers_)[i].SetCamera(camera_);
 		(*iceFlowers_)[i].SetModel("iceFlower");
 		iceFlowerTransforms_[i] = {
@@ -35,7 +35,7 @@ void PlayerSpecialAttack::EnsureIceFlowerCount(int count) {
 
 void PlayerSpecialAttack::Initialize() {
 	debugBox_ = std::make_unique<Object3d>();
-	debugBox_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	debugBox_->Initialize();
 	debugBox_->SetCamera(camera_);
 	debugBox_->SetModel("debugBox");
 	iceFlowers_ = std::make_unique<std::vector<Object3d>>();
@@ -98,10 +98,10 @@ void PlayerSpecialAttack::StartAttack(const Transform& playerTransform, int iceC
 	}
 }
 void PlayerSpecialAttack::Draw() {
-	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAdd);
+	Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAdd);
 	for (size_t i = 0; i < iceFlowers_->size(); i++) {
 		(*iceFlowers_)[i].Draw();
 	}
-	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAlpha);
+	Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
 	
 }

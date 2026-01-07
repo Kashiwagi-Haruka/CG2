@@ -11,7 +11,7 @@ EnemyAttack::EnemyAttack() {
 
 void EnemyAttack::Initialize(Camera* camera) {
 	camera_ = camera;
-	object_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	object_->Initialize();
 	object_->SetModel("EnemyAttack");
 	object_->SetCamera(camera_);
 }

@@ -45,9 +45,9 @@ void Player::Initialize(Camera* camera) {
         .translate{-100.0f, 2.5f, -100.0f}
     };
 
-	playerObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	playerObject_->Initialize();
 	playerObject_->SetModel("playerModel");
-	fallingEffectObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	fallingEffectObject_->Initialize();
 	fallingEffectObject_->SetModel("FallingEffect");
 
 	camera_ = camera;
@@ -541,13 +541,13 @@ void Player::EXPMath() { parameters_.EXP += 50; }
 
 void Player::Draw() {
 
-	GameBase::GetInstance()->ModelCommonSet();
+	
 	/*playerObject_->Draw();*/
 	models_->Draw();
 	if (isFallingAttack_) {
-	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAdd);
+		Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAdd);
 	fallingEffectObject_->Draw();
-	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAlpha);
+		Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
 	}
 	sword_->Draw();
 	if (isSkillAttack) {

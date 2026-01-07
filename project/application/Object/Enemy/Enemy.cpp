@@ -18,7 +18,7 @@ void Enemy::Initialize(Camera* camera,Vector3 translates) {
 	isStun_ = false;
 	HP = 3;
 	
-	object_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	object_->Initialize();
 	object_->SetModel("Enemy");
 	camera_ = camera;
 	transform_ = {

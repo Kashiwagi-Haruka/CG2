@@ -12,7 +12,7 @@
 #include "Light/PointLight.h"
 #include "CameraForGPU.h"
 class Camera;
-class Object3dCommon;
+
 class Model;
 class Object3d {
 
@@ -33,7 +33,7 @@ class Object3d {
 
 	Camera* camera_;
 
-	Object3dCommon* obj3dCommon_;
+	
 	
 
 	TransformationMatrix* transformationMatrixData_;
@@ -50,7 +50,7 @@ class Object3d {
 	bool isUseSetWorld;
 
 public:
-	void Initialize(Object3dCommon* modelCommon);
+	void Initialize();
 	void Update();
 	void Draw();
 

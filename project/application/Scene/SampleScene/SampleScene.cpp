@@ -27,10 +27,10 @@ SampleScene::SampleScene() {
 void SampleScene::Initialize() {
 
 	
-	uvBallObj_->Initialize(GameBase::GetInstance()->GetObject3dCommon()); 
+	uvBallObj_->Initialize(); 
 	uvBallObj_->SetCamera(camera_.get());
 	uvBallObj_->SetModel("uvBall");
-	fieldObj_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	fieldObj_->Initialize();
 	fieldObj_->SetCamera(camera_.get());
 	fieldObj_->SetModel("terrain");
 
@@ -102,9 +102,9 @@ void SampleScene::Update() {
 		
 	}
 	ImGui::End();
-	GameBase::GetInstance()->GetObject3dCommon()->SetDirectionalLight(directionalLight_);
-	GameBase::GetInstance()->GetObject3dCommon()->SetPointLight(pointLight_);
-	GameBase::GetInstance()->GetObject3dCommon()->SetSpotLight(spotLight_);
+	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+	Object3dCommon::GetInstance()->SetPointLight(pointLight_);
+	Object3dCommon::GetInstance()->SetSpotLight(spotLight_);
 	if (ImGui::Begin("SampleuvBall")) {
 		if (ImGui::TreeNode("Transform")) {
 		
@@ -135,7 +135,7 @@ void SampleScene::Update() {
 	fieldObj_->Update();
 }
 void SampleScene::Draw() { 
-	GameBase::GetInstance()->ModelCommonSet();
+	Object3dCommon::GetInstance()->DrawCommon();
 	uvBallObj_->Draw();
 	fieldObj_->Draw();
 }

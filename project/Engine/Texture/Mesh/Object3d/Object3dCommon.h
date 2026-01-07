@@ -12,6 +12,9 @@ class DirectXCommon;
 class Object3dCommon {
 
 private:
+
+	static std::unique_ptr<Object3dCommon> instance;
+
 	Camera* defaultCamera = nullptr;
 
 	DirectXCommon* dxCommon_ = nullptr;
@@ -33,6 +36,9 @@ private:
 
 
 public:
+	static Object3dCommon* GetInstance();
+	Object3dCommon();
+	~Object3dCommon();
 	void Initialize(DirectXCommon* dxCommon);
 	void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
 	Camera* GetDefaultCamera() const { return defaultCamera; };

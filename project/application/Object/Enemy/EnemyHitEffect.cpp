@@ -7,7 +7,7 @@ void EnemyHitEffect::Initialize() {
 	ModelManeger::GetInstance()->LoadModel("HitEffect");
 
 	hitEffect_ = std::make_unique<Object3d>();
-	hitEffect_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	hitEffect_->Initialize();
 	hitEffect_->SetModel("HitEffect");
 	hitEffect_->SetEnableLighting(false);
 	hitEffect_->SetCamera(camera_);

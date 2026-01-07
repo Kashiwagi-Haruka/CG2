@@ -30,11 +30,11 @@ void PlayerModels::Initialize() {
 	legL_->SetModel("playerLleg");
 	legR_->SetModel("playerRleg");
 
-	head_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
-	armR_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
-	armL_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
-	legL_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
-	legR_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	head_->Initialize();
+	armR_->Initialize();
+	armL_->Initialize();
+	legL_->Initialize();
+	legR_->Initialize();
 
 	// ★ ローカル位置（player基準）
 	headT_ = {

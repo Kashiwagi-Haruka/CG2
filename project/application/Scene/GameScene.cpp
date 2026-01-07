@@ -54,7 +54,7 @@ void GameScene::Initialize() {
 	isBGMPlaying = false;
 	cameraController->Initialize();
 
-	GameBase::GetInstance()->SetDefaultCamera(cameraController->GetCamera());
+	Object3dCommon::GetInstance()->SetDefaultCamera(cameraController->GetCamera());
 
 	skyDome->Initialize(cameraController->GetCamera());
 	player->Initialize(cameraController->GetCamera());
@@ -263,9 +263,9 @@ void GameScene::Update() {
 	}
 
 	DebugImGui();
-	GameBase::GetInstance()->GetObject3dCommon()->SetDirectionalLight(directionalLight_);
-	GameBase::GetInstance()->GetObject3dCommon()->SetPointLight(pointLight_);
-	GameBase::GetInstance()->GetObject3dCommon()->SetSpotLight(spotLight_);
+	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+	Object3dCommon::GetInstance()->SetPointLight(pointLight_);
+	Object3dCommon::GetInstance()->SetSpotLight(spotLight_);
 	skyDome->SetCamera(cameraController->GetCamera());
 	player->SetCamera(cameraController->GetCamera());
 	field->SetCamera(cameraController->GetCamera());
@@ -501,7 +501,7 @@ void GameScene::Update() {
 
 void GameScene::Draw() {
 
-	GameBase::GetInstance()->ModelCommonSet();
+	Object3dCommon::GetInstance()->DrawCommon();
 	skyDome->Draw();
 	field->Draw();
 	house->Draw();

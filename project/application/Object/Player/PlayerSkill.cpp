@@ -7,24 +7,24 @@ PlayerSkill::PlayerSkill() {
 }
 void PlayerSkill::Initialize() {
 	debugBox_ = std::make_unique<Object3d>();
-	debugBox_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	debugBox_->Initialize();
 	debugBox_->SetCamera(camera_);
 	debugBox_->SetModel("debugBox");
 	debugDamageBox1_ = std::make_unique<Object3d>();
-	debugDamageBox1_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	debugDamageBox1_->Initialize();
 	debugDamageBox1_->SetCamera(camera_);
 	debugDamageBox1_->SetModel("debugBox");
 	debugDamageBox2_ = std::make_unique<Object3d>();
-	debugDamageBox2_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	debugDamageBox2_->Initialize();
 	debugDamageBox2_->SetCamera(camera_);
 	debugDamageBox2_->SetModel("debugBox");
 	skillUpObject_ = std::make_unique<Object3d>();
-	skillUpObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	skillUpObject_->Initialize();
 	skillUpObject_->SetCamera(camera_);
 	skillUpObject_->SetModel("playerSkillUp");
 
 	skillUnderObject_ = std::make_unique<Object3d>();
-	skillUnderObject_->Initialize(GameBase::GetInstance()->GetObject3dCommon());
+	skillUnderObject_->Initialize();
 	skillUnderObject_->SetCamera(camera_);
 	skillUnderObject_->SetModel("playerSkillUnder");
 	transform_ = {
@@ -150,12 +150,12 @@ void PlayerSkill::Draw() {
 		skillEmitter_->Draw();
 	}
 	}
-	GameBase::GetInstance()->ModelCommonSet();
-	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendScreen);
+	
+	Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendScreen);
 	skillUpObject_->Draw();
 	skillUnderObject_->Draw();
 
-	GameBase::GetInstance()->GetObject3dCommon()->SetBlendMode(BlendMode::kBlendModeAlpha);
+	Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
 }
 
 
