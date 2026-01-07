@@ -1,11 +1,11 @@
 #define NOMINMAX
 #include "GameBase.h"
 #include "ImGuiManager.h"
-#include "ModelManeger.h"
-#include "Object3dCommon.h"
+#include "Model/ModelManeger.h"
+#include "Object3d/Object3dCommon.h"
 #include "ParticleManager.h"
 #include "SpriteCommon.h"
-#include "SrvManager.h"
+#include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
 #include <DbgHelp.h>
 #include <dxgidebug.h>

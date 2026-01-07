@@ -1,7 +1,7 @@
 #include "Enemy.h"
 #include "GameBase.h"
-#include "ModelManeger.h"
-#include "Object3d.h"
+#include "Model/ModelManeger.h"
+#include "Object3d/Object3d.h"
 #include "Camera.h"
 #include <algorithm>
 

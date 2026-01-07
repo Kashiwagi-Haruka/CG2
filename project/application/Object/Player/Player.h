@@ -1,6 +1,6 @@
 #pragma once
 #include "Input.h"
-#include "Object3d.h"
+#include "Object3d/Object3d.h"
 #include "PlayerParameters.h"
 #include "PlayerSword.h"
 #include "PlayerSkill.h"

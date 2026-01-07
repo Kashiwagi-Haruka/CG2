@@ -1,7 +1,7 @@
 #include "MapchipField.h"
 #include "GameBase.h"
-#include "ModelManeger.h"
-#include "Object3d.h"
+#include "Model/ModelManeger.h"
+#include "Object3d/Object3d.h"
 
 const float MapchipField::kTileSize = 1.0f;
 

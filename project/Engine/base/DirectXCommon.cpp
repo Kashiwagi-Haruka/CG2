@@ -6,7 +6,7 @@
 #include <format>
 #include <dxcapi.h>
 #include <thread>
-#include "SrvManager.h"
+#include "SrvManager/SrvManager.h"
 #include "ParticleManager.h"
 
 #pragma comment(lib, "d3d12.lib")

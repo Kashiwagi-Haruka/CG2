@@ -6,7 +6,7 @@
 #include <cassert>
 #include "TextureManager.h"
 #include "Function.h"
-#include "SrvManager.h"
+#include "SrvManager/SrvManager.h"
 
 void Model::Initialize(ModelCommon* modelCommon) {
 

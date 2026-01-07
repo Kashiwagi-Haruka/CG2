@@ -158,6 +158,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
   <ItemGroup>
     <ClCompile Include="application\Object\Enemy\EnemyAttack.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyHitEffect.cpp" />
+    <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp" />
     <ClCompile Include="Engine\BaseScene\AbstractSceneFactory.cpp" />
     <ClCompile Include="application\Object\Enemy\Enemy.cpp" />
     <ClCompile Include="application\CameraController.cpp" />
@@ -171,7 +172,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\math\RigidBody.cpp" />
-    <ClCompile Include="Engine\Texture\BlendModeManeger.cpp" />
+    <ClCompile Include="Engine\Texture\BlendMode\BlendModeManager.cpp" />
     <ClCompile Include="Engine\base\DirectXCommon.cpp" />
     <ClCompile Include="Engine\LeakChecker\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -200,18 +201,18 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\ImGui\ImGuiManager.cpp" />
     <ClCompile Include="application\main.cpp" />
     <ClCompile Include="Engine\base\WinApp.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Object3d.cpp" />
+    <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3d.cpp" />
     <ClCompile Include="Engine\Log\Logger.cpp" />
     <ClCompile Include="Engine\stringUtillity\StringUtility.cpp" />
     <ClCompile Include="application\Scene\GameScene.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Object3dCommon.cpp" />
+    <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3dCommon.cpp" />
     <ClCompile Include="Engine\Texture\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\Texture\Sprite\SpriteCommon.cpp" />
     <ClCompile Include="Engine\Texture\TextureManager.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Model.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\ModelCommon.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\ModelManeger.cpp" />
-    <ClCompile Include="Engine\Texture\SrvManager.cpp" />
+    <ClCompile Include="Engine\Texture\Mesh\Model\Model.cpp" />
+    <ClCompile Include="Engine\Texture\Mesh\Model\ModelCommon.cpp" />
+    <ClCompile Include="Engine\Texture\Mesh\Model\ModelManeger.cpp" />
+    <ClCompile Include="Engine\Texture\SrvManager\SrvManager.cpp" />
     <ClCompile Include="Engine\Texture\Particle\ParticleManager.cpp" />
     <ClCompile Include="Engine\Texture\Particle\ParticleEmitter.cpp" />
     <ClCompile Include="application\Object\Player\Player.cpp" />
@@ -254,6 +255,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
   <ItemGroup>
     <ClInclude Include="application\Object\Enemy\EnemyAttack.h" />
     <ClInclude Include="application\Object\Enemy\EnemyHitEffect.h" />
+    <ClInclude Include="Engine\Texture\PSO\CreatePSO.h" />
     <ClInclude Include="Engine\BaseScene\AbstractSceneFactory.h" />
     <ClInclude Include="application\Object\Enemy\Enemy.h" />
     <ClInclude Include="application\CameraController.h" />
@@ -269,7 +271,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\math\RigidBody.h" />
     <ClInclude Include="Engine\math\Transform.h" />
-    <ClInclude Include="Engine\Texture\BlendModeManeger.h" />
+    <ClInclude Include="Engine\Texture\BlendMode\BlendModeManager.h" />
     <ClInclude Include="Engine\base\DirectXCommon.h" />
     <ClInclude Include="Engine\LeakChecker\D3DResourceLeakChecker.h" />
     <ClInclude Include="Engine\Texture\Light\PointLight.h" />
@@ -291,18 +293,18 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\math\Vector4.h" />
     <ClInclude Include="Engine\Texture\VertexData.h" />
     <ClInclude Include="Engine\base\WinApp.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Object3d.h" />
+    <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3d.h" />
     <ClInclude Include="Engine\Log\Logger.h" />
     <ClInclude Include="Engine\stringUtillity\StringUtility.h" />
     <ClInclude Include="application\Scene\GameScene.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Object3dCommon.h" />
+    <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3dCommon.h" />
     <ClInclude Include="Engine\Texture\Sprite\Sprite.h" />
     <ClInclude Include="Engine\Texture\Sprite\SpriteCommon.h" />
     <ClInclude Include="Engine\Texture\TextureManager.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Model.h" />
-    <ClInclude Include="Engine\Texture\Mesh\ModelCommon.h" />
-    <ClInclude Include="Engine\Texture\Mesh\ModelManeger.h" />
-    <ClInclude Include="Engine\Texture\SrvManager.h" />
+    <ClInclude Include="Engine\Texture\Mesh\Model\Model.h" />
+    <ClInclude Include="Engine\Texture\Mesh\Model\ModelCommon.h" />
+    <ClInclude Include="Engine\Texture\Mesh\Model\ModelManeger.h" />
+    <ClInclude Include="Engine\Texture\SrvManager\SrvManager.h" />
     <ClInclude Include="Engine\Texture\Particle\ParticleManager.h" />
     <ClInclude Include="Engine\Texture\Particle\ParticleEmitter.h" />
     <ClInclude Include="application\Object\Player\Player.h" />

@@ -1,6 +1,6 @@
-#include "ModelManeger.h"
-#include "ModelCommon.h"
-#include "Model.h"
+#include "Model/ModelManeger.h"
+#include "Model/ModelCommon.h"
+#include "Model/Model.h"
 
 std::unique_ptr<ModelManeger> ModelManeger::instance = nullptr;
 

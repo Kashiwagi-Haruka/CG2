@@ -1,6 +1,6 @@
 #pragma once
 #include "BaseScene.h"
-#include "Object3d.h"
+#include "Object3d/Object3d.h"
 #include "Camera.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"

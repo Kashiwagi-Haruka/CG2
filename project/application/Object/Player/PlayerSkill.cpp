@@ -1,6 +1,6 @@
 #include "PlayerSkill.h"
 #include "GameBase.h"
-#include "Object3dCommon.h"
+#include "Object3d/Object3dCommon.h"
 PlayerSkill::PlayerSkill() {
 	state = up;
 	isSkillEnd = true;

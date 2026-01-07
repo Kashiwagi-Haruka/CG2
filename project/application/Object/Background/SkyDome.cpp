@@ -1,6 +1,6 @@
 #include "SkyDome.h"
 #include "GameBase.h"
-#include "ModelManeger.h"
+#include "Model/ModelManeger.h"
 #include "Camera.h"
 
 SkyDome::SkyDome() {

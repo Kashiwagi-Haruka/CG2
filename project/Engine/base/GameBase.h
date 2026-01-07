@@ -1,6 +1,6 @@
 #pragma once
 #include "Audio.h"
-#include "BlendModeManeger.h"
+#include "BlendMode/BlendModeManager.h"
 #include "Camera.h"
 #include "DirectXCommon.h"
 #include "Function.h"

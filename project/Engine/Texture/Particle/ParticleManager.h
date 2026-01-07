@@ -7,7 +7,7 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include <cstdint>
-#include "BlendModeManeger.h"
+#include "BlendMode/BlendModeManager.h"
 #include "Transform.h"
 #include "RigidBody.h"
 #include "Vector4.h"
@@ -103,7 +103,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob_;
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
 
-	BlendModeManeger blendModeManeger_;
+	BlendModeManager blendModeManeger_;
 	BlendMode currentBlendMode_ = BlendMode::kBlendModeAlpha;
 
 	// ... 既存のメンバ変数の下に追加

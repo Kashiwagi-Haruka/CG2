@@ -9,7 +9,7 @@
 #include <string>
 #include "WinApp.h"
 #include "DirectXCommon.h"
-#include "SrvManager.h"
+#include "SrvManager/SrvManager.h"
 
 
 

@@ -1,7 +1,7 @@
-#include "BlendModeManeger.h"
+#include "BlendModeManager.h"
 #include <cassert>
 
-D3D12_BLEND_DESC BlendModeManeger::SetBlendMode(BlendMode blendMode) {
+D3D12_BLEND_DESC BlendModeManager::SetBlendMode(BlendMode blendMode) {
 	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.AlphaToCoverageEnable = FALSE;
 	blendDesc.IndependentBlendEnable = FALSE;

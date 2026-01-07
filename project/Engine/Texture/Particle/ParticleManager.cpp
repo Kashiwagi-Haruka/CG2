@@ -2,7 +2,7 @@
 #include "Camera.h"
 #include "DirectXCommon.h"
 #include "Logger.h"
-#include "SrvManager.h"
+#include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
 #include "VertexData.h"
 #include <cassert>

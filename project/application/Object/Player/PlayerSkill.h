@@ -1,5 +1,5 @@
 #pragma once
-#include "Object3d.h"
+#include "Object3d/Object3d.h"
 #include <memory>
 #include "Transform.h"
 #include "Camera.h"

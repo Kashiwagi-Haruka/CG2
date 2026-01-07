@@ -1,10 +1,10 @@
 #pragma once
 #include <Windows.h>
 #include <wrl.h>
-#include "BlendModeManeger.h"
+#include "BlendMode/BlendModeManager.h"
 class DirectXCommon;
 
-class BlendmodeManeger;
+class BlendmodeManager;
 
 class SpriteCommon {
 
@@ -19,7 +19,7 @@ class SpriteCommon {
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
 
 	BlendMode blendMode_ = BlendMode::kBlendModeAlpha;
-	BlendModeManeger blendModeManeger_;
+	BlendModeManager blendModeManager_;
 
 	HRESULT hr_;
 

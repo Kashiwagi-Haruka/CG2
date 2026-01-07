@@ -3,7 +3,7 @@
 #include "Function.h"
 #include "DirectXCommon.h"
 #include "TextureManager.h"
-#include "SrvManager.h"
+#include "SrvManager/SrvManager.h"
 void Sprite::Initialize(SpriteCommon* spriteCommon,uint32_t Handle){
 
 	spriteCommon_ = spriteCommon;

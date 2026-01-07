@@ -14,7 +14,7 @@ enum BlendMode {
 	kCountOfBlendMode   // ブレンドモードの数.使用禁止
 };
 
-class BlendModeManeger {
+class BlendModeManager {
 
 	private:
 

@@ -1,11 +1,11 @@
-#include "Object3d.h"
-#include "Object3dCommon.h"
+#include "Object3d/Object3d.h"
+#include "Object3d/Object3dCommon.h"
 #include "DirectXCommon.h"
 #include <cassert>
 #include "Function.h"
 #include "TextureManager.h"
-#include "ModelManeger.h"
-#include "Model.h"
+#include "Model/ModelManeger.h"
+#include "Model/Model.h"
 #include "Camera.h"
 
 

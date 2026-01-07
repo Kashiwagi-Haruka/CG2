@@ -1,10 +1,10 @@
 #include "GameScene.h"
 #include "CameraController.h"
-#include "ModelManeger.h"
+#include "Model/ModelManeger.h"
 #include "Object/Background/SkyDome.h"
 #include "Object/Enemy/EnemyManager.h"
 #include "Object/Player/Player.h"
-#include "Object3dCommon.h"
+#include "Object3d/Object3dCommon.h"
 #include "ParticleManager.h"
 #include "SceneManager.h"
 #include <numbers>

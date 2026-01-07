@@ -1,6 +1,6 @@
 #include "EnemyHitEffect.h"
 #include "GameBase.h"
-#include "ModelManeger.h"
+#include "Model/ModelManeger.h"
 #include <numbers>
 void EnemyHitEffect::Initialize() {
 

@@ -121,7 +121,7 @@ void SpriteCommon::CreateGraphicsPipeline() {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
 	baseDesc.pRootSignature = rootSignature_.Get();
 	baseDesc.InputLayout = inputLayoutDesc;
-	baseDesc.BlendState = blendModeManeger_.SetBlendMode(blendMode_);
+	baseDesc.BlendState = blendModeManager_.SetBlendMode(blendMode_);
 	baseDesc.NumRenderTargets = 1;
 	baseDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	baseDesc.DepthStencilState = depthStencilDesc;
@@ -138,7 +138,7 @@ void SpriteCommon::CreateGraphicsPipeline() {
     // 修正案: IID_PPV_ARGSの引数にgraphicsPipelineState_[i].ReleaseAndGetAddressOf()を使う
     for (int i = 0; i < BlendMode::kCountOfBlendMode; i++) {
         D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = baseDesc;
-        psoDesc.BlendState = blendModeManeger_.SetBlendMode(static_cast<BlendMode>(i));
+        psoDesc.BlendState = blendModeManager_.SetBlendMode(static_cast<BlendMode>(i));
         psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
         psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
         D3D12_RASTERIZER_DESC rasterizerDesc{};

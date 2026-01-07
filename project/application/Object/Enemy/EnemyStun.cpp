@@ -1,5 +1,5 @@
 #include "EnemyStun.h"
-#include "ModelManeger.h"
+#include "Model/ModelManeger.h"
 #include "GameBase.h"
 
 EnemyStun::EnemyStun() {

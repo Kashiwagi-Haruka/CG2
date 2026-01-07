@@ -1,10 +1,11 @@
 #pragma once
 #include <Windows.h>
 #include <wrl.h>
-#include "BlendModeManeger.h"
+#include "PSO/CreatePSO.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
+#include <memory>
 class Camera;
 class DirectXCommon;
 
@@ -18,13 +19,9 @@ private:
 	HRESULT hr_;
 
 	BlendMode blendMode_ = BlendMode::kBlendModeNone;
-	BlendModeManeger blendModeManeger_;
+	BlendModeManager blendModeManeger_;
 
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_[6];
-
-	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob_;
-	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
+	std::unique_ptr<CreatePSO> pso_;
 
 	// Directional Light（共通）
 	DirectionalLight* directionalLightData_ = nullptr;
@@ -34,10 +31,6 @@ private:
 	SpotLight* spotlightData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_ = nullptr;
 
-private:
-	void CreateRootsignature();
-
-	void CreateGraphicsPipeline();
 
 public:
 	void Initialize(DirectXCommon* dxCommon);

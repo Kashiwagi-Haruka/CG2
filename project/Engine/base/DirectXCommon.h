@@ -23,12 +23,12 @@
 #include "VertexData.h"
 #include "Matrix4x4.h"
 #include "Function.h"
-#include "BlendModeManeger.h"
+#include "BlendMode/BlendModeManager.h"
 #include "Transform.h"
 #include "Light/DirectionalLight.h"
 
 
-class BlendModeManeger;
+class BlendModeManager;
 class SrvManager;
 
 class DirectXCommon {

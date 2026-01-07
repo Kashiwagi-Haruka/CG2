@@ -3,11 +3,11 @@
 #include "Camera.h"
 #include "Function.h"
 #include "GameBase.h"
-#include "ModelManeger.h"
+#include "Model/ModelManeger.h"
 #include "Object/MapchipField.h"
 #include <algorithm>
 #include <numbers>
-#include "Object3dCommon.h"
+#include "Object3d/Object3dCommon.h"
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI

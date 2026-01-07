@@ -1,7 +1,7 @@
 #include "SampleScene.h"
 #include "GameBase.h"
-#include "ModelManeger.h"
-#include "Object3dCommon.h"
+#include "Model/ModelManeger.h"
+#include "Object3d/Object3dCommon.h"
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
@@ -99,8 +99,9 @@ void SampleScene::Update() {
 			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLight_.cosFalloffStart, 0.1f, 0.0f, 1.0f);
 			ImGui::TreePop();
 		}
-		ImGui::End();
+		
 	}
+	ImGui::End();
 	GameBase::GetInstance()->GetObject3dCommon()->SetDirectionalLight(directionalLight_);
 	GameBase::GetInstance()->GetObject3dCommon()->SetPointLight(pointLight_);
 	GameBase::GetInstance()->GetObject3dCommon()->SetSpotLight(spotLight_);
@@ -122,9 +123,9 @@ void SampleScene::Update() {
 		ImGui::TreePop();
 		}
 	
-		ImGui::End();
+		
 	}
-
+	ImGui::End();
 
 #endif // USE_IMGUI
 	camera_->Update();

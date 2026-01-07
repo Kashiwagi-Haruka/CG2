@@ -1,7 +1,7 @@
 #define NOMINMAX
 #include "House.h"
 #include "GameBase.h"
-#include "ModelManeger.h"
+#include "Model/ModelManeger.h"
 #include "Function.h"
 #include <numbers>
 #include "Object/House/HouseHP.h"
