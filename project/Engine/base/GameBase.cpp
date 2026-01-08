@@ -62,8 +62,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	ModelManeger::GetInstance()->Initialize(dxCommon_.get());
 	
 	Object3dCommon::GetInstance()->Initialize(dxCommon_.get());
-	spriteCommon_ = std::make_unique<SpriteCommon>();
-	spriteCommon_->Initialize(dxCommon_.get());
+
 }
 
 bool GameBase::ProcessMessage() { return winApp_->ProcessMessage(); }
@@ -94,7 +93,7 @@ LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 
 
 
-void GameBase::SpriteCommonSet() { spriteCommon_->DrawCommon(); }
+
 
 
 void GameBase::BeginFlame() {

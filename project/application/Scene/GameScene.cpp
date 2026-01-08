@@ -5,6 +5,7 @@
 #include "Object/Enemy/EnemyManager.h"
 #include "Object/Player/Player.h"
 #include "Object3d/Object3dCommon.h"
+#include "Sprite/SpriteCommon.h"
 #include "ParticleManager.h"
 #include "SceneManager.h"
 #include <numbers>
@@ -515,10 +516,10 @@ void GameScene::Draw() {
 	particles->Draw();
 	
 
-	GameBase::GetInstance()->SpriteCommonSet();
+	SpriteCommon::GetInstance()->DrawCommon();
 	uimanager->Draw();
 	if (isPhaseSpriteActive_) {
-		GameBase::GetInstance()->SpriteCommonSet();
+		
 		phaseSprites_[currentPhaseSpriteIndex_]->Draw();
 	}
 	// =============================
@@ -526,7 +527,7 @@ void GameScene::Draw() {
 	// =============================
 	if (isLevelSelecting) {
 
-		GameBase::GetInstance()->SpriteCommonSet();
+		
 
 		// 左と右の選択肢
 		int leftID = selectChoices[0];

@@ -1,5 +1,6 @@
 #include "ResultScene.h"
 #include "GameBase.h"
+#include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 #include "SceneManager.h"
 #include "GameTimer.h"
@@ -151,7 +152,7 @@ void ResultScene::Update() {
 }
 
 void ResultScene::Draw() {
-	GameBase::GetInstance()->SpriteCommonSet();
+	SpriteCommon::GetInstance()->DrawCommon();
 	logoSP_.sprite->Draw();
 	for (int i = 0; i < 3; ++i) {
 		starSP_[i].sprite->Draw();

@@ -2,7 +2,7 @@
 #include "GameBase.h"
 #include "TextureManager.h"
 #include "SceneManager.h"
-
+#include "Sprite/SpriteCommon.h"
 GameOverScene::GameOverScene() {
 
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/over.png");
@@ -65,7 +65,7 @@ void GameOverScene::Update() {
 }
 
 void GameOverScene::Draw() {
-	GameBase::GetInstance()->SpriteCommonSet();
+	SpriteCommon::GetInstance()->DrawCommon();
 	logoSP_.sprite->Draw();
 	pressSpaceSprite->Draw();
 	if (isTransitionIn || isTransitionOut) {

@@ -2,6 +2,7 @@
 #include "UIManager.h"
 #include "GameBase.h"
 #include "Sprite.h"
+#include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 
 UIManager::UIManager() {
@@ -257,7 +258,7 @@ void UIManager::Update() {
 
 void UIManager::Draw() {
 
-	GameBase::GetInstance()->SpriteCommonSet();
+	SpriteCommon::GetInstance()->DrawCommon();
 
 	playerHpSPData.sprite->Draw();
 	playerHPFlameSPData.sprite->Draw();

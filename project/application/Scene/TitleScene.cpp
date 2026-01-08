@@ -1,5 +1,6 @@
 #include "TitleScene.h"
 #include "GameBase.h"
+#include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 #include <imgui.h>
 #include "SceneManager.h"
@@ -87,7 +88,7 @@ void TitleScene::Update(){
 }
 void TitleScene::Draw(){
 
-	GameBase::GetInstance()->SpriteCommonSet();
+	SpriteCommon::GetInstance()->DrawCommon();
 	BGSP_.sprite->Draw();
 	logoSP_.sprite->Draw();
 	pressSpaceSprite->Draw();

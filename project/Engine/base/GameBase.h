@@ -25,9 +25,6 @@ private:
 	std::unique_ptr<DirectXCommon> dxCommon_ = nullptr;
 	std::unique_ptr<SrvManager> srvManager_ = nullptr;
 
-	std::unique_ptr<SpriteCommon> spriteCommon_ = nullptr;
-	
-
 	std::unique_ptr<ImGuiManager> imguiM_ = nullptr;
 
 	HRESULT hr_;
@@ -48,7 +45,7 @@ public:
 
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
 
-	void SpriteCommonSet();
+	
 	
 	bool PushKey(BYTE keyNumber);
 	bool TriggerKey(BYTE keyNumber);
@@ -151,6 +148,6 @@ public:
 	float GetMouseY() const;
 	Vector2 GetMouseMove() const;
 
-	SpriteCommon* GetSpriteCommon() { return spriteCommon_.get(); };
+	
 	
 };
