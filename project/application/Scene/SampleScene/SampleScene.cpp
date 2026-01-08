@@ -78,7 +78,6 @@ void SampleScene::Update() {
 		}
 		ImGui::End();
 	}
-	camera_->SetTransform(cameraTransform_);
 	if (ImGui::Begin("SampleLight")) {
 		if (ImGui::TreeNode("DirectionalLight")) {
 			ImGui::ColorEdit4("LightColor", &directionalLight_.color.x);
@@ -118,9 +117,6 @@ void SampleScene::Update() {
 		}
 	}
 	ImGui::End();
-	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
-	Object3dCommon::GetInstance()->SetSpotLight(spotLight_);
 	if (ImGui::Begin("SampleuvBall")) {
 		if (ImGui::TreeNode("Transform")) {
 
@@ -142,6 +138,10 @@ void SampleScene::Update() {
 	ImGui::End();
 
 #endif // USE_IMGUI
+	camera_->SetTransform(cameraTransform_);
+	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
+	Object3dCommon::GetInstance()->SetSpotLight(spotLight_);
 	camera_->Update();
 
 	uvBallObj_->SetTransform(uvBallTransform_);
