@@ -1,22 +1,24 @@
 #pragma once
-#include "GameBase.h"
-#include "Sprite.h"
-#include "Object3d/Object3d.h"
-#include "Particles.h"
-#include <imgui.h>
-#include "Object/MapchipField.h"
 #include "Audio.h"
-#include "SceneTransition.h"
-#include "UIManager.h"
 #include "BaseScene.h"
-#include "Object/House/House.h"
+#include "GameBase.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
+#include "Object/House/House.h"
+#include "Object/MapchipField.h"
+#include "Object3d/Object3d.h"
+#include "Particles.h"
 #include "Pause.h"
+#include "SceneTransition.h"
+#include "Sprite.h"
+#include "UIManager.h"
 #include "Vector2.h"
+#include <array>
+#include <cstdint>
+#include <imgui.h>
 #include <string>
-class Player;
+    class Player;
 class Enemy;
 class CameraController;
 class SkyDome;
@@ -68,7 +70,8 @@ class GameScene: public BaseScene{
 
     
 	DirectionalLight directionalLight_{};
-	PointLight pointLight_{};
+	std::array<PointLight, kMaxPointLights> pointLights_{};
+	uint32_t activePointLightCount_ = 0;
 	SpotLight spotLight_{};
 	
 	bool goalActive = false; // 敵全滅後に true になる
