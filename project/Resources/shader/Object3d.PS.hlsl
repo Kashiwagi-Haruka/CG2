@@ -75,7 +75,6 @@ PixelShaderOutput main(VertexShaderOutput input)
         
 // Point Light
         float3 N = normalize(input.normal);
-        N.x = -N.x;
         float3 diffuseP = float3(0.0f, 0.0f, 0.0f);
         float3 specularP = float3(0.0f, 0.0f, 0.0f);
         for (int i = 0; i < gPointLight.count; ++i)
@@ -105,7 +104,8 @@ PixelShaderOutput main(VertexShaderOutput input)
         float specularPowS = pow(saturate(dot(N, normalize(spotLightDirectionOnsurface + toEye))), gMaterial.shininess);
         float cosAngle = dot(spotLightDirectionOnsurface, spotDirection);
         float falloffFactor = saturate((cosAngle - gSpotLight.cosAngle) / (gSpotLight.cosFalloffStart - gSpotLight.cosAngle));
-        float attenuationFactor = pow(saturate(1.0f - gSpotLight.distance / gSpotLight.cosAngle), gSpotLight.decay);
+        float spotDistance = length(gSpotLight.position - input.worldPosition);
+        float attenuationFactor = pow(saturate(1.0f - spotDistance / max(gSpotLight.distance, 0.0001f)), gSpotLight.decay);
         
         float3 spotLightDiffuse = gMaterial.color.rgb * textureColor.rgb * gSpotLight.color.rgb * gSpotLight.intensity * attenuationFactor * falloffFactor;
         float3 spotLightSpecular = gSpotLight.color.rgb * gSpotLight.intensity * attenuationFactor * falloffFactor;
