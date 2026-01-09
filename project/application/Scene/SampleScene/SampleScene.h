@@ -13,6 +13,7 @@ class SampleScene : public BaseScene {
 
 	std::unique_ptr<Object3d> uvBallObj_ = nullptr;
 	std::unique_ptr<Object3d> fieldObj_ = nullptr;
+	std::unique_ptr<Object3d> planeGltf_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
 	DirectionalLight directionalLight_{};
 	std::array<PointLight, kMaxPointLights> pointLights_{};

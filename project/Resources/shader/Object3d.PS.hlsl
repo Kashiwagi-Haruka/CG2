@@ -75,15 +75,11 @@ PixelShaderOutput main(VertexShaderOutput input)
         
 // Point Light
         float3 N = normalize(input.normal);
-        float3 diffuseP = float3(0.0f, 0.0f, 0.0f);
-        float3 specularP = float3(0.0f, 0.0f, 0.0f);
-        for (int i = 0; i < gPointLight.count; ++i)
-        {
-            PointLight light = gPointLight.lights[i];
-            float3 Lp = normalize(light.position - input.worldPosition);
-            float3 H = normalize(Lp + toEye); // ハーフベクトル
-            float distance = length(light.position - input.worldPosition);
-            float attenuation = pow(saturate(1.0f - distance / max(light.radius, 0.0001f)), light.decay);
+        
+        float3 Lp = normalize(gPointLight.position - input.worldPosition);
+        float3 H = normalize(Lp + toEye); // ハーフベクトル
+        float distance = length(gPointLight.position - input.worldPosition);
+        float attenuation = pow(saturate(1.0f - distance / gPointLight.radius), gPointLight.decay);
 
             // 拡散 (Lambert)
             float NdotL_p = saturate(dot(N, Lp));
