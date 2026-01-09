@@ -1,7 +1,6 @@
 #include "Object3d/Object3dCommon.h"
 #include "DirectXCommon.h"
 #include "Logger.h"
-#include <algorithm>
 #include <cassert>
 
 std::unique_ptr<Object3dCommon> Object3dCommon::instance = nullptr;
@@ -33,7 +32,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
         1.0f
     };
 	directionalLightResource_->Unmap(0, nullptr);
-	pointLightResource_ = CreateBufferResource(sizeof(PointLightSet));
+	pointLightResource_ = CreateBufferResource(sizeof(PointLight));
 	assert(pointLightResource_);
 
 	spotLightResource_ = CreateBufferResource(sizeof(SpotLight));
@@ -52,17 +51,13 @@ void Object3dCommon::SetBlendMode(BlendMode blendMode) {
 	blendMode_ = blendMode;
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get());
 }
-void Object3dCommon::SetPointLights(const PointLight* pointLights, uint32_t count) {
+void Object3dCommon::SetPointLight(PointLight pointlight) {
 	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointlightData_));
-	const uint32_t maxPointLights = static_cast<uint32_t>(kMaxPointLights);
-	uint32_t pointLightCount = std::min<uint32_t>(count, maxPointLights);
-	pointlightData_->count = static_cast<int>(pointLightCount);
-	for (uint32_t index = 0; index < pointLightCount; ++index) {
-		pointlightData_->lights[index] = pointLights[index];
-	}
-	for (uint32_t index = pointLightCount; index < maxPointLights; ++index) {
-		pointlightData_->lights[index] = {};
-	}
+	pointlightData_->color = pointlight.color;
+	pointlightData_->position = pointlight.position;
+	pointlightData_->intensity = pointlight.intensity;
+	pointlightData_->radius = pointlight.radius;
+	pointlightData_->decay = pointlight.decay;
 	pointLightResource_->Unmap(0, nullptr);
 }
 void Object3dCommon::SetSpotLight(SpotLight spotlight) {

@@ -29,7 +29,7 @@ private:
 	// Directional Light（共通）
 	DirectionalLight* directionalLightData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-	PointLightSet* pointlightData_;
+	PointLight* pointlightData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_ = nullptr;
 	SpotLight* spotlightData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_ = nullptr;
@@ -50,6 +50,6 @@ public:
 	ID3D12Resource* GetPointLightResource() const { return pointLightResource_.Get(); }
 	ID3D12Resource* GetSpotLightResource() const { return spotLightResource_.Get(); }
 	void SetDirectionalLight(DirectionalLight& light);
-	void SetPointLights(const PointLight* pointLights, uint32_t count);
+	void SetPointLight(PointLight pointLights);
 	void SetSpotLight(SpotLight spotlight);
 };

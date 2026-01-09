@@ -109,16 +109,12 @@ void GameScene::Initialize() {
 	isPhaseSpritePaused_ = false;
 
 	activePointLightCount_ = 2;
-	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLights_[0].position = {-75.0f, 5.0f, -75.0f};
-	pointLights_[0].intensity = 1.0f;
-	pointLights_[0].radius = 20.0f;
-	pointLights_[0].decay = 0.7f;
-	pointLights_[1].color = {0.8f, 0.9f, 1.0f, 1.0f};
-	pointLights_[1].position = {75.0f, 5.0f, 75.0f};
-	pointLights_[1].intensity = 0.8f;
-	pointLights_[1].radius = 25.0f;
-	pointLights_[1].decay = 0.6f;
+	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	pointLight_.position = {-75.0f, 5.0f, -75.0f};
+	pointLight_.intensity = 1.0f;
+	pointLight_.radius = 20.0f;
+	pointLight_.decay = 0.7f;
+	
 
 	directionalLight_.color = {0.3725f, 0.2667f, 0.7882f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.5f};
@@ -146,18 +142,15 @@ void GameScene::DebugImGui() {
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("PointLight")) {
-			int lightCount = static_cast<int>(activePointLightCount_);
-			if (ImGui::SliderInt("PointLightCount", &lightCount, 0, static_cast<int>(kMaxPointLights))) {
-				activePointLightCount_ = static_cast<uint32_t>(lightCount);
-			}
+
 			for (uint32_t index = 0; index < activePointLightCount_; ++index) {
 				ImGui::PushID(static_cast<int>(index));
 				if (ImGui::TreeNode("PointLight")) {
-					ImGui::ColorEdit4("PointLightColor", &pointLights_[index].color.x);
-					ImGui::DragFloat("PointLightIntensity", &pointLights_[index].intensity, 0.1f);
-					ImGui::DragFloat3("PointLightPosition", &pointLights_[index].position.x, 0.1f);
-					ImGui::DragFloat("PointLightRadius", &pointLights_[index].radius, 0.1f);
-					ImGui::DragFloat("PointLightDecay", &pointLights_[index].decay, 0.1f);
+					ImGui::ColorEdit4("PointLightColor", &pointLight_.color.x);
+					ImGui::DragFloat("PointLightIntensity", &pointLight_.intensity, 0.1f);
+					ImGui::DragFloat3("PointLightPosition", &pointLight_.position.x, 0.1f);
+					ImGui::DragFloat("PointLightRadius", &pointLight_.radius, 0.1f);
+					ImGui::DragFloat("PointLightDecay", &pointLight_.decay, 0.1f);
 					ImGui::TreePop();
 				}
 				ImGui::PopID();
@@ -280,7 +273,7 @@ void GameScene::Update() {
 
 DebugImGui();
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
+	Object3dCommon::GetInstance()->SetPointLight(pointLight_);
 	Object3dCommon::GetInstance()->SetSpotLight(spotLight_);
 	skyDome->SetCamera(cameraController->GetCamera());
 	player->SetCamera(cameraController->GetCamera());
