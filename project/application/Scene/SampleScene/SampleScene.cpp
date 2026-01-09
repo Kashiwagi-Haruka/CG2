@@ -12,6 +12,7 @@ SampleScene::SampleScene() {
 	
 	uvBallObj_ = std::make_unique<Object3d>();
 	fieldObj_ = std::make_unique<Object3d>();
+	planeGltf_ = std::make_unique<Object3d>();
 	cameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -23,6 +24,7 @@ SampleScene::SampleScene() {
 	
 	ModelManeger::GetInstance()->LoadModel("uvBall");
 	ModelManeger::GetInstance()->LoadModel("terrain");
+	ModelManeger::GetInstance()->LoadGltfModel("planeG");
 }
 void SampleScene::Initialize() {
 
@@ -33,6 +35,9 @@ void SampleScene::Initialize() {
 	fieldObj_->Initialize();
 	fieldObj_->SetCamera(camera_.get());
 	fieldObj_->SetModel("terrain");
+	planeGltf_->Initialize();
+	planeGltf_->SetCamera(camera_.get());
+	planeGltf_->SetModel("planeG");
 
 	uvBallTransform_ = {
 		.scale{1.0f, 1.0f, 1.0f  },
@@ -40,6 +45,7 @@ void SampleScene::Initialize() {
 		.translate{0.0f, 0.0f, 0.0f}
     };
 	uvBallObj_->SetTransform(uvBallTransform_);
+	planeGltf_->SetTransform(uvBallTransform_);
 	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLight_.position = {0.0f, 5.0f, 0.0f};
 	pointLight_.intensity = 1.0f;
@@ -131,12 +137,15 @@ void SampleScene::Update() {
 	camera_->Update();
 	
 	uvBallObj_->SetTransform(uvBallTransform_);
+	planeGltf_->SetTransform(uvBallTransform_);
 	uvBallObj_->Update();
 	fieldObj_->Update();
+	planeGltf_->Update();
 }
 void SampleScene::Draw() { 
 	Object3dCommon::GetInstance()->DrawCommon();
-	uvBallObj_->Draw();
+	/*uvBallObj_->Draw();*/
+	planeGltf_->Draw();
 	fieldObj_->Draw();
 }
 void SampleScene::Finalize() {

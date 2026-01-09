@@ -68,7 +68,7 @@ PixelShaderOutput main(VertexShaderOutput input)
         
 // Point Light
         float3 N = normalize(input.normal);
-        N.x = -N.x;
+        
         float3 Lp = normalize(gPointLight.position - input.worldPosition);
         float3 H = normalize(Lp + toEye); // ハーフベクトル
         float distance = length(gPointLight.position - input.worldPosition);
