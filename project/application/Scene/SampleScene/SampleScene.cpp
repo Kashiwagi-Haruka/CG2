@@ -44,6 +44,11 @@ void SampleScene::Initialize() {
 		.rotate{0.0f, 0.0f, 0.0f  },
 		.translate{0.0f, 0.0f, 0.0f}
     };
+	planeGTransform_ = {
+	    .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f, 0.0f, 0.0f},
+        .translate{0.0f, 1.0f, 0.0f}
+    };
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(uvBallTransform_);
 	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -131,6 +136,17 @@ void SampleScene::Update() {
 		}
 	}
 	ImGui::End();
+	if (ImGui::Begin("planeG")) {
+		if (ImGui::TreeNode("TransformG")) {
+
+			ImGui::DragFloat3("ScaleG", &planeGTransform_.scale.x, 0.1f);
+			ImGui::DragFloat3("RotateG", &planeGTransform_.rotate.x, 0.1f);
+			ImGui::DragFloat3("TranslateG", &planeGTransform_.translate.x, 0.1f);
+			ImGui::TreePop();
+		}
+		
+	}
+	ImGui::End();
 
 #endif // USE_IMGUI
 	camera_->SetTransform(cameraTransform_);
@@ -140,14 +156,14 @@ void SampleScene::Update() {
 	camera_->Update();
 
 	uvBallObj_->SetTransform(uvBallTransform_);
-	planeGltf_->SetTransform(uvBallTransform_);
+	planeGltf_->SetTransform(planeGTransform_);
 	uvBallObj_->Update();
 	fieldObj_->Update();
 	planeGltf_->Update();
 }
 void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
-	/*uvBallObj_->Draw();*/
+	uvBallObj_->Draw();
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 }

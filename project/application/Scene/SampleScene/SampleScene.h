@@ -21,6 +21,7 @@ class SampleScene : public BaseScene {
 	SpotLight spotLight_{};
 	Transform uvBallTransform_{};
 	Transform cameraTransform_{};
+	Transform planeGTransform_{};
 
 	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	bool enableLighting = true;
