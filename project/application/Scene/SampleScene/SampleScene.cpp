@@ -93,11 +93,11 @@ void SampleScene::Update() {
 			for (uint32_t index = 0; index < activePointLightCount_; ++index) {
 				ImGui::PushID(static_cast<int>(index));
 				if (ImGui::TreeNode("PointLight")) {
-					ImGui::ColorEdit4("PointLightColor", &pointLights_[index].color.x);
-					ImGui::DragFloat("PointLightIntensity", &pointLights_[index].intensity, 0.1f);
-					ImGui::DragFloat3("PointLightPosition", &pointLights_[index].position.x, 0.1f);
-					ImGui::DragFloat("PointLightRadius", &pointLights_[index].radius, 0.1f);
-					ImGui::DragFloat("PointLightDecay", &pointLights_[index].decay, 0.1f);
+					ImGui::ColorEdit4("PointLightColor", &pointLight_.color.x);
+					ImGui::DragFloat("PointLightIntensity", &pointLight_.intensity, 0.1f);
+					ImGui::DragFloat3("PointLightPosition", &pointLight_.position.x, 0.1f);
+					ImGui::DragFloat("PointLightRadius", &pointLight_.radius, 0.1f);
+					ImGui::DragFloat("PointLightDecay", &pointLight_.decay, 0.1f);
 					ImGui::TreePop();
 				}
 				ImGui::PopID();
@@ -140,7 +140,7 @@ void SampleScene::Update() {
 #endif // USE_IMGUI
 	camera_->SetTransform(cameraTransform_);
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
+	Object3dCommon::GetInstance()->SetPointLight(pointLight_);
 	Object3dCommon::GetInstance()->SetSpotLight(spotLight_);
 	camera_->Update();
 
