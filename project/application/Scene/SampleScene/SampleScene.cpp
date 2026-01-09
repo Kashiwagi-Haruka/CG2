@@ -85,25 +85,20 @@ void SampleScene::Update() {
 			ImGui::DragFloat("LightIntensity", &directionalLight_.intensity, 0.1f, 0.0f, 10.0f);
 			ImGui::TreePop();
 		}
+	
+		
+			
+				
 		if (ImGui::TreeNode("PointLight")) {
-			int lightCount = static_cast<int>(activePointLightCount_);
-			if (ImGui::SliderInt("PointLightCount", &lightCount, 0, static_cast<int>(kMaxPointLights))) {
-				activePointLightCount_ = static_cast<uint32_t>(lightCount);
-			}
-			for (uint32_t index = 0; index < activePointLightCount_; ++index) {
-				ImGui::PushID(static_cast<int>(index));
-				if (ImGui::TreeNode("PointLight")) {
-					ImGui::ColorEdit4("PointLightColor", &pointLight_.color.x);
-					ImGui::DragFloat("PointLightIntensity", &pointLight_.intensity, 0.1f);
-					ImGui::DragFloat3("PointLightPosition", &pointLight_.position.x, 0.1f);
-					ImGui::DragFloat("PointLightRadius", &pointLight_.radius, 0.1f);
-					ImGui::DragFloat("PointLightDecay", &pointLight_.decay, 0.1f);
-					ImGui::TreePop();
-				}
-				ImGui::PopID();
-			}
+			ImGui::ColorEdit4("PointLightColor", &pointLight_.color.x);
+			ImGui::DragFloat("PointLightIntensity", &pointLight_.intensity, 0.1f);
+			ImGui::DragFloat3("PointLightPosition", &pointLight_.position.x, 0.1f);
+			ImGui::DragFloat("PointLightRadius", &pointLight_.radius, 0.1f);
+			ImGui::DragFloat("PointLightDecay", &pointLight_.decay, 0.1f);
 			ImGui::TreePop();
 		}
+				
+		
 		if (ImGui::TreeNode("SpotLight")) {
 			ImGui::ColorEdit4("SpotLightColor", &spotLight_.color.x);
 			ImGui::DragFloat("SpotLightIntensity", &spotLight_.intensity, 0.1f);
