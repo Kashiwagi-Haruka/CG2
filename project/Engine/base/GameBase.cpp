@@ -37,6 +37,9 @@ void GameBase::Finalize() {
 	ParticleManager::GetInstance()->Finalize();
 	ModelManeger::GetInstance()->Finalize();
 
+	SpriteCommon::GetInstance()->Finalize();
+	Object3dCommon::GetInstance()->Finalize();
+
 	dxCommon_->Finalize();
 	winApp_->Finalize();
 	instance.reset();
@@ -62,7 +65,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	ModelManeger::GetInstance()->Initialize(dxCommon_.get());
 	
 	Object3dCommon::GetInstance()->Initialize(dxCommon_.get());
-
+	SpriteCommon::GetInstance()->Initialize(dxCommon_.get());
 }
 
 bool GameBase::ProcessMessage() { return winApp_->ProcessMessage(); }

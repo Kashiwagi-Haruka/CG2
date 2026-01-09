@@ -26,6 +26,7 @@ class SpriteCommon {
 	public:
 	static SpriteCommon* GetInstance();
 	void Initialize(DirectXCommon* dxCommon);
+	void Finalize();
 	void DrawCommon();
 
 	void CreateRootSignatures();

@@ -16,6 +16,8 @@ Object3dCommon* Object3dCommon::GetInstance() {
 	return instance.get();
 }
 
+void Object3dCommon::Finalize() { instance.reset(); }
+
 void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	pso_ = std::make_unique<CreatePSO>(dxCommon_);

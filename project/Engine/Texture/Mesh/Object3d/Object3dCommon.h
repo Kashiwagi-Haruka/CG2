@@ -39,6 +39,7 @@ public:
 	Object3dCommon();
 	~Object3dCommon();
 	void Initialize(DirectXCommon* dxCommon);
+	void Finalize();
 	void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
 	Camera* GetDefaultCamera() const { return defaultCamera; };
 	void DrawCommon();

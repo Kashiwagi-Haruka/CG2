@@ -11,8 +11,6 @@
 #include "WinApp.h"
 #include <memory>
 class SrvManager;
-class SpriteCommon;
-class ModelCommon;
 class ImGuiManager;
 
 class GameBase {
