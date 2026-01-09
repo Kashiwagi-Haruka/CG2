@@ -66,11 +66,11 @@ void SampleScene::Initialize() {
 	spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 }
 
-void SampleScene::Update() { 
+void SampleScene::Update() {
 #ifdef USE_IMGUI
 	if (ImGui::Begin("SampleCamera")) {
 		if (ImGui::TreeNode("Transform")) {
-		
+
 			ImGui::DragFloat3("Scale", &cameraTransform_.scale.x, 0.1f);
 			ImGui::DragFloat3("Rotate", &cameraTransform_.rotate.x, 0.1f);
 			ImGui::DragFloat3("Translate", &cameraTransform_.translate.x, 0.1f);
@@ -78,7 +78,6 @@ void SampleScene::Update() {
 		}
 		ImGui::End();
 	}
-	camera_->SetTransform(cameraTransform_);
 	if (ImGui::Begin("SampleLight")) {
 		if (ImGui::TreeNode("DirectionalLight")) {
 			ImGui::ColorEdit4("LightColor", &directionalLight_.color.x);
@@ -87,11 +86,22 @@ void SampleScene::Update() {
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("PointLight")) {
-			ImGui::ColorEdit4("PointLightColor", &pointLight_.color.x);
-			ImGui::DragFloat("PointLightIntensity", &pointLight_.intensity,0.1f);
-			ImGui::DragFloat3("PointLightPosition", &pointLight_.position.x,0.1f);
-			ImGui::DragFloat("PointLightRadius", &pointLight_.radius,0.1f);
-			ImGui::DragFloat("PointLightDecay", &pointLight_.decay,0.1f);
+			int lightCount = static_cast<int>(activePointLightCount_);
+			if (ImGui::SliderInt("PointLightCount", &lightCount, 0, static_cast<int>(kMaxPointLights))) {
+				activePointLightCount_ = static_cast<uint32_t>(lightCount);
+			}
+			for (uint32_t index = 0; index < activePointLightCount_; ++index) {
+				ImGui::PushID(static_cast<int>(index));
+				if (ImGui::TreeNode("PointLight")) {
+					ImGui::ColorEdit4("PointLightColor", &pointLights_[index].color.x);
+					ImGui::DragFloat("PointLightIntensity", &pointLights_[index].intensity, 0.1f);
+					ImGui::DragFloat3("PointLightPosition", &pointLights_[index].position.x, 0.1f);
+					ImGui::DragFloat("PointLightRadius", &pointLights_[index].radius, 0.1f);
+					ImGui::DragFloat("PointLightDecay", &pointLights_[index].decay, 0.1f);
+					ImGui::TreePop();
+				}
+				ImGui::PopID();
+			}
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("SpotLight")) {
@@ -105,51 +115,46 @@ void SampleScene::Update() {
 			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLight_.cosFalloffStart, 0.1f, 0.0f, 1.0f);
 			ImGui::TreePop();
 		}
-		
 	}
 	ImGui::End();
-	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-	Object3dCommon::GetInstance()->SetPointLight(pointLight_);
-	Object3dCommon::GetInstance()->SetSpotLight(spotLight_);
 	if (ImGui::Begin("SampleuvBall")) {
 		if (ImGui::TreeNode("Transform")) {
-		
+
 			ImGui::DragFloat3("Scale", &uvBallTransform_.scale.x, 0.1f);
 			ImGui::DragFloat3("Rotate", &uvBallTransform_.rotate.x, 0.1f);
 			ImGui::DragFloat3("Translate", &uvBallTransform_.translate.x, 0.1f);
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Material")) {
-		ImGui::ColorEdit4("MaterialColor", &color.x);
-		ImGui::Checkbox("EnableLighting", &enableLighting);
-		ImGui::DragFloat("Shininess", &shininess, 0.1f, 0.0f, 100.0f);
-		uvBallObj_->SetColor(color);
-		uvBallObj_->SetEnableLighting(enableLighting);
-		uvBallObj_->SetShininess(shininess);
-		ImGui::TreePop();
+			ImGui::ColorEdit4("MaterialColor", &color.x);
+			ImGui::Checkbox("EnableLighting", &enableLighting);
+			ImGui::DragFloat("Shininess", &shininess, 0.1f, 0.0f, 100.0f);
+			uvBallObj_->SetColor(color);
+			uvBallObj_->SetEnableLighting(enableLighting);
+			uvBallObj_->SetShininess(shininess);
+			ImGui::TreePop();
 		}
-	
-		
 	}
 	ImGui::End();
 
 #endif // USE_IMGUI
+	camera_->SetTransform(cameraTransform_);
+	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
+	Object3dCommon::GetInstance()->SetSpotLight(spotLight_);
 	camera_->Update();
-	
+
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(uvBallTransform_);
 	uvBallObj_->Update();
 	fieldObj_->Update();
 	planeGltf_->Update();
 }
-void SampleScene::Draw() { 
+void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
 	/*uvBallObj_->Draw();*/
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 }
-void SampleScene::Finalize() {
+void SampleScene::Finalize() {}
 
-
-
-}

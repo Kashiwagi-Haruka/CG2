@@ -1,18 +1,18 @@
 #pragma once
-#include <Windows.h>
-#include <wrl.h>
-#include "PSO/CreatePSO.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
+#include "PSO/CreatePSO.h"
+#include <Windows.h>
+#include <cstdint>
 #include <memory>
+#include <wrl.h>
 class Camera;
 class DirectXCommon;
 
 class Object3dCommon {
 
 private:
-
 	static std::unique_ptr<Object3dCommon> instance;
 
 	Camera* defaultCamera = nullptr;
@@ -29,11 +29,10 @@ private:
 	// Directional Light（共通）
 	DirectionalLight* directionalLightData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-	PointLight* pointlightData_;
+	PointLightSet* pointlightData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_ = nullptr;
 	SpotLight* spotlightData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_ = nullptr;
-
 
 public:
 	static Object3dCommon* GetInstance();
@@ -51,6 +50,6 @@ public:
 	ID3D12Resource* GetPointLightResource() const { return pointLightResource_.Get(); }
 	ID3D12Resource* GetSpotLightResource() const { return spotLightResource_.Get(); }
 	void SetDirectionalLight(DirectionalLight& light);
-	void SetPointLight(PointLight pointlight);
+	void SetPointLights(const PointLight* pointLights, uint32_t count);
 	void SetSpotLight(SpotLight spotlight);
 };

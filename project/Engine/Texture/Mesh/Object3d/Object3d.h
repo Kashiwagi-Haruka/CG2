@@ -1,26 +1,25 @@
 #pragma once
 
+#include "CameraForGPU.h"
+#include "Light/DirectionalLight.h"
+#include "Matrix4x4.h"
+#include "Transform.h"
+#include "Vector4.h"
 #include "VertexData.h"
 #include <Windows.h>
-#include <wrl.h>
 #include <d3d12.h>
-#include "Matrix4x4.h"
-#include "Vector4.h"
 #include <string>
-#include "Transform.h"
-#include "Light/DirectionalLight.h"
-#include "Light/PointLight.h"
-#include "CameraForGPU.h"
+#include <wrl.h>
 class Camera;
 
 class Model;
 class Object3d {
 
 	struct alignas(256) TransformationMatrix {
-		Matrix4x4 WVP;   // 64 バイト
-		Matrix4x4 World; // 64 バイト
+		Matrix4x4 WVP;                   // 64 バイト
+		Matrix4x4 World;                 // 64 バイト
 		Matrix4x4 WorldInverseTranspose; // ここで自動的に 128 バイト分のパディングが入って、
-		                 // sizeof(TransformationMatrix) == 256 になる
+		                                 // sizeof(TransformationMatrix) == 256 になる
 	};
 
 	Transform transform_ = {
@@ -28,8 +27,6 @@ class Object3d {
 	    {0.0f, 0.0f, 0.0f},
 	    {0.0f, 0.0f, 0.0f},
 	};
-
-	
 
 	Camera* camera_;
 
@@ -74,7 +71,7 @@ public:
 	void SetEnableLighting(bool enable);
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetShininess(float shininess);
-	void SetPointLight(PointLight pointlight);
+	
 	Vector3 GetTranslate() { return transform_.translate; }
 	Vector3 GetRotate() { return transform_.rotate; }
 	Vector3 GetScale() { return transform_.scale; }
