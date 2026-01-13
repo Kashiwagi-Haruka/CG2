@@ -1,7 +1,12 @@
+#define NOMINMAX
 #include "Object3d/Object3dCommon.h"
 #include "DirectXCommon.h"
 #include "Logger.h"
+#include "SrvManager/SrvManager.h"
+#include "TextureManager.h"
+#include <algorithm>
 #include <cassert>
+#include <cstring>
 
 std::unique_ptr<Object3dCommon> Object3dCommon::instance = nullptr;
 
@@ -34,8 +39,14 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
         1.0f
     };
 	directionalLightResource_->Unmap(0, nullptr);
-	pointLightResource_ = CreateBufferResource(sizeof(PointLight));
+	pointLightResource_ = CreateBufferResource(sizeof(PointLight) * kMaxPointLights);
 	assert(pointLightResource_);
+	pointLightCountResource_ = CreateBufferResource(sizeof(PointLightCount));
+	assert(pointLightCountResource_);
+
+	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
+	pointLightSrvIndex_ = srvManager->Allocate();
+	srvManager->CreateSRVforStructuredBuffer(pointLightSrvIndex_, pointLightResource_.Get(), static_cast<UINT>(kMaxPointLights), sizeof(PointLight));
 
 	spotLightResource_ = CreateBufferResource(sizeof(SpotLight));
 	assert(spotLightResource_);
@@ -53,14 +64,18 @@ void Object3dCommon::SetBlendMode(BlendMode blendMode) {
 	blendMode_ = blendMode;
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get());
 }
-void Object3dCommon::SetPointLight(PointLight pointlight) {
+void Object3dCommon::SetPointLights(const PointLight* pointLights, uint32_t count) {
+	uint32_t clampedCount = std::min(count, static_cast<uint32_t>(kMaxPointLights));
 	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointlightData_));
-	pointlightData_->color = pointlight.color;
-	pointlightData_->position = pointlight.position;
-	pointlightData_->intensity = pointlight.intensity;
-	pointlightData_->radius = pointlight.radius;
-	pointlightData_->decay = pointlight.decay;
+	std::memset(pointlightData_, 0, sizeof(PointLight) * kMaxPointLights);
+	if (pointLights && clampedCount > 0) {
+		std::memcpy(pointlightData_, pointLights, sizeof(PointLight) * clampedCount);
+	}
 	pointLightResource_->Unmap(0, nullptr);
+
+	pointLightCountResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointLightCountData_));
+	pointLightCountData_->count = clampedCount;
+	pointLightCountResource_->Unmap(0, nullptr);
 }
 void Object3dCommon::SetSpotLight(SpotLight spotlight) {
 	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotlightData_));

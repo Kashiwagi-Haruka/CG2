@@ -29,8 +29,11 @@ private:
 	// Directional Light（共通）
 	DirectionalLight* directionalLightData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
-	PointLight* pointlightData_;
+	PointLight* pointlightData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_ = nullptr;
+	PointLightCount* pointLightCountData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightCountResource_ = nullptr;
+	uint32_t pointLightSrvIndex_ = 0;
 	SpotLight* spotlightData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_ = nullptr;
 
@@ -48,9 +51,10 @@ public:
 	void SetBlendMode(BlendMode blendmode);
 	BlendMode GetBlendMode() const { return blendMode_; }
 	ID3D12Resource* GetDirectionalLightResource() const { return directionalLightResource_.Get(); }
-	ID3D12Resource* GetPointLightResource() const { return pointLightResource_.Get(); }
+	ID3D12Resource* GetPointLightCountResource() const { return pointLightCountResource_.Get(); }
 	ID3D12Resource* GetSpotLightResource() const { return spotLightResource_.Get(); }
+	uint32_t GetPointLightSrvIndex() const { return pointLightSrvIndex_; }
 	void SetDirectionalLight(DirectionalLight& light);
-	void SetPointLight(PointLight pointLights);
+	void SetPointLights(const PointLight* pointLights, uint32_t count);
 	void SetSpotLight(SpotLight spotlight);
 };

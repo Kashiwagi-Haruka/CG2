@@ -1,5 +1,8 @@
 #pragma once
+#include <cstdint>
 class Primitive {
+
+	private:
 
 
 	public:
@@ -15,7 +18,14 @@ class Primitive {
 		Box,
 	};
 
+	private:
+
+
+
+	
+	public:
+
 	void Initialize(PrimitiveName name);
-
-
+	void Update();
+	void Draw();
 };

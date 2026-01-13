@@ -28,8 +28,7 @@ SampleScene::SampleScene() {
 }
 void SampleScene::Initialize() {
 
-	
-	uvBallObj_->Initialize(); 
+	uvBallObj_->Initialize();
 	uvBallObj_->SetCamera(camera_.get());
 	uvBallObj_->SetModel("uvBall");
 	fieldObj_->Initialize();
@@ -40,9 +39,9 @@ void SampleScene::Initialize() {
 	planeGltf_->SetModel("planeG");
 
 	uvBallTransform_ = {
-		.scale{1.0f, 1.0f, 1.0f  },
-		.rotate{0.0f, 0.0f, 0.0f  },
-		.translate{0.0f, 0.0f, 0.0f}
+	    .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f, 0.0f, 0.0f},
+        .translate{0.0f, 0.0f, 0.0f}
     };
 	planeGTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
@@ -51,11 +50,17 @@ void SampleScene::Initialize() {
     };
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(uvBallTransform_);
-	pointLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLight_.position = {0.0f, 5.0f, 0.0f};
-	pointLight_.intensity = 1.0f;
-	pointLight_.radius = 10.0f;	
-	pointLight_.decay = 1.0f;
+	activePointLightCount_ = 2;
+	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
+	pointLights_[0].intensity = 1.0f;
+	pointLights_[0].radius = 10.0f;
+	pointLights_[0].decay = 1.0f;
+	pointLights_[1].color = {1.0f, 0.0f, 0.0f, 1.0f};
+	pointLights_[1].position = {5.0f, 5.0f, 5.0f};
+	pointLights_[1].intensity = 1.0f;
+	pointLights_[1].radius = 10.0f;
+	pointLights_[1].decay = 1.0f;
 
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
@@ -67,7 +72,7 @@ void SampleScene::Initialize() {
 	spotLight_.intensity = 4.0f;
 	spotLight_.distance = 7.0f;
 	spotLight_.decay = 2.0f;
-	spotLight_.cosAngle = std::cos(std::numbers::pi_v<float>/3.0f);
+	spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 }
 
@@ -93,15 +98,23 @@ void SampleScene::Update() {
 	
 		
 			
-				
 		if (ImGui::TreeNode("PointLight")) {
-			ImGui::ColorEdit4("PointLightColor", &pointLight_.color.x);
-			ImGui::DragFloat("PointLightIntensity", &pointLight_.intensity, 0.1f);
-			ImGui::DragFloat3("PointLightPosition", &pointLight_.position.x, 0.1f);
-			ImGui::DragFloat("PointLightRadius", &pointLight_.radius, 0.1f);
-			ImGui::DragFloat("PointLightDecay", &pointLight_.decay, 0.1f);
+			ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);
+			ImGui::DragFloat("PointLightIntensity", &pointLights_[0].intensity, 0.1f);
+			ImGui::DragFloat3("PointLightPosition", &pointLights_[0].position.x, 0.1f);
+			ImGui::DragFloat("PointLightRadius", &pointLights_[0].radius, 0.1f);
+			ImGui::DragFloat("PointLightDecay", &pointLights_[0].decay, 0.1f);
 			ImGui::TreePop();
 		}
+		if (ImGui::TreeNode("PointLigh1")) {
+			ImGui::ColorEdit4("PointLightColo1", &pointLights_[1].color.x);
+			ImGui::DragFloat("PointLightIntensit1", &pointLights_[1].intensity, 0.1f);
+			ImGui::DragFloat3("PointLightPositio1", &pointLights_[1].position.x, 0.1f);
+			ImGui::DragFloat("PointLightRadiu1", &pointLights_[1].radius, 0.1f);
+			ImGui::DragFloat("PointLightDecay1", &pointLights_[1].decay, 0.1f);
+			ImGui::TreePop();
+		}
+			
 				
 		
 		if (ImGui::TreeNode("SpotLight")) {
@@ -151,7 +164,7 @@ void SampleScene::Update() {
 #endif // USE_IMGUI
 	camera_->SetTransform(cameraTransform_);
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-	Object3dCommon::GetInstance()->SetPointLight(pointLight_);
+	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLight(spotLight_);
 	camera_->Update();
 
@@ -168,4 +181,3 @@ void SampleScene::Draw() {
 	fieldObj_->Draw();
 }
 void SampleScene::Finalize() {}
-

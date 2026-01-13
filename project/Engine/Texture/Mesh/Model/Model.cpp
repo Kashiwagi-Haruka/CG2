@@ -7,6 +7,7 @@
 #include "TextureManager.h"
 #include "Function.h"
 #include "SrvManager/SrvManager.h"
+#include "Object3d/Object3dCommon.h"
 
 void Model::Initialize(ModelCommon* modelCommon) {
 
@@ -79,6 +80,9 @@ void Model::Draw() {
 	// TextureManagerからSRVのGPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex);
 	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvHandle);
+
+		// --- PointLight SRVのDescriptorTableを設定 ---
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(7, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
 
 	
 

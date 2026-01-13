@@ -70,7 +70,7 @@ class GameScene: public BaseScene{
 
     
 	DirectionalLight directionalLight_{};
-	PointLight pointLight_{};
+	std::array<PointLight, kMaxPointLights> pointLights_{};
 	uint32_t activePointLightCount_ = 0;
 	SpotLight spotLight_{};
 	
