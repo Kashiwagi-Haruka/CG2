@@ -7,9 +7,8 @@
 #endif // USE_IMGUI
 #include <numbers>
 
-
 SampleScene::SampleScene() {
-	
+
 	uvBallObj_ = std::make_unique<Object3d>();
 	fieldObj_ = std::make_unique<Object3d>();
 	planeGltf_ = std::make_unique<Object3d>();
@@ -21,7 +20,7 @@ SampleScene::SampleScene() {
 
 	camera_ = std::make_unique<Camera>();
 	camera_->SetTransform(cameraTransform_);
-	
+
 	ModelManager::GetInstance()->LoadModel("uvBall");
 	ModelManager::GetInstance()->LoadModel("terrain");
 	ModelManager::GetInstance()->LoadGltfModel("planeG");
@@ -95,9 +94,7 @@ void SampleScene::Update() {
 			ImGui::DragFloat("LightIntensity", &directionalLight_.intensity, 0.1f, 0.0f, 10.0f);
 			ImGui::TreePop();
 		}
-	
-		
-			
+
 		if (ImGui::TreeNode("PointLight")) {
 			ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);
 			ImGui::DragFloat("PointLightIntensity", &pointLights_[0].intensity, 0.1f);
@@ -114,9 +111,7 @@ void SampleScene::Update() {
 			ImGui::DragFloat("PointLightDecay1", &pointLights_[1].decay, 0.1f);
 			ImGui::TreePop();
 		}
-			
-				
-		
+
 		if (ImGui::TreeNode("SpotLight")) {
 			ImGui::ColorEdit4("SpotLightColor", &spotLight_.color.x);
 			ImGui::DragFloat("SpotLightIntensity", &spotLight_.intensity, 0.1f);
@@ -157,7 +152,6 @@ void SampleScene::Update() {
 			ImGui::DragFloat3("TranslateG", &planeGTransform_.translate.x, 0.1f);
 			ImGui::TreePop();
 		}
-		
 	}
 	ImGui::End();
 
