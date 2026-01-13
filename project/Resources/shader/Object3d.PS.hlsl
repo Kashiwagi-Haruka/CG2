@@ -111,16 +111,25 @@ PixelShaderOutput main(VertexShaderOutput input)
         for (uint spotIndex = 0; spotIndex < gSpotLightCount.count; ++spotIndex)
         {
             SpotLight spotLight = gSpotLights[spotIndex];
-            float3 spotLightDirectionOnsurface = normalize(input.worldPosition-spotLight.position);
+            float3 lightToSurface = spotLight.position - input.worldPosition;
+            float3 lightDirection = normalize(lightToSurface);
             float3 spotDirection = normalize(spotLight.direction);
-            float cosAngle = dot(spotLightDirectionOnsurface, spotDirection);
+            float cosAngle = dot(lightDirection, spotDirection);
             float falloffFactor = saturate((cosAngle - spotLight.cosAngle) / (spotLight.cosFalloffStart - spotLight.cosAngle));
-            float attenuationFactor = pow(saturate(1.0f - spotLight.distance / spotLight.cosAngle), spotLight.decay);
+            float distanceToLight = length(lightToSurface);
+            float attenuationFactor = pow(saturate(1.0f - distanceToLight / spotLight.distance), spotLight.decay);
 
-            spotLightDiffuse += gMaterial.color.rgb * textureColor.rgb * spotLight.color.rgb * spotLight.intensity * attenuationFactor * falloffFactor;
-            spotLightSpecular += spotLight.color.rgb * spotLight.intensity * attenuationFactor * falloffFactor;
+            float NdotL_s = saturate(dot(N, lightDirection));
+            float3 Hs = normalize(lightDirection + toEye);
+            float NdotH_s = saturate(dot(N, Hs));
+            float specularPowS = pow(NdotH_s, gMaterial.shininess);
+
+            spotLightDiffuse += gMaterial.color.rgb * textureColor.rgb *
+                spotLight.color.rgb * spotLight.intensity *
+                NdotL_s * attenuationFactor * falloffFactor;
+            spotLightSpecular += spotLight.color.rgb * spotLight.intensity *
+                specularPowS * attenuationFactor * falloffFactor;
         }
-        
         output.color.rgb = diffuse + specular + diffuseP + specularP + spotLightDiffuse + spotLightSpecular;
         output.color.a = gMaterial.color.a * textureColor.a;
     }
