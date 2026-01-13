@@ -65,7 +65,7 @@ void SampleScene::Initialize() {
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
 	directionalLight_.intensity = 1.0f;
 
-	activeSpotLightCount_ = 1;
+	activeSpotLightCount_ = 2;
 	spotLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	spotLights_[0].position = {2.0f, 1.25f, 0.0f};
 	spotLights_[0].direction = {-1.0f, -1.0f, 0.0f};
@@ -74,6 +74,15 @@ void SampleScene::Initialize() {
 	spotLights_[0].decay = 2.0f;
 	spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+
+	spotLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	spotLights_[1].position = {2.0f, 1.25f, 0.0f};
+	spotLights_[1].direction = {-1.0f, -1.0f, 0.0f};
+	spotLights_[1].intensity = 4.0f;
+	spotLights_[1].distance = 7.0f;
+	spotLights_[1].decay = 2.0f;
+	spotLights_[1].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
+	spotLights_[1].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 }
 
 void SampleScene::Update() {
@@ -104,11 +113,11 @@ void SampleScene::Update() {
 			ImGui::DragFloat("PointLightDecay", &pointLights_[0].decay, 0.1f);
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("PointLigh1")) {
-			ImGui::ColorEdit4("PointLightColo1", &pointLights_[1].color.x);
-			ImGui::DragFloat("PointLightIntensit1", &pointLights_[1].intensity, 0.1f);
-			ImGui::DragFloat3("PointLightPositio1", &pointLights_[1].position.x, 0.1f);
-			ImGui::DragFloat("PointLightRadiu1", &pointLights_[1].radius, 0.1f);
+		if (ImGui::TreeNode("PointLight1")) {
+			ImGui::ColorEdit4("PointLightColor1", &pointLights_[1].color.x);
+			ImGui::DragFloat("PointLightIntensity1", &pointLights_[1].intensity, 0.1f);
+			ImGui::DragFloat3("PointLightPosition1", &pointLights_[1].position.x, 0.1f);
+			ImGui::DragFloat("PointLightRadius1", &pointLights_[1].radius, 0.1f);
 			ImGui::DragFloat("PointLightDecay1", &pointLights_[1].decay, 0.1f);
 			ImGui::TreePop();
 		}
@@ -122,6 +131,17 @@ void SampleScene::Update() {
 			ImGui::DragFloat("SpotLightDecay", &spotLights_[0].decay, 0.1f);
 			ImGui::DragFloat("SpotLightCosAngle", &spotLights_[0].cosAngle, 0.1f, 0.0f, 1.0f);
 			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLights_[0].cosFalloffStart, 0.1f, 0.0f, 1.0f);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("SpotLight1")) {
+			ImGui::ColorEdit4("SpotLightColor1", &spotLights_[1].color.x);
+			ImGui::DragFloat("SpotLightIntensity1", &spotLights_[1].intensity, 0.1f);
+			ImGui::DragFloat3("SpotLightPosition1", &spotLights_[1].position.x, 0.1f);
+			ImGui::DragFloat3("SpotLightDirection1", &spotLights_[1].direction.x, 0.1f);
+			ImGui::DragFloat("SpotLightDistance1", &spotLights_[1].distance, 0.1f);
+			ImGui::DragFloat("SpotLightDecay1", &spotLights_[1].decay, 0.1f);
+			ImGui::DragFloat("SpotLightCosAngle1", &spotLights_[1].cosAngle, 0.1f, 0.0f, 1.0f);
+			ImGui::DragFloat("SpotLightCosFalloffStart1", &spotLights_[1].cosFalloffStart, 0.1f, 0.0f, 1.0f);
 			ImGui::TreePop();
 		}
 	}
