@@ -83,6 +83,25 @@ void SampleScene::Initialize() {
 	spotLights_[1].decay = 2.0f;
 	spotLights_[1].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLights_[1].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+
+	areaLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	areaLights_[0].position = {-5.0f, 3.0f, 0.0f};
+	areaLights_[0].normal = {1.0f, -1.0f, 0.0f};
+	areaLights_[0].intensity = 4.0f;
+	areaLights_[0].width = 2.0f;
+	areaLights_[0].height = 2.0f;
+	areaLights_[0].radius = 0.1f;
+	areaLights_[0].decay = 2.0f;
+
+	areaLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	areaLights_[1].position = {-5.0f, 3.0f, 0.0f};
+	areaLights_[1].normal = {1.0f, -1.0f, 0.0f};
+	areaLights_[1].intensity = 4.0f;
+	areaLights_[1].width = 2.0f;
+	areaLights_[1].height = 2.0f;
+	areaLights_[1].radius = 0.1f;
+	areaLights_[1].decay = 2.0f;
+
 }
 
 void SampleScene::Update() {
@@ -144,6 +163,28 @@ void SampleScene::Update() {
 			ImGui::DragFloat("SpotLightCosFalloffStart1", &spotLights_[1].cosFalloffStart, 0.1f, 0.0f, 1.0f);
 			ImGui::TreePop();
 		}
+		if (ImGui::TreeNode("AreaLight")) {
+			ImGui::ColorEdit4("AreaLightColor", &areaLights_[0].color.x);
+			ImGui::DragFloat("AreaLightIntensity", &areaLights_[0].intensity, 0.1f);
+			ImGui::DragFloat3("AreaLightPosition", &areaLights_[0].position.x, 0.1f);
+			ImGui::DragFloat3("AreaLightNormal", &areaLights_[0].normal.x, 0.1f);
+			ImGui::DragFloat("AreaLightWidth", &areaLights_[0].width, 0.1f);
+			ImGui::DragFloat("AreaLightHeight", &areaLights_[0].height, 0.1f);
+			ImGui::DragFloat("AreaLightRadius", &areaLights_[0].radius, 0.1f);
+			ImGui::DragFloat("AreaLightDecay", &areaLights_[0].decay, 0.1f);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("AreaLight1")) {
+			ImGui::ColorEdit4("AreaLightColor1", &areaLights_[1].color.x);
+			ImGui::DragFloat("AreaLightIntensity1", &areaLights_[1].intensity, 0.1f);
+			ImGui::DragFloat3("AreaLightPosition1", &areaLights_[1].position.x, 0.1f);
+			ImGui::DragFloat3("AreaLightNormal1", &areaLights_[1].normal.x, 0.1f);
+			ImGui::DragFloat("AreaLightWidth1", &areaLights_[1].width, 0.1f);
+			ImGui::DragFloat("AreaLightHeight1", &areaLights_[1].height, 0.1f);
+			ImGui::DragFloat("AreaLightRadius1", &areaLights_[1].radius, 0.1f);
+			ImGui::DragFloat("AreaLightDecay1", &areaLights_[1].decay, 0.1f);
+			ImGui::TreePop();
+		}
 	}
 	ImGui::End();
 	if (ImGui::Begin("SampleuvBall")) {
@@ -181,6 +222,7 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
+	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
 	camera_->Update();
 
 	uvBallObj_->SetTransform(uvBallTransform_);

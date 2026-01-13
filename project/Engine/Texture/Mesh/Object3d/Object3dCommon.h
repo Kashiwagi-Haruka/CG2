@@ -2,6 +2,7 @@
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
+#include "Light/AreaLight.h"
 #include "PSO/CreatePSO.h"
 #include <Windows.h>
 #include <cstdint>
@@ -38,6 +39,11 @@ private:
 	SpotLightCount* spotLightCountData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightCountResource_ = nullptr;
 	uint32_t spotLightSrvIndex_ = 0;
+	AreaLight* areaLightData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> areaLightResource_ = nullptr;
+	AreaLightCount* areaLightCountData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> areaLightCountResource_ = nullptr;
+	uint32_t areaLightSrvIndex_ = 0;
 
 public:
 	static Object3dCommon* GetInstance();
@@ -57,7 +63,10 @@ public:
 	uint32_t GetPointLightSrvIndex() const { return pointLightSrvIndex_; }
 	ID3D12Resource* GetSpotLightCountResource() const { return spotLightCountResource_.Get(); }
 	uint32_t GetSpotLightSrvIndex() const { return spotLightSrvIndex_; }
+	ID3D12Resource* GetAreaLightCountResource() const { return areaLightCountResource_.Get(); }
+	uint32_t GetAreaLightSrvIndex() const { return areaLightSrvIndex_; }
 	void SetDirectionalLight(DirectionalLight& light);
 	void SetPointLights(const PointLight* pointLights, uint32_t count);
 	void SetSpotLights(const SpotLight* spotLights, uint32_t count);
+	void SetAreaLights(const AreaLight* areaLights, uint32_t count);
 };

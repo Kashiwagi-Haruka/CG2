@@ -55,6 +55,15 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 
 	spotLightSrvIndex_ = srvManager->Allocate();
 	srvManager->CreateSRVforStructuredBuffer(spotLightSrvIndex_, spotLightResource_.Get(), static_cast<UINT>(kMaxSpotLights), sizeof(SpotLight));
+
+	areaLightResource_ = CreateBufferResource(sizeof(AreaLight) * kMaxAreaLights);
+	assert(areaLightResource_);
+	areaLightCountResource_ = CreateBufferResource(sizeof(AreaLightCount));
+	assert(areaLightCountResource_);
+
+	areaLightSrvIndex_ = srvManager->Allocate();
+	srvManager->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaLight));
+
 }
 
 void Object3dCommon::DrawCommon() {
@@ -94,6 +103,19 @@ void Object3dCommon::SetSpotLights(const SpotLight* spotLights, uint32_t count) 
 	spotLightCountResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightCountData_));
 	spotLightCountData_->count = clampedCount;
 	spotLightCountResource_->Unmap(0, nullptr);
+}
+void Object3dCommon::SetAreaLights(const AreaLight* areaLights, uint32_t count) {
+	uint32_t clampedCount = std::min(count, static_cast<uint32_t>(kMaxAreaLights));
+	areaLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&areaLightData_));
+	std::memset(areaLightData_, 0, sizeof(AreaLight) * kMaxAreaLights);
+	if (areaLights && clampedCount > 0) {
+		std::memcpy(areaLightData_, areaLights, sizeof(AreaLight) * clampedCount);
+	}
+	areaLightResource_->Unmap(0, nullptr);
+
+	areaLightCountResource_->Map(0, nullptr, reinterpret_cast<void**>(&areaLightCountData_));
+	areaLightCountData_->count = clampedCount;
+	areaLightCountResource_->Unmap(0, nullptr);
 }
 Microsoft::WRL::ComPtr<ID3D12Resource> Object3dCommon::CreateBufferResource(size_t sizeInBytes) {
 	// バッファの設定(UPLOAD用に変更)

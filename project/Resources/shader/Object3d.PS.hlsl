@@ -43,6 +43,23 @@ struct SpotLightCount
     uint count;
     float3 padding;
 };
+struct AreaLight
+{
+    float4 color;
+    float3 position;
+    float intensity;
+    float3 normal;
+    float width;
+    float height;
+    float radius;
+    float decay;
+    float padding;
+};
+struct AreaLightCount
+{
+    uint count;
+    float3 padding;
+};
 struct Camera
 {
     float3 worldPosition;
@@ -52,8 +69,10 @@ ConstantBuffer<DirectionalLight> gDirectionalLight : register(b3);
 ConstantBuffer<Camera> gCamera : register(b4);
 ConstantBuffer<PointLightCount> gPointLightCount : register(b5);
 ConstantBuffer<SpotLightCount> gSpotLightCount : register(b6);
+ConstantBuffer<AreaLightCount> gAreaLightCount : register(b7);
 StructuredBuffer<SpotLight> gSpotLights : register(t2);
 StructuredBuffer<PointLight> gPointLights : register(t1);
+StructuredBuffer<AreaLight> gAreaLights : register(t3);
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 struct PixelShaderOutput
@@ -131,7 +150,32 @@ PixelShaderOutput main(VertexShaderOutput input)
             spotLightSpecular += spotLight.color.rgb * spotLight.intensity *
                 specularPowS * attenuationFactor * falloffFactor;
         }
-        output.color.rgb = diffuse + specular + diffuseP + specularP + spotLightDiffuse + spotLightSpecular;
+        // Area Light
+        float3 areaLightDiffuse = float3(0.0f, 0.0f, 0.0f);
+        float3 areaLightSpecular = float3(0.0f, 0.0f, 0.0f);
+        for (uint areaIndex = 0; areaIndex < gAreaLightCount.count; ++areaIndex)
+        {
+            AreaLight areaLight = gAreaLights[areaIndex];
+            float3 lightToSurface = areaLight.position - input.worldPosition;
+            float3 lightDirection = normalize(lightToSurface);
+            float distanceToLight = length(lightToSurface);
+            float attenuationFactor = pow(saturate(1.0f - distanceToLight / areaLight.radius), areaLight.decay);
+            float lightFacing = saturate(dot(normalize(areaLight.normal), -lightDirection));
+            float areaScale = areaLight.width * areaLight.height;
+
+            float NdotL_a = saturate(dot(N, lightDirection));
+            float3 Ha = normalize(lightDirection + toEye);
+            float NdotH_a = saturate(dot(N, Ha));
+            float specularPowA = pow(NdotH_a, gMaterial.shininess);
+            float intensity = areaLight.intensity * areaScale * lightFacing;
+
+            areaLightDiffuse += gMaterial.color.rgb * textureColor.rgb *
+                areaLight.color.rgb * intensity *
+                NdotL_a * attenuationFactor;
+            areaLightSpecular += areaLight.color.rgb * intensity *
+                specularPowA * attenuationFactor;
+        }
+        output.color.rgb = diffuse + specular + diffuseP + specularP + spotLightDiffuse + spotLightSpecular + areaLightDiffuse + areaLightSpecular;
         output.color.a = gMaterial.color.a * textureColor.a;
     }
     else

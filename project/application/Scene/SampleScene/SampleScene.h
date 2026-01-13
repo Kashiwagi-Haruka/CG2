@@ -4,6 +4,7 @@
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
+#include "Light/AreaLight.h"
 #include "Object3d/Object3d.h"
 #include "Transform.h"
 #include <array>
@@ -15,12 +16,15 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Object3d> fieldObj_ = nullptr;
 	std::unique_ptr<Object3d> planeGltf_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
+
 	DirectionalLight directionalLight_{};
 	std::array<PointLight, kMaxPointLights> pointLights_{};
 	uint32_t activePointLightCount_ = 0;
-
 	std::array<SpotLight, kMaxSpotLights> spotLights_{};
 	uint32_t activeSpotLightCount_ = 0;
+	std::array<AreaLight, kMaxAreaLights> areaLights_{};
+	uint32_t activeAreaLightCount_ = 0;
+
 	Transform uvBallTransform_{};
 	Transform cameraTransform_{};
 	Transform planeGTransform_{};

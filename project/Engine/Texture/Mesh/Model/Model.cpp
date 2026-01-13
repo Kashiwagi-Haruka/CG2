@@ -79,10 +79,14 @@ void Model::Draw() {
 	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvHandle);
 
 	// --- PointLight SRVのDescriptorTableを設定 ---
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(7, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
 
 	// --- SpotLight SRVのDescriptorTableを設定 ---
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(9, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
+
+	// --- AreaLight SRVのDescriptorTableを設定 ---
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());
+
 
 	// --- 描画！（DrawCall）---
 	modelCommon_->GetDxCommon()->GetCommandList()->DrawInstanced(
