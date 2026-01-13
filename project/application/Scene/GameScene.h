@@ -72,7 +72,8 @@ class GameScene: public BaseScene{
 	DirectionalLight directionalLight_{};
 	std::array<PointLight, kMaxPointLights> pointLights_{};
 	uint32_t activePointLightCount_ = 0;
-	SpotLight spotLight_{};
+	std::array<SpotLight, kMaxSpotLights> spotLights_{};
+	uint32_t activeSpotLightCount_ = 0;
 	
 	bool goalActive = false; // 敵全滅後に true になる
 

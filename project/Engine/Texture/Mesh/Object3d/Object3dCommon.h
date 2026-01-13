@@ -9,7 +9,6 @@
 #include <wrl.h>
 class Camera;
 class DirectXCommon;
-
 class Object3dCommon {
 
 private:
@@ -34,8 +33,11 @@ private:
 	PointLightCount* pointLightCountData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightCountResource_ = nullptr;
 	uint32_t pointLightSrvIndex_ = 0;
-	SpotLight* spotlightData_;
+	SpotLight* spotLightData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_ = nullptr;
+	SpotLightCount* spotLightCountData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightCountResource_ = nullptr;
+	uint32_t spotLightSrvIndex_ = 0;
 
 public:
 	static Object3dCommon* GetInstance();
@@ -52,9 +54,10 @@ public:
 	BlendMode GetBlendMode() const { return blendMode_; }
 	ID3D12Resource* GetDirectionalLightResource() const { return directionalLightResource_.Get(); }
 	ID3D12Resource* GetPointLightCountResource() const { return pointLightCountResource_.Get(); }
-	ID3D12Resource* GetSpotLightResource() const { return spotLightResource_.Get(); }
 	uint32_t GetPointLightSrvIndex() const { return pointLightSrvIndex_; }
+	ID3D12Resource* GetSpotLightCountResource() const { return spotLightCountResource_.Get(); }
+	uint32_t GetSpotLightSrvIndex() const { return spotLightSrvIndex_; }
 	void SetDirectionalLight(DirectionalLight& light);
 	void SetPointLights(const PointLight* pointLights, uint32_t count);
-	void SetSpotLight(SpotLight spotlight);
+	void SetSpotLights(const SpotLight* spotLights, uint32_t count);
 };

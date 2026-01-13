@@ -48,8 +48,13 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	pointLightSrvIndex_ = srvManager->Allocate();
 	srvManager->CreateSRVforStructuredBuffer(pointLightSrvIndex_, pointLightResource_.Get(), static_cast<UINT>(kMaxPointLights), sizeof(PointLight));
 
-	spotLightResource_ = CreateBufferResource(sizeof(SpotLight));
+	spotLightResource_ = CreateBufferResource(sizeof(SpotLight) * kMaxSpotLights);
 	assert(spotLightResource_);
+	spotLightCountResource_ = CreateBufferResource(sizeof(SpotLightCount));
+	assert(spotLightCountResource_);
+
+	spotLightSrvIndex_ = srvManager->Allocate();
+	srvManager->CreateSRVforStructuredBuffer(spotLightSrvIndex_, spotLightResource_.Get(), static_cast<UINT>(kMaxSpotLights), sizeof(SpotLight));
 }
 
 void Object3dCommon::DrawCommon() {
@@ -77,19 +82,19 @@ void Object3dCommon::SetPointLights(const PointLight* pointLights, uint32_t coun
 	pointLightCountData_->count = clampedCount;
 	pointLightCountResource_->Unmap(0, nullptr);
 }
-void Object3dCommon::SetSpotLight(SpotLight spotlight) {
-	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotlightData_));
-	spotlightData_->color = spotlight.color;
-	spotlightData_->position = spotlight.position;
-	spotlightData_->intensity = spotlight.intensity;
-	spotlightData_->direction = spotlight.direction;
-	spotlightData_->distance = spotlight.distance;
-	spotlightData_->decay = spotlight.decay;
-	spotlightData_->cosAngle = spotlight.cosAngle;
-	spotlightData_->cosFalloffStart = spotlight.cosFalloffStart;
+void Object3dCommon::SetSpotLights(const SpotLight* spotLights, uint32_t count) {
+	uint32_t clampedCount = std::min(count, static_cast<uint32_t>(kMaxSpotLights));
+	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData_));
+	std::memset(spotLightData_, 0, sizeof(SpotLight) * kMaxSpotLights);
+	if (spotLights && clampedCount > 0) {
+		std::memcpy(spotLightData_, spotLights, sizeof(SpotLight) * clampedCount);
+	}
 	spotLightResource_->Unmap(0, nullptr);
-}
 
+	spotLightCountResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightCountData_));
+	spotLightCountData_->count = clampedCount;
+	spotLightCountResource_->Unmap(0, nullptr);
+}
 Microsoft::WRL::ComPtr<ID3D12Resource> Object3dCommon::CreateBufferResource(size_t sizeInBytes) {
 	// バッファの設定(UPLOAD用に変更)
 	D3D12_HEAP_PROPERTIES heapProperties = {};

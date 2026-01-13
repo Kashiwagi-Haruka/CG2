@@ -1,36 +1,30 @@
 #include "Object3d/Object3d.h"
-#include "Object3d/Object3dCommon.h"
-#include "DirectXCommon.h"
-#include <cassert>
-#include "Function.h"
-#include "TextureManager.h"
-#include "Model/ModelManeger.h"
-#include "Model/Model.h"
 #include "Camera.h"
+#include "DirectXCommon.h"
+#include "Function.h"
+#include "Model/Model.h"
+#include "Model/ModelManeger.h"
+#include "Object3d/Object3dCommon.h"
+#include "TextureManager.h"
+#include <cassert>
 
+void Object3d::Initialize() {
 
-void Object3d::Initialize(){ 
-	
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	CreateResources();
 	isUseSetWorld = false;
 }
-void Object3d::Update(){
+void Object3d::Update() {
 	// [0]=モデル描画用で使う
-	
+
 	if (!isUseSetWorld) {
-	worldMatrix = Function::Multiply(model_->GetModelData().rootnode.localMatrix ,Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
+		worldMatrix = Function::Multiply(model_->GetModelData().rootnode.localMatrix, Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
 	} else {
 		worldMatrix = Function::Multiply(model_->GetModelData().rootnode.localMatrix, worldMatrix);
 	}
-	
-	
-	worldViewProjectionMatrix = Function::Multiply(model_->GetModelData().rootnode.localMatrix , Function::Multiply(Function::Multiply(worldMatrix,camera_->GetViewMatrix()),camera_->GetProjectionMatrix()));
-	
-		
-	
 
-	
+	worldViewProjectionMatrix =
+	    Function::Multiply(model_->GetModelData().rootnode.localMatrix, Function::Multiply(Function::Multiply(worldMatrix, camera_->GetViewMatrix()), camera_->GetProjectionMatrix()));
 
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 
@@ -47,11 +41,8 @@ void Object3d::Update(){
 		cameraData_->worldPosition = {transform_.translate};
 	}
 	cameraResource_->Unmap(0, nullptr);
-	
 }
 void Object3d::Draw() {
-
-
 
 	// --- 座標変換行列CBufferの場所を設定 ---
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
@@ -59,11 +50,10 @@ void Object3d::Draw() {
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Object3dCommon::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, Object3dCommon::GetInstance()->GetPointLightCountResource()->GetGPUVirtualAddress());
-	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(6, Object3dCommon::GetInstance()->GetSpotLightResource()->GetGPUVirtualAddress());
+	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(6, Object3dCommon::GetInstance()->GetSpotLightCountResource()->GetGPUVirtualAddress());
 	if (model_) {
 		model_->Draw();
 	}
-	
 }
 
 void Object3d::SetModel(const std::string& filePath) { model_ = ModelManager::GetInstance()->FindModel(filePath); }
@@ -104,7 +94,4 @@ void Object3d::SetShininess(float shininess) {
 void Object3d::CreateResources() {
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
-	
-
-
 }

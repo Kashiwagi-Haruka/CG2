@@ -37,6 +37,11 @@ struct SpotLight
     float cosAngle;
     float cosFalloffStart;
 };
+struct SpotLightCount
+{
+    uint count;
+    float3 padding;
+};
 struct Camera
 {
     float3 worldPosition;
@@ -45,7 +50,8 @@ ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b3);
 ConstantBuffer<Camera> gCamera : register(b4);
 ConstantBuffer<PointLightCount> gPointLightCount : register(b5);
-ConstantBuffer<SpotLight> gSpotLight : register(b6);
+ConstantBuffer<SpotLightCount> gSpotLightCount : register(b6);
+StructuredBuffer<SpotLight> gSpotLights : register(t2);
 StructuredBuffer<PointLight> gPointLights : register(t1);
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
@@ -100,15 +106,20 @@ PixelShaderOutput main(VertexShaderOutput input)
         }
 
 // Spot Light
-        float3 spotLightDirectionOnsurface = normalize(gSpotLight.position - input.worldPosition);
-        float3 spotDirection = normalize(gSpotLight.direction);
-        float specularPowS = pow(saturate(dot(N, normalize(spotLightDirectionOnsurface + toEye))), gMaterial.shininess);
-        float cosAngle = dot(spotLightDirectionOnsurface, spotDirection);
-        float falloffFactor = saturate((cosAngle - gSpotLight.cosAngle) / (gSpotLight.cosFalloffStart - gSpotLight.cosAngle));
-        float attenuationFactor = pow(saturate(1.0f - gSpotLight.distance / gSpotLight.cosAngle), gSpotLight.decay);
-        
-        float3 spotLightDiffuse = gMaterial.color.rgb * textureColor.rgb * gSpotLight.color.rgb * gSpotLight.intensity * attenuationFactor * falloffFactor;
-        float3 spotLightSpecular = gSpotLight.color.rgb * gSpotLight.intensity * attenuationFactor * falloffFactor;
+        float3 spotLightDiffuse = float3(0.0f, 0.0f, 0.0f);
+        float3 spotLightSpecular = float3(0.0f, 0.0f, 0.0f);
+        for (uint spotIndex = 0; spotIndex < gSpotLightCount.count; ++spotIndex)
+        {
+            SpotLight spotLight = gSpotLights[spotIndex];
+            float3 spotLightDirectionOnsurface = normalize(spotLight.position - input.worldPosition);
+            float3 spotDirection = normalize(spotLight.direction);
+            float cosAngle = dot(spotLightDirectionOnsurface, spotDirection);
+            float falloffFactor = saturate((cosAngle - spotLight.cosAngle) / (spotLight.cosFalloffStart - spotLight.cosAngle));
+            float attenuationFactor = pow(saturate(1.0f - spotLight.distance / spotLight.cosAngle), spotLight.decay);
+
+            spotLightDiffuse += gMaterial.color.rgb * textureColor.rgb * spotLight.color.rgb * spotLight.intensity * attenuationFactor * falloffFactor;
+            spotLightSpecular += spotLight.color.rgb * spotLight.intensity * attenuationFactor * falloffFactor;
+        }
         
         output.color.rgb = diffuse + specular + diffuseP + specularP + spotLightDiffuse + spotLightSpecular;
         output.color.a = gMaterial.color.a * textureColor.a;

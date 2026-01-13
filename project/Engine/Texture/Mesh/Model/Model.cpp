@@ -1,13 +1,13 @@
 #include "Model.h"
-#include "ModelCommon.h"
 #include "DirectXCommon.h"
+#include "Function.h"
+#include "ModelCommon.h"
+#include "Object3d/Object3dCommon.h"
+#include "SrvManager/SrvManager.h"
+#include "TextureManager.h"
+#include <cassert>
 #include <fstream>
 #include <sstream>
-#include <cassert>
-#include "TextureManager.h"
-#include "Function.h"
-#include "SrvManager/SrvManager.h"
-#include "Object3d/Object3dCommon.h"
 
 void Model::Initialize(ModelCommon* modelCommon) {
 
@@ -41,7 +41,7 @@ void Model::Initialize(ModelCommon* modelCommon) {
 	modelData_.material.textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath(modelData_.material.textureFilePath);
 }
 void Model::SetColor(Vector4 color) {
-	
+
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
 	mat3d->color = color;
 	materialResource_->Unmap(0, nullptr);
@@ -62,7 +62,6 @@ void Model::SetShininess(float shininess) {
 	materialResource_->Unmap(0, nullptr);
 }
 void Model::Draw() {
-
 	// --- SRVヒープをバインド ---
 	ID3D12DescriptorHeap* descriptorHeaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
 
@@ -74,17 +73,16 @@ void Model::Draw() {
 	// --- マテリアルCBufferの場所を設定 ---
 	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
-	
-
 	// --- SRVのDescriptorTableの先頭を設定 ---
 	// TextureManagerからSRVのGPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex);
 	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvHandle);
 
-		// --- PointLight SRVのDescriptorTableを設定 ---
+	// --- PointLight SRVのDescriptorTableを設定 ---
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(7, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
 
-	
+	// --- SpotLight SRVのDescriptorTableを設定 ---
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
 
 	// --- 描画！（DrawCall）---
 	modelCommon_->GetDxCommon()->GetCommandList()->DrawInstanced(
@@ -158,8 +156,6 @@ void Model::LoadObjFile(const std::string& directoryPath, const std::string& fil
 		}
 	}
 
-	
-
 	modelData_ = modelData;
 }
 Model::MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
@@ -183,22 +179,20 @@ void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::strin
 	std::string path = directoryPath + "/" + filename;
 
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path,aiProcess_FlipWindingOrder|aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 
 	assert(scene && scene->HasMeshes());
-
-	
 
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex]; // OBJは1メッシュ想定
 		assert(mesh->HasNormals());
 		assert(mesh->HasTextureCoords(0));
-	
-		for(uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex){
+
+		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
 			assert(face.mNumIndices == 3);
 			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
-			
+
 				uint32_t vertexIndex = face.mIndices[element];
 				aiVector3D& position = mesh->mVertices[vertexIndex];
 				aiVector3D& normal = mesh->mNormals[vertexIndex];
@@ -211,16 +205,14 @@ void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::strin
 				vertex.position.x *= -1.0f;
 				vertex.normal.x *= -1.0f;
 
-				modelData_.vertices.push_back(vertex);	
+				modelData_.vertices.push_back(vertex);
 			}
 		}
-
-		
 	}
 
 	// --- Material & Texture ---
 	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
-	
+
 		aiMaterial* material = scene->mMaterials[materialIndex];
 		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
 			aiString textureFilepath;
@@ -241,11 +233,9 @@ void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::strin
 				modelData_.material.textureFilePath = directoryPath + "/" + texturePath;
 			}
 		}
-
 	}
 
 	modelData_.rootnode.localMatrix = Function::MakeIdentity4x4();
-	
 }
 void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string& filename) {
 	std::string path = directoryPath + "/" + filename;
@@ -309,12 +299,12 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 
 	modelData_.rootnode = NodeRead(scene->mRootNode);
 }
-Model::Node Model::NodeRead(aiNode* node){ 
+Model::Node Model::NodeRead(aiNode* node) {
 	Node result;
 	aiMatrix4x4 aiLocalMatrix4x4 = node->mTransformation;
 	aiLocalMatrix4x4.Transpose();
 	for (int i = 0; i < 4; i++) {
-		for (int j=0;j<4;j++){
+		for (int j = 0; j < 4; j++) {
 			result.localMatrix.m[i][j] = aiLocalMatrix4x4[i][j];
 		}
 	}

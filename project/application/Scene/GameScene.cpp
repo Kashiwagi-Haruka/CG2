@@ -127,14 +127,15 @@ void GameScene::Initialize() {
 	directionalLight_.direction = {0.0f, -1.0f, 0.5f};
 	directionalLight_.intensity = 1.0f;
 
-	spotLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	spotLight_.position = {-50.0f, 5.0f, -50.0f};
-	spotLight_.direction = {0.0f, 1.0f, 0.0f};
-	spotLight_.intensity = 0.0f;
-	spotLight_.distance = 7.0f;
-	spotLight_.decay = 2.0f;
-	spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-	spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+	activeSpotLightCount_ = 1;
+	spotLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	spotLights_[0].position = {-50.0f, 5.0f, -50.0f};
+	spotLights_[0].direction = {0.0f, 1.0f, 0.0f};
+	spotLights_[0].intensity = 0.0f;
+	spotLights_[0].distance = 7.0f;
+	spotLights_[0].decay = 2.0f;
+	spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
+	spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 	pause->Initialize();
 }
 
@@ -165,14 +166,14 @@ void GameScene::DebugImGui() {
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("SpotLight")) {
-			ImGui::ColorEdit4("SpotLightColor", &spotLight_.color.x);
-			ImGui::DragFloat("SpotLightIntensity", &spotLight_.intensity, 0.1f);
-			ImGui::DragFloat3("SpotLightPosition", &spotLight_.position.x, 0.1f);
-			ImGui::DragFloat3("SpotLightDirection", &spotLight_.direction.x, 0.1f);
-			ImGui::DragFloat("SpotLightDistance", &spotLight_.distance, 0.1f);
-			ImGui::DragFloat("SpotLightDecay", &spotLight_.decay, 0.1f);
-			ImGui::DragFloat("SpotLightCosAngle", &spotLight_.cosAngle, 0.1f, 0.0f, 1.0f);
-			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLight_.cosFalloffStart, 0.1f, 0.0f, 1.0f);
+			ImGui::ColorEdit4("SpotLightColor", &spotLights_[0].color.x);
+			ImGui::DragFloat("SpotLightIntensity", &spotLights_[0].intensity, 0.1f);
+			ImGui::DragFloat3("SpotLightPosition", &spotLights_[0].position.x, 0.1f);
+			ImGui::DragFloat3("SpotLightDirection", &spotLights_[0].direction.x, 0.1f);
+			ImGui::DragFloat("SpotLightDistance", &spotLights_[0].distance, 0.1f);
+			ImGui::DragFloat("SpotLightDecay", &spotLights_[0].decay, 0.1f);
+			ImGui::DragFloat("SpotLightCosAngle", &spotLights_[0].cosAngle, 0.1f, 0.0f, 1.0f);
+			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLights_[0].cosFalloffStart, 0.1f, 0.0f, 1.0f);
 			ImGui::TreePop();
 		}
 	}
@@ -281,7 +282,7 @@ void GameScene::Update() {
 DebugImGui();
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
-	Object3dCommon::GetInstance()->SetSpotLight(spotLight_);
+	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
 	skyDome->SetCamera(cameraController->GetCamera());
 	player->SetCamera(cameraController->GetCamera());
 	field->SetCamera(cameraController->GetCamera());
