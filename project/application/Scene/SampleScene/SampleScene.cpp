@@ -22,9 +22,9 @@ SampleScene::SampleScene() {
 	camera_ = std::make_unique<Camera>();
 	camera_->SetTransform(cameraTransform_);
 	
-	ModelManeger::GetInstance()->LoadModel("uvBall");
-	ModelManeger::GetInstance()->LoadModel("terrain");
-	ModelManeger::GetInstance()->LoadGltfModel("planeG");
+	ModelManager::GetInstance()->LoadModel("uvBall");
+	ModelManager::GetInstance()->LoadModel("terrain");
+	ModelManager::GetInstance()->LoadGltfModel("planeG");
 }
 void SampleScene::Initialize() {
 

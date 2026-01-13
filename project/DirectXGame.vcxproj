@@ -240,6 +240,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Pause.cpp" />
     <ClCompile Include="application\Object\House\HouseHP.cpp" />
     <ClCompile Include="application\Team\Team.cpp" />
+    <ClCompile Include="Engine\Texture\Mesh\Primitive\Primitive.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -334,6 +335,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Pause.h" />
     <ClInclude Include="application\Object\House\HouseHP.h" />
     <ClInclude Include="application\Team\Team.h" />
+    <ClInclude Include="Engine\Texture\Mesh\Primitive\Primitive.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d.PS.hlsl">

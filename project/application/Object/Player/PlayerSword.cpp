@@ -4,8 +4,8 @@
 #include "Function.h"
 PlayerSword::PlayerSword() {
 
-	ModelManeger::GetInstance()->LoadModel("playerSword");
-	ModelManeger::GetInstance()->LoadModel("debugBox");
+	ModelManager::GetInstance()->LoadModel("playerSword");
+	ModelManager::GetInstance()->LoadModel("debugBox");
 }
 
 void PlayerSword::Initialize() {

@@ -2,21 +2,21 @@
 #include "Model/ModelCommon.h"
 #include "Model/Model.h"
 
-std::unique_ptr<ModelManeger> ModelManeger::instance = nullptr;
+std::unique_ptr<ModelManager> ModelManager::instance = nullptr;
 
-ModelManeger* ModelManeger::GetInstance(){
+ModelManager* ModelManager::GetInstance(){
 	if (instance == nullptr) {
-		instance = std::make_unique<ModelManeger>();
+		instance = std::make_unique<ModelManager>();
 	}
 	return instance.get();
 }
 
-void ModelManeger::Initialize(DirectXCommon* dxCommon){
+void ModelManager::Initialize(DirectXCommon* dxCommon){
 	modelCommon_ = std::make_unique<ModelCommon>();
 	modelCommon_->Initialize(dxCommon);
 }
 
-void ModelManeger::LoadModel(const std::string& filePath){
+void ModelManager::LoadModel(const std::string& filePath){
 
 	if (models.contains(filePath)) {
 		return;
@@ -27,7 +27,7 @@ void ModelManeger::LoadModel(const std::string& filePath){
 	model->Initialize(modelCommon_.get());
 	models.insert(std::make_pair(filePath, std::move(model)));
 }
-void ModelManeger::LoadGltfModel(const std::string& filePath) {
+void ModelManager::LoadGltfModel(const std::string& filePath) {
 	if (models.contains(filePath)) {
 		return;
 	}
@@ -40,14 +40,14 @@ void ModelManeger::LoadGltfModel(const std::string& filePath) {
 
 }
 
-Model* ModelManeger::FindModel(const std::string& filePath){
+Model* ModelManager::FindModel(const std::string& filePath){
 	if (models.contains(filePath)) {
 		return models.at(filePath).get();
 	}
 	return nullptr;
 }
 
-void ModelManeger::Finalize(){
+void ModelManager::Finalize(){
 
 	instance.reset();
 	

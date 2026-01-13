@@ -1,18 +1,15 @@
 #include "WinApp.h"
 #include <d3d12.h>
+#include <dbt.h>
 #include <strsafe.h>
-#include <dbt.h> 
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui_impl_win32.h"
 #endif // USE_IMGUI
-
 
 #pragma comment(lib, "winmm.lib")
 #ifdef USE_IMGUI
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
 #endif // USE_IMGUI
-
-
 
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 #ifdef USE_IMGUI
@@ -24,7 +21,7 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
-	
+
 	case WM_DEVICECHANGE:
 		if (wparam == DBT_DEVICEARRIVAL || wparam == DBT_DEVICEREMOVECOMPLETE || wparam == DBT_DEVNODES_CHANGED) {
 			// パッド再列挙フラグを立てる
@@ -34,13 +31,11 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 			}
 		}
 		break;
-
 	}
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-
-void WinApp::Initialize(const wchar_t* TitleName) { 
+void WinApp::Initialize(const wchar_t* TitleName) {
 	HRESULT hr = CoInitializeEx(0, COINITBASE_MULTITHREADED);
 
 	wc_.lpfnWndProc = WindowProc;
@@ -58,7 +53,6 @@ void WinApp::Initialize(const wchar_t* TitleName) {
 	AdjustWindowRect(&wrc_, WS_OVERLAPPEDWINDOW, false);
 
 	hwnd_ = CreateWindow(wc_.lpszClassName, TitleName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, wrc_.right - wrc_.left, wrc_.bottom - wrc_.top, nullptr, nullptr, wc_.hInstance, nullptr);
-	
 
 	ShowWindow(hwnd_, SW_SHOW);
 	SetWindowLongPtr(hwnd_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
@@ -66,22 +60,17 @@ void WinApp::Initialize(const wchar_t* TitleName) {
 	timeBeginPeriod(1); // タイマーの精度を1msに設定
 }
 
-void WinApp::Update() {
-	
-	
-	
-}
+void WinApp::Update() {}
 
 void WinApp::Finalize() {
 	CloseWindow(hwnd_);
 	/*CoUninitialize(); */
-
 }
 
 bool WinApp::ProcessMessage() {
-	
+
 	MSG msg{};
-	
+
 	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
@@ -91,7 +80,5 @@ bool WinApp::ProcessMessage() {
 		return false;
 	}
 
-
 	return true;
 }
-

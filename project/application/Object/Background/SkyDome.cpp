@@ -4,7 +4,7 @@
 #include "Camera.h"
 
 SkyDome::SkyDome() {
-	ModelManeger::GetInstance()->LoadModel("skyDome");
+	ModelManager::GetInstance()->LoadModel("skyDome");
 	skyDomeObject_ = std::make_unique<Object3d>();
 }
 

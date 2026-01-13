@@ -7,22 +7,22 @@ class Model;
 class ModelCommon;
 class DirectXCommon;
 
-class ModelManeger {
+class ModelManager {
 
-	static std::unique_ptr<ModelManeger> instance;
+	static std::unique_ptr<ModelManager> instance;
 
 
-	ModelManeger(ModelManeger&) = delete;
-	ModelManeger& operator=(ModelManeger&) = delete;
+	ModelManager(ModelManager&) = delete;
+	ModelManager& operator=(ModelManager&) = delete;
 
 	std::map<std::string, std::unique_ptr<Model>> models;
 	std::unique_ptr<ModelCommon> modelCommon_ = nullptr;
 
 	public:
 
-		ModelManeger() = default;
-	    ~ModelManeger() = default;
-		static ModelManeger* GetInstance();
+		ModelManager() = default;
+	    ~ModelManager() = default;
+		static ModelManager* GetInstance();
 
 		void Initialize(DirectXCommon* dxCommon);
 	    void LoadModel(const std::string& filePath);

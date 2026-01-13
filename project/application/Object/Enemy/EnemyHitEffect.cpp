@@ -4,7 +4,7 @@
 #include <numbers>
 void EnemyHitEffect::Initialize() {
 
-	ModelManeger::GetInstance()->LoadModel("HitEffect");
+	ModelManager::GetInstance()->LoadModel("HitEffect");
 
 	hitEffect_ = std::make_unique<Object3d>();
 	hitEffect_->Initialize();

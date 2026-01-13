@@ -10,7 +10,7 @@ MapchipField::MapchipField() {
 	
 
 	// モデル読み込み（map.obj）
-	ModelManeger::GetInstance()->LoadModel("map");
+	ModelManager::GetInstance()->LoadModel("map");
 	fieldObj = std::make_unique<Object3d>();
 	
 }

@@ -43,8 +43,6 @@ public:
 
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
 
-	
-	
 	bool PushKey(BYTE keyNumber);
 	bool TriggerKey(BYTE keyNumber);
 	bool ReleaseKey(BYTE keyNumber);
@@ -145,7 +143,4 @@ public:
 	float GetMouseX() const;
 	float GetMouseY() const;
 	Vector2 GetMouseMove() const;
-
-	
-	
 };

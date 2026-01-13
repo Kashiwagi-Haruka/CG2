@@ -66,7 +66,7 @@ void Object3d::Draw() {
 	
 }
 
-void Object3d::SetModel(const std::string& filePath) { model_ = ModelManeger::GetInstance()->FindModel(filePath); }
+void Object3d::SetModel(const std::string& filePath) { model_ = ModelManager::GetInstance()->FindModel(filePath); }
 void Object3d::SetCamera(Camera* camera) { camera_ = camera; }
 void Object3d::SetScale(Vector3 scale) {
 	transform_.scale = scale;

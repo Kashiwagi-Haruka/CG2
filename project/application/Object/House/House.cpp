@@ -11,9 +11,9 @@ House::House() {}
 
 void House::Initialize(Camera* camera) {
 
-	ModelManeger::GetInstance()->LoadModel("house");
-	ModelManeger::GetInstance()->LoadModel("HPBar");
-	ModelManeger::GetInstance()->LoadModel("HPFlame");
+	ModelManager::GetInstance()->LoadModel("house");
+	ModelManager::GetInstance()->LoadModel("HPBar");
+	ModelManager::GetInstance()->LoadModel("HPFlame");
 	object_ = std::make_unique<Object3d>();
 
 	object_->Initialize();

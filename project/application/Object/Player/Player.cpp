@@ -13,11 +13,11 @@
 #endif // USE_IMGUI
 
 Player::Player() {
-	ModelManeger::GetInstance()->LoadGltfModel("astralPlayer");
-	ModelManeger::GetInstance()->LoadModel("playerModel");
-	ModelManeger::GetInstance()->LoadModel("FallingEffect");
-	ModelManeger::GetInstance()->LoadModel("playerSkillUp");
-	ModelManeger::GetInstance()->LoadModel("playerSkillUnder");
+	ModelManager::GetInstance()->LoadGltfModel("astralPlayer");
+	ModelManager::GetInstance()->LoadModel("playerModel");
+	ModelManager::GetInstance()->LoadModel("FallingEffect");
+	ModelManager::GetInstance()->LoadModel("playerSkillUp");
+	ModelManager::GetInstance()->LoadModel("playerSkillUnder");
 	playerObject_ = std::make_unique<Object3d>();
 	fallingEffectObject_ = std::make_unique<Object3d>();
 	sword_ = std::make_unique<PlayerSword>();

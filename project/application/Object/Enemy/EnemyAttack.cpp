@@ -5,7 +5,7 @@
 #include "Model/ModelManeger.h"
 
 EnemyAttack::EnemyAttack() {
-	ModelManeger::GetInstance()->LoadModel("EnemyAttack"); // 鎌モデル
+	ModelManager::GetInstance()->LoadModel("EnemyAttack"); // 鎌モデル
 	object_ = std::make_unique<Object3d>();
 }
 

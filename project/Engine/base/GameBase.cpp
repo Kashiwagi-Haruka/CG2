@@ -31,11 +31,10 @@ void GameBase::Finalize() {
 	imguiM_->Finalize();
 	Audio::GetInstance()->Finalize();
 
-	// TextureManager は1回だけ
 	TextureManager::GetInstance()->Finalize();
 
 	ParticleManager::GetInstance()->Finalize();
-	ModelManeger::GetInstance()->Finalize();
+	ModelManager::GetInstance()->Finalize();
 
 	SpriteCommon::GetInstance()->Finalize();
 	Object3dCommon::GetInstance()->Finalize();
@@ -62,8 +61,8 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	Audio::GetInstance()->InitializeIXAudio();
 	TextureManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
 	ParticleManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
-	ModelManeger::GetInstance()->Initialize(dxCommon_.get());
-	
+	ModelManager::GetInstance()->Initialize(dxCommon_.get());
+
 	Object3dCommon::GetInstance()->Initialize(dxCommon_.get());
 	SpriteCommon::GetInstance()->Initialize(dxCommon_.get());
 }
@@ -94,11 +93,6 @@ LONG WINAPI GameBase::ExportDump(EXCEPTION_POINTERS* exception) {
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
-
-
-
-
-
 void GameBase::BeginFlame() {
 
 	dxCommon_->PreDraw();
@@ -125,17 +119,9 @@ void GameBase::SetIsCursorStablity(bool iscursor) { DInput->SetIsCursor(iscursor
 bool GameBase::PushKey(BYTE keyNumber) { return DInput->PushKey(keyNumber); }
 bool GameBase::TriggerKey(BYTE keyNumber) { return DInput->TriggerKey(keyNumber); }
 bool GameBase::ReleaseKey(BYTE keyNumber) { return DInput->ReleaseKey(keyNumber); }
-bool GameBase::PushButton(Input::PadButton button) { 
-
-	return DInput->PushButton(button); }
-bool GameBase::TriggerButton(Input::PadButton button) {
-
-	return DInput->TriggerButton(button);
-}
-bool GameBase::ReleaseButton(Input::PadButton button) {
-
-	return DInput->ReleaseButton(button);
-}
+bool GameBase::PushButton(Input::PadButton button) { return DInput->PushButton(button); }
+bool GameBase::TriggerButton(Input::PadButton button) { return DInput->TriggerButton(button); }
+bool GameBase::ReleaseButton(Input::PadButton button) { return DInput->ReleaseButton(button); }
 // ジョイスティック
 
 float GameBase::GetJoyStickLX() const { return DInput->GetJoyStickLX(); };
@@ -149,10 +135,8 @@ float GameBase::GetJoyStickRY() const { return DInput->GetJoyStickRY(); };
 Vector2 GameBase::GetJoyStickRXY() const { return DInput->GetJoyStickRXY(); };
 void GameBase::SetIsCursorVisible(bool isVisible) { DInput->SetIsCursorVisible(isVisible); }
 
-
 /// <summary>
 /// デッドゾーンの設定
 /// </summary>
 /// <param name="deadZone">初期値は0.2f</param>
 void GameBase::SetDeadZone(float deadZone) { DInput->SetDeadZone(deadZone); };
-
