@@ -111,7 +111,7 @@ PixelShaderOutput main(VertexShaderOutput input)
         for (uint spotIndex = 0; spotIndex < gSpotLightCount.count; ++spotIndex)
         {
             SpotLight spotLight = gSpotLights[spotIndex];
-            float3 spotLightDirectionOnsurface = normalize(spotLight.position - input.worldPosition);
+            float3 spotLightDirectionOnsurface = normalize(input.worldPosition-spotLight.position);
             float3 spotDirection = normalize(spotLight.direction);
             float cosAngle = dot(spotLightDirectionOnsurface, spotDirection);
             float falloffFactor = saturate((cosAngle - spotLight.cosAngle) / (spotLight.cosFalloffStart - spotLight.cosAngle));

@@ -228,7 +228,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\BaseScene\FrameWork.cpp" />
     <ClCompile Include="application\Scene\Game\Game.cpp" />
     <ClCompile Include="application\Scene\GameOverScene.cpp" />
-    <ClCompile Include="Engine\Texture\Light\DirectionalLight.cpp" />
     <ClCompile Include="application\Object\House\House.cpp" />
     <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp" />
     <ClCompile Include="application\Scene\SampleScene\SampleScene.cpp" />
@@ -259,6 +258,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\Enemy\EnemyAttack.h" />
     <ClInclude Include="application\Object\Enemy\EnemyHitEffect.h" />
     <ClInclude Include="application\Object\Character\Model\CharacterModel.h" />
+    <ClInclude Include="Engine\Texture\Light\AreaLight.h" />
     <ClInclude Include="Engine\Texture\PSO\CreatePSO.h" />
     <ClInclude Include="Engine\BaseScene\AbstractSceneFactory.h" />
     <ClInclude Include="application\Object\Enemy\Enemy.h" />

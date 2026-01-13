@@ -225,9 +225,6 @@
     <ClCompile Include="application\Scene\GameOverScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\Light\DirectionalLight.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="application\Object\House\House.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -533,6 +530,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\Mesh\Primitive\Primitive.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Light\AreaLight.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
