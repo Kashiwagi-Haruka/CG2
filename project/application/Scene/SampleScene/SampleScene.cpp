@@ -84,6 +84,7 @@ void SampleScene::Initialize() {
 	spotLights_[1].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLights_[1].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 
+	activeAreaLightCount_ = 2;
 	areaLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	areaLights_[0].position = {0.0f, 3.0f, 0.0f};
 	areaLights_[0].normal = {1.0f, -1.0f, 0.0f};
