@@ -36,6 +36,7 @@ struct SpotLight
     float decay;
     float cosAngle;
     float cosFalloffStart;
+    float2 padding;
 };
 struct SpotLightCount
 {
