@@ -3,6 +3,10 @@
 void Primitive::Initialize(PrimitiveName name) {
 
 	primitiveName_ = name;
+	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
+
+	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
+	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
 
 	switch (primitiveName_) {
 	case Primitive::Plane:
@@ -27,7 +31,7 @@ void Primitive::Initialize(PrimitiveName name) {
 		break;
 	}
 
-	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
+	
 
 
 }

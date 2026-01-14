@@ -30,17 +30,10 @@ class Object3d {
 
 	Camera* camera_;
 
-	
-	
-
 	TransformationMatrix* transformationMatrixData_;
-
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	CameraForGpu* cameraData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
-	
-
 	Model* model_ = nullptr;
 	Matrix4x4 worldMatrix;
 	Matrix4x4 worldViewProjectionMatrix;
@@ -71,7 +64,7 @@ public:
 	void SetEnableLighting(bool enable);
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetShininess(float shininess);
-	
+
 	Vector3 GetTranslate() { return transform_.translate; }
 	Vector3 GetRotate() { return transform_.rotate; }
 	Vector3 GetScale() { return transform_.scale; }
