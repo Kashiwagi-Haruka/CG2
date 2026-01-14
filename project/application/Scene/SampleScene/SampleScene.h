@@ -1,10 +1,11 @@
 #pragma once
+#include "Animation/Animation.h"
 #include "BaseScene.h"
 #include "Camera.h"
+#include "Light/AreaLight.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
-#include "Light/AreaLight.h"
 #include "Object3d/Object3d.h"
 #include "Transform.h"
 #include <array>
@@ -15,6 +16,7 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Object3d> uvBallObj_ = nullptr;
 	std::unique_ptr<Object3d> fieldObj_ = nullptr;
 	std::unique_ptr<Object3d> planeGltf_ = nullptr;
+	std::unique_ptr<Object3d> animatedCubeObj_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
 
 	DirectionalLight directionalLight_{};
@@ -28,6 +30,9 @@ class SampleScene : public BaseScene {
 	Transform uvBallTransform_{};
 	Transform cameraTransform_{};
 	Transform planeGTransform_{};
+	Transform animatedCubeTransform_{};
+
+	Animation::AnimationData animatedCubeAnimation_{};
 
 	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	bool enableLighting = true;

@@ -6,12 +6,12 @@
 #include <imgui.h>
 #endif // USE_IMGUI
 #include <numbers>
-
 SampleScene::SampleScene() {
 
 	uvBallObj_ = std::make_unique<Object3d>();
 	fieldObj_ = std::make_unique<Object3d>();
 	planeGltf_ = std::make_unique<Object3d>();
+	animatedCubeObj_ = std::make_unique<Object3d>();
 	cameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -21,9 +21,10 @@ SampleScene::SampleScene() {
 	camera_ = std::make_unique<Camera>();
 	camera_->SetTransform(cameraTransform_);
 
-	ModelManager::GetInstance()->LoadModel("Resources/3d","uvBall");
-	ModelManager::GetInstance()->LoadModel("Resources/3d","terrain");
-	ModelManager::GetInstance()->LoadGltfModel("Resources/3d","planeG");
+	ModelManager::GetInstance()->LoadModel("Resources/3d", "uvBall");
+	ModelManager::GetInstance()->LoadModel("Resources/3d", "terrain");
+	ModelManager::GetInstance()->LoadGltfModel("Resources/3d", "planeG");
+	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/AnimatedCube", "AnimatedCube");
 }
 void SampleScene::Initialize() {
 
@@ -36,6 +37,9 @@ void SampleScene::Initialize() {
 	planeGltf_->Initialize();
 	planeGltf_->SetCamera(camera_.get());
 	planeGltf_->SetModel("planeG");
+	animatedCubeObj_->Initialize();
+	animatedCubeObj_->SetCamera(camera_.get());
+	animatedCubeObj_->SetModel("AnimatedCube");
 
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
@@ -47,8 +51,16 @@ void SampleScene::Initialize() {
         .rotate{0.0f, 0.0f, 0.0f},
         .translate{0.0f, 1.0f, 0.0f}
     };
+	animatedCubeTransform_ = {
+	    .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f, 0.0f, 0.0f},
+        .translate{3.0f, 1.0f, 0.0f}
+    };
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(uvBallTransform_);
+	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
+	animatedCubeObj_->SetAnimation(&animatedCubeAnimation_, true);
+	animatedCubeObj_->SetTransform(animatedCubeTransform_);
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
@@ -230,14 +242,17 @@ void SampleScene::Update() {
 
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);
+	animatedCubeObj_->SetTransform(animatedCubeTransform_);
 	uvBallObj_->Update();
 	fieldObj_->Update();
 	planeGltf_->Update();
+	animatedCubeObj_->Update();
 }
 void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
 	uvBallObj_->Draw();
 	planeGltf_->Draw();
 	fieldObj_->Draw();
+	animatedCubeObj_->Draw();
 }
 void SampleScene::Finalize() {}
