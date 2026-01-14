@@ -1,7 +1,8 @@
 #include "Model/ModelManager.h"
 #include "Model/ModelCommon.h"
 #include "Model/Model.h"
-
+#include <filesystem>
+#include <vector>
 std::unique_ptr<ModelManager> ModelManager::instance = nullptr;
 
 ModelManager* ModelManager::GetInstance(){
@@ -31,9 +32,33 @@ void ModelManager::LoadGltfModel(const std::string& directionalPath , const std:
 	if (models.contains(filePath)) {
 		return;
 	}
+	namespace fs = std::filesystem;
+	const fs::path basePath = fs::path(directionalPath) / filePath;
+	std::vector<fs::path> candidates;
+	fs::path directoryPath = directionalPath;
+	std::string filename = filePath;
+
+	if (basePath.has_extension()) {
+		candidates.push_back(basePath);
+		if (basePath.has_parent_path()) {
+			directoryPath = basePath.parent_path();
+			filename = basePath.filename().string();
+		}
+	} else {
+		candidates.push_back(fs::path(basePath.string() + ".gltf"));
+		candidates.push_back(fs::path(basePath.string() + ".glb"));
+	}
+
+	for (const auto& candidate : candidates) {
+		if (fs::exists(candidate)) {
+			directoryPath = candidate.parent_path();
+			filename = candidate.filename().string();
+			break;
+		}
+	}
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->LoadObjFileAssimp(directionalPath, filePath +".glb");
+	model->LoadObjFileAssimp(directoryPath.string(), filename);
 	model->Initialize(modelCommon_.get());
 	models.insert(std::make_pair(filePath, std::move(model)));
 

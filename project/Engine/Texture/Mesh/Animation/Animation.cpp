@@ -53,7 +53,7 @@ Vector4 Slerp(const Vector4& start, const Vector4& end, float ratio) {
 } // namespace
 
 Animation::AnimationData Animation::LoadAnimationData(const std::string& directoryPath, const std::string& filename) {
-	std::string filePath = directoryPath + "/" + filename;
+	std::string filePath = directoryPath + "/" + filename + ".gltf";
 
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(filePath, 0);
