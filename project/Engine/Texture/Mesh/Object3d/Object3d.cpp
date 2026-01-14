@@ -30,13 +30,25 @@ void Object3d::Update() {
 			}
 		}
 
-		const auto& nodeName = model_->GetModelData().rootnode.name;
-		auto it = animation_->nodeAnimations.find(nodeName);
-		if (it != animation_->nodeAnimations.end()) {
-			const Animation::NodeAnimation& rootNodeAnimation = it->second;
-			Vector3 translate = rootNodeAnimation.translate.keyframes.empty() ? Vector3{0.0f, 0.0f, 0.0f} : Animation::CalculateValue(rootNodeAnimation.translate, animationTime_);
-			Vector4 rotate = rootNodeAnimation.rotation.keyframes.empty() ? Vector4{0.0f, 0.0f, 0.0f, 1.0f} : Animation::CalculateValue(rootNodeAnimation.rotation, animationTime_);
-			Vector3 scale = rootNodeAnimation.scale.keyframes.empty() ? Vector3{1.0f, 1.0f, 1.0f} : Animation::CalculateValue(rootNodeAnimation.scale, animationTime_);
+		const auto& rootNode = model_->GetModelData().rootnode;
+		const Animation::NodeAnimation* nodeAnimation = nullptr;
+		auto findNodeAnimation = [&](const auto& node, const auto& nodeAnimations, auto&& self) -> const Animation::NodeAnimation* {
+			auto it = nodeAnimations.find(node.name);
+			if (it != nodeAnimations.end()) {
+				return &it->second;
+			}
+			for (const auto& child : node.childlen) {
+				if (const Animation::NodeAnimation* found = self(child, nodeAnimations, self)) {
+					return found;
+				}
+			}
+			return nullptr;
+		};
+		nodeAnimation = findNodeAnimation(rootNode, animation_->nodeAnimations, findNodeAnimation);
+		if (nodeAnimation) {
+			Vector3 translate = nodeAnimation->translate.keyframes.empty() ? Vector3{0.0f, 0.0f, 0.0f} : Animation::CalculateValue(nodeAnimation->translate, animationTime_);
+			Vector4 rotate = nodeAnimation->rotation.keyframes.empty() ? Vector4{0.0f, 0.0f, 0.0f, 1.0f} : Animation::CalculateValue(nodeAnimation->rotation, animationTime_);
+			Vector3 scale = nodeAnimation->scale.keyframes.empty() ? Vector3{1.0f, 1.0f, 1.0f} : Animation::CalculateValue(nodeAnimation->scale, animationTime_);
 			localMatrix = Function::MakeAffineMatrix(scale, rotate, translate);
 		}
 	}
