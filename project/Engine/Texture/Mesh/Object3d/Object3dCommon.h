@@ -7,6 +7,7 @@
 #include <Windows.h>
 #include <cstdint>
 #include <memory>
+#include <string>
 #include <wrl.h>
 class Camera;
 class DirectXCommon;
@@ -44,6 +45,8 @@ private:
 	AreaLightCount* areaLightCountData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> areaLightCountResource_ = nullptr;
 	uint32_t areaLightSrvIndex_ = 0;
+	uint32_t environmentMapSrvIndex_ = 0;
+	std::string environmentMapPath_;
 
 public:
 	static Object3dCommon* GetInstance();
@@ -65,6 +68,8 @@ public:
 	uint32_t GetSpotLightSrvIndex() const { return spotLightSrvIndex_; }
 	ID3D12Resource* GetAreaLightCountResource() const { return areaLightCountResource_.Get(); }
 	uint32_t GetAreaLightSrvIndex() const { return areaLightSrvIndex_; }
+	uint32_t GetEnvironmentMapSrvIndex() const { return environmentMapSrvIndex_; }
+	void SetEnvironmentMapTexture(const std::string& filePath);
 	void SetDirectionalLight(DirectionalLight& light);
 	void SetPointLights(const PointLight* pointLights, uint32_t count);
 	void SetSpotLights(const SpotLight* spotLights, uint32_t count);

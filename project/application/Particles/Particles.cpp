@@ -12,13 +12,6 @@ Particles::Particles() {
 	ParticleManager::GetInstance()->CreateParticleGroup("Arrow", "Resources/2d/ArrowParticle.png");
 	ParticleManager::GetInstance()->CreateParticleGroup("skill", "Resources/2d/ArrowParticle.png");
 
-	//// ★ new → make_unique に変更
-	//particleplayer = std::make_unique<ParticleEmitter>(
-	//    "player", Transform{{0.1f, 0.1f, 1.0f},{0.0f, 0.0f, 0.0f} ,{0.0f, 0.0f, 0.0f}}, 1.0f, 5, Vector3{-0.01f, 0.001f, 0.0f}, Vector3{-10.0f, 0, -1}, Vector3{10.0f, 3, 0});
-
-	//particleleaf = std::make_unique<ParticleEmitter>("leaf", Transform{{0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}, 1.0f, 5, Vector3{0.0f, -0.1f, 0}, Vector3{-640, 0, -1}, Vector3{640, 320, 0});
-
-	//particlegoal = std::make_unique<ParticleEmitter>("goal", Transform{{0.2f, 0.2f, 1.0f}, {0.0f, 0.0f, 0.0f},{0.0f, 0.0f, 0.0f}}, 1.0f, 5, Vector3{0, 0.1f, 0.0f}, Vector3{-10.0f, 0, -1}, Vector3{10.0f, 3, 0});
 	particleArrow = std::make_unique<ParticleEmitter>(
 	    "Arrow",
 	    Transform{
@@ -44,51 +37,10 @@ void Particles::Update() {
 
 	playerEmitterTransform.translate = {playerPos_.x * kParticlePosScale, (playerPos_.y - 0.9f) * kParticlePosScale, playerPos_.z};
 
-	//particleArrow
-	//    ->Update({{1,1,1},{0,0,0},{-25,3,-25}});
 
-	/*particleplayer->Update(playerEmitterTransform);
-
-	particleleaf->Update({
-	    {0.5f,         0.5f,         1.0f},
-        {0,            0,            0   },
-        {cameraPos_.x, cameraPos_.y, 0   }
-    });
-
-	if (isgoal) {
-		particlegoal->Update({
-		    {0.2f,              0.2f,                       1.0f                 },
-            {0,                 0,                          0                    },
-            {goalPos_.x * 2.5f, (goalPos_.y - 0.5f) * 2.5f, goalPos_.z * 2.5f + 1}
-        });
-	}*/
-
-//#ifdef USE_IMGUI
-//	if (ImGui::Begin("Particles Editor")) {
-//		ImGui::Text("Player Emitter");
-//		EditSingleEmitter(particleplayer.get());
-//
-//		ImGui::Separator();
-//		ImGui::Text("Leaf Emitter");
-//		EditSingleEmitter(particleleaf.get());
-//
-//		ImGui::Separator();
-//		ImGui::Text("Goal Emitter");
-//		EditSingleEmitter(particlegoal.get());
-//	}
-//	ImGui::End();
-//#endif
 }
 void Particles::Draw() {
-	/*if (particleplayer) {
-		particleplayer->Draw();
-	}
-	if (particleleaf) {
-		particleleaf->Draw();
-	}
-	if (particlegoal) {
-		particlegoal->Draw();
-	}*/
+
 	if (particleArrow) {
 		particleArrow->Draw();
 	}

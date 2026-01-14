@@ -91,7 +91,11 @@ void Object3d::SetShininess(float shininess) {
 		model_->SetShininess(shininess);
 	}
 }
-
+void Object3d::SetEnvironmentCoefficient(float coefficient) {
+	if (model_) {
+		model_->SetEnvironmentCoefficient(coefficient);
+	}
+}
 void Object3d::CreateResources() {
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));

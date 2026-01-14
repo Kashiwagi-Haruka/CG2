@@ -34,6 +34,7 @@ void Model::Initialize(ModelCommon* modelCommon) {
 	mat3d->enableLighting = true;
 	mat3d->uvTransform = Function::MakeIdentity4x4();
 	mat3d->shininess = 40.0f;
+	mat3d->environmentCoefficient = 0.0f;
 
 	materialResource_->Unmap(0, nullptr);
 
@@ -59,6 +60,11 @@ void Model::SetUvTransform(const Matrix4x4& uvTransform) {
 void Model::SetShininess(float shininess) {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
 	mat3d->shininess = shininess;
+	materialResource_->Unmap(0, nullptr);
+}
+void Model::SetEnvironmentCoefficient(float coefficient) {
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
+	mat3d->environmentCoefficient = coefficient;
 	materialResource_->Unmap(0, nullptr);
 }
 void Model::Draw() {
@@ -87,6 +93,8 @@ void Model::Draw() {
 	// --- AreaLight SRVのDescriptorTableを設定 ---
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());
 
+	// --- Environment Map SRVのDescriptorTableを設定 ---
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(11, Object3dCommon::GetInstance()->GetEnvironmentMapSrvIndex());
 
 	// --- 描画！（DrawCall）---
 	modelCommon_->GetDxCommon()->GetCommandList()->DrawInstanced(

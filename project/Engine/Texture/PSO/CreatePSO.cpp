@@ -9,13 +9,12 @@ void CreatePSO::Create(D3D12_CULL_MODE cullMode) {
 	CreateRootSignature();
 	CreateGraphicsPipeline(cullMode);
 }
-
 void CreatePSO::CreateRootSignature() {
 	// --- RootSignature ---
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	D3D12_ROOT_PARAMETER rootParameters[11] = {};
-	D3D12_DESCRIPTOR_RANGE descriptorRange[4] = {};
+	D3D12_ROOT_PARAMETER rootParameters[12] = {};
+	D3D12_DESCRIPTOR_RANGE descriptorRange[5] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
 	descriptorRange[0].NumDescriptors = 1;
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
@@ -35,6 +34,11 @@ void CreatePSO::CreateRootSignature() {
 	descriptorRange[3].NumDescriptors = 1;
 	descriptorRange[3].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[3].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	descriptorRange[4].BaseShaderRegister = 4;
+	descriptorRange[4].NumDescriptors = 1;
+	descriptorRange[4].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[4].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
@@ -83,6 +87,12 @@ void CreatePSO::CreateRootSignature() {
 	rootParameters[10].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[10].DescriptorTable.pDescriptorRanges = &descriptorRange[3];
 	rootParameters[10].DescriptorTable.NumDescriptorRanges = 1;
+
+	rootParameters[11].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[11].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[11].DescriptorTable.pDescriptorRanges = &descriptorRange[4];
+	rootParameters[11].DescriptorTable.NumDescriptorRanges = 1;
+
 
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);

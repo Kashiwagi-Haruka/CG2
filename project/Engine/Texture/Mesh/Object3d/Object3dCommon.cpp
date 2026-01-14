@@ -27,6 +27,9 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	pso_ = std::make_unique<CreatePSO>(dxCommon_);
 	pso_->Create(D3D12_CULL_MODE_BACK);
+
+	SetEnvironmentMapTexture("Resources/3d/skydome.png");
+
 	// Directional Light の共通バッファ作成
 	directionalLightResource_ = CreateBufferResource(sizeof(DirectionalLight));
 	assert(directionalLightResource_);
@@ -65,7 +68,11 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	srvManager->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaLight));
 
 }
-
+void Object3dCommon::SetEnvironmentMapTexture(const std::string& filePath) {
+	environmentMapPath_ = filePath;
+	TextureManager::GetInstance()->LoadTextureName(environmentMapPath_);
+	environmentMapSrvIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(environmentMapPath_);
+}
 void Object3dCommon::DrawCommon() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(pso_->GetRootSignature().Get());

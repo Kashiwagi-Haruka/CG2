@@ -32,6 +32,7 @@ class SampleScene : public BaseScene {
 	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	bool enableLighting = true;
 	float shininess = 40.0f;
+	float environmentCoefficient = 0.25f;
 
 public:
 	SampleScene();

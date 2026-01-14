@@ -34,8 +34,9 @@ class Model {
 		float padding[3];
 		Matrix4x4 uvTransform;
 		float shininess;
+		float environmentCoefficient;
+		float padding2[2];
 	};
-
 
 	ModelCommon* modelCommon_;
 
@@ -60,6 +61,7 @@ public:
 	void SetEnableLighting(bool enable);
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetShininess(float shininess);
+	void SetEnvironmentCoefficient(float coefficient);
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() { return vertexBufferView_; }
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetMaterialResource() { return materialResource_; }
 	ModelData& GetModelData() { return modelData_; }

@@ -102,7 +102,7 @@
     <ClCompile Include="Engine\stringUtillity\StringUtility.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="application\CameraController.cpp">
+    <ClCompile Include="application\CameraController\CameraController.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Camera\Camera.cpp">
@@ -174,7 +174,7 @@
     <ClCompile Include="application\Object\Player\Player.cpp">
       <Filter>ソース ファイル\application\Object\Player</Filter>
     </ClCompile>
-    <ClCompile Include="application\Particles.cpp">
+    <ClCompile Include="application\Particles\Particles.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="application\Object\Enemy\Enemy.cpp">
@@ -261,10 +261,10 @@
     <ClCompile Include="application\Object\Enemy\EnemyHitEffect.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\GameTimer.cpp">
+    <ClCompile Include="application\GameTimer\GameTimer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\Pause.cpp">
+    <ClCompile Include="application\Pause\Pause.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\Object\House\HouseHP.cpp">
@@ -325,7 +325,7 @@
     <ClInclude Include="Engine\ImGui\ImGuiManager.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="application\CameraController.h">
+    <ClInclude Include="application\CameraController\CameraController.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Loadfile\CSVManager.h">
@@ -445,7 +445,7 @@
     <ClInclude Include="application\Object\Player\Player.h">
       <Filter>ヘッダー ファイル\application\Player</Filter>
     </ClInclude>
-    <ClInclude Include="application\Particles.h">
+    <ClInclude Include="application\Particles\Particles.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="Engine\BaseScene\BaseScene.h">
@@ -511,10 +511,10 @@
     <ClInclude Include="application\Object\Enemy\EnemyHitEffect.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\GameTimer.h">
+    <ClInclude Include="application\GameTimer\GameTimer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\Pause.h">
+    <ClInclude Include="application\Pause\Pause.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Object\House\HouseHP.h">

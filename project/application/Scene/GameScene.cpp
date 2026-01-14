@@ -1,5 +1,5 @@
 #include "GameScene.h"
-#include "CameraController.h"
+#include "CameraController/CameraController.h"
 #include "Model/ModelManeger.h"
 #include "Object/Background/SkyDome.h"
 #include "Object/Enemy/EnemyManager.h"
@@ -10,7 +10,7 @@
 #include "SceneManager.h"
 #include <numbers>
 #include "RigidBody.h"
-#include "GameTimer.h"
+#include "GameTimer/GameTimer.h"
 #include "TextureManager.h"
 #include <algorithm>
 

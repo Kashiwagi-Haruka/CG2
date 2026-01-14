@@ -3,7 +3,7 @@
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 #include "SceneManager.h"
-#include "GameTimer.h"
+#include "GameTimer/GameTimer.h"
 #include "Object/House/HouseHP.h"
 #include <algorithm>
 

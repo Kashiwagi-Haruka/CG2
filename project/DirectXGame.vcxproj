@@ -162,7 +162,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp" />
     <ClCompile Include="Engine\BaseScene\AbstractSceneFactory.cpp" />
     <ClCompile Include="application\Object\Enemy\Enemy.cpp" />
-    <ClCompile Include="application\CameraController.cpp" />
+    <ClCompile Include="application\CameraController\CameraController.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyManager.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyStun.cpp" />
     <ClCompile Include="application\Object\Player\PlayerParameters.cpp" />
@@ -223,7 +223,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Scene\TitleScene.cpp" />
     <ClCompile Include="application\UIManager.cpp" />
     <ClCompile Include="application\SceneTransition.cpp" />
-    <ClCompile Include="application\Particles.cpp" />
+    <ClCompile Include="application\Particles\Particles.cpp" />
     <ClCompile Include="Engine\BaseScene\SceneManager.cpp" />
     <ClCompile Include="Engine\BaseScene\FrameWork.cpp" />
     <ClCompile Include="application\Scene\Game\Game.cpp" />
@@ -235,8 +235,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\Player\PlayerSkill.cpp" />
     <ClCompile Include="application\Object\Player\PlayerSpecialAttack.cpp" />
     <ClCompile Include="application\Object\Player\PlayerModels.cpp" />
-    <ClCompile Include="application\GameTimer.cpp" />
-    <ClCompile Include="application\Pause.cpp" />
+    <ClCompile Include="application\GameTimer\GameTimer.cpp" />
+    <ClCompile Include="application\Pause\Pause.cpp" />
     <ClCompile Include="application\Object\House\HouseHP.cpp" />
     <ClCompile Include="application\Team\Team.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Primitive\Primitive.cpp" />
@@ -262,7 +262,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\PSO\CreatePSO.h" />
     <ClInclude Include="Engine\BaseScene\AbstractSceneFactory.h" />
     <ClInclude Include="application\Object\Enemy\Enemy.h" />
-    <ClInclude Include="application\CameraController.h" />
+    <ClInclude Include="application\CameraController\CameraController.h" />
     <ClInclude Include="application\Object\Enemy\EnemyManager.h" />
     <ClInclude Include="application\Object\Enemy\EnemyStun.h" />
     <ClInclude Include="application\Object\Player\PlayerParameters.h" />
@@ -318,7 +318,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Scene\TitleScene.h" />
     <ClInclude Include="application\UIManager.h" />
     <ClInclude Include="application\SceneTransition.h" />
-    <ClInclude Include="application\Particles.h" />
+    <ClInclude Include="application\Particles\Particles.h" />
     <ClInclude Include="Engine\BaseScene\SceneManager.h" />
     <ClInclude Include="Engine\BaseScene\FrameWork.h" />
     <ClInclude Include="application\Scene\Game\Game.h" />
@@ -331,8 +331,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\Player\PlayerSkill.h" />
     <ClInclude Include="application\Object\Player\PlayerSpecialAttack.h" />
     <ClInclude Include="application\Object\Player\PlayerModels.h" />
-    <ClInclude Include="application\GameTimer.h" />
-    <ClInclude Include="application\Pause.h" />
+    <ClInclude Include="application\GameTimer\GameTimer.h" />
+    <ClInclude Include="application\Pause\Pause.h" />
     <ClInclude Include="application\Object\House\HouseHP.h" />
     <ClInclude Include="application\Team\Team.h" />
     <ClInclude Include="Engine\Texture\Mesh\Primitive\Primitive.h" />

@@ -200,9 +200,11 @@ void SampleScene::Update() {
 			ImGui::ColorEdit4("MaterialColor", &color.x);
 			ImGui::Checkbox("EnableLighting", &enableLighting);
 			ImGui::DragFloat("Shininess", &shininess, 0.1f, 0.0f, 100.0f);
+			ImGui::DragFloat("EnvironmentCoefficient", &environmentCoefficient, 0.01f, 0.0f, 1.0f);
 			uvBallObj_->SetColor(color);
 			uvBallObj_->SetEnableLighting(enableLighting);
 			uvBallObj_->SetShininess(shininess);
+			uvBallObj_->SetEnvironmentCoefficient(environmentCoefficient);
 			ImGui::TreePop();
 		}
 	}
