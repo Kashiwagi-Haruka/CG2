@@ -484,7 +484,7 @@ void ParticleManager::CreateGraphicsPipeline() {
 		rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE; // ★ カリングOFF
 		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 		psoDesc.RasterizerState = rasterizerDesc;
-		psoDesc.BlendState = blendModeManeger_.SetBlendMode(static_cast<BlendMode>(i));
+		psoDesc.BlendState = blendModeManager_.SetBlendMode(static_cast<BlendMode>(i));
 		psoDesc.NumRenderTargets = 1;
 		psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 		psoDesc.DepthStencilState = depthDesc;

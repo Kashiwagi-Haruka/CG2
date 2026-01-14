@@ -156,6 +156,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyAttack.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyHitEffect.cpp" />
     <ClCompile Include="application\Object\Character\Model\CharacterModel.cpp" />
@@ -212,7 +213,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\TextureManager.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Model\Model.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Model\ModelCommon.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Model\ModelManeger.cpp" />
+    <ClCompile Include="Engine\Texture\Mesh\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Texture\SrvManager\SrvManager.cpp" />
     <ClCompile Include="Engine\Texture\Particle\ParticleManager.cpp" />
     <ClCompile Include="Engine\Texture\Particle\ParticleEmitter.cpp" />
@@ -255,6 +256,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <None Include="Resources\shader\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h" />
     <ClInclude Include="application\Object\Enemy\EnemyAttack.h" />
     <ClInclude Include="application\Object\Enemy\EnemyHitEffect.h" />
     <ClInclude Include="application\Object\Character\Model\CharacterModel.h" />
@@ -307,7 +309,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\TextureManager.h" />
     <ClInclude Include="Engine\Texture\Mesh\Model\Model.h" />
     <ClInclude Include="Engine\Texture\Mesh\Model\ModelCommon.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Model\ModelManeger.h" />
+    <ClInclude Include="Engine\Texture\Mesh\Model\ModelManager.h" />
     <ClInclude Include="Engine\Texture\SrvManager\SrvManager.h" />
     <ClInclude Include="Engine\Texture\Particle\ParticleManager.h" />
     <ClInclude Include="Engine\Texture\Particle\ParticleEmitter.h" />

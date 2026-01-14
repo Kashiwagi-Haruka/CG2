@@ -103,7 +103,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob_;
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
 
-	BlendModeManager blendModeManeger_;
+	BlendModeManager blendModeManager_;
 	BlendMode currentBlendMode_ = BlendMode::kBlendModeAlpha;
 
 	// ... 既存のメンバ変数の下に追加

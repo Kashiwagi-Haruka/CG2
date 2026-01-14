@@ -150,7 +150,7 @@
     <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3dCommon.cpp">
       <Filter>ソース ファイル\Engine\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Model\ModelManeger.cpp">
+    <ClCompile Include="Engine\Texture\Mesh\Model\ModelManager.cpp">
       <Filter>ソース ファイル\Engine\Texture</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3d.cpp">
@@ -282,6 +282,9 @@
     <ClCompile Include="Engine\Texture\Mesh\Primitive\Primitive.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -394,7 +397,7 @@
     <ClInclude Include="Engine\Texture\Mesh\Model\ModelCommon.h">
       <Filter>ヘッダー ファイル\Engine\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Model\ModelManeger.h">
+    <ClInclude Include="Engine\Texture\Mesh\Model\ModelManager.h">
       <Filter>ヘッダー ファイル\Engine\Texture</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\Mesh\Model\Model.h">
@@ -533,6 +536,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\Light\AreaLight.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

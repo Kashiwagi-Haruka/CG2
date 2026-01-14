@@ -1,7 +1,7 @@
 #include "PlayerModels.h"
 #include <cmath>
 #include "Function.h"
-#include "Model/ModelManeger.h"
+#include "Model/ModelManager.h"
 #include "GameBase.h"
 #include "imgui.h"
 PlayerModels::PlayerModels() {

@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "Function.h"
 #include "GameBase.h"
-#include "Model/ModelManeger.h"
+#include "Model/ModelManager.h"
 #include "Object/MapchipField.h"
 #include <algorithm>
 #include <numbers>

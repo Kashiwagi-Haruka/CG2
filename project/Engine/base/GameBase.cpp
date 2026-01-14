@@ -1,7 +1,7 @@
 #define NOMINMAX
 #include "GameBase.h"
 #include "ImGuiManager.h"
-#include "Model/ModelManeger.h"
+#include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #include "ParticleManager.h"
 #include "SpriteCommon.h"

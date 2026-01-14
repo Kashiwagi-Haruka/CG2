@@ -1,6 +1,6 @@
 #include "SampleScene.h"
 #include "GameBase.h"
-#include "Model/ModelManeger.h"
+#include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #ifdef USE_IMGUI
 #include <imgui.h>

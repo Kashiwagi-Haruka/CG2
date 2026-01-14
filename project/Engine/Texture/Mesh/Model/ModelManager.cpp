@@ -1,4 +1,4 @@
-#include "Model/ModelManeger.h"
+#include "Model/ModelManager.h"
 #include "Model/ModelCommon.h"
 #include "Model/Model.h"
 

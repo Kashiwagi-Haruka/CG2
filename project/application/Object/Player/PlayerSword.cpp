@@ -1,6 +1,6 @@
 #include "PlayerSword.h"
 #include "GameBase.h"
-#include "Model/ModelManeger.h"
+#include "Model/ModelManager.h"
 #include "Function.h"
 PlayerSword::PlayerSword() {
 

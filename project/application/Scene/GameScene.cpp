@@ -1,6 +1,6 @@
 #include "GameScene.h"
 #include "CameraController/CameraController.h"
-#include "Model/ModelManeger.h"
+#include "Model/ModelManager.h"
 #include "Object/Background/SkyDome.h"
 #include "Object/Enemy/EnemyManager.h"
 #include "Object/Player/Player.h"

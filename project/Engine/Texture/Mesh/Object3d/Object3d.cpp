@@ -3,7 +3,7 @@
 #include "DirectXCommon.h"
 #include "Function.h"
 #include "Model/Model.h"
-#include "Model/ModelManeger.h"
+#include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #include "TextureManager.h"
 #include <cassert>

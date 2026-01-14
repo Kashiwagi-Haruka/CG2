@@ -23,7 +23,7 @@ private:
 	HRESULT hr_;
 
 	BlendMode blendMode_ = BlendMode::kBlendModeNone;
-	BlendModeManager blendModeManeger_;
+	BlendModeManager blendModeManager_;
 
 	std::unique_ptr<CreatePSO> pso_;
 

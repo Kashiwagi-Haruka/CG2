@@ -2,7 +2,7 @@
 #include "EnemyAttack.h"
 #include "Camera.h"
 #include "GameBase.h"
-#include "Model/ModelManeger.h"
+#include "Model/ModelManager.h"
 
 EnemyAttack::EnemyAttack() {
 	ModelManager::GetInstance()->LoadModel("EnemyAttack"); // 鎌モデル
