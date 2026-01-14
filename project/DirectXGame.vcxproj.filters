@@ -291,7 +291,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
-    <None Include="Resources\shader\Object3d.hlsli">
+    <None Include="Resources\shader\Object3d\Object3d.hlsli">
       <Filter>リソース ファイル</Filter>
     </None>
     <None Include="Resources\shader\Particle.hlsli" />
@@ -549,10 +549,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resources\shader\Object3d.PS.hlsl">
+    <FxCompile Include="Resources\shader\Object3d\Object3d.PS.hlsl">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Object3d.VS.hlsl">
+    <FxCompile Include="Resources\shader\Object3d\Object3d.VS.hlsl">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shader\WhitePS.hlsl">

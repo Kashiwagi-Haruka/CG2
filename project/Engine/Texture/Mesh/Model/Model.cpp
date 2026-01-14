@@ -5,6 +5,7 @@
 #include "Object3d/Object3dCommon.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
+#include "Logger.h"
 #include <cassert>
 #include <fstream>
 #include <sstream>
@@ -253,9 +254,14 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 	std::string path = directoryPath + "/" + filename;
 
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
 
-	assert(scene && scene->HasMeshes());
+	if (!scene || !scene->HasMeshes()) {
+		Logger::Log("LoadObjFileGltf failed: " + path + " " + importer.GetErrorString() + "\n");
+		modelData_ = {};
+		modelData_.rootnode.localMatrix = Function::MakeIdentity4x4();
+		return;
+	}
 
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex]; // OBJは1メッシュ想定
@@ -309,7 +315,11 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 		}
 	}
 
-	modelData_.rootnode = NodeRead(scene->mRootNode);
+	if (scene->mRootNode) {
+		modelData_.rootnode = NodeRead(scene->mRootNode);
+	} else {
+		modelData_.rootnode.localMatrix = Function::MakeIdentity4x4();
+	}
 }
 Model::Node Model::NodeRead(aiNode* node) {
 	Node result;

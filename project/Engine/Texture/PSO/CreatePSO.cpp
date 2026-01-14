@@ -172,8 +172,8 @@ void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode) {
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	// --- シェーダーコンパイル ---
-	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d.VS.hlsl", L"vs_6_0");
-	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d.PS.hlsl", L"ps_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d/Object3d.VS.hlsl", L"vs_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d/Object3d.PS.hlsl", L"ps_6_0");
 	assert(vsBlob && psBlob);
 
 	for (int i = 0; i < BlendMode::kCountOfBlendMode; i++) {
