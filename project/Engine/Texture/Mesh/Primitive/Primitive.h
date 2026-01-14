@@ -1,9 +1,9 @@
 #pragma once
 #include <cstdint>
+
+class Camera;
+
 class Primitive {
-
-	private:
-
 
 	public:
 	enum PrimitiveName {
@@ -21,6 +21,7 @@ class Primitive {
 	private:
 
 		PrimitiveName primitiveName_;
+	    Camera* camera_;
 
 	
 	public:

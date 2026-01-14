@@ -53,6 +53,5 @@ void SceneManager::ChangeScene(const std::string& sceneName) {
 	assert(sceneFactory_);
 	assert(nextscene_ == nullptr);
 
-	// ★ unique_ptr を直接受け取る
-	nextscene_ = std::unique_ptr<BaseScene>(sceneFactory_->CreateScene(sceneName));
+nextscene_ = sceneFactory_->CreateScene(sceneName);
 }

@@ -1,15 +1,13 @@
 #pragma once
 
 #include "BaseScene.h"
+#include <memory>
 #include <string>
 
 class AbstractSceneFactory {
 
-	public:
+public:
+	virtual ~AbstractSceneFactory() = default;
 
-		virtual ~AbstractSceneFactory() = default;
-
-		virtual BaseScene* CreateScene(const std::string& sceneName) = 0;
-
-
+	virtual std::unique_ptr<BaseScene> CreateScene(const std::string& sceneName) = 0;
 };

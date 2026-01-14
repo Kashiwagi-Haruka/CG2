@@ -1,5 +1,5 @@
 #include "Primitive.h"
-
+#include "Object3d/Object3dCommon.h"
 void Primitive::Initialize(PrimitiveName name) {
 
 	primitiveName_ = name;
@@ -27,6 +27,7 @@ void Primitive::Initialize(PrimitiveName name) {
 		break;
 	}
 
+	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 
 
 }
