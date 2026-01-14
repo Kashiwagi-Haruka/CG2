@@ -6,7 +6,7 @@
 #include <algorithm>
 
 Enemy::Enemy() {
-	ModelManager::GetInstance()->LoadModel("Enemy");
+	ModelManager::GetInstance()->LoadModel("Resources/3d","Enemy");
 	object_ = std::make_unique<Object3d>();
 	enemyStun = std::make_unique<EnemyStun>();
 	

@@ -1,41 +1,25 @@
 #pragma once
 #include "Vector3.h"
 #include "Vector4.h"
-#include <vector>
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
+
 class Animation {
-
-	struct KeyframeVector3 {
-		Vector3 value;
-		float time;
-	};
-
-	struct KeyframeVector4 {
-		Vector4 value;
-		float time;
-	};
-
-	template<typename tValue> 
-	struct Keyflame {
+public:
+	template<typename tValue> struct Keyframe {
 		float time;
 		tValue value;
-	
 	};
 
-	using KeyframeVector3 = Keyflame<Vector3>;
-	using KeyframeVector4 = Keyflame<Vector4>;
+	using KeyframeVector3 = Keyframe<Vector3>;
+	using KeyframeVector4 = Keyframe<Vector4>;
+
+	template<typename tValue> struct AnimationCurve {
+		std::vector<Keyframe<tValue>> keyframes;
+	};
 
 	struct NodeAnimation {
-		std::vector<KeyframeVector3> translate;
-		std::vector<KeyframeVector4> rotation;
-		std::vector<KeyframeVector3> scale;
-	};
-	template<typename tValue>
-	struct AnimationCurve{
-		std::vector<Keyflame<tValue>> keyframes;
-	};
-	struct NodeAnimation{
 		AnimationCurve<Vector3> translate;
 		AnimationCurve<Vector4> rotation;
 		AnimationCurve<Vector3> scale;
@@ -43,7 +27,8 @@ class Animation {
 
 	struct AnimationData {
 		float duration;
-		
-		std::map<std::string,NodeAnimation> nodeAnimations;
+		std::map<std::string, NodeAnimation> nodeAnimations;
 	};
+
+	static AnimationData LoadAnimationData(const std::string& directoryPath, const std::string& filename);
 };

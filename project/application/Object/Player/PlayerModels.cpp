@@ -5,12 +5,12 @@
 #include "GameBase.h"
 #include "imgui.h"
 PlayerModels::PlayerModels() {
-	ModelManager::GetInstance()->LoadModel("playerRarm");
-	ModelManager::GetInstance()->LoadModel("playerbody");
+	ModelManager::GetInstance()->LoadModel("Resources/3d","playerRarm");
+	ModelManager::GetInstance()->LoadModel("Resources/3d","playerbody");
 
-	ModelManager::GetInstance()->LoadModel("playerLarm");
-	ModelManager::GetInstance()->LoadModel("playerRleg");
-	ModelManager::GetInstance()->LoadModel("playerLleg");
+	ModelManager::GetInstance()->LoadModel("Resources/3d","playerLarm");
+	ModelManager::GetInstance()->LoadModel("Resources/3d","playerRleg");
+	ModelManager::GetInstance()->LoadModel("Resources/3d","playerLleg");
 };
 PlayerModels::~PlayerModels() {};
 

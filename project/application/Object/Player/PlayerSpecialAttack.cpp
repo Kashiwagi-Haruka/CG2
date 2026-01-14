@@ -3,7 +3,7 @@
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #include <numbers>
-PlayerSpecialAttack::PlayerSpecialAttack() { ModelManager::GetInstance()->LoadModel("iceFlower"); }
+PlayerSpecialAttack::PlayerSpecialAttack() { ModelManager::GetInstance()->LoadModel("Resources/3d","iceFlower"); }
 
 void PlayerSpecialAttack::EnsureIceFlowerCount(int count) {
 	if (count < 0) {

@@ -3,7 +3,7 @@
 #include "GameBase.h"
 
 EnemyStun::EnemyStun() {
-	ModelManager::GetInstance()->LoadModel("EnemyStun");
+	ModelManager::GetInstance()->LoadModel("Resources/3d","EnemyStun");
 	object_ = std::make_unique<Object3d>();
 	object_->SetModel("EnemyStun");
 }
