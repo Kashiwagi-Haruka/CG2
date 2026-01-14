@@ -3,6 +3,7 @@
 #include "CameraForGPU.h"
 #include "Light/DirectionalLight.h"
 #include "Matrix4x4.h"
+#include "Animation/Animation.h"
 #include "Transform.h"
 #include "Vector4.h"
 #include "VertexData.h"
@@ -38,6 +39,9 @@ class Object3d {
 	Matrix4x4 worldMatrix;
 	Matrix4x4 worldViewProjectionMatrix;
 	bool isUseSetWorld;
+	const Animation::AnimationData* animation_ = nullptr;
+	float animationTime_ = 0.0f;
+	bool isLoopAnimation_ = true;
 
 public:
 	void Initialize();
@@ -65,6 +69,12 @@ public:
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetShininess(float shininess);
 	void SetEnvironmentCoefficient(float coefficient);
+	void SetAnimation(const Animation::AnimationData* animation, bool loop = true) {
+		animation_ = animation;
+		isLoopAnimation_ = loop;
+		animationTime_ = 0.0f;
+	}
+	void ResetAnimationTime(float time = 0.0f) { animationTime_ = time; }
 	Vector3 GetTranslate() { return transform_.translate; }
 	Vector3 GetRotate() { return transform_.rotate; }
 	Vector3 GetScale() { return transform_.scale; }

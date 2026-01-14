@@ -6,6 +6,6 @@ class CharacterModel {
 	
 
 
-	void LoadModel(std::string CharaName);
+	void LoadModel();
 
 };

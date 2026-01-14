@@ -6,7 +6,9 @@
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #include "TextureManager.h"
+#include <algorithm>
 #include <cassert>
+#include <cmath>
 
 void Object3d::Initialize() {
 
@@ -17,15 +19,35 @@ void Object3d::Initialize() {
 void Object3d::Update() {
 	// [0]=モデル描画用で使う
 
-	if (!isUseSetWorld) {
-		worldMatrix = Function::Multiply(model_->GetModelData().rootnode.localMatrix, Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
-	} else {
-		worldMatrix = Function::Multiply(model_->GetModelData().rootnode.localMatrix, worldMatrix);
+	Matrix4x4 localMatrix = model_ ? model_->GetModelData().rootnode.localMatrix : Function::MakeIdentity4x4();
+	if (animation_ && model_) {
+		animationTime_ += 1.0f / 60.0f;
+		if (animation_->duration > 0.0f) {
+			if (isLoopAnimation_) {
+				animationTime_ = std::fmod(animationTime_, animation_->duration);
+			} else {
+				animationTime_ = std::min(animationTime_, animation_->duration);
+			}
+		}
+
+		const auto& nodeName = model_->GetModelData().rootnode.name;
+		auto it = animation_->nodeAnimations.find(nodeName);
+		if (it != animation_->nodeAnimations.end()) {
+			const Animation::NodeAnimation& rootNodeAnimation = it->second;
+			Vector3 translate = rootNodeAnimation.translate.keyframes.empty() ? Vector3{0.0f, 0.0f, 0.0f} : Animation::CalculateValue(rootNodeAnimation.translate, animationTime_);
+			Vector4 rotate = rootNodeAnimation.rotation.keyframes.empty() ? Vector4{0.0f, 0.0f, 0.0f, 1.0f} : Animation::CalculateValue(rootNodeAnimation.rotation, animationTime_);
+			Vector3 scale = rootNodeAnimation.scale.keyframes.empty() ? Vector3{1.0f, 1.0f, 1.0f} : Animation::CalculateValue(rootNodeAnimation.scale, animationTime_);
+			localMatrix = Function::MakeAffineMatrix(scale, rotate, translate);
+		}
 	}
 
-	worldViewProjectionMatrix =
-	    Function::Multiply(model_->GetModelData().rootnode.localMatrix, Function::Multiply(Function::Multiply(worldMatrix, camera_->GetViewMatrix()), camera_->GetProjectionMatrix()));
+	if (!isUseSetWorld) {
+		worldMatrix = Function::Multiply(localMatrix, Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
+	} else {
+		worldMatrix = Function::Multiply(localMatrix, worldMatrix);
+	}
 
+	worldViewProjectionMatrix = Function::Multiply(localMatrix, Function::Multiply(Function::Multiply(worldMatrix, camera_->GetViewMatrix()), camera_->GetProjectionMatrix()));
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;

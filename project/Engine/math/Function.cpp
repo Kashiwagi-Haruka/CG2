@@ -164,6 +164,50 @@ Matrix4x4 MakeRotateZMatrix(float radian) {
 	return result;
 }
 
+Matrix4x4 MakeRotateMatrix(const Vector4& rotate) {
+	Matrix4x4 result{};
+	float length = std::sqrt(rotate.x * rotate.x + rotate.y * rotate.y + rotate.z * rotate.z + rotate.w * rotate.w);
+	Vector4 q = rotate;
+	if (length > 0.0f) {
+		q.x /= length;
+		q.y /= length;
+		q.z /= length;
+		q.w /= length;
+	}
+
+	float xx = q.x * q.x;
+	float yy = q.y * q.y;
+	float zz = q.z * q.z;
+	float xy = q.x * q.y;
+	float xz = q.x * q.z;
+	float yz = q.y * q.z;
+	float wx = q.w * q.x;
+	float wy = q.w * q.y;
+	float wz = q.w * q.z;
+
+	result.m[0][0] = 1.0f - 2.0f * (yy + zz);
+	result.m[0][1] = 2.0f * (xy + wz);
+	result.m[0][2] = 2.0f * (xz - wy);
+	result.m[0][3] = 0.0f;
+
+	result.m[1][0] = 2.0f * (xy - wz);
+	result.m[1][1] = 1.0f - 2.0f * (xx + zz);
+	result.m[1][2] = 2.0f * (yz + wx);
+	result.m[1][3] = 0.0f;
+
+	result.m[2][0] = 2.0f * (xz + wy);
+	result.m[2][1] = 2.0f * (yz - wx);
+	result.m[2][2] = 1.0f - 2.0f * (xx + yy);
+	result.m[2][3] = 0.0f;
+
+	result.m[3][0] = 0.0f;
+	result.m[3][1] = 0.0f;
+	result.m[3][2] = 0.0f;
+	result.m[3][3] = 1.0f;
+
+	return result;
+}
+
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 result{};
 	for (int row = 0; row < 4; ++row) {
@@ -173,7 +217,6 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 	}
 	return result;
 }
-
 
 Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 	Vector3 result;
@@ -195,6 +238,13 @@ Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) {
 	result = Multiply(ScaleRotateMatrix, MakeTranslateMatrix(translate));
 
 	return result;
+}
+
+Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector4 rotate, Vector3 translate) {
+	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+	Matrix4x4 rotateMatrix = MakeRotateMatrix(rotate);
+	Matrix4x4 scaleRotateMatrix = Multiply(scaleMatrix, rotateMatrix);
+	return Multiply(scaleRotateMatrix, MakeTranslateMatrix(translate));
 }
 
 Vector3 TransformVM(const Vector3& vector, const Matrix4x4& matrix4x4) {

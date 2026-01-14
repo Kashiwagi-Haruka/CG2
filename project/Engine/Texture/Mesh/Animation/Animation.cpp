@@ -1,8 +1,56 @@
 #include "Animation.h"
+#include "Function.h"
 
+#include <algorithm>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <cassert>
+#include <cmath>
+
+namespace {
+float Dot(const Vector4& a, const Vector4& b) { return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w; }
+
+Vector4 Normalize(const Vector4& v) {
+	float length = std::sqrt(Dot(v, v));
+	if (length == 0.0f) {
+		return {0.0f, 0.0f, 0.0f, 1.0f};
+	}
+	return {v.x / length, v.y / length, v.z / length, v.w / length};
+}
+
+Vector4 Slerp(const Vector4& start, const Vector4& end, float ratio) {
+	Vector4 normalizedStart = Normalize(start);
+	Vector4 normalizedEnd = Normalize(end);
+	float dot = Dot(normalizedStart, normalizedEnd);
+	if (dot < 0.0f) {
+		normalizedEnd = {-normalizedEnd.x, -normalizedEnd.y, -normalizedEnd.z, -normalizedEnd.w};
+		dot = -dot;
+	}
+
+	const float kThreshold = 0.9995f;
+	if (dot > kThreshold) {
+		Vector4 result{
+		    normalizedStart.x + (normalizedEnd.x - normalizedStart.x) * ratio,
+		    normalizedStart.y + (normalizedEnd.y - normalizedStart.y) * ratio,
+		    normalizedStart.z + (normalizedEnd.z - normalizedStart.z) * ratio,
+		    normalizedStart.w + (normalizedEnd.w - normalizedStart.w) * ratio,
+		};
+		return Normalize(result);
+	}
+
+	float theta = std::acos(std::clamp(dot, -1.0f, 1.0f));
+	float sinTheta = std::sin(theta);
+	float startScale = std::sin((1.0f - ratio) * theta) / sinTheta;
+	float endScale = std::sin(ratio * theta) / sinTheta;
+
+	return {
+	    startScale * normalizedStart.x + endScale * normalizedEnd.x,
+	    startScale * normalizedStart.y + endScale * normalizedEnd.y,
+	    startScale * normalizedStart.z + endScale * normalizedEnd.z,
+	    startScale * normalizedStart.w + endScale * normalizedEnd.w,
+	};
+}
+} // namespace
 
 Animation::AnimationData Animation::LoadAnimationData(const std::string& directoryPath, const std::string& filename) {
 	std::string filePath = directoryPath + "/" + filename;
@@ -48,4 +96,40 @@ Animation::AnimationData Animation::LoadAnimationData(const std::string& directo
 	}
 
 	return animation;
+}
+
+Vector3 Animation::CalculateValue(const AnimationCurve<Vector3>& keyframes, float time) {
+	assert(!keyframes.keyframes.empty());
+	if (keyframes.keyframes.size() == 1 || time <= keyframes.keyframes.front().time) {
+		return keyframes.keyframes.front().value;
+	}
+
+	for (size_t index = 0; index + 1 < keyframes.keyframes.size(); ++index) {
+		const KeyframeVector3& current = keyframes.keyframes[index];
+		const KeyframeVector3& next = keyframes.keyframes[index + 1];
+		if (current.time <= time && time <= next.time) {
+			float t = (time - current.time) / (next.time - current.time);
+			return Function::Lerp(current.value, next.value, t);
+		}
+	}
+
+	return keyframes.keyframes.back().value;
+}
+
+Vector4 Animation::CalculateValue(const AnimationCurve<Vector4>& keyframes, float time) {
+	assert(!keyframes.keyframes.empty());
+	if (keyframes.keyframes.size() == 1 || time <= keyframes.keyframes.front().time) {
+		return keyframes.keyframes.front().value;
+	}
+
+	for (size_t index = 0; index + 1 < keyframes.keyframes.size(); ++index) {
+		const KeyframeVector4& current = keyframes.keyframes[index];
+		const KeyframeVector4& next = keyframes.keyframes[index + 1];
+		if (current.time <= time && time <= next.time) {
+			float t = (time - current.time) / (next.time - current.time);
+			return Slerp(current.value, next.value, t);
+		}
+	}
+
+	return keyframes.keyframes.back().value;
 }
