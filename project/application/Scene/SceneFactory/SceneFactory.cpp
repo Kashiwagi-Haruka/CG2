@@ -1,26 +1,27 @@
 #include "SceneFactory.h"
+#include <memory>
 #include "Scene/TitleScene.h"
 #include "Scene/GameScene.h"
 #include "Scene/ResultScene.h"
 #include "Scene/GameOverScene.h"
 #include "Scene/SampleScene/SampleScene.h"
 BaseScene* SceneFactory::CreateScene(const std::string& sceneName) {
-	BaseScene* scene = nullptr;
+	std::shared_ptr<BaseScene> scene = nullptr;
 
 	if (sceneName == "Title") {
-		scene = new TitleScene();
+		scene = std::make_shared<TitleScene>();
 	}
 	else if (sceneName == "Game") {
-		scene = new GameScene();
+		scene = std::make_shared<GameScene>();
 	}
 	else if (sceneName == "Result") {
-		scene = new ResultScene();
+		scene = std::make_shared<ResultScene>();
 	} else if (sceneName == "GameOver") {
-		scene = new GameOverScene();
+		scene = std::make_shared<GameOverScene>();
 	} else if (sceneName == "Sample") {
-		scene = new SampleScene();
+		scene = std::make_shared<SampleScene>();
 	}
 
 
-	return scene;
+	return scene.get();
 }

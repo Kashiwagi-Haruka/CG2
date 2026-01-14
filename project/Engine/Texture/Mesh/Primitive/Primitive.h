@@ -20,7 +20,7 @@ class Primitive {
 
 	private:
 
-
+		PrimitiveName primitiveName_;
 
 	
 	public:
