@@ -42,7 +42,7 @@ void Object3d::Update() {
 			if (it != nodeAnimations.end()) {
 				return &it->second;
 			}
-			for (const auto& child : node.childlen) {
+			for (const auto& child : node.children) {
 				if (const Animation::NodeAnimation* found = self(child, nodeAnimations, self)) {
 					return found;
 				}

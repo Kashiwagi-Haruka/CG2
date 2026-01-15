@@ -332,9 +332,9 @@ Model::Node Model::NodeRead(aiNode* node) {
 	}
 	Matrix4x4 axisFlip = Function::MakeIdentity4x4();	
 	result.name = node->mName.C_Str();
-	result.childlen.resize(node->mNumChildren);
+	result.children.resize(node->mNumChildren);
 	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
-		result.childlen[childIndex] = NodeRead(node->mChildren[childIndex]);
+		result.children[childIndex] = NodeRead(node->mChildren[childIndex]);
 	}
 
 	return result;

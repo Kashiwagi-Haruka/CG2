@@ -1,6 +1,7 @@
 #pragma once
 #include "Matrix4x4.h"
 #include "VertexData.h"
+#include "QuaternionTransform.h"
 #include <Windows.h>
 #include <d3d12.h>
 #include <string>
@@ -14,9 +15,10 @@ class ModelCommon;
 class Model {
 
 	struct Node {
+		QuaternionTransform transform;
 		Matrix4x4 localMatrix;
 		std::string name;
-		std::vector<Node> childlen;
+		std::vector<Node> children;
 	};
 	struct MaterialData {
 		std::string textureFilePath;

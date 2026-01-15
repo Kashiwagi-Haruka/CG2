@@ -547,6 +547,9 @@
     <ClInclude Include="application\Object\Playable\Model\PlayableModel.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\math\QuaternionTransform.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d\Object3d.PS.hlsl">
