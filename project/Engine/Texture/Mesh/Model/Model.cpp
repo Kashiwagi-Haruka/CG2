@@ -254,7 +254,7 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 	std::string path = directoryPath + "/" + filename;
 
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 
 	if (!scene || !scene->HasMeshes()) {
 		Logger::Log("LoadObjFileGltf failed: " + path + " " + importer.GetErrorString() + "\n");
@@ -330,6 +330,7 @@ Model::Node Model::NodeRead(aiNode* node) {
 			result.localMatrix.m[i][j] = aiLocalMatrix4x4[i][j];
 		}
 	}
+	Matrix4x4 axisFlip = Function::MakeIdentity4x4();	
 	result.name = node->mName.C_Str();
 	result.childlen.resize(node->mNumChildren);
 	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {

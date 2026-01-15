@@ -58,7 +58,7 @@ void ModelManager::LoadGltfModel(const std::string& directionalPath , const std:
 	}
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->LoadObjFileAssimp(directoryPath.string(), filename);
+	model->LoadObjFileGltf(directoryPath.string(), filename);
 	model->Initialize(modelCommon_.get());
 	models.insert(std::make_pair(filePath, std::move(model)));
 
