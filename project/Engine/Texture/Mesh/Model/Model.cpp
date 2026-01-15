@@ -323,14 +323,15 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 }
 Model::Node Model::NodeRead(aiNode* node) {
 	Node result;
-	aiMatrix4x4 aiLocalMatrix4x4 = node->mTransformation;
-	aiLocalMatrix4x4.Transpose();
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			result.localMatrix.m[i][j] = aiLocalMatrix4x4[i][j];
-		}
-	}
-	Matrix4x4 axisFlip = Function::MakeIdentity4x4();	
+	aiVector3D scale;
+	aiVector3D translate;
+	aiQuaternion rotate;
+	node->mTransformation.Decompose(scale, rotate, translate);
+
+	result.transform.scale = {scale.x, scale.y, scale.z};
+	result.transform.quaternion = {rotate.x, -rotate.y, -rotate.z, rotate.w};
+	result.transform.translate = {-translate.x, translate.y, translate.z};
+	result.localMatrix = Function::MakeAffineMatrix(result.transform.scale, result.transform.quaternion, result.transform.translate);
 	result.name = node->mName.C_Str();
 	result.children.resize(node->mNumChildren);
 	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
