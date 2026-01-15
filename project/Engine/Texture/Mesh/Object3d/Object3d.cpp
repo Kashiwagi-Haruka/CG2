@@ -15,13 +15,18 @@ void Object3d::Initialize() {
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	CreateResources();
 	isUseSetWorld = false;
+	animationTime_ = 0.0f;
 }
 void Object3d::Update() {
 	// [0]=モデル描画用で使う
 
 	Matrix4x4 localMatrix = model_ ? model_->GetModelData().rootnode.localMatrix : Function::MakeIdentity4x4();
 	if (animation_ && model_) {
-		animationTime_ += 1.0f / 60.0f;
+		float deltaTime = 1.0f / 60.0f;
+		
+		deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+	
+		animationTime_ += deltaTime;
 		if (animation_->duration > 0.0f) {
 			if (isLoopAnimation_) {
 				animationTime_ = std::fmod(animationTime_, animation_->duration);

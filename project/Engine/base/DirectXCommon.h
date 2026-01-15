@@ -84,8 +84,7 @@ class DirectXCommon {
 	// transitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier_{};
 
-
-
+	float deltaTime_ = 1.0f / 60.0f;
 	WinApp* winApp_ = nullptr;
 	std::chrono::steady_clock::time_point reference_;
 
@@ -99,7 +98,7 @@ public:
 	void PostDraw();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void Finalize();
-
+	float GetDeltaTime() const { return deltaTime_; }
 	ID3D12Device* GetDevice() { return device_.Get(); };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
 	

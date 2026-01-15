@@ -77,7 +77,9 @@ void DirectXCommon::UpdateFixFPS() {
 		}
 	}
 
-	reference_ = std::chrono::steady_clock::now();
+	now = std::chrono::steady_clock::now();
+	deltaTime_ = std::chrono::duration<float>(now - reference_).count();
+	reference_ = now;
 
 }
 #pragma endregion
