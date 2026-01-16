@@ -1,7 +1,11 @@
 #include "Skeleton.h"
 #include "Function.h"
+#include <cmath>
 
 namespace {
+constexpr float kJointRadius = 0.03f;
+constexpr float kBoneThickness = 0.015f;
+constexpr float kBoneLengthEpsilon = 0.0001f;
 int32_t CreateJoint(const Model::Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints) {
 	Joint joint;
 	joint.name = node.name;
@@ -61,5 +65,69 @@ void ApplyAnimation(Skeleton& skeleton, const Animation::AnimationData& animatio
 		if (!nodeAnimation.scale.keyframes.empty()) {
 			joint.transform.scale = Animation::CalculateValue(nodeAnimation.scale, animationTime);
 		}
+	}
+}
+
+Vector3 GetJointWorldPosition(const Joint& joint, const Matrix4x4& objectMatrix) {
+	Matrix4x4 worldMatrix = Function::Multiply(joint.skeletonSpaceMatrix, objectMatrix);
+	return Function::TransformVM({0.0f, 0.0f, 0.0f}, worldMatrix);
+}
+
+void UpdateSkeletonAnimation(Skeleton& skeleton, const Animation::AnimationData& animation, float& animationTime, float deltaTime) {
+	if (animation.duration <= 0.0f) {
+		return;
+	}
+
+	animationTime += deltaTime;
+	animationTime = std::fmod(animationTime, animation.duration);
+	ApplyAnimation(skeleton, animation, animationTime);
+	UpdateSkeleton(skeleton);
+}
+
+void DrawSkeletonBones(const Skeleton& skeleton, const Matrix4x4& objectMatrix, Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor) {
+	if (!jointPrimitive || !bonePrimitive) {
+		return;
+	}
+
+	jointPrimitive->SetColor(jointColor);
+	bonePrimitive->SetColor(boneColor);
+	jointPrimitive->SetEnableLighting(false);
+	bonePrimitive->SetEnableLighting(false);
+
+	for (const Joint& joint : skeleton.joints) {
+		Vector3 jointPosition = GetJointWorldPosition(joint, objectMatrix);
+		jointPrimitive->SetTransform({
+		    .scale{kJointRadius,    kJointRadius,    kJointRadius   },
+		    .rotate{0.0f,            0.0f,            0.0f           },
+		    .translate{jointPosition.x, jointPosition.y, jointPosition.z},
+		});
+		jointPrimitive->Update();
+		jointPrimitive->Draw();
+
+		if (!joint.parent.has_value()) {
+			continue;
+		}
+
+		const Joint& parentJoint = skeleton.joints[*joint.parent];
+		Vector3 parentPosition = GetJointWorldPosition(parentJoint, objectMatrix);
+		Vector3 direction = jointPosition - parentPosition;
+		float length = Function::Length(direction);
+		if (length <= kBoneLengthEpsilon) {
+			continue;
+		}
+
+		Vector3 center = {
+		    (jointPosition.x + parentPosition.x) * 0.5f,
+		    (jointPosition.y + parentPosition.y) * 0.5f,
+		    (jointPosition.z + parentPosition.z) * 0.5f,
+		};
+		Vector3 rotation = Function::DirectionToRotation(Function::Normalize(direction), {1.0f, 0.0f, 0.0f});
+		bonePrimitive->SetTransform({
+		    .scale{length,     kBoneThickness, kBoneThickness},
+		    .rotate{rotation.x, rotation.y,     rotation.z    },
+		    .translate{center.x,   center.y,       center.z      },
+		});
+		bonePrimitive->Update();
+		bonePrimitive->Draw();
 	}
 }

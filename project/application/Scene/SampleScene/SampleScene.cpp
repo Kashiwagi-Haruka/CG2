@@ -1,4 +1,5 @@
 #include "SampleScene.h"
+#include "Function.h"
 #include "GameBase.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
@@ -6,6 +7,7 @@
 #include <imgui.h>
 #endif // USE_IMGUI
 #include <numbers>
+
 SampleScene::SampleScene() {
 
 	uvBallObj_ = std::make_unique<Object3d>();
@@ -14,6 +16,8 @@ SampleScene::SampleScene() {
 	animatedCubeObj_ = std::make_unique<Object3d>();
 	humanWalkObj_ = std::make_unique<Object3d>();
 	humanSneakWalkObj_ = std::make_unique<Object3d>();
+	jointPrimitive_ = std::make_unique<Primitive>();
+	bonePrimitive_ = std::make_unique<Primitive>();
 	cameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -50,6 +54,10 @@ void SampleScene::Initialize() {
 	humanSneakWalkObj_->Initialize();
 	humanSneakWalkObj_->SetCamera(camera_.get());
 	humanSneakWalkObj_->SetModel("sneakWalk");
+	jointPrimitive_->Initialize(Primitive::Sphere);
+	jointPrimitive_->SetCamera(camera_.get());
+	bonePrimitive_->Initialize(Primitive::Box);
+	bonePrimitive_->SetCamera(camera_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -66,8 +74,8 @@ void SampleScene::Initialize() {
         .translate{3.0f, 1.0f, 0.0f}
     };
 	humanWalkTransform_ = {
-	    .scale{1.0f,  1.0f, 1.0f},
-        .rotate{0.0f,  0.0f, 0.0f},
+	    .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f, 0.0f, 0.0f},
         .translate{0.0f, 0.0f, 0.0f}
     };
 	humanSneakWalkTransform_ = {
@@ -86,6 +94,13 @@ void SampleScene::Initialize() {
 	humanSneakWalkAnimation_ = Animation::LoadAnimationData("Resources/3d/human", "sneakWalk");
 	humanSneakWalkObj_->SetAnimation(&humanSneakWalkAnimation_, true);
 	humanSneakWalkObj_->SetTransform(humanSneakWalkTransform_);
+
+	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
+		humanWalkSkeleton_ = CreateSkeleton(walkModel->GetModelData().rootnode);
+	}
+	if (Model* sneakModel = ModelManager::GetInstance()->FindModel("sneakWalk")) {
+		humanSneakWalkSkeleton_ = CreateSkeleton(sneakModel->GetModelData().rootnode);
+	}
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
@@ -276,14 +291,23 @@ void SampleScene::Update() {
 	animatedCubeObj_->Update();
 	humanWalkObj_->Update();
 	humanSneakWalkObj_->Update();
+
+	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+	UpdateSkeletonAnimation(humanWalkSkeleton_, humanWalkAnimation_, humanWalkAnimationTime_, deltaTime);
+	UpdateSkeletonAnimation(humanSneakWalkSkeleton_, humanSneakWalkAnimation_, humanSneakWalkAnimationTime_, deltaTime);
 }
 void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
-	//uvBallObj_->Draw();
-	//planeGltf_->Draw();
-	//fieldObj_->Draw();
+	// uvBallObj_->Draw();
+	// planeGltf_->Draw();
+	// fieldObj_->Draw();
 	animatedCubeObj_->Draw();
 	humanWalkObj_->Draw();
 	humanSneakWalkObj_->Draw();
+
+	Matrix4x4 walkWorld = Function::MakeAffineMatrix(humanWalkTransform_.scale, humanWalkTransform_.rotate, humanWalkTransform_.translate);
+	Matrix4x4 sneakWorld = Function::MakeAffineMatrix(humanSneakWalkTransform_.scale, humanSneakWalkTransform_.rotate, humanSneakWalkTransform_.translate);
+	DrawSkeletonBones(humanWalkSkeleton_, walkWorld, jointPrimitive_.get(), bonePrimitive_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
+	DrawSkeletonBones(humanSneakWalkSkeleton_, sneakWorld, jointPrimitive_.get(), bonePrimitive_.get(), {1.0f, 0.5f, 0.2f, 1.0f}, {0.9f, 0.3f, 0.1f, 1.0f});
 }
 void SampleScene::Finalize() {}

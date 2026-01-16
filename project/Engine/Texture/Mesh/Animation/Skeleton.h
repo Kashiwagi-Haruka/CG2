@@ -2,7 +2,10 @@
 #include "Animation/Animation.h"
 #include "Matrix4x4.h"
 #include "Model/Model.h"
+#include "Primitive/Primitive.h"
 #include "QuaternionTransform.h"
+#include "Vector3.h"
+#include "Vector4.h"
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -28,3 +31,6 @@ struct Skeleton {
 Skeleton CreateSkeleton(const Model::Node& rootNode);
 void UpdateSkeleton(Skeleton& skeleton);
 void ApplyAnimation(Skeleton& skeleton, const Animation::AnimationData& animation, float animationTime);
+Vector3 GetJointWorldPosition(const Joint& joint, const Matrix4x4& objectMatrix);
+void UpdateSkeletonAnimation(Skeleton& skeleton, const Animation::AnimationData& animation, float& animationTime, float deltaTime);
+void DrawSkeletonBones(const Skeleton& skeleton, const Matrix4x4& objectMatrix, Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor);
