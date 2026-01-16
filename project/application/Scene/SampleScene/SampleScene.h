@@ -17,6 +17,8 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Object3d> fieldObj_ = nullptr;
 	std::unique_ptr<Object3d> planeGltf_ = nullptr;
 	std::unique_ptr<Object3d> animatedCubeObj_ = nullptr;
+	std::unique_ptr<Object3d> humanWalkObj_ = nullptr;
+	std::unique_ptr<Object3d> humanSneakWalkObj_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
 
 	DirectionalLight directionalLight_{};
@@ -31,8 +33,12 @@ class SampleScene : public BaseScene {
 	Transform cameraTransform_{};
 	Transform planeGTransform_{};
 	Transform animatedCubeTransform_{};
+	Transform humanWalkTransform_{};
+	Transform humanSneakWalkTransform_{};
 
 	Animation::AnimationData animatedCubeAnimation_{};
+	Animation::AnimationData humanWalkAnimation_{};
+	Animation::AnimationData humanSneakWalkAnimation_{};
 
 	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	bool enableLighting = true;

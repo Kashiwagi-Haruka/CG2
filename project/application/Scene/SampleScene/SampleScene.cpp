@@ -12,6 +12,8 @@ SampleScene::SampleScene() {
 	fieldObj_ = std::make_unique<Object3d>();
 	planeGltf_ = std::make_unique<Object3d>();
 	animatedCubeObj_ = std::make_unique<Object3d>();
+	humanWalkObj_ = std::make_unique<Object3d>();
+	humanSneakWalkObj_ = std::make_unique<Object3d>();
 	cameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -25,6 +27,8 @@ SampleScene::SampleScene() {
 	ModelManager::GetInstance()->LoadModel("Resources/3d", "terrain");
 	ModelManager::GetInstance()->LoadGltfModel("Resources/3d", "planeG");
 	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/AnimatedCube", "AnimatedCube");
+	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "walk");
+	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "sneakWalk");
 }
 void SampleScene::Initialize() {
 
@@ -40,7 +44,12 @@ void SampleScene::Initialize() {
 	animatedCubeObj_->Initialize();
 	animatedCubeObj_->SetCamera(camera_.get());
 	animatedCubeObj_->SetModel("AnimatedCube");
-
+	humanWalkObj_->Initialize();
+	humanWalkObj_->SetCamera(camera_.get());
+	humanWalkObj_->SetModel("walk");
+	humanSneakWalkObj_->Initialize();
+	humanSneakWalkObj_->SetCamera(camera_.get());
+	humanSneakWalkObj_->SetModel("sneakWalk");
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -56,11 +65,27 @@ void SampleScene::Initialize() {
         .rotate{0.0f, 0.0f, 0.0f},
         .translate{3.0f, 1.0f, 0.0f}
     };
+	humanWalkTransform_ = {
+	    .scale{1.0f,  1.0f, 1.0f},
+        .rotate{0.0f,  0.0f, 0.0f},
+        .translate{0.0f, 0.0f, 0.0f}
+    };
+	humanSneakWalkTransform_ = {
+	    .scale{1.0f,  1.0f, 1.0f},
+        .rotate{0.0f,  0.0f, 0.0f},
+        .translate{-1.0f, 0.0f, 0.0f}
+    };
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(uvBallTransform_);
 	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
 	animatedCubeObj_->SetAnimation(&animatedCubeAnimation_, true);
 	animatedCubeObj_->SetTransform(animatedCubeTransform_);
+	humanWalkAnimation_ = Animation::LoadAnimationData("Resources/3d/human", "walk");
+	humanWalkObj_->SetAnimation(&humanWalkAnimation_, true);
+	humanWalkObj_->SetTransform(humanWalkTransform_);
+	humanSneakWalkAnimation_ = Animation::LoadAnimationData("Resources/3d/human", "sneakWalk");
+	humanSneakWalkObj_->SetAnimation(&humanSneakWalkAnimation_, true);
+	humanSneakWalkObj_->SetTransform(humanSneakWalkTransform_);
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
@@ -243,16 +268,22 @@ void SampleScene::Update() {
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);
 	animatedCubeObj_->SetTransform(animatedCubeTransform_);
+	humanWalkObj_->SetTransform(humanWalkTransform_);
+	humanSneakWalkObj_->SetTransform(humanSneakWalkTransform_);
 	uvBallObj_->Update();
 	fieldObj_->Update();
 	planeGltf_->Update();
 	animatedCubeObj_->Update();
+	humanWalkObj_->Update();
+	humanSneakWalkObj_->Update();
 }
 void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
-	uvBallObj_->Draw();
-	planeGltf_->Draw();
-	fieldObj_->Draw();
+	//uvBallObj_->Draw();
+	//planeGltf_->Draw();
+	//fieldObj_->Draw();
 	animatedCubeObj_->Draw();
+	humanWalkObj_->Draw();
+	humanSneakWalkObj_->Draw();
 }
 void SampleScene::Finalize() {}
