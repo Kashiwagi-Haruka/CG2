@@ -13,13 +13,15 @@
 class ModelCommon;
 
 class Model {
-
+public:
 	struct Node {
 		QuaternionTransform transform;
 		Matrix4x4 localMatrix;
 		std::string name;
 		std::vector<Node> children;
 	};
+
+private:
 	struct MaterialData {
 		std::string textureFilePath;
 		uint32_t textureIndex = 0;
