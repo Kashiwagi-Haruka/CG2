@@ -76,12 +76,12 @@ void SampleScene::Initialize() {
 	humanWalkTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{0.0f, 0.0f, 0.0f}
+        .translate{0.0f, 1.0f, 0.0f}
     };
 	humanSneakWalkTransform_ = {
 	    .scale{1.0f,  1.0f, 1.0f},
         .rotate{0.0f,  0.0f, 0.0f},
-        .translate{-1.0f, 0.0f, 0.0f}
+        .translate{-1.0f, 1.0f, 0.0f}
     };
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(uvBallTransform_);
