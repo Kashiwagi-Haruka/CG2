@@ -6,6 +6,16 @@ namespace {
 constexpr float kJointRadius = 0.03f;
 constexpr float kBoneThickness = 0.015f;
 constexpr float kBoneLengthEpsilon = 0.0001f;
+bool IsIdentityMatrix(const Matrix4x4& matrix) {
+	const Matrix4x4 identity = Function::MakeIdentity4x4();
+	const float epsilon = 1e-5f;
+	return std::abs(matrix.m[0][0] - identity.m[0][0]) < epsilon && std::abs(matrix.m[0][1] - identity.m[0][1]) < epsilon && std::abs(matrix.m[0][2] - identity.m[0][2]) < epsilon &&
+	       std::abs(matrix.m[0][3] - identity.m[0][3]) < epsilon && std::abs(matrix.m[1][0] - identity.m[1][0]) < epsilon && std::abs(matrix.m[1][1] - identity.m[1][1]) < epsilon &&
+	       std::abs(matrix.m[1][2] - identity.m[1][2]) < epsilon && std::abs(matrix.m[1][3] - identity.m[1][3]) < epsilon && std::abs(matrix.m[2][0] - identity.m[2][0]) < epsilon &&
+	       std::abs(matrix.m[2][1] - identity.m[2][1]) < epsilon && std::abs(matrix.m[2][2] - identity.m[2][2]) < epsilon && std::abs(matrix.m[2][3] - identity.m[2][3]) < epsilon &&
+	       std::abs(matrix.m[3][0] - identity.m[3][0]) < epsilon && std::abs(matrix.m[3][1] - identity.m[3][1]) < epsilon && std::abs(matrix.m[3][2] - identity.m[3][2]) < epsilon &&
+	       std::abs(matrix.m[3][3] - identity.m[3][3]) < epsilon;
+}
 int32_t CreateJoint(const Model::Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints) {
 	Joint joint;
 	joint.name = node.name;
@@ -37,7 +47,12 @@ Skeleton CreateSkeleton(const Model::Node& rootNode) {
 	UpdateSkeleton(skeleton);
 	return skeleton;
 }
-
+const Model::Node& GetSkeletonRootNode(const Model::Node& rootNode) {
+	if (IsIdentityMatrix(rootNode.localMatrix) && rootNode.children.size() == 1) {
+		return rootNode.children.front();
+	}
+	return rootNode;
+}
 void UpdateSkeleton(Skeleton& skeleton) {
 	for (Joint& joint : skeleton.joints) {
 		joint.localMatrix = Function::MakeAffineMatrix(joint.transform.scale, joint.transform.quaternion, joint.transform.translate);

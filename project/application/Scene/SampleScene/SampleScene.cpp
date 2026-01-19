@@ -99,10 +99,10 @@ void SampleScene::Initialize() {
 	humanSneakWalkObj_->SetTransform(humanSneakWalkTransform_);
 
 	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
-		humanWalkSkeleton_ = CreateSkeleton(walkModel->GetModelData().rootnode);
+		humanWalkSkeleton_ = CreateSkeleton(GetSkeletonRootNode(walkModel->GetModelData().rootnode));
 	}
 	if (Model* sneakModel = ModelManager::GetInstance()->FindModel("sneakWalk")) {
-		humanSneakWalkSkeleton_ = CreateSkeleton(sneakModel->GetModelData().rootnode);
+		humanSneakWalkSkeleton_ = CreateSkeleton(GetSkeletonRootNode(sneakModel->GetModelData().rootnode));
 	}
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};

@@ -34,3 +34,5 @@ void ApplyAnimation(Skeleton& skeleton, const Animation::AnimationData& animatio
 Vector3 GetJointWorldPosition(const Joint& joint, const Matrix4x4& objectMatrix);
 void UpdateSkeletonAnimation(Skeleton& skeleton, const Animation::AnimationData& animation, float& animationTime, float deltaTime);
 void DrawSkeletonBones(const Skeleton& skeleton, const Matrix4x4& objectMatrix, Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor);
+void DrawSkeletonBones(const Skeleton& skeleton, const Matrix4x4& objectMatrix, Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor);
+const Model::Node& GetSkeletonRootNode(const Model::Node& rootNode);
