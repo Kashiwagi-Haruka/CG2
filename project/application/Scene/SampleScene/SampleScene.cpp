@@ -77,14 +77,14 @@ void SampleScene::Initialize() {
         .translate{3.0f, 1.0f, 0.0f}
     };
 	humanWalkTransform_ = {
-	    .scale{1.0f, 1.0f, 1.0f},
-        .rotate{0.0f, 0.0f, 0.0f},
-        .translate{0.0f, 1.0f, 0.0f}
+	    .scale{100.0f, 100.0f,                      100.0f},
+        .rotate{-std::numbers::pi_v<float>/2.0f, std::numbers::pi_v<float>, 0.0f  },
+        .translate{0.0f, 1.0f,                      0.0f}
     };
 	humanSneakWalkTransform_ = {
-	    .scale{1.0f,  1.0f, 1.0f},
-        .rotate{0.0f,  0.0f, 0.0f},
-        .translate{-1.0f, 1.0f, 0.0f}
+	    .scale{100.0f,  100.0f,                      100.0f},
+        .rotate{-std::numbers::pi_v<float>/2.0f, std::numbers::pi_v<float>, 0.0f  },
+        .translate{-1.0f, 1.0f,                      0.0f}
     };
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(uvBallTransform_);
