@@ -327,8 +327,8 @@ void SampleScene::Update() {
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	humanWalkSkeleton_->UpdateAnimation(humanWalkAnimation_, humanWalkAnimationTime_, deltaTime);
 	humanSneakWalkSkeleton_->UpdateAnimation(humanSneakWalkAnimation_, humanSneakWalkAnimationTime_, deltaTime);
-	Matrix4x4 walkWorld = Function::MakeAffineMatrix(humanWalkTransform_.scale, humanWalkTransform_.rotate, humanWalkTransform_.translate);
-	Matrix4x4 sneakWorld = Function::MakeAffineMatrix(humanSneakWalkTransform_.scale, humanSneakWalkTransform_.rotate, humanSneakWalkTransform_.translate);
+	Matrix4x4 walkWorld = humanWalkObj_->GetWorldMatrix();
+	Matrix4x4 sneakWorld = humanSneakWalkObj_->GetWorldMatrix();
 	humanWalkSkeleton_->SetObjectMatrix(walkWorld);
 	humanSneakWalkSkeleton_->SetObjectMatrix(sneakWorld);
 }
