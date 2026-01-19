@@ -278,6 +278,24 @@ void SampleScene::Update() {
 		}
 	}
 	ImGui::End();
+	if (ImGui::Begin("walk")) {
+		if (ImGui::TreeNode("TransformWalk")) {
+			ImGui::DragFloat3("ScaleWalk", &humanWalkTransform_.scale.x, 0.1f);
+			ImGui::DragFloat3("RotateWalk", &humanWalkTransform_.rotate.x, 0.1f);
+			ImGui::DragFloat3("TranslateWalk", &humanWalkTransform_.translate.x, 0.1f);
+			ImGui::TreePop();
+		}
+	}
+	ImGui::End();
+	if (ImGui::Begin("sneakWalk")) {
+		if (ImGui::TreeNode("TransformSneakWalk")) {
+			ImGui::DragFloat3("ScaleSneakWalk", &humanSneakWalkTransform_.scale.x, 0.1f);
+			ImGui::DragFloat3("RotateSneakWalk", &humanSneakWalkTransform_.rotate.x, 0.1f);
+			ImGui::DragFloat3("TranslateSneakWalk", &humanSneakWalkTransform_.translate.x, 0.1f);
+			ImGui::TreePop();
+		}
+	}
+	ImGui::End();
 
 #endif // USE_IMGUI
 	if (useDebugCamera_) {

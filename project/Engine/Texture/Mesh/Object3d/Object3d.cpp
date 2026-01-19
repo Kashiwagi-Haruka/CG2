@@ -17,15 +17,36 @@ void Object3d::Initialize() {
 	isUseSetWorld = false;
 	animationTime_ = 0.0f;
 }
+namespace {
+bool IsIdentityMatrix(const Matrix4x4& matrix) {
+	const Matrix4x4 identity = Function::MakeIdentity4x4();
+	const float epsilon = 1e-5f;
+	return std::abs(matrix.m[0][0] - identity.m[0][0]) < epsilon && std::abs(matrix.m[0][1] - identity.m[0][1]) < epsilon && std::abs(matrix.m[0][2] - identity.m[0][2]) < epsilon &&
+	       std::abs(matrix.m[0][3] - identity.m[0][3]) < epsilon && std::abs(matrix.m[1][0] - identity.m[1][0]) < epsilon && std::abs(matrix.m[1][1] - identity.m[1][1]) < epsilon &&
+	       std::abs(matrix.m[1][2] - identity.m[1][2]) < epsilon && std::abs(matrix.m[1][3] - identity.m[1][3]) < epsilon && std::abs(matrix.m[2][0] - identity.m[2][0]) < epsilon &&
+	       std::abs(matrix.m[2][1] - identity.m[2][1]) < epsilon && std::abs(matrix.m[2][2] - identity.m[2][2]) < epsilon && std::abs(matrix.m[2][3] - identity.m[2][3]) < epsilon &&
+	       std::abs(matrix.m[3][0] - identity.m[3][0]) < epsilon && std::abs(matrix.m[3][1] - identity.m[3][1]) < epsilon && std::abs(matrix.m[3][2] - identity.m[3][2]) < epsilon &&
+	       std::abs(matrix.m[3][3] - identity.m[3][3]) < epsilon;
+}
+} // namespace
+
 void Object3d::Update() {
 	// [0]=モデル描画用で使う
 
-	Matrix4x4 localMatrix = model_ ? model_->GetModelData().rootnode.localMatrix : Function::MakeIdentity4x4();
+	const Model::Node* baseNode = nullptr;
+	if (model_) {
+		const auto& rootNode = model_->GetModelData().rootnode;
+		baseNode = &rootNode;
+		if (IsIdentityMatrix(rootNode.localMatrix) && rootNode.children.size() == 1) {
+			baseNode = &rootNode.children.front();
+		}
+	}
+	Matrix4x4 localMatrix = baseNode ? baseNode->localMatrix : Function::MakeIdentity4x4();
 	if (animation_ && model_) {
 		float deltaTime = 1.0f / 60.0f;
-		
+
 		deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-	
+
 		animationTime_ += deltaTime;
 		if (animation_->duration > 0.0f) {
 			if (isLoopAnimation_) {
@@ -35,21 +56,13 @@ void Object3d::Update() {
 			}
 		}
 
-		const auto& rootNode = model_->GetModelData().rootnode;
 		const Animation::NodeAnimation* nodeAnimation = nullptr;
-		auto findNodeAnimation = [&](const auto& node, const auto& nodeAnimations, auto&& self) -> const Animation::NodeAnimation* {
-			auto it = nodeAnimations.find(node.name);
-			if (it != nodeAnimations.end()) {
-				return &it->second;
+		if (baseNode) {
+			auto it = animation_->nodeAnimations.find(baseNode->name);
+			if (it != animation_->nodeAnimations.end()) {
+				nodeAnimation = &it->second;
 			}
-			for (const auto& child : node.children) {
-				if (const Animation::NodeAnimation* found = self(child, nodeAnimations, self)) {
-					return found;
-				}
-			}
-			return nullptr;
-		};
-		nodeAnimation = findNodeAnimation(rootNode, animation_->nodeAnimations, findNodeAnimation);
+		}
 		if (nodeAnimation) {
 			Vector3 translate = nodeAnimation->translate.keyframes.empty() ? Vector3{0.0f, 0.0f, 0.0f} : Animation::CalculateValue(nodeAnimation->translate, animationTime_);
 			Vector4 rotate = nodeAnimation->rotation.keyframes.empty() ? Vector4{0.0f, 0.0f, 0.0f, 1.0f} : Animation::CalculateValue(nodeAnimation->rotation, animationTime_);
