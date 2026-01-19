@@ -3,7 +3,7 @@
 #include "Sprite.h"
 #include <memory>
 #include "Audio.h"
-#include "SceneTransition.h"
+#include "SceneTransition/SceneTransition.h"
 class GameBase;
 
 class TitleScene : public BaseScene {

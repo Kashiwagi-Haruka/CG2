@@ -223,7 +223,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Scene\ResultScene.cpp" />
     <ClCompile Include="application\Scene\TitleScene.cpp" />
     <ClCompile Include="application\UIManager.cpp" />
-    <ClCompile Include="application\SceneTransition.cpp" />
+    <ClCompile Include="application\SceneTransition\SceneTransition.cpp" />
     <ClCompile Include="application\Particles\Particles.cpp" />
     <ClCompile Include="Engine\BaseScene\SceneManager.cpp" />
     <ClCompile Include="Engine\BaseScene\FrameWork.cpp" />
@@ -322,7 +322,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Scene\ResultScene.h" />
     <ClInclude Include="application\Scene\TitleScene.h" />
     <ClInclude Include="application\UIManager.h" />
-    <ClInclude Include="application\SceneTransition.h" />
+    <ClInclude Include="application\SceneTransition\SceneTransition.h" />
     <ClInclude Include="application\Particles\Particles.h" />
     <ClInclude Include="Engine\BaseScene\SceneManager.h" />
     <ClInclude Include="Engine\BaseScene\FrameWork.h" />

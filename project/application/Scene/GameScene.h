@@ -10,7 +10,7 @@
 #include "Object3d/Object3d.h"
 #include "Particles/Particles.h"
 #include "Pause/Pause.h"
-#include "SceneTransition.h"
+#include "SceneTransition/SceneTransition.h"
 #include "Sprite.h"
 #include "UIManager.h"
 #include "Vector2.h"

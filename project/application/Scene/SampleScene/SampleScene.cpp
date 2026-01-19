@@ -336,7 +336,7 @@ void SampleScene::Draw() {
 	animatedCubeObj_->Draw();
 	humanWalkObj_->Draw();
 	humanSneakWalkObj_->Draw();
-
+	Object3dCommon::GetInstance()->DrawCommonNoDepth();
 	Matrix4x4 walkWorld = Function::MakeAffineMatrix(humanWalkTransform_.scale, humanWalkTransform_.rotate, humanWalkTransform_.translate);
 	Matrix4x4 sneakWorld = Function::MakeAffineMatrix(humanSneakWalkTransform_.scale, humanSneakWalkTransform_.rotate, humanSneakWalkTransform_.translate);
 	humanWalkSkeleton_->DrawBones(walkWorld, jointPrimitive_.get(), bonePrimitive_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});

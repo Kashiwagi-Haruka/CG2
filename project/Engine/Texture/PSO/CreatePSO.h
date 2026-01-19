@@ -21,12 +21,11 @@ class CreatePSO {
 	BlendModeManager blendModeManager_;
 
 	void CreateRootSignature();
-	void CreateGraphicsPipeline(D3D12_CULL_MODE cullMode);
+	void CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnable);
 
-	public:
-	
+public:
 	CreatePSO(DirectXCommon* dxCommom);
-	    void Create(D3D12_CULL_MODE cullMode);
+	void Create(D3D12_CULL_MODE cullMode, bool depthEnable = true);
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature_; };
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> GetGraphicsPipelineState(BlendMode blendMode) { return graphicsPipelineState_[blendMode]; };
 

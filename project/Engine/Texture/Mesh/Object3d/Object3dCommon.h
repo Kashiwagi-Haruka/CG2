@@ -26,6 +26,7 @@ private:
 	BlendModeManager blendModeManager_;
 
 	std::unique_ptr<CreatePSO> pso_;
+	std::unique_ptr<CreatePSO> psoNoDepth_;
 
 	// Directional Light（共通）
 	DirectionalLight* directionalLightData_ = nullptr;
@@ -57,6 +58,7 @@ public:
 	void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
 	Camera* GetDefaultCamera() const { return defaultCamera; };
 	void DrawCommon();
+	void DrawCommonNoDepth();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	DirectXCommon* GetDxCommon() const { return dxCommon_; };
 	void SetBlendMode(BlendMode blendmode);

@@ -165,7 +165,7 @@
     <ClCompile Include="application\main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\SceneTransition.cpp">
+    <ClCompile Include="application\SceneTransition\SceneTransition.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="application\UIManager.cpp">
@@ -445,7 +445,7 @@
     <ClInclude Include="Engine\math\RigidBody.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="application\SceneTransition.h">
+    <ClInclude Include="application\SceneTransition\SceneTransition.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="application\UIManager.h">

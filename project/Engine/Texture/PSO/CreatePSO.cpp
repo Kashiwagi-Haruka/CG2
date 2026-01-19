@@ -5,9 +5,9 @@
 
 CreatePSO::CreatePSO(DirectXCommon* dxCommon){ dxCommon_ = dxCommon; }
 
-void CreatePSO::Create(D3D12_CULL_MODE cullMode) { 
+void CreatePSO::Create(D3D12_CULL_MODE cullMode, bool depthEnable) {
 	CreateRootSignature();
-	CreateGraphicsPipeline(cullMode);
+	CreateGraphicsPipeline(cullMode, depthEnable);
 }
 void CreatePSO::CreateRootSignature() {
 	// --- RootSignature ---
@@ -121,9 +121,7 @@ void CreatePSO::CreateRootSignature() {
 	hr_ = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr_));
 }
-void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode) {
-
-	
+void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnable) {
 
 	// --- InputLayout ---
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
@@ -154,7 +152,7 @@ void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode) {
 
 	// --- DepthStencil ---
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthEnable = depthEnable;
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;  // ★ 深度書き込みを有効
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // ★ 手前なら描画
 
