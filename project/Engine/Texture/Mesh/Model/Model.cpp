@@ -23,7 +23,17 @@ void Model::Initialize(ModelCommon* modelCommon) {
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
 	vertexResource_->Unmap(0, nullptr);
+	if (!modelData_.indices.empty()) {
+		indexResource_ = modelCommon_->CreateBufferResource(sizeof(uint32_t) * modelData_.indices.size());
+		indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+		indexBufferView_.SizeInBytes = UINT(sizeof(uint32_t) * modelData_.indices.size());
+		indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
+		uint32_t* indexData = nullptr;
+		indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+		std::memcpy(indexData, modelData_.indices.data(), sizeof(uint32_t) * modelData_.indices.size());
+		indexResource_->Unmap(0, nullptr);
+	}
 	// --- マテリアル用リソース ---
 	// 3D用（球など陰影つけたいもの）
 	// 必ず256バイト単位で切り上げる
@@ -74,8 +84,11 @@ void Model::Draw() {
 
 	modelCommon_->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-	// --- VertexBufferViewを設定 ---
+		// --- VertexBufferViewを設定 ---
 	modelCommon_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	if (!modelData_.indices.empty()) {
+		modelCommon_->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
+	}
 
 	// --- マテリアルCBufferの場所を設定 ---
 	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
@@ -97,13 +110,17 @@ void Model::Draw() {
 	// --- Environment Map SRVのDescriptorTableを設定 ---
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(11, Object3dCommon::GetInstance()->GetEnvironmentMapSrvIndex());
 
-	// --- 描画！（DrawCall）---
-	modelCommon_->GetDxCommon()->GetCommandList()->DrawInstanced(
-	    static_cast<UINT>(modelData_.vertices.size()), // 頂点数
-	    1,                                             // インスタンス数
-	    0,                                             // 開始頂点位置
-	    0                                              // 開始インスタンス位置
-	);
+		// --- 描画！（DrawCall）---
+	if (!modelData_.indices.empty()) {
+		modelCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(modelData_.indices.size()), 1, 0, 0, 0);
+	} else {
+		modelCommon_->GetDxCommon()->GetCommandList()->DrawInstanced(
+		    static_cast<UINT>(modelData_.vertices.size()), // 頂点数
+		    1,                                             // インスタンス数
+		    0,                                             // 開始頂点位置
+		    0                                              // 開始インスタンス位置
+		);
+	}
 }
 
 // objfileを読む関数
@@ -189,6 +206,7 @@ Model::MaterialData Model::LoadMaterialTemplateFile(const std::string& directory
 	return matData;
 }
 void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::string& filename) {
+	ModelData modelData;
 	std::string path = directoryPath + "/" + filename;
 
 	Assimp::Importer importer;
@@ -201,24 +219,28 @@ void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::strin
 		assert(mesh->HasNormals());
 		assert(mesh->HasTextureCoords(0));
 
+		uint32_t vertexOffset = static_cast<uint32_t>(modelData.vertices.size());
+		modelData.vertices.resize(vertexOffset + mesh->mNumVertices);
+		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
+			aiVector3D& position = mesh->mVertices[vertexIndex];
+			aiVector3D& normal = mesh->mNormals[vertexIndex];
+			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+			VertexData vertex;
+			vertex.position = {position.x, position.y, position.z, 1.0f};
+			vertex.normal = {normal.x, normal.y, normal.z};
+			vertex.texcoord = {texcoord.x, texcoord.y};
+
+			vertex.position.x *= -1.0f;
+			vertex.normal.x *= -1.0f;
+
+			modelData.vertices[vertexOffset + vertexIndex] = vertex;
+		}
+
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
 			assert(face.mNumIndices == 3);
 			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
-
-				uint32_t vertexIndex = face.mIndices[element];
-				aiVector3D& position = mesh->mVertices[vertexIndex];
-				aiVector3D& normal = mesh->mNormals[vertexIndex];
-				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
-				VertexData vertex;
-				vertex.position = {position.x, position.y, position.z, 1.0f};
-				vertex.normal = {normal.x, normal.y, normal.z};
-				vertex.texcoord = {texcoord.x, texcoord.y};
-
-				vertex.position.x *= -1.0f;
-				vertex.normal.x *= -1.0f;
-
-				modelData_.vertices.push_back(vertex);
+				modelData.indices.push_back(vertexOffset + face.mIndices[element]);
 			}
 		}
 	}
@@ -239,18 +261,20 @@ void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::strin
 					} else {
 						TextureManager::GetInstance()->LoadTextureFromRGBA8(texturePath, embeddedTexture->mWidth, embeddedTexture->mHeight, reinterpret_cast<const uint8_t*>(embeddedTexture->pcData));
 					}
-					modelData_.material.textureFilePath = texturePath;
-					modelData_.material.textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
+					modelData.material.textureFilePath = texturePath;
+					modelData.material.textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 				}
 			} else if (!texturePath.empty()) {
-				modelData_.material.textureFilePath = directoryPath + "/" + texturePath;
+				modelData.material.textureFilePath = directoryPath + "/" + texturePath;
 			}
 		}
 	}
 
-	modelData_.rootnode.localMatrix = Function::MakeIdentity4x4();
+	modelData.rootnode.localMatrix = Function::MakeIdentity4x4();
+	modelData_ = std::move(modelData);
 }
 void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string& filename) {
+	ModelData modelData;
 	std::string path = directoryPath + "/" + filename;
 
 	Assimp::Importer importer;
@@ -268,24 +292,28 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 		assert(mesh->HasNormals());
 		assert(mesh->HasTextureCoords(0));
 
+		uint32_t vertexOffset = static_cast<uint32_t>(modelData.vertices.size());
+		modelData.vertices.resize(vertexOffset + mesh->mNumVertices);
+		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
+			aiVector3D& position = mesh->mVertices[vertexIndex];
+			aiVector3D& normal = mesh->mNormals[vertexIndex];
+			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+			VertexData vertex;
+			vertex.position = {position.x, position.y, position.z, 1.0f};
+			vertex.normal = {normal.x, normal.y, normal.z};
+			vertex.texcoord = {texcoord.x, texcoord.y};
+
+			vertex.position.x *= -1.0f;
+			vertex.normal.x *= -1.0f;
+
+			modelData.vertices[vertexOffset + vertexIndex] = vertex;
+		}
+
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
 			assert(face.mNumIndices == 3);
 			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
-
-				uint32_t vertexIndex = face.mIndices[element];
-				aiVector3D& position = mesh->mVertices[vertexIndex];
-				aiVector3D& normal = mesh->mNormals[vertexIndex];
-				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
-				VertexData vertex;
-				vertex.position = {position.x, position.y, position.z, 1.0f};
-				vertex.normal = {normal.x, normal.y, normal.z};
-				vertex.texcoord = {texcoord.x, texcoord.y};
-
-				vertex.position.x *= -1.0f;
-				vertex.normal.x *= -1.0f;
-
-				modelData_.vertices.push_back(vertex);
+				modelData.indices.push_back(vertexOffset + face.mIndices[element]);
 			}
 		}
 	}
@@ -306,20 +334,21 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 					} else {
 						TextureManager::GetInstance()->LoadTextureFromRGBA8(texturePath, embeddedTexture->mWidth, embeddedTexture->mHeight, reinterpret_cast<const uint8_t*>(embeddedTexture->pcData));
 					}
-					modelData_.material.textureFilePath = texturePath;
-					modelData_.material.textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
+					modelData.material.textureFilePath = texturePath;
+					modelData.material.textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 				}
 			} else if (!texturePath.empty()) {
-				modelData_.material.textureFilePath = directoryPath + "/" + texturePath;
+				modelData.material.textureFilePath = directoryPath + "/" + texturePath;
 			}
 		}
 	}
 
 	if (scene->mRootNode) {
-		modelData_.rootnode = NodeRead(scene->mRootNode);
+		modelData.rootnode = NodeRead(scene->mRootNode);
 	} else {
-		modelData_.rootnode.localMatrix = Function::MakeIdentity4x4();
+		modelData.rootnode.localMatrix = Function::MakeIdentity4x4();
 	}
+	modelData_ = std::move(modelData);
 }
 Model::Node Model::NodeRead(aiNode* node) {
 	Node result;

@@ -49,6 +49,8 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
+	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	VertexData* vertexData = nullptr;
