@@ -59,7 +59,7 @@ void SampleScene::Initialize() {
 	humanSneakWalkObj_->SetModel("sneakWalk");
 	jointPrimitive_->Initialize(Primitive::Sphere);
 	jointPrimitive_->SetCamera(camera_.get());
-	bonePrimitive_->Initialize(Primitive::Box);
+	bonePrimitive_->Initialize(Primitive::Line);
 	bonePrimitive_->SetCamera(camera_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
@@ -340,7 +340,7 @@ void SampleScene::Draw() {
 	animatedCubeObj_->Draw();
 	humanWalkObj_->Draw();
 	humanSneakWalkObj_->Draw();
-	Object3dCommon::GetInstance()->DrawCommonNoDepth();
+	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 	humanWalkSkeleton_->DrawBones(jointPrimitive_.get(), bonePrimitive_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
 	humanSneakWalkSkeleton_->DrawBones(jointPrimitive_.get(), bonePrimitive_.get(), {1.0f, 0.5f, 0.2f, 1.0f}, {0.9f, 0.3f, 0.1f, 1.0f});
 }

@@ -29,6 +29,14 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	pso_->Create(D3D12_CULL_MODE_BACK);
 	psoNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoNoDepth_->Create(D3D12_CULL_MODE_BACK, false);
+	psoWireframe_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoWireframe_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_WIREFRAME);
+	psoWireframeNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoWireframeNoDepth_->Create(D3D12_CULL_MODE_NONE, false, D3D12_FILL_MODE_WIREFRAME);
+	psoLine_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoLine_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+	psoLineNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoLineNoDepth_->Create(D3D12_CULL_MODE_NONE, false, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
 
 	SetEnvironmentMapTexture("Resources/3d/skydome.png");
 
@@ -87,6 +95,18 @@ void Object3dCommon::DrawCommonNoDepth() {
 	dxCommon_->GetCommandList()->SetPipelineState(psoNoDepth_->GetGraphicsPipelineState(blendMode_).Get());
 
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::DrawCommonWireframeNoDepth() {
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoWireframeNoDepth_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoWireframeNoDepth_->GetGraphicsPipelineState(blendMode_).Get());
+
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::DrawCommonLineNoDepth() {
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoLineNoDepth_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoLineNoDepth_->GetGraphicsPipelineState(blendMode_).Get());
+
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 }
 void Object3dCommon::SetDirectionalLight(DirectionalLight& light) { *directionalLightData_ = light; }
 void Object3dCommon::SetBlendMode(BlendMode blendMode) {

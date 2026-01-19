@@ -22,6 +22,7 @@ public:
 		Torus,
 		Cylinder,
 		Cone,
+		Line,
 		Triangle,
 		Box,
 	};

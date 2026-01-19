@@ -1,5 +1,6 @@
 #include "Skeleton.h"
 #include "Function.h"
+#include "Object3d/Object3dCommon.h"
 #include <cmath>
 
 bool IsIdentityMatrix(const Matrix4x4& matrix) {
@@ -111,6 +112,7 @@ void Skeleton::DrawBones(Primitive* jointPrimitive, Primitive* bonePrimitive, co
 	jointPrimitive->SetEnableLighting(false);
 	bonePrimitive->SetEnableLighting(false);
 
+	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 	for (const Joint& joint : joints_) {
 		Vector3 jointPosition = GetJointWorldPosition(joint);
 		jointPrimitive->SetTransform({
@@ -120,12 +122,16 @@ void Skeleton::DrawBones(Primitive* jointPrimitive, Primitive* bonePrimitive, co
 		});
 		jointPrimitive->Update();
 		jointPrimitive->Draw();
+	}
 
+	Object3dCommon::GetInstance()->DrawCommonLineNoDepth();
+	for (const Joint& joint : joints_) {
 		if (!joint.parent.has_value()) {
 			continue;
 		}
 
 		const Joint& parentJoint = joints_[*joint.parent];
+		Vector3 jointPosition = GetJointWorldPosition(joint);
 		Vector3 parentPosition = GetJointWorldPosition(parentJoint);
 		Vector3 direction = jointPosition - parentPosition;
 		float length = Function::Length(direction);

@@ -100,6 +100,15 @@ MeshData BuildCircle(uint32_t slices) {
 
 	return mesh;
 }
+MeshData BuildLine() {
+	MeshData mesh;
+	mesh.vertices = {
+	    {{-kHalfSize, 0.0f, 0.0f, 1.0f}, {0.0f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+	    {{kHalfSize, 0.0f, 0.0f, 1.0f},  {1.0f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+	};
+	mesh.indices = {0, 1};
+	return mesh;
+}
 
 MeshData BuildRing(uint32_t slices) {
 	MeshData mesh;
@@ -438,6 +447,9 @@ void Primitive::Initialize(PrimitiveName name) {
 	case Primitive::Triangle:
 		mesh = BuildTriangle();
 		break;
+	case Primitive::Line:
+		mesh = BuildLine();
+		break;
 	case Primitive::Box:
 		mesh = BuildBox();
 		break;
@@ -445,7 +457,6 @@ void Primitive::Initialize(PrimitiveName name) {
 		mesh = BuildPlane();
 		break;
 	}
-
 	vertices_ = std::move(mesh.vertices);
 	indices_ = std::move(mesh.indices);
 

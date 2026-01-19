@@ -5,9 +5,9 @@
 
 CreatePSO::CreatePSO(DirectXCommon* dxCommon){ dxCommon_ = dxCommon; }
 
-void CreatePSO::Create(D3D12_CULL_MODE cullMode, bool depthEnable) {
+void CreatePSO::Create(D3D12_CULL_MODE cullMode, bool depthEnable, D3D12_FILL_MODE fillMode, D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType) {
 	CreateRootSignature();
-	CreateGraphicsPipeline(cullMode, depthEnable);
+	CreateGraphicsPipeline(cullMode, depthEnable, fillMode, topologyType);
 }
 void CreatePSO::CreateRootSignature() {
 	// --- RootSignature ---
@@ -121,7 +121,7 @@ void CreatePSO::CreateRootSignature() {
 	hr_ = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr_));
 }
-void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnable) {
+void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnable, D3D12_FILL_MODE fillMode, D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType) {
 
 	// --- InputLayout ---
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
@@ -169,7 +169,7 @@ void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnabl
 	baseDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	baseDesc.DepthStencilState = depthStencilDesc;
 	baseDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	baseDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	baseDesc.PrimitiveTopologyType = topologyType;
 	baseDesc.SampleDesc.Count = 1;
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
@@ -187,7 +187,7 @@ void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnabl
 		D3D12_RASTERIZER_DESC rasterizerDesc{};
 		// ★ 背面カリングを有効化（裏面は描画しない）
 		rasterizerDesc.CullMode = cullMode;
-		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+		rasterizerDesc.FillMode = fillMode;
 		// ★ 深度クリッピングを有効化
 		rasterizerDesc.DepthClipEnable = TRUE;
 		// ★ 反時計回りを表面に設定
