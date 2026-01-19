@@ -1,8 +1,9 @@
 #define NOMINMAX
-#include <algorithm>
 #include "DebugCamera.h"
-#include "Input.h"
+#include "GameBase.h"
 #include "ImGuiManager.h"
+#include "Input.h"
+#include <algorithm>
 void DebugCamera::Initialize() {
 	// ViewMatrixの作成
 	Matrix4x4 cameraMatrix = Function::MakeAffineMatrix(
@@ -23,41 +24,45 @@ void DebugCamera::Initialize() {
 	matRot_ = Function::MakeIdentity4x4();
 }
 
-void DebugCamera::Update(uint8_t* key, uint8_t* /*preKey*/) {
+void DebugCamera::Update() {
 	// ── ImGui でパラメータをいじれるように ──
-	//ImGui::Begin("DebugCamera");
-	//ImGui::SliderFloat3("Offset", &translation_.x, -100.0f, 1000.0f);
-	//ImGui::SliderFloat3("Pivot", &pivot_.x, 0.0f, 1000.0f);
-	//ImGui::End();
+	// ImGui::Begin("DebugCamera");
+	// ImGui::SliderFloat3("Offset", &translation_.x, -100.0f, 1000.0f);
+	// ImGui::SliderFloat3("Pivot", &pivot_.x, 0.0f, 1000.0f);
+	// ImGui::End();
 
-	const float rotSpeed = 0.02f;
-	float dPitch = 0, dYaw = 0, dZ = 0;
+	const float rotSpeed = 0.005f;
+	const float zoomSpeed = 0.01f;
+	const float panSpeed = 0.02f;
+	float dPitch = 0.0f;
+	float dYaw = 0.0f;
 
-	// キー入力処理...
+	GameBase* gameBase = GameBase::GetInstance();
+	Vector2 mouseMove = gameBase->GetMouseMove();
+	const bool isShift = gameBase->PushKey(DIK_LSHIFT) || gameBase->PushKey(DIK_RSHIFT);
+	const bool isLeftDrag = gameBase->PushMouseButton(Input::MouseButton::kLeft);
 
-	
+	if (isLeftDrag && !isShift) {
+		dYaw = mouseMove.x * rotSpeed;
+		dPitch = mouseMove.y * rotSpeed;
+	} else if (isLeftDrag && isShift) {
+		Vector3 right = {matRot_.m[0][0], matRot_.m[1][0], matRot_.m[2][0]};
+		Vector3 up = {matRot_.m[0][1], matRot_.m[1][1], matRot_.m[2][1]};
+		pivot_ += right * (-mouseMove.x * panSpeed);
+		pivot_ += up * (mouseMove.y * panSpeed);
+	}
 
-
-
-	//if (key[DIK_UP] & 0x80)
-	//	dPitch =-rotSpeed;
-	//if (key[DIK_DOWN] & 0x80)
-	//	dPitch = rotSpeed;
-	//if (key[DIK_LEFT] & 0x80)
-	//	dYaw = -rotSpeed;
-	//if (key[DIK_RIGHT] & 0x80)
-	//	dYaw = rotSpeed;
-	//if (key[DIK_RSHIFT] & 0x80)
-	//	dZ = -rotSpeed;
-	//if (key[DIK_END] & 0x80)
-	//	dZ = rotSpeed;
-
+	const float wheelDelta = gameBase->GetMouseWheelDelta();
+	if (wheelDelta != 0.0f) {
+		translation_.z += wheelDelta * zoomSpeed;
+		translation_.z = std::min(translation_.z, -1.0f);
+		translation_.z = std::max(translation_.z, -500.0f);
+	}
 
 	// ── 累積回転行列に今回フレーム分の回転を乗算 ──
 	Matrix4x4 matRotDelta = Function::MakeIdentity4x4();
 	matRotDelta = Function::Multiply(matRotDelta, Function::MakeRotateXMatrix(dPitch));
 	matRotDelta = Function::Multiply(matRotDelta, Function::MakeRotateYMatrix(dYaw));
-	matRotDelta = Function::Multiply(matRotDelta, Function::MakeRotateZMatrix(dZ));
 	matRot_ = Function::Multiply(matRotDelta, matRot_); // ★資料「回転行列の累積」と同じ
 
 	// ── scale は GUI 値が大きいほどズームインにしたいので逆数を使う ──

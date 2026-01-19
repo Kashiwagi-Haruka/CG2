@@ -314,6 +314,7 @@ Vector2 Input::GetMouseMove() const {
 	// DIMOUSESTATE2 の lX, lY は相対移動量
 	return Vector2(static_cast<float>(mouseState_.lX), static_cast<float>(mouseState_.lY));
 }
+float Input::GetMouseWheelDelta() const { return static_cast<float>(mouseState_.lZ); }
 
 bool Input::PushMouseButton(MouseButton button) const {
 	int index = static_cast<int>(button);

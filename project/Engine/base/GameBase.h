@@ -143,4 +143,5 @@ public:
 	float GetMouseX() const;
 	float GetMouseY() const;
 	Vector2 GetMouseMove() const;
+	float GetMouseWheelDelta() const;
 };

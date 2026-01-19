@@ -25,6 +25,7 @@ SampleScene::SampleScene() {
     };
 
 	camera_ = std::make_unique<Camera>();
+	debugCamera_ = std::make_unique<DebugCamera>();
 	camera_->SetTransform(cameraTransform_);
 
 	ModelManager::GetInstance()->LoadModel("Resources/3d", "uvBall");
@@ -36,6 +37,8 @@ SampleScene::SampleScene() {
 }
 void SampleScene::Initialize() {
 
+	debugCamera_->Initialize();
+	debugCamera_->SetTranslation(cameraTransform_.translate);
 	uvBallObj_->Initialize();
 	uvBallObj_->SetCamera(camera_.get());
 	uvBallObj_->SetModel("uvBall");
@@ -160,11 +163,15 @@ void SampleScene::Initialize() {
 void SampleScene::Update() {
 #ifdef USE_IMGUI
 	if (ImGui::Begin("SampleCamera")) {
+		ImGui::Checkbox("Use Debug Camera (F1)", &useDebugCamera_);
+		ImGui::Text("Debug: LMB drag rotate, Shift+LMB drag pan, Wheel zoom");
 		if (ImGui::TreeNode("Transform")) {
 
-			ImGui::DragFloat3("Scale", &cameraTransform_.scale.x, 0.1f);
-			ImGui::DragFloat3("Rotate", &cameraTransform_.rotate.x, 0.1f);
-			ImGui::DragFloat3("Translate", &cameraTransform_.translate.x, 0.1f);
+			if (!useDebugCamera_) {
+				ImGui::DragFloat3("Scale", &cameraTransform_.scale.x, 0.1f);
+				ImGui::DragFloat3("Rotate", &cameraTransform_.rotate.x, 0.1f);
+				ImGui::DragFloat3("Translate", &cameraTransform_.translate.x, 0.1f);
+			}
 			ImGui::TreePop();
 		}
 		ImGui::End();
@@ -273,12 +280,19 @@ void SampleScene::Update() {
 	ImGui::End();
 
 #endif // USE_IMGUI
-	camera_->SetTransform(cameraTransform_);
+	if (useDebugCamera_) {
+		debugCamera_->Update();
+		camera_->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
+	} else {
+		camera_->SetTransform(cameraTransform_);
+		camera_->Update();
+	}
+	
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
 	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
-	camera_->Update();
+	
 
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);

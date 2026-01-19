@@ -3,6 +3,7 @@
 #include "Animation/Skeleton.h"
 #include "BaseScene.h"
 #include "Camera.h"
+#include "DebugCamera.h"
 #include "Light/AreaLight.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
@@ -22,6 +23,8 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Object3d> humanWalkObj_ = nullptr;
 	std::unique_ptr<Object3d> humanSneakWalkObj_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
+	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
+	bool useDebugCamera_ = false;
 
 	DirectionalLight directionalLight_{};
 	std::array<PointLight, kMaxPointLights> pointLights_{};

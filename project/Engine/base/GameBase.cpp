@@ -140,3 +140,4 @@ void GameBase::SetIsCursorVisible(bool isVisible) { DInput->SetIsCursorVisible(i
 /// </summary>
 /// <param name="deadZone">初期値は0.2f</param>
 void GameBase::SetDeadZone(float deadZone) { DInput->SetDeadZone(deadZone); };
+float GameBase::GetMouseWheelDelta() const { return DInput->GetMouseWheelDelta(); }

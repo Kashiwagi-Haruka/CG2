@@ -134,6 +134,7 @@ public:
 	float GetMouseX() const; // マウスのX座標を取得
 	float GetMouseY() const; // マウスのY座標を取得
 	Vector2 GetMouseMove()const; // マウスの移動量を取得
+	float GetMouseWheelDelta() const;                  // マウスホイールの移動量を取得
 	bool PushMouseButton(MouseButton button) const; // マウスボタンが押されているか
 	bool TriggerMouseButton(MouseButton button) const; // マウスボタンが押された瞬間か
 	bool ReleaseMouseButton(MouseButton button) const; // マウスボタンが離された瞬間か
