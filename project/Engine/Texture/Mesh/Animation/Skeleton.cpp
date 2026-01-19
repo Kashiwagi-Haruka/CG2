@@ -34,6 +34,7 @@ Skeleton CreateSkeleton(const Model::Node& rootNode) {
 		skeleton.jointMap.emplace(joint.name, joint.index);
 	}
 
+	UpdateSkeleton(skeleton);
 	return skeleton;
 }
 
@@ -75,6 +76,7 @@ Vector3 GetJointWorldPosition(const Joint& joint, const Matrix4x4& objectMatrix)
 
 void UpdateSkeletonAnimation(Skeleton& skeleton, const Animation::AnimationData& animation, float& animationTime, float deltaTime) {
 	if (animation.duration <= 0.0f) {
+		UpdateSkeleton(skeleton);
 		return;
 	}
 
