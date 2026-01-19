@@ -327,6 +327,10 @@ void SampleScene::Update() {
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	humanWalkSkeleton_->UpdateAnimation(humanWalkAnimation_, humanWalkAnimationTime_, deltaTime);
 	humanSneakWalkSkeleton_->UpdateAnimation(humanSneakWalkAnimation_, humanSneakWalkAnimationTime_, deltaTime);
+	Matrix4x4 walkWorld = Function::MakeAffineMatrix(humanWalkTransform_.scale, humanWalkTransform_.rotate, humanWalkTransform_.translate);
+	Matrix4x4 sneakWorld = Function::MakeAffineMatrix(humanSneakWalkTransform_.scale, humanSneakWalkTransform_.rotate, humanSneakWalkTransform_.translate);
+	humanWalkSkeleton_->SetObjectMatrix(walkWorld);
+	humanSneakWalkSkeleton_->SetObjectMatrix(sneakWorld);
 }
 void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
@@ -337,9 +341,7 @@ void SampleScene::Draw() {
 	humanWalkObj_->Draw();
 	humanSneakWalkObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonNoDepth();
-	Matrix4x4 walkWorld = Function::MakeAffineMatrix(humanWalkTransform_.scale, humanWalkTransform_.rotate, humanWalkTransform_.translate);
-	Matrix4x4 sneakWorld = Function::MakeAffineMatrix(humanSneakWalkTransform_.scale, humanSneakWalkTransform_.rotate, humanSneakWalkTransform_.translate);
-	humanWalkSkeleton_->DrawBones(walkWorld, jointPrimitive_.get(), bonePrimitive_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
-	humanSneakWalkSkeleton_->DrawBones(sneakWorld, jointPrimitive_.get(), bonePrimitive_.get(), {1.0f, 0.5f, 0.2f, 1.0f}, {0.9f, 0.3f, 0.1f, 1.0f});
+	humanWalkSkeleton_->DrawBones(jointPrimitive_.get(), bonePrimitive_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
+	humanSneakWalkSkeleton_->DrawBones(jointPrimitive_.get(), bonePrimitive_.get(), {1.0f, 0.5f, 0.2f, 1.0f}, {0.9f, 0.3f, 0.1f, 1.0f});
 }
 void SampleScene::Finalize() {}

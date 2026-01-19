@@ -29,14 +29,16 @@ public:
 
 	void Update();
 	void ApplyAnimation(const Animation::AnimationData& animation, float animationTime);
-	Vector3 GetJointWorldPosition(const Joint& joint, const Matrix4x4& objectMatrix) const;
+	void SetObjectMatrix(const Matrix4x4& objectMatrix);
+	Vector3 GetJointWorldPosition(const Joint& joint) const;
 	void UpdateAnimation(const Animation::AnimationData& animation, float& animationTime, float deltaTime);
-	void DrawBones(const Matrix4x4& objectMatrix, Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor) const;
+	void DrawBones(Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor) const;
 
 private:
 	int32_t root_ = -1;
 	std::map<std::string, int32_t> jointMap_{};
 	std::vector<Joint> joints_{};
+	Matrix4x4 objectMatrix_{};
 	float kJointRadius = 0.03f;
 	float kBoneThickness = 0.015f;
 	float kBoneLengthEpsilon = 0.0001f;

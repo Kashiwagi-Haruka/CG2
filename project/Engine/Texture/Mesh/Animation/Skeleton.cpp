@@ -84,8 +84,10 @@ void Skeleton::ApplyAnimation(const Animation::AnimationData& animation, float a
 	}
 }
 
-Vector3 Skeleton::GetJointWorldPosition(const Joint& joint, const Matrix4x4& objectMatrix) const {
-	Matrix4x4 worldMatrix = Function::Multiply(joint.skeletonSpaceMatrix, objectMatrix);
+void Skeleton::SetObjectMatrix(const Matrix4x4& objectMatrix) { objectMatrix_ = objectMatrix; }
+
+Vector3 Skeleton::GetJointWorldPosition(const Joint& joint) const {
+	Matrix4x4 worldMatrix = Function::Multiply(joint.skeletonSpaceMatrix, objectMatrix_);
 	return Function::TransformVM({0.0f, 0.0f, 0.0f}, worldMatrix);
 }
 
@@ -101,7 +103,7 @@ void Skeleton::UpdateAnimation(const Animation::AnimationData& animation, float&
 	Update();
 }
 
-void Skeleton::DrawBones(const Matrix4x4& objectMatrix, Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor) const {
+void Skeleton::DrawBones(Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor) const {
 	if (!jointPrimitive || !bonePrimitive) {
 		return;
 	}
@@ -112,7 +114,7 @@ void Skeleton::DrawBones(const Matrix4x4& objectMatrix, Primitive* jointPrimitiv
 	bonePrimitive->SetEnableLighting(false);
 
 	for (const Joint& joint : joints_) {
-		Vector3 jointPosition = GetJointWorldPosition(joint, objectMatrix);
+		Vector3 jointPosition = GetJointWorldPosition(joint);
 		jointPrimitive->SetTransform({
 		    .scale{kJointRadius,    kJointRadius,    kJointRadius   },
 		    .rotate{0.0f,            0.0f,            0.0f           },
@@ -126,7 +128,7 @@ void Skeleton::DrawBones(const Matrix4x4& objectMatrix, Primitive* jointPrimitiv
 		}
 
 		const Joint& parentJoint = joints_[*joint.parent];
-		Vector3 parentPosition = GetJointWorldPosition(parentJoint, objectMatrix);
+		Vector3 parentPosition = GetJointWorldPosition(parentJoint);
 		Vector3 direction = jointPosition - parentPosition;
 		float length = Function::Length(direction);
 		if (length <= kBoneLengthEpsilon) {
