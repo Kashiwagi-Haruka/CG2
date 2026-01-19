@@ -2,10 +2,8 @@
 #include "Function.h"
 #include <cmath>
 
-namespace {
-constexpr float kJointRadius = 0.03f;
-constexpr float kBoneThickness = 0.015f;
-constexpr float kBoneLengthEpsilon = 0.0001f;
+
+
 bool IsIdentityMatrix(const Matrix4x4& matrix) {
 	const Matrix4x4 identity = Function::MakeIdentity4x4();
 	const float epsilon = 1e-5f;
@@ -34,38 +32,40 @@ int32_t CreateJoint(const Model::Node& node, const std::optional<int32_t>& paren
 
 	return jointIndex;
 }
-} // namespace
 
-Skeleton CreateSkeleton(const Model::Node& rootNode) {
+
+Skeleton Skeleton::Create(const Model::Node& rootNode) {
 	Skeleton skeleton;
-	skeleton.root = CreateJoint(rootNode, std::nullopt, skeleton.joints);
+	skeleton.root_ = CreateJoint(rootNode, std::nullopt, skeleton.joints_);
 
-	for (const Joint& joint : skeleton.joints) {
-		skeleton.jointMap.emplace(joint.name, joint.index);
+	for (const Joint& joint : skeleton.joints_) {
+		skeleton.jointMap_.emplace(joint.name, joint.index);
 	}
 
-	UpdateSkeleton(skeleton);
+	skeleton.Update();
 	return skeleton;
 }
-const Model::Node& GetSkeletonRootNode(const Model::Node& rootNode) {
+
+Model::Node& Skeleton::GetRootNode(const Model::Node& rootNode) {
 	if (IsIdentityMatrix(rootNode.localMatrix) && rootNode.children.size() == 1) {
-		return rootNode.children.front();
+		return const_cast<Model::Node&>(rootNode.children.front());
 	}
-	return rootNode;
+	return const_cast<Model::Node&>(rootNode);
 }
-void UpdateSkeleton(Skeleton& skeleton) {
-	for (Joint& joint : skeleton.joints) {
+
+void Skeleton::Update() {
+	for (Joint& joint : joints_) {
 		joint.localMatrix = Function::MakeAffineMatrix(joint.transform.scale, joint.transform.quaternion, joint.transform.translate);
 		if (joint.parent) {
-			joint.skeletonSpaceMatrix = Function::Multiply(joint.localMatrix, skeleton.joints[*joint.parent].skeletonSpaceMatrix);
+			joint.skeletonSpaceMatrix = Function::Multiply(joint.localMatrix, joints_[*joint.parent].skeletonSpaceMatrix);
 		} else {
 			joint.skeletonSpaceMatrix = joint.localMatrix;
 		}
 	}
 }
 
-void ApplyAnimation(Skeleton& skeleton, const Animation::AnimationData& animation, float animationTime) {
-	for (Joint& joint : skeleton.joints) {
+void Skeleton::ApplyAnimation(const Animation::AnimationData& animation, float animationTime) {
+	for (Joint& joint : joints_) {
 		auto it = animation.nodeAnimations.find(joint.name);
 		if (it == animation.nodeAnimations.end()) {
 			continue;
@@ -84,24 +84,24 @@ void ApplyAnimation(Skeleton& skeleton, const Animation::AnimationData& animatio
 	}
 }
 
-Vector3 GetJointWorldPosition(const Joint& joint, const Matrix4x4& objectMatrix) {
+Vector3 Skeleton::GetJointWorldPosition(const Joint& joint, const Matrix4x4& objectMatrix) const {
 	Matrix4x4 worldMatrix = Function::Multiply(joint.skeletonSpaceMatrix, objectMatrix);
 	return Function::TransformVM({0.0f, 0.0f, 0.0f}, worldMatrix);
 }
 
-void UpdateSkeletonAnimation(Skeleton& skeleton, const Animation::AnimationData& animation, float& animationTime, float deltaTime) {
+void Skeleton::UpdateAnimation(const Animation::AnimationData& animation, float& animationTime, float deltaTime) {
 	if (animation.duration <= 0.0f) {
-		UpdateSkeleton(skeleton);
+		Update();
 		return;
 	}
 
 	animationTime += deltaTime;
 	animationTime = std::fmod(animationTime, animation.duration);
-	ApplyAnimation(skeleton, animation, animationTime);
-	UpdateSkeleton(skeleton);
+	ApplyAnimation(animation, animationTime);
+	Update();
 }
 
-void DrawSkeletonBones(const Skeleton& skeleton, const Matrix4x4& objectMatrix, Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor) {
+void Skeleton::DrawBones(const Matrix4x4& objectMatrix, Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor) const {
 	if (!jointPrimitive || !bonePrimitive) {
 		return;
 	}
@@ -111,7 +111,7 @@ void DrawSkeletonBones(const Skeleton& skeleton, const Matrix4x4& objectMatrix, 
 	jointPrimitive->SetEnableLighting(false);
 	bonePrimitive->SetEnableLighting(false);
 
-	for (const Joint& joint : skeleton.joints) {
+	for (const Joint& joint : joints_) {
 		Vector3 jointPosition = GetJointWorldPosition(joint, objectMatrix);
 		jointPrimitive->SetTransform({
 		    .scale{kJointRadius,    kJointRadius,    kJointRadius   },
@@ -125,7 +125,7 @@ void DrawSkeletonBones(const Skeleton& skeleton, const Matrix4x4& objectMatrix, 
 			continue;
 		}
 
-		const Joint& parentJoint = skeleton.joints[*joint.parent];
+		const Joint& parentJoint = joints_[*joint.parent];
 		Vector3 parentPosition = GetJointWorldPosition(parentJoint, objectMatrix);
 		Vector3 direction = jointPosition - parentPosition;
 		float length = Function::Length(direction);

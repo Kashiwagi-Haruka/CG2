@@ -99,10 +99,10 @@ void SampleScene::Initialize() {
 	humanSneakWalkObj_->SetTransform(humanSneakWalkTransform_);
 
 	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
-		humanWalkSkeleton_ = CreateSkeleton(GetSkeletonRootNode(walkModel->GetModelData().rootnode));
+		humanWalkSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
 	}
 	if (Model* sneakModel = ModelManager::GetInstance()->FindModel("sneakWalk")) {
-		humanSneakWalkSkeleton_ = CreateSkeleton(GetSkeletonRootNode(sneakModel->GetModelData().rootnode));
+		humanSneakWalkSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sneakModel->GetModelData().rootnode));
 	}
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -325,8 +325,8 @@ void SampleScene::Update() {
 	humanSneakWalkObj_->Update();
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-	UpdateSkeletonAnimation(humanWalkSkeleton_, humanWalkAnimation_, humanWalkAnimationTime_, deltaTime);
-	UpdateSkeletonAnimation(humanSneakWalkSkeleton_, humanSneakWalkAnimation_, humanSneakWalkAnimationTime_, deltaTime);
+	humanWalkSkeleton_->UpdateAnimation(humanWalkAnimation_, humanWalkAnimationTime_, deltaTime);
+	humanSneakWalkSkeleton_->UpdateAnimation(humanSneakWalkAnimation_, humanSneakWalkAnimationTime_, deltaTime);
 }
 void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
@@ -339,7 +339,7 @@ void SampleScene::Draw() {
 
 	Matrix4x4 walkWorld = Function::MakeAffineMatrix(humanWalkTransform_.scale, humanWalkTransform_.rotate, humanWalkTransform_.translate);
 	Matrix4x4 sneakWorld = Function::MakeAffineMatrix(humanSneakWalkTransform_.scale, humanSneakWalkTransform_.rotate, humanSneakWalkTransform_.translate);
-	DrawSkeletonBones(humanWalkSkeleton_, walkWorld, jointPrimitive_.get(), bonePrimitive_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
-	DrawSkeletonBones(humanSneakWalkSkeleton_, sneakWorld, jointPrimitive_.get(), bonePrimitive_.get(), {1.0f, 0.5f, 0.2f, 1.0f}, {0.9f, 0.3f, 0.1f, 1.0f});
+	humanWalkSkeleton_->DrawBones(walkWorld, jointPrimitive_.get(), bonePrimitive_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
+	humanSneakWalkSkeleton_->DrawBones(sneakWorld, jointPrimitive_.get(), bonePrimitive_.get(), {1.0f, 0.5f, 0.2f, 1.0f}, {0.9f, 0.3f, 0.1f, 1.0f});
 }
 void SampleScene::Finalize() {}

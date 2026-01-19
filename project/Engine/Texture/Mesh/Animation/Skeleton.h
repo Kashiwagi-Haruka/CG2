@@ -28,11 +28,22 @@ struct Skeleton {
 	std::vector<Joint> joints;
 };
 
-Skeleton CreateSkeleton(const Model::Node& rootNode);
-void UpdateSkeleton(Skeleton& skeleton);
-void ApplyAnimation(Skeleton& skeleton, const Animation::AnimationData& animation, float animationTime);
-Vector3 GetJointWorldPosition(const Joint& joint, const Matrix4x4& objectMatrix);
-void UpdateSkeletonAnimation(Skeleton& skeleton, const Animation::AnimationData& animation, float& animationTime, float deltaTime);
-void DrawSkeletonBones(const Skeleton& skeleton, const Matrix4x4& objectMatrix, Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor);
-void DrawSkeletonBones(const Skeleton& skeleton, const Matrix4x4& objectMatrix, Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor);
-const Model::Node& GetSkeletonRootNode(const Model::Node& rootNode);
+class Skeleton {
+public:
+	Skeleton Create(const Model::Node& rootNode);
+	Model::Node& GetRootNode(const Model::Node& rootNode);
+
+	void Update();
+	void ApplyAnimation(const Animation::AnimationData& animation, float animationTime);
+	Vector3 GetJointWorldPosition(const Joint& joint, const Matrix4x4& objectMatrix) const;
+	void UpdateAnimation(const Animation::AnimationData& animation, float& animationTime, float deltaTime);
+	void DrawBones(const Matrix4x4& objectMatrix, Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor) const;
+
+private:
+	int32_t root_ = -1;
+	std::map<std::string, int32_t> jointMap_{};
+	std::vector<Joint> joints_{};
+	float kJointRadius = 0.03f;
+	float kBoneThickness = 0.015f;
+	float kBoneLengthEpsilon = 0.0001f;
+};

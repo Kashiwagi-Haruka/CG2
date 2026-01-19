@@ -44,8 +44,8 @@ class SampleScene : public BaseScene {
 	Animation::AnimationData animatedCubeAnimation_{};
 	Animation::AnimationData humanWalkAnimation_{};
 	Animation::AnimationData humanSneakWalkAnimation_{};
-	Skeleton humanWalkSkeleton_{};
-	Skeleton humanSneakWalkSkeleton_{};
+	std::unique_ptr<Skeleton> humanWalkSkeleton_{};
+	std::unique_ptr<Skeleton> humanSneakWalkSkeleton_{};
 	float humanWalkAnimationTime_ = 0.0f;
 	float humanSneakWalkAnimationTime_ = 0.0f;
 
