@@ -25,7 +25,7 @@ struct Joint {
 class Skeleton {
 public:
 	Skeleton Create(const Model::Node& rootNode);
-	Model::Node& GetRootNode(const Model::Node& rootNode);
+	const Model::Node& GetRootNode(const Model::Node& rootNode) const;
 
 	void Update();
 	void ApplyAnimation(const Animation::AnimationData& animation, float animationTime);

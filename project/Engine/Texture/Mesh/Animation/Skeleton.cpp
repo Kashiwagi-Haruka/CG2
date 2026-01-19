@@ -2,8 +2,6 @@
 #include "Function.h"
 #include <cmath>
 
-
-
 bool IsIdentityMatrix(const Matrix4x4& matrix) {
 	const Matrix4x4 identity = Function::MakeIdentity4x4();
 	const float epsilon = 1e-5f;
@@ -33,10 +31,10 @@ int32_t CreateJoint(const Model::Node& node, const std::optional<int32_t>& paren
 	return jointIndex;
 }
 
-
 Skeleton Skeleton::Create(const Model::Node& rootNode) {
 	Skeleton skeleton;
-	skeleton.root_ = CreateJoint(rootNode, std::nullopt, skeleton.joints_);
+	const Model::Node& baseNode = skeleton.GetRootNode(rootNode);
+	skeleton.root_ = CreateJoint(baseNode, std::nullopt, skeleton.joints_);
 
 	for (const Joint& joint : skeleton.joints_) {
 		skeleton.jointMap_.emplace(joint.name, joint.index);
@@ -46,11 +44,11 @@ Skeleton Skeleton::Create(const Model::Node& rootNode) {
 	return skeleton;
 }
 
-Model::Node& Skeleton::GetRootNode(const Model::Node& rootNode) {
+const Model::Node& Skeleton::GetRootNode(const Model::Node& rootNode) const {
 	if (IsIdentityMatrix(rootNode.localMatrix) && rootNode.children.size() == 1) {
-		return const_cast<Model::Node&>(rootNode.children.front());
+		return rootNode.children.front();
 	}
-	return const_cast<Model::Node&>(rootNode);
+	return rootNode;
 }
 
 void Skeleton::Update() {
