@@ -9,7 +9,6 @@
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
 #include "Object3d/Object3d.h"
-#include "Primitive/Primitive.h"
 #include "Transform.h"
 #include <array>
 #include <cstdint>
@@ -48,9 +47,6 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Skeleton> humanSneakWalkSkeleton_{};
 	float humanWalkAnimationTime_ = 0.0f;
 	float humanSneakWalkAnimationTime_ = 0.0f;
-
-	std::unique_ptr<Primitive> jointPrimitive_ = nullptr;
-	std::unique_ptr<Primitive> bonePrimitive_ = nullptr;
 
 	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	bool enableLighting = true;

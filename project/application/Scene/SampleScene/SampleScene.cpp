@@ -16,8 +16,6 @@ SampleScene::SampleScene() {
 	animatedCubeObj_ = std::make_unique<Object3d>();
 	humanWalkObj_ = std::make_unique<Object3d>();
 	humanSneakWalkObj_ = std::make_unique<Object3d>();
-	jointPrimitive_ = std::make_unique<Primitive>();
-	bonePrimitive_ = std::make_unique<Primitive>();
 	cameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -57,10 +55,6 @@ void SampleScene::Initialize() {
 	humanSneakWalkObj_->Initialize();
 	humanSneakWalkObj_->SetCamera(camera_.get());
 	humanSneakWalkObj_->SetModel("sneakWalk");
-	jointPrimitive_->Initialize(Primitive::Sphere);
-	jointPrimitive_->SetCamera(camera_.get());
-	bonePrimitive_->Initialize(Primitive::Line);
-	bonePrimitive_->SetCamera(camera_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -341,7 +335,7 @@ void SampleScene::Draw() {
 	humanWalkObj_->Draw();
 	humanSneakWalkObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
-	humanWalkSkeleton_->DrawBones(jointPrimitive_.get(), bonePrimitive_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
-	humanSneakWalkSkeleton_->DrawBones(jointPrimitive_.get(), bonePrimitive_.get(), {1.0f, 0.5f, 0.2f, 1.0f}, {0.9f, 0.3f, 0.1f, 1.0f});
+	humanWalkSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
+	humanSneakWalkSkeleton_->DrawBones(camera_.get(), {1.0f, 0.5f, 0.2f, 1.0f}, {0.9f, 0.3f, 0.1f, 1.0f});
 }
 void SampleScene::Finalize() {}

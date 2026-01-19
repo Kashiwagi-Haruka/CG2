@@ -11,6 +11,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <memory>
 
 struct Joint {
 	QuaternionTransform transform{};
@@ -21,7 +22,7 @@ struct Joint {
 	int32_t index = -1;
 	std::optional<int32_t> parent;
 };
-
+class Camera;
 class Skeleton {
 public:
 	Skeleton Create(const Model::Node& rootNode);
@@ -32,7 +33,7 @@ public:
 	void SetObjectMatrix(const Matrix4x4& objectMatrix);
 	Vector3 GetJointWorldPosition(const Joint& joint) const;
 	void UpdateAnimation(const Animation::AnimationData& animation, float& animationTime, float deltaTime);
-	void DrawBones(Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor) const;
+	void DrawBones(Camera* camera, const Vector4& jointColor, const Vector4& boneColor);
 
 private:
 	int32_t root_ = -1;

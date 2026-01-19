@@ -1,5 +1,6 @@
 #include "Skeleton.h"
 #include "Function.h"
+#include "Camera.h"
 #include "Object3d/Object3dCommon.h"
 #include <cmath>
 
@@ -102,19 +103,39 @@ void Skeleton::UpdateAnimation(const Animation::AnimationData& animation, float&
 	Update();
 }
 
-void Skeleton::DrawBones(Primitive* jointPrimitive, Primitive* bonePrimitive, const Vector4& jointColor, const Vector4& boneColor) const {
-	if (!jointPrimitive || !bonePrimitive) {
+void Skeleton::DrawBones(Camera* camera, const Vector4& jointColor, const Vector4& boneColor) {
+	if (!camera) {
 		return;
 	}
 
-	jointPrimitive->SetColor(jointColor);
-	bonePrimitive->SetColor(boneColor);
-	jointPrimitive->SetEnableLighting(false);
-	bonePrimitive->SetEnableLighting(false);
+	const size_t jointCount = joints_.size();
+	if (debugJointPrimitives_.size() != jointCount) {
+		debugJointPrimitives_.clear();
+		debugJointPrimitives_.reserve(jointCount);
+		for (size_t i = 0; i < jointCount; ++i) {
+			auto primitive = std::make_unique<Primitive>();
+			primitive->Initialize(Primitive::Sphere);
+			debugJointPrimitives_.push_back(std::move(primitive));
+		}
+	}
+	if (debugBonePrimitives_.size() != jointCount) {
+		debugBonePrimitives_.clear();
+		debugBonePrimitives_.reserve(jointCount);
+		for (size_t i = 0; i < jointCount; ++i) {
+			auto primitive = std::make_unique<Primitive>();
+			primitive->Initialize(Primitive::Line);
+			debugBonePrimitives_.push_back(std::move(primitive));
+		}
+	}
 
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
-	for (const Joint& joint : joints_) {
+	for (size_t i = 0; i < jointCount; ++i) {
+		const Joint& joint = joints_[i];
 		Vector3 jointPosition = GetJointWorldPosition(joint);
+		Primitive* jointPrimitive = debugJointPrimitives_[i].get();
+		jointPrimitive->SetCamera(camera);
+		jointPrimitive->SetColor(jointColor);
+		jointPrimitive->SetEnableLighting(false);
 		jointPrimitive->SetTransform({
 		    .scale{kJointRadius,    kJointRadius,    kJointRadius   },
 		    .rotate{0.0f,            0.0f,            0.0f           },
@@ -125,7 +146,8 @@ void Skeleton::DrawBones(Primitive* jointPrimitive, Primitive* bonePrimitive, co
 	}
 
 	Object3dCommon::GetInstance()->DrawCommonLineNoDepth();
-	for (const Joint& joint : joints_) {
+	for (size_t i = 0; i < jointCount; ++i) {
+		const Joint& joint = joints_[i];
 		if (!joint.parent.has_value()) {
 			continue;
 		}
@@ -145,6 +167,10 @@ void Skeleton::DrawBones(Primitive* jointPrimitive, Primitive* bonePrimitive, co
 		    (jointPosition.z + parentPosition.z) * 0.5f,
 		};
 		Vector3 rotation = Function::DirectionToRotation(Function::Normalize(direction), {1.0f, 0.0f, 0.0f});
+		Primitive* bonePrimitive = debugBonePrimitives_[i].get();
+		bonePrimitive->SetCamera(camera);
+		bonePrimitive->SetColor(boneColor);
+		bonePrimitive->SetEnableLighting(false);
 		bonePrimitive->SetTransform({
 		    .scale{length,     kBoneThickness, kBoneThickness},
 		    .rotate{rotation.x, rotation.y,     rotation.z    },
