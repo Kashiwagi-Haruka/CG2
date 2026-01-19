@@ -173,25 +173,11 @@ void Skeleton::DrawBones(Camera* camera, const Vector4& jointColor, const Vector
 		}
 		Vector3 axisZ = Function::Normalize(Function::Cross(axisX, up));
 		Vector3 axisY = Function::Cross(axisZ, axisX);
-		Matrix4x4 boneWorld{};
-		boneWorld.m[0][0] = axisX.x * length;
-		boneWorld.m[1][0] = axisX.y * length;
-		boneWorld.m[2][0] = axisX.z * length;
-		boneWorld.m[3][0] = center.x;
-		boneWorld.m[0][1] = axisY.x * kBoneThickness;
-		boneWorld.m[1][1] = axisY.y * kBoneThickness;
-		boneWorld.m[2][1] = axisY.z * kBoneThickness;
-		boneWorld.m[3][1] = center.y;
-		boneWorld.m[0][2] = axisZ.x * kBoneThickness;
-		boneWorld.m[1][2] = axisZ.y * kBoneThickness;
-		boneWorld.m[2][2] = axisZ.z * kBoneThickness;
-		boneWorld.m[3][2] = center.z;
-		boneWorld.m[3][3] = 1.0f;
 		Primitive* bonePrimitive = debugBonePrimitives_[i].get();
 		bonePrimitive->SetCamera(camera);
 		bonePrimitive->SetColor(boneColor);
 		bonePrimitive->SetEnableLighting(false);
-		bonePrimitive->SetWorldMatrix(boneWorld);
+		bonePrimitive->SetLinePositions(parentPosition, jointPosition);
 		bonePrimitive->Update();
 		bonePrimitive->Draw();
 	}

@@ -81,9 +81,15 @@ public:
 	void SetScale(Vector3 scale);
 	void SetTransform(Transform transform);
 	void SetWorldMatrix(Matrix4x4 matrix);
+	void SetLinePositions(const Vector3& start, const Vector3& end);
 	void SetColor(Vector4 color);
 	void SetEnableLighting(bool enable);
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetShininess(float shininess);
 	void SetEnvironmentCoefficient(float coefficient);
+
+private:
+	Vector3 lineStart_ = {0.0f, 0.0f, 0.0f};
+	Vector3 lineEnd_ = {0.0f, 0.0f, 0.0f};
+	bool useLinePositions_ = false;
 };

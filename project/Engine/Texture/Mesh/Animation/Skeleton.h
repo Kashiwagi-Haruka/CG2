@@ -41,7 +41,6 @@ private:
 	std::vector<Joint> joints_{};
 	Matrix4x4 objectMatrix_{};
 	float kJointRadius = 0.03f;
-	float kBoneThickness = 0.015f;
 	float kBoneLengthEpsilon = 0.0001f;
 	std::vector<std::unique_ptr<Primitive>> debugBonePrimitives_{};
 	std::vector<std::unique_ptr<Primitive>> debugJointPrimitives_{};

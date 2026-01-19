@@ -496,6 +496,15 @@ void Primitive::Initialize(PrimitiveName name) {
 }
 
 void Primitive::Update() {
+	if (primitiveName_ == Primitive::Line && useLinePositions_) {
+		vertices_[0].position = {lineStart_.x, lineStart_.y, lineStart_.z, 1.0f};
+		vertices_[1].position = {lineEnd_.x, lineEnd_.y, lineEnd_.z, 1.0f};
+		VertexData* vertexData = nullptr;
+		vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+		std::memcpy(vertexData, vertices_.data(), sizeof(VertexData) * vertices_.size());
+		vertexResource_->Unmap(0, nullptr);
+	}
+
 	if (!isUseSetWorld) {
 		worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	}
@@ -546,22 +555,37 @@ void Primitive::SetCamera(Camera* camera) { camera_ = camera; }
 void Primitive::SetTranslate(Vector3 translate) {
 	transform_.translate = translate;
 	isUseSetWorld = false;
+	useLinePositions_ = false;
 }
 void Primitive::SetRotate(Vector3 rotate) {
 	transform_.rotate = rotate;
 	isUseSetWorld = false;
+	useLinePositions_ = false;
 }
 void Primitive::SetScale(Vector3 scale) {
 	transform_.scale = scale;
 	isUseSetWorld = false;
+	useLinePositions_ = false;
 }
 void Primitive::SetTransform(Transform transform) {
 	transform_ = transform;
 	isUseSetWorld = false;
+	useLinePositions_ = false;
 }
 void Primitive::SetWorldMatrix(Matrix4x4 matrix) {
 	worldMatrix = matrix;
 	isUseSetWorld = true;
+	useLinePositions_ = false;
+}
+void Primitive::SetLinePositions(const Vector3& start, const Vector3& end) {
+	if (primitiveName_ != Primitive::Line) {
+		return;
+	}
+	lineStart_ = start;
+	lineEnd_ = end;
+	useLinePositions_ = true;
+	isUseSetWorld = true;
+	worldMatrix = Function::MakeIdentity4x4();
 }
 void Primitive::SetColor(Vector4 color) {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
