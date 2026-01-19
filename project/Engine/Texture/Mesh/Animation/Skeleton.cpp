@@ -166,16 +166,32 @@ void Skeleton::DrawBones(Camera* camera, const Vector4& jointColor, const Vector
 		    (jointPosition.y + parentPosition.y) * 0.5f,
 		    (jointPosition.z + parentPosition.z) * 0.5f,
 		};
-		Vector3 rotation = Function::DirectionToRotation(Function::Normalize(direction), {1.0f, 0.0f, 0.0f});
+		Vector3 axisX = Function::Normalize(direction);
+		Vector3 up = {0.0f, 1.0f, 0.0f};
+		if (std::abs(Function::Dot(axisX, up)) > 0.99f) {
+			up = {0.0f, 0.0f, 1.0f};
+		}
+		Vector3 axisZ = Function::Normalize(Function::Cross(axisX, up));
+		Vector3 axisY = Function::Cross(axisZ, axisX);
+		Matrix4x4 boneWorld{};
+		boneWorld.m[0][0] = axisX.x * length;
+		boneWorld.m[1][0] = axisX.y * length;
+		boneWorld.m[2][0] = axisX.z * length;
+		boneWorld.m[3][0] = center.x;
+		boneWorld.m[0][1] = axisY.x * kBoneThickness;
+		boneWorld.m[1][1] = axisY.y * kBoneThickness;
+		boneWorld.m[2][1] = axisY.z * kBoneThickness;
+		boneWorld.m[3][1] = center.y;
+		boneWorld.m[0][2] = axisZ.x * kBoneThickness;
+		boneWorld.m[1][2] = axisZ.y * kBoneThickness;
+		boneWorld.m[2][2] = axisZ.z * kBoneThickness;
+		boneWorld.m[3][2] = center.z;
+		boneWorld.m[3][3] = 1.0f;
 		Primitive* bonePrimitive = debugBonePrimitives_[i].get();
 		bonePrimitive->SetCamera(camera);
 		bonePrimitive->SetColor(boneColor);
 		bonePrimitive->SetEnableLighting(false);
-		bonePrimitive->SetTransform({
-		    .scale{length,     kBoneThickness, kBoneThickness},
-		    .rotate{rotation.x, rotation.y,     rotation.z    },
-		    .translate{center.x,   center.y,       center.z      },
-		});
+		bonePrimitive->SetWorldMatrix(boneWorld);
 		bonePrimitive->Update();
 		bonePrimitive->Draw();
 	}
