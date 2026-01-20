@@ -27,7 +27,8 @@ class Skeleton {
 public:
 	Skeleton Create(const Model::Node& rootNode);
 	const Model::Node& GetRootNode(const Model::Node& rootNode) const;
-
+	const std::vector<Joint>& GetJoints() const { return joints_; }
+	std::optional<int32_t> FindJointIndex(const std::string& name) const;
 	void Update();
 	void ApplyAnimation(const Animation::AnimationData& animation, float animationTime);
 	void SetObjectMatrix(const Matrix4x4& objectMatrix);

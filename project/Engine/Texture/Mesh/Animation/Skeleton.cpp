@@ -52,7 +52,13 @@ const Model::Node& Skeleton::GetRootNode(const Model::Node& rootNode) const {
 	}
 	return rootNode;
 }
-
+std::optional<int32_t> Skeleton::FindJointIndex(const std::string& name) const {
+	auto it = jointMap_.find(name);
+	if (it == jointMap_.end()) {
+		return std::nullopt;
+	}
+	return it->second;
+}
 void Skeleton::Update() {
 	for (Joint& joint : joints_) {
 		joint.localMatrix = Function::MakeAffineMatrix(joint.transform.scale, joint.transform.quaternion, joint.transform.translate);

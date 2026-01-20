@@ -75,5 +75,5 @@ public:
 	void SetEnvironmentCoefficient(float coefficient);
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() { return vertexBufferView_; }
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetMaterialResource() { return materialResource_; }
-	ModelData& GetModelData() { return modelData_; }
+	const ModelData& GetModelData() const { return modelData_; }
 };
