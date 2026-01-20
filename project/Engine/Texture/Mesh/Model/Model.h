@@ -2,6 +2,7 @@
 #include "Matrix4x4.h"
 #include "VertexData.h"
 #include "QuaternionTransform.h"
+#include "SkinningData.h"
 #include <Windows.h>
 #include <d3d12.h>
 #include <string>
@@ -10,6 +11,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <map>
+
 class ModelCommon;
 
 class Model {
@@ -33,7 +36,7 @@ private:
 		Node rootnode;
 	};
 	struct Material {
-
+		std::map<std::string, JointWeightData> skinClusterData;
 		Vector4 color;
 		int enableLighting;
 		float padding[3];
