@@ -72,6 +72,7 @@ private:
 
 public:
 	void Initialize(PrimitiveName name);
+	void Initialize(PrimitiveName name,const std::string& texturePath);
 	void Update();
 	void Draw();
 

@@ -494,6 +494,84 @@ void Primitive::Initialize(PrimitiveName name) {
 
 	isUseSetWorld = false;
 }
+void Primitive::Initialize(PrimitiveName name,const std::string& texturePath) {
+	primitiveName_ = name;
+	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
+	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
+	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
+
+	MeshData mesh;
+	switch (primitiveName_) {
+	case Primitive::Plane:
+		mesh = BuildPlane();
+		break;
+	case Primitive::Circle:
+		mesh = BuildCircle(kDefaultSlices);
+		break;
+	case Primitive::Ring:
+		mesh = BuildRing(kDefaultSlices);
+		break;
+	case Primitive::Sphere:
+		mesh = BuildSphere(kDefaultSlices, kDefaultStacks);
+		break;
+	case Primitive::Torus:
+		mesh = BuildTorus(kDefaultSlices, kDefaultStacks);
+		break;
+	case Primitive::Cylinder:
+		mesh = BuildCylinder(kDefaultSlices);
+		break;
+	case Primitive::Cone:
+		mesh = BuildCone(kDefaultSlices);
+		break;
+	case Primitive::Triangle:
+		mesh = BuildTriangle();
+		break;
+	case Primitive::Line:
+		mesh = BuildLine();
+		break;
+	case Primitive::Box:
+		mesh = BuildBox();
+		break;
+	default:
+		mesh = BuildPlane();
+		break;
+	}
+	vertices_ = std::move(mesh.vertices);
+	indices_ = std::move(mesh.indices);
+
+	vertexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * vertices_.size());
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+	VertexData* vertexData = nullptr;
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	std::memcpy(vertexData, vertices_.data(), sizeof(VertexData) * vertices_.size());
+	vertexResource_->Unmap(0, nullptr);
+
+	indexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * indices_.size());
+	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	indexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * indices_.size());
+	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+	void* mappedIndex = nullptr;
+	indexResource_->Map(0, nullptr, &mappedIndex);
+	std::memcpy(mappedIndex, indices_.data(), sizeof(uint32_t) * indices_.size());
+	indexResource_->Unmap(0, nullptr);
+
+	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
+	materialResource_ = Object3dCommon::GetInstance()->CreateBufferResource(alignedSize);
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	materialData_->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	materialData_->enableLighting = 1;
+	materialData_->uvTransform = Function::MakeIdentity4x4();
+	materialData_->shininess = 40.0f;
+	materialData_->environmentCoefficient = 0.0f;
+	materialResource_->Unmap(0, nullptr);
+
+	TextureManager::GetInstance()->LoadTextureName(texturePath);
+	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
+
+	isUseSetWorld = false;
+}
 
 void Primitive::Update() {
 	if (primitiveName_ == Primitive::Line && useLinePositions_) {
