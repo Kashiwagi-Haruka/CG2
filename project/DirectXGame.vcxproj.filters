@@ -610,9 +610,6 @@
     <FxCompile Include="Resources\shader\Object3d\Object3d.VS.hlsl">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\shader\WhitePS.hlsl">
-      <Filter>リソース ファイル</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\shader\Particle\Particle.PS.hlsl">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
