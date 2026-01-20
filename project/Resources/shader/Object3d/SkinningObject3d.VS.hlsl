@@ -5,10 +5,8 @@ struct TransformationMatrix
     float4x4 World;
     float4x4 WorldInverseTranspose;
 };
-cbuffer gTransformationMatrix : register(b1)
-{
-    TransformationMatrix gTransformationMatrix;
-}
+
+ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b1);
 
 struct Well
 {
