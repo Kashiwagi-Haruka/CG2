@@ -138,8 +138,8 @@ void SpriteCommon::CreateGraphicsPipeline() {
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	// --- 通常PSO（裏面カリング） ---
-	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(L"Resources/shader/Sprite.VS.hlsl", L"vs_6_0");
-	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Sprite.PS.hlsl", L"ps_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(L"Resources/shader/Sprite/Sprite.VS.hlsl", L"vs_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Sprite/Sprite.PS.hlsl", L"ps_6_0");
 	assert(vsBlob && psBlob);
 
 	// 修正案: IID_PPV_ARGSの引数にgraphicsPipelineState_[i].ReleaseAndGetAddressOf()を使う

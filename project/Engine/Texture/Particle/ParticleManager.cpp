@@ -470,8 +470,8 @@ void ParticleManager::CreateGraphicsPipeline() {
 	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	// Shader
-	auto vsBlob = dxCommon_->CompileShader(L"Resources/shader/Particle.VS.hlsl", L"vs_6_0");
-	auto psBlob = dxCommon_->CompileShader(L"Resources/shader/Particle.PS.hlsl", L"ps_6_0");
+	auto vsBlob = dxCommon_->CompileShader(L"Resources/shader/Particle/Particle.VS.hlsl", L"vs_6_0");
+	auto psBlob = dxCommon_->CompileShader(L"Resources/shader/Particle/Particle.PS.hlsl", L"ps_6_0");
 
 	// PSO
 	for (int i = 0; i < BlendMode::kCountOfBlendMode; i++) {
