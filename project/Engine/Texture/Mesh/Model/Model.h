@@ -1,17 +1,17 @@
 #pragma once
 #include "Matrix4x4.h"
-#include "VertexData.h"
 #include "QuaternionTransform.h"
 #include "SkinningData.h"
+#include "VertexData.h"
 #include <Windows.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 #include <d3d12.h>
+#include <map>
 #include <string>
 #include <vector>
 #include <wrl.h>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include <map>
 
 class ModelCommon;
 struct SkinCluster;
@@ -37,7 +37,7 @@ private:
 		Node rootnode;
 	};
 	struct Material {
-		
+
 		Vector4 color;
 		int enableLighting;
 		float padding[3];

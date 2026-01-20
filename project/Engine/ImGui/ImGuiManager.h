@@ -1,8 +1,8 @@
 #pragma once
 
+#include <cstdint>
 #include <d3d12.h>
 #include <dxgi1_6.h>
-#include <cstdint>
 
 class WinApp;
 class DirectXCommon;
@@ -11,13 +11,11 @@ class ImGuiManager {
 
 	uint32_t srvIndex_;
 
-
 public:
-
-	void Initialize(WinApp* winapp, DirectXCommon* dxCommon, SrvManager* srvManager );
+	void Initialize(WinApp* winapp, DirectXCommon* dxCommon, SrvManager* srvManager);
 	void Begin();
 	void End();
-	void Draw(SrvManager* srvManager,DirectXCommon* dxCommon);
+	void Draw(SrvManager* srvManager, DirectXCommon* dxCommon);
 
 	void Finalize();
 };

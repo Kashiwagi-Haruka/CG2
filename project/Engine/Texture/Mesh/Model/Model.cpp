@@ -2,11 +2,11 @@
 #include "Animation/SkinCluster.h"
 #include "DirectXCommon.h"
 #include "Function.h"
+#include "Logger.h"
 #include "ModelCommon.h"
 #include "Object3d/Object3dCommon.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
-#include "Logger.h"
 #include <cassert>
 #include <fstream>
 #include <sstream>
@@ -119,7 +119,7 @@ void Model::Draw(const SkinCluster* skinCluster) {
 	// --- Environment Map SRVのDescriptorTableを設定 ---
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(11, Object3dCommon::GetInstance()->GetEnvironmentMapSrvIndex());
 
-		// --- 描画！（DrawCall）---
+	// --- 描画！（DrawCall）---
 	if (!modelData_.indices.empty()) {
 		modelCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(modelData_.indices.size()), 1, 0, 0, 0);
 	} else {
@@ -252,7 +252,6 @@ void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::strin
 				modelData.indices.push_back(vertexOffset + face.mIndices[element]);
 			}
 		}
-
 	}
 
 	// --- Material & Texture ---

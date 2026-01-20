@@ -1,9 +1,9 @@
 #pragma once
-#include <xaudio2.h>
 #include <cstdint>
-#include <wrl.h>
-#include <vector>
 #include <memory>
+#include <vector>
+#include <wrl.h>
+#include <xaudio2.h>
 struct ChunkHeader {
 	char id[4];
 	int32_t size;
@@ -50,8 +50,7 @@ public:
 	void InitializeIXAudio();
 	SoundData SoundLoadFile(const char* filename);
 	void SoundUnload(SoundData* soundData);
-	void SoundPlayWave(const SoundData& sounddata,bool isLoop=false);
+	void SoundPlayWave(const SoundData& sounddata, bool isLoop = false);
 	void SetSoundVolume(SoundData* soundData, float volume);
 	Microsoft::WRL::ComPtr<IXAudio2> GetIXAudio2() { return xAudio2_; };
-}
-;
+};

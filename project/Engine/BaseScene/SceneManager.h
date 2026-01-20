@@ -1,6 +1,6 @@
 #pragma once
+#include "AbstractSceneFactory.h"
 #include "BaseScene.h"
-#include  "AbstractSceneFactory.h"
 #include <memory>
 class SceneManager {
 
@@ -11,12 +11,11 @@ class SceneManager {
 
 	AbstractSceneFactory* sceneFactory_ = nullptr;
 
-	public:
-
-		void SetSceneFactory(AbstractSceneFactory* sceneFactory) { sceneFactory_ = sceneFactory; };
-	    void ChangeScene(const std::string& sceneName);		
-	    void Update();
-	    void Draw();
-	    void Finalize();
-	    static SceneManager* GetInstance();
+public:
+	void SetSceneFactory(AbstractSceneFactory* sceneFactory) { sceneFactory_ = sceneFactory; };
+	void ChangeScene(const std::string& sceneName);
+	void Update();
+	void Draw();
+	void Finalize();
+	static SceneManager* GetInstance();
 };

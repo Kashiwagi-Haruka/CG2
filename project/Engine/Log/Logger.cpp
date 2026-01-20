@@ -3,9 +3,6 @@
 
 namespace Logger {
 
-	void Log(const std::string& message) {	
+void Log(const std::string& message) { OutputDebugStringA(message.c_str()); }
 
-		OutputDebugStringA(message.c_str()); 
-	}
-
-}
+} // namespace Logger

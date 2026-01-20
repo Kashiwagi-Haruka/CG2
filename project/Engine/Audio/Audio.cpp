@@ -12,7 +12,7 @@
 
 std::unique_ptr<Audio> Audio::instance = nullptr;
 
-Audio* Audio::GetInstance(){
+Audio* Audio::GetInstance() {
 	if (instance == nullptr) {
 		instance = std::make_unique<Audio>();
 	}
@@ -29,8 +29,6 @@ void Audio::Finalize() {
 	result_ = MFShutdown();
 	assert(SUCCEEDED(result_));
 
-
-	
 	instance = nullptr;
 }
 
@@ -115,7 +113,7 @@ SoundData Audio::SoundLoadFile(const char* filename) {
 
 	// 1フレームずつ読み込む
 	while (true) {
-		DWORD streamIndex = 0,flags = 0;
+		DWORD streamIndex = 0, flags = 0;
 		LONGLONG llTimeStamp = 0;
 		Microsoft::WRL::ComPtr<IMFSample> pSample;
 
@@ -129,24 +127,23 @@ SoundData Audio::SoundLoadFile(const char* filename) {
 		if (!pSample) {
 			continue;
 		} else {
-		Microsoft::WRL::ComPtr<IMFMediaBuffer> pBuffer;
-		hr = pSample->ConvertToContiguousBuffer(&pBuffer);
-		assert(SUCCEEDED(hr));
+			Microsoft::WRL::ComPtr<IMFMediaBuffer> pBuffer;
+			hr = pSample->ConvertToContiguousBuffer(&pBuffer);
+			assert(SUCCEEDED(hr));
 
-		BYTE* pData = nullptr;
-		DWORD maxLength = 0, curLength = 0;
+			BYTE* pData = nullptr;
+			DWORD maxLength = 0, curLength = 0;
 
-		hr = pBuffer->Lock(&pData, &maxLength, &curLength);
-		assert(SUCCEEDED(hr));
+			hr = pBuffer->Lock(&pData, &maxLength, &curLength);
+			assert(SUCCEEDED(hr));
 
-		soundData.buffer.insert(soundData.buffer.end(), pData, pData + curLength);
- 
-		pBuffer->Unlock();
+			soundData.buffer.insert(soundData.buffer.end(), pData, pData + curLength);
+
+			pBuffer->Unlock();
 		}
 	}
 
 	// 必要ないので解放
-
 
 	return soundData;
 }

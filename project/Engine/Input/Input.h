@@ -1,11 +1,11 @@
 #pragma once
 #define DIRECTINPUT_VERSION 0x0800
+#include "Vector2.h"
+#include "WinApp.h"
 #include <Windows.h>
 #include <cstdint>
 #include <dinput.h>
 #include <wrl.h>
-#include "Vector2.h"
-#include "WinApp.h"
 
 class Input {
 
@@ -23,7 +23,7 @@ class Input {
 	DIJOYSTATE prePadState_{}; // 前フレームの状態
 
 	float deadZone_ = 0.2f; // デッドゾーン(0.0f～1.0f)
-	
+
 	DIMOUSESTATE2 mouseState_{};
 	DIMOUSESTATE2 prevMouseState_{};
 	LONG mouseX_ = 0;
@@ -37,7 +37,6 @@ class Input {
 	bool isCursorVisible_ = true;
 
 public:
-
 	enum class PadButton {
 		kButtonA = 0,         // rgbButtons[0]
 		kButtonB,             // rgbButtons[1]
@@ -59,11 +58,7 @@ public:
 		kMaxButtons
 	};
 
-	enum class MouseButton {
-		kLeft = 0,
-		kRight,
-		kMiddle,
-		kMaxButtons };
+	enum class MouseButton { kLeft = 0, kRight, kMiddle, kMaxButtons };
 
 	/// <summary>
 	/// 初期化
@@ -78,7 +73,7 @@ public:
 	void Update();
 
 	// キーボード
-	
+
 	/// <summary>
 	/// キーが押されているか
 	/// </summary>
@@ -101,11 +96,11 @@ public:
 	bool ReleaseKey(BYTE keyNumber);
 
 	// ゲームパッド
-	bool PushButton(PadButton button);                    // ボタンが押されているか
-	bool TriggerButton(PadButton button);                 // ボタンが押された瞬間か
-	bool ReleaseButton(PadButton button);                 // ボタンが離されているか
+	bool PushButton(PadButton button);    // ボタンが押されているか
+	bool TriggerButton(PadButton button); // ボタンが押された瞬間か
+	bool ReleaseButton(PadButton button); // ボタンが離されているか
 
-	//ジョイスティック
+	// ジョイスティック
 
 	/// <summary>
 	/// ジョイスティックのX軸を取得
@@ -124,21 +119,20 @@ public:
 	/// <returns></returns>
 	Vector2 GetJoyStickLXY() const;
 
-
 	// 右スティック
 	float GetJoyStickRX() const;
 	float GetJoyStickRY() const;
 	Vector2 GetJoyStickRXY() const;
 
 	// マウス
-	float GetMouseX() const; // マウスのX座標を取得
-	float GetMouseY() const; // マウスのY座標を取得
-	Vector2 GetMouseMove()const; // マウスの移動量を取得
+	float GetMouseX() const;                           // マウスのX座標を取得
+	float GetMouseY() const;                           // マウスのY座標を取得
+	Vector2 GetMouseMove() const;                      // マウスの移動量を取得
 	float GetMouseWheelDelta() const;                  // マウスホイールの移動量を取得
-	bool PushMouseButton(MouseButton button) const; // マウスボタンが押されているか
+	bool PushMouseButton(MouseButton button) const;    // マウスボタンが押されているか
 	bool TriggerMouseButton(MouseButton button) const; // マウスボタンが押された瞬間か
 	bool ReleaseMouseButton(MouseButton button) const; // マウスボタンが離された瞬間か
-	void SetIsCursor(bool isCursor) { isCursorStability=isCursor; }
+	void SetIsCursor(bool isCursor) { isCursorStability = isCursor; }
 	void SetIsCursorVisible(bool isVisible);
 	/// <summary>
 	/// デッドゾーンの設定

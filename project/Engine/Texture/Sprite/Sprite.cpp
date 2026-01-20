@@ -1,14 +1,10 @@
 #include "Sprite.h"
-#include "SpriteCommon.h"
-#include "Function.h"
 #include "DirectXCommon.h"
-#include "TextureManager.h"
+#include "Function.h"
+#include "SpriteCommon.h"
 #include "SrvManager/SrvManager.h"
-void Sprite::Initialize(uint32_t Handle){
-
-	
-
-	 
+#include "TextureManager.h"
+void Sprite::Initialize(uint32_t Handle) {
 
 	textureIndex = Handle;
 
@@ -18,7 +14,7 @@ void Sprite::Initialize(uint32_t Handle){
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	// 頂点データ
-	
+
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	// ……スプライトの頂点6つ設定……
 	// 頂点は 4つだけにする
@@ -38,10 +34,7 @@ void Sprite::Initialize(uint32_t Handle){
 	vertexData[3].position = {1.0f, 1.0f, 0.0f, 1.0f};
 	vertexData[3].texcoord = {1.0f, 1.0f};
 
-
-	
-	
-// 頂点は4つだけ
+	// 頂点は4つだけ
 	for (int i = 0; i < 4; i++) {
 		vertexData[i].normal = {0.0f, 0.0f, -1.0f};
 	}
@@ -60,9 +53,6 @@ void Sprite::Initialize(uint32_t Handle){
 	indexBufferView.SizeInBytes = sizeof(indices);
 	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 
-
-	
-
 	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
 	// スプライト用（陰影つけたくないもの）
 	materialResource = SpriteCommon::GetInstance()->CreateBufferResource(alignedSize);
@@ -78,15 +68,12 @@ void Sprite::Initialize(uint32_t Handle){
 	transformResource->Map(0, nullptr, reinterpret_cast<void**>(&transformData));
 	transformData->WVP = Function::MakeIdentity4x4();
 	transformData->World = Function::MakeIdentity4x4();
-	
+
 	AdjustTextureSize();
 	SetTextureRange({0.0f, 0.0f}, textureSize);
-
 }
 
-void Sprite::Draw(){
-
-	
+void Sprite::Draw() {
 
 	// 頂点バッファビューとインデックスバッファビューをセット（オフセット指定）
 	UINT offset = currentSpriteVertexOffset_;
@@ -111,11 +98,7 @@ void Sprite::Draw(){
 	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 	// 次のスプライト用にオフセットを進める
-
-
-
 }
-
 
 void Sprite::Update() {
 
@@ -134,32 +117,24 @@ void Sprite::Update() {
 	vertexData[2].position = {left, bottom, 0.0f, 1.0f};
 	vertexData[3].position = {right, bottom, 0.0f, 1.0f};
 
+	// World
+	Matrix4x4 world = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
+	// 画面サイズに基づく正射影。left=0, top=0, right=幅, bottom=高さ, near=0, far=1
+	Matrix4x4 ortho = Function::MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight), 0.0f, 1.0f);
 
+	// 行列の掛け順は VS 側の mul(input.position, WVP) に合わせる
+	Matrix4x4 wvp = Function::Multiply(world, ortho);
 
-	   // World
-    Matrix4x4 world = Function::MakeAffineMatrix(
-        transform_.scale, transform_.rotate, transform_.translate);
-
-    // 画面サイズに基づく正射影。left=0, top=0, right=幅, bottom=高さ, near=0, far=1
-    Matrix4x4 ortho = Function::MakeOrthographicMatrix(
-        0.0f, 0.0f,
-        static_cast<float>(WinApp::kClientWidth),
-        static_cast<float>(WinApp::kClientHeight),
-        0.0f, 1.0f);
-
-    // 行列の掛け順は VS 側の mul(input.position, WVP) に合わせる
-    Matrix4x4 wvp = Function::Multiply(world, ortho);
-
-    transformData->WVP   = wvp;
-    transformData->World = world;
+	transformData->WVP = wvp;
+	transformData->World = world;
 }
 
 void Sprite::SetColor(const Vector4& color) { material->color = color; };
 
 void Sprite::SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize) {
 
-		const DirectX::TexMetadata& metaData = TextureManager::GetInstance()->GetMetaData(textureIndex);
+	const DirectX::TexMetadata& metaData = TextureManager::GetInstance()->GetMetaData(textureIndex);
 	float tex_left = leftTop.x / metaData.width;
 	float tex_right = (leftTop.x + TextureSize.x) / metaData.width;
 	float tex_top = leftTop.y / metaData.height;
@@ -171,10 +146,7 @@ void Sprite::SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize)
 	vertexData[3].texcoord = {tex_right, tex_bottom};
 }
 
-void Sprite::SetIsFlipX(const bool isFlipX) { 
-	isFlipX_ = isFlipX;
-
-}
+void Sprite::SetIsFlipX(const bool isFlipX) { isFlipX_ = isFlipX; }
 
 void Sprite::SetIsFlipY(const bool isFlipY) { isFripY_ = isFlipY; }
 
@@ -185,5 +157,4 @@ void Sprite::AdjustTextureSize() {
 	textureCutSize.y = static_cast<float>(metadata.height);
 
 	textureSize = textureCutSize;
-
 }

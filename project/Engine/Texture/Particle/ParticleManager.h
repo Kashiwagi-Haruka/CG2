@@ -1,18 +1,18 @@
 #pragma once
-#include <string>
-#include <unordered_map>
-#include <list>
-#include <wrl.h>
-#include <d3d12.h>
-#include "Vector3.h"
-#include "Matrix4x4.h"
-#include <cstdint>
 #include "BlendMode/BlendModeManager.h"
-#include "Transform.h"
+#include "Matrix4x4.h"
 #include "RigidBody.h"
+#include "Transform.h"
+#include "Vector3.h"
 #include "Vector4.h"
 #include <array>
+#include <cstdint>
+#include <d3d12.h>
+#include <list>
 #include <memory>
+#include <string>
+#include <unordered_map>
+#include <wrl.h>
 
 struct Particle {
 	Transform transform_{
@@ -34,7 +34,6 @@ struct Particle {
 	bool visible = true;
 };
 
-
 class SrvManager;
 class DirectXCommon;
 class Camera;
@@ -42,7 +41,6 @@ class Camera;
 class ParticleManager {
 
 public:
-
 	struct ParticleGroup {
 
 		std::string textureFilePath;
@@ -62,7 +60,6 @@ public:
 		std::array<BlendBucket, static_cast<int>(BlendMode::kCountOfBlendMode)> buckets;
 	};
 
-
 public:
 	static ParticleManager* GetInstance();
 	void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager);
@@ -70,7 +67,6 @@ public:
 	void Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life);
 	void SetCamera(Camera* camera);
 	void SetBlendMode(BlendMode mode);
-
 
 	// 更新 / 描画
 	void Update(Camera* camera);
@@ -86,15 +82,13 @@ private:
 		float pad[3]; // 16バイトアラインメント
 	};
 
-
-	Vector3 scale_ = {1,1,1};
-	
+	Vector3 scale_ = {1, 1, 1};
 
 	static std::unique_ptr<ParticleManager> instance;
 	DirectXCommon* dxCommon_ = nullptr;
 	SrvManager* srvManager_ = nullptr;
-	
-	std::unordered_map<std::string, ParticleGroup> particleGroups;	
+
+	std::unordered_map<std::string, ParticleGroup> particleGroups;
 	D3D12_VERTEX_BUFFER_VIEW vbView_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;

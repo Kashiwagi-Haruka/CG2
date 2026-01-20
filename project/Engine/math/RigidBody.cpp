@@ -1,4 +1,4 @@
-#define NOMINMAX 
+#define NOMINMAX
 #include "RigidBody.h"
 #include "Function.h"
 #include <algorithm>
@@ -10,15 +10,15 @@ bool IsCollision(const AABB& aabb, const Vector3& point) {
 bool isCollision(const AABB& aabb1, const AABB& aabb2) {
 	// 各軸で重なっているか確認（Separating Axis Theoremの基本）
 	if (aabb1.max.x < aabb2.min.x || aabb1.min.x > aabb2.max.x) {
-	
+
 		return false;
 	}
 	if (aabb1.max.y < aabb2.min.y || aabb1.min.y > aabb2.max.y) {
-	
+
 		return false;
 	}
 	if (aabb1.max.z < aabb2.min.z || aabb1.min.z > aabb2.max.z) {
-	
+
 		return false;
 	}
 
@@ -32,7 +32,6 @@ bool isCollision(const AABB& aabb, const Sphere& sphere) {
 	closestPoint.x = std::clamp(sphere.center.x, aabb.min.x, aabb.max.x);
 	closestPoint.y = std::clamp(sphere.center.y, aabb.min.y, aabb.max.y);
 	closestPoint.z = std::clamp(sphere.center.z, aabb.min.z, aabb.max.z);
-
 
 	// 最近接点と球の中心の距離の2乗を計算
 	Vector3 difference = sphere.center - closestPoint;
@@ -82,7 +81,6 @@ bool isCollision(const AABB& aabb, const Segment& segment) {
 }
 
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
-	
 
 	// 8頂点定義（ワールド座標）
 	Vector3 vertices[8] = {
@@ -120,10 +118,10 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
         {3, 7}  // 側面
 	};
 	(uint32_t)color;
-	//for (int i = 0; i < 12; ++i) {
+	// for (int i = 0; i < 12; ++i) {
 	//	const Vector3& v0 = vertices[lines[i][0]];
 	//	const Vector3& v1 = vertices[lines[i][1]];
 	//	Novice::DrawLine(static_cast<int>(v0.x), static_cast<int>(v0.y), static_cast<int>(v1.x), static_cast<int>(v1.y), color);
-	//}
+	// }
 }
-}
+} // namespace RigidBody

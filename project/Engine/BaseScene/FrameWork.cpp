@@ -15,13 +15,8 @@ void FrameWork::Run() {
 	Finalize();
 }
 
+void FrameWork::Initialize() {}
 
-void FrameWork::Initialize() {
-
-}
-
-void FrameWork::Update() {
-
-}
+void FrameWork::Update() {}
 
 void FrameWork::Finalize() {}

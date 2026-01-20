@@ -1,7 +1,7 @@
 #pragma once
 class D3DResourceLeakChecker {
 
-	public:
+public:
 	/// <summary>
 	/// デストラクタ
 	/// </summary>

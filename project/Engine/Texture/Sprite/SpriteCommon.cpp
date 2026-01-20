@@ -11,23 +11,15 @@ SpriteCommon* SpriteCommon::GetInstance() {
 		instance_ = std::make_unique<SpriteCommon>();
 	}
 	return instance_.get();
-
 }
 
 void SpriteCommon::Initialize(DirectXCommon* dxCommon) {
 
 	dxCommon_ = dxCommon;
 
-	
-	
 	CreateGraphicsPipeline();
-
 }
-void SpriteCommon::Finalize(){
-
-instance_.reset();
-
-}
+void SpriteCommon::Finalize() { instance_.reset(); }
 void SpriteCommon::DrawCommon() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
@@ -36,7 +28,7 @@ void SpriteCommon::DrawCommon() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-void SpriteCommon::CreateRootSignatures(){
+void SpriteCommon::CreateRootSignatures() {
 
 	// --- RootSignature ---
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -95,7 +87,7 @@ void SpriteCommon::CreateRootSignatures(){
 void SpriteCommon::CreateGraphicsPipeline() {
 
 	CreateRootSignatures();
-	
+
 	// --- InputLayout ---
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 
@@ -130,7 +122,7 @@ void SpriteCommon::CreateGraphicsPipeline() {
 	depthStencilDesc.DepthEnable = false;
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;  // 深度書き込みを有効
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // 手前なら描画
-	 depthStencilDesc.StencilEnable = false;                        // ステンシル不要なら false
+	depthStencilDesc.StencilEnable = false;                        // ステンシル不要なら false
 
 	// --- 共通設定 ---
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
@@ -150,23 +142,19 @@ void SpriteCommon::CreateGraphicsPipeline() {
 	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Sprite.PS.hlsl", L"ps_6_0");
 	assert(vsBlob && psBlob);
 
-    // 修正案: IID_PPV_ARGSの引数にgraphicsPipelineState_[i].ReleaseAndGetAddressOf()を使う
-    for (int i = 0; i < BlendMode::kCountOfBlendMode; i++) {
-        D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = baseDesc;
-        psoDesc.BlendState = blendModeManager_.SetBlendMode(static_cast<BlendMode>(i));
-        psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
-        psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
-        D3D12_RASTERIZER_DESC rasterizerDesc{};
-        rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-        rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-        psoDesc.RasterizerState = rasterizerDesc;
-        hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(
-            &psoDesc,
-            IID_PPV_ARGS(graphicsPipelineState_[i].GetAddressOf())
-        );
-        assert(SUCCEEDED(hr_));
-    }
-	
+	// 修正案: IID_PPV_ARGSの引数にgraphicsPipelineState_[i].ReleaseAndGetAddressOf()を使う
+	for (int i = 0; i < BlendMode::kCountOfBlendMode; i++) {
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = baseDesc;
+		psoDesc.BlendState = blendModeManager_.SetBlendMode(static_cast<BlendMode>(i));
+		psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
+		psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
+		D3D12_RASTERIZER_DESC rasterizerDesc{};
+		rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+		psoDesc.RasterizerState = rasterizerDesc;
+		hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(graphicsPipelineState_[i].GetAddressOf()));
+		assert(SUCCEEDED(hr_));
+	}
 }
 Microsoft::WRL::ComPtr<ID3D12Resource> SpriteCommon::CreateBufferResource(size_t sizeInBytes) {
 	// バッファの設定（UPLOAD用に変更）

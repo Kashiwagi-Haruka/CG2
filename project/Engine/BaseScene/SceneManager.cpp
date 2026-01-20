@@ -53,5 +53,5 @@ void SceneManager::ChangeScene(const std::string& sceneName) {
 	assert(sceneFactory_);
 	assert(nextscene_ == nullptr);
 
-nextscene_ = sceneFactory_->CreateScene(sceneName);
+	nextscene_ = sceneFactory_->CreateScene(sceneName);
 }

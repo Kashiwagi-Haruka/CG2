@@ -1,31 +1,25 @@
 #include "TextureManager.h"
 #include "DirectXCommon.h"
-#include "StringUtility.h"
 #include "SrvManager/SrvManager.h"
+#include "StringUtility.h"
 std::unique_ptr<TextureManager> TextureManager::instance = nullptr;
 uint32_t TextureManager::kSRVIndexTop = 1;
 
-TextureManager* TextureManager::GetInstance(){
+TextureManager* TextureManager::GetInstance() {
 
 	if (instance == nullptr) {
 		instance = std::make_unique<TextureManager>();
-	
 	}
 	return instance.get();
-
 }
 
-void TextureManager::Initialize(DirectXCommon* dxCommon,SrvManager* srvManager){
+void TextureManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
 	dxCommon_ = dxCommon;
 	srvManager_ = srvManager;
 	textureDatas.reserve(srvManager_->kMaxSRVCount_);
-	
-	
 }
 
-void TextureManager::Finalize(){ 
-	
-	instance.reset(); }
+void TextureManager::Finalize() { instance.reset(); }
 
 void TextureManager::LoadTextureName(const std::string& filePath) {
 
@@ -45,7 +39,6 @@ void TextureManager::LoadTextureName(const std::string& filePath) {
 	hr_ = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
 	assert(SUCCEEDED(hr_));
 
-	
 	TextureData& textureData = textureDatas[filePath];
 	textureData.filePath = filePath;
 	textureData.metadata = mipImages.GetMetadata();
@@ -70,7 +63,6 @@ void TextureManager::LoadTextureName(const std::string& filePath) {
 	// デバッグログ出力
 	std::string log = "Texture Loaded: " + filePath + " | SRV Index: " + std::to_string(textureData.srvIndex) + " | GPU Handle: " + std::to_string(textureData.srvHandleGPU.ptr) + "\n";
 	OutputDebugStringA(log.c_str());
-
 }
 void TextureManager::LoadTextureFromMemory(const std::string& key, const uint8_t* data, size_t size) {
 	if (textureDatas.contains(key)) {
@@ -180,7 +172,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(Dir
 	return textureResource_;
 }
 
-//uint32_t TextureManager::GetTextureIndexByfilePath(const std::string& filePath){
+// uint32_t TextureManager::GetTextureIndexByfilePath(const std::string& filePath){
 //
 //	LoadTextureName(filePath);
 //
@@ -189,13 +181,13 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(Dir
 //
 //
 //	if (it != textureDatas.end()) {
-//	
+//
 //		uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas.begin(), it));
 //		return textureIndex;
 //	}
 //	assert(0);
 //	return 0;
-//}
+// }
 uint32_t TextureManager::GetTextureIndexByfilePath(const std::string& filePath) {
 	LoadTextureName(filePath);
 
@@ -232,7 +224,6 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& fileP
 
 	return it->second.metadata;
 }
-
 
 void TextureManager::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages) {
 	// Meta情報を取得

@@ -1,8 +1,8 @@
 #pragma once
-#include<Windows.h>
-#include <wrl.h>
+#include <Windows.h>
 #include <cstdint>
 #include <d3d12.h>
+#include <wrl.h>
 class DirectXCommon;
 class SrvManager {
 
@@ -14,9 +14,7 @@ class SrvManager {
 
 	uint32_t useIndex = 0;
 
-	
-	public:
-
+public:
 	void Initialize(DirectXCommon* dxCommon);
 
 	uint32_t Allocate();

@@ -7,7 +7,6 @@
 
 using namespace Microsoft::WRL;
 
-
 BOOL CALLBACK Input::EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext) {
 	Input* input = reinterpret_cast<Input*>(pContext);
 	HRESULT hr = input->directInput->CreateDevice(pdidInstance->guidInstance, &input->gamePadDevice_, NULL);
@@ -48,11 +47,9 @@ void Input::Initialize(WinApp* winApp) {
 	result = directInput->CreateDevice(GUID_SysMouse, &mouseDevice_, nullptr);
 	assert(SUCCEEDED(result));
 
-	
 	result = mouseDevice_->SetDataFormat(&c_dfDIMouse2);
 	assert(SUCCEEDED(result));
 
-	
 	result = mouseDevice_->SetCooperativeLevel(winApp_->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(result));
 }
@@ -79,8 +76,6 @@ void Input::Update() {
 	// ゲームパッド
 	prePadState_ = padState_;
 
-	
-	
 	if (gamePadDevice_) {
 		HRESULT hr = gamePadDevice_->Acquire();
 		if (SUCCEEDED(hr)) {
@@ -106,16 +101,16 @@ void Input::Update() {
 	}
 
 	if (winApp_->GetIsPad()) {
-		
-	// --- もしデバイスが切れていたら再列挙 ---
-	if (!gamePadDevice_) {
-		directInput->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, this, DIEDFL_ATTACHEDONLY);
-		if (gamePadDevice_) {
-			gamePadDevice_->SetDataFormat(&c_dfDIJoystick);
-			gamePadDevice_->SetCooperativeLevel(GetActiveWindow(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+
+		// --- もしデバイスが切れていたら再列挙 ---
+		if (!gamePadDevice_) {
+			directInput->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, this, DIEDFL_ATTACHEDONLY);
+			if (gamePadDevice_) {
+				gamePadDevice_->SetDataFormat(&c_dfDIJoystick);
+				gamePadDevice_->SetCooperativeLevel(GetActiveWindow(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+			}
 		}
-	}
-	winApp_->SetIsPad(false);
+		winApp_->SetIsPad(false);
 	}
 
 	prevMouseState_ = mouseState_;
@@ -125,7 +120,6 @@ void Input::Update() {
 		mouseDevice_->Acquire();
 		mouseDevice_->GetDeviceState(sizeof(mouseState_), &mouseState_);
 	}
-	
 
 	// ３）Windows API でマウスの絶対位置を取得
 	POINT pt;
@@ -134,48 +128,47 @@ void Input::Update() {
 	mouseX_ = pt.x;                          // ここではクランプせずそのまま代入
 	mouseY_ = pt.y;
 	if (isCursorStability) {
-	if (GetForegroundWindow() == winApp_->GetHwnd()) {
-		RECT clientRect{};
-		if (GetClientRect(winApp_->GetHwnd(), &clientRect)) {
-			POINT center{(clientRect.right - clientRect.left) / 2, (clientRect.bottom - clientRect.top) / 2};
-			POINT screenCenter = center;
-			ClientToScreen(winApp_->GetHwnd(), &screenCenter);
-			SetCursorPos(screenCenter.x, screenCenter.y);
-			mouseX_ = center.x;
-			mouseY_ = center.y;
+		if (GetForegroundWindow() == winApp_->GetHwnd()) {
+			RECT clientRect{};
+			if (GetClientRect(winApp_->GetHwnd(), &clientRect)) {
+				POINT center{(clientRect.right - clientRect.left) / 2, (clientRect.bottom - clientRect.top) / 2};
+				POINT screenCenter = center;
+				ClientToScreen(winApp_->GetHwnd(), &screenCenter);
+				SetCursorPos(screenCenter.x, screenCenter.y);
+				mouseX_ = center.x;
+				mouseY_ = center.y;
+			}
 		}
-	}
 	}
 }
 
-
 bool Input::PushKey(BYTE keyNumber) {
-	
+
 	if (key[keyNumber]) {
-	
+
 		return true;
 	}
-	
+
 	return false;
 }
 
 bool Input::TriggerKey(BYTE keyNumber) {
-	
+
 	if (key[keyNumber] && !preKey[keyNumber]) {
-		
+
 		return true;
 	}
-	
+
 	return false;
 }
 
 bool Input::ReleaseKey(BYTE keyNumber) {
-	
+
 	if (!key[keyNumber] && preKey[keyNumber]) {
-		
+
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -201,7 +194,6 @@ bool Input::PushButton(PadButton button) {
 	}
 	return false;
 }
-
 
 bool Input::TriggerButton(PadButton button) {
 	if (!gamePadDevice_)
@@ -272,10 +264,7 @@ float Input::GetJoyStickLY() const {
 	return -norm;
 }
 
-Vector2 Input::GetJoyStickLXY() const {
-
-	return Vector2(GetJoyStickLX(), GetJoyStickLY()); 
-}
+Vector2 Input::GetJoyStickLXY() const { return Vector2(GetJoyStickLX(), GetJoyStickLY()); }
 
 float Input::GetJoyStickRX() const {
 	if (!gamePadDevice_)
@@ -297,12 +286,12 @@ float Input::GetJoyStickRY() const {
 
 Vector2 Input::GetJoyStickRXY() const { return Vector2(GetJoyStickRX(), GetJoyStickRY()); }
 
-void Input::SetDeadZone(float deadZone){
+void Input::SetDeadZone(float deadZone) {
 	if (deadZone < 0.0f)
 		deadZone = 0.0f;
 	if (deadZone > 1.0f)
 		deadZone = 1.0f;
-	
+
 	deadZone_ = deadZone;
 }
 

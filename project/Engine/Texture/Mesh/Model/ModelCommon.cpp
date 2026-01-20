@@ -1,10 +1,6 @@
 #include "ModelCommon.h"
 #include "DirectXCommon.h"
-void ModelCommon::Initialize(DirectXCommon* dxCommon){ 
-	dxCommon_ = dxCommon; 
-
-
-}
+void ModelCommon::Initialize(DirectXCommon* dxCommon) { dxCommon_ = dxCommon; }
 Microsoft::WRL::ComPtr<ID3D12Resource> ModelCommon::CreateBufferResource(size_t sizeInBytes) {
 	// バッファの設定（UPLOAD用に変更）
 	D3D12_HEAP_PROPERTIES heapProperties = {};

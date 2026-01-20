@@ -2,25 +2,24 @@
 #include "DirectXCommon.h"
 #include <cassert>
 const uint32_t SrvManager::kMaxSRVCount_ = 512;
-void SrvManager::Initialize(DirectXCommon* dxCommon){ 
-	directXCommon_ = dxCommon; 
+void SrvManager::Initialize(DirectXCommon* dxCommon) {
+	directXCommon_ = dxCommon;
 
-		// SRV用ディスクリプタヒープ作成
+	// SRV用ディスクリプタヒープ作成
 	descriptorHeap_ = directXCommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount_, true);
 	descriptorSize_ = directXCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
-uint32_t SrvManager::Allocate(){
+uint32_t SrvManager::Allocate() {
 
 	int index = useIndex;
 
 	useIndex++;
 
 	return index;
-
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE SrvManager::GetCPUDescriptorHandle(uint32_t index) { 
+D3D12_CPU_DESCRIPTOR_HANDLE SrvManager::GetCPUDescriptorHandle(uint32_t index) {
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	handleCPU.ptr += (descriptorSize_ * index);
 	return handleCPU;
@@ -31,7 +30,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE SrvManager::GetGPUDescriptorHandle(uint32_t index) {
 	return handleGPU;
 }
 
-void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT format, UINT MipLevels){
+void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT format, UINT MipLevels) {
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = format;
@@ -63,7 +62,7 @@ void SrvManager::CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource*
 	);
 }
 
-void SrvManager::PreDraw() { 
+void SrvManager::PreDraw() {
 	ID3D12DescriptorHeap* descriptorHeaps[] = {descriptorHeap_.Get()};
 	directXCommon_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 }
@@ -71,7 +70,6 @@ void SrvManager::PreDraw() {
 void SrvManager::SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_t srvIndex) {
 
 	directXCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(RootParameterIndex, GetGPUDescriptorHandle(srvIndex));
-
 }
 bool SrvManager::CanAllocate() const {
 	// useIndex が最大数 kMaxSRVCount_ に達していなければ true

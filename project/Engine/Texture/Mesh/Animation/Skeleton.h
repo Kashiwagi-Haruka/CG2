@@ -8,10 +8,10 @@
 #include "Vector4.h"
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
-#include <memory>
 
 struct Joint {
 	QuaternionTransform transform{};

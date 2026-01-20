@@ -162,13 +162,11 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\Enemy\EnemyHitEffect.cpp" />
     <ClCompile Include="application\Object\Character\Model\CharacterModel.cpp" />
     <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp" />
-    <ClCompile Include="Engine\BaseScene\AbstractSceneFactory.cpp" />
     <ClCompile Include="application\Object\Enemy\Enemy.cpp" />
     <ClCompile Include="application\CameraController\CameraController.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyManager.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyStun.cpp" />
     <ClCompile Include="application\Object\Player\PlayerParameters.cpp" />
-    <ClCompile Include="Engine\BaseScene\BaseScene.cpp" />
     <ClCompile Include="Engine\Loadfile\CSVManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />

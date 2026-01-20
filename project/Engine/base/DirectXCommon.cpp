@@ -1,13 +1,13 @@
 #define NOMINMAX
 #include "DirectXCommon.h"
-#include <cassert>
 #include "Logger.h"
-#include "StringUtility.h"
-#include <format>
-#include <dxcapi.h>
-#include <thread>
-#include "SrvManager/SrvManager.h"
 #include "ParticleManager.h"
+#include "SrvManager/SrvManager.h"
+#include "StringUtility.h"
+#include <cassert>
+#include <dxcapi.h>
+#include <format>
+#include <thread>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -16,7 +16,6 @@
 #pragma comment(lib, "dxcompiler.lib")
 
 using namespace Microsoft::WRL;
-
 
 void DirectXCommon::initialize(WinApp* winApp) {
 	assert(winApp);
@@ -45,24 +44,18 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	ScissorRectInitialize();
 	// DXCコンパイラの生成
 	DXCCompilerCreate();
-
 }
 
 #pragma region FixFPS
-void DirectXCommon::InitializeFixFPS() {
-
-	reference_ = std::chrono::steady_clock::now();
-
-
-}
+void DirectXCommon::InitializeFixFPS() { reference_ = std::chrono::steady_clock::now(); }
 void DirectXCommon::UpdateFixFPS() {
 
 	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
 
 	const std::chrono::microseconds kMinCheckTime(uint64_t(1000000.0f / 65.0f));
 
-	//　現在時刻を取得する
-	
+	// 　現在時刻を取得する
+
 	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
 
 	// 　前回時刻からの経過時間を取得する
@@ -72,7 +65,7 @@ void DirectXCommon::UpdateFixFPS() {
 	if (elapsed < kMinCheckTime) {
 		// 1/60秒になるまでスリープする
 		while (std::chrono::steady_clock::now() - reference_ < kMinTime) {
-			//1マイクロスリープ
+			// 1マイクロスリープ
 			std::this_thread::sleep_for(std::chrono::microseconds(1));
 		}
 	}
@@ -80,7 +73,6 @@ void DirectXCommon::UpdateFixFPS() {
 	now = std::chrono::steady_clock::now();
 	deltaTime_ = std::chrono::duration<float>(now - reference_).count();
 	reference_ = now;
-
 }
 #pragma endregion
 
@@ -99,8 +91,6 @@ void DirectXCommon::DebugLayer() {
 #endif // DEBUG
 }
 void DirectXCommon::DeviceInitialize() {
-
-	
 
 	/// Debuglayer
 	DebugLayer();
@@ -203,12 +193,11 @@ void DirectXCommon::CommandListInitialize() {
 	// コマンドキューの生成がうまくいかなかったので起動できない
 	assert(SUCCEEDED(hr_));
 
-// 初期化時 (CreateDevice後)
+	// 初期化時 (CreateDevice後)
 	for (UINT i = 0; i < kFrameCount; i++) {
 		hr_ = device_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocators_[i]));
 		assert(SUCCEEDED(hr_));
 	}
-
 
 	// commandAllocators_[0] を使って最初に作る
 	hr_ = device_->CreateCommandList(
@@ -216,9 +205,6 @@ void DirectXCommon::CommandListInitialize() {
 	    commandAllocators_[0].Get(), // ★最初の1つを渡す
 	    nullptr, IID_PPV_ARGS(&commandList_));
 	assert(SUCCEEDED(hr_));
-
-	
-	
 }
 void DirectXCommon::SwapChainInitialize() {
 
@@ -280,19 +266,14 @@ void DirectXCommon::DepthBufferCreate() {
 void DirectXCommon::DescriptorHeapCreate() {
 
 	descriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	
-	descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
+	descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	// ディスクリプタヒープの生成
 
 	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
-
-
 	dsvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
-
-
 }
 Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
 
@@ -319,7 +300,7 @@ void DirectXCommon::RenderTargetViewInitialize() {
 	assert(swapChainResources_[1] != nullptr);
 	assert(swapChainResources_[backBufferIndex_] != nullptr);
 	//
-	
+
 	rtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;      // 出力結果をSRGBに変換して書き込む
 	rtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D; // 2dテクスチャとして書き込む
 	// ディスクリプタの先頭を取得する
@@ -341,11 +322,7 @@ void DirectXCommon::DepthStencilViewInitialize() {
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 
-	device_->CreateDepthStencilView(
-		depthStenicilResource_.Get(),
-		&dsvDesc,
-		dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart()
-	);
+	device_->CreateDepthStencilView(depthStenicilResource_.Get(), &dsvDesc, dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 void DirectXCommon::DXCCompilerCreate() {
 
@@ -361,9 +338,6 @@ void DirectXCommon::DXCCompilerCreate() {
 	includeHandler_ = nullptr;
 	hr_ = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
 	assert(SUCCEEDED(hr_));
-
-
-
 }
 void DirectXCommon::FenceCreate() {
 	// Fenceを作る
@@ -381,7 +355,7 @@ void DirectXCommon::FenceCreate() {
 	hr_ = commandQueue_->Signal(fence_.Get(), fenceValue_);
 	assert(SUCCEEDED(hr_));
 }
-void DirectXCommon::ViewportRectInitialize(){
+void DirectXCommon::ViewportRectInitialize() {
 
 	// ビューポートとシザー設定
 	viewport_ = {};
@@ -391,18 +365,14 @@ void DirectXCommon::ViewportRectInitialize(){
 	viewport_.TopLeftY = 0;
 	viewport_.MinDepth = 0.0f;
 	viewport_.MaxDepth = 1.0f;
-
-	
-
 }
-void DirectXCommon::ScissorRectInitialize(){
+void DirectXCommon::ScissorRectInitialize() {
 
 	scissorRect_ = {};
 	scissorRect_.left = 0;
 	scissorRect_.right = WinApp::kClientWidth;
 	scissorRect_.top = 0;
 	scissorRect_.bottom = WinApp::kClientHeight;
-
 }
 #pragma endregion
 
@@ -415,14 +385,11 @@ void DirectXCommon::PreDraw() {
 	assert(backBufferIndex_ < 2);
 	assert(swapChainResources_[backBufferIndex_] != nullptr); // 安全強化！
 
-
-
 	// ③ コマンドリストのリセット
 	FrameStart();
 
 	// ④ バックバッファへのバリア & RTV 設定 & クリア
 	DrawCommandList();
-	
 }
 void DirectXCommon::PostDraw() {
 	// RenderTarget→Present に戻す
@@ -453,10 +420,8 @@ void DirectXCommon::PostDraw() {
 
 void DirectXCommon::FrameStart() {
 
-// FrameStart
+	// FrameStart
 	frameIndex_ = swapChain_->GetCurrentBackBufferIndex();
-
-	
 }
 
 void DirectXCommon::DrawCommandList() {
@@ -489,10 +454,8 @@ void DirectXCommon::DrawCommandList() {
 	commandList_->RSSetViewports(1, &viewport_);       // Viewportを設定
 	commandList_->RSSetScissorRects(1, &scissorRect_); // Scissorを設定
 
-	
-
-	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = {srvDescriptorHeap_.Get()};
-	//commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+	// Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = {srvDescriptorHeap_.Get()};
+	// commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 }
 
 void DirectXCommon::CrtvTransitionBarrier() {
@@ -507,8 +470,7 @@ void DirectXCommon::CrtvTransitionBarrier() {
 Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(
     /* CompilerするShaderファイルへのパス*/ const std::wstring& filePath,
     // Compilerに使用するProfile
-    const wchar_t* profile
-    ) {
+    const wchar_t* profile) {
 	// ここの中身をこの後書いていく
 	// 1. hlslファイルを読む
 	// // これからシェーダーをコンパイルする旨をログに出す
@@ -541,13 +503,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(
 
 	// 実際にShaderをコンパイルする
 	Microsoft::WRL::ComPtr<IDxcResult> shaderResult = nullptr;
-	hr_ = dxcCompiler_->Compile(
-	    &shaderSourceBuffer,
-	    arguments,
-	    _countof(arguments),
-	    includeHandler_.Get(),
-	    IID_PPV_ARGS(&shaderResult)
-	);
+	hr_ = dxcCompiler_->Compile(&shaderSourceBuffer, arguments, _countof(arguments), includeHandler_.Get(), IID_PPV_ARGS(&shaderResult));
 
 	// コンパイルエラーではなくdxcが起動できないなど致命的な状況
 	assert(SUCCEEDED(hr_));
@@ -636,8 +592,6 @@ void DirectXCommon::Finalize() {
 	rtvDescriptorHeap_.Reset();
 	srvDescriptorHeap_.Reset();
 	dsvDescriptorHeap_.Reset();
-
-
 
 	// --- Command ---
 	commandList_.Reset();

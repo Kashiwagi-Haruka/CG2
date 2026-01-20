@@ -1,8 +1,8 @@
 #pragma once
+#include "Matrix4x4.h"
 #include <cstdint>
 #include <vector>
-#include "Matrix4x4.h"
-struct VertexWeightData{
+struct VertexWeightData {
 	float weight;
 	uint32_t vertexIndex;
 };

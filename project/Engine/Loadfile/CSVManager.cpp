@@ -1,7 +1,7 @@
 #include "CSVManager.h"
+#include "Logger.h"
 #include <fstream>
 #include <sstream>
-#include "Logger.h"
 CSVManager* CSVManager::GetInstance() {
 	static CSVManager instance;
 	return &instance;
@@ -32,7 +32,6 @@ void CSVManager::LoadCSV(const std::string& filename) {
 				row.push_back(0); // ← 空セルでも 0 として扱う
 			}
 		}
-
 
 		if (!row.empty()) {
 			data_.push_back(row);

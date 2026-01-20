@@ -11,22 +11,21 @@
 #include <sal.h>
 
 #include <array>
+#include <chrono>
 #include <string>
 #include <vector>
-#include <chrono>
 
 #include "WinApp.h"
 
-#include "Vector4.h"
-#include "Vector3.h"
-#include "Vector2.h"
-#include "VertexData.h"
-#include "Matrix4x4.h"
-#include "Function.h"
 #include "BlendMode/BlendModeManager.h"
-#include "Transform.h"
+#include "Function.h"
 #include "Light/DirectionalLight.h"
-
+#include "Matrix4x4.h"
+#include "Transform.h"
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Vector4.h"
+#include "VertexData.h"
 
 class BlendModeManager;
 class SrvManager;
@@ -39,7 +38,7 @@ class DirectXCommon {
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc_;
-	
+
 	static const UINT kFrameCount = 2; // スワップチェインのバッファ数に合わせる
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocators_[kFrameCount];
 	UINT frameIndex_ = 0;
@@ -57,7 +56,6 @@ class DirectXCommon {
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_;
-
 
 	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
@@ -80,7 +78,6 @@ class DirectXCommon {
 	// シザー矩形
 	D3D12_RECT scissorRect_;
 
-
 	// transitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier_{};
 
@@ -89,7 +86,6 @@ class DirectXCommon {
 	std::chrono::steady_clock::time_point reference_;
 
 public:
-
 	void initialize(WinApp* winApp);
 	void InitializeFixFPS();
 
@@ -101,10 +97,8 @@ public:
 	float GetDeltaTime() const { return deltaTime_; }
 	ID3D12Device* GetDevice() { return device_.Get(); };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
-	
-	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc_; }
 
-	
+	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc_; }
 
 	size_t GetSwapChainResourcesNum() const { return swapChainResources_.size(); }
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue_; }
@@ -113,12 +107,10 @@ public:
 	    const std::wstring& filePath,
 	    // Compilerに使用するProfile
 	    const wchar_t* profile);
-	
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 private:
-
 	void DebugLayer();
 	void DeviceInitialize();
 	void DebugError();
@@ -126,7 +118,7 @@ private:
 	void SwapChainInitialize();
 	void DepthBufferCreate();
 	void DescriptorHeapCreate();
-	
+
 	void RenderTargetViewInitialize();
 	void DepthStencilViewInitialize();
 	void FenceCreate();
@@ -134,13 +126,8 @@ private:
 	void ScissorRectInitialize();
 	void DXCCompilerCreate();
 
-	void FrameStart(); // フレーム最初の準備
+	void FrameStart();      // フレーム最初の準備
 	void DrawCommandList(); // 描画コマンドリスト
 
 	void CrtvTransitionBarrier();
-
-
-	
-	
-	
 };

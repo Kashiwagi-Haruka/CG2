@@ -77,7 +77,6 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 
 	areaLightSrvIndex_ = srvManager->Allocate();
 	srvManager->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaLight));
-
 }
 void Object3dCommon::SetEnvironmentMapTexture(const std::string& filePath) {
 	environmentMapPath_ = filePath;

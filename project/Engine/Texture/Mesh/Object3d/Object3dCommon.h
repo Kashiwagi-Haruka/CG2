@@ -1,8 +1,8 @@
 #pragma once
+#include "Light/AreaLight.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
-#include "Light/AreaLight.h"
 #include "PSO/CreatePSO.h"
 #include <Windows.h>
 #include <cstdint>

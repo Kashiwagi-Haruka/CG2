@@ -3,13 +3,10 @@
 #include <cassert>
 #include <cmath>
 
-
 static const int kColumnWidth = 60;
 static const int kRowHeight = 30;
 
 namespace Function {
-
-
 
 float Length(const Vector3& v) { return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z); }
 
@@ -34,9 +31,7 @@ Vector3 DirectionToRotation(const Vector3& direction, const Vector3& forwardAxis
 	return {pitch, -yaw, roll};
 }
 
-
-
-//Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
+// Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
 //	Matrix4x4 result{};
 //	float f = 1.0f / std::tanf(fovY * 0.5f);
 //	result.m[0][0] = f / aspectRatio;
@@ -46,7 +41,7 @@ Vector3 DirectionToRotation(const Vector3& direction, const Vector3& forwardAxis
 //	result.m[3][2] = (-nearClip * farClip) / (farClip - nearClip);
 //	result.m[3][3] = 0.0f;
 //	return result;
-//}
+// }
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspect, float nearZ, float farZ) {
 	Matrix4x4 result{};
 	float f = 1.0f / tanf(fovY * 0.5f);
@@ -92,8 +87,7 @@ Vector3 Lerp(const Vector3& start, const Vector3& end, float ratio) {
 	result.z = start.z + (end.z - start.z) * ratio;
 	return result;
 }
-float Lerp(float start, float end, float ratio) {
-	return start + (end - start) * ratio; }
+float Lerp(float start, float end, float ratio) { return start + (end - start) * ratio; }
 Matrix4x4 MakeTranslateMatrix(Vector3 translate) {
 	Matrix4x4 result{};
 	result.m[0][0] = 1.0f;
@@ -344,12 +338,12 @@ Matrix4x4 MakeIdentity4x4() {
 
 	return result;
 }
-float Dot(const Vector3& v1, const Vector3& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;}
+float Dot(const Vector3& v1, const Vector3& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
 
 Vector3 Distance(const Vector3& pos1, const Vector3& pos2) { return {pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z}; }
 
 } // namespace Function
-Vector3 operator+ (const Vector3& v1, const Vector3& v2) { return {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
-Vector3 operator-(const Vector3& v1, const Vector3& v2) {return {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};}
+Vector3 operator+(const Vector3& v1, const Vector3& v2) { return {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
+Vector3 operator-(const Vector3& v1, const Vector3& v2) { return {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}; }
 Vector3 operator*(const Vector3& v, float scalar) { return {v.x * scalar, v.y * scalar, v.z * scalar}; }
 Vector3 operator+=(Vector3& v1, const Vector3& v2) { return v1 = v1 + v2; }

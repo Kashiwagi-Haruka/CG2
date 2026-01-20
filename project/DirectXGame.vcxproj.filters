@@ -240,9 +240,6 @@
     <ClCompile Include="Engine\BaseScene\SceneManager.cpp">
       <Filter>ソース ファイル\Engine\BaseScene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\BaseScene\BaseScene.cpp">
-      <Filter>ソース ファイル\Engine\BaseScene</Filter>
-    </ClCompile>
     <ClCompile Include="application\Object\Player\PlayerSword.cpp">
       <Filter>ソース ファイル\application\Object\Player</Filter>
     </ClCompile>
@@ -263,9 +260,6 @@
     </ClCompile>
     <ClCompile Include="application\Object\Enemy\EnemyAttack.cpp">
       <Filter>ソース ファイル\application\Object\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\BaseScene\AbstractSceneFactory.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp">
       <Filter>ソース ファイル\Engine</Filter>
