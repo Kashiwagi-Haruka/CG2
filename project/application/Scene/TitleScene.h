@@ -1,9 +1,9 @@
 #pragma once
+#include "Audio.h"
 #include "BaseScene.h"
+#include "SceneTransition/SceneTransition.h"
 #include "Sprite.h"
 #include <memory>
-#include "Audio.h"
-#include "SceneTransition/SceneTransition.h"
 class GameBase;
 
 class TitleScene : public BaseScene {
@@ -28,8 +28,6 @@ class TitleScene : public BaseScene {
 	bool isTransitionIn = false;
 	bool isTransitionOut = false;
 	std::unique_ptr<SceneTransition> transition = nullptr;
-	
-
 
 public:
 	TitleScene();

@@ -8,8 +8,6 @@ GameTimer* GameTimer::GetInstance() {
 	}
 	return instance.get();
 }
-void GameTimer::Reset(){ 
-	timer_ = 0.0f; 
-}
+void GameTimer::Reset() { timer_ = 0.0f; }
 
-void GameTimer::Update(){ timer_ += 1.0f / 60.0f; }
+void GameTimer::Update() { timer_ += 1.0f / 60.0f; }

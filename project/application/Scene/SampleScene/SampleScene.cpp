@@ -71,14 +71,14 @@ void SampleScene::Initialize() {
         .translate{3.0f, 1.0f, 0.0f}
     };
 	humanWalkTransform_ = {
-	    .scale{100.0f, 100.0f,                      100.0f},
-        .rotate{-std::numbers::pi_v<float>/2.0f, std::numbers::pi_v<float>, 0.0f  },
-        .translate{0.0f, 1.0f,                      0.0f}
+	    .scale{100.0f,	                        100.0f,                    100.0f},
+        .rotate{-std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0.0f  },
+        .translate{0.0f,                              1.0f,                      0.0f  }
     };
 	humanSneakWalkTransform_ = {
-	    .scale{100.0f,  100.0f,                      100.0f},
-        .rotate{-std::numbers::pi_v<float>/2.0f, std::numbers::pi_v<float>, 0.0f  },
-        .translate{-1.0f, 1.0f,                      0.0f}
+	    .scale{100.0f,	                        100.0f,                    100.0f},
+        .rotate{-std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0.0f  },
+        .translate{-1.0f,                             1.0f,                      0.0f  }
     };
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(uvBallTransform_);
@@ -159,7 +159,6 @@ void SampleScene::Initialize() {
 	areaLights_[1].height = 2.0f;
 	areaLights_[1].radius = 0.1f;
 	areaLights_[1].decay = 2.0f;
-
 }
 
 void SampleScene::Update() {
@@ -307,12 +306,11 @@ void SampleScene::Update() {
 		camera_->SetTransform(cameraTransform_);
 		camera_->Update();
 	}
-	
+
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
 	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
-	
 
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);

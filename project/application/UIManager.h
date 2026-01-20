@@ -1,12 +1,11 @@
 #pragma once
+#include "Object/Player/PlayerParameters.h"
 #include "Vector2.h"
 #include <cstdint>
-#include "Object/Player/PlayerParameters.h"
 #include <memory>
 class Sprite;
 class GameBase;
 class UIManager {
-
 
 	enum Numbers {
 
@@ -26,9 +25,9 @@ class UIManager {
 	struct SpriteData {
 		std::unique_ptr<Sprite> sprite;
 		uint32_t handle = 0;
-		Vector2 size = {100,100};
-		Vector2 rotate = {0,0};
-		Vector2 translate = {0,0};
+		Vector2 size = {100, 100};
+		Vector2 rotate = {0, 0};
+		Vector2 translate = {0, 0};
 	};
 
 	SpriteData playerHpSPData;
@@ -44,27 +43,23 @@ class UIManager {
 
 	SpriteData SlashSPData[2];
 	SpriteData EXPSPData;
-	
 
 	int playerHP;
 	int playerHPMax;
-	Vector2 playerHPMaxSize = {400,100};
+	Vector2 playerHPMaxSize = {400, 100};
 	float playerHPWidth = 1200.0f;
 	float playerHPWidthMax = 1200.0f;
 	Vector2 numbersTextureSize = {300, 300};
 	Parameters parameters_;
 
-	public:
-
+public:
 	UIManager();
 	~UIManager();
 	void Initialize();
 	void Update();
 	void Draw();
 
-	
 	void SetPlayerHP(int HP);
 	void SetPlayerHPMax(int HPMax);
 	void SetPlayerParameters(Parameters parameters);
-
 };

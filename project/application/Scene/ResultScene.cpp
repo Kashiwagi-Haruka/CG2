@@ -1,10 +1,10 @@
 #include "ResultScene.h"
 #include "GameBase.h"
-#include "Sprite/SpriteCommon.h"
-#include "TextureManager.h"
-#include "SceneManager.h"
 #include "GameTimer/GameTimer.h"
 #include "Object/House/HouseHP.h"
+#include "SceneManager.h"
+#include "Sprite/SpriteCommon.h"
+#include "TextureManager.h"
 #include <algorithm>
 
 namespace {
@@ -39,7 +39,7 @@ ResultScene::ResultScene() {
 		timeDigitSP_[i].sprite = std::make_unique<Sprite>();
 		timeDigitSP_[i].sprite->Initialize(timeDigitSP_[i].handle);
 	}
-	
+
 	transition = std::make_unique<SceneTransition>();
 }
 
@@ -50,7 +50,7 @@ void ResultScene::Initialize() {
 	logoSP_.size = {1280, 720};
 	logoSP_.translate = {640, 360};
 	logoSP_.sprite->SetScale(logoSP_.size);
-	
+
 	logoSP_.sprite->SetPosition(logoSP_.translate);
 	logoSP_.sprite->Update();
 
@@ -108,8 +108,6 @@ void ResultScene::Initialize() {
 		timeDigitSP_[i].sprite->Update();
 	}
 
-	
-
 	GameBase::GetInstance()->SetIsCursorStablity(false);
 	GameBase::GetInstance()->SetIsCursorVisible(true);
 	transition->Initialize(false);
@@ -129,7 +127,7 @@ void ResultScene::Update() {
 	for (int i = 0; i < 4; ++i) {
 		timeDigitSP_[i].sprite->Update();
 	}
-	
+
 	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;
@@ -147,8 +145,6 @@ void ResultScene::Update() {
 	ImGui::Begin("resultScene");
 	ImGui::End();
 #endif // USE_IMGUI
-
-
 }
 
 void ResultScene::Draw() {
@@ -160,7 +156,7 @@ void ResultScene::Draw() {
 	for (int i = 0; i < 4; ++i) {
 		timeDigitSP_[i].sprite->Draw();
 	}
-	
+
 	pressSpaceSprite->Draw();
 	if (isTransitionIn || isTransitionOut) {
 		transition->Draw();

@@ -1,8 +1,8 @@
 #include "GameOverScene.h"
 #include "GameBase.h"
-#include "TextureManager.h"
 #include "SceneManager.h"
 #include "Sprite/SpriteCommon.h"
+#include "TextureManager.h"
 GameOverScene::GameOverScene() {
 
 	logoSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/over.png");
@@ -45,7 +45,7 @@ void GameOverScene::Update() {
 		Audio::GetInstance()->SoundPlayWave(BGM_, true);
 		isBGMPlaying = true;
 	}
-		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
+	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;
 	}

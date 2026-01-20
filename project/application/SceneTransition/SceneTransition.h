@@ -26,5 +26,4 @@ public:
 	void Update();
 	void Draw();
 	bool IsEnd() { return isEnd; };
-
 };

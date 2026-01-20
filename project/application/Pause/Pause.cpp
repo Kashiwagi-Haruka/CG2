@@ -18,7 +18,6 @@ Pause::Pause() {
 	Select_ = std::make_unique<Sprite>();
 	Button_ = std::make_unique<Sprite>();
 
-	
 	BG_->Initialize(BGHandle_);
 	Select_->Initialize(SelectHandle_);
 	Button_->Initialize(ButtonHandle_);

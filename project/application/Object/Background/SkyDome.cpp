@@ -1,16 +1,15 @@
 #include "SkyDome.h"
+#include "Camera.h"
 #include "GameBase.h"
 #include "Model/ModelManager.h"
-#include "Camera.h"
 
 SkyDome::SkyDome() {
-	ModelManager::GetInstance()->LoadModel("Resources/3d","skyDome");
+	ModelManager::GetInstance()->LoadModel("Resources/3d", "skyDome");
 	skyDomeObject_ = std::make_unique<Object3d>();
 }
 
-
 void SkyDome::Initialize(Camera* camera) {
-	
+
 	skyDomeObject_->Initialize();
 	skyDomeObject_->SetModel("skyDome");
 	camera_ = camera;
@@ -23,8 +22,7 @@ void SkyDome::Initialize(Camera* camera) {
 }
 void SkyDome::Update() {
 	skyDomeObject_->SetCamera(camera_);
-	
+
 	skyDomeObject_->Update();
 }
-void SkyDome::Draw() {
-	skyDomeObject_->Draw(); }
+void SkyDome::Draw() { skyDomeObject_->Draw(); }

@@ -1,9 +1,9 @@
 #include "TitleScene.h"
 #include "GameBase.h"
+#include "SceneManager.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 #include <imgui.h>
-#include "SceneManager.h"
 TitleScene::TitleScene() {
 	BGSP_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/title.png");
 	BGSP_.sprite = std::make_unique<Sprite>();
@@ -54,17 +54,16 @@ void TitleScene::Initialize() {
 	GameBase::GetInstance()->SetIsCursorVisible(true);
 }
 
-void TitleScene::Update(){ 
+void TitleScene::Update() {
 	if (!isBGMPlaying) {
 		Audio::GetInstance()->SoundPlayWave(BGMData, true);
 		isBGMPlaying = true;
 	}
 
-	BGSP_.rotate+=0.01f;
-	
+	BGSP_.rotate += 0.01f;
+
 	BGSP_.sprite->SetRotation(BGSP_.rotate);
 	BGSP_.sprite->Update();
-	
 
 	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
 		transition->Initialize(true);
@@ -80,13 +79,12 @@ void TitleScene::Update(){
 		}
 	}
 
-	#ifdef USE_IMGUI
+#ifdef USE_IMGUI
 	ImGui::Begin("titleScene");
 	ImGui::End();
 #endif // USE_IMGUI
-
 }
-void TitleScene::Draw(){
+void TitleScene::Draw() {
 
 	SpriteCommon::GetInstance()->DrawCommon();
 	BGSP_.sprite->Draw();
@@ -95,9 +93,8 @@ void TitleScene::Draw(){
 	if (isTransitionIn || isTransitionOut) {
 		transition->Draw();
 	}
-	
+
 	if (isTransitionOut) {
-	ruleSP_.sprite->Draw();
+		ruleSP_.sprite->Draw();
 	}
-	
 }

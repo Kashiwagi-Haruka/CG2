@@ -18,7 +18,6 @@ UIManager::UIManager() {
 	// WASD / SPACE / ATTACK
 	HowtoOperateSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/option.png");
 
-
 	// Level
 	LevelSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Lv.png");
 
@@ -29,8 +28,6 @@ UIManager::UIManager() {
 	for (int i = 0; i < 5; i++) {
 		MaxSPData[i].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Max.png");
 	}
-
-		
 
 	// ステータスUPアイコン
 	AttackUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/AttuckUp.png");
@@ -52,7 +49,6 @@ UIManager::UIManager() {
 	playerHpSPData.sprite = std::make_unique<Sprite>();
 	playerHPFlameSPData.sprite = std::make_unique<Sprite>();
 
-	
 	HowtoOperateSPData.sprite = std::make_unique<Sprite>();
 
 	LevelSPData.sprite = std::make_unique<Sprite>();
@@ -69,14 +65,11 @@ UIManager::UIManager() {
 	HealthUpSPData.sprite = std::make_unique<Sprite>();
 	SpeedUpSPData.sprite = std::make_unique<Sprite>();
 	AllowUpSPData.sprite = std::make_unique<Sprite>();
-
 }
 
 UIManager::~UIManager() {}
 
 void UIManager::Initialize() {
-
-	
 
 	// ------------------ HP Bar ------------------
 	playerHpSPData.sprite->Initialize(playerHpSPData.handle);
@@ -97,11 +90,10 @@ void UIManager::Initialize() {
 	playerHPFlameSPData.sprite->SetScale(playerHPFlameSPData.size);
 
 	// ------------------ WASD / SPACE / ATTACK ------------------
-	
+
 	HowtoOperateSPData.sprite->Initialize(HowtoOperateSPData.handle);
 	HowtoOperateSPData.sprite->SetScale({700, 100});
 	HowtoOperateSPData.sprite->SetPosition({10, 600});
-	
 
 	// ------------------ Level ------------------
 	LevelSPData.sprite->Initialize(LevelSPData.handle);
@@ -123,7 +115,6 @@ void UIManager::Initialize() {
 
 	for (int i = 0; i < 2; i++) {
 		SlashSPData[i].sprite->Initialize(SlashSPData[0].handle);
-
 	}
 
 	// Up アイコン
@@ -138,8 +129,6 @@ void UIManager::Initialize() {
 
 	AllowUpSPData.sprite->Initialize(AllowUpSPData.handle);
 	AllowUpSPData.sprite->SetScale({48, 48});
-
-	
 }
 
 void UIManager::Update() {
@@ -166,7 +155,6 @@ void UIManager::Update() {
 	playerHpSPData.sprite->Update();
 	playerHPFlameSPData.sprite->Update();
 
-	
 	HowtoOperateSPData.sprite->Update();
 
 	LevelSPData.sprite->Update();
@@ -252,8 +240,6 @@ void UIManager::Update() {
 		MaxSPData[i].sprite->SetPosition(MaxSPData[i].translate);
 		MaxSPData[i].sprite->Update();
 	}
-
-
 }
 
 void UIManager::Draw() {
@@ -264,8 +250,6 @@ void UIManager::Draw() {
 	playerHPFlameSPData.sprite->Draw();
 
 	HowtoOperateSPData.sprite->Draw();
-	
-	
 
 	LevelSPData.sprite->Draw();
 
@@ -301,8 +285,6 @@ void UIManager::Draw() {
 	} else {
 		MaxSPData[4].sprite->Draw();
 	}
-
-
 }
 
 void UIManager::SetPlayerHP(int HP) { playerHP = HP; }

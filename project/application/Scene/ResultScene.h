@@ -1,10 +1,10 @@
 #pragma once
-#include <imgui.h>
-#include "Sprite.h"
-#include "BaseScene.h"
-#include <memory>
-#include "SceneTransition/SceneTransition.h"
 #include "Audio.h"
+#include "BaseScene.h"
+#include "SceneTransition/SceneTransition.h"
+#include "Sprite.h"
+#include <imgui.h>
+#include <memory>
 class GameBase;
 
 class ResultScene : public BaseScene {
@@ -20,12 +20,10 @@ class ResultScene : public BaseScene {
 	SpriteData logoSP_;
 	SpriteData starSP_[3];
 	SpriteData timeDigitSP_[4];
-	
 
 	uint32_t starOnHandle_ = 0;
 	uint32_t starOffHandle_ = 0;
 	uint32_t numberHandle_ = 0;
-	
 
 	int resultStars_ = 0;
 	int resultMinutes_ = 0;
@@ -39,11 +37,11 @@ class ResultScene : public BaseScene {
 	Vector2 pressSpacePos = {640, 420};
 	Vector2 pressSpaceSize = {300, 300};
 
-		std::unique_ptr<SceneTransition> transition = nullptr;
+	std::unique_ptr<SceneTransition> transition = nullptr;
 	bool isTransitionIn = false;
 	bool isTransitionOut = false;
 
-		SoundData BGM_;
+	SoundData BGM_;
 	bool isBGMPlaying = false;
 
 public:

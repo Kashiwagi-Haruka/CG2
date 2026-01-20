@@ -1,6 +1,6 @@
 #include "Particles.h"
-#include "ParticleManager.h"
 #include "Function.h"
+#include "ParticleManager.h"
 #include "imgui.h"
 
 Particles::Particles() {
@@ -15,18 +15,15 @@ Particles::Particles() {
 	particleArrow = std::make_unique<ParticleEmitter>(
 	    "Arrow",
 	    Transform{
-	        {1, 1, 1},
-            {0, 0, 0},
+	        {1,  1, 1 },
+            {0,  0, 0 },
             {25, 0, 25}
     },
 	    1.0f, 5, Vector3{0, 0, 0}, Vector3{-1, -1, -1}, Vector3{1, 1, 1});
 	isgoal = false;
 }
 
-Particles::~Particles() {
-
-	ParticleManager::GetInstance()->Clear();
-}
+Particles::~Particles() { ParticleManager::GetInstance()->Clear(); }
 
 constexpr float kParticlePosScale = 5.0f;
 
@@ -36,8 +33,6 @@ void Particles::Update() {
 	playerEmitterTransform.rotate = {0, 0, 0};
 
 	playerEmitterTransform.translate = {playerPos_.x * kParticlePosScale, (playerPos_.y - 0.9f) * kParticlePosScale, playerPos_.z};
-
-
 }
 void Particles::Draw() {
 
@@ -45,7 +40,7 @@ void Particles::Draw() {
 		particleArrow->Draw();
 	}
 }
-void Particles::SetPlayerPos(Vector3 playerPos){ playerPos_ = playerPos; }
+void Particles::SetPlayerPos(Vector3 playerPos) { playerPos_ = playerPos; }
 void Particles::SetCameraPos(Vector3 cameraPos) { cameraPos_ = cameraPos; }
 void Particles::SetGoalPos(Vector3 goalPos) { goalPos_ = goalPos; }
 void Particles::EditSingleEmitter(ParticleEmitter* e) {
@@ -121,6 +116,4 @@ void Particles::EditSingleEmitter(ParticleEmitter* e) {
 
 	ImGui::PopID();
 #endif // USE_IMGUI
-
-	
 }

@@ -1,8 +1,8 @@
 #pragma once
 #include "Audio.h"
 #include "BaseScene.h"
-#include "GameBase.h"
 #include "CollisionManager.h"
+#include "GameBase.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
@@ -19,20 +19,15 @@
 #include <cstdint>
 #include <imgui.h>
 #include <string>
-    class Player;
+class Player;
 class Enemy;
 class CameraController;
 class SkyDome;
 class EnemyManager;
 
+class GameScene : public BaseScene {
 
-class GameScene: public BaseScene{
-
-
-	private:
-		
-
-
+private:
 	bool IsPKey = false;
 	bool IsXButton = false;
 	bool IsKeyboard = true;
@@ -55,7 +50,7 @@ class GameScene: public BaseScene{
 	std::string nextSceneName;
 	bool isBGMPlaying = false;
 	bool isPause = false;
-			
+
 	SoundData BGMData;
 
 	// レベルアップ選択専用スプライト
@@ -70,13 +65,12 @@ class GameScene: public BaseScene{
 	Vector2 phaseSpriteSize_ = {400.0f, 120.0f};
 	float phaseSpriteY_ = 80.0f;
 
-    
 	DirectionalLight directionalLight_{};
 	std::array<PointLight, kMaxPointLights> pointLights_{};
 	uint32_t activePointLightCount_ = 0;
 	std::array<SpotLight, kMaxSpotLights> spotLights_{};
 	uint32_t activeSpotLightCount_ = 0;
-	
+
 	bool goalActive = false; // 敵全滅後に true になる
 
 	bool sceneEndClear = false;
@@ -88,8 +82,7 @@ class GameScene: public BaseScene{
 	int selectChoices[2]; // 0:Atk, 1:Speed, 2:HP, 3:Allow
 	int cursorIndex = 0;  // 0 or 1
 
-	public:
-
+public:
 	GameScene();
 	~GameScene() override;
 
@@ -99,6 +92,4 @@ class GameScene: public BaseScene{
 	void Finalize() override;
 
 	void DebugImGui();
-
-	
 };

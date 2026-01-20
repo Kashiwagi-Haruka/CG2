@@ -3,7 +3,6 @@
 #include <memory>
 class Particles {
 
-
 	std::unique_ptr<ParticleEmitter> particleArrow = nullptr;
 
 	Vector3 playerPos_;
@@ -13,8 +12,7 @@ class Particles {
 
 	bool isgoal;
 
-	public:
-
+public:
 	Particles();
 	~Particles();
 	void Update();
