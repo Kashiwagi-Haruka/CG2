@@ -31,6 +31,7 @@ private:
 	std::unique_ptr<CreatePSO> psoWireframeNoDepth_;
 	std::unique_ptr<CreatePSO> psoLine_;
 	std::unique_ptr<CreatePSO> psoLineNoDepth_;
+	std::unique_ptr<CreatePSO> psoSkinning_;
 
 	// Directional Light（共通）
 	DirectionalLight* directionalLightData_ = nullptr;
@@ -65,6 +66,7 @@ public:
 	void DrawCommonNoDepth();
 	void DrawCommonWireframeNoDepth();
 	void DrawCommonLineNoDepth();
+	void DrawCommonSkinning();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	DirectXCommon* GetDxCommon() const { return dxCommon_; };
 	void SetBlendMode(BlendMode blendmode);

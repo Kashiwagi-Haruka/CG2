@@ -94,9 +94,17 @@ void SampleScene::Initialize() {
 
 	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
 		humanWalkSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
+		humanWalkSkinCluster_ = CreateSkinCluster(ModelManager::GetInstance()->GetModelCommon(), *humanWalkSkeleton_, *walkModel);
+		if (!humanWalkSkinCluster_.mappedPalette.empty()) {
+			humanWalkObj_->SetSkinCluster(&humanWalkSkinCluster_);
+		}
 	}
 	if (Model* sneakModel = ModelManager::GetInstance()->FindModel("sneakWalk")) {
 		humanSneakWalkSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sneakModel->GetModelData().rootnode));
+		humanSneakWalkSkinCluster_ = CreateSkinCluster(ModelManager::GetInstance()->GetModelCommon(), *humanSneakWalkSkeleton_, *sneakModel);
+		if (!humanSneakWalkSkinCluster_.mappedPalette.empty()) {
+			humanSneakWalkObj_->SetSkinCluster(&humanSneakWalkSkinCluster_);
+		}
 	}
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -321,6 +329,12 @@ void SampleScene::Update() {
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	humanWalkSkeleton_->UpdateAnimation(humanWalkAnimation_, humanWalkAnimationTime_, deltaTime);
 	humanSneakWalkSkeleton_->UpdateAnimation(humanSneakWalkAnimation_, humanSneakWalkAnimationTime_, deltaTime);
+	if (!humanWalkSkinCluster_.mappedPalette.empty()) {
+		UpdateSkinCluster(humanWalkSkinCluster_, *humanWalkSkeleton_);
+	}
+	if (!humanSneakWalkSkinCluster_.mappedPalette.empty()) {
+		UpdateSkinCluster(humanSneakWalkSkinCluster_, *humanSneakWalkSkeleton_);
+	}
 	Matrix4x4 walkWorld = humanWalkObj_->GetWorldMatrix();
 	Matrix4x4 sneakWorld = humanSneakWalkObj_->GetWorldMatrix();
 	humanWalkSkeleton_->SetObjectMatrix(walkWorld);
@@ -332,6 +346,7 @@ void SampleScene::Draw() {
 	// planeGltf_->Draw();
 	// fieldObj_->Draw();
 	animatedCubeObj_->Draw();
+	Object3dCommon::GetInstance()->DrawCommonSkinning();
 	humanWalkObj_->Draw();
 	humanSneakWalkObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();

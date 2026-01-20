@@ -31,5 +31,5 @@ class ModelManager {
 		void Finalize();
 
 
-
+		ModelCommon* GetModelCommon() const { return modelCommon_.get(); }
 };

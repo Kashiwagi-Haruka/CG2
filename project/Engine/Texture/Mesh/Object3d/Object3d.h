@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Animation/Animation.h"
 #include "CameraForGPU.h"
 #include "Light/DirectionalLight.h"
 #include "Matrix4x4.h"
-#include "Animation/Animation.h"
 #include "Transform.h"
 #include "Vector4.h"
 #include "VertexData.h"
@@ -12,6 +12,7 @@
 #include <string>
 #include <wrl.h>
 class Camera;
+struct SkinCluster;
 
 class Model;
 class Object3d {
@@ -42,6 +43,7 @@ class Object3d {
 	const Animation::AnimationData* animation_ = nullptr;
 	float animationTime_ = 0.0f;
 	bool isLoopAnimation_ = true;
+	SkinCluster* skinCluster_ = nullptr;
 
 public:
 	void Initialize();
@@ -74,6 +76,7 @@ public:
 		isLoopAnimation_ = loop;
 		animationTime_ = 0.0f;
 	}
+	void SetSkinCluster(SkinCluster* skinCluster) { skinCluster_ = skinCluster; }
 	void ResetAnimationTime(float time = 0.0f) { animationTime_ = time; }
 	Vector3 GetTranslate() { return transform_.translate; }
 	Vector3 GetRotate() { return transform_.rotate; }

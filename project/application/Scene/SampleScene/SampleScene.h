@@ -1,6 +1,7 @@
 #pragma once
 #include "Animation/Animation.h"
 #include "Animation/Skeleton.h"
+#include "Animation/SkinCluster.h"
 #include "BaseScene.h"
 #include "Camera.h"
 #include "DebugCamera.h"
@@ -45,6 +46,8 @@ class SampleScene : public BaseScene {
 	Animation::AnimationData humanSneakWalkAnimation_{};
 	std::unique_ptr<Skeleton> humanWalkSkeleton_{};
 	std::unique_ptr<Skeleton> humanSneakWalkSkeleton_{};
+	SkinCluster humanWalkSkinCluster_{};
+	SkinCluster humanSneakWalkSkinCluster_{};
 	float humanWalkAnimationTime_ = 0.0f;
 	float humanSneakWalkAnimationTime_ = 0.0f;
 

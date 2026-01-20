@@ -580,6 +580,7 @@
     <FxCompile Include="Resources\shader\Particle.VS.hlsl" />
     <FxCompile Include="Resources\shader\Sprite.VS.hlsl" />
     <FxCompile Include="Resources\shader\Sprite.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\SkinningObject3d.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">

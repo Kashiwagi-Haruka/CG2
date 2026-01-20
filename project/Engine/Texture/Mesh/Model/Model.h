@@ -14,7 +14,7 @@
 #include <map>
 
 class ModelCommon;
-
+struct SkinCluster;
 class Model {
 public:
 	struct Node {
@@ -68,6 +68,7 @@ public:
 	void LoadObjFileAssimp(const std::string& directoryPath, const std::string& filename);
 	void LoadObjFileGltf(const std::string& directoryPath, const std::string& filename);
 	void Draw();
+	void Draw(const SkinCluster* skinCluster);
 	void SetColor(Vector4 color);
 	void SetEnableLighting(bool enable);
 	void SetUvTransform(const Matrix4x4& uvTransform);

@@ -1,9 +1,10 @@
 #include "CreatePSO.h"
-#include "Logger.h"
-#include <cassert>
 #include "DirectXCommon.h"
+#include "Logger.h"
+#include <array>
+#include <cassert>
 
-CreatePSO::CreatePSO(DirectXCommon* dxCommon){ dxCommon_ = dxCommon; }
+CreatePSO::CreatePSO(DirectXCommon* dxCommon, bool useSkinning) : dxCommon_(dxCommon), useSkinning_(useSkinning) {}
 
 void CreatePSO::Create(D3D12_CULL_MODE cullMode, bool depthEnable, D3D12_FILL_MODE fillMode, D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType) {
 	CreateRootSignature();
@@ -13,8 +14,8 @@ void CreatePSO::CreateRootSignature() {
 	// --- RootSignature ---
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	D3D12_ROOT_PARAMETER rootParameters[12] = {};
-	D3D12_DESCRIPTOR_RANGE descriptorRange[5] = {};
+	D3D12_ROOT_PARAMETER rootParameters[13] = {};
+	D3D12_DESCRIPTOR_RANGE descriptorRange[6] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
 	descriptorRange[0].NumDescriptors = 1;
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
@@ -39,6 +40,14 @@ void CreatePSO::CreateRootSignature() {
 	descriptorRange[4].NumDescriptors = 1;
 	descriptorRange[4].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[4].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	if (useSkinning_) {
+		descriptorRange[5].BaseShaderRegister = 0;
+		descriptorRange[5].NumDescriptors = 1;
+		descriptorRange[5].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		descriptorRange[5].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	}
+
 
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
@@ -93,9 +102,15 @@ void CreatePSO::CreateRootSignature() {
 	rootParameters[11].DescriptorTable.pDescriptorRanges = &descriptorRange[4];
 	rootParameters[11].DescriptorTable.NumDescriptorRanges = 1;
 
+	if (useSkinning_) {
+		rootParameters[12].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters[12].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+		rootParameters[12].DescriptorTable.pDescriptorRanges = &descriptorRange[5];
+		rootParameters[12].DescriptorTable.NumDescriptorRanges = 1;
+	}
 
 	descriptionRootSignature.pParameters = rootParameters;
-	descriptionRootSignature.NumParameters = _countof(rootParameters);
+	descriptionRootSignature.NumParameters = useSkinning_ ? 13 : 12;
 
 	D3D12_STATIC_SAMPLER_DESC staticSampler[1] = {};
 	staticSampler[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -124,31 +139,77 @@ void CreatePSO::CreateRootSignature() {
 void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnable, D3D12_FILL_MODE fillMode, D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType) {
 
 	// --- InputLayout ---
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-	inputElementDescs[0].SemanticName = "POSITION";
-	inputElementDescs[0].SemanticIndex = 0;
-	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	inputElementDescs[0].InputSlot = 0;
-	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	inputElementDescs[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
-	inputElementDescs[0].InstanceDataStepRate = 0;
-
-	inputElementDescs[1].SemanticName = "TEXCOORD";
-	inputElementDescs[1].SemanticIndex = 0;
-	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	inputElementDescs[1].InputSlot = 0;
-	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	inputElementDescs[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
-	inputElementDescs[1].InstanceDataStepRate = 0;
-
-	inputElementDescs[2].SemanticName = "NORMAL";
-	inputElementDescs[2].SemanticIndex = 0;
-	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
+	std::array<D3D12_INPUT_ELEMENT_DESC, 5> skinningElementDescs{};
+	std::array<D3D12_INPUT_ELEMENT_DESC, 3> inputElementDescs{};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	inputLayoutDesc.pInputElementDescs = inputElementDescs;
-	inputLayoutDesc.NumElements = _countof(inputElementDescs);
+	if (useSkinning_) {
+		skinningElementDescs[0].SemanticName = "POSITION";
+		skinningElementDescs[0].SemanticIndex = 0;
+		skinningElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		skinningElementDescs[0].InputSlot = 0;
+		skinningElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		skinningElementDescs[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+		skinningElementDescs[0].InstanceDataStepRate = 0;
+
+		skinningElementDescs[1].SemanticName = "TEXCOORD";
+		skinningElementDescs[1].SemanticIndex = 0;
+		skinningElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+		skinningElementDescs[1].InputSlot = 0;
+		skinningElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		skinningElementDescs[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+		skinningElementDescs[1].InstanceDataStepRate = 0;
+
+		skinningElementDescs[2].SemanticName = "NORMAL";
+		skinningElementDescs[2].SemanticIndex = 0;
+		skinningElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		skinningElementDescs[2].InputSlot = 0;
+		skinningElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		skinningElementDescs[2].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+		skinningElementDescs[2].InstanceDataStepRate = 0;
+
+		skinningElementDescs[3].SemanticName = "WEIGHT";
+		skinningElementDescs[3].SemanticIndex = 0;
+		skinningElementDescs[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		skinningElementDescs[3].InputSlot = 1;
+		skinningElementDescs[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		skinningElementDescs[3].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+		skinningElementDescs[3].InstanceDataStepRate = 0;
+
+		skinningElementDescs[4].SemanticName = "INDEX";
+		skinningElementDescs[4].SemanticIndex = 0;
+		skinningElementDescs[4].Format = DXGI_FORMAT_R32G32B32A32_SINT;
+		skinningElementDescs[4].InputSlot = 1;
+		skinningElementDescs[4].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		skinningElementDescs[4].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+		skinningElementDescs[4].InstanceDataStepRate = 0;
+
+		inputLayoutDesc.pInputElementDescs = skinningElementDescs.data();
+		inputLayoutDesc.NumElements = static_cast<UINT>(skinningElementDescs.size());
+	} else {
+		inputElementDescs[0].SemanticName = "POSITION";
+		inputElementDescs[0].SemanticIndex = 0;
+		inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputElementDescs[0].InputSlot = 0;
+		inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		inputElementDescs[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+		inputElementDescs[0].InstanceDataStepRate = 0;
+
+		inputElementDescs[1].SemanticName = "TEXCOORD";
+		inputElementDescs[1].SemanticIndex = 0;
+		inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputElementDescs[1].InputSlot = 0;
+		inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		inputElementDescs[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+		inputElementDescs[1].InstanceDataStepRate = 0;
+
+		inputElementDescs[2].SemanticName = "NORMAL";
+		inputElementDescs[2].SemanticIndex = 0;
+		inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+		inputLayoutDesc.pInputElementDescs = inputElementDescs.data();
+		inputLayoutDesc.NumElements = static_cast<UINT>(inputElementDescs.size());
+	}
 
 	// --- DepthStencil ---
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
@@ -174,7 +235,8 @@ void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnabl
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	// --- シェーダーコンパイル ---
-	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d/Object3d.VS.hlsl", L"vs_6_0");
+	std::wstring vsPath = useSkinning_ ? L"Resources/shader/Object3d/SkinningObject3d.VS.hlsl" : L"Resources/shader/Object3d/Object3d.VS.hlsl";
+	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(vsPath.c_str(), L"vs_6_0");
 	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d/Object3d.PS.hlsl", L"ps_6_0");
 	assert(vsBlob && psBlob);
 

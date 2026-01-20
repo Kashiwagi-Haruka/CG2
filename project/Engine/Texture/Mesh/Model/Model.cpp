@@ -1,4 +1,5 @@
 #include "Model.h"
+#include "Animation/SkinCluster.h"
 #include "DirectXCommon.h"
 #include "Function.h"
 #include "ModelCommon.h"
@@ -78,14 +79,22 @@ void Model::SetEnvironmentCoefficient(float coefficient) {
 	mat3d->environmentCoefficient = coefficient;
 	materialResource_->Unmap(0, nullptr);
 }
-void Model::Draw() {
+void Model::Draw() { Draw(nullptr); }
+void Model::Draw(const SkinCluster* skinCluster) {
+	constexpr UINT kMatrixPaletteRootParameterIndex = 12;
 	// --- SRVヒープをバインド ---
 	ID3D12DescriptorHeap* descriptorHeaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
 
 	modelCommon_->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-		// --- VertexBufferViewを設定 ---
-	modelCommon_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	// --- VertexBufferViewを設定 ---
+	if (skinCluster) {
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferViews[] = {vertexBufferView_, skinCluster->influenceBufferView};
+		modelCommon_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, _countof(vertexBufferViews), vertexBufferViews);
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(kMatrixPaletteRootParameterIndex, skinCluster->paletteSrvIndex);
+	} else {
+		modelCommon_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	}
 	if (!modelData_.indices.empty()) {
 		modelCommon_->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
 	}
