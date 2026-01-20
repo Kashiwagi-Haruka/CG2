@@ -327,6 +327,9 @@
     <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
+    <ClCompile Include="application\CollisionManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -601,6 +604,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Texture\Particle\ParticleManager.h">
       <Filter>ヘッダー ファイル\Engine\Texture\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="application\CollisionManager.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

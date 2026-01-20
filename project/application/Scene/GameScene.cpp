@@ -1,18 +1,18 @@
 #include "GameScene.h"
 #include "CameraController/CameraController.h"
+#include "GameTimer/GameTimer.h"
 #include "Model/ModelManager.h"
 #include "Object/Background/SkyDome.h"
 #include "Object/Enemy/EnemyManager.h"
 #include "Object/Player/Player.h"
 #include "Object3d/Object3dCommon.h"
-#include "Sprite/SpriteCommon.h"
 #include "ParticleManager.h"
-#include "SceneManager.h"
-#include <numbers>
 #include "RigidBody.h"
-#include "GameTimer/GameTimer.h"
+#include "SceneManager.h"
+#include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 #include <algorithm>
+#include <numbers>
 
 GameScene::GameScene() {
 
@@ -71,9 +71,6 @@ void GameScene::Initialize() {
 	uimanager->SetPlayerHP(player->GetHP());
 
 	uimanager->Initialize();
-	/*BG->SetCamera(cameraController->GetCamera());
-	BG->SetPosition(player->GetPosition());
-	BG->Initialize();*/
 	house->Initialize(cameraController->GetCamera());
 	// ==================
 	// ★ レベルアップ用スプライト画像読み込み
@@ -119,9 +116,6 @@ void GameScene::Initialize() {
 	pointLights_[1].intensity = 1.0f;
 	pointLights_[1].radius = 20.0f;
 	pointLights_[1].decay = 0.7f;
-	
-
-	
 
 	directionalLight_.color = {0.3725f, 0.2667f, 0.7882f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.5f};
@@ -229,7 +223,6 @@ void GameScene::Update() {
 		return;
 	}
 
-
 	auto makeAabb = [](const Vector3& center, const Vector3& halfSize) {
 		AABB aabb;
 		aabb.min = {center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z};
@@ -279,15 +272,13 @@ void GameScene::Update() {
 		return;
 	}
 
-DebugImGui();
+	DebugImGui();
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
 	skyDome->SetCamera(cameraController->GetCamera());
 	player->SetCamera(cameraController->GetCamera());
 	field->SetCamera(cameraController->GetCamera());
-	
-	
 
 	ParticleManager::GetInstance()->Update(cameraController->GetCamera());
 	skyDome->Update();
@@ -368,16 +359,13 @@ DebugImGui();
 		isTransitionOut = true;
 	}
 
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	if (GameBase::GetInstance()->TriggerKey(DIK_P)) {
 		nextSceneName = "Result";
 		sceneTransition->Initialize(true);
 		isTransitionOut = true;
 	}
 #endif // _DEBUG
-
-
-
 
 	if (!player->GetIsAlive()) {
 		if (!isTransitionOut) {
@@ -451,7 +439,7 @@ DebugImGui();
 			}
 		}
 
-				// ===== ③ 必殺技との当たり判定 =====
+		// ===== ③ 必殺技との当たり判定 =====
 		if (player->GetIsAlive() && player->GetSpecialAttack() && player->GetSpecialAttack()->IsDamaging()) {
 			bool hitSpecial = false;
 			for (const auto& specialTransform : player->GetSpecialAttack()->GetIceFlowerTransforms()) {
@@ -485,18 +473,13 @@ DebugImGui();
 		}
 
 		// ===== ③ House と敵の当たり判定 =====
-	
 	}
-
-
-
 
 	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
-	
+
 	uimanager->Update();
-	
-	
+
 	particles->SetCameraPos(cameraController->GetCamera()->GetTranslate());
 	particles->SetPlayerPos(player->GetPosition());
 	particles->Update();
@@ -505,12 +488,12 @@ DebugImGui();
 
 	cameraController->Update();
 
-	if (isTransitionIn||isTransitionOut) {
+	if (isTransitionIn || isTransitionOut) {
 		sceneTransition->Update();
 		if (sceneTransition->IsEnd() && isTransitionIn) {
 			isTransitionIn = false;
 		}
-		if (sceneTransition->IsEnd()&&isTransitionOut) {
+		if (sceneTransition->IsEnd() && isTransitionOut) {
 			SceneManager::GetInstance()->ChangeScene(nextSceneName);
 		}
 	}
@@ -524,26 +507,19 @@ void GameScene::Draw() {
 	house->Draw();
 	player->Draw();
 	enemyManager->Draw();
-	
-
-
-
 
 	particles->Draw();
-	
 
 	SpriteCommon::GetInstance()->DrawCommon();
 	uimanager->Draw();
 	if (isPhaseSpriteActive_) {
-		
+
 		phaseSprites_[currentPhaseSpriteIndex_]->Draw();
 	}
 	// =============================
 	// ★ レベルアップ選択画面描画(別スプライト使用版)
 	// =============================
 	if (isLevelSelecting) {
-
-		
 
 		// 左と右の選択肢
 		int leftID = selectChoices[0];
