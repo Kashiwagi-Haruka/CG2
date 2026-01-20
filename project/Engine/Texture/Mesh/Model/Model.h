@@ -30,13 +30,14 @@ private:
 		uint32_t textureIndex = 0;
 	};
 	struct ModelData {
+		std::map<std::string, JointWeightData> skinClusterData;
 		std::vector<VertexData> vertices;
 		std::vector<uint32_t> indices;
 		MaterialData material;
 		Node rootnode;
 	};
 	struct Material {
-		std::map<std::string, JointWeightData> skinClusterData;
+		
 		Vector4 color;
 		int enableLighting;
 		float padding[3];

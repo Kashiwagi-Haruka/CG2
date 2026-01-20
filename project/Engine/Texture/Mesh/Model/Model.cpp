@@ -243,6 +243,7 @@ void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::strin
 				modelData.indices.push_back(vertexOffset + face.mIndices[element]);
 			}
 		}
+
 	}
 
 	// --- Material & Texture ---
@@ -314,6 +315,24 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 			assert(face.mNumIndices == 3);
 			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
 				modelData.indices.push_back(vertexOffset + face.mIndices[element]);
+			}
+		}
+		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
+			aiBone* bone = mesh->mBones[boneIndex];
+			std::string jointName = bone->mName.C_Str();
+			JointWeightData& jointWeightData = modelData.skinClusterData[jointName];
+
+			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
+			aiVector3D scale;
+			aiVector3D translate;
+			aiQuaternion rotate;
+			bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
+			Matrix4x4 bindPoseMatrix = Function::MakeAffineMatrix({scale.x, scale.y, scale.z}, {rotate.x, -rotate.y, -rotate.z, rotate.w}, {-translate.x, translate.y, translate.z});
+			jointWeightData.inverseBindPoseMatrix = Function::Inverse(bindPoseMatrix);
+
+			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
+				const aiVertexWeight& weight = bone->mWeights[weightIndex];
+				jointWeightData.vertexWeights.push_back({weight.mWeight, weight.mVertexId});
 			}
 		}
 	}
