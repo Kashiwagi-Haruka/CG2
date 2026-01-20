@@ -150,7 +150,7 @@ void PlayerSkill::Draw() {
 		skillEmitter_->Draw();
 	}
 	}
-	
+	Object3dCommon::GetInstance()->DrawCommon();
 	Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendScreen);
 	skillUpObject_->Draw();
 	skillUnderObject_->Draw();

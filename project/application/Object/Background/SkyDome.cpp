@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "GameBase.h"
 #include "Model/ModelManager.h"
+#include "Object3d/Object3dCommon.h"
 
 SkyDome::SkyDome() {
 	ModelManager::GetInstance()->LoadModel("Resources/3d", "skyDome");
@@ -23,6 +24,11 @@ void SkyDome::Initialize(Camera* camera) {
 void SkyDome::Update() {
 	skyDomeObject_->SetCamera(camera_);
 	skyDomeObject_->SetEnableLighting(false);
+	skyDomeObject_->SetShininess(0.0f);
 	skyDomeObject_->Update();
 }
-void SkyDome::Draw() { skyDomeObject_->Draw(); }
+void SkyDome::Draw() { 
+	Object3dCommon::GetInstance()->DrawCommon();
+	
+	skyDomeObject_->Draw(); 
+}

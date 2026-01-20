@@ -112,8 +112,8 @@ void GameScene::Initialize() {
 	pointLights_[0].decay = 0.7f;
 	pointLights_[1].color = {1.0f, 0.9f, 0.9f, 1.0f};
 	pointLights_[1].position = {75.0f, 5.0f, 75.0f};
-	pointLights_[1].intensity = 1.0f;
-	pointLights_[1].radius = 20.0f;
+	pointLights_[1].intensity = 0.0f;
+	pointLights_[1].radius = 10.0f;
 	pointLights_[1].decay = 0.7f;
 
 	directionalLight_.color = {0.3725f, 0.2667f, 0.7882f, 1.0f};
@@ -265,6 +265,16 @@ void GameScene::Update() {
 	}
 
 	DebugImGui();
+	
+	if (player->GetIsSkillAttack()) {
+		pointLights_[1].intensity = 1.0f;
+		pointLights_[1].position = {player->GetSkillPosition().x, player->GetSkillPosition().y + 4, player->GetSkillPosition().z};
+		
+	} else {
+		pointLights_[1].intensity = 0.0f;
+		pointLights_[1].position = {player->GetPosition().x, player->GetPosition().y + 4, player->GetPosition().z};
+	}
+	
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);

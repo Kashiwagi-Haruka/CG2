@@ -4,6 +4,7 @@
 #include "Model/ModelManager.h"
 #include "GameBase.h"
 #include "imgui.h"
+#include <numbers>
 PlayerModels::PlayerModels() {
 	ModelManager::GetInstance()->LoadModel("Resources/3d","playerRarm");
 	ModelManager::GetInstance()->LoadModel("Resources/3d","playerbody");
@@ -71,11 +72,20 @@ void PlayerModels::Update() {
 	t += 0.1f;
 	switch (state_) {
 	case PlayerModels::idle:
+		armRT_.rotate.z = std::numbers::pi_v<float> / 5.0f;
+		armRT_.rotate.y = std::sin(t) * 0.0f;
+		armLT_.rotate.z = -std::numbers::pi_v<float> / 5.0f;
+		armLT_.rotate.y = std::sin(t) * 0.0f;
+
+		legRT_.rotate.x = -std::sin(t) * 0.0f;
+		legLT_.rotate.x = std::sin(t) * 0.0f;
 		break;
 	case PlayerModels::walk:
 		
-			armRT_.rotate.x = std::sin(t) * 0.5f;
-			armLT_.rotate.x = -std::sin(t) * 0.5f;
+			armRT_.rotate.z = std::numbers::pi_v<float> / 5.0f;
+			armRT_.rotate.y = std::sin(t) * 0.5f;
+		    armLT_.rotate.z = -std::numbers::pi_v<float> / 5.0f;
+			armLT_.rotate.y = std::sin(t) * 0.5f;
 
 			legRT_.rotate.x = -std::sin(t) * 0.5f;
 			legLT_.rotate.x = std::sin(t) * 0.5f;

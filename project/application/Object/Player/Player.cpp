@@ -183,6 +183,7 @@ void Player::Move() {
 
 	if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D) && !GameBase::GetInstance()->PushKey(DIK_W) && !GameBase::GetInstance()->PushKey(DIK_S)) {
 		isDash = false;
+		models_->SetStateM(PlayerModels::StateM::idle);
 	} else {
 		isDash = GameBase::GetInstance()->PushKey(DIK_LSHIFT) || GameBase::GetInstance()->PushKey(DIK_RSHIFT);
 	}

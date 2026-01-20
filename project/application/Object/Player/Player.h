@@ -126,6 +126,8 @@ public:
 	Vector3 GetVelocity() { return velocity_; }
 	Vector3 GetBulletPosition();
 	bool GetIsAlive() { return isAlive; }
+	bool GetIsSkillAttack() { return isSkillAttack; }
+	Vector3 GetSkillPosition() { return skill_->GetDamagePosition(); }
 	Parameters GetParameters() { return parameters_; }
 	void SetParameters(const Parameters& p) { parameters_ = p; }
 	Vector3 GetRotate() { return transform_.rotate; }

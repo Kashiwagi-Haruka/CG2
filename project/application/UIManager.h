@@ -43,6 +43,8 @@ class UIManager {
 
 	SpriteData SlashSPData[2];
 	SpriteData EXPSPData;
+	SpriteData houseHpNumberSPData[3];
+	SpriteData houseHpPercentSPData;
 
 	int playerHP;
 	int playerHPMax;
@@ -50,6 +52,9 @@ class UIManager {
 	float playerHPWidth = 1200.0f;
 	float playerHPWidthMax = 1200.0f;
 	Vector2 numbersTextureSize = {300, 300};
+	Vector2 houseHpNumbersTextureSize = {400, 400};
+	Vector2 houseHpPercentBasePosition = {980, 520};
+	int houseHpDigitStartIndex = 0;
 	Parameters parameters_;
 
 public:

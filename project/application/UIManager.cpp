@@ -1,9 +1,11 @@
 #define NOMINMAX
 #include "UIManager.h"
 #include "GameBase.h"
+#include "Object/House/HouseHP.h"
 #include "Sprite.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
+#include <algorithm>
 
 UIManager::UIManager() {
 
@@ -41,6 +43,7 @@ UIManager::UIManager() {
 	SlashSPData[0].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Slash.png");
 
 	EXPSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Exp.png");
+	houseHpPercentSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/houseHPNumbers.png");
 
 	// ===========================
 	//      Sprite の生成
@@ -65,6 +68,10 @@ UIManager::UIManager() {
 	HealthUpSPData.sprite = std::make_unique<Sprite>();
 	SpeedUpSPData.sprite = std::make_unique<Sprite>();
 	AllowUpSPData.sprite = std::make_unique<Sprite>();
+	houseHpPercentSPData.sprite = std::make_unique<Sprite>();
+	for (int i = 0; i < 3; i++) {
+		houseHpNumberSPData[i].sprite = std::make_unique<Sprite>();
+	}
 }
 
 UIManager::~UIManager() {}
@@ -129,6 +136,15 @@ void UIManager::Initialize() {
 
 	AllowUpSPData.sprite->Initialize(AllowUpSPData.handle);
 	AllowUpSPData.sprite->SetScale({48, 48});
+
+	houseHpPercentSPData.sprite->Initialize(houseHpPercentSPData.handle);
+	houseHpPercentSPData.sprite->SetTextureRange({houseHpNumbersTextureSize.x * 10.0f, 0}, houseHpNumbersTextureSize);
+	houseHpPercentSPData.sprite->SetScale({32, 32});
+	for (int i = 0; i < 3; i++) {
+		houseHpNumberSPData[i].sprite->Initialize(houseHpPercentSPData.handle);
+		houseHpNumberSPData[i].sprite->SetTextureRange({0, 0}, houseHpNumbersTextureSize);
+		houseHpNumberSPData[i].sprite->SetScale({32, 32});
+	}
 }
 
 void UIManager::Update() {
@@ -240,6 +256,21 @@ void UIManager::Update() {
 		MaxSPData[i].sprite->SetPosition(MaxSPData[i].translate);
 		MaxSPData[i].sprite->Update();
 	}
+	int houseHp = std::clamp(HouseHP::GetInstance()->GetHP(), 0, 1000);
+	int houseHpPercent = std::clamp(houseHp * 100 / 1000, 0, 100);
+	houseHpDigitStartIndex = houseHpPercent >= 100 ? 0 : (houseHpPercent >= 10 ? 1 : 2);
+	int houseDigits[3] = {houseHpPercent / 100, (houseHpPercent / 10) % 10, houseHpPercent % 10};
+	float xOffset = houseHpPercentBasePosition.x;
+	for (int i = houseHpDigitStartIndex; i < 3; i++) {
+		houseHpNumberSPData[i].sprite->SetTextureRange({houseHpNumbersTextureSize.x * houseDigits[i], 0}, houseHpNumbersTextureSize);
+		houseHpNumberSPData[i].translate = {xOffset, houseHpPercentBasePosition.y};
+		houseHpNumberSPData[i].sprite->SetPosition(houseHpNumberSPData[i].translate);
+		houseHpNumberSPData[i].sprite->Update();
+		xOffset += 32.0f;
+	}
+	houseHpPercentSPData.translate = {xOffset, houseHpPercentBasePosition.y};
+	houseHpPercentSPData.sprite->SetPosition(houseHpPercentSPData.translate);
+	houseHpPercentSPData.sprite->Update();
 }
 
 void UIManager::Draw() {
@@ -285,6 +316,10 @@ void UIManager::Draw() {
 	} else {
 		MaxSPData[4].sprite->Draw();
 	}
+	for (int i = houseHpDigitStartIndex; i < 3; i++) {
+		houseHpNumberSPData[i].sprite->Draw();
+	}
+	houseHpPercentSPData.sprite->Draw();
 }
 
 void UIManager::SetPlayerHP(int HP) { playerHP = HP; }
