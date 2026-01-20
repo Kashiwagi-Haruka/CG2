@@ -1,1 +1,101 @@
 #include "CollisionManager.h"
+#include "Function.h"
+#include "Object/Enemy/EnemyManager.h"
+#include "Object/House/House.h"
+#include "Object/Player/Player.h"
+#include "RigidBody.h"
+
+namespace {
+AABB MakeAabb(const Vector3& center, const Vector3& halfSize) {
+	AABB aabb;
+	aabb.min = {center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z};
+	aabb.max = {center.x + halfSize.x, center.y + halfSize.y, center.z + halfSize.z};
+	return aabb;
+}
+} // namespace
+
+void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& enemyManager, House& house) {
+	AABB playerAabb = MakeAabb(player.GetPosition(), player.GetScale());
+	AABB houseAabb = MakeAabb(house.GetPosition(), house.GetScale());
+
+	for (auto& enemy : enemyManager.GetEnemies()) {
+		if (!enemy->GetIsAlive()) {
+			continue;
+		}
+
+		Vector3 enemyPos = enemy->GetPosition();
+		AABB enemyAabb = MakeAabb(enemyPos, enemy->GetScale());
+		bool hitHouseBody = RigidBody::isCollision(enemyAabb, houseAabb);
+		if (hitHouseBody) {
+			Vector3 toEnemy = enemyPos - house.GetPosition();
+			toEnemy.y = 0.0f;
+			if (LengthSquared(toEnemy) < 0.0001f) {
+				toEnemy = {1.0f, 0.0f, 0.0f};
+			}
+			Vector3 pushDir = Function::Normalize(toEnemy);
+			Vector3 houseScale = house.GetScale();
+			Vector3 enemyScale = enemy->GetScale();
+			float minDistance = houseScale.x + enemyScale.x;
+			Vector3 correctedPos = house.GetPosition() + pushDir * minDistance;
+			correctedPos.y = enemyPos.y;
+			enemy->SetPosition(correctedPos);
+			enemyPos = correctedPos;
+			enemyAabb = MakeAabb(enemyPos, enemy->GetScale());
+		}
+
+		if (player.GetIsAlive() && player.GetSword()->IsAttacking()) {
+			Vector3 swordPos = player.GetSword()->GetPosition();
+			float swordHit = player.GetSword()->GetHitSize();
+			AABB swordAabb = MakeAabb(swordPos, {swordHit, swordHit, swordHit});
+			bool hitSword = RigidBody::isCollision(swordAabb, enemyAabb);
+			if (hitSword) {
+				enemy->SetHPSubtract(1);
+				enemyManager.OnEnemyDamaged(enemy.get());
+				if (!enemy->GetIsAlive()) {
+					player.EXPMath();
+				}
+			}
+		}
+
+		if (player.GetIsAlive() && player.GetSkill() && player.GetSkill()->IsDamaging()) {
+			AABB skillAabb = MakeAabb(player.GetSkill()->GetDamagePosition(), player.GetSkill()->GetDamageScale());
+			bool hitSkill = RigidBody::isCollision(skillAabb, enemyAabb);
+			if (hitSkill) {
+				enemy->SetHPSubtract(1);
+				enemyManager.OnEnemyDamaged(enemy.get());
+				if (!enemy->GetIsAlive()) {
+					player.EXPMath();
+				}
+			}
+		}
+
+		if (player.GetIsAlive() && player.GetSpecialAttack() && player.GetSpecialAttack()->IsDamaging()) {
+			bool hitSpecial = false;
+			for (const auto& specialTransform : player.GetSpecialAttack()->GetIceFlowerTransforms()) {
+				AABB specialAabb = MakeAabb(specialTransform.translate, specialTransform.scale);
+				if (RigidBody::isCollision(specialAabb, enemyAabb)) {
+					hitSpecial = true;
+					break;
+				}
+			}
+
+			if (hitSpecial) {
+				enemy->SetHPSubtract(1);
+				enemyManager.OnEnemyDamaged(enemy.get());
+				if (!enemy->GetIsAlive()) {
+					player.EXPMath();
+				}
+			}
+		}
+
+		if (enemy->IsAttackHitActive()) {
+			AABB enemyAttackAabb = MakeAabb(enemy->GetAttackPosition(), {enemy->GetAttackHitSize(), enemy->GetAttackHitSize(), enemy->GetAttackHitSize()});
+			if (RigidBody::isCollision(enemyAttackAabb, playerAabb)) {
+				player.Damage(1);
+			}
+			if (RigidBody::isCollision(enemyAttackAabb, houseAabb)) {
+				house.Damage(1);
+			}
+		}
+	}
+}

@@ -2,6 +2,7 @@
 #include "Audio.h"
 #include "BaseScene.h"
 #include "GameBase.h"
+#include "CollisionManager.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
@@ -47,6 +48,7 @@ class GameScene: public BaseScene{
 	std::unique_ptr<MapchipField> field;
 	std::unique_ptr<House> house;
 	std::unique_ptr<Pause> pause;
+	CollisionManager collisionManager_;
 
 	bool isTransitionIn = true;
 	bool isTransitionOut = false;

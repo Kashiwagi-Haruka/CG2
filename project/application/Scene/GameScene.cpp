@@ -7,7 +7,6 @@
 #include "Object/Player/Player.h"
 #include "Object3d/Object3dCommon.h"
 #include "ParticleManager.h"
-#include "RigidBody.h"
 #include "SceneManager.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
@@ -223,13 +222,6 @@ void GameScene::Update() {
 		return;
 	}
 
-	auto makeAabb = [](const Vector3& center, const Vector3& halfSize) {
-		AABB aabb;
-		aabb.min = {center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z};
-		aabb.max = {center.x + halfSize.x, center.y + halfSize.y, center.z + halfSize.z};
-		return aabb;
-	};
-
 	// ★ レベルアップ選択中は操作受付
 	if (isLevelSelecting) {
 
@@ -376,104 +368,7 @@ void GameScene::Update() {
 	}
 
 	// ===== プレイヤーと敵の当たり判定 =====
-	Vector3 p = player->GetPosition();
-	Vector3 v = player->GetVelocity();
-	AABB playerAabb = makeAabb(p, player->GetScale());
-
-	Vector3 housePos = house->GetPosition();
-	AABB houseAabb = makeAabb(housePos, house->GetScale());
-
-	for (auto& e : enemyManager->GetEnemies()) {
-
-		if (!e->GetIsAlive())
-			continue; // 死んだ敵はスキップ
-
-		Vector3 ePos = e->GetPosition();
-		AABB enemyAabb = makeAabb(ePos, e->GetScale());
-		bool hitHouseBody = RigidBody::isCollision(enemyAabb, houseAabb);
-		if (hitHouseBody) {
-			Vector3 toEnemy = ePos - housePos;
-			toEnemy.y = 0.0f;
-			if (LengthSquared(toEnemy) < 0.0001f) {
-				toEnemy = {1.0f, 0.0f, 0.0f};
-			}
-			Vector3 pushDir = Function::Normalize(toEnemy);
-			Vector3 houseScale = house->GetScale();
-			Vector3 enemyScale = e->GetScale();
-			float minDistance = houseScale.x + enemyScale.x;
-			Vector3 correctedPos = housePos + pushDir * minDistance;
-			correctedPos.y = ePos.y;
-			e->SetPosition(correctedPos);
-			ePos = correctedPos;
-			enemyAabb = makeAabb(ePos, e->GetScale());
-		}
-		// ===== ① 剣との当たり判定 =====
-		if (player->GetIsAlive() && player->GetSword()->IsAttacking()) {
-
-			Vector3 swordPos = player->GetSword()->GetPosition();
-			float swordHit = player->GetSword()->GetHitSize();
-
-			AABB swordAabb = makeAabb(swordPos, {swordHit, swordHit, swordHit});
-			bool hitSword = RigidBody::isCollision(swordAabb, enemyAabb);
-
-			if (hitSword) {
-				e->SetHPSubtract(1); // ダメージ
-				enemyManager->OnEnemyDamaged(e.get());
-				// 敵を倒したらEXP獲得
-				if (!e->GetIsAlive()) {
-					player->EXPMath();
-				}
-			}
-		}
-		// ===== ② スキル攻撃との当たり判定 =====
-		if (player->GetIsAlive() && player->GetSkill() && player->GetSkill()->IsDamaging()) {
-			AABB skillAabb = makeAabb(player->GetSkill()->GetDamagePosition(), player->GetSkill()->GetDamageScale());
-			bool hitSkill = RigidBody::isCollision(skillAabb, enemyAabb);
-
-			if (hitSkill) {
-				e->SetHPSubtract(1);
-				enemyManager->OnEnemyDamaged(e.get());
-				if (!e->GetIsAlive()) {
-					player->EXPMath();
-				}
-			}
-		}
-
-		// ===== ③ 必殺技との当たり判定 =====
-		if (player->GetIsAlive() && player->GetSpecialAttack() && player->GetSpecialAttack()->IsDamaging()) {
-			bool hitSpecial = false;
-			for (const auto& specialTransform : player->GetSpecialAttack()->GetIceFlowerTransforms()) {
-				AABB specialAabb = makeAabb(specialTransform.translate, specialTransform.scale);
-				if (RigidBody::isCollision(specialAabb, enemyAabb)) {
-					hitSpecial = true;
-					break;
-				}
-			}
-
-			if (hitSpecial) {
-				e->SetHPSubtract(1);
-				enemyManager->OnEnemyDamaged(e.get());
-				if (!e->GetIsAlive()) {
-					player->EXPMath();
-				}
-			}
-		}
-
-		// ===== ④ 敵の攻撃判定 =====
-		if (e->IsAttackHitActive()) {
-			AABB enemyAttackAabb = makeAabb(e->GetAttackPosition(), {e->GetAttackHitSize(), e->GetAttackHitSize(), e->GetAttackHitSize()});
-			bool hitEnemyAttack = RigidBody::isCollision(enemyAttackAabb, playerAabb);
-			if (hitEnemyAttack) {
-				player->Damage(1);
-			}
-			bool hitHouseAttack = RigidBody::isCollision(enemyAttackAabb, houseAabb);
-			if (hitHouseAttack) {
-				house->Damage(1);
-			}
-		}
-
-		// ===== ③ House と敵の当たり判定 =====
-	}
+	collisionManager_.HandleGameSceneCollisions(*player, *enemyManager, *house);
 
 	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
