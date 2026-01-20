@@ -340,7 +340,7 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 
 			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
 				const aiVertexWeight& weight = bone->mWeights[weightIndex];
-				jointWeightData.vertexWeights.push_back({weight.mWeight, weight.mVertexId});
+				jointWeightData.vertexWeights.push_back({weight.mWeight, weight.mVertexId + vertexOffset});
 			}
 		}
 	}
