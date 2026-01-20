@@ -52,9 +52,6 @@
     <Filter Include="ソース ファイル\Engine\Base">
       <UniqueIdentifier>{e2d52732-d767-4257-87f7-9c9563aa862f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\application\Player">
-      <UniqueIdentifier>{820bd1cf-53ed-4e12-91a5-3818988c5acd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\application\Object">
       <UniqueIdentifier>{191ae536-4edd-4da5-ae5d-471f157add70}</UniqueIdentifier>
     </Filter>
@@ -72,6 +69,39 @@
     </Filter>
     <Filter Include="ソース ファイル\application\Object\Enemy">
       <UniqueIdentifier>{2d21fc60-49d5-4fc9-b5a5-a50c5de56a4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\application\Scene">
+      <UniqueIdentifier>{8a6ad971-0a34-44e2-b0e4-2e5f7d9a7cd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\application\Object">
+      <UniqueIdentifier>{96a744ed-e116-4b8e-931e-79762d4089cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\application\Object\Player">
+      <UniqueIdentifier>{820bd1cf-53ed-4e12-91a5-3818988c5acd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\application\Object\Enemy">
+      <UniqueIdentifier>{bce17c6e-4bb5-464e-b02b-a21b8427c9ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Light">
+      <UniqueIdentifier>{1ca0768a-cf2c-427b-a9bb-893a5673b7d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\BaseScene">
+      <UniqueIdentifier>{c0acfc70-693d-4b25-a153-71bbcb8126d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Texture\Sprite">
+      <UniqueIdentifier>{0bcecf61-46e2-4922-9fcb-b90162b527bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Texture\Mesh">
+      <UniqueIdentifier>{36a4cfa6-0948-4dd3-ae2f-e7490db477c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Texture\Mesh\Animaton">
+      <UniqueIdentifier>{5269a918-e6ac-4800-bd0f-f8024878714a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Texture\Mesh\Model">
+      <UniqueIdentifier>{f7360dfa-9ac1-403e-8fac-7a20edfee519}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Texture\Particle">
+      <UniqueIdentifier>{5070aa60-306c-41c2-beb9-1a66dae9b72b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -353,20 +383,8 @@
     <ClInclude Include="Engine\LeakChecker\D3DResourceLeakChecker.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="application\Object\Enemy\Enemy.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Enemy\EnemyManager.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Scene\GameScene.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Log\Logger.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\MapchipField.h">
-      <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\BlendMode\BlendModeManager.h">
       <Filter>ヘッダー ファイル\Engine\Texture</Filter>
@@ -398,38 +416,11 @@
     <ClInclude Include="Engine\base\WinApp.h">
       <Filter>ヘッダー ファイル\Engine\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Particle\ParticleEmitter.h">
-      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Particle\ParticleManager.h">
-      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3d.h">
-      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3dCommon.h">
-      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Model\ModelCommon.h">
-      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Model\ModelManager.h">
-      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Model\Model.h">
-      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Camera\Camera.h">
       <Filter>ヘッダー ファイル\Engine\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Camera\DebugCamera.h">
       <Filter>ヘッダー ファイル\Engine\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Sprite\Sprite.h">
-      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Sprite\SpriteCommon.h">
-      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\SrvManager\SrvManager.h">
       <Filter>ヘッダー ファイル\Engine\Texture</Filter>
@@ -437,20 +428,11 @@
     <ClInclude Include="Engine\Texture\TextureManager.h">
       <Filter>ヘッダー ファイル\Engine\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="application\Scene\TitleScene.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\math\Transform.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\stringUtillity\StringUtility.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Scene\ResultScene.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Background\SkyDome.h">
-      <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="Engine\math\RigidBody.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
@@ -462,115 +444,163 @@
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="application\Object\Player\Player.h">
-      <Filter>ヘッダー ファイル\application\Player</Filter>
+      <Filter>ヘッダー ファイル\application\Object\Player</Filter>
     </ClInclude>
     <ClInclude Include="application\Particles\Particles.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\BaseScene\BaseScene.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\BaseScene\SceneManager.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\BaseScene\AbstractSceneFactory.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Light\AreaLight.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Camera\CameraForGPU.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\PSO\CreatePSO.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Light\DirectionalLight.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Character\Model\CharacterModel.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Enemy\EnemyAttack.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\BaseScene\FrameWork.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Enemy\EnemyHitEffect.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Enemy\EnemyStun.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Scene\Game\Game.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Scene\GameOverScene.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="application\GameTimer\GameTimer.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="application\Object\House\House.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\House\HouseHP.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
     <ClInclude Include="application\Pause\Pause.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Playable\Model\PlayableModel.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Player\PlayerModels.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Player\PlayerParameters.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Player\PlayerSkill.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Player\PlayerSpecialAttack.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Player\PlayerSword.h">
-      <Filter>ヘッダー ファイル\application</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Scene\SampleScene\SampleScene.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="application\Team\Team.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
+    <ClInclude Include="application\Object\Enemy\Enemy.h">
+      <Filter>ヘッダー ファイル\application\Object\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Enemy\EnemyHitEffect.h">
+      <Filter>ヘッダー ファイル\application\Object\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Enemy\EnemyAttack.h">
+      <Filter>ヘッダー ファイル\application\Object\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Enemy\EnemyStun.h">
+      <Filter>ヘッダー ファイル\application\Object\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Enemy\EnemyManager.h">
+      <Filter>ヘッダー ファイル\application\Object\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Character\Model\CharacterModel.h">
+      <Filter>ヘッダー ファイル\application\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\Game\Game.h">
+      <Filter>ヘッダー ファイル\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\GameScene.h">
+      <Filter>ヘッダー ファイル\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\GameOverScene.h">
+      <Filter>ヘッダー ファイル\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\House\House.h">
+      <Filter>ヘッダー ファイル\application\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\House\HouseHP.h">
+      <Filter>ヘッダー ファイル\application\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\MapchipField.h">
+      <Filter>ヘッダー ファイル\application\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Player\PlayerSkill.h">
+      <Filter>ヘッダー ファイル\application\Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Player\PlayerParameters.h">
+      <Filter>ヘッダー ファイル\application\Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Player\PlayerModels.h">
+      <Filter>ヘッダー ファイル\application\Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Playable\Model\PlayableModel.h">
+      <Filter>ヘッダー ファイル\application\Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Player\PlayerSword.h">
+      <Filter>ヘッダー ファイル\application\Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Player\PlayerSpecialAttack.h">
+      <Filter>ヘッダー ファイル\application\Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\TitleScene.h">
+      <Filter>ヘッダー ファイル\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\SampleScene\SampleScene.h">
+      <Filter>ヘッダー ファイル\application\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\ResultScene.h">
+      <Filter>ヘッダー ファイル\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Background\SkyDome.h">
+      <Filter>ヘッダー ファイル\application\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Light\AreaLight.h">
+      <Filter>ヘッダー ファイル\Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BaseScene\AbstractSceneFactory.h">
+      <Filter>ヘッダー ファイル\Engine\BaseScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BaseScene\BaseScene.h">
+      <Filter>ヘッダー ファイル\Engine\BaseScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\PSO\CreatePSO.h">
+      <Filter>ヘッダー ファイル\Engine\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Light\DirectionalLight.h">
+      <Filter>ヘッダー ファイル\Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BaseScene\FrameWork.h">
+      <Filter>ヘッダー ファイル\Engine\BaseScene</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Texture\Light\PointLight.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Primitive\Primitive.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\math\QuaternionTransform.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
+      <Filter>ヘッダー ファイル\Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="application\Scene\SceneFactory\SceneFactory.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Animation\Skeleton.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\Mesh\Animation\SkinCluster.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Texture\SkinningData.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
+      <Filter>ヘッダー ファイル\application\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\Light\SpotLight.h">
-      <Filter>ヘッダー ファイル\Engine</Filter>
+      <Filter>ヘッダー ファイル\Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BaseScene\SceneManager.h">
+      <Filter>ヘッダー ファイル\Engine\BaseScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Camera\CameraForGPU.h">
+      <Filter>ヘッダー ファイル\Engine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\math\QuaternionTransform.h">
+      <Filter>ヘッダー ファイル\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Mesh\Animaton</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Animation\Skeleton.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Mesh\Animaton</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\SkinningData.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Mesh\Animaton</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Animation\SkinCluster.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Mesh\Animaton</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Sprite\Sprite.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Sprite\SpriteCommon.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Model\Model.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Mesh\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Model\ModelCommon.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Mesh\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Model\ModelManager.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Mesh\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3d.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3dCommon.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Primitive\Primitive.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Particle\ParticleEmitter.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Particle\ParticleManager.h">
+      <Filter>ヘッダー ファイル\Engine\Texture\Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
