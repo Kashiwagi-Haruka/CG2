@@ -331,13 +331,13 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 			std::string jointName = bone->mName.C_Str();
 			JointWeightData& jointWeightData = modelData.skinClusterData[jointName];
 
-			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
+			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix;
 			aiVector3D scale;
 			aiVector3D translate;
 			aiQuaternion rotate;
 			bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
 			Matrix4x4 bindPoseMatrix = Function::MakeAffineMatrix({scale.x, scale.y, scale.z}, {rotate.x, -rotate.y, -rotate.z, rotate.w}, {-translate.x, translate.y, translate.z});
-			jointWeightData.inverseBindPoseMatrix = Function::Inverse(bindPoseMatrix);
+			jointWeightData.inverseBindPoseMatrix = bindPoseMatrix;
 
 			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
 				const aiVertexWeight& weight = bone->mWeights[weightIndex];

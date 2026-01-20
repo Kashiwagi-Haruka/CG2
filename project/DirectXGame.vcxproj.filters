@@ -70,6 +70,9 @@
     <Filter Include="ソース ファイル\Engine\BaseScene">
       <UniqueIdentifier>{3ad642dc-260b-4863-ab44-4e7707a0def9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\application\Object\Enemy">
+      <UniqueIdentifier>{2d21fc60-49d5-4fc9-b5a5-a50c5de56a4f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -162,9 +165,6 @@
     <ClCompile Include="Engine\Texture\Mesh\Model\Model.cpp">
       <Filter>ソース ファイル\Engine\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="application\main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="application\SceneTransition\SceneTransition.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
@@ -176,9 +176,6 @@
     </ClCompile>
     <ClCompile Include="application\Particles\Particles.cpp">
       <Filter>ソース ファイル\application</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Object\Enemy\Enemy.cpp">
-      <Filter>ソース ファイル\application\Object</Filter>
     </ClCompile>
     <ClCompile Include="application\Object\Background\SkyDome.cpp">
       <Filter>ソース ファイル\application\Object\Background</Filter>
@@ -216,21 +213,6 @@
     <ClCompile Include="Engine\BaseScene\BaseScene.cpp">
       <Filter>ソース ファイル\Engine\BaseScene</Filter>
     </ClCompile>
-    <ClCompile Include="application\Scene\Game\Game.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Object\Enemy\EnemyStun.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Scene\GameOverScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Object\House\House.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\BaseScene\AbstractSceneFactory.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -252,16 +234,7 @@
     <ClCompile Include="Engine\BaseScene\FrameWork.cpp">
       <Filter>ソース ファイル\Engine\BaseScene</Filter>
     </ClCompile>
-    <ClCompile Include="application\Object\Enemy\EnemyAttack.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="application\Object\Player\PlayerModels.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Object\Enemy\EnemyHitEffect.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\GameTimer\GameTimer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\Pause\Pause.cpp">
@@ -270,29 +243,59 @@
     <ClCompile Include="application\Object\House\HouseHP.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Object\Character\Model\CharacterModel.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Team\Team.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Primitive\Primitive.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="application\Object\Playable\Model\PlayableModel.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Animation\Skeleton.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="application\Object\Enemy\Enemy.cpp">
+      <Filter>ソース ファイル\application\Object\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Object\Enemy\EnemyAttack.cpp">
+      <Filter>ソース ファイル\application\Object\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\BaseScene\AbstractSceneFactory.cpp">
+      <Filter>ソース ファイル\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp">
+      <Filter>ソース ファイル\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Object\Character\Model\CharacterModel.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp">
+      <Filter>ソース ファイル\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Object\Enemy\EnemyHitEffect.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Object\Enemy\EnemyStun.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Scene\Game\Game.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Scene\GameOverScene.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameTimer\GameTimer.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\main.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Object\House\House.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Team\Team.cpp">
+      <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Texture\Mesh\Animation\SkinCluster.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Animation\Skeleton.cpp">
+      <Filter>ソース ファイル\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Primitive\Primitive.cpp">
+      <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
