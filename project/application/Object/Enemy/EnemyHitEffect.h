@@ -3,11 +3,16 @@
 #include "Object3d/Object3d.h"
 #include <vector>
 #include "Transform.h"
+#include "Primitive/Primitive.h"
 #include "Vector3.h"
 class EnemyHitEffect {
 
 	std::unique_ptr<Object3d> hitEffect_;
+	std::unique_ptr<Primitive> hitPrimitive_;
+	std::unique_ptr<Primitive> hitPrimitiveInner_;
 	Transform hitTransform_;
+	Transform hitPrimitiveTransform_;
+	Transform hitPrimitiveInnerTransform_;
 	Camera* camera_ = nullptr;
 	Vector3 enemyPosition_;
 	bool isActive_ = false;

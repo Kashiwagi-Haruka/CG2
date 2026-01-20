@@ -2,6 +2,7 @@
 #include "EnemyStun.h"
 #include "Transform.h"
 #include "EnemyAttack.h"
+#include "Primitive/Primitive.h"
 #include "Vector3.h"
 #include <memory>
 
@@ -31,7 +32,6 @@ class Enemy {
 	std::unique_ptr<Object3d> object_;
 	std::unique_ptr<EnemyStun> enemyStun;
 	std::unique_ptr<EnemyAttack> enemyAttack_;
-	
 
 	Camera* camera_ = nullptr;
 	float playerChaseRange_ = 8.0f;

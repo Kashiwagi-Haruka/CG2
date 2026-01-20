@@ -43,6 +43,7 @@ private:
 	std::unique_ptr<MapchipField> field;
 	std::unique_ptr<House> house;
 	std::unique_ptr<Pause> pause;
+
 	CollisionManager collisionManager_;
 
 	bool isTransitionIn = true;

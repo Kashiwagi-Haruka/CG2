@@ -8,7 +8,7 @@
 #include <d3d12.h>
 #include <vector>
 #include <wrl.h>
-
+#include <string>
 class Camera;
 
 class Primitive {

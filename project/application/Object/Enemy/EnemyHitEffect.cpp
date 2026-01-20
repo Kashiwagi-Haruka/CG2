@@ -2,10 +2,11 @@
 #include "GameBase.h"
 #include "Model/ModelManager.h"
 #include <numbers>
+
 void EnemyHitEffect::Initialize() {
 
 	ModelManager::GetInstance()->LoadModel("Resources/3d","HitEffect");
-
+	
 	hitEffect_ = std::make_unique<Object3d>();
 	hitEffect_->Initialize();
 	hitEffect_->SetModel("HitEffect");
@@ -16,6 +17,24 @@ void EnemyHitEffect::Initialize() {
         .rotate{0, 0, 0},
         .translate{0, 0, 0}
     };
+	hitPrimitive_ = std::make_unique<Primitive>();
+	hitPrimitiveTransform_ = {
+	    .scale{1, 1, 1},
+        .rotate{0, 0, 0},
+        .translate{0, 0, 0}
+    };
+	hitPrimitive_->SetTransform(hitPrimitiveTransform_);
+	hitPrimitive_->Initialize(Primitive::Plane, "Resources/3d/Circle.png");
+
+	hitPrimitiveInner_ = std::make_unique<Primitive>();
+	hitPrimitiveInnerTransform_ = {
+	    .scale{0.5f, 0.5f, 0.5f},
+        .rotate{0,    0,    0   },
+        .translate{0,    0,    0   }
+    };
+	hitPrimitiveInner_->SetTransform(hitPrimitiveInnerTransform_);
+	hitPrimitiveInner_->Initialize(Primitive::Plane, "Resources/3d/Circle.png");
+
 	enemyPosition_ = {0.0f, 0.0f, 0.0f};
 }
 
@@ -42,10 +61,19 @@ void EnemyHitEffect::Update() {
 	Matrix4x4 c = camera_->GetWorldMatrix();
 	c.m[3][0] = c.m[3][1] = c.m[3][2] = 0;
 	Matrix4x4 world = Function::Multiply(c, Function::MakeAffineMatrix(hitTransform_.scale, hitTransform_.rotate, hitTransform_.translate));
+	Matrix4x4 primitiveWorld = Function::Multiply(c, Function::MakeAffineMatrix(hitPrimitiveTransform_.scale, hitPrimitiveTransform_.rotate, hitPrimitiveTransform_.translate));
+	Matrix4x4 primitiveInnerWorld = Function::Multiply(c, Function::MakeAffineMatrix(hitPrimitiveInnerTransform_.scale, hitPrimitiveInnerTransform_.rotate, hitPrimitiveInnerTransform_.translate));
 	
 	hitEffect_->SetCamera(camera_);
 	hitEffect_->SetWorldMatrix(world);
 	hitEffect_->Update();
+	hitPrimitive_->SetCamera(camera_);
+	hitPrimitive_->SetWorldMatrix(primitiveWorld);
+	hitPrimitive_->Update();
+	hitPrimitiveInner_->SetCamera(camera_);
+	hitPrimitiveInner_->SetWorldMatrix(primitiveInnerWorld);
+	hitEffect_->Update();
+	
 }
 
 void EnemyHitEffect::Draw() {
@@ -54,4 +82,6 @@ void EnemyHitEffect::Draw() {
 	}
 
 	hitEffect_->Draw();
+	hitPrimitive_->Draw();
+	hitPrimitiveInner_->Draw();
 }
