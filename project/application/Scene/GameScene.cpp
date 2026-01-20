@@ -396,6 +396,8 @@ void GameScene::Update() {
 
 void GameScene::Draw() {
 
+	
+	
 	Object3dCommon::GetInstance()->DrawCommon();
 	skyDome->Draw();
 	field->Draw();

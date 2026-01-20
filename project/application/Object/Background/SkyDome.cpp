@@ -22,7 +22,7 @@ void SkyDome::Initialize(Camera* camera) {
 }
 void SkyDome::Update() {
 	skyDomeObject_->SetCamera(camera_);
-
+	skyDomeObject_->SetEnableLighting(false);
 	skyDomeObject_->Update();
 }
 void SkyDome::Draw() { skyDomeObject_->Draw(); }

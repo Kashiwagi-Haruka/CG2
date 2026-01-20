@@ -61,6 +61,8 @@ void Pause::Update(bool isPause) {
 		startTime = 0.0f;
 		isEnd_ = true;
 		isStart_ = false;
+		GameBase::GetInstance()->SetIsCursorStablity(true);
+		GameBase::GetInstance()->SetIsCursorVisible(false);
 	}
 
 	float offsetX = kHiddenOffsetX;
@@ -72,6 +74,8 @@ void Pause::Update(bool isPause) {
 			isStart_ = false;
 			isActive_ = true;
 			offsetX = 0.0f;
+			GameBase::GetInstance()->SetIsCursorStablity(false);
+			GameBase::GetInstance()->SetIsCursorVisible(true);
 		}
 	} else if (isEnd_) {
 		startTime += kTransitionSpeed;
