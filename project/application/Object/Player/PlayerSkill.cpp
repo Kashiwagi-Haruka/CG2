@@ -135,6 +135,7 @@ void PlayerSkill::StartAttack(const Transform& playerTransform) {
 	downTime = 0;
 	damageTime = 0;
 	endTime = 0;
+	skillDamageId_++;
 }
 void PlayerSkill::Draw() {
 	

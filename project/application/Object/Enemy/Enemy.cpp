@@ -11,20 +11,20 @@ Enemy::Enemy() {
 	enemyStun = std::make_unique<EnemyStun>();
 	
 }
-
-
-void Enemy::Initialize(Camera* camera,Vector3 translates) {
+void Enemy::Initialize(Camera* camera, Vector3 translates) {
 	isAlive = true;
 	isStun_ = false;
 	HP = 3;
-	
+	damageInvincibleTimer_ = 0.0f;
+	lastSkillDamageId_ = -1;
+
 	object_->Initialize();
 	object_->SetModel("Enemy");
 	camera_ = camera;
 	transform_ = {
-		.scale{1.0f,1.0f,1.0f},
-		.rotate{0.0f,0.0f,0.0f},
-		.translate=translates
+	    .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f, 0.0f, 0.0f},
+        .translate = translates
     };
 	object_->SetTransform(transform_);
 	object_->SetCamera(camera_);
@@ -37,6 +37,12 @@ void Enemy::Initialize(Camera* camera,Vector3 translates) {
 
 void Enemy::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive) {
 	attackTimer_ += 1.0f / 60.0f;
+	if (damageInvincibleTimer_ > 0.0f) {
+		damageInvincibleTimer_ -= 1.0f / 60.0f;
+		if (damageInvincibleTimer_ < 0.0f) {
+			damageInvincibleTimer_ = 0.0f;
+		}
+	}
 	// 敵の更新処理
 	if (!isStun_) {
 		Vector3 target = housePos;

@@ -48,8 +48,9 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 			float swordHit = player.GetSword()->GetHitSize();
 			AABB swordAabb = MakeAabb(swordPos, {swordHit, swordHit, swordHit});
 			bool hitSword = RigidBody::isCollision(swordAabb, enemyAabb);
-			if (hitSword) {
+			if (hitSword && enemy->CanTakeDamage()) {
 				enemy->SetHPSubtract(1);
+				enemy->TriggerDamageInvincibility();
 				enemyManager.OnEnemyDamaged(enemy.get());
 				if (!enemy->GetIsAlive()) {
 					player.EXPMath();
@@ -60,8 +61,10 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 		if (player.GetIsAlive() && player.GetSkill() && player.GetSkill()->IsDamaging()) {
 			AABB skillAabb = MakeAabb(player.GetSkill()->GetDamagePosition(), player.GetSkill()->GetDamageScale());
 			bool hitSkill = RigidBody::isCollision(skillAabb, enemyAabb);
-			if (hitSkill) {
+			int skillDamageId = player.GetSkill()->GetSkillDamageId();
+			if (hitSkill && enemy->GetLastSkillDamageId() != skillDamageId) {
 				enemy->SetHPSubtract(1);
+				enemy->SetLastSkillDamageId(skillDamageId);
 				enemyManager.OnEnemyDamaged(enemy.get());
 				if (!enemy->GetIsAlive()) {
 					player.EXPMath();
@@ -80,10 +83,13 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 			}
 
 			if (hitSpecial) {
-				enemy->SetHPSubtract(1);
-				enemyManager.OnEnemyDamaged(enemy.get());
-				if (!enemy->GetIsAlive()) {
-					player.EXPMath();
+				if (enemy->CanTakeDamage()) {
+					enemy->SetHPSubtract(1);
+					enemy->TriggerDamageInvincibility();
+					enemyManager.OnEnemyDamaged(enemy.get());
+					if (!enemy->GetIsAlive()) {
+						player.EXPMath();
+					}
 				}
 			}
 		}
