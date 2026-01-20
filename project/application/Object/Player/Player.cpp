@@ -155,8 +155,14 @@ void Player::Move() {
 		const Vector3 right = {std::cosf(cameraYaw), 0.0f, -std::sinf(cameraYaw)};
 		inputDirection = forward * inputAxis.z + right * inputAxis.x;
 
-		velocity_.x += inputDirection.x * parameters_.accelationRate * (parameters_.SpeedUp + 1);
-		velocity_.z += inputDirection.z * parameters_.accelationRate * (parameters_.SpeedUp + 1);
+		const float accel = parameters_.accelationRate * (parameters_.SpeedUp + 1);
+		float currentSpeed = velocity_.x * inputDirection.x + velocity_.z * inputDirection.z;
+		if (currentSpeed < 0.0f) {
+			currentSpeed = 0.0f;
+		}
+		const float nextSpeed = std::min(parameters_.accelationMax, currentSpeed + accel);
+		velocity_.x = inputDirection.x * nextSpeed;
+		velocity_.z = inputDirection.z * nextSpeed;
 		// 入力方向から目標角度を計算
 		float targetAngle = std::atan2(inputDirection.x, inputDirection.z);
 
