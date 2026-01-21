@@ -254,6 +254,7 @@ void Player::Falling() {
 			models_->SetStateM(PlayerModels::StateM::fallingAttack);
 		} else {
 			velocity_.y -= parameters_.gravity;
+			models_->SetStateM(PlayerModels::StateM::idle);
 		}
 
 		if (transform_.translate.y <= 2.5f) {

@@ -3,7 +3,13 @@
 #include "Model/ModelManager.h"
 #include "Object3d/Object3d.h"
 #include "Camera.h"
+#include "Vector4.h"
 #include <algorithm>
+
+namespace {
+const Vector4 kDamageInvincibleColor = {1.0f, 0.0f, 0.0f, 1.0f};
+const Vector4 kDefaultColor = {1.0f, 1.0f, 1.0f, 1.0f};
+} // namespace
 
 Enemy::Enemy() {
 	ModelManager::GetInstance()->LoadModel("Resources/3d","Enemy");
@@ -33,6 +39,7 @@ void Enemy::Initialize(Camera* camera, Vector3 translates) {
 	enemyStun->Initialize();
 	enemyAttack_ = std::make_unique<EnemyAttack>();
 	enemyAttack_->Initialize(camera_);
+	object_->SetColor(kDefaultColor);
 }
 
 void Enemy::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive) {
@@ -43,6 +50,7 @@ void Enemy::Update(const Vector3& housePos, const Vector3& playerPos, bool isPla
 			damageInvincibleTimer_ = 0.0f;
 		}
 	}
+	object_->SetColor(damageInvincibleTimer_ > 0.0f ? kDamageInvincibleColor : kDefaultColor);
 	// 敵の更新処理
 	if (!isStun_) {
 		Vector3 target = housePos;

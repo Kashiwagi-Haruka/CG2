@@ -72,8 +72,12 @@ void PlayerModels::Update() {
 	t += 0.1f;
 	switch (state_) {
 	case PlayerModels::idle:
+		headT_.rotate.x = 0.0f;
+		
+		armLT_.rotate.x = 0.0f;
 		armRT_.rotate.z = std::numbers::pi_v<float> / 5.0f;
 		armRT_.rotate.y = std::sin(t) * 0.0f;
+		armRT_.rotate.x = 0.0f;
 		armLT_.rotate.z = -std::numbers::pi_v<float> / 5.0f;
 		armLT_.rotate.y = std::sin(t) * 0.0f;
 
