@@ -19,7 +19,7 @@ void EnemyHitEffect::Initialize() {
     };
 	hitPrimitive_ = std::make_unique<Primitive>();
 	hitPrimitiveTransform_ = {
-	    .scale{1, 1, 1},
+	    .scale{1.0f, 2.0f, 1.0f},
         .rotate{0, 0, 0},
         .translate{0, 0, 0}
     };
@@ -28,7 +28,7 @@ void EnemyHitEffect::Initialize() {
 
 	hitPrimitiveInner_ = std::make_unique<Primitive>();
 	hitPrimitiveInnerTransform_ = {
-	    .scale{0.5f, 0.5f, 0.5f},
+	    .scale{1.0f, 2.0f, 1.0f},
         .rotate{0,    0,    0   },
         .translate{0,    0,    0   }
     };
@@ -57,6 +57,10 @@ void EnemyHitEffect::Update() {
 
 	hitTransform_.translate = enemyPosition_;
 	hitTransform_.rotate.y = std::numbers::pi_v<float>;
+	hitPrimitiveTransform_.translate = enemyPosition_;
+	hitPrimitiveTransform_.rotate.y = std::numbers::pi_v<float>;
+	hitPrimitiveInnerTransform_.translate = enemyPosition_;
+	hitPrimitiveInnerTransform_.rotate.y = std::numbers::pi_v<float>;
 
 	Matrix4x4 c = camera_->GetWorldMatrix();
 	c.m[3][0] = c.m[3][1] = c.m[3][2] = 0;
@@ -72,7 +76,7 @@ void EnemyHitEffect::Update() {
 	hitPrimitive_->Update();
 	hitPrimitiveInner_->SetCamera(camera_);
 	hitPrimitiveInner_->SetWorldMatrix(primitiveInnerWorld);
-	hitEffect_->Update();
+	hitPrimitiveInner_->Update();
 	
 }
 
