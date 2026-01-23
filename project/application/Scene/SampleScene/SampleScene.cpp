@@ -7,15 +7,14 @@
 #include <imgui.h>
 #endif // USE_IMGUI
 #include <numbers>
-
+#include "SceneManager.h"
 SampleScene::SampleScene() {
 
 	uvBallObj_ = std::make_unique<Object3d>();
 	fieldObj_ = std::make_unique<Object3d>();
 	planeGltf_ = std::make_unique<Object3d>();
 	animatedCubeObj_ = std::make_unique<Object3d>();
-	humanWalkObj_ = std::make_unique<Object3d>();
-	humanSneakWalkObj_ = std::make_unique<Object3d>();
+	humanObj_ = std::make_unique<Object3d>();
 	cameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -49,12 +48,9 @@ void SampleScene::Initialize() {
 	animatedCubeObj_->Initialize();
 	animatedCubeObj_->SetCamera(camera_.get());
 	animatedCubeObj_->SetModel("AnimatedCube");
-	humanWalkObj_->Initialize();
-	humanWalkObj_->SetCamera(camera_.get());
-	humanWalkObj_->SetModel("walk");
-	humanSneakWalkObj_->Initialize();
-	humanSneakWalkObj_->SetCamera(camera_.get());
-	humanSneakWalkObj_->SetModel("sneakWalk");
+	humanObj_->Initialize();
+	humanObj_->SetCamera(camera_.get());
+	humanObj_->SetModel("walk");
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -70,40 +66,30 @@ void SampleScene::Initialize() {
         .rotate{0.0f, 0.0f, 0.0f},
         .translate{3.0f, 1.0f, 0.0f}
     };
-	humanWalkTransform_ = {
+	humanTransform_ = {
 	    .scale{100.0f,	                        100.0f,                    100.0f},
         .rotate{-std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0.0f  },
-        .translate{0.0f,                              1.0f,                      0.0f  }
-    };
-	humanSneakWalkTransform_ = {
-	    .scale{100.0f,	                        100.0f,                    100.0f},
-        .rotate{-std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0.0f  },
-        .translate{-1.0f,                             1.0f,                      0.0f  }
+        .translate{0.0f,                              1.0f,                      -3.0f  }
     };
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(uvBallTransform_);
 	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
 	animatedCubeObj_->SetAnimation(&animatedCubeAnimation_, true);
 	animatedCubeObj_->SetTransform(animatedCubeTransform_);
-	humanWalkAnimation_ = Animation::LoadAnimationData("Resources/3d/human", "walk");
-	humanWalkObj_->SetAnimation(&humanWalkAnimation_, true);
-	humanWalkObj_->SetTransform(humanWalkTransform_);
-	humanSneakWalkAnimation_ = Animation::LoadAnimationData("Resources/3d/human", "sneakWalk");
-	humanSneakWalkObj_->SetAnimation(&humanSneakWalkAnimation_, true);
-	humanSneakWalkObj_->SetTransform(humanSneakWalkTransform_);
+	humanAnimationClips_ = Animation::LoadAnimationClips("Resources/3d/human", "walk");
+	std::vector<Animation::AnimationData> sneakClips = Animation::LoadAnimationClips("Resources/3d/human", "sneakWalk");
+	humanAnimationClips_.insert(humanAnimationClips_.end(), sneakClips.begin(), sneakClips.end());
+	if (!humanAnimationClips_.empty()) {
+		currentHumanAnimationIndex_ = 0;
+		humanObj_->SetAnimation(&humanAnimationClips_[currentHumanAnimationIndex_], true);
+	}
+	humanObj_->SetTransform(humanTransform_);
 
 	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
-		humanWalkSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
-		humanWalkSkinCluster_ = CreateSkinCluster(ModelManager::GetInstance()->GetModelCommon(), *humanWalkSkeleton_, *walkModel);
-		if (!humanWalkSkinCluster_.mappedPalette.empty()) {
-			humanWalkObj_->SetSkinCluster(&humanWalkSkinCluster_);
-		}
-	}
-	if (Model* sneakModel = ModelManager::GetInstance()->FindModel("sneakWalk")) {
-		humanSneakWalkSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sneakModel->GetModelData().rootnode));
-		humanSneakWalkSkinCluster_ = CreateSkinCluster(ModelManager::GetInstance()->GetModelCommon(), *humanSneakWalkSkeleton_, *sneakModel);
-		if (!humanSneakWalkSkinCluster_.mappedPalette.empty()) {
-			humanSneakWalkObj_->SetSkinCluster(&humanSneakWalkSkinCluster_);
+		humanSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
+		humanSkinCluster_ = CreateSkinCluster(ModelManager::GetInstance()->GetModelCommon(), *humanSkeleton_, *walkModel);
+		if (!humanSkinCluster_.mappedPalette.empty()) {
+			humanObj_->SetSkinCluster(&humanSkinCluster_);
 		}
 	}
 	activePointLightCount_ = 2;
@@ -279,24 +265,36 @@ void SampleScene::Update() {
 		}
 	}
 	ImGui::End();
-	if (ImGui::Begin("walk")) {
-		if (ImGui::TreeNode("TransformWalk")) {
-			ImGui::DragFloat3("ScaleWalk", &humanWalkTransform_.scale.x, 0.1f);
-			ImGui::DragFloat3("RotateWalk", &humanWalkTransform_.rotate.x, 0.1f);
-			ImGui::DragFloat3("TranslateWalk", &humanWalkTransform_.translate.x, 0.1f);
+	if (ImGui::Begin("Human")) {
+		if (ImGui::TreeNode("Transform")) {
+			ImGui::DragFloat3("Scale", &humanTransform_.scale.x, 0.1f);
+			ImGui::DragFloat3("Rotate", &humanTransform_.rotate.x, 0.1f);
+			ImGui::DragFloat3("Translate", &humanTransform_.translate.x, 0.1f);
 			ImGui::TreePop();
+		}
+		if (!humanAnimationClips_.empty()) {
+			std::vector<const char*> animationNames;
+			animationNames.reserve(humanAnimationClips_.size());
+			for (const auto& clip : humanAnimationClips_) {
+				animationNames.push_back(clip.name.c_str());
+			}
+			int selectedIndex = static_cast<int>(currentHumanAnimationIndex_);
+			if (ImGui::Combo("Animation", &selectedIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
+				currentHumanAnimationIndex_ = static_cast<size_t>(selectedIndex);
+				humanObj_->SetAnimation(&humanAnimationClips_[currentHumanAnimationIndex_], true);
+				humanAnimationTime_ = 0.0f;
+			}
 		}
 	}
 	ImGui::End();
-	if (ImGui::Begin("sneakWalk")) {
-		if (ImGui::TreeNode("TransformSneakWalk")) {
-			ImGui::DragFloat3("ScaleSneakWalk", &humanSneakWalkTransform_.scale.x, 0.1f);
-			ImGui::DragFloat3("RotateSneakWalk", &humanSneakWalkTransform_.rotate.x, 0.1f);
-			ImGui::DragFloat3("TranslateSneakWalk", &humanSneakWalkTransform_.translate.x, 0.1f);
-			ImGui::TreePop();
+	if (ImGui::Begin("Scene")) {
+	
+		if (ImGui::Button("Title")) {
+			SceneManager::GetInstance()->ChangeScene("Title");
 		}
 	}
 	ImGui::End();
+
 
 #endif // USE_IMGUI
 	if (useDebugCamera_) {
@@ -315,40 +313,36 @@ void SampleScene::Update() {
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);
 	animatedCubeObj_->SetTransform(animatedCubeTransform_);
-	humanWalkObj_->SetTransform(humanWalkTransform_);
-	humanSneakWalkObj_->SetTransform(humanSneakWalkTransform_);
+	animatedCubeObj_->SetTransform(animatedCubeTransform_);
+	humanObj_->SetTransform(humanTransform_);
 	uvBallObj_->Update();
 	fieldObj_->Update();
 	planeGltf_->Update();
 	animatedCubeObj_->Update();
-	humanWalkObj_->Update();
-	humanSneakWalkObj_->Update();
+	humanObj_->Update();
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-	humanWalkSkeleton_->UpdateAnimation(humanWalkAnimation_, humanWalkAnimationTime_, deltaTime);
-	humanSneakWalkSkeleton_->UpdateAnimation(humanSneakWalkAnimation_, humanSneakWalkAnimationTime_, deltaTime);
-	if (!humanWalkSkinCluster_.mappedPalette.empty()) {
-		UpdateSkinCluster(humanWalkSkinCluster_, *humanWalkSkeleton_);
+	if (humanSkeleton_ && !humanAnimationClips_.empty()) {
+		const Animation::AnimationData& currentAnimation = humanAnimationClips_[currentHumanAnimationIndex_];
+		humanSkeleton_->UpdateAnimation(currentAnimation, humanAnimationTime_, deltaTime);
+		if (!humanSkinCluster_.mappedPalette.empty()) {
+			UpdateSkinCluster(humanSkinCluster_, *humanSkeleton_);
+		}
+		Matrix4x4 humanWorld = humanObj_->GetWorldMatrix();
+		humanSkeleton_->SetObjectMatrix(humanWorld);
 	}
-	if (!humanSneakWalkSkinCluster_.mappedPalette.empty()) {
-		UpdateSkinCluster(humanSneakWalkSkinCluster_, *humanSneakWalkSkeleton_);
-	}
-	Matrix4x4 walkWorld = humanWalkObj_->GetWorldMatrix();
-	Matrix4x4 sneakWorld = humanSneakWalkObj_->GetWorldMatrix();
-	humanWalkSkeleton_->SetObjectMatrix(walkWorld);
-	humanSneakWalkSkeleton_->SetObjectMatrix(sneakWorld);
 }
 void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
-	// uvBallObj_->Draw();
-	// planeGltf_->Draw();
-	// fieldObj_->Draw();
+	 uvBallObj_->Draw();
+	 planeGltf_->Draw();
+	 fieldObj_->Draw();
 	animatedCubeObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonSkinning();
-	humanWalkObj_->Draw();
-	humanSneakWalkObj_->Draw();
+	humanObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
-	humanWalkSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
-	humanSneakWalkSkeleton_->DrawBones(camera_.get(), {1.0f, 0.5f, 0.2f, 1.0f}, {0.9f, 0.3f, 0.1f, 1.0f});
+	if (humanSkeleton_) {
+		humanSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
+	}
 }
 void SampleScene::Finalize() {}

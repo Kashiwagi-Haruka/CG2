@@ -10,6 +10,49 @@
 namespace {
 float Dot(const Vector4& a, const Vector4& b) { return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w; }
 
+Animation::AnimationData BuildAnimationData(const aiAnimation* animationAssimp, const std::string& fallbackName) {
+	const double ticksPerSecond = (animationAssimp->mTicksPerSecond != 0.0) ? animationAssimp->mTicksPerSecond : 1.0;
+	std::string name = animationAssimp->mName.C_Str();
+	if (name.empty()) {
+		name = fallbackName;
+	}
+
+	Animation::AnimationData animation;
+	animation.name = name;
+	animation.duration = static_cast<float>(animationAssimp->mDuration / ticksPerSecond);
+
+	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; ++channelIndex) {
+		const aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
+		Animation::NodeAnimation& nodeAnimation = animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
+
+		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; ++keyIndex) {
+			const aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
+			Animation::KeyframeVector3 keyframe{};
+			keyframe.time = static_cast<float>(keyAssimp.mTime / ticksPerSecond);
+			keyframe.value = {-keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z};
+			nodeAnimation.translate.keyframes.push_back(keyframe);
+		}
+
+		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumRotationKeys; ++keyIndex) {
+			const aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
+			Animation::KeyframeVector4 keyframe{};
+			keyframe.time = static_cast<float>(keyAssimp.mTime / ticksPerSecond);
+			keyframe.value = {keyAssimp.mValue.x, -keyAssimp.mValue.y, -keyAssimp.mValue.z, keyAssimp.mValue.w};
+			nodeAnimation.rotation.keyframes.push_back(keyframe);
+		}
+
+		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumScalingKeys; ++keyIndex) {
+			const aiVectorKey& keyAssimp = nodeAnimationAssimp->mScalingKeys[keyIndex];
+			Animation::KeyframeVector3 keyframe{};
+			keyframe.time = static_cast<float>(keyAssimp.mTime / ticksPerSecond);
+			keyframe.value = {keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z};
+			nodeAnimation.scale.keyframes.push_back(keyframe);
+		}
+	}
+
+	return animation;
+}
+
 Vector4 Normalize(const Vector4& v) {
 	float length = std::sqrt(Dot(v, v));
 	if (length == 0.0f) {
@@ -52,7 +95,27 @@ Vector4 Slerp(const Vector4& start, const Vector4& end, float ratio) {
 }
 } // namespace
 
-Animation::AnimationData Animation::LoadAnimationData(const std::string& directoryPath, const std::string& filename) {
+Animation::AnimationData Animation::LoadAnimationData(const std::string& directoryPath, const std::string& filename) { return LoadAnimationData(directoryPath, filename, 0); }
+
+Animation::AnimationData Animation::LoadAnimationData(const std::string& directoryPath, const std::string& filename, size_t animationIndex) {
+	std::string filePath = directoryPath + "/" + filename + ".gltf";
+
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(filePath, 0);
+	assert(scene);
+	assert(scene->mNumAnimations != 0);
+	assert(animationIndex < scene->mNumAnimations);
+
+	const aiAnimation* animationAssimp = scene->mAnimations[animationIndex];
+	std::string fallbackName = filename;
+	if (animationIndex > 0) {
+		fallbackName += "_" + std::to_string(animationIndex);
+	}
+
+	return BuildAnimationData(animationAssimp, fallbackName);
+}
+
+std::vector<Animation::AnimationData> Animation::LoadAnimationClips(const std::string& directoryPath, const std::string& filename) {
 	std::string filePath = directoryPath + "/" + filename + ".gltf";
 
 	Assimp::Importer importer;
@@ -60,42 +123,17 @@ Animation::AnimationData Animation::LoadAnimationData(const std::string& directo
 	assert(scene);
 	assert(scene->mNumAnimations != 0);
 
-	const aiAnimation* animationAssimp = scene->mAnimations[0];
-	const double ticksPerSecond = (animationAssimp->mTicksPerSecond != 0.0) ? animationAssimp->mTicksPerSecond : 1.0;
-
-	AnimationData animation;
-	animation.duration = static_cast<float>(animationAssimp->mDuration / ticksPerSecond);
-
-	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; ++channelIndex) {
-		const aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
-		NodeAnimation& nodeAnimation = animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
-
-		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys; ++keyIndex) {
-			const aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
-			KeyframeVector3 keyframe{};
-			keyframe.time = static_cast<float>(keyAssimp.mTime / ticksPerSecond);
-			keyframe.value = {-keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z};
-			nodeAnimation.translate.keyframes.push_back(keyframe);
+	std::vector<AnimationData> animations;
+	animations.reserve(scene->mNumAnimations);
+	for (size_t index = 0; index < scene->mNumAnimations; ++index) {
+		std::string fallbackName = filename;
+		if (index > 0) {
+			fallbackName += "_" + std::to_string(index);
 		}
-
-		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumRotationKeys; ++keyIndex) {
-			const aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
-			KeyframeVector4 keyframe{};
-			keyframe.time = static_cast<float>(keyAssimp.mTime / ticksPerSecond);
-			keyframe.value = {keyAssimp.mValue.x, -keyAssimp.mValue.y, -keyAssimp.mValue.z, keyAssimp.mValue.w};
-			nodeAnimation.rotation.keyframes.push_back(keyframe);
-		}
-
-		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumScalingKeys; ++keyIndex) {
-			const aiVectorKey& keyAssimp = nodeAnimationAssimp->mScalingKeys[keyIndex];
-			KeyframeVector3 keyframe{};
-			keyframe.time = static_cast<float>(keyAssimp.mTime / ticksPerSecond);
-			keyframe.value = {keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z};
-			nodeAnimation.scale.keyframes.push_back(keyframe);
-		}
+		animations.push_back(BuildAnimationData(scene->mAnimations[index], fallbackName));
 	}
 
-	return animation;
+	return animations;
 }
 
 Vector3 Animation::CalculateValue(const AnimationCurve<Vector3>& keyframes, float time) {

@@ -82,6 +82,12 @@ void TitleScene::Update() {
 #ifdef USE_IMGUI
 	ImGui::Begin("titleScene");
 	ImGui::End();
+	if (ImGui::Begin("Scene")) {
+		if (ImGui::Button("Sample")) {
+			SceneManager::GetInstance()->ChangeScene("Sample");
+		}
+	}
+	ImGui::End();
 #endif // USE_IMGUI
 }
 void TitleScene::Draw() {

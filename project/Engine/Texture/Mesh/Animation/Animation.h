@@ -26,11 +26,14 @@ public:
 	};
 
 	struct AnimationData {
+		std::string name;
 		float duration;
 		std::map<std::string, NodeAnimation> nodeAnimations;
 	};
 
 	static AnimationData LoadAnimationData(const std::string& directoryPath, const std::string& filename);
+	static AnimationData LoadAnimationData(const std::string& directoryPath, const std::string& filename, size_t animationIndex);
+	static std::vector<AnimationData> LoadAnimationClips(const std::string& directoryPath, const std::string& filename);
 	static Vector3 CalculateValue(const AnimationCurve<Vector3>& keyframes, float time);
 	static Vector4 CalculateValue(const AnimationCurve<Vector4>& keyframes, float time);
 };

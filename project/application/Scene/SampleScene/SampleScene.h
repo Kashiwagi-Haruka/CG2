@@ -14,14 +14,14 @@
 #include <array>
 #include <cstdint>
 #include <memory>
+#include <vector>
 class SampleScene : public BaseScene {
 
 	std::unique_ptr<Object3d> uvBallObj_ = nullptr;
 	std::unique_ptr<Object3d> fieldObj_ = nullptr;
 	std::unique_ptr<Object3d> planeGltf_ = nullptr;
 	std::unique_ptr<Object3d> animatedCubeObj_ = nullptr;
-	std::unique_ptr<Object3d> humanWalkObj_ = nullptr;
-	std::unique_ptr<Object3d> humanSneakWalkObj_ = nullptr;
+	std::unique_ptr<Object3d> humanObj_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	bool useDebugCamera_ = false;
@@ -38,18 +38,14 @@ class SampleScene : public BaseScene {
 	Transform cameraTransform_{};
 	Transform planeGTransform_{};
 	Transform animatedCubeTransform_{};
-	Transform humanWalkTransform_{};
-	Transform humanSneakWalkTransform_{};
+	Transform humanTransform_{};
 
 	Animation::AnimationData animatedCubeAnimation_{};
-	Animation::AnimationData humanWalkAnimation_{};
-	Animation::AnimationData humanSneakWalkAnimation_{};
-	std::unique_ptr<Skeleton> humanWalkSkeleton_{};
-	std::unique_ptr<Skeleton> humanSneakWalkSkeleton_{};
-	SkinCluster humanWalkSkinCluster_{};
-	SkinCluster humanSneakWalkSkinCluster_{};
-	float humanWalkAnimationTime_ = 0.0f;
-	float humanSneakWalkAnimationTime_ = 0.0f;
+	std::vector<Animation::AnimationData> humanAnimationClips_{};
+	size_t currentHumanAnimationIndex_ = 0;
+	std::unique_ptr<Skeleton> humanSkeleton_{};
+	SkinCluster humanSkinCluster_{};
+	float humanAnimationTime_ = 0.0f;
 
 	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	bool enableLighting = true;
