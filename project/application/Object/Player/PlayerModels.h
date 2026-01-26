@@ -1,11 +1,15 @@
 #pragma once
+#include "Animation/Animation.h"
+#include "Animation/Skeleton.h"
+#include "Animation/SkinCluster.h"
+#include "Camera.h"
 #include "Object3d/Object3d.h"
 #include "Transform.h"
-#include "Camera.h"
 #include <memory>
+#include <vector>
 class PlayerModels {
 
-	public:
+public:
 	enum StateM {
 		idle,
 		walk,
@@ -19,12 +23,17 @@ class PlayerModels {
 
 	};
 
-	private:
+private:
 	StateM state_;
 
 	std::unique_ptr<Object3d> Sizuku_;
 	Transform player_;
 	Camera* camera_;
+	std::unique_ptr<Skeleton> sizukuSkeleton_{};
+	SkinCluster sizukuSkinCluster_{};
+	std::vector<Animation::AnimationData> sizukuAnimationClips_{};
+	float sizukuAnimationTime_ = 0.0f;
+	size_t sizukuAnimationIndex_ = 0;
 
 public:
 	PlayerModels();
@@ -35,5 +44,4 @@ public:
 	void Initialize();
 	void Update();
 	void Draw();
-
 };

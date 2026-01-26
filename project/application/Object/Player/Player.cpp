@@ -548,9 +548,8 @@ void Player::EXPMath() { parameters_.EXP += 50; }
 
 void Player::Draw() {
 
-	
-	/*playerObject_->Draw();*/
 	models_->Draw();
+	Object3dCommon::GetInstance()->DrawCommon();
 	if (isFallingAttack_) {
 		Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAdd);
 	fallingEffectObject_->Draw();
