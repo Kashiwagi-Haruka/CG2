@@ -1,6 +1,7 @@
 #pragma once
 #include "Audio.h"
 #include "BaseScene.h"
+#include "Object/Character/Model/CharacterModel.h"
 #include "CollisionManager.h"
 #include "GameBase.h"
 #include "Light/DirectionalLight.h"
@@ -53,6 +54,8 @@ private:
 	bool isPause = false;
 
 	SoundData BGMData;
+
+	CharacterModel characterModel;
 
 	// レベルアップ選択専用スプライト
 	std::unique_ptr<Sprite> levelupIcons[4]; // 0:Atk, 1:Speed, 2:HP, 3:Allow

@@ -22,6 +22,7 @@ class PlayerModels {
 	private:
 	StateM state_;
 
+	std::unique_ptr<Object3d> Sizuku_;
 	std::unique_ptr<Object3d> head_;
 	std::unique_ptr<Object3d> armR_;
 	std::unique_ptr<Object3d> armL_;

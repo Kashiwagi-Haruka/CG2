@@ -1,5 +1,5 @@
 #include "CharacterModel.h"
-
-void CharacterModel::LoadModel() {
-	
+#include "Model/ModelManager.h"
+void CharacterModel::LoadModel() { 
+	ModelManager::GetInstance()->LoadGltfModel("Resources/3d", "sizuku"); 
 }

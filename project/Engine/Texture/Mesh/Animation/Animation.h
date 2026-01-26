@@ -14,6 +14,7 @@ public:
 
 	using KeyframeVector3 = Keyframe<Vector3>;
 	using KeyframeVector4 = Keyframe<Vector4>;
+	using KeyframeFloat = Keyframe<float>;
 
 	template<typename tValue> struct AnimationCurve {
 		std::vector<Keyframe<tValue>> keyframes;
@@ -23,6 +24,7 @@ public:
 		AnimationCurve<Vector3> translate;
 		AnimationCurve<Vector4> rotation;
 		AnimationCurve<Vector3> scale;
+		AnimationCurve<float> misc;
 	};
 
 	struct AnimationData {
@@ -36,4 +38,6 @@ public:
 	static std::vector<AnimationData> LoadAnimationClips(const std::string& directoryPath, const std::string& filename);
 	static Vector3 CalculateValue(const AnimationCurve<Vector3>& keyframes, float time);
 	static Vector4 CalculateValue(const AnimationCurve<Vector4>& keyframes, float time);
+	static float CalculateValue(const AnimationCurve<float>& keyframes, float time);
+	static float CalculateValueOrDefault(const AnimationCurve<float>& keyframes, float time, float defaultValue);
 };

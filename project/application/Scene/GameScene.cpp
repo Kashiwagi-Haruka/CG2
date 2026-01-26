@@ -14,7 +14,7 @@
 #include <numbers>
 
 GameScene::GameScene() {
-
+	characterModel.LoadModel();
 	cameraController = std::make_unique<CameraController>();
 	particles = std::make_unique<Particles>();
 	skyDome = std::make_unique<SkyDome>();

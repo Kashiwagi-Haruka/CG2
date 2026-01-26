@@ -17,7 +17,7 @@ PlayerModels::~PlayerModels() {};
 
 void PlayerModels::Initialize() {
 
-
+	Sizuku_ = std::make_unique<Object3d>();
 
 	head_ = std::make_unique<Object3d>();
 	armR_ = std::make_unique<Object3d>();
@@ -25,17 +25,23 @@ void PlayerModels::Initialize() {
 	legR_ = std::make_unique<Object3d>();
 	legL_ = std::make_unique<Object3d>();
 
+	Sizuku_->SetModel("sizuku");
+
 	head_->SetModel("playerbody");
 	armR_->SetModel("playerRarm");
 	armL_->SetModel("playerLarm");
 	legL_->SetModel("playerLleg");
 	legR_->SetModel("playerRleg");
 
+	Sizuku_->Initialize();
+
 	head_->Initialize();
 	armR_->Initialize();
 	armL_->Initialize();
 	legL_->Initialize();
 	legR_->Initialize();
+
+
 
 	// ★ ローカル位置（player基準）
 	headT_ = {
@@ -207,6 +213,10 @@ void PlayerModels::Draw() {
 	Matrix4x4 legRM = Function::MakeAffineMatrix(legRT_.scale, legRT_.rotate, legRT_.translate);
 	Matrix4x4 legLM = Function::MakeAffineMatrix(legLT_.scale, legLT_.rotate, legLT_.translate);
 
+	Sizuku_->SetWorldMatrix(playerWorld);
+	Sizuku_->SetCamera(camera_);
+	Sizuku_->Update();
+	Sizuku_->Draw();
 
 	// head
 	head_->SetWorldMatrix(Function::Multiply(bodyM, playerWorld));

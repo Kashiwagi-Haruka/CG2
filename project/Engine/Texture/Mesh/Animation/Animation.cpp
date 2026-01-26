@@ -171,3 +171,27 @@ Vector4 Animation::CalculateValue(const AnimationCurve<Vector4>& keyframes, floa
 
 	return keyframes.keyframes.back().value;
 }
+float Animation::CalculateValue(const AnimationCurve<float>& keyframes, float time) {
+	assert(!keyframes.keyframes.empty());
+	if (keyframes.keyframes.size() == 1 || time <= keyframes.keyframes.front().time) {
+		return keyframes.keyframes.front().value;
+	}
+
+	for (size_t index = 0; index + 1 < keyframes.keyframes.size(); ++index) {
+		const KeyframeFloat& current = keyframes.keyframes[index];
+		const KeyframeFloat& next = keyframes.keyframes[index + 1];
+		if (current.time <= time && time <= next.time) {
+			float t = (time - current.time) / (next.time - current.time);
+			return Function::Lerp(current.value, next.value, t);
+		}
+	}
+
+	return keyframes.keyframes.back().value;
+}
+
+float Animation::CalculateValueOrDefault(const AnimationCurve<float>& keyframes, float time, float defaultValue) {
+	if (keyframes.keyframes.empty()) {
+		return defaultValue;
+	}
+	return CalculateValue(keyframes, time);
+}
