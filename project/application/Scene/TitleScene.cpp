@@ -17,6 +17,7 @@ TitleScene::TitleScene() {
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Rendez-vous_2.mp3");
 	Audio::GetInstance()->SetSoundVolume(&BGMData, 0.3f);
 	transition = std::make_unique<SceneTransition>();
+	characterModel_.LoadModel();
 }
 
 void TitleScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGMData); }
@@ -69,6 +70,9 @@ void TitleScene::Update() {
 		transition->Initialize(true);
 		isTransitionOut = true;
 	}
+	if (GameBase::GetInstance()->TriggerKey(DIK_T)) {
+		SceneManager::GetInstance()->ChangeScene("Tutorial");
+	}
 	if (isTransitionIn || isTransitionOut) {
 		transition->Update();
 		if (transition->IsEnd() && isTransitionIn) {
@@ -85,6 +89,9 @@ void TitleScene::Update() {
 	if (ImGui::Begin("Scene")) {
 		if (ImGui::Button("Sample")) {
 			SceneManager::GetInstance()->ChangeScene("Sample");
+		}
+		if (ImGui::Button("Tutorial")) {
+			SceneManager::GetInstance()->ChangeScene("Tutorial");
 		}
 	}
 	ImGui::End();
