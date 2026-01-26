@@ -39,7 +39,7 @@ void Player::Initialize(Camera* camera) {
 	state_ = State::kIdle;
 	velocity_ = {0.0f, 0.0f, 0.0f};
 	transform_ = {
-	    .scale{2.0f, 2.0f, 2.0f},
+	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
         .translate{-100.0f, 3.0f, -100.0f}
     };
