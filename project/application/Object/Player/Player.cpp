@@ -13,8 +13,7 @@
 #endif // USE_IMGUI
 
 Player::Player() {
-	ModelManager::GetInstance()->LoadGltfModel("Resources/3d","astralPlayer");
-	ModelManager::GetInstance()->LoadModel("Resources/3d","playerModel");
+
 	ModelManager::GetInstance()->LoadModel("Resources/3d","FallingEffect");
 	ModelManager::GetInstance()->LoadModel("Resources/3d","playerSkillUp");
 	ModelManager::GetInstance()->LoadModel("Resources/3d","playerSkillUnder");
@@ -42,7 +41,7 @@ void Player::Initialize(Camera* camera) {
 	transform_ = {
 	    .scale{2.0f, 2.0f, 2.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{-100.0f, 2.5f, -100.0f}
+        .translate{-100.0f, 3.0f, -100.0f}
     };
 
 	playerObject_->Initialize();
@@ -257,8 +256,8 @@ void Player::Falling() {
 			models_->SetStateM(PlayerModels::StateM::idle);
 		}
 
-		if (transform_.translate.y <= 2.5f) {
-			transform_.translate.y = 2.5f;
+		if (transform_.translate.y <= 3.0f) {
+			transform_.translate.y = 3.0f;
 			velocity_.y = 0.0f;
 			isfalling = false;
 

@@ -23,22 +23,6 @@ class PlayerModels {
 	StateM state_;
 
 	std::unique_ptr<Object3d> Sizuku_;
-	std::unique_ptr<Object3d> head_;
-	std::unique_ptr<Object3d> armR_;
-	std::unique_ptr<Object3d> armL_;
-	std::unique_ptr<Object3d> legR_;
-	std::unique_ptr<Object3d> legL_;
-
-	Transform headT_;
-	Transform armRT_;
-	Transform armLT_;
-	Transform legRT_;
-	Transform legLT_;
-	Transform headBaseT_;
-	Transform armRBaseT_;
-	Transform armLBaseT_;
-	Transform legRBaseT_;
-	Transform legLBaseT_;
 	Transform player_;
 	Camera* camera_;
 
