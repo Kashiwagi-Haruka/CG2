@@ -24,7 +24,6 @@ public:
 		AnimationCurve<Vector3> translate;
 		AnimationCurve<Vector4> rotation;
 		AnimationCurve<Vector3> scale;
-		AnimationCurve<float> misc;
 	};
 
 	struct AnimationData {

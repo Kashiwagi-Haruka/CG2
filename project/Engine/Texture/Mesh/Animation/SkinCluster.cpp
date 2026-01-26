@@ -62,13 +62,43 @@ SkinCluster CreateSkinCluster(ModelCommon* modelCommon, const Skeleton& skeleton
 		skinCluster.inverseBindPoseMatrices[*jointIndex] = jointWeight.inverseBindPoseMatrix;
 		for (const auto& vertexWeight : jointWeight.vertexWeights) {
 			auto& currentInfluence = skinCluster.mappedInfluence[vertexWeight.vertexIndex];
+			uint32_t targetIndex = kNumMaxInfluence;
 			for (uint32_t index = 0; index < kNumMaxInfluence; ++index) {
 				if (currentInfluence.weights[index] == 0.0f) {
-					currentInfluence.weights[index] = vertexWeight.weight;
-					currentInfluence.jointIndices[index] = *jointIndex;
+					targetIndex = index;
 					break;
 				}
 			}
+
+			if (targetIndex == kNumMaxInfluence) {
+				float minWeight = currentInfluence.weights[0];
+				targetIndex = 0;
+				for (uint32_t index = 1; index < kNumMaxInfluence; ++index) {
+					if (currentInfluence.weights[index] < minWeight) {
+						minWeight = currentInfluence.weights[index];
+						targetIndex = index;
+					}
+				}
+				if (vertexWeight.weight <= minWeight) {
+					continue;
+				}
+			}
+
+			currentInfluence.weights[targetIndex] = vertexWeight.weight;
+			currentInfluence.jointIndices[targetIndex] = *jointIndex;
+		}
+	}
+
+	for (auto& influence : skinCluster.mappedInfluence) {
+		float weightSum = 0.0f;
+		for (float weight : influence.weights) {
+			weightSum += weight;
+		}
+		if (weightSum <= 0.0f) {
+			continue;
+		}
+		for (float& weight : influence.weights) {
+			weight /= weightSum;
 		}
 	}
 

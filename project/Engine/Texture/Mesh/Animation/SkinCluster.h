@@ -11,7 +11,7 @@
 #include <vector>
 #include <wrl.h>
 
-constexpr uint32_t kNumMaxInfluence = 5;
+constexpr uint32_t kNumMaxInfluence = 4;
 
 struct VertexInfluence {
 	std::array<float, kNumMaxInfluence> weights{};
