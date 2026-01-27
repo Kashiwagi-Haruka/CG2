@@ -6,6 +6,7 @@
 #include "Object3d/Object3d.h"
 #include "Transform.h"
 #include <memory>
+#include <optional>
 #include <vector>
 class PlayerModels {
 
@@ -44,4 +45,5 @@ public:
 	void Initialize();
 	void Update();
 	void Draw();
+	std::optional<Matrix4x4> GetJointWorldMatrix(const std::string& jointName) const;
 };

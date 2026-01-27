@@ -1,8 +1,10 @@
 #pragma once
 #include "Camera.h"
+#include "Matrix4x4.h"
 #include "Object3d/Object3d.h"
 #include "Transform.h"
 #include <memory>
+#include <optional>
 
 class PlayerSword {
 
@@ -14,17 +16,16 @@ class PlayerSword {
 
 	bool isAttacking_ = false;
 	float attackTimer_ = 0.0f;
-	float attackDuration_ = 0.3f; // 攻撃の持続時間
-	int currentComboStep_ = 0;    // 現在のコンボ段階
+	float attackDuration_ = 0.3f;      // 攻撃の持続時間
+	int currentComboStep_ = 0;         // 現在のコンボ段階
 	float distanceFromPlayer_ = -1.5f; // プレイヤーからの距離
-	float playerYaw_ = 0.0f;          // プレイヤーの向き（ヨー角）
-
+	float playerYaw_ = 0.0f;           // プレイヤーの向き（ヨー角）
 
 public:
 	PlayerSword();
 
 	void Initialize();
-	void Update(const Transform& playerTransform);
+	void Update(const Transform& playerTransform, const std::optional<Matrix4x4>& jointWorldMatrix);
 	void Draw();
 
 	void StartAttack(int comboStep = 1); // コンボ段階を受け取る (1-4:通常攻撃, 5:落下攻撃, 6:重撃)

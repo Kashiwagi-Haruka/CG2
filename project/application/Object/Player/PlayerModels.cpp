@@ -120,3 +120,21 @@ void PlayerModels::Draw() {
 	}
 #endif
 }
+std::optional<Matrix4x4> PlayerModels::GetJointWorldMatrix(const std::string& jointName) const {
+	if (!sizukuSkeleton_) {
+		return std::nullopt;
+	}
+
+	const auto jointIndex = sizukuSkeleton_->FindJointIndex(jointName);
+	if (!jointIndex.has_value()) {
+		return std::nullopt;
+	}
+
+	const auto& joints = sizukuSkeleton_->GetJoints();
+	if (*jointIndex < 0 || static_cast<size_t>(*jointIndex) >= joints.size()) {
+		return std::nullopt;
+	}
+
+	const Matrix4x4 playerWorld = Function::MakeAffineMatrix(player_.scale, player_.rotate, player_.translate);
+	return Function::Multiply(joints[*jointIndex].skeletonSpaceMatrix, playerWorld);
+}

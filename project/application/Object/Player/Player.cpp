@@ -483,12 +483,13 @@ void Player::Update() {
 	fallingEffectObject_->SetCamera(camera_);
 	fallingEffectObject_->SetTransform(fallingEffectTransform_);
 	fallingEffectObject_->Update();
-	sword_->SetCamera(camera_);
-	sword_->SetPlayerYaw(transform_.rotate.y);
-	sword_->Update(transform_);
 	models_->SetCamera(camera_);
 	models_->SetPlayerTransform(transform_);
 	models_->Update();
+	const auto swordJointMatrix = models_->GetJointWorldMatrix("剣と手の間");
+	sword_->SetCamera(camera_);
+	sword_->SetPlayerYaw(transform_.rotate.y);
+	sword_->Update(transform_, swordJointMatrix);
 	
 	if (isSkillAttack) {
 	skill_->SetCamera(camera_);
