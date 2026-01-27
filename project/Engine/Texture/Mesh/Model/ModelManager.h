@@ -4,7 +4,6 @@
 #include <string>
 
 class Model;
-class ModelCommon;
 class DirectXCommon;
 
 class ModelManager {
@@ -15,7 +14,7 @@ class ModelManager {
 	ModelManager& operator=(ModelManager&) = delete;
 
 	std::map<std::string, std::unique_ptr<Model>> models;
-	std::unique_ptr<ModelCommon> modelCommon_ = nullptr;
+	
 
 public:
 	ModelManager() = default;
@@ -27,6 +26,4 @@ public:
 	void LoadGltfModel(const std::string& directionalPath, const std::string& filePath);
 	Model* FindModel(const std::string& filePath);
 	void Finalize();
-
-	ModelCommon* GetModelCommon() const { return modelCommon_.get(); }
 };

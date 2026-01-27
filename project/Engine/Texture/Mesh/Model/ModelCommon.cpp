@@ -1,6 +1,18 @@
 #include "ModelCommon.h"
 #include "DirectXCommon.h"
+#include "TextureManager.h"
+#include "SrvManager/SrvManager.h"
+#include "Object3d/Object3dCommon.h"
+std::unique_ptr<ModelCommon> ModelCommon::instance = nullptr;
+
+ModelCommon* ModelCommon::GetInstance() {
+	if (instance == nullptr) {
+		instance = std::make_unique<ModelCommon>();
+	}
+	return instance.get();
+}
 void ModelCommon::Initialize(DirectXCommon* dxCommon) { dxCommon_ = dxCommon; }
+
 Microsoft::WRL::ComPtr<ID3D12Resource> ModelCommon::CreateBufferResource(size_t sizeInBytes) {
 	// バッファの設定（UPLOAD用に変更）
 	D3D12_HEAP_PROPERTIES heapProperties = {};

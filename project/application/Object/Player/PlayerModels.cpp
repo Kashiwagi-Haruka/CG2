@@ -32,7 +32,7 @@ void PlayerModels::Initialize() {
 
 	if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("sizuku")) {
 		sizukuSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
-		sizukuSkinCluster_ = CreateSkinCluster(ModelManager::GetInstance()->GetModelCommon(), *sizukuSkeleton_, *sizukuModel);
+		sizukuSkinCluster_ = CreateSkinCluster(*sizukuSkeleton_, *sizukuModel);
 		if (!sizukuSkinCluster_.mappedPalette.empty()) {
 			Sizuku_->SetSkinCluster(&sizukuSkinCluster_);
 		}

@@ -13,9 +13,8 @@ ModelManager* ModelManager::GetInstance() {
 }
 
 void ModelManager::Initialize(DirectXCommon* dxCommon) {
-	modelCommon_ = std::make_unique<ModelCommon>();
-	modelCommon_->Initialize(dxCommon);
-}
+	
+	ModelCommon::GetInstance()->Initialize(dxCommon); }
 
 void ModelManager::LoadModel(const std::string& directionalPath, const std::string& filePath) {
 
@@ -25,7 +24,7 @@ void ModelManager::LoadModel(const std::string& directionalPath, const std::stri
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
 	model->LoadObjFileAssimp(directionalPath, filePath + ".obj");
-	model->Initialize(modelCommon_.get());
+	model->Initialize();
 	models.insert(std::make_pair(filePath, std::move(model)));
 }
 void ModelManager::LoadGltfModel(const std::string& directionalPath, const std::string& filePath) {
@@ -59,7 +58,7 @@ void ModelManager::LoadGltfModel(const std::string& directionalPath, const std::
 
 	std::unique_ptr<Model> model = std::make_unique<Model>();
 	model->LoadObjFileGltf(directoryPath.string(), filename);
-	model->Initialize(modelCommon_.get());
+	model->Initialize();
 	models.insert(std::make_pair(filePath, std::move(model)));
 }
 

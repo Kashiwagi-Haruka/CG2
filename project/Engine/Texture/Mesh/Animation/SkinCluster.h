@@ -34,5 +34,5 @@ struct SkinCluster {
 	uint32_t paletteSrvIndex = 0;
 };
 
-SkinCluster CreateSkinCluster(ModelCommon* modelCommon, const Skeleton& skeleton, const Model& model);
+SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model);
 void UpdateSkinCluster(SkinCluster& skinCluster, const Skeleton& skeleton);

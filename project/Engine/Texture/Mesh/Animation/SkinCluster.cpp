@@ -6,13 +6,10 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include "Model/ModelCommon.h"
 
-SkinCluster CreateSkinCluster(ModelCommon* modelCommon, const Skeleton& skeleton, const Model& model) {
+SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model) {
 	SkinCluster skinCluster{};
-	if (!modelCommon) {
-		Logger::Log("CreateSkinCluster failed: ModelCommon is null.\n");
-		return skinCluster;
-	}
 
 	const auto& joints = skeleton.GetJoints();
 	if (joints.empty()) {
@@ -23,7 +20,7 @@ SkinCluster CreateSkinCluster(ModelCommon* modelCommon, const Skeleton& skeleton
 	const auto& modelData = model.GetModelData();
 
 	// palette用Resourceを確保
-	skinCluster.paletteResource = modelCommon->CreateBufferResource(sizeof(WellForGPU) * joints.size());
+	skinCluster.paletteResource = ModelCommon::GetInstance()->CreateBufferResource(sizeof(WellForGPU) * joints.size());
 	WellForGPU* mappedPalette = nullptr;
 	skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedPalette));
 	skinCluster.mappedPalette = {mappedPalette, joints.size()};
@@ -37,7 +34,7 @@ SkinCluster CreateSkinCluster(ModelCommon* modelCommon, const Skeleton& skeleton
 	srvManager->CreateSRVforStructuredBuffer(skinCluster.paletteSrvIndex, skinCluster.paletteResource.Get(), static_cast<UINT>(joints.size()), sizeof(WellForGPU));
 
 	// Influence用Resourceを確保
-	skinCluster.influenceResource = modelCommon->CreateBufferResource(sizeof(VertexInfluence) * modelData.vertices.size());
+	skinCluster.influenceResource = ModelCommon::GetInstance()->CreateBufferResource(sizeof(VertexInfluence) * modelData.vertices.size());
 	VertexInfluence* mappedInfluence = nullptr;
 	skinCluster.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
 	std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * modelData.vertices.size());

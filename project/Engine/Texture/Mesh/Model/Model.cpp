@@ -11,11 +11,9 @@
 #include <fstream>
 #include <sstream>
 
-void Model::Initialize(ModelCommon* modelCommon) {
+void Model::Initialize() {
 
-	modelCommon_ = modelCommon;
-
-	vertexResource_ = modelCommon_->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+	vertexResource_ = ModelCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
@@ -25,7 +23,7 @@ void Model::Initialize(ModelCommon* modelCommon) {
 	std::memcpy(vertexData, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
 	vertexResource_->Unmap(0, nullptr);
 	if (!modelData_.indices.empty()) {
-		indexResource_ = modelCommon_->CreateBufferResource(sizeof(uint32_t) * modelData_.indices.size());
+		indexResource_ = ModelCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * modelData_.indices.size());
 		indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
 		indexBufferView_.SizeInBytes = UINT(sizeof(uint32_t) * modelData_.indices.size());
 		indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
@@ -39,7 +37,7 @@ void Model::Initialize(ModelCommon* modelCommon) {
 	// 3D用（球など陰影つけたいもの）
 	// 必ず256バイト単位で切り上げる
 	size_t alignedSize = (sizeof(Material) + 0xFF) & ~0xFF;
-	materialResource_ = modelCommon_->CreateBufferResource(alignedSize);
+	materialResource_ = ModelCommon::GetInstance()->CreateBufferResource(alignedSize);
 	mat3d = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&mat3d));
 	mat3d->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -85,27 +83,27 @@ void Model::Draw(const SkinCluster* skinCluster) {
 	// --- SRVヒープをバインド ---
 	ID3D12DescriptorHeap* descriptorHeaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
 
-	modelCommon_->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+	ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	// --- VertexBufferViewを設定 ---
 	if (skinCluster) {
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferViews[] = {vertexBufferView_, skinCluster->influenceBufferView};
-		modelCommon_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, _countof(vertexBufferViews), vertexBufferViews);
+		ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, _countof(vertexBufferViews), vertexBufferViews);
 		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(kMatrixPaletteRootParameterIndex, skinCluster->paletteSrvIndex);
 	} else {
-		modelCommon_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+		ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	}
 	if (!modelData_.indices.empty()) {
-		modelCommon_->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
+		ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
 	}
 
 	// --- マテリアルCBufferの場所を設定 ---
-	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
 	// --- SRVのDescriptorTableの先頭を設定 ---
 	// TextureManagerからSRVのGPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex);
-	modelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvHandle);
+	ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvHandle);
 
 	// --- PointLight SRVのDescriptorTableを設定 ---
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
@@ -121,9 +119,9 @@ void Model::Draw(const SkinCluster* skinCluster) {
 
 	// --- 描画！（DrawCall）---
 	if (!modelData_.indices.empty()) {
-		modelCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(modelData_.indices.size()), 1, 0, 0, 0);
+		ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(modelData_.indices.size()), 1, 0, 0, 0);
 	} else {
-		modelCommon_->GetDxCommon()->GetCommandList()->DrawInstanced(
+		ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->DrawInstanced(
 		    static_cast<UINT>(modelData_.vertices.size()), // 頂点数
 		    1,                                             // インスタンス数
 		    0,                                             // 開始頂点位置

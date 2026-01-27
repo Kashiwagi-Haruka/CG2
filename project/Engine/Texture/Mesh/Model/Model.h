@@ -13,7 +13,7 @@
 #include <vector>
 #include <wrl.h>
 
-class ModelCommon;
+
 struct SkinCluster;
 class Model {
 public:
@@ -47,7 +47,7 @@ private:
 		float padding2[2];
 	};
 
-	ModelCommon* modelCommon_;
+	
 
 	ModelData modelData_;
 
@@ -63,7 +63,7 @@ private:
 	Node NodeRead(aiNode* node);
 
 public:
-	void Initialize(ModelCommon* modelCommon);
+	void Initialize();
 	void LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	void LoadObjFileAssimp(const std::string& directoryPath, const std::string& filename);
 	void LoadObjFileGltf(const std::string& directoryPath, const std::string& filename);

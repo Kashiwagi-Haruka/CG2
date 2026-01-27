@@ -87,7 +87,7 @@ void SampleScene::Initialize() {
 
 	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
 		humanSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
-		humanSkinCluster_ = CreateSkinCluster(ModelManager::GetInstance()->GetModelCommon(), *humanSkeleton_, *walkModel);
+		humanSkinCluster_ = CreateSkinCluster(*humanSkeleton_, *walkModel);
 		if (!humanSkinCluster_.mappedPalette.empty()) {
 			humanObj_->SetSkinCluster(&humanSkinCluster_);
 		}
