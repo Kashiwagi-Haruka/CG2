@@ -83,36 +83,42 @@ void Object3dCommon::SetEnvironmentMapTexture(const std::string& filePath) {
 	TextureManager::GetInstance()->LoadTextureName(environmentMapPath_);
 	environmentMapSrvIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(environmentMapPath_);
 }
+void Object3dCommon::DrawSet(){
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, Object3dCommon::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, Object3dCommon::GetInstance()->GetPointLightCountResource()->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, Object3dCommon::GetInstance()->GetSpotLightCountResource()->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(7, Object3dCommon::GetInstance()->GetAreaLightCountResource()->GetGPUVirtualAddress());
+}
 void Object3dCommon::DrawCommon() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(pso_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get());
-
+	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonNoDepth() {
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoNoDepth_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoNoDepth_->GetGraphicsPipelineState(blendMode_).Get());
-
+	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonWireframeNoDepth() {
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoWireframeNoDepth_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoWireframeNoDepth_->GetGraphicsPipelineState(blendMode_).Get());
-
+	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonLineNoDepth() {
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoLineNoDepth_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoLineNoDepth_->GetGraphicsPipelineState(blendMode_).Get());
-
+	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 }
 void Object3dCommon::DrawCommonSkinning() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinning_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinning_->GetGraphicsPipelineState(blendMode_).Get());
-
+	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::SetDirectionalLight(DirectionalLight& light) { *directionalLightData_ = light; }

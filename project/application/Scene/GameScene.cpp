@@ -280,9 +280,11 @@ void GameScene::Update() {
 		pointLights_[1].position = {player->GetPosition().x, player->GetPosition().y + 4, player->GetPosition().z};
 	}
 	pointLights_[2].position = {player->GetPosition().x, player->GetPosition().y + 2, player->GetPosition().z};
+
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
+
 	skyDome->SetCamera(cameraController->GetCamera());
 	player->SetCamera(cameraController->GetCamera());
 	field->SetCamera(cameraController->GetCamera());

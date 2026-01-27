@@ -54,6 +54,8 @@ private:
 	uint32_t environmentMapSrvIndex_ = 0;
 	std::string environmentMapPath_;
 
+	void DrawSet();
+
 public:
 	static Object3dCommon* GetInstance();
 	Object3dCommon();

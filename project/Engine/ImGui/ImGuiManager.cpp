@@ -57,6 +57,11 @@ void ImGuiManager::Begin() {
 	ImGui_ImplWin32_NewFrame();
 
 	ImGui::NewFrame();
+	ImGuiIO& io = ImGui::GetIO();
+	if (ImGui::Begin("Performance")) {
+		ImGui::Text("FPS: %.1f", io.Framerate);
+	}
+	ImGui::End();
 #endif
 }
 
