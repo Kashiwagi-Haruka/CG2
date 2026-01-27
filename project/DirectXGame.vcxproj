@@ -156,7 +156,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application\CollisionManager.cpp" />
+    <ClCompile Include="application\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyAttack.cpp" />
     <ClCompile Include="application\Object\Enemy\EnemyHitEffect.cpp" />
@@ -221,7 +221,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\Background\SkyDome.cpp" />
     <ClCompile Include="application\Scene\ResultScene.cpp" />
     <ClCompile Include="application\Scene\TitleScene.cpp" />
-    <ClCompile Include="application\UIManager.cpp" />
+    <ClCompile Include="application\UIManager\UIManager.cpp" />
     <ClCompile Include="application\SceneTransition\SceneTransition.cpp" />
     <ClCompile Include="application\Particles\Particles.cpp" />
     <ClCompile Include="Engine\BaseScene\SceneManager.cpp" />
@@ -259,7 +259,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <None Include="Resources\shader\Sprite\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="application\CollisionManager.h" />
+    <ClInclude Include="application\CollisionManager\CollisionManager.h" />
     <ClInclude Include="Engine\math\QuaternionTransform.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h" />
     <ClInclude Include="application\Object\Enemy\EnemyAttack.h" />
@@ -324,7 +324,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\Background\SkyDome.h" />
     <ClInclude Include="application\Scene\ResultScene.h" />
     <ClInclude Include="application\Scene\TitleScene.h" />
-    <ClInclude Include="application\UIManager.h" />
+    <ClInclude Include="application\UIManager\UIManager.h" />
     <ClInclude Include="application\SceneTransition\SceneTransition.h" />
     <ClInclude Include="application\Particles\Particles.h" />
     <ClInclude Include="Engine\BaseScene\SceneManager.h" />

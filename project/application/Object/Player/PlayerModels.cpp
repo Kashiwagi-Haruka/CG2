@@ -7,9 +7,7 @@
 #include <cmath>
 #include <numbers>
 
-PlayerModels::PlayerModels() {
-
-};
+PlayerModels::PlayerModels() : state_(StateM::idle) {};
 PlayerModels::~PlayerModels() {};
 
 void PlayerModels::Initialize() {
@@ -45,12 +43,13 @@ void PlayerModels::Update() {
 
 	static float t = 0.0f;
 	t += 0.1f;
+	const char* desiredAnimationName = "Idle";
 	switch (state_) {
 	case PlayerModels::idle:
-
+		desiredAnimationName = "Idle";
 		break;
 	case PlayerModels::walk:
-
+		desiredAnimationName = "Walk";
 		break;
 	case PlayerModels::attack1:
 
@@ -75,6 +74,22 @@ void PlayerModels::Update() {
 		break;
 	default:
 		break;
+	}
+	
+	if (!sizukuAnimationClips_.empty()) {
+		size_t desiredIndex = sizukuAnimationIndex_;
+		for (size_t i = 0; i < sizukuAnimationClips_.size(); ++i) {
+			if (sizukuAnimationClips_[i].name == desiredAnimationName) {
+				desiredIndex = i;
+				break;
+			}
+		}
+
+		if (desiredIndex != sizukuAnimationIndex_) {
+			sizukuAnimationIndex_ = desiredIndex;
+			sizukuAnimationTime_ = 0.0f;
+			Sizuku_->SetAnimation(&sizukuAnimationClips_[sizukuAnimationIndex_], true);
+		}
 	}
 
 	if (sizukuSkeleton_ && !sizukuAnimationClips_.empty()) {

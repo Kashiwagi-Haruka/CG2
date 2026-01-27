@@ -2,7 +2,7 @@
 #include "Audio.h"
 #include "BaseScene.h"
 #include "Object/Character/Model/CharacterModel.h"
-#include "CollisionManager.h"
+#include "CollisionManager/CollisionManager.h"
 #include "GameBase.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
@@ -14,7 +14,7 @@
 #include "Pause/Pause.h"
 #include "SceneTransition/SceneTransition.h"
 #include "Sprite.h"
-#include "UIManager.h"
+#include "UIManager/UIManager.h"
 #include "Vector2.h"
 #include <array>
 #include <cstdint>

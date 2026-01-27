@@ -486,7 +486,7 @@ void Player::Update() {
 	models_->SetCamera(camera_);
 	models_->SetPlayerTransform(transform_);
 	models_->Update();
-	const auto swordJointMatrix = models_->GetJointWorldMatrix("剣と手の間");
+	const auto swordJointMatrix = models_->GetJointWorldMatrix("剣");
 	sword_->SetCamera(camera_);
 	sword_->SetPlayerYaw(transform_.rotate.y);
 	sword_->Update(transform_, swordJointMatrix);

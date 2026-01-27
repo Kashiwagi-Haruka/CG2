@@ -77,49 +77,6 @@ void PlayerSword::Update(const Transform& playerTransform, const std::optional<M
 	// 攻撃中は振る
 	if (isAttacking_) {
 		attackTimer_ += 1.0f / 60.0f;
-
-		// コンボ段階ごとに異なるモーション
-		switch (currentComboStep_) {
-		case 1: // 1段目: 横薙ぎ
-			swordTransform.rotate.y += attackTimer_ * 8.0f;
-			swordTransform.rotate.x -= attackTimer_ * 2.0f;
-			break;
-
-		case 2: // 2段目: 縦斬り
-			swordTransform.rotate.x -= attackTimer_ * 10.0f;
-			swordTransform.rotate.z -= attackTimer_ * 3.0f;
-			break;
-
-		case 3: // 3段目: 回転斬り
-			swordTransform.rotate.y += attackTimer_ * 12.0f;
-			swordTransform.rotate.z += attackTimer_ * 4.0f;
-			break;
-
-		case 4: // 4段目: 強烈な叩きつけ
-			swordTransform.rotate.x -= attackTimer_ * 15.0f;
-			swordTransform.rotate.z -= attackTimer_ * 8.0f;
-			swordTransform.translate.y += attackTimer_ * 2.0f; // 上から振り下ろす
-			break;
-
-		case 5:                                 // 落下攻撃: 真下に突き刺す
-			swordTransform.rotate.x -= 3.14f;   // 真下に向ける
-			swordTransform.translate.y -= 1.0f; // 下に伸ばす
-			// 回転エフェクト
-			swordTransform.rotate.y += attackTimer_ * 20.0f;
-			break;
-
-		case 6: // 重撃: 大振りの横薙ぎ
-			swordTransform.rotate.y += attackTimer_ * 18.0f;
-			swordTransform.rotate.z += attackTimer_ * 10.0f;
-			swordTransform.translate.x += attackTimer_ * 3.0f; // 大きく振る
-			break;
-
-		default:
-			swordTransform.rotate.x -= attackTimer_ * 3.0f;
-			swordTransform.rotate.z -= attackTimer_ * 6.0f;
-			break;
-		}
-
 		// 攻撃終了判定
 		if (attackTimer_ >= attackDuration_) {
 			isAttacking_ = false;

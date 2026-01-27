@@ -198,7 +198,7 @@
     <ClCompile Include="application\SceneTransition\SceneTransition.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="application\UIManager.cpp">
+    <ClCompile Include="application\UIManager\UIManager.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="application\Object\Player\Player.cpp">
@@ -321,7 +321,7 @@
     <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="application\CollisionManager.cpp">
+    <ClCompile Include="application\CollisionManager\CollisionManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\Scene\TutorialScene.cpp">
@@ -440,7 +440,7 @@
     <ClInclude Include="application\SceneTransition\SceneTransition.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="application\UIManager.h">
+    <ClInclude Include="application\UIManager\UIManager.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="application\Object\Player\Player.h">
@@ -602,7 +602,7 @@
     <ClInclude Include="Engine\Texture\Particle\ParticleManager.h">
       <Filter>ヘッダー ファイル\Engine\Texture\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="application\CollisionManager.h">
+    <ClInclude Include="application\CollisionManager\CollisionManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Scene\TutorialScene.h">
