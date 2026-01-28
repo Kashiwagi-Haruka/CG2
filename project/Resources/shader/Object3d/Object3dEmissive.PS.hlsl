@@ -39,8 +39,13 @@ PixelShaderOutput main(VertexShaderOutput input)
     float softRim = smoothstep(0.0f, 0.9f, rim);
     float glow = pow(softRim, 1.4f);
     float halo = pow(softRim, 3.0f);
+    float luminance = dot(baseColor, float3(0.2126f, 0.7152f, 0.0722f));
+    float glowMask = smoothstep(0.2f, 0.85f, luminance);
+    float glowRamp = smoothstep(0.35f, 0.95f, softRim);
+    float glowStrength = 1.0f + saturate(gMaterial.environmentCoefficient) * 2.0f;
+    float3 glowColor = baseColor * glowStrength * (glowMask * 1.2f + glowRamp * 1.6f);
 
-    output.color.rgb = baseColor * (1.4f + glow * 3.0f) + baseColor * (halo * 2.5f);
+    output.color.rgb = baseColor * (1.4f + glow * 3.0f) + baseColor * (halo * 2.5f) + glowColor;
     output.color.a = textureColor.a * gMaterial.color.a;
 
     if (textureColor.a < 0.5f)

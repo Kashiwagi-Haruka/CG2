@@ -33,6 +33,8 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	psoNoCull_->Create(D3D12_CULL_MODE_NONE);
 	psoNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoNoDepth_->Create(D3D12_CULL_MODE_BACK, false);
+	psoNoCullDepth_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoNoCullDepth_->Create(D3D12_CULL_MODE_NONE, false);
 	psoWireframe_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoWireframe_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_WIREFRAME);
 	psoWireframeNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
@@ -116,6 +118,12 @@ void Object3dCommon::DrawCommonNoCull() {
 void Object3dCommon::DrawCommonNoDepth() {
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoNoDepth_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoNoDepth_->GetGraphicsPipelineState(blendMode_).Get());
+	DrawSet();
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::DrawCommonNoCullDepth() {
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoNoCullDepth_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoNoCullDepth_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

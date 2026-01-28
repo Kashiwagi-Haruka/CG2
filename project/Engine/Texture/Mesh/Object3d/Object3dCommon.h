@@ -29,6 +29,7 @@ private:
 	std::unique_ptr<CreatePSO> psoEmissive_;
 	std::unique_ptr<CreatePSO> psoNoCull_;
 	std::unique_ptr<CreatePSO> psoNoDepth_;
+	std::unique_ptr<CreatePSO> psoNoCullDepth_;
 	std::unique_ptr<CreatePSO> psoWireframe_;
 	std::unique_ptr<CreatePSO> psoWireframeNoDepth_;
 	std::unique_ptr<CreatePSO> psoLine_;
@@ -70,6 +71,7 @@ public:
 	void DrawCommonEmissive();
 	void DrawCommonNoCull();
 	void DrawCommonNoDepth();
+	void DrawCommonNoCullDepth();
 	void DrawCommonWireframeNoDepth();
 	void DrawCommonLineNoDepth();
 	void DrawCommonSkinning();

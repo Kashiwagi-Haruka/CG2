@@ -55,16 +55,14 @@ void House::Update(Camera* camera) {
 	object_->SetTranslate(position_);
 	object_->Update();
 
-	constexpr float kHpOffsetY = 5.0f;
+	constexpr float kHpOffsetY = 1.0f;
 	constexpr float kHpBarMaxScale = 1.0f;
 	constexpr float kHpBarHalfWidth = 0.5f;
-	Vector3 hpBasePos = {position_.x, position_.y + kHpOffsetY, position_.z};
+	Vector3 hpBasePos = {position_.x, position_.y+kHpOffsetY, position_.z};
 
 	float hpRatio = std::clamp(static_cast<float>(hp_) / kMaxHP, 0.0f, 1.0f);
 	hpBarT_.scale = {kHpBarMaxScale * hpRatio, 1.0f, 1.0f};
 	hpBarT_.translate = hpBasePos;
-	hpBarT_.translate.x += (kHpBarMaxScale - hpBarT_.scale.x) * kHpBarHalfWidth;
-	hpFlameT_.rotate.y = std::numbers::pi_v<float>;
 	Matrix4x4 billboard = camera->GetWorldMatrix();
 	billboard.m[3][0] = billboard.m[3][1] = billboard.m[3][2] = 0;
 
@@ -73,16 +71,19 @@ void House::Update(Camera* camera) {
 
 	hpflame_->SetCamera(camera);
 	hpflame_->SetWorldMatrix(FlameW);
+	hpflame_->SetEnableLighting(false);
 	hpflame_->Update();
 
 	hpbar_->SetCamera(camera);
 	hpbar_->SetWorldMatrix(BarW);
+	hpbar_->SetEnableLighting(false);
 	hpbar_->Update();
 }
 
 void House::Draw() {
 
 	object_->Draw();
+	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
 	hpflame_->Draw();
 	hpbar_->Draw();
 }
