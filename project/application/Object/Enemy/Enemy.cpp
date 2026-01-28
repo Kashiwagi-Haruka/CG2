@@ -98,7 +98,9 @@ void Enemy::Update(const Vector3& housePos, const Vector3& playerPos, bool isPla
 	if (!isStun_) {
 		Vector3 toTarget = targetPosition - transform_.translate;
 		toTarget.y = 0.0f;
-		inAttackRange = LengthSquared(toTarget) <= attackRange_ * attackRange_;
+		Vector3 toHouse = housePos - transform_.translate;
+		toHouse.y = 0.0f;
+		inAttackRange = LengthSquared(toTarget) <= attackRange_ * attackRange_ || LengthSquared(toHouse) <= attackRange_ * attackRange_;
 	}
 	if (!isStun_ && !IsAttacking() && inAttackRange && IsAttackReady()) {
 		enemyAttack_->Start(transform_);

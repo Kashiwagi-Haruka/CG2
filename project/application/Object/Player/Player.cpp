@@ -189,7 +189,7 @@ void Player::Move() {
 
 	if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D) && !GameBase::GetInstance()->PushKey(DIK_W) && !GameBase::GetInstance()->PushKey(DIK_S)) {
 		isDash = false;
-		if (!isAttacking_) {
+		if (!isAttacking_&&!isSkillAttack) {
 		models_->SetStateM(PlayerModels::StateM::idle);
 		}
 	} else {
