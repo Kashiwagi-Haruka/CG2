@@ -1,17 +1,17 @@
 #pragma once
 #include "Camera.h"
+#include "Object/House/HouseHP.h"
 #include "Object3d/Object3d.h"
+#include "Transform.h"
 #include "Vector3.h"
 #include <memory>
-#include "Transform.h"
 class House {
 
 	std::unique_ptr<Object3d> object_;
 	std::unique_ptr<Object3d> hpbar_;
 	std::unique_ptr<Object3d> hpflame_;
 	Vector3 position_ = {0, 1.5f, 0};
-	static constexpr int kMaxHP = 1000;
-	int hp_ = kMaxHP;
+	int hp_ = HouseHP::GetInstance()->GetMaxHP();
 
 	Transform hpBarT_;
 	Transform hpFlameT_;

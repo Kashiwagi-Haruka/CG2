@@ -15,7 +15,7 @@ constexpr float kMidHpRatio = 0.5f;
 } // namespace
 
 int CalculateStarCount(float timeSeconds, int houseHp) {
-	float hpRatio = std::clamp(houseHp / 100.0f, 0.0f, 1.0f);
+	float hpRatio = std::clamp(houseHp / static_cast<float>(HouseHP::GetInstance()->GetMaxHP()), 0.0f, 1.0f);
 	int stars = 1;
 	if (timeSeconds <= kGoodTimeSeconds && hpRatio >= kHighHpRatio) {
 		stars = 3;

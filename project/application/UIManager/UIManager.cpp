@@ -256,8 +256,9 @@ void UIManager::Update() {
 		MaxSPData[i].sprite->SetPosition(MaxSPData[i].translate);
 		MaxSPData[i].sprite->Update();
 	}
-	int houseHp = std::clamp(HouseHP::GetInstance()->GetHP(), 0, 1000);
-	int houseHpPercent = std::clamp(houseHp * 100 / 1000, 0, 100);
+	int houseMaxHp = HouseHP::GetInstance()->GetMaxHP();
+	int houseHp = std::clamp(HouseHP::GetInstance()->GetHP(), 0, houseMaxHp);
+	int houseHpPercent = std::clamp(houseHp * 100 / houseMaxHp, 0, 100);
 	houseHpDigitStartIndex = houseHpPercent >= 100 ? 0 : (houseHpPercent >= 10 ? 1 : 2);
 	int houseDigits[3] = {houseHpPercent / 100, (houseHpPercent / 10) % 10, houseHpPercent % 10};
 	float xOffset = houseHpPercentBasePosition.x;

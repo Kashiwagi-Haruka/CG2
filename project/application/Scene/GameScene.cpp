@@ -420,11 +420,10 @@ void GameScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
 	skyDome->Draw();
 	field->Draw();
-	house->Draw();
 	player->Draw();
 	enemyManager->Draw();
 	expCubeManager->Draw();
-
+	house->Draw();
 	particles->Draw();
 
 	SpriteCommon::GetInstance()->DrawCommon();

@@ -60,8 +60,9 @@ void House::Update(Camera* camera) {
 	constexpr float kHpBarHalfWidth = 0.5f;
 	Vector3 hpBasePos = {position_.x, position_.y+kHpOffsetY, position_.z};
 
-	float hpRatio = std::clamp(static_cast<float>(hp_) / kMaxHP, 0.0f, 1.0f);
+	float hpRatio = std::clamp(static_cast<float>(hp_) / HouseHP::GetInstance()->GetMaxHP(), 0.0f, 1.0f);
 	hpBarT_.scale = {kHpBarMaxScale * hpRatio, 1.0f, 1.0f};
+	hpBarT_.rotate.y = std::numbers::pi_v<float>;
 	hpBarT_.translate = hpBasePos;
 	Matrix4x4 billboard = camera->GetWorldMatrix();
 	billboard.m[3][0] = billboard.m[3][1] = billboard.m[3][2] = 0;
