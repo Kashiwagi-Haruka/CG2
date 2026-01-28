@@ -71,7 +71,7 @@ void PlayerModels::Update() {
 		loopAnimation = false;
 		break;
 	case PlayerModels::fallingAttack:
-		desiredAnimationName = "Attack5";
+		desiredAnimationName = "FallAttack";
 		loopAnimation = false;
 		break;
 	case PlayerModels::skillAttack:
