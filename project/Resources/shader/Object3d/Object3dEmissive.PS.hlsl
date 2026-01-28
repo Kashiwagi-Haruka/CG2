@@ -36,9 +36,11 @@ PixelShaderOutput main(VertexShaderOutput input)
     float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
     float3 normal = normalize(input.normal);
     float rim = 1.0f - saturate(dot(normal, toEye));
-    float glow = pow(rim, 2.0f);
+    float softRim = smoothstep(0.0f, 0.9f, rim);
+    float glow = pow(softRim, 1.4f);
+    float halo = pow(softRim, 3.0f);
 
-    output.color.rgb = baseColor * (2.0f + glow * 4.0f);
+    output.color.rgb = baseColor * (1.4f + glow * 3.0f) + baseColor * (halo * 2.5f);
     output.color.a = textureColor.a * gMaterial.color.a;
 
     if (textureColor.a < 0.5f)
