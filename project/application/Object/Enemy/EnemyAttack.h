@@ -17,6 +17,7 @@ public:
 	void Update();
 	void Draw();
 	void Cancel();
+	bool ConsumeHit();
 
 	bool IsAttacking() const { return state_ != State::Idle; }
 	bool IsHitActive() const { return hitActive_; }
@@ -37,4 +38,5 @@ private:
 	float swingTime_ = 0.3f; // 振り下ろし時間
 	float hitSize_ = 1.2f;
 	bool hitActive_ = false;
+	bool hasDealtDamage_ = false;
 };

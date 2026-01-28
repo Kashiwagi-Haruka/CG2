@@ -116,8 +116,14 @@ void PlayerModels::Update() {
 			UpdateSkinCluster(sizukuSkinCluster_, *sizukuSkeleton_);
 		}
 	}
+	Matrix4x4 playerWorld = Function::MakeAffineMatrix(player_.scale, player_.rotate, player_.translate);
 
-#ifdef USE_IMGUI
+	Sizuku_->SetWorldMatrix(playerWorld);
+	Sizuku_->SetCamera(camera_);
+	Sizuku_->SetShininess(20.0f);
+	Sizuku_->Update();
+
+#ifdef USE_IMGU
 	if (!ImGui::Begin("Player Parts Adjust")) {
 		ImGui::End();
 		return;
@@ -135,11 +141,7 @@ void PlayerModels::Update() {
 
 void PlayerModels::Draw() {
 
-	Matrix4x4 playerWorld = Function::MakeAffineMatrix(player_.scale, player_.rotate, player_.translate);
 
-	Sizuku_->SetWorldMatrix(playerWorld);
-	Sizuku_->SetCamera(camera_);
-	Sizuku_->Update();
 	Object3dCommon::GetInstance()->DrawCommonSkinning();
 	Sizuku_->Draw();
 

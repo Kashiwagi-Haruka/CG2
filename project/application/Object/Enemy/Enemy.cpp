@@ -159,3 +159,10 @@ Vector3 Enemy::GetAttackPosition() const {
 }
 
 bool Enemy::IsAttackHitActive() const { return enemyAttack_ && enemyAttack_->IsHitActive(); }
+
+bool Enemy::ConsumeAttackHit() {
+	if (!enemyAttack_) {
+		return false;
+	}
+	return enemyAttack_->ConsumeHit();
+}

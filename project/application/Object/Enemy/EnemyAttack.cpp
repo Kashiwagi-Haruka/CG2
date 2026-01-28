@@ -20,7 +20,7 @@ void EnemyAttack::Start(const Transform& enemyTransform) {
 	state_ = State::SwingDown;
 	timer_ = 0.0f;
 	hitActive_ = true;
-
+	hasDealtDamage_ = false;
 	// 敵の少し前＆上に出す
 	transform_ = enemyTransform;
 	transform_.translate.y += 1.0f;
@@ -58,9 +58,18 @@ void EnemyAttack::Cancel() {
 	state_ = State::Idle;
 	timer_ = 0.0f;
 	hitActive_ = false;
+	hasDealtDamage_ = false;
 }
 void EnemyAttack::Draw() {
 	if (state_ != State::Idle) {
 		object_->Draw();
 	}
+}
+
+bool EnemyAttack::ConsumeHit() {
+	if (!hitActive_ || hasDealtDamage_) {
+		return false;
+	}
+	hasDealtDamage_ = true;
+	return true;
 }

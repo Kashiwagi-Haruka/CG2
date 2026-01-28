@@ -106,11 +106,14 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 
 		if (enemy->IsAttackHitActive()) {
 			AABB enemyAttackAabb = MakeAabb(enemy->GetAttackPosition(), {enemy->GetAttackHitSize(), enemy->GetAttackHitSize(), enemy->GetAttackHitSize()});
-			if (RigidBody::isCollision(enemyAttackAabb, playerAabb)) {
-				player.Damage(1);
-			}
-			if (RigidBody::isCollision(enemyAttackAabb, houseAabb)) {
-				house.Damage(1);
+			const bool hitPlayer = RigidBody::isCollision(enemyAttackAabb, playerAabb);
+			const bool hitHouse = RigidBody::isCollision(enemyAttackAabb, houseAabb);
+			if ((hitPlayer || hitHouse) && enemy->ConsumeAttackHit()) {
+				if (hitPlayer) {
+					player.Damage(1);
+				} else if (hitHouse) {
+					house.Damage(1);
+				}
 			}
 		}
 	}

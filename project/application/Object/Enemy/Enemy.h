@@ -17,7 +17,7 @@ class Enemy {
 	bool isStun_ = false;
 
 	int stunTime;
-	int stunTimeMax = 60 * 3;
+	int stunTimeMax = 60 * 0.75f;
 
 	float attackTimer_ = 0.0f;
 	float attackCooldown_ = 0.6f;
@@ -64,6 +64,7 @@ public:
 	float GetAttackHitSize() const;
 	Vector3 GetAttackPosition() const;
 	bool IsAttackHitActive() const;
+	bool ConsumeAttackHit();
 	bool IsAttackReady() const { return attackTimer_ >= attackCooldown_; }
 	void ResetAttackTimer() { attackTimer_ = 0.0f; }
 	void SetPosition() { transform_.translate; }
