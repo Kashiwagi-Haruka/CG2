@@ -25,6 +25,7 @@ public:
 		Line,
 		Triangle,
 		Box,
+		Band,
 	};
 
 private:

@@ -14,7 +14,7 @@ constexpr float kPi = 3.14159265358979323846f;
 constexpr uint32_t kDefaultSlices = 32;
 constexpr uint32_t kDefaultStacks = 16;
 constexpr float kHalfSize = 0.5f;
-
+constexpr float kBandWidth = 0.2f;
 struct MeshData {
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
@@ -413,6 +413,41 @@ MeshData BuildBox() {
 
 	return mesh;
 }
+MeshData BuildBand(uint32_t segments) {
+	MeshData mesh;
+	const float length = kHalfSize * 2.0f;
+	const float halfWidth = kBandWidth * 0.5f;
+	mesh.vertices.reserve((segments + 1) * 2);
+	mesh.indices.reserve(segments * 6);
+
+	for (uint32_t i = 0; i <= segments; ++i) {
+		float t = static_cast<float>(i) / static_cast<float>(segments);
+		float x = -kHalfSize + length * t;
+		Vector3 normal = {0.0f, 0.0f, -1.0f};
+		mesh.vertices.push_back({
+		    {x, -halfWidth, 0.0f, 1.0f},
+            {t, 1.0f},
+            normal
+        });
+		mesh.vertices.push_back({
+		    {x, halfWidth, 0.0f, 1.0f},
+            {t, 0.0f},
+            normal
+        });
+	}
+
+	for (uint32_t i = 0; i < segments; ++i) {
+		uint32_t base = i * 2;
+		mesh.indices.push_back(base);
+		mesh.indices.push_back(base + 2);
+		mesh.indices.push_back(base + 1);
+		mesh.indices.push_back(base + 1);
+		mesh.indices.push_back(base + 2);
+		mesh.indices.push_back(base + 3);
+	}
+
+	return mesh;
+}
 } // namespace
 
 void Primitive::Initialize(PrimitiveName name) {
@@ -452,6 +487,9 @@ void Primitive::Initialize(PrimitiveName name) {
 		break;
 	case Primitive::Box:
 		mesh = BuildBox();
+		break;
+	case Primitive::Band:
+		mesh = BuildBand(kDefaultSlices);
 		break;
 	default:
 		mesh = BuildPlane();
@@ -531,6 +569,9 @@ void Primitive::Initialize(PrimitiveName name,const std::string& texturePath) {
 		break;
 	case Primitive::Box:
 		mesh = BuildBox();
+		break;
+	case Primitive::Band:
+		mesh = BuildBand(kDefaultSlices);
 		break;
 	default:
 		mesh = BuildPlane();
@@ -613,12 +654,8 @@ void Primitive::Draw() {
 
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
-	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, Object3dCommon::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
-	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, Object3dCommon::GetInstance()->GetPointLightCountResource()->GetGPUVirtualAddress());
-	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(6, Object3dCommon::GetInstance()->GetSpotLightCountResource()->GetGPUVirtualAddress());
-	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(7, Object3dCommon::GetInstance()->GetAreaLightCountResource()->GetGPUVirtualAddress());
-
+	
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_);
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvHandle);
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
