@@ -45,7 +45,7 @@ public:
 
 	void Initialize(Camera* camera, Vector3 translate);
 	void SetIsStun(bool isStun);
-	void Update(const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive);
+	void Update(const Vector3& housePos, const Vector3& houseScale, const Vector3& playerPos, bool isPlayerAlive);
 	void Draw();
 	void Stun();
 	void SetHPSubtract(int hp) {

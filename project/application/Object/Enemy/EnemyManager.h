@@ -36,7 +36,7 @@ public:
 
 	void Initialize(Camera* camera);
 	void AddEnemy(Camera* camera, const Vector3& pos);
-	void Update(Camera* camera, const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive);
+	void Update(Camera* camera, const Vector3& housePos, const Vector3& houseScale, const Vector3& playerPos, bool isPlayerAlive);
 	void Draw();
 	void Clear();
 	void OnEnemyDamaged(Enemy* enemy);

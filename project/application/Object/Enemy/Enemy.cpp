@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "Enemy.h"
 #include "Camera.h"
 #include "GameBase.h"
@@ -43,7 +44,7 @@ void Enemy::Initialize(Camera* camera, Vector3 translates) {
 	object_->SetColor(kDefaultColor);
 }
 
-void Enemy::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive) {
+void Enemy::Update(const Vector3& housePos, const Vector3& houseScale, const Vector3& playerPos, bool isPlayerAlive) {
 	const float deltaTime = 1.0f / 60.0f;
 	if (!enemyAttack_ || !enemyAttack_->IsAttacking()) {
 		attackTimer_ += deltaTime;
@@ -100,7 +101,10 @@ void Enemy::Update(const Vector3& housePos, const Vector3& playerPos, bool isPla
 		toTarget.y = 0.0f;
 		Vector3 toHouse = housePos - transform_.translate;
 		toHouse.y = 0.0f;
-		inAttackRange = LengthSquared(toTarget) <= attackRange_ * attackRange_ || LengthSquared(toHouse) <= attackRange_ * attackRange_;
+		float houseRadius = std::max({houseScale.x, houseScale.y, houseScale.z});
+		float enemyRadius = std::max({transform_.scale.x, transform_.scale.y, transform_.scale.z});
+		float houseAttackRange = attackRange_ + houseRadius + enemyRadius;
+		inAttackRange = LengthSquared(toTarget) <= attackRange_ * attackRange_ || LengthSquared(toHouse) <= houseAttackRange * houseAttackRange;
 	}
 	if (!isStun_ && !IsAttacking() && inAttackRange && IsAttackReady()) {
 		enemyAttack_->Start(transform_);

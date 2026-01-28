@@ -320,7 +320,7 @@ void GameScene::Update() {
 	}
 
 	// ★ ウェーブシステムの更新
-	enemyManager->Update(cameraController->GetCamera(), house->GetPosition(), player->GetPosition(), player->GetIsAlive());
+	enemyManager->Update(cameraController->GetCamera(), house->GetPosition(), house->GetScale(), player->GetPosition(), player->GetIsAlive());
 	expCubeManager->Update(cameraController->GetCamera());
 	int currentWave = enemyManager->GetCurrentWave();
 	if (currentWave != lastWave_) {
@@ -380,7 +380,7 @@ void GameScene::Update() {
 	}
 #endif // _DEBUG
 
-	if (!player->GetIsAlive()) {
+	if (!player->GetIsAlive()||house->GetHP()==0) {
 		if (!isTransitionOut) {
 			nextSceneName = "GameOver";
 			sceneTransition->Initialize(true);
