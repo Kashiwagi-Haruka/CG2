@@ -44,38 +44,48 @@ void PlayerModels::Update() {
 	static float t = 0.0f;
 	t += 0.1f;
 	const char* desiredAnimationName = "Idle";
+	bool loopAnimation = true;
 	switch (state_) {
 	case PlayerModels::idle:
 		desiredAnimationName = "Idle";
+		loopAnimation = true;
 		break;
 	case PlayerModels::walk:
 		desiredAnimationName = "Walk";
+		loopAnimation = true;
 		break;
 	case PlayerModels::attack1:
 		desiredAnimationName = "Attack1";
+		loopAnimation = false;
 		break;
 	case PlayerModels::attack2:
 		desiredAnimationName = "Attack2";
+		loopAnimation = false;
 		break;
 	case PlayerModels::attack3:
 		desiredAnimationName = "Attack3";
+		loopAnimation = false;
 		break;
 	case PlayerModels::attack4:
 		desiredAnimationName = "Attack4";
+		loopAnimation = false;
 		break;
 	case PlayerModels::fallingAttack:
 		desiredAnimationName = "Attack5";
+		loopAnimation = false;
 		break;
 	case PlayerModels::skillAttack:
 		desiredAnimationName = "SkillAttack";
+		loopAnimation = false;
 		break;
 	case PlayerModels::damage:
 		desiredAnimationName = "Idle";
+		loopAnimation = true;
 		break;
 	default:
 		break;
 	}
-	
+
 	if (!sizukuAnimationClips_.empty()) {
 		size_t desiredIndex = sizukuAnimationIndex_;
 		for (size_t i = 0; i < sizukuAnimationClips_.size(); ++i) {
@@ -85,17 +95,23 @@ void PlayerModels::Update() {
 			}
 		}
 
-		if (desiredIndex != sizukuAnimationIndex_) {
+		if (desiredIndex != sizukuAnimationIndex_ || loopAnimation != sizukuAnimationLoop_) {
 			sizukuAnimationIndex_ = desiredIndex;
 			sizukuAnimationTime_ = 0.0f;
-			Sizuku_->SetAnimation(&sizukuAnimationClips_[sizukuAnimationIndex_], true);
+			sizukuAnimationLoop_ = loopAnimation;
+			animationFinished_ = false;
+			Sizuku_->SetAnimation(&sizukuAnimationClips_[sizukuAnimationIndex_], loopAnimation);
 		}
 	}
 
 	if (sizukuSkeleton_ && !sizukuAnimationClips_.empty()) {
 		const auto& currentAnimation = sizukuAnimationClips_[sizukuAnimationIndex_];
 		const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-		sizukuSkeleton_->UpdateAnimation(currentAnimation, sizukuAnimationTime_, deltaTime);
+		animationFinished_ = false;
+		if (!loopAnimation && currentAnimation.duration > 0.0f) {
+			animationFinished_ = (sizukuAnimationTime_ + deltaTime) >= currentAnimation.duration;
+		}
+		sizukuSkeleton_->UpdateAnimation(currentAnimation, sizukuAnimationTime_, deltaTime, loopAnimation);
 		if (!sizukuSkinCluster_.mappedPalette.empty()) {
 			UpdateSkinCluster(sizukuSkinCluster_, *sizukuSkeleton_);
 		}

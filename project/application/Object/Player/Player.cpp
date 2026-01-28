@@ -375,6 +375,7 @@ void Player::Attack() {
 		if (attackHoldTimer_ >= heavyAttackThreshold_ && isAttacking_) {
 			attackState_ = AttackState::kStrongAttack;
 			sword_->StartAttack(6); // 6=重撃
+			models_->SetStateM(PlayerModels::StateM::attack4);
 
 			// コンボリセット
 			comboStep_ = 0;
@@ -386,17 +387,16 @@ void Player::Attack() {
 	}
 
 	// 攻撃モーションが終了したか確認
-	if (isAttacking_ && !sword_->IsAttacking()) {
+	if (isAttacking_ && !isFallingAttack_ && models_->IsAttackAnimationFinished()) {
 		isAttacking_ = false;
 		canCombo_ = true; // 次のコンボ入力を受け付ける
+		sword_->EndAttack();
 
 		// 4段階目が終わったらコンボリセット
 		if (comboStep_ >= 4) {
 			comboStep_ = 0;
 			canCombo_ = false;
 			comboTimer_ = 0.0f;
-			
-			
 		}
 
 		// 重撃が終わったらリセット

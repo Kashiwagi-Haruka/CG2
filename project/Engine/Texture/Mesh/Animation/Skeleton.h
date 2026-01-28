@@ -33,7 +33,7 @@ public:
 	void ApplyAnimation(const Animation::AnimationData& animation, float animationTime);
 	void SetObjectMatrix(const Matrix4x4& objectMatrix);
 	Vector3 GetJointWorldPosition(const Joint& joint) const;
-	void UpdateAnimation(const Animation::AnimationData& animation, float& animationTime, float deltaTime);
+	void UpdateAnimation(const Animation::AnimationData& animation, float& animationTime, float deltaTime, bool loop = true);
 	void DrawBones(Camera* camera, const Vector4& jointColor, const Vector4& boneColor);
 
 private:

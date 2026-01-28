@@ -28,38 +28,11 @@ void PlayerSword::Initialize() {
 
 void PlayerSword::StartAttack(int comboStep) {
 	isAttacking_ = true;
-	attackTimer_ = 0.0f;
 	currentComboStep_ = comboStep;
-
-	// コンボ段階ごとに攻撃時間を設定
-	switch (comboStep) {
-	case 1:
-		attackDuration_ = 0.25f; // 1段目: 速い
-		break;
-	case 2:
-		attackDuration_ = 0.28f; // 2段目: やや速い
-		break;
-	case 3:
-		attackDuration_ = 0.32f; // 3段目: 普通
-		break;
-	case 4:
-		attackDuration_ = 0.45f; // 4段目: フィニッシュで長め
-		break;
-	case 5:
-		attackDuration_ = 0.6f; // 落下攻撃: 長め
-		break;
-	case 6:
-		attackDuration_ = 0.5f; // 重撃: 強力で長め
-		break;
-	default:
-		attackDuration_ = 0.3f;
-		break;
-	}
 }
 
 void PlayerSword::EndAttack() {
 	isAttacking_ = false;
-	attackTimer_ = 0.0f;
 }
 
 Vector3 PlayerSword::GetPosition() const { return hitTransform_.translate; }
@@ -82,17 +55,7 @@ void PlayerSword::Update(const Transform& playerTransform, const std::optional<M
 	hitTransform_ = playerTransform;
 	hitTransform_.scale = {GetHitSize(), GetHitSize(), GetHitSize()};
 	hitTransform_.translate = playerTransform.translate + forwardDir * hitDistanceFromPlayer_;
-	// 攻撃中は振る
-	if (isAttacking_) {
-		attackTimer_ += 1.0f / 60.0f;
-		// 攻撃終了判定
-		if (attackTimer_ >= attackDuration_) {
-			isAttacking_ = false;
-			attackTimer_ = 0.0f;
-		}
-	}
 
-	
 	if (useJointAttachment) {
 		const Matrix4x4 localMatrix = Function::MakeAffineMatrix(swordTransform.scale, swordTransform.rotate, swordTransform.translate);
 		const Matrix4x4 worldMatrix = Function::Multiply(localMatrix, *jointWorldMatrix);

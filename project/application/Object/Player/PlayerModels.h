@@ -35,6 +35,8 @@ private:
 	std::vector<Animation::AnimationData> sizukuAnimationClips_{};
 	float sizukuAnimationTime_ = 0.0f;
 	size_t sizukuAnimationIndex_ = 0;
+	bool sizukuAnimationLoop_ = true;
+	bool animationFinished_ = false;
 
 public:
 	PlayerModels();
@@ -46,4 +48,5 @@ public:
 	void Update();
 	void Draw();
 	std::optional<Matrix4x4> GetJointWorldMatrix(const std::string& jointName) const;
+	bool IsAttackAnimationFinished() const { return animationFinished_; }
 };
