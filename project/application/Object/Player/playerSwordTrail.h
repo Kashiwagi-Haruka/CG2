@@ -17,8 +17,7 @@ public:
 	void SetCamera(Camera* camera) { camera_ = camera; }
 
 private:
-	void EnsureSegmentCount(size_t count);
-	void UpdateSegments();
+	void UpdateTrailMesh();
 
 	static constexpr float kTipLocalOffset = 1.2f;
 	static constexpr float kSegmentWidth = 0.25f;
@@ -26,6 +25,6 @@ private:
 	static constexpr size_t kMaxPoints = 14;
 
 	std::deque<Vector3> points_;
-	std::vector<std::unique_ptr<Primitive>> segments_;
+	std::unique_ptr<Primitive> trail_;
 	Camera* camera_ = nullptr;
 };

@@ -3,91 +3,26 @@
 #include <cmath>
 
 namespace {
-Vector3 Lerp(const Vector3& a, const Vector3& b, float t) { return {a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t}; }
-
 float Length(const Vector3& v) { return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z); }
 
-Matrix4x4 MakeSegmentMatrix(const Vector3& start, const Vector3& end, float width) {
-	Vector3 direction = end - start;
-	float length = Length(direction);
-	if (length < 1e-4f) {
-		return Function::MakeTranslateMatrix(start);
+Vector3 NormalizeOrFallback(const Vector3& v, const Vector3& fallback) {
+	if (Length(v) < 1e-4f) {
+		return fallback;
 	}
-
-	Vector3 xAxis = Function::Normalize(direction);
-	Vector3 up = {0.0f, 1.0f, 0.0f};
-	Vector3 zAxis = Function::Normalize(Function::Cross(xAxis, up));
-	if (Length(zAxis) < 1e-4f) {
-		up = {0.0f, 0.0f, 1.0f};
-		zAxis = Function::Normalize(Function::Cross(xAxis, up));
-	}
-	if (Length(zAxis) < 1e-4f) {
-		zAxis = {0.0f, 0.0f, 1.0f};
-	}
-	Vector3 yAxis = Function::Normalize(Function::Cross(zAxis, xAxis));
-
-	Vector3 center = Lerp(start, end, 0.5f);
-
-	Matrix4x4 world{};
-	world.m[0][0] = xAxis.x * length;
-	world.m[1][0] = xAxis.y * length;
-	world.m[2][0] = xAxis.z * length;
-	world.m[0][1] = yAxis.x * width;
-	world.m[1][1] = yAxis.y * width;
-	world.m[2][1] = yAxis.z * width;
-	world.m[0][2] = zAxis.x;
-	world.m[1][2] = zAxis.y;
-	world.m[2][2] = zAxis.z;
-	world.m[3][0] = center.x;
-	world.m[3][1] = center.y;
-	world.m[3][2] = center.z;
-	world.m[3][3] = 1.0f;
-	return world;
+	return Function::Normalize(v);
 }
 } // namespace
 
 void PlayerSwordTrail::Initialize() {
 	points_.clear();
-	segments_.clear();
-}
-
-void PlayerSwordTrail::Clear() {
-	points_.clear();
-	segments_.clear();
-}
-
-void PlayerSwordTrail::EnsureSegmentCount(size_t count) {
-	if (segments_.size() == count) {
-		return;
-	}
-	if (segments_.size() < count) {
-		while (segments_.size() < count) {
-			auto primitive = std::make_unique<Primitive>();
-			primitive->Initialize(Primitive::Band, "Resources/3d/Circle.png");
-			primitive->SetEnableLighting(false);
-			segments_.push_back(std::move(primitive));
-		}
-	} else {
-		segments_.resize(count);
+	if (!trail_) {
+		trail_ = std::make_unique<Primitive>();
+		trail_->Initialize(Primitive::Band, "Resources/3d/Circle.png");
+		trail_->SetEnableLighting(false);
 	}
 }
 
-void PlayerSwordTrail::UpdateSegments() {
-	if (segments_.empty()) {
-		return;
-	}
-	const size_t segmentCount = segments_.size();
-	for (size_t i = 0; i < segmentCount; ++i) {
-		const Vector3& start = points_[i];
-		const Vector3& end = points_[i + 1];
-		Primitive* segment = segments_[i].get();
-		segment->SetCamera(camera_);
-		segment->SetWorldMatrix(MakeSegmentMatrix(start, end, kSegmentWidth));
-		float t = static_cast<float>(i + 1) / static_cast<float>(segmentCount);
-		segment->SetColor({0.2f, 0.7f, 1.0f, 0.6f * t});
-		segment->Update();
-	}
-}
+void PlayerSwordTrail::Clear() { points_.clear(); }
 
 void PlayerSwordTrail::Update(const Matrix4x4& swordWorldMatrix, bool isAttacking) {
 	if (!isAttacking) {
@@ -111,16 +46,86 @@ void PlayerSwordTrail::Update(const Matrix4x4& swordWorldMatrix, bool isAttackin
 	}
 
 	if (points_.size() < 2) {
-		EnsureSegmentCount(0);
 		return;
 	}
 
-	EnsureSegmentCount(points_.size() - 1);
-	UpdateSegments();
+	UpdateTrailMesh();
 }
 
 void PlayerSwordTrail::Draw() {
-	for (const auto& segment : segments_) {
-		segment->Draw();
+	if (!trail_ || points_.size() < 2) {
+		return;
 	}
+	trail_->Draw();
+}
+
+void PlayerSwordTrail::UpdateTrailMesh() {
+	if (!trail_ || points_.size() < 2) {
+		return;
+	}
+	const size_t pointCount = points_.size();
+	const float halfWidth = kSegmentWidth * 0.5f;
+	std::vector<float> cumulativeLength(pointCount, 0.0f);
+	float totalLength = 0.0f;
+	for (size_t i = 1; i < pointCount; ++i) {
+		const float segmentLength = Length(points_[i] - points_[i - 1]);
+		totalLength += segmentLength;
+		cumulativeLength[i] = totalLength;
+	}
+	if (totalLength < 1e-4f) {
+		totalLength = 1.0f;
+	}
+
+	std::vector<VertexData> vertices;
+	std::vector<uint32_t> indices;
+	vertices.reserve(pointCount * 2);
+	indices.reserve((pointCount - 1) * 6);
+
+	const Vector3 cameraPos = camera_ ? camera_->GetWorldTranslate() : Vector3{0.0f, 0.0f, -1.0f};
+	for (size_t i = 0; i < pointCount; ++i) {
+		Vector3 direction{};
+		if (i == 0) {
+			direction = points_[1] - points_[0];
+		} else if (i + 1 == pointCount) {
+			direction = points_[i] - points_[i - 1];
+		} else {
+			direction = points_[i + 1] - points_[i - 1];
+		}
+		direction = NormalizeOrFallback(direction, {1.0f, 0.0f, 0.0f});
+		Vector3 viewDir = NormalizeOrFallback(cameraPos - points_[i], {0.0f, 0.0f, -1.0f});
+		Vector3 side = NormalizeOrFallback(Function::Cross(viewDir, direction), {0.0f, 1.0f, 0.0f});
+		if (Length(side) < 1e-4f) {
+			side = NormalizeOrFallback(Function::Cross(direction, {0.0f, 1.0f, 0.0f}), {0.0f, 0.0f, 1.0f});
+		}
+		Vector3 normal = NormalizeOrFallback(Function::Cross(direction, side), {0.0f, 0.0f, 1.0f});
+		const float t = cumulativeLength[i] / totalLength;
+		Vector3 left = points_[i] - side * halfWidth;
+		Vector3 right = points_[i] + side * halfWidth;
+		vertices.push_back({
+		    {left.x, left.y, left.z, 1.0f},
+            {t, 1.0f},
+            normal
+        });
+		vertices.push_back({
+		    {right.x, right.y, right.z, 1.0f},
+            {t, 0.0f},
+            normal
+        });
+	}
+
+	for (size_t i = 0; i + 1 < pointCount; ++i) {
+		const uint32_t base = static_cast<uint32_t>(i * 2);
+		indices.push_back(base);
+		indices.push_back(base + 2);
+		indices.push_back(base + 1);
+		indices.push_back(base + 1);
+		indices.push_back(base + 2);
+		indices.push_back(base + 3);
+	}
+
+	trail_->SetCamera(camera_);
+	trail_->SetWorldMatrix(Function::MakeIdentity4x4());
+	trail_->SetColor({0.2f, 0.7f, 1.0f, 0.6f});
+	trail_->SetMeshData(vertices, indices);
+	trail_->Update();
 }

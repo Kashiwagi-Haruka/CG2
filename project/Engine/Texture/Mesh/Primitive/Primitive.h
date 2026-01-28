@@ -84,6 +84,7 @@ public:
 	void SetTransform(Transform transform);
 	void SetWorldMatrix(Matrix4x4 matrix);
 	void SetLinePositions(const Vector3& start, const Vector3& end);
+	void SetMeshData(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices);
 	void SetColor(Vector4 color);
 	void SetEnableLighting(bool enable);
 	void SetUvTransform(const Matrix4x4& uvTransform);

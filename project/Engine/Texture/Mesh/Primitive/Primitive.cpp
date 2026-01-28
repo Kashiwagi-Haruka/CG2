@@ -418,7 +418,7 @@ MeshData BuildBand(uint32_t segments) {
 	const float length = kHalfSize * 2.0f;
 	const float halfWidth = kBandWidth * 0.5f;
 	mesh.vertices.reserve((segments + 1) * 2);
-	mesh.indices.reserve(segments * 6);
+	mesh.indices.reserve(segments * 12);
 
 	for (uint32_t i = 0; i <= segments; ++i) {
 		float t = static_cast<float>(i) / static_cast<float>(segments);
@@ -436,7 +436,7 @@ MeshData BuildBand(uint32_t segments) {
         });
 	}
 
-	for (uint32_t i = 0; i < segments; ++i) {
+for (uint32_t i = 0; i < segments; ++i) {
 		uint32_t base = i * 2;
 		mesh.indices.push_back(base);
 		mesh.indices.push_back(base + 2);
@@ -444,6 +444,12 @@ MeshData BuildBand(uint32_t segments) {
 		mesh.indices.push_back(base + 1);
 		mesh.indices.push_back(base + 2);
 		mesh.indices.push_back(base + 3);
+		mesh.indices.push_back(base + 1);
+		mesh.indices.push_back(base + 2);
+		mesh.indices.push_back(base);
+		mesh.indices.push_back(base + 3);
+		mesh.indices.push_back(base + 2);
+		mesh.indices.push_back(base + 1);
 	}
 
 	return mesh;
@@ -701,6 +707,31 @@ void Primitive::SetLinePositions(const Vector3& start, const Vector3& end) {
 	useLinePositions_ = true;
 	isUseSetWorld = true;
 	worldMatrix = Function::MakeIdentity4x4();
+}
+void Primitive::SetMeshData(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices) {
+	if (vertices.empty() || indices.empty()) {
+		return;
+	}
+	vertices_ = vertices;
+	indices_ = indices;
+
+	vertexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * vertices_.size());
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+	VertexData* vertexData = nullptr;
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	std::memcpy(vertexData, vertices_.data(), sizeof(VertexData) * vertices_.size());
+	vertexResource_->Unmap(0, nullptr);
+
+	indexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * indices_.size());
+	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	indexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * indices_.size());
+	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+	void* mappedIndex = nullptr;
+	indexResource_->Map(0, nullptr, &mappedIndex);
+	std::memcpy(mappedIndex, indices_.data(), sizeof(uint32_t) * indices_.size());
+	indexResource_->Unmap(0, nullptr);
 }
 void Primitive::SetColor(Vector4 color) {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
