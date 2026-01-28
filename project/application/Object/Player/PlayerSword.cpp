@@ -18,6 +18,11 @@ void PlayerSword::Initialize() {
 	debugBox_->Initialize();
 	debugBox_->SetCamera(camera);
 	debugBox_->SetModel("debugBox");
+	hitTransform_ = {
+	    .scale{1, 1, 1},
+        .rotate{0, 0, 0},
+        .translate{0, 0, 0}
+	};
 #endif // _DEBUG
 }
 
@@ -57,7 +62,7 @@ void PlayerSword::EndAttack() {
 	attackTimer_ = 0.0f;
 }
 
-Vector3 PlayerSword::GetPosition() const { return swordObject_->GetTransform().translate; }
+Vector3 PlayerSword::GetPosition() const { return hitTransform_.translate; }
 
 void PlayerSword::Update(const Transform& playerTransform, const std::optional<Matrix4x4>& jointWorldMatrix) {
 
@@ -73,7 +78,10 @@ void PlayerSword::Update(const Transform& playerTransform, const std::optional<M
 		Vector3 backDir = {sinf(playerYaw_), 0.0f, cosf(playerYaw_)};
 		swordTransform.translate = playerTransform.translate - backDir * distanceFromPlayer_;
 	}
-
+	Vector3 forwardDir = {sinf(playerYaw_), 0.0f, cosf(playerYaw_)};
+	hitTransform_ = playerTransform;
+	hitTransform_.scale = {GetHitSize(), GetHitSize(), GetHitSize()};
+	hitTransform_.translate = playerTransform.translate + forwardDir * hitDistanceFromPlayer_;
 	// 攻撃中は振る
 	if (isAttacking_) {
 		attackTimer_ += 1.0f / 60.0f;
@@ -96,13 +104,7 @@ void PlayerSword::Update(const Transform& playerTransform, const std::optional<M
 	swordObject_->Update();
 
 #ifdef _DEBUG
-	if (useJointAttachment) {
-		const Matrix4x4 localMatrix = Function::MakeAffineMatrix(swordTransform.scale, swordTransform.rotate, swordTransform.translate);
-		const Matrix4x4 worldMatrix = Function::Multiply(localMatrix, *jointWorldMatrix);
-		debugBox_->SetWorldMatrix(worldMatrix);
-	} else {
-		debugBox_->SetTransform(swordTransform);
-	}
+	debugBox_->SetTransform(hitTransform_);
 	debugBox_->SetCamera(camera);
 	debugBox_->Update();
 #endif // _DEBUG
