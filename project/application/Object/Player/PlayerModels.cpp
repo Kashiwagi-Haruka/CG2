@@ -52,25 +52,25 @@ void PlayerModels::Update() {
 		desiredAnimationName = "Walk";
 		break;
 	case PlayerModels::attack1:
-
+		desiredAnimationName = "Attack1";
 		break;
 	case PlayerModels::attack2:
-
+		desiredAnimationName = "Attack2";
 		break;
 	case PlayerModels::attack3:
-
+		desiredAnimationName = "Attack3";
 		break;
 	case PlayerModels::attack4:
-
+		desiredAnimationName = "Attack4";
 		break;
 	case PlayerModels::fallingAttack:
-
+		desiredAnimationName = "Attack5";
 		break;
 	case PlayerModels::skillAttack:
-
+		desiredAnimationName = "SkillAttack";
 		break;
 	case PlayerModels::damage:
-
+		desiredAnimationName = "Idle";
 		break;
 	default:
 		break;
@@ -131,7 +131,7 @@ void PlayerModels::Draw() {
 	if (sizukuSkeleton_) {
 		sizukuSkeleton_->SetObjectMatrix(playerWorld);
 		Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
-		sizukuSkeleton_->DrawBones(camera_, {0.2f, 0.9f, 1.0f, 1.0f}, {0.1f, 0.5f, 0.9f, 1.0f});
+		/*sizukuSkeleton_->DrawBones(camera_, {0.2f, 0.9f, 1.0f, 1.0f}, {0.1f, 0.5f, 0.9f, 1.0f});*/
 	}
 #endif
 }
