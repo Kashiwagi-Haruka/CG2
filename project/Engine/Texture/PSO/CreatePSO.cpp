@@ -6,7 +6,8 @@
 
 CreatePSO::CreatePSO(DirectXCommon* dxCommon, bool useSkinning) : dxCommon_(dxCommon), useSkinning_(useSkinning) {}
 
-void CreatePSO::Create(D3D12_CULL_MODE cullMode, bool depthEnable, D3D12_FILL_MODE fillMode, D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType) {
+void CreatePSO::Create(D3D12_CULL_MODE cullMode, bool depthEnable, D3D12_FILL_MODE fillMode, D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType, const std::wstring& pixelShaderPath) {
+	pixelShaderPath_ = pixelShaderPath;
 	CreateRootSignature();
 	CreateGraphicsPipeline(cullMode, depthEnable, fillMode, topologyType);
 }
@@ -236,7 +237,7 @@ void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnabl
 	// --- シェーダーコンパイル ---
 	std::wstring vsPath = useSkinning_ ? L"Resources/shader/Object3d/SkinningObject3d.VS.hlsl" : L"Resources/shader/Object3d/Object3d.VS.hlsl";
 	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(vsPath.c_str(), L"vs_6_0");
-	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Object3d/Object3d.PS.hlsl", L"ps_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(pixelShaderPath_.c_str(), L"ps_6_0");
 	assert(vsBlob && psBlob);
 
 	for (int i = 0; i < BlendMode::kCountOfBlendMode; i++) {

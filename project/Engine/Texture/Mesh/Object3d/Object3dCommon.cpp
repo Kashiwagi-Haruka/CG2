@@ -27,6 +27,8 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	pso_ = std::make_unique<CreatePSO>(dxCommon_);
 	pso_->Create(D3D12_CULL_MODE_BACK);
+	psoEmissive_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoEmissive_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dEmissive.PS.hlsl");
 	psoNoCull_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoNoCull_->Create(D3D12_CULL_MODE_NONE);
 	psoNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
@@ -95,6 +97,12 @@ void Object3dCommon::DrawCommon() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(pso_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get());
+	DrawSet();
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::DrawCommonEmissive() {
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoEmissive_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoEmissive_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

@@ -91,7 +91,7 @@ void PlayerSword::Update(const Transform& playerTransform, const std::optional<M
 
 void PlayerSword::Draw() {
 	if (swordTrail_) {
-		Object3dCommon::GetInstance()->DrawCommonNoCull();
+		Object3dCommon::GetInstance()->DrawCommonEmissive();
 		swordTrail_->Draw();
 	}
 	Object3dCommon::GetInstance()->DrawCommon();

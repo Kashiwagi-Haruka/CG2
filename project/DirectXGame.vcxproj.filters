@@ -637,6 +637,7 @@
     <FxCompile Include="Resources\shader\Sprite\Sprite.VS.hlsl">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\shader\Object3d\Object3dEmissive.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
