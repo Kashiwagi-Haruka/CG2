@@ -79,7 +79,7 @@ void PlayerModels::Update() {
 		loopAnimation = false;
 		break;
 	case PlayerModels::damage:
-		desiredAnimationName = "Idle";
+		desiredAnimationName = "damage";
 		loopAnimation = true;
 		break;
 	default:
