@@ -12,6 +12,11 @@ struct Material
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
+struct Camera
+{
+    float3 worldPosition;
+};
+ConstantBuffer<Camera> gCamera : register(b4);
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 
@@ -27,7 +32,13 @@ PixelShaderOutput main(VertexShaderOutput input)
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
 
-    output.color.rgb = textureColor.rgb * gMaterial.color.rgb * 2.0f;
+    float3 baseColor = textureColor.rgb * gMaterial.color.rgb;
+    float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
+    float3 normal = normalize(input.normal);
+    float rim = 1.0f - saturate(dot(normal, toEye));
+    float glow = pow(rim, 2.0f);
+
+    output.color.rgb = baseColor * (2.0f + glow * 4.0f);
     output.color.a = textureColor.a * gMaterial.color.a;
 
     if (textureColor.a < 0.5f)
