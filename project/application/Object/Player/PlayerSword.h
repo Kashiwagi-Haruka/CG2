@@ -3,12 +3,14 @@
 #include "Matrix4x4.h"
 #include "Object3d/Object3d.h"
 #include "Transform.h"
+#include "playerSwordTrail.h"
 #include <memory>
 #include <optional>
 
 class PlayerSword {
 
 	std::unique_ptr<Object3d> swordObject_;
+	std::unique_ptr<PlayerSwordTrail> swordTrail_;
 #ifdef _DEBUG
 	std::unique_ptr<Object3d> debugBox_;
 #endif // _DEBUG

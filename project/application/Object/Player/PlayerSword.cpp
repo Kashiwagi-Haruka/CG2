@@ -1,11 +1,11 @@
 #include "PlayerSword.h"
+#include "Function.h"
 #include "GameBase.h"
 #include "Model/ModelManager.h"
-#include "Function.h"
 PlayerSword::PlayerSword() {
 
-	ModelManager::GetInstance()->LoadModel("Resources/3d","playerSword");
-	ModelManager::GetInstance()->LoadModel("Resources/3d","debugBox");
+	ModelManager::GetInstance()->LoadModel("Resources/3d", "playerSword");
+	ModelManager::GetInstance()->LoadModel("Resources/3d", "debugBox");
 }
 
 void PlayerSword::Initialize() {
@@ -13,6 +13,9 @@ void PlayerSword::Initialize() {
 	swordObject_->Initialize();
 	swordObject_->SetCamera(camera);
 	swordObject_->SetModel("playerSword");
+	swordTrail_ = std::make_unique<PlayerSwordTrail>();
+	swordTrail_->Initialize();
+	swordTrail_->SetCamera(camera);
 #ifdef _DEBUG
 	debugBox_ = std::make_unique<Object3d>();
 	debugBox_->Initialize();
@@ -22,7 +25,7 @@ void PlayerSword::Initialize() {
 	    .scale{1, 1, 1},
         .rotate{0, 0, 0},
         .translate{0, 0, 0}
-	};
+    };
 #endif // _DEBUG
 }
 
@@ -33,6 +36,9 @@ void PlayerSword::StartAttack(int comboStep) {
 
 void PlayerSword::EndAttack() {
 	isAttacking_ = false;
+	if (swordTrail_) {
+		swordTrail_->Clear();
+	}
 }
 
 Vector3 PlayerSword::GetPosition() const { return hitTransform_.translate; }
@@ -60,8 +66,17 @@ void PlayerSword::Update(const Transform& playerTransform, const std::optional<M
 		const Matrix4x4 localMatrix = Function::MakeAffineMatrix(swordTransform.scale, swordTransform.rotate, swordTransform.translate);
 		const Matrix4x4 worldMatrix = Function::Multiply(localMatrix, *jointWorldMatrix);
 		swordObject_->SetWorldMatrix(worldMatrix);
+		if (swordTrail_) {
+			swordTrail_->SetCamera(camera);
+			swordTrail_->Update(worldMatrix, isAttacking_);
+		}
 	} else {
 		swordObject_->SetTransform(swordTransform);
+		const Matrix4x4 worldMatrix = Function::MakeAffineMatrix(swordTransform.scale, swordTransform.rotate, swordTransform.translate);
+		if (swordTrail_) {
+			swordTrail_->SetCamera(camera);
+			swordTrail_->Update(worldMatrix, isAttacking_);
+		}
 	}
 	swordObject_->SetCamera(camera);
 	swordObject_->Update();
@@ -74,6 +89,9 @@ void PlayerSword::Update(const Transform& playerTransform, const std::optional<M
 }
 
 void PlayerSword::Draw() {
+	if (swordTrail_) {
+		swordTrail_->Draw();
+	}
 	swordObject_->Draw();
 #ifdef _DEBUG
 	debugBox_->Draw();
