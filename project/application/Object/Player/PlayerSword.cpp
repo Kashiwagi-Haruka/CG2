@@ -50,7 +50,7 @@ void PlayerSword::Update(const Transform& playerTransform, const std::optional<M
 	Transform swordTransform = playerTransform;
 	if (useJointAttachment) {
 		swordTransform = {
-		    .scale{1.0f, 1.0f, 1.0f},
+		    .scale{2.0f, 2.0f, 2.0f},
 		    .rotate{0.0f, 0.0f, 0.0f},
 		    .translate{0.0f, 0.0f, 0.0f},
 		};

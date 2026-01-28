@@ -20,7 +20,7 @@ class Enemy {
 	int stunTimeMax = 60 * 3;
 
 	float attackTimer_ = 0.0f;
-	float attackCooldown_ = 1.0f;
+	float attackCooldown_ = 0.6f;
 	float attackRange_ = 1.5f;
 	float attackHitSize_ = 1.2f;
 	float damageInvincibleTimer_ = 0.0f;

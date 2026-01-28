@@ -1,6 +1,7 @@
 #include "CollisionManager.h"
 #include "Function.h"
 #include "Object/Enemy/EnemyManager.h"
+#include "Object/ExpCube/ExpCubeManager.h"
 #include "Object/House/House.h"
 #include "Object/Player/Player.h"
 #include "RigidBody.h"
@@ -14,7 +15,7 @@ AABB MakeAabb(const Vector3& center, const Vector3& halfSize) {
 }
 } // namespace
 
-void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& enemyManager, House& house) {
+void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& enemyManager, ExpCubeManager& expCubeManager, House& house) {
 	AABB playerAabb = MakeAabb(player.GetPosition(), player.GetScale());
 	AABB houseAabb = MakeAabb(house.GetPosition(), house.GetScale());
 	auto tryEnemyFlinch = [](Enemy* target) {
@@ -59,7 +60,7 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 				enemyManager.OnEnemyDamaged(enemy.get());
 				tryEnemyFlinch(enemy.get());
 				if (!enemy->GetIsAlive()) {
-					player.EXPMath();
+					expCubeManager.SpawnDrops(enemy->GetPosition(), 3);
 				}
 			}
 		}
@@ -74,7 +75,7 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 				enemyManager.OnEnemyDamaged(enemy.get());
 				tryEnemyFlinch(enemy.get());
 				if (!enemy->GetIsAlive()) {
-					player.EXPMath();
+					expCubeManager.SpawnDrops(enemy->GetPosition(), 3);
 				}
 			}
 		}
@@ -96,7 +97,7 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 					enemyManager.OnEnemyDamaged(enemy.get());
 					tryEnemyFlinch(enemy.get());
 					if (!enemy->GetIsAlive()) {
-						player.EXPMath();
+						expCubeManager.SpawnDrops(enemy->GetPosition(), 3);
 					}
 				}
 			}
@@ -109,6 +110,19 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 			}
 			if (RigidBody::isCollision(enemyAttackAabb, houseAabb)) {
 				house.Damage(1);
+			}
+		}
+	}
+
+	if (player.GetIsAlive()) {
+		for (auto& cube : expCubeManager.GetCubes()) {
+			if (cube->IsCollected()) {
+				continue;
+			}
+			AABB cubeAabb = MakeAabb(cube->GetPosition(), cube->GetScale());
+			if (RigidBody::isCollision(playerAabb, cubeAabb)) {
+				cube->Collect();
+				player.EXPMath();
 			}
 		}
 	}

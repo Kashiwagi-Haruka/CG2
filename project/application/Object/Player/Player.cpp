@@ -41,7 +41,7 @@ void Player::Initialize(Camera* camera) {
 	transform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{-100.0f, 3.0f, -100.0f}
+        .translate{-100.0f, 3.6f, -100.0f}
     };
 
 	playerObject_->Initialize();
@@ -93,7 +93,6 @@ void Player::Move() {
 		return;
 	}
 
-
 	// 入力方向を記録する変数
 	Vector3 inputDirection = {0.0f, 0.0f, 0.0f};
 	Vector3 inputAxis = {0.0f, 0.0f, 0.0f};
@@ -102,41 +101,49 @@ void Player::Move() {
 	if (GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_D)) {
 
 		if (!GameBase::GetInstance()->PushKey(DIK_D)) {
-			
+
 			if (GameBase::GetInstance()->PushKey(DIK_A)) {
 
 				inputAxis.x = -1.0f;
 				hasInput = true;
-				models_->SetStateM(PlayerModels::StateM::walk);
+				if (!isAttacking_) {
+					models_->SetStateM(PlayerModels::StateM::walk);
+				}
 			}
 		}
 
 		if (!GameBase::GetInstance()->PushKey(DIK_A)) {
-			
+
 			if (GameBase::GetInstance()->PushKey(DIK_D)) {
 				inputAxis.x = 1.0f;
 				hasInput = true;
-				models_->SetStateM(PlayerModels::StateM::walk);
+				if (!isAttacking_) {
+					models_->SetStateM(PlayerModels::StateM::walk);
+				}
 			}
 		}
 	}
 	if (GameBase::GetInstance()->PushKey(DIK_W) || GameBase::GetInstance()->PushKey(DIK_S)) {
 
 		if (!GameBase::GetInstance()->PushKey(DIK_W)) {
-		
+
 			if (GameBase::GetInstance()->PushKey(DIK_S)) {
-				models_->SetStateM(PlayerModels::StateM::walk);
+				if (!isAttacking_) {
+					models_->SetStateM(PlayerModels::StateM::walk);
+				}
 				inputAxis.z = -1.0f;
 				hasInput = true;
 			}
 		}
 
 		if (!GameBase::GetInstance()->PushKey(DIK_S)) {
-			
+
 			if (GameBase::GetInstance()->PushKey(DIK_W)) {
 				inputAxis.z = 1.0f;
 				hasInput = true;
-				models_->SetStateM(PlayerModels::StateM::walk);
+				if (!isAttacking_) {
+					models_->SetStateM(PlayerModels::StateM::walk);
+				}
 			}
 		}
 	}
@@ -258,8 +265,8 @@ void Player::Falling() {
 			models_->SetStateM(PlayerModels::StateM::idle);
 		}
 
-		if (transform_.translate.y <= 3.0f) {
-			transform_.translate.y = 3.0f;
+		if (transform_.translate.y <= 3.6f) {
+			transform_.translate.y = 3.6f;
 			velocity_.y = 0.0f;
 			isfalling = false;
 

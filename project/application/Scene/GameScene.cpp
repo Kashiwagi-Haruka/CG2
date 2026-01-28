@@ -4,6 +4,7 @@
 #include "Model/ModelManager.h"
 #include "Object/Background/SkyDome.h"
 #include "Object/Enemy/EnemyManager.h"
+#include "Object/ExpCube/ExpCubeManager.h"
 #include "Object/Player/Player.h"
 #include "Object3d/Object3dCommon.h"
 #include "ParticleManager.h"
@@ -20,6 +21,7 @@ GameScene::GameScene() {
 	skyDome = std::make_unique<SkyDome>();
 	player = std::make_unique<Player>();
 	enemyManager = std::make_unique<EnemyManager>();
+	expCubeManager = std::make_unique<ExpCubeManager>();
 
 	field = std::make_unique<MapchipField>();
 	sceneTransition = std::make_unique<SceneTransition>();
@@ -60,6 +62,7 @@ void GameScene::Initialize() {
 	player->Initialize(cameraController->GetCamera());
 
 	enemyManager->Initialize(cameraController->GetCamera());
+	expCubeManager->Initialize(cameraController->GetCamera());
 	field->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field->Initialize(cameraController->GetCamera());
 	sceneTransition->Initialize(false);
@@ -318,6 +321,7 @@ void GameScene::Update() {
 
 	// ★ ウェーブシステムの更新
 	enemyManager->Update(cameraController->GetCamera(), house->GetPosition(), player->GetPosition(), player->GetIsAlive());
+	expCubeManager->Update(cameraController->GetCamera());
 	int currentWave = enemyManager->GetCurrentWave();
 	if (currentWave != lastWave_) {
 		lastWave_ = currentWave;
@@ -385,7 +389,7 @@ void GameScene::Update() {
 	}
 
 	// ===== プレイヤーと敵の当たり判定 =====
-	collisionManager_.HandleGameSceneCollisions(*player, *enemyManager, *house);
+	collisionManager_.HandleGameSceneCollisions(*player, *enemyManager, *expCubeManager, *house);
 
 	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
@@ -413,14 +417,13 @@ void GameScene::Update() {
 
 void GameScene::Draw() {
 
-	
-	
 	Object3dCommon::GetInstance()->DrawCommon();
 	skyDome->Draw();
 	field->Draw();
 	house->Draw();
 	player->Draw();
 	enemyManager->Draw();
+	expCubeManager->Draw();
 
 	particles->Draw();
 

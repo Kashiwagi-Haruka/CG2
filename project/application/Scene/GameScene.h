@@ -25,6 +25,7 @@ class Enemy;
 class CameraController;
 class SkyDome;
 class EnemyManager;
+class ExpCubeManager;
 
 class GameScene : public BaseScene {
 
@@ -39,6 +40,7 @@ private:
 	std::unique_ptr<SceneTransition> sceneTransition;
 	std::unique_ptr<Player> player;
 	std::unique_ptr<EnemyManager> enemyManager;
+	std::unique_ptr<ExpCubeManager> expCubeManager;
 	std::unique_ptr<SkyDome> skyDome;
 	std::unique_ptr<CameraController> cameraController;
 	std::unique_ptr<MapchipField> field;
