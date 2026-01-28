@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "CollisionManager.h"
 #include "Function.h"
 #include "Object/Enemy/EnemyManager.h"
@@ -5,7 +6,7 @@
 #include "Object/House/House.h"
 #include "Object/Player/Player.h"
 #include "RigidBody.h"
-
+#include <algorithm>
 namespace {
 AABB MakeAabb(const Vector3& center, const Vector3& halfSize) {
 	AABB aabb;
@@ -119,8 +120,15 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 			if (cube->IsCollected()) {
 				continue;
 			}
-			AABB cubeAabb = MakeAabb(cube->GetPosition(), cube->GetScale());
-			if (RigidBody::isCollision(playerAabb, cubeAabb)) {
+			const Vector3 cubePos = cube->GetPosition();
+			Vector3 toCube = player.GetPosition() - cubePos;
+			toCube.y = 0.0f;
+			const Vector3 playerScale = player.GetScale();
+			const Vector3 cubeScale = cube->GetScale();
+			const float playerRadius = std::max(playerScale.x, playerScale.z);
+			const float cubeRadius = std::max(cubeScale.x, cubeScale.z);
+			const float pickupRadius = playerRadius + cubeRadius;
+			if (LengthSquared(toCube) <= pickupRadius * pickupRadius) {
 				cube->Collect();
 				player.EXPMath();
 			}

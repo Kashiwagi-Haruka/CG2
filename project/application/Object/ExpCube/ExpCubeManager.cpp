@@ -1,5 +1,6 @@
 #include "ExpCubeManager.h"
 #include "Camera.h"
+#include "Object3d/Object3dCommon.h"
 #include <algorithm>
 #include <cstdlib>
 
@@ -25,9 +26,11 @@ void ExpCubeManager::Update(Camera* camera) {
 }
 
 void ExpCubeManager::Draw() {
+	Object3dCommon::GetInstance()->DrawCommonEmissive();
 	for (auto& cube : expCubes_) {
 		cube->Draw();
 	}
+	Object3dCommon::GetInstance()->DrawCommon();
 }
 
 void ExpCubeManager::SpawnDrops(const Vector3& position, int count) {
