@@ -1,8 +1,8 @@
 #include "Enemy.h"
+#include "Camera.h"
 #include "GameBase.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3d.h"
-#include "Camera.h"
 #include "Vector4.h"
 #include <algorithm>
 
@@ -12,15 +12,16 @@ const Vector4 kDefaultColor = {1.0f, 1.0f, 1.0f, 1.0f};
 } // namespace
 
 Enemy::Enemy() {
-	
+
 	object_ = std::make_unique<Object3d>();
 	enemyStun = std::make_unique<EnemyStun>();
-	
 }
 void Enemy::Initialize(Camera* camera, Vector3 translates) {
 	isAlive = true;
 	isStun_ = false;
 	HP = 3;
+	stunTime = 0;
+	attackTimer_ = 0.0f;
 	damageInvincibleTimer_ = 0.0f;
 	lastSkillDamageId_ = -1;
 
@@ -43,25 +44,28 @@ void Enemy::Initialize(Camera* camera, Vector3 translates) {
 }
 
 void Enemy::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive) {
-	attackTimer_ += 1.0f / 60.0f;
+	const float deltaTime = 1.0f / 60.0f;
+	if (!enemyAttack_ || !enemyAttack_->IsAttacking()) {
+		attackTimer_ += deltaTime;
+	}
 	if (damageInvincibleTimer_ > 0.0f) {
-		damageInvincibleTimer_ -= 1.0f / 60.0f;
+		damageInvincibleTimer_ -= deltaTime;
 		if (damageInvincibleTimer_ < 0.0f) {
 			damageInvincibleTimer_ = 0.0f;
 		}
 	}
 	object_->SetColor(damageInvincibleTimer_ > 0.0f ? kDamageInvincibleColor : kDefaultColor);
+	Vector3 targetPosition = housePos;
+	if (isPlayerAlive) {
+		Vector3 toPlayer = playerPos - transform_.translate;
+		if (LengthSquared(toPlayer) <= playerChaseRange_ * playerChaseRange_) {
+			targetPosition = playerPos;
+		}
+	}
+
 	// 敵の更新処理
 	if (!isStun_) {
-		Vector3 target = housePos;
-		if (isPlayerAlive) {
-			Vector3 toPlayer = playerPos - transform_.translate;
-			if (LengthSquared(toPlayer) <= playerChaseRange_ * playerChaseRange_) {
-				target = playerPos;
-			}
-		}
-
-		Vector3 toTarget = target - transform_.translate;
+		Vector3 toTarget = targetPosition - transform_.translate;
 		toTarget.y = 0.0f;
 		if (LengthSquared(toTarget) > 0.0001f) {
 			Vector3 direction = Function::Normalize(toTarget);
@@ -69,7 +73,9 @@ void Enemy::Update(const Vector3& housePos, const Vector3& playerPos, bool isPla
 		} else {
 			velocity_ = {0.0f, 0.0f, 0.0f};
 		}
-	
+		if (enemyAttack_ && enemyAttack_->IsAttacking()) {
+			velocity_ = {0.0f, 0.0f, 0.0f};
+		}
 	}
 
 	if (isStun_) {
@@ -86,11 +92,15 @@ void Enemy::Update(const Vector3& housePos, const Vector3& playerPos, bool isPla
 	object_->SetCamera(camera_);
 	object_->SetTransform(transform_);
 	object_->Update();
-	// 攻撃タイマー更新
-	attackTimer_ += 1.0f / 60.0f;
 
 	// 攻撃開始条件
-	if (!isStun_ && IsAttackReady()) {
+	bool inAttackRange = false;
+	if (!isStun_) {
+		Vector3 toTarget = targetPosition - transform_.translate;
+		toTarget.y = 0.0f;
+		inAttackRange = LengthSquared(toTarget) <= attackRange_ * attackRange_;
+	}
+	if (!isStun_ && !IsAttacking() && inAttackRange && IsAttackReady()) {
 		enemyAttack_->Start(transform_);
 		ResetAttackTimer();
 	}
@@ -103,6 +113,10 @@ void Enemy::Update(const Vector3& housePos, const Vector3& playerPos, bool isPla
 }
 void Enemy::Stun() {
 	isStun_ = true;
+	stunTime = 0;
+	if (enemyAttack_) {
+		enemyAttack_->Cancel();
+	}
 	if (HP <= 0) {
 		isAlive = false;
 	}
@@ -119,12 +133,8 @@ void Enemy::Draw() {
 	if (isStun_) {
 		enemyStun->Draw();
 	}
-
-
 }
-void Enemy::BulletCollision(){
-
-}
+void Enemy::BulletCollision() {}
 
 void Enemy::SetIsStun(bool IsStun) { isStun_ = IsStun; }
 

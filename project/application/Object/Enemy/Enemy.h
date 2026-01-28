@@ -72,4 +72,6 @@ public:
 	void TriggerDamageInvincibility() { damageInvincibleTimer_ = damageInvincibleDuration_; }
 	int GetLastSkillDamageId() const { return lastSkillDamageId_; }
 	void SetLastSkillDamageId(int skillDamageId) { lastSkillDamageId_ = skillDamageId; }
+	bool IsAttacking() const { return enemyAttack_ && enemyAttack_->IsAttacking(); }
+	bool IsStunned() const { return isStun_; }
 };

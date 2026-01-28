@@ -16,6 +16,7 @@ public:
 	void Start(const Transform& enemyTransform);
 	void Update();
 	void Draw();
+	void Cancel();
 
 	bool IsAttacking() const { return state_ != State::Idle; }
 	bool IsHitActive() const { return hitActive_; }

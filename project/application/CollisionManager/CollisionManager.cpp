@@ -17,6 +17,11 @@ AABB MakeAabb(const Vector3& center, const Vector3& halfSize) {
 void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& enemyManager, House& house) {
 	AABB playerAabb = MakeAabb(player.GetPosition(), player.GetScale());
 	AABB houseAabb = MakeAabb(house.GetPosition(), house.GetScale());
+	auto tryEnemyFlinch = [](Enemy* target) {
+		if (!target->IsAttacking()) {
+			target->Stun();
+		}
+	};
 
 	for (auto& enemy : enemyManager.GetEnemies()) {
 		if (!enemy->GetIsAlive()) {
@@ -52,6 +57,7 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 				enemy->SetHPSubtract(1);
 				enemy->TriggerDamageInvincibility();
 				enemyManager.OnEnemyDamaged(enemy.get());
+				tryEnemyFlinch(enemy.get());
 				if (!enemy->GetIsAlive()) {
 					player.EXPMath();
 				}
@@ -66,6 +72,7 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 				enemy->SetHPSubtract(1);
 				enemy->SetLastSkillDamageId(skillDamageId);
 				enemyManager.OnEnemyDamaged(enemy.get());
+				tryEnemyFlinch(enemy.get());
 				if (!enemy->GetIsAlive()) {
 					player.EXPMath();
 				}
@@ -87,6 +94,7 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 					enemy->SetHPSubtract(1);
 					enemy->TriggerDamageInvincibility();
 					enemyManager.OnEnemyDamaged(enemy.get());
+					tryEnemyFlinch(enemy.get());
 					if (!enemy->GetIsAlive()) {
 						player.EXPMath();
 					}

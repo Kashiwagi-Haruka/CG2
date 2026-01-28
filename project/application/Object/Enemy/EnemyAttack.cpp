@@ -54,7 +54,11 @@ void EnemyAttack::Update() {
 		state_ = State::Idle;
 	}
 }
-
+void EnemyAttack::Cancel() {
+	state_ = State::Idle;
+	timer_ = 0.0f;
+	hitActive_ = false;
+}
 void EnemyAttack::Draw() {
 	if (state_ != State::Idle) {
 		object_->Draw();
