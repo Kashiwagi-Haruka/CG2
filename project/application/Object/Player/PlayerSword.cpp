@@ -2,6 +2,7 @@
 #include "Function.h"
 #include "GameBase.h"
 #include "Model/ModelManager.h"
+#include "Object3d/Object3dCommon.h"
 PlayerSword::PlayerSword() {
 
 	ModelManager::GetInstance()->LoadModel("Resources/3d", "playerSword");
@@ -90,8 +91,10 @@ void PlayerSword::Update(const Transform& playerTransform, const std::optional<M
 
 void PlayerSword::Draw() {
 	if (swordTrail_) {
+		Object3dCommon::GetInstance()->DrawCommonNoCull();
 		swordTrail_->Draw();
 	}
+	Object3dCommon::GetInstance()->DrawCommon();
 	swordObject_->Draw();
 #ifdef _DEBUG
 	debugBox_->Draw();

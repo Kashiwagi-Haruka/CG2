@@ -27,6 +27,8 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	pso_ = std::make_unique<CreatePSO>(dxCommon_);
 	pso_->Create(D3D12_CULL_MODE_BACK);
+	psoNoCull_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoNoCull_->Create(D3D12_CULL_MODE_NONE);
 	psoNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoNoDepth_->Create(D3D12_CULL_MODE_BACK, false);
 	psoWireframe_ = std::make_unique<CreatePSO>(dxCommon_);
@@ -93,6 +95,13 @@ void Object3dCommon::DrawCommon() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(pso_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get());
+	DrawSet();
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::DrawCommonNoCull() {
+
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoNoCull_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoNoCull_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

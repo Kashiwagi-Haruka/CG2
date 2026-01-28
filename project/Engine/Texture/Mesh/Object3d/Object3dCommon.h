@@ -26,6 +26,7 @@ private:
 	BlendModeManager blendModeManager_;
 
 	std::unique_ptr<CreatePSO> pso_;
+	std::unique_ptr<CreatePSO> psoNoCull_;
 	std::unique_ptr<CreatePSO> psoNoDepth_;
 	std::unique_ptr<CreatePSO> psoWireframe_;
 	std::unique_ptr<CreatePSO> psoWireframeNoDepth_;
@@ -65,6 +66,7 @@ public:
 	void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
 	Camera* GetDefaultCamera() const { return defaultCamera; };
 	void DrawCommon();
+	void DrawCommonNoCull();
 	void DrawCommonNoDepth();
 	void DrawCommonWireframeNoDepth();
 	void DrawCommonLineNoDepth();
