@@ -84,20 +84,20 @@ struct PixelShaderOutput
     float4 color : SV_TARGET0;
 };
 
-static const float kToonShadowThreshold = 0.25f;
-static const float kToonShadowStrength = 0.45f;
-static const float kToonSpecularThreshold = 0.35f;
-static const float kToonSpecularSoftness = 0.18f;
-static const float kToonRimThreshold = 0.35f;
-static const float kToonRimSoftness = 0.12f;
-static const float kToonRimPower = 2.2f;
-static const float kToonRimStrength = 0.16f;
-static const float kToonEdgeSoftness = 0.06f;
-static const float kToonLightWrap = 0.35f;
-static const float kToonAmbientStrength = 0.0f;
-static const float kToonSpecularStrength = 0.18f;
-static const float kToonColorPreserveStrength = 0.55f;
-static const float kToonLightIntensityMax = 0.85f;
+static const float kToonShadowThreshold = 0.32f; // ← 影を狭める
+static const float kToonShadowStrength = 0.62f; // ← 影を明るめに
+static const float kToonSpecularThreshold = 0.42f;
+static const float kToonSpecularSoftness = 0.22f;
+static const float kToonSpecularStrength = 0.12f; // 主張させない
+static const float kToonRimThreshold = 0.28f;
+static const float kToonRimSoftness = 0.20f;
+static const float kToonRimPower = 1.6f;
+static const float kToonRimStrength = 0.10f;
+static const float kToonEdgeSoftness = 0.10f; // ← 境界をかなり柔らかく
+static const float kToonLightWrap = 0.45f; // ← 回り込み強め
+static const float kToonAmbientStrength = 0.08f;
+static const float kToonColorPreserveStrength = 0.70f;
+static const float kToonLightIntensityMax = 0.80f;
 
 float ComputeToonStep(float NdotL)
 {
@@ -128,7 +128,6 @@ PixelShaderOutput main(VertexShaderOutput input)
         ////half lambert
         float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
         float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
-        float cos = pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
         float3 halfVector = normalize(-gDirectionalLight.direction + toEye);
         float NDotH = dot(normalize(input.normal), halfVector);
         float specularPow = pow(saturate(NDotH), gMaterial.shininess);
@@ -140,10 +139,11 @@ PixelShaderOutput main(VertexShaderOutput input)
 
         float3 baseColor = gMaterial.color.rgb * textureColor.rgb;
         float3 shadowTint = baseColor * float3(0.75f, 0.78f, 0.85f);
-        float3 litDiffuse = baseColor * gDirectionalLight.color.rgb * gDirectionalLight.intensity;
+        float directionalIntensity = min(gDirectionalLight.intensity, kToonLightIntensityMax);
+        float3 litDiffuse = baseColor * gDirectionalLight.color.rgb * directionalIntensity;
         float3 diffuse = lerp(shadowTint, litDiffuse, toonDiffuseStep);
-        float3 specular = gDirectionalLight.color.rgb * gDirectionalLight.intensity * toonSpecularStep * 0.6f;
-        float3 rimLight = gDirectionalLight.color.rgb * gDirectionalLight.intensity * rimStep * kToonRimStrength;
+        float3 specular = gDirectionalLight.color.rgb * directionalIntensity * toonSpecularStep * kToonSpecularStrength;
+        float3 rimLight = gDirectionalLight.color.rgb * directionalIntensity * rimStep * kToonRimStrength;
         float3 ambient = baseColor * kToonAmbientStrength;
         
 // Point Light
@@ -162,15 +162,16 @@ PixelShaderOutput main(VertexShaderOutput input)
 // 拡散 (Lambert)
             float NdotL_p = saturate(dot(N, Lp));
             float toonDiffuseStepP = ComputeToonStep(NdotL_p);
-            float3 litDiffuseP = baseColor * pointLight.color.rgb * pointLight.intensity * attenuation;
+            float pointIntensity = min(pointLight.intensity, kToonLightIntensityMax);
+            float3 litDiffuseP = baseColor * pointLight.color.rgb * pointIntensity * attenuation;
             diffuseP += litDiffuseP * toonDiffuseStepP;
 
 // 鏡面反射 (Phong)
             float NdotH_p = saturate(dot(N, H));
             float specularPowP = pow(NdotH_p, gMaterial.shininess);
             float toonSpecularStepP = ComputeToonSpecular(specularPowP);
-            specularP += pointLight.color.rgb * pointLight.intensity *
-                   toonSpecularStepP * 0.6f * attenuation;
+            specularP += pointLight.color.rgb * pointIntensity *
+                   toonSpecularStepP * kToonSpecularStrength * attenuation;
         }
 
 // Spot Light
@@ -194,11 +195,12 @@ PixelShaderOutput main(VertexShaderOutput input)
             float toonDiffuseStepS = ComputeToonStep(NdotL_s);
             float toonSpecularStepS = ComputeToonSpecular(specularPowS);
 
-            float3 litDiffuseS = baseColor * spotLight.color.rgb * spotLight.intensity *
+            float spotIntensity = min(spotLight.intensity, kToonLightIntensityMax);
+            float3 litDiffuseS = baseColor * spotLight.color.rgb * spotIntensity *
                 attenuationFactor * falloffFactor;
             spotLightDiffuse += litDiffuseS * toonDiffuseStepS;
-            spotLightSpecular += spotLight.color.rgb * spotLight.intensity *
-                toonSpecularStepS * 0.6f * attenuationFactor * falloffFactor;
+            spotLightSpecular += spotLight.color.rgb * spotIntensity *
+                toonSpecularStepS * kToonSpecularStrength * attenuationFactor * falloffFactor;
         }
         // Area Light
         float3 areaLightDiffuse = float3(0.0f, 0.0f, 0.0f);
@@ -219,13 +221,14 @@ PixelShaderOutput main(VertexShaderOutput input)
             float specularPowA = pow(NdotH_a, gMaterial.shininess);
             float toonDiffuseStepA = ComputeToonStep(NdotL_a);
             float toonSpecularStepA = ComputeToonSpecular(specularPowA);
-            float intensity = areaLight.intensity * areaScale * lightFacing;
+            float areaIntensity = min(areaLight.intensity, kToonLightIntensityMax);
+            float intensity = areaIntensity * areaScale * lightFacing;
 
             float3 litDiffuseA = baseColor * areaLight.color.rgb * intensity *
                 attenuationFactor;
             areaLightDiffuse += litDiffuseA * toonDiffuseStepA;
             areaLightSpecular += areaLight.color.rgb * intensity *
-                toonSpecularStepA * 0.6f * attenuationFactor;
+                toonSpecularStepA * kToonSpecularStrength * attenuationFactor;
         }
         float3 viewDirection = normalize(input.worldPosition - gCamera.worldPosition);
         float3 reflectedDirection = reflect(viewDirection, normalize(input.normal));
@@ -233,7 +236,8 @@ PixelShaderOutput main(VertexShaderOutput input)
             asin(reflectedDirection.y) / pi + 0.5f);
         float3 environmentColor = gEnvironmentTexture.Sample(gSampler, environmentUV).rgb;
 
-        output.color.rgb = diffuse + specular + rimLight + ambient + diffuseP + specularP + spotLightDiffuse + spotLightSpecular + areaLightDiffuse + areaLightSpecular;
+        float3 lightingSum = diffuse + specular + rimLight + ambient + diffuseP + specularP + spotLightDiffuse + spotLightSpecular + areaLightDiffuse + areaLightSpecular;
+        output.color.rgb = lerp(baseColor, lightingSum, kToonColorPreserveStrength);
         output.color.rgb += environmentColor * gMaterial.environmentCoefficient;
         output.color.a = gMaterial.color.a * textureColor.a;
     }
