@@ -47,6 +47,8 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	psoLineNoDepth_->Create(D3D12_CULL_MODE_NONE, false, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
 	psoSkinning_ = std::make_unique<CreatePSO>(dxCommon_, true);
 	psoSkinning_->Create(D3D12_CULL_MODE_BACK);
+	psoSkinningToon_ = std::make_unique<CreatePSO>(dxCommon_, true);
+	psoSkinningToon_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dToon.PS.hlsl");
 	SetEnvironmentMapTexture("Resources/3d/skydome.png");
 
 	// Directional Light の共通バッファ作成
@@ -152,6 +154,13 @@ void Object3dCommon::DrawCommonSkinning() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinning_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinning_->GetGraphicsPipelineState(blendMode_).Get());
+	DrawSet();
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::DrawCommonSkinningToon() {
+
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinningToon_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoSkinningToon_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
