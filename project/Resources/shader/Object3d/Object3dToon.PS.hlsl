@@ -139,12 +139,11 @@ PixelShaderOutput main(VertexShaderOutput input)
         float rimStep = ComputeToonRim(rim);
 
         float3 baseColor = gMaterial.color.rgb * textureColor.rgb;
-        float3 shadowTint = baseColor * float3(0.8f, 0.86f, 0.96f);
-        float3 toonBase = lerp(shadowTint, baseColor, toonDiffuseStep);
-        float directionalIntensity = min(gDirectionalLight.intensity, kToonLightIntensityMax);
-        float3 diffuse = toonBase * gDirectionalLight.color.rgb * directionalIntensity;
-        float3 specular = gDirectionalLight.color.rgb * directionalIntensity * toonSpecularStep * kToonSpecularStrength;
-        float3 rimLight = gDirectionalLight.color.rgb * directionalIntensity * rimStep * kToonRimStrength;
+        float3 shadowTint = baseColor * float3(0.75f, 0.78f, 0.85f);
+        float3 litDiffuse = baseColor * gDirectionalLight.color.rgb * gDirectionalLight.intensity;
+        float3 diffuse = lerp(shadowTint, litDiffuse, toonDiffuseStep);
+        float3 specular = gDirectionalLight.color.rgb * gDirectionalLight.intensity * toonSpecularStep * 0.6f;
+        float3 rimLight = gDirectionalLight.color.rgb * gDirectionalLight.intensity * rimStep * kToonRimStrength;
         float3 ambient = baseColor * kToonAmbientStrength;
         
 // Point Light
@@ -159,20 +158,19 @@ PixelShaderOutput main(VertexShaderOutput input)
             float3 H = normalize(Lp + toEye); // ハーフベクトル
             float distance = length(pointLight.position - input.worldPosition);
             float attenuation = pow(saturate(1.0f - distance / pointLight.radius), pointLight.decay);
-            float pointIntensity = min(pointLight.intensity * attenuation, kToonLightIntensityMax);
 
 // 拡散 (Lambert)
             float NdotL_p = saturate(dot(N, Lp));
             float toonDiffuseStepP = ComputeToonStep(NdotL_p);
-            float3 toonBaseP = lerp(shadowTint, baseColor, toonDiffuseStepP);
-            diffuseP += toonBaseP * pointLight.color.rgb * pointIntensity;
+            float3 litDiffuseP = baseColor * pointLight.color.rgb * pointLight.intensity * attenuation;
+            diffuseP += litDiffuseP * toonDiffuseStepP;
 
 // 鏡面反射 (Phong)
             float NdotH_p = saturate(dot(N, H));
             float specularPowP = pow(NdotH_p, gMaterial.shininess);
             float toonSpecularStepP = ComputeToonSpecular(specularPowP);
-            specularP += pointLight.color.rgb * pointIntensity *
-                   toonSpecularStepP * kToonSpecularStrength;
+            specularP += pointLight.color.rgb * pointLight.intensity *
+                   toonSpecularStepP * 0.6f * attenuation;
         }
 
 // Spot Light
@@ -188,7 +186,6 @@ PixelShaderOutput main(VertexShaderOutput input)
             float falloffFactor = saturate((cosAngle - spotLight.cosAngle) / (spotLight.cosFalloffStart - spotLight.cosAngle));
             float distanceToLight = length(lightToSurface);
             float attenuationFactor = pow(saturate(1.0f - distanceToLight / spotLight.distance), spotLight.decay);
-            float spotIntensity = min(spotLight.intensity * attenuationFactor * falloffFactor, kToonLightIntensityMax);
 
             float NdotL_s = saturate(dot(N, lightDirection));
             float3 Hs = normalize(lightDirection + toEye);
@@ -197,10 +194,11 @@ PixelShaderOutput main(VertexShaderOutput input)
             float toonDiffuseStepS = ComputeToonStep(NdotL_s);
             float toonSpecularStepS = ComputeToonSpecular(specularPowS);
 
-            float3 toonBaseS = lerp(shadowTint, baseColor, toonDiffuseStepS);
-            spotLightDiffuse += toonBaseS * spotLight.color.rgb * spotIntensity;
-            spotLightSpecular += spotLight.color.rgb * spotIntensity *
-                toonSpecularStepS * kToonSpecularStrength;
+            float3 litDiffuseS = baseColor * spotLight.color.rgb * spotLight.intensity *
+                attenuationFactor * falloffFactor;
+            spotLightDiffuse += litDiffuseS * toonDiffuseStepS;
+            spotLightSpecular += spotLight.color.rgb * spotLight.intensity *
+                toonSpecularStepS * 0.6f * attenuationFactor * falloffFactor;
         }
         // Area Light
         float3 areaLightDiffuse = float3(0.0f, 0.0f, 0.0f);
@@ -221,12 +219,13 @@ PixelShaderOutput main(VertexShaderOutput input)
             float specularPowA = pow(NdotH_a, gMaterial.shininess);
             float toonDiffuseStepA = ComputeToonStep(NdotL_a);
             float toonSpecularStepA = ComputeToonSpecular(specularPowA);
-            float intensity = min(areaLight.intensity * areaScale * lightFacing * attenuationFactor, kToonLightIntensityMax);
+            float intensity = areaLight.intensity * areaScale * lightFacing;
 
-            float3 toonBaseA = lerp(shadowTint, baseColor, toonDiffuseStepA);
-            areaLightDiffuse += toonBaseA * areaLight.color.rgb * intensity;
+            float3 litDiffuseA = baseColor * areaLight.color.rgb * intensity *
+                attenuationFactor;
+            areaLightDiffuse += litDiffuseA * toonDiffuseStepA;
             areaLightSpecular += areaLight.color.rgb * intensity *
-                toonSpecularStepA * kToonSpecularStrength;
+                toonSpecularStepA * 0.6f * attenuationFactor;
         }
         float3 viewDirection = normalize(input.worldPosition - gCamera.worldPosition);
         float3 reflectedDirection = reflect(viewDirection, normalize(input.normal));
@@ -234,8 +233,7 @@ PixelShaderOutput main(VertexShaderOutput input)
             asin(reflectedDirection.y) / pi + 0.5f);
         float3 environmentColor = gEnvironmentTexture.Sample(gSampler, environmentUV).rgb;
 
-        float3 litColor = diffuse + specular + rimLight + ambient + diffuseP + specularP + spotLightDiffuse + spotLightSpecular + areaLightDiffuse + areaLightSpecular;
-        output.color.rgb = lerp(litColor, baseColor, kToonColorPreserveStrength);
+        output.color.rgb = diffuse + specular + rimLight + ambient + diffuseP + specularP + spotLightDiffuse + spotLightSpecular + areaLightDiffuse + areaLightSpecular;
         output.color.rgb += environmentColor * gMaterial.environmentCoefficient;
         output.color.a = gMaterial.color.a * textureColor.a;
     }

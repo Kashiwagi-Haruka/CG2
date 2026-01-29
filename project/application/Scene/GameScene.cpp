@@ -109,7 +109,7 @@ void GameScene::Initialize() {
 
 	activePointLightCount_ = 3;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLights_[0].position = {-75.0f, 5.0f, -75.0f};
+	pointLights_[0].position = {-75.0f, 10.0f, -75.0f};
 	pointLights_[0].intensity = 1.0f;
 	pointLights_[0].radius = 10.0f;
 	pointLights_[0].decay = 0.7f;
