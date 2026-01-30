@@ -30,6 +30,7 @@ public:
 	void Initialize(Camera* camera);
 	void Update();
 	void Draw();
+	float GetMirrorPlaneY() const { return transform_.translate.y + transform_.scale.y; }
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	bool IsWall(int x, int y) const;
 	void LoadFromCSV(const std::string& filename);

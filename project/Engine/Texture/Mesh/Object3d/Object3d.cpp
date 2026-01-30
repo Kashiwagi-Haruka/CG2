@@ -95,6 +95,25 @@ void Object3d::Update() {
 	cameraData_->screenSize = {static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)};
 	cameraResource_->Unmap(0, nullptr);
 }
+
+void Object3d::UpdateWorldMatrix(const Matrix4x4& matrix) {
+	worldMatrix = matrix;
+	worldViewProjectionMatrix = Function::Multiply(worldMatrix, Function::Multiply(camera_->GetViewMatrix(), camera_->GetProjectionMatrix()));
+	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+	transformationMatrixData_->WVP = worldViewProjectionMatrix;
+	transformationMatrixData_->World = worldMatrix;
+	transformationMatrixData_->WorldInverseTranspose = Function::Inverse(worldMatrix);
+	transformResource_->Unmap(0, nullptr);
+
+	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
+	if (camera_) {
+		cameraData_->worldPosition = camera_->GetWorldTranslate();
+	} else {
+		cameraData_->worldPosition = {transform_.translate};
+	}
+	cameraData_->screenSize = {static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)};
+	cameraResource_->Unmap(0, nullptr);
+}
 void Object3d::Draw() {
 
 	// --- 座標変換行列CBufferの場所を設定 ---

@@ -114,6 +114,7 @@ public:
 	void Attack();
 	void Update();
 	void Draw();
+	void DrawReflection(float mirrorY, float alpha);
 	void Jump();
 	void Falling();
 	PlayerSkill* GetSkill() { return skill_.get(); }

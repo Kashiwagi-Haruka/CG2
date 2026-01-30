@@ -38,6 +38,7 @@ public:
 	void AddEnemy(Camera* camera, const Vector3& pos);
 	void Update(Camera* camera, const Vector3& housePos, const Vector3& houseScale, const Vector3& playerPos, bool isPlayerAlive);
 	void Draw();
+	void DrawReflection(float mirrorY, float alpha);
 	void Clear();
 	void OnEnemyDamaged(Enemy* enemy);
 	// ウェーブシステム関連

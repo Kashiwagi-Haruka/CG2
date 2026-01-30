@@ -47,6 +47,7 @@ public:
 	void Initialize();
 	void Update();
 	void Draw();
+	void DrawReflection(const Matrix4x4& mirrorMatrix, float alpha);
 	std::optional<Matrix4x4> GetJointWorldMatrix(const std::string& jointName) const;
 	bool IsAttackAnimationFinished() const { return animationFinished_; }
 };

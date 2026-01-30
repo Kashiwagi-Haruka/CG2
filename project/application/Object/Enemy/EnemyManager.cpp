@@ -225,6 +225,14 @@ void EnemyManager::Draw() {
 	}
 }
 
+void EnemyManager::DrawReflection(float mirrorY, float alpha) {
+	for (auto& e : enemies) {
+		if (e->GetIsAlive()) {
+			e->DrawReflection(mirrorY, alpha);
+		}
+	}
+}
+
 void EnemyManager::OnEnemyDamaged(Enemy* enemy) {
 	for (auto& entry : hitEffects) {
 		if (entry.enemy == enemy) {

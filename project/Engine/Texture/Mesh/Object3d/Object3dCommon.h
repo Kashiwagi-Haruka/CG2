@@ -36,6 +36,7 @@ private:
 	std::unique_ptr<CreatePSO> psoLine_;
 	std::unique_ptr<CreatePSO> psoLineNoDepth_;
 	std::unique_ptr<CreatePSO> psoSkinning_;
+	std::unique_ptr<CreatePSO> psoSkinningNoCull_;
 	std::unique_ptr<CreatePSO> psoSkinningToon_;
 	std::unique_ptr<CreatePSO> psoMirror_;
 
@@ -79,6 +80,7 @@ public:
 	void DrawCommonWireframeNoDepth();
 	void DrawCommonLineNoDepth();
 	void DrawCommonSkinning();
+	void DrawCommonSkinningNoCull();
 	void DrawCommonSkinningToon();
 	void DrawCommonMirror();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);

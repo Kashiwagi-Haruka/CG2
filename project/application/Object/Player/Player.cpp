@@ -573,3 +573,11 @@ void Player::Draw() {
 	specialAttack_->Draw();
 	}
 }
+
+void Player::DrawReflection(float mirrorY, float alpha) {
+	if (!models_) {
+		return;
+	}
+	const Matrix4x4 mirrorMatrix = Function::MakeMirrorMatrix(mirrorY);
+	models_->DrawReflection(mirrorMatrix, alpha);
+}

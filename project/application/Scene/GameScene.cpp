@@ -419,8 +419,14 @@ void GameScene::Draw() {
 
 	Object3dCommon::GetInstance()->DrawCommon();
 	skyDome->Draw();
+	const float mirrorPlaneY = field->GetMirrorPlaneY();
+	Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
+	player->DrawReflection(mirrorPlaneY, 0.35f);
+	enemyManager->DrawReflection(mirrorPlaneY, 0.3f);
+	house->DrawReflection(mirrorPlaneY, 0.3f);
 	Object3dCommon::GetInstance()->DrawCommonMirror();
 	field->Draw();
+	Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeNone);
 	player->Draw();
 
 	enemyManager->Draw();

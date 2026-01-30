@@ -153,6 +153,20 @@ void PlayerModels::Draw() {
 	}
 #endif
 }
+
+void PlayerModels::DrawReflection(const Matrix4x4& mirrorMatrix, float alpha) {
+	if (!Sizuku_) {
+		return;
+	}
+	const Matrix4x4 originalWorld = Sizuku_->GetWorldMatrix();
+	const Matrix4x4 reflectedWorld = Function::Multiply(originalWorld, mirrorMatrix);
+	Object3dCommon::GetInstance()->DrawCommonSkinningNoCull();
+	Sizuku_->SetColor({1.0f, 1.0f, 1.0f, alpha});
+	Sizuku_->UpdateWorldMatrix(reflectedWorld);
+	Sizuku_->Draw();
+	Sizuku_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	Sizuku_->UpdateWorldMatrix(originalWorld);
+}
 std::optional<Matrix4x4> PlayerModels::GetJointWorldMatrix(const std::string& jointName) const {
 	if (!sizukuSkeleton_) {
 		return std::nullopt;
