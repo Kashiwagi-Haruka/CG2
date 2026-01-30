@@ -421,6 +421,7 @@ void GameScene::Draw() {
 	skyDome->Draw();
 	field->Draw();
 	player->Draw();
+
 	enemyManager->Draw();
 	expCubeManager->Draw();
 	house->Draw();

@@ -85,7 +85,7 @@ struct PixelShaderOutput
 };
 
 static const float kToonShadowThreshold = 0.32f; // ← 影を狭める
-static const float kToonShadowStrength = 0.62f; // ← 影を明るめに
+static const float kToonShadowStrength = 0.52f; // ← 影をやや濃く
 static const float kToonSpecularThreshold = 0.42f;
 static const float kToonSpecularSoftness = 0.22f;
 static const float kToonSpecularStrength = 0.12f; // 主張させない
@@ -95,9 +95,9 @@ static const float kToonRimPower = 1.6f;
 static const float kToonRimStrength = 0.10f;
 static const float kToonEdgeSoftness = 0.10f; // ← 境界をかなり柔らかく
 static const float kToonLightWrap = 0.45f; // ← 回り込み強め
-static const float kToonAmbientStrength = 0.08f;
-static const float kToonColorPreserveStrength = 0.70f;
-static const float kToonLightIntensityMax = 0.80f;
+static const float kToonAmbientStrength = 0.06f;
+static const float kToonColorPreserveStrength = 0.50f;
+static const float kToonLightIntensityMax = 0.65f;
 
 float ComputeToonStep(float NdotL)
 {
@@ -138,7 +138,7 @@ PixelShaderOutput main(VertexShaderOutput input)
         float rimStep = ComputeToonRim(rim);
 
         float3 baseColor = gMaterial.color.rgb * textureColor.rgb;
-        float3 shadowTint = baseColor * float3(0.75f, 0.78f, 0.85f);
+        float3 shadowTint = baseColor * float3(0.65f, 0.68f, 0.75f);
         float directionalIntensity = min(gDirectionalLight.intensity, kToonLightIntensityMax);
         float3 litDiffuse = baseColor * gDirectionalLight.color.rgb * directionalIntensity;
         float3 diffuse = lerp(shadowTint, litDiffuse, toonDiffuseStep);
@@ -236,7 +236,9 @@ PixelShaderOutput main(VertexShaderOutput input)
             asin(reflectedDirection.y) / pi + 0.5f);
         float3 environmentColor = gEnvironmentTexture.Sample(gSampler, environmentUV).rgb;
 
-        float3 lightingSum = diffuse + specular + rimLight + ambient + diffuseP + specularP + spotLightDiffuse + spotLightSpecular + areaLightDiffuse + areaLightSpecular;
+        float otherLightMask = toonDiffuseStep;
+        float3 otherLights = diffuseP + specularP + spotLightDiffuse + spotLightSpecular + areaLightDiffuse + areaLightSpecular;
+        float3 lightingSum = diffuse + specular + rimLight + ambient + (otherLights * otherLightMask);
         output.color.rgb = lerp(baseColor, lightingSum, kToonColorPreserveStrength);
         output.color.rgb += environmentColor * gMaterial.environmentCoefficient;
         output.color.a = gMaterial.color.a * textureColor.a;
