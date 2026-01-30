@@ -94,10 +94,10 @@ static const float kToonRimSoftness = 0.20f;
 static const float kToonRimPower = 1.6f;
 static const float kToonRimStrength = 0.10f;
 static const float kToonEdgeSoftness = 0.10f; // ← 境界をかなり柔らかく
-static const float kToonLightWrap = 0.45f; // ← 回り込み強め
-static const float kToonAmbientStrength = 0.06f;
-static const float kToonColorPreserveStrength = 0.50f;
-static const float kToonLightIntensityMax = 0.65f;
+static const float kToonLightWrap = 0.25f; // ← 回り込みを抑えて指向性を強める
+static const float kToonAmbientStrength = 0.03f;
+static const float kToonColorPreserveStrength = 0.35f;
+static const float kToonLightIntensityMax = 1.00f;
 
 float ComputeToonStep(float NdotL)
 {

@@ -142,7 +142,7 @@ void PlayerModels::Update() {
 void PlayerModels::Draw() {
 
 
-	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
+	Object3dCommon::GetInstance()->DrawCommonSkinning();
 	Sizuku_->Draw();
 
 #ifdef _DEBUG
