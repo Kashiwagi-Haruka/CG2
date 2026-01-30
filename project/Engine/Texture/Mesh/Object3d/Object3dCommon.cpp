@@ -50,7 +50,8 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	psoSkinningToon_ = std::make_unique<CreatePSO>(dxCommon_, true);
 	psoSkinningToon_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dToon.PS.hlsl");
 	SetEnvironmentMapTexture("Resources/3d/skydome.png");
-
+	psoMirror_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoMirror_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dMirror.PS.hlsl");
 	// Directional Light の共通バッファ作成
 	directionalLightResource_ = CreateBufferResource(sizeof(DirectionalLight));
 	assert(directionalLightResource_);
@@ -164,6 +165,14 @@ void Object3dCommon::DrawCommonSkinningToon() {
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
+void Object3dCommon::DrawCommonMirror() {
+
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoMirror_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoMirror_->GetGraphicsPipelineState(blendMode_).Get());
+	DrawSet();
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
 void Object3dCommon::SetDirectionalLight(DirectionalLight& light) { *directionalLightData_ = light; }
 void Object3dCommon::SetBlendMode(BlendMode blendMode) {
 	blendMode_ = blendMode;

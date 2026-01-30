@@ -419,6 +419,7 @@ void GameScene::Draw() {
 
 	Object3dCommon::GetInstance()->DrawCommon();
 	skyDome->Draw();
+	Object3dCommon::GetInstance()->DrawCommonMirror();
 	field->Draw();
 	player->Draw();
 
