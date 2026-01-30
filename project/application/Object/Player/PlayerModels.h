@@ -8,6 +8,7 @@
 #include <memory>
 #include <optional>
 #include <vector>
+#include "Function.h"
 class PlayerModels {
 
 public:
@@ -26,7 +27,7 @@ public:
 
 private:
 	StateM state_;
-
+	Matrix4x4 playerWorld;
 	std::unique_ptr<Object3d> Sizuku_;
 	Transform player_;
 	Camera* camera_;
@@ -37,6 +38,7 @@ private:
 	size_t sizukuAnimationIndex_ = 0;
 	bool sizukuAnimationLoop_ = true;
 	bool animationFinished_ = false;
+	
 
 public:
 	PlayerModels();

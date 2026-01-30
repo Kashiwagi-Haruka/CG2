@@ -17,7 +17,7 @@ class Enemy {
 	bool isStun_ = false;
 
 	int stunTime;
-	int stunTimeMax = 60 * 0.75f;
+	float stunTimeMax = 60.0f * 0.75f;
 
 	float attackTimer_ = 0.0f;
 	float attackCooldown_ = 0.6f;

@@ -116,7 +116,7 @@ void PlayerModels::Update() {
 			UpdateSkinCluster(sizukuSkinCluster_, *sizukuSkeleton_);
 		}
 	}
-	Matrix4x4 playerWorld = Function::MakeAffineMatrix(player_.scale, player_.rotate, player_.translate);
+	playerWorld = Function::MakeAffineMatrix(player_.scale, player_.rotate, player_.translate);
 
 	Sizuku_->SetWorldMatrix(playerWorld);
 	Sizuku_->SetCamera(camera_);
