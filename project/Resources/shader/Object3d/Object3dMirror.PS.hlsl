@@ -12,6 +12,9 @@ struct Material
 struct Camera
 {
     float3 worldPosition;
+    float padding;
+    float2 screenSize;
+    float2 padding2;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<Camera> gCamera : register(b4);
@@ -26,19 +29,14 @@ struct PixelShaderOutput
 PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
-    const float pi = 3.14159265f;
-
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
     float3 baseColor = (gMaterial.color * textureColor).rgb;
 
     float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
-    float3 viewDirection = normalize(input.worldPosition - gCamera.worldPosition);
-    float3 reflectedDirection = reflect(viewDirection, normalize(input.normal));
-
-    float2 environmentUV = float2(atan2(reflectedDirection.z, reflectedDirection.x) / (2.0f * pi) + 0.5f,
-        asin(reflectedDirection.y) / pi + 0.5f);
-    float3 environmentColor = gEnvironmentTexture.Sample(gSampler, environmentUV).rgb;
+    float2 screenUV = input.position.xy / gCamera.screenSize;
+    screenUV.x = 1.0f - screenUV.x;
+    float3 environmentColor = gEnvironmentTexture.Sample(gSampler, saturate(screenUV)).rgb;
 
     float fresnel = pow(1.0f - saturate(dot(normalize(input.normal), toEye)), 5.0f);
     float mirrorStrength = saturate(gMaterial.environmentCoefficient);

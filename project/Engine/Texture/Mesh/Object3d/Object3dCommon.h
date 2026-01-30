@@ -94,6 +94,7 @@ public:
 	uint32_t GetAreaLightSrvIndex() const { return areaLightSrvIndex_; }
 	uint32_t GetEnvironmentMapSrvIndex() const { return environmentMapSrvIndex_; }
 	void SetEnvironmentMapTexture(const std::string& filePath);
+	void SetEnvironmentMapTextureResource(ID3D12Resource* resource, DXGI_FORMAT format);
 	void SetDirectionalLight(DirectionalLight& light);
 	void SetPointLights(const PointLight* pointLights, uint32_t count);
 	void SetSpotLights(const SpotLight* spotLights, uint32_t count);

@@ -66,6 +66,9 @@ struct AreaLightCount
 struct Camera
 {
     float3 worldPosition;
+    float padding;
+    float2 screenSize;
+    float2 padding2;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b3);

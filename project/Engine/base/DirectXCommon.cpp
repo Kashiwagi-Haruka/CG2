@@ -35,6 +35,8 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	DescriptorHeapCreate();
 	// RTVの初期化
 	RenderTargetViewInitialize();
+	// シーンカラーテクスチャの生成
+	SceneColorResourceCreate();
 	// DSVの初期化
 	DepthStencilViewInitialize();
 	// フェンスの生成
@@ -314,7 +316,24 @@ void DirectXCommon::RenderTargetViewInitialize() {
 	// 2つ目を作る
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
 }
+void DirectXCommon::SceneColorResourceCreate() {
+	D3D12_RESOURCE_DESC textureDesc{};
+	textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	textureDesc.Width = WinApp::kClientWidth;
+	textureDesc.Height = WinApp::kClientHeight;
+	textureDesc.DepthOrArraySize = 1;
+	textureDesc.MipLevels = 1;
+	textureDesc.Format = swapChainDesc_.Format;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
+	D3D12_HEAP_PROPERTIES heapProps{};
+	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	hr_ = device_->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, nullptr, IID_PPV_ARGS(&sceneColorResource_));
+	assert(SUCCEEDED(hr_));
+}
 void DirectXCommon::DepthStencilViewInitialize() {
 
 	// depthStenicilResource_ は DepthBufferCreate() で作成済みのはず
@@ -393,7 +412,29 @@ void DirectXCommon::PreDraw() {
 }
 void DirectXCommon::PostDraw() {
 	// RenderTarget→Present に戻す
-	CrtvTransitionBarrier(); // バリア遷移 :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
+	D3D12_RESOURCE_BARRIER barriers[2]{};
+	barriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barriers[0].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barriers[0].Transition.pResource = swapChainResources_[backBufferIndex_].Get();
+	barriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+	barriers[0].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+	barriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barriers[1].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barriers[1].Transition.pResource = sceneColorResource_.Get();
+	barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+	barriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+	commandList_->ResourceBarrier(_countof(barriers), barriers);
+	commandList_->CopyResource(sceneColorResource_.Get(), swapChainResources_[backBufferIndex_].Get());
+
+	barriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
+	barriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	commandList_->ResourceBarrier(_countof(barriers), barriers);
 
 	// コマンドリストをクローズして実行
 	hr_ = commandList_->Close();

@@ -56,6 +56,7 @@ class DirectXCommon {
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> sceneColorResource_ = nullptr;
 
 	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
@@ -118,6 +119,7 @@ private:
 	void SwapChainInitialize();
 	void DepthBufferCreate();
 	void DescriptorHeapCreate();
+	void SceneColorResourceCreate();
 
 	void RenderTargetViewInitialize();
 	void DepthStencilViewInitialize();

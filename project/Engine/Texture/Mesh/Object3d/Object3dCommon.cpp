@@ -94,6 +94,14 @@ void Object3dCommon::SetEnvironmentMapTexture(const std::string& filePath) {
 	TextureManager::GetInstance()->LoadTextureName(environmentMapPath_);
 	environmentMapSrvIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(environmentMapPath_);
 }
+void Object3dCommon::SetEnvironmentMapTextureResource(ID3D12Resource* resource, DXGI_FORMAT format) {
+	if (!resource) {
+		return;
+	}
+	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
+	environmentMapSrvIndex_ = srvManager->Allocate();
+	srvManager->CreateSRVforTexture2D(environmentMapSrvIndex_, resource, format, 1);
+}
 void Object3dCommon::DrawSet(){
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, Object3dCommon::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, Object3dCommon::GetInstance()->GetPointLightCountResource()->GetGPUVirtualAddress());

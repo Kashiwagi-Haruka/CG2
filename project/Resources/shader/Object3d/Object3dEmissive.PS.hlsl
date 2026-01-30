@@ -15,6 +15,9 @@ ConstantBuffer<Material> gMaterial : register(b0);
 struct Camera
 {
     float3 worldPosition;
+    float padding;
+    float2 screenSize;
+    float2 padding2;
 };
 ConstantBuffer<Camera> gCamera : register(b4);
 Texture2D<float4> gTexture : register(t0);

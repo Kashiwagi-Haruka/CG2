@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include "WinApp.h"
 
 namespace {
 constexpr float kPi = 3.14159265358979323846f;
@@ -648,6 +649,7 @@ void Primitive::Update() {
 	} else {
 		cameraData_->worldPosition = {transform_.translate};
 	}
+	cameraData_->screenSize = {static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)};
 	cameraResource_->Unmap(0, nullptr);
 }
 
