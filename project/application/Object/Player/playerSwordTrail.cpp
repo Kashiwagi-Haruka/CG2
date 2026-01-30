@@ -64,7 +64,6 @@ void PlayerSwordTrail::UpdateTrailMesh() {
 		return;
 	}
 	const size_t pointCount = points_.size();
-	const float halfWidth = kSegmentWidth * 0.5f;
 	std::vector<float> cumulativeLength(pointCount, 0.0f);
 	float totalLength = 0.0f;
 	for (size_t i = 1; i < pointCount; ++i) {
@@ -99,6 +98,8 @@ void PlayerSwordTrail::UpdateTrailMesh() {
 		}
 		Vector3 normal = NormalizeOrFallback(Function::Cross(direction, side), {0.0f, 0.0f, 1.0f});
 		const float t = cumulativeLength[i] / totalLength;
+		const float widthScale = 1.0f + (kHiltWidthScale - 1.0f) * t;
+		const float halfWidth = kSegmentWidth * 0.5f * widthScale;
 		Vector3 left = points_[i] - side * halfWidth;
 		Vector3 right = points_[i] + side * halfWidth;
 		vertices.push_back({

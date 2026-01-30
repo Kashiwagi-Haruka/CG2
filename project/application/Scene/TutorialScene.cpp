@@ -55,6 +55,9 @@ void TutorialScene::Update() {
 	skyDome_->Update();
 	field_->Update();
 	player_->Update();
+	player_->SetCamera(cameraController_->GetCamera());
+	skyDome_->SetCamera(cameraController_->GetCamera());
+	field_->SetCamera(cameraController_->GetCamera());
 
 	if (!isTutorialComplete_) {
 		bool progressed = false;
