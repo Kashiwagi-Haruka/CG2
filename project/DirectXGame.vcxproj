@@ -247,6 +247,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\Mesh\Animation\SkinCluster.cpp" />
     <ClCompile Include="application\Scene\TutorialScene.cpp" />
     <ClCompile Include="application\Object\Player\playerSwordTrail.cpp" />
+    <ClCompile Include="application\TutorialUI\TutorialUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -355,6 +356,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\Mesh\Animation\SkinCluster.h" />
     <ClInclude Include="application\Scene\TutorialScene.h" />
     <ClInclude Include="application\Object\Player\playerSwordTrail.h" />
+    <ClInclude Include="application\TutorialUI\TutorialUI.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d\Object3d.PS.hlsl">
