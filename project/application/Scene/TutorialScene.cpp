@@ -9,6 +9,7 @@
 #include "Sprite.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
+#include "Object/Character/Model/CharacterModel.h"
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
@@ -16,6 +17,8 @@
 TutorialScene::TutorialScene() {}
 
 void TutorialScene::Initialize() {
+	CharacterModel characterModel;
+	characterModel.LoadModel();
 	cameraController_ = std::make_unique<CameraController>();
 	skyDome_ = std::make_unique<SkyDome>();
 	player_ = std::make_unique<Player>();
@@ -39,61 +42,77 @@ void TutorialScene::Initialize() {
 	stepCompleted_.fill(false);
 	currentStepIndex_ = 0;
 	isTutorialComplete_ = false;
+	isPaused_ = false;
+	wasSkipKeyHeld_ = false;
+	skipHoldTimer_ = 0.0f;
 
 	GameBase::GetInstance()->SetIsCursorStablity(true);
 	GameBase::GetInstance()->SetIsCursorVisible(false);
 }
 
 void TutorialScene::Update() {
-	if (GameBase::GetInstance()->TriggerKey(DIK_ESCAPE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonStart)) {
-		SceneManager::GetInstance()->ChangeScene("Title");
-		return;
-	}
-
-	cameraController_->SetPlayerPos(player_->GetPosition());
-	cameraController_->Update();
-	skyDome_->Update();
-	field_->Update();
-	player_->Update();
-	player_->SetCamera(cameraController_->GetCamera());
-	skyDome_->SetCamera(cameraController_->GetCamera());
-	field_->SetCamera(cameraController_->GetCamera());
-
-	if (!isTutorialComplete_) {
-		bool progressed = false;
-		switch (currentStepIndex_) {
-		case 0:
-			progressed = GameBase::GetInstance()->PushKey(DIK_W) || GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_S) || GameBase::GetInstance()->PushKey(DIK_D);
-			break;
-		case 1:
-			progressed = GameBase::GetInstance()->PushKey(DIK_LSHIFT) || GameBase::GetInstance()->PushKey(DIK_RSHIFT) || GameBase::GetInstance()->PushButton(Input::PadButton::kButtonLeftShoulder);
-			break;
-		case 2:
-			progressed = GameBase::GetInstance()->TriggerKey(DIK_SPACE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonA);
-			break;
-		case 3:
-			progressed = GameBase::GetInstance()->TriggerMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonB);
-			break;
-		case 4:
-			progressed = GameBase::GetInstance()->TriggerKey(DIK_E) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonY);
-			break;
-		case 5:
-			progressed = GameBase::GetInstance()->TriggerKey(DIK_Q) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonX);
-			break;
-		default:
-			break;
-		}
-
-		if (progressed) {
-			stepCompleted_[currentStepIndex_] = true;
-			currentStepIndex_++;
-			if (currentStepIndex_ >= kStepCount) {
-				isTutorialComplete_ = true;
-			}
+	const float deltaTime = 1.0f / 60.0f;
+	bool skipKeyHeld = GameBase::GetInstance()->PushKey(DIK_P);
+	if (skipKeyHeld) {
+		skipHoldTimer_ += deltaTime;
+		if (skipHoldTimer_ >= kSkipHoldDuration) {
+			SceneManager::GetInstance()->ChangeScene("Game");
+			return;
 		}
 	} else {
-		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonA)) {
-			SceneManager::GetInstance()->ChangeScene("Game");
+		if (wasSkipKeyHeld_ && skipHoldTimer_ < kSkipHoldDuration) {
+			isPaused_ = !isPaused_;
+		}
+		skipHoldTimer_ = 0.0f;
+	}
+	wasSkipKeyHeld_ = skipKeyHeld;
+
+	if (!isPaused_) {
+		cameraController_->SetPlayerPos(player_->GetPosition());
+		cameraController_->Update();
+		skyDome_->Update();
+		field_->Update();
+		player_->Update();
+		player_->SetCamera(cameraController_->GetCamera());
+		skyDome_->SetCamera(cameraController_->GetCamera());
+		field_->SetCamera(cameraController_->GetCamera());
+
+		if (!isTutorialComplete_) {
+			bool progressed = false;
+			switch (currentStepIndex_) {
+			case 0:
+				progressed = GameBase::GetInstance()->PushKey(DIK_W) || GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_S) || GameBase::GetInstance()->PushKey(DIK_D);
+				break;
+			case 1:
+				progressed = GameBase::GetInstance()->PushKey(DIK_LSHIFT) || GameBase::GetInstance()->PushKey(DIK_RSHIFT) || GameBase::GetInstance()->PushButton(Input::PadButton::kButtonLeftShoulder);
+				break;
+			case 2:
+				progressed = GameBase::GetInstance()->TriggerKey(DIK_SPACE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonA);
+				break;
+			case 3:
+				progressed = GameBase::GetInstance()->TriggerMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonB);
+				break;
+			case 4:
+				progressed = GameBase::GetInstance()->TriggerKey(DIK_E) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonY);
+				break;
+			case 5:
+				progressed = GameBase::GetInstance()->TriggerKey(DIK_Q) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonX);
+				break;
+			default:
+				break;
+			}
+
+			if (progressed) {
+				stepCompleted_[currentStepIndex_] = true;
+				currentStepIndex_++;
+				if (currentStepIndex_ >= kStepCount) {
+					isTutorialComplete_ = true;
+				}
+			}
+		} else {
+			if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonA)) {
+				SceneManager::GetInstance()->ChangeScene("Game");
+			}
 		}
 	}
 
@@ -114,7 +133,11 @@ void TutorialScene::Update() {
 	if (isTutorialComplete_) {
 		ImGui::Text("SPACE でゲーム開始");
 	}
-	ImGui::Text("ESC でタイトルへ戻る");
+	ImGui::Text("P 長押しでチュートリアルスキップ");
+	ImGui::Text("P 押しでポーズ/再開");
+	if (isPaused_) {
+		ImGui::Text("PAUSE");
+	}
 	ImGui::End();
 #endif // USE_IMGUI
 }
