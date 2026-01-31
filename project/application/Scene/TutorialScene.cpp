@@ -2,14 +2,15 @@
 #include "CameraController/CameraController.h"
 #include "GameBase.h"
 #include "Object/Background/SkyDome.h"
+#include "Object/Character/Model/CharacterModel.h"
 #include "Object/MapchipField.h"
 #include "Object/Player/Player.h"
 #include "Object3d/Object3dCommon.h"
+#include "Pause/Pause.h"
 #include "SceneManager.h"
 #include "Sprite.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
-#include "Object/Character/Model/CharacterModel.h"
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
@@ -23,6 +24,7 @@ void TutorialScene::Initialize() {
 	skyDome_ = std::make_unique<SkyDome>();
 	player_ = std::make_unique<Player>();
 	field_ = std::make_unique<MapchipField>();
+	pause_ = std::make_unique<Pause>();
 
 	cameraController_->Initialize();
 	Object3dCommon::GetInstance()->SetDefaultCamera(cameraController_->GetCamera());
@@ -31,6 +33,7 @@ void TutorialScene::Initialize() {
 	player_->Initialize(cameraController_->GetCamera());
 	field_->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field_->Initialize(cameraController_->GetCamera());
+	pause_->Initialize();
 
 	controlSpriteHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/option.png");
 	controlSprite_ = std::make_unique<Sprite>();
@@ -115,6 +118,18 @@ void TutorialScene::Update() {
 			}
 		}
 	}
+	pause_->Update(isPaused_);
+	Pause::Action pauseAction = pause_->ConsumeAction();
+	if (pauseAction == Pause::Action::kResume) {
+		isPaused_ = false;
+	} else if (pauseAction == Pause::Action::kTitle) {
+		SceneManager::GetInstance()->ChangeScene("Title");
+		return;
+	}
+
+	if (isPaused_) {
+		return;
+	}
 
 #ifdef USE_IMGUI
 	ImGui::Begin("Tutorial");
@@ -152,6 +167,7 @@ void TutorialScene::Draw() {
 	if (controlSprite_) {
 		controlSprite_->Draw();
 	}
+	pause_->Draw();
 }
 
 void TutorialScene::Finalize() {}
