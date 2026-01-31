@@ -56,6 +56,9 @@ void TutorialScene::Initialize() {
 void TutorialScene::Update() {
 	const float deltaTime = 1.0f / 60.0f;
 	bool skipKeyHeld = GameBase::GetInstance()->PushKey(DIK_P);
+	if (GameBase::GetInstance()->TriggerKey(DIK_ESCAPE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonStart)) {
+		isPaused_ = !isPaused_;
+	}
 	if (skipKeyHeld) {
 		skipHoldTimer_ += deltaTime;
 		if (skipHoldTimer_ >= kSkipHoldDuration) {
