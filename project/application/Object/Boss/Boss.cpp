@@ -58,12 +58,15 @@ void Boss::Update() {
 	}
 	float appearT = std::clamp(appearTimer_ / appearDuration_, 0.0f, 1.0f);
 	float smoothT = appearT * appearT * (3.0f - 2.0f * appearT);
-	transform_.scale = baseScale_ * smoothT;
+	float scalePulse = 1.0f + std::sin(animationTimer_ * std::numbers::pi_v<float>) * 0.05f;
+	transform_.scale = baseScale_ * (smoothT * scalePulse);
 
 	float bob = std::sin(animationTimer_ * std::numbers::pi_v<float> * 2.0f) * 0.5f;
 	transform_.translate = basePosition_;
 	transform_.translate.y += bob;
+	transform_.translate.x += std::sin(animationTimer_ * std::numbers::pi_v<float> * 0.5f) * 0.3f;
 	transform_.rotate.y += deltaTime * 0.5f;
+	transform_.rotate.z = std::sin(animationTimer_ * std::numbers::pi_v<float>) * 0.05f;
 
 	object_->SetCamera(camera_);
 	object_->SetTransform(transform_);
