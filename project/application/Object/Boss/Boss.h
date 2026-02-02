@@ -21,6 +21,9 @@ class Boss {
 	Transform transform_{};
 	Vector3 basePosition_{};
 	Vector3 baseScale_{};
+	Vector3 velocity_{};
+	float maxSpeed_ = 0.12f;
+	float playerChaseRange_ = 10.0f;
 
 	float animationTimer_ = 0.0f;
 	float animationTime_ = 0.0f;
@@ -43,7 +46,7 @@ public:
 	~Boss() = default;
 
 	void Initialize(Camera* camera, const Vector3& position);
-	void Update();
+	void Update(const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive);
 	void Draw();
 
 	void SetCamera(Camera* camera) { camera_ = camera; }

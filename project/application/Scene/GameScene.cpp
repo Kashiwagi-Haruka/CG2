@@ -424,7 +424,7 @@ void GameScene::Update() {
 
 	if (isBossActive_ && boss_->GetIsAlive()) {
 		boss_->SetCamera(cameraController->GetCamera());
-		boss_->Update();
+		boss_->Update(house->GetPosition(), player->GetPosition(), player->GetIsAlive());
 	}
 
 	if (isBossActive_ && !boss_->GetIsAlive()) {

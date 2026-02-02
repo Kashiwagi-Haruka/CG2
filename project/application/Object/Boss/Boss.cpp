@@ -76,7 +76,7 @@ void Boss::Initialize(Camera* camera, const Vector3& position) {
 #endif // _DEBUG
 }
 
-void Boss::Update() {
+void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlayerAlive) {
 	if (!isAlive_) {
 		return;
 	}
@@ -93,6 +93,23 @@ void Boss::Update() {
 	if (appearTimer_ < appearDuration_) {
 		appearTimer_ += deltaTime;
 	}
+
+	Vector3 targetPosition = housePos;
+	if (isPlayerAlive) {
+		Vector3 toPlayer = playerPos - basePosition_;
+		if (LengthSquared(toPlayer) <= playerChaseRange_ * playerChaseRange_) {
+			targetPosition = playerPos;
+		}
+	}
+	Vector3 toTarget = targetPosition - basePosition_;
+	toTarget.y = 0.0f;
+	if (LengthSquared(toTarget) > 0.0001f) {
+		Vector3 direction = Function::Normalize(toTarget);
+		velocity_ = direction * maxSpeed_;
+	} else {
+		velocity_ = {0.0f, 0.0f, 0.0f};
+	}
+	basePosition_ += velocity_;
 	float appearT = std::clamp(appearTimer_ / appearDuration_, 0.0f, 1.0f);
 	float smoothT = appearT * appearT * (3.0f - 2.0f * appearT);
 	float scalePulse = 1.0f + std::sin(animationTimer_ * std::numbers::pi_v<float>) * 0.05f;
