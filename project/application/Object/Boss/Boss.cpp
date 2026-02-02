@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include "Object3d/Object3dCommon.h"
 
 namespace {
 const Vector4 kDamageInvincibleColor = {1.0f, 0.25f, 0.25f, 1.0f};
@@ -74,6 +75,7 @@ void Boss::Draw() {
 	if (!isAlive_) {
 		return;
 	}
+	Object3dCommon::GetInstance()->DrawCommonSkinning();
 	object_->Draw();
 }
 

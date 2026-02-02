@@ -1,6 +1,10 @@
 #include "EnemyManager.h"
 #include "Function.h"
 #include <cstdlib>
+
+namespace {
+constexpr int kFinalWave = 5;
+}
 void EnemyManager::Clear() {
 	enemies.clear(); // unique_ptr が自動削除
 	hitEffects.clear();
@@ -213,6 +217,9 @@ void EnemyManager::CheckWaveComplete() {
 	if (aliveCount == 0 && !enemies.empty()) {
 		waveState_ = WaveState::kComplete;
 		totalEnemiesKilled_ += static_cast<int>(enemies.size());
+		if (currentWave_ >= kFinalWave) {
+			allWavesComplete_ = true;
+		}
 
 		// 倒した敵をクリア
 		enemies.clear();
