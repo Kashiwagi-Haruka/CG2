@@ -1,6 +1,7 @@
 #define NOMINMAX
 #include "CollisionManager.h"
 #include "Function.h"
+#include "Object/Boss/Boss.h"
 #include "Object/Enemy/EnemyManager.h"
 #include "Object/ExpCube/ExpCubeManager.h"
 #include "Object/House/House.h"
@@ -16,7 +17,7 @@ AABB MakeAabb(const Vector3& center, const Vector3& halfSize) {
 }
 } // namespace
 
-void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& enemyManager, ExpCubeManager& expCubeManager, House& house) {
+void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& enemyManager, ExpCubeManager& expCubeManager, House& house, Boss* boss) {
 	AABB playerAabb = MakeAabb(player.GetPosition(), player.GetScale());
 	AABB houseAabb = MakeAabb(house.GetPosition(), house.GetScale());
 	auto tryEnemyFlinch = [](Enemy* target) {
@@ -117,7 +118,46 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 			}
 		}
 	}
+	if (boss && boss->GetIsAlive()) {
+		AABB bossAabb = MakeAabb(boss->GetPosition(), boss->GetScale());
 
+		if (player.GetIsAlive() && player.GetSword()->IsAttacking()) {
+			Vector3 swordPos = player.GetSword()->GetPosition();
+			float swordHit = player.GetSword()->GetHitSize();
+			AABB swordAabb = MakeAabb(swordPos, {swordHit, swordHit, swordHit});
+			bool hitSword = RigidBody::isCollision(swordAabb, bossAabb);
+			if (hitSword && boss->CanTakeDamage()) {
+				boss->SetHPSubtract(1);
+				boss->TriggerDamageInvincibility();
+			}
+		}
+
+		if (player.GetIsAlive() && player.GetSkill() && player.GetSkill()->IsDamaging()) {
+			AABB skillAabb = MakeAabb(player.GetSkill()->GetDamagePosition(), player.GetSkill()->GetDamageScale());
+			bool hitSkill = RigidBody::isCollision(skillAabb, bossAabb);
+			int skillDamageId = player.GetSkill()->GetSkillDamageId();
+			if (hitSkill && boss->GetLastSkillDamageId() != skillDamageId) {
+				boss->SetHPSubtract(1);
+				boss->SetLastSkillDamageId(skillDamageId);
+			}
+		}
+
+		if (player.GetIsAlive() && player.GetSpecialAttack() && player.GetSpecialAttack()->IsDamaging()) {
+			bool hitSpecial = false;
+			for (const auto& specialTransform : player.GetSpecialAttack()->GetIceFlowerTransforms()) {
+				AABB specialAabb = MakeAabb(specialTransform.translate, specialTransform.scale);
+				if (RigidBody::isCollision(specialAabb, bossAabb)) {
+					hitSpecial = true;
+					break;
+				}
+			}
+
+			if (hitSpecial && boss->CanTakeDamage()) {
+				boss->SetHPSubtract(1);
+				boss->TriggerDamageInvincibility();
+			}
+		}
+	}
 	if (player.GetIsAlive()) {
 		for (auto& cube : expCubeManager.GetCubes()) {
 			if (cube->IsCollected()) {

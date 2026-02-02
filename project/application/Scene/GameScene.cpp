@@ -3,6 +3,7 @@
 #include "GameTimer/GameTimer.h"
 #include "Model/ModelManager.h"
 #include "Object/Background/SkyDome.h"
+#include "Object/Boss/Boss.h"
 #include "Object/Enemy/EnemyManager.h"
 #include "Object/ExpCube/ExpCubeManager.h"
 #include "Object/Player/Player.h"
@@ -12,6 +13,7 @@
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 #include <algorithm>
+#include <cmath>
 #include <numbers>
 
 GameScene::GameScene() {
@@ -22,6 +24,7 @@ GameScene::GameScene() {
 	player = std::make_unique<Player>();
 	enemyManager = std::make_unique<EnemyManager>();
 	expCubeManager = std::make_unique<ExpCubeManager>();
+	boss_ = std::make_unique<Boss>();
 
 	field = std::make_unique<MapchipField>();
 	sceneTransition = std::make_unique<SceneTransition>();
@@ -106,6 +109,15 @@ void GameScene::Initialize() {
 	lastWave_ = 0;
 	isPhaseSpriteActive_ = false;
 	isPhaseSpritePaused_ = false;
+	isWarningActive_ = false;
+	warningTimer_ = 0.0f;
+	isBossActive_ = false;
+
+	const uint32_t warningHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/warnig.png");
+	warningSprite_ = std::make_unique<Sprite>();
+	warningSprite_->Initialize(warningHandle);
+	warningSprite_->SetScale(warningSpriteBaseScale_);
+	warningSprite_->SetPosition({640.0f - warningSpriteBaseScale_.x / 2.0f, 360.0f - warningSpriteBaseScale_.y / 2.0f});
 
 	activePointLightCount_ = 3;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -361,11 +373,34 @@ void GameScene::Update() {
 		phaseSprite->Update();
 	}
 
-	// ★ ウェーブクリア判定でゴールを有効化
-	// 全ウェーブクリア後にゴールを出すなど、条件は自由に変更可能
-	if (enemyManager->GetCurrentWave() >= 5 && enemyManager->IsWaveComplete()) {
+	// ★ 全フェーズ終了後に警告表示→ボス登場
+	if (enemyManager->AreAllWavesComplete() && !isBossActive_) {
+		const float deltaTime = 1.0f / 60.0f;
+		if (!isWarningActive_) {
+			isWarningActive_ = true;
+			warningTimer_ = 0.0f;
+		}
+		warningTimer_ += deltaTime;
+		float pulse = 1.0f + std::sin(warningTimer_ * 6.0f) * 0.05f;
+		warningSprite_->SetScale({warningSpriteBaseScale_.x * pulse, warningSpriteBaseScale_.y * pulse});
+		warningSprite_->SetPosition({640.0f - warningSpriteBaseScale_.x * pulse / 2.0f, 360.0f - warningSpriteBaseScale_.y * pulse / 2.0f});
+		warningSprite_->Update();
+		if (warningTimer_ >= warningDuration_) {
+			isWarningActive_ = false;
+			isBossActive_ = true;
+			boss_->Initialize(cameraController->GetCamera(), {0.0f, 2.5f, -40.0f});
+		}
+	}
+
+	if (isBossActive_ && boss_->GetIsAlive()) {
+		boss_->SetCamera(cameraController->GetCamera());
+		boss_->Update();
+	}
+
+	if (isBossActive_ && !boss_->GetIsAlive()) {
 		goalActive = true;
 	}
+
 	if (goalActive && player->GetIsAlive() && !isTransitionOut) {
 		nextSceneName = "Result";
 		sceneTransition->Initialize(true);
@@ -380,7 +415,7 @@ void GameScene::Update() {
 	}
 #endif // _DEBUG
 
-	if (!player->GetIsAlive()||house->GetHP()==0) {
+	if (!player->GetIsAlive() || house->GetHP() == 0) {
 		if (!isTransitionOut) {
 			nextSceneName = "GameOver";
 			sceneTransition->Initialize(true);
@@ -389,7 +424,8 @@ void GameScene::Update() {
 	}
 
 	// ===== プレイヤーと敵の当たり判定 =====
-	collisionManager_.HandleGameSceneCollisions(*player, *enemyManager, *expCubeManager, *house);
+	Boss* activeBoss = (isBossActive_ && boss_->GetIsAlive()) ? boss_.get() : nullptr;
+	collisionManager_.HandleGameSceneCollisions(*player, *enemyManager, *expCubeManager, *house, activeBoss);
 
 	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
@@ -424,6 +460,9 @@ void GameScene::Draw() {
 	player->Draw();
 
 	enemyManager->Draw();
+	if (isBossActive_) {
+		boss_->Draw();
+	}
 	expCubeManager->Draw();
 	house->Draw();
 	particles->Draw();
@@ -433,6 +472,9 @@ void GameScene::Draw() {
 	if (isPhaseSpriteActive_) {
 
 		phaseSprites_[currentPhaseSpriteIndex_]->Draw();
+	}
+	if (isWarningActive_) {
+		warningSprite_->Draw();
 	}
 	// =============================
 	// ★ レベルアップ選択画面描画(別スプライト使用版)

@@ -29,6 +29,8 @@ private:
 	float waveTimer_ = 0.0f;     // ウェーブタイマー
 	float waveDelay_ = 3.0f;     // ウェーブ間の待機時間（秒）
 	int totalEnemiesKilled_ = 0; // 倒した敵の総数
+	bool allWavesComplete_ = false;
+	int maxWave_ = 5;
 
 public:
 	EnemyManager() {}
@@ -53,6 +55,8 @@ public:
 	bool IsWaveActive() const;     // ウェーブ進行中か
 	bool IsWaveComplete() const;   // ウェーブクリアしたか
 	float GetWaveProgress() const; // ウェーブの進行度（0.0～1.0）
+	bool AreAllWavesComplete() const { return allWavesComplete_; }
+	int GetMaxWave() const { return maxWave_; }
 
 	// セッター
 	void SetWaveDelay(float delay) { waveDelay_ = delay; }

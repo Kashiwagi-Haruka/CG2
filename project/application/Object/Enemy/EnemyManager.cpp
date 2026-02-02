@@ -1,6 +1,6 @@
 #include "EnemyManager.h"
-#include <cstdlib>
 #include "Function.h"
+#include <cstdlib>
 void EnemyManager::Clear() {
 	enemies.clear(); // unique_ptr が自動削除
 	hitEffects.clear();
@@ -16,12 +16,16 @@ void EnemyManager::Initialize(Camera* camera) {
 	waveTimer_ = 0.0f;
 	waveDelay_ = 3.0f; // ウェーブ間の待機時間（秒）
 	totalEnemiesKilled_ = 0;
+	allWavesComplete_ = false;
 
 	// 最初のウェーブを開始
 	StartNextWave();
 }
 
 void EnemyManager::StartNextWave() {
+	if (allWavesComplete_) {
+		return;
+	}
 	currentWave_++;
 	waveState_ = WaveState::kSpawning;
 	waveTimer_ = 0.0f;
@@ -171,8 +175,10 @@ void EnemyManager::Update(Camera* camera, const Vector3& housePos, const Vector3
 
 	case WaveState::kComplete:
 		// ウェーブクリア：次のウェーブへ
-		waveState_ = WaveState::kWaiting;
-		waveTimer_ = 0.0f;
+		if (!allWavesComplete_) {
+			waveState_ = WaveState::kWaiting;
+			waveTimer_ = 0.0f;
+		}
 		break;
 
 	default:
