@@ -157,6 +157,18 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 				boss->TriggerDamageInvincibility();
 			}
 		}
+		if (boss->IsAttackHitActive()) {
+			AABB bossAttackAabb = MakeAabb(boss->GetAttackPosition(), {boss->GetAttackHitSize(), boss->GetAttackHitSize(), boss->GetAttackHitSize()});
+			const bool hitPlayer = RigidBody::isCollision(bossAttackAabb, playerAabb);
+			const bool hitHouse = RigidBody::isCollision(bossAttackAabb, houseAabb);
+			if ((hitPlayer || hitHouse) && boss->ConsumeAttackHit()) {
+				if (hitPlayer) {
+					player.Damage(1);
+				} else if (hitHouse) {
+					house.Damage(1);
+				}
+			}
+		}
 	}
 	if (player.GetIsAlive()) {
 		for (auto& cube : expCubeManager.GetCubes()) {

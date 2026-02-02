@@ -31,7 +31,9 @@ void Boss::Initialize(Camera* camera, const Vector3& position) {
 	animationTimer_ = 0.0f;
 	animationTime_ = 0.0f;
 	appearTimer_ = 0.0f;
-
+	attackTimer_ = 0.0f;
+	attackActiveTimer_ = 0.0f;
+	attackHitConsumed_ = false;
 	camera_ = camera;
 	object_->Initialize();
 	if (!ModelManager::GetInstance()->FindModel("WaterBoss")) {
@@ -87,6 +89,15 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 	const float deltaTime = 1.0f / 60.0f;
 	const float animationDeltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	animationTimer_ += deltaTime;
+	if (attackActiveTimer_ > 0.0f) {
+		attackActiveTimer_ -= deltaTime;
+		if (attackActiveTimer_ <= 0.0f) {
+			attackActiveTimer_ = 0.0f;
+			attackHitConsumed_ = false;
+		}
+	} else {
+		attackTimer_ += deltaTime;
+	}
 	if (damageInvincibleTimer_ > 0.0f) {
 		damageInvincibleTimer_ -= deltaTime;
 		if (damageInvincibleTimer_ < 0.0f) {
@@ -114,6 +125,23 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 		velocity_ = {0.0f, 0.0f, 0.0f};
 	}
 	basePosition_ += velocity_;
+
+	bool inAttackRange = false;
+	Vector3 toHouse = housePos - basePosition_;
+	toHouse.y = 0.0f;
+	if (LengthSquared(toHouse) <= attackRange_ * attackRange_) {
+		inAttackRange = true;
+	}
+	if (!inAttackRange && isPlayerAlive) {
+		Vector3 toPlayer = playerPos - basePosition_;
+		toPlayer.y = 0.0f;
+		inAttackRange = LengthSquared(toPlayer) <= attackRange_ * attackRange_;
+	}
+	if (attackTimer_ >= attackCooldown_ && inAttackRange) {
+		attackActiveTimer_ = attackActiveDuration_;
+		attackHitConsumed_ = false;
+		attackTimer_ = 0.0f;
+	}
 	float appearT = std::clamp(appearTimer_ / appearDuration_, 0.0f, 1.0f);
 	float smoothT = appearT * appearT * (3.0f - 2.0f * appearT);
 	float scalePulse = 1.0f + std::sin(animationTimer_ * std::numbers::pi_v<float>) * 0.05f;
@@ -170,4 +198,11 @@ void Boss::SetHPSubtract(int hp) {
 	if (hp_ <= 0) {
 		isAlive_ = false;
 	}
+}
+bool Boss::ConsumeAttackHit() {
+	if (attackHitConsumed_ || attackActiveTimer_ <= 0.0f) {
+		return false;
+	}
+	attackHitConsumed_ = true;
+	return true;
 }

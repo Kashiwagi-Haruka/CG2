@@ -25,6 +25,14 @@ class Boss {
 	float maxSpeed_ = 0.12f;
 	float playerChaseRange_ = 10.0f;
 
+	float attackTimer_ = 0.0f;
+	float attackCooldown_ = 2.0f;
+	float attackActiveTimer_ = 0.0f;
+	float attackActiveDuration_ = 0.4f;
+	float attackRange_ = 2.5f;
+	float attackHitSize_ = 1.2f;
+	bool attackHitConsumed_ = false;
+
 	float animationTimer_ = 0.0f;
 	float animationTime_ = 0.0f;
 	float appearTimer_ = 0.0f;
@@ -60,4 +68,9 @@ public:
 	void TriggerDamageInvincibility() { damageInvincibleTimer_ = damageInvincibleDuration_; }
 	int GetLastSkillDamageId() const { return lastSkillDamageId_; }
 	void SetLastSkillDamageId(int skillDamageId) { lastSkillDamageId_ = skillDamageId; }
+
+	float GetAttackHitSize() const { return attackHitSize_; }
+	Vector3 GetAttackPosition() const { return transform_.translate; }
+	bool IsAttackHitActive() const { return attackActiveTimer_ > 0.0f; }
+	bool ConsumeAttackHit();
 };
