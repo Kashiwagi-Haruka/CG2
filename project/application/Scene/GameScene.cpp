@@ -223,7 +223,7 @@ void GameScene::Update() {
 			isPause = !isPause;
 		}
 	}
-
+	DebugImGui();
 	pause->Update(isPause);
 	Pause::Action pauseAction = pause->ConsumeAction();
 	if (pauseAction == Pause::Action::kResume) {
@@ -284,7 +284,7 @@ void GameScene::Update() {
 		return;
 	}
 
-	DebugImGui();
+
 	
 	if (player->GetIsSkillAttack()) {
 		pointLights_[1].intensity = 1.0f;
