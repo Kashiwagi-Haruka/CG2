@@ -63,7 +63,7 @@ void Boss::Initialize(Camera* camera, const Vector3& position) {
 	basePosition_ = position;
 	baseScale_ = {1.0f, 1.0f, 1.0f};
 	transform_ = {
-	    .scale{0.0f, 0.0f, 0.0f},
+	    .scale{1.0f, 1.0f, 1.0f},
 	    .rotate{0.0f, 0.0f, 0.0f},
 	    .translate = position,
 	};
@@ -183,7 +183,11 @@ void Boss::Draw() {
 	if (!isAlive_) {
 		return;
 	}
-	Object3dCommon::GetInstance()->DrawCommonSkinning();
+	if (skinCluster_.mappedPalette.empty()) {
+		Object3dCommon::GetInstance()->DrawCommon();
+	} else {
+		Object3dCommon::GetInstance()->DrawCommonSkinning();
+	}
 	object_->Draw();
 #ifdef _DEBUG
 	if (debugBox_) {

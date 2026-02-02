@@ -2,6 +2,7 @@
 #include "Function.h"
 #include <algorithm>
 #include <cstdlib>
+#include "Object3d/Object3dCommon.h"
 
 namespace {
 constexpr int kFinalWave = 5;
@@ -233,10 +234,11 @@ void EnemyManager::Draw() {
 			e->Draw();
 		}
 	}
-
+	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
 	for (auto& entry : hitEffects) {
 		entry.effect->Draw();
 	}
+	Object3dCommon::GetInstance()->DrawCommon();
 }
 
 void EnemyManager::OnEnemyDamaged(Enemy* enemy) {

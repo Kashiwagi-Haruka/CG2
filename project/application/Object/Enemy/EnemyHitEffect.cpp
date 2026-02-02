@@ -18,22 +18,26 @@ void EnemyHitEffect::Initialize() {
         .translate{0, 0, 0}
     };
 	hitPrimitive_ = std::make_unique<Primitive>();
+	hitPrimitive_->Initialize(Primitive::Plane, "Resources/3d/Circle.png");
 	hitPrimitiveTransform_ = {
-	    .scale{1.0f, 2.0f, 1.0f},
+	    .scale{3.0f, 0.001f, 1.0f},
         .rotate{0, 0, 0},
         .translate{0, 0, 0}
     };
 	hitPrimitive_->SetTransform(hitPrimitiveTransform_);
-	hitPrimitive_->Initialize(Primitive::Plane, "Resources/3d/Circle.png");
+	hitPrimitive_->SetEnableLighting(false);
+	hitPrimitive_->SetCamera(camera_);
+
 
 	hitPrimitiveInner_ = std::make_unique<Primitive>();
 	hitPrimitiveInnerTransform_ = {
-	    .scale{1.0f, 2.0f, 1.0f},
+	    .scale{0.001f, 3.0f, 1.0f},
         .rotate{0,    0,    0   },
         .translate{0,    0,    0   }
     };
-	hitPrimitiveInner_->SetTransform(hitPrimitiveInnerTransform_);
 	hitPrimitiveInner_->Initialize(Primitive::Plane, "Resources/3d/Circle.png");
+	hitPrimitiveInner_->SetEnableLighting(false);
+	hitPrimitiveInner_->SetTransform(hitPrimitiveInnerTransform_);
 
 	enemyPosition_ = {0.0f, 0.0f, 0.0f};
 }
@@ -86,6 +90,6 @@ void EnemyHitEffect::Draw() {
 	}
 
 	hitEffect_->Draw();
-	hitPrimitive_->Draw();
-	hitPrimitiveInner_->Draw();
+	//hitPrimitive_->Draw();
+	//hitPrimitiveInner_->Draw();
 }

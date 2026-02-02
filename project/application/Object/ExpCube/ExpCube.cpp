@@ -10,7 +10,7 @@ void ExpCube::Initialize(Camera* camera, const Vector3& position) {
 	camera_ = camera;
 	isCollected_ = false;
 	primitive_ = std::make_unique<Primitive>();
-	primitive_->Initialize(Primitive::Box);
+	primitive_->Initialize(Primitive::Box, "Resources/2d/ExpGauge.png");
 	primitive_->SetEnableLighting(false);
 	primitive_->SetColor(kExpCubeColor);
 	transform_ = {
