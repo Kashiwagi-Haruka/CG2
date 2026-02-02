@@ -2,19 +2,25 @@
 #include "Boss.h"
 #include "Camera.h"
 #include "Function.h"
+#include "Model/ModelManager.h"
 #include "Object3d/Object3d.h"
+#include "Object3d/Object3dCommon.h"
 #include "Vector4.h"
 #include <algorithm>
 #include <cmath>
 #include <numbers>
-#include "Object3d/Object3dCommon.h"
 
 namespace {
 const Vector4 kDamageInvincibleColor = {1.0f, 0.25f, 0.25f, 1.0f};
 const Vector4 kDefaultColor = {1.0f, 1.0f, 1.0f, 1.0f};
 } // namespace
 
-Boss::Boss() { object_ = std::make_unique<Object3d>(); }
+Boss::Boss() {
+	object_ = std::make_unique<Object3d>();
+#ifdef _DEBUG
+	ModelManager::GetInstance()->LoadModel("Resources/3d", "debugBox");
+#endif // _DEBUG
+}
 
 void Boss::Initialize(Camera* camera, const Vector3& position) {
 	hp_ = 50;
@@ -50,6 +56,15 @@ void Boss::Initialize(Camera* camera, const Vector3& position) {
 	object_->SetCamera(camera_);
 	object_->SetColor(kDefaultColor);
 	object_->Update();
+#ifdef _DEBUG
+	debugBox_ = std::make_unique<Object3d>();
+	debugBox_->Initialize();
+	debugBox_->SetCamera(camera_);
+	debugBox_->SetModel("debugBox");
+	debugBox_->SetColor({0.25f, 0.9f, 0.3f, 0.4f});
+	debugBox_->SetTransform(transform_);
+	debugBox_->Update();
+#endif // _DEBUG
 }
 
 void Boss::Update() {
@@ -84,6 +99,13 @@ void Boss::Update() {
 	object_->SetTransform(transform_);
 	object_->SetColor(damageInvincibleTimer_ > 0.0f ? kDamageInvincibleColor : kDefaultColor);
 	object_->Update();
+#ifdef _DEBUG
+	if (debugBox_) {
+		debugBox_->SetCamera(camera_);
+		debugBox_->SetTransform(transform_);
+		debugBox_->Update();
+	}
+#endif // _DEBUG
 }
 
 void Boss::Draw() {
@@ -92,6 +114,12 @@ void Boss::Draw() {
 	}
 	Object3dCommon::GetInstance()->DrawCommonSkinning();
 	object_->Draw();
+#ifdef _DEBUG
+	if (debugBox_) {
+		Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
+		debugBox_->Draw();
+	}
+#endif // _DEBUG
 }
 
 void Boss::SetHPSubtract(int hp) {

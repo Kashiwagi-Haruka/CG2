@@ -28,6 +28,9 @@ class Boss {
 	size_t currentAnimationIndex_ = 0;
 
 	std::unique_ptr<Object3d> object_;
+#ifdef _DEBUG
+	std::unique_ptr<Object3d> debugBox_;
+#endif // _DEBUG
 	Camera* camera_ = nullptr;
 
 public:
