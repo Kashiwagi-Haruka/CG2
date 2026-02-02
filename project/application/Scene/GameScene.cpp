@@ -105,7 +105,7 @@ void GameScene::Initialize() {
 		phaseSprites_[i]->Initialize(phaseHandles[i]);
 		phaseSprites_[i]->SetScale(phaseSpriteSize_);
 	}
-
+	debugPhaseSelection_ = std::clamp(enemyManager->GetCurrentWave(), 1, 5) - 1;
 	lastWave_ = 0;
 	isPhaseSpriteActive_ = false;
 	isPhaseSpritePaused_ = false;
@@ -206,10 +206,40 @@ void GameScene::DebugImGui() {
 		if (ImGui::DragFloat("Wave Delay", &waveDelay, 0.1f, 0.5f, 10.0f)) {
 			enemyManager->SetWaveDelay(waveDelay);
 		}
+		ImGui::Separator();
+		ImGui::Text("Phase Select");
+		const char* phaseItems[] = {"Phase 1", "Phase 2", "Phase 3", "Phase 4", "Phase 5", "Boss"};
+		ImGui::Combo("Phase", &debugPhaseSelection_, phaseItems, IM_ARRAYSIZE(phaseItems));
+		if (ImGui::Button("Apply Phase")) {
+			ApplyPhaseSelection(debugPhaseSelection_);
+		}
 		ImGui::End();
 	}
 
 #endif // USE_IMGUI
+}
+
+void GameScene::ApplyPhaseSelection(int selectionIndex) {
+	isWarningActive_ = false;
+	warningTimer_ = 0.0f;
+	isPhaseSpriteActive_ = false;
+	isPhaseSpritePaused_ = false;
+	phaseSpriteStopTimer_ = 0.0f;
+	phaseSpriteX_ = 0.0f;
+	goalActive = false;
+
+	const int bossIndex = 5;
+	if (selectionIndex == bossIndex) {
+		enemyManager->ForceBossPhase();
+		isBossActive_ = true;
+		boss_->Initialize(cameraController->GetCamera(), {50.0f, 2.5f, 40.0f});
+		return;
+	}
+
+	isBossActive_ = false;
+	const int waveNumber = selectionIndex + 1;
+	enemyManager->ForceStartWave(waveNumber);
+	lastWave_ = waveNumber - 1;
 }
 void GameScene::Update() {
 	GameTimer::GetInstance()->Update();

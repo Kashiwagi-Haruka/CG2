@@ -36,7 +36,7 @@ public:
 	EnemyManager() {}
 	~EnemyManager() = default;
 
-	void Initialize(Camera* camera);
+		void Initialize(Camera* camera);
 	void AddEnemy(Camera* camera, const Vector3& pos);
 	void Update(Camera* camera, const Vector3& housePos, const Vector3& houseScale, const Vector3& playerPos, bool isPlayerAlive);
 	void Draw();
@@ -60,6 +60,8 @@ public:
 
 	// セッター
 	void SetWaveDelay(float delay) { waveDelay_ = delay; }
+	void ForceStartWave(int waveNumber);
+	void ForceBossPhase();
 
 	// 敵リストへのアクセス（当たり判定用など）
 	std::vector<std::unique_ptr<Enemy>>& GetEnemies() { return enemies; }

@@ -1,5 +1,6 @@
 #include "EnemyManager.h"
 #include "Function.h"
+#include <algorithm>
 #include <cstdlib>
 
 namespace {
@@ -245,6 +246,22 @@ void EnemyManager::OnEnemyDamaged(Enemy* enemy) {
 			break;
 		}
 	}
+}
+void EnemyManager::ForceStartWave(int waveNumber) {
+	Clear();
+	allWavesComplete_ = false;
+	waveTimer_ = 0.0f;
+	currentWave_ = std::clamp(waveNumber, 1, maxWave_);
+	waveState_ = WaveState::kSpawning;
+	SpawnWaveEnemies();
+}
+
+void EnemyManager::ForceBossPhase() {
+	Clear();
+	allWavesComplete_ = true;
+	waveTimer_ = 0.0f;
+	currentWave_ = maxWave_;
+	waveState_ = WaveState::kComplete;
 }
 
 int EnemyManager::GetAliveEnemyCount() const {

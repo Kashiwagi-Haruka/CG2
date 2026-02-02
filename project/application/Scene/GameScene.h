@@ -95,6 +95,10 @@ private:
 	bool isLevelSelecting = false;
 	int selectChoices[2]; // 0:Atk, 1:Speed, 2:HP, 3:Allow
 	int cursorIndex = 0;  // 0 or 1
+	int debugPhaseSelection_ = 0;
+
+	void ApplyPhaseSelection(int selectionIndex);
+
 public:
 	GameScene();
 	~GameScene() override;
