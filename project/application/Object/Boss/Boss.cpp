@@ -34,7 +34,11 @@ void Boss::Initialize(Camera* camera, const Vector3& position) {
 
 	camera_ = camera;
 	object_->Initialize();
+	if (!ModelManager::GetInstance()->FindModel("WaterBoss")) {
+		ModelManager::GetInstance()->LoadGltfModel("Resources/3d", "WaterBoss");
+	}
 	object_->SetModel("WaterBoss");
+
 	animationClips_ = Animation::LoadAnimationClips("Resources/3d", "WaterBoss");
 	if (!animationClips_.empty()) {
 		currentAnimationIndex_ = 0;
