@@ -11,6 +11,7 @@
 #include "Sprite.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
+#include "TutorialUI/TutorialUI.h"
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
@@ -25,6 +26,7 @@ void TutorialScene::Initialize() {
 	player_ = std::make_unique<Player>();
 	field_ = std::make_unique<MapchipField>();
 	pause_ = std::make_unique<Pause>();
+	tutorialUI_ = std::make_unique<TutorialUI>();
 
 	cameraController_->Initialize();
 	Object3dCommon::GetInstance()->SetDefaultCamera(cameraController_->GetCamera());
@@ -34,6 +36,7 @@ void TutorialScene::Initialize() {
 	field_->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field_->Initialize(cameraController_->GetCamera());
 	pause_->Initialize();
+	tutorialUI_->Initialize();
 
 	controlSpriteHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/option.png");
 	controlSprite_ = std::make_unique<Sprite>();
@@ -130,6 +133,14 @@ void TutorialScene::Update() {
 		return;
 	}
 
+	const int completedSteps = isTutorialComplete_ ? kStepCount : currentStepIndex_;
+	const float tutorialProgress = static_cast<float>(completedSteps) / static_cast<float>(kStepCount);
+	const float skipProgress = (skipHoldTimer_ >= kSkipHoldDuration) ? 1.0f : (skipHoldTimer_ / kSkipHoldDuration);
+	if (tutorialUI_) {
+		const int stepSpriteIndex = isTutorialComplete_ ? kStepCount : currentStepIndex_;
+		tutorialUI_->Update(tutorialProgress, skipProgress, stepSpriteIndex, skipHoldTimer_ > 0.0f);
+	}
+
 	if (isPaused_) {
 		return;
 	}
@@ -169,6 +180,9 @@ void TutorialScene::Draw() {
 	SpriteCommon::GetInstance()->DrawCommon();
 	if (controlSprite_) {
 		controlSprite_->Draw();
+	}
+	if (tutorialUI_) {
+		tutorialUI_->Draw();
 	}
 	pause_->Draw();
 }

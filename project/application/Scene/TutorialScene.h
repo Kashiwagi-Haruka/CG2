@@ -10,6 +10,7 @@ class Player;
 class SkyDome;
 class Sprite;
 class Pause;
+class TutorialUI;
 class TutorialScene : public BaseScene {
 
 public:
@@ -29,6 +30,7 @@ private:
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<MapchipField> field_;
 	std::unique_ptr<Sprite> controlSprite_;
+	std::unique_ptr<TutorialUI> tutorialUI_;
 	std::unique_ptr<Pause> pause_;
 	uint32_t controlSpriteHandle_ = 0;
 
