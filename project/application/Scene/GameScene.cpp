@@ -418,7 +418,7 @@ void GameScene::Update() {
 		if (warningTimer_ >= warningDuration_) {
 			isWarningActive_ = false;
 			isBossActive_ = true;
-			boss_->Initialize(cameraController->GetCamera(), {50.0f, 2.5f, 40.0f});
+			boss_->Initialize(cameraController->GetCamera(), {50.0f, 3.5f, 50.0f});
 		}
 	}
 
@@ -492,6 +492,7 @@ void GameScene::Draw() {
 	enemyManager->Draw();
 	if (isBossActive_) {
 		boss_->Draw();
+		Object3dCommon::GetInstance()->DrawCommon();
 	}
 	expCubeManager->Draw();
 	house->Draw();

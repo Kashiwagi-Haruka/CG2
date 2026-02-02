@@ -27,8 +27,20 @@ void Boss::Initialize(Camera* camera, const Vector3& position) {
 	camera_ = camera;
 	object_->Initialize();
 	object_->SetModel("WaterBoss");
+	animationClips_ = Animation::LoadAnimationClips("Resources/3d", "WaterBoss");
+	if (!animationClips_.empty()) {
+		currentAnimationIndex_ = 0;
+		for (size_t i = 0; i < animationClips_.size(); ++i) {
+			if (animationClips_[i].name == "Walk") {
+				currentAnimationIndex_ = i;
+				break;
+			}
+		}
+		object_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
+		object_->ResetAnimationTime();
+	}
 	basePosition_ = position;
-	baseScale_ = {2.5f, 2.5f, 2.5f};
+	baseScale_ = {1.0f, 1.0f, 1.0f};
 	transform_ = {
 	    .scale{0.0f, 0.0f, 0.0f},
 	    .rotate{0.0f, 0.0f, 0.0f},

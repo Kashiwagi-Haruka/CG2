@@ -1,7 +1,9 @@
 #pragma once
+#include "Animation/Animation.h"
 #include "Transform.h"
 #include "Vector3.h"
 #include <memory>
+#include <vector>
 
 class Camera;
 class Object3d;
@@ -21,6 +23,9 @@ class Boss {
 	float animationTimer_ = 0.0f;
 	float appearTimer_ = 0.0f;
 	float appearDuration_ = 2.0f;
+
+	std::vector<Animation::AnimationData> animationClips_{};
+	size_t currentAnimationIndex_ = 0;
 
 	std::unique_ptr<Object3d> object_;
 	Camera* camera_ = nullptr;
