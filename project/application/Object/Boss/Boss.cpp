@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include "DirectXCommon.h"
 
 namespace {
 const Vector4 kDamageInvincibleColor = {1.0f, 0.25f, 0.25f, 1.0f};
@@ -28,6 +29,7 @@ void Boss::Initialize(Camera* camera, const Vector3& position) {
 	damageInvincibleTimer_ = 0.0f;
 	lastSkillDamageId_ = -1;
 	animationTimer_ = 0.0f;
+	animationTime_ = 0.0f;
 	appearTimer_ = 0.0f;
 
 	camera_ = camera;
@@ -44,6 +46,13 @@ void Boss::Initialize(Camera* camera, const Vector3& position) {
 		}
 		object_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
 		object_->ResetAnimationTime();
+	}
+	if (Model* bossModel = ModelManager::GetInstance()->FindModel("WaterBoss")) {
+		skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(bossModel->GetModelData().rootnode));
+		skinCluster_ = CreateSkinCluster(*skeleton_, *bossModel);
+		if (!skinCluster_.mappedPalette.empty()) {
+			object_->SetSkinCluster(&skinCluster_);
+		}
 	}
 	basePosition_ = position;
 	baseScale_ = {1.0f, 1.0f, 1.0f};
@@ -72,6 +81,7 @@ void Boss::Update() {
 		return;
 	}
 	const float deltaTime = 1.0f / 60.0f;
+	const float animationDeltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	animationTimer_ += deltaTime;
 	if (damageInvincibleTimer_ > 0.0f) {
 		damageInvincibleTimer_ -= deltaTime;
@@ -95,11 +105,23 @@ void Boss::Update() {
 	transform_.rotate.y += deltaTime * 0.5f;
 	transform_.rotate.z = std::sin(animationTimer_ * std::numbers::pi_v<float>) * 0.05f;
 
+	if (skeleton_ && !animationClips_.empty()) {
+		const auto& currentAnimation = animationClips_[currentAnimationIndex_];
+		skeleton_->UpdateAnimation(currentAnimation, animationTime_, animationDeltaTime, true);
+		if (!skinCluster_.mappedPalette.empty()) {
+			UpdateSkinCluster(skinCluster_, *skeleton_);
+		}
+	}
+
 	object_->SetCamera(camera_);
 	object_->SetTransform(transform_);
 	object_->SetColor(damageInvincibleTimer_ > 0.0f ? kDamageInvincibleColor : kDefaultColor);
 	object_->Update();
+	if (skeleton_) {
+		skeleton_->SetObjectMatrix(object_->GetWorldMatrix());
+	}
 #ifdef _DEBUG
+	skeleton_->DrawBones(camera_, {1, 1, 1, 1}, {1, 1, 0, 1});
 	if (debugBox_) {
 		debugBox_->SetCamera(camera_);
 		debugBox_->SetTransform(transform_);

@@ -1,5 +1,7 @@
 #pragma once
 #include "Animation/Animation.h"
+#include "Animation/Skeleton.h"
+#include "Animation/SkinCluster.h"
 #include "Transform.h"
 #include "Vector3.h"
 #include <memory>
@@ -21,6 +23,7 @@ class Boss {
 	Vector3 baseScale_{};
 
 	float animationTimer_ = 0.0f;
+	float animationTime_ = 0.0f;
 	float appearTimer_ = 0.0f;
 	float appearDuration_ = 2.0f;
 
@@ -28,6 +31,8 @@ class Boss {
 	size_t currentAnimationIndex_ = 0;
 
 	std::unique_ptr<Object3d> object_;
+	std::unique_ptr<Skeleton> skeleton_;
+	SkinCluster skinCluster_{};
 #ifdef _DEBUG
 	std::unique_ptr<Object3d> debugBox_;
 #endif // _DEBUG
