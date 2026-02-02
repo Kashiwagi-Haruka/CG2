@@ -388,7 +388,7 @@ void GameScene::Update() {
 		if (warningTimer_ >= warningDuration_) {
 			isWarningActive_ = false;
 			isBossActive_ = true;
-			boss_->Initialize(cameraController->GetCamera(), {0.0f, 2.5f, -40.0f});
+			boss_->Initialize(cameraController->GetCamera(), {50.0f, 2.5f, 40.0f});
 		}
 	}
 
