@@ -70,8 +70,8 @@ class UIManager {
 	SpriteData houseHpNumberSPData[3];
 	// 家HPの%表示用スプライト。
 	SpriteData houseHpPercentSPData;
-	// 家HPの文字表示用スプライト
-	SpriteData houseHPStringSPData;
+	// 家HPラベル用スプライト。
+	SpriteData houseHpStringSPData;
 
 	// 現在のプレイヤーHP。
 	int playerHP;
@@ -91,6 +91,8 @@ class UIManager {
 	Vector2 houseHpNumbersTextureSize = {400, 400};
 	// 家HPの%表示基準位置。
 	Vector2 houseHpPercentBasePosition = {980, 520};
+	// 家HPラベルのオフセット。
+	Vector2 houseHpStringOffset = {0, -40};
 	// 家HPの桁表示開始インデックス。
 	int houseHpDigitStartIndex = 0;
 	// プレイヤーパラメータの保持領域。

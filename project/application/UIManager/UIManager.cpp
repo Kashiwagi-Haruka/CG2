@@ -46,6 +46,7 @@ UIManager::UIManager() {
 	expBarSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/BossHpBar.png");
 	expBarBackSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/BossHpBar.png");
 	houseHpPercentSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/houseHPNumbers.png");
+	houseHpStringSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/houseHPString.png");
 
 	// ===========================
 	//      Sprite の生成
@@ -76,7 +77,7 @@ UIManager::UIManager() {
 	for (int i = 0; i < 3; i++) {
 		houseHpNumberSPData[i].sprite = std::make_unique<Sprite>();
 	}
-	houseHPStringSPData.sprite = std::make_unique<Sprite>();
+	houseHpStringSPData.sprite = std::make_unique<Sprite>();
 }
 
 UIManager::~UIManager() {}
@@ -145,6 +146,10 @@ void UIManager::Initialize() {
 	houseHpPercentSPData.sprite->Initialize(houseHpPercentSPData.handle);
 	houseHpPercentSPData.sprite->SetTextureRange({houseHpNumbersTextureSize.x * 10.0f, 0}, houseHpNumbersTextureSize);
 	houseHpPercentSPData.sprite->SetScale({32, 32});
+
+	houseHpStringSPData.sprite->Initialize(houseHpStringSPData.handle);
+	houseHpStringSPData.sprite->SetAnchorPoint({0.5f, 0.5f});
+	houseHpStringSPData.sprite->SetScale({160, 40});
 	for (int i = 0; i < 3; i++) {
 		houseHpNumberSPData[i].sprite->Initialize(houseHpPercentSPData.handle);
 		houseHpNumberSPData[i].sprite->SetTextureRange({0, 0}, houseHpNumbersTextureSize);
@@ -274,6 +279,11 @@ void UIManager::Update() {
 	houseHpPercentSPData.translate = {xOffset, houseHpPercentBasePosition.y};
 	houseHpPercentSPData.sprite->SetPosition(houseHpPercentSPData.translate);
 	houseHpPercentSPData.sprite->Update();
+	float houseHpLabelRight = xOffset + 32.0f;
+	Vector2 houseHpLabelCenter = {(houseHpPercentBasePosition.x + houseHpLabelRight) * 0.5f, houseHpPercentBasePosition.y + houseHpStringOffset.y};
+	houseHpStringSPData.translate = houseHpLabelCenter;
+	houseHpStringSPData.sprite->SetPosition(houseHpStringSPData.translate);
+	houseHpStringSPData.sprite->Update();
 }
 
 void UIManager::Draw() {
@@ -322,6 +332,7 @@ void UIManager::Draw() {
 		houseHpNumberSPData[i].sprite->Draw();
 	}
 	houseHpPercentSPData.sprite->Draw();
+	houseHpStringSPData.sprite->Draw();
 }
 
 void UIManager::SetPlayerHP(int HP) { playerHP = HP; }
