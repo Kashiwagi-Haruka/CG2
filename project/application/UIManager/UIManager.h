@@ -57,6 +57,8 @@ class UIManager {
 	SpriteData SpeedUpSPData;
 	// 矢数アップ表示用スプライト。
 	SpriteData AllowUpSPData;
+	// スキルアイコン表示用スプライト。
+	SpriteData SkillIconSPData;
 
 	// スラッシュ表示用スプライト（未使用含む）。
 	SpriteData SlashSPData[2];

@@ -39,7 +39,7 @@ UIManager::UIManager() {
 	SpeedUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/SpeedUp.png");
 
 	AllowUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/ArrowUp.png");
-
+	SkillIconSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/skill.png");
 	SlashSPData[0].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Slash.png");
 
 	EXPSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Exp.png");
@@ -71,6 +71,7 @@ UIManager::UIManager() {
 	HealthUpSPData.sprite = std::make_unique<Sprite>();
 	SpeedUpSPData.sprite = std::make_unique<Sprite>();
 	AllowUpSPData.sprite = std::make_unique<Sprite>();
+	SkillIconSPData.sprite = std::make_unique<Sprite>();
 	expBarSPData.sprite = std::make_unique<Sprite>();
 	expBarBackSPData.sprite = std::make_unique<Sprite>();
 	houseHpPercentSPData.sprite = std::make_unique<Sprite>();
@@ -143,6 +144,10 @@ void UIManager::Initialize() {
 	AllowUpSPData.sprite->Initialize(AllowUpSPData.handle);
 	AllowUpSPData.sprite->SetScale({48, 48});
 
+	SkillIconSPData.sprite->Initialize(SkillIconSPData.handle);
+	SkillIconSPData.sprite->SetAnchorPoint({1.0f, 1.0f});
+	SkillIconSPData.sprite->SetScale({64, 64});
+
 	houseHpPercentSPData.sprite->Initialize(houseHpPercentSPData.handle);
 	houseHpPercentSPData.sprite->SetTextureRange({houseHpNumbersTextureSize.x * 10.0f, 0}, houseHpNumbersTextureSize);
 	houseHpPercentSPData.sprite->SetScale({32, 32});
@@ -214,8 +219,10 @@ void UIManager::Update() {
 	AllowUpSPData.translate = {10, SpeedUpSPData.translate.y + 70};
 	AllowUpSPData.sprite->SetPosition(AllowUpSPData.translate);
 	AllowUpSPData.sprite->Update();
-
-// ===========================
+	SkillIconSPData.translate = {1260, 700};
+	SkillIconSPData.sprite->SetPosition(SkillIconSPData.translate);
+	SkillIconSPData.sprite->Update();
+	// ===========================
 	//     EXPバー表示
 	// ===========================
 	if (parameters_.MaxEXP > 0) {
@@ -301,6 +308,7 @@ void UIManager::Draw() {
 	HealthUpSPData.sprite->Draw();
 	SpeedUpSPData.sprite->Draw();
 	AllowUpSPData.sprite->Draw();
+	SkillIconSPData.sprite->Draw();
 	expBarBackSPData.sprite->Draw();
 	expBarSPData.sprite->Draw();
 	if (parameters_.Level < parameters_.MaxLevel) {

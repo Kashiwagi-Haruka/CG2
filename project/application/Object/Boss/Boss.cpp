@@ -13,6 +13,7 @@
 
 namespace {
 const Vector4 kDamageInvincibleColor = {1.0f, 0.25f, 0.25f, 1.0f};
+const Vector4 kChargeColor = {1.0f, 0.95f, 0.6f, 1.0f};
 const Vector4 kDefaultColor = {1.0f, 1.0f, 1.0f, 1.0f};
 } // namespace
 
@@ -156,7 +157,7 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 	} else {
 		velocity_ = {0.0f, 0.0f, 0.0f};
 	}
-	if (actionState_ != ActionState::Idle) {
+	if (actionState_ == ActionState::Charging) {
 		velocity_ = {0.0f, 0.0f, 0.0f};
 	}
 	basePosition_ += velocity_;
@@ -243,7 +244,14 @@ bool inAttackRange = false;
 
 	object_->SetCamera(camera_);
 	object_->SetTransform(transform_);
-	object_->SetColor(damageInvincibleTimer_ > 0.0f ? kDamageInvincibleColor : kDefaultColor);
+	Vector4 nextColor = kDefaultColor;
+	if (actionState_ == ActionState::Charging) {
+		nextColor = kChargeColor;
+	}
+	if (damageInvincibleTimer_ > 0.0f) {
+		nextColor = kDamageInvincibleColor;
+	}
+	object_->SetColor(nextColor);
 	object_->Update();
 	if (skeleton_) {
 		skeleton_->SetObjectMatrix(object_->GetWorldMatrix());
