@@ -158,14 +158,22 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 			}
 		}
 		if (boss->IsAttackHitActive()) {
-			AABB bossAttackAabb = MakeAabb(boss->GetAttackPosition(), {boss->GetAttackHitSize(), boss->GetAttackHitSize(), boss->GetAttackHitSize()});
+			AABB bossAttackAabb{};
+			if (boss->IsChargeAttackHitActive()) {
+				const Vector3 chargeHitSize = boss->GetChargeAttackHitSize();
+				bossAttackAabb = MakeAabb(boss->GetPosition(), chargeHitSize);
+			} else {
+				const float hitSize = boss->GetAttackHitSize();
+				bossAttackAabb = MakeAabb(boss->GetAttackPosition(), {hitSize, hitSize, hitSize});
+			}
 			const bool hitPlayer = RigidBody::isCollision(bossAttackAabb, playerAabb);
 			const bool hitHouse = RigidBody::isCollision(bossAttackAabb, houseAabb);
 			if ((hitPlayer || hitHouse) && boss->ConsumeAttackHit()) {
+				const int damage = boss->GetAttackDamage();
 				if (hitPlayer) {
-					player.Damage(1);
+					player.Damage(damage);
 				} else if (hitHouse) {
-					house.Damage(1);
+					house.Damage(damage);
 				}
 			}
 		}

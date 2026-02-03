@@ -16,7 +16,6 @@ class Boss {
 		Charging,
 		Attacking,
 	};
-
 	int hp_ = 50;
 	int maxHp_ = 50;
 	bool isAlive_ = true;
@@ -37,11 +36,21 @@ class Boss {
 	float attackActiveDuration_ = 0.4f;
 	float attackRange_ = 2.5f;
 	float attackHitSize_ = 1.2f;
+	float attackHitForwardOffset_ = 0.8f;
+	float chargeAttackHitWidth_ = 1.8f;
+	float chargeAttackHitHeight_ = 1.4f;
+	float chargeAttackHitDepth_ = 1.8f;
+	int attackDamage_ = 1;
+	int chargeAttackDamage_ = 2;
 	bool attackHitConsumed_ = false;
 	float chargeTimer_ = 0.0f;
 	float chargeDuration_ = 0.8f;
 	float attackAnimationTimer_ = 0.0f;
 	float attackAnimationDuration_ = 0.0f;
+	float chargeSpinTimer_ = 0.0f;
+	float chargeSpinDuration_ = 2.0f;
+	float chargeSpinSpeed_ = 6.0f;
+	bool isChargeAttack_ = false;
 	ActionState actionState_ = ActionState::Idle;
 
 	float animationTimer_ = 0.0f;
@@ -84,7 +93,10 @@ public:
 	void SetLastSkillDamageId(int skillDamageId) { lastSkillDamageId_ = skillDamageId; }
 
 	float GetAttackHitSize() const { return attackHitSize_; }
-	Vector3 GetAttackPosition() const { return transform_.translate; }
+	Vector3 GetAttackPosition() const;
+	Vector3 GetChargeAttackHitSize() const { return {chargeAttackHitWidth_, chargeAttackHitHeight_, chargeAttackHitDepth_}; }
+	bool IsChargeAttackHitActive() const { return isChargeAttack_ && IsAttackHitActive(); }
+	int GetAttackDamage() const { return isChargeAttack_ ? chargeAttackDamage_ : attackDamage_; }
 	bool IsAttackHitActive() const { return attackActiveTimer_ > 0.0f; }
 	bool ConsumeAttackHit();
 };

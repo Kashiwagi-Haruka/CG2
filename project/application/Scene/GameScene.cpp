@@ -532,8 +532,8 @@ void GameScene::Draw() {
 		phaseSprites_[currentPhaseSpriteIndex_]->Draw();
 	}
 	if (isBossActive_ && boss_->GetIsAlive()) {
-		bossHpBarSprite_->Draw();
 		bossHpBarBackSprite_->Draw();
+		bossHpBarSprite_->Draw();
 	}
 	if (isWarningActive_) {
 		warningSprite_->Draw();

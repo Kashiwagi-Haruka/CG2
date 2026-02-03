@@ -36,6 +36,8 @@ void Boss::Initialize(Camera* camera, const Vector3& position) {
 	attackHitConsumed_ = false;
 	chargeTimer_ = 0.0f;
 	attackAnimationTimer_ = 0.0f;
+	chargeSpinTimer_ = 0.0f;
+	isChargeAttack_ = false;
 	actionState_ = ActionState::Idle;
 	animationLoop_ = true;
 	camera_ = camera;
@@ -118,6 +120,7 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 			attackActiveTimer_ = attackActiveDuration_;
 			attackHitConsumed_ = false;
 			attackAnimationTimer_ = attackAnimationDuration_ > 0.0f ? attackAnimationDuration_ : attackActiveDuration_;
+			chargeSpinTimer_ = chargeSpinDuration_;
 		}
 	} else if (actionState_ == ActionState::Attacking) {
 		attackAnimationTimer_ -= deltaTime;
@@ -135,6 +138,7 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 	if (appearTimer_ < appearDuration_) {
 		appearTimer_ += deltaTime;
 	}
+
 
 	Vector3 targetPosition = housePos;
 	if (isPlayerAlive) {
@@ -156,7 +160,7 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 	}
 	basePosition_ += velocity_;
 
-	bool inAttackRange = false;
+bool inAttackRange = false;
 	Vector3 toHouse = housePos - basePosition_;
 	toHouse.y = 0.0f;
 	if (LengthSquared(toHouse) <= attackRange_ * attackRange_) {
@@ -171,6 +175,10 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 		actionState_ = ActionState::Charging;
 		chargeTimer_ = chargeDuration_;
 		attackTimer_ = 0.0f;
+		isChargeAttack_ = true;
+	}
+	if (actionState_ == ActionState::Idle) {
+		isChargeAttack_ = false;
 	}
 	float appearT = std::clamp(appearTimer_ / appearDuration_, 0.0f, 1.0f);
 	float smoothT = appearT * appearT * (3.0f - 2.0f * appearT);
@@ -181,7 +189,12 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 	transform_.translate = basePosition_;
 	transform_.translate.y += bob;
 	transform_.translate.x += std::sin(animationTimer_ * std::numbers::pi_v<float> * 0.5f) * 0.3f;
-	transform_.rotate.y += deltaTime * 0.5f;
+	if (chargeSpinTimer_ > 0.0f) {
+		chargeSpinTimer_ = std::max(0.0f, chargeSpinTimer_ - deltaTime);
+		transform_.rotate.y += deltaTime * chargeSpinSpeed_;
+	} else {
+		transform_.rotate.y += deltaTime * 0.5f;
+	}
 	transform_.rotate.z = std::sin(animationTimer_ * std::numbers::pi_v<float>) * 0.05f;
 
 	if (!animationClips_.empty()) {
@@ -243,6 +256,14 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 	}
 #endif // _DEBUG
 }
+Vector3 Boss::GetAttackPosition() const {
+	Vector3 forwardDir = {std::sinf(transform_.rotate.y), 0.0f, std::cosf(transform_.rotate.y)};
+	if (isChargeAttack_) {
+		return transform_.translate + forwardDir * (attackHitForwardOffset_ * 0.6f);
+	}
+	return transform_.translate + forwardDir * attackHitForwardOffset_;
+}
+
 void Boss::Draw() {
 	if (!isAlive_) {
 		return;
