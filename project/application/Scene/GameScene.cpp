@@ -377,7 +377,7 @@ void GameScene::Update() {
 
 	// ★ ウェーブシステムの更新
 	enemyManager->Update(cameraController->GetCamera(), house->GetPosition(), house->GetScale(), player->GetPosition(), player->GetIsAlive());
-	expCubeManager->Update(cameraController->GetCamera());
+	expCubeManager->Update(cameraController->GetCamera(), player->GetMovementLimitCenter(), player->GetMovementLimitRadius());
 	int currentWave = enemyManager->GetCurrentWave();
 	if (currentWave != lastWave_) {
 		lastWave_ = currentWave;

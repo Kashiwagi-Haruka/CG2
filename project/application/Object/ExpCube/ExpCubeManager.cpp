@@ -14,12 +14,12 @@ void ExpCubeManager::Initialize(Camera* camera) {
 	expCubes_.clear();
 }
 
-void ExpCubeManager::Update(Camera* camera) {
+void ExpCubeManager::Update(Camera* camera, const Vector3& movementLimitCenter, float movementLimitRadius) {
 	camera_ = camera;
 	for (auto& cube : expCubes_) {
 		if (!cube->IsCollected()) {
 			cube->SetCamera(camera_);
-			cube->Update();
+			cube->Update(movementLimitCenter, movementLimitRadius);
 		}
 	}
 	RemoveCollected();

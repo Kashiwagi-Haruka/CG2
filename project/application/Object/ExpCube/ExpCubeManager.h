@@ -9,7 +9,7 @@ class Camera;
 class ExpCubeManager {
 public:
 	void Initialize(Camera* camera);
-	void Update(Camera* camera);
+	void Update(Camera* camera, const Vector3& movementLimitCenter, float movementLimitRadius);
 	void Draw();
 	void SpawnDrops(const Vector3& position, int count);
 	void RemoveCollected();

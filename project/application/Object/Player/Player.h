@@ -142,6 +142,8 @@ public:
 	bool GetSelect() { return isSelect_; };
 	int GetHP() const { return hp_; }
 	int GetHPMax() const { return parameters_.hpMax_; }
+	Vector3 GetMovementLimitCenter() const { return movementLimitCenter_; }
+	float GetMovementLimitRadius() const { return movementLimitRadius_; }
 	void IsLevelUp(bool lv) { isLevelUP = lv; }
 	bool GetLv() { return isLevelUP; }
 	void EXPMath();

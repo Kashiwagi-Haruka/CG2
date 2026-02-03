@@ -10,7 +10,7 @@ class Camera;
 class ExpCube {
 public:
 	void Initialize(Camera* camera, const Vector3& position);
-	void Update();
+	void Update(const Vector3& movementLimitCenter, float movementLimitRadius);
 	void Draw();
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	Vector3 GetPosition() const { return transform_.translate; }
