@@ -62,7 +62,6 @@ void House::Update(Camera* camera) {
 
 	float hpRatio = std::clamp(static_cast<float>(hp_) / HouseHP::GetInstance()->GetMaxHP(), 0.0f, 1.0f);
 	hpBarT_.scale = {kHpBarMaxScale * hpRatio, 1.0f, 1.0f};
-	hpBarT_.rotate.y = std::numbers::pi_v<float>;
 	hpBarT_.translate = hpBasePos;
 	hpFlameT_.translate = hpBasePos;
 	Matrix4x4 billboard = camera->GetWorldMatrix();

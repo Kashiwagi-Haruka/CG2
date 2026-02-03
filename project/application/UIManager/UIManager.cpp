@@ -154,7 +154,7 @@ void UIManager::Initialize() {
 
 	houseHpStringSPData.sprite->Initialize(houseHpStringSPData.handle);
 	houseHpStringSPData.sprite->SetAnchorPoint({0.5f, 0.5f});
-	houseHpStringSPData.sprite->SetScale({160, 40});
+	houseHpStringSPData.sprite->SetScale({160, 90});
 	for (int i = 0; i < 3; i++) {
 		houseHpNumberSPData[i].sprite->Initialize(houseHpPercentSPData.handle);
 		houseHpNumberSPData[i].sprite->SetTextureRange({0, 0}, houseHpNumbersTextureSize);

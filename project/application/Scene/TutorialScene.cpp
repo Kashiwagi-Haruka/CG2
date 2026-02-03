@@ -97,6 +97,27 @@ void TutorialScene::Update() {
 		skyDome_->Update();
 		field_->Update();
 		player_->Update();
+		if (player_->GetIsAlive()) {
+			for (auto& cube : expCubeManager_->GetCubes()) {
+				if (!cube || cube->IsCollected()) {
+					continue;
+				}
+				Vector3 toCube = player_->GetPosition() - cube->GetPosition();
+				toCube.y = 0.0f;
+				const Vector3 playerScale = player_->GetScale();
+				const Vector3 cubeScale = cube->GetScale();
+				const float playerRadius = std::max(playerScale.x, playerScale.z);
+				const float cubeRadius = std::max(cubeScale.x, cubeScale.z);
+				const float pickupRadius = playerRadius + cubeRadius;
+				if (LengthSquared(toCube) <= pickupRadius * pickupRadius) {
+					cube->Collect();
+					player_->EXPMath();
+					if (currentStepIndex_ == 5) {
+						expCubeCollectedCount_++;
+					}
+				}
+			}
+		}
 		expCubeManager_->Update(cameraController_->GetCamera(), player_->GetMovementLimitCenter(), player_->GetMovementLimitRadius());
 		player_->SetCamera(cameraController_->GetCamera());
 		skyDome_->SetCamera(cameraController_->GetCamera());
@@ -156,12 +177,7 @@ void TutorialScene::Update() {
 					expCubeManager_->SpawnDrops(spawnCenter, kExpCubeTargetCount);
 					expCubesSpawned_ = true;
 				}
-				expCubeCollectedCount_ = 0;
-				for (const auto& cube : expCubeManager_->GetCubes()) {
-					if (cube && cube->IsCollected()) {
-						expCubeCollectedCount_++;
-					}
-				}
+
 				currentStepProgress_ = static_cast<float>(expCubeCollectedCount_) / static_cast<float>(kExpCubeTargetCount);
 				progressed = expCubeCollectedCount_ >= kExpCubeTargetCount;
 				break;

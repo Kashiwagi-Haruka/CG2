@@ -15,8 +15,8 @@ public:
 private:
 	static constexpr int kStepCount = 8;
 	static constexpr int kStepSpriteCount = kStepCount;
-	static constexpr float kStepSpriteWidth = 420.0f;
-	static constexpr float kStepSpriteHeight = 140.0f;
+	static constexpr float kStepSpriteWidth = 320.0f;
+	static constexpr float kStepSpriteHeight = 180.0f;
 	static constexpr float kProgressBarWidth = 360.0f;
 	static constexpr float kProgressBarHeight = 20.0f;
 	static constexpr float kSkipBarWidth = 300.0f;
