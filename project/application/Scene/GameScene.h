@@ -63,6 +63,8 @@ private:
 	// レベルアップ選択専用スプライト
 	std::unique_ptr<Sprite> levelupIcons[4]; // 0:Atk, 1:Speed, 2:HP, 3:Allow
 	std::unique_ptr<Sprite> phaseSprites_[5];
+	std::unique_ptr<Sprite> bossHpBarSprite_;
+	std::unique_ptr<Sprite> bossHpBarBackSprite_;
 	std::unique_ptr<Sprite> warningSprite_;
 	int currentPhaseSpriteIndex_ = 0;
 	int lastWave_ = 0;
@@ -72,6 +74,7 @@ private:
 	float phaseSpriteStopTimer_ = 0.0f;
 	Vector2 phaseSpriteSize_ = {400.0f, 120.0f};
 	float phaseSpriteY_ = 80.0f;
+	Vector2 bossHpBarSize_ = {400.0f, 120.0f};
 	Vector2 warningSpriteBaseScale_ = {600.0f, 200.0f};
 	bool isWarningActive_ = false;
 	float warningTimer_ = 0.0f;

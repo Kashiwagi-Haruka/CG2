@@ -100,11 +100,25 @@ void GameScene::Initialize() {
 	    TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/phase5.png"),
 	};
 
+	const uint32_t bossHpBarHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/BossHpBar.png");
+
 	for (int i = 0; i < 5; i++) {
 		phaseSprites_[i] = std::make_unique<Sprite>();
 		phaseSprites_[i]->Initialize(phaseHandles[i]);
 		phaseSprites_[i]->SetScale(phaseSpriteSize_);
 	}
+	bossHpBarSprite_ = std::make_unique<Sprite>();
+	bossHpBarSprite_->Initialize(bossHpBarHandle);
+	bossHpBarSprite_->SetAnchorPoint({0.0f, 0.0f});
+	bossHpBarSprite_->SetColor({0.9f, 0.0f, 0.0f, 1.0f});
+	bossHpBarSprite_->SetScale(bossHpBarSize_);
+	bossHpBarSprite_->SetPosition({640.0f - bossHpBarSize_.x / 2.0f, phaseSpriteY_});
+	bossHpBarBackSprite_ = std::make_unique<Sprite>();
+	bossHpBarBackSprite_->Initialize(bossHpBarHandle);
+	bossHpBarBackSprite_->SetAnchorPoint({0.0f, 0.0f});
+	bossHpBarBackSprite_->SetScale(bossHpBarSize_);
+	bossHpBarBackSprite_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
+	bossHpBarBackSprite_->SetPosition({640.0f - bossHpBarSize_.x / 2.0f, phaseSpriteY_});
 	debugPhaseSelection_ = std::clamp(enemyManager->GetCurrentWave(), 1, 5) - 1;
 	lastWave_ = 0;
 	isPhaseSpriteActive_ = false;
@@ -374,7 +388,7 @@ void GameScene::Update() {
 		phaseSpriteX_ = 1280.0f + phaseSpriteSize_.x;
 	}
 
-	if (isPhaseSpriteActive_) {
+		if (isPhaseSpriteActive_ && !isBossActive_) {
 		const float deltaTime = 1.0f / 60.0f;
 		const float moveSpeed = 500.0f;
 		const float stopDuration = 0.8f;
@@ -401,6 +415,19 @@ void GameScene::Update() {
 		auto* phaseSprite = phaseSprites_[currentPhaseSpriteIndex_].get();
 		phaseSprite->SetPosition({phaseSpriteX_, phaseSpriteY_});
 		phaseSprite->Update();
+	}
+	if (isBossActive_ && boss_->GetIsAlive()) {
+		const int bossMaxHp = boss_->GetMaxHP();
+		if (bossMaxHp > 0) {
+			const float hpRatio = std::clamp(static_cast<float>(boss_->GetHP()) / static_cast<float>(bossMaxHp), 0.0f, 1.0f);
+			Vector2 bossHpBarScale = bossHpBarSize_;
+			bossHpBarScale.x *= hpRatio;
+			bossHpBarSprite_->SetScale(bossHpBarScale);
+			bossHpBarSprite_->SetPosition({640.0f - bossHpBarSize_.x / 2.0f, phaseSpriteY_});
+		}
+
+		bossHpBarSprite_->Update();
+		bossHpBarBackSprite_->Update();
 	}
 
 	// ★ 全フェーズ終了後に警告表示→ボス登場
@@ -500,9 +527,13 @@ void GameScene::Draw() {
 
 	SpriteCommon::GetInstance()->DrawCommon();
 	uimanager->Draw();
-	if (isPhaseSpriteActive_) {
+	if (isPhaseSpriteActive_ && !isBossActive_) {
 
 		phaseSprites_[currentPhaseSpriteIndex_]->Draw();
+	}
+	if (isBossActive_ && boss_->GetIsAlive()) {
+		bossHpBarSprite_->Draw();
+		bossHpBarBackSprite_->Draw();
 	}
 	if (isWarningActive_) {
 		warningSprite_->Draw();

@@ -24,7 +24,7 @@ Boss::Boss() {
 }
 
 void Boss::Initialize(Camera* camera, const Vector3& position) {
-	hp_ = 50;
+	hp_ = maxHp_;
 	isAlive_ = true;
 	damageInvincibleTimer_ = 0.0f;
 	lastSkillDamageId_ = -1;

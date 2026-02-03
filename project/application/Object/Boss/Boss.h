@@ -13,6 +13,7 @@ class Object3d;
 class Boss {
 
 	int hp_ = 50;
+	int maxHp_ = 50;
 	bool isAlive_ = true;
 	float damageInvincibleTimer_ = 0.0f;
 	float damageInvincibleDuration_ = 0.5f;
@@ -59,6 +60,8 @@ public:
 
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	bool GetIsAlive() const { return isAlive_; }
+	int GetHP() const { return hp_; }
+	int GetMaxHP() const { return maxHp_; }
 	Vector3 GetPosition() const { return transform_.translate; }
 	Vector3 GetScale() const { return transform_.scale; }
 	void SetPosition(const Vector3& position) { transform_.translate = position; }
