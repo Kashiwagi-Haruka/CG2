@@ -150,7 +150,7 @@ void GameScene::Initialize() {
 	pointLights_[2].radius = 5.0f;
 	pointLights_[2].decay = 0.7f;
 
-	directionalLight_.color = {0.3725f, 0.2667f, 0.7882f, 1.0f};
+	directionalLight_.color = {76.0f/255.0f, 96.0f/255.0f, 178/255.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.5f};
 	directionalLight_.intensity = 1.0f;
 

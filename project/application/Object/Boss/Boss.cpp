@@ -121,6 +121,7 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 			attackHitConsumed_ = false;
 			attackAnimationTimer_ = attackAnimationDuration_ > 0.0f ? attackAnimationDuration_ : attackActiveDuration_;
 			chargeSpinTimer_ = chargeSpinDuration_;
+			baseYaw_ = transform_.rotate.y;
 		}
 	} else if (actionState_ == ActionState::Attacking) {
 		attackAnimationTimer_ -= deltaTime;
@@ -193,7 +194,7 @@ bool inAttackRange = false;
 		chargeSpinTimer_ = std::max(0.0f, chargeSpinTimer_ - deltaTime);
 		transform_.rotate.y += deltaTime * chargeSpinSpeed_;
 	} else {
-		transform_.rotate.y += deltaTime * 0.5f;
+		transform_.rotate.y = baseYaw_;
 	}
 	transform_.rotate.z = std::sin(animationTimer_ * std::numbers::pi_v<float>) * 0.05f;
 

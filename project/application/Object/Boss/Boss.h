@@ -50,6 +50,7 @@ class Boss {
 	float chargeSpinTimer_ = 0.0f;
 	float chargeSpinDuration_ = 2.0f;
 	float chargeSpinSpeed_ = 6.0f;
+	float baseYaw_ = 0.0f;
 	bool isChargeAttack_ = false;
 	ActionState actionState_ = ActionState::Idle;
 
