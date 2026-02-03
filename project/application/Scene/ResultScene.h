@@ -20,10 +20,12 @@ class ResultScene : public BaseScene {
 	SpriteData logoSP_;
 	SpriteData starSP_[3];
 	SpriteData timeDigitSP_[4];
+	SpriteData houseHpStringSP_;
 
 	uint32_t starOnHandle_ = 0;
 	uint32_t starOffHandle_ = 0;
 	uint32_t numberHandle_ = 0;
+	uint32_t houseHpStringHandle_ = 0;
 
 	int resultStars_ = 0;
 	int resultMinutes_ = 0;
@@ -31,6 +33,7 @@ class ResultScene : public BaseScene {
 	Vector2 numberTextureSize_ = {300, 300};
 	Vector2 timeDigitSize_ = {48, 48};
 	Vector2 starSize_ = {120, 120};
+	Vector2 houseHpStringSize_ = {320, 180};
 	std::unique_ptr<Sprite> pressSpaceSprite = nullptr;
 	uint32_t pressSpaceHandle = 0;
 

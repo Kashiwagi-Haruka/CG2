@@ -32,6 +32,7 @@ ResultScene::ResultScene() {
 	starOnHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/StarOn.png");
 	starOffHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/StarOff.png");
 	numberHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/No.png");
+	houseHpStringHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/houseHPString.png");
 	BGM_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/アンドロイドの涙.mp3");
 
 	for (int i = 0; i < 4; ++i) {
@@ -39,6 +40,9 @@ ResultScene::ResultScene() {
 		timeDigitSP_[i].sprite = std::make_unique<Sprite>();
 		timeDigitSP_[i].sprite->Initialize(timeDigitSP_[i].handle);
 	}
+	houseHpStringSP_.handle = houseHpStringHandle_;
+	houseHpStringSP_.sprite = std::make_unique<Sprite>();
+	houseHpStringSP_.sprite->Initialize(houseHpStringSP_.handle);
 
 	transition = std::make_unique<SceneTransition>();
 }
@@ -89,7 +93,13 @@ void ResultScene::Initialize() {
 		starSP_[i].sprite->SetPosition(starSP_[i].translate);
 		starSP_[i].sprite->Update();
 	}
-
+	Vector2 starTopLeft = {starStart.x - starSize_.x*3.0f, starStart.y+80.0f};
+	houseHpStringSP_.sprite->SetAnchorPoint({0.0f, 1.0f});
+	houseHpStringSP_.size = houseHpStringSize_;
+	houseHpStringSP_.translate = starTopLeft;
+	houseHpStringSP_.sprite->SetScale(houseHpStringSP_.size);
+	houseHpStringSP_.sprite->SetPosition(houseHpStringSP_.translate);
+	houseHpStringSP_.sprite->Update();
 	int minuteTens = (resultMinutes_ / 10) % 10;
 	int minuteOnes = resultMinutes_ % 10;
 	int secondTens = (resultSeconds_ / 10) % 10;
@@ -127,7 +137,7 @@ void ResultScene::Update() {
 	for (int i = 0; i < 4; ++i) {
 		timeDigitSP_[i].sprite->Update();
 	}
-
+	houseHpStringSP_.sprite->Update();
 	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;
@@ -156,7 +166,7 @@ void ResultScene::Draw() {
 	for (int i = 0; i < 4; ++i) {
 		timeDigitSP_[i].sprite->Draw();
 	}
-
+	houseHpStringSP_.sprite->Draw();
 	pressSpaceSprite->Draw();
 	if (isTransitionIn || isTransitionOut) {
 		transition->Draw();
