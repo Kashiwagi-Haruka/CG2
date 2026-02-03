@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "GameBase.h"
 #include <imgui.h>
+#include <random>
 CameraController::~CameraController() {}
 void CameraController::Initialize() {
 
@@ -19,10 +20,10 @@ void CameraController::Update() {
 #ifdef USE_IMGUI
 
 	/*if (ImGui::Begin("CameraController")) {
-		ImGui::DragFloat3("CameraScale", &transform_.scale.x, 0.01f);
-		ImGui::DragFloat("OrbitYaw", &orbitYaw_, 0.01f);
-		ImGui::DragFloat("OrbitPitch", &orbitPitch_, 0.01f);
-		ImGui::DragFloat3("CameraTranslate", &transform_.translate.x, 0.1f);
+	    ImGui::DragFloat3("CameraScale", &transform_.scale.x, 0.01f);
+	    ImGui::DragFloat("OrbitYaw", &orbitYaw_, 0.01f);
+	    ImGui::DragFloat("OrbitPitch", &orbitPitch_, 0.01f);
+	    ImGui::DragFloat3("CameraTranslate", &transform_.translate.x, 0.1f);
 	}
 	ImGui::End();*/
 
@@ -46,8 +47,25 @@ void CameraController::Update() {
 	transform_.translate = playerPos - orbitDir * distance;
 	transform_.rotate = {orbitPitch_, orbitYaw_, 0.0f};
 
+	if (shakeTimer_ > 0.0f) {
+		shakeTimer_ -= 1.0f / 60.0f;
+		if (shakeTimer_ < 0.0f) {
+			shakeTimer_ = 0.0f;
+		}
+		const float decay = shakeDuration_ > 0.0f ? (shakeTimer_ / shakeDuration_) : 0.0f;
+		const float strength = shakeAmplitude_ * decay;
+		static std::mt19937 rng{std::random_device{}()};
+		std::uniform_real_distribution<float> offsetDist(-1.0f, 1.0f);
+		transform_.translate.x += offsetDist(rng) * strength;
+		transform_.translate.y += offsetDist(rng) * strength;
+	}
+
 	camera_->SetTransform(transform_);
 	camera_->Update();
 }
 void CameraController::SpecialAttackUpdate() {}
 Camera* CameraController::GetCamera() { return camera_.get(); }
+void CameraController::StartShake(float durationSeconds) {
+	shakeDuration_ = durationSeconds;
+	shakeTimer_ = durationSeconds;
+}

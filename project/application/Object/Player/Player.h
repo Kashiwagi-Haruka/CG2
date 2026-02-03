@@ -49,7 +49,7 @@ class Player {
 	bool isAlive;
 	bool isInvincible_ = false;
 	float invincibleTimer_ = 0.0f;
-
+	bool damageTrigger_ = false;
 
 
 	// コンボ攻撃用
@@ -137,7 +137,13 @@ public:
 			hp_ -= amount;
 			isInvincible_ = true;
 			invincibleTimer_ = 1.0f; // 1秒無敵
+			damageTrigger_ = true;
 		}
+	}
+	bool ConsumeDamageTrigger() {
+		const bool triggered = damageTrigger_;
+		damageTrigger_ = false;
+		return triggered;
 	}
 	bool GetSelect() { return isSelect_; };
 	int GetHP() const { return hp_; }

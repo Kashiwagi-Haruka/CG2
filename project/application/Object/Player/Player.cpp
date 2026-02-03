@@ -69,6 +69,7 @@ void Player::Initialize(Camera* camera) {
 	isfalling = false;
 	isLevelUP = false;
 	rotateTimer = 0.1f;
+	damageTrigger_ = false;
 
 	// コンボ関連の初期化
 	comboStep_ = 0;

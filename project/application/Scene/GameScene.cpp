@@ -483,7 +483,9 @@ void GameScene::Update() {
 	// ===== プレイヤーと敵の当たり判定 =====
 	Boss* activeBoss = (isBossActive_ && boss_->GetIsAlive()) ? boss_.get() : nullptr;
 	collisionManager_.HandleGameSceneCollisions(*player, *enemyManager, *expCubeManager, *house, activeBoss);
-
+	if (player->ConsumeDamageTrigger()) {
+		cameraController->StartShake(0.75f);
+	}
 	uimanager->SetPlayerParameters(player->GetParameters());
 	uimanager->SetPlayerHP(player->GetHP());
 
