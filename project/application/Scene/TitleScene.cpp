@@ -70,16 +70,14 @@ void TitleScene::Update() {
 		transition->Initialize(true);
 		isTransitionOut = true;
 	}
-	if (GameBase::GetInstance()->TriggerKey(DIK_T)) {
-		SceneManager::GetInstance()->ChangeScene("Tutorial");
-	}
+
 	if (isTransitionIn || isTransitionOut) {
 		transition->Update();
 		if (transition->IsEnd() && isTransitionIn) {
 			isTransitionIn = false;
 		}
 		if (transition->IsEnd() && isTransitionOut) {
-			SceneManager::GetInstance()->ChangeScene("Game");
+			SceneManager::GetInstance()->ChangeScene("Tutorial");
 		}
 	}
 

@@ -13,8 +13,8 @@ public:
 	void Draw();
 
 private:
-	static constexpr int kStepCount = 6;
-	static constexpr int kStepSpriteCount = kStepCount + 1;
+	static constexpr int kStepCount = 8;
+	static constexpr int kStepSpriteCount = kStepCount;
 	static constexpr float kStepSpriteWidth = 420.0f;
 	static constexpr float kStepSpriteHeight = 140.0f;
 	static constexpr float kProgressBarWidth = 360.0f;

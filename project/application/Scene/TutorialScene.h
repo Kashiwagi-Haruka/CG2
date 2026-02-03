@@ -22,14 +22,17 @@ public:
 	void Finalize() override;
 
 private:
-	static constexpr int kStepCount = 6;
+	static constexpr int kStepCount = 8;
+	static constexpr int kExpCubeTargetCount = 4;
 	static constexpr float kSkipHoldDuration = 1.0f;
 	static constexpr float kAutoAdvanceDuration = 2.0f;
+	static constexpr float kEndAutoAdvanceDuration = 2.0f;
 
 	std::unique_ptr<CameraController> cameraController_;
 	std::unique_ptr<SkyDome> skyDome_;
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<MapchipField> field_;
+	std::unique_ptr<class ExpCubeManager> expCubeManager_;
 	std::unique_ptr<Sprite> controlSprite_;
 	std::unique_ptr<TutorialUI> tutorialUI_;
 	std::unique_ptr<Pause> pause_;
@@ -42,4 +45,6 @@ private:
 	bool wasSkipKeyHeld_ = false;
 	float skipHoldTimer_ = 0.0f;
 	float stepTimer_ = 0.0f;
+	int expCubeCollectedCount_ = 0;
+	bool expCubesSpawned_ = false;
 };

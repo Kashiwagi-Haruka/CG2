@@ -3,6 +3,7 @@
 #include "GameBase.h"
 #include "Object/Background/SkyDome.h"
 #include "Object/Character/Model/CharacterModel.h"
+#include "Object/ExpCube/ExpCubeManager.h"
 #include "Object/MapchipField.h"
 #include "Object/Player/Player.h"
 #include "Object3d/Object3dCommon.h"
@@ -27,6 +28,7 @@ void TutorialScene::Initialize() {
 	field_ = std::make_unique<MapchipField>();
 	pause_ = std::make_unique<Pause>();
 	tutorialUI_ = std::make_unique<TutorialUI>();
+	expCubeManager_ = std::make_unique<ExpCubeManager>();
 
 	cameraController_->Initialize();
 	Object3dCommon::GetInstance()->SetDefaultCamera(cameraController_->GetCamera());
@@ -35,6 +37,7 @@ void TutorialScene::Initialize() {
 	player_->Initialize(cameraController_->GetCamera());
 	field_->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field_->Initialize(cameraController_->GetCamera());
+	expCubeManager_->Initialize(cameraController_->GetCamera());
 	pause_->Initialize();
 	tutorialUI_->Initialize();
 
@@ -52,6 +55,8 @@ void TutorialScene::Initialize() {
 	wasSkipKeyHeld_ = false;
 	skipHoldTimer_ = 0.0f;
 	stepTimer_ = 0.0f;
+	expCubeCollectedCount_ = 0;
+	expCubesSpawned_ = false;
 
 	GameBase::GetInstance()->SetIsCursorStablity(true);
 	GameBase::GetInstance()->SetIsCursorVisible(false);
@@ -83,6 +88,7 @@ void TutorialScene::Update() {
 		skyDome_->Update();
 		field_->Update();
 		player_->Update();
+		expCubeManager_->Update(cameraController_->GetCamera(), player_->GetMovementLimitCenter(), player_->GetMovementLimitRadius());
 		player_->SetCamera(cameraController_->GetCamera());
 		skyDome_->SetCamera(cameraController_->GetCamera());
 		field_->SetCamera(cameraController_->GetCamera());
@@ -100,19 +106,39 @@ void TutorialScene::Update() {
 				break;
 			case 2:
 				stepTimer_ = 0.0f;
-				progressed = GameBase::GetInstance()->TriggerKey(DIK_SPACE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonA);
+				progressed = GameBase::GetInstance()->PushKey(DIK_W) || GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_S) || GameBase::GetInstance()->PushKey(DIK_D) ||
+				             GameBase::GetInstance()->GetJoyStickLXY().x != 0.0f || GameBase::GetInstance()->GetJoyStickLXY().y != 0.0f;
 				break;
 			case 3:
 				stepTimer_ = 0.0f;
-				progressed = GameBase::GetInstance()->TriggerMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonB);
+				progressed = GameBase::GetInstance()->GetMouseMove().x != 0.0f || GameBase::GetInstance()->GetMouseMove().y != 0.0f || GameBase::GetInstance()->GetJoyStickRXY().x != 0.0f ||
+				             GameBase::GetInstance()->GetJoyStickRXY().y != 0.0f;
 				break;
 			case 4:
 				stepTimer_ = 0.0f;
-				progressed = GameBase::GetInstance()->TriggerKey(DIK_E) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonY);
+				progressed = GameBase::GetInstance()->TriggerMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonB);
 				break;
 			case 5:
 				stepTimer_ = 0.0f;
-				progressed = GameBase::GetInstance()->TriggerKey(DIK_Q) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonX);
+				if (!expCubesSpawned_) {
+					expCubeManager_->SpawnDrops(player_->GetPosition(), kExpCubeTargetCount);
+					expCubesSpawned_ = true;
+				}
+				expCubeCollectedCount_ = 0;
+				for (const auto& cube : expCubeManager_->GetCubes()) {
+					if (cube && cube->IsCollected()) {
+						expCubeCollectedCount_++;
+					}
+				}
+				progressed = expCubeCollectedCount_ >= kExpCubeTargetCount;
+				break;
+			case 6:
+				stepTimer_ = 0.0f;
+				progressed = GameBase::GetInstance()->TriggerKey(DIK_E) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonY);
+				break;
+			case 7:
+				stepTimer_ += deltaTime;
+				progressed = stepTimer_ >= kEndAutoAdvanceDuration;
 				break;
 			default:
 				stepTimer_ = 0.0f;
@@ -128,9 +154,8 @@ void TutorialScene::Update() {
 				}
 			}
 		} else {
-			if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonA)) {
-				SceneManager::GetInstance()->ChangeScene("Game");
-			}
+			SceneManager::GetInstance()->ChangeScene("Game");
+			return;
 		}
 	}
 	pause_->Update(isPaused_);
@@ -146,7 +171,7 @@ void TutorialScene::Update() {
 	const float tutorialProgress = static_cast<float>(completedSteps) / static_cast<float>(kStepCount);
 	const float skipProgress = (skipHoldTimer_ >= kSkipHoldDuration) ? 1.0f : (skipHoldTimer_ / kSkipHoldDuration);
 	if (tutorialUI_) {
-		const int stepSpriteIndex = isTutorialComplete_ ? kStepCount : currentStepIndex_;
+		const int stepSpriteIndex = isTutorialComplete_ ? (kStepCount - 1) : currentStepIndex_;
 		tutorialUI_->Update(tutorialProgress, skipProgress, stepSpriteIndex, skipHoldTimer_ > 0.0f);
 	}
 
@@ -158,8 +183,9 @@ void TutorialScene::Update() {
 	ImGui::Begin("Tutorial");
 	ImGui::Text("体験型チュートリアル");
 	ImGui::Separator();
-	const char* stepTitles[kStepCount] = {"移動", "ダッシュ", "ジャンプ", "通常攻撃", "スキル", "必殺技"};
-	const char* stepHints[kStepCount] = {"WASD で移動してみよう", "SHIFT を押してダッシュ", "SPACE でジャンプ", "左クリックで攻撃", "E でスキル攻撃", "Q で必殺技"};
+	const char* stepTitles[kStepCount] = {"開始", "準備", "移動", "視点移動", "攻撃", "ExpCube", "スキル", "おわり"};
+	const char* stepHints[kStepCount] = {"チュートリアル開始", "準備ができたら進みます", "WASD で移動してみよう", "マウスで視点を動かしてみよう",
+	                                     "左クリックで攻撃",   "ExpCube を4個集めよう",  "E でスキル攻撃",        "まもなくゲーム開始"};
 	for (int i = 0; i < kStepCount; ++i) {
 		ImVec4 color = stepCompleted_[i] ? ImVec4(0.3f, 1.0f, 0.3f, 1.0f) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 		if (i == currentStepIndex_) {
@@ -168,9 +194,6 @@ void TutorialScene::Update() {
 		ImGui::TextColored(color, "%s: %s", stepTitles[i], stepHints[i]);
 	}
 	ImGui::Separator();
-	if (isTutorialComplete_) {
-		ImGui::Text("SPACE でゲーム開始");
-	}
 	ImGui::Text("P 長押しでチュートリアルスキップ");
 	ImGui::Text("P 押しでポーズ/再開");
 	if (isPaused_) {
@@ -185,6 +208,9 @@ void TutorialScene::Draw() {
 	skyDome_->Draw();
 	field_->Draw();
 	player_->Draw();
+	if (expCubeManager_) {
+		expCubeManager_->Draw();
+	}
 
 	SpriteCommon::GetInstance()->DrawCommon();
 	if (controlSprite_) {
