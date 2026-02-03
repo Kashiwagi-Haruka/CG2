@@ -1,5 +1,7 @@
+#define NOMINMAX
 #include "TutorialScene.h"
 #include "CameraController/CameraController.h"
+#include "Function.h"
 #include "GameBase.h"
 #include "Object/Background/SkyDome.h"
 #include "Object/Character/Model/CharacterModel.h"
@@ -13,6 +15,7 @@
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 #include "TutorialUI/TutorialUI.h"
+#include <algorithm>
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
@@ -89,6 +92,25 @@ void TutorialScene::Update() {
 		field_->Update();
 		player_->Update();
 		expCubeManager_->Update(cameraController_->GetCamera(), player_->GetMovementLimitCenter(), player_->GetMovementLimitRadius());
+		if (expCubeManager_ && player_->GetIsAlive()) {
+			for (auto& cube : expCubeManager_->GetCubes()) {
+				if (!cube || cube->IsCollected()) {
+					continue;
+				}
+				const Vector3 cubePos = cube->GetPosition();
+				Vector3 toCube = player_->GetPosition() - cubePos;
+				toCube.y = 0.0f;
+				const Vector3 playerScale = player_->GetScale();
+				const Vector3 cubeScale = cube->GetScale();
+				const float playerRadius = std::max(playerScale.x, playerScale.z);
+				const float cubeRadius = std::max(cubeScale.x, cubeScale.z);
+				const float pickupRadius = playerRadius + cubeRadius;
+				if (LengthSquared(toCube) <= pickupRadius * pickupRadius) {
+					cube->Collect();
+					player_->EXPMath();
+				}
+			}
+		}
 		player_->SetCamera(cameraController_->GetCamera());
 		skyDome_->SetCamera(cameraController_->GetCamera());
 		field_->SetCamera(cameraController_->GetCamera());
