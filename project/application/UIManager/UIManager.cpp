@@ -31,7 +31,7 @@ UIManager::UIManager() {
 		MaxSPData[i].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Max.png");
 	}
 
-	// ステータスUPアイコン
+// ステータスUPアイコン
 	AttackUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/AttuckUp.png");
 
 	HealthUpSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/HealthUp.png");
@@ -43,6 +43,8 @@ UIManager::UIManager() {
 	SlashSPData[0].handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Slash.png");
 
 	EXPSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/Exp.png");
+	expBarSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/BossHpBar.png");
+	expBarBackSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/BossHpBar.png");
 	houseHpPercentSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/houseHPNumbers.png");
 
 	// ===========================
@@ -68,6 +70,8 @@ UIManager::UIManager() {
 	HealthUpSPData.sprite = std::make_unique<Sprite>();
 	SpeedUpSPData.sprite = std::make_unique<Sprite>();
 	AllowUpSPData.sprite = std::make_unique<Sprite>();
+	expBarSPData.sprite = std::make_unique<Sprite>();
+	expBarBackSPData.sprite = std::make_unique<Sprite>();
 	houseHpPercentSPData.sprite = std::make_unique<Sprite>();
 	for (int i = 0; i < 3; i++) {
 		houseHpNumberSPData[i].sprite = std::make_unique<Sprite>();
@@ -145,6 +149,22 @@ void UIManager::Initialize() {
 		houseHpNumberSPData[i].sprite->SetTextureRange({0, 0}, houseHpNumbersTextureSize);
 		houseHpNumberSPData[i].sprite->SetScale({32, 32});
 	}
+	// ------------------ EXP Bar ------------------
+	expBarSPData.sprite->Initialize(expBarSPData.handle);
+	expBarSPData.sprite->SetAnchorPoint({0.0f, 0.0f});
+	expBarSPData.sprite->SetColor({0.0f, 0.8f, 0.0f, 1.0f});
+	expBarSPData.size = expBarMaxSize;
+	expBarSPData.sprite->SetScale(expBarSPData.size);
+	expBarSPData.translate = {100, 20};
+	expBarSPData.sprite->SetPosition(expBarSPData.translate);
+
+	expBarBackSPData.sprite->Initialize(expBarBackSPData.handle);
+	expBarBackSPData.sprite->SetAnchorPoint({0.0f, 0.0f});
+	expBarBackSPData.sprite->SetColor({0.2f, 0.2f, 0.2f, 1.0f});
+	expBarBackSPData.size = expBarMaxSize;
+	expBarBackSPData.sprite->SetScale(expBarBackSPData.size);
+	expBarBackSPData.translate = expBarSPData.translate;
+	expBarBackSPData.sprite->SetPosition(expBarBackSPData.translate);
 }
 
 void UIManager::Update() {
@@ -188,33 +208,17 @@ void UIManager::Update() {
 	AllowUpSPData.sprite->SetPosition(AllowUpSPData.translate);
 	AllowUpSPData.sprite->Update();
 
+// ===========================
+	//     EXPバー表示
 	// ===========================
-	//     EXP(3桁表示)
-	// ===========================
-
-	int exp = parameters_.EXP;
-
-	int exp100 = exp / 100;      // 百の位
-	int exp10 = (exp / 10) % 10; // 十の位
-	int exp1 = exp % 10;         // 一の位
-
-	NumberSPData[kExp100].sprite->SetTextureRange({300.0f * exp100, 0}, numbersTextureSize);
-	NumberSPData[kExp10].sprite->SetTextureRange({300.0f * exp10, 0}, numbersTextureSize);
-	NumberSPData[kEexp1].sprite->SetTextureRange({300.0f * exp1, 0}, numbersTextureSize);
-
-	// ===========================
-	//     MaxEXP(3桁表示)
-	// ===========================
-
-	int expMax = parameters_.MaxEXP;
-
-	int expMax100 = expMax / 100;
-	int expMax10 = (expMax / 10) % 10;
-	int expMax1 = expMax % 10;
-
-	NumberSPData[kExpMax100].sprite->SetTextureRange({300.0f * expMax100, 0}, numbersTextureSize);
-	NumberSPData[kExpMax10].sprite->SetTextureRange({300.0f * expMax10, 0}, numbersTextureSize);
-	NumberSPData[kExpMax1].sprite->SetTextureRange({300.0f * expMax1, 0}, numbersTextureSize);
+	if (parameters_.MaxEXP > 0) {
+		const float expRatio = std::clamp(static_cast<float>(parameters_.EXP) / static_cast<float>(parameters_.MaxEXP), 0.0f, 1.0f);
+		expBarSPData.size.x = expBarMaxSize.x * expRatio;
+		expBarSPData.sprite->SetScale(expBarSPData.size);
+		expBarSPData.sprite->SetPosition(expBarSPData.translate);
+	}
+	expBarBackSPData.sprite->Update();
+	expBarSPData.sprite->Update();
 
 	NumberSPData[kLv].sprite->SetTextureRange({300.0f * parameters_.Level, 0}, numbersTextureSize);
 	NumberSPData[kAttuck].sprite->SetTextureRange({300.0f * parameters_.AttuckUp, 0}, numbersTextureSize);
@@ -237,10 +241,6 @@ void UIManager::Update() {
 	NumberSPData[kArrow].translate = {AllowUpSPData.translate.x + 40, AllowUpSPData.translate.y + 20};
 	NumberSPData[kArrow].sprite->SetPosition(NumberSPData[kArrow].translate);
 
-	for (int i = kExp100; i <= kExpMax1; i++) {
-
-		NumberSPData[i].sprite->SetPosition({i * 50.0f + 100, 20});
-	}
 
 	for (int i = 0; i < NumbersCountMax; i++) {
 		NumberSPData[i].sprite->Update();
@@ -289,9 +289,8 @@ void UIManager::Draw() {
 	HealthUpSPData.sprite->Draw();
 	SpeedUpSPData.sprite->Draw();
 	AllowUpSPData.sprite->Draw();
-	for (int i = 0; i <= kExpMax1; i++) {
-		NumberSPData[i].sprite->Draw();
-	}
+	expBarBackSPData.sprite->Draw();
+	expBarSPData.sprite->Draw();
 	if (parameters_.Level < parameters_.MaxLevel) {
 		NumberSPData[kLv].sprite->Draw();
 	} else {

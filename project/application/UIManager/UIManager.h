@@ -62,6 +62,10 @@ class UIManager {
 	SpriteData SlashSPData[2];
 	// EXPラベル用スプライト。
 	SpriteData EXPSPData;
+	// EXPバー用スプライト。
+	SpriteData expBarSPData;
+	// EXPバー背景用スプライト。
+	SpriteData expBarBackSPData;
 	// 家HP数字表示用スプライト群。
 	SpriteData houseHpNumberSPData[3];
 	// 家HPの%表示用スプライト。
@@ -77,6 +81,8 @@ class UIManager {
 	float playerHPWidth = 1200.0f;
 	// HPバーの最大表示幅。
 	float playerHPWidthMax = 1200.0f;
+	// EXPバー最大サイズ。
+	Vector2 expBarMaxSize = {300, 40};
 	// 数字テクスチャの1桁あたりサイズ。
 	Vector2 numbersTextureSize = {300, 300};
 	// 家HP数字テクスチャの1桁あたりサイズ。
