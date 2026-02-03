@@ -34,6 +34,10 @@ void Boss::Initialize(Camera* camera, const Vector3& position) {
 	attackTimer_ = 0.0f;
 	attackActiveTimer_ = 0.0f;
 	attackHitConsumed_ = false;
+	chargeTimer_ = 0.0f;
+	attackAnimationTimer_ = 0.0f;
+	actionState_ = ActionState::Idle;
+	animationLoop_ = true;
 	camera_ = camera;
 	object_->Initialize();
 	if (!ModelManager::GetInstance()->FindModel("WaterBoss")) {
@@ -50,8 +54,17 @@ void Boss::Initialize(Camera* camera, const Vector3& position) {
 				break;
 			}
 		}
-		object_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
+		animationLoop_ = true;
+		object_->SetAnimation(&animationClips_[currentAnimationIndex_], animationLoop_);
 		object_->ResetAnimationTime();
+		for (const auto& clip : animationClips_) {
+			if (clip.name == "Charge" && clip.duration > 0.0f) {
+				chargeDuration_ = clip.duration;
+			}
+			if (clip.name == "Attack" && clip.duration > 0.0f) {
+				attackAnimationDuration_ = clip.duration;
+			}
+		}
 	}
 	if (Model* bossModel = ModelManager::GetInstance()->FindModel("WaterBoss")) {
 		skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(bossModel->GetModelData().rootnode));
@@ -95,8 +108,22 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 			attackActiveTimer_ = 0.0f;
 			attackHitConsumed_ = false;
 		}
-	} else {
+	} else if (actionState_ == ActionState::Idle) {
 		attackTimer_ += deltaTime;
+	}
+	if (actionState_ == ActionState::Charging) {
+		chargeTimer_ -= deltaTime;
+		if (chargeTimer_ <= 0.0f) {
+			actionState_ = ActionState::Attacking;
+			attackActiveTimer_ = attackActiveDuration_;
+			attackHitConsumed_ = false;
+			attackAnimationTimer_ = attackAnimationDuration_ > 0.0f ? attackAnimationDuration_ : attackActiveDuration_;
+		}
+	} else if (actionState_ == ActionState::Attacking) {
+		attackAnimationTimer_ -= deltaTime;
+		if (attackAnimationTimer_ <= 0.0f) {
+			actionState_ = ActionState::Idle;
+		}
 	}
 	if (damageInvincibleTimer_ > 0.0f) {
 		damageInvincibleTimer_ -= deltaTime;
@@ -124,6 +151,9 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 	} else {
 		velocity_ = {0.0f, 0.0f, 0.0f};
 	}
+	if (actionState_ != ActionState::Idle) {
+		velocity_ = {0.0f, 0.0f, 0.0f};
+	}
 	basePosition_ += velocity_;
 
 	bool inAttackRange = false;
@@ -137,9 +167,9 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 		toPlayer.y = 0.0f;
 		inAttackRange = LengthSquared(toPlayer) <= attackRange_ * attackRange_;
 	}
-	if (attackTimer_ >= attackCooldown_ && inAttackRange) {
-		attackActiveTimer_ = attackActiveDuration_;
-		attackHitConsumed_ = false;
+	if (actionState_ == ActionState::Idle && attackTimer_ >= attackCooldown_ && inAttackRange) {
+		actionState_ = ActionState::Charging;
+		chargeTimer_ = chargeDuration_;
 		attackTimer_ = 0.0f;
 	}
 	float appearT = std::clamp(appearTimer_ / appearDuration_, 0.0f, 1.0f);
@@ -154,9 +184,44 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 	transform_.rotate.y += deltaTime * 0.5f;
 	transform_.rotate.z = std::sin(animationTimer_ * std::numbers::pi_v<float>) * 0.05f;
 
+	if (!animationClips_.empty()) {
+		const char* desiredAnimationName = "Walk";
+		bool loopAnimation = true;
+		switch (actionState_) {
+		case ActionState::Idle:
+			desiredAnimationName = "Walk";
+			loopAnimation = true;
+			break;
+		case ActionState::Charging:
+			desiredAnimationName = "Charge";
+			loopAnimation = false;
+			break;
+		case ActionState::Attacking:
+			desiredAnimationName = "Attack";
+			loopAnimation = false;
+			break;
+		default:
+			break;
+		}
+
+		size_t desiredIndex = currentAnimationIndex_;
+		for (size_t i = 0; i < animationClips_.size(); ++i) {
+			if (animationClips_[i].name == desiredAnimationName) {
+				desiredIndex = i;
+				break;
+			}
+		}
+		if (desiredIndex != currentAnimationIndex_ || loopAnimation != animationLoop_) {
+			currentAnimationIndex_ = desiredIndex;
+			animationLoop_ = loopAnimation;
+			animationTime_ = 0.0f;
+			object_->SetAnimation(&animationClips_[currentAnimationIndex_], animationLoop_);
+		}
+	}
+
 	if (skeleton_ && !animationClips_.empty()) {
 		const auto& currentAnimation = animationClips_[currentAnimationIndex_];
-		skeleton_->UpdateAnimation(currentAnimation, animationTime_, animationDeltaTime, true);
+		skeleton_->UpdateAnimation(currentAnimation, animationTime_, animationDeltaTime, animationLoop_);
 		if (!skinCluster_.mappedPalette.empty()) {
 			UpdateSkinCluster(skinCluster_, *skeleton_);
 		}
@@ -178,7 +243,6 @@ void Boss::Update(const Vector3& housePos, const Vector3& playerPos, bool isPlay
 	}
 #endif // _DEBUG
 }
-
 void Boss::Draw() {
 	if (!isAlive_) {
 		return;

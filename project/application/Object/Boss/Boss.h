@@ -11,6 +11,11 @@ class Camera;
 class Object3d;
 
 class Boss {
+	enum class ActionState {
+		Idle,
+		Charging,
+		Attacking,
+	};
 
 	int hp_ = 50;
 	int maxHp_ = 50;
@@ -33,6 +38,11 @@ class Boss {
 	float attackRange_ = 2.5f;
 	float attackHitSize_ = 1.2f;
 	bool attackHitConsumed_ = false;
+	float chargeTimer_ = 0.0f;
+	float chargeDuration_ = 0.8f;
+	float attackAnimationTimer_ = 0.0f;
+	float attackAnimationDuration_ = 0.0f;
+	ActionState actionState_ = ActionState::Idle;
 
 	float animationTimer_ = 0.0f;
 	float animationTime_ = 0.0f;
@@ -41,6 +51,7 @@ class Boss {
 
 	std::vector<Animation::AnimationData> animationClips_{};
 	size_t currentAnimationIndex_ = 0;
+	bool animationLoop_ = true;
 
 	std::unique_ptr<Object3d> object_;
 	std::unique_ptr<Skeleton> skeleton_;
