@@ -26,12 +26,14 @@ void TutorialUI::Initialize() {
 	tutorialIconSprite_->Initialize(tutorialIconHandle_);
 	tutorialIconSprite_->SetScale({64.0f, 64.0f});
 	tutorialIconSprite_->SetPosition({1280.0f-20.0f, 20.0f});
+	tutorialIconSprite_->SetAnchorPoint({1.0f, 0.0f});
 	tutorialIconSprite_->Update();
 
 	for (int i = 0; i < kStepSpriteCount; ++i) {
 		tutorialStepSprites_[i]->Initialize(tutorialStepHandles_[i]);
 		tutorialStepSprites_[i]->SetScale({kStepSpriteWidth, kStepSpriteHeight});
-		tutorialStepSprites_[i]->SetPosition({1280.0f-300.0f, 20.0f});
+		tutorialStepSprites_[i]->SetPosition({1280.0f-40.0f, 20.0f});
+		tutorialStepSprites_[i]->SetAnchorPoint({1.0f, 0.0f});
 		tutorialStepSprites_[i]->Update();
 	}
 
