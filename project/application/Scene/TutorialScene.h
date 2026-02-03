@@ -1,4 +1,5 @@
 #pragma once
+#include "Audio.h"
 #include "BaseScene.h"
 #include <array>
 #include <cstdint>
@@ -55,4 +56,6 @@ private:
 	int skillUseCount_ = 0;
 	bool attackComboCompleted_ = false;
 	int previousStepIndex_ = -1;
+	SoundData BGMData_{};
+	bool isBGMPlaying_ = false;
 };

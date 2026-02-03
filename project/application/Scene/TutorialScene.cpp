@@ -19,7 +19,10 @@
 #include <imgui.h>
 #endif // USE_IMGUI
 
-TutorialScene::TutorialScene() {}
+TutorialScene::TutorialScene() {
+	BGMData_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/昼下がり気分.mp3");
+	Audio::GetInstance()->SetSoundVolume(&BGMData_, 0.3f);
+}
 namespace {
 const Vector3 kTutorialExpCubeSpawnOffset{2.5f, 0.0f, 2.5f};
 } // namespace
@@ -66,6 +69,7 @@ void TutorialScene::Initialize() {
 	skillUseCount_ = 0;
 	attackComboCompleted_ = false;
 	previousStepIndex_ = -1;
+	isBGMPlaying_ = false;
 
 	GameBase::GetInstance()->SetIsCursorStablity(true);
 	GameBase::GetInstance()->SetIsCursorVisible(false);
@@ -76,6 +80,10 @@ void TutorialScene::Update() {
 	bool skipKeyHeld = GameBase::GetInstance()->PushKey(DIK_P);
 	if (GameBase::GetInstance()->TriggerKey(DIK_ESCAPE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonStart)) {
 		isPaused_ = !isPaused_;
+	}
+	if (!isBGMPlaying_) {
+		Audio::GetInstance()->SoundPlayWave(BGMData_, true);
+		isBGMPlaying_ = true;
 	}
 	if (skipKeyHeld) {
 		skipHoldTimer_ += deltaTime;
@@ -277,4 +285,4 @@ void TutorialScene::Draw() {
 	pause_->Draw();
 }
 
-void TutorialScene::Finalize() {}
+void TutorialScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGMData_); }
