@@ -17,6 +17,8 @@ UIManager::UIManager() {
 
 	playerHPFlameSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/playerHPFlame.png");
 
+	playerHPStringSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/playerHPString.png");
+
 	// WASD / SPACE / ATTACK
 	HowtoOperateSPData.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/option.png");
 
@@ -54,6 +56,7 @@ UIManager::UIManager() {
 
 	playerHpSPData.sprite = std::make_unique<Sprite>();
 	playerHPFlameSPData.sprite = std::make_unique<Sprite>();
+	playerHPStringSPData.sprite = std::make_unique<Sprite>();
 
 	HowtoOperateSPData.sprite = std::make_unique<Sprite>();
 
@@ -102,6 +105,14 @@ void UIManager::Initialize() {
 	playerHPFlameSPData.sprite->SetAnchorPoint({0.5f, 0.0f});
 	playerHPFlameSPData.sprite->SetPosition(playerHPFlameSPData.translate);
 	playerHPFlameSPData.sprite->SetScale(playerHPFlameSPData.size);
+
+	// ------------------ HP Label ------------------
+
+	playerHPStringSPData.sprite->Initialize(playerHPStringSPData.handle);
+	playerHPStringSPData.sprite->SetAnchorPoint({1.0f, 0.5f});
+	playerHPStringSPData.sprite->SetScale({160, 160});
+	playerHPStringSPData.translate = {playerHpSPData.translate.x - 10.0f, playerHpSPData.translate.y + playerHPMaxSize.y * 0.5f};
+	playerHPStringSPData.sprite->SetPosition(playerHPStringSPData.translate);
 
 	// ------------------ WASD / SPACE / ATTACK ------------------
 
@@ -202,6 +213,9 @@ void UIManager::Update() {
 	// 各スプライト Update
 	playerHpSPData.sprite->Update();
 	playerHPFlameSPData.sprite->Update();
+	playerHPStringSPData.translate = {playerHpSPData.translate.x - 10.0f, playerHpSPData.translate.y + playerHPMaxSize.y * 0.5f};
+	playerHPStringSPData.sprite->SetPosition(playerHPStringSPData.translate);
+	playerHPStringSPData.sprite->Update();
 
 	HowtoOperateSPData.sprite->Update();
 
@@ -299,6 +313,7 @@ void UIManager::Draw() {
 
 	playerHpSPData.sprite->Draw();
 	playerHPFlameSPData.sprite->Draw();
+	playerHPStringSPData.sprite->Draw();
 
 	HowtoOperateSPData.sprite->Draw();
 

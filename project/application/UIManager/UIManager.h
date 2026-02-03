@@ -41,6 +41,8 @@ class UIManager {
 	SpriteData playerHpSPData;
 	// プレイヤーHPフレーム用スプライト。
 	SpriteData playerHPFlameSPData;
+	// プレイヤーHPラベル用スプライト。
+	SpriteData playerHPStringSPData;
 	// 操作方法表示用スプライト。
 	SpriteData HowtoOperateSPData;
 	// レベルラベル用スプライト。

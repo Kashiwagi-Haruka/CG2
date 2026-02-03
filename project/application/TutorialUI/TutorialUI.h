@@ -26,15 +26,19 @@ private:
 	std::unique_ptr<Sprite> tutorialIconSprite_;
 	std::unique_ptr<Sprite> tutorialProgressBackSprite_;
 	std::unique_ptr<Sprite> tutorialProgressFillSprite_;
+	std::unique_ptr<Sprite> tutorialProgressLabelSprite_;
 	std::unique_ptr<Sprite> tutorialSkipBackSprite_;
 	std::unique_ptr<Sprite> tutorialSkipFillSprite_;
+	std::unique_ptr<Sprite> tutorialSkipLabelSprite_;
 
 	std::array<uint32_t, kStepSpriteCount> tutorialStepHandles_{};
 	uint32_t tutorialIconHandle_ = 0;
 	uint32_t tutorialProgressBackHandle_ = 0;
 	uint32_t tutorialProgressFillHandle_ = 0;
+	uint32_t tutorialProgressLabelHandle_ = 0;
 	uint32_t tutorialSkipBackHandle_ = 0;
 	uint32_t tutorialSkipFillHandle_ = 0;
+	uint32_t tutorialSkipLabelHandle_ = 0;
 
 	int currentStepIndex_ = 0;
 	bool showSkip_ = false;
