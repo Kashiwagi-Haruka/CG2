@@ -24,9 +24,12 @@ public:
 private:
 	static constexpr int kStepCount = 8;
 	static constexpr int kExpCubeTargetCount = 4;
+	static constexpr int kSkillUseTargetCount = 3;
 	static constexpr float kSkipHoldDuration = 1.0f;
 	static constexpr float kAutoAdvanceDuration = 2.0f;
 	static constexpr float kEndAutoAdvanceDuration = 2.0f;
+	static constexpr float kMoveActionDuration = 2.0f;
+	static constexpr float kLookActionDuration = 2.0f;
 
 	std::unique_ptr<CameraController> cameraController_;
 	std::unique_ptr<SkyDome> skyDome_;
@@ -45,6 +48,11 @@ private:
 	bool wasSkipKeyHeld_ = false;
 	float skipHoldTimer_ = 0.0f;
 	float stepTimer_ = 0.0f;
+	float stepActionTimer_ = 0.0f;
+	float currentStepProgress_ = 0.0f;
 	int expCubeCollectedCount_ = 0;
 	bool expCubesSpawned_ = false;
+	int skillUseCount_ = 0;
+	bool attackComboCompleted_ = false;
+	int previousStepIndex_ = -1;
 };

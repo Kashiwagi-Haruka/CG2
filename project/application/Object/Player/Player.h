@@ -55,7 +55,7 @@ class Player {
 	// コンボ攻撃用
 	int comboStep_ = 0;        // 現在のコンボ段階 (0〜4)
 	float comboTimer_ = 0.0f;  // コンボ受付タイマー
-	float comboWindow_ = 0.6f; // コンボ受付時間（秒）
+	float comboWindow_ = 0.8f; // コンボ受付時間（秒）
 	bool isAttacking_ = false; // 攻撃中フラグ
 	bool canCombo_ = false;    // 次のコンボ入力可能フラグ
 

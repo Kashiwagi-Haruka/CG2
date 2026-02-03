@@ -74,7 +74,7 @@ void Player::Initialize(Camera* camera) {
 	// コンボ関連の初期化
 	comboStep_ = 0;
 	comboTimer_ = 0.0f;
-	comboWindow_ = 0.6f; // コンボ受付時間（秒）
+	comboWindow_ = 0.8f; // コンボ受付時間（秒）
 	isAttacking_ = false;
 	canCombo_ = false;
 

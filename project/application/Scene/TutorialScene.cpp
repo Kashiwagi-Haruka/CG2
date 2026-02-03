@@ -1,7 +1,6 @@
 #define NOMINMAX
 #include "TutorialScene.h"
 #include "CameraController/CameraController.h"
-#include "Function.h"
 #include "GameBase.h"
 #include "Object/Background/SkyDome.h"
 #include "Object/Character/Model/CharacterModel.h"
@@ -21,7 +20,9 @@
 #endif // USE_IMGUI
 
 TutorialScene::TutorialScene() {}
-
+namespace {
+const Vector3 kTutorialExpCubeSpawnOffset{2.5f, 0.0f, 2.5f};
+} // namespace
 void TutorialScene::Initialize() {
 	CharacterModel characterModel;
 	characterModel.LoadModel();
@@ -58,8 +59,13 @@ void TutorialScene::Initialize() {
 	wasSkipKeyHeld_ = false;
 	skipHoldTimer_ = 0.0f;
 	stepTimer_ = 0.0f;
+	stepActionTimer_ = 0.0f;
+	currentStepProgress_ = 0.0f;
 	expCubeCollectedCount_ = 0;
 	expCubesSpawned_ = false;
+	skillUseCount_ = 0;
+	attackComboCompleted_ = false;
+	previousStepIndex_ = -1;
 
 	GameBase::GetInstance()->SetIsCursorStablity(true);
 	GameBase::GetInstance()->SetIsCursorVisible(false);
@@ -92,58 +98,62 @@ void TutorialScene::Update() {
 		field_->Update();
 		player_->Update();
 		expCubeManager_->Update(cameraController_->GetCamera(), player_->GetMovementLimitCenter(), player_->GetMovementLimitRadius());
-		if (expCubeManager_ && player_->GetIsAlive()) {
-			for (auto& cube : expCubeManager_->GetCubes()) {
-				if (!cube || cube->IsCollected()) {
-					continue;
-				}
-				const Vector3 cubePos = cube->GetPosition();
-				Vector3 toCube = player_->GetPosition() - cubePos;
-				toCube.y = 0.0f;
-				const Vector3 playerScale = player_->GetScale();
-				const Vector3 cubeScale = cube->GetScale();
-				const float playerRadius = std::max(playerScale.x, playerScale.z);
-				const float cubeRadius = std::max(cubeScale.x, cubeScale.z);
-				const float pickupRadius = playerRadius + cubeRadius;
-				if (LengthSquared(toCube) <= pickupRadius * pickupRadius) {
-					cube->Collect();
-					player_->EXPMath();
-				}
-			}
-		}
 		player_->SetCamera(cameraController_->GetCamera());
 		skyDome_->SetCamera(cameraController_->GetCamera());
 		field_->SetCamera(cameraController_->GetCamera());
 
 		if (!isTutorialComplete_) {
 			bool progressed = false;
+			if (currentStepIndex_ != previousStepIndex_) {
+				stepTimer_ = 0.0f;
+				stepActionTimer_ = 0.0f;
+				currentStepProgress_ = 0.0f;
+				skillUseCount_ = 0;
+				attackComboCompleted_ = false;
+				if (currentStepIndex_ == 5) {
+					expCubesSpawned_ = false;
+					expCubeCollectedCount_ = 0;
+				}
+				previousStepIndex_ = currentStepIndex_;
+			}
 			switch (currentStepIndex_) {
 			case 0:
 				stepTimer_ += deltaTime;
+				currentStepProgress_ = stepTimer_ / kAutoAdvanceDuration;
 				progressed = stepTimer_ >= kAutoAdvanceDuration;
 				break;
 			case 1:
 				stepTimer_ += deltaTime;
+				currentStepProgress_ = stepTimer_ / kAutoAdvanceDuration;
 				progressed = stepTimer_ >= kAutoAdvanceDuration;
 				break;
 			case 2:
-				stepTimer_ = 0.0f;
-				progressed = GameBase::GetInstance()->PushKey(DIK_W) || GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_S) || GameBase::GetInstance()->PushKey(DIK_D) ||
-				             GameBase::GetInstance()->GetJoyStickLXY().x != 0.0f || GameBase::GetInstance()->GetJoyStickLXY().y != 0.0f;
+				if (GameBase::GetInstance()->PushKey(DIK_W) || GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_S) || GameBase::GetInstance()->PushKey(DIK_D) ||
+				    GameBase::GetInstance()->GetJoyStickLXY().x != 0.0f || GameBase::GetInstance()->GetJoyStickLXY().y != 0.0f) {
+					stepActionTimer_ += deltaTime;
+				}
+				currentStepProgress_ = stepActionTimer_ / kMoveActionDuration;
+				progressed = stepActionTimer_ >= kMoveActionDuration;
 				break;
 			case 3:
-				stepTimer_ = 0.0f;
-				progressed = GameBase::GetInstance()->GetMouseMove().x != 0.0f || GameBase::GetInstance()->GetMouseMove().y != 0.0f || GameBase::GetInstance()->GetJoyStickRXY().x != 0.0f ||
-				             GameBase::GetInstance()->GetJoyStickRXY().y != 0.0f;
+				if (GameBase::GetInstance()->GetMouseMove().x != 0.0f || GameBase::GetInstance()->GetMouseMove().y != 0.0f || GameBase::GetInstance()->GetJoyStickRXY().x != 0.0f ||
+				    GameBase::GetInstance()->GetJoyStickRXY().y != 0.0f) {
+					stepActionTimer_ += deltaTime;
+				}
+				currentStepProgress_ = stepActionTimer_ / kLookActionDuration;
+				progressed = stepActionTimer_ >= kLookActionDuration;
 				break;
 			case 4:
-				stepTimer_ = 0.0f;
-				progressed = GameBase::GetInstance()->TriggerMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonB);
+				if (!attackComboCompleted_ && player_->GetComboStep() >= 4) {
+					attackComboCompleted_ = true;
+				}
+				currentStepProgress_ = attackComboCompleted_ ? 1.0f : (static_cast<float>(player_->GetComboStep()) / 4.0f);
+				progressed = attackComboCompleted_;
 				break;
 			case 5:
-				stepTimer_ = 0.0f;
 				if (!expCubesSpawned_) {
-					expCubeManager_->SpawnDrops(player_->GetPosition(), kExpCubeTargetCount);
+					const Vector3 spawnCenter = player_->GetPosition() + kTutorialExpCubeSpawnOffset;
+					expCubeManager_->SpawnDrops(spawnCenter, kExpCubeTargetCount);
 					expCubesSpawned_ = true;
 				}
 				expCubeCollectedCount_ = 0;
@@ -152,25 +162,33 @@ void TutorialScene::Update() {
 						expCubeCollectedCount_++;
 					}
 				}
+				currentStepProgress_ = static_cast<float>(expCubeCollectedCount_) / static_cast<float>(kExpCubeTargetCount);
 				progressed = expCubeCollectedCount_ >= kExpCubeTargetCount;
 				break;
 			case 6:
-				stepTimer_ = 0.0f;
-				progressed = GameBase::GetInstance()->TriggerKey(DIK_E) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonY);
+				if (GameBase::GetInstance()->TriggerKey(DIK_E) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonY)) {
+					skillUseCount_++;
+				}
+				currentStepProgress_ = static_cast<float>(skillUseCount_) / static_cast<float>(kSkillUseTargetCount);
+				progressed = skillUseCount_ >= kSkillUseTargetCount;
 				break;
 			case 7:
 				stepTimer_ += deltaTime;
+				currentStepProgress_ = stepTimer_ / kEndAutoAdvanceDuration;
 				progressed = stepTimer_ >= kEndAutoAdvanceDuration;
 				break;
 			default:
-				stepTimer_ = 0.0f;
+				currentStepProgress_ = 0.0f;
 				break;
 			}
 
+			currentStepProgress_ = std::clamp(currentStepProgress_, 0.0f, 1.0f);
 			if (progressed) {
 				stepCompleted_[currentStepIndex_] = true;
 				currentStepIndex_++;
 				stepTimer_ = 0.0f;
+				stepActionTimer_ = 0.0f;
+				currentStepProgress_ = 0.0f;
 				if (currentStepIndex_ >= kStepCount) {
 					isTutorialComplete_ = true;
 				}
@@ -189,8 +207,7 @@ void TutorialScene::Update() {
 		return;
 	}
 
-	const int completedSteps = isTutorialComplete_ ? kStepCount : currentStepIndex_;
-	const float tutorialProgress = static_cast<float>(completedSteps) / static_cast<float>(kStepCount);
+	const float tutorialProgress = isTutorialComplete_ ? 1.0f : (static_cast<float>(currentStepIndex_) + currentStepProgress_) / static_cast<float>(kStepCount);
 	const float skipProgress = (skipHoldTimer_ >= kSkipHoldDuration) ? 1.0f : (skipHoldTimer_ / kSkipHoldDuration);
 	if (tutorialUI_) {
 		const int stepSpriteIndex = isTutorialComplete_ ? (kStepCount - 1) : currentStepIndex_;
