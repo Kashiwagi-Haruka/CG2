@@ -51,6 +51,7 @@ void TutorialScene::Initialize() {
 	isPaused_ = false;
 	wasSkipKeyHeld_ = false;
 	skipHoldTimer_ = 0.0f;
+	stepTimer_ = 0.0f;
 
 	GameBase::GetInstance()->SetIsCursorStablity(true);
 	GameBase::GetInstance()->SetIsCursorVisible(false);
@@ -90,30 +91,38 @@ void TutorialScene::Update() {
 			bool progressed = false;
 			switch (currentStepIndex_) {
 			case 0:
-				progressed = GameBase::GetInstance()->PushKey(DIK_W) || GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_S) || GameBase::GetInstance()->PushKey(DIK_D);
+				stepTimer_ += deltaTime;
+				progressed = stepTimer_ >= kAutoAdvanceDuration;
 				break;
 			case 1:
-				progressed = GameBase::GetInstance()->PushKey(DIK_LSHIFT) || GameBase::GetInstance()->PushKey(DIK_RSHIFT) || GameBase::GetInstance()->PushButton(Input::PadButton::kButtonLeftShoulder);
+				stepTimer_ += deltaTime;
+				progressed = stepTimer_ >= kAutoAdvanceDuration;
 				break;
 			case 2:
+				stepTimer_ = 0.0f;
 				progressed = GameBase::GetInstance()->TriggerKey(DIK_SPACE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonA);
 				break;
 			case 3:
+				stepTimer_ = 0.0f;
 				progressed = GameBase::GetInstance()->TriggerMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonB);
 				break;
 			case 4:
+				stepTimer_ = 0.0f;
 				progressed = GameBase::GetInstance()->TriggerKey(DIK_E) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonY);
 				break;
 			case 5:
+				stepTimer_ = 0.0f;
 				progressed = GameBase::GetInstance()->TriggerKey(DIK_Q) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonX);
 				break;
 			default:
+				stepTimer_ = 0.0f;
 				break;
 			}
 
 			if (progressed) {
 				stepCompleted_[currentStepIndex_] = true;
 				currentStepIndex_++;
+				stepTimer_ = 0.0f;
 				if (currentStepIndex_ >= kStepCount) {
 					isTutorialComplete_ = true;
 				}

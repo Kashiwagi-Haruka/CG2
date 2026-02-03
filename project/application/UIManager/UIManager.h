@@ -70,6 +70,8 @@ class UIManager {
 	SpriteData houseHpNumberSPData[3];
 	// 家HPの%表示用スプライト。
 	SpriteData houseHpPercentSPData;
+	// 家HPの文字表示用スプライト
+	SpriteData houseHPStringSPData;
 
 	// 現在のプレイヤーHP。
 	int playerHP;

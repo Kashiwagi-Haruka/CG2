@@ -24,6 +24,7 @@ public:
 private:
 	static constexpr int kStepCount = 6;
 	static constexpr float kSkipHoldDuration = 1.0f;
+	static constexpr float kAutoAdvanceDuration = 2.0f;
 
 	std::unique_ptr<CameraController> cameraController_;
 	std::unique_ptr<SkyDome> skyDome_;
@@ -40,4 +41,5 @@ private:
 	bool isPaused_ = false;
 	bool wasSkipKeyHeld_ = false;
 	float skipHoldTimer_ = 0.0f;
+	float stepTimer_ = 0.0f;
 };

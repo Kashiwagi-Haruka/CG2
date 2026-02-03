@@ -76,6 +76,7 @@ UIManager::UIManager() {
 	for (int i = 0; i < 3; i++) {
 		houseHpNumberSPData[i].sprite = std::make_unique<Sprite>();
 	}
+	houseHPStringSPData.sprite = std::make_unique<Sprite>();
 }
 
 UIManager::~UIManager() {}
@@ -149,6 +150,7 @@ void UIManager::Initialize() {
 		houseHpNumberSPData[i].sprite->SetTextureRange({0, 0}, houseHpNumbersTextureSize);
 		houseHpNumberSPData[i].sprite->SetScale({32, 32});
 	}
+
 	// ------------------ EXP Bar ------------------
 	expBarSPData.sprite->Initialize(expBarSPData.handle);
 	expBarSPData.sprite->SetAnchorPoint({0.0f, 0.0f});
