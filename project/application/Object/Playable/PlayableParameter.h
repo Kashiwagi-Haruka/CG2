@@ -5,9 +5,9 @@ struct PlayableParameter {
 	int HPMax;//最大HP
 	int AttackPower;//攻撃力
 	int DefensePower;//防御力
-	int AstralLinkPower;//星
+	int AstralLinkPower;//星命力
 	AttackStatus attack;
-	bool ShadowsOfTheStars[6];
+	bool ShadowsOfTheStars[6];//凸
 };
 
 struct AttackStatus {
