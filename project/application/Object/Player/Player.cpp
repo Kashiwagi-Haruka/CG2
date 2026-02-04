@@ -21,7 +21,7 @@ Player::Player() {
 	fallingEffectObject_ = std::make_unique<Object3d>();
 	sword_ = std::make_unique<PlayerSword>();
 	skill_ = std::make_unique<PlayerSkill>();
-	specialAttack_ = std::make_unique<PlayerSpecialAttack>();
+
 	attackSE = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/normalAttack.mp3");
 	attackEndSE = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/endAttack.mp3");
 	skillAttackSE = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/magic.mp3");
@@ -55,8 +55,6 @@ void Player::Initialize(Camera* camera) {
 	sword_->SetCamera(camera_);
 	skill_->Initialize();
 	skill_->SetCamera(camera_);
-	specialAttack_->Initialize();
-	specialAttack_->SetCamera(camera_); 
 	isAlive = true;
 	parameters_ = SetInit();
 	models_->SetCamera(camera_);
@@ -424,7 +422,7 @@ void Player::Attack() {
 			if (parameters_.AllowUp > 0) {
 				isSpecialAttack = true;
 				attackState_ = AttackState::kSpecialAttack;
-				specialAttack_->StartAttack(transform_, parameters_.AllowUp);
+				skill_->StartSpecialAttack(transform_, parameters_.AllowUp);
 			}
 			// コンボリセット
 			comboStep_ = 0;
@@ -510,11 +508,8 @@ void Player::Update() {
 	}
 
 	if (isSpecialAttack) {
-	specialAttack_->SetCamera(camera_);
-	specialAttack_->Update(transform_);
-	if (specialAttack_->IsSpecialEnd()) {
-		isSpecialAttack = false;
-	}
+	
+	
 	}
 
 #ifdef USE_IMGUI
@@ -571,6 +566,6 @@ void Player::Draw() {
 	skill_->Draw();
 	}
 	if (isSpecialAttack) {
-	specialAttack_->Draw();
+	
 	}
 }

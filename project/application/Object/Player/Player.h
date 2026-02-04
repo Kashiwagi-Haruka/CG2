@@ -4,7 +4,6 @@
 #include "PlayerParameters.h"
 #include "PlayerSword.h"
 #include "PlayerSkill.h"
-#include "PlayerSpecialAttack.h"
 #include "Transform.h"
 #include "Vector3.h"
 #include <memory>
@@ -83,7 +82,7 @@ class Player {
 
 	std::unique_ptr<PlayerSword> sword_;
 	std::unique_ptr<PlayerSkill> skill_;
-	std::unique_ptr<PlayerSpecialAttack> specialAttack_;
+
 
 	Camera* camera_;
 
@@ -118,7 +117,6 @@ public:
 	void Falling();
 	PlayerSkill* GetSkill() { return skill_.get(); }
 
-	PlayerSpecialAttack* GetSpecialAttack() { return specialAttack_.get(); }
 
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	void SetMap(MapchipField* map) { map_ = map; }

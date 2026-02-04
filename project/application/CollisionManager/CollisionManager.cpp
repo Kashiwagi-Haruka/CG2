@@ -82,9 +82,9 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 			}
 		}
 
-		if (player.GetIsAlive() && player.GetSpecialAttack() && player.GetSpecialAttack()->IsDamaging()) {
+if (player.GetIsAlive() && player.GetSkill() && player.GetSkill()->IsSpecialDamaging()) {
 			bool hitSpecial = false;
-			for (const auto& specialTransform : player.GetSpecialAttack()->GetIceFlowerTransforms()) {
+			for (const auto& specialTransform : player.GetSkill()->GetSpecialIceFlowerTransforms()) {
 				AABB specialAabb = MakeAabb(specialTransform.translate, specialTransform.scale);
 				if (RigidBody::isCollision(specialAabb, enemyAabb)) {
 					hitSpecial = true;
@@ -142,9 +142,9 @@ void CollisionManager::HandleGameSceneCollisions(Player& player, EnemyManager& e
 			}
 		}
 
-		if (player.GetIsAlive() && player.GetSpecialAttack() && player.GetSpecialAttack()->IsDamaging()) {
+		if (player.GetIsAlive() && player.GetSkill() && player.GetSkill()->IsSpecialDamaging()) {
 			bool hitSpecial = false;
-			for (const auto& specialTransform : player.GetSpecialAttack()->GetIceFlowerTransforms()) {
+			for (const auto& specialTransform : player.GetSkill()->GetSpecialIceFlowerTransforms()) {
 				AABB specialAabb = MakeAabb(specialTransform.translate, specialTransform.scale);
 				if (RigidBody::isCollision(specialAabb, bossAabb)) {
 					hitSpecial = true;

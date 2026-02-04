@@ -1,5 +1,16 @@
 #pragma once
+struct NormalAttack {
 
+	float attack1Power;
+	float attack2Power;
+	float attack3Power;
+	float attack4Power;
+	float heavyAttack;
+};
+struct AttackStatus {
+
+	NormalAttack normal;
+};
 struct PlayableParameter {
 
 	int HPMax;//最大HP
@@ -10,18 +21,5 @@ struct PlayableParameter {
 	bool ShadowsOfTheStars[6];//凸
 };
 
-struct AttackStatus {
-
-NormalAttack normal;
 
 
-};
-
-struct NormalAttack {
-
-	float attack1Power;
-	float attack2Power;
-	float attack3Power;
-	float attack4Power;
-	float heavyAttack;
-};
