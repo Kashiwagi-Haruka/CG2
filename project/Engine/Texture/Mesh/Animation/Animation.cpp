@@ -29,7 +29,7 @@ Animation::AnimationData BuildAnimationData(const aiAnimation* animationAssimp, 
 			const aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
 			Animation::KeyframeVector3 keyframe{};
 			keyframe.time = static_cast<float>(keyAssimp.mTime / ticksPerSecond);
-			keyframe.value = {keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z};
+			keyframe.value = {-keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z};
 			nodeAnimation.translate.keyframes.push_back(keyframe);
 		}
 
@@ -37,7 +37,7 @@ Animation::AnimationData BuildAnimationData(const aiAnimation* animationAssimp, 
 			const aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
 			Animation::KeyframeVector4 keyframe{};
 			keyframe.time = static_cast<float>(keyAssimp.mTime / ticksPerSecond);
-			keyframe.value = {keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z, keyAssimp.mValue.w};
+			keyframe.value = {keyAssimp.mValue.x, -keyAssimp.mValue.y, -keyAssimp.mValue.z, keyAssimp.mValue.w};
 			nodeAnimation.rotation.keyframes.push_back(keyframe);
 		}
 

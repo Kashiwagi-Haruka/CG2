@@ -150,6 +150,8 @@ void Model::LoadObjFile(const std::string& directoryPath, const std::string& fil
 			Vector4 position;
 			s >> position.x >> position.y >> position.z;
 			position.w = 1.0f;
+			// ここでx反転
+			position.x *= -1.0f;
 
 			positions.push_back(position);
 		} else if (identifier == "vt") {
@@ -160,7 +162,7 @@ void Model::LoadObjFile(const std::string& directoryPath, const std::string& fil
 		} else if (identifier == "vn") {
 			Vector3 normal;
 			s >> normal.x >> normal.y >> normal.z;
-\
+			// ここで法線もx反転
 
 			normals.push_back(normal);
 		} else if (identifier == "f") {
@@ -215,7 +217,7 @@ void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::strin
 	std::string path = directoryPath + "/" + filename;
 
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_ConvertToLeftHanded);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 
 	assert(scene && scene->HasMeshes());
 
@@ -234,6 +236,9 @@ void Model::LoadObjFileAssimp(const std::string& directoryPath, const std::strin
 			vertex.position = {position.x, position.y, position.z, 1.0f};
 			vertex.normal = {normal.x, normal.y, normal.z};
 			vertex.texcoord = {texcoord.x, texcoord.y};
+
+			vertex.position.x *= -1.0f;
+			vertex.normal.x *= -1.0f;
 
 			modelData.vertices[vertexOffset + vertexIndex] = vertex;
 		}
@@ -280,7 +285,7 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 	std::string path = directoryPath + "/" + filename;
 
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_ConvertToLeftHanded);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 
 	if (!scene || !scene->HasMeshes()) {
 		Logger::Log("LoadObjFileGltf failed: " + path + " " + importer.GetErrorString() + "\n");
@@ -305,6 +310,9 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 			vertex.normal = {normal.x, normal.y, normal.z};
 			vertex.texcoord = {texcoord.x, texcoord.y};
 
+			vertex.position.x *= -1.0f;
+			vertex.normal.x *= -1.0f;
+
 			modelData.vertices[vertexOffset + vertexIndex] = vertex;
 		}
 
@@ -325,7 +333,7 @@ void Model::LoadObjFileGltf(const std::string& directoryPath, const std::string&
 			aiVector3D translate;
 			aiQuaternion rotate;
 			bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
-			Matrix4x4 bindPoseMatrix = Function::MakeAffineMatrix({scale.x, scale.y, scale.z}, {rotate.x, rotate.y, rotate.z, rotate.w}, {translate.x, translate.y, translate.z});
+			Matrix4x4 bindPoseMatrix = Function::MakeAffineMatrix({scale.x, scale.y, scale.z}, {rotate.x, -rotate.y, -rotate.z, rotate.w}, {-translate.x, translate.y, translate.z});
 			jointWeightData.inverseBindPoseMatrix = bindPoseMatrix;
 
 			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
@@ -375,8 +383,8 @@ Model::Node Model::NodeRead(aiNode* node) {
 	node->mTransformation.Decompose(scale, rotate, translate);
 
 	result.transform.scale = {scale.x, scale.y, scale.z};
-	result.transform.quaternion = {rotate.x, rotate.y, rotate.z, rotate.w};
-	result.transform.translate = {translate.x, translate.y, translate.z};
+	result.transform.quaternion = {rotate.x, -rotate.y, -rotate.z, rotate.w};
+	result.transform.translate = {-translate.x, translate.y, translate.z};
 	result.localMatrix = Function::MakeAffineMatrix(result.transform.scale, result.transform.quaternion, result.transform.translate);
 	result.name = node->mName.C_Str();
 	result.children.resize(node->mNumChildren);
