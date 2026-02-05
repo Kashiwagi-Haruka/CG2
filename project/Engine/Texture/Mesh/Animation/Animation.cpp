@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <cassert>
 #include <cmath>
@@ -101,7 +102,7 @@ Animation::AnimationData Animation::LoadAnimationData(const std::string& directo
 	std::string filePath = directoryPath + "/" + filename + ".gltf";
 
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filePath, 0);
+	const aiScene* scene = importer.ReadFile(filePath, aiProcess_ConvertToLeftHanded);
 	assert(scene);
 	assert(scene->mNumAnimations != 0);
 	assert(animationIndex < scene->mNumAnimations);
@@ -119,7 +120,7 @@ std::vector<Animation::AnimationData> Animation::LoadAnimationClips(const std::s
 	std::string filePath = directoryPath + "/" + filename + ".gltf";
 
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filePath, 0);
+	const aiScene* scene = importer.ReadFile(filePath, aiProcess_ConvertToLeftHanded);
 	assert(scene);
 	assert(scene->mNumAnimations != 0);
 
