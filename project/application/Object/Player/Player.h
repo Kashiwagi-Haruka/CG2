@@ -75,10 +75,7 @@ class Player {
 	Vector3 bulletVelocity_;
 
 	Transform transform_;
-	Transform fallingEffectTransform_;
 
-	std::unique_ptr<Object3d> playerObject_;
-	std::unique_ptr<Object3d> fallingEffectObject_;
 
 	std::unique_ptr<PlayerSword> sword_;
 	std::unique_ptr<PlayerSkill> skill_;

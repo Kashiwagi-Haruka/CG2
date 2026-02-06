@@ -251,6 +251,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\Player\playerSwordTrail.cpp" />
     <ClCompile Include="application\TutorialUI\TutorialUI.cpp" />
     <ClCompile Include="application\Object\Character\Sizuku\Sizuku.cpp" />
+    <ClCompile Include="application\Object\Player\Attack\PlayerFallAttack.cpp" />
+    <ClCompile Include="application\Object\Player\Attack\PlayerAttack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -364,6 +366,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\Player\playerSwordTrail.h" />
     <ClInclude Include="application\TutorialUI\TutorialUI.h" />
     <ClInclude Include="application\Object\Character\Sizuku\Sizuku.h" />
+    <ClInclude Include="application\Object\Player\Attack\PlayerFallAttack.h" />
+    <ClInclude Include="application\Object\Player\Attack\PlayerAttack.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d\Object3d.PS.hlsl">

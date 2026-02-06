@@ -17,8 +17,7 @@ Player::Player() {
 	ModelManager::GetInstance()->LoadModel("Resources/3d","FallingEffect");
 	ModelManager::GetInstance()->LoadModel("Resources/3d","playerSkillUp");
 	ModelManager::GetInstance()->LoadModel("Resources/3d","playerSkillUnder");
-	playerObject_ = std::make_unique<Object3d>();
-	fallingEffectObject_ = std::make_unique<Object3d>();
+
 	sword_ = std::make_unique<PlayerSword>();
 	skill_ = std::make_unique<PlayerSkill>();
 
@@ -43,14 +42,7 @@ void Player::Initialize(Camera* camera) {
         .rotate{0.0f, 0.0f, 0.0f},
         .translate{-100.0f, 3.6f, -100.0f}
     };
-
-	playerObject_->Initialize();
-	playerObject_->SetModel("playerModel");
-	fallingEffectObject_->Initialize();
-	fallingEffectObject_->SetModel("FallingEffect");
-
 	camera_ = camera;
-	playerObject_->SetCamera(camera_);
 	sword_->Initialize();
 	sword_->SetCamera(camera_);
 	skill_->Initialize();
@@ -468,7 +460,7 @@ void Player::Update() {
 		}
 	}
 
-	playerObject_->SetCamera(camera_);
+
 	transform_.translate += velocity_;
 	{
 		const float radius = movementLimitRadius_;
@@ -482,15 +474,8 @@ void Player::Update() {
 			transform_.translate.z = movementLimitCenter_.z + dz * scale;
 		}
 	}
-	playerObject_->SetTransform(transform_);
-	playerObject_->Update();
-	fallingEffectTransform_.scale = transform_.scale;
-	fallingEffectTransform_.translate = transform_.translate;
-	fallingEffectTransform_.translate.y -= 1.0f;
-	fallingEffectTransform_.rotate.y += 0.2f;
-	fallingEffectObject_->SetCamera(camera_);
-	fallingEffectObject_->SetTransform(fallingEffectTransform_);
-	fallingEffectObject_->Update();
+
+
 	models_->SetCamera(camera_);
 	models_->SetPlayerTransform(transform_);
 	models_->Update();
@@ -557,9 +542,7 @@ void Player::Draw() {
 	models_->Draw();
 	Object3dCommon::GetInstance()->DrawCommon();
 	if (isFallingAttack_) {
-		Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAdd);
-	fallingEffectObject_->Draw();
-		Object3dCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
+
 	}
 	sword_->Draw();
 	if (isSkillAttack) {
