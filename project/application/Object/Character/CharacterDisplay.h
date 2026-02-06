@@ -1,9 +1,33 @@
 #pragma once
-class CharacterDisplay {
+#include "Camera.h"
+#include "Object3d/Object3d.h"
+#include "Transform.h"
+#include <memory>
 
+class CharacterDisplay {
+	std::unique_ptr<Object3d> characterObject_ = nullptr;
+	std::unique_ptr<Camera> camera_ = nullptr;
+	Transform characterTransform_ = {
+	    .scale{55.0f, 55.0f, 55.0f},
+	    .rotate{0.0f,  0.0f,  0.0f },
+	    .translate{0.0f,  -2.0f, 0.0f },
+	};
+	Transform cameraTransform_ = {
+	    .scale{1.0f, 1.0f, 1.0f  },
+	    .rotate{0.1f, 0.0f, 0.0f  },
+	    .translate{0.0f, 3.0f, -35.0f},
+	};
+	float rotateSpeed_ = 0.01f;
+	bool isActive_ = true;
+
+public:
 	void Initialize();
 	void Update();
 	void Draw();
-
-
+	void SetActive(bool isActive) { isActive_ = isActive; }
+	bool IsActive() const { return isActive_; }
+	void SetCharacterTransform(const Transform& transform) { characterTransform_ = transform; }
+	const Transform& GetCharacterTransform() const { return characterTransform_; }
+	void SetCameraTransform(const Transform& transform) { cameraTransform_ = transform; }
+	const Transform& GetCameraTransform() const { return cameraTransform_; }
 };
