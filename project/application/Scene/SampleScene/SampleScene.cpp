@@ -155,9 +155,9 @@ void SampleScene::Update() {
 		if (ImGui::TreeNode("Transform")) {
 
 			if (!useDebugCamera_) {
-				ImGui::DragFloat3("Scale", &cameraTransform_.scale.x, 0.1f);
-				ImGui::DragFloat3("Rotate", &cameraTransform_.rotate.x, 0.1f);
-				ImGui::DragFloat3("Translate", &cameraTransform_.translate.x, 0.1f);
+				ImGui::DragFloat3("Scale", &cameraTransform_.scale.x, 0.01f);
+				ImGui::DragFloat3("Rotate", &cameraTransform_.rotate.x, 0.01f);
+				ImGui::DragFloat3("Translate", &cameraTransform_.translate.x, 0.01f);
 			}
 			ImGui::TreePop();
 		}
