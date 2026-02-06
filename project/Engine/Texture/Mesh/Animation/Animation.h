@@ -38,5 +38,6 @@ public:
 	static Vector3 CalculateValue(const AnimationCurve<Vector3>& keyframes, float time);
 	static Vector4 CalculateValue(const AnimationCurve<Vector4>& keyframes, float time);
 	static float CalculateValue(const AnimationCurve<float>& keyframes, float time);
+	static float AdvanceTime(const AnimationData& animation, float currentTime, float deltaTime, bool loop = true);
 	static float CalculateValueOrDefault(const AnimationCurve<float>& keyframes, float time, float defaultValue);
 };

@@ -236,7 +236,9 @@ bool inAttackRange = false;
 
 	if (skeleton_ && !animationClips_.empty()) {
 		const auto& currentAnimation = animationClips_[currentAnimationIndex_];
-		skeleton_->UpdateAnimation(currentAnimation, animationTime_, animationDeltaTime, animationLoop_);
+		animationTime_ = Animation::AdvanceTime(currentAnimation, animationTime_, animationDeltaTime, animationLoop_);
+		skeleton_->ApplyAnimation(currentAnimation, animationTime_);
+		skeleton_->Update();
 		if (!skinCluster_.mappedPalette.empty()) {
 			UpdateSkinCluster(skinCluster_, *skeleton_);
 		}

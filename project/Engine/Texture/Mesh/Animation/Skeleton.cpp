@@ -96,24 +96,6 @@ Vector3 Skeleton::GetJointWorldPosition(const Joint& joint) const {
 	Matrix4x4 worldMatrix = Function::Multiply(joint.skeletonSpaceMatrix, objectMatrix_);
 	return Function::TransformVM({0.0f, 0.0f, 0.0f}, worldMatrix);
 }
-
-void Skeleton::UpdateAnimation(const Animation::AnimationData& animation, float& animationTime, float deltaTime, bool loop) {
-	if (animation.duration <= 0.0f) {
-		Update();
-		return;
-	}
-
-	animationTime += deltaTime;
-	if (loop) {
-		animationTime = std::fmod(animationTime, animation.duration);
-	} else {
-		animationTime = std::min(animationTime, animation.duration);
-	}
-	ApplyAnimation(animation, animationTime);
-	Update();
-}
-
-
 void Skeleton::DrawBones(Camera* camera, const Vector4& jointColor, const Vector4& boneColor) {
 	if (!camera) {
 		return;

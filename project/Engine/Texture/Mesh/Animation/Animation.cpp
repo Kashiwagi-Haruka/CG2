@@ -188,7 +188,22 @@ float Animation::CalculateValue(const AnimationCurve<float>& keyframes, float ti
 
 	return keyframes.keyframes.back().value;
 }
+float Animation::AdvanceTime(const AnimationData& animation, float currentTime, float deltaTime, bool loop) {
+	if (animation.duration <= 0.0f) {
+		return 0.0f;
+	}
 
+	float nextTime = currentTime + deltaTime;
+	if (loop) {
+		nextTime = std::fmod(nextTime, animation.duration);
+		if (nextTime < 0.0f) {
+			nextTime += animation.duration;
+		}
+	} else {
+		nextTime = std::clamp(nextTime, 0.0f, animation.duration);
+	}
+	return nextTime;
+}
 float Animation::CalculateValueOrDefault(const AnimationCurve<float>& keyframes, float time, float defaultValue) {
 	if (keyframes.keyframes.empty()) {
 		return defaultValue;

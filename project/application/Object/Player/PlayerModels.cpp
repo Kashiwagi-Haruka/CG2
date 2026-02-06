@@ -111,7 +111,9 @@ void PlayerModels::Update() {
 		if (!loopAnimation && currentAnimation.duration > 0.0f) {
 			animationFinished_ = (sizukuAnimationTime_ + deltaTime) >= currentAnimation.duration;
 		}
-		sizukuSkeleton_->UpdateAnimation(currentAnimation, sizukuAnimationTime_, deltaTime, loopAnimation);
+		sizukuAnimationTime_ = Animation::AdvanceTime(currentAnimation, sizukuAnimationTime_, deltaTime, loopAnimation);
+		sizukuSkeleton_->ApplyAnimation(currentAnimation, sizukuAnimationTime_);
+		sizukuSkeleton_->Update();
 		if (!sizukuSkinCluster_.mappedPalette.empty()) {
 			UpdateSkinCluster(sizukuSkinCluster_, *sizukuSkeleton_);
 		}

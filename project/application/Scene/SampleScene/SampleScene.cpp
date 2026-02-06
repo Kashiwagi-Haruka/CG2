@@ -324,7 +324,9 @@ void SampleScene::Update() {
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	if (humanSkeleton_ && !humanAnimationClips_.empty()) {
 		const Animation::AnimationData& currentAnimation = humanAnimationClips_[currentHumanAnimationIndex_];
-		humanSkeleton_->UpdateAnimation(currentAnimation, humanAnimationTime_, deltaTime);
+		humanAnimationTime_ = Animation::AdvanceTime(currentAnimation, humanAnimationTime_, deltaTime, true);
+		humanSkeleton_->ApplyAnimation(currentAnimation, humanAnimationTime_);
+		humanSkeleton_->Update();
 		if (!humanSkinCluster_.mappedPalette.empty()) {
 			UpdateSkinCluster(humanSkinCluster_, *humanSkeleton_);
 		}

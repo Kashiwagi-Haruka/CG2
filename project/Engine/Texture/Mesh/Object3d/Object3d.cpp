@@ -47,14 +47,7 @@ void Object3d::Update() {
 
 		deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 
-		animationTime_ += deltaTime;
-		if (animation_->duration > 0.0f) {
-			if (isLoopAnimation_) {
-				animationTime_ = std::fmod(animationTime_, animation_->duration);
-			} else {
-				animationTime_ = std::min(animationTime_, animation_->duration);
-			}
-		}
+		animationTime_ = Animation::AdvanceTime(*animation_, animationTime_, deltaTime, isLoopAnimation_);
 
 		const Animation::NodeAnimation* nodeAnimation = nullptr;
 		if (baseNode) {
