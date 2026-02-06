@@ -243,10 +243,10 @@
     <ClCompile Include="application\Object\Player\PlayerSword.cpp">
       <Filter>ソース ファイル\application\Object\Player</Filter>
     </ClCompile>
-    <ClCompile Include="application\Object\Player\PlayerSpecialAttack.cpp">
+    <ClCompile Include="application\Object\Player\Attack\Special\PlayerSpecialAttack.cpp">
       <Filter>ソース ファイル\application\Object\Player</Filter>
     </ClCompile>
-    <ClCompile Include="application\Object\Player\PlayerSkill.cpp">
+    <ClCompile Include="application\Object\Player\Attack\Skill\PlayerSkill.cpp">
       <Filter>ソース ファイル\application\Object\Player</Filter>
     </ClCompile>
     <ClCompile Include="application\Object\Player\PlayerParameters.cpp">
@@ -346,12 +346,6 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Object\Player\Attack\PlayerFallAttack.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Object\Player\Attack\PlayerAttack.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\Object\Character\CharacterDisplay.cpp">
@@ -524,7 +518,7 @@
     <ClInclude Include="application\Object\MapchipField.h">
       <Filter>ヘッダー ファイル\application\Object</Filter>
     </ClInclude>
-    <ClInclude Include="application\Object\Player\PlayerSkill.h">
+    <ClInclude Include="application\Object\Player\Attack\Skill\PlayerSkill.h">
       <Filter>ヘッダー ファイル\application\Object\Player</Filter>
     </ClInclude>
     <ClInclude Include="application\Object\Player\PlayerParameters.h">
@@ -539,7 +533,7 @@
     <ClInclude Include="application\Object\Player\PlayerSword.h">
       <Filter>ヘッダー ファイル\application\Object\Player</Filter>
     </ClInclude>
-    <ClInclude Include="application\Object\Player\PlayerSpecialAttack.h">
+    <ClInclude Include="application\Object\Player\Attack\Special\PlayerSpecialAttack.h">
       <Filter>ヘッダー ファイル\application\Object\Player</Filter>
     </ClInclude>
     <ClInclude Include="application\Scene\TitleScene.h">
@@ -663,12 +657,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\Mesh\Animation\AnimationManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Player\Attack\PlayerFallAttack.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Object\Player\Attack\PlayerAttack.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Object\Character\CharacterDisplay.h">

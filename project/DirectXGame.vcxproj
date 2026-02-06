@@ -237,8 +237,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp" />
     <ClCompile Include="application\Scene\SampleScene\SampleScene.cpp" />
     <ClCompile Include="application\Object\Player\PlayerSword.cpp" />
-    <ClCompile Include="application\Object\Player\PlayerSkill.cpp" />
-    <ClCompile Include="application\Object\Player\PlayerSpecialAttack.cpp" />
+    <ClCompile Include="application\Object\Player\Attack\Skill\PlayerSkill.cpp" />
+    <ClCompile Include="application\Object\Player\Attack\Special\PlayerSpecialAttack.cpp" />
     <ClCompile Include="application\Object\Player\PlayerModels.cpp" />
     <ClCompile Include="application\GameTimer\GameTimer.cpp" />
     <ClCompile Include="application\Pause\Pause.cpp" />
@@ -252,8 +252,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Object\Player\playerSwordTrail.cpp" />
     <ClCompile Include="application\TutorialUI\TutorialUI.cpp" />
     <ClCompile Include="application\Object\Character\Sizuku\Sizuku.cpp" />
-    <ClCompile Include="application\Object\Player\Attack\PlayerFallAttack.cpp" />
-    <ClCompile Include="application\Object\Player\Attack\PlayerAttack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -353,8 +351,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Scene\SceneFactory\SceneFactory.h" />
     <ClInclude Include="application\Scene\SampleScene\SampleScene.h" />
     <ClInclude Include="application\Object\Player\PlayerSword.h" />
-    <ClInclude Include="application\Object\Player\PlayerSkill.h" />
-    <ClInclude Include="application\Object\Player\PlayerSpecialAttack.h" />
+    <ClInclude Include="application\Object\Player\Attack\Skill\PlayerSkill.h" />
+    <ClInclude Include="application\Object\Player\Attack\Special\PlayerSpecialAttack.h" />
     <ClInclude Include="application\Object\Player\PlayerModels.h" />
     <ClInclude Include="application\GameTimer\GameTimer.h" />
     <ClInclude Include="application\Pause\Pause.h" />
@@ -368,8 +366,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Object\Player\playerSwordTrail.h" />
     <ClInclude Include="application\TutorialUI\TutorialUI.h" />
     <ClInclude Include="application\Object\Character\Sizuku\Sizuku.h" />
-    <ClInclude Include="application\Object\Player\Attack\PlayerFallAttack.h" />
-    <ClInclude Include="application\Object\Player\Attack\PlayerAttack.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d\Object3d.PS.hlsl">
