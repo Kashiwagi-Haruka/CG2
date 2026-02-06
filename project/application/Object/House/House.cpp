@@ -88,3 +88,18 @@ void House::Draw() {
 	hpflame_->Draw();
 	hpbar_->Draw();
 }
+
+void House::DrawReflection(float mirrorY, float alpha) {
+	if (!object_) {
+		return;
+	}
+	const Matrix4x4 mirrorMatrix = Function::MakeMirrorMatrix(mirrorY);
+	const Matrix4x4 originalWorld = object_->GetWorldMatrix();
+	const Matrix4x4 reflectedWorld = Function::Multiply(originalWorld, mirrorMatrix);
+	Object3dCommon::GetInstance()->DrawCommonNoCull();
+	object_->SetColor({1.0f, 1.0f, 1.0f, alpha});
+	object_->UpdateWorldMatrix(reflectedWorld);
+	object_->Draw();
+	object_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	object_->UpdateWorldMatrix(originalWorld);
+}

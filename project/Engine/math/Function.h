@@ -27,6 +27,7 @@ Matrix4x4 Inverse(const Matrix4x4& m);
 Matrix4x4 MakeTranslateMatrix(Vector3 translate);
 Matrix4x4 MakeTranslateMatrix(float x, float y, float z);
 Matrix4x4 MakeScaleMatrix(Vector3 scale);
+Matrix4x4 MakeMirrorMatrix(float mirrorY);
 Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate);
 Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector4 rotate, Vector3 translate);
 

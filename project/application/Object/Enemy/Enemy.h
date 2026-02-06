@@ -47,6 +47,7 @@ public:
 	void SetIsStun(bool isStun);
 	void Update(const Vector3& housePos, const Vector3& houseScale, const Vector3& playerPos, bool isPlayerAlive);
 	void Draw();
+	void DrawReflection(float mirrorY, float alpha);
 	void Stun();
 	void SetHPSubtract(int hp) {
 		HP -= hp;

@@ -4,6 +4,7 @@
 #include "GameBase.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3d.h"
+#include "Object3d/Object3dCommon.h"
 #include "Vector4.h"
 #include <algorithm>
 
@@ -139,6 +140,22 @@ void Enemy::Draw() {
 	if (isStun_) {
 		enemyStun->Draw();
 	}
+}
+
+void Enemy::DrawReflection(float mirrorY, float alpha) {
+	if (!isAlive || !object_) {
+		return;
+	}
+	const Matrix4x4 mirrorMatrix = Function::MakeMirrorMatrix(mirrorY);
+	const Matrix4x4 originalWorld = object_->GetWorldMatrix();
+	const Matrix4x4 reflectedWorld = Function::Multiply(originalWorld, mirrorMatrix);
+	const Vector4 baseColor = (damageInvincibleTimer_ > 0.0f) ? kDamageInvincibleColor : kDefaultColor;
+	Object3dCommon::GetInstance()->DrawCommonNoCull();
+	object_->SetColor({baseColor.x, baseColor.y, baseColor.z, alpha});
+	object_->UpdateWorldMatrix(reflectedWorld);
+	object_->Draw();
+	object_->SetColor(baseColor);
+	object_->UpdateWorldMatrix(originalWorld);
 }
 void Enemy::BulletCollision() {}
 

@@ -220,6 +220,13 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 	return result;
 }
 
+Matrix4x4 MakeMirrorMatrix(float mirrorY) {
+	const Matrix4x4 translateToOrigin = MakeTranslateMatrix(0.0f, -mirrorY, 0.0f);
+	const Matrix4x4 mirrorScale = MakeScaleMatrix({1.0f, -1.0f, 1.0f});
+	const Matrix4x4 translateBack = MakeTranslateMatrix(0.0f, mirrorY, 0.0f);
+	return Multiply(translateToOrigin, Multiply(mirrorScale, translateBack));
+}
+
 Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) {
 	Matrix4x4 result{};
 

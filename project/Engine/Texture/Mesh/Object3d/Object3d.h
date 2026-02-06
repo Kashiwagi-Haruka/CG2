@@ -48,6 +48,7 @@ class Object3d {
 public:
 	void Initialize();
 	void Update();
+	void UpdateWorldMatrix(const Matrix4x4& matrix);
 	void Draw();
 
 	void CreateResources();

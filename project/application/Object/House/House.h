@@ -23,6 +23,7 @@ public:
 	void Initialize(Camera* camera);
 	void Update(Camera* camera);
 	void Draw();
+	void DrawReflection(float mirrorY, float alpha);
 
 	Vector3 GetPosition() const { return position_; }
 	Vector3 GetScale() const { return object_->GetTransform().scale; }
