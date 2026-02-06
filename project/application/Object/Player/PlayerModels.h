@@ -1,6 +1,7 @@
 #pragma once
 #include "Animation/Animation.h"
 #include "Animation/Skeleton.h"
+#include "Animation/AnimationManager.h"
 #include "Animation/SkinCluster.h"
 #include "Camera.h"
 #include "Object3d/Object3d.h"
@@ -33,10 +34,9 @@ private:
 	Camera* camera_;
 	std::unique_ptr<Skeleton> sizukuSkeleton_{};
 	SkinCluster sizukuSkinCluster_{};
-	std::vector<Animation::AnimationData> sizukuAnimationClips_{};
-	float sizukuAnimationTime_ = 0.0f;
-	size_t sizukuAnimationIndex_ = 0;
-	bool sizukuAnimationLoop_ = true;
+	Animation::AnimationData blendedPoseAnimation_{};
+	const std::string animationGroupName_ = "sizuku";
+	const float kAnimationBlendDuration_ = 0.3f;
 	bool animationFinished_ = false;
 	
 

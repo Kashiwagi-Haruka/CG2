@@ -18,7 +18,7 @@ SampleScene::SampleScene() {
 	cameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
         .rotate{0.0f, 0.0f, 0.0f  },
-        .translate{0.0f, 5.0f, -30.0f}
+        .translate{0.0f, 5.0f, -10.0f}
     };
 
 	camera_ = std::make_unique<Camera>();
@@ -340,7 +340,7 @@ void SampleScene::Draw() {
 	 planeGltf_->Draw();
 	 fieldObj_->Draw();
 	animatedCubeObj_->Draw();
-	Object3dCommon::GetInstance()->DrawCommonSkinning();
+	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 	if (humanSkeleton_) {

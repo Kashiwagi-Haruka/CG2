@@ -132,7 +132,7 @@
     <ClCompile Include="application\Object\Enemy\EnemyManager.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\stringUtillity\StringUtility.cpp">
+    <ClCompile Include="Engine\StringUtillity\StringUtility.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
     <ClCompile Include="application\CameraController\CameraController.cpp">
@@ -144,10 +144,10 @@
     <ClCompile Include="Engine\Camera\DebugCamera.cpp">
       <Filter>ソース ファイル\Engine\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\math\RigidBody.cpp">
+    <ClCompile Include="Engine\Math\RigidBody.cpp">
       <Filter>ソース ファイル\Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\math\Function.cpp">
+    <ClCompile Include="Engine\Math\Function.cpp">
       <Filter>ソース ファイル\Engine\Math</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Texture\BlendMode\BlendModeManager.cpp">
@@ -345,6 +345,9 @@
     <ClCompile Include="application\Object\Character\Sizuku\Sizuku.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -407,19 +410,19 @@
     <ClInclude Include="Engine\Texture\BlendMode\BlendModeManager.h">
       <Filter>ヘッダー ファイル\Engine\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\math\Function.h">
+    <ClInclude Include="Engine\Math\Function.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\math\Matrix4x4.h">
+    <ClInclude Include="Engine\Math\Matrix4x4.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\math\Vector2.h">
+    <ClInclude Include="Engine\Math\Vector2.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\math\Vector3.h">
+    <ClInclude Include="Engine\Math\Vector3.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\math\Vector4.h">
+    <ClInclude Include="Engine\Math\Vector4.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\VertexData.h">
@@ -446,13 +449,13 @@
     <ClInclude Include="Engine\Texture\TextureManager.h">
       <Filter>ヘッダー ファイル\Engine\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\math\Transform.h">
+    <ClInclude Include="Engine\Math\Transform.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\stringUtillity\StringUtility.h">
+    <ClInclude Include="Engine\StringUtillity\StringUtility.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\math\RigidBody.h">
+    <ClInclude Include="Engine\Math\RigidBody.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
     <ClInclude Include="application\SceneTransition\SceneTransition.h">
@@ -575,7 +578,7 @@
     <ClInclude Include="Engine\Camera\CameraForGPU.h">
       <Filter>ヘッダー ファイル\Engine\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\math\QuaternionTransform.h">
+    <ClInclude Include="Engine\Math\QuaternionTransform.h">
       <Filter>ヘッダー ファイル\Engine\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h">
@@ -648,6 +651,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Object\Playable\PlayableParameter.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Animation\AnimationManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

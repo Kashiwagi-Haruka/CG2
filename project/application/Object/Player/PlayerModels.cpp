@@ -18,16 +18,10 @@ void PlayerModels::Initialize() {
 
 	Sizuku_->Initialize();
 
-	sizukuAnimationClips_ = Animation::LoadAnimationClips("Resources/3d", "sizuku");
-	if (!sizukuAnimationClips_.empty()) {
-		sizukuAnimationIndex_ = 0;
-		for (size_t i = 0; i < sizukuAnimationClips_.size(); ++i) {
-			if (sizukuAnimationClips_[i].name == "Idle") {
-				sizukuAnimationIndex_ = i;
-				break;
-			}
-		}
-		Sizuku_->SetAnimation(&sizukuAnimationClips_[sizukuAnimationIndex_], true);
+	AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/3d", "sizuku");
+	AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "Idle", true);
+	if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, "Idle")) {
+		Sizuku_->SetAnimation(idleAnimation, true);
 	}
 
 	if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("sizuku")) {
@@ -41,8 +35,6 @@ void PlayerModels::Initialize() {
 
 void PlayerModels::Update() {
 
-	static float t = 0.0f;
-	t += 0.1f;
 	const char* desiredAnimationName = "Idle";
 	bool loopAnimation = true;
 	switch (state_) {
@@ -85,37 +77,20 @@ void PlayerModels::Update() {
 	default:
 		break;
 	}
+	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+	AnimationManager::PlaybackResult playbackResult{};
+	if (AnimationManager::GetInstance()->UpdatePlayback(animationGroupName_, desiredAnimationName, loopAnimation, deltaTime, kAnimationBlendDuration_, blendedPoseAnimation_, playbackResult)) {
+		animationFinished_ = playbackResult.animationFinished;
+		if (playbackResult.changedAnimation && playbackResult.currentAnimation) {
+			Sizuku_->SetAnimation(playbackResult.currentAnimation, loopAnimation);
+		}
 
-	if (!sizukuAnimationClips_.empty()) {
-		size_t desiredIndex = sizukuAnimationIndex_;
-		for (size_t i = 0; i < sizukuAnimationClips_.size(); ++i) {
-			if (sizukuAnimationClips_[i].name == desiredAnimationName) {
-				desiredIndex = i;
-				break;
+		if (sizukuSkeleton_ && playbackResult.animationToApply) {
+			sizukuSkeleton_->ApplyAnimation(*playbackResult.animationToApply, playbackResult.animationTime);
+			sizukuSkeleton_->Update();
+			if (!sizukuSkinCluster_.mappedPalette.empty()) {
+				UpdateSkinCluster(sizukuSkinCluster_, *sizukuSkeleton_);
 			}
-		}
-
-		if (desiredIndex != sizukuAnimationIndex_ || loopAnimation != sizukuAnimationLoop_) {
-			sizukuAnimationIndex_ = desiredIndex;
-			sizukuAnimationTime_ = 0.0f;
-			sizukuAnimationLoop_ = loopAnimation;
-			animationFinished_ = false;
-			Sizuku_->SetAnimation(&sizukuAnimationClips_[sizukuAnimationIndex_], loopAnimation);
-		}
-	}
-
-	if (sizukuSkeleton_ && !sizukuAnimationClips_.empty()) {
-		const auto& currentAnimation = sizukuAnimationClips_[sizukuAnimationIndex_];
-		const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-		animationFinished_ = false;
-		if (!loopAnimation && currentAnimation.duration > 0.0f) {
-			animationFinished_ = (sizukuAnimationTime_ + deltaTime) >= currentAnimation.duration;
-		}
-		sizukuAnimationTime_ = Animation::AdvanceTime(currentAnimation, sizukuAnimationTime_, deltaTime, loopAnimation);
-		sizukuSkeleton_->ApplyAnimation(currentAnimation, sizukuAnimationTime_);
-		sizukuSkeleton_->Update();
-		if (!sizukuSkinCluster_.mappedPalette.empty()) {
-			UpdateSkinCluster(sizukuSkinCluster_, *sizukuSkeleton_);
 		}
 	}
 	playerWorld = Function::MakeAffineMatrix(player_.scale, player_.rotate, player_.translate);
