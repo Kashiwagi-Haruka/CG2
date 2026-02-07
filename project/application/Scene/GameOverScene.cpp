@@ -1,5 +1,5 @@
 #include "GameOverScene.h"
-#include "GameBase.h"
+#include "Input.h"
 #include "SceneManager.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
@@ -32,8 +32,8 @@ void GameOverScene::Initialize() {
 	pressSpaceSprite->SetPosition(pressSpacePos);
 	pressSpaceSprite->SetTextureRange({0, 0}, {768, 768});
 	pressSpaceSprite->Update();
-	GameBase::GetInstance()->SetIsCursorStablity(false);
-	GameBase::GetInstance()->SetIsCursorVisible(true);
+	Input::GetInstance()->SetIsCursorStability(false);
+	Input::GetInstance()->SetIsCursorVisible(true);
 	transition->Initialize(false);
 	isTransitionIn = true;
 	isTransitionOut = false;
@@ -45,7 +45,7 @@ void GameOverScene::Update() {
 		Audio::GetInstance()->SoundPlayWave(BGM_, true);
 		isBGMPlaying = true;
 	}
-	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;
 	}

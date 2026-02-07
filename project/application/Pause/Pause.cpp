@@ -1,6 +1,5 @@
 #include "Pause.h"
 #include "Function.h"
-#include "GameBase.h"
 #include "Input.h"
 #include "TextureManager.h"
 
@@ -61,8 +60,8 @@ void Pause::Update(bool isPause) {
 		startTime = 0.0f;
 		isEnd_ = true;
 		isStart_ = false;
-		GameBase::GetInstance()->SetIsCursorStablity(true);
-		GameBase::GetInstance()->SetIsCursorVisible(false);
+		Input::GetInstance()->SetIsCursorStability(true);
+		Input::GetInstance()->SetIsCursorVisible(false);
 	}
 
 	float offsetX = kHiddenOffsetX;
@@ -74,8 +73,8 @@ void Pause::Update(bool isPause) {
 			isStart_ = false;
 			isActive_ = true;
 			offsetX = 0.0f;
-			GameBase::GetInstance()->SetIsCursorStablity(false);
-			GameBase::GetInstance()->SetIsCursorVisible(true);
+			Input::GetInstance()->SetIsCursorStability(false);
+			Input::GetInstance()->SetIsCursorVisible(true);
 		}
 	} else if (isEnd_) {
 		startTime += kTransitionSpeed;
@@ -91,16 +90,16 @@ void Pause::Update(bool isPause) {
 	}
 
 	if (isActive_) {
-		bool moveUp = GameBase::GetInstance()->TriggerKey(DIK_W) || GameBase::GetInstance()->TriggerKey(DIK_UP) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonUp);
-		bool moveDown = GameBase::GetInstance()->TriggerKey(DIK_S) || GameBase::GetInstance()->TriggerKey(DIK_DOWN) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonDown);
+		bool moveUp = Input::GetInstance()->TriggerKey(DIK_W) || Input::GetInstance()->TriggerKey(DIK_UP) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonUp);
+		bool moveDown = Input::GetInstance()->TriggerKey(DIK_S) || Input::GetInstance()->TriggerKey(DIK_DOWN) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonDown);
 
 		if (moveUp || moveDown) {
 			selectIndex_ = 1 - selectIndex_;
 		}
 
-		bool confirm = GameBase::GetInstance()->TriggerKey(DIK_RETURN) || GameBase::GetInstance()->TriggerKey(DIK_SPACE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonA);
-		bool cancel = GameBase::GetInstance()->TriggerKey(DIK_ESCAPE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonStart) ||
-		              GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonB);
+		bool confirm = Input::GetInstance()->TriggerKey(DIK_RETURN) || Input::GetInstance()->TriggerKey(DIK_SPACE) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonA);
+		bool cancel = Input::GetInstance()->TriggerKey(DIK_ESCAPE) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonStart) ||
+		              Input::GetInstance()->TriggerButton(Input::PadButton::kButtonB);
 
 		if (confirm) {
 			action_ = (selectIndex_ == 0) ? Action::kTitle : Action::kResume;

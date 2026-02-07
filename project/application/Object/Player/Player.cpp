@@ -89,11 +89,11 @@ void Player::Move() {
 	Vector3 inputAxis = {0.0f, 0.0f, 0.0f};
 	bool hasInput = false;
 
-	if (GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_D)) {
+	if (Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_D)) {
 
-		if (!GameBase::GetInstance()->PushKey(DIK_D)) {
+		if (!Input::GetInstance()->PushKey(DIK_D)) {
 
-			if (GameBase::GetInstance()->PushKey(DIK_A)) {
+			if (Input::GetInstance()->PushKey(DIK_A)) {
 
 				inputAxis.x = -1.0f;
 				hasInput = true;
@@ -103,9 +103,9 @@ void Player::Move() {
 			}
 		}
 
-		if (!GameBase::GetInstance()->PushKey(DIK_A)) {
+		if (!Input::GetInstance()->PushKey(DIK_A)) {
 
-			if (GameBase::GetInstance()->PushKey(DIK_D)) {
+			if (Input::GetInstance()->PushKey(DIK_D)) {
 				inputAxis.x = 1.0f;
 				hasInput = true;
 				if (!isAttacking_) {
@@ -114,11 +114,11 @@ void Player::Move() {
 			}
 		}
 	}
-	if (GameBase::GetInstance()->PushKey(DIK_W) || GameBase::GetInstance()->PushKey(DIK_S)) {
+	if (Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S)) {
 
-		if (!GameBase::GetInstance()->PushKey(DIK_W)) {
+		if (!Input::GetInstance()->PushKey(DIK_W)) {
 
-			if (GameBase::GetInstance()->PushKey(DIK_S)) {
+			if (Input::GetInstance()->PushKey(DIK_S)) {
 				if (!isAttacking_) {
 					models_->SetStateM(PlayerModels::StateM::walk);
 				}
@@ -127,9 +127,9 @@ void Player::Move() {
 			}
 		}
 
-		if (!GameBase::GetInstance()->PushKey(DIK_S)) {
+		if (!Input::GetInstance()->PushKey(DIK_S)) {
 
-			if (GameBase::GetInstance()->PushKey(DIK_W)) {
+			if (Input::GetInstance()->PushKey(DIK_W)) {
 				inputAxis.z = 1.0f;
 				hasInput = true;
 				if (!isAttacking_) {
@@ -178,28 +178,28 @@ void Player::Move() {
 		transform_.rotate.y = Function::Lerp(transform_.rotate.y, transform_.rotate.y + angleDiff, rotateTimer);
 	}
 
-	if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D) && !GameBase::GetInstance()->PushKey(DIK_W) && !GameBase::GetInstance()->PushKey(DIK_S)) {
+	if (!Input::GetInstance()->PushKey(DIK_A) && !Input::GetInstance()->PushKey(DIK_D) && !Input::GetInstance()->PushKey(DIK_W) && !Input::GetInstance()->PushKey(DIK_S)) {
 		isDash = false;
 		if (!isAttacking_&&!isSkillAttack) {
 		models_->SetStateM(PlayerModels::StateM::idle);
 		}
 	} else {
-		isDash = GameBase::GetInstance()->PushKey(DIK_LSHIFT) || GameBase::GetInstance()->PushKey(DIK_RSHIFT);
+		isDash = Input::GetInstance()->PushKey(DIK_LSHIFT) || Input::GetInstance()->PushKey(DIK_RSHIFT);
 	}
 
-	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		if (!isfalling && !isJump) {
 			isJump = true;
 		}
 	}
 
-	if (!GameBase::GetInstance()->PushKey(DIK_A) && !GameBase::GetInstance()->PushKey(DIK_D)) {
+	if (!Input::GetInstance()->PushKey(DIK_A) && !Input::GetInstance()->PushKey(DIK_D)) {
 		velocity_.x *= (1.0f - parameters_.decelerationRate);
 		if (velocity_.x > -0.01f && velocity_.x < 0.01f) {
 			velocity_.x = 0.0f;
 		}
 	}
-	if (!GameBase::GetInstance()->PushKey(DIK_W) && !GameBase::GetInstance()->PushKey(DIK_S)) {
+	if (!Input::GetInstance()->PushKey(DIK_W) && !Input::GetInstance()->PushKey(DIK_S)) {
 		velocity_.z *= (1.0f - parameters_.decelerationRate);
 		if (velocity_.z > -0.01f && velocity_.z < 0.01f) {
 			velocity_.z = 0.0f;
@@ -213,10 +213,10 @@ void Player::Move() {
 		velocity_.z *= parameters_.dashMagnification;
 	}
 
-	if (GameBase::GetInstance()->PushKey(DIK_A)) {
+	if (Input::GetInstance()->PushKey(DIK_A)) {
 		bulletVelocity_.x = -1;
 	}
-	if (GameBase::GetInstance()->PushKey(DIK_D)) {
+	if (Input::GetInstance()->PushKey(DIK_D)) {
 		bulletVelocity_.x = 1;
 	}
 }
@@ -300,12 +300,12 @@ void Player::Attack() {
 	}
 
 	// ===== 左クリック長押し判定 =====
-	if (GameBase::GetInstance()->PushMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->PushButton(Input::PadButton::kButtonB)) {
+	if (Input::GetInstance()->PushMouseButton(Input::MouseButton::kLeft) || Input::GetInstance()->PushButton(Input::PadButton::kButtonB)) {
 		attackHoldTimer_ += 1.0f / 60.0f;
 	}
 
 	// ===== 攻撃入力の処理 =====
-	if (GameBase::GetInstance()->TriggerMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonB)) {
+	if (Input::GetInstance()->TriggerMouseButton(Input::MouseButton::kLeft) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonB)) {
 
 		// ★ 空中にいる場合は落下攻撃
 		if (isfalling || isJump) {
@@ -367,7 +367,7 @@ void Player::Attack() {
 	}
 
 		// ===== 左クリックを離したとき =====
-	if (GameBase::GetInstance()->ReleaseMouseButton(Input::MouseButton::kLeft) || GameBase::GetInstance()->ReleaseButton(Input::PadButton::kButtonB)) {
+	if (Input::GetInstance()->ReleaseMouseButton(Input::MouseButton::kLeft) || Input::GetInstance()->ReleaseButton(Input::PadButton::kButtonB)) {
 
 		// ★ 長押ししていた場合は重撃に変更
 		if (attackHoldTimer_ >= heavyAttackThreshold_ && isAttacking_) {
@@ -404,7 +404,7 @@ void Player::Attack() {
 			comboTimer_ = 0.0f;
 		}
 	}
-	if (GameBase::GetInstance()->TriggerKey(DIK_E)||GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonY)) {
+	if (Input::GetInstance()->TriggerKey(DIK_E) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonY)) {
 		// スキル攻撃
 		if (!isSkillAttack) {
 			isSkillAttack = true;
@@ -422,7 +422,7 @@ void Player::Attack() {
 			comboTimer_ = 0.0f;
 		}
 	}
-	if (GameBase::GetInstance()->TriggerKey(DIK_Q)||GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonX)) {
+	if (Input::GetInstance()->TriggerKey(DIK_Q) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonX)) {
 		//必殺技
 		if (!isSpecialAttack) {
 			isSpecialAttack = true;

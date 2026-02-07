@@ -1,5 +1,5 @@
 #include "TitleScene.h"
-#include "GameBase.h"
+#include "Input.h"
 #include "SceneManager.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
@@ -51,8 +51,8 @@ void TitleScene::Initialize() {
 	isTransitionIn = true;
 	isTransitionOut = false;
 	transition->Initialize(false);
-	GameBase::GetInstance()->SetIsCursorStablity(false);
-	GameBase::GetInstance()->SetIsCursorVisible(true);
+	Input::GetInstance()->SetIsCursorStability(false);
+	Input::GetInstance()->SetIsCursorVisible(true);
 }
 
 void TitleScene::Update() {
@@ -66,7 +66,7 @@ void TitleScene::Update() {
 	BGSP_.sprite->SetRotation(BGSP_.rotate);
 	BGSP_.sprite->Update();
 
-	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;
 	}

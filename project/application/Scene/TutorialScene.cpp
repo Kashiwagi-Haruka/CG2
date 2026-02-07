@@ -1,7 +1,7 @@
 #define NOMINMAX
 #include "TutorialScene.h"
 #include "CameraController/CameraController.h"
-#include "GameBase.h"
+#include "Input.h"
 #include "Object/Background/SkyDome.h"
 #include "Object/Character/Model/CharacterModel.h"
 #include "Object/ExpCube/ExpCubeManager.h"
@@ -71,14 +71,14 @@ void TutorialScene::Initialize() {
 	previousStepIndex_ = -1;
 	isBGMPlaying_ = false;
 
-	GameBase::GetInstance()->SetIsCursorStablity(true);
-	GameBase::GetInstance()->SetIsCursorVisible(false);
+	Input::GetInstance()->SetIsCursorStability(true);
+	Input::GetInstance()->SetIsCursorVisible(false);
 }
 
 void TutorialScene::Update() {
 	const float deltaTime = 1.0f / 60.0f;
-	bool skipKeyHeld = GameBase::GetInstance()->PushKey(DIK_P);
-	if (GameBase::GetInstance()->TriggerKey(DIK_ESCAPE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonStart)) {
+	bool skipKeyHeld = Input::GetInstance()->PushKey(DIK_P);
+	if (Input::GetInstance()->TriggerKey(DIK_ESCAPE) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonStart)) {
 		isPaused_ = !isPaused_;
 	}
 	if (!isBGMPlaying_) {
@@ -157,16 +157,16 @@ void TutorialScene::Update() {
 				progressed = stepTimer_ >= kAutoAdvanceDuration;
 				break;
 			case 2:
-				if (GameBase::GetInstance()->PushKey(DIK_W) || GameBase::GetInstance()->PushKey(DIK_A) || GameBase::GetInstance()->PushKey(DIK_S) || GameBase::GetInstance()->PushKey(DIK_D) ||
-				    GameBase::GetInstance()->GetJoyStickLXY().x != 0.0f || GameBase::GetInstance()->GetJoyStickLXY().y != 0.0f) {
+				if (Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_S) || Input::GetInstance()->PushKey(DIK_D) ||
+				    Input::GetInstance()->GetJoyStickLXY().x != 0.0f || Input::GetInstance()->GetJoyStickLXY().y != 0.0f) {
 					stepActionTimer_ += deltaTime;
 				}
 				currentStepProgress_ = stepActionTimer_ / kMoveActionDuration;
 				progressed = stepActionTimer_ >= kMoveActionDuration;
 				break;
 			case 3:
-				if (GameBase::GetInstance()->GetMouseMove().x != 0.0f || GameBase::GetInstance()->GetMouseMove().y != 0.0f || GameBase::GetInstance()->GetJoyStickRXY().x != 0.0f ||
-				    GameBase::GetInstance()->GetJoyStickRXY().y != 0.0f) {
+				if (Input::GetInstance()->GetMouseMove().x != 0.0f || Input::GetInstance()->GetMouseMove().y != 0.0f || Input::GetInstance()->GetJoyStickRXY().x != 0.0f ||
+				    Input::GetInstance()->GetJoyStickRXY().y != 0.0f) {
 					stepActionTimer_ += deltaTime;
 				}
 				currentStepProgress_ = stepActionTimer_ / kLookActionDuration;
@@ -190,7 +190,7 @@ void TutorialScene::Update() {
 				progressed = expCubeCollectedCount_ >= kExpCubeTargetCount;
 				break;
 			case 6:
-				if (GameBase::GetInstance()->TriggerKey(DIK_E) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonY)) {
+				if (Input::GetInstance()->TriggerKey(DIK_E) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonY)) {
 					skillUseCount_++;
 				}
 				currentStepProgress_ = static_cast<float>(skillUseCount_) / static_cast<float>(kSkillUseTargetCount);

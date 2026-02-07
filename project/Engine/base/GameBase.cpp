@@ -1,6 +1,7 @@
 #define NOMINMAX
 #include "GameBase.h"
 #include "ImGuiManager.h"
+#include "Input.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #include "ParticleManager.h"
@@ -54,8 +55,7 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	srvManager_ = std::make_unique<SrvManager>();
 	srvManager_->Initialize(dxCommon_.get());
 
-	DInput = std::make_unique<Input>();
-	DInput->Initialize(winApp_.get());
+	Input::GetInstance()->Initialize(winApp_.get());
 	imguiM_ = std::make_unique<ImGuiManager>();
 	imguiM_->Initialize(winApp_.get(), dxCommon_.get(), srvManager_.get());
 	Audio::GetInstance()->InitializeIXAudio();
@@ -97,7 +97,7 @@ void GameBase::BeginFlame() {
 
 	dxCommon_->PreDraw();
 	imguiM_->Begin();
-	DInput->Update();
+	Input::GetInstance()->Update();
 	Audio::GetInstance()->Update();
 }
 
@@ -107,37 +107,3 @@ void GameBase::EndFlame() {
 	imguiM_->Draw(srvManager_.get(), dxCommon_.get());
 	dxCommon_->PostDraw();
 }
-
-bool GameBase::PushMouseButton(Input::MouseButton button) const { return DInput->PushMouseButton(button); }
-
-bool GameBase::TriggerMouseButton(Input::MouseButton button) const { return DInput->TriggerMouseButton(button); }
-bool GameBase::ReleaseMouseButton(Input::MouseButton button) const { return DInput->ReleaseMouseButton(button); }
-float GameBase::GetMouseX() const { return DInput->GetMouseX(); };
-float GameBase::GetMouseY() const { return DInput->GetMouseY(); };
-Vector2 GameBase::GetMouseMove() const { return DInput->GetMouseMove(); };
-void GameBase::SetIsCursorStablity(bool iscursor) { DInput->SetIsCursor(iscursor); }
-bool GameBase::PushKey(BYTE keyNumber) { return DInput->PushKey(keyNumber); }
-bool GameBase::TriggerKey(BYTE keyNumber) { return DInput->TriggerKey(keyNumber); }
-bool GameBase::ReleaseKey(BYTE keyNumber) { return DInput->ReleaseKey(keyNumber); }
-bool GameBase::PushButton(Input::PadButton button) { return DInput->PushButton(button); }
-bool GameBase::TriggerButton(Input::PadButton button) { return DInput->TriggerButton(button); }
-bool GameBase::ReleaseButton(Input::PadButton button) { return DInput->ReleaseButton(button); }
-// ジョイスティック
-
-float GameBase::GetJoyStickLX() const { return DInput->GetJoyStickLX(); };
-
-float GameBase::GetJoyStickLY() const { return DInput->GetJoyStickLY(); };
-
-Vector2 GameBase::GetJoyStickLXY() const { return DInput->GetJoyStickLXY(); };
-
-float GameBase::GetJoyStickRX() const { return DInput->GetJoyStickRX(); };
-float GameBase::GetJoyStickRY() const { return DInput->GetJoyStickRY(); };
-Vector2 GameBase::GetJoyStickRXY() const { return DInput->GetJoyStickRXY(); };
-void GameBase::SetIsCursorVisible(bool isVisible) { DInput->SetIsCursorVisible(isVisible); }
-
-/// <summary>
-/// デッドゾーンの設定
-/// </summary>
-/// <param name="deadZone">初期値は0.2f</param>
-void GameBase::SetDeadZone(float deadZone) { DInput->SetDeadZone(deadZone); };
-float GameBase::GetMouseWheelDelta() const { return DInput->GetMouseWheelDelta(); }

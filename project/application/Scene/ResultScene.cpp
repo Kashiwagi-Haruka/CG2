@@ -1,5 +1,5 @@
 #include "ResultScene.h"
-#include "GameBase.h"
+#include "Input.h"
 #include "GameTimer/GameTimer.h"
 #include "Object/House/HouseHP.h"
 #include "SceneManager.h"
@@ -118,8 +118,8 @@ void ResultScene::Initialize() {
 		timeDigitSP_[i].sprite->Update();
 	}
 
-	GameBase::GetInstance()->SetIsCursorStablity(false);
-	GameBase::GetInstance()->SetIsCursorVisible(true);
+	Input::GetInstance()->SetIsCursorStability(false);
+	Input::GetInstance()->SetIsCursorVisible(true);
 	transition->Initialize(false);
 	isTransitionIn = true;
 	isTransitionOut = false;
@@ -138,7 +138,7 @@ void ResultScene::Update() {
 		timeDigitSP_[i].sprite->Update();
 	}
 	houseHpStringSP_.sprite->Update();
-	if (GameBase::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;
 	}

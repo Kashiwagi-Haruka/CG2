@@ -5,9 +5,11 @@
 #include <Windows.h>
 #include <cstdint>
 #include <dinput.h>
+#include <memory>
 #include <wrl.h>
 
 class Input {
+	static std::unique_ptr<Input> instance_;
 
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
@@ -37,6 +39,13 @@ class Input {
 	bool isCursorVisible_ = true;
 
 public:
+	static Input* GetInstance();
+
+	Input(const Input&) = delete;
+	Input& operator=(const Input&) = delete;
+	Input(Input&&) = delete;
+	Input& operator=(Input&&) = delete;
+
 	enum class PadButton {
 		kButtonA = 0,         // rgbButtons[0]
 		kButtonB,             // rgbButtons[1]
@@ -132,7 +141,7 @@ public:
 	bool PushMouseButton(MouseButton button) const;    // マウスボタンが押されているか
 	bool TriggerMouseButton(MouseButton button) const; // マウスボタンが押された瞬間か
 	bool ReleaseMouseButton(MouseButton button) const; // マウスボタンが離された瞬間か
-	void SetIsCursor(bool isCursor) { isCursorStability = isCursor; }
+	void SetIsCursorStability(bool isCursor) { isCursorStability = isCursor; }
 	void SetIsCursorVisible(bool isVisible);
 	/// <summary>
 	/// デッドゾーンの設定
@@ -141,6 +150,8 @@ public:
 	void SetDeadZone(float deadZone);
 
 private:
+	Input() = default;
+
 	// デバイス列挙用の static コールバック
 	static BOOL CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext);
 };

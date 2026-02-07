@@ -1,8 +1,9 @@
 #include "CameraController.h"
 #include "Camera.h"
-#include "GameBase.h"
+#include "Input.h"
 #include <imgui.h>
 #include <random>
+#include "Function.h"
 CameraController::~CameraController() {}
 void CameraController::Initialize() {
 
@@ -28,7 +29,7 @@ void CameraController::Update() {
 	ImGui::End();*/
 
 #endif
-	const Vector2 mouseMove = GameBase::GetInstance()->GetMouseMove();
+	const Vector2 mouseMove = Input::GetInstance()->GetMouseMove();
 	orbitYaw_ += mouseMove.x * mouseSensitivity_;
 	orbitPitch_ += mouseMove.y * mouseSensitivity_;
 

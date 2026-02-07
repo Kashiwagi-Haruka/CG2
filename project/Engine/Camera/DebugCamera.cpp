@@ -1,6 +1,6 @@
 #define NOMINMAX
 #include "DebugCamera.h"
-#include "GameBase.h"
+#include "Input.h"
 #include "ImGuiManager.h"
 #include "Input.h"
 #include <algorithm>
@@ -37,10 +37,10 @@ void DebugCamera::Update() {
 	float dPitch = 0.0f;
 	float dYaw = 0.0f;
 
-	GameBase* gameBase = GameBase::GetInstance();
-	Vector2 mouseMove = gameBase->GetMouseMove();
-	const bool isShift = gameBase->PushKey(DIK_LSHIFT) || gameBase->PushKey(DIK_RSHIFT);
-	const bool isLeftDrag = gameBase->PushMouseButton(Input::MouseButton::kLeft);
+	Input* Input = Input::GetInstance();
+	Vector2 mouseMove = Input->GetMouseMove();
+	const bool isShift = Input->PushKey(DIK_LSHIFT) || Input->PushKey(DIK_RSHIFT);
+	const bool isLeftDrag = Input->PushMouseButton(Input::MouseButton::kLeft);
 
 	if (isLeftDrag && !isShift) {
 		dYaw = mouseMove.x * rotSpeed;
@@ -52,7 +52,7 @@ void DebugCamera::Update() {
 		pivot_ += up * (mouseMove.y * panSpeed);
 	}
 
-	const float wheelDelta = gameBase->GetMouseWheelDelta();
+	const float wheelDelta = Input->GetMouseWheelDelta();
 	if (wheelDelta != 0.0f) {
 		translation_.z += wheelDelta * zoomSpeed;
 		translation_.z = std::min(translation_.z, -1.0f);

@@ -36,8 +36,8 @@ GameScene::GameScene() {
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Tailshaft.mp3");
 	Audio::GetInstance()->SetSoundVolume(&BGMData, 0.3f);
 	GameTimer::GetInstance()->Reset();
-	GameBase::GetInstance()->SetIsCursorStablity(true);
-	GameBase::GetInstance()->SetIsCursorVisible(false);
+	Input::GetInstance()->SetIsCursorStability(true);
+	Input::GetInstance()->SetIsCursorVisible(false);
 }
 
 GameScene::~GameScene() {}
@@ -262,7 +262,7 @@ void GameScene::Update() {
 		isBGMPlaying = true;
 	}
 	if (!isLevelSelecting && !isTransitionIn && !isTransitionOut) {
-		bool togglePause = GameBase::GetInstance()->TriggerKey(DIK_ESCAPE) || GameBase::GetInstance()->TriggerButton(Input::PadButton::kButtonStart);
+		bool togglePause = Input::GetInstance()->TriggerKey(DIK_ESCAPE) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonStart);
 		if (togglePause) {
 			isPause = !isPause;
 		}
@@ -290,15 +290,15 @@ void GameScene::Update() {
 	if (isLevelSelecting) {
 
 		// A で左、D で右
-		if (GameBase::GetInstance()->TriggerKey(DIK_A)) {
+		if (Input::GetInstance()->TriggerKey(DIK_A)) {
 			cursorIndex = 0;
 		}
-		if (GameBase::GetInstance()->TriggerKey(DIK_D)) {
+		if (Input::GetInstance()->TriggerKey(DIK_D)) {
 			cursorIndex = 1;
 		}
 
 		// SPACEで決定
-		if (GameBase::GetInstance()->TriggerKey(DIK_SPACE)) {
+		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 
 			int choice = selectChoices[cursorIndex];
 			auto params = player->GetParameters();
@@ -465,7 +465,7 @@ void GameScene::Update() {
 	}
 
 #ifdef _DEBUG
-	if (GameBase::GetInstance()->TriggerKey(DIK_P)) {
+	if (Input::GetInstance()->TriggerKey(DIK_P)) {
 		nextSceneName = "Result";
 		sceneTransition->Initialize(true);
 		isTransitionOut = true;

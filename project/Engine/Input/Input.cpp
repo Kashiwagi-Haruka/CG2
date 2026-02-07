@@ -6,7 +6,14 @@
 #pragma comment(lib, "dxguid.lib")
 
 using namespace Microsoft::WRL;
+std::unique_ptr<Input> Input::instance_ = nullptr;
 
+Input* Input::GetInstance() {
+	if (instance_ == nullptr) {
+		instance_ = std::unique_ptr<Input>(new Input());
+	}
+	return instance_.get();
+}
 BOOL CALLBACK Input::EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext) {
 	Input* input = reinterpret_cast<Input*>(pContext);
 	HRESULT hr = input->directInput->CreateDevice(pdidInstance->guidInstance, &input->gamePadDevice_, NULL);
