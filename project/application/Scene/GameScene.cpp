@@ -38,6 +38,7 @@ GameScene::GameScene() {
 	GameTimer::GetInstance()->Reset();
 	Input::GetInstance()->SetIsCursorStability(true);
 	Input::GetInstance()->SetIsCursorVisible(false);
+	characterDisplay_ = std::make_unique<CharacterDisplay>();
 }
 
 GameScene::~GameScene() {}
@@ -57,6 +58,7 @@ void GameScene::Initialize() {
 	sceneEndClear = false;
 	sceneEndOver = false;
 	isBGMPlaying = false;
+	isCharacterDisplayMode_ = false;
 	cameraController->Initialize();
 
 	Object3dCommon::GetInstance()->SetDefaultCamera(cameraController->GetCamera());
@@ -164,6 +166,8 @@ void GameScene::Initialize() {
 	spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 	pause->Initialize();
+	characterDisplay_->Initialize();
+	characterDisplay_->SetActive(false);
 }
 
 void GameScene::DebugImGui() {
@@ -262,9 +266,19 @@ void GameScene::Update() {
 		isBGMPlaying = true;
 	}
 	if (!isLevelSelecting && !isTransitionIn && !isTransitionOut) {
-		bool togglePause = Input::GetInstance()->TriggerKey(DIK_ESCAPE) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonStart);
-		if (togglePause) {
-			isPause = !isPause;
+		if (Input::GetInstance()->TriggerKey(DIK_C)) {
+			isCharacterDisplayMode_ = !isCharacterDisplayMode_;
+			if (isCharacterDisplayMode_) {
+				isPause = false;
+			}
+			characterDisplay_->SetActive(isCharacterDisplayMode_);
+		}
+
+		if (!isCharacterDisplayMode_) {
+			bool togglePause = Input::GetInstance()->TriggerKey(DIK_ESCAPE) || Input::GetInstance()->TriggerButton(Input::PadButton::kButtonStart);
+			if (togglePause) {
+				isPause = !isPause;
+			}
 		}
 	}
 	DebugImGui();
@@ -285,7 +299,10 @@ void GameScene::Update() {
 	if (isPause && !isTransitionOut) {
 		return;
 	}
-
+	if (isCharacterDisplayMode_ && !isTransitionOut) {
+		characterDisplay_->Update();
+		return;
+	}
 	// ★ レベルアップ選択中は操作受付
 	if (isLevelSelecting) {
 
@@ -516,6 +533,10 @@ void GameScene::Draw() {
 	skyDome->Draw();
 	Object3dCommon::GetInstance()->DrawCommonMirror();
 	field->Draw();
+	if (isCharacterDisplayMode_) {
+		characterDisplay_->Draw();
+		return;
+	}
 	player->Draw();
 
 	enemyManager->Draw();
@@ -565,6 +586,7 @@ void GameScene::Draw() {
 		levelupIcons[rightID]->Update();
 		levelupIcons[rightID]->Draw();
 	}
+
 	pause->Draw();
 	if (isTransitionIn || isTransitionOut) {
 		sceneTransition->Draw();

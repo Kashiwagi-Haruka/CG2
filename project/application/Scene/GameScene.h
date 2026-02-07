@@ -15,6 +15,7 @@
 #include "SceneTransition/SceneTransition.h"
 #include "Sprite.h"
 #include "UIManager/UIManager.h"
+#include "Object/Character/CharacterDisplay.h"
 #include "Vector2.h"
 #include <array>
 #include <cstdint>
@@ -55,10 +56,12 @@ private:
 	std::string nextSceneName;
 	bool isBGMPlaying = false;
 	bool isPause = false;
+	bool isCharacterDisplayMode_ = false;
 
 	SoundData BGMData;
 
 	CharacterModel characterModel;
+	std::unique_ptr<CharacterDisplay> characterDisplay_;
 
 	// レベルアップ選択専用スプライト
 	std::unique_ptr<Sprite> levelupIcons[4]; // 0:Atk, 1:Speed, 2:HP, 3:Allow

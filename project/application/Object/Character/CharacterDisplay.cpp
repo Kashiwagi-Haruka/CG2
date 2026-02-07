@@ -8,9 +8,6 @@ void CharacterDisplay::Initialize() {
 	camera_->SetTransform(cameraTransform_);
 	camera_->Update();
 
-	if (ModelManager::GetInstance()->FindModel("sizuku") == nullptr) {
-		ModelManager::GetInstance()->LoadGltfModel("Resources/3d", "sizuku");
-	}
 
 	characterObject_ = std::make_unique<Object3d>();
 	characterObject_->Initialize();
@@ -26,12 +23,6 @@ void CharacterDisplay::Update() {
 	if (!isActive_ || !characterObject_ || !camera_) {
 		return;
 	}
-
-	characterTransform_.rotate.y += rotateSpeed_;
-	if (characterTransform_.rotate.y > std::numbers::pi_v<float> * 2.0f) {
-		characterTransform_.rotate.y -= std::numbers::pi_v<float> * 2.0f;
-	}
-
 	camera_->SetTransform(cameraTransform_);
 	camera_->Update();
 	characterObject_->SetCamera(camera_.get());
