@@ -42,7 +42,6 @@ void TutorialScene::Initialize() {
 
 	skyDome_->Initialize(cameraController_->GetCamera());
 	player_->Initialize(cameraController_->GetCamera());
-	field_->LoadFromCSV("Resources/CSV/MapChip_stage1.csv");
 	field_->Initialize(cameraController_->GetCamera());
 	expCubeManager_->Initialize(cameraController_->GetCamera());
 	pause_->Initialize();
