@@ -40,6 +40,8 @@ public:
 
 	bool ProcessMessage();
 
+	float GetDeltaTime();
+
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
 
 

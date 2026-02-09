@@ -1,15 +1,11 @@
 #pragma once
-#include "Animation/Animation.h"
-#include "Animation/Skeleton.h"
-#include "Animation/AnimationManager.h"
-#include "Animation/SkinCluster.h"
 #include "Camera.h"
-#include "Object3d/Object3d.h"
 #include "Transform.h"
 #include <memory>
 #include <optional>
 #include <vector>
 #include "Function.h"
+#include "Object/Character/Sizuku/Sizuku.h"
 class PlayerModels {
 
 public:
@@ -28,17 +24,10 @@ public:
 
 private:
 	StateM state_;
-	Matrix4x4 playerWorld;
-	std::unique_ptr<Object3d> Sizuku_;
-	Transform player_;
 	Camera* camera_;
-	std::unique_ptr<Skeleton> sizukuSkeleton_{};
-	SkinCluster sizukuSkinCluster_{};
-	Animation::AnimationData blendedPoseAnimation_{};
-	const std::string animationGroupName_ = "sizuku";
-	const float kAnimationBlendDuration_ = 0.3f;
-	bool animationFinished_ = false;
-	
+	Transform player_;
+	bool animationFinished_;
+	std::unique_ptr<Sizuku> sizuku_;
 
 public:
 	PlayerModels();

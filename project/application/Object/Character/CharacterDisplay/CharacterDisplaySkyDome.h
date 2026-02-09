@@ -9,5 +9,7 @@ class CharacterDisplaySkyDome {
 
 	public:
 
-
+	void Initialize(Camera* camera);
+	void Update();
+	void Draw();
 };

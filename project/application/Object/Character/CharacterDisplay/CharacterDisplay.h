@@ -2,10 +2,12 @@
 #include "Camera.h"
 #include "Object3d/Object3d.h"
 #include "Transform.h"
+#include "CharacterDisplaySkyDome.h"
 #include <memory>
 
 class CharacterDisplay {
 	std::unique_ptr<Object3d> characterObject_ = nullptr;
+	std::unique_ptr<CharacterDisplaySkyDome> skyDome_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
 	Transform characterTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
@@ -15,7 +17,7 @@ class CharacterDisplay {
 	Transform cameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
 	    .rotate{0.1f, 0.0f, 0.0f  },
-	    .translate{0.0f, 5.0f, -10.0f},
+	    .translate{0.0f, 0.0f, -30.0f},
 	};
 	float rotateSpeed_ = 0.01f;
 	bool isActive_ = true;

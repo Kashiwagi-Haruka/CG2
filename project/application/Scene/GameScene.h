@@ -15,7 +15,7 @@
 #include "SceneTransition/SceneTransition.h"
 #include "Sprite.h"
 #include "UIManager/UIManager.h"
-#include "Object/Character/CharacterDisplay.h"
+#include "Object/Character/CharacterDisplay/CharacterDisplay.h"
 #include "Vector2.h"
 #include <array>
 #include <cstdint>

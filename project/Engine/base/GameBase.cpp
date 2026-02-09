@@ -107,3 +107,5 @@ void GameBase::EndFlame() {
 	imguiM_->Draw(srvManager_.get(), dxCommon_.get());
 	dxCommon_->PostDraw();
 }
+
+float GameBase::GetDeltaTime() { return dxCommon_->GetDeltaTime(); }

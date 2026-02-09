@@ -528,15 +528,15 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
-
-	Object3dCommon::GetInstance()->DrawCommon();
-	skyDome->Draw();
-	Object3dCommon::GetInstance()->DrawCommonMirror();
-	field->Draw();
 	if (isCharacterDisplayMode_) {
 		characterDisplay_->Draw();
 		return;
 	}
+	Object3dCommon::GetInstance()->DrawCommon();
+	skyDome->Draw();
+	Object3dCommon::GetInstance()->DrawCommonMirror();
+	field->Draw();
+
 	player->Draw();
 
 	enemyManager->Draw();
