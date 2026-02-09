@@ -12,6 +12,7 @@ class SkyDome;
 class Sprite;
 class Pause;
 class TutorialUI;
+class ExpCubeManager;
 class TutorialScene : public BaseScene {
 
 public:
@@ -36,7 +37,7 @@ private:
 	std::unique_ptr<SkyDome> skyDome_;
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<MapchipField> field_;
-	std::unique_ptr<class ExpCubeManager> expCubeManager_;
+	std::unique_ptr<ExpCubeManager> expCubeManager_;
 	std::unique_ptr<Sprite> controlSprite_;
 	std::unique_ptr<TutorialUI> tutorialUI_;
 	std::unique_ptr<Pause> pause_;

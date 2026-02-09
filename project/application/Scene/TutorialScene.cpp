@@ -15,12 +15,10 @@
 #include "TextureManager.h"
 #include "TutorialUI/TutorialUI.h"
 #include <algorithm>
-#ifdef USE_IMGUI
 #include <imgui.h>
-#endif // USE_IMGUI
 
 TutorialScene::TutorialScene() {
-	BGMData_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/昼下がり気分.mp3");
+	BGMData_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Tailshaft.mp3");
 	Audio::GetInstance()->SetSoundVolume(&BGMData_, 0.3f);
 }
 namespace {
