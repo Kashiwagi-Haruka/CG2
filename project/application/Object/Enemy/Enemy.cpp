@@ -63,6 +63,7 @@ void Enemy::Update(const Vector3& housePos, const Vector3& houseScale, const Vec
 		object_->Update();
 		if (progress >= 1.0f) {
 			isAlive = false;
+			isDying_ = false;
 		}
 		return;
 	}
