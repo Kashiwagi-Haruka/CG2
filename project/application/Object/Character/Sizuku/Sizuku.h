@@ -16,7 +16,7 @@ class Sizuku {
 
 	Matrix4x4 playerWorld;
 	std::unique_ptr<Object3d> Sizuku_;
-	Transform player_;
+	Transform transform_;
 	Camera* camera_;
 	std::unique_ptr<Skeleton> sizukuSkeleton_{};
 	SkinCluster sizukuSkinCluster_{};
@@ -31,5 +31,7 @@ class Sizuku {
 	void Update();
 	void Draw();
 	void SetCamera(Camera* camera);
+	void SetTransform(Transform transform) { transform_ = transform; }
 	std::optional<Matrix4x4> GetJointWorldMatrix(const std::string& jointName) const;
+	bool IsAnimationFinished() const { return animationFinished_; }
 };

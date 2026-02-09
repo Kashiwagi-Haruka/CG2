@@ -39,5 +39,5 @@ public:
 	void Update();
 	void Draw();
 	std::optional<Matrix4x4> GetJointWorldMatrix(const std::string& jointName) const;
-	bool IsAttackAnimationFinished() const { return animationFinished_; }
+	bool IsAttackAnimationFinished() const { return sizuku_ ? sizuku_->IsAnimationFinished() : false; }
 };

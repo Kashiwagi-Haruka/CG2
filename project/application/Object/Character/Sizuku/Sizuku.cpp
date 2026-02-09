@@ -68,7 +68,7 @@ void Sizuku::Update() {
 			}
 		}
 	}
-	playerWorld = Function::MakeAffineMatrix(player_.scale, player_.rotate, player_.translate);
+	playerWorld = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
 	Sizuku_->SetWorldMatrix(playerWorld);
 	Sizuku_->SetCamera(camera_);
@@ -101,6 +101,6 @@ std::optional<Matrix4x4> Sizuku::GetJointWorldMatrix(const std::string& jointNam
 		return std::nullopt;
 	}
 
-	const Matrix4x4 playerWorld = Function::MakeAffineMatrix(player_.scale, player_.rotate, player_.translate);
+	const Matrix4x4 playerWorld = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	return Function::Multiply(joints[*jointIndex].skeletonSpaceMatrix, playerWorld);
 }

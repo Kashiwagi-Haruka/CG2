@@ -16,7 +16,7 @@ void PlayerModels::Initialize() {
 }
 
 void PlayerModels::Update() {
-
+	sizuku_->SetTransform(player_);
 	switch (state_) {
 	case PlayerModels::idle:
 		sizuku_->SetAnimation("Idle");
