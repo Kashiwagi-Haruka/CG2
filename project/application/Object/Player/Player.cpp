@@ -40,7 +40,7 @@ void Player::Initialize(Camera* camera) {
 	transform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{30.0f, 3.6f, 30.0f}
+        .translate{10.0f, 3.6f, 10.0f}
     };
 	camera_ = camera;
 	sword_->Initialize();
