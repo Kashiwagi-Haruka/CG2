@@ -78,7 +78,8 @@ void Model::SetEnvironmentCoefficient(float coefficient) {
 	materialResource_->Unmap(0, nullptr);
 }
 void Model::Draw() { Draw(nullptr); }
-void Model::Draw(const SkinCluster* skinCluster) {
+void Model::Draw(const SkinCluster* skinCluster) { Draw(skinCluster, nullptr); }
+void Model::Draw(const SkinCluster* skinCluster, const ID3D12Resource* materialResourceOverride) {
 	constexpr UINT kMatrixPaletteRootParameterIndex = 12;
 	// --- SRVヒープをバインド ---
 	ID3D12DescriptorHeap* descriptorHeaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
@@ -98,8 +99,11 @@ void Model::Draw(const SkinCluster* skinCluster) {
 	}
 
 	// --- マテリアルCBufferの場所を設定 ---
-	ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-
+    const D3D12_GPU_VIRTUAL_ADDRESS materialAddress =
+        materialResourceOverride
+            ? const_cast<ID3D12Resource*>(materialResourceOverride)->GetGPUVirtualAddress()
+            : materialResource_.Get()->GetGPUVirtualAddress();
+	ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialAddress);
 	// --- SRVのDescriptorTableの先頭を設定 ---
 	// TextureManagerからSRVのGPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex);

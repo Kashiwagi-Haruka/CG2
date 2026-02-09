@@ -9,12 +9,14 @@
 #include "VertexData.h"
 #include <Windows.h>
 #include <d3d12.h>
+#include <memory>
 #include <string>
 #include <wrl.h>
+#include "Model/Model.h"
 class Camera;
 struct SkinCluster;
 
-class Model;
+
 class Object3d {
 
 	struct alignas(256) TransformationMatrix {
@@ -22,6 +24,16 @@ class Object3d {
 		Matrix4x4 World;                 // 64 バイト
 		Matrix4x4 WorldInverseTranspose; // ここで自動的に 128 バイト分のパディングが入って、
 		                                 // sizeof(TransformationMatrix) == 256 になる
+	};
+
+	struct Material {
+		Vector4 color;
+		int enableLighting;
+		float padding[3];
+		Matrix4x4 uvTransform;
+		float shininess;
+		float environmentCoefficient;
+		float padding2[2];
 	};
 
 	Transform transform_ = {
@@ -36,10 +48,13 @@ class Object3d {
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
 	CameraForGpu* cameraData_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+	Material* materialData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Model* model_ = nullptr;
 	Matrix4x4 worldMatrix;
 	Matrix4x4 worldViewProjectionMatrix;
 	bool isUseSetWorld;
+	std::unique_ptr<Model> modelInstance_;
 	const Animation::AnimationData* animation_ = nullptr;
 	float animationTime_ = 0.0f;
 	bool isLoopAnimation_ = true;

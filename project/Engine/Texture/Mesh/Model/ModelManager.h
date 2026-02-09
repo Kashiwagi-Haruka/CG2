@@ -14,7 +14,12 @@ class ModelManager {
 	ModelManager& operator=(ModelManager&) = delete;
 
 	std::map<std::string, std::unique_ptr<Model>> models;
-	
+	struct ModelSource {
+		std::string directoryPath;
+		std::string filePath;
+		bool isGltf = false;
+	};
+	std::map<std::string, ModelSource> modelSources;
 
 public:
 	ModelManager() = default;
@@ -25,5 +30,6 @@ public:
 	void LoadModel(const std::string& directionalPath, const std::string& filePath);
 	void LoadGltfModel(const std::string& directionalPath, const std::string& filePath);
 	Model* FindModel(const std::string& filePath);
+	std::unique_ptr<Model> CreateModelInstance(const std::string& filePath);
 	void Finalize();
 };

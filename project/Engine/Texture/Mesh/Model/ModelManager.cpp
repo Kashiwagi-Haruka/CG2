@@ -12,9 +12,7 @@ ModelManager* ModelManager::GetInstance() {
 	return instance.get();
 }
 
-void ModelManager::Initialize(DirectXCommon* dxCommon) {
-	
-	ModelCommon::GetInstance()->Initialize(dxCommon); }
+void ModelManager::Initialize(DirectXCommon* dxCommon) { ModelCommon::GetInstance()->Initialize(dxCommon); }
 
 void ModelManager::LoadModel(const std::string& directionalPath, const std::string& filePath) {
 
@@ -26,6 +24,7 @@ void ModelManager::LoadModel(const std::string& directionalPath, const std::stri
 	model->LoadObjFileAssimp(directionalPath, filePath + ".obj");
 	model->Initialize();
 	models.insert(std::make_pair(filePath, std::move(model)));
+	modelSources[filePath] = ModelSource{directionalPath, filePath + ".obj", false};
 }
 void ModelManager::LoadGltfModel(const std::string& directionalPath, const std::string& filePath) {
 	if (models.contains(filePath)) {
@@ -60,6 +59,23 @@ void ModelManager::LoadGltfModel(const std::string& directionalPath, const std::
 	model->LoadObjFileGltf(directoryPath.string(), filename);
 	model->Initialize();
 	models.insert(std::make_pair(filePath, std::move(model)));
+	modelSources[filePath] = ModelSource{directoryPath.string(), filename, true};
+}
+
+std::unique_ptr<Model> ModelManager::CreateModelInstance(const std::string& filePath) {
+	if (!modelSources.contains(filePath)) {
+		return nullptr;
+	}
+
+	const ModelSource& source = modelSources.at(filePath);
+	std::unique_ptr<Model> model = std::make_unique<Model>();
+	if (source.isGltf) {
+		model->LoadObjFileGltf(source.directoryPath, source.filePath);
+	} else {
+		model->LoadObjFileAssimp(source.directoryPath, source.filePath);
+	}
+	model->Initialize();
+	return model;
 }
 
 Model* ModelManager::FindModel(const std::string& filePath) {
@@ -69,4 +85,7 @@ Model* ModelManager::FindModel(const std::string& filePath) {
 	return nullptr;
 }
 
-void ModelManager::Finalize() { instance.reset(); }
+void ModelManager::Finalize() {
+	modelSources.clear();
+	instance.reset();
+}

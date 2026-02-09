@@ -63,12 +63,14 @@ private:
 	Node NodeRead(aiNode* node);
 
 public:
+public:
 	void Initialize();
 	void LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	void LoadObjFileAssimp(const std::string& directoryPath, const std::string& filename);
 	void LoadObjFileGltf(const std::string& directoryPath, const std::string& filename);
 	void Draw();
 	void Draw(const SkinCluster* skinCluster);
+	void Draw(const SkinCluster* skinCluster, const ID3D12Resource* materialResourceOverride);
 	void SetColor(Vector4 color);
 	void SetEnableLighting(bool enable);
 	void SetUvTransform(const Matrix4x4& uvTransform);
@@ -77,4 +79,5 @@ public:
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() { return vertexBufferView_; }
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetMaterialResource() { return materialResource_; }
 	const ModelData& GetModelData() const { return modelData_; }
+
 };

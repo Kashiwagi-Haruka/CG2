@@ -16,6 +16,11 @@ void Object3d::Initialize() {
 	CreateResources();
 	isUseSetWorld = false;
 	animationTime_ = 0.0f;
+	SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	SetEnableLighting(true);
+	SetUvTransform(Function::MakeIdentity4x4());
+	SetShininess(40.0f);
+	SetEnvironmentCoefficient(0.0f);
 }
 namespace {
 bool IsIdentityMatrix(const Matrix4x4& matrix) {
@@ -95,11 +100,18 @@ void Object3d::Draw() {
 	// --- 平行光源CBufferの場所を設定 ---
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 	if (model_) {
-		model_->Draw(skinCluster_);
+		model_->Draw(skinCluster_, materialResource_.Get());
 	}
 }
 
-void Object3d::SetModel(const std::string& filePath) { model_ = ModelManager::GetInstance()->FindModel(filePath); }
+void Object3d::SetModel(const std::string& filePath) {
+	modelInstance_ = ModelManager::GetInstance()->CreateModelInstance(filePath);
+	if (modelInstance_) {
+		model_ = modelInstance_.get();
+		return;
+	}
+	model_ = ModelManager::GetInstance()->FindModel(filePath);
+}
 void Object3d::SetCamera(Camera* camera) { camera_ = camera; }
 void Object3d::SetScale(Vector3 scale) {
 	transform_.scale = scale;
@@ -114,31 +126,34 @@ void Object3d::SetTranslate(Vector3 translate) {
 	isUseSetWorld = false;
 }
 void Object3d::SetColor(Vector4 color) {
-	if (model_) {
-		model_->SetColor(color);
+	if (materialData_) {
+		materialData_->color = color;
 	}
 }
 void Object3d::SetEnableLighting(bool enable) {
-	if (model_) {
-		model_->SetEnableLighting(enable);
+	if (materialData_) {
+		materialData_->enableLighting = enable ? 1 : 0;
 	}
 }
 void Object3d::SetUvTransform(const Matrix4x4& uvTransform) {
-	if (model_) {
-		model_->SetUvTransform(uvTransform);
+	if (materialData_) {
+		materialData_->uvTransform = uvTransform;
 	}
 }
 void Object3d::SetShininess(float shininess) {
-	if (model_) {
-		model_->SetShininess(shininess);
+	if (materialData_) {
+		materialData_->shininess = shininess;
 	}
 }
 void Object3d::SetEnvironmentCoefficient(float coefficient) {
-	if (model_) {
-		model_->SetEnvironmentCoefficient(coefficient);
+	if (materialData_) {
+		materialData_->environmentCoefficient = coefficient;
 	}
 }
 void Object3d::CreateResources() {
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
+	const size_t alignedMaterialSize = (sizeof(Material) + 0xFF) & ~0xFF;
+	materialResource_ = Object3dCommon::GetInstance()->CreateBufferResource(alignedMaterialSize);
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 }

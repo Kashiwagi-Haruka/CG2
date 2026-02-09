@@ -80,7 +80,6 @@ void TitleScene::Update() {
 			SceneManager::GetInstance()->ChangeScene("Tutorial");
 		}
 	}
-
 #ifdef USE_IMGUI
 	ImGui::Begin("titleScene");
 	ImGui::End();
