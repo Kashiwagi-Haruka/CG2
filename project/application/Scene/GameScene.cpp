@@ -272,6 +272,9 @@ void GameScene::Update() {
 				isPause = false;
 			}
 			characterDisplay_->SetActive(isCharacterDisplayMode_);
+			if (isCharacterDisplayMode_) {
+				Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+			}
 		}
 
 		if (!isCharacterDisplayMode_) {

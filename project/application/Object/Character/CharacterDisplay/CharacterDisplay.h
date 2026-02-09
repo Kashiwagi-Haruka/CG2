@@ -23,7 +23,7 @@ class CharacterDisplay {
 	};
 	float rotateSpeed_ = 0.01f;
 	bool isActive_ = true;
-	DirectionalLight directionalLight;
+	DirectionalLight directionalLight{.color{1,1,1,},.direction{0,-1,1.0f},.intensity{0.5f}};
 
 public:
 	void Initialize();

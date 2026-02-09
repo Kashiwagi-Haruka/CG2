@@ -32,6 +32,7 @@ void CharacterDisplay::Update() {
 	if (!isActive_ || !sizukuObject_ || !camera_) {
 		return;
 	}
+	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight);
 	Input::GetInstance()->SetIsCursorStability(false);
 	Input::GetInstance()->SetIsCursorVisible(true);
 	camera_->SetTransform(cameraTransform_);
