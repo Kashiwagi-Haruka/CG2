@@ -49,6 +49,8 @@ void Sizuku::Update() {
 		loopAnimation = false;
 	} else if (desiredAnimationName == "damage"){
 		loopAnimation = true;
+	} else if (desiredAnimationName == "InitIdle") {
+		loopAnimation = true;
 	}
 
 	

@@ -5,25 +5,29 @@
 #include <imgui.h>
 #include "Input.h"
 void CharacterDisplay::Initialize() {
+	if (camera_) {
 	camera_ = std::make_unique<Camera>();
+	}
 	camera_->SetTransform(cameraTransform_);
 	camera_->Update();
 
+	if (sizukuObject_) {
+	sizukuObject_ = std::make_unique<Sizuku>();
+	}
+	sizukuObject_->Initialize();
+	sizukuObject_->SetCamera(camera_.get());
+	sizukuObject_->SetAnimation("InitIdle");
+	sizukuObject_->SetTransform(characterTransform_);
+	sizukuObject_->Update();
 
-	characterObject_ = std::make_unique<Object3d>();
-	characterObject_->Initialize();
-	characterObject_->SetCamera(camera_.get());
-	characterObject_->SetModel("sizuku");
-	characterObject_->SetTransform(characterTransform_);
-	characterObject_->SetShininess(20.0f);
-	characterObject_->Update();
-
+	if (skyDome_) {
 	skyDome_ = std::make_unique<CharacterDisplaySkyDome>();
+	}
 	skyDome_->Initialize(camera_.get());
 }
 
 void CharacterDisplay::Update() {
-	if (!isActive_ || !characterObject_ || !camera_) {
+	if (!isActive_ || !sizukuObject_ || !camera_) {
 		return;
 	}
 	Input::GetInstance()->SetIsCursorStability(false);
@@ -48,17 +52,17 @@ void CharacterDisplay::Update() {
 	}
 	ImGui::End();
 #endif // USE_IMGUI
-	characterObject_->SetCamera(camera_.get());
-	characterObject_->SetTransform(characterTransform_);
-	characterObject_->Update();
+	sizukuObject_->SetCamera(camera_.get());
+	sizukuObject_->SetTransform(characterTransform_);
+	sizukuObject_->Update();
 }
 
 void CharacterDisplay::Draw() {
-	if (!isActive_ || !characterObject_) {
+	if (!isActive_ || !sizukuObject_) {
 		return;
 	}
 	Object3dCommon::GetInstance()->DrawCommon();
 	skyDome_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
-	characterObject_->Draw();
+	sizukuObject_->Draw();
 }
