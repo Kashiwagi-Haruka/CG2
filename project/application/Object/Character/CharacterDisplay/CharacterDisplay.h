@@ -6,6 +6,7 @@
 #include <memory>
 #include "Object/Character/Sizuku/Sizuku.h"
 #include <numbers>
+#include "Light/DirectionalLight.h"
 class CharacterDisplay {
 	std::unique_ptr<Sizuku> sizukuObject_ = nullptr;
 	std::unique_ptr<CharacterDisplaySkyDome> skyDome_ = nullptr;
@@ -22,6 +23,7 @@ class CharacterDisplay {
 	};
 	float rotateSpeed_ = 0.01f;
 	bool isActive_ = true;
+	DirectionalLight directionalLight;
 
 public:
 	void Initialize();

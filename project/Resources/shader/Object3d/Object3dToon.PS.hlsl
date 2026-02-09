@@ -113,7 +113,7 @@ PixelShaderOutput main(VertexShaderOutput input)
 
         float directionalIntensity = min(gDirectionalLight.intensity, kToonLightIntensityMax);
         float3 litColor = baseColor * gDirectionalLight.color.rgb * directionalIntensity;
-        float3 shadowColor = baseColor * kToonShadowStrength;
+        float3 shadowColor = baseColor * gDirectionalLight.color.rgb * kToonShadowStrength;
         float3 viewDirection = normalize(input.worldPosition - gCamera.worldPosition);
         float3 reflectedDirection = reflect(viewDirection, normalize(input.normal));
         float2 environmentUV = float2(atan2(reflectedDirection.z, reflectedDirection.x) / (2.0f * pi) + 0.5f,
