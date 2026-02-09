@@ -10,6 +10,7 @@
 namespace {
 const Vector4 kDamageInvincibleColor = {1.0f, 0.0f, 0.0f, 1.0f};
 const Vector4 kDefaultColor = {1.0f, 1.0f, 1.0f, 1.0f};
+const Vector4 kDeathColor = {1.0f, 0.2f, 0.2f, 1.0f};
 } // namespace
 
 Enemy::Enemy() {
@@ -25,6 +26,8 @@ void Enemy::Initialize(Camera* camera, Vector3 translates) {
 	attackTimer_ = 0.0f;
 	damageInvincibleTimer_ = 0.0f;
 	lastSkillDamageId_ = -1;
+	isDying_ = false;
+	deathTimer_ = 0.0f;
 
 	object_->Initialize();
 	object_->SetModel("Enemy");
@@ -46,6 +49,23 @@ void Enemy::Initialize(Camera* camera, Vector3 translates) {
 
 void Enemy::Update(const Vector3& housePos, const Vector3& houseScale, const Vector3& playerPos, bool isPlayerAlive) {
 	const float deltaTime = 1.0f / 60.0f;
+	if (isDying_) {
+		deathTimer_ += deltaTime;
+		float progress = std::clamp(deathTimer_ / deathDuration_, 0.0f, 1.0f);
+		transform_.rotate.z = deathTargetRotateZ_ * progress;
+		object_->SetColor(kDeathColor);
+		if (enemyAttack_) {
+			enemyAttack_->Cancel();
+			enemyAttack_->Update();
+		}
+		object_->SetCamera(camera_);
+		object_->SetTransform(transform_);
+		object_->Update();
+		if (progress >= 1.0f) {
+			isAlive = false;
+		}
+		return;
+	}
 	if (!enemyAttack_ || !enemyAttack_->IsAttacking()) {
 		attackTimer_ += deltaTime;
 	}
@@ -113,18 +133,21 @@ void Enemy::Update(const Vector3& housePos, const Vector3& houseScale, const Vec
 
 	enemyAttack_->Update();
 
-	if (HP <= 0) {
-		isAlive = false;
+	if (HP <= 0 && !isDying_) {
+		StartDeathAnimation();
 	}
 }
 void Enemy::Stun() {
+	if (isDying_) {
+		return;
+	}
 	isStun_ = true;
 	stunTime = 0;
 	if (enemyAttack_) {
 		enemyAttack_->Cancel();
 	}
-	if (HP <= 0) {
-		isAlive = false;
+	if (HP <= 0 && !isDying_) {
+		StartDeathAnimation();
 	}
 }
 
@@ -132,13 +155,26 @@ void Enemy::Draw() {
 	// 敵の描画処理
 	object_->Draw();
 
-	if (enemyAttack_) {
+	if (!isDying_ && enemyAttack_) {
 		enemyAttack_->Draw();
 	}
 
-	if (isStun_) {
+	if (!isDying_ && isStun_) {
 		enemyStun->Draw();
 	}
+}
+void Enemy::StartDeathAnimation() {
+	if (isDying_) {
+		return;
+	}
+	isDying_ = true;
+	deathTimer_ = 0.0f;
+	isStun_ = false;
+	velocity_ = {0.0f, 0.0f, 0.0f};
+	if (enemyAttack_) {
+		enemyAttack_->Cancel();
+	}
+	object_->SetColor(kDeathColor);
 }
 void Enemy::BulletCollision() {}
 

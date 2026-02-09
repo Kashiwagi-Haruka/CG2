@@ -14,6 +14,7 @@ class Enemy {
 
 	int HP = 10;
 	bool isAlive = true;
+	bool isDying_ = false;
 	bool isStun_ = false;
 
 	int stunTime;
@@ -38,6 +39,11 @@ class Enemy {
 
 	Camera* camera_ = nullptr;
 	float playerChaseRange_ = 8.0f;
+	float deathTimer_ = 0.0f;
+	const float deathDuration_ = 0.45f;
+	const float deathTargetRotateZ_ = 1.57f;
+
+	void StartDeathAnimation();
 
 public:
 	Enemy();
@@ -49,13 +55,17 @@ public:
 	void Draw();
 	void Stun();
 	void SetHPSubtract(int hp) {
+		if (isDying_ || !isAlive) {
+			return;
+		}
 		HP -= hp;
 		if (HP <= 0) {
-			isAlive = false;
+			StartDeathAnimation();
 		}
 	}
 	int GetHP() { return HP; }
 	bool GetIsAlive() { return isAlive; }
+	bool IsDying() const { return isDying_; }
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	Vector3 GetPosition() { return transform_.translate; }
 	Vector3 GetScale() { return transform_.scale; }

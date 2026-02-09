@@ -193,7 +193,7 @@ void EnemyManager::Update(Camera* camera, const Vector3& housePos, const Vector3
 
 	// 敵の更新
 	for (auto& e : enemies) {
-		if (e->GetIsAlive()) {
+		if (e->GetIsAlive() || e->IsDying()) {
 			e->SetCamera(camera);
 			e->Update(housePos, houseScale, playerPos, isPlayerAlive);
 		}
@@ -230,7 +230,7 @@ void EnemyManager::CheckWaveComplete() {
 
 void EnemyManager::Draw() {
 	for (auto& e : enemies) {
-		if (e->GetIsAlive()) {
+		if (e->GetIsAlive() || e->IsDying()) {
 			e->Draw();
 		}
 	}

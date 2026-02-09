@@ -5,25 +5,27 @@
 #include <imgui.h>
 #include "Input.h"
 void CharacterDisplay::Initialize() {
-	if (camera_) {
+	if (!camera_) {
 	camera_ = std::make_unique<Camera>();
 	}
 	camera_->SetTransform(cameraTransform_);
 	camera_->Update();
 
-	if (sizukuObject_) {
+	if (!sizukuObject_) {
 	sizukuObject_ = std::make_unique<Sizuku>();
-	}
 	sizukuObject_->Initialize();
+	}
+	
 	sizukuObject_->SetCamera(camera_.get());
 	sizukuObject_->SetAnimation("InitIdle");
 	sizukuObject_->SetTransform(characterTransform_);
 	sizukuObject_->Update();
 
-	if (skyDome_) {
+	if (!skyDome_) {
 	skyDome_ = std::make_unique<CharacterDisplaySkyDome>();
+		skyDome_->Initialize(camera_.get());
 	}
-	skyDome_->Initialize(camera_.get());
+	
 }
 
 void CharacterDisplay::Update() {
