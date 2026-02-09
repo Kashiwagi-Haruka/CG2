@@ -21,7 +21,7 @@ void House::Initialize(Camera* camera) {
 
 	object_->SetCamera(camera);
 	object_->SetScale({1, 1, 1});
-	position_ = {-75.0f, 1.5f, -75.0f};
+	position_ = {0.0f, 1.5f, 0.0f};
 	object_->SetTranslate(position_);
 
 	hpbar_ = std::make_unique<Object3d>();

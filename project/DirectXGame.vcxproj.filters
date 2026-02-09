@@ -348,7 +348,10 @@
     <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\Object\Character\CharacterDisplay.cpp">
+    <ClCompile Include="application\Object\Character\CharacterDisplay\CharacterDisplay.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Object\Character\CharacterDisplay\CharacterDisplaySkyDome.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -659,7 +662,10 @@
     <ClInclude Include="Engine\Texture\Mesh\Animation\AnimationManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\Object\Character\CharacterDisplay.h">
+    <ClInclude Include="application\Object\Character\CharacterDisplay\CharacterDisplay.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Object\Character\CharacterDisplay\CharacterDisplaySkyDome.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

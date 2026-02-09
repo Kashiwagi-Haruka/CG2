@@ -14,8 +14,7 @@ void CharacterDisplay::Initialize() {
 	characterObject_->SetCamera(camera_.get());
 	characterObject_->SetModel("sizuku");
 	characterObject_->SetTransform(characterTransform_);
-	characterObject_->SetShininess(80.0f);
-	characterObject_->SetEnvironmentCoefficient(0.35f);
+	characterObject_->SetShininess(20.0f);
 	characterObject_->Update();
 }
 

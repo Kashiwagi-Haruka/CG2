@@ -10,12 +10,12 @@ class CharacterDisplay {
 	Transform characterTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
 	    .rotate{0.0f,  0.0f,  0.0f },
-	    .translate{0.0f,  0.0f, 0.0f },
+	    .translate{0.0f,  2.0f, 0.0f },
 	};
 	Transform cameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
 	    .rotate{0.1f, 0.0f, 0.0f  },
-	    .translate{0.0f, 0.0f, -10.0f},
+	    .translate{0.0f, 5.0f, -10.0f},
 	};
 	float rotateSpeed_ = 0.01f;
 	bool isActive_ = true;

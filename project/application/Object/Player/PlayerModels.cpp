@@ -31,6 +31,7 @@ void PlayerModels::Initialize() {
 			Sizuku_->SetSkinCluster(&sizukuSkinCluster_);
 		}
 	}
+	Sizuku_->SetShininess(20.0f);
 }
 
 void PlayerModels::Update() {
@@ -97,7 +98,7 @@ void PlayerModels::Update() {
 
 	Sizuku_->SetWorldMatrix(playerWorld);
 	Sizuku_->SetCamera(camera_);
-	Sizuku_->SetShininess(20.0f);
+
 	Sizuku_->Update();
 
 #ifdef USE_IMGU

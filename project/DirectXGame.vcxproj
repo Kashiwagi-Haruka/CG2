@@ -156,7 +156,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application\Object\Character\CharacterDisplay.cpp" />
+    <ClCompile Include="application\Object\Character\CharacterDisplay\CharacterDisplay.cpp" />
+    <ClCompile Include="application\Object\Character\CharacterDisplay\CharacterDisplaySkyDome.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp" />
     <ClCompile Include="application\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="application\Object\Boss\Boss.cpp" />
@@ -267,7 +268,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <None Include="Resources\shader\Sprite\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="application\Object\Character\CharacterDisplay.h" />
+    <ClInclude Include="application\Object\Character\CharacterDisplay\CharacterDisplay.h" />
+    <ClInclude Include="application\Object\Character\CharacterDisplay\CharacterDisplaySkyDome.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\AnimationManager.h" />
     <ClInclude Include="application\CollisionManager\CollisionManager.h" />
     <ClInclude Include="application\Object\Boss\Boss.h" />
