@@ -118,11 +118,13 @@ private:
 	PerFrame* perFrameData_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignature_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> computePipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> emitComputePipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> updateComputePipelineState_;
 	bool isParticleInitialized_ = false;
 
 	void CreateRootsignature();
 	void CreateGraphicsPipeline();
 	void CreateComputePipeline();
 	void InitializeParticlesByCompute();
+	void UpdateParticlesByCompute();
 };

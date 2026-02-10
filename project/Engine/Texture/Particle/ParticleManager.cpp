@@ -105,7 +105,13 @@ void ParticleManager::CreateParticleGroup(const std::string& name, const std::st
 
 void ParticleManager::SetCamera(Camera* camera) { camera_ = camera; }
 
-void ParticleManager::Update(Camera* camera) { camera_ = camera; }
+void ParticleManager::Update(Camera* camera) {
+	camera_ = camera;
+	if (!isParticleInitialized_) {
+		return;
+	}
+	UpdateParticlesByCompute();
+}
 
 void ParticleManager::Draw(const std::string& name) {
 	struct alignas(256) MaterialCB {
@@ -231,7 +237,7 @@ void ParticleManager::Emit(const std::string& name, const Transform& transform, 
 
 	ID3D12DescriptorHeap* heaps[] = {srvManager_->GetDescriptorHeap().Get()};
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(1, heaps);
-	dxCommon_->GetCommandList()->SetPipelineState(computePipelineState_.Get());
+	dxCommon_->GetCommandList()->SetPipelineState(emitComputePipelineState_.Get());
 	dxCommon_->GetCommandList()->SetComputeRootSignature(computeRootSignature_.Get());
 	dxCommon_->GetCommandList()->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
 	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(1, emitterResource_->GetGPUVirtualAddress());
@@ -395,13 +401,66 @@ void ParticleManager::CreateComputePipeline() {
 	hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&computeRootSignature_));
 	assert(SUCCEEDED(hr));
 
-	auto csBlob = dxCommon_->CompileShader(L"Resources/shader/Particle/Particle.CS.hlsl", L"cs_6_0");
+auto emitCsBlob = dxCommon_->CompileShader(L"Resources/shader/Particle/Particle.CS.hlsl", L"cs_6_0");
 	D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineDesc{};
 	computePipelineDesc.pRootSignature = computeRootSignature_.Get();
-	computePipelineDesc.CS = {csBlob->GetBufferPointer(), csBlob->GetBufferSize()};
+	computePipelineDesc.CS = {emitCsBlob->GetBufferPointer(), emitCsBlob->GetBufferSize()};
 
-	hr = dxCommon_->GetDevice()->CreateComputePipelineState(&computePipelineDesc, IID_PPV_ARGS(&computePipelineState_));
+	hr = dxCommon_->GetDevice()->CreateComputePipelineState(&computePipelineDesc, IID_PPV_ARGS(&emitComputePipelineState_));
 	assert(SUCCEEDED(hr));
+
+	auto updateCsBlob = dxCommon_->CompileShader(L"Resources/shader/Particle/UpdateParticle.CS.hlsl", L"cs_6_0");
+	computePipelineDesc.CS = {updateCsBlob->GetBufferPointer(), updateCsBlob->GetBufferSize()};
+
+	hr = dxCommon_->GetDevice()->CreateComputePipelineState(&computePipelineDesc, IID_PPV_ARGS(&updateComputePipelineState_));
+	assert(SUCCEEDED(hr));
+}
+
+void ParticleManager::UpdateParticlesByCompute() {
+	if (particleResourceState_ != D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
+		D3D12_RESOURCE_BARRIER barrier{};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Transition.pResource = particleResource_.Get();
+		barrier.Transition.StateBefore = particleResourceState_;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
+		particleResourceState_ = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	}
+
+	if (freeCounterResourceState_ != D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
+		D3D12_RESOURCE_BARRIER barrier{};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Transition.pResource = freeCounterResource_.Get();
+		barrier.Transition.StateBefore = freeCounterResourceState_;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
+		freeCounterResourceState_ = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	}
+
+	emitterData_->emit = 0;
+	perFrameData_->deltaTime = dxCommon_->GetDeltaTime();
+	if (perFrameData_->deltaTime <= 0.0f) {
+		perFrameData_->deltaTime = 1.0f / 60.0f;
+	}
+	perFrameData_->time += perFrameData_->deltaTime;
+
+	ID3D12DescriptorHeap* heaps[] = {srvManager_->GetDescriptorHeap().Get()};
+	dxCommon_->GetCommandList()->SetDescriptorHeaps(1, heaps);
+	dxCommon_->GetCommandList()->SetPipelineState(updateComputePipelineState_.Get());
+	dxCommon_->GetCommandList()->SetComputeRootSignature(computeRootSignature_.Get());
+	dxCommon_->GetCommandList()->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
+	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(1, emitterResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->Dispatch(1, 1, 1);
+
+	D3D12_RESOURCE_BARRIER uavBarriers[2]{};
+	uavBarriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+	uavBarriers[0].UAV.pResource = particleResource_.Get();
+	uavBarriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+	uavBarriers[1].UAV.pResource = freeCounterResource_.Get();
+	dxCommon_->GetCommandList()->ResourceBarrier(2, uavBarriers);
 }
 
 void ParticleManager::InitializeParticlesByCompute() {
@@ -437,8 +496,7 @@ void ParticleManager::InitializeParticlesByCompute() {
 
 	ID3D12DescriptorHeap* heaps[] = {srvManager_->GetDescriptorHeap().Get()};
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(1, heaps);
-	dxCommon_->GetCommandList()->SetPipelineState(computePipelineState_.Get());
-	dxCommon_->GetCommandList()->SetComputeRootSignature(computeRootSignature_.Get());
+	dxCommon_->GetCommandList()->SetPipelineState(emitComputePipelineState_.Get());
 	dxCommon_->GetCommandList()->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
 	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(1, emitterResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
