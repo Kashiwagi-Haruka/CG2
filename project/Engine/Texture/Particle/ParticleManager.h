@@ -83,7 +83,7 @@ private:
 		Matrix4x4 billboardMatrix;
 	};
 
-	static constexpr uint32_t kMaxParticles_ = 1024;
+	static constexpr uint32_t kMaxParticles_ = 4096;
 
 	static std::unique_ptr<ParticleManager> instance;
 	DirectXCommon* dxCommon_ = nullptr;

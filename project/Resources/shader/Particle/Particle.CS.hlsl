@@ -1,6 +1,6 @@
 #include "Particle.hlsli"
 
-static const uint kMaxParticles = 1024;
+static const uint kMaxParticles = 4096;
 
 RWStructuredBuffer<Particle> gParticles : register(u0);
 RWStructuredBuffer<int> gFreeListIndex : register(u1);
@@ -8,7 +8,7 @@ RWStructuredBuffer<uint> gFreeList : register(u2);
 ConstantBuffer<EmitterSphere> gEmitter : register(b0);
 ConstantBuffer<PerFrame> gPerFrame : register(b1);
 
-[numthreads(1024, 1, 1)]
+[numthreads(256, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
     uint particleIndex = DTid.x;

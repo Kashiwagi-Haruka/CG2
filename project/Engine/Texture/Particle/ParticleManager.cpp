@@ -14,6 +14,8 @@
 #include <numbers>
 
 namespace {
+constexpr uint32_t kParticleThreadGroupSize = 256;
+constexpr uint32_t kParticleDispatchCount = 4096 / kParticleThreadGroupSize;
 Microsoft::WRL::ComPtr<ID3D12Resource> CreateDefaultBufferResource(DirectXCommon* dxCommon, size_t sizeInBytes, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState) {
 	D3D12_HEAP_PROPERTIES heapProperties{};
 	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -224,7 +226,7 @@ void ParticleManager::Emit(const std::string& name, const Transform& transform, 
 	emitterData_->acceleration = accel;
 	emitterData_->emit = 1;
 
-	perFrameData_->time = life;
+	perFrameData_->time = 0.0f;
 	perFrameData_->deltaTime = 1.0f / 60.0f;
 
 	if (particleResourceState_ != D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
@@ -267,7 +269,7 @@ void ParticleManager::Emit(const std::string& name, const Transform& transform, 
 	dxCommon_->GetCommandList()->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
 	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(1, emitterResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
-	dxCommon_->GetCommandList()->Dispatch(1, 1, 1);
+	dxCommon_->GetCommandList()->Dispatch(kParticleDispatchCount, 1, 1);
 
 	D3D12_RESOURCE_BARRIER uavBarriers[3]{};
 	uavBarriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
