@@ -3,7 +3,8 @@
 static const uint kMaxParticles = 1024;
 
 RWStructuredBuffer<Particle> gParticles : register(u0);
-RWStructuredBuffer<int> gFreeCounter : register(u1);
+RWStructuredBuffer<int> gFreeListIndex : register(u1);
+RWStructuredBuffer<uint> gFreeList : register(u2);
 ConstantBuffer<EmitterSphere> gEmitter : register(b0);
 ConstantBuffer<PerFrame> gPerFrame : register(b1);
 
@@ -17,11 +18,12 @@ void main(uint3 DTid : SV_DispatchThreadID)
         if (particleIndex < kMaxParticles)
         {
             gParticles[particleIndex] = (Particle) 0;
+            gFreeList[particleIndex] = particleIndex;
         }
 
         if (particleIndex == 0)
         {
-            gFreeCounter[0] = 0;
+            gFreeListIndex[0] = int(kMaxParticles) - 1;
         }
         return;
     }
@@ -36,29 +38,32 @@ void main(uint3 DTid : SV_DispatchThreadID)
         return;
     }
 
-    gFreeCounter[0] = 0;
-
     RandomGenerator generator;
     generator.seed = (float(particleIndex) + gPerFrame.time).xxx * max(gPerFrame.time, 0.0001f);
 
     for (uint countIndex = 0; countIndex < gEmitter.count; ++countIndex)
     {
-        int emitIndex;
-        InterlockedAdd(gFreeCounter[0], 1, emitIndex);
-        if (emitIndex >= int(kMaxParticles))
+        int freeListIndex;
+        InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
+        if (0 <= freeListIndex && freeListIndex < int(kMaxParticles))
         {
+            int emitIndex = gFreeList[freeListIndex];
+
+            float3 randomDirection = generator.Generate3d() * 2.0f - 1.0f;
+            float randomLength = generator.Generate1d() * gEmitter.radius;
+
+            gParticles[emitIndex].scale = generator.Generate3d() * 0.4f + 0.1f;
+            gParticles[emitIndex].translate = gEmitter.translate + randomDirection * randomLength;
+            gParticles[emitIndex].velocity = (generator.Generate3d() * 2.0f - 1.0f) * 0.05f;
+            gParticles[emitIndex].lifeTime = gEmitter.lifeTime;
+            gParticles[emitIndex].currentTime = 0.0f;
+            gParticles[emitIndex].color.rgb = generator.Generate3d();
+            gParticles[emitIndex].color.a = 1.0f;
+        }
+        else
+        {
+            InterlockedAdd(gFreeListIndex[0], 1);
             break;
         }
-
-        float3 randomDirection = generator.Generate3d() * 2.0f - 1.0f;
-        float randomLength = generator.Generate1d() * gEmitter.radius;
-
-        gParticles[emitIndex].scale = generator.Generate3d() * 0.4f + 0.1f;
-        gParticles[emitIndex].translate = gEmitter.translate + randomDirection * randomLength;
-        gParticles[emitIndex].velocity = (generator.Generate3d() * 2.0f - 1.0f) * 0.05f;
-        gParticles[emitIndex].lifeTime = gEmitter.lifeTime;
-        gParticles[emitIndex].currentTime = 0.0f;
-        gParticles[emitIndex].color.rgb = generator.Generate3d();
-        gParticles[emitIndex].color.a = 1.0f;
     }
 }
