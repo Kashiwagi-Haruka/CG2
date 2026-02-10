@@ -227,7 +227,11 @@ void ParticleManager::Emit(const std::string& name, const Transform& transform, 
 	emitterData_->emit = 1;
 
 	perFrameData_->time = 0.0f;
-	perFrameData_->deltaTime = 1.0f / 60.0f;
+	perFrameData_->deltaTime = dxCommon_->GetDeltaTime();
+	if (perFrameData_->deltaTime <= 0.0f) {
+		perFrameData_->deltaTime = 1.0f / 60.0f;
+	}
+	perFrameData_->time += perFrameData_->deltaTime;
 
 	if (particleResourceState_ != D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
 		D3D12_RESOURCE_BARRIER barrier{};
