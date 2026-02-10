@@ -76,7 +76,7 @@ void SampleScene::Initialize() {
 	particleTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f },
         .rotate{0.0f, 0.0f, 0.0f },
-        .translate{0.0f, 1.0f, -5.0f}
+        .translate{0.0f, 1.0f, -3.0f}
     };
 	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample", particleTransform_, 0.1f, 5, Vector3{0.0f, 0.0f, 0.0f}, Vector3{-0.5f, -0.5f, -0.5f}, Vector3{0.5f, 0.5f, 0.5f});
 	uvBallObj_->SetTransform(uvBallTransform_);
@@ -395,18 +395,19 @@ void SampleScene::Update() {
 }
 void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
-	 uvBallObj_->Draw();
-	 planeGltf_->Draw();
-	 fieldObj_->Draw();
-	animatedCubeObj_->Draw();
+	// uvBallObj_->Draw();
+	// planeGltf_->Draw();
+	// fieldObj_->Draw();
+	//animatedCubeObj_->Draw();
 	 if (sampleParticleEmitter_) {
+		Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
 		 sampleParticleEmitter_->Draw();
 	 }
-	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
-	humanObj_->Draw();
-	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
-	if (humanSkeleton_) {
-		humanSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
-	}
+	//Object3dCommon::GetInstance()->DrawCommonSkinningToon();
+	//humanObj_->Draw();
+	//Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
+	//if (humanSkeleton_) {
+	//	humanSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
+	//}
 }
 void SampleScene::Finalize() {}

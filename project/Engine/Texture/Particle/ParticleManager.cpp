@@ -59,12 +59,12 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
 	CreateComputePipeline();
 
 	VertexData vertices[6] = {
-	    {{-1.0f, -1.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-        {{-1.0f, 1.0f, 0.0f, 1.0f},  {0.0f, 0.0f}},
-        {{1.0f, 1.0f, 0.0f, 1.0f},   {1.0f, 0.0f}},
-	    {{-1.0f, -1.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-        {{1.0f, 1.0f, 0.0f, 1.0f},   {1.0f, 0.0f}},
-        {{1.0f, -1.0f, 0.0f, 1.0f},  {1.0f, 1.0f}}
+	    {{-1.0f, -1.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+        {{-1.0f, 1.0f, 0.0f, 1.0f},  {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+        {{1.0f, 1.0f, 0.0f, 1.0f},   {1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+	    {{-1.0f, -1.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+        {{1.0f, 1.0f, 0.0f, 1.0f},   {1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+        {{1.0f, -1.0f, 0.0f, 1.0f},  {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}
     };
 
 	vertexBuffer_ = dxCommon_->CreateBufferResource(sizeof(vertices));
@@ -185,15 +185,15 @@ void ParticleManager::Draw(const std::string& name) {
 		perViewCB_->Unmap(0, nullptr);
 	}
 
-	if (particleResourceState_ != D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE) {
+	if (particleResourceState_ != D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE) {
 		D3D12_RESOURCE_BARRIER barrier{};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		barrier.Transition.pResource = particleResource_.Get();
 		barrier.Transition.StateBefore = particleResourceState_;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
 		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
-		particleResourceState_ = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+		particleResourceState_ = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
 	}
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
