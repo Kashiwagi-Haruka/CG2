@@ -28,9 +28,8 @@ struct Particle {
 
 	BlendMode blendmode = BlendMode::kBlendModeAlpha;
 
-	// ★ 個別フィールド
-	Vector3 accel; // 個別加速度
-	AABB area;     // 個別発生エリア
+	Vector3 accel;
+	AABB area;
 	bool visible = true;
 };
 
@@ -42,22 +41,10 @@ class ParticleManager {
 
 public:
 	struct ParticleGroup {
-
 		std::string textureFilePath;
-		uint32_t textureSrvIndex;
-
+		uint32_t textureSrvIndex = 0;
 		std::list<Particle> particles;
-
-		// ★ ブレンドモードごとのバッファ
-		struct BlendBucket {
-			uint32_t instancingSrvIndex = 0;
-			Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource;
-			void* instancingDataPtr = nullptr;
-			uint32_t instanceCount = 0;
-			uint32_t maxInstance = 1000;
-		};
-
-		std::array<BlendBucket, static_cast<int>(BlendMode::kCountOfBlendMode)> buckets;
+		uint32_t drawCount = 1024;
 	};
 
 public:
@@ -68,42 +55,48 @@ public:
 	void SetCamera(Camera* camera);
 	void SetBlendMode(BlendMode mode);
 
-	// 更新 / 描画
 	void Update(Camera* camera);
 	void Draw(const std::string& name);
 	void Clear();
 	void Finalize();
 
 private:
-	struct TransformationMatrix {
-		Matrix4x4 WVP;
-		Matrix4x4 World;
-		float alpha;  // ★追加：インスタンスごとの透明度
-		float pad[3]; // 16バイトアラインメント
+	struct PerView {
+		Matrix4x4 viewProjection;
+		Matrix4x4 billboardMatrix;
 	};
 
-	Vector3 scale_ = {1, 1, 1};
+	static constexpr uint32_t kMaxParticles_ = 1024;
 
 	static std::unique_ptr<ParticleManager> instance;
 	DirectXCommon* dxCommon_ = nullptr;
 	SrvManager* srvManager_ = nullptr;
 
 	std::unordered_map<std::string, ParticleGroup> particleGroups;
-	D3D12_VERTEX_BUFFER_VIEW vbView_;
+	Camera* camera_ = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vbView_{};
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_[6];
-
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob_;
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
-
 	BlendModeManager blendModeManager_;
 	BlendMode currentBlendMode_ = BlendMode::kBlendModeAlpha;
 
-	// ... 既存のメンバ変数の下に追加
 	Microsoft::WRL::ComPtr<ID3D12Resource> cbResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> vsTransformCB_; // ← 追加: VS用定数バッファ
-	void EnsureCapacityBucket(ParticleGroup::BlendBucket& bucket, uint32_t required);
+	Microsoft::WRL::ComPtr<ID3D12Resource> perViewCB_;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> particleResource_;
+	uint32_t particleSrvIndex_ = 0;
+	uint32_t particleUavIndex_ = 0;
+	D3D12_RESOURCE_STATES particleResourceState_ = D3D12_RESOURCE_STATE_COMMON;
+
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> computePipelineState_;
+	bool isParticleInitialized_ = false;
+
 	void CreateRootsignature();
 	void CreateGraphicsPipeline();
+	void CreateComputePipeline();
+	void InitializeParticlesByCompute();
 };

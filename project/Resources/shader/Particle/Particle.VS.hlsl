@@ -1,13 +1,7 @@
 #include "Particle.hlsli"
-struct TransformationMatrix
-{
-    float4x4 WVP;
-    float4x4 World;
-    float alpha;
-    float3 pad;
-};
 
-StructuredBuffer<TransformationMatrix> gTransformationMatrices : register(t1);
+StructuredBuffer<Particle> gParticles : register(t1);
+ConstantBuffer<PerView> gPerView : register(b1);
 
 struct VertexShaderInput
 {
@@ -15,14 +9,24 @@ struct VertexShaderInput
     float2 texcoord : TEXCOORD0;
     float3 normal : NORMAL0;
 };
-VertexShaderOutput main(VertexShaderInput input,uint instanceId : SV_InstanceID)
+
+VertexShaderOutput main(VertexShaderInput input, uint instanceId : SV_InstanceID)
 {
     VertexShaderOutput output;
-    output.position = mul(input.position, gTransformationMatrices[instanceId].WVP);
-    output.normal = normalize(mul(input.normal, (float3x3) gTransformationMatrices[instanceId].World));
-    output.texcoord = input.texcoord;
 
-    output.alpha = gTransformationMatrices[instanceId].alpha;
+    Particle particle = gParticles[instanceId];
+
+    float4x4 worldMatrix = gPerView.billboardMatrix;
+    worldMatrix[0] *= particle.scale.x;
+    worldMatrix[1] *= particle.scale.y;
+    worldMatrix[2] *= particle.scale.z;
+    worldMatrix[3].xyz = particle.translate;
+
+    float4x4 worldViewProjection = mul(worldMatrix, gPerView.viewProjection);
+
+    output.position = mul(input.position, worldViewProjection);
+    output.texcoord = input.texcoord;
+    output.color = particle.color;
 
     return output;
 }
