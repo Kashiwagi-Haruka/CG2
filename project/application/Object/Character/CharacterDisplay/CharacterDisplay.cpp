@@ -30,6 +30,8 @@ void CharacterDisplay::Initialize() {
 
 void CharacterDisplay::Update() {
 	if (!isActive_ || !sizukuObject_ || !camera_) {
+		Input::GetInstance()->SetIsCursorStability(true);
+		Input::GetInstance()->SetIsCursorVisible(false);
 		return;
 	}
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight);

@@ -167,24 +167,8 @@ void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnabl
 		skinningElementDescs[2].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
 		skinningElementDescs[2].InstanceDataStepRate = 0;
 
-		skinningElementDescs[3].SemanticName = "WEIGHT";
-		skinningElementDescs[3].SemanticIndex = 0;
-		skinningElementDescs[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		skinningElementDescs[3].InputSlot = 1;
-		skinningElementDescs[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-		skinningElementDescs[3].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
-		skinningElementDescs[3].InstanceDataStepRate = 0;
-
-		skinningElementDescs[4].SemanticName = "INDEX";
-		skinningElementDescs[4].SemanticIndex = 0;
-		skinningElementDescs[4].Format = DXGI_FORMAT_R32G32B32A32_SINT;
-		skinningElementDescs[4].InputSlot = 1;
-		skinningElementDescs[4].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-		skinningElementDescs[4].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
-		skinningElementDescs[4].InstanceDataStepRate = 0;
-
 		inputLayoutDesc.pInputElementDescs = skinningElementDescs.data();
-		inputLayoutDesc.NumElements = static_cast<UINT>(skinningElementDescs.size());
+		inputLayoutDesc.NumElements = 3;
 	} else {
 		inputElementDescs[0].SemanticName = "POSITION";
 		inputElementDescs[0].SemanticIndex = 0;

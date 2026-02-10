@@ -80,7 +80,6 @@ void Model::SetEnvironmentCoefficient(float coefficient) {
 void Model::Draw() { Draw(nullptr); }
 void Model::Draw(const SkinCluster* skinCluster) { Draw(skinCluster, nullptr); }
 void Model::Draw(const SkinCluster* skinCluster, const ID3D12Resource* materialResourceOverride) {
-	constexpr UINT kMatrixPaletteRootParameterIndex = 12;
 	// --- SRVヒープをバインド ---
 	ID3D12DescriptorHeap* descriptorHeaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
 
@@ -88,9 +87,8 @@ void Model::Draw(const SkinCluster* skinCluster, const ID3D12Resource* materialR
 
 	// --- VertexBufferViewを設定 ---
 	if (skinCluster) {
-		D3D12_VERTEX_BUFFER_VIEW vertexBufferViews[] = {vertexBufferView_, skinCluster->influenceBufferView};
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferViews[] = {skinCluster->outputVertexBufferView};
 		ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, _countof(vertexBufferViews), vertexBufferViews);
-		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(kMatrixPaletteRootParameterIndex, skinCluster->paletteSrvIndex);
 	} else {
 		ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	}

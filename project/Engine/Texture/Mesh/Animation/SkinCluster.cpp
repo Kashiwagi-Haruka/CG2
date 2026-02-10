@@ -1,12 +1,94 @@
 #include "SkinCluster.h"
+#include "DirectXCommon.h"
 #include "Function.h"
 #include "Logger.h"
+#include "Model/ModelCommon.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
 #include <algorithm>
 #include <cassert>
 #include <cstring>
-#include "Model/ModelCommon.h"
+
+namespace {
+Microsoft::WRL::ComPtr<ID3D12Resource> CreateDefaultBufferResource(DirectXCommon* dxCommon, size_t sizeInBytes, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState) {
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Width = sizeInBytes;
+	resourceDesc.Height = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resourceDesc.Flags = flags;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource = nullptr;
+	HRESULT hr = dxCommon->GetDevice()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, initialState, nullptr, IID_PPV_ARGS(&bufferResource));
+	assert(SUCCEEDED(hr));
+	return bufferResource;
+}
+
+void CreateSkinningComputePipeline(SkinCluster& skinCluster) {
+	auto* dxCommon = ModelCommon::GetInstance()->GetDxCommon();
+	assert(dxCommon);
+
+	D3D12_DESCRIPTOR_RANGE descriptorRanges[4]{};
+	descriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRanges[0].NumDescriptors = 1;
+	descriptorRanges[0].BaseShaderRegister = 0;
+	descriptorRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	descriptorRanges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRanges[1].NumDescriptors = 1;
+	descriptorRanges[1].BaseShaderRegister = 1;
+	descriptorRanges[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	descriptorRanges[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRanges[2].NumDescriptors = 1;
+	descriptorRanges[2].BaseShaderRegister = 2;
+	descriptorRanges[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	descriptorRanges[3].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	descriptorRanges[3].NumDescriptors = 1;
+	descriptorRanges[3].BaseShaderRegister = 0;
+	descriptorRanges[3].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_ROOT_PARAMETER rootParameters[5]{};
+	for (uint32_t i = 0; i < 4; ++i) {
+		rootParameters[i].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters[i].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		rootParameters[i].DescriptorTable.pDescriptorRanges = &descriptorRanges[i];
+		rootParameters[i].DescriptorTable.NumDescriptorRanges = 1;
+	}
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[4].Descriptor.ShaderRegister = 0;
+
+	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
+	rootSignatureDesc.NumParameters = _countof(rootParameters);
+	rootSignatureDesc.pParameters = rootParameters;
+	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	assert(SUCCEEDED(hr));
+
+	hr = dxCommon->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&skinCluster.computeRootSignature));
+	assert(SUCCEEDED(hr));
+
+	auto csBlob = dxCommon->CompileShader(L"Resources/shader/Object3d/Skinning.CS.hlsl", L"cs_6_0");
+	D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineDesc{};
+	computePipelineDesc.pRootSignature = skinCluster.computeRootSignature.Get();
+	computePipelineDesc.CS = {csBlob->GetBufferPointer(), csBlob->GetBufferSize()};
+
+	hr = dxCommon->GetDevice()->CreateComputePipelineState(&computePipelineDesc, IID_PPV_ARGS(&skinCluster.computePipelineState));
+	assert(SUCCEEDED(hr));
+}
+} // namespace
 
 SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model) {
 	SkinCluster skinCluster{};
@@ -18,6 +100,8 @@ SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model) {
 	}
 
 	const auto& modelData = model.GetModelData();
+	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
+	assert(srvManager);
 
 	// palette用Resourceを確保
 	skinCluster.paletteResource = ModelCommon::GetInstance()->CreateBufferResource(sizeof(WellForGPU) * joints.size());
@@ -26,7 +110,6 @@ SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model) {
 	skinCluster.mappedPalette = {mappedPalette, joints.size()};
 
 	// palette用SRVを作成
-	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
 	assert(srvManager->CanAllocate());
 	skinCluster.paletteSrvIndex = srvManager->Allocate();
 	skinCluster.paletteSrvHandle.first = srvManager->GetCPUDescriptorHandle(skinCluster.paletteSrvIndex);
@@ -40,10 +123,40 @@ SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model) {
 	std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * modelData.vertices.size());
 	skinCluster.mappedInfluence = {mappedInfluence, modelData.vertices.size()};
 
-	// Influence用VBVを作成
-	skinCluster.influenceBufferView.BufferLocation = skinCluster.influenceResource->GetGPUVirtualAddress();
-	skinCluster.influenceBufferView.SizeInBytes = static_cast<UINT>(sizeof(VertexInfluence) * modelData.vertices.size());
-	skinCluster.influenceBufferView.StrideInBytes = sizeof(VertexInfluence);
+	assert(srvManager->CanAllocate());
+	skinCluster.influenceSrvIndex = srvManager->Allocate();
+	srvManager->CreateSRVforStructuredBuffer(skinCluster.influenceSrvIndex, skinCluster.influenceResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexInfluence));
+
+	// Compute shader input/output vertex
+	skinCluster.inputVertexResource = model.GetVertexResource();
+	assert(srvManager->CanAllocate());
+	skinCluster.inputVertexSrvIndex = srvManager->Allocate();
+	srvManager->CreateSRVforStructuredBuffer(skinCluster.inputVertexSrvIndex, skinCluster.inputVertexResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexData));
+
+	skinCluster.outputVertexResource = CreateDefaultBufferResource(
+	    ModelCommon::GetInstance()->GetDxCommon(), sizeof(VertexData) * modelData.vertices.size(), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
+	skinCluster.outputVertexBufferView.BufferLocation = skinCluster.outputVertexResource->GetGPUVirtualAddress();
+	skinCluster.outputVertexBufferView.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * modelData.vertices.size());
+	skinCluster.outputVertexBufferView.StrideInBytes = sizeof(VertexData);
+
+	assert(srvManager->CanAllocate());
+	skinCluster.outputVertexSrvIndex = srvManager->Allocate();
+	srvManager->CreateSRVforStructuredBuffer(skinCluster.outputVertexSrvIndex, skinCluster.outputVertexResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexData));
+
+	assert(srvManager->CanAllocate());
+	skinCluster.outputVertexUavIndex = srvManager->Allocate();
+	srvManager->CreateUAVforStructuredBuffer(skinCluster.outputVertexUavIndex, skinCluster.outputVertexResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexData));
+
+	// SkinningInformation (CBV)
+	const size_t skinningInformationSize = (sizeof(SkinCluster::SkinningInformation) + 0xFF) & ~0xFF;
+	skinCluster.skinningInformationResource = ModelCommon::GetInstance()->CreateBufferResource(skinningInformationSize);
+	SkinCluster::SkinningInformation* mappedSkinningInformation = nullptr;
+	skinCluster.skinningInformationResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedSkinningInformation));
+	skinCluster.mappedSkinningInformation = {mappedSkinningInformation, 1};
+	skinCluster.mappedSkinningInformation[0].numVertices = static_cast<int32_t>(modelData.vertices.size());
+
+	CreateSkinningComputePipeline(skinCluster);
 
 	// InverseBindPoseMatrixを格納する場所を作成
 	skinCluster.inverseBindPoseMatrices.resize(joints.size());
@@ -109,4 +222,42 @@ void UpdateSkinCluster(SkinCluster& skinCluster, const Skeleton& skeleton) {
 		skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix = Function::Multiply(skinCluster.inverseBindPoseMatrices[jointIndex], joints[jointIndex].skeletonSpaceMatrix);
 		skinCluster.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Function::Transpose(Function::Inverse(skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix));
 	}
+	auto* dxCommon = ModelCommon::GetInstance()->GetDxCommon();
+	auto* commandList = dxCommon->GetCommandList();
+	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
+	assert(commandList && srvManager);
+
+	if (!skinCluster.outputVertexInUavState) {
+		D3D12_RESOURCE_BARRIER toUavBarrier{};
+		toUavBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		toUavBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		toUavBarrier.Transition.pResource = skinCluster.outputVertexResource.Get();
+		toUavBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+		toUavBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		toUavBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		commandList->ResourceBarrier(1, &toUavBarrier);
+		skinCluster.outputVertexInUavState = true;
+	}
+
+	ID3D12DescriptorHeap* descriptorHeaps[] = {srvManager->GetDescriptorHeap().Get()};
+	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+	commandList->SetComputeRootSignature(skinCluster.computeRootSignature.Get());
+	commandList->SetPipelineState(skinCluster.computePipelineState.Get());
+	commandList->SetComputeRootDescriptorTable(0, srvManager->GetGPUDescriptorHandle(skinCluster.paletteSrvIndex));
+	commandList->SetComputeRootDescriptorTable(1, srvManager->GetGPUDescriptorHandle(skinCluster.inputVertexSrvIndex));
+	commandList->SetComputeRootDescriptorTable(2, srvManager->GetGPUDescriptorHandle(skinCluster.influenceSrvIndex));
+	commandList->SetComputeRootDescriptorTable(3, srvManager->GetGPUDescriptorHandle(skinCluster.outputVertexUavIndex));
+	commandList->SetComputeRootConstantBufferView(4, skinCluster.skinningInformationResource->GetGPUVirtualAddress());
+	const UINT threadGroupCountX = (static_cast<UINT>(skinCluster.mappedSkinningInformation[0].numVertices) + 1023u) / 1024u;
+	commandList->Dispatch(threadGroupCountX, 1, 1);
+
+	D3D12_RESOURCE_BARRIER toVertexBufferBarrier{};
+	toVertexBufferBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	toVertexBufferBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	toVertexBufferBarrier.Transition.pResource = skinCluster.outputVertexResource.Get();
+	toVertexBufferBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	toVertexBufferBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+	toVertexBufferBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	commandList->ResourceBarrier(1, &toVertexBufferBarrier);
+	skinCluster.outputVertexInUavState = false;
 }

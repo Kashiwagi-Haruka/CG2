@@ -24,14 +24,30 @@ struct WellForGPU {
 };
 
 struct SkinCluster {
+	struct SkinningInformation {
+		int32_t numVertices = 0;
+	};
+
 	std::vector<Matrix4x4> inverseBindPoseMatrices;
 	Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
-	D3D12_VERTEX_BUFFER_VIEW influenceBufferView{};
 	std::span<VertexInfluence> mappedInfluence;
 	Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource;
 	std::span<WellForGPU> mappedPalette;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle{};
 	uint32_t paletteSrvIndex = 0;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> inputVertexResource;
+	uint32_t inputVertexSrvIndex = 0;
+	Microsoft::WRL::ComPtr<ID3D12Resource> outputVertexResource;
+	D3D12_VERTEX_BUFFER_VIEW outputVertexBufferView{};
+	uint32_t outputVertexSrvIndex = 0;
+	uint32_t outputVertexUavIndex = 0;
+	bool outputVertexInUavState = true;
+	uint32_t influenceSrvIndex = 0;
+	Microsoft::WRL::ComPtr<ID3D12Resource> skinningInformationResource;
+	std::span<SkinningInformation> mappedSkinningInformation;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignature;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> computePipelineState;
 };
 
 SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model);
