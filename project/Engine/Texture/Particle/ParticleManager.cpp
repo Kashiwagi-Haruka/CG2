@@ -541,6 +541,7 @@ void ParticleManager::InitializeParticlesByCompute() {
 	ID3D12DescriptorHeap* heaps[] = {srvManager_->GetDescriptorHeap().Get()};
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(1, heaps);
 	dxCommon_->GetCommandList()->SetPipelineState(emitComputePipelineState_.Get());
+	dxCommon_->GetCommandList()->SetComputeRootSignature(computeRootSignature_.Get());
 	dxCommon_->GetCommandList()->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
 	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(1, emitterResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
