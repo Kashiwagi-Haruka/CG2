@@ -3,6 +3,7 @@
 #include "GameBase.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
+#include "ParticleManager.h"
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
@@ -31,6 +32,7 @@ SampleScene::SampleScene() {
 	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/AnimatedCube", "AnimatedCube");
 	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "walk");
 	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "sneakWalk");
+	ParticleManager::GetInstance()->CreateParticleGroup("sample", "Resources/2d/defaultParticle.png");
 }
 void SampleScene::Initialize() {
 
@@ -71,6 +73,12 @@ void SampleScene::Initialize() {
         .rotate{-std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0.0f  },
         .translate{0.0f,                              1.0f,                      -3.0f  }
     };
+	particleTransform_ = {
+	    .scale{1.0f, 1.0f, 1.0f },
+        .rotate{0.0f, 0.0f, 0.0f },
+        .translate{0.0f, 1.0f, -5.0f}
+    };
+	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample", particleTransform_, 0.1f, 5, Vector3{0.0f, 0.0f, 0.0f}, Vector3{-0.5f, -0.5f, -0.5f}, Vector3{0.5f, 0.5f, 0.5f});
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(uvBallTransform_);
 	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
@@ -145,6 +153,8 @@ void SampleScene::Initialize() {
 	areaLights_[1].height = 2.0f;
 	areaLights_[1].radius = 0.1f;
 	areaLights_[1].decay = 2.0f;
+
+	
 }
 
 void SampleScene::Update() {
@@ -304,7 +314,10 @@ void SampleScene::Update() {
 		camera_->SetTransform(cameraTransform_);
 		camera_->Update();
 	}
-
+	ParticleManager::GetInstance()->Update(camera_.get());
+	if (sampleParticleEmitter_) {
+		sampleParticleEmitter_->Update(particleTransform_);
+	}
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
@@ -340,6 +353,9 @@ void SampleScene::Draw() {
 	 planeGltf_->Draw();
 	 fieldObj_->Draw();
 	animatedCubeObj_->Draw();
+	 if (sampleParticleEmitter_) {
+		 sampleParticleEmitter_->Draw();
+	 }
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();

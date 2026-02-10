@@ -10,6 +10,7 @@
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
 #include "Object3d/Object3d.h"
+#include "ParticleEmitter.h"
 #include "Transform.h"
 #include <array>
 #include <cstdint>
@@ -39,6 +40,8 @@ class SampleScene : public BaseScene {
 	Transform planeGTransform_{};
 	Transform animatedCubeTransform_{};
 	Transform humanTransform_{};
+	Transform particleTransform_{};
+	std::unique_ptr<ParticleEmitter> sampleParticleEmitter_ = nullptr;
 
 	Animation::AnimationData animatedCubeAnimation_{};
 	std::vector<Animation::AnimationData> humanAnimationClips_{};
