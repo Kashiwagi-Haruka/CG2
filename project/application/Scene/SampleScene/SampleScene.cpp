@@ -297,6 +297,52 @@ void SampleScene::Update() {
 		}
 	}
 	ImGui::End();
+	if (ImGui::Begin("Particle Editor")) {
+		ImGui::Text("Sample Particle Emitter");
+		if (ImGui::TreeNode("Emitter Transform")) {
+			ImGui::DragFloat3("Scale##Particle", &particleTransform_.scale.x, 0.01f);
+			ImGui::DragFloat3("Rotate##Particle", &particleTransform_.rotate.x, 0.01f);
+			ImGui::DragFloat3("Translate##Particle", &particleTransform_.translate.x, 0.01f);
+			ImGui::TreePop();
+		}
+
+		if (sampleParticleEmitter_) {
+			float frequency = sampleParticleEmitter_->GetFrequency();
+			if (ImGui::DragFloat("Frequency", &frequency, 0.01f, 0.0f, 10.0f)) {
+				sampleParticleEmitter_->SetFrequency(frequency);
+			}
+
+			int emitCount = static_cast<int>(sampleParticleEmitter_->GetCount());
+			if (ImGui::DragInt("EmitCount", &emitCount, 1, 1, 1024)) {
+				sampleParticleEmitter_->SetCount(static_cast<uint32_t>(emitCount));
+			}
+
+			Vector3 acceleration = sampleParticleEmitter_->GetAcceleration();
+			if (ImGui::DragFloat3("Acceleration", &acceleration.x, 0.01f)) {
+				sampleParticleEmitter_->SetAcceleration(acceleration);
+			}
+
+			Vector3 areaMin = sampleParticleEmitter_->GetAreaMin();
+			if (ImGui::DragFloat3("AreaMin", &areaMin.x, 0.01f)) {
+				sampleParticleEmitter_->SetAreaMin(areaMin);
+			}
+
+			Vector3 areaMax = sampleParticleEmitter_->GetAreaMax();
+			if (ImGui::DragFloat3("AreaMax", &areaMax.x, 0.01f)) {
+				sampleParticleEmitter_->SetAreaMax(areaMax);
+			}
+
+			float life = sampleParticleEmitter_->GetLife();
+			if (ImGui::DragFloat("Life", &life, 1.0f, 0.0f, 10000.0f)) {
+				sampleParticleEmitter_->SetLife(life);
+			}
+
+			if (ImGui::Button("Emit Now")) {
+				sampleParticleEmitter_->Emit();
+			}
+		}
+	}
+	ImGui::End();
 	if (ImGui::Begin("Scene")) {
 	
 		if (ImGui::Button("Title")) {

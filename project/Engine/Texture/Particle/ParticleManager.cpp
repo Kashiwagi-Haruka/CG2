@@ -115,6 +115,10 @@ void ParticleManager::SetCamera(Camera* camera) { camera_ = camera; }
 void ParticleManager::Update(Camera* camera) {
 	camera_ = camera;
 	if (!isParticleInitialized_) {
+		InitializeParticlesByCompute();
+	}
+
+	if (!isParticleInitialized_) {
 		return;
 	}
 	UpdateParticlesByCompute();
@@ -205,6 +209,9 @@ void ParticleManager::Draw(const std::string& name) {
 
 void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life) {
 	(void)name;
+	if (!isParticleInitialized_) {
+		InitializeParticlesByCompute();
+	}
 
 	if (!emitterData_ || !perFrameData_) {
 		return;
