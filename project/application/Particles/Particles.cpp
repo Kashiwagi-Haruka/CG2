@@ -33,6 +33,9 @@ void Particles::Update() {
 	playerEmitterTransform.rotate = {0, 0, 0};
 
 	playerEmitterTransform.translate = {playerPos_.x * kParticlePosScale, (playerPos_.y - 0.9f) * kParticlePosScale, playerPos_.z};
+	if (particleArrow) {
+		particleArrow->Update(playerEmitterTransform);
+	}
 }
 void Particles::Draw() {
 
