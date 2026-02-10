@@ -694,6 +694,7 @@
     <FxCompile Include="Resources\shader\Object3d\Object3dEmissive.PS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\Object3dToon.PS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\Object3dMirror.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\Skinning.CS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
