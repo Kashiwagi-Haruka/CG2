@@ -133,8 +133,9 @@ SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model) {
 	skinCluster.inputVertexSrvIndex = srvManager->Allocate();
 	srvManager->CreateSRVforStructuredBuffer(skinCluster.inputVertexSrvIndex, skinCluster.inputVertexResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexData));
 
-	skinCluster.outputVertexResource = CreateDefaultBufferResource(
-	    ModelCommon::GetInstance()->GetDxCommon(), sizeof(VertexData) * modelData.vertices.size(), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		skinCluster.outputVertexResource =
+	    CreateDefaultBufferResource(ModelCommon::GetInstance()->GetDxCommon(), sizeof(VertexData) * modelData.vertices.size(), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON);
+	skinCluster.outputVertexCurrentState = D3D12_RESOURCE_STATE_COMMON;
 
 	skinCluster.outputVertexBufferView.BufferLocation = skinCluster.outputVertexResource->GetGPUVirtualAddress();
 	skinCluster.outputVertexBufferView.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * modelData.vertices.size());
@@ -227,16 +228,16 @@ void UpdateSkinCluster(SkinCluster& skinCluster, const Skeleton& skeleton) {
 	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
 	assert(commandList && srvManager);
 
-	if (!skinCluster.outputVertexInUavState) {
+	if (skinCluster.outputVertexCurrentState != D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
 		D3D12_RESOURCE_BARRIER toUavBarrier{};
 		toUavBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		toUavBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		toUavBarrier.Transition.pResource = skinCluster.outputVertexResource.Get();
-		toUavBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+		toUavBarrier.Transition.StateBefore = skinCluster.outputVertexCurrentState;
 		toUavBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		toUavBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		commandList->ResourceBarrier(1, &toUavBarrier);
-		skinCluster.outputVertexInUavState = true;
+		skinCluster.outputVertexCurrentState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 	}
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = {srvManager->GetDescriptorHeap().Get()};
@@ -255,9 +256,9 @@ void UpdateSkinCluster(SkinCluster& skinCluster, const Skeleton& skeleton) {
 	toVertexBufferBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	toVertexBufferBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	toVertexBufferBarrier.Transition.pResource = skinCluster.outputVertexResource.Get();
-	toVertexBufferBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	toVertexBufferBarrier.Transition.StateBefore = skinCluster.outputVertexCurrentState;
 	toVertexBufferBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
 	toVertexBufferBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	commandList->ResourceBarrier(1, &toVertexBufferBarrier);
-	skinCluster.outputVertexInUavState = false;
+	skinCluster.outputVertexCurrentState = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
 }

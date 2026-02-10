@@ -42,7 +42,7 @@ struct SkinCluster {
 	D3D12_VERTEX_BUFFER_VIEW outputVertexBufferView{};
 	uint32_t outputVertexSrvIndex = 0;
 	uint32_t outputVertexUavIndex = 0;
-	bool outputVertexInUavState = true;
+	D3D12_RESOURCE_STATES outputVertexCurrentState = D3D12_RESOURCE_STATE_COMMON;
 	uint32_t influenceSrvIndex = 0;
 	Microsoft::WRL::ComPtr<ID3D12Resource> skinningInformationResource;
 	std::span<SkinningInformation> mappedSkinningInformation;
