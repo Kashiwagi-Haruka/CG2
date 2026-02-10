@@ -58,9 +58,8 @@ float3 rand3dTo3d(float3 value)
     );
 }
 
-class RandomGenerator
+struct RandomGenerator
 {
-public:
     float3 seed;
 
     float3 Generate3d()
