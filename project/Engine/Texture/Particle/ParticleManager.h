@@ -116,10 +116,23 @@ private:
 	uint32_t freeListUavIndex_ = 0;
 	D3D12_RESOURCE_STATES freeListResourceState_ = D3D12_RESOURCE_STATE_COMMON;
 
+	// Emit dispatch 用（Emit() で書き換える）
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
 	EmitterSphere* emitterData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> perFrameResource_;
 	PerFrame* perFrameData_ = nullptr;
+
+	// Update dispatch 用（UpdateParticlesByCompute() で書き換える）
+	Microsoft::WRL::ComPtr<ID3D12Resource> updateEmitterResource_;
+	EmitterSphere* updateEmitterData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> updatePerFrameResource_;
+	PerFrame* updatePerFrameData_ = nullptr;
+
+	// Initialize dispatch 用（固定値）
+	Microsoft::WRL::ComPtr<ID3D12Resource> initEmitterResource_;
+	EmitterSphere* initEmitterData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> initPerFrameResource_;
+	PerFrame* initPerFrameData_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> emitComputePipelineState_;

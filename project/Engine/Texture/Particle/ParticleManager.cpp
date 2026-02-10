@@ -102,6 +102,24 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
 	perFrameResource_ = dxCommon_->CreateBufferResource(sizeof(PerFrame));
 	perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&perFrameData_));
 	*perFrameData_ = PerFrame{};
+
+		updateEmitterResource_ = dxCommon_->CreateBufferResource(sizeof(EmitterSphere));
+	updateEmitterResource_->Map(0, nullptr, reinterpret_cast<void**>(&updateEmitterData_));
+	*updateEmitterData_ = EmitterSphere{};
+
+	updatePerFrameResource_ = dxCommon_->CreateBufferResource(sizeof(PerFrame));
+	updatePerFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&updatePerFrameData_));
+	*updatePerFrameData_ = PerFrame{};
+
+	initEmitterResource_ = dxCommon_->CreateBufferResource(sizeof(EmitterSphere));
+	initEmitterResource_->Map(0, nullptr, reinterpret_cast<void**>(&initEmitterData_));
+	*initEmitterData_ = EmitterSphere{};
+	initEmitterData_->emit = 2;
+
+	initPerFrameResource_ = dxCommon_->CreateBufferResource(sizeof(PerFrame));
+	initPerFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&initPerFrameData_));
+	*initPerFrameData_ = PerFrame{};
+	initPerFrameData_->deltaTime = 1.0f / 60.0f;
 }
 
 void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& textureFilePath) {
@@ -215,15 +233,17 @@ void ParticleManager::Emit(const std::string& name, const Transform& transform, 
 		InitializeParticlesByCompute();
 	}
 
-	if (!emitterData_ || !perFrameData_) {
+	if (!emitterData_ || !perFrameData_ || !updateEmitterData_) {
 		return;
 	}
 
 	emitterData_->translate = transform.translate;
 	emitterData_->radius = std::max({std::abs(area.min.x), std::abs(area.min.y), std::abs(area.min.z), std::abs(area.max.x), std::abs(area.max.y), std::abs(area.max.z)});
-	emitterData_->count = count;
-	emitterData_->lifeTime = life;
+	emitterData_->count = std::min(count, kMaxParticles_);
+	emitterData_->lifeTime = std::max(life, 1.0f / 60.0f);
 	emitterData_->acceleration = accel;
+	// Update 側でも同じ加速度を使う
+	updateEmitterData_->acceleration = accel;
 	emitterData_->emit = 1;
 
 	perFrameData_->time = 0.0f;
@@ -284,7 +304,6 @@ void ParticleManager::Emit(const std::string& name, const Transform& transform, 
 	uavBarriers[2].UAV.pResource = freeListResource_.Get();
 	dxCommon_->GetCommandList()->ResourceBarrier(3, uavBarriers);
 
-	emitterData_->emit = 0;
 }
 
 void ParticleManager::Finalize() {
@@ -483,20 +502,24 @@ void ParticleManager::UpdateParticlesByCompute() {
 		freeListResourceState_ = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 	}
 
-	emitterData_->emit = 0;
-	perFrameData_->deltaTime = dxCommon_->GetDeltaTime();
-	if (perFrameData_->deltaTime <= 0.0f) {
-		perFrameData_->deltaTime = 1.0f / 60.0f;
+		if (!updateEmitterData_ || !updatePerFrameData_) {
+		return;
 	}
-	perFrameData_->time += perFrameData_->deltaTime;
+
+	updateEmitterData_->emit = 0;
+	updatePerFrameData_->deltaTime = dxCommon_->GetDeltaTime();
+	if (updatePerFrameData_->deltaTime <= 0.0f) {
+		updatePerFrameData_->deltaTime = 1.0f / 60.0f;
+	}
+	updatePerFrameData_->time += updatePerFrameData_->deltaTime;
 
 	ID3D12DescriptorHeap* heaps[] = {srvManager_->GetDescriptorHeap().Get()};
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(1, heaps);
 	dxCommon_->GetCommandList()->SetPipelineState(updateComputePipelineState_.Get());
 	dxCommon_->GetCommandList()->SetComputeRootSignature(computeRootSignature_.Get());
 	dxCommon_->GetCommandList()->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
-	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(1, emitterResource_->GetGPUVirtualAddress());
-	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(1, updateEmitterResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(2, updatePerFrameResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->Dispatch(kParticleDispatchCount, 1, 1);
 
 	D3D12_RESOURCE_BARRIER uavBarriers[3]{};
@@ -547,17 +570,21 @@ void ParticleManager::InitializeParticlesByCompute() {
 		freeListResourceState_ = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 	}
 
-	emitterData_->emit = 2;
-	perFrameData_->time = 0.0f;
-	perFrameData_->deltaTime = 1.0f / 60.0f;
+	if (!initEmitterData_ || !initPerFrameData_) {
+		return;
+	}
+
+	initEmitterData_->emit = 2;
+	initPerFrameData_->time = 0.0f;
+	initPerFrameData_->deltaTime = 1.0f / 60.0f;
 
 	ID3D12DescriptorHeap* heaps[] = {srvManager_->GetDescriptorHeap().Get()};
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(1, heaps);
 	dxCommon_->GetCommandList()->SetPipelineState(emitComputePipelineState_.Get());
 	dxCommon_->GetCommandList()->SetComputeRootSignature(computeRootSignature_.Get());
 	dxCommon_->GetCommandList()->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
-	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(1, emitterResource_->GetGPUVirtualAddress());
-	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(1, initEmitterResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(2, initPerFrameResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->Dispatch(kParticleDispatchCount, 1, 1);
 
 	D3D12_RESOURCE_BARRIER uavBarriers[3]{};
@@ -569,6 +596,6 @@ void ParticleManager::InitializeParticlesByCompute() {
 	uavBarriers[2].UAV.pResource = freeListResource_.Get();
 	dxCommon_->GetCommandList()->ResourceBarrier(3, uavBarriers);
 
-	emitterData_->emit = 0;
+	// init リソースは固定値のまま維持し、GPU 実行タイミング競合を避ける。
 	isParticleInitialized_ = true;
 }
