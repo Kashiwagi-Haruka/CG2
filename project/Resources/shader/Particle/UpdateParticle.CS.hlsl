@@ -4,7 +4,7 @@ static const uint kMaxParticles = 1024;
 
 RWStructuredBuffer<Particle> gParticles : register(u0);
 RWStructuredBuffer<int> gFreeListIndex : register(u1);
-RWStructuredBuffer<int> gFreeList : register(u2);
+RWStructuredBuffer<uint> gFreeList : register(u2);
 ConstantBuffer<EmitterSphere> gEmitter : register(b0);
 ConstantBuffer<PerFrame> gPerFrame : register(b1);
 
@@ -45,7 +45,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
         InterlockedAdd(gFreeListIndex[0], 1, freeListIndex);
         if ((freeListIndex + 1) < int(kMaxParticles))
         {
-            gFreeList[freeListIndex + 1] = particleIndex;
+            gFreeList[freeListIndex + 1] = (uint) particleIndex;
         }
         else
         {
