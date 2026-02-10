@@ -61,6 +61,23 @@ public:
 	void Finalize();
 
 private:
+	struct EmitterSphere {
+		Vector3 translate{0.0f, 0.0f, 0.0f};
+		float radius = 1.0f;
+		uint32_t count = 10;
+		float frequency = 0.5f;
+		float frequencyTime = 0.0f;
+		uint32_t emit = 0;
+		float lifeTime = 120.0f;
+		Vector3 acceleration{0.0f, 0.0f, 0.0f};
+	};
+
+	struct PerFrame {
+		float time = 0.0f;
+		float deltaTime = 1.0f / 60.0f;
+		float pad[2] = {0.0f, 0.0f};
+	};
+
 	struct PerView {
 		Matrix4x4 viewProjection;
 		Matrix4x4 billboardMatrix;
@@ -90,6 +107,15 @@ private:
 	uint32_t particleSrvIndex_ = 0;
 	uint32_t particleUavIndex_ = 0;
 	D3D12_RESOURCE_STATES particleResourceState_ = D3D12_RESOURCE_STATE_COMMON;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> freeCounterResource_;
+	uint32_t freeCounterUavIndex_ = 0;
+	D3D12_RESOURCE_STATES freeCounterResourceState_ = D3D12_RESOURCE_STATE_COMMON;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
+	EmitterSphere* emitterData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> perFrameResource_;
+	PerFrame* perFrameData_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> computePipelineState_;
