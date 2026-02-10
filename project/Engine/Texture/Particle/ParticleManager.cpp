@@ -493,7 +493,7 @@ void ParticleManager::UpdateParticlesByCompute() {
 	dxCommon_->GetCommandList()->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
 	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(1, emitterResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
-	dxCommon_->GetCommandList()->Dispatch(1, 1, 1);
+	dxCommon_->GetCommandList()->Dispatch(kParticleDispatchCount, 1, 1);
 
 	D3D12_RESOURCE_BARRIER uavBarriers[3]{};
 	uavBarriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
@@ -554,7 +554,7 @@ void ParticleManager::InitializeParticlesByCompute() {
 	dxCommon_->GetCommandList()->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
 	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(1, emitterResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress());
-	dxCommon_->GetCommandList()->Dispatch(1, 1, 1);
+	dxCommon_->GetCommandList()->Dispatch(kParticleDispatchCount, 1, 1);
 
 	D3D12_RESOURCE_BARRIER uavBarriers[3]{};
 	uavBarriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
