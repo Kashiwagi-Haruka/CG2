@@ -1,6 +1,7 @@
 #pragma once
 #include "Transform.h"
 #include "Vector3.h"
+#include "Vector4.h"
 #include <cstdint>
 #include <string>
 
@@ -8,7 +9,8 @@ class ParticleEmitter {
 public:
 	// コンストラクタ
 	ParticleEmitter(
-	    const std::string& groupName, const Transform& transform, float emitFrequency, uint32_t emitCount, Vector3 acceleration = {0, 0, 0}, Vector3 areaMin = {0, 0, 0}, Vector3 areaMax = {1, 1, 1});
+	    const std::string& groupName, const Transform& transform, float emitFrequency, uint32_t emitCount, Vector3 acceleration = {0, 0, 0}, Vector3 areaMin = {0, 0, 0}, Vector3 areaMax = {1, 1, 1},
+	    Vector4 color = {1, 1, 1, 1});
 
 	// 更新
 	void Update(const Transform& transform);
@@ -33,6 +35,8 @@ public:
 
 	void SetTransform(Transform& t) { transform_ = t; }
 	void SetLife(float life) { this->life = life; }
+	void SetColor(Vector4 color) { color_ = color; }
+	Vector4 GetColor() const { return color_; }
 	float GetLife() const { return life; }
 
 private:
@@ -47,4 +51,5 @@ private:
 	bool emitVisible_ = true;
 	float timer = 0.0f; // 発生管理用のタイマー
 	float life = 120.0f;
+	Vector4 color_ = {1, 1, 1, 1};
 };

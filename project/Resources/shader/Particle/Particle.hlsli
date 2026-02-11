@@ -26,6 +26,7 @@ struct EmitterSphere
     uint emit;
     float lifeTime;
     float3 acceleration;
+    float4 color;
 };
 
 struct PerFrame

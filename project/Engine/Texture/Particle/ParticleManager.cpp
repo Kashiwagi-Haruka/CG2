@@ -227,7 +227,7 @@ void ParticleManager::Draw(const std::string& name) {
 	dxCommon_->GetCommandList()->DrawInstanced(6, kMaxParticles_, 0, 0);
 }
 
-void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life) {
+void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life, const Vector4& color) {
 	(void)name;
 	if (!isParticleInitialized_) {
 		InitializeParticlesByCompute();
@@ -242,8 +242,7 @@ void ParticleManager::Emit(const std::string& name, const Transform& transform, 
 	emitterData_->count = std::min(count, kMaxParticles_);
 	emitterData_->lifeTime = std::max(life, 1.0f / 60.0f);
 	emitterData_->acceleration = accel;
-	// Update 側でも同じ加速度を使う
-	updateEmitterData_->acceleration = accel;
+	emitterData_->color = color;
 	emitterData_->emit = 1;
 
 	perFrameData_->time = 0.0f;

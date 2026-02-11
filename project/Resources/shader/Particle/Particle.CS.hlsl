@@ -57,8 +57,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
             gParticles[emitIndex].velocity = (generator.Generate3d() * 2.0f - 1.0f) * 0.05f;
             gParticles[emitIndex].lifeTime = gEmitter.lifeTime;
             gParticles[emitIndex].currentTime = 0.0f;
-            gParticles[emitIndex].color.rgb = generator.Generate3d();
-            gParticles[emitIndex].color.a = 1.0f;
+            gParticles[emitIndex].color = gEmitter.color;
         }
         else
         {

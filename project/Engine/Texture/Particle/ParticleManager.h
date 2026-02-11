@@ -6,6 +6,7 @@
 #include "Vector3.h"
 #include "Vector4.h"
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <d3d12.h>
 #include <list>
@@ -51,7 +52,7 @@ public:
 	static ParticleManager* GetInstance();
 	void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager);
 	void CreateParticleGroup(const std::string& name, const std::string& textureFilePath);
-	void Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life);
+	void Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life, const Vector4& color);
 	void SetCamera(Camera* camera);
 	void SetBlendMode(BlendMode mode);
 
@@ -70,7 +71,10 @@ private:
 		uint32_t emit = 0;
 		float lifeTime = 120.0f;
 		Vector3 acceleration{0.0f, 0.0f, 0.0f};
+		Vector4 color{1.0f, 1.0f, 1.0f, 1.0f};
 	};
+	static_assert(offsetof(EmitterSphere, color) == 48, "EmitterSphere.color layout mismatch with shader cbuffer");
+	static_assert(sizeof(EmitterSphere) == 64, "EmitterSphere size mismatch with shader cbuffer");
 
 	struct PerFrame {
 		float time = 0.0f;
