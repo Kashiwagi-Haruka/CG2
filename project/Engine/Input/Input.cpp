@@ -313,6 +313,13 @@ float Input::GetRightTrigger() const {
 		norm = 1.0f;
 	return norm;
 }
+bool Input::PushLeftTrigger(float threshold) const { return GetLeftTrigger() >= threshold; }
+
+bool Input::PushRightTrigger(float threshold) const { return GetRightTrigger() >= threshold; }
+
+bool Input::TriggerLeftTrigger(float threshold) const { return GetLeftTrigger() >= threshold && static_cast<float>(prePadState_.lZ) / 65535.0f < threshold; }
+
+bool Input::TriggerRightTrigger(float threshold) const { return GetRightTrigger() >= threshold && static_cast<float>(prePadState_.lRz) / 65535.0f < threshold; }
 void Input::SetDeadZone(float deadZone) {
 	if (deadZone < 0.0f)
 		deadZone = 0.0f;

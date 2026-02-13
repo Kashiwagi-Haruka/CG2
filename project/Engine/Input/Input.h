@@ -145,6 +145,11 @@ public:
 	void SetIsCursorVisible(bool isVisible);
 	float GetLeftTrigger() const;
 	float GetRightTrigger() const;
+	bool PushLeftTrigger(float threshold = 0.5f) const;
+	bool PushRightTrigger(float threshold = 0.5f) const;
+	bool TriggerLeftTrigger(float threshold = 0.5f) const;
+	bool TriggerRightTrigger(float threshold = 0.5f) const;
+	;
 	/// <summary>
 	/// デッドゾーンの設定
 	/// </summary>

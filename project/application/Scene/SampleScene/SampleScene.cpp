@@ -273,6 +273,14 @@ void SampleScene::Update() {
 				hasPush = true;
 			}
 		}
+		if (input->PushLeftTrigger()) {
+			ImGui::BulletText("LT");
+			hasPush = true;
+		}
+		if (input->PushRightTrigger()) {
+			ImGui::BulletText("RT");
+			hasPush = true;
+		}
 		if (!hasPush) {
 			ImGui::TextDisabled("(なし)");
 		}
@@ -285,6 +293,14 @@ void SampleScene::Update() {
 				ImGui::BulletText("%s", buttonName);
 				hasTrigger = true;
 			}
+		}
+		if (input->TriggerLeftTrigger()) {
+			ImGui::BulletText("LT");
+			hasTrigger = true;
+		}
+		if (input->TriggerRightTrigger()) {
+			ImGui::BulletText("RT");
+			hasTrigger = true;
 		}
 		if (!hasTrigger) {
 			ImGui::TextDisabled("(なし)");
