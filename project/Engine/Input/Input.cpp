@@ -12,7 +12,15 @@ using namespace Microsoft::WRL;
 std::unique_ptr<Input> Input::instance_ = nullptr;
 namespace {
 float Clamp01(float value) { return std::clamp(value, 0.0f, 1.0f); }
+constexpr int kLeftTriggerButtonIndex = 10;
+constexpr int kRightTriggerButtonIndex = 11;
 
+float GetDigitalTrigger(const DIJOYSTATE& state, int buttonIndex) {
+	if (buttonIndex < 0 || buttonIndex >= 32) {
+		return 0.0f;
+	}
+	return (state.rgbButtons[buttonIndex] & 0x80) != 0 ? 1.0f : 0.0f;
+}
 float GetCombinedTriggerLeft(LONG zAxis) {
 	// 中央(32767)より小さい側をLTとして扱う
 	return Clamp01((32767.0f - static_cast<float>(zAxis)) / 32767.0f);
@@ -312,23 +320,27 @@ float Input::GetLeftTrigger() const {
 	if (!gamePadDevice_)
 		return 0.0f;
 
+	float analog = 0.0f;
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
-		return GetCombinedTriggerRight(padState_.lZ);
+		analog = GetCombinedTriggerRight(padState_.lZ);
+	} else {
+		analog = Clamp01(static_cast<float>(padState_.lRz) / 65535.0f);
 	}
 
-	return Clamp01(static_cast<float>(padState_.lRz) / 65535.0f);
+	return std::max(analog, GetDigitalTrigger(padState_, kLeftTriggerButtonIndex));
 }
 
 float Input::GetRightTrigger() const {
 	if (!gamePadDevice_)
 		return 0.0f;
-	float norm = static_cast<float>(padState_.lZ) / 65535.0f;
+	float analog = static_cast<float>(padState_.lZ) / 65535.0f;
 
 	// コントローラーによっては LT/RT が lZ の片側にまとまって入る場合がある
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
-		norm = GetCombinedTriggerLeft(padState_.lZ);
+		analog = GetCombinedTriggerLeft(padState_.lZ);
 	}
-	return Clamp01(norm);
+	analog = Clamp01(analog);
+	return std::max(analog, GetDigitalTrigger(padState_, kRightTriggerButtonIndex));
 }
 bool Input::PushLeftTrigger(float threshold) const { return GetLeftTrigger() >= threshold; }
 
@@ -341,6 +353,7 @@ bool Input::TriggerLeftTrigger(float threshold) const {
 	} else {
 		prevNorm = Clamp01(static_cast<float>(prePadState_.lRz) / 65535.0f);
 	}
+	prevNorm = std::max(prevNorm, GetDigitalTrigger(prePadState_, kLeftTriggerButtonIndex));
 	return GetLeftTrigger() >= threshold && prevNorm < threshold;
 }
 
@@ -350,6 +363,7 @@ bool Input::TriggerRightTrigger(float threshold) const {
 		prevNorm = GetCombinedTriggerLeft(prePadState_.lZ);
 	}
 	prevNorm = Clamp01(prevNorm);
+	prevNorm = std::max(prevNorm, GetDigitalTrigger(prePadState_, kRightTriggerButtonIndex));
 	return GetRightTrigger() >= threshold && prevNorm < threshold;
 }
 void Input::SetDeadZone(float deadZone) {
