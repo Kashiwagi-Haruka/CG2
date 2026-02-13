@@ -143,6 +143,8 @@ public:
 	bool ReleaseMouseButton(MouseButton button) const; // マウスボタンが離された瞬間か
 	void SetIsCursorStability(bool isCursor) { isCursorStability = isCursor; }
 	void SetIsCursorVisible(bool isVisible);
+	float GetLeftTrigger() const;
+	float GetRightTrigger() const;
 	/// <summary>
 	/// デッドゾーンの設定
 	/// </summary>

@@ -289,6 +289,14 @@ void SampleScene::Update() {
 		if (!hasTrigger) {
 			ImGui::TextDisabled("(なし)");
 		}
+		ImGui::Separator();
+		ImGui::Text("アナログ入力");
+		const Vector2 leftStick = input->GetJoyStickLXY();
+		const Vector2 rightStick = input->GetJoyStickRXY();
+		ImGui::Text("Left Stick  : X %.3f / Y %.3f", leftStick.x, leftStick.y);
+		ImGui::Text("Right Stick : X %.3f / Y %.3f", rightStick.x, rightStick.y);
+		ImGui::Text("LT: %.3f", input->GetLeftTrigger());
+		ImGui::Text("RT: %.3f", input->GetRightTrigger());
 	}
 	ImGui::End();
 	if (ImGui::Begin("SampleuvBall")) {

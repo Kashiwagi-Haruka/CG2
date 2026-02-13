@@ -292,7 +292,27 @@ float Input::GetJoyStickRY() const {
 }
 
 Vector2 Input::GetJoyStickRXY() const { return Vector2(GetJoyStickRX(), GetJoyStickRY()); }
+float Input::GetLeftTrigger() const {
+	if (!gamePadDevice_)
+		return 0.0f;
+	float norm = static_cast<float>(padState_.lZ) / 65535.0f;
+	if (norm < 0.0f)
+		norm = 0.0f;
+	if (norm > 1.0f)
+		norm = 1.0f;
+	return norm;
+}
 
+float Input::GetRightTrigger() const {
+	if (!gamePadDevice_)
+		return 0.0f;
+	float norm = static_cast<float>(padState_.lRz) / 65535.0f;
+	if (norm < 0.0f)
+		norm = 0.0f;
+	if (norm > 1.0f)
+		norm = 1.0f;
+	return norm;
+}
 void Input::SetDeadZone(float deadZone) {
 	if (deadZone < 0.0f)
 		deadZone = 0.0f;
