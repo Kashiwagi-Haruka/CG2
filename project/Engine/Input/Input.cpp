@@ -1,6 +1,9 @@
+#define NOMINMAX
 #include "Input.h"
 #include <cassert>
+#include <algorithm>
 #include <cmath>
+
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -307,6 +310,13 @@ float Input::GetRightTrigger() const {
 	if (!gamePadDevice_)
 		return 0.0f;
 	float norm = static_cast<float>(padState_.lRz) / 65535.0f;
+
+	// コントローラーによっては RT が lRz ではなく lZ の正方向に入る場合がある
+	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
+		float zAxis = (static_cast<float>(padState_.lZ) - 32767.0f) / 32767.0f;
+		norm = std::max(norm, zAxis);
+	}
+
 	if (norm < 0.0f)
 		norm = 0.0f;
 	if (norm > 1.0f)
@@ -319,7 +329,18 @@ bool Input::PushRightTrigger(float threshold) const { return GetRightTrigger() >
 
 bool Input::TriggerLeftTrigger(float threshold) const { return GetLeftTrigger() >= threshold && static_cast<float>(prePadState_.lZ) / 65535.0f < threshold; }
 
-bool Input::TriggerRightTrigger(float threshold) const { return GetRightTrigger() >= threshold && static_cast<float>(prePadState_.lRz) / 65535.0f < threshold; }
+bool Input::TriggerRightTrigger(float threshold) const {
+	float prevNorm = static_cast<float>(prePadState_.lRz) / 65535.0f;
+	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
+		float prevZAxis = (static_cast<float>(prePadState_.lZ) - 32767.0f) / 32767.0f;
+		prevNorm = std::max(prevNorm, prevZAxis);
+	}
+	if (prevNorm < 0.0f)
+		prevNorm = 0.0f;
+	if (prevNorm > 1.0f)
+		prevNorm = 1.0f;
+	return GetRightTrigger() >= threshold && prevNorm < threshold;
+}
 void Input::SetDeadZone(float deadZone) {
 	if (deadZone < 0.0f)
 		deadZone = 0.0f;
