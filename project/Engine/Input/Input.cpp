@@ -10,6 +10,19 @@
 
 using namespace Microsoft::WRL;
 std::unique_ptr<Input> Input::instance_ = nullptr;
+namespace {
+float Clamp01(float value) { return std::clamp(value, 0.0f, 1.0f); }
+
+float GetCombinedTriggerLeft(LONG zAxis) {
+	// 中央(32767)より小さい側をLTとして扱う
+	return Clamp01((32767.0f - static_cast<float>(zAxis)) / 32767.0f);
+}
+
+float GetCombinedTriggerRight(LONG zAxis) {
+	// 中央(32767)より大きい側をRTとして扱う
+	return Clamp01((static_cast<float>(zAxis) - 32767.0f) / 32767.0f);
+}
+} // namespace
 
 Input* Input::GetInstance() {
 	if (instance_ == nullptr) {
@@ -298,12 +311,12 @@ Vector2 Input::GetJoyStickRXY() const { return Vector2(GetJoyStickRX(), GetJoySt
 float Input::GetLeftTrigger() const {
 	if (!gamePadDevice_)
 		return 0.0f;
-	float norm = static_cast<float>(padState_.lZ) / 65535.0f;
-	if (norm < 0.0f)
-		norm = 0.0f;
-	if (norm > 1.0f)
-		norm = 1.0f;
-	return norm;
+
+	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
+		return GetCombinedTriggerLeft(padState_.lZ);
+	}
+
+	return Clamp01(static_cast<float>(padState_.lZ) / 65535.0f);
 }
 
 float Input::GetRightTrigger() const {
@@ -313,32 +326,30 @@ float Input::GetRightTrigger() const {
 
 	// コントローラーによっては RT が lRz ではなく lZ の正方向に入る場合がある
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
-		float zAxis = (static_cast<float>(padState_.lZ) - 32767.0f) / 32767.0f;
-		norm = std::max(norm, zAxis);
+		norm = GetCombinedTriggerRight(padState_.lZ);
 	}
-
-	if (norm < 0.0f)
-		norm = 0.0f;
-	if (norm > 1.0f)
-		norm = 1.0f;
-	return norm;
+	return Clamp01(norm);
 }
 bool Input::PushLeftTrigger(float threshold) const { return GetLeftTrigger() >= threshold; }
 
 bool Input::PushRightTrigger(float threshold) const { return GetRightTrigger() >= threshold; }
 
-bool Input::TriggerLeftTrigger(float threshold) const { return GetLeftTrigger() >= threshold && static_cast<float>(prePadState_.lZ) / 65535.0f < threshold; }
+bool Input::TriggerLeftTrigger(float threshold) const {
+	float prevNorm = 0.0f;
+	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
+		prevNorm = GetCombinedTriggerLeft(prePadState_.lZ);
+	} else {
+		prevNorm = Clamp01(static_cast<float>(prePadState_.lZ) / 65535.0f);
+	}
+	return GetLeftTrigger() >= threshold && prevNorm < threshold;
+}
 
 bool Input::TriggerRightTrigger(float threshold) const {
 	float prevNorm = static_cast<float>(prePadState_.lRz) / 65535.0f;
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
-		float prevZAxis = (static_cast<float>(prePadState_.lZ) - 32767.0f) / 32767.0f;
-		prevNorm = std::max(prevNorm, prevZAxis);
+		prevNorm = GetCombinedTriggerRight(prePadState_.lZ);
 	}
-	if (prevNorm < 0.0f)
-		prevNorm = 0.0f;
-	if (prevNorm > 1.0f)
-		prevNorm = 1.0f;
+	prevNorm = Clamp01(prevNorm);
 	return GetRightTrigger() >= threshold && prevNorm < threshold;
 }
 void Input::SetDeadZone(float deadZone) {
