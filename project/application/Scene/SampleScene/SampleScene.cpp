@@ -1,6 +1,7 @@
 #include "SampleScene.h"
 #include "Function.h"
 #include "GameBase.h"
+#include "Input.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #include "ParticleManager.h"
@@ -8,6 +9,7 @@
 #include <imgui.h>
 #endif // USE_IMGUI
 #include <numbers>
+#include <utility>
 #include "SceneManager.h"
 SampleScene::SampleScene() {
 
@@ -241,6 +243,51 @@ void SampleScene::Update() {
 			ImGui::DragFloat("AreaLightRadius1", &areaLights_[1].radius, 0.1f);
 			ImGui::DragFloat("AreaLightDecay1", &areaLights_[1].decay, 0.1f);
 			ImGui::TreePop();
+		}
+	}
+	ImGui::End();
+	if (ImGui::Begin("Pad Input")) {
+		ImGui::Text("押されているパッドボタン");
+		const std::array<std::pair<Input::PadButton, const char*>, 14> padButtons = {
+		    {{Input::PadButton::kButtonA, "A"},
+		     {Input::PadButton::kButtonB, "B"},
+		     {Input::PadButton::kButtonX, "X"},
+		     {Input::PadButton::kButtonY, "Y"},
+		     {Input::PadButton::kButtonLeftShoulder, "LB"},
+		     {Input::PadButton::kButtonRightShoulder, "RB"},
+		     {Input::PadButton::kButtonBack, "Back"},
+		     {Input::PadButton::kButtonStart, "Start"},
+		     {Input::PadButton::kButtonLeftThumb, "LStick"},
+		     {Input::PadButton::kButtonRightThumb, "RStick"},
+		     {Input::PadButton::kButtonUp, "DPad Up"},
+		     {Input::PadButton::kButtonDown, "DPad Down"},
+		     {Input::PadButton::kButtonLeft, "DPad Left"},
+		     {Input::PadButton::kButtonRight, "DPad Right"}}
+        };
+
+		Input* input = Input::GetInstance();
+		bool hasPush = false;
+		for (const auto& [button, buttonName] : padButtons) {
+			if (input->PushButton(button)) {
+				ImGui::BulletText("%s", buttonName);
+				hasPush = true;
+			}
+		}
+		if (!hasPush) {
+			ImGui::TextDisabled("(なし)");
+		}
+
+		ImGui::Separator();
+		ImGui::Text("このフレームで押されたボタン");
+		bool hasTrigger = false;
+		for (const auto& [button, buttonName] : padButtons) {
+			if (input->TriggerButton(button)) {
+				ImGui::BulletText("%s", buttonName);
+				hasTrigger = true;
+			}
+		}
+		if (!hasTrigger) {
+			ImGui::TextDisabled("(なし)");
 		}
 	}
 	ImGui::End();
