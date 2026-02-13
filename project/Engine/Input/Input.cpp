@@ -313,20 +313,20 @@ float Input::GetLeftTrigger() const {
 		return 0.0f;
 
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
-		return GetCombinedTriggerLeft(padState_.lZ);
+		return GetCombinedTriggerRight(padState_.lZ);
 	}
 
-	return Clamp01(static_cast<float>(padState_.lZ) / 65535.0f);
+	return Clamp01(static_cast<float>(padState_.lRz) / 65535.0f);
 }
 
 float Input::GetRightTrigger() const {
 	if (!gamePadDevice_)
 		return 0.0f;
-	float norm = static_cast<float>(padState_.lRz) / 65535.0f;
+	float norm = static_cast<float>(padState_.lZ) / 65535.0f;
 
-	// コントローラーによっては RT が lRz ではなく lZ の正方向に入る場合がある
+	// コントローラーによっては LT/RT が lZ の片側にまとまって入る場合がある
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
-		norm = GetCombinedTriggerRight(padState_.lZ);
+		norm = GetCombinedTriggerLeft(padState_.lZ);
 	}
 	return Clamp01(norm);
 }
@@ -337,17 +337,17 @@ bool Input::PushRightTrigger(float threshold) const { return GetRightTrigger() >
 bool Input::TriggerLeftTrigger(float threshold) const {
 	float prevNorm = 0.0f;
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
-		prevNorm = GetCombinedTriggerLeft(prePadState_.lZ);
+		prevNorm = GetCombinedTriggerRight(prePadState_.lZ);
 	} else {
-		prevNorm = Clamp01(static_cast<float>(prePadState_.lZ) / 65535.0f);
+		prevNorm = Clamp01(static_cast<float>(prePadState_.lRz) / 65535.0f);
 	}
 	return GetLeftTrigger() >= threshold && prevNorm < threshold;
 }
 
 bool Input::TriggerRightTrigger(float threshold) const {
-	float prevNorm = static_cast<float>(prePadState_.lRz) / 65535.0f;
+	float prevNorm = static_cast<float>(prePadState_.lZ) / 65535.0f;
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
-		prevNorm = GetCombinedTriggerRight(prePadState_.lZ);
+		prevNorm = GetCombinedTriggerLeft(prePadState_.lZ);
 	}
 	prevNorm = Clamp01(prevNorm);
 	return GetRightTrigger() >= threshold && prevNorm < threshold;
