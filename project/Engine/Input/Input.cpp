@@ -12,14 +12,28 @@ using namespace Microsoft::WRL;
 std::unique_ptr<Input> Input::instance_ = nullptr;
 namespace {
 float Clamp01(float value) { return std::clamp(value, 0.0f, 1.0f); }
-constexpr int kLeftTriggerButtonIndex = 10;
-constexpr int kRightTriggerButtonIndex = 11;
+constexpr int kDefaultLeftTriggerButtonIndex = 10;
+constexpr int kDefaultRightTriggerButtonIndex = 11;
 
 float GetDigitalTrigger(const DIJOYSTATE& state, int buttonIndex) {
 	if (buttonIndex < 0 || buttonIndex >= 32) {
 		return 0.0f;
 	}
 	return (state.rgbButtons[buttonIndex] & 0x80) != 0 ? 1.0f : 0.0f;
+}
+
+int FindNewlyPressedButton(const DIJOYSTATE& now, const DIJOYSTATE& prev, int skipIndexA, int skipIndexB) {
+	for (int i = 0; i < 32; ++i) {
+		if (i == skipIndexA || i == skipIndexB) {
+			continue;
+		}
+		bool nowPressed = (now.rgbButtons[i] & 0x80) != 0;
+		bool prevPressed = (prev.rgbButtons[i] & 0x80) != 0;
+		if (nowPressed && !prevPressed) {
+			return i;
+		}
+	}
+	return -1;
 }
 float GetCombinedTriggerLeft(LONG zAxis) {
 	// 中央(32767)より小さい側をLTとして扱う
@@ -131,6 +145,30 @@ void Input::Update() {
 		}
 	}
 
+	if (gamePadDevice_ && padState_.lRz == 0 && prePadState_.lRz == 0) {
+		constexpr float kTriggerDetectThreshold = 0.55f;
+
+		if (leftTriggerButtonIndex_ < 0 || leftTriggerButtonIndex_ >= 32) {
+			leftTriggerButtonIndex_ = kDefaultLeftTriggerButtonIndex;
+		}
+		if (rightTriggerButtonIndex_ < 0 || rightTriggerButtonIndex_ >= 32) {
+			rightTriggerButtonIndex_ = kDefaultRightTriggerButtonIndex;
+		}
+
+		if (GetCombinedTriggerRight(padState_.lZ) >= kTriggerDetectThreshold) {
+			int detected = FindNewlyPressedButton(padState_, prePadState_, rightTriggerButtonIndex_, -1);
+			if (detected >= 0) {
+				leftTriggerButtonIndex_ = detected;
+			}
+		}
+
+		if (GetCombinedTriggerLeft(padState_.lZ) >= kTriggerDetectThreshold) {
+			int detected = FindNewlyPressedButton(padState_, prePadState_, leftTriggerButtonIndex_, -1);
+			if (detected >= 0) {
+				rightTriggerButtonIndex_ = detected;
+			}
+		}
+	}
 	if (winApp_->GetIsPad()) {
 
 		// --- もしデバイスが切れていたら再列挙 ---
@@ -327,7 +365,7 @@ float Input::GetLeftTrigger() const {
 		analog = Clamp01(static_cast<float>(padState_.lRz) / 65535.0f);
 	}
 
-	return std::max(analog, GetDigitalTrigger(padState_, kLeftTriggerButtonIndex));
+	return std::max(analog, GetDigitalTrigger(padState_, leftTriggerButtonIndex_));
 }
 
 float Input::GetRightTrigger() const {
@@ -340,7 +378,7 @@ float Input::GetRightTrigger() const {
 		analog = GetCombinedTriggerLeft(padState_.lZ);
 	}
 	analog = Clamp01(analog);
-	return std::max(analog, GetDigitalTrigger(padState_, kRightTriggerButtonIndex));
+	return std::max(analog, GetDigitalTrigger(padState_, rightTriggerButtonIndex_));
 }
 bool Input::PushLeftTrigger(float threshold) const { return GetLeftTrigger() >= threshold; }
 
@@ -353,7 +391,7 @@ bool Input::TriggerLeftTrigger(float threshold) const {
 	} else {
 		prevNorm = Clamp01(static_cast<float>(prePadState_.lRz) / 65535.0f);
 	}
-	prevNorm = std::max(prevNorm, GetDigitalTrigger(prePadState_, kLeftTriggerButtonIndex));
+	prevNorm = std::max(prevNorm, GetDigitalTrigger(prePadState_, leftTriggerButtonIndex_));
 	return GetLeftTrigger() >= threshold && prevNorm < threshold;
 }
 
@@ -363,7 +401,7 @@ bool Input::TriggerRightTrigger(float threshold) const {
 		prevNorm = GetCombinedTriggerLeft(prePadState_.lZ);
 	}
 	prevNorm = Clamp01(prevNorm);
-	prevNorm = std::max(prevNorm, GetDigitalTrigger(prePadState_, kRightTriggerButtonIndex));
+	prevNorm = std::max(prevNorm, GetDigitalTrigger(prePadState_, rightTriggerButtonIndex_));
 	return GetRightTrigger() >= threshold && prevNorm < threshold;
 }
 void Input::SetDeadZone(float deadZone) {

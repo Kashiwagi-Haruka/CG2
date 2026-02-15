@@ -31,6 +31,8 @@ class Input {
 	LONG mouseX_ = 0;
 	LONG mouseY_ = 0;
 	int noPadCounter = 0;
+	int leftTriggerButtonIndex_ = 10;
+	int rightTriggerButtonIndex_ = 11;
 
 	WinApp* winApp_ = nullptr;
 
