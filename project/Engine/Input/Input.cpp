@@ -21,7 +21,14 @@ float GetDigitalTrigger(const DIJOYSTATE& state, int buttonIndex) {
 	}
 	return (state.rgbButtons[buttonIndex] & 0x80) != 0 ? 1.0f : 0.0f;
 }
-
+bool IsCombinedTriggerBothPressed(const DIJOYSTATE& state, int leftButtonIndex, int rightButtonIndex) {
+	if (leftButtonIndex < 0 || leftButtonIndex >= 32 || rightButtonIndex < 0 || rightButtonIndex >= 32) {
+		return false;
+	}
+	const bool leftPressed = (state.rgbButtons[leftButtonIndex] & 0x80) != 0;
+	const bool rightPressed = (state.rgbButtons[rightButtonIndex] & 0x80) != 0;
+	return leftPressed && rightPressed;
+}
 int FindNewlyPressedButton(const DIJOYSTATE& now, const DIJOYSTATE& prev, int skipIndexA, int skipIndexB) {
 	for (int i = 0; i < 32; ++i) {
 		if (i == skipIndexA || i == skipIndexB) {
@@ -361,6 +368,9 @@ float Input::GetLeftTrigger() const {
 	float analog = 0.0f;
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
 		analog = GetCombinedTriggerRight(padState_.lZ);
+		if (IsCombinedTriggerBothPressed(padState_, leftTriggerButtonIndex_, rightTriggerButtonIndex_)) {
+			analog = 1.0f;
+		}
 	} else {
 		analog = Clamp01(static_cast<float>(padState_.lRz) / 65535.0f);
 	}
@@ -376,6 +386,9 @@ float Input::GetRightTrigger() const {
 	// コントローラーによっては LT/RT が lZ の片側にまとまって入る場合がある
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
 		analog = GetCombinedTriggerLeft(padState_.lZ);
+		if (IsCombinedTriggerBothPressed(padState_, leftTriggerButtonIndex_, rightTriggerButtonIndex_)) {
+			analog = 1.0f;
+		}
 	}
 	analog = Clamp01(analog);
 	return std::max(analog, GetDigitalTrigger(padState_, rightTriggerButtonIndex_));
