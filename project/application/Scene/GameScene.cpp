@@ -1,8 +1,5 @@
 #include "GameScene.h"
-
-#include "GameTimer/GameTimer.h"
 #include "Model/ModelManager.h"
-
 #include "Object3d/Object3dCommon.h"
 #include "ParticleManager.h"
 #include "SceneManager.h"
@@ -13,16 +10,11 @@
 #include <numbers>
 
 GameScene::GameScene() {
-
-
-
 	sceneTransition = std::make_unique<SceneTransition>();
-
 
 	pause = std::make_unique<Pause>();
 	BGMData = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Tailshaft.mp3");
 	Audio::GetInstance()->SetSoundVolume(&BGMData, 0.3f);
-	GameTimer::GetInstance()->Reset();
 }
 
 GameScene::~GameScene() {}
@@ -31,10 +23,6 @@ void GameScene::Finalize() {
 
 	Audio::GetInstance()->SoundUnload(&BGMData);
 
-	// level up icons
-	for (int i = 0; i < 4; i++) {
-		levelupIcons[i].reset();
-	}
 }
 
 void GameScene::Initialize() {
@@ -129,7 +117,6 @@ void GameScene::DebugImGui() {
 
 
 void GameScene::Update() {
-	GameTimer::GetInstance()->Update();
 	if (!isBGMPlaying) {
 		Audio::GetInstance()->SoundPlayWave(BGMData, true);
 		isBGMPlaying = true;

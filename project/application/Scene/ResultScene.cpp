@@ -1,6 +1,5 @@
 #include "ResultScene.h"
 #include "Input.h"
-#include "GameTimer/GameTimer.h"
 #include "SceneManager.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
