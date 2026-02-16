@@ -144,6 +144,7 @@ void GameScene::Draw() {
 	
 	pause->Draw();
 	if (isTransitionIn || isTransitionOut) {
+
 		sceneTransition->Draw();
 	}
 }
