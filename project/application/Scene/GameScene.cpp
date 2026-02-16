@@ -35,9 +35,6 @@ void GameScene::Initialize() {
 	isTransitionIn = true;
 	isTransitionOut = false;
 	nextSceneName.clear();
-	
-	
-
 	activePointLightCount_ = 3;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {-75.0f, 10.0f, -75.0f};
@@ -131,7 +128,6 @@ void GameScene::Update() {
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
 
-	/*ParticleManager::GetInstance()->Update(cameraController->GetCamera());*/
 
 	if (isTransitionIn || isTransitionOut) {
 		sceneTransition->Update();
