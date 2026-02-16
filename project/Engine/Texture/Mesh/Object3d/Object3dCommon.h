@@ -13,6 +13,7 @@ class Camera;
 class DirectXCommon;
 class Object3dCommon {
 
+
 private:
 	static std::unique_ptr<Object3dCommon> instance;
 
@@ -38,6 +39,7 @@ private:
 	std::unique_ptr<CreatePSO> psoSkinning_;
 	std::unique_ptr<CreatePSO> psoSkinningToon_;
 	std::unique_ptr<CreatePSO> psoMirror_;
+	std::unique_ptr<CreatePSO> psoShadow_;
 
 	// Directional Light（共通）
 	DirectionalLight* directionalLightData_ = nullptr;
@@ -58,7 +60,14 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> areaLightCountResource_ = nullptr;
 	uint32_t areaLightSrvIndex_ = 0;
 	uint32_t environmentMapSrvIndex_ = 0;
+	uint32_t shadowMapSrvIndex_ = 0;
 	std::string environmentMapPath_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> shadowMapResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> shadowDsvHeap_ = nullptr;
+	D3D12_VIEWPORT shadowViewport_{};
+	D3D12_RECT shadowScissorRect_{};
+	static constexpr uint32_t kShadowMapSize_ = 2048;
+	bool isShadowMapPassActive_ = false;
 
 	void DrawSet();
 
@@ -81,6 +90,9 @@ public:
 	void DrawCommonSkinning();
 	void DrawCommonSkinningToon();
 	void DrawCommonMirror();
+	void DrawCommonShadow();
+	void BeginShadowMapPass();
+	void EndShadowMapPass();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	DirectXCommon* GetDxCommon() const { return dxCommon_; };
 	void SetBlendMode(BlendMode blendmode);
@@ -93,6 +105,8 @@ public:
 	ID3D12Resource* GetAreaLightCountResource() const { return areaLightCountResource_.Get(); }
 	uint32_t GetAreaLightSrvIndex() const { return areaLightSrvIndex_; }
 	uint32_t GetEnvironmentMapSrvIndex() const { return environmentMapSrvIndex_; }
+	uint32_t GetShadowMapSrvIndex() const { return shadowMapSrvIndex_; }
+	bool IsShadowMapPassActive() const { return isShadowMapPassActive_; }
 	void SetEnvironmentMapTexture(const std::string& filePath);
 	void SetEnvironmentMapTextureResource(ID3D12Resource* resource, DXGI_FORMAT format);
 	void SetDirectionalLight(DirectionalLight& light);

@@ -93,6 +93,7 @@ public:
 	void UpdateFixFPS();
 	void PreDraw();
 	void PostDraw();
+	void SetMainRenderTarget();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void Finalize();
 	float GetDeltaTime() const { return deltaTime_; }
