@@ -1,88 +1,86 @@
 #define NOMINMAX
 #include "DebugCamera.h"
+
+#include "Function.h"
 #include "Input.h"
-#include "ImGuiManager.h"
-#include "Input.h"
+#include "WinApp.h"
 #include <algorithm>
+
+namespace {
+Matrix4x4 MakeCameraViewMatrix(const Transform& transform) {
+	const Matrix4x4 inverseTranslate = Function::MakeTranslateMatrix(-transform.translate.x, -transform.translate.y, -transform.translate.z);
+	const Matrix4x4 inverseRotateY = Function::MakeRotateYMatrix(-transform.rotate.y);
+	const Matrix4x4 inverseRotateX = Function::MakeRotateXMatrix(-transform.rotate.x);
+	const Matrix4x4 inverseRotateZ = Function::MakeRotateZMatrix(-transform.rotate.z);
+	return Function::Multiply(Function::Multiply(Function::Multiply(inverseTranslate, inverseRotateY), inverseRotateX), inverseRotateZ);
+}
+} // namespace
+
 void DebugCamera::Initialize() {
-	// ViewMatrixの作成
-	Matrix4x4 cameraMatrix = Function::MakeAffineMatrix(
-	    {1, 1, 1},   // スケールは1
-	    rotation_,   // 初期回転（デフォルト: {0, 0, 0}）
-	    translation_ // 初期位置（デフォルト: {0, 0, -50}）
-	);
-
-	viewMatrix_ = Function::Inverse(cameraMatrix);
-
-	// ProjectionMatrixの作成（FOV: 0.45f * π、アスペクト比: 16:9、近クリップ: 0.1f、遠クリップ: 1000.0f）
-	float fovY = 0.45f * 3.14159265f; // ラジアン
-	float aspectRatio = 16.0f / 9.0f;
-	float nearClip = 0.1f;
-	float farClip = 1000.0f;
-
-	projectionMatrix_ = Function::MakePerspectiveFovMatrix(fovY, aspectRatio, nearClip, farClip);
+	fovY_ = 0.45f * 3.14159265f;
+	aspectRatio_ = float(WinApp::kClientWidth) / float(WinApp::kClientHeight);
+	nearZ_ = 0.1f;
+	farZ_ = 10000.0f;
 	matRot_ = Function::MakeIdentity4x4();
+	translation_ = transform_.translate;
+	Update();
+}
+
+void DebugCamera::SetTransform(const Transform& transform) {
+	transform_ = transform;
+	pivot_ = {0.0f, 0.0f, 0.0f};
+	translation_ = transform.translate;
+	matRot_ = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, transform.rotate, {0.0f, 0.0f, 0.0f});
+}
+
+void DebugCamera::SetRotation(const Vector3& rotation) {
+	transform_.rotate = rotation;
+	matRot_ = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, transform_.rotate, {0.0f, 0.0f, 0.0f});
 }
 
 void DebugCamera::Update() {
-	// ── ImGui でパラメータをいじれるように ──
-	// ImGui::Begin("DebugCamera");
-	// ImGui::SliderFloat3("Offset", &translation_.x, -100.0f, 1000.0f);
-	// ImGui::SliderFloat3("Pivot", &pivot_.x, 0.0f, 1000.0f);
-	// ImGui::End();
-
-	const float rotSpeed = 0.005f;
-	const float zoomSpeed = 0.01f;
+	const float rotateSpeed = 0.005f;
 	const float panSpeed = 0.02f;
+	const float zoomSpeed = 0.01f;
+
+	Input* input = Input::GetInstance();
+	const Vector2 mouseMove = input->GetMouseMove();
+	const bool isLeftDrag = input->PushMouseButton(Input::MouseButton::kLeft);
+	const bool isShift = input->PushKey(DIK_LSHIFT) || input->PushKey(DIK_RSHIFT);
+
 	float dPitch = 0.0f;
 	float dYaw = 0.0f;
-
-	Input* Input = Input::GetInstance();
-	Vector2 mouseMove = Input->GetMouseMove();
-	const bool isShift = Input->PushKey(DIK_LSHIFT) || Input->PushKey(DIK_RSHIFT);
-	const bool isLeftDrag = Input->PushMouseButton(Input::MouseButton::kLeft);
-
 	if (isLeftDrag && !isShift) {
-		dYaw = mouseMove.x * rotSpeed;
-		dPitch = mouseMove.y * rotSpeed;
+		dYaw = mouseMove.x * rotateSpeed;
+		dPitch = mouseMove.y * rotateSpeed;
 	} else if (isLeftDrag && isShift) {
-		Vector3 right = {matRot_.m[0][0], matRot_.m[1][0], matRot_.m[2][0]};
-		Vector3 up = {matRot_.m[0][1], matRot_.m[1][1], matRot_.m[2][1]};
+		const Vector3 right = {matRot_.m[0][0], matRot_.m[1][0], matRot_.m[2][0]};
+		const Vector3 up = {matRot_.m[0][1], matRot_.m[1][1], matRot_.m[2][1]};
 		pivot_ += right * (-mouseMove.x * panSpeed);
 		pivot_ += up * (mouseMove.y * panSpeed);
 	}
 
-	const float wheelDelta = Input->GetMouseWheelDelta();
+	const float wheelDelta = input->GetMouseWheelDelta();
 	if (wheelDelta != 0.0f) {
 		translation_.z += wheelDelta * zoomSpeed;
-		translation_.z = std::min(translation_.z, -1.0f);
-		translation_.z = std::max(translation_.z, -500.0f);
+		translation_.z = std::clamp(translation_.z, -500.0f, -1.0f);
 	}
 
-	// ── 累積回転行列に今回フレーム分の回転を乗算 ──
 	Matrix4x4 matRotDelta = Function::MakeIdentity4x4();
 	matRotDelta = Function::Multiply(matRotDelta, Function::MakeRotateXMatrix(dPitch));
 	matRotDelta = Function::Multiply(matRotDelta, Function::MakeRotateYMatrix(dYaw));
-	matRot_ = Function::Multiply(matRotDelta, matRot_); // ★資料「回転行列の累積」と同じ
+	matRot_ = Function::Multiply(matRotDelta, matRot_);
+	transform_.rotate.x += dPitch;
+	transform_.rotate.y += dYaw;
 
-	// ── scale は GUI 値が大きいほどズームインにしたいので逆数を使う ──
-	Vector3 invScale = {scale_.x, scale_.y, scale_.z};
+	const Matrix4x4 pivotMat = Function::MakeTranslateMatrix(pivot_);
+	const Matrix4x4 scaleMat = Function::MakeScaleMatrix(scale_);
+	const Matrix4x4 offsetMat = Function::MakeTranslateMatrix(translation_);
+	const Matrix4x4 pivotCameraMatrix = Function::Multiply(Function::Multiply(Function::Multiply(pivotMat, matRot_), scaleMat), offsetMat);
 
-	// ── 行列合成：Pivot→累積回転→Scale→Offset（Pivot→(R→S→T)）─
-	Matrix4x4 pivotMat = Function::MakeTranslateMatrix(pivot_);
-	Matrix4x4 scaleMat = Function::MakeScaleMatrix(invScale);
-	Matrix4x4 offsetMat = Function::MakeTranslateMatrix(translation_);
-
-	// world→camera 行列
-	//    ① pivot へ
-	//    ② 回転（累積）
-	//    ③ スケール（ズーム）
-	//    ④ オフセット（距離）
-	Matrix4x4 worldCam = Function::Multiply(Function::Multiply(Function::Multiply(pivotMat, matRot_), scaleMat), offsetMat);
-
-	// ── ビュー行列は逆行列を取ってセット ──
-	viewMatrix_ = Function::Inverse(worldCam);
-
-	// ── ビュー×プロジェクション行列を更新 ──
+	transform_.translate = {pivotCameraMatrix.m[3][0], pivotCameraMatrix.m[3][1], pivotCameraMatrix.m[3][2]};
+	worldMatrix_ = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, transform_.rotate, transform_.translate);
+	viewMatrix_ = MakeCameraViewMatrix(transform_);
+	projectionMatrix_ = Function::MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearZ_, farZ_);
 	viewProjectionMatrix_ = Function::Multiply(viewMatrix_, projectionMatrix_);
 }

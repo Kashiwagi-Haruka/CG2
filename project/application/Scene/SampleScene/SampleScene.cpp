@@ -466,16 +466,16 @@ void SampleScene::Update() {
 }
 void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
-	// uvBallObj_->Draw();
-	// planeGltf_->Draw();
-	// fieldObj_->Draw();
-	//animatedCubeObj_->Draw();
+	 uvBallObj_->Draw();
+	 planeGltf_->Draw();
+	 fieldObj_->Draw();
+	animatedCubeObj_->Draw();
 	 if (sampleParticleEmitter_) {
 		Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
 		 sampleParticleEmitter_->Draw();
 	 }
-	//Object3dCommon::GetInstance()->DrawCommonSkinningToon();
-	//humanObj_->Draw();
+	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
+	humanObj_->Draw();
 	//Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 	//if (humanSkeleton_) {
 	//	humanSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
