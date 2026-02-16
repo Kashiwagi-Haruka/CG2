@@ -156,21 +156,9 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application\Object\Character\CharacterDisplay\CharacterDisplay.cpp" />
-    <ClCompile Include="application\Object\Character\CharacterDisplay\CharacterDisplaySkyDome.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp" />
-    <ClCompile Include="application\CollisionManager\CollisionManager.cpp" />
-    <ClCompile Include="application\Object\Boss\Boss.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp" />
-    <ClCompile Include="application\Object\Enemy\EnemyAttack.cpp" />
-    <ClCompile Include="application\Object\Enemy\EnemyHitEffect.cpp" />
-    <ClCompile Include="application\Object\Character\Model\CharacterModel.cpp" />
     <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp" />
-    <ClCompile Include="application\Object\Enemy\Enemy.cpp" />
-    <ClCompile Include="application\CameraController\CameraController.cpp" />
-    <ClCompile Include="application\Object\Enemy\EnemyManager.cpp" />
-    <ClCompile Include="application\Object\Enemy\EnemyStun.cpp" />
-    <ClCompile Include="application\Object\Player\PlayerParameters.cpp" />
     <ClCompile Include="Engine\Loadfile\CSVManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
@@ -180,8 +168,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\BlendMode\BlendModeManager.cpp" />
     <ClCompile Include="Engine\base\DirectXCommon.cpp" />
     <ClCompile Include="Engine\LeakChecker\D3DResourceLeakChecker.cpp" />
-    <ClCompile Include="application\Object\ExpCube\ExpCube.cpp" />
-    <ClCompile Include="application\Object\ExpCube\ExpCubeManager.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -222,37 +208,20 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\SrvManager\SrvManager.cpp" />
     <ClCompile Include="Engine\Texture\Particle\ParticleManager.cpp" />
     <ClCompile Include="Engine\Texture\Particle\ParticleEmitter.cpp" />
-    <ClCompile Include="application\Object\Player\Player.cpp" />
-    <ClCompile Include="application\Object\MapchipField.cpp" />
-    <ClCompile Include="application\Object\Background\SkyDome.cpp" />
     <ClCompile Include="application\Scene\ResultScene.cpp" />
     <ClCompile Include="application\Scene\TitleScene.cpp" />
-    <ClCompile Include="application\UIManager\UIManager.cpp" />
     <ClCompile Include="application\SceneTransition\SceneTransition.cpp" />
-    <ClCompile Include="application\Particles\Particles.cpp" />
     <ClCompile Include="Engine\BaseScene\SceneManager.cpp" />
     <ClCompile Include="Engine\BaseScene\FrameWork.cpp" />
     <ClCompile Include="application\Scene\Game\Game.cpp" />
     <ClCompile Include="application\Scene\GameOverScene.cpp" />
-    <ClCompile Include="application\Object\House\House.cpp" />
     <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp" />
     <ClCompile Include="application\Scene\SampleScene\SampleScene.cpp" />
-    <ClCompile Include="application\Object\Player\PlayerSword.cpp" />
-    <ClCompile Include="application\Object\Player\Attack\Skill\PlayerSkill.cpp" />
-    <ClCompile Include="application\Object\Player\Attack\Special\PlayerSpecialAttack.cpp" />
-    <ClCompile Include="application\Object\Player\PlayerModels.cpp" />
     <ClCompile Include="application\GameTimer\GameTimer.cpp" />
     <ClCompile Include="application\Pause\Pause.cpp" />
-    <ClCompile Include="application\Object\House\HouseHP.cpp" />
-    <ClCompile Include="application\Team\Team.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Primitive\Primitive.cpp" />
-    <ClCompile Include="application\Object\Playable\Model\PlayableModel.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\Skeleton.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\SkinCluster.cpp" />
-    <ClCompile Include="application\Scene\TutorialScene.cpp" />
-    <ClCompile Include="application\Object\Player\playerSwordTrail.cpp" />
-    <ClCompile Include="application\TutorialUI\TutorialUI.cpp" />
-    <ClCompile Include="application\Object\Character\Sizuku\Sizuku.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -268,26 +237,13 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <None Include="Resources\shader\Sprite\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="application\Object\Character\CharacterDisplay\CharacterDisplay.h" />
-    <ClInclude Include="application\Object\Character\CharacterDisplay\CharacterDisplaySkyDome.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\AnimationManager.h" />
-    <ClInclude Include="application\CollisionManager\CollisionManager.h" />
-    <ClInclude Include="application\Object\Boss\Boss.h" />
-    <ClInclude Include="application\Object\Playable\PlayableParameter.h" />
     <ClInclude Include="Engine\Math\QuaternionTransform.h" />
     <ClInclude Include="Engine\Texture\Color.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h" />
-    <ClInclude Include="application\Object\Enemy\EnemyAttack.h" />
-    <ClInclude Include="application\Object\Enemy\EnemyHitEffect.h" />
-    <ClInclude Include="application\Object\Character\Model\CharacterModel.h" />
     <ClInclude Include="Engine\Texture\Light\AreaLight.h" />
     <ClInclude Include="Engine\Texture\PSO\CreatePSO.h" />
     <ClInclude Include="Engine\BaseScene\AbstractSceneFactory.h" />
-    <ClInclude Include="application\Object\Enemy\Enemy.h" />
-    <ClInclude Include="application\CameraController\CameraController.h" />
-    <ClInclude Include="application\Object\Enemy\EnemyManager.h" />
-    <ClInclude Include="application\Object\Enemy\EnemyStun.h" />
-    <ClInclude Include="application\Object\Player\PlayerParameters.h" />
     <ClInclude Include="Engine\BaseScene\BaseScene.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\Loadfile\CSVManager.h" />
@@ -303,8 +259,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\Light\PointLight.h" />
     <ClInclude Include="Engine\Texture\Light\SpotLight.h" />
     <ClInclude Include="Engine\Texture\SkinningData.h" />
-    <ClInclude Include="application\Object\ExpCube\ExpCube.h" />
-    <ClInclude Include="application\Object\ExpCube\ExpCubeManager.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -336,38 +290,21 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\SrvManager\SrvManager.h" />
     <ClInclude Include="Engine\Texture\Particle\ParticleManager.h" />
     <ClInclude Include="Engine\Texture\Particle\ParticleEmitter.h" />
-    <ClInclude Include="application\Object\Player\Player.h" />
-    <ClInclude Include="application\Object\MapchipField.h" />
-    <ClInclude Include="application\Object\Background\SkyDome.h" />
     <ClInclude Include="application\Scene\ResultScene.h" />
     <ClInclude Include="application\Scene\TitleScene.h" />
-    <ClInclude Include="application\UIManager\UIManager.h" />
     <ClInclude Include="application\SceneTransition\SceneTransition.h" />
-    <ClInclude Include="application\Particles\Particles.h" />
     <ClInclude Include="Engine\BaseScene\SceneManager.h" />
     <ClInclude Include="Engine\BaseScene\FrameWork.h" />
     <ClInclude Include="application\Scene\Game\Game.h" />
     <ClInclude Include="application\Scene\GameOverScene.h" />
     <ClInclude Include="Engine\Texture\Light\DirectionalLight.h" />
-    <ClInclude Include="application\Object\House\House.h" />
     <ClInclude Include="application\Scene\SceneFactory\SceneFactory.h" />
     <ClInclude Include="application\Scene\SampleScene\SampleScene.h" />
-    <ClInclude Include="application\Object\Player\PlayerSword.h" />
-    <ClInclude Include="application\Object\Player\Attack\Skill\PlayerSkill.h" />
-    <ClInclude Include="application\Object\Player\Attack\Special\PlayerSpecialAttack.h" />
-    <ClInclude Include="application\Object\Player\PlayerModels.h" />
     <ClInclude Include="application\GameTimer\GameTimer.h" />
     <ClInclude Include="application\Pause\Pause.h" />
-    <ClInclude Include="application\Object\House\HouseHP.h" />
-    <ClInclude Include="application\Team\Team.h" />
     <ClInclude Include="Engine\Texture\Mesh\Primitive\Primitive.h" />
-    <ClInclude Include="application\Object\Playable\Model\PlayableModel.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\Skeleton.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\SkinCluster.h" />
-    <ClInclude Include="application\Scene\TutorialScene.h" />
-    <ClInclude Include="application\Object\Player\playerSwordTrail.h" />
-    <ClInclude Include="application\TutorialUI\TutorialUI.h" />
-    <ClInclude Include="application\Object\Character\Sizuku\Sizuku.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d\Object3d.PS.hlsl">
