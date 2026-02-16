@@ -7,6 +7,7 @@
 #include <dinput.h>
 #include <memory>
 #include <wrl.h>
+#include <Xinput.h>
 
 class Input {
 	static std::unique_ptr<Input> instance_;
@@ -33,6 +34,9 @@ class Input {
 	int noPadCounter = 0;
 	int leftTriggerButtonIndex_ = 10;
 	int rightTriggerButtonIndex_ = 11;
+	bool isXInputConnected_ = false;
+	XINPUT_STATE xInputState_{};
+	XINPUT_STATE preXInputState_{};
 
 	WinApp* winApp_ = nullptr;
 

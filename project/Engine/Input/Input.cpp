@@ -7,6 +7,7 @@
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "xinput.lib")
 
 using namespace Microsoft::WRL;
 std::unique_ptr<Input> Input::instance_ = nullptr;
@@ -65,6 +66,7 @@ void GetCombinedTriggerValues(const DIJOYSTATE& state, int leftButtonIndex, int 
 		outRight = std::max(outRight, rightDigital);
 	}
 }
+float NormalizeXInputTrigger(BYTE triggerValue) { return Clamp01(static_cast<float>(triggerValue) / 255.0f); }
 } // namespace
 
 Input* Input::GetInstance() {
@@ -142,6 +144,9 @@ void Input::Update() {
 
 	// ゲームパッド
 	prePadState_ = padState_;
+	preXInputState_ = xInputState_;
+	xInputState_ = {};
+	isXInputConnected_ = XInputGetState(0, &xInputState_) == ERROR_SUCCESS;
 
 	if (gamePadDevice_) {
 		HRESULT hr = gamePadDevice_->Acquire();
@@ -354,6 +359,10 @@ float Input::GetJoyStickRY() const {
 
 Vector2 Input::GetJoyStickRXY() const { return Vector2(GetJoyStickRX(), GetJoyStickRY()); }
 float Input::GetLeftTrigger() const {
+	if (isXInputConnected_) {
+		return NormalizeXInputTrigger(xInputState_.Gamepad.bLeftTrigger);
+	}
+
 	if (!gamePadDevice_)
 		return 0.0f;
 
@@ -369,6 +378,10 @@ float Input::GetLeftTrigger() const {
 }
 
 float Input::GetRightTrigger() const {
+	if (isXInputConnected_) {
+		return NormalizeXInputTrigger(xInputState_.Gamepad.bRightTrigger);
+	}
+
 	if (!gamePadDevice_)
 		return 0.0f;
 
@@ -387,6 +400,12 @@ bool Input::PushLeftTrigger(float threshold) const { return GetLeftTrigger() >= 
 bool Input::PushRightTrigger(float threshold) const { return GetRightTrigger() >= threshold; }
 
 bool Input::TriggerLeftTrigger(float threshold) const {
+	if (isXInputConnected_) {
+		const float now = NormalizeXInputTrigger(xInputState_.Gamepad.bLeftTrigger);
+		const float prev = NormalizeXInputTrigger(preXInputState_.Gamepad.bLeftTrigger);
+		return now >= threshold && prev < threshold;
+	}
+
 	float prevNorm = 0.0f;
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
 		float prevLeft = 0.0f;
@@ -400,6 +419,12 @@ bool Input::TriggerLeftTrigger(float threshold) const {
 }
 
 bool Input::TriggerRightTrigger(float threshold) const {
+	if (isXInputConnected_) {
+		const float now = NormalizeXInputTrigger(xInputState_.Gamepad.bRightTrigger);
+		const float prev = NormalizeXInputTrigger(preXInputState_.Gamepad.bRightTrigger);
+		return now >= threshold && prev < threshold;
+	}
+
 	float prevNorm = 0.0f;
 	if (padState_.lRz == 0 && prePadState_.lRz == 0) {
 		float prevLeft = 0.0f;
