@@ -498,6 +498,12 @@ void DirectXCommon::DrawCommandList() {
 	// Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = {srvDescriptorHeap_.Get()};
 	// commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 }
+void DirectXCommon::SetMainRenderTarget() {
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex_], false, &dsvHandle);
+	commandList_->RSSetViewports(1, &viewport_);
+	commandList_->RSSetScissorRects(1, &scissorRect_);
+}
 
 void DirectXCommon::CrtvTransitionBarrier() {
 	// 画面に描く処理はすべて終わり、画面に映すので、状態を遷移

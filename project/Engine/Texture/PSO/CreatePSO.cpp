@@ -6,17 +6,27 @@
 
 CreatePSO::CreatePSO(DirectXCommon* dxCommon, bool useSkinning) : dxCommon_(dxCommon), useSkinning_(useSkinning) {}
 
-void CreatePSO::Create(D3D12_CULL_MODE cullMode, bool depthEnable, D3D12_FILL_MODE fillMode, D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType, const std::wstring& pixelShaderPath) {
+void CreatePSO::Create(
+    D3D12_CULL_MODE cullMode, bool depthEnable, D3D12_FILL_MODE fillMode, D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType, const std::wstring& pixelShaderPath, const std::wstring& vertexShaderPath) {
+	isShadowPass_ = false;
 	pixelShaderPath_ = pixelShaderPath;
+	vertexShaderPath_ = vertexShaderPath;
 	CreateRootSignature();
 	CreateGraphicsPipeline(cullMode, depthEnable, fillMode, topologyType);
+}
+void CreatePSO::CreateShadow(D3D12_CULL_MODE cullMode, D3D12_FILL_MODE fillMode) {
+	isShadowPass_ = true;
+	vertexShaderPath_ = L"Resources/shader/Object3d/Object3dShadowMap.VS.hlsl";
+	pixelShaderPath_ = L"Resources/shader/Object3d/Object3dShadowMap.PS.hlsl";
+	CreateRootSignature();
+	CreateGraphicsPipeline(cullMode, true, fillMode, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 }
 void CreatePSO::CreateRootSignature() {
 	// --- RootSignature ---
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	D3D12_ROOT_PARAMETER rootParameters[13] = {};
-	D3D12_DESCRIPTOR_RANGE descriptorRange[6] = {};
+	D3D12_ROOT_PARAMETER rootParameters[14] = {};
+	D3D12_DESCRIPTOR_RANGE descriptorRange[7] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
 	descriptorRange[0].NumDescriptors = 1;
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
@@ -42,15 +52,20 @@ void CreatePSO::CreateRootSignature() {
 	descriptorRange[4].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[4].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
+	descriptorRange[5].BaseShaderRegister = 5;
+	descriptorRange[5].NumDescriptors = 1;
+	descriptorRange[5].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[5].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
 	if (useSkinning_) {
-		descriptorRange[5].BaseShaderRegister = 0;
-		descriptorRange[5].NumDescriptors = 1;
-		descriptorRange[5].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-		descriptorRange[5].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		descriptorRange[6].BaseShaderRegister = 0;
+		descriptorRange[6].NumDescriptors = 1;
+		descriptorRange[6].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		descriptorRange[6].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 	}
 
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
 
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -102,15 +117,19 @@ void CreatePSO::CreateRootSignature() {
 	rootParameters[11].DescriptorTable.pDescriptorRanges = &descriptorRange[4];
 	rootParameters[11].DescriptorTable.NumDescriptorRanges = 1;
 
-	if (useSkinning_) {
-		rootParameters[12].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		rootParameters[12].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-		rootParameters[12].DescriptorTable.pDescriptorRanges = &descriptorRange[5];
-		rootParameters[12].DescriptorTable.NumDescriptorRanges = 1;
-	}
+	rootParameters[12].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[12].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[12].DescriptorTable.pDescriptorRanges = &descriptorRange[5];
+	rootParameters[12].DescriptorTable.NumDescriptorRanges = 1;
 
+	if (useSkinning_) {
+		rootParameters[13].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters[13].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+		rootParameters[13].DescriptorTable.pDescriptorRanges = &descriptorRange[6];
+		rootParameters[13].DescriptorTable.NumDescriptorRanges = 1;
+	}
 	descriptionRootSignature.pParameters = rootParameters;
-	descriptionRootSignature.NumParameters = useSkinning_ ? 13 : 12;
+	descriptionRootSignature.NumParameters = useSkinning_ ? 14 : 13;
 
 	D3D12_STATIC_SAMPLER_DESC staticSampler[1] = {};
 	staticSampler[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -205,21 +224,25 @@ void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnabl
 	}
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL; // ★ 手前なら描画
 
-	// --- 共通設定 ---
+// --- 共通設定 ---
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
 	baseDesc.pRootSignature = rootSignature_.Get();
 	baseDesc.InputLayout = inputLayoutDesc;
 	baseDesc.BlendState = blendModeManager_.SetBlendMode(blendMode_);
 	baseDesc.NumRenderTargets = 1;
-	baseDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	if (isShadowPass_) {
+		baseDesc.NumRenderTargets = 0;
+	} else {
+		baseDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	}
 	baseDesc.DepthStencilState = depthStencilDesc;
-	baseDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	baseDesc.DSVFormat = isShadowPass_ ? DXGI_FORMAT_D32_FLOAT : DXGI_FORMAT_D24_UNORM_S8_UINT;
 	baseDesc.PrimitiveTopologyType = topologyType;
 	baseDesc.SampleDesc.Count = 1;
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	// --- シェーダーコンパイル ---
-	std::wstring vsPath = useSkinning_ ? L"Resources/shader/Object3d/SkinningObject3d.VS.hlsl" : L"Resources/shader/Object3d/Object3d.VS.hlsl";
+	std::wstring vsPath = vertexShaderPath_.empty() ? (useSkinning_ ? L"Resources/shader/Object3d/SkinningObject3d.VS.hlsl" : L"Resources/shader/Object3d/Object3d.VS.hlsl") : vertexShaderPath_;
 	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(vsPath.c_str(), L"vs_6_0");
 	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(pixelShaderPath_.c_str(), L"ps_6_0");
 	assert(vsBlob && psBlob);

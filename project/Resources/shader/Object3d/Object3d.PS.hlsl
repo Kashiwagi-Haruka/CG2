@@ -81,11 +81,67 @@ StructuredBuffer<PointLight> gPointLights : register(t1);
 StructuredBuffer<AreaLight> gAreaLights : register(t3);
 Texture2D<float4> gTexture : register(t0);
 Texture2D<float4> gEnvironmentTexture : register(t4);
+Texture2D<float> gShadowMap : register(t5);
 SamplerState gSampler : register(s0);
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
 };
+
+float ComputeMicroShadow(float3 normal, float3 toLight, float3 toEye)
+{
+    // シャドウマップ以外の陰りはハーフランバートで制御する。
+    // ※toEyeはインターフェース維持のため受け取る。
+    float NdotL = saturate(dot(normal, toLight));
+    (void) toEye;
+    return pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
+}
+
+float ComputeShadowVisibility(float4 shadowPosition)
+{
+    if (shadowPosition.w <= 0.0f)
+    {
+        return 1.0f;
+    }
+
+    float3 shadowCoord = shadowPosition.xyz / shadowPosition.w;
+    float2 shadowUV;
+    shadowUV.x = shadowCoord.x * 0.5f + 0.5f;
+    shadowUV.y = -shadowCoord.y * 0.5f + 0.5f;
+
+    if (shadowUV.x < 0.0f || shadowUV.x > 1.0f || shadowUV.y < 0.0f || shadowUV.y > 1.0f)
+    {
+        return 1.0f;
+    }
+
+    float receiverDepth = shadowCoord.z;
+    if (receiverDepth <= 0.0f || receiverDepth >= 1.0f)
+    {
+        return 1.0f;
+    }
+
+    uint shadowMapWidth;
+    uint shadowMapHeight;
+    gShadowMap.GetDimensions(shadowMapWidth, shadowMapHeight);
+    float2 texelSize = 1.0f / float2(shadowMapWidth, shadowMapHeight);
+    const float depthBias = 0.002f;
+
+    float visibility = 0.0f;
+    [unroll]
+    for (int y = -1; y <= 1; ++y)
+    {
+        [unroll]
+        for (int x = -1; x <= 1; ++x)
+        {
+            float2 sampleUV = saturate(shadowUV + float2(x, y) * texelSize);
+            float shadowDepth = gShadowMap.Sample(gSampler, sampleUV);
+            visibility += ((receiverDepth - depthBias) <= shadowDepth) ? 1.0f : 0.0f;
+        }
+    }
+
+    visibility /= 9.0f;
+    return lerp(0.25f, 1.0f, visibility);
+}
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
@@ -98,14 +154,17 @@ PixelShaderOutput main(VertexShaderOutput input)
     {
         ////half lambert
         float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
-        float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
+        float3 directionalLightVector = -normalize(gDirectionalLight.direction);
+        float NdotL = dot(normalize(input.normal), directionalLightVector);
         float cos = pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
-        float3 halfVector = normalize(-gDirectionalLight.direction + toEye);
+        float3 halfVector = normalize(directionalLightVector + toEye);
         float NDotH = dot(normalize(input.normal), halfVector);
         float specularPow = pow(saturate(NDotH), gMaterial.shininess);
+        float directionalShadow = ComputeMicroShadow(normalize(input.normal), directionalLightVector, toEye);
+        float shadowVisibility = ComputeShadowVisibility(input.shadowPosition);
         
-        float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
-        float3 specular = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
+        float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity * directionalShadow * shadowVisibility;
+        float3 specular = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * directionalShadow * shadowVisibility;
         
 // Point Light
         float3 N = normalize(input.normal);
@@ -122,15 +181,16 @@ PixelShaderOutput main(VertexShaderOutput input)
 
 // 拡散 (Lambert)
             float NdotL_p = saturate(dot(N, Lp));
+            float pointShadow = ComputeMicroShadow(N, Lp, toEye);
             diffuseP += gMaterial.color.rgb * textureColor.rgb *
                   pointLight.color.rgb * pointLight.intensity *
-                  NdotL_p * attenuation;
+                  NdotL_p * attenuation * pointShadow;
 
 // 鏡面反射 (Phong)
             float NdotH_p = saturate(dot(N, H));
             float specularPowP = pow(NdotH_p, gMaterial.shininess);
             specularP += pointLight.color.rgb * pointLight.intensity *
-                   specularPowP * attenuation;
+                   specularPowP * attenuation * pointShadow;
         }
 
 // Spot Light
@@ -148,15 +208,16 @@ PixelShaderOutput main(VertexShaderOutput input)
             float attenuationFactor = pow(saturate(1.0f - distanceToLight / spotLight.distance), spotLight.decay);
 
             float NdotL_s = saturate(dot(N, lightDirection));
+            float spotShadow = ComputeMicroShadow(N, lightDirection, toEye);
             float3 Hs = normalize(lightDirection + toEye);
             float NdotH_s = saturate(dot(N, Hs));
             float specularPowS = pow(NdotH_s, gMaterial.shininess);
 
             spotLightDiffuse += gMaterial.color.rgb * textureColor.rgb *
                 spotLight.color.rgb * spotLight.intensity *
-                NdotL_s * attenuationFactor * falloffFactor;
+                NdotL_s * attenuationFactor * falloffFactor * spotShadow;
             spotLightSpecular += spotLight.color.rgb * spotLight.intensity *
-                specularPowS * attenuationFactor * falloffFactor;
+                specularPowS * attenuationFactor * falloffFactor * spotShadow;
         }
         // Area Light
         float3 areaLightDiffuse = float3(0.0f, 0.0f, 0.0f);
@@ -172,6 +233,7 @@ PixelShaderOutput main(VertexShaderOutput input)
             float areaScale = areaLight.width * areaLight.height;
 
             float NdotL_a = saturate(dot(N, lightDirection));
+            float areaShadow = ComputeMicroShadow(N, lightDirection, toEye);
             float3 Ha = normalize(lightDirection + toEye);
             float NdotH_a = saturate(dot(N, Ha));
             float specularPowA = pow(NdotH_a, gMaterial.shininess);
@@ -179,9 +241,9 @@ PixelShaderOutput main(VertexShaderOutput input)
 
             areaLightDiffuse += gMaterial.color.rgb * textureColor.rgb *
                 areaLight.color.rgb * intensity *
-                NdotL_a * attenuationFactor;
+                NdotL_a * attenuationFactor * areaShadow;
             areaLightSpecular += areaLight.color.rgb * intensity *
-                specularPowA * attenuationFactor;
+                specularPowA * attenuationFactor * areaShadow;
         }
         float3 viewDirection = normalize(input.worldPosition - gCamera.worldPosition);
         float3 reflectedDirection = reflect(viewDirection, normalize(input.normal));
