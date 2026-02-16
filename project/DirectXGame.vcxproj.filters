@@ -103,6 +103,42 @@
     <Filter Include="ヘッダー ファイル\Engine\Texture\Particle">
       <UniqueIdentifier>{5070aa60-306c-41c2-beb9-1a66dae9b72b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\application\Pause">
+      <UniqueIdentifier>{92c2529e-2eab-4570-b75c-2468118d6e97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Audio">
+      <UniqueIdentifier>{969502e0-14cf-40a8-be99-88cdd4ec178b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Load">
+      <UniqueIdentifier>{f97b274b-4ac4-456c-a4af-f9cfc52c8d55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Log">
+      <UniqueIdentifier>{6c14ba1d-2c70-4e21-8c6d-4773477eae97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\ImGui">
+      <UniqueIdentifier>{6b509066-4f76-4144-84ef-30b6f96390c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Input">
+      <UniqueIdentifier>{a8ce4e30-0cb4-4112-aaf9-bdcdc6096dfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Leak">
+      <UniqueIdentifier>{b6bcc086-db3f-41f8-8ea7-0ca55f2a9572}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Texture\Animation">
+      <UniqueIdentifier>{40ae1842-5ee4-45f0-bff4-65a11f352fdf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Texture\Model">
+      <UniqueIdentifier>{d3e50c65-245f-4659-ac86-c8b76c943f34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Texture\Object3d">
+      <UniqueIdentifier>{5426155d-1d54-4870-8cb4-f42c5a5dff25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Texture\Sprite">
+      <UniqueIdentifier>{5bcfc4d1-34e5-4b81-88b0-3bbb80b82879}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Texture\Particle">
+      <UniqueIdentifier>{0742339b-1d3a-47a2-a184-b80450f1dd5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -125,12 +161,6 @@
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Audio\Audio.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\StringUtillity\StringUtility.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Camera\Camera.cpp">
       <Filter>ソース ファイル\Engine\Camera</Filter>
@@ -162,33 +192,6 @@
     <ClCompile Include="Engine\Texture\SrvManager\SrvManager.cpp">
       <Filter>ソース ファイル\Engine\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\Sprite\SpriteCommon.cpp">
-      <Filter>ソース ファイル\Engine\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Sprite\Sprite.cpp">
-      <Filter>ソース ファイル\Engine\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Particle\ParticleManager.cpp">
-      <Filter>ソース ファイル\Engine\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Particle\ParticleEmitter.cpp">
-      <Filter>ソース ファイル\Engine\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3dCommon.cpp">
-      <Filter>ソース ファイル\Engine\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Model\ModelManager.cpp">
-      <Filter>ソース ファイル\Engine\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3d.cpp">
-      <Filter>ソース ファイル\Engine\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Model\ModelCommon.cpp">
-      <Filter>ソース ファイル\Engine\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Model\Model.cpp">
-      <Filter>ソース ファイル\Engine\Texture</Filter>
-    </ClCompile>
     <ClCompile Include="application\SceneTransition\SceneTransition.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
@@ -201,38 +204,11 @@
     <ClCompile Include="application\Scene\TitleScene.cpp">
       <Filter>ソース ファイル\application\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Loadfile\CSVManager.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\LeakChecker\D3DResourceLeakChecker.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\ImGui\ImGuiManager.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Input\Input.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Log\Logger.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\BaseScene\SceneManager.cpp">
       <Filter>ソース ファイル\Engine\BaseScene</Filter>
     </ClCompile>
     <ClCompile Include="Engine\BaseScene\FrameWork.cpp">
       <Filter>ソース ファイル\Engine\BaseScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Scene\Game\Game.cpp">
-      <Filter>ソース ファイル\application</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Scene\GameOverScene.cpp">
-      <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="application\GameTimer\GameTimer.cpp">
       <Filter>ソース ファイル\application</Filter>
@@ -240,26 +216,86 @@
     <ClCompile Include="application\main.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Animation\SkinCluster.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
+    <ClCompile Include="application\Scene\GameOverScene.cpp">
+      <Filter>ソース ファイル\application\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Animation\Skeleton.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Texture\Mesh\Primitive\Primitive.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
+    <ClCompile Include="application\Scene\Game\Game.cpp">
+      <Filter>ソース ファイル\application\Scene</Filter>
     </ClCompile>
     <ClCompile Include="application\Pause\Pause.cpp">
-      <Filter>ソース ファイル\application</Filter>
+      <Filter>ソース ファイル\application\Pause</Filter>
     </ClCompile>
     <ClCompile Include="application\Scene\SampleScene\SampleScene.cpp">
-      <Filter>ソース ファイル\application</Filter>
+      <Filter>ソース ファイル\application\Scene</Filter>
     </ClCompile>
     <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp">
-      <Filter>ソース ファイル\application</Filter>
+      <Filter>ソース ファイル\application\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Audio\Audio.cpp">
+      <Filter>ソース ファイル\Engine\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Loadfile\CSVManager.cpp">
+      <Filter>ソース ファイル\Engine\Load</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Log\Logger.cpp">
+      <Filter>ソース ファイル\Engine\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\StringUtillity\StringUtility.cpp">
+      <Filter>ソース ファイル\Engine\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Primitive\Primitive.cpp">
+      <Filter>ソース ファイル\Engine\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\ImGui\ImGuiManager.cpp">
+      <Filter>ソース ファイル\Engine\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Input\Input.cpp">
+      <Filter>ソース ファイル\Engine\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\LeakChecker\D3DResourceLeakChecker.cpp">
+      <Filter>ソース ファイル\Engine\Leak</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Animation</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp">
-      <Filter>ソース ファイル\Engine</Filter>
+      <Filter>ソース ファイル\Engine\Texture\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Animation\Skeleton.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Animation\SkinCluster.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Model\Model.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Model\ModelCommon.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3d.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Object3d</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3dCommon.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Object3d</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Model\ModelManager.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Sprite\Sprite.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Sprite\SpriteCommon.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Particle\ParticleEmitter.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Particle\ParticleManager.cpp">
+      <Filter>ソース ファイル\Engine\Texture\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
