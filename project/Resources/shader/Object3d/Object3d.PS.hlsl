@@ -90,18 +90,11 @@ struct PixelShaderOutput
 
 float ComputeMicroShadow(float3 normal, float3 toLight, float3 toEye)
 {
-    // 視線方向と法線方向の関係を使った簡易的な遮蔽項。
-    // 直接的なシャドウマップが無い場合でも、角度に応じて光の回り込みを抑える。
+    // シャドウマップ以外の陰りはハーフランバートで制御する。
+    // ※toEyeはインターフェース維持のため受け取る。
     float NdotL = saturate(dot(normal, toLight));
-    float NdotV = saturate(dot(normal, toEye));
-
-    // Disney系のSmith近似を使った幾何減衰項をマイクロシャドウとして利用
-    const float roughness = 0.85f;
-    float k = ((roughness + 1.0f) * (roughness + 1.0f)) * 0.125f;
-    float gl = NdotL / lerp(k, 1.0f, NdotL);
-    float gv = NdotV / lerp(k, 1.0f, NdotV);
-
-    return saturate(gl * gv);
+    (void) toEye;
+    return pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
 }
 
 float ComputeShadowVisibility(float4 shadowPosition)
