@@ -12,6 +12,34 @@ using namespace Microsoft::WRL;
 std::unique_ptr<Input> Input::instance_ = nullptr;
 namespace {
 float Clamp01(float value) { return std::clamp(value, 0.0f, 1.0f); }
+bool SetJoystickAxisRange(LPDIRECTINPUTDEVICE8 device, DWORD objectOffset, LONG minValue, LONG maxValue) {
+	if (!device) {
+		return false;
+	}
+
+	DIPROPRANGE range{};
+	range.diph.dwSize = sizeof(DIPROPRANGE);
+	range.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+	range.diph.dwObj = objectOffset;
+	range.diph.dwHow = DIPH_BYOFFSET;
+	range.lMin = minValue;
+	range.lMax = maxValue;
+
+	return SUCCEEDED(device->SetProperty(DIPROP_RANGE, &range.diph));
+}
+
+void ConfigureJoystickAxisRanges(LPDIRECTINPUTDEVICE8 device) {
+	constexpr LONG kAxisMin = 0;
+	constexpr LONG kAxisMax = 65535;
+	SetJoystickAxisRange(device, DIJOFS_X, kAxisMin, kAxisMax);
+	SetJoystickAxisRange(device, DIJOFS_Y, kAxisMin, kAxisMax);
+	SetJoystickAxisRange(device, DIJOFS_Z, kAxisMin, kAxisMax);
+	SetJoystickAxisRange(device, DIJOFS_RX, kAxisMin, kAxisMax);
+	SetJoystickAxisRange(device, DIJOFS_RY, kAxisMin, kAxisMax);
+	SetJoystickAxisRange(device, DIJOFS_RZ, kAxisMin, kAxisMax);
+	SetJoystickAxisRange(device, DIJOFS_SLIDER(0), kAxisMin, kAxisMax);
+	SetJoystickAxisRange(device, DIJOFS_SLIDER(1), kAxisMin, kAxisMax);
+}
 float GetDigitalTrigger(const DIJOYSTATE& state, int buttonIndex) {
 	if (buttonIndex < 0 || buttonIndex >= 32) {
 		return 0.0f;
@@ -78,6 +106,7 @@ void Input::Initialize(WinApp* winApp) {
 	if (gamePadDevice_) {
 		result = gamePadDevice_->SetDataFormat(&c_dfDIJoystick);
 		assert(SUCCEEDED(result));
+		ConfigureJoystickAxisRanges(gamePadDevice_.Get());
 		result = gamePadDevice_->SetCooperativeLevel(winApp_->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 		assert(SUCCEEDED(result));
 	}
@@ -138,7 +167,6 @@ void Input::Update() {
 		}
 	}
 
-
 	if (winApp_->GetIsPad()) {
 
 		// --- もしデバイスが切れていたら再列挙 ---
@@ -146,6 +174,7 @@ void Input::Update() {
 			directInput->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, this, DIEDFL_ATTACHEDONLY);
 			if (gamePadDevice_) {
 				gamePadDevice_->SetDataFormat(&c_dfDIJoystick);
+				ConfigureJoystickAxisRanges(gamePadDevice_.Get());
 				gamePadDevice_->SetCooperativeLevel(GetActiveWindow(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 			}
 		}
