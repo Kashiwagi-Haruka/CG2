@@ -1,11 +1,13 @@
 #define NOMINMAX
 #include "Object3d/Object3dCommon.h"
 #include "DirectXCommon.h"
+#include "Function.h"
 #include "Logger.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstring>
 
 std::unique_ptr<Object3dCommon> Object3dCommon::instance = nullptr;
@@ -264,7 +266,38 @@ void Object3dCommon::EndShadowMapPass() {
 	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
 	isShadowMapPassActive_ = false;
 }
-void Object3dCommon::SetDirectionalLight(DirectionalLight& light) { *directionalLightData_ = light; }
+void Object3dCommon::SetDirectionalLight(DirectionalLight& light) {
+	*directionalLightData_ = light;
+	directionalLightData_->direction = Function::Normalize(directionalLightData_->direction);
+}
+
+Matrix4x4 Object3dCommon::GetDirectionalLightViewProjectionMatrix() const {
+	Vector3 lightDirection = Function::Normalize(directionalLightData_->direction);
+	if (Function::Length(lightDirection) < 1.0e-5f) {
+		lightDirection = {0.0f, -1.0f, 0.0f};
+	}
+	const Vector3 lightPosition = shadowLightPosition_ - lightDirection * 120.0f;
+	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
+	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
+	const Vector3 cameraUp = Function::Cross(lightDirection, right);
+
+	Matrix4x4 lightView = Function::MakeIdentity4x4();
+	lightView.m[0][0] = right.x;
+	lightView.m[1][0] = right.y;
+	lightView.m[2][0] = right.z;
+	lightView.m[0][1] = cameraUp.x;
+	lightView.m[1][1] = cameraUp.y;
+	lightView.m[2][1] = cameraUp.z;
+	lightView.m[0][2] = lightDirection.x;
+	lightView.m[1][2] = lightDirection.y;
+	lightView.m[2][2] = lightDirection.z;
+	lightView.m[3][0] = -Function::Dot(lightPosition, right);
+	lightView.m[3][1] = -Function::Dot(lightPosition, cameraUp);
+	lightView.m[3][2] = -Function::Dot(lightPosition, lightDirection);
+
+	Matrix4x4 lightProjection = Function::MakeOrthographicMatrix(-shadowOrthoHalfWidth_, shadowOrthoHalfHeight_, shadowOrthoHalfWidth_, -shadowOrthoHalfHeight_, shadowCameraNear_, shadowCameraFar_);
+	return Function::Multiply(lightView, lightProjection);
+}
 void Object3dCommon::SetBlendMode(BlendMode blendMode) {
 	blendMode_ = blendMode;
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get());

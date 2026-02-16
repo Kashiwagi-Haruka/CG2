@@ -21,9 +21,9 @@ class Object3d {
 
 	struct alignas(256) TransformationMatrix {
 		Matrix4x4 WVP;                   // 64 バイト
+		Matrix4x4 LightWVP;              // 64 バイト
 		Matrix4x4 World;                 // 64 バイト
-		Matrix4x4 WorldInverseTranspose; // ここで自動的に 128 バイト分のパディングが入って、
-		                                 // sizeof(TransformationMatrix) == 256 になる
+		Matrix4x4 WorldInverseTranspose; // 64 バイト
 	};
 
 	struct Material {

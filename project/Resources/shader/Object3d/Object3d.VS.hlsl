@@ -2,6 +2,7 @@
 struct TransformationMatrix
 {
     float4x4 WVP;
+    float4x4 LightWVP;
     float4x4 World;
     float4x4 WorldInverseTranspose;
 };
@@ -22,6 +23,6 @@ VertexShaderOutput main(VertexShaderInput input)
     output.texcoord = input.texcoord;
     output.worldPosition = mul(input.position, gTransformationMatrix.World).xyz;
     // PS側で常に参照されるため、未初期化にならないように必ず書き込む
-    output.shadowPosition = float4(0.0f, 0.0f, 0.0f, 1.0f);
+    output.shadowPosition = mul(input.position, gTransformationMatrix.LightWVP);
     return output;
 }

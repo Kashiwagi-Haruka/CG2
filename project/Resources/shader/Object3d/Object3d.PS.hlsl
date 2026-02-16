@@ -106,6 +106,11 @@ float ComputeMicroShadow(float3 normal, float3 toLight, float3 toEye)
 
 float ComputeShadowVisibility(float4 shadowPosition)
 {
+    if (shadowPosition.w <= 0.0f)
+    {
+        return 1.0f;
+    }
+
     float3 shadowCoord = shadowPosition.xyz / shadowPosition.w;
     float2 shadowUV;
     shadowUV.x = shadowCoord.x * 0.5f + 0.5f;
@@ -116,10 +121,33 @@ float ComputeShadowVisibility(float4 shadowPosition)
         return 1.0f;
     }
 
-    float receiverDepth = saturate(shadowCoord.z);
-    float shadowDepth = gShadowMap.Sample(gSampler, shadowUV);
-    const float depthBias = 0.0015f;
-    return (receiverDepth - depthBias) <= shadowDepth ? 1.0f : 0.25f;
+    float receiverDepth = shadowCoord.z;
+    if (receiverDepth <= 0.0f || receiverDepth >= 1.0f)
+    {
+        return 1.0f;
+    }
+
+    uint shadowMapWidth;
+    uint shadowMapHeight;
+    gShadowMap.GetDimensions(shadowMapWidth, shadowMapHeight);
+    float2 texelSize = 1.0f / float2(shadowMapWidth, shadowMapHeight);
+    const float depthBias = 0.002f;
+
+    float visibility = 0.0f;
+    [unroll]
+    for (int y = -1; y <= 1; ++y)
+    {
+        [unroll]
+        for (int x = -1; x <= 1; ++x)
+        {
+            float2 sampleUV = saturate(shadowUV + float2(x, y) * texelSize);
+            float shadowDepth = gShadowMap.Sample(gSampler, sampleUV);
+            visibility += ((receiverDepth - depthBias) <= shadowDepth) ? 1.0f : 0.0f;
+        }
+    }
+
+    visibility /= 9.0f;
+    return lerp(0.25f, 1.0f, visibility);
 }
 
 PixelShaderOutput main(VertexShaderOutput input)

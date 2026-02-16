@@ -640,6 +640,7 @@ void Primitive::Update() {
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
+	transformationMatrixData_->LightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetDirectionalLightViewProjectionMatrix());
 	transformationMatrixData_->WorldInverseTranspose = Function::Inverse(worldMatrix);
 	transformResource_->Unmap(0, nullptr);
 

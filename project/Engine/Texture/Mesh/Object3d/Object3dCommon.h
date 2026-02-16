@@ -4,6 +4,7 @@
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
 #include "PSO/CreatePSO.h"
+#include "Matrix4x4.h"
 #include <Windows.h>
 #include <cstdint>
 #include <memory>
@@ -68,7 +69,11 @@ private:
 	D3D12_RECT shadowScissorRect_{};
 	static constexpr uint32_t kShadowMapSize_ = 2048;
 	bool isShadowMapPassActive_ = false;
-
+	Vector3 shadowLightPosition_ = {0.0f, 80.0f, 0.0f};
+	float shadowCameraNear_ = 0.1f;
+	float shadowCameraFar_ = 300.0f;
+	float shadowOrthoHalfWidth_ = 80.0f;
+	float shadowOrthoHalfHeight_ = 80.0f;
 	void DrawSet();
 
 public:
@@ -113,4 +118,5 @@ public:
 	void SetPointLights(const PointLight* pointLights, uint32_t count);
 	void SetSpotLights(const SpotLight* spotLights, uint32_t count);
 	void SetAreaLights(const AreaLight* areaLights, uint32_t count);
+	Matrix4x4 GetDirectionalLightViewProjectionMatrix() const;
 };
