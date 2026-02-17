@@ -1,14 +1,14 @@
 #include "Player.h"
-#include"Function.h"
-#include<numbers>
+#include"GameObject/YoshidaMath/YoshidaMath.h"
+
 #include "Model/ModelManager.h"
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
 #include"KeyBindConfig.h"
 #include<imgui.h>
-
-namespace {
-    const constexpr float PI = std::numbers::pi_v<float>;
+#include"GameObject/YoshidaMath/Easing.h"
+namespace PlayerConst{
+    const constexpr float kRotateYSpeed = 0.25f;
 };
 
 Player::Player()
@@ -31,12 +31,13 @@ void Player::Initialize()
 
     transform_ = {
     .scale{100.0f,100.0f,100.0f},
-    .rotate{-PI / 2.0f, 0.0f, 0.0f  },
+    .rotate{-YoshidaMath::PI / 2.0f, 0.0f, 0.0f  },
     .translate{0.0f,1.0f,-3.0f}
     };
 
     velocity_ = { 0.0f,0.0f,0.0f };
     speed_ = { 0.0f };
+
 
     //アニメーションクリップ
     animationClips_ = Animation::LoadAnimationClips("Resources/3d/human", "walk");
@@ -60,24 +61,13 @@ void Player::Initialize()
 
 void Player::Update()
 {
+    //移動処理
     Move();
 
     bodyObj_->SetTransform(transform_);
     bodyObj_->Update();
-
-    float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-
-    if (skeleton_ && !animationClips_.empty()) {
-        const Animation::AnimationData& currentAnimation = animationClips_[currentAnimationIndex_];
-        animationTime_ = Animation::AdvanceTime(currentAnimation, animationTime_, deltaTime, true);
-        skeleton_->ApplyAnimation(currentAnimation, animationTime_);
-        skeleton_->Update();
-        if (!skinCluster_.mappedPalette.empty()) {
-            UpdateSkinCluster(skinCluster_, *skeleton_);
-        }
-        Matrix4x4 humanWorld = bodyObj_->GetWorldMatrix();
-        skeleton_->SetObjectMatrix(humanWorld);
-    }
+    //アニメーション
+    Animation();
     //デバック
     Debug();
 }
@@ -137,62 +127,54 @@ void Player::Move()
         if (playerCommand->MoveBackward()) { velocity_.z = -1.0f; }
     }
 
-    Vector2 direction = MyMath::Normalize({ velocity_.x,velocity_.z });
-
+    //xy成分だけ正規化
+    Vector2 direction = YoshidaMath::Normalize({ velocity_.x,velocity_.z });
     // Y軸回転（左右）
-    transform_.rotate.y = std::atan2(direction.x, direction.y);
+    transform_.rotate.y = YoshidaMath::Easing::Lerp(transform_.rotate.y, std::atan2(direction.x, direction.y), PlayerConst::kRotateYSpeed);
 
-   /* transform_.rotate = Function::DirectionToRotation(Function::Normalize({ velocity_.x,0.0f,velocity_.z }), { 1,0,0 });*/
-
-    float length = MyMath::Length(Vector2{ velocity_.x,velocity_.z });
-    speed_ = (playerCommand->Sneak() || length >= 0.5f) ? 0.25f : 0.125f;
+    float length = YoshidaMath::Length(Vector2{ velocity_.x,velocity_.z });
+    speed_ = (playerCommand->Sneak() || length <= 0.5f) ? 0.125f: 0.25f ;
 
     if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
 
         //前の方向を取得
-        Vector3 forward = MyMath::GetForward(transform_.rotate.z);
+        Vector3 forward = YoshidaMath::GetForward(transform_.rotate.z);
         forward.y = 0.0f;
 
         // forwardに垂直な右方向ベクトルを計算
         Vector3 right = Function::Cross(Vector3(0, 1, 0), forward);
         right = Function::Normalize(right);
         //速度を正規化しそれぞれ足す
-// x, z 成分だけ正規化 
-        Vector3 horizontal = Function::Normalize(Vector3{ velocity_.x, 0.0f, velocity_.z });
 
-        transform_.translate += forward * horizontal.z * speed_;
-        transform_.translate += right * horizontal.x * speed_;
+        transform_.translate += forward * direction.y * speed_;
+        transform_.translate += right * direction.x * speed_;
     }
 
 
 }
 
-float MyMath::Dot(const Vector2& v1, const Vector2& v2)
+void Player::Animation()
 {
-    return { v1.x * v2.x + v1.y * v2.y };
-}
+    float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 
-float MyMath::Length(const Vector2& v)
-{
-    return { sqrtf(Dot(v,v)) };
-}
 
-Vector2 MyMath::Normalize(const Vector2& v)
-{
-    float length = Length(v);
-    if (length != 0.0f) {
-        return { v.x / length,v.y / length };
+    auto* playerCommand = PlayerCommand::GetInstance();
+    if (playerCommand->Sneak()) {
+        currentAnimationIndex_ = 1;
     } else {
-        return { 0.0f, 0.0f };
+        currentAnimationIndex_ = 0;
+    }
+
+
+    if (skeleton_ && !animationClips_.empty()) {
+        const Animation::AnimationData& currentAnimation = animationClips_[currentAnimationIndex_];
+        animationTime_ = Animation::AdvanceTime(currentAnimation, animationTime_, deltaTime, true);
+        skeleton_->ApplyAnimation(currentAnimation, animationTime_);
+        skeleton_->Update();
+        if (!skinCluster_.mappedPalette.empty()) {
+            UpdateSkinCluster(skinCluster_, *skeleton_);
+        }
+        Matrix4x4 humanWorld = bodyObj_->GetWorldMatrix();
+        skeleton_->SetObjectMatrix(humanWorld);
     }
 }
-
-Vector3 MyMath::GetForward(const float angle) {
-
-    Matrix4x4 rotationZMatrix;
-
-    rotationZMatrix = Function::MakeRotateZMatrix(angle);
-    Vector3 localForward = { 0.0f, 0.0f, 1.0f };
-    return Function::TransformVM(localForward, rotationZMatrix);
-}
-

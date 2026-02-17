@@ -43,11 +43,7 @@ public:
     void Debug();
     //移動
     void Move();
+    //アニメーション
+    void Animation();
 };
 
-namespace MyMath {
-    float Dot(const Vector2& v1, const Vector2& v2);
-    float Length(const Vector2& v);
-    Vector2 Normalize(const Vector2& v);
-    Vector3 GetForward(const float angle);
-}
