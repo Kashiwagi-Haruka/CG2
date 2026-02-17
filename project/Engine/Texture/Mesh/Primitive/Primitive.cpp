@@ -531,6 +531,8 @@ void Primitive::Initialize(PrimitiveName name) {
 	materialData_->uvTransform = Function::MakeIdentity4x4();
 	materialData_->shininess = 40.0f;
 	materialData_->environmentCoefficient = 0.0f;
+	materialData_->grayscaleEnabled = 0;
+	materialData_->sepiaEnabled = 0;
 	materialResource_->Unmap(0, nullptr);
 
 	const std::string texturePath = "Resources/3d/uvChecker.png";
@@ -613,6 +615,8 @@ void Primitive::Initialize(PrimitiveName name,const std::string& texturePath) {
 	materialData_->uvTransform = Function::MakeIdentity4x4();
 	materialData_->shininess = 40.0f;
 	materialData_->environmentCoefficient = 0.0f;
+	materialData_->grayscaleEnabled = 0;
+	materialData_->sepiaEnabled = 0;
 	materialResource_->Unmap(0, nullptr);
 
 	TextureManager::GetInstance()->LoadTextureName(texturePath);
@@ -652,6 +656,7 @@ void Primitive::Update() {
 	}
 	cameraData_->screenSize = {static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)};
 	cameraData_->fullscreenGrayscaleEnabled = Object3dCommon::GetInstance()->IsFullScreenGrayscaleEnabled() ? 1 : 0;
+	cameraData_->fullscreenSepiaEnabled = Object3dCommon::GetInstance()->IsFullScreenSepiaEnabled() ? 1 : 0;
 	cameraResource_->Unmap(0, nullptr);
 }
 

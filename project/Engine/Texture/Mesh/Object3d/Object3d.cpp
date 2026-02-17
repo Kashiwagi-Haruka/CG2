@@ -93,6 +93,7 @@ void Object3d::Update() {
 	}
 	cameraData_->screenSize = {static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)};
 	cameraData_->fullscreenGrayscaleEnabled = Object3dCommon::GetInstance()->IsFullScreenGrayscaleEnabled() ? 1 : 0;
+	cameraData_->fullscreenSepiaEnabled = Object3dCommon::GetInstance()->IsFullScreenSepiaEnabled() ? 1 : 0;
 	cameraResource_->Unmap(0, nullptr);
 }
 void Object3d::Draw() {
@@ -140,6 +141,11 @@ void Object3d::SetEnableLighting(bool enable) {
 void Object3d::SetGrayscaleEnabled(bool enable) {
 	if (materialData_) {
 		materialData_->grayscaleEnabled = enable ? 1 : 0;
+	}
+}
+void Object3d::SetSepiaEnabled(bool enable) {
+	if (materialData_) {
+		materialData_->sepiaEnabled = enable ? 1 : 0;
 	}
 }
 void Object3d::SetUvTransform(const Matrix4x4& uvTransform) {

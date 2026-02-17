@@ -75,6 +75,7 @@ private:
 	float shadowOrthoHalfWidth_ = 80.0f;
 	float shadowOrthoHalfHeight_ = 80.0f;
 	bool fullScreenGrayscaleEnabled_ = false;
+	bool fullScreenSepiaEnabled_ = false;
 	void DrawSet();
 
 public:
@@ -122,4 +123,6 @@ public:
 	Matrix4x4 GetDirectionalLightViewProjectionMatrix() const;
 	void SetFullScreenGrayscaleEnabled(bool enable) { fullScreenGrayscaleEnabled_ = enable; }
 	bool IsFullScreenGrayscaleEnabled() const { return fullScreenGrayscaleEnabled_; }
+	void SetFullScreenSepiaEnabled(bool enable) { fullScreenSepiaEnabled_ = enable; }
+	bool IsFullScreenSepiaEnabled() const { return fullScreenSepiaEnabled_; }
 };

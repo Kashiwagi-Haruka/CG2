@@ -34,7 +34,8 @@ class Object3d {
 		float shininess;
 		float environmentCoefficient;
 		int grayscaleEnabled;
-		float padding2;
+		int sepiaEnabled;
+		float padding2[2];
 	};
 
 	Transform transform_ = {
@@ -85,6 +86,7 @@ public:
 	void SetColor(Vector4 color);
 	void SetEnableLighting(bool enable);
 	void SetGrayscaleEnabled(bool enable);
+	void SetSepiaEnabled(bool enable);
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetShininess(float shininess);
 	void SetEnvironmentCoefficient(float coefficient);
