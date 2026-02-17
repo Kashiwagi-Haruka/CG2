@@ -1,12 +1,12 @@
 #include "Player.h"
-#include"Input.h"
 #include"Function.h"
 #include<numbers>
 #include "Model/ModelManager.h"
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
-
+#include"KeyBindConfig.h"
 #include<imgui.h>
+
 namespace {
     const constexpr float PI = std::numbers::pi_v<float>;
 };
@@ -36,6 +36,7 @@ void Player::Initialize()
     };
 
     velocity_ = { 0.0f,0.0f,0.0f };
+    speed_ = { 0.0f };
 
     //アニメーションクリップ
     animationClips_ = Animation::LoadAnimationClips("Resources/3d/human", "walk");
@@ -59,23 +60,7 @@ void Player::Initialize()
 
 void Player::Update()
 {
-    auto* input = Input::GetInstance();
-
-    if (input->TriggerKey(DIK_W)) {
-        Function::DirectionToRotation({ 0,0,1 }, { 1,0,0 });
-    }
-
-    if (input->TriggerKey(DIK_S)) {
-        Function::DirectionToRotation({ 0,0,-1 }, { 1,0,0 });
-    }
-
-    if (input->TriggerKey(DIK_A)) {
-        Function::DirectionToRotation({ -1,0,0 }, { 1,0,0 });
-    }
-
-    if (input->TriggerKey(DIK_D)) {
-        Function::DirectionToRotation({ 1,0,0 }, { 1,0,0 });
-    }
+    Move();
 
     bodyObj_->SetTransform(transform_);
     bodyObj_->Update();
@@ -129,3 +114,85 @@ void Player::Debug()
     ImGui::End();
 #endif
 }
+
+void Player::Move()
+{
+
+    velocity_.x = { 0.0f };
+    velocity_.z = { 0.0f };
+
+    auto* input = Input::GetInstance();
+
+    Vector2 controllerPos = input->GetJoyStickLXY();
+
+    velocity_.x = controllerPos.x;
+    velocity_.z = controllerPos.y;
+
+    auto* playerCommand = PlayerCommand::GetInstance();
+
+    if (fabs(velocity_.x) <= 0.0f && fabs(velocity_.z) <= 0.0f) {
+        if (playerCommand->MoveLeft()) { velocity_.x = -1.0f; }
+        if (playerCommand->MoveRight()) { velocity_.x = 1.0f; }
+        if (playerCommand->MoveForward()) { velocity_.z = 1.0f; }
+        if (playerCommand->MoveBackward()) { velocity_.z = -1.0f; }
+    }
+
+    Vector2 direction = MyMath::Normalize({ velocity_.x,velocity_.z });
+
+    // Y軸回転（左右）
+    transform_.rotate.y = std::atan2(direction.x, direction.y);
+
+   /* transform_.rotate = Function::DirectionToRotation(Function::Normalize({ velocity_.x,0.0f,velocity_.z }), { 1,0,0 });*/
+
+    float length = MyMath::Length(Vector2{ velocity_.x,velocity_.z });
+    speed_ = (playerCommand->Sneak() || length >= 0.5f) ? 0.25f : 0.125f;
+
+    if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
+
+        //前の方向を取得
+        Vector3 forward = MyMath::GetForward(transform_.rotate.z);
+        forward.y = 0.0f;
+
+        // forwardに垂直な右方向ベクトルを計算
+        Vector3 right = Function::Cross(Vector3(0, 1, 0), forward);
+        right = Function::Normalize(right);
+        //速度を正規化しそれぞれ足す
+// x, z 成分だけ正規化 
+        Vector3 horizontal = Function::Normalize(Vector3{ velocity_.x, 0.0f, velocity_.z });
+
+        transform_.translate += forward * horizontal.z * speed_;
+        transform_.translate += right * horizontal.x * speed_;
+    }
+
+
+}
+
+float MyMath::Dot(const Vector2& v1, const Vector2& v2)
+{
+    return { v1.x * v2.x + v1.y * v2.y };
+}
+
+float MyMath::Length(const Vector2& v)
+{
+    return { sqrtf(Dot(v,v)) };
+}
+
+Vector2 MyMath::Normalize(const Vector2& v)
+{
+    float length = Length(v);
+    if (length != 0.0f) {
+        return { v.x / length,v.y / length };
+    } else {
+        return { 0.0f, 0.0f };
+    }
+}
+
+Vector3 MyMath::GetForward(const float angle) {
+
+    Matrix4x4 rotationZMatrix;
+
+    rotationZMatrix = Function::MakeRotateZMatrix(angle);
+    Vector3 localForward = { 0.0f, 0.0f, 1.0f };
+    return Function::TransformVM(localForward, rotationZMatrix);
+}
+
