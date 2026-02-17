@@ -45,5 +45,7 @@ public:
     void Move();
     //アニメーション
     void Animation();
+    //ワールド行列の取得
+    const Matrix4x4& GetWorldMatrix()const { return bodyObj_->GetWorldMatrix(); }
 };
 

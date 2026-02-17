@@ -137,8 +137,8 @@ void ShadowGameScene::UpdateCamera()
         debugCamera_->Update();
         camera_->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
     } else {
-        camera_->SetTransform(cameraTransform_);
-        camera_->Update();
+        //Playerからの視点
+        camera_->SetViewProjectionMatrix(player_->GetWorldMatrix(),camera_->GetProjectionMatrix());
     }
 #ifdef USE_IMGUI
     if (ImGui::Begin("Camera")) {
