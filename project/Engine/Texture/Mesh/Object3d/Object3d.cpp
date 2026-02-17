@@ -22,6 +22,7 @@ void Object3d::Initialize() {
 	SetShininess(40.0f);
 	SetEnvironmentCoefficient(0.0f);
 	SetGrayscaleEnabled(false);
+	SetSepiaEnabled(false);
 }
 namespace {
 bool IsIdentityMatrix(const Matrix4x4& matrix) {
