@@ -7,7 +7,8 @@ struct Material
     float4x4 uvTransform;
     float shininess;
     float environmentCoefficient;
-    float2 padding2;
+    int grayscaleEnabled;
+    float padding2;
 };
 struct Camera
 {
@@ -25,6 +26,16 @@ struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
 };
+float3 ApplyGrayscale(float3 color)
+{
+    if (gMaterial.grayscaleEnabled == 0)
+    {
+        return color;
+    }
+    float y = dot(color, float3(0.2125f, 0.7154f, 0.0721f));
+    return float3(y, y, y);
+}
+
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
@@ -44,6 +55,8 @@ PixelShaderOutput main(VertexShaderOutput input)
 
     output.color.rgb = lerp(baseColor, environmentColor, reflectionFactor);
     output.color.a = gMaterial.color.a * textureColor.a;
+
+    output.color.rgb = ApplyGrayscale(output.color.rgb);
 
     if (textureColor.a < 0.5f)
     {

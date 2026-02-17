@@ -33,7 +33,8 @@ class Object3d {
 		Matrix4x4 uvTransform;
 		float shininess;
 		float environmentCoefficient;
-		float padding2[2];
+		int grayscaleEnabled;
+		float padding2;
 	};
 
 	Transform transform_ = {
@@ -83,6 +84,7 @@ public:
 	}
 	void SetColor(Vector4 color);
 	void SetEnableLighting(bool enable);
+	void SetGrayscaleEnabled(bool enable);
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetShininess(float shininess);
 	void SetEnvironmentCoefficient(float coefficient);

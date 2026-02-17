@@ -21,6 +21,7 @@ void Object3d::Initialize() {
 	SetUvTransform(Function::MakeIdentity4x4());
 	SetShininess(40.0f);
 	SetEnvironmentCoefficient(0.0f);
+	SetGrayscaleEnabled(false);
 }
 namespace {
 bool IsIdentityMatrix(const Matrix4x4& matrix) {
@@ -133,6 +134,11 @@ void Object3d::SetColor(Vector4 color) {
 void Object3d::SetEnableLighting(bool enable) {
 	if (materialData_) {
 		materialData_->enableLighting = enable ? 1 : 0;
+	}
+}
+void Object3d::SetGrayscaleEnabled(bool enable) {
+	if (materialData_) {
+		materialData_->grayscaleEnabled = enable ? 1 : 0;
 	}
 }
 void Object3d::SetUvTransform(const Matrix4x4& uvTransform) {
