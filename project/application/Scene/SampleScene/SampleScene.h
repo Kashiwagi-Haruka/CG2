@@ -55,6 +55,7 @@ class SampleScene : public BaseScene {
 	float shininess = 40.0f;
 	float environmentCoefficient = 0.25f;
 	bool grayscaleEnabled = false;
+	bool fullScreenGrayscaleEnabled_ = false;
 
 public:
 	SampleScene();

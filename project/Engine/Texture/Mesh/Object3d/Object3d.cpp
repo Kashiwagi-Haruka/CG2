@@ -92,6 +92,7 @@ void Object3d::Update() {
 		cameraData_->worldPosition = {transform_.translate};
 	}
 	cameraData_->screenSize = {static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)};
+	cameraData_->fullscreenGrayscaleEnabled = Object3dCommon::GetInstance()->IsFullScreenGrayscaleEnabled() ? 1 : 0;
 	cameraResource_->Unmap(0, nullptr);
 }
 void Object3d::Draw() {

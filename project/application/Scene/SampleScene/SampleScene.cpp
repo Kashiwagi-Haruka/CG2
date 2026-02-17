@@ -423,7 +423,10 @@ void SampleScene::Update() {
 		}
 	}
 	ImGui::End();
-
+	if (ImGui::Begin("ScreenEffectd")) {
+		ImGui::Checkbox("Fullscreen Grayscale (BT709)", &fullScreenGrayscaleEnabled_);
+	}
+	ImGui::End();
 
 #endif // USE_IMGUI
 	if (useDebugCamera_) {
@@ -441,6 +444,7 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
 	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
+	Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(fullScreenGrayscaleEnabled_);
 
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);

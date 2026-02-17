@@ -69,7 +69,8 @@ struct Camera
     float3 worldPosition;
     float padding;
     float2 screenSize;
-    float2 padding2;
+    int fullscreenGrayscaleEnabled;
+    float padding2;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b3);
@@ -93,7 +94,7 @@ static const float kToonShadowStrength = 0.35f;
 static const float kToonLightIntensityMax = 1.00f;
 float3 ApplyGrayscale(float3 color)
 {
-    if (gMaterial.grayscaleEnabled == 0)
+    if (gMaterial.grayscaleEnabled == 0 && gCamera.fullscreenGrayscaleEnabled == 0)
     {
         return color;
     }

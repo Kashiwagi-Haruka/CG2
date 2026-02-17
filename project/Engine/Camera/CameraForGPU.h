@@ -5,5 +5,6 @@ struct CameraForGpu {
 	Vector3 worldPosition;
 	float padding = 0.0f;
 	Vector2 screenSize;
-	Vector2 padding2;
+	int fullscreenGrayscaleEnabled = 0;
+	float padding2 = 0.0f;
 };
