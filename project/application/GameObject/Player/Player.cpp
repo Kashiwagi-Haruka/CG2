@@ -4,11 +4,13 @@
 #include "Model/ModelManager.h"
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
-#include"KeyBindConfig.h"
+#include"GameObject/KeyBindConfig.h"
 #include<imgui.h>
 #include"GameObject/YoshidaMath/Easing.h"
 namespace PlayerConst{
     const constexpr float kRotateYSpeed = 0.25f;
+    const constexpr float kSneakSpeed = 0.125f;
+    const constexpr float kWalkSpeed = 0.25f;
 };
 
 Player::Player()
@@ -133,7 +135,7 @@ void Player::Move()
     transform_.rotate.y = YoshidaMath::Easing::Lerp(transform_.rotate.y, std::atan2(direction.x, direction.y), PlayerConst::kRotateYSpeed);
 
     float length = YoshidaMath::Length(Vector2{ velocity_.x,velocity_.z });
-    speed_ = (playerCommand->Sneak() || length <= 0.5f) ? 0.125f: 0.25f ;
+    speed_ = (playerCommand->Sneak() || length <= 0.5f) ? PlayerConst::kSneakSpeed: PlayerConst::kWalkSpeed;
 
     if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
 
