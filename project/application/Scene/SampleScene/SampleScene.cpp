@@ -328,10 +328,14 @@ void SampleScene::Update() {
 			ImGui::Checkbox("EnableLighting", &enableLighting);
 			ImGui::DragFloat("Shininess", &shininess, 0.1f, 0.0f, 100.0f);
 			ImGui::DragFloat("EnvironmentCoefficient", &environmentCoefficient, 0.01f, 0.0f, 1.0f);
+			ImGui::Checkbox("Grayscale (BT709)", &grayscaleEnabled);
+			ImGui::Checkbox("Sepia", &sepiaEnabled);
 			uvBallObj_->SetColor(color);
 			uvBallObj_->SetEnableLighting(enableLighting);
 			uvBallObj_->SetShininess(shininess);
 			uvBallObj_->SetEnvironmentCoefficient(environmentCoefficient);
+			uvBallObj_->SetGrayscaleEnabled(grayscaleEnabled);
+			uvBallObj_->SetSepiaEnabled(sepiaEnabled);
 			ImGui::TreePop();
 		}
 	}
@@ -421,7 +425,11 @@ void SampleScene::Update() {
 		}
 	}
 	ImGui::End();
-
+	if (ImGui::Begin("ScreenEffectd")) {
+		ImGui::Checkbox("Fullscreen Grayscale (BT709)", &fullScreenGrayscaleEnabled_);
+		ImGui::Checkbox("Fullscreen Sepia", &fullScreenSepiaEnabled_);
+	}
+	ImGui::End();
 
 #endif // USE_IMGUI
 	if (useDebugCamera_) {
@@ -439,6 +447,8 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
 	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
+	Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(fullScreenGrayscaleEnabled_);
+	Object3dCommon::GetInstance()->SetFullScreenSepiaEnabled(fullScreenSepiaEnabled_);
 
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);
@@ -470,8 +480,7 @@ void SampleScene::Draw() {
 	uvBallObj_->Draw();
 	planeGltf_->Draw();
 	fieldObj_->Draw();
-	animatedCubeObj_->Draw();
-	humanObj_->Draw();
+	/*animatedCubeObj_->Draw();*/
 	Object3dCommon::GetInstance()->EndShadowMapPass();
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->DrawCommon();

@@ -21,6 +21,8 @@ void Object3d::Initialize() {
 	SetUvTransform(Function::MakeIdentity4x4());
 	SetShininess(40.0f);
 	SetEnvironmentCoefficient(0.0f);
+	SetGrayscaleEnabled(false);
+	SetSepiaEnabled(false);
 }
 namespace {
 bool IsIdentityMatrix(const Matrix4x4& matrix) {
@@ -91,6 +93,8 @@ void Object3d::Update() {
 		cameraData_->worldPosition = {transform_.translate};
 	}
 	cameraData_->screenSize = {static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)};
+	cameraData_->fullscreenGrayscaleEnabled = Object3dCommon::GetInstance()->IsFullScreenGrayscaleEnabled() ? 1 : 0;
+	cameraData_->fullscreenSepiaEnabled = Object3dCommon::GetInstance()->IsFullScreenSepiaEnabled() ? 1 : 0;
 	cameraResource_->Unmap(0, nullptr);
 }
 void Object3d::Draw() {
@@ -133,6 +137,16 @@ void Object3d::SetColor(Vector4 color) {
 void Object3d::SetEnableLighting(bool enable) {
 	if (materialData_) {
 		materialData_->enableLighting = enable ? 1 : 0;
+	}
+}
+void Object3d::SetGrayscaleEnabled(bool enable) {
+	if (materialData_) {
+		materialData_->grayscaleEnabled = enable ? 1 : 0;
+	}
+}
+void Object3d::SetSepiaEnabled(bool enable) {
+	if (materialData_) {
+		materialData_->sepiaEnabled = enable ? 1 : 0;
 	}
 }
 void Object3d::SetUvTransform(const Matrix4x4& uvTransform) {

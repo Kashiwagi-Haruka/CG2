@@ -74,6 +74,8 @@ private:
 	float shadowCameraFar_ = 300.0f;
 	float shadowOrthoHalfWidth_ = 80.0f;
 	float shadowOrthoHalfHeight_ = 80.0f;
+	bool fullScreenGrayscaleEnabled_ = false;
+	bool fullScreenSepiaEnabled_ = false;
 	void DrawSet();
 
 public:
@@ -119,4 +121,8 @@ public:
 	void SetSpotLights(const SpotLight* spotLights, uint32_t count);
 	void SetAreaLights(const AreaLight* areaLights, uint32_t count);
 	Matrix4x4 GetDirectionalLightViewProjectionMatrix() const;
+	void SetFullScreenGrayscaleEnabled(bool enable) { fullScreenGrayscaleEnabled_ = enable; }
+	bool IsFullScreenGrayscaleEnabled() const { return fullScreenGrayscaleEnabled_; }
+	void SetFullScreenSepiaEnabled(bool enable) { fullScreenSepiaEnabled_ = enable; }
+	bool IsFullScreenSepiaEnabled() const { return fullScreenSepiaEnabled_; }
 };

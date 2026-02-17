@@ -37,6 +37,8 @@ private:
 		Matrix4x4 uvTransform;
 		float shininess;
 		float environmentCoefficient;
+		int grayscaleEnabled;
+		int sepiaEnabled;
 		float padding2[2];
 	};
 	struct alignas(256) TransformationMatrix {
