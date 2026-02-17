@@ -222,6 +222,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\Mesh\Primitive\Primitive.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\Skeleton.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\SkinCluster.cpp" />
+    <ClCompile Include="application\Scene\TD3_4month\ShadowGameScene.cpp" />
+    <ClCompile Include="application\GameObject\Player\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -305,6 +307,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\Mesh\Primitive\Primitive.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\Skeleton.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\SkinCluster.h" />
+    <ClInclude Include="application\Scene\TD3_4month\ShadowGameScene.h" />
+    <ClInclude Include="application\GameObject\Player\Player.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\Object3d\Object3d.PS.hlsl">
