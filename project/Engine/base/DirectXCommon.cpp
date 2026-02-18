@@ -351,7 +351,10 @@ void DirectXCommon::SceneColorViewCreate() {
 	// RTV
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStart = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	sceneRtvHandle_.ptr = rtvStart.ptr + descriptorSizeRTV_ * 2;
-	device_->CreateRenderTargetView(sceneColorResource_.Get(), &rtvDesc_, sceneRtvHandle_);
+	D3D12_RENDER_TARGET_VIEW_DESC sceneRtvDesc{};
+	sceneRtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	sceneRtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+	device_->CreateRenderTargetView(sceneColorResource_.Get(), &sceneRtvDesc, sceneRtvHandle_);
 
 	// SRV
 	sceneSrvHandleCPU_ = sceneSrvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
