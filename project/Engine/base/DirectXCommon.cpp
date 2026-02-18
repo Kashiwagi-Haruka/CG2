@@ -329,7 +329,9 @@ void DirectXCommon::SceneColorResourceCreate() {
 	textureDesc.Height = WinApp::kClientHeight;
 	textureDesc.DepthOrArraySize = 1;
 	textureDesc.MipLevels = 1;
-	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	// sRGB で描画する各 PSO と整合するように typeless で確保し、
+	// RTV/SRV で用途に応じたフォーマットを指定できるようにする
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_TYPELESS;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
@@ -338,7 +340,8 @@ void DirectXCommon::SceneColorResourceCreate() {
 	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 
 	D3D12_CLEAR_VALUE clearValue{};
-	clearValue.Format = textureDesc.Format;
+	// typeless リソースのため、最適化クリアは実際に使う RTV フォーマットを指定する
+	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	clearValue.Color[0] = 0.1f;
 	clearValue.Color[1] = 0.25f;
 	clearValue.Color[2] = 0.5f;
@@ -352,7 +355,7 @@ void DirectXCommon::SceneColorViewCreate() {
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStart = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	sceneRtvHandle_.ptr = rtvStart.ptr + descriptorSizeRTV_ * 2;
 	D3D12_RENDER_TARGET_VIEW_DESC sceneRtvDesc{};
-	sceneRtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	sceneRtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	sceneRtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	device_->CreateRenderTargetView(sceneColorResource_.Get(), &sceneRtvDesc, sceneRtvHandle_);
 
@@ -360,7 +363,8 @@ void DirectXCommon::SceneColorViewCreate() {
 	sceneSrvHandleCPU_ = sceneSrvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	sceneSrvHandleGPU_ = sceneSrvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	// SceneColor は sRGB で書かれているため、サンプリング時に線形化する
+	srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
