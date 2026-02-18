@@ -33,6 +33,8 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	DepthBufferCreate();
 	// ディスクリプタヒープの生成
 	DescriptorHeapCreate();
+	// DXCコンパイラの生成
+	DXCCompilerCreate();
 	// RTVの初期化
 	RenderTargetViewInitialize();
 	// シーンカラーテクスチャの生成
@@ -48,8 +50,7 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	// ビューポートとシザー矩形の設定
 	ViewportRectInitialize();
 	ScissorRectInitialize();
-	// DXCコンパイラの生成
-	DXCCompilerCreate();
+
 }
 
 #pragma region FixFPS
