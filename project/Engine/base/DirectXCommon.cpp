@@ -412,8 +412,9 @@ void DirectXCommon::SceneCopyPipelineCreate() {
 	hr_ = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&copyRootSignature_));
 	assert(SUCCEEDED(hr_));
 
-	auto vsBlob = CompileShader(L"Resources/shader/FullscreenCopy/CopyImage.VS.hlsl", L"vs_6_0");
-	auto psBlob = CompileShader(L"Resources/shader/FullscreenCopy/CopyImage.PS.hlsl", L"ps_6_0");
+	// FullScreenCopy pass は SV_VertexID を使った全画面三角形で描画する
+	auto vsBlob = CompileShader(L"Resources/shader/FullScreenCopy/CopyImage.VS.hlsl", L"vs_6_0");
+	auto psBlob = CompileShader(L"Resources/shader/FullScreenCopy/CopyImage.PS.hlsl", L"ps_6_0");
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
 	psoDesc.pRootSignature = copyRootSignature_.Get();
