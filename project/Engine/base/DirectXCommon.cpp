@@ -544,7 +544,10 @@ void DirectXCommon::PostDraw() {
 	barriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barriers[1].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	barriers[1].Transition.pResource = sceneColorResource_.Get();
-	barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	// DrawSceneTextureToBackBuffer() の最後で sceneColor は
+	// PIXEL_SHADER_RESOURCE から RENDER_TARGET に戻しているため、
+	// PostDraw 時点の遷移前状態は RENDER_TARGET が正しい。
+	barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
 	barriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
@@ -554,7 +557,7 @@ void DirectXCommon::PostDraw() {
 	barriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
 	barriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList_->ResourceBarrier(_countof(barriers), barriers);
 
 	// コマンドリストをクローズして実行
