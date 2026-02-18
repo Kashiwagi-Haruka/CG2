@@ -273,6 +273,7 @@
     <None Include="Resources\shader\Sprite\Sprite.hlsli">
       <Filter>リソース ファイル</Filter>
     </None>
+    <None Include="Resources\shader\FullScreenCopy\CopyImage.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -510,6 +511,8 @@
     <FxCompile Include="Resources\shader\Particle\UpdateParticle.CS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\Object3dShadowMap.VS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\Object3dShadowMap.PS.hlsl" />
+    <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.VS.hlsl" />
+    <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
