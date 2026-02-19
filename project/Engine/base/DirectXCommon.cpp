@@ -45,6 +45,9 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	// シーンカラーをバックバッファにコピーするためのPSO作成
 	SceneCopyPipelineCreate();
 	SetVignetteStrength(vignetteStrength_);
+	SetRandomNoiseEnabled(randomNoiseEnabled_);
+	SetRandomNoiseScale(randomNoiseScale_);
+	SetRandomNoiseBlendMode(randomNoiseBlendMode_);
 	// DSVの初期化
 	DepthStencilViewInitialize();
 	// フェンスの生成
@@ -462,10 +465,14 @@ void DirectXCommon::SceneCopyPipelineCreate() {
 
 	hr_ = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&copyPipelineState_));
 	assert(SUCCEEDED(hr_));
-	postEffectParameterResource_ = CreateBufferResource(sizeof(float));
+	postEffectParameterResource_ = CreateBufferResource(sizeof(PostEffectParameters));
 	hr_ = postEffectParameterResource_->Map(0, nullptr, reinterpret_cast<void**>(&postEffectParameterMappedData_));
 	assert(SUCCEEDED(hr_));
-	*postEffectParameterMappedData_ = vignetteStrength_;
+	postEffectParameterMappedData_->vignetteStrength = vignetteStrength_;
+	postEffectParameterMappedData_->randomNoiseEnabled = randomNoiseEnabled_ ? 1.0f : 0.0f;
+	postEffectParameterMappedData_->randomNoiseScale = randomNoiseScale_;
+	postEffectParameterMappedData_->randomNoiseTime = randomNoiseTime_;
+	postEffectParameterMappedData_->randomNoiseBlendMode = static_cast<float>(randomNoiseBlendMode_);
 }
 void DirectXCommon::DepthStencilViewInitialize() {
 
@@ -530,11 +537,34 @@ void DirectXCommon::ScissorRectInitialize() {
 void DirectXCommon::SetVignetteStrength(float strength) {
 	vignetteStrength_ = std::clamp(strength, 0.0f, 1.0f);
 	if (postEffectParameterMappedData_) {
-		*postEffectParameterMappedData_ = vignetteStrength_;
+		postEffectParameterMappedData_->vignetteStrength = vignetteStrength_;
+	}
+}
+
+void DirectXCommon::SetRandomNoiseEnabled(bool enabled) {
+	randomNoiseEnabled_ = enabled;
+	if (postEffectParameterMappedData_) {
+		postEffectParameterMappedData_->randomNoiseEnabled = randomNoiseEnabled_ ? 1.0f : 0.0f;
+	}
+}
+
+void DirectXCommon::SetRandomNoiseScale(float scale) {
+	randomNoiseScale_ = std::max(scale, 1.0f);
+	if (postEffectParameterMappedData_) {
+		postEffectParameterMappedData_->randomNoiseScale = randomNoiseScale_;
+	}
+}
+void DirectXCommon::SetRandomNoiseBlendMode(int blendMode) {
+	randomNoiseBlendMode_ = std::clamp(blendMode, 0, 4);
+	if (postEffectParameterMappedData_) {
+		postEffectParameterMappedData_->randomNoiseBlendMode = static_cast<float>(randomNoiseBlendMode_);
 	}
 }
 void DirectXCommon::PreDraw() {
-
+	randomNoiseTime_ += deltaTime_;
+	if (postEffectParameterMappedData_) {
+		postEffectParameterMappedData_->randomNoiseTime = randomNoiseTime_;
+	}
 	// ① 現在のバックバッファをフレーム毎に更新
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
@@ -549,33 +579,15 @@ void DirectXCommon::PreDraw() {
 	DrawCommandList();
 }
 void DirectXCommon::PostDraw() {
-	// RenderTarget→Present に戻す
-	D3D12_RESOURCE_BARRIER barriers[2]{};
-	barriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barriers[0].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barriers[0].Transition.pResource = swapChainResources_[backBufferIndex_].Get();
-	barriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
-	barriers[0].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-	barriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barriers[1].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barriers[1].Transition.pResource = sceneColorResource_.Get();
-	// DrawSceneTextureToBackBuffer() の最後で sceneColor は
-	// PIXEL_SHADER_RESOURCE から RENDER_TARGET に戻しているため、
-	// PostDraw 時点の遷移前状態は RENDER_TARGET が正しい。
-	barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
-	barriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-	commandList_->ResourceBarrier(_countof(barriers), barriers);
-	commandList_->CopyResource(sceneColorResource_.Get(), swapChainResources_[backBufferIndex_].Get());
-
-	barriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
-	barriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	commandList_->ResourceBarrier(_countof(barriers), barriers);
+	// Present前にバックバッファをRTV状態からPresent状態へ戻す
+	D3D12_RESOURCE_BARRIER presentBarrier{};
+	presentBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	presentBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	presentBarrier.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
+	presentBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	presentBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	presentBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	commandList_->ResourceBarrier(1, &presentBarrier);
 
 	// コマンドリストをクローズして実行
 	hr_ = commandList_->Close();

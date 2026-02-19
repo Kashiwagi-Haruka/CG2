@@ -7,4 +7,8 @@ struct VertexShaderOutput
 cbuffer PostEffectParameters : register(b0)
 {
     float vignetteStrength;
+    float randomNoiseEnabled;
+    float randomNoiseScale;
+    float randomNoiseTime;
+    float randomNoiseBlendMode;
 };
