@@ -58,6 +58,7 @@ class SampleScene : public BaseScene {
 	bool sepiaEnabled = false;
 	bool fullScreenGrayscaleEnabled_ = false;
 	bool fullScreenSepiaEnabled_ = false;
+	float vignetteStrength_ = 1.0f;
 
 public:
 	SampleScene();

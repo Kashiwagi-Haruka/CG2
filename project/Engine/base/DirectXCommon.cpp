@@ -4,6 +4,7 @@
 #include "ParticleManager.h"
 #include "SrvManager/SrvManager.h"
 #include "StringUtility.h"
+#include <algorithm>
 #include <cassert>
 #include <dxcapi.h>
 #include <format>
@@ -43,6 +44,7 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	SceneColorViewCreate();
 	// シーンカラーをバックバッファにコピーするためのPSO作成
 	SceneCopyPipelineCreate();
+	SetVignetteStrength(vignetteStrength_);
 	// DSVの初期化
 	DepthStencilViewInitialize();
 	// フェンスの生成
@@ -377,11 +379,16 @@ void DirectXCommon::SceneCopyPipelineCreate() {
 	range.BaseShaderRegister = 0;
 	range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER rootParameter{};
-	rootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameter.DescriptorTable.NumDescriptorRanges = 1;
-	rootParameter.DescriptorTable.pDescriptorRanges = &range;
+	D3D12_ROOT_PARAMETER rootParameters[2]{};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[0].DescriptorTable.pDescriptorRanges = &range;
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[1].Descriptor.ShaderRegister = 0;
+	rootParameters[1].Descriptor.RegisterSpace = 0;
 
 	D3D12_STATIC_SAMPLER_DESC staticSampler{};
 	staticSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -394,8 +401,8 @@ void DirectXCommon::SceneCopyPipelineCreate() {
 
 	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	rootSignatureDesc.NumParameters = 1;
-	rootSignatureDesc.pParameters = &rootParameter;
+	rootSignatureDesc.NumParameters = _countof(rootParameters);
+	rootSignatureDesc.pParameters = rootParameters;
 	rootSignatureDesc.NumStaticSamplers = 1;
 	rootSignatureDesc.pStaticSamplers = &staticSampler;
 
@@ -455,6 +462,10 @@ void DirectXCommon::SceneCopyPipelineCreate() {
 
 	hr_ = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&copyPipelineState_));
 	assert(SUCCEEDED(hr_));
+	postEffectParameterResource_ = CreateBufferResource(sizeof(float));
+	hr_ = postEffectParameterResource_->Map(0, nullptr, reinterpret_cast<void**>(&postEffectParameterMappedData_));
+	assert(SUCCEEDED(hr_));
+	*postEffectParameterMappedData_ = vignetteStrength_;
 }
 void DirectXCommon::DepthStencilViewInitialize() {
 
@@ -516,7 +527,12 @@ void DirectXCommon::ScissorRectInitialize() {
 	scissorRect_.bottom = WinApp::kClientHeight;
 }
 #pragma endregion
-
+void DirectXCommon::SetVignetteStrength(float strength) {
+	vignetteStrength_ = std::clamp(strength, 0.0f, 1.0f);
+	if (postEffectParameterMappedData_) {
+		*postEffectParameterMappedData_ = vignetteStrength_;
+	}
+}
 void DirectXCommon::PreDraw() {
 
 	// ① 現在のバックバッファをフレーム毎に更新
@@ -604,6 +620,7 @@ void DirectXCommon::DrawSceneTextureToBackBuffer() {
 	commandList_->SetPipelineState(copyPipelineState_.Get());
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList_->SetGraphicsRootDescriptorTable(0, sceneSrvHandleGPU_);
+	commandList_->SetGraphicsRootConstantBufferView(1, postEffectParameterResource_->GetGPUVirtualAddress());
 	commandList_->DrawInstanced(3, 1, 0, 0);
 
 	barriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
