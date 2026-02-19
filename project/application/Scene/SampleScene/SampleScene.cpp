@@ -82,7 +82,7 @@ void SampleScene::Initialize() {
     };
 	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample", particleTransform_, 0.1f, 5, Vector3{0.0f, 0.0f, 0.0f}, Vector3{-0.5f, -0.5f, -0.5f}, Vector3{0.5f, 0.5f, 0.5f});
 	uvBallObj_->SetTransform(uvBallTransform_);
-	planeGltf_->SetTransform(uvBallTransform_);
+	planeGltf_->SetTransform(planeGTransform_);
 	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
 	animatedCubeObj_->SetAnimation(&animatedCubeAnimation_, true);
 	animatedCubeObj_->SetTransform(animatedCubeTransform_);

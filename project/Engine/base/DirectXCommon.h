@@ -73,7 +73,7 @@ class DirectXCommon {
 		float padding;
 	};
 	PostEffectParameters* postEffectParameterMappedData_ = nullptr;
-	float vignetteStrength_ = 1.0f;
+	float vignetteStrength_ = 0.0f;
 	bool randomNoiseEnabled_ = false;
 	float randomNoiseScale_ = 512.0f;
 	// RTVの設定
