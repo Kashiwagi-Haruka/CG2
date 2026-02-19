@@ -428,6 +428,7 @@ void SampleScene::Update() {
 	if (ImGui::Begin("ScreenEffectd")) {
 		ImGui::Checkbox("Fullscreen Grayscale (BT709)", &fullScreenGrayscaleEnabled_);
 		ImGui::Checkbox("Fullscreen Sepia", &fullScreenSepiaEnabled_);
+		ImGui::SliderFloat("Vignette Strength", &vignetteStrength_, 0.0f, 1.0f);
 	}
 	ImGui::End();
 
@@ -449,6 +450,7 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
 	Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(fullScreenGrayscaleEnabled_);
 	Object3dCommon::GetInstance()->SetFullScreenSepiaEnabled(fullScreenSepiaEnabled_);
+	Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength_);
 
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);

@@ -57,7 +57,17 @@ class DirectXCommon {
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> sceneColorResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> sceneSrvDescriptorHeap_ = nullptr;
+	D3D12_CPU_DESCRIPTOR_HANDLE sceneRtvHandle_{};
+	D3D12_CPU_DESCRIPTOR_HANDLE sceneSrvHandleCPU_{};
+	D3D12_GPU_DESCRIPTOR_HANDLE sceneSrvHandleGPU_{};
 
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> copyRootSignature_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> copyPipelineState_ = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> postEffectParameterResource_ = nullptr;
+	float* postEffectParameterMappedData_ = nullptr;
+	float vignetteStrength_ = 1.0f;
 	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	// RTVを2つ作るのでディスクリプタを2つ用意
@@ -94,9 +104,12 @@ public:
 	void PreDraw();
 	void PostDraw();
 	void SetMainRenderTarget();
+	void DrawSceneTextureToBackBuffer();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void Finalize();
 	float GetDeltaTime() const { return deltaTime_; }
+	void SetVignetteStrength(float strength);
+	float GetVignetteStrength() const { return vignetteStrength_; }
 	ID3D12Device* GetDevice() { return device_.Get(); };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
 
@@ -121,6 +134,8 @@ private:
 	void DepthBufferCreate();
 	void DescriptorHeapCreate();
 	void SceneColorResourceCreate();
+	void SceneColorViewCreate();
+	void SceneCopyPipelineCreate();
 
 	void RenderTargetViewInitialize();
 	void DepthStencilViewInitialize();

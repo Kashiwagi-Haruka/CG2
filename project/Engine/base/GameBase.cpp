@@ -104,6 +104,7 @@ void GameBase::BeginFlame() {
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
 void GameBase::EndFlame() {
 	imguiM_->End();
+	dxCommon_->DrawSceneTextureToBackBuffer();
 	imguiM_->Draw(srvManager_.get(), dxCommon_.get());
 	dxCommon_->PostDraw();
 }
