@@ -242,6 +242,7 @@ void ParticleManager::Emit(const std::string& name, const Transform& transform, 
 	emitterData_->count = std::min(count, kMaxParticles_);
 	emitterData_->lifeTime = std::max(life, 1.0f / 60.0f);
 	emitterData_->acceleration = accel;
+	emitterData_->particleScale = transform.scale;
 	emitterData_->color = color;
 	emitterData_->emit = 1;
 
