@@ -347,6 +347,8 @@ void Object3dCommon::SetRandomNoiseEnabled(bool enabled) { dxCommon_->SetRandomN
 
 void Object3dCommon::SetRandomNoiseScale(float scale) { dxCommon_->SetRandomNoiseScale(scale); }
 
+void Object3dCommon::SetRandomNoiseBlendMode(int blendMode) { dxCommon_->SetRandomNoiseBlendMode(blendMode); }
+
 Microsoft::WRL::ComPtr<ID3D12Resource> Object3dCommon::CreateBufferResource(size_t sizeInBytes) {
 	// バッファの設定(UPLOAD用に変更)
 	D3D12_HEAP_PROPERTIES heapProperties = {};

@@ -47,6 +47,7 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	SetVignetteStrength(vignetteStrength_);
 	SetRandomNoiseEnabled(randomNoiseEnabled_);
 	SetRandomNoiseScale(randomNoiseScale_);
+	SetRandomNoiseBlendMode(randomNoiseBlendMode_);
 	// DSVの初期化
 	DepthStencilViewInitialize();
 	// フェンスの生成
@@ -471,7 +472,7 @@ void DirectXCommon::SceneCopyPipelineCreate() {
 	postEffectParameterMappedData_->randomNoiseEnabled = randomNoiseEnabled_ ? 1.0f : 0.0f;
 	postEffectParameterMappedData_->randomNoiseScale = randomNoiseScale_;
 	postEffectParameterMappedData_->randomNoiseTime = randomNoiseTime_;
-
+	postEffectParameterMappedData_->randomNoiseBlendMode = static_cast<float>(randomNoiseBlendMode_);
 }
 void DirectXCommon::DepthStencilViewInitialize() {
 
@@ -551,6 +552,12 @@ void DirectXCommon::SetRandomNoiseScale(float scale) {
 	randomNoiseScale_ = std::max(scale, 1.0f);
 	if (postEffectParameterMappedData_) {
 		postEffectParameterMappedData_->randomNoiseScale = randomNoiseScale_;
+	}
+}
+void DirectXCommon::SetRandomNoiseBlendMode(int blendMode) {
+	randomNoiseBlendMode_ = std::clamp(blendMode, 0, 4);
+	if (postEffectParameterMappedData_) {
+		postEffectParameterMappedData_->randomNoiseBlendMode = static_cast<float>(randomNoiseBlendMode_);
 	}
 }
 void DirectXCommon::PreDraw() {

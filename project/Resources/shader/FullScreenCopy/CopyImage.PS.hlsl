@@ -30,7 +30,30 @@ PixelShaderOutput main(VertexShaderOutput input)
     if (randomNoiseEnabled > 0.5f)
     {
         float random = rand2dTo1d(input.texcoord * randomNoiseScale * randomNoiseTime);
-        output.color.rgb = float3(random, random, random);
+        float3 noiseColor = float3(random, random, random);
+
+        if (randomNoiseBlendMode < 0.5f)
+        {
+            output.color.rgb = noiseColor;
+        }
+        else if (randomNoiseBlendMode < 1.5f)
+        {
+            output.color.rgb += noiseColor;
+        }
+        else if (randomNoiseBlendMode < 2.5f)
+        {
+            output.color.rgb -= noiseColor;
+        }
+        else if (randomNoiseBlendMode < 3.5f)
+        {
+            output.color.rgb *= noiseColor;
+        }
+        else
+        {
+            output.color.rgb = 1.0f - ((1.0f - output.color.rgb) * (1.0f - noiseColor));
+        }
+
+        output.color.rgb = saturate(output.color.rgb);
     }
 
     return output;

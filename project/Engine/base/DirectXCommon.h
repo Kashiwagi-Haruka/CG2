@@ -71,12 +71,15 @@ class DirectXCommon {
 		float randomNoiseEnabled;
 		float randomNoiseScale;
 		float randomNoiseTime;
+		float randomNoiseBlendMode;
+		float padding[3];
 	};
 	PostEffectParameters* postEffectParameterMappedData_ = nullptr;
 	float vignetteStrength_ = 0.0f;
 	bool randomNoiseEnabled_ = false;
 	float randomNoiseScale_ = 512.0f;
 	float randomNoiseTime_ = 0.0f;
+	int randomNoiseBlendMode_ = 0;
 	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	// RTVを2つ作るのでディスクリプタを2つ用意
@@ -123,6 +126,8 @@ public:
 	bool GetRandomNoiseEnabled() const { return randomNoiseEnabled_; }
 	void SetRandomNoiseScale(float scale);
 	float GetRandomNoiseScale() const { return randomNoiseScale_; }
+	void SetRandomNoiseBlendMode(int blendMode);
+	int GetRandomNoiseBlendMode() const { return randomNoiseBlendMode_; }
 	ID3D12Device* GetDevice() { return device_.Get(); };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
 

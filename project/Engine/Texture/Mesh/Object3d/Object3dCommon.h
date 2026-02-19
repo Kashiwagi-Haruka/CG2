@@ -128,4 +128,5 @@ public:
 	void SetVignetteStrength(float strength);
 	void SetRandomNoiseEnabled(bool enabled);
 	void SetRandomNoiseScale(float scale);
+	void SetRandomNoiseBlendMode(int blendMode);
 };

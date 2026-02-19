@@ -426,11 +426,13 @@ void SampleScene::Update() {
 	}
 	ImGui::End();
 	if (ImGui::Begin("ScreenEffectd")) {
+		static const char* noiseBlendModes[] = {"Overwrite", "Add", "Subtract", "Multiply", "Screen"};
 		ImGui::Checkbox("Fullscreen Grayscale (BT709)", &fullScreenGrayscaleEnabled_);
 		ImGui::Checkbox("Fullscreen Sepia", &fullScreenSepiaEnabled_);
 		ImGui::SliderFloat("Vignette Strength", &vignetteStrength_, 0.0f, 1.0f);
 		ImGui::Checkbox("Random Noise (Monochrome)", &randomNoiseEnabled_);
 		ImGui::SliderFloat("Random Noise Scale", &randomNoiseScale_, 1.0f, 4096.0f);
+		ImGui::Combo("Random Noise Blend", &randomNoiseBlendMode_, noiseBlendModes, IM_ARRAYSIZE(noiseBlendModes));
 	}
 	ImGui::End();
 
@@ -456,6 +458,7 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength_);
 	Object3dCommon::GetInstance()->SetRandomNoiseEnabled(randomNoiseEnabled_);
 	Object3dCommon::GetInstance()->SetRandomNoiseScale(randomNoiseScale_);
+	Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode_);
 
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);

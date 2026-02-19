@@ -10,4 +10,5 @@ cbuffer PostEffectParameters : register(b0)
     float randomNoiseEnabled;
     float randomNoiseScale;
     float randomNoiseTime;
+    float randomNoiseBlendMode;
 };
