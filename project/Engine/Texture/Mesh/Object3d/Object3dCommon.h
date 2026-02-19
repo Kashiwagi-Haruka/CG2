@@ -125,4 +125,7 @@ public:
 	bool IsFullScreenGrayscaleEnabled() const { return fullScreenGrayscaleEnabled_; }
 	void SetFullScreenSepiaEnabled(bool enable) { fullScreenSepiaEnabled_ = enable; }
 	bool IsFullScreenSepiaEnabled() const { return fullScreenSepiaEnabled_; }
+	void SetVignetteStrength(float strength);
+	void SetRandomNoiseEnabled(bool enabled);
+	void SetRandomNoiseScale(float scale);
 };

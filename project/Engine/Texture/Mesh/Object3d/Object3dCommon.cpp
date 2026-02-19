@@ -341,6 +341,12 @@ void Object3dCommon::SetAreaLights(const AreaLight* areaLights, uint32_t count) 
 	areaLightCountData_->count = clampedCount;
 	areaLightCountResource_->Unmap(0, nullptr);
 }
+void Object3dCommon::SetVignetteStrength(float strength) { dxCommon_->SetVignetteStrength(strength); }
+
+void Object3dCommon::SetRandomNoiseEnabled(bool enabled) { dxCommon_->SetRandomNoiseEnabled(enabled); }
+
+void Object3dCommon::SetRandomNoiseScale(float scale) { dxCommon_->SetRandomNoiseScale(scale); }
+
 Microsoft::WRL::ComPtr<ID3D12Resource> Object3dCommon::CreateBufferResource(size_t sizeInBytes) {
 	// バッファの設定(UPLOAD用に変更)
 	D3D12_HEAP_PROPERTIES heapProperties = {};

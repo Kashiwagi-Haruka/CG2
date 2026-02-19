@@ -453,8 +453,9 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(fullScreenGrayscaleEnabled_);
 	Object3dCommon::GetInstance()->SetFullScreenSepiaEnabled(fullScreenSepiaEnabled_);
 	Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength_);
-	ImGui::Checkbox("Random Noise (Monochrome)", &randomNoiseEnabled_);
-	ImGui::SliderFloat("Random Noise Scale", &randomNoiseScale_, 1.0f, 4096.0f);
+	Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength_);
+	Object3dCommon::GetInstance()->SetRandomNoiseEnabled(randomNoiseEnabled_);
+	Object3dCommon::GetInstance()->SetRandomNoiseScale(randomNoiseScale_);
 
 	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);
