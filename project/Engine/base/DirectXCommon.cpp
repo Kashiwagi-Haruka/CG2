@@ -45,6 +45,8 @@ void DirectXCommon::initialize(WinApp* winApp) {
 	// シーンカラーをバックバッファにコピーするためのPSO作成
 	SceneCopyPipelineCreate();
 	SetVignetteStrength(vignetteStrength_);
+	SetRandomNoiseEnabled(randomNoiseEnabled_);
+	SetRandomNoiseScale(randomNoiseScale_);
 	// DSVの初期化
 	DepthStencilViewInitialize();
 	// フェンスの生成
@@ -462,10 +464,14 @@ void DirectXCommon::SceneCopyPipelineCreate() {
 
 	hr_ = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&copyPipelineState_));
 	assert(SUCCEEDED(hr_));
-	postEffectParameterResource_ = CreateBufferResource(sizeof(float));
+	postEffectParameterResource_ = CreateBufferResource(sizeof(PostEffectParameters));
 	hr_ = postEffectParameterResource_->Map(0, nullptr, reinterpret_cast<void**>(&postEffectParameterMappedData_));
 	assert(SUCCEEDED(hr_));
-	*postEffectParameterMappedData_ = vignetteStrength_;
+	postEffectParameterMappedData_->vignetteStrength = vignetteStrength_;
+	postEffectParameterMappedData_->randomNoiseEnabled = randomNoiseEnabled_ ? 1.0f : 0.0f;
+	postEffectParameterMappedData_->randomNoiseScale = randomNoiseScale_;
+	postEffectParameterMappedData_->padding = 0.0f;
+
 }
 void DirectXCommon::DepthStencilViewInitialize() {
 
@@ -530,7 +536,21 @@ void DirectXCommon::ScissorRectInitialize() {
 void DirectXCommon::SetVignetteStrength(float strength) {
 	vignetteStrength_ = std::clamp(strength, 0.0f, 1.0f);
 	if (postEffectParameterMappedData_) {
-		*postEffectParameterMappedData_ = vignetteStrength_;
+		postEffectParameterMappedData_->vignetteStrength = vignetteStrength_;
+	}
+}
+
+void DirectXCommon::SetRandomNoiseEnabled(bool enabled) {
+	randomNoiseEnabled_ = enabled;
+	if (postEffectParameterMappedData_) {
+		postEffectParameterMappedData_->randomNoiseEnabled = randomNoiseEnabled_ ? 1.0f : 0.0f;
+	}
+}
+
+void DirectXCommon::SetRandomNoiseScale(float scale) {
+	randomNoiseScale_ = std::max(scale, 1.0f);
+	if (postEffectParameterMappedData_) {
+		postEffectParameterMappedData_->randomNoiseScale = randomNoiseScale_;
 	}
 }
 void DirectXCommon::PreDraw() {
