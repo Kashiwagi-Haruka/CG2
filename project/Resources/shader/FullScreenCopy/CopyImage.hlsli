@@ -9,5 +9,5 @@ cbuffer PostEffectParameters : register(b0)
     float vignetteStrength;
     float randomNoiseEnabled;
     float randomNoiseScale;
-    float padding;
+    float randomNoiseTime;
 };

@@ -70,12 +70,13 @@ class DirectXCommon {
 		float vignetteStrength;
 		float randomNoiseEnabled;
 		float randomNoiseScale;
-		float padding;
+		float randomNoiseTime;
 	};
 	PostEffectParameters* postEffectParameterMappedData_ = nullptr;
 	float vignetteStrength_ = 0.0f;
 	bool randomNoiseEnabled_ = false;
 	float randomNoiseScale_ = 512.0f;
+	float randomNoiseTime_ = 0.0f;
 	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	// RTVを2つ作るのでディスクリプタを2つ用意

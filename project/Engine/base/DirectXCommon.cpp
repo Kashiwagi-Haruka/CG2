@@ -470,7 +470,7 @@ void DirectXCommon::SceneCopyPipelineCreate() {
 	postEffectParameterMappedData_->vignetteStrength = vignetteStrength_;
 	postEffectParameterMappedData_->randomNoiseEnabled = randomNoiseEnabled_ ? 1.0f : 0.0f;
 	postEffectParameterMappedData_->randomNoiseScale = randomNoiseScale_;
-	postEffectParameterMappedData_->padding = 0.0f;
+	postEffectParameterMappedData_->randomNoiseTime = randomNoiseTime_;
 
 }
 void DirectXCommon::DepthStencilViewInitialize() {
@@ -554,7 +554,10 @@ void DirectXCommon::SetRandomNoiseScale(float scale) {
 	}
 }
 void DirectXCommon::PreDraw() {
-
+	randomNoiseTime_ += deltaTime_;
+	if (postEffectParameterMappedData_) {
+		postEffectParameterMappedData_->randomNoiseTime = randomNoiseTime_;
+	}
 	// ① 現在のバックバッファをフレーム毎に更新
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
