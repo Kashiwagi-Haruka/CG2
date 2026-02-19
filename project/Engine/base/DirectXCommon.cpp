@@ -569,33 +569,15 @@ void DirectXCommon::PreDraw() {
 	DrawCommandList();
 }
 void DirectXCommon::PostDraw() {
-	// RenderTarget→Present に戻す
-	D3D12_RESOURCE_BARRIER barriers[2]{};
-	barriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barriers[0].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barriers[0].Transition.pResource = swapChainResources_[backBufferIndex_].Get();
-	barriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
-	barriers[0].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-	barriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barriers[1].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barriers[1].Transition.pResource = sceneColorResource_.Get();
-	// DrawSceneTextureToBackBuffer() の最後で sceneColor は
-	// PIXEL_SHADER_RESOURCE から RENDER_TARGET に戻しているため、
-	// PostDraw 時点の遷移前状態は RENDER_TARGET が正しい。
-	barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
-	barriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-	commandList_->ResourceBarrier(_countof(barriers), barriers);
-	commandList_->CopyResource(sceneColorResource_.Get(), swapChainResources_[backBufferIndex_].Get());
-
-	barriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
-	barriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	barriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	commandList_->ResourceBarrier(_countof(barriers), barriers);
+	// Present前にバックバッファをRTV状態からPresent状態へ戻す
+	D3D12_RESOURCE_BARRIER presentBarrier{};
+	presentBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	presentBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	presentBarrier.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
+	presentBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	presentBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	presentBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	commandList_->ResourceBarrier(1, &presentBarrier);
 
 	// コマンドリストをクローズして実行
 	hr_ = commandList_->Close();
