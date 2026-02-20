@@ -14,7 +14,6 @@
 Object3d::~Object3d() { Hinstance::GetInstance()->UnregisterObject3d(this); }
 
 void Object3d::Initialize() {
-	Hinstance::GetInstance()->RegisterObject3d(this);
 
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	CreateResources();
@@ -27,6 +26,10 @@ void Object3d::Initialize() {
 	SetEnvironmentCoefficient(0.0f);
 	SetGrayscaleEnabled(false);
 	SetSepiaEnabled(false);
+
+	Hinstance* hinstance = Hinstance::GetInstance();
+	hinstance->RegisterObject3d(this);
+	hinstance->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
 }
 namespace {
 bool IsIdentityMatrix(const Matrix4x4& matrix) {
@@ -167,6 +170,42 @@ void Object3d::SetEnvironmentCoefficient(float coefficient) {
 	if (materialData_) {
 		materialData_->environmentCoefficient = coefficient;
 	}
+}
+Vector4 Object3d::GetColor() const {
+	if (materialData_) {
+		return materialData_->color;
+	}
+	return {1.0f, 1.0f, 1.0f, 1.0f};
+}
+bool Object3d::IsLightingEnabled() const {
+	if (materialData_) {
+		return materialData_->enableLighting != 0;
+	}
+	return true;
+}
+float Object3d::GetShininess() const {
+	if (materialData_) {
+		return materialData_->shininess;
+	}
+	return 40.0f;
+}
+float Object3d::GetEnvironmentCoefficient() const {
+	if (materialData_) {
+		return materialData_->environmentCoefficient;
+	}
+	return 0.0f;
+}
+bool Object3d::IsGrayscaleEnabled() const {
+	if (materialData_) {
+		return materialData_->grayscaleEnabled != 0;
+	}
+	return false;
+}
+bool Object3d::IsSepiaEnabled() const {
+	if (materialData_) {
+		return materialData_->sepiaEnabled != 0;
+	}
+	return false;
 }
 void Object3d::CreateResources() {
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));

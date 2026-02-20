@@ -10,10 +10,12 @@ class SceneManager {
 	std::unique_ptr<BaseScene> nextscene_ = nullptr;
 
 	AbstractSceneFactory* sceneFactory_ = nullptr;
+	bool isSceneReinitializeRequested_ = false;
 
 public:
 	void SetSceneFactory(AbstractSceneFactory* sceneFactory) { sceneFactory_ = sceneFactory; };
 	void ChangeScene(const std::string& sceneName);
+	void RequestReinitializeCurrentScene();
 	void Update();
 	void Draw();
 	void Finalize();
