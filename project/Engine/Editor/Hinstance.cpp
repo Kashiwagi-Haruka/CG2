@@ -260,7 +260,8 @@ if (!isPlaying_) {
 				ImGui::TextUnformatted("Playing... editor values are locked");
 			} else {
 				std::array<char, 128> nameBuffer{};
-				std::strncpy(nameBuffer.data(), objectName.c_str(), nameBuffer.size() - 1);
+				const size_t copyLength = std::min(nameBuffer.size() - 1, objectName.size());
+				std::copy_n(objectName.begin(), copyLength, nameBuffer.begin());
 				if (ImGui::InputText(("Name##" + std::to_string(i)).c_str(), nameBuffer.data(), nameBuffer.size())) {
 					objectName = nameBuffer.data();
 					nameChanged = true;
