@@ -8,9 +8,9 @@
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
+#include "SceneManager.h"
 #include <numbers>
 #include <utility>
-#include "SceneManager.h"
 SampleScene::SampleScene() {
 
 	uvBallObj_ = std::make_unique<Object3d>();
@@ -18,6 +18,7 @@ SampleScene::SampleScene() {
 	planeGltf_ = std::make_unique<Object3d>();
 	animatedCubeObj_ = std::make_unique<Object3d>();
 	humanObj_ = std::make_unique<Object3d>();
+	primitivePlane_ = std::make_unique<Primitive>();
 	cameraTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -55,6 +56,8 @@ void SampleScene::Initialize() {
 	humanObj_->Initialize();
 	humanObj_->SetCamera(camera_.get());
 	humanObj_->SetModel("walk");
+	primitivePlane_->Initialize(Primitive::Plane, "Resources/3d/uvChecker.png");
+	primitivePlane_->SetCamera(camera_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -73,7 +76,12 @@ void SampleScene::Initialize() {
 	humanTransform_ = {
 	    .scale{100.0f,	                        100.0f,                    100.0f},
         .rotate{-std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0.0f  },
-        .translate{0.0f,                              1.0f,                      -3.0f  }
+        .translate{0.0f,                              1.0f,                      -3.0f }
+    };
+	primitivePlaneTransform_ = {
+	    .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f, 0.0f, 0.0f},
+        .translate{-3.0f, 1.0f, 0.0f}
     };
 	particleTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f },
@@ -94,7 +102,7 @@ void SampleScene::Initialize() {
 		humanObj_->SetAnimation(&humanAnimationClips_[currentHumanAnimationIndex_], true);
 	}
 	humanObj_->SetTransform(humanTransform_);
-
+	primitivePlane_->SetTransform(primitivePlaneTransform_);
 	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
 		humanSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
 		humanSkinCluster_ = CreateSkinCluster(*humanSkeleton_, *walkModel);
@@ -155,8 +163,6 @@ void SampleScene::Initialize() {
 	areaLights_[1].height = 2.0f;
 	areaLights_[1].radius = 0.1f;
 	areaLights_[1].decay = 2.0f;
-
-	
 }
 
 void SampleScene::Update() {
@@ -384,7 +390,7 @@ void SampleScene::Update() {
 	}
 	ImGui::End();
 	if (ImGui::Begin("Scene")) {
-	
+
 		if (ImGui::Button("Title")) {
 			SceneManager::GetInstance()->ChangeScene("Title");
 		}
@@ -430,11 +436,13 @@ void SampleScene::Update() {
 	animatedCubeObj_->SetTransform(animatedCubeTransform_);
 	animatedCubeObj_->SetTransform(animatedCubeTransform_);
 	humanObj_->SetTransform(humanTransform_);
+	primitivePlane_->SetTransform(primitivePlaneTransform_);
 	uvBallObj_->Update();
 	fieldObj_->Update();
 	planeGltf_->Update();
 	animatedCubeObj_->Update();
 	humanObj_->Update();
+	primitivePlane_->Update();
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	if (humanSkeleton_ && !humanAnimationClips_.empty()) {
@@ -456,22 +464,24 @@ void SampleScene::Draw() {
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
+	primitivePlane_->Draw();
 	Object3dCommon::GetInstance()->EndShadowMapPass();
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->DrawCommon();
-	 uvBallObj_->Draw();
-	 planeGltf_->Draw();
-	 fieldObj_->Draw();
+	uvBallObj_->Draw();
+	planeGltf_->Draw();
+	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
-	 if (sampleParticleEmitter_) {
+	primitivePlane_->Draw();
+	if (sampleParticleEmitter_) {
 		Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
-		 sampleParticleEmitter_->Draw();
-	 }
+		sampleParticleEmitter_->Draw();
+	}
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
-	//if (humanSkeleton_) {
+	// if (humanSkeleton_) {
 	//	humanSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
-	//}
+	// }
 }
 void SampleScene::Finalize() {}

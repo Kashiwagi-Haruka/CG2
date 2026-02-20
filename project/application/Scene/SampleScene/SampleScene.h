@@ -11,6 +11,7 @@
 #include "Light/SpotLight.h"
 #include "Object3d/Object3d.h"
 #include "ParticleEmitter.h"
+#include "Primitive/Primitive.h"
 #include "Transform.h"
 #include <array>
 #include <cstdint>
@@ -23,6 +24,8 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Object3d> planeGltf_ = nullptr;
 	std::unique_ptr<Object3d> animatedCubeObj_ = nullptr;
 	std::unique_ptr<Object3d> humanObj_ = nullptr;
+	std::unique_ptr<Primitive> primitivePlane_ = nullptr;
+
 	std::unique_ptr<Camera> camera_ = nullptr;
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	bool useDebugCamera_ = false;
@@ -40,6 +43,7 @@ class SampleScene : public BaseScene {
 	Transform planeGTransform_{};
 	Transform animatedCubeTransform_{};
 	Transform humanTransform_{};
+	Transform primitivePlaneTransform_{};
 	Transform particleTransform_{};
 	std::unique_ptr<ParticleEmitter> sampleParticleEmitter_ = nullptr;
 
