@@ -14,7 +14,6 @@
 Object3d::~Object3d() { Hinstance::GetInstance()->UnregisterObject3d(this); }
 
 void Object3d::Initialize() {
-	Hinstance::GetInstance()->RegisterObject3d(this);
 
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	CreateResources();
@@ -27,6 +26,10 @@ void Object3d::Initialize() {
 	SetEnvironmentCoefficient(0.0f);
 	SetGrayscaleEnabled(false);
 	SetSepiaEnabled(false);
+
+	Hinstance* hinstance = Hinstance::GetInstance();
+	hinstance->RegisterObject3d(this);
+	hinstance->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
 }
 namespace {
 bool IsIdentityMatrix(const Matrix4x4& matrix) {

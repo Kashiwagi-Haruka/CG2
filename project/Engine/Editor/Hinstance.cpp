@@ -10,7 +10,14 @@
 #include <algorithm>
 #include <array>
 #include <cstring>
+#include <filesystem>
 #include <string>
+
+namespace {
+std::filesystem::path ResolveObjectEditorJsonPath(const std::string& filePath) { return std::filesystem::path("Resources") / "JSON" / std::filesystem::path(filePath).filename(); }
+
+bool HasObjectEditorJsonFile(const std::string& filePath) { return std::filesystem::exists(ResolveObjectEditorJsonPath(filePath)); }
+} // namespace
 
 Hinstance* Hinstance::GetInstance() {
 	static Hinstance instance;
@@ -34,9 +41,16 @@ void Hinstance::RegisterObject3d(Object3d* object) {
 		    object->IsGrayscaleEnabled(),
 		    object->IsSepiaEnabled(),
 		});
+
 	}
 }
+bool Hinstance::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
+	if (!HasObjectEditorJsonFile(filePath)) {
+		return false;
+	}
 
+	return LoadObjectEditorsFromJson(filePath);
+}
 void Hinstance::UnregisterObject3d(Object3d* object) {
 	if (!object) {
 		return;
