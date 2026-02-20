@@ -3,8 +3,11 @@
 #include "Vector3.h"
 #include "Vector4.h"
 #include <cstdint>
+#include <numbers>
 
 namespace Function {
+
+inline constexpr float kPi = std::numbers::pi_v<float>;
 
 float Dot(const Vector3& v1, const Vector3& v2);
 float Length(const Vector3& v);

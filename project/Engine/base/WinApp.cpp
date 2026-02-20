@@ -15,6 +15,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 namespace {
 constexpr float kTargetAspectRatio = 16.0f / 9.0f;
+constexpr DWORD kFixedWindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 bool gIsFullscreen = false;
 RECT gWindowedRect{};
 DWORD gWindowedStyle = 0;
@@ -60,18 +61,15 @@ void KeepClientAspectRatio16By9(HWND hwnd, WPARAM edge, RECT* rect) {
 	int32_t clientWidth = std::max(1, windowWidth - nonClientWidth);
 	int32_t clientHeight = std::max(1, windowHeight - nonClientHeight);
 
-	switch (edge) {
-	case WMSZ_LEFT:
-	case WMSZ_RIGHT:
-		clientWidth = static_cast<int32_t>(static_cast<float>(clientHeight) * kTargetAspectRatio);
-		break;
-	case WMSZ_TOP:
-	case WMSZ_BOTTOM:
-		clientHeight = static_cast<int32_t>(static_cast<float>(clientWidth) / kTargetAspectRatio);
-		break;
-	default:
-		clientHeight = static_cast<int32_t>(static_cast<float>(clientWidth) / kTargetAspectRatio);
-		break;
+	const int32_t heightFromWidth = std::max(1, static_cast<int32_t>(static_cast<float>(clientWidth) / kTargetAspectRatio));
+	const int32_t widthFromHeight = std::max(1, static_cast<int32_t>(static_cast<float>(clientHeight) * kTargetAspectRatio));
+	const int32_t adjustHeightAmount = std::abs(heightFromWidth - clientHeight);
+	const int32_t adjustWidthAmount = std::abs(widthFromHeight - clientWidth);
+
+	if (adjustWidthAmount < adjustHeightAmount) {
+		clientWidth = widthFromHeight;
+	} else {
+		clientHeight = heightFromWidth;
 	}
 
 	const int32_t adjustedWindowWidth = clientWidth + nonClientWidth;
@@ -100,7 +98,8 @@ void KeepClientAspectRatio16By9(HWND hwnd, WPARAM edge, RECT* rect) {
 	}
 }
 } // namespace
-
+int32_t WinApp::kClientWidth = 1280;
+int32_t WinApp::kClientHeight = 720;
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	if (msg == WM_KEYDOWN && wparam == VK_F11) {
 		ToggleFullscreen(hwnd);
@@ -131,8 +130,14 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-void WinApp::Initialize(const wchar_t* TitleName) {
+void WinApp::Initialize(const wchar_t* TitleName, int32_t clientWidth, int32_t clientHeight) {
+	kClientWidth = clientWidth;
+	kClientHeight = clientHeight;
 	HRESULT hr = CoInitializeEx(0, COINITBASE_MULTITHREADED);
+#ifdef USE_IMGUI
+	// フルスクリーン時を含む高DPI環境で、ImGuiのマウス座標と描画座標がずれないようにする
+	ImGui_ImplWin32_EnableDpiAwareness();
+#endif // USE_IMGUI
 
 	wc_.lpfnWndProc = WindowProc;
 
@@ -146,16 +151,27 @@ void WinApp::Initialize(const wchar_t* TitleName) {
 
 	wrc_ = {0, 0, kClientWidth, kClientHeight};
 
-	AdjustWindowRect(&wrc_, WS_OVERLAPPEDWINDOW, false);
+	AdjustWindowRect(&wrc_, kFixedWindowStyle, false);
 
-	hwnd_ = CreateWindow(wc_.lpszClassName, TitleName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, wrc_.right - wrc_.left, wrc_.bottom - wrc_.top, nullptr, nullptr, wc_.hInstance, nullptr);
+	hwnd_ = CreateWindow(wc_.lpszClassName, TitleName, kFixedWindowStyle, CW_USEDEFAULT, CW_USEDEFAULT, wrc_.right - wrc_.left, wrc_.bottom - wrc_.top, nullptr, nullptr, wc_.hInstance, nullptr);
 
 	ShowWindow(hwnd_, SW_SHOW);
 	SetWindowLongPtr(hwnd_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
 	timeBeginPeriod(1); // タイマーの精度を1msに設定
 }
+void WinApp::SetClientSize(int32_t clientWidth, int32_t clientHeight) {
+	if (!hwnd_) {
+		return;
+	}
 
+	RECT windowRect{0, 0, clientWidth, clientHeight};
+	const DWORD style = static_cast<DWORD>(GetWindowLongPtr(hwnd_, GWL_STYLE));
+	const DWORD exStyle = static_cast<DWORD>(GetWindowLongPtr(hwnd_, GWL_EXSTYLE));
+	AdjustWindowRectEx(&windowRect, style, false, exStyle);
+
+	SetWindowPos(hwnd_, nullptr, 0, 0, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+}
 void WinApp::Update() {}
 
 void WinApp::Finalize() {

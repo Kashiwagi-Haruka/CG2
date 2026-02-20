@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "ImGuiManager.h"
 #include "Engine/Editor/Hinstance.h"
 #include <dxgi1_6.h>
@@ -9,12 +10,15 @@
 #include "DirectXCommon.h"
 #include "SrvManager/SrvManager.h"
 #include "WinApp.h"
+#include <algorithm>
+#include <cfloat>
 #include <format>
 #include <string>
 
 void ImGuiManager::Initialize([[maybe_unused]] WinApp* winApp, [[maybe_unused]] DirectXCommon* dxCommon, [[maybe_unused]] SrvManager* srvManager) {
 #ifdef USE_IMGUI
 	dxCommon_ = dxCommon;
+	winApp_ = winApp;
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
@@ -58,17 +62,43 @@ void ImGuiManager::Begin() {
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 
-	ImGui::NewFrame();
+
 	ImGuiIO& io = ImGui::GetIO();
+
+	if (winApp_) {
+		RECT clientRect{};
+		if (GetClientRect(winApp_->GetHwnd(), &clientRect)) {
+			const float clientWidth = static_cast<float>(std::max(1L, clientRect.right - clientRect.left));
+			const float clientHeight = static_cast<float>(std::max(1L, clientRect.bottom - clientRect.top));
+			const float renderWidth = static_cast<float>(WinApp::kClientWidth);
+			const float renderHeight = static_cast<float>(WinApp::kClientHeight);
+
+			POINT cursorPoint{};
+			if (GetCursorPos(&cursorPoint) && ScreenToClient(winApp_->GetHwnd(), &cursorPoint) != 0 && cursorPoint.x >= 0 && cursorPoint.y >= 0 &&
+			    cursorPoint.x < (clientRect.right - clientRect.left) && cursorPoint.y < (clientRect.bottom - clientRect.top)) {
+				const float mappedMouseX = static_cast<float>(cursorPoint.x) * (renderWidth / clientWidth);
+				const float mappedMouseY = static_cast<float>(cursorPoint.y) * (renderHeight / clientHeight);
+				io.AddMousePosEvent(mappedMouseX, mappedMouseY);
+			} else {
+				io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
+			}
+
+			io.DisplaySize = ImVec2(renderWidth, renderHeight);
+			io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+		}
+	}
+	ImGui::NewFrame();
 	if (ImGui::Begin("Performance")) {
 		ImGui::Text("FPS: %.1f", io.Framerate);
 	}
 	ImGui::End();
 
 	Hinstance* hinstance = Hinstance::GetInstance();
+	const bool isEditorLayoutEnabled = hinstance->HasRegisteredObjects();
 	if (dxCommon_) {
-		dxCommon_->SetEditorLayoutEnabled(hinstance->HasRegisteredObjects());
+		dxCommon_->SetEditorLayoutEnabled(isEditorLayoutEnabled);
 	}
+	prevEditorLayoutEnabled_ = isEditorLayoutEnabled;
 	hinstance->DrawObjectEditors();
 #endif
 }
