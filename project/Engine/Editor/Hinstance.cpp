@@ -41,12 +41,13 @@ void Hinstance::DrawObjectEditors() {
 	constexpr float kGameWidthRatio = 0.68f;
 	constexpr float kEditorMinWidth = 280.0f;
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
-	const ImGuiStyle& style = ImGui::GetStyle();
-	const float editorWidthMax = viewport->Size.x * (1.0f - kGameWidthRatio);
-	const float editorWidth = std::max(kEditorMinWidth, std::min(editorWidthMax, viewport->Size.x));
+	const float editorWidthMax = viewport->WorkSize.x * (1.0f - kGameWidthRatio);
+	const float editorWidth = std::max(kEditorMinWidth, std::min(editorWidthMax, viewport->WorkSize.x));
+	const float editorPosX = viewport->WorkPos.x + viewport->WorkSize.x - editorWidth;
+	const float editorPosY = viewport->WorkPos.y;
 
-	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x + viewport->Size.x - editorWidth, viewport->Pos.y), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(editorWidth, viewport->Size.y - style.WindowPadding.y), ImGuiCond_Always);
+	ImGui::SetNextWindowPos(ImVec2(editorPosX, editorPosY), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(editorWidth, viewport->WorkSize.y), ImGuiCond_Always);
 
 	if (!ImGui::Begin("Hinstance", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)) {
 		ImGui::End();
