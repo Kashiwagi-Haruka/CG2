@@ -162,7 +162,18 @@ void WinApp::Initialize(const wchar_t* TitleName, int32_t clientWidth, int32_t c
 
 	timeBeginPeriod(1); // タイマーの精度を1msに設定
 }
+void WinApp::SetClientSize(int32_t clientWidth, int32_t clientHeight) {
+	if (!hwnd_) {
+		return;
+	}
 
+	RECT windowRect{0, 0, clientWidth, clientHeight};
+	const DWORD style = static_cast<DWORD>(GetWindowLongPtr(hwnd_, GWL_STYLE));
+	const DWORD exStyle = static_cast<DWORD>(GetWindowLongPtr(hwnd_, GWL_EXSTYLE));
+	AdjustWindowRectEx(&windowRect, style, false, exStyle);
+
+	SetWindowPos(hwnd_, nullptr, 0, 0, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+}
 void WinApp::Update() {}
 
 void WinApp::Finalize() {

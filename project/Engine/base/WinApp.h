@@ -20,7 +20,7 @@ public:
 public:
 	// 初期化
 	void Initialize(const wchar_t* TitleName, int32_t clientWidth, int32_t clientHeight);
-
+	void SetClientSize(int32_t clientWidth, int32_t clientHeight);
 	// 更新
 	void Update();
 	// 終了
