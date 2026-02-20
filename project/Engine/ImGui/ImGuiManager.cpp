@@ -76,9 +76,11 @@ void ImGuiManager::Begin() {
 			POINT cursorPoint{};
 			if (GetCursorPos(&cursorPoint) && ScreenToClient(winApp_->GetHwnd(), &cursorPoint) != 0 && cursorPoint.x >= 0 && cursorPoint.y >= 0 &&
 			    cursorPoint.x < (clientRect.right - clientRect.left) && cursorPoint.y < (clientRect.bottom - clientRect.top)) {
-				io.MousePos = ImVec2(static_cast<float>(cursorPoint.x) * (renderWidth / clientWidth), static_cast<float>(cursorPoint.y) * (renderHeight / clientHeight));
+				const float mappedMouseX = static_cast<float>(cursorPoint.x) * (renderWidth / clientWidth);
+				const float mappedMouseY = static_cast<float>(cursorPoint.y) * (renderHeight / clientHeight);
+				io.AddMousePosEvent(mappedMouseX, mappedMouseY);
 			} else {
-				io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
+				io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
 			}
 
 			io.DisplaySize = ImVec2(renderWidth, renderHeight);
