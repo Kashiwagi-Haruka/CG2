@@ -74,7 +74,7 @@ void Hinstance::DrawObjectEditors() {
 
 	ImGui::SetNextWindowPos(ImVec2(editorPosX, editorPosY), ImGuiCond_Always);
 
-	if (!ImGui::Begin("Hinstance", nullptr, ImGuiWindowFlags_NoMove)) {
+	if (!ImGui::Begin("Hinstance", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
 		ImGui::End();
 		return;
 	}
