@@ -11,6 +11,7 @@
 #include "SrvManager/SrvManager.h"
 #include "WinApp.h"
 #include <algorithm>
+#include <cfloat>
 #include <format>
 #include <string>
 
@@ -64,7 +65,7 @@ void ImGuiManager::Begin() {
 
 	ImGuiIO& io = ImGui::GetIO();
 
-		if (winApp_) {
+	if (winApp_) {
 		RECT clientRect{};
 		if (GetClientRect(winApp_->GetHwnd(), &clientRect)) {
 			const float clientWidth = static_cast<float>(std::max(1L, clientRect.right - clientRect.left));
@@ -72,15 +73,19 @@ void ImGuiManager::Begin() {
 			const float renderWidth = static_cast<float>(WinApp::kClientWidth);
 			const float renderHeight = static_cast<float>(WinApp::kClientHeight);
 
-			if (io.MousePos.x >= 0.0f && io.MousePos.y >= 0.0f) {
-				io.MousePos.x = io.MousePos.x * (renderWidth / clientWidth);
-				io.MousePos.y = io.MousePos.y * (renderHeight / clientHeight);
+			POINT cursorPoint{};
+			if (GetCursorPos(&cursorPoint) && ScreenToClient(winApp_->GetHwnd(), &cursorPoint) != 0 && cursorPoint.x >= 0 && cursorPoint.y >= 0 &&
+			    cursorPoint.x < (clientRect.right - clientRect.left) && cursorPoint.y < (clientRect.bottom - clientRect.top)) {
+				io.MousePos = ImVec2(static_cast<float>(cursorPoint.x) * (renderWidth / clientWidth), static_cast<float>(cursorPoint.y) * (renderHeight / clientHeight));
+			} else {
+				io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
 			}
+
 			io.DisplaySize = ImVec2(renderWidth, renderHeight);
 			io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 		}
 	}
-	    ImGui::NewFrame();
+	ImGui::NewFrame();
 	if (ImGui::Begin("Performance")) {
 		ImGui::Text("FPS: %.1f", io.Framerate);
 	}
