@@ -17,6 +17,7 @@ Matrix4x4 MakeCameraViewMatrix(const Transform& transform) {
 } // namespace
 
 void DebugCamera::Initialize() {
+	// 既定値を実画面サイズに合わせて設定
 	fovY_ = 0.45f * 3.14159265f;
 	aspectRatio_ = float(WinApp::kClientWidth) / float(WinApp::kClientHeight);
 	nearZ_ = 0.1f;
@@ -27,6 +28,7 @@ void DebugCamera::Initialize() {
 }
 
 void DebugCamera::SetTransform(const Transform& transform) {
+	// 受け取った姿勢を基準に、Pivot操作用の内部状態を再初期化
 	transform_ = transform;
 	pivot_ = {0.0f, 0.0f, 0.0f};
 	translation_ = transform.translate;
@@ -34,11 +36,13 @@ void DebugCamera::SetTransform(const Transform& transform) {
 }
 
 void DebugCamera::SetRotation(const Vector3& rotation) {
+	// 回転角を反映し、回転行列を同期
 	transform_.rotate = rotation;
 	matRot_ = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, transform_.rotate, {0.0f, 0.0f, 0.0f});
 }
 
 void DebugCamera::Update() {
+	// 左ドラッグ: 回転 / Shift+左ドラッグ: パン / ホイール: ズーム
 	const float rotateSpeed = 0.005f;
 	const float panSpeed = 0.02f;
 	const float zoomSpeed = 0.01f;

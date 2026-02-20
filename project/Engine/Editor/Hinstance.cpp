@@ -1,5 +1,5 @@
+#define NOMINMAX
 #include "Hinstance.h"
-
 #include "Object3d/Object3d.h"
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
@@ -38,10 +38,15 @@ void Hinstance::DrawObjectEditors() {
 		return;
 	}
 
-	constexpr float kEditorWidth = 440.0f;
+	constexpr float kGameWidthRatio = 0.68f;
+	constexpr float kEditorMinWidth = 280.0f;
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x + viewport->Size.x - kEditorWidth, viewport->Pos.y), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(kEditorWidth, viewport->Size.y), ImGuiCond_Always);
+	const ImGuiStyle& style = ImGui::GetStyle();
+	const float editorWidthMax = viewport->Size.x * (1.0f - kGameWidthRatio);
+	const float editorWidth = std::max(kEditorMinWidth, std::min(editorWidthMax, viewport->Size.x));
+
+	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x + viewport->Size.x - editorWidth, viewport->Pos.y), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(editorWidth, viewport->Size.y - style.WindowPadding.y), ImGuiCond_Always);
 
 	if (!ImGui::Begin("Hinstance", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)) {
 		ImGui::End();

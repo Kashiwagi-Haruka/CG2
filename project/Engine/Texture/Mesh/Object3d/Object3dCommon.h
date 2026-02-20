@@ -114,18 +114,24 @@ public:
 	uint32_t GetEnvironmentMapSrvIndex() const { return environmentMapSrvIndex_; }
 	uint32_t GetShadowMapSrvIndex() const { return shadowMapSrvIndex_; }
 	bool IsShadowMapPassActive() const { return isShadowMapPassActive_; }
+
 	void SetEnvironmentMapTexture(const std::string& filePath);
 	void SetEnvironmentMapTextureResource(ID3D12Resource* resource, DXGI_FORMAT format);
+
 	void SetDirectionalLight(DirectionalLight& light);
 	void SetPointLights(const PointLight* pointLights, uint32_t count);
 	void SetSpotLights(const SpotLight* spotLights, uint32_t count);
 	void SetAreaLights(const AreaLight* areaLights, uint32_t count);
+
 	Matrix4x4 GetDirectionalLightViewProjectionMatrix() const;
+
 	void SetFullScreenGrayscaleEnabled(bool enable) { fullScreenGrayscaleEnabled_ = enable; }
 	bool IsFullScreenGrayscaleEnabled() const { return fullScreenGrayscaleEnabled_; }
 	void SetFullScreenSepiaEnabled(bool enable) { fullScreenSepiaEnabled_ = enable; }
 	bool IsFullScreenSepiaEnabled() const { return fullScreenSepiaEnabled_; }
+
 	void SetVignetteStrength(float strength);
+
 	void SetRandomNoiseEnabled(bool enabled);
 	void SetRandomNoiseScale(float scale);
 	void SetRandomNoiseBlendMode(int blendMode);

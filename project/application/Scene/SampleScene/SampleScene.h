@@ -58,7 +58,7 @@ class SampleScene : public BaseScene {
 	bool sepiaEnabled = false;
 	bool fullScreenGrayscaleEnabled_ = false;
 	bool fullScreenSepiaEnabled_ = false;
-	float vignetteStrength_ = 1.0f;
+	float vignetteStrength_ = 0.0f;
 	bool randomNoiseEnabled_ = false;
 	float randomNoiseScale_ = 512.0f;
 	int randomNoiseBlendMode_ = 0;
