@@ -1,4 +1,6 @@
+#define NOMINMAX
 #include "WinApp.h"
+#include <algorithm>
 #include <d3d12.h>
 #include <dbt.h>
 #include <strsafe.h>
@@ -11,6 +13,69 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lparam);
 #endif // USE_IMGUI
 
+namespace {
+constexpr float kTargetAspectRatio = 16.0f / 9.0f;
+
+void KeepClientAspectRatio16By9(HWND hwnd, WPARAM edge, RECT* rect) {
+	if (!rect) {
+		return;
+	}
+
+	RECT currentWindowRect{};
+	RECT currentClientRect{};
+	if (!GetWindowRect(hwnd, &currentWindowRect) || !GetClientRect(hwnd, &currentClientRect)) {
+		return;
+	}
+
+	const int32_t nonClientWidth = (currentWindowRect.right - currentWindowRect.left) - (currentClientRect.right - currentClientRect.left);
+	const int32_t nonClientHeight = (currentWindowRect.bottom - currentWindowRect.top) - (currentClientRect.bottom - currentClientRect.top);
+
+	const int32_t windowWidth = rect->right - rect->left;
+	const int32_t windowHeight = rect->bottom - rect->top;
+	int32_t clientWidth = std::max(1, windowWidth - nonClientWidth);
+	int32_t clientHeight = std::max(1, windowHeight - nonClientHeight);
+
+	switch (edge) {
+	case WMSZ_LEFT:
+	case WMSZ_RIGHT:
+		clientWidth = static_cast<int32_t>(static_cast<float>(clientHeight) * kTargetAspectRatio);
+		break;
+	case WMSZ_TOP:
+	case WMSZ_BOTTOM:
+		clientHeight = static_cast<int32_t>(static_cast<float>(clientWidth) / kTargetAspectRatio);
+		break;
+	default:
+		clientHeight = static_cast<int32_t>(static_cast<float>(clientWidth) / kTargetAspectRatio);
+		break;
+	}
+
+	const int32_t adjustedWindowWidth = clientWidth + nonClientWidth;
+	const int32_t adjustedWindowHeight = clientHeight + nonClientHeight;
+
+	switch (edge) {
+	case WMSZ_LEFT:
+	case WMSZ_TOPLEFT:
+	case WMSZ_BOTTOMLEFT:
+		rect->left = rect->right - adjustedWindowWidth;
+		break;
+	default:
+		rect->right = rect->left + adjustedWindowWidth;
+		break;
+	}
+
+	switch (edge) {
+	case WMSZ_TOP:
+	case WMSZ_TOPLEFT:
+	case WMSZ_TOPRIGHT:
+		rect->top = rect->bottom - adjustedWindowHeight;
+		break;
+	default:
+		rect->bottom = rect->top + adjustedWindowHeight;
+		break;
+	}
+}
+} // namespace
+
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 #ifdef USE_IMGUI
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
@@ -21,7 +86,9 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
-
+	case WM_SIZING:
+		KeepClientAspectRatio16By9(hwnd, wparam, reinterpret_cast<RECT*>(lparam));
+		return TRUE;
 	case WM_DEVICECHANGE:
 		if (wparam == DBT_DEVICEARRIVAL || wparam == DBT_DEVICEREMOVECOMPLETE || wparam == DBT_DEVNODES_CHANGED) {
 			// パッド再列挙フラグを立てる
