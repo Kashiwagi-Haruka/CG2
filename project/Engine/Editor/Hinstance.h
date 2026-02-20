@@ -25,5 +25,6 @@ private:
 	std::vector<Object3d*> objects_;
 	std::vector<Transform> editorTransforms_;
 	std::string saveStatusMessage_;
+	bool hasUnsavedChanges_ = false;
 	bool isPlaying_ = false;
 };

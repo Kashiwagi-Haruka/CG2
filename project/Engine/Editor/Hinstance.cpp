@@ -155,11 +155,15 @@ void Hinstance::DrawObjectEditors() {
 		ImGui::Text("%s", saveStatusMessage_.c_str());
 	}
 
-	if (!isPlaying_) {
+if (!isPlaying_) {
 		if (ImGui::Button("Play")) {
-			SceneManager::GetInstance()->RequestReinitializeCurrentScene();
-			SetPlayMode(true);
-			saveStatusMessage_ = "Playing";
+			if (hasUnsavedChanges_) {
+				saveStatusMessage_ = "Warning: unsaved changes. Save To JSON before Play";
+			} else {
+				SceneManager::GetInstance()->RequestReinitializeCurrentScene();
+				SetPlayMode(true);
+				saveStatusMessage_ = "Playing";
+			}
 		}
 	} else {
 		if (ImGui::Button("Stop")) {
@@ -187,6 +191,7 @@ void Hinstance::DrawObjectEditors() {
 				changed |= ImGui::DragFloat3(("Translate##" + std::to_string(i)).c_str(), &transform.translate.x, 0.01f);
 			}
 			if (changed) {
+				hasUnsavedChanges_ = true;
 				object->SetTransform(transform);
 			}
 			ImGui::TreePop();
