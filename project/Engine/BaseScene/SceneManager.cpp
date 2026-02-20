@@ -10,6 +10,8 @@ SceneManager* SceneManager::GetInstance() {
 	return instance_.get();
 }
 
+void SceneManager::RequestReinitializeCurrentScene() { isSceneReinitializeRequested_ = true; }
+
 void SceneManager::Finalize() {
 
 	if (scene_) {
@@ -25,6 +27,13 @@ void SceneManager::Finalize() {
 
 void SceneManager::Update() {
 
+	// シーン再初期化
+	if (isSceneReinitializeRequested_ && scene_) {
+		scene_->Finalize();
+		scene_->Initialize();
+		isSceneReinitializeRequested_ = false;
+	}
+
 	// シーン切り替え
 	if (nextscene_) {
 
@@ -35,6 +44,7 @@ void SceneManager::Update() {
 		scene_ = std::move(nextscene_);
 		scene_->SetSceneManager(this);
 		scene_->Initialize();
+		isSceneReinitializeRequested_ = false;
 	}
 
 	if (scene_) {

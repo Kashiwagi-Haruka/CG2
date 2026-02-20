@@ -1,5 +1,6 @@
 #define NOMINMAX
 #include "Hinstance.h"
+#include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Object3d/Object3d.h"
 #ifdef USE_IMGUI
@@ -58,6 +59,64 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 	return jsonManager->SaveJson(filePath);
 }
 
+bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
+	JsonManager* jsonManager = JsonManager::GetInstance();
+	if (!jsonManager->LoadJson(filePath)) {
+		return false;
+	}
+
+	const nlohmann::json& root = jsonManager->GetData();
+	if (!root.contains("objects") || !root["objects"].is_array()) {
+		return false;
+	}
+
+	for (const auto& objectJson : root["objects"]) {
+		if (!objectJson.contains("index") || !objectJson["index"].is_number_unsigned()) {
+			continue;
+		}
+		const size_t index = objectJson["index"].get<size_t>();
+		if (index >= objects_.size() || !objects_[index]) {
+			continue;
+		}
+		if (!objectJson.contains("transform") || !objectJson["transform"].is_object()) {
+			continue;
+		}
+		const auto& transformJson = objectJson["transform"];
+		if (!transformJson.contains("scale") || !transformJson["scale"].is_array() || transformJson["scale"].size() != 3) {
+			continue;
+		}
+		if (!transformJson.contains("rotate") || !transformJson["rotate"].is_array() || transformJson["rotate"].size() != 3) {
+			continue;
+		}
+		if (!transformJson.contains("translate") || !transformJson["translate"].is_array() || transformJson["translate"].size() != 3) {
+			continue;
+		}
+
+		Transform transform = objects_[index]->GetTransform();
+		transform.scale = {
+		    transformJson["scale"][0].get<float>(),
+		    transformJson["scale"][1].get<float>(),
+		    transformJson["scale"][2].get<float>(),
+		};
+		transform.rotate = {
+		    transformJson["rotate"][0].get<float>(),
+		    transformJson["rotate"][1].get<float>(),
+		    transformJson["rotate"][2].get<float>(),
+		};
+		transform.translate = {
+		    transformJson["translate"][0].get<float>(),
+		    transformJson["translate"][1].get<float>(),
+		    transformJson["translate"][2].get<float>(),
+		};
+
+		objects_[index]->SetTransform(transform);
+	}
+
+	return true;
+}
+
+void Hinstance::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
+
 void Hinstance::DrawObjectEditors() {
 #ifdef USE_IMGUI
 	if (objects_.empty()) {
@@ -82,13 +141,28 @@ void Hinstance::DrawObjectEditors() {
 	ImGui::Text("Auto Object Editor");
 	ImGui::Separator();
 
-	if (ImGui::Button("Save To JSON")) {
+	if (!isPlaying_ && ImGui::Button("Save To JSON")) {
 		const bool saved = SaveObjectEditorsToJson("objectEditors.json");
 		saveStatusMessage_ = saved ? "Saved: objectEditors.json" : "Save failed: objectEditors.json";
 	}
 	if (!saveStatusMessage_.empty()) {
 		ImGui::Text("%s", saveStatusMessage_.c_str());
 	}
+
+	if (!isPlaying_) {
+		if (ImGui::Button("Play")) {
+			SceneManager::GetInstance()->RequestReinitializeCurrentScene();
+			SetPlayMode(true);
+			saveStatusMessage_ = "Playing";
+		}
+	} else {
+		if (ImGui::Button("Stop")) {
+			const bool loaded = LoadObjectEditorsFromJson("objectEditors.json");
+			SetPlayMode(false);
+			saveStatusMessage_ = loaded ? "Stopped: loaded objectEditors.json" : "Stop failed: objectEditors.json";
+		}
+	}
+
 	ImGui::Separator();
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		Object3d* object = objects_[i];
@@ -99,9 +173,13 @@ void Hinstance::DrawObjectEditors() {
 		if (ImGui::TreeNode((nodeLabel + "##node").c_str())) {
 			Transform transform = object->GetTransform();
 			bool changed = false;
-			changed |= ImGui::DragFloat3(("Scale##" + std::to_string(i)).c_str(), &transform.scale.x, 0.01f);
-			changed |= ImGui::DragFloat3(("Rotate##" + std::to_string(i)).c_str(), &transform.rotate.x, 0.01f);
-			changed |= ImGui::DragFloat3(("Translate##" + std::to_string(i)).c_str(), &transform.translate.x, 0.01f);
+			if (isPlaying_) {
+				ImGui::TextUnformatted("Playing... object values are locked");
+			} else {
+				changed |= ImGui::DragFloat3(("Scale##" + std::to_string(i)).c_str(), &transform.scale.x, 0.01f);
+				changed |= ImGui::DragFloat3(("Rotate##" + std::to_string(i)).c_str(), &transform.rotate.x, 0.01f);
+				changed |= ImGui::DragFloat3(("Translate##" + std::to_string(i)).c_str(), &transform.translate.x, 0.01f);
+			}
 			if (changed) {
 				object->SetTransform(transform);
 			}
