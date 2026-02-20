@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "ImGuiManager.h"
 #include "Engine/Editor/Hinstance.h"
 #include <dxgi1_6.h>
@@ -9,12 +10,14 @@
 #include "DirectXCommon.h"
 #include "SrvManager/SrvManager.h"
 #include "WinApp.h"
+#include <algorithm>
 #include <format>
 #include <string>
 
 void ImGuiManager::Initialize([[maybe_unused]] WinApp* winApp, [[maybe_unused]] DirectXCommon* dxCommon, [[maybe_unused]] SrvManager* srvManager) {
 #ifdef USE_IMGUI
 	dxCommon_ = dxCommon;
+	winApp_ = winApp;
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
@@ -58,8 +61,26 @@ void ImGuiManager::Begin() {
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 
-	ImGui::NewFrame();
+
 	ImGuiIO& io = ImGui::GetIO();
+
+		if (winApp_) {
+		RECT clientRect{};
+		if (GetClientRect(winApp_->GetHwnd(), &clientRect)) {
+			const float clientWidth = static_cast<float>(std::max(1L, clientRect.right - clientRect.left));
+			const float clientHeight = static_cast<float>(std::max(1L, clientRect.bottom - clientRect.top));
+			const float renderWidth = static_cast<float>(WinApp::kClientWidth);
+			const float renderHeight = static_cast<float>(WinApp::kClientHeight);
+
+			if (io.MousePos.x >= 0.0f && io.MousePos.y >= 0.0f) {
+				io.MousePos.x = io.MousePos.x * (renderWidth / clientWidth);
+				io.MousePos.y = io.MousePos.y * (renderHeight / clientHeight);
+			}
+			io.DisplaySize = ImVec2(renderWidth, renderHeight);
+			io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+		}
+	}
+	    ImGui::NewFrame();
 	if (ImGui::Begin("Performance")) {
 		ImGui::Text("FPS: %.1f", io.Framerate);
 	}

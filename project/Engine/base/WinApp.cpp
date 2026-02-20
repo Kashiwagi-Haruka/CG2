@@ -133,6 +133,10 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 void WinApp::Initialize(const wchar_t* TitleName) {
 	HRESULT hr = CoInitializeEx(0, COINITBASE_MULTITHREADED);
+#ifdef USE_IMGUI
+	// フルスクリーン時を含む高DPI環境で、ImGuiのマウス座標と描画座標がずれないようにする
+	ImGui_ImplWin32_EnableDpiAwareness();
+#endif // USE_IMGUI
 
 	wc_.lpfnWndProc = WindowProc;
 

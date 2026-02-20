@@ -11,6 +11,7 @@ class ImGuiManager {
 
 	uint32_t srvIndex_;
 	DirectXCommon* dxCommon_ = nullptr;
+	WinApp* winApp_ = nullptr;
 
 public:
 	void Initialize(WinApp* winapp, DirectXCommon* dxCommon, SrvManager* srvManager);
