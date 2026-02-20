@@ -150,6 +150,9 @@ void Hinstance::DrawObjectEditors() {
 
 	if (!isPlaying_ && ImGui::Button("Save To JSON")) {
 		const bool saved = SaveObjectEditorsToJson("objectEditors.json");
+		if (saved) {
+			hasUnsavedChanges_ = false;
+		}
 		saveStatusMessage_ = saved ? "Saved: objectEditors.json" : "Save failed: objectEditors.json";
 	}
 	if (!saveStatusMessage_.empty()) {
@@ -169,6 +172,9 @@ if (!isPlaying_) {
 	} else {
 		if (ImGui::Button("Stop")) {
 			const bool loaded = LoadObjectEditorsFromJson("objectEditors.json");
+			if (loaded) {
+				hasUnsavedChanges_ = false;
+			}
 			SetPlayMode(false);
 			saveStatusMessage_ = loaded ? "Stopped: loaded objectEditors.json" : "Stop failed: objectEditors.json";
 		}
