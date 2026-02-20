@@ -15,7 +15,32 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 namespace {
 constexpr float kTargetAspectRatio = 16.0f / 9.0f;
+bool gIsFullscreen = false;
+RECT gWindowedRect{};
+DWORD gWindowedStyle = 0;
 
+void ToggleFullscreen(HWND hwnd) {
+	if (!gIsFullscreen) {
+		gWindowedStyle = static_cast<DWORD>(GetWindowLongPtr(hwnd, GWL_STYLE));
+		GetWindowRect(hwnd, &gWindowedRect);
+
+		MONITORINFO monitorInfo{};
+		monitorInfo.cbSize = sizeof(monitorInfo);
+		GetMonitorInfo(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), &monitorInfo);
+
+		SetWindowLongPtr(hwnd, GWL_STYLE, static_cast<LONG_PTR>(gWindowedStyle & ~WS_OVERLAPPEDWINDOW));
+		SetWindowPos(
+		    hwnd, HWND_TOP, monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.top, monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
+		    SWP_FRAMECHANGED);
+		gIsFullscreen = true;
+	} else {
+		SetWindowLongPtr(hwnd, GWL_STYLE, static_cast<LONG_PTR>(gWindowedStyle));
+		SetWindowPos(
+		    hwnd, nullptr, gWindowedRect.left, gWindowedRect.top, gWindowedRect.right - gWindowedRect.left, gWindowedRect.bottom - gWindowedRect.top,
+		    SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOZORDER);
+		gIsFullscreen = false;
+	}
+}
 void KeepClientAspectRatio16By9(HWND hwnd, WPARAM edge, RECT* rect) {
 	if (!rect) {
 		return;
@@ -77,6 +102,10 @@ void KeepClientAspectRatio16By9(HWND hwnd, WPARAM edge, RECT* rect) {
 } // namespace
 
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+	if (msg == WM_KEYDOWN && wparam == VK_F11) {
+		ToggleFullscreen(hwnd);
+		return 0;
+	}
 #ifdef USE_IMGUI
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
 		return true;
