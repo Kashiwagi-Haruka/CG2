@@ -168,6 +168,42 @@ void Object3d::SetEnvironmentCoefficient(float coefficient) {
 		materialData_->environmentCoefficient = coefficient;
 	}
 }
+Vector4 Object3d::GetColor() const {
+	if (materialData_) {
+		return materialData_->color;
+	}
+	return {1.0f, 1.0f, 1.0f, 1.0f};
+}
+bool Object3d::IsLightingEnabled() const {
+	if (materialData_) {
+		return materialData_->enableLighting != 0;
+	}
+	return true;
+}
+float Object3d::GetShininess() const {
+	if (materialData_) {
+		return materialData_->shininess;
+	}
+	return 40.0f;
+}
+float Object3d::GetEnvironmentCoefficient() const {
+	if (materialData_) {
+		return materialData_->environmentCoefficient;
+	}
+	return 0.0f;
+}
+bool Object3d::IsGrayscaleEnabled() const {
+	if (materialData_) {
+		return materialData_->grayscaleEnabled != 0;
+	}
+	return false;
+}
+bool Object3d::IsSepiaEnabled() const {
+	if (materialData_) {
+		return materialData_->sepiaEnabled != 0;
+	}
+	return false;
+}
 void Object3d::CreateResources() {
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));

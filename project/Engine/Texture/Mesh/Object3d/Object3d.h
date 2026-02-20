@@ -91,6 +91,12 @@ public:
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetShininess(float shininess);
 	void SetEnvironmentCoefficient(float coefficient);
+	Vector4 GetColor() const;
+	bool IsLightingEnabled() const;
+	float GetShininess() const;
+	float GetEnvironmentCoefficient() const;
+	bool IsGrayscaleEnabled() const;
+	bool IsSepiaEnabled() const;
 	void SetAnimation(const Animation::AnimationData* animation, bool loop = true) {
 		animation_ = animation;
 		isLoopAnimation_ = loop;

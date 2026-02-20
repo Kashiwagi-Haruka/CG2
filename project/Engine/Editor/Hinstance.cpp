@@ -22,6 +22,14 @@ void Hinstance::RegisterObject3d(Object3d* object) {
 	if (std::find(objects_.begin(), objects_.end(), object) == objects_.end()) {
 		objects_.push_back(object);
 		editorTransforms_.push_back(object->GetTransform());
+		editorMaterials_.push_back({
+		    object->GetColor(),
+		    object->IsLightingEnabled(),
+		    object->GetShininess(),
+		    object->GetEnvironmentCoefficient(),
+		    object->IsGrayscaleEnabled(),
+		    object->IsSepiaEnabled(),
+		});
 	}
 }
 
@@ -33,6 +41,7 @@ void Hinstance::UnregisterObject3d(Object3d* object) {
 		if (objects_[i] == object) {
 			objects_.erase(objects_.begin() + i);
 			editorTransforms_.erase(editorTransforms_.begin() + i);
+			editorMaterials_.erase(editorMaterials_.begin() + i);
 			break;
 		}
 	}
@@ -44,7 +53,7 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 	nlohmann::json root;
 	root["objects"] = nlohmann::json::array();
 
-	for (size_t i = 0; i < objects_.size(); ++i) {
+		for (size_t i = 0; i < objects_.size(); ++i) {
 		const Object3d* object = objects_[i];
 		if (!object) {
 			continue;
@@ -56,6 +65,15 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 		    {"scale",     {transform.scale.x, transform.scale.y, transform.scale.z}            },
 		    {"rotate",    {transform.rotate.x, transform.rotate.y, transform.rotate.z}         },
 		    {"translate", {transform.translate.x, transform.translate.y, transform.translate.z}},
+		};
+		const EditorMaterial& material = editorMaterials_[i];
+		objectJson["material"] = {
+		    {"color",                  {material.color.x, material.color.y, material.color.z, material.color.w}},
+		    {"enableLighting",         material.enableLighting                                                 },
+		    {"shininess",              material.shininess		                                              },
+		    {"environmentCoefficient", material.environmentCoefficient                                         },
+		    {"grayscaleEnabled",       material.grayscaleEnabled                                               },
+		    {"sepiaEnabled",           material.sepiaEnabled		                                           },
 		};
 		root["objects"].push_back(objectJson);
 	}
@@ -116,6 +134,40 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 		};
 		editorTransforms_[index] = transform;
 		objects_[index]->SetTransform(transform);
+		EditorMaterial material = editorMaterials_[index];
+		if (objectJson.contains("material") && objectJson["material"].is_object()) {
+			const auto& materialJson = objectJson["material"];
+			if (materialJson.contains("color") && materialJson["color"].is_array() && materialJson["color"].size() == 4) {
+				material.color = {
+				    materialJson["color"][0].get<float>(),
+				    materialJson["color"][1].get<float>(),
+				    materialJson["color"][2].get<float>(),
+				    materialJson["color"][3].get<float>(),
+				};
+			}
+			if (materialJson.contains("enableLighting") && materialJson["enableLighting"].is_boolean()) {
+				material.enableLighting = materialJson["enableLighting"].get<bool>();
+			}
+			if (materialJson.contains("shininess") && materialJson["shininess"].is_number()) {
+				material.shininess = materialJson["shininess"].get<float>();
+			}
+			if (materialJson.contains("environmentCoefficient") && materialJson["environmentCoefficient"].is_number()) {
+				material.environmentCoefficient = materialJson["environmentCoefficient"].get<float>();
+			}
+			if (materialJson.contains("grayscaleEnabled") && materialJson["grayscaleEnabled"].is_boolean()) {
+				material.grayscaleEnabled = materialJson["grayscaleEnabled"].get<bool>();
+			}
+			if (materialJson.contains("sepiaEnabled") && materialJson["sepiaEnabled"].is_boolean()) {
+				material.sepiaEnabled = materialJson["sepiaEnabled"].get<bool>();
+			}
+		}
+		editorMaterials_[index] = material;
+		objects_[index]->SetColor(material.color);
+		objects_[index]->SetEnableLighting(material.enableLighting);
+		objects_[index]->SetShininess(material.shininess);
+		objects_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
+		objects_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
+		objects_[index]->SetSepiaEnabled(material.sepiaEnabled);
 	}
 
 	return true;
@@ -189,17 +241,36 @@ if (!isPlaying_) {
 		std::string nodeLabel = "Object " + std::to_string(i);
 		if (ImGui::TreeNode((nodeLabel + "##node").c_str())) {
 			Transform& transform = editorTransforms_[i];
-			bool changed = false;
+			EditorMaterial& material = editorMaterials_[i];
+			bool transformChanged = false;
+			bool materialChanged = false;
 			if (isPlaying_) {
 				ImGui::TextUnformatted("Playing... editor values are locked");
 			} else {
-				changed |= ImGui::DragFloat3(("Scale##" + std::to_string(i)).c_str(), &transform.scale.x, 0.01f);
-				changed |= ImGui::DragFloat3(("Rotate##" + std::to_string(i)).c_str(), &transform.rotate.x, 0.01f);
-				changed |= ImGui::DragFloat3(("Translate##" + std::to_string(i)).c_str(), &transform.translate.x, 0.01f);
+				transformChanged |= ImGui::DragFloat3(("Scale##" + std::to_string(i)).c_str(), &transform.scale.x, 0.01f);
+				transformChanged |= ImGui::DragFloat3(("Rotate##" + std::to_string(i)).c_str(), &transform.rotate.x, 0.01f);
+				transformChanged |= ImGui::DragFloat3(("Translate##" + std::to_string(i)).c_str(), &transform.translate.x, 0.01f);
+				ImGui::SeparatorText("Material");
+				materialChanged |= ImGui::ColorEdit4(("Color##" + std::to_string(i)).c_str(), &material.color.x);
+				materialChanged |= ImGui::Checkbox(("Enable Lighting##" + std::to_string(i)).c_str(), &material.enableLighting);
+				materialChanged |= ImGui::DragFloat(("Shininess##" + std::to_string(i)).c_str(), &material.shininess, 0.1f, 0.0f, 256.0f);
+				materialChanged |= ImGui::DragFloat(("Environment##" + std::to_string(i)).c_str(), &material.environmentCoefficient, 0.01f, 0.0f, 1.0f);
+				materialChanged |= ImGui::Checkbox(("Grayscale##" + std::to_string(i)).c_str(), &material.grayscaleEnabled);
+				materialChanged |= ImGui::Checkbox(("Sepia##" + std::to_string(i)).c_str(), &material.sepiaEnabled);
 			}
-			if (changed) {
+			if (transformChanged || materialChanged) {
 				hasUnsavedChanges_ = true;
+			}
+			if (transformChanged) {
 				object->SetTransform(transform);
+			}
+			if (materialChanged) {
+				object->SetColor(material.color);
+				object->SetEnableLighting(material.enableLighting);
+				object->SetShininess(material.shininess);
+				object->SetEnvironmentCoefficient(material.environmentCoefficient);
+				object->SetGrayscaleEnabled(material.grayscaleEnabled);
+				object->SetSepiaEnabled(material.sepiaEnabled);
 			}
 			ImGui::TreePop();
 		}
