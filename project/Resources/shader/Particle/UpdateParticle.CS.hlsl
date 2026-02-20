@@ -27,17 +27,17 @@ void main(uint3 DTid : SV_DispatchThreadID)
     particle.translate += particle.velocity * gPerFrame.deltaTime;
     particle.currentTime += gPerFrame.deltaTime;
 
-    if (particle.lifeTime > 0.0f)
+    if (particle.lifeTime <= 0.0f || particle.currentTime >= particle.lifeTime)
+    {
+        particle.color.a = 0.0f;
+    }
+    else
     {
         float alpha = 1.0f - (particle.currentTime / particle.lifeTime);
         particle.color.a = saturate(alpha);
     }
-    else
-    {
-        particle.color.a = 0.0f;
-    }
 
-    if (particle.color.a == 0.0f)
+    if (particle.color.a <= 0.0f)
     {
         particle.scale = float3(0.0f, 0.0f, 0.0f);
 
