@@ -4,6 +4,7 @@
 #include "Sprite/SpriteCommon.h"
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
+#include<numbers>
 
 ShadowGameScene::ShadowGameScene()
 {
@@ -138,7 +139,10 @@ void ShadowGameScene::UpdateCamera()
         camera_->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
     } else {
         //Playerからの視点
-        camera_->SetViewProjectionMatrix(player_->GetWorldMatrix(),camera_->GetProjectionMatrix());
+        Transform  transform= player_->GetTransform();
+        transform.scale = { 1.0f,1.0f,1.0f };
+        transform.rotate.x = std::numbers::pi_v<float>*0.5f;
+        camera_->SetTransform(transform);
     }
 #ifdef USE_IMGUI
     if (ImGui::Begin("Camera")) {
