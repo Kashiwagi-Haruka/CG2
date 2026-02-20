@@ -10,14 +10,17 @@
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "mfreadwrite.lib")
 
+// Audio シングルトンインスタンス
 std::unique_ptr<Audio> Audio::instance = nullptr;
 
+// シングルトンインスタンスを返す
 Audio* Audio::GetInstance() {
 	if (instance == nullptr) {
 		instance = std::make_unique<Audio>();
 	}
 	return instance.get();
 }
+// 再生中ボイスとオーディオAPIを終了する
 void Audio::Finalize() {
 	StopAllVoices();
 	if (masterVoice_) {
@@ -32,6 +35,7 @@ void Audio::Finalize() {
 	instance = nullptr;
 }
 
+// Media Foundation / XAudio2 を初期化する
 void Audio::InitializeIXAudio() {
 	result_ = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
 	assert(SUCCEEDED(result_));
@@ -41,6 +45,7 @@ void Audio::InitializeIXAudio() {
 	assert(SUCCEEDED(result_)); // ここも追加
 }
 
+// ワンショット再生が終わったボイスを回収する
 void Audio::Update() {
 	if (activeVoices_.empty()) {
 		return;
@@ -65,6 +70,7 @@ void Audio::Update() {
 	activeVoices_.erase(std::remove_if(activeVoices_.begin(), activeVoices_.end(), [](const ActiveVoice& active) { return active.voice == nullptr; }), activeVoices_.end());
 }
 
+// 音声ファイルを PCM として読み込んで SoundData を生成する
 SoundData Audio::SoundLoadFile(const char* filename) {
 	// フルパス → UTF-16 変換
 	std::wstring filePathW;
@@ -148,6 +154,7 @@ SoundData Audio::SoundLoadFile(const char* filename) {
 	return soundData;
 }
 
+// 指定サウンドに紐づく再生を止めてメモリを解放する
 void Audio::SoundUnload(SoundData* soundData) {
 	if (!soundData) {
 		return;
@@ -157,6 +164,7 @@ void Audio::SoundUnload(SoundData* soundData) {
 	soundData->wfex = {};
 }
 
+// サウンドを再生する(必要ならループ再生)
 void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	if (!xAudio2_) {
 		OutputDebugStringA("SoundPlayWave: xAudio2 is null!\n");
@@ -191,6 +199,7 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	activeVoices_.push_back({pSourceVoice, soundData.buffer.data(), isLoop});
 }
 
+// 特定サウンドを再生しているボイスだけを停止する
 void Audio::StopVoicesForSound(const SoundData& soundData) {
 	const BYTE* targetData = soundData.buffer.data();
 	if (!targetData) {
@@ -207,6 +216,7 @@ void Audio::StopVoicesForSound(const SoundData& soundData) {
 
 	activeVoices_.erase(std::remove_if(activeVoices_.begin(), activeVoices_.end(), [](const ActiveVoice& active) { return active.voice == nullptr; }), activeVoices_.end());
 }
+// サウンド音量を更新し、再生中ボイスにも反映する
 void Audio::SetSoundVolume(SoundData* soundData, float volume) {
 	if (!soundData) {
 		return;
@@ -223,6 +233,7 @@ void Audio::SetSoundVolume(SoundData* soundData, float volume) {
 		}
 	}
 }
+// すべての再生中ボイスを停止する
 void Audio::StopAllVoices() {
 	for (auto& active : activeVoices_) {
 		if (active.voice) {

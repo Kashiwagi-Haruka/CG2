@@ -315,40 +315,7 @@ void SampleScene::Update() {
 		ImGui::Text("RT: %.3f", input->GetRightTrigger());
 	}
 	ImGui::End();
-	if (ImGui::Begin("SampleuvBall")) {
-		if (ImGui::TreeNode("Transform")) {
 
-			ImGui::DragFloat3("Scale", &uvBallTransform_.scale.x, 0.1f);
-			ImGui::DragFloat3("Rotate", &uvBallTransform_.rotate.x, 0.1f);
-			ImGui::DragFloat3("Translate", &uvBallTransform_.translate.x, 0.1f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("Material")) {
-			ImGui::ColorEdit4("MaterialColor", &color.x);
-			ImGui::Checkbox("EnableLighting", &enableLighting);
-			ImGui::DragFloat("Shininess", &shininess, 0.1f, 0.0f, 100.0f);
-			ImGui::DragFloat("EnvironmentCoefficient", &environmentCoefficient, 0.01f, 0.0f, 1.0f);
-			ImGui::Checkbox("Grayscale (BT709)", &grayscaleEnabled);
-			ImGui::Checkbox("Sepia", &sepiaEnabled);
-			uvBallObj_->SetColor(color);
-			uvBallObj_->SetEnableLighting(enableLighting);
-			uvBallObj_->SetShininess(shininess);
-			uvBallObj_->SetEnvironmentCoefficient(environmentCoefficient);
-			uvBallObj_->SetGrayscaleEnabled(grayscaleEnabled);
-			uvBallObj_->SetSepiaEnabled(sepiaEnabled);
-			ImGui::TreePop();
-		}
-	}
-	ImGui::End();
-	if (ImGui::Begin("planeG")) {
-		if (ImGui::TreeNode("TransformG")) {
-
-			ImGui::DragFloat3("ScaleG", &planeGTransform_.scale.x, 0.1f);
-			ImGui::DragFloat3("RotateG", &planeGTransform_.rotate.x, 0.1f);
-			ImGui::DragFloat3("TranslateG", &planeGTransform_.translate.x, 0.1f);
-			ImGui::TreePop();
-		}
-	}
 	ImGui::End();
 	if (ImGui::Begin("Human")) {
 		if (ImGui::TreeNode("Transform")) {
