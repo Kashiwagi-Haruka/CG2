@@ -60,18 +60,15 @@ void KeepClientAspectRatio16By9(HWND hwnd, WPARAM edge, RECT* rect) {
 	int32_t clientWidth = std::max(1, windowWidth - nonClientWidth);
 	int32_t clientHeight = std::max(1, windowHeight - nonClientHeight);
 
-	switch (edge) {
-	case WMSZ_LEFT:
-	case WMSZ_RIGHT:
-		clientWidth = static_cast<int32_t>(static_cast<float>(clientHeight) * kTargetAspectRatio);
-		break;
-	case WMSZ_TOP:
-	case WMSZ_BOTTOM:
-		clientHeight = static_cast<int32_t>(static_cast<float>(clientWidth) / kTargetAspectRatio);
-		break;
-	default:
-		clientHeight = static_cast<int32_t>(static_cast<float>(clientWidth) / kTargetAspectRatio);
-		break;
+	const int32_t heightFromWidth = std::max(1, static_cast<int32_t>(static_cast<float>(clientWidth) / kTargetAspectRatio));
+	const int32_t widthFromHeight = std::max(1, static_cast<int32_t>(static_cast<float>(clientHeight) * kTargetAspectRatio));
+	const int32_t adjustHeightAmount = std::abs(heightFromWidth - clientHeight);
+	const int32_t adjustWidthAmount = std::abs(widthFromHeight - clientWidth);
+
+	if (adjustWidthAmount < adjustHeightAmount) {
+		clientWidth = widthFromHeight;
+	} else {
+		clientHeight = heightFromWidth;
 	}
 
 	const int32_t adjustedWindowWidth = clientWidth + nonClientWidth;
