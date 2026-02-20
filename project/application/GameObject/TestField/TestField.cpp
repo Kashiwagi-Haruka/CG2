@@ -11,6 +11,7 @@ void TestField::Initialize()
     plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/atHome.jpg");
     plane_->SetTransform(transform_);
     plane_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+    plane_->SetEnableLighting(false);
 }
 
 void TestField::Update()
