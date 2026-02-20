@@ -250,7 +250,8 @@ if (!isPlaying_) {
 		}
 		std::string& objectName = objectNames_[i];
 		std::string nodeLabel = objectName.empty() ? ("Object " + std::to_string(i)) : objectName;
-		if (ImGui::TreeNode((nodeLabel + "##node").c_str())) {
+		const std::string treeNodeLabel = nodeLabel + "###node_" + std::to_string(i);
+		if (ImGui::TreeNode(treeNodeLabel.c_str())) {
 			Transform& transform = editorTransforms_[i];
 			EditorMaterial& material = editorMaterials_[i];
 			bool transformChanged = false;
