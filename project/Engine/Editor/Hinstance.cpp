@@ -1,5 +1,6 @@
 #define NOMINMAX
 #include "Hinstance.h"
+#include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Object3d/Object3d.h"
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
@@ -32,6 +33,31 @@ void Hinstance::UnregisterObject3d(Object3d* object) {
 
 bool Hinstance::HasRegisteredObjects() const { return !objects_.empty(); }
 
+bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
+	nlohmann::json root;
+	root["objects"] = nlohmann::json::array();
+
+	for (size_t i = 0; i < objects_.size(); ++i) {
+		const Object3d* object = objects_[i];
+		if (!object) {
+			continue;
+		}
+		Transform transform = object->GetTransform();
+		nlohmann::json objectJson;
+		objectJson["index"] = i;
+		objectJson["transform"] = {
+		    {"scale",     {transform.scale.x, transform.scale.y, transform.scale.z}            },
+		    {"rotate",    {transform.rotate.x, transform.rotate.y, transform.rotate.z}         },
+		    {"translate", {transform.translate.x, transform.translate.y, transform.translate.z}},
+		};
+		root["objects"].push_back(objectJson);
+	}
+
+	JsonManager* jsonManager = JsonManager::GetInstance();
+	jsonManager->SetData(root);
+	return jsonManager->SaveJson(filePath);
+}
+
 void Hinstance::DrawObjectEditors() {
 #ifdef USE_IMGUI
 	if (objects_.empty()) {
@@ -54,6 +80,15 @@ void Hinstance::DrawObjectEditors() {
 	}
 
 	ImGui::Text("Auto Object Editor");
+	ImGui::Separator();
+
+	if (ImGui::Button("Save To JSON")) {
+		const bool saved = SaveObjectEditorsToJson("objectEditors.json");
+		saveStatusMessage_ = saved ? "Saved: objectEditors.json" : "Save failed: objectEditors.json";
+	}
+	if (!saveStatusMessage_.empty()) {
+		ImGui::Text("%s", saveStatusMessage_.c_str());
+	}
 	ImGui::Separator();
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		Object3d* object = objects_[i];

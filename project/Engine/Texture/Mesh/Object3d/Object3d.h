@@ -101,6 +101,6 @@ public:
 	Vector3 GetTranslate() { return transform_.translate; }
 	Vector3 GetRotate() { return transform_.rotate; }
 	Vector3 GetScale() { return transform_.scale; }
-	Transform GetTransform() { return transform_; }
+	Transform GetTransform() const { return transform_; }
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix; }
 };

@@ -26,7 +26,16 @@ bool JsonManager::LoadJson(const std::string& filename) {
 
 	return true;
 }
+bool JsonManager::SaveJson(const std::string& filename) const {
+	std::ofstream file(filename);
+	if (!file.is_open()) {
+		Logger::Log("JSON ファイルを書き込めません\n");
+		return false;
+	}
 
+	file << data_.dump(2);
+	return true;
+}
 const nlohmann::json* JsonManager::Find(const std::string& key) const {
 	if (!data_.is_object()) {
 		return nullptr;
