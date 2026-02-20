@@ -133,12 +133,13 @@ void Hinstance::DrawObjectEditors() {
 	constexpr float kEditorMinWidth = 280.0f;
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
 	const float editorWidthMax = viewport->WorkSize.x * (1.0f - kGameWidthRatio);
-	const float editorWidth = std::max(kEditorMinWidth, std::min(editorWidthMax, viewport->WorkSize.x));
+	const float editorMinWidth = std::min(kEditorMinWidth, viewport->WorkSize.x);
+	const float editorWidth = std::clamp(editorWidthMax, editorMinWidth, viewport->WorkSize.x);
 	const float editorPosX = viewport->WorkPos.x + viewport->WorkSize.x - editorWidth;
 	const float editorPosY = viewport->WorkPos.y;
 
 	ImGui::SetNextWindowPos(ImVec2(editorPosX, editorPosY), ImGuiCond_Always);
-
+	ImGui::SetNextWindowSize(ImVec2(editorWidth, viewport->WorkSize.y), ImGuiCond_Always);
 	if (!ImGui::Begin("Hinstance", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
 		ImGui::End();
 		return;
