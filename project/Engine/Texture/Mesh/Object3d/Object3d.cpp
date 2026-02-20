@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "DirectXCommon.h"
 #include "Function.h"
+#include "Engine/Editor/Hinstance.h"
 #include "Model/Model.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
@@ -10,7 +11,10 @@
 #include <cassert>
 #include <cmath>
 
+Object3d::~Object3d() { Hinstance::GetInstance()->UnregisterObject3d(this); }
+
 void Object3d::Initialize() {
+	Hinstance::GetInstance()->RegisterObject3d(this);
 
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	CreateResources();
