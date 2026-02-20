@@ -97,8 +97,8 @@ void ShadowGameScene::InitializeLights()
     pointLights_[1].decay = 1.0f;
 
     directionalLight_.color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    directionalLight_.direction = { 0.0f, -1.0f, 0.0f };
-    directionalLight_.intensity = 1.0f;
+    directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
+    directionalLight_.intensity = 0.1f;
 
     activeSpotLightCount_ = 2;
     spotLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -150,7 +150,7 @@ void ShadowGameScene::UpdateCamera()
         transform.scale = { 1.0f,1.0f,1.0f };
         transform.rotate.x += std::numbers::pi_v<float>*0.5f;
         transform.rotate.z = 0.0f;
-        transform.translate.y += 1.0f;
+        transform.translate.y += 1.5f;
         camera_->SetTransform(transform);
         camera_->Update();
     }
