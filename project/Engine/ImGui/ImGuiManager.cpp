@@ -96,15 +96,7 @@ void ImGuiManager::Begin() {
 	if (dxCommon_) {
 		dxCommon_->SetEditorLayoutEnabled(isEditorLayoutEnabled);
 	}
-	if (winApp_ && prevEditorLayoutEnabled_ != isEditorLayoutEnabled) {
-		constexpr float kGameWidthRatio = 0.68f;
-		int32_t targetClientWidth = WinApp::kClientWidth;
-		if (isEditorLayoutEnabled) {
-			targetClientWidth = static_cast<int32_t>(std::ceil(static_cast<float>(WinApp::kClientWidth) / kGameWidthRatio));
-		}
-		winApp_->SetClientSize(targetClientWidth, WinApp::kClientHeight);
-		prevEditorLayoutEnabled_ = isEditorLayoutEnabled;
-	}
+	prevEditorLayoutEnabled_ = isEditorLayoutEnabled;
 	hinstance->DrawObjectEditors();
 #endif
 }
