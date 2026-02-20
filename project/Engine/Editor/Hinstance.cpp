@@ -8,6 +8,8 @@
 #endif
 
 #include <algorithm>
+#include <array>
+#include <cstring>
 #include <string>
 
 Hinstance* Hinstance::GetInstance() {
@@ -20,7 +22,9 @@ void Hinstance::RegisterObject3d(Object3d* object) {
 		return;
 	}
 	if (std::find(objects_.begin(), objects_.end(), object) == objects_.end()) {
+		const size_t index = objects_.size();
 		objects_.push_back(object);
+		objectNames_.push_back("Object " + std::to_string(index));
 		editorTransforms_.push_back(object->GetTransform());
 		editorMaterials_.push_back({
 		    object->GetColor(),
@@ -40,6 +44,7 @@ void Hinstance::UnregisterObject3d(Object3d* object) {
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		if (objects_[i] == object) {
 			objects_.erase(objects_.begin() + i);
+			objectNames_.erase(objectNames_.begin() + i);
 			editorTransforms_.erase(editorTransforms_.begin() + i);
 			editorMaterials_.erase(editorMaterials_.begin() + i);
 			break;
@@ -47,13 +52,14 @@ void Hinstance::UnregisterObject3d(Object3d* object) {
 	}
 }
 
+
 bool Hinstance::HasRegisteredObjects() const { return !objects_.empty(); }
 
 bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 	nlohmann::json root;
 	root["objects"] = nlohmann::json::array();
 
-		for (size_t i = 0; i < objects_.size(); ++i) {
+	for (size_t i = 0; i < objects_.size(); ++i) {
 		const Object3d* object = objects_[i];
 		if (!object) {
 			continue;
@@ -61,6 +67,7 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 		const Transform& transform = editorTransforms_[i];
 		nlohmann::json objectJson;
 		objectJson["index"] = i;
+		objectJson["name"] = objectNames_[i];
 		objectJson["transform"] = {
 		    {"scale",     {transform.scale.x, transform.scale.y, transform.scale.z}            },
 		    {"rotate",    {transform.rotate.x, transform.rotate.y, transform.rotate.z}         },
@@ -101,6 +108,9 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 		const size_t index = objectJson["index"].get<size_t>();
 		if (index >= objects_.size() || !objects_[index]) {
 			continue;
+		}
+		if (objectJson.contains("name") && objectJson["name"].is_string()) {
+			objectNames_[index] = objectJson["name"].get<std::string>();
 		}
 		if (!objectJson.contains("transform") || !objectJson["transform"].is_object()) {
 			continue;
@@ -238,15 +248,23 @@ if (!isPlaying_) {
 		if (!object) {
 			continue;
 		}
-		std::string nodeLabel = "Object " + std::to_string(i);
+		std::string& objectName = objectNames_[i];
+		std::string nodeLabel = objectName.empty() ? ("Object " + std::to_string(i)) : objectName;
 		if (ImGui::TreeNode((nodeLabel + "##node").c_str())) {
 			Transform& transform = editorTransforms_[i];
 			EditorMaterial& material = editorMaterials_[i];
 			bool transformChanged = false;
 			bool materialChanged = false;
+			bool nameChanged = false;
 			if (isPlaying_) {
 				ImGui::TextUnformatted("Playing... editor values are locked");
 			} else {
+				std::array<char, 128> nameBuffer{};
+				std::strncpy(nameBuffer.data(), objectName.c_str(), nameBuffer.size() - 1);
+				if (ImGui::InputText(("Name##" + std::to_string(i)).c_str(), nameBuffer.data(), nameBuffer.size())) {
+					objectName = nameBuffer.data();
+					nameChanged = true;
+				}
 				transformChanged |= ImGui::DragFloat3(("Scale##" + std::to_string(i)).c_str(), &transform.scale.x, 0.01f);
 				transformChanged |= ImGui::DragFloat3(("Rotate##" + std::to_string(i)).c_str(), &transform.rotate.x, 0.01f);
 				transformChanged |= ImGui::DragFloat3(("Translate##" + std::to_string(i)).c_str(), &transform.translate.x, 0.01f);
@@ -258,7 +276,7 @@ if (!isPlaying_) {
 				materialChanged |= ImGui::Checkbox(("Grayscale##" + std::to_string(i)).c_str(), &material.grayscaleEnabled);
 				materialChanged |= ImGui::Checkbox(("Sepia##" + std::to_string(i)).c_str(), &material.sepiaEnabled);
 			}
-			if (transformChanged || materialChanged) {
+			if (transformChanged || materialChanged || nameChanged) {
 				hasUnsavedChanges_ = true;
 			}
 			if (transformChanged) {

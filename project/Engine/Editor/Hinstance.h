@@ -33,6 +33,7 @@ private:
 	bool LoadObjectEditorsFromJson(const std::string& filePath);
 
 	std::vector<Object3d*> objects_;
+	std::vector<std::string> objectNames_;
 	std::vector<Transform> editorTransforms_;
 	std::vector<EditorMaterial> editorMaterials_;
 	std::string saveStatusMessage_;
