@@ -315,8 +315,6 @@ void SampleScene::Update() {
 		ImGui::Text("RT: %.3f", input->GetRightTrigger());
 	}
 	ImGui::End();
-
-	ImGui::End();
 	if (ImGui::Begin("Human")) {
 		if (ImGui::TreeNode("Transform")) {
 			ImGui::DragFloat3("Scale", &humanTransform_.scale.x, 0.1f);
