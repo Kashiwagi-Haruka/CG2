@@ -201,7 +201,7 @@
     <ClCompile Include="application\Scene\TitleScene.cpp">
       <Filter>ソース ファイル\application\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Loadfile\CSVManager.cpp">
+    <ClCompile Include="Engine\Loadfile\CSV\CSVManager.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\LeakChecker\D3DResourceLeakChecker.cpp">
@@ -279,6 +279,9 @@
     <ClCompile Include="application\GameObject\Wall\Wall.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -327,7 +330,7 @@
     <ClInclude Include="Engine\ImGui\ImGuiManager.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Loadfile\CSVManager.h">
+    <ClInclude Include="Engine\Loadfile\CSV\CSVManager.h">
       <Filter>ヘッダー ファイル\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\LeakChecker\D3DResourceLeakChecker.h">
@@ -514,6 +517,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\GameObject\Wall\Wall.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
