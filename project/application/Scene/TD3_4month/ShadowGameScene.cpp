@@ -22,6 +22,8 @@ ShadowGameScene::ShadowGameScene()
     debugCamera_ = std::make_unique<DebugCamera>();
     //プレイヤーの生成
     player_ = std::make_unique<Player>();
+    //テスト地面
+    testField_ = std::make_unique<TestField>();
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -42,12 +44,17 @@ void ShadowGameScene::Initialize()
     player_->Initialize();
     player_->SetCamera(camera_.get());
 
+    testField_->Initialize();
+    testField_->SetCamera(camera_.get());
+
 }
 
 void ShadowGameScene::Update()
 {
     //シーン遷移の更新処理
     UpdateSceneTransition();
+    //ライトの更新処理
+    UpdatePointLight();
     //カメラの更新処理
     UpdateCamera();
     //ゲームオブジェクトの更新処理
@@ -139,7 +146,7 @@ void ShadowGameScene::UpdateCamera()
         camera_->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
     } else {
         //Playerからの視点
-        Transform  transform= player_->GetTransform();
+        Transform  transform = player_->GetTransform();
         transform.scale = { 1.0f,1.0f,1.0f };
         transform.rotate.x = std::numbers::pi_v<float>*0.5f;
         camera_->SetTransform(transform);
@@ -186,8 +193,9 @@ void ShadowGameScene::UpdateGameObject()
     Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
     Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
     Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
-   
+
     player_->Update();
+    testField_->Update();
 }
 void ShadowGameScene::UpdatePointLight()
 {
@@ -233,6 +241,8 @@ void ShadowGameScene::DrawGameObject()
     Object3dCommon::GetInstance()->DrawCommon();
 
     //Object3dCommon::GetInstance()->DrawCommonSkinningToon();
+
+    testField_->Draw();
     //プレイヤーの描画処理
     player_->Draw();
 

@@ -6,6 +6,8 @@
 #include "Camera.h"
 #include "DebugCamera.h"
 #include"GameObject/Player/Player.h"
+#include"GameObject/TestField/TestField.h"
+
 #include "Light/DirectionalLight.h" 
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h" 
@@ -26,7 +28,8 @@ private:
 
     //Player
     std::unique_ptr<Player> player_ = nullptr;
-
+    //TestField
+    std::unique_ptr<TestField> testField_ = nullptr;
 #pragma region// light
     //DirectionalLight
     DirectionalLight directionalLight_{}; 

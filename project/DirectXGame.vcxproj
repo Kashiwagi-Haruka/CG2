@@ -230,6 +230,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Wall\Wall.cpp" />
     <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp" />
     <ClCompile Include="Engine\Editor\Hinstance.cpp" />
+    <ClCompile Include="application\GameObject\TestField\TestField.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -322,6 +323,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Wall\Wall.h" />
     <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h" />
     <ClInclude Include="Engine\Editor\Hinstance.h" />
+    <ClInclude Include="application\GameObject\TestField\TestField.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
