@@ -46,7 +46,7 @@ void ShadowGameScene::Initialize()
 
     testField_->Initialize();
     testField_->SetCamera(camera_.get());
-
+    InitializeLights();
 }
 
 void ShadowGameScene::Update()
