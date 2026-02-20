@@ -40,7 +40,7 @@ void Player::Initialize()
     velocity_ = { 0.0f,0.0f,0.0f };
     speed_ = { 0.0f };
 
-
+    tempDirection_ = { 0.0f };
     //アニメーションクリップ
     animationClips_ = Animation::LoadAnimationClips("Resources/3d/human", "walk");
     std::vector<Animation::AnimationData> sneakClips = Animation::LoadAnimationClips("Resources/3d/human", "sneakWalk");
@@ -132,12 +132,15 @@ void Player::Move()
     //xy成分だけ正規化
     Vector2 direction = YoshidaMath::Normalize({ velocity_.x,velocity_.z });
     // Y軸回転（左右）
-    transform_.rotate.y = YoshidaMath::Easing::Lerp(transform_.rotate.y, std::atan2(direction.x, direction.y), PlayerConst::kRotateYSpeed);
+    transform_.rotate.y = YoshidaMath::Easing::Lerp(transform_.rotate.y, std::atan2(tempDirection_.x, tempDirection_.y), PlayerConst::kRotateYSpeed);
 
     float length = YoshidaMath::Length(Vector2{ velocity_.x,velocity_.z });
     speed_ = (playerCommand->Sneak() || length <= 0.5f) ? PlayerConst::kSneakSpeed: PlayerConst::kWalkSpeed;
 
     if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
+
+        //動いていたら
+        tempDirection_ = direction;
 
         //前の方向を取得
         Vector3 forward = YoshidaMath::GetForward(transform_.rotate.z);

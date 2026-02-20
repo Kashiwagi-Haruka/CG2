@@ -28,6 +28,7 @@ private:
     Transform transform_{};
     Vector3 velocity_ = { 0.0f };
     float speed_ = { 0.0f };
+    Vector2 tempDirection_ = { 0.0f };
 public:
     Transform& GetTransform() { return transform_; };
     //コンストラクタ

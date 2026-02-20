@@ -148,8 +148,11 @@ void ShadowGameScene::UpdateCamera()
         //Playerからの視点
         Transform  transform = player_->GetTransform();
         transform.scale = { 1.0f,1.0f,1.0f };
-        transform.rotate.x = std::numbers::pi_v<float>*0.5f;
+        transform.rotate.x += std::numbers::pi_v<float>*0.5f;
+        transform.rotate.z = 0.0f;
+        transform.translate.y += 1.0f;
         camera_->SetTransform(transform);
+        camera_->Update();
     }
 #ifdef USE_IMGUI
     if (ImGui::Begin("Camera")) {
