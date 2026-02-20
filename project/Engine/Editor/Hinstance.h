@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "Transform.h"
+
 class Object3d;
 
 class Hinstance {
@@ -21,6 +23,7 @@ private:
 	bool LoadObjectEditorsFromJson(const std::string& filePath);
 
 	std::vector<Object3d*> objects_;
+	std::vector<Transform> editorTransforms_;
 	std::string saveStatusMessage_;
 	bool isPlaying_ = false;
 };

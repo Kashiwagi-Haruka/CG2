@@ -21,6 +21,7 @@ void Hinstance::RegisterObject3d(Object3d* object) {
 	}
 	if (std::find(objects_.begin(), objects_.end(), object) == objects_.end()) {
 		objects_.push_back(object);
+		editorTransforms_.push_back(object->GetTransform());
 	}
 }
 
@@ -28,8 +29,13 @@ void Hinstance::UnregisterObject3d(Object3d* object) {
 	if (!object) {
 		return;
 	}
-	auto it = std::remove(objects_.begin(), objects_.end(), object);
-	objects_.erase(it, objects_.end());
+	for (size_t i = 0; i < objects_.size(); ++i) {
+		if (objects_[i] == object) {
+			objects_.erase(objects_.begin() + i);
+			editorTransforms_.erase(editorTransforms_.begin() + i);
+			break;
+		}
+	}
 }
 
 bool Hinstance::HasRegisteredObjects() const { return !objects_.empty(); }
@@ -43,7 +49,7 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 		if (!object) {
 			continue;
 		}
-		Transform transform = object->GetTransform();
+		const Transform& transform = editorTransforms_[i];
 		nlohmann::json objectJson;
 		objectJson["index"] = i;
 		objectJson["transform"] = {
@@ -108,7 +114,7 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 		    transformJson["translate"][1].get<float>(),
 		    transformJson["translate"][2].get<float>(),
 		};
-
+		editorTransforms_[index] = transform;
 		objects_[index]->SetTransform(transform);
 	}
 
@@ -171,10 +177,10 @@ void Hinstance::DrawObjectEditors() {
 		}
 		std::string nodeLabel = "Object " + std::to_string(i);
 		if (ImGui::TreeNode((nodeLabel + "##node").c_str())) {
-			Transform transform = object->GetTransform();
+			Transform& transform = editorTransforms_[i];
 			bool changed = false;
 			if (isPlaying_) {
-				ImGui::TextUnformatted("Playing... object values are locked");
+				ImGui::TextUnformatted("Playing... editor values are locked");
 			} else {
 				changed |= ImGui::DragFloat3(("Scale##" + std::to_string(i)).c_str(), &transform.scale.x, 0.01f);
 				changed |= ImGui::DragFloat3(("Rotate##" + std::to_string(i)).c_str(), &transform.rotate.x, 0.01f);
