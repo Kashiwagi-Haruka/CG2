@@ -15,6 +15,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 namespace {
 constexpr float kTargetAspectRatio = 16.0f / 9.0f;
+constexpr DWORD kFixedWindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 bool gIsFullscreen = false;
 RECT gWindowedRect{};
 DWORD gWindowedStyle = 0;
@@ -150,9 +151,9 @@ void WinApp::Initialize(const wchar_t* TitleName, int32_t clientWidth, int32_t c
 
 	wrc_ = {0, 0, kClientWidth, kClientHeight};
 
-	AdjustWindowRect(&wrc_, WS_OVERLAPPEDWINDOW, false);
+	AdjustWindowRect(&wrc_, kFixedWindowStyle, false);
 
-	hwnd_ = CreateWindow(wc_.lpszClassName, TitleName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, wrc_.right - wrc_.left, wrc_.bottom - wrc_.top, nullptr, nullptr, wc_.hInstance, nullptr);
+	hwnd_ = CreateWindow(wc_.lpszClassName, TitleName, kFixedWindowStyle, CW_USEDEFAULT, CW_USEDEFAULT, wrc_.right - wrc_.left, wrc_.bottom - wrc_.top, nullptr, nullptr, wc_.hInstance, nullptr);
 
 	ShowWindow(hwnd_, SW_SHOW);
 	SetWindowLongPtr(hwnd_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
