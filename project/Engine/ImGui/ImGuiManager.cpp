@@ -1,4 +1,5 @@
 #include "ImGuiManager.h"
+#include "Engine/Editor/Hinstance.h"
 #include <dxgi1_6.h>
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
@@ -13,6 +14,7 @@
 
 void ImGuiManager::Initialize([[maybe_unused]] WinApp* winApp, [[maybe_unused]] DirectXCommon* dxCommon, [[maybe_unused]] SrvManager* srvManager) {
 #ifdef USE_IMGUI
+	dxCommon_ = dxCommon;
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
@@ -62,6 +64,12 @@ void ImGuiManager::Begin() {
 		ImGui::Text("FPS: %.1f", io.Framerate);
 	}
 	ImGui::End();
+
+	Hinstance* hinstance = Hinstance::GetInstance();
+	if (dxCommon_) {
+		dxCommon_->SetEditorLayoutEnabled(hinstance->HasRegisteredObjects());
+	}
+	hinstance->DrawObjectEditors();
 #endif
 }
 

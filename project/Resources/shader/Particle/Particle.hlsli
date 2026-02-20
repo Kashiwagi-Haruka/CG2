@@ -26,6 +26,8 @@ struct EmitterSphere
     uint emit;
     float lifeTime;
     float3 acceleration;
+    float pad0;
+    float3 particleScale;
     float4 color;
 };
 

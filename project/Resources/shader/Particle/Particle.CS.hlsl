@@ -52,9 +52,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
             float3 randomDirection = generator.Generate3d() * 2.0f - 1.0f;
             float randomLength = generator.Generate1d() * gEmitter.radius;
 
-            gParticles[emitIndex].scale = float3(0.3f, 0.3f, 0.3f);
+            gParticles[emitIndex].scale = gEmitter.particleScale;
             gParticles[emitIndex].translate = gEmitter.translate + randomDirection * randomLength;
-            gParticles[emitIndex].velocity = (generator.Generate3d() * 2.0f - 1.0f) * 0.05f;
+            gParticles[emitIndex].velocity = float3(0.0f, 0.0f, 0.0f);
             gParticles[emitIndex].lifeTime = gEmitter.lifeTime;
             gParticles[emitIndex].currentTime = 0.0f;
             gParticles[emitIndex].color = gEmitter.color;

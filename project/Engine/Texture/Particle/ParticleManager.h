@@ -71,10 +71,12 @@ private:
 		uint32_t emit = 0;
 		float lifeTime = 120.0f;
 		Vector3 acceleration{0.0f, 0.0f, 0.0f};
+		float pad = 0.0f;
+		Vector3 particleScale{1.0f, 1.0f, 1.0f};
 		Vector4 color{1.0f, 1.0f, 1.0f, 1.0f};
 	};
-	static_assert(offsetof(EmitterSphere, color) == 48, "EmitterSphere.color layout mismatch with shader cbuffer");
-	static_assert(sizeof(EmitterSphere) == 64, "EmitterSphere size mismatch with shader cbuffer");
+	static_assert(offsetof(EmitterSphere, color) == 64, "EmitterSphere.color layout mismatch with shader cbuffer");
+	static_assert(sizeof(EmitterSphere) == 80, "EmitterSphere size mismatch with shader cbuffer");
 
 	struct PerFrame {
 		float time = 0.0f;

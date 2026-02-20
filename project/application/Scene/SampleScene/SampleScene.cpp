@@ -19,7 +19,7 @@ SampleScene::SampleScene() {
 	animatedCubeObj_ = std::make_unique<Object3d>();
 	humanObj_ = std::make_unique<Object3d>();
 	cameraTransform_ = {
-	    .scale{1.0f, 1.0f, 1.0f  },
+	    .scale{0.1f, 0.1f, 0.1f  },
         .rotate{0.0f, 0.0f, 0.0f  },
         .translate{0.0f, 5.0f, -10.0f}
     };
@@ -76,7 +76,7 @@ void SampleScene::Initialize() {
         .translate{0.0f,                              1.0f,                      -3.0f  }
     };
 	particleTransform_ = {
-	    .scale{1.0f, 1.0f, 1.0f },
+	    .scale{0.1f, 0.1f, 0.1f },
         .rotate{0.0f, 0.0f, 0.0f },
         .translate{0.0f, 1.0f, -3.0f}
     };
@@ -315,41 +315,6 @@ void SampleScene::Update() {
 		ImGui::Text("RT: %.3f", input->GetRightTrigger());
 	}
 	ImGui::End();
-	if (ImGui::Begin("SampleuvBall")) {
-		if (ImGui::TreeNode("Transform")) {
-
-			ImGui::DragFloat3("Scale", &uvBallTransform_.scale.x, 0.1f);
-			ImGui::DragFloat3("Rotate", &uvBallTransform_.rotate.x, 0.1f);
-			ImGui::DragFloat3("Translate", &uvBallTransform_.translate.x, 0.1f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("Material")) {
-			ImGui::ColorEdit4("MaterialColor", &color.x);
-			ImGui::Checkbox("EnableLighting", &enableLighting);
-			ImGui::DragFloat("Shininess", &shininess, 0.1f, 0.0f, 100.0f);
-			ImGui::DragFloat("EnvironmentCoefficient", &environmentCoefficient, 0.01f, 0.0f, 1.0f);
-			ImGui::Checkbox("Grayscale (BT709)", &grayscaleEnabled);
-			ImGui::Checkbox("Sepia", &sepiaEnabled);
-			uvBallObj_->SetColor(color);
-			uvBallObj_->SetEnableLighting(enableLighting);
-			uvBallObj_->SetShininess(shininess);
-			uvBallObj_->SetEnvironmentCoefficient(environmentCoefficient);
-			uvBallObj_->SetGrayscaleEnabled(grayscaleEnabled);
-			uvBallObj_->SetSepiaEnabled(sepiaEnabled);
-			ImGui::TreePop();
-		}
-	}
-	ImGui::End();
-	if (ImGui::Begin("planeG")) {
-		if (ImGui::TreeNode("TransformG")) {
-
-			ImGui::DragFloat3("ScaleG", &planeGTransform_.scale.x, 0.1f);
-			ImGui::DragFloat3("RotateG", &planeGTransform_.rotate.x, 0.1f);
-			ImGui::DragFloat3("TranslateG", &planeGTransform_.translate.x, 0.1f);
-			ImGui::TreePop();
-		}
-	}
-	ImGui::End();
 	if (ImGui::Begin("Human")) {
 		if (ImGui::TreeNode("Transform")) {
 			ImGui::DragFloat3("Scale", &humanTransform_.scale.x, 0.1f);
@@ -490,21 +455,21 @@ void SampleScene::Draw() {
 	uvBallObj_->Draw();
 	planeGltf_->Draw();
 	fieldObj_->Draw();
-	/*animatedCubeObj_->Draw();*/
+	animatedCubeObj_->Draw();
 	Object3dCommon::GetInstance()->EndShadowMapPass();
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->DrawCommon();
 	 uvBallObj_->Draw();
 	 planeGltf_->Draw();
 	 fieldObj_->Draw();
-	/*animatedCubeObj_->Draw();*/
-	 //if (sampleParticleEmitter_) {
-		//Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
-		// sampleParticleEmitter_->Draw();
-	 //}
-	/*Object3dCommon::GetInstance()->DrawCommonSkinningToon();
-	humanObj_->Draw();*/
-	//Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
+	animatedCubeObj_->Draw();
+	 if (sampleParticleEmitter_) {
+		Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
+		 sampleParticleEmitter_->Draw();
+	 }
+	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
+	humanObj_->Draw();
+	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 	//if (humanSkeleton_) {
 	//	humanSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
 	//}

@@ -63,6 +63,7 @@ class Object3d {
 	SkinCluster* skinCluster_ = nullptr;
 
 public:
+	~Object3d();
 	void Initialize();
 	void Update();
 	void Draw();

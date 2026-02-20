@@ -623,8 +623,31 @@ void DirectXCommon::DrawSceneTextureToBackBuffer() {
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex_], false, &dsvHandle);
-	commandList_->RSSetViewports(1, &viewport_);
-	commandList_->RSSetScissorRects(1, &scissorRect_);
+	float backBufferClearColor[] = {0.06f, 0.06f, 0.08f, 1.0f};
+	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex_], backBufferClearColor, 0, nullptr);
+
+	D3D12_VIEWPORT gameViewport = viewport_;
+	D3D12_RECT gameScissor = scissorRect_;
+	if (editorLayoutEnabled_) {
+		const float gameWidthRatio = 0.68f;
+		const float kGameAspect = 16.0f / 9.0f;
+		const float availableWidth = viewport_.Width * gameWidthRatio;
+		const float availableHeight = viewport_.Height;
+
+		float gameWidth = availableWidth;
+		float gameHeight = gameWidth / kGameAspect;
+		if (gameHeight > availableHeight) {
+			gameHeight = availableHeight;
+			gameWidth = gameHeight * kGameAspect;
+		}
+
+		gameViewport.Width = std::max(1.0f, gameWidth);
+		gameViewport.Height = std::max(1.0f, gameHeight);
+		gameScissor.right = gameScissor.left + static_cast<LONG>(gameViewport.Width);
+		gameScissor.bottom = gameScissor.top + static_cast<LONG>(gameViewport.Height);
+	}
+	commandList_->RSSetViewports(1, &gameViewport);
+	commandList_->RSSetScissorRects(1, &gameScissor);
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = {sceneSrvDescriptorHeap_.Get()};
 	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
@@ -634,6 +657,8 @@ void DirectXCommon::DrawSceneTextureToBackBuffer() {
 	commandList_->SetGraphicsRootDescriptorTable(0, sceneSrvHandleGPU_);
 	commandList_->SetGraphicsRootConstantBufferView(1, postEffectParameterResource_->GetGPUVirtualAddress());
 	commandList_->DrawInstanced(3, 1, 0, 0);
+	commandList_->RSSetViewports(1, &viewport_);
+	commandList_->RSSetScissorRects(1, &scissorRect_);
 
 	barriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barriers[1].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
