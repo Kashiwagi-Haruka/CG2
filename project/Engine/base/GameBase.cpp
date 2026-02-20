@@ -48,7 +48,7 @@ void GameBase::Finalize() {
 void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight) {
 
 	winApp_ = std::make_unique<WinApp>();
-	winApp_->Initialize(TitleName);
+	winApp_->Initialize(TitleName, WindowWidth, WindowHeight);
 
 	dxCommon_ = std::make_unique<DirectXCommon>();
 	dxCommon_->initialize(winApp_.get());

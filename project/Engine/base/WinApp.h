@@ -13,14 +13,14 @@ private:
 	const wchar_t* TitleName_ = L"CG2";
 
 	bool IsPad_ = false;
-
 public:
-	static const int32_t kClientWidth = 1280;
-	static const int32_t kClientHeight = 720;
+	static int32_t kClientWidth;
+	static int32_t kClientHeight;
 
 public:
 	// 初期化
-	void Initialize(const wchar_t* TitleName);
+	void Initialize(const wchar_t* TitleName, int32_t clientWidth, int32_t clientHeight);
+
 	// 更新
 	void Update();
 	// 終了

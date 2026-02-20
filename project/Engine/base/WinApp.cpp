@@ -100,7 +100,8 @@ void KeepClientAspectRatio16By9(HWND hwnd, WPARAM edge, RECT* rect) {
 	}
 }
 } // namespace
-
+int32_t WinApp::kClientWidth = 1280;
+int32_t WinApp::kClientHeight = 720;
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	if (msg == WM_KEYDOWN && wparam == VK_F11) {
 		ToggleFullscreen(hwnd);
@@ -131,7 +132,9 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-void WinApp::Initialize(const wchar_t* TitleName) {
+void WinApp::Initialize(const wchar_t* TitleName, int32_t clientWidth, int32_t clientHeight) {
+	kClientWidth = clientWidth;
+	kClientHeight = clientHeight;
 	HRESULT hr = CoInitializeEx(0, COINITBASE_MULTITHREADED);
 #ifdef USE_IMGUI
 	// フルスクリーン時を含む高DPI環境で、ImGuiのマウス座標と描画座標がずれないようにする
