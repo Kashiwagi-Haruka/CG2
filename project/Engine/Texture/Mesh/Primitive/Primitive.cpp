@@ -12,9 +12,7 @@
 #include <cstring>
 
 namespace {
-constexpr float kPi = 3.14159265358979323846f;
 constexpr uint32_t kDefaultSlices = 32;
-constexpr uint32_t kDefaultStacks = 16;
 constexpr float kHalfSize = 0.5f;
 constexpr float kBandWidth = 0.2f;
 struct MeshData {
@@ -88,7 +86,7 @@ MeshData BuildCircle(uint32_t slices) {
     });
 
 	for (uint32_t i = 0; i <= slices; ++i) {
-		float angle = (static_cast<float>(i) / static_cast<float>(slices)) * kPi * 2.0f;
+		float angle = (static_cast<float>(i) / static_cast<float>(slices)) * Function::kPi * 2.0f;
 		float x = std::cos(angle) * kHalfSize;
 		float y = std::sin(angle) * kHalfSize;
 		mesh.vertices.push_back({
@@ -128,7 +126,7 @@ MeshData BuildRing(uint32_t slices, const Vector2& innerDiameter, const Vector2&
 	mesh.indices.reserve(slices * 6);
 
 	for (uint32_t i = 0; i <= slices; ++i) {
-		float angle = (static_cast<float>(i) / static_cast<float>(slices)) * kPi * 2.0f;
+		float angle = (static_cast<float>(i) / static_cast<float>(slices)) * Function::kPi * 2.0f;
 		float cosA = std::cos(angle);
 		float sinA = std::sin(angle);
 		Vector3 normal = {0.0f, 0.0f, -1.0f};
@@ -168,12 +166,12 @@ MeshData BuildSphere(uint32_t slices, uint32_t stacks) {
 
 	for (uint32_t y = 0; y <= stacks; ++y) {
 		float v = static_cast<float>(y) / static_cast<float>(stacks);
-		float theta = v * kPi;
+		float theta = v * Function::kPi;
 		float sinTheta = std::sin(theta);
 		float cosTheta = std::cos(theta);
 		for (uint32_t x = 0; x <= slices; ++x) {
 			float u = static_cast<float>(x) / static_cast<float>(slices);
-			float phi = u * kPi * 2.0f;
+			float phi = u * Function::kPi * 2.0f;
 			float sinPhi = std::sin(phi);
 			float cosPhi = std::cos(phi);
 			Vector3 normal = {sinTheta * cosPhi, cosTheta, sinTheta * sinPhi};
@@ -213,12 +211,12 @@ MeshData BuildTorus(uint32_t slices, uint32_t stacks) {
 
 	for (uint32_t y = 0; y <= stacks; ++y) {
 		float v = static_cast<float>(y) / static_cast<float>(stacks);
-		float theta = v * kPi * 2.0f;
+		float theta = v * Function::kPi * 2.0f;
 		float cosTheta = std::cos(theta);
 		float sinTheta = std::sin(theta);
 		for (uint32_t x = 0; x <= slices; ++x) {
 			float u = static_cast<float>(x) / static_cast<float>(slices);
-			float phi = u * kPi * 2.0f;
+			float phi = u * Function::kPi * 2.0f;
 			float cosPhi = std::cos(phi);
 			float sinPhi = std::sin(phi);
 			float radial = majorRadius + minorRadius * cosTheta;
@@ -257,7 +255,7 @@ MeshData BuildCylinder(uint32_t slices) {
 
 	for (uint32_t i = 0; i <= slices; ++i) {
 		float u = static_cast<float>(i) / static_cast<float>(slices);
-		float angle = u * kPi * 2.0f;
+		float angle = u * Function::kPi * 2.0f;
 		float cosA = std::cos(angle);
 		float sinA = std::sin(angle);
 		Vector3 normal = {cosA, 0.0f, sinA};
@@ -297,7 +295,7 @@ MeshData BuildCylinder(uint32_t slices) {
 
 	for (uint32_t i = 0; i <= slices; ++i) {
 		float u = static_cast<float>(i) / static_cast<float>(slices);
-		float angle = u * kPi * 2.0f;
+		float angle = u * Function::kPi * 2.0f;
 		float cosA = std::cos(angle);
 		float sinA = std::sin(angle);
 		mesh.vertices.push_back({
@@ -337,7 +335,7 @@ MeshData BuildCone(uint32_t slices) {
 
 	for (uint32_t i = 0; i <= slices; ++i) {
 		float u = static_cast<float>(i) / static_cast<float>(slices);
-		float angle = u * kPi * 2.0f;
+		float angle = u * Function::kPi * 2.0f;
 		float cosA = std::cos(angle);
 		float sinA = std::sin(angle);
 		Vector3 normal = Function::Normalize({cosA, radius / height, sinA});
@@ -367,7 +365,7 @@ MeshData BuildCone(uint32_t slices) {
     });
 	for (uint32_t i = 0; i <= slices; ++i) {
 		float u = static_cast<float>(i) / static_cast<float>(slices);
-		float angle = u * kPi * 2.0f;
+		float angle = u * Function::kPi * 2.0f;
 		float cosA = std::cos(angle);
 		float sinA = std::sin(angle);
 		mesh.vertices.push_back({
@@ -468,54 +466,53 @@ MeshData BuildBand(uint32_t segments) {
 
 	return mesh;
 }
+
+uint32_t ClampSlices(uint32_t slices) { return std::max(3u, slices); }
+
+uint32_t ComputeStacksFromSlices(uint32_t slices) { return std::max(2u, slices / 2); }
+
+MeshData BuildMeshByPrimitiveName(Primitive::PrimitiveName primitiveName, uint32_t slices, uint32_t stacks) {
+	switch (primitiveName) {
+	case Primitive::Plane:
+		return BuildPlane();
+	case Primitive::Circle:
+		return BuildCircle(slices);
+	case Primitive::Ring:
+		return BuildRing(slices, {kHalfSize * 1.2f, kHalfSize * 1.2f}, {kHalfSize * 2.0f, kHalfSize * 2.0f});
+	case Primitive::Sphere:
+		return BuildSphere(slices, stacks);
+	case Primitive::Torus:
+		return BuildTorus(slices, stacks);
+	case Primitive::Cylinder:
+		return BuildCylinder(slices);
+	case Primitive::Cone:
+		return BuildCone(slices);
+	case Primitive::Triangle:
+		return BuildTriangle();
+	case Primitive::Line:
+		return BuildLine();
+	case Primitive::Box:
+		return BuildBox();
+	case Primitive::Band:
+		return BuildBand(slices);
+	default:
+		return BuildPlane();
+	}
+}
 } // namespace
 
 // 既定テクスチャでプリミティブを初期化
-void Primitive::Initialize(PrimitiveName name) {
+void Primitive::Initialize(PrimitiveName name) { Initialize(name, kDefaultSlices); }
+// 指定分割数で既定テクスチャ初期化
+void Primitive::Initialize(PrimitiveName name, uint32_t slices) {
 	primitiveName_ = name;
+	slices_ = ClampSlices(slices);
+	stacks_ = ComputeStacksFromSlices(slices_);
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
 
-	MeshData mesh;
-	switch (primitiveName_) {
-	case Primitive::Plane:
-		mesh = BuildPlane();
-		break;
-	case Primitive::Circle:
-		mesh = BuildCircle(kDefaultSlices);
-		break;
-	case Primitive::Ring:
-		mesh = BuildRing(kDefaultSlices, {kHalfSize * 1.2f, kHalfSize * 1.2f}, {kHalfSize * 2.0f, kHalfSize * 2.0f});
-		break;
-	case Primitive::Sphere:
-		mesh = BuildSphere(kDefaultSlices, kDefaultStacks);
-		break;
-	case Primitive::Torus:
-		mesh = BuildTorus(kDefaultSlices, kDefaultStacks);
-		break;
-	case Primitive::Cylinder:
-		mesh = BuildCylinder(kDefaultSlices);
-		break;
-	case Primitive::Cone:
-		mesh = BuildCone(kDefaultSlices);
-		break;
-	case Primitive::Triangle:
-		mesh = BuildTriangle();
-		break;
-	case Primitive::Line:
-		mesh = BuildLine();
-		break;
-	case Primitive::Box:
-		mesh = BuildBox();
-		break;
-	case Primitive::Band:
-		mesh = BuildBand(kDefaultSlices);
-		break;
-	default:
-		mesh = BuildPlane();
-		break;
-	}
+	MeshData mesh = BuildMeshByPrimitiveName(primitiveName_, slices_, stacks_);
 	vertices_ = std::move(mesh.vertices);
 	indices_ = std::move(mesh.indices);
 
@@ -556,51 +553,17 @@ void Primitive::Initialize(PrimitiveName name) {
 	isUseSetWorld = false;
 }
 // 指定テクスチャでプリミティブを初期化
-void Primitive::Initialize(PrimitiveName name,const std::string& texturePath) {
+void Primitive::Initialize(PrimitiveName name, const std::string& texturePath) { Initialize(name, texturePath, kDefaultSlices); }
+// 指定分割数・指定テクスチャでプリミティブを初期化
+void Primitive::Initialize(PrimitiveName name, const std::string& texturePath, uint32_t slices) {
 	primitiveName_ = name;
+	slices_ = ClampSlices(slices);
+	stacks_ = ComputeStacksFromSlices(slices_);
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
 
-	MeshData mesh;
-	switch (primitiveName_) {
-	case Primitive::Plane:
-		mesh = BuildPlane();
-		break;
-	case Primitive::Circle:
-		mesh = BuildCircle(kDefaultSlices);
-		break;
-	case Primitive::Ring:
-		mesh = BuildRing(kDefaultSlices, {kHalfSize * 1.2f, kHalfSize * 1.2f}, {kHalfSize * 2.0f, kHalfSize * 2.0f});
-		break;
-	case Primitive::Sphere:
-		mesh = BuildSphere(kDefaultSlices, kDefaultStacks);
-		break;
-	case Primitive::Torus:
-		mesh = BuildTorus(kDefaultSlices, kDefaultStacks);
-		break;
-	case Primitive::Cylinder:
-		mesh = BuildCylinder(kDefaultSlices);
-		break;
-	case Primitive::Cone:
-		mesh = BuildCone(kDefaultSlices);
-		break;
-	case Primitive::Triangle:
-		mesh = BuildTriangle();
-		break;
-	case Primitive::Line:
-		mesh = BuildLine();
-		break;
-	case Primitive::Box:
-		mesh = BuildBox();
-		break;
-	case Primitive::Band:
-		mesh = BuildBand(kDefaultSlices);
-		break;
-	default:
-		mesh = BuildPlane();
-		break;
-	}
+	MeshData mesh = BuildMeshByPrimitiveName(primitiveName_, slices_, stacks_);
 	vertices_ = std::move(mesh.vertices);
 	indices_ = std::move(mesh.indices);
 
@@ -740,7 +703,7 @@ void Primitive::SetRingDiameterXY(const Vector2& innerDiameter, const Vector2& o
 	if (primitiveName_ != Primitive::Ring) {
 		return;
 	}
-	MeshData mesh = BuildRing(kDefaultSlices, innerDiameter, outerDiameter);
+	MeshData mesh = BuildRing(slices_, innerDiameter, outerDiameter);
 	SetMeshData(mesh.vertices, mesh.indices);
 }
 // 外部メッシュへ置き換え、GPU バッファを再作成

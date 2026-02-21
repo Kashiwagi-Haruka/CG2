@@ -78,8 +78,12 @@ private:
 public:
 	// 指定した形状を既定テクスチャで初期化
 	void Initialize(PrimitiveName name);
+	// 指定した形状を分割数付きで既定テクスチャ初期化
+	void Initialize(PrimitiveName name, uint32_t slices);
 	// 指定した形状を任意テクスチャで初期化
 	void Initialize(PrimitiveName name, const std::string& texturePath);
+	// 指定した形状を分割数付きで任意テクスチャ初期化
+	void Initialize(PrimitiveName name, const std::string& texturePath, uint32_t slices);
 	// 行列・マテリアルなど GPU に渡す定数を更新
 	void Update();
 	// 現在の設定で描画
@@ -121,4 +125,8 @@ private:
 	Vector3 lineEnd_ = {0.0f, 0.0f, 0.0f};
 	// true の場合は lineStart_/lineEnd_ を優先して線を更新
 	bool useLinePositions_ = false;
+	// 曲面系プリミティブの分割数
+	uint32_t slices_ = 32;
+	// Sphere/Torus の縦分割数
+	uint32_t stacks_ = 16;
 };

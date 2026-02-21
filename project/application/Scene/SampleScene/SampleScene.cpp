@@ -56,7 +56,7 @@ void SampleScene::Initialize() {
 	humanObj_->Initialize();
 	humanObj_->SetCamera(camera_.get());
 	humanObj_->SetModel("walk");
-	ringPrimitive_->Initialize(Primitive::Ring);
+	ringPrimitive_->Initialize(Primitive::Ring,24);
 	ringPrimitive_->SetCamera(camera_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
