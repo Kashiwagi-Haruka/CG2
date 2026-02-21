@@ -5,10 +5,10 @@
 #include "Object3d/Object3dCommon.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
+#include "WinApp.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-#include "WinApp.h"
 
 namespace {
 constexpr float kPi = 3.14159265358979323846f;
@@ -21,6 +21,7 @@ struct MeshData {
 	std::vector<uint32_t> indices;
 };
 
+// 4頂点の四角形を 2 三角形としてメッシュへ追加
 void AppendQuad(MeshData& mesh, const VertexData& v0, const VertexData& v1, const VertexData& v2, const VertexData& v3) {
 	uint32_t baseIndex = static_cast<uint32_t>(mesh.vertices.size());
 	mesh.vertices.push_back(v0);
@@ -35,6 +36,7 @@ void AppendQuad(MeshData& mesh, const VertexData& v0, const VertexData& v1, cons
 	mesh.indices.push_back(baseIndex + 1);
 }
 
+// 正方形の板ポリゴンを生成
 MeshData BuildPlane() {
 	MeshData mesh;
 	VertexData v0 = {
@@ -61,6 +63,7 @@ MeshData BuildPlane() {
 	return mesh;
 }
 
+// 単純な三角形を生成
 MeshData BuildTriangle() {
 	MeshData mesh;
 	mesh.vertices = {
@@ -72,6 +75,7 @@ MeshData BuildTriangle() {
 	return mesh;
 }
 
+// 扇形分割で円板を生成
 MeshData BuildCircle(uint32_t slices) {
 	MeshData mesh;
 	mesh.vertices.reserve(slices + 1);
@@ -101,6 +105,7 @@ MeshData BuildCircle(uint32_t slices) {
 
 	return mesh;
 }
+// 原点中心の線分を生成
 MeshData BuildLine() {
 	MeshData mesh;
 	mesh.vertices = {
@@ -111,6 +116,7 @@ MeshData BuildLine() {
 	return mesh;
 }
 
+// 内径と外径を持つリングを生成
 MeshData BuildRing(uint32_t slices) {
 	MeshData mesh;
 	const float innerRadius = kHalfSize * 0.6f;
@@ -151,6 +157,7 @@ MeshData BuildRing(uint32_t slices) {
 	return mesh;
 }
 
+// 緯度経度分割で球を生成
 MeshData BuildSphere(uint32_t slices, uint32_t stacks) {
 	MeshData mesh;
 	mesh.vertices.reserve((slices + 1) * (stacks + 1));
@@ -193,6 +200,7 @@ MeshData BuildSphere(uint32_t slices, uint32_t stacks) {
 	return mesh;
 }
 
+// 主半径・副半径でトーラスを生成
 MeshData BuildTorus(uint32_t slices, uint32_t stacks) {
 	MeshData mesh;
 	const float majorRadius = kHalfSize * 0.8f;
@@ -238,6 +246,7 @@ MeshData BuildTorus(uint32_t slices, uint32_t stacks) {
 	return mesh;
 }
 
+// 側面+上下蓋付き円柱を生成
 MeshData BuildCylinder(uint32_t slices) {
 	MeshData mesh;
 	const float height = kHalfSize;
@@ -316,7 +325,7 @@ MeshData BuildCylinder(uint32_t slices) {
 
 	return mesh;
 }
-
+// 側面+底面付き円錐を生成
 MeshData BuildCone(uint32_t slices) {
 	MeshData mesh;
 	const float height = kHalfSize;
@@ -375,7 +384,7 @@ MeshData BuildCone(uint32_t slices) {
 
 	return mesh;
 }
-
+// 6面それぞれの法線を持つボックスを生成
 MeshData BuildBox() {
 	MeshData mesh;
 	const float s = kHalfSize;
@@ -414,6 +423,7 @@ MeshData BuildBox() {
 
 	return mesh;
 }
+// 表裏を持つ細長い帯を生成
 MeshData BuildBand(uint32_t segments) {
 	MeshData mesh;
 	const float length = kHalfSize * 2.0f;
@@ -437,7 +447,7 @@ MeshData BuildBand(uint32_t segments) {
         });
 	}
 
-for (uint32_t i = 0; i < segments; ++i) {
+	for (uint32_t i = 0; i < segments; ++i) {
 		uint32_t base = i * 2;
 		mesh.indices.push_back(base);
 		mesh.indices.push_back(base + 2);
@@ -457,6 +467,7 @@ for (uint32_t i = 0; i < segments; ++i) {
 }
 } // namespace
 
+// 既定テクスチャでプリミティブを初期化
 void Primitive::Initialize(PrimitiveName name) {
 	primitiveName_ = name;
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
@@ -541,6 +552,7 @@ void Primitive::Initialize(PrimitiveName name) {
 
 	isUseSetWorld = false;
 }
+// 指定テクスチャでプリミティブを初期化
 void Primitive::Initialize(PrimitiveName name,const std::string& texturePath) {
 	primitiveName_ = name;
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
@@ -624,7 +636,7 @@ void Primitive::Initialize(PrimitiveName name,const std::string& texturePath) {
 
 	isUseSetWorld = false;
 }
-
+// 座標変換やマテリアル定数を更新
 void Primitive::Update() {
 	if (primitiveName_ == Primitive::Line && useLinePositions_) {
 		vertices_[0].position = {lineStart_.x, lineStart_.y, lineStart_.z, 1.0f};
@@ -659,7 +671,7 @@ void Primitive::Update() {
 	cameraData_->fullscreenSepiaEnabled = Object3dCommon::GetInstance()->IsFullScreenSepiaEnabled() ? 1 : 0;
 	cameraResource_->Unmap(0, nullptr);
 }
-
+// 設定済みのメッシュを描画
 void Primitive::Draw() {
 	ID3D12DescriptorHeap* descriptorHeaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
@@ -709,6 +721,7 @@ void Primitive::SetWorldMatrix(Matrix4x4 matrix) {
 	isUseSetWorld = true;
 	useLinePositions_ = false;
 }
+// Line の始点・終点を更新して頂点へ反映
 void Primitive::SetLinePositions(const Vector3& start, const Vector3& end) {
 	if (primitiveName_ != Primitive::Line) {
 		return;
@@ -719,6 +732,7 @@ void Primitive::SetLinePositions(const Vector3& start, const Vector3& end) {
 	isUseSetWorld = true;
 	worldMatrix = Function::MakeIdentity4x4();
 }
+// 外部メッシュへ置き換え、GPU バッファを再作成
 void Primitive::SetMeshData(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices) {
 	if (vertices.empty() || indices.empty()) {
 		return;
