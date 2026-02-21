@@ -1,4 +1,3 @@
-
 #include "Function.h"
 #include <cassert>
 #include <cmath>
@@ -8,11 +7,13 @@ static const int kRowHeight = 30;
 
 namespace Function {
 
+// ベクトルの長さを計算する
 float Length(const Vector3& v) { return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z); }
 
 // direction = 向きたい方向（正規化推奨）
 // forwardAxis = モデルの前方向（Cube は X軸 {1,0,0}）
 // return = 回転角（x, y, z）
+// 方向ベクトルからピッチ・ヨー・ロールを計算する
 Vector3 DirectionToRotation(const Vector3& direction, const Vector3& forwardAxis) {
 	// 方向を正規化
 	Vector3 dir = Normalize(direction);
@@ -42,6 +43,7 @@ Vector3 DirectionToRotation(const Vector3& direction, const Vector3& forwardAxis
 //	result.m[3][3] = 0.0f;
 //	return result;
 // }
+// 透視投影行列を作る
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspect, float nearZ, float farZ) {
 	Matrix4x4 result{};
 	float f = 1.0f / tanf(fovY * 0.5f);
@@ -56,6 +58,7 @@ Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspect, float nearZ, float 
 	return result;
 }
 
+// 正射影行列を作る
 Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
 	Matrix4x4 result{};
 	result.m[0][0] = 2.0f / (right - left);
@@ -67,6 +70,7 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 	result.m[3][3] = 1.0f;
 	return result;
 }
+// ビューポート変換行列を作る
 Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) {
 
 	Matrix4x4 result{};
@@ -80,6 +84,7 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 	return result;
 }
 
+// Vector3を線形補間する
 Vector3 Lerp(const Vector3& start, const Vector3& end, float ratio) {
 	Vector3 result;
 	result.x = start.x + (end.x - start.x) * ratio;
@@ -87,7 +92,9 @@ Vector3 Lerp(const Vector3& start, const Vector3& end, float ratio) {
 	result.z = start.z + (end.z - start.z) * ratio;
 	return result;
 }
+// floatを線形補間する
 float Lerp(float start, float end, float ratio) { return start + (end - start) * ratio; }
+// 平行移動行列を作る
 Matrix4x4 MakeTranslateMatrix(Vector3 translate) {
 	Matrix4x4 result{};
 	result.m[0][0] = 1.0f;
@@ -100,6 +107,7 @@ Matrix4x4 MakeTranslateMatrix(Vector3 translate) {
 
 	return result;
 }
+// 平行移動行列を作る（スカラー指定）
 Matrix4x4 Function::MakeTranslateMatrix(float x, float y, float z) {
 	Matrix4x4 result{};
 
@@ -115,6 +123,7 @@ Matrix4x4 Function::MakeTranslateMatrix(float x, float y, float z) {
 	return result;
 }
 
+// 拡大縮小行列を作る
 Matrix4x4 MakeScaleMatrix(Vector3 scale) {
 	Matrix4x4 result{};
 	result.m[0][0] = scale.x;
@@ -125,6 +134,7 @@ Matrix4x4 MakeScaleMatrix(Vector3 scale) {
 	return result;
 }
 
+// X軸回転行列を作る
 Matrix4x4 MakeRotateXMatrix(float radian) {
 	Matrix4x4 result{};
 	result.m[0][0] = 1.0f;
@@ -136,6 +146,7 @@ Matrix4x4 MakeRotateXMatrix(float radian) {
 	return result;
 }
 
+// Y軸回転行列を作る
 Matrix4x4 MakeRotateYMatrix(float radian) {
 	Matrix4x4 result{};
 	result.m[0][0] = std::cosf(radian);
@@ -147,6 +158,7 @@ Matrix4x4 MakeRotateYMatrix(float radian) {
 	return result;
 }
 
+// Z軸回転行列を作る
 Matrix4x4 MakeRotateZMatrix(float radian) {
 	Matrix4x4 result{};
 	result.m[0][0] = std::cosf(radian);
@@ -158,6 +170,7 @@ Matrix4x4 MakeRotateZMatrix(float radian) {
 	return result;
 }
 
+// クォータニオンから回転行列を作る
 Matrix4x4 MakeRotateMatrix(const Vector4& rotate) {
 	Matrix4x4 result{};
 	float length = std::sqrt(rotate.x * rotate.x + rotate.y * rotate.y + rotate.z * rotate.z + rotate.w * rotate.w);
@@ -202,6 +215,7 @@ Matrix4x4 MakeRotateMatrix(const Vector4& rotate) {
 	return result;
 }
 
+// 4x4行列同士を乗算する
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 result{};
 	for (int row = 0; row < 4; ++row) {
@@ -212,6 +226,7 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 	return result;
 }
 
+// 外積を計算する
 Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 	Vector3 result;
 	result.x = v1.y * v2.z - v1.z * v2.y;
@@ -220,6 +235,7 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 	return result;
 }
 
+// SRT行列を作る（オイラー角）
 Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) {
 	Matrix4x4 result{};
 
@@ -234,6 +250,7 @@ Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) {
 	return result;
 }
 
+// SRT行列を作る（クォータニオン）
 Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector4 rotate, Vector3 translate) {
 	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
 	Matrix4x4 rotateMatrix = MakeRotateMatrix(rotate);
@@ -241,6 +258,7 @@ Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector4 rotate, Vector3 translate) {
 	return Multiply(scaleRotateMatrix, MakeTranslateMatrix(translate));
 }
 
+// ベクトルを行列で変換する
 Vector3 TransformVM(const Vector3& vector, const Matrix4x4& matrix4x4) {
 	Vector3 result;
 	result.x = vector.x * matrix4x4.m[0][0] + vector.y * matrix4x4.m[1][0] + vector.z * matrix4x4.m[2][0] + matrix4x4.m[3][0];
@@ -260,6 +278,7 @@ Vector3 TransformVM(const Vector3& vector, const Matrix4x4& matrix4x4) {
 
 	return result;
 }
+// 4x4行列の逆行列を求める
 Matrix4x4 Inverse(const Matrix4x4& m) {
 	Matrix4x4 i;
 
@@ -312,6 +331,7 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 	return i;
 }
 
+// 4x4行列を転置する
 Matrix4x4 Transpose(const Matrix4x4& m) {
 	Matrix4x4 result;
 	for (int i = 0; i < 4; i++) {
@@ -322,6 +342,7 @@ Matrix4x4 Transpose(const Matrix4x4& m) {
 	return result;
 }
 
+// ベクトルを正規化する
 Vector3 Normalize(const Vector3& v) {
 	float len = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 	if (len > 1e-6f)
@@ -330,6 +351,7 @@ Vector3 Normalize(const Vector3& v) {
 		return {0.0f, 0.0f, 0.0f};
 }
 
+// 単位行列を作る
 Matrix4x4 MakeIdentity4x4() {
 
 	Matrix4x4 result;
@@ -338,12 +360,53 @@ Matrix4x4 MakeIdentity4x4() {
 
 	return result;
 }
+// 内積を計算する
 float Dot(const Vector3& v1, const Vector3& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
 
+// 2点間の差分ベクトルを返す
 Vector3 Distance(const Vector3& pos1, const Vector3& pos2) { return {pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z}; }
 
+// クォータニオンを正規化する
+Vector4 NormalizeQuaternion(const Vector4& q) {
+	float len = std::sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
+	if (len <= 1e-6f) {
+		return {0.0f, 0.0f, 0.0f, 1.0f};
+	}
+	return {q.x / len, q.y / len, q.z / len, q.w / len};
+}
+
+// クォータニオン積を計算する
+Vector4 MultiplyQuaternion(const Vector4& q1, const Vector4& q2) {
+	return {
+	    q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y, q1.w * q2.y - q1.x * q2.z + q1.y * q2.w + q1.z * q2.x, q1.w * q2.z + q1.x * q2.y - q1.y * q2.x + q1.z * q2.w,
+	    q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z};
+}
+
+// クォータニオン共役を返す
+Vector4 ConjugateQuaternion(const Vector4& q) { return {-q.x, -q.y, -q.z, q.w}; }
+
+// 軸角からクォータニオンを作る
+Vector4 MakeQuaternionFromAxisAngle(const Vector3& axis, float radian) {
+	Vector3 n = Normalize(axis);
+	float half = radian * 0.5f;
+	float s = std::sinf(half);
+	return NormalizeQuaternion({n.x * s, n.y * s, n.z * s, std::cosf(half)});
+}
+
+// クォータニオンでベクトルを回転する
+Vector3 RotateVectorByQuaternion(const Vector3& v, const Vector4& q) {
+	Vector4 nq = NormalizeQuaternion(q);
+	Vector4 vq{v.x, v.y, v.z, 0.0f};
+	Vector4 rq = MultiplyQuaternion(MultiplyQuaternion(nq, vq), ConjugateQuaternion(nq));
+	return {rq.x, rq.y, rq.z};
+}
+
 } // namespace Function
+// Vector3加算
 Vector3 operator+(const Vector3& v1, const Vector3& v2) { return {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
+// Vector3減算
 Vector3 operator-(const Vector3& v1, const Vector3& v2) { return {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}; }
+// Vector3スカラー倍
 Vector3 operator*(const Vector3& v, float scalar) { return {v.x * scalar, v.y * scalar, v.z * scalar}; }
+// Vector3加算代入
 Vector3 operator+=(Vector3& v1, const Vector3& v2) { return v1 = v1 + v2; }
