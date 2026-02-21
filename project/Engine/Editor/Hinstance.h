@@ -7,6 +7,7 @@
 #include "Vector4.h"
 
 class Object3d;
+class Primitive;
 
 class Hinstance {
 public:
@@ -14,6 +15,8 @@ public:
 
 	void RegisterObject3d(Object3d* object);
 	void UnregisterObject3d(Object3d* object);
+	void RegisterPrimitive(Primitive* primitive);
+	void UnregisterPrimitive(Primitive* primitive);
 	bool HasRegisteredObjects() const;
 	void DrawObjectEditors();
 	void SetPlayMode(bool isPlaying);
@@ -37,6 +40,11 @@ private:
 	std::vector<std::string> objectNames_;
 	std::vector<Transform> editorTransforms_;
 	std::vector<EditorMaterial> editorMaterials_;
+
+	std::vector<Primitive*> primitives_;
+	std::vector<std::string> primitiveNames_;
+	std::vector<Transform> primitiveEditorTransforms_;
+	std::vector<EditorMaterial> primitiveEditorMaterials_;
 	std::string saveStatusMessage_;
 	bool hasUnsavedChanges_ = false;
 	bool isPlaying_ = false;

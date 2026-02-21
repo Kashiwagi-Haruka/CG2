@@ -76,6 +76,7 @@ private:
 	bool isUseSetWorld;
 
 public:
+	~Primitive();
 	// 指定した形状を既定テクスチャで初期化
 	void Initialize(PrimitiveName name);
 	// 指定した形状を分割数付きで既定テクスチャ初期化
@@ -117,6 +118,19 @@ public:
 	void SetShininess(float shininess);
 	// 環境マップ反射係数を設定
 	void SetEnvironmentCoefficient(float coefficient);
+	// グレースケール有効/無効
+	void SetGrayscaleEnabled(bool enable);
+	// セピア有効/無効
+	void SetSepiaEnabled(bool enable);
+	// 現在の Transform を取得
+	Transform GetTransform() const { return transform_; }
+	// 現在のマテリアル値を取得
+	Vector4 GetColor() const;
+	bool IsLightingEnabled() const;
+	float GetShininess() const;
+	float GetEnvironmentCoefficient() const;
+	bool IsGrayscaleEnabled() const;
+	bool IsSepiaEnabled() const;
 
 private:
 	// Line 描画時に使う始点

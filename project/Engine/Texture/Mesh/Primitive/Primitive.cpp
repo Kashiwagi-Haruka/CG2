@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "DirectXCommon.h"
 #include "Function.h"
+#include "Engine/Editor/Hinstance.h"
 #include "Object3d/Object3dCommon.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
@@ -500,7 +501,7 @@ MeshData BuildMeshByPrimitiveName(Primitive::PrimitiveName primitiveName, uint32
 	}
 }
 } // namespace
-
+Primitive::~Primitive() { Hinstance::GetInstance()->UnregisterPrimitive(this); }
 // 既定テクスチャでプリミティブを初期化
 void Primitive::Initialize(PrimitiveName name) { Initialize(name, kDefaultSlices); }
 // 指定分割数で既定テクスチャ初期化
@@ -551,6 +552,7 @@ void Primitive::Initialize(PrimitiveName name, uint32_t slices) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 
 	isUseSetWorld = false;
+	Hinstance::GetInstance()->RegisterPrimitive(this);
 }
 // 指定テクスチャでプリミティブを初期化
 void Primitive::Initialize(PrimitiveName name, const std::string& texturePath) { Initialize(name, texturePath, kDefaultSlices); }
@@ -601,6 +603,7 @@ void Primitive::Initialize(PrimitiveName name, const std::string& texturePath, u
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 
 	isUseSetWorld = false;
+	Hinstance::GetInstance()->RegisterPrimitive(this);
 }
 // 座標変換やマテリアル定数を更新
 void Primitive::Update() {
@@ -756,4 +759,57 @@ void Primitive::SetEnvironmentCoefficient(float coefficient) {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->environmentCoefficient = coefficient;
 	materialResource_->Unmap(0, nullptr);
+}
+void Primitive::SetGrayscaleEnabled(bool enable) {
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	materialData_->grayscaleEnabled = enable ? 1 : 0;
+	materialResource_->Unmap(0, nullptr);
+}
+
+void Primitive::SetSepiaEnabled(bool enable) {
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	materialData_->sepiaEnabled = enable ? 1 : 0;
+	materialResource_->Unmap(0, nullptr);
+}
+
+Vector4 Primitive::GetColor() const {
+	if (materialData_) {
+		return materialData_->color;
+	}
+	return {1.0f, 1.0f, 1.0f, 1.0f};
+}
+
+bool Primitive::IsLightingEnabled() const {
+	if (materialData_) {
+		return materialData_->enableLighting != 0;
+	}
+	return true;
+}
+
+float Primitive::GetShininess() const {
+	if (materialData_) {
+		return materialData_->shininess;
+	}
+	return 40.0f;
+}
+
+float Primitive::GetEnvironmentCoefficient() const {
+	if (materialData_) {
+		return materialData_->environmentCoefficient;
+	}
+	return 0.0f;
+}
+
+bool Primitive::IsGrayscaleEnabled() const {
+	if (materialData_) {
+		return materialData_->grayscaleEnabled != 0;
+	}
+	return false;
+}
+
+bool Primitive::IsSepiaEnabled() const {
+	if (materialData_) {
+		return materialData_->sepiaEnabled != 0;
+	}
+	return false;
 }

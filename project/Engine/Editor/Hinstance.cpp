@@ -3,13 +3,13 @@
 #include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Object3d/Object3d.h"
+#include "Primitive/Primitive.h"
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
 #endif
 
 #include <algorithm>
 #include <array>
-#include <cstring>
 #include <filesystem>
 #include <string>
 
@@ -41,16 +41,9 @@ void Hinstance::RegisterObject3d(Object3d* object) {
 		    object->IsGrayscaleEnabled(),
 		    object->IsSepiaEnabled(),
 		});
-
 	}
 }
-bool Hinstance::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
-	if (!HasObjectEditorJsonFile(filePath)) {
-		return false;
-	}
 
-	return LoadObjectEditorsFromJson(filePath);
-}
 void Hinstance::UnregisterObject3d(Object3d* object) {
 	if (!object) {
 		return;
@@ -66,12 +59,54 @@ void Hinstance::UnregisterObject3d(Object3d* object) {
 	}
 }
 
+void Hinstance::RegisterPrimitive(Primitive* primitive) {
+	if (!primitive) {
+		return;
+	}
+	if (std::find(primitives_.begin(), primitives_.end(), primitive) == primitives_.end()) {
+		const size_t index = primitives_.size();
+		primitives_.push_back(primitive);
+		primitiveNames_.push_back("Primitive " + std::to_string(index));
+		primitiveEditorTransforms_.push_back(primitive->GetTransform());
+		primitiveEditorMaterials_.push_back({
+		    primitive->GetColor(),
+		    primitive->IsLightingEnabled(),
+		    primitive->GetShininess(),
+		    primitive->GetEnvironmentCoefficient(),
+		    primitive->IsGrayscaleEnabled(),
+		    primitive->IsSepiaEnabled(),
+		});
+	}
+}
 
-bool Hinstance::HasRegisteredObjects() const { return !objects_.empty(); }
+void Hinstance::UnregisterPrimitive(Primitive* primitive) {
+	if (!primitive) {
+		return;
+	}
+	for (size_t i = 0; i < primitives_.size(); ++i) {
+		if (primitives_[i] == primitive) {
+			primitives_.erase(primitives_.begin() + i);
+			primitiveNames_.erase(primitiveNames_.begin() + i);
+			primitiveEditorTransforms_.erase(primitiveEditorTransforms_.begin() + i);
+			primitiveEditorMaterials_.erase(primitiveEditorMaterials_.begin() + i);
+			break;
+		}
+	}
+}
+
+bool Hinstance::HasRegisteredObjects() const { return !objects_.empty() || !primitives_.empty(); }
+
+bool Hinstance::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
+	if (!HasObjectEditorJsonFile(filePath)) {
+		return false;
+	}
+	return LoadObjectEditorsFromJson(filePath);
+}
 
 bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 	nlohmann::json root;
 	root["objects"] = nlohmann::json::array();
+	root["primitives"] = nlohmann::json::array();
 
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		const Object3d* object = objects_[i];
@@ -79,6 +114,7 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 			continue;
 		}
 		const Transform& transform = editorTransforms_[i];
+		const EditorMaterial& material = editorMaterials_[i];
 		nlohmann::json objectJson;
 		objectJson["index"] = i;
 		objectJson["name"] = objectNames_[i];
@@ -87,7 +123,6 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 		    {"rotate",    {transform.rotate.x, transform.rotate.y, transform.rotate.z}         },
 		    {"translate", {transform.translate.x, transform.translate.y, transform.translate.z}},
 		};
-		const EditorMaterial& material = editorMaterials_[i];
 		objectJson["material"] = {
 		    {"color",                  {material.color.x, material.color.y, material.color.z, material.color.w}},
 		    {"enableLighting",         material.enableLighting                                                 },
@@ -97,6 +132,32 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 		    {"sepiaEnabled",           material.sepiaEnabled		                                           },
 		};
 		root["objects"].push_back(objectJson);
+	}
+
+	for (size_t i = 0; i < primitives_.size(); ++i) {
+		const Primitive* primitive = primitives_[i];
+		if (!primitive) {
+			continue;
+		}
+		const Transform& transform = primitiveEditorTransforms_[i];
+		const EditorMaterial& material = primitiveEditorMaterials_[i];
+		nlohmann::json primitiveJson;
+		primitiveJson["index"] = i;
+		primitiveJson["name"] = primitiveNames_[i];
+		primitiveJson["transform"] = {
+		    {"scale",     {transform.scale.x, transform.scale.y, transform.scale.z}            },
+		    {"rotate",    {transform.rotate.x, transform.rotate.y, transform.rotate.z}         },
+		    {"translate", {transform.translate.x, transform.translate.y, transform.translate.z}},
+		};
+		primitiveJson["material"] = {
+		    {"color",                  {material.color.x, material.color.y, material.color.z, material.color.w}},
+		    {"enableLighting",         material.enableLighting                                                 },
+		    {"shininess",              material.shininess		                                              },
+		    {"environmentCoefficient", material.environmentCoefficient                                         },
+		    {"grayscaleEnabled",       material.grayscaleEnabled                                               },
+		    {"sepiaEnabled",           material.sepiaEnabled		                                           },
+		};
+		root["primitives"].push_back(primitiveJson);
 	}
 
 	JsonManager* jsonManager = JsonManager::GetInstance();
@@ -111,87 +172,122 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 	}
 
 	const nlohmann::json& root = jsonManager->GetData();
-	if (!root.contains("objects") || !root["objects"].is_array()) {
+	if (!root.is_object()) {
 		return false;
 	}
 
-	for (const auto& objectJson : root["objects"]) {
-		if (!objectJson.contains("index") || !objectJson["index"].is_number_unsigned()) {
-			continue;
+	if (root.contains("objects") && root["objects"].is_array()) {
+		for (const auto& objectJson : root["objects"]) {
+			if (!objectJson.contains("index") || !objectJson["index"].is_number_unsigned()) {
+				continue;
+			}
+			const size_t index = objectJson["index"].get<size_t>();
+			if (index >= objects_.size() || !objects_[index]) {
+				continue;
+			}
+			if (objectJson.contains("name") && objectJson["name"].is_string()) {
+				objectNames_[index] = objectJson["name"].get<std::string>();
+			}
+			if (objectJson.contains("transform") && objectJson["transform"].is_object()) {
+				const auto& transformJson = objectJson["transform"];
+				if (transformJson.contains("scale") && transformJson["scale"].is_array() && transformJson["scale"].size() == 3 && transformJson.contains("rotate") &&
+				    transformJson["rotate"].is_array() && transformJson["rotate"].size() == 3 && transformJson.contains("translate") && transformJson["translate"].is_array() &&
+				    transformJson["translate"].size() == 3) {
+					Transform transform = objects_[index]->GetTransform();
+					transform.scale = {transformJson["scale"][0].get<float>(), transformJson["scale"][1].get<float>(), transformJson["scale"][2].get<float>()};
+					transform.rotate = {transformJson["rotate"][0].get<float>(), transformJson["rotate"][1].get<float>(), transformJson["rotate"][2].get<float>()};
+					transform.translate = {transformJson["translate"][0].get<float>(), transformJson["translate"][1].get<float>(), transformJson["translate"][2].get<float>()};
+					editorTransforms_[index] = transform;
+					objects_[index]->SetTransform(transform);
+				}
+			}
+			EditorMaterial material = editorMaterials_[index];
+			if (objectJson.contains("material") && objectJson["material"].is_object()) {
+				const auto& materialJson = objectJson["material"];
+				if (materialJson.contains("color") && materialJson["color"].is_array() && materialJson["color"].size() == 4) {
+					material.color = {materialJson["color"][0].get<float>(), materialJson["color"][1].get<float>(), materialJson["color"][2].get<float>(), materialJson["color"][3].get<float>()};
+				}
+				if (materialJson.contains("enableLighting") && materialJson["enableLighting"].is_boolean()) {
+					material.enableLighting = materialJson["enableLighting"].get<bool>();
+				}
+				if (materialJson.contains("shininess") && materialJson["shininess"].is_number()) {
+					material.shininess = materialJson["shininess"].get<float>();
+				}
+				if (materialJson.contains("environmentCoefficient") && materialJson["environmentCoefficient"].is_number()) {
+					material.environmentCoefficient = materialJson["environmentCoefficient"].get<float>();
+				}
+				if (materialJson.contains("grayscaleEnabled") && materialJson["grayscaleEnabled"].is_boolean()) {
+					material.grayscaleEnabled = materialJson["grayscaleEnabled"].get<bool>();
+				}
+				if (materialJson.contains("sepiaEnabled") && materialJson["sepiaEnabled"].is_boolean()) {
+					material.sepiaEnabled = materialJson["sepiaEnabled"].get<bool>();
+				}
+			}
+			editorMaterials_[index] = material;
+			objects_[index]->SetColor(material.color);
+			objects_[index]->SetEnableLighting(material.enableLighting);
+			objects_[index]->SetShininess(material.shininess);
+			objects_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
+			objects_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
+			objects_[index]->SetSepiaEnabled(material.sepiaEnabled);
 		}
-		const size_t index = objectJson["index"].get<size_t>();
-		if (index >= objects_.size() || !objects_[index]) {
-			continue;
-		}
-		if (objectJson.contains("name") && objectJson["name"].is_string()) {
-			objectNames_[index] = objectJson["name"].get<std::string>();
-		}
-		if (!objectJson.contains("transform") || !objectJson["transform"].is_object()) {
-			continue;
-		}
-		const auto& transformJson = objectJson["transform"];
-		if (!transformJson.contains("scale") || !transformJson["scale"].is_array() || transformJson["scale"].size() != 3) {
-			continue;
-		}
-		if (!transformJson.contains("rotate") || !transformJson["rotate"].is_array() || transformJson["rotate"].size() != 3) {
-			continue;
-		}
-		if (!transformJson.contains("translate") || !transformJson["translate"].is_array() || transformJson["translate"].size() != 3) {
-			continue;
-		}
+	}
 
-		Transform transform = objects_[index]->GetTransform();
-		transform.scale = {
-		    transformJson["scale"][0].get<float>(),
-		    transformJson["scale"][1].get<float>(),
-		    transformJson["scale"][2].get<float>(),
-		};
-		transform.rotate = {
-		    transformJson["rotate"][0].get<float>(),
-		    transformJson["rotate"][1].get<float>(),
-		    transformJson["rotate"][2].get<float>(),
-		};
-		transform.translate = {
-		    transformJson["translate"][0].get<float>(),
-		    transformJson["translate"][1].get<float>(),
-		    transformJson["translate"][2].get<float>(),
-		};
-		editorTransforms_[index] = transform;
-		objects_[index]->SetTransform(transform);
-		EditorMaterial material = editorMaterials_[index];
-		if (objectJson.contains("material") && objectJson["material"].is_object()) {
-			const auto& materialJson = objectJson["material"];
-			if (materialJson.contains("color") && materialJson["color"].is_array() && materialJson["color"].size() == 4) {
-				material.color = {
-				    materialJson["color"][0].get<float>(),
-				    materialJson["color"][1].get<float>(),
-				    materialJson["color"][2].get<float>(),
-				    materialJson["color"][3].get<float>(),
-				};
+	if (root.contains("primitives") && root["primitives"].is_array()) {
+		for (const auto& primitiveJson : root["primitives"]) {
+			if (!primitiveJson.contains("index") || !primitiveJson["index"].is_number_unsigned()) {
+				continue;
 			}
-			if (materialJson.contains("enableLighting") && materialJson["enableLighting"].is_boolean()) {
-				material.enableLighting = materialJson["enableLighting"].get<bool>();
+			const size_t index = primitiveJson["index"].get<size_t>();
+			if (index >= primitives_.size() || !primitives_[index]) {
+				continue;
 			}
-			if (materialJson.contains("shininess") && materialJson["shininess"].is_number()) {
-				material.shininess = materialJson["shininess"].get<float>();
+			if (primitiveJson.contains("name") && primitiveJson["name"].is_string()) {
+				primitiveNames_[index] = primitiveJson["name"].get<std::string>();
 			}
-			if (materialJson.contains("environmentCoefficient") && materialJson["environmentCoefficient"].is_number()) {
-				material.environmentCoefficient = materialJson["environmentCoefficient"].get<float>();
+			if (primitiveJson.contains("transform") && primitiveJson["transform"].is_object()) {
+				const auto& transformJson = primitiveJson["transform"];
+				if (transformJson.contains("scale") && transformJson["scale"].is_array() && transformJson["scale"].size() == 3 && transformJson.contains("rotate") &&
+				    transformJson["rotate"].is_array() && transformJson["rotate"].size() == 3 && transformJson.contains("translate") && transformJson["translate"].is_array() &&
+				    transformJson["translate"].size() == 3) {
+					Transform transform = primitives_[index]->GetTransform();
+					transform.scale = {transformJson["scale"][0].get<float>(), transformJson["scale"][1].get<float>(), transformJson["scale"][2].get<float>()};
+					transform.rotate = {transformJson["rotate"][0].get<float>(), transformJson["rotate"][1].get<float>(), transformJson["rotate"][2].get<float>()};
+					transform.translate = {transformJson["translate"][0].get<float>(), transformJson["translate"][1].get<float>(), transformJson["translate"][2].get<float>()};
+					primitiveEditorTransforms_[index] = transform;
+					primitives_[index]->SetTransform(transform);
+				}
 			}
-			if (materialJson.contains("grayscaleEnabled") && materialJson["grayscaleEnabled"].is_boolean()) {
-				material.grayscaleEnabled = materialJson["grayscaleEnabled"].get<bool>();
+			EditorMaterial material = primitiveEditorMaterials_[index];
+			if (primitiveJson.contains("material") && primitiveJson["material"].is_object()) {
+				const auto& materialJson = primitiveJson["material"];
+				if (materialJson.contains("color") && materialJson["color"].is_array() && materialJson["color"].size() == 4) {
+					material.color = {materialJson["color"][0].get<float>(), materialJson["color"][1].get<float>(), materialJson["color"][2].get<float>(), materialJson["color"][3].get<float>()};
+				}
+				if (materialJson.contains("enableLighting") && materialJson["enableLighting"].is_boolean()) {
+					material.enableLighting = materialJson["enableLighting"].get<bool>();
+				}
+				if (materialJson.contains("shininess") && materialJson["shininess"].is_number()) {
+					material.shininess = materialJson["shininess"].get<float>();
+				}
+				if (materialJson.contains("environmentCoefficient") && materialJson["environmentCoefficient"].is_number()) {
+					material.environmentCoefficient = materialJson["environmentCoefficient"].get<float>();
+				}
+				if (materialJson.contains("grayscaleEnabled") && materialJson["grayscaleEnabled"].is_boolean()) {
+					material.grayscaleEnabled = materialJson["grayscaleEnabled"].get<bool>();
+				}
+				if (materialJson.contains("sepiaEnabled") && materialJson["sepiaEnabled"].is_boolean()) {
+					material.sepiaEnabled = materialJson["sepiaEnabled"].get<bool>();
+				}
 			}
-			if (materialJson.contains("sepiaEnabled") && materialJson["sepiaEnabled"].is_boolean()) {
-				material.sepiaEnabled = materialJson["sepiaEnabled"].get<bool>();
-			}
+			primitiveEditorMaterials_[index] = material;
+			primitives_[index]->SetColor(material.color);
+			primitives_[index]->SetEnableLighting(material.enableLighting);
+			primitives_[index]->SetShininess(material.shininess);
+			primitives_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
+			primitives_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
+			primitives_[index]->SetSepiaEnabled(material.sepiaEnabled);
 		}
-		editorMaterials_[index] = material;
-		objects_[index]->SetColor(material.color);
-		objects_[index]->SetEnableLighting(material.enableLighting);
-		objects_[index]->SetShininess(material.shininess);
-		objects_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
-		objects_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
-		objects_[index]->SetSepiaEnabled(material.sepiaEnabled);
 	}
 
 	return true;
@@ -201,7 +297,7 @@ void Hinstance::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
 
 void Hinstance::DrawObjectEditors() {
 #ifdef USE_IMGUI
-	if (objects_.empty()) {
+	if (objects_.empty() && primitives_.empty()) {
 		return;
 	}
 
@@ -235,7 +331,7 @@ void Hinstance::DrawObjectEditors() {
 		ImGui::Text("%s", saveStatusMessage_.c_str());
 	}
 
-if (!isPlaying_) {
+	if (!isPlaying_) {
 		if (ImGui::Button("Play")) {
 			if (hasUnsavedChanges_) {
 				saveStatusMessage_ = "Warning: unsaved changes. Save To JSON before Play";
@@ -256,7 +352,7 @@ if (!isPlaying_) {
 		}
 	}
 
-	ImGui::Separator();
+	ImGui::SeparatorText("Object3d");
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		Object3d* object = objects_[i];
 		if (!object) {
@@ -264,7 +360,7 @@ if (!isPlaying_) {
 		}
 		std::string& objectName = objectNames_[i];
 		std::string nodeLabel = objectName.empty() ? ("Object " + std::to_string(i)) : objectName;
-		const std::string treeNodeLabel = nodeLabel + "###node_" + std::to_string(i);
+		const std::string treeNodeLabel = nodeLabel + "###object_node_" + std::to_string(i);
 		if (ImGui::TreeNode(treeNodeLabel.c_str())) {
 			Transform& transform = editorTransforms_[i];
 			EditorMaterial& material = editorMaterials_[i];
@@ -277,20 +373,20 @@ if (!isPlaying_) {
 				std::array<char, 128> nameBuffer{};
 				const size_t copyLength = std::min(nameBuffer.size() - 1, objectName.size());
 				std::copy_n(objectName.begin(), copyLength, nameBuffer.begin());
-				if (ImGui::InputText(("Name##" + std::to_string(i)).c_str(), nameBuffer.data(), nameBuffer.size())) {
+				if (ImGui::InputText(("Name##object_" + std::to_string(i)).c_str(), nameBuffer.data(), nameBuffer.size())) {
 					objectName = nameBuffer.data();
 					nameChanged = true;
 				}
-				transformChanged |= ImGui::DragFloat3(("Scale##" + std::to_string(i)).c_str(), &transform.scale.x, 0.01f);
-				transformChanged |= ImGui::DragFloat3(("Rotate##" + std::to_string(i)).c_str(), &transform.rotate.x, 0.01f);
-				transformChanged |= ImGui::DragFloat3(("Translate##" + std::to_string(i)).c_str(), &transform.translate.x, 0.01f);
+				transformChanged |= ImGui::DragFloat3(("Scale##object_" + std::to_string(i)).c_str(), &transform.scale.x, 0.01f);
+				transformChanged |= ImGui::DragFloat3(("Rotate##object_" + std::to_string(i)).c_str(), &transform.rotate.x, 0.01f);
+				transformChanged |= ImGui::DragFloat3(("Translate##object_" + std::to_string(i)).c_str(), &transform.translate.x, 0.01f);
 				ImGui::SeparatorText("Material");
-				materialChanged |= ImGui::ColorEdit4(("Color##" + std::to_string(i)).c_str(), &material.color.x);
-				materialChanged |= ImGui::Checkbox(("Enable Lighting##" + std::to_string(i)).c_str(), &material.enableLighting);
-				materialChanged |= ImGui::DragFloat(("Shininess##" + std::to_string(i)).c_str(), &material.shininess, 0.1f, 0.0f, 256.0f);
-				materialChanged |= ImGui::DragFloat(("Environment##" + std::to_string(i)).c_str(), &material.environmentCoefficient, 0.01f, 0.0f, 1.0f);
-				materialChanged |= ImGui::Checkbox(("Grayscale##" + std::to_string(i)).c_str(), &material.grayscaleEnabled);
-				materialChanged |= ImGui::Checkbox(("Sepia##" + std::to_string(i)).c_str(), &material.sepiaEnabled);
+				materialChanged |= ImGui::ColorEdit4(("Color##object_" + std::to_string(i)).c_str(), &material.color.x);
+				materialChanged |= ImGui::Checkbox(("Enable Lighting##object_" + std::to_string(i)).c_str(), &material.enableLighting);
+				materialChanged |= ImGui::DragFloat(("Shininess##object_" + std::to_string(i)).c_str(), &material.shininess, 0.1f, 0.0f, 256.0f);
+				materialChanged |= ImGui::DragFloat(("Environment##object_" + std::to_string(i)).c_str(), &material.environmentCoefficient, 0.01f, 0.0f, 1.0f);
+				materialChanged |= ImGui::Checkbox(("Grayscale##object_" + std::to_string(i)).c_str(), &material.grayscaleEnabled);
+				materialChanged |= ImGui::Checkbox(("Sepia##object_" + std::to_string(i)).c_str(), &material.sepiaEnabled);
 			}
 			if (transformChanged || materialChanged || nameChanged) {
 				hasUnsavedChanges_ = true;
@@ -305,6 +401,60 @@ if (!isPlaying_) {
 				object->SetEnvironmentCoefficient(material.environmentCoefficient);
 				object->SetGrayscaleEnabled(material.grayscaleEnabled);
 				object->SetSepiaEnabled(material.sepiaEnabled);
+			}
+			ImGui::TreePop();
+		}
+	}
+
+	ImGui::SeparatorText("Primitive");
+	for (size_t i = 0; i < primitives_.size(); ++i) {
+		Primitive* primitive = primitives_[i];
+		if (!primitive) {
+			continue;
+		}
+		std::string& primitiveName = primitiveNames_[i];
+		std::string nodeLabel = primitiveName.empty() ? ("Primitive " + std::to_string(i)) : primitiveName;
+		const std::string treeNodeLabel = nodeLabel + "###primitive_node_" + std::to_string(i);
+		if (ImGui::TreeNode(treeNodeLabel.c_str())) {
+			Transform& transform = primitiveEditorTransforms_[i];
+			EditorMaterial& material = primitiveEditorMaterials_[i];
+			bool transformChanged = false;
+			bool materialChanged = false;
+			bool nameChanged = false;
+			if (isPlaying_) {
+				ImGui::TextUnformatted("Playing... editor values are locked");
+			} else {
+				std::array<char, 128> nameBuffer{};
+				const size_t copyLength = std::min(nameBuffer.size() - 1, primitiveName.size());
+				std::copy_n(primitiveName.begin(), copyLength, nameBuffer.begin());
+				if (ImGui::InputText(("Name##primitive_" + std::to_string(i)).c_str(), nameBuffer.data(), nameBuffer.size())) {
+					primitiveName = nameBuffer.data();
+					nameChanged = true;
+				}
+				transformChanged |= ImGui::DragFloat3(("Scale##primitive_" + std::to_string(i)).c_str(), &transform.scale.x, 0.01f);
+				transformChanged |= ImGui::DragFloat3(("Rotate##primitive_" + std::to_string(i)).c_str(), &transform.rotate.x, 0.01f);
+				transformChanged |= ImGui::DragFloat3(("Translate##primitive_" + std::to_string(i)).c_str(), &transform.translate.x, 0.01f);
+				ImGui::SeparatorText("Material");
+				materialChanged |= ImGui::ColorEdit4(("Color##primitive_" + std::to_string(i)).c_str(), &material.color.x);
+				materialChanged |= ImGui::Checkbox(("Enable Lighting##primitive_" + std::to_string(i)).c_str(), &material.enableLighting);
+				materialChanged |= ImGui::DragFloat(("Shininess##primitive_" + std::to_string(i)).c_str(), &material.shininess, 0.1f, 0.0f, 256.0f);
+				materialChanged |= ImGui::DragFloat(("Environment##primitive_" + std::to_string(i)).c_str(), &material.environmentCoefficient, 0.01f, 0.0f, 1.0f);
+				materialChanged |= ImGui::Checkbox(("Grayscale##primitive_" + std::to_string(i)).c_str(), &material.grayscaleEnabled);
+				materialChanged |= ImGui::Checkbox(("Sepia##primitive_" + std::to_string(i)).c_str(), &material.sepiaEnabled);
+			}
+			if (transformChanged || materialChanged || nameChanged) {
+				hasUnsavedChanges_ = true;
+			}
+			if (transformChanged) {
+				primitive->SetTransform(transform);
+			}
+			if (materialChanged) {
+				primitive->SetColor(material.color);
+				primitive->SetEnableLighting(material.enableLighting);
+				primitive->SetShininess(material.shininess);
+				primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
+				primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
+				primitive->SetSepiaEnabled(material.sepiaEnabled);
 			}
 			ImGui::TreePop();
 		}
