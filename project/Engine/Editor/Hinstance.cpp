@@ -375,12 +375,8 @@ void Hinstance::DrawObjectEditors() {
 		}
 	} else {
 		if (ImGui::Button("Stop")) {
-			const bool loaded = LoadObjectEditorsFromJson("objectEditors.json");
-			if (loaded) {
-				hasUnsavedChanges_ = false;
-			}
 			SetPlayMode(false);
-			saveStatusMessage_ = loaded ? "Stopped: loaded objectEditors.json" : "Stop failed: objectEditors.json";
+			saveStatusMessage_ = "Stopped: applied editor values";
 		}
 	}
 
