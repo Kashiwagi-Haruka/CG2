@@ -300,7 +300,39 @@ void Hinstance::DrawObjectEditors() {
 	if (objects_.empty() && primitives_.empty()) {
 		return;
 	}
+	if (!isPlaying_) {
+		for (size_t i = 0; i < objects_.size(); ++i) {
+			Object3d* object = objects_[i];
+			if (!object) {
+				continue;
+			}
+			const Transform& transform = editorTransforms_[i];
+			const EditorMaterial& material = editorMaterials_[i];
+			object->SetTransform(transform);
+			object->SetColor(material.color);
+			object->SetEnableLighting(material.enableLighting);
+			object->SetShininess(material.shininess);
+			object->SetEnvironmentCoefficient(material.environmentCoefficient);
+			object->SetGrayscaleEnabled(material.grayscaleEnabled);
+			object->SetSepiaEnabled(material.sepiaEnabled);
+		}
 
+		for (size_t i = 0; i < primitives_.size(); ++i) {
+			Primitive* primitive = primitives_[i];
+			if (!primitive) {
+				continue;
+			}
+			const Transform& transform = primitiveEditorTransforms_[i];
+			const EditorMaterial& material = primitiveEditorMaterials_[i];
+			primitive->SetTransform(transform);
+			primitive->SetColor(material.color);
+			primitive->SetEnableLighting(material.enableLighting);
+			primitive->SetShininess(material.shininess);
+			primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
+			primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
+			primitive->SetSepiaEnabled(material.sepiaEnabled);
+		}
+	}
 	constexpr float kGameWidthRatio = 0.68f;
 	constexpr float kEditorMinWidth = 280.0f;
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
