@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "Primitive.h"
 #include "Camera.h"
 #include "DirectXCommon.h"
@@ -117,10 +118,12 @@ MeshData BuildLine() {
 }
 
 // 内径と外径を持つリングを生成
-MeshData BuildRing(uint32_t slices) {
+MeshData BuildRing(uint32_t slices, const Vector2& innerDiameter, const Vector2& outerDiameter) {
 	MeshData mesh;
-	const float innerRadius = kHalfSize * 0.6f;
-	const float outerRadius = kHalfSize;
+	const float innerRadiusX = std::max(innerDiameter.x * 0.5f, 0.0f);
+	const float innerRadiusY = std::max(innerDiameter.y * 0.5f, 0.0f);
+	const float outerRadiusX = std::max(outerDiameter.x * 0.5f, 0.0f);
+	const float outerRadiusY = std::max(outerDiameter.y * 0.5f, 0.0f);
 	mesh.vertices.reserve((slices + 1) * 2);
 	mesh.indices.reserve(slices * 6);
 
@@ -130,12 +133,12 @@ MeshData BuildRing(uint32_t slices) {
 		float sinA = std::sin(angle);
 		Vector3 normal = {0.0f, 0.0f, -1.0f};
 		mesh.vertices.push_back({
-		    {outerRadius * cosA, outerRadius * sinA, 0.0f, 1.0f},
+		    {outerRadiusX * cosA, outerRadiusY * sinA, 0.0f, 1.0f},
             {0.5f + cosA * 0.5f, 0.5f - sinA * 0.5f},
             normal
         });
 		mesh.vertices.push_back({
-		    {innerRadius * cosA, innerRadius * sinA, 0.0f, 1.0f},
+		    {innerRadiusX * cosA, innerRadiusY * sinA, 0.0f, 1.0f},
             {0.5f + cosA * 0.3f, 0.5f - sinA * 0.3f},
             normal
         });
@@ -483,7 +486,7 @@ void Primitive::Initialize(PrimitiveName name) {
 		mesh = BuildCircle(kDefaultSlices);
 		break;
 	case Primitive::Ring:
-		mesh = BuildRing(kDefaultSlices);
+		mesh = BuildRing(kDefaultSlices, {kHalfSize * 1.2f, kHalfSize * 1.2f}, {kHalfSize * 2.0f, kHalfSize * 2.0f});
 		break;
 	case Primitive::Sphere:
 		mesh = BuildSphere(kDefaultSlices, kDefaultStacks);
@@ -568,7 +571,7 @@ void Primitive::Initialize(PrimitiveName name,const std::string& texturePath) {
 		mesh = BuildCircle(kDefaultSlices);
 		break;
 	case Primitive::Ring:
-		mesh = BuildRing(kDefaultSlices);
+		mesh = BuildRing(kDefaultSlices, {kHalfSize * 1.2f, kHalfSize * 1.2f}, {kHalfSize * 2.0f, kHalfSize * 2.0f});
 		break;
 	case Primitive::Sphere:
 		mesh = BuildSphere(kDefaultSlices, kDefaultStacks);
@@ -731,6 +734,14 @@ void Primitive::SetLinePositions(const Vector3& start, const Vector3& end) {
 	useLinePositions_ = true;
 	isUseSetWorld = true;
 	worldMatrix = Function::MakeIdentity4x4();
+}
+// Ring の内径・外径を XY ごとに更新して頂点へ反映
+void Primitive::SetRingDiameterXY(const Vector2& innerDiameter, const Vector2& outerDiameter) {
+	if (primitiveName_ != Primitive::Ring) {
+		return;
+	}
+	MeshData mesh = BuildRing(kDefaultSlices, innerDiameter, outerDiameter);
+	SetMeshData(mesh.vertices, mesh.indices);
 }
 // 外部メッシュへ置き換え、GPU バッファを再作成
 void Primitive::SetMeshData(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices) {

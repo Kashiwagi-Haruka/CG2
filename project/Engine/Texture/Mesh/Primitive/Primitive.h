@@ -2,6 +2,7 @@
 #include "CameraForGPU.h"
 #include "Matrix4x4.h"
 #include "Transform.h"
+#include "Vector2.h"
 #include "Vector4.h"
 #include "VertexData.h"
 #include <cstdint>
@@ -98,6 +99,8 @@ public:
 	void SetWorldMatrix(Matrix4x4 matrix);
 	// Line 用の始点・終点を設定
 	void SetLinePositions(const Vector3& start, const Vector3& end);
+	// Ring 用の内径・外径を X/Y ごとに設定
+	void SetRingDiameterXY(const Vector2& innerDiameter, const Vector2& outerDiameter);
 	// メッシュデータを外部から差し替え
 	void SetMeshData(const std::vector<VertexData>& vertices, const std::vector<uint32_t>& indices);
 	// ベースカラーを設定
