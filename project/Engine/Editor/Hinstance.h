@@ -19,6 +19,7 @@ public:
 	void UnregisterPrimitive(Primitive* primitive);
 	bool HasRegisteredObjects() const;
 	void DrawObjectEditors();
+	void ApplyEditorValues();
 	void SetPlayMode(bool isPlaying);
 	bool IsPlayMode() const { return isPlaying_; }
 	bool LoadObjectEditorsFromJsonIfExists(const std::string& filePath);

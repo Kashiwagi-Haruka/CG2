@@ -432,13 +432,12 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetRandomNoiseScale(randomNoiseScale_);
 	Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode_);
 
-	uvBallObj_->SetTransform(uvBallTransform_);
-	planeGltf_->SetTransform(planeGTransform_);
-	animatedCubeObj_->SetTransform(animatedCubeTransform_);
-	animatedCubeObj_->SetTransform(animatedCubeTransform_);
-	humanObj_->SetTransform(humanTransform_);
-	ringPrimitive_->SetTransform(ringTransform_);
-	ringPrimitive_->SetColor({1.0f, 0.85f, 0.2f, 1.0f});
+	/*uvBallObj_->SetTransform(uvBallTransform_);*/
+	/*planeGltf_->SetTransform(planeGTransform_);*/
+	/*animatedCubeObj_->SetTransform(animatedCubeTransform_);*/
+	/*humanObj_->SetTransform(humanTransform_);*/
+	/*ringPrimitive_->SetTransform(ringTransform_);*/
+	/*ringPrimitive_->SetColor({1.0f, 0.85f, 0.2f, 1.0f});*/
 	uvBallObj_->Update();
 	fieldObj_->Update();
 	planeGltf_->Update();

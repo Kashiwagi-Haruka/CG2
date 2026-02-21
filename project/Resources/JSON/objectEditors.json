@@ -83,7 +83,7 @@
         "sepiaEnabled": false,
         "shininess": 40.0
       },
-      "name": "Object 2",
+      "name": "plane",
       "transform": {
         "rotate": [
           0.0,
@@ -96,8 +96,8 @@
           1.0
         ],
         "translate": [
-          0.0,
-          0.0,
+          0.18000000715255737,
+          2.490000009536743,
           0.0
         ]
       }
@@ -117,7 +117,7 @@
         "sepiaEnabled": false,
         "shininess": 40.0
       },
-      "name": "Object 3",
+      "name": "animeCube",
       "transform": {
         "rotate": [
           0.0,
@@ -130,8 +130,8 @@
           1.0
         ],
         "translate": [
-          0.0,
-          0.0,
+          4.130000114440918,
+          1.409999966621399,
           0.0
         ]
       }
@@ -164,8 +164,8 @@
           1.0
         ],
         "translate": [
-          0.0,
-          0.0,
+          0.2199999988079071,
+          2.509999990463257,
           0.0
         ]
       }
@@ -181,13 +181,13 @@
           1.0,
           1.0
         ],
-        "enableLighting": true,
+        "enableLighting": false,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
         "shininess": 40.0
       },
-      "name": "Primitive 0",
+      "name": "ring",
       "transform": {
         "rotate": [
           0.0,
@@ -195,14 +195,14 @@
           0.0
         ],
         "scale": [
-          1.340000033378601,
-          1.0,
+          2.440000057220459,
+          2.569999933242798,
           1.0
         ],
         "translate": [
-          2.0,
-          0.4099999964237213,
-          0.0
+          0.03999999910593033,
+          2.859999895095825,
+          -3.3399999141693115
         ]
       }
     }
