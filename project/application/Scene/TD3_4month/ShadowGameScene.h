@@ -10,6 +10,7 @@
 #include"GameObject/TestField/TestField.h"
 #include"GameObject/Portal/Portal.h"
 #include"GameObject/WarpPos/WarpPos1.h"
+#include"GameObject/WhiteBoard/WhiteBoardManager.h"
 
 #pragma endregion
 #include "Light/DirectionalLight.h" 
@@ -17,7 +18,6 @@
 #include "Light/SpotLight.h" 
 #include "Light/AreaLight.h"
 #include"Audio.h"
-
 
 class ShadowGameScene : public BaseScene
 {
@@ -33,6 +33,8 @@ private:
     bool useDebugCamera_ = false;
     //ワープ座標
     std::unique_ptr<WarpPos1> warpPos_ = nullptr;
+    //ホワイトボード管理
+    std::unique_ptr<WhiteBoardManager> whiteBoardManager_ = nullptr;
 
     //シーン遷移の設定
     std::unique_ptr<SceneTransition> transition_ = nullptr;

@@ -34,7 +34,8 @@ ShadowGameScene::ShadowGameScene()
     portal_ = std::make_unique<Portal>();
     //ワープ座標
     warpPos_ = std::make_unique<WarpPos1>();
-
+    //ホワイトボード管理
+    whiteBoardManager_ = std::make_unique<WhiteBoardManager>();
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -64,7 +65,9 @@ void ShadowGameScene::Initialize()
     //ワープ座標
     warpPos_->Initialize();
     warpPos_->SetCamera(camera_.get());
-    
+    //ホワイトボード管理
+    whiteBoardManager_->Initialize();
+    whiteBoardManager_->SetCamera(camera_.get());
     //ワープSEの再生フラグ
     isWarpSESound_ = false;
 }
@@ -92,9 +95,6 @@ void ShadowGameScene::Draw()
     DrawSceneTransition();
     //ゲームオブジェクトの描画処理
     DrawGameObject();
-
-
-
 }
 
 void ShadowGameScene::Finalize()
@@ -253,6 +253,7 @@ void ShadowGameScene::UpdateGameObject()
     testField_->Update();
     portal_->Update();
     warpPos_->Update();
+    whiteBoardManager_->Update();
 }
 void ShadowGameScene::UpdatePointLight()
 {
@@ -307,6 +308,8 @@ void ShadowGameScene::DrawGameObject()
     warpPos_->Draw();
     //プレイヤーの描画処理
     player_->Draw();
-    
+    //ホワイトボード管理
+    whiteBoardManager_->Draw();
+
 }
 #pragma endregion
