@@ -184,8 +184,8 @@ void Player::Rotate()
 
     if (fabs(inputMovePos.x) > 0.0f || fabs(inputMovePos.y) > 0.0f) {
         //スティック処理が優先される
-        dYaw = inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_* 2.0f;
-        dPitch = -inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_* 2.0f;
+        dYaw = inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_* 10.0f;
+        dPitch = -inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_* 10.0f;
     } else {
         //マウス
        inputMovePos = input->GetMouseMove();
