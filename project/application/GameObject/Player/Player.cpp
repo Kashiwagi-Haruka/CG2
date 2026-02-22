@@ -9,7 +9,7 @@
 #include"GameObject/YoshidaMath/Easing.h"
 #include<imgui.h>
 
-namespace PlayerConst{
+namespace PlayerConst {
     const constexpr float kRotateYSpeed = 0.25f;
     const constexpr float kSneakSpeed = 0.125f;
     const constexpr float kWalkSpeed = 0.25f;
@@ -20,6 +20,10 @@ Player::Player()
 {
     //体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
+#ifdef _DEBUG
+    //Primitiveの生成
+    primitive_ = std::make_unique<Primitive>();
+#endif
     //モデルの読み込み
     ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "walk");
     ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "sneakWalk");
@@ -27,6 +31,9 @@ Player::Player()
 void Player::SetCamera(Camera* camera)
 {
     bodyObj_->SetCamera(camera);
+#ifdef _DEBUG
+    primitive_->SetCamera(camera);
+#endif
 }
 void Player::Initialize()
 {
@@ -42,6 +49,12 @@ void Player::Initialize()
 
     velocity_ = { 0.0f,0.0f,0.0f };
     speed_ = { 0.0f };
+
+    localAABB_ = { .min = {-1.0f,0.0f,-1.0f},.max = {1.0f,1.0f,1.0f} };
+#ifdef _DEBUG
+    primitive_->Initialize(Primitive::Box);
+  
+#endif
 
     //カメラの感度をここで宣言していて良くない
     eyeRotateSpeed_ = 0.3f;
@@ -75,6 +88,10 @@ void Player::Update()
     Rotate();
     bodyObj_->SetTransform(transform_);
     bodyObj_->Update();
+#ifdef _DEBUG
+    primitive_->SetTransform(transform_);
+    primitive_->Update();
+#endif
     //アニメーション
     Animation();
     //デバック
@@ -84,6 +101,10 @@ void Player::Update()
 void Player::Draw()
 {
     bodyObj_->Draw();
+
+#ifdef _DEBUG
+    primitive_->Draw();
+#endif
 }
 
 void Player::Debug()
@@ -92,7 +113,7 @@ void Player::Debug()
     if (ImGui::Begin("Human")) {
 
         if (ImGui::TreeNode("Eye")) {
-            ImGui::DragFloat("eyeRotateSpeed", &eyeRotateSpeed_, 0.1f,0.1f);
+            ImGui::DragFloat("eyeRotateSpeed", &eyeRotateSpeed_, 0.1f, 0.1f);
             ImGui::DragFloat("eyeRotateX", &eyeRotateX_, 0.1f);
             ImGui::TreePop();
         }
@@ -149,7 +170,7 @@ void Player::Move()
     float yaw = std::atan2(tempDirection_.x, tempDirection_.y);
     //ベクトルのXZ長さ
     float length = YoshidaMath::Length(Vector2{ velocity_.x,velocity_.z });
-    speed_ = (playerCommand->Sneak() || length <= 0.5f) ? PlayerConst::kSneakSpeed: PlayerConst::kWalkSpeed;
+    speed_ = (playerCommand->Sneak() || length <= 0.5f) ? PlayerConst::kSneakSpeed : PlayerConst::kWalkSpeed;
 
     //計算を入れる
     bodyObj_->SetTransform(transform_);
@@ -177,20 +198,20 @@ void Player::Move()
 void Player::Rotate()
 {
     auto* input = Input::GetInstance();
-   
+
     Vector2 inputMovePos = input->GetJoyStickRXY();
     float dPitch = 0.0f;
     float dYaw = 0.0f;
 
     if (fabs(inputMovePos.x) > 0.0f || fabs(inputMovePos.y) > 0.0f) {
         //スティック処理が優先される
-        dYaw = inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_* 2.0f;
-        dPitch = -inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_* 2.0f;
+        dYaw = inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_ * 10.0f;
+        dPitch = -inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_ * 10.0f;
     } else {
         //マウス
-       inputMovePos = input->GetMouseMove();
-       dYaw += inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_;
-       dPitch += inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_;
+        inputMovePos = input->GetMouseMove();
+        dYaw += inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_;
+        dPitch += inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_;
     }
 
     eyeRotateX_ += dPitch;
@@ -198,8 +219,8 @@ void Player::Rotate()
 
     eyeRotateX_ = std::clamp(
         eyeRotateX_,
-        -Function::kPi *0.5f,
-        Function::kPi *0.5f);
+        -Function::kPi * 0.5f,
+        Function::kPi * 0.5f);
 
 }
 
@@ -227,4 +248,9 @@ void Player::Animation()
         Matrix4x4 humanWorld = bodyObj_->GetWorldMatrix();
         skeleton_->SetObjectMatrix(humanWorld);
     }
+}
+
+AABB Player::GetWorldAABB()
+{
+    return YoshidaMath::GetAABBWorldPos(localAABB_, transform_.translate);
 }
