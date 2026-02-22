@@ -28,7 +28,12 @@ private:
     Transform transform_{};
     Vector3 velocity_ = { 0.0f };
     float speed_ = { 0.0f };
-    Vector2 tempDirection_ = { 0.0f };
+    Vector3 tempDirection_ = { 0.0f };
+
+    //カメラの感度をここで宣言していて良くない
+    float eyeRotateSpeed_ = 0.3f;
+    float eyeRotateX_ = 0.0f;
+
 public:
     Transform& GetTransform() { return transform_; };
     //コンストラクタ
@@ -45,6 +50,8 @@ public:
     void Debug();
     //移動
     void Move();
+    //回転
+    void Rotate();
     //アニメーション
     void Animation();
     //ワールド行列の取得

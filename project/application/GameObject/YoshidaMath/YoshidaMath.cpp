@@ -1,6 +1,7 @@
 #include "YoshidaMath.h"
 #include"Function.h"
 #include<cmath>
+#include<algorithm>
 
 float YoshidaMath::Dot(const Vector2& v1, const Vector2& v2)
 {
@@ -9,7 +10,7 @@ float YoshidaMath::Dot(const Vector2& v1, const Vector2& v2)
 
 float YoshidaMath::Length(const Vector2& v)
 {
-    return { sqrtf(Dot(v,v)) };
+    return { sqrtf(YoshidaMath::Dot(v,v)) };
 }
 
 Vector2 YoshidaMath::Normalize(const Vector2& v)
@@ -22,12 +23,7 @@ Vector2 YoshidaMath::Normalize(const Vector2& v)
     }
 }
 
-Vector3 YoshidaMath::GetForward(const float angle) {
+Vector3 YoshidaMath::GetForward(const Matrix4x4& m) {
 
-    Matrix4x4 rotationZMatrix;
-
-    rotationZMatrix = Function::MakeRotateZMatrix(angle);
-    Vector3 localForward = { 0.0f, 0.0f, 1.0f };
-    return Function::TransformVM(localForward, rotationZMatrix);
+    return  Function::Normalize({ m.m[2][0],m.m[2][1], m.m[2][2] });
 }
-

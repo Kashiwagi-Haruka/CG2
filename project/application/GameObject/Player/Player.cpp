@@ -1,16 +1,19 @@
 #include "Player.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
-
+#include"Animation/Animation.h"
 #include "Model/ModelManager.h"
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
 #include"GameObject/KeyBindConfig.h"
 #include<imgui.h>
 #include"GameObject/YoshidaMath/Easing.h"
+#include<imgui.h>
+
 namespace PlayerConst{
     const constexpr float kRotateYSpeed = 0.25f;
     const constexpr float kSneakSpeed = 0.125f;
     const constexpr float kWalkSpeed = 0.25f;
+
 };
 
 Player::Player()
@@ -40,6 +43,10 @@ void Player::Initialize()
     velocity_ = { 0.0f,0.0f,0.0f };
     speed_ = { 0.0f };
 
+    //カメラの感度をここで宣言していて良くない
+    eyeRotateSpeed_ = 0.3f;
+    eyeRotateX_ = 0.0f;
+
     tempDirection_ = { 0.0f };
     //アニメーションクリップ
     animationClips_ = Animation::LoadAnimationClips("Resources/3d/human", "walk");
@@ -65,7 +72,7 @@ void Player::Update()
 {
     //移動処理
     Move();
-
+    Rotate();
     bodyObj_->SetTransform(transform_);
     bodyObj_->Update();
     //アニメーション
@@ -83,6 +90,13 @@ void Player::Debug()
 {
 #ifdef USE_IMGUI
     if (ImGui::Begin("Human")) {
+
+        if (ImGui::TreeNode("Eye")) {
+            ImGui::DragFloat("eyeRotateSpeed", &eyeRotateSpeed_, 0.1f,0.1f);
+            ImGui::DragFloat("eyeRotateX", &eyeRotateX_, 0.1f);
+            ImGui::TreePop();
+        }
+
         if (ImGui::TreeNode("Transform")) {
             ImGui::DragFloat3("Scale", &transform_.scale.x, 0.1f);
             ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.1f);
@@ -130,32 +144,62 @@ void Player::Move()
     }
 
     //xy成分だけ正規化
-    Vector2 direction = YoshidaMath::Normalize({ velocity_.x,velocity_.z });
-    // Y軸回転（左右）
-   
-    transform_.rotate.y = YoshidaMath::Easing::Lerp(transform_.rotate.y, std::atan2(tempDirection_.x, tempDirection_.y), PlayerConst::kRotateYSpeed);
-
+    Vector3 horizontal = Function::Normalize({ velocity_.x,0.0f,velocity_.z });
+    //Y回転
+    float yaw = std::atan2(tempDirection_.x, tempDirection_.y);
+    //ベクトルのXZ長さ
     float length = YoshidaMath::Length(Vector2{ velocity_.x,velocity_.z });
     speed_ = (playerCommand->Sneak() || length <= 0.5f) ? PlayerConst::kSneakSpeed: PlayerConst::kWalkSpeed;
+
+    //計算を入れる
+    bodyObj_->SetTransform(transform_);
+    bodyObj_->Update();
 
     if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
 
         //動いていたら
-        tempDirection_ = direction;
+        tempDirection_ = horizontal;
 
         //前の方向を取得
-        Vector3 forward = YoshidaMath::GetForward(transform_.rotate.z);
+        Vector3 forward = YoshidaMath::GetForward(bodyObj_->GetWorldMatrix());
         forward.y = 0.0f;
 
         // forwardに垂直な右方向ベクトルを計算
-        Vector3 right = Function::Cross(Vector3(0, 1, 0), forward);
+        Vector3 right = Function::Cross({ 0.0f, 1.0f, 0.0f }, forward);
         right = Function::Normalize(right);
         //速度を正規化しそれぞれ足す
-
-        transform_.translate += forward * direction.y * speed_;
-        transform_.translate += right * direction.x * speed_;
+        transform_.translate += forward * horizontal.z * speed_;
+        transform_.translate += right * horizontal.x * speed_;
     }
 
+}
+
+void Player::Rotate()
+{
+    auto* input = Input::GetInstance();
+   
+    Vector2 inputMovePos = input->GetJoyStickRXY();
+    float dPitch = 0.0f;
+    float dYaw = 0.0f;
+
+    if (fabs(inputMovePos.x) > 0.0f || fabs(inputMovePos.y) > 0.0f) {
+        //スティック処理が優先される
+        dYaw = inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_* 2.0f;
+        dPitch = -inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_* 2.0f;
+    } else {
+        //マウス
+       inputMovePos = input->GetMouseMove();
+       dYaw += inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_;
+       dPitch += inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_;
+    }
+
+    eyeRotateX_ += dPitch;
+    transform_.rotate.y += dYaw;
+
+    eyeRotateX_ = std::clamp(
+        eyeRotateX_,
+        -Function::kPi *0.5f,
+        Function::kPi *0.5f);
 
 }
 

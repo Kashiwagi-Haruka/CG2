@@ -1,9 +1,6 @@
 #include "Portal.h"
 #include"Function.h"
-
-namespace {
-    const float kDeltaTime = 1.0f/60.0f;
-}
+#include"application/GameObject/YoshidaMath/YoshidaMath.h"
 Portal::Portal()
 {
     ring_ = std::make_unique<Primitive>();
@@ -22,7 +19,7 @@ void Portal::Initialize()
 void Portal::Update()
 {
     ring_->Update();
-    uvTranslateY_ += kDeltaTime;
+    uvTranslateY_ += YoshidaMath::kDeltaTime;
    uvMat_ =  Function::MakeTranslateMatrix({ 0.0f,uvTranslateY_ ,0.0f });
     ring_->SetUvTransform(uvMat_);
 ;}
