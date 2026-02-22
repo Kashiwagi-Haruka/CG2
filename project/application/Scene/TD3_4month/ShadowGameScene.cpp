@@ -5,9 +5,15 @@
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
 #include<numbers>
+#include"RigidBody.h"
+#include "WinApp.h"
 
 ShadowGameScene::ShadowGameScene()
 {
+
+    warpSE_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/magic.mp3");
+    Audio::GetInstance()->SetSoundVolume(&warpSE_, 1.0f);
+
     //シーン遷移の設定
     transition_ = std::make_unique<SceneTransition>();
     //カメラの設定
@@ -26,11 +32,13 @@ ShadowGameScene::ShadowGameScene()
     testField_ = std::make_unique<TestField>();
     //Portal
     portal_ = std::make_unique<Portal>();
+
+
 }
 
 ShadowGameScene::~ShadowGameScene()
 {
-
+    Audio::GetInstance()->SoundUnload(&warpSE_);
 }
 
 void ShadowGameScene::Initialize()
@@ -52,10 +60,13 @@ void ShadowGameScene::Initialize()
     //Portalの初期化処理
     portal_->Initialize();
     portal_->SetCamera(camera_.get());
+    //ワープSEの再生フラグ
+    isWarpSESound_ = false;
 }
 
 void ShadowGameScene::Update()
 {
+
     //シーン遷移の更新処理
     UpdateSceneTransition();
     //ライトの更新処理
@@ -64,6 +75,8 @@ void ShadowGameScene::Update()
     UpdateCamera();
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
+    //オブジェクトの当たり判定
+    CheckCollision();
 }
 
 void ShadowGameScene::Draw()
@@ -74,6 +87,9 @@ void ShadowGameScene::Draw()
     DrawSceneTransition();
     //ゲームオブジェクトの描画処理
     DrawGameObject();
+
+
+
 }
 
 void ShadowGameScene::Finalize()
@@ -87,6 +103,30 @@ void ShadowGameScene::DebugImGui()
     ImGui::End();
 #endif // USE_IMGUI
 }
+
+void ShadowGameScene::CheckCollision()
+{
+#ifdef USE_IMGUI
+    ImGui::Begin("RigidBodyGetWorldAABB");
+    AABB aabb = player_->GetWorldAABB();
+    ImGui::DragFloat3("playerAABBMin", &aabb.min.x, 0.0f, 100.0f);
+    ImGui::DragFloat3("playerAABBMax", &aabb.max.x, 0.0f, 100.0f);
+    ImGui::DragFloat3("portalTranslate", &portal_->GetTranslate().x, 0.0f, 100.0f);
+    ImGui::End();
+#endif // USE_IMGUI
+
+    //ポータルとプレイヤーの当たり判定
+    if (RigidBody::isCollision(player_->GetWorldAABB(), portal_->GetSphere())) {
+        if (!isWarpSESound_) {
+            Audio::GetInstance()->SoundPlayWave(warpSE_, false);
+            isWarpSESound_ = true;
+        }  
+    } else {
+        isWarpSESound_ = false;
+    }
+
+}
+
 void ShadowGameScene::InitializeLights()
 {
     activePointLightCount_ = 2;
@@ -250,7 +290,7 @@ void ShadowGameScene::DrawGameObject()
     Object3dCommon::GetInstance()->DrawCommon();
 
     //Object3dCommon::GetInstance()->DrawCommonSkinningToon();
-  
+
     //テスト地面
     testField_->Draw();
     //Portalの描画処理

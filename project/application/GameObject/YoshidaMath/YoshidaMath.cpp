@@ -27,3 +27,9 @@ Vector3 YoshidaMath::GetForward(const Matrix4x4& m) {
 
     return  Function::Normalize({ m.m[2][0],m.m[2][1], m.m[2][2] });
 }
+
+
+AABB YoshidaMath::GetAABBWorldPos(const AABB& localAABB, const Vector3& worldPos)
+{
+    return  { .min = localAABB.min + worldPos,.max = localAABB.max + worldPos };
+}

@@ -14,6 +14,7 @@ void Portal::Initialize()
     ring_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
     uvTranslateY_ = 0.0f;
     uvMat_ = Function::MakeTranslateMatrix({ 0.0f,uvTranslateY_ ,0.0f });
+    sphere_ = { .center = {transform_.translate},.radius = 2.5f };
 }
 
 void Portal::Update()
@@ -32,4 +33,10 @@ void Portal::Draw()
 void Portal::SetCamera(Camera* camera)
 {
     ring_->SetCamera(camera);
+}
+
+const Sphere& Portal::GetSphere()
+{
+    sphere_ = { .center = {transform_.translate},.radius = 0.5f };
+    return sphere_;
 }

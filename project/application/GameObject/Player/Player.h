@@ -4,6 +4,10 @@
 #include "Animation/Animation.h"
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
+#include"RigidBody.h"
+#ifdef _DEBUG
+#include"Primitive/Primitive.h"
+#endif
 class Camera;
 
 class Player
@@ -12,7 +16,9 @@ private:
 #pragma region//体やメッシュの情報
     //体のObj
     std::unique_ptr<Object3d> bodyObj_ = nullptr;
-
+#ifdef _DEBUG
+    std::unique_ptr<Primitive> primitive_ = nullptr;
+#endif
     //アニメーションクリップ
     std::vector<Animation::AnimationData> animationClips_{};
     //現在のアニメーションインデックス
@@ -33,7 +39,7 @@ private:
     //カメラの感度をここで宣言していて良くない
     float eyeRotateSpeed_ = 0.3f;
     float eyeRotateX_ = 0.0f;
-
+    AABB localAABB_ = { 0.0f };
 public:
     Transform& GetTransform() { return transform_; };
     //コンストラクタ
@@ -56,5 +62,7 @@ public:
     void Animation();
     //ワールド行列の取得
     const Matrix4x4& GetWorldMatrix()const { return bodyObj_->GetWorldMatrix(); }
+    //ワールド座標のAABBの取得
+    AABB GetWorldAABB();
 };
 

@@ -13,9 +13,16 @@
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h" 
 #include "Light/AreaLight.h"
+#include"Audio.h"
+
+
 class ShadowGameScene : public BaseScene
 {
 private:
+    //BGMData
+    SoundData warpSE_;
+    bool isWarpSESound_ = false;
+
     Transform cameraTransform_ = {};
     //カメラの設定
     std::unique_ptr<Camera> camera_ = nullptr;
@@ -55,6 +62,7 @@ public:
     void Draw() override;
     void Finalize() override;
     void DebugImGui();
+    void CheckCollision();
 private:
     // =======================================
     // プライベート初期化
