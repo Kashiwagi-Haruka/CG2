@@ -5,10 +5,13 @@
 #include "SceneTransition/SceneTransition.h"
 #include "Camera.h"
 #include "DebugCamera.h"
+#pragma region //GameObject
 #include"GameObject/Player/Player.h"
 #include"GameObject/TestField/TestField.h"
 #include"GameObject/Portal/Portal.h"
+#include"GameObject/WarpPos/WarpPos1.h"
 
+#pragma endregion
 #include "Light/DirectionalLight.h" 
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h" 
@@ -28,6 +31,8 @@ private:
     std::unique_ptr<Camera> camera_ = nullptr;
     std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
     bool useDebugCamera_ = false;
+    //ワープ座標
+    std::unique_ptr<WarpPos1> warpPos_ = nullptr;
 
     //シーン遷移の設定
     std::unique_ptr<SceneTransition> transition_ = nullptr;

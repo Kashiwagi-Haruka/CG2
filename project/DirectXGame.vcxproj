@@ -231,6 +231,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Editor\Hinstance.cpp" />
     <ClCompile Include="application\GameObject\TestField\TestField.cpp" />
     <ClCompile Include="application\GameObject\Portal\Portal.cpp" />
+    <ClCompile Include="application\GameObject\WarpPos\WarpPos1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -324,6 +325,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Editor\Hinstance.h" />
     <ClInclude Include="application\GameObject\TestField\TestField.h" />
     <ClInclude Include="application\GameObject\Portal\Portal.h" />
+    <ClInclude Include="application\GameObject\WarpPos\WarpPos1.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

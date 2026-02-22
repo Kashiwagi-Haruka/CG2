@@ -32,7 +32,8 @@ ShadowGameScene::ShadowGameScene()
     testField_ = std::make_unique<TestField>();
     //Portal
     portal_ = std::make_unique<Portal>();
-
+    //ワープ座標
+    warpPos_ = std::make_unique<WarpPos1>();
 
 }
 
@@ -60,6 +61,10 @@ void ShadowGameScene::Initialize()
     //Portalの初期化処理
     portal_->Initialize();
     portal_->SetCamera(camera_.get());
+    //ワープ座標
+    warpPos_->Initialize();
+    warpPos_->SetCamera(camera_.get());
+    
     //ワープSEの再生フラグ
     isWarpSESound_ = false;
 }
@@ -120,6 +125,8 @@ void ShadowGameScene::CheckCollision()
         if (!isWarpSESound_) {
             Audio::GetInstance()->SoundPlayWave(warpSE_, false);
             isWarpSESound_ = true;
+            //ワープする
+            player_->SetTranslate(warpPos_->GetTranslate());
         }  
     } else {
         isWarpSESound_ = false;
@@ -245,6 +252,7 @@ void ShadowGameScene::UpdateGameObject()
     player_->Update();
     testField_->Update();
     portal_->Update();
+    warpPos_->Update();
 }
 void ShadowGameScene::UpdatePointLight()
 {
@@ -295,8 +303,10 @@ void ShadowGameScene::DrawGameObject()
     testField_->Draw();
     //Portalの描画処理
     portal_->Draw();
+    //ワープ地点
+    warpPos_->Draw();
     //プレイヤーの描画処理
     player_->Draw();
-
+    
 }
 #pragma endregion
