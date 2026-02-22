@@ -7,6 +7,7 @@
 #include<numbers>
 #include"RigidBody.h"
 #include "WinApp.h"
+#include"GameObject/YoshidaMath/YoshidaMath.h"
 
 ShadowGameScene::ShadowGameScene()
 {

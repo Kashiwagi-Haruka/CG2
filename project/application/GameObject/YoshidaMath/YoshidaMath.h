@@ -11,4 +11,6 @@ namespace YoshidaMath {
     Vector3 GetForward(const Matrix4x4& m);
     const float kDeltaTime = 1.0f / 60.0f;
     AABB GetAABBWorldPos(const AABB& localAabb,const Vector3& worldPos) ;
+    bool RayIntersectsAABB(const Ray& ray, const AABB& box, float& tMin, float& tMax);
+    Vector3 GetWorldPosByMat(const Matrix4x4& mat);
 }

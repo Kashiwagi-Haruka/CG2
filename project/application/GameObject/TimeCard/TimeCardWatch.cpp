@@ -1,9 +1,11 @@
 #include "TimeCardWatch.h"
 #include"Model/ModelManager.h"
 #include"Function.h"
+#include"GameObject/YoshidaMath/YoshidaMath.h"
 #include<imgui.h>
-
+#include"GameObject/KeyBindConfig.h"
 namespace {
+    float tMin_ = 0.1f;
     float rayDiff = 10.0f;
 }
 
@@ -22,7 +24,7 @@ void TimeCardWatch::Initialize()
     line_->Initialize(Primitive::Box);
     line_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
     transform_ = { .scale = {10.0f,10.0f,10.0f},.rotate = {-1.5f,0.0f,2.55f},.translate = {1.5f,-1.2f,0.75f} };
-    lineTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate  = {0.0f,0.0f,0.0f} };
+    lineTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
 }
 
 void TimeCardWatch::SetCamera(Camera* camera)
@@ -39,7 +41,7 @@ void TimeCardWatch::Update()
     Matrix4x4 parent = Function::MakeAffineMatrix(parentTransform_->scale, parentTransform_->rotate, parentTransform_->translate);
     child = Function::Multiply(child, parent);
 
-    Vector3 worldPos = { child.m[2][0], child.m[2][1], child.m[2][2] };
+    Vector3 worldPos = YoshidaMath::GetWorldPosByMat(child);
 
     Vector3 end = {
      .x = ray_.origin.x + ray_.diff.x * rayDiff,
@@ -49,7 +51,7 @@ void TimeCardWatch::Update()
 
     lineTransform_.translate = end;
     line_->SetTransform(lineTransform_);
- /*   line_->SetLinePositions(worldPos, end);*/
+    /*   line_->SetLinePositions(worldPos, end);*/
     line_->Update();
 
     modelObj_->SetWorldMatrix(child);
@@ -79,9 +81,20 @@ void TimeCardWatch::SetRay(const Vector3& origin, const Vector3& diff)
 {
     ray_.origin = origin;
     ray_.diff = diff;
+}
 
-    //ray_.diff.x = std::cosf(parentTransform_->rotate.y);
-    //ray_.diff.z =  std::sinf(parentTransform_->rotate.y);
+void TimeCardWatch::OnCollisionObjOfMakePortal(const AABB& aabb)
+{
+    //ポータル作れるよ
+    bool canMakePortal = YoshidaMath::RayIntersectsAABB(ray_, aabb, tMin_, rayDiff);
 
+    if (canMakePortal) {
 
+        if (PlayerCommand::GetInstance()->Shot()) {
+            //ショットしたら
+
+            //ポータル作る
+        }
+
+    };
 }

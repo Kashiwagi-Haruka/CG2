@@ -3,6 +3,7 @@
 #include<memory>
 #include"RigidBody.h"
 #include"Primitive/Primitive.h"
+
 class Camera;
 class TimeCardWatch
 {
@@ -14,6 +15,7 @@ public:
     void Draw();
     void SetRay(const Vector3& origin,const Vector3& diff);
     void SetTransformPtr(Transform* transform) { parentTransform_ = transform; };
+    void OnCollisionObjOfMakePortal(const AABB& aabb);
 private:
     std::unique_ptr<Object3d> modelObj_ = nullptr;
     Ray ray_;
