@@ -24,6 +24,8 @@ ShadowGameScene::ShadowGameScene()
     player_ = std::make_unique<Player>();
     //テスト地面
     testField_ = std::make_unique<TestField>();
+    //Portal
+    portal_ = std::make_unique<Portal>();
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -47,6 +49,9 @@ void ShadowGameScene::Initialize()
     testField_->Initialize();
     testField_->SetCamera(camera_.get());
     InitializeLights();
+    //Portalの初期化処理
+    portal_->Initialize();
+    portal_->SetCamera(camera_.get());
 }
 
 void ShadowGameScene::Update()
@@ -199,6 +204,7 @@ void ShadowGameScene::UpdateGameObject()
 
     player_->Update();
     testField_->Update();
+    portal_->Update();
 }
 void ShadowGameScene::UpdatePointLight()
 {
@@ -244,8 +250,11 @@ void ShadowGameScene::DrawGameObject()
     Object3dCommon::GetInstance()->DrawCommon();
 
     //Object3dCommon::GetInstance()->DrawCommonSkinningToon();
-
+  
+    //テスト地面
     testField_->Draw();
+    //Portalの描画処理
+    portal_->Draw();
     //プレイヤーの描画処理
     player_->Draw();
 

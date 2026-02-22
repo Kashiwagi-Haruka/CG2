@@ -132,6 +132,7 @@ void Player::Move()
     //xy成分だけ正規化
     Vector2 direction = YoshidaMath::Normalize({ velocity_.x,velocity_.z });
     // Y軸回転（左右）
+   
     transform_.rotate.y = YoshidaMath::Easing::Lerp(transform_.rotate.y, std::atan2(tempDirection_.x, tempDirection_.y), PlayerConst::kRotateYSpeed);
 
     float length = YoshidaMath::Length(Vector2{ velocity_.x,velocity_.z });
