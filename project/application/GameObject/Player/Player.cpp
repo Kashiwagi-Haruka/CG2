@@ -7,7 +7,6 @@
 #include"GameObject/KeyBindConfig.h"
 #include<imgui.h>
 #include"GameObject/YoshidaMath/Easing.h"
-#include<imgui.h>
 
 namespace PlayerConst {
     const constexpr float kRotateYSpeed = 0.25f;
@@ -20,47 +19,37 @@ Player::Player()
 {
     //体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
-#ifdef _DEBUG
-    //Primitiveの生成
-    primitive_ = std::make_unique<Primitive>();
-#endif
     //モデルの読み込み
     ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "walk");
     ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "sneakWalk");
 }
 void Player::SetCamera(Camera* camera)
 {
+    //カメラのセット
     bodyObj_->SetCamera(camera);
-#ifdef _DEBUG
-    primitive_->SetCamera(camera);
-#endif
 }
 void Player::Initialize()
 {
+    //体の初期化
     bodyObj_->Initialize();
-
+    //体にモデル挿入
     bodyObj_->SetModel("walk");
-
+    //座標の初期化
     transform_ = {
     .scale{100.0f,100.0f,100.0f},
     .rotate{-YoshidaMath::PI / 2.0f, 0.0f, 0.0f  },
     .translate{0.0f,1.0f,-3.0f}
     };
-
-    velocity_ = { 0.0f,0.0f,0.0f };
-    speed_ = { 0.0f };
+    //速度の初期化
+    velocity_ = { 0.0f};
+    //
+    moveSpeed_ = { 0.0f };
 
     localAABB_ = { .min = {-1.0f,0.0f,-1.0f},.max = {1.0f,1.0f,1.0f} };
-#ifdef _DEBUG
-    primitive_->Initialize(Primitive::Box);
-  
-#endif
 
     //カメラの感度をここで宣言していて良くない
     eyeRotateSpeed_ = 0.3f;
     eyeRotateX_ = 0.0f;
-
-    tempDirection_ = { 0.0f };
     //アニメーションクリップ
     animationClips_ = Animation::LoadAnimationClips("Resources/3d/human", "walk");
     std::vector<Animation::AnimationData> sneakClips = Animation::LoadAnimationClips("Resources/3d/human", "sneakWalk");
@@ -88,10 +77,6 @@ void Player::Update()
     Rotate();
     bodyObj_->SetTransform(transform_);
     bodyObj_->Update();
-#ifdef _DEBUG
-    primitive_->SetTransform(transform_);
-    primitive_->Update();
-#endif
     //アニメーション
     Animation();
     //デバック
@@ -102,9 +87,6 @@ void Player::Draw()
 {
     bodyObj_->Draw();
 
-#ifdef _DEBUG
-    primitive_->Draw();
-#endif
 }
 
 void Player::Debug()
@@ -167,20 +149,16 @@ void Player::Move()
     //xy成分だけ正規化
     Vector3 horizontal = Function::Normalize({ velocity_.x,0.0f,velocity_.z });
     //Y回転
-    float yaw = std::atan2(tempDirection_.x, tempDirection_.y);
+    float yaw = std::atan2(horizontal.x, horizontal.y);
     //ベクトルのXZ長さ
     float length = YoshidaMath::Length(Vector2{ velocity_.x,velocity_.z });
-    speed_ = (playerCommand->Sneak() || length <= 0.5f) ? PlayerConst::kSneakSpeed : PlayerConst::kWalkSpeed;
+    moveSpeed_ = (playerCommand->Sneak() || length <= 0.5f) ? PlayerConst::kSneakSpeed : PlayerConst::kWalkSpeed;
 
     //計算を入れる
     bodyObj_->SetTransform(transform_);
     bodyObj_->Update();
 
     if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
-
-        //動いていたら
-        tempDirection_ = horizontal;
-
         //前の方向を取得
         Vector3 forward = YoshidaMath::GetForward(bodyObj_->GetWorldMatrix());
         forward.y = 0.0f;
@@ -189,8 +167,8 @@ void Player::Move()
         Vector3 right = Function::Cross({ 0.0f, 1.0f, 0.0f }, forward);
         right = Function::Normalize(right);
         //速度を正規化しそれぞれ足す
-        transform_.translate += forward * horizontal.z * speed_;
-        transform_.translate += right * horizontal.x * speed_;
+        transform_.translate += forward * horizontal.z * moveSpeed_;
+        transform_.translate += right * horizontal.x * moveSpeed_;
     }
 
 }

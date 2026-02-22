@@ -5,9 +5,6 @@
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
 #include"RigidBody.h"
-#ifdef _DEBUG
-#include"Primitive/Primitive.h"
-#endif
 class Camera;
 
 class Player
@@ -16,9 +13,6 @@ private:
 #pragma region//体やメッシュの情報
     //体のObj
     std::unique_ptr<Object3d> bodyObj_ = nullptr;
-#ifdef _DEBUG
-    std::unique_ptr<Primitive> primitive_ = nullptr;
-#endif
     //アニメーションクリップ
     std::vector<Animation::AnimationData> animationClips_{};
     //現在のアニメーションインデックス
@@ -30,18 +24,19 @@ private:
     //アニメーション時間
     float animationTime_ = 0.0f;
 #pragma endregion
-    //体のtransform
+    //体の座標
     Transform transform_{};
+    //速度
     Vector3 velocity_ = { 0.0f };
-    float speed_ = { 0.0f };
-    Vector3 tempDirection_ = { 0.0f };
-
+    //移動の速さ
+    float moveSpeed_ = { 0.0f };
     //カメラの感度をここで宣言していて良くない
     float eyeRotateSpeed_ = 0.3f;
     float eyeRotateX_ = 0.0f;
     AABB localAABB_ = { 0.0f };
 public:
-    Transform& GetTransform() { return transform_; };
+    const Transform& GetTransform() { return transform_; };
+    void SetTranslate(const Vector3& translate) {  transform_.translate = translate; };
     //コンストラクタ
     Player();
     //カメラのセッター
