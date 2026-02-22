@@ -17,8 +17,11 @@ public:
 private:
     std::unique_ptr<Primitive>ring_ = nullptr;
     Transform transform_ = {};
+    std::unique_ptr<Primitive>sphereMesh_ = nullptr;
+    Transform sphereTransform_ = {};
     Matrix4x4 uvMat_ = { 0.0f };
     float uvTranslateY_ = 0.0f ;
     Sphere sphere_ = {0.0f};
+    
 };
 
