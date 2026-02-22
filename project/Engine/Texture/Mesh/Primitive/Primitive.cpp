@@ -545,6 +545,8 @@ void Primitive::Initialize(PrimitiveName name, uint32_t slices) {
 	materialData_->environmentCoefficient = 0.0f;
 	materialData_->grayscaleEnabled = 0;
 	materialData_->sepiaEnabled = 0;
+	materialData_->distortionStrength = 0.0f;
+	materialData_->distortionFalloff = 1.0f;
 	materialResource_->Unmap(0, nullptr);
 
 	const std::string texturePath = "Resources/3d/uvChecker.png";
@@ -771,7 +773,17 @@ void Primitive::SetSepiaEnabled(bool enable) {
 	materialData_->sepiaEnabled = enable ? 1 : 0;
 	materialResource_->Unmap(0, nullptr);
 }
+void Primitive::SetDistortionStrength(float strength) {
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	materialData_->distortionStrength = strength;
+	materialResource_->Unmap(0, nullptr);
+}
 
+void Primitive::SetDistortionFalloff(float falloff) {
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	materialData_->distortionFalloff = falloff;
+	materialResource_->Unmap(0, nullptr);
+}
 Vector4 Primitive::GetColor() const {
 	if (materialData_) {
 		return materialData_->color;
@@ -812,4 +824,16 @@ bool Primitive::IsSepiaEnabled() const {
 		return materialData_->sepiaEnabled != 0;
 	}
 	return false;
+}
+float Primitive::GetDistortionStrength() const {
+	if (materialData_) {
+		return materialData_->distortionStrength;
+	}
+	return 0.0f;
+}
+float Primitive::GetDistortionFalloff() const {
+	if (materialData_) {
+		return materialData_->distortionFalloff;
+	}
+	return 1.0f;
 }

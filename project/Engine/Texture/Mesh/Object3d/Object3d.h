@@ -35,7 +35,8 @@ class Object3d {
 		float environmentCoefficient;
 		int grayscaleEnabled;
 		int sepiaEnabled;
-		float padding2[2];
+		float distortionStrength;
+		float distortionFalloff;
 	};
 
 	Transform transform_ = {
@@ -88,6 +89,8 @@ public:
 	void SetEnableLighting(bool enable);
 	void SetGrayscaleEnabled(bool enable);
 	void SetSepiaEnabled(bool enable);
+	void SetDistortionStrength(float strength);
+	void SetDistortionFalloff(float falloff);
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetShininess(float shininess);
 	void SetEnvironmentCoefficient(float coefficient);
@@ -97,6 +100,8 @@ public:
 	float GetEnvironmentCoefficient() const;
 	bool IsGrayscaleEnabled() const;
 	bool IsSepiaEnabled() const;
+	float GetDistortionStrength() const;
+	float GetDistortionFalloff() const;
 	void SetAnimation(const Animation::AnimationData* animation, bool loop = true) {
 		animation_ = animation;
 		isLoopAnimation_ = loop;

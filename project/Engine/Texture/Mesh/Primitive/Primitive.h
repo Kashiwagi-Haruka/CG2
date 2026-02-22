@@ -41,7 +41,8 @@ private:
 		float environmentCoefficient;
 		int grayscaleEnabled;
 		int sepiaEnabled;
-		float padding2[2];
+		float distortionStrength;
+		float distortionFalloff;
 	};
 	struct alignas(256) TransformationMatrix {
 		Matrix4x4 WVP;                   // 64 バイト
@@ -122,6 +123,10 @@ public:
 	void SetGrayscaleEnabled(bool enable);
 	// セピア有効/無効
 	void SetSepiaEnabled(bool enable);
+	// 歪み回転の強さを設定
+	void SetDistortionStrength(float strength);
+	// 歪み回転の外側への効き方を設定
+	void SetDistortionFalloff(float falloff);
 	// 現在の Transform を取得
 	Transform GetTransform() const { return transform_; }
 	// 現在のマテリアル値を取得
@@ -131,6 +136,8 @@ public:
 	float GetEnvironmentCoefficient() const;
 	bool IsGrayscaleEnabled() const;
 	bool IsSepiaEnabled() const;
+	float GetDistortionStrength() const;
+	float GetDistortionFalloff() const;
 
 private:
 	// Line 描画時に使う始点

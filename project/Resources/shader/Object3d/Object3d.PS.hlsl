@@ -9,7 +9,8 @@ struct Material
     float environmentCoefficient;
     int grayscaleEnabled;
     int sepiaEnabled;
-    float2 padding2;
+    float distortionStrength;
+    float distortionFalloff;
 };
 struct DirectionalLight
 {
@@ -118,7 +119,7 @@ float ComputeMicroShadow(float3 normal, float3 toLight, float3 toEye)
     // シャドウマップ以外の陰りはハーフランバートで制御する。
     // ※toEyeはインターフェース維持のため受け取る。
     float NdotL = saturate(dot(normal, toLight));
-    (void) toEye;
+    (float3) toEye;
     return pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
 }
 
@@ -173,7 +174,18 @@ PixelShaderOutput main(VertexShaderOutput input)
     PixelShaderOutput output;
     const float pi = 3.14159265f;
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-
+    float2 distortionCenter = float2(0.5f, 0.5f);
+    float2 offsetFromCenter = transformedUV.xy - distortionCenter;
+    float distanceFromCenter = length(offsetFromCenter);
+    float distortionWeight = saturate(distanceFromCenter * max(gMaterial.distortionFalloff, 0.001f));
+    float twistAngle = distortionWeight * gMaterial.distortionStrength * (2.0f * pi);
+    float sineValue = sin(twistAngle);
+    float cosineValue = cos(twistAngle);
+    float2 twistedOffset = float2(
+        offsetFromCenter.x * cosineValue - offsetFromCenter.y * sineValue,
+        offsetFromCenter.x * sineValue + offsetFromCenter.y * cosineValue);
+    float radialScale = 1.0f + distortionWeight * abs(gMaterial.distortionStrength) * 0.2f;
+    transformedUV.xy = distortionCenter + twistedOffset * radialScale;
     float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
     if (gMaterial.enableLighting != 0)
     {
