@@ -36,6 +36,8 @@ ShadowGameScene::ShadowGameScene()
     warpPos_ = std::make_unique<WarpPos1>();
     //ホワイトボード管理
     whiteBoardManager_ = std::make_unique<WhiteBoardManager>();
+    //携帯打刻機
+    timeCardWatch_ = std::make_unique<TimeCardWatch>();
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -70,6 +72,11 @@ void ShadowGameScene::Initialize()
     whiteBoardManager_->SetCamera(camera_.get());
     //ワープSEの再生フラグ
     isWarpSESound_ = false;
+    //携帯打刻機
+    timeCardWatch_->Initialize();
+    timeCardWatch_->SetCamera(camera_.get());
+    //Playerの座標のポインタを入れる
+    timeCardWatch_->SetTransformPtr(&player_->GetTransform());
 }
 
 void ShadowGameScene::Update()
@@ -77,12 +84,13 @@ void ShadowGameScene::Update()
 
     //シーン遷移の更新処理
     UpdateSceneTransition();
-    //ライトの更新処理
-    UpdatePointLight();
     //カメラの更新処理
     UpdateCamera();
+    //ライトの更新処理
+    UpdatePointLight();
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
+
     //オブジェクトの当たり判定
     CheckCollision();
 }
@@ -244,16 +252,24 @@ void ShadowGameScene::UpdateSceneTransition()
 
 void ShadowGameScene::UpdateGameObject()
 {
+#pragma region//Lightを組み込む
     Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
     Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
     Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
     Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
+#pragma endregion
 
+#pragma region//ゲームオブジェクト
     player_->Update();
+    timeCardWatch_->SetRay(player_->GetTransform().translate, player_->GetForward());
+    timeCardWatch_->Update();
+
     testField_->Update();
     portal_->Update();
     warpPos_->Update();
     whiteBoardManager_->Update();
+
+#pragma endregion
 }
 void ShadowGameScene::UpdatePointLight()
 {
@@ -306,10 +322,13 @@ void ShadowGameScene::DrawGameObject()
     portal_->Draw();
     //ワープ地点
     warpPos_->Draw();
-    //プレイヤーの描画処理
-    player_->Draw();
     //ホワイトボード管理
     whiteBoardManager_->Draw();
+    //携帯打刻機の描画処理
+    timeCardWatch_->Draw();
+    //プレイヤーの描画処理
+    player_->Draw();
+
 
 }
 #pragma endregion

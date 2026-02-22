@@ -11,6 +11,7 @@
 #include"GameObject/Portal/Portal.h"
 #include"GameObject/WarpPos/WarpPos1.h"
 #include"GameObject/WhiteBoard/WhiteBoardManager.h"
+#include"GameObject/TimeCard/TimeCardWatch.h"
 
 #pragma endregion
 #include "Light/DirectionalLight.h" 
@@ -22,34 +23,47 @@
 class ShadowGameScene : public BaseScene
 {
 private:
-    //BGMData
+
+#pragma region//音の設定
+    //音楽
     SoundData warpSE_;
     bool isWarpSESound_ = false;
-
+#pragma endregion
+#pragma region//カメラの設定
     Transform cameraTransform_ = {};
     //カメラの設定
     std::unique_ptr<Camera> camera_ = nullptr;
     std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
     bool useDebugCamera_ = false;
-    //ワープ座標
-    std::unique_ptr<WarpPos1> warpPos_ = nullptr;
-    //ホワイトボード管理
-    std::unique_ptr<WhiteBoardManager> whiteBoardManager_ = nullptr;
+#pragma endregion
 
+#pragma region//シーン遷移の設定
     //シーン遷移の設定
     std::unique_ptr<SceneTransition> transition_ = nullptr;
+    //遷移入り
     bool isTransitionIn_ = false;
+    //遷移抜け
     bool isTransitionOut_ = false;
+#pragma endregion
 
+#pragma region//ゲームオブジェクトの設定
     //Player
     std::unique_ptr<Player> player_ = nullptr;
     //TestField
     std::unique_ptr<TestField> testField_ = nullptr;
     //ポータル
     std::unique_ptr<Portal> portal_ = nullptr;
+    //ワープ座標
+    std::unique_ptr<WarpPos1> warpPos_ = nullptr;
+    //ホワイトボード管理
+    std::unique_ptr<WhiteBoardManager> whiteBoardManager_ = nullptr;
+    //携帯打刻機
+    std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
+#pragma endregion
+
 #pragma region// light
     //DirectionalLight
-    DirectionalLight directionalLight_{}; 
+    DirectionalLight directionalLight_{};
     //PointLight
     std::array<PointLight, kMaxPointLights> pointLights_{};
     uint32_t activePointLightCount_ = 0;
@@ -61,14 +75,21 @@ private:
     uint32_t activeAreaLightCount_ = 0;
 #pragma endregion
 public:
+    //シーンのコンストラクタ
     ShadowGameScene();
+    //デストラクタ
     ~ShadowGameScene() override;
-
+    //初期化処理
     void Initialize() override;
+    //更新処理
     void Update() override;
+    //描画処理
     void Draw() override;
+    //終了処理
     void Finalize() override;
+    //デバック
     void DebugImGui();
+    //衝突判定チェック
     void CheckCollision();
 private:
     // =======================================

@@ -36,13 +36,14 @@ void Player::Initialize()
     bodyObj_->SetModel("walk");
     //座標の初期化
     transform_ = {
-    .scale{100.0f,100.0f,100.0f},
+    .scale{1.0f,1.0f,1.0f},
     .rotate{-YoshidaMath::PI / 2.0f, 0.0f, 0.0f  },
-    .translate{0.0f,1.0f,-3.0f}
+    .translate{0.0f,0.0f,0.0f}
     };
     //速度の初期化
     velocity_ = { 0.0f};
-    //
+    forward_ = { 0.0f };
+
     moveSpeed_ = { 0.0f };
 
     localAABB_ = { .min = {-1.0f,0.0f,-1.0f},.max = {1.0f,1.0f,1.0f} };
@@ -154,20 +155,16 @@ void Player::Move()
     float length = YoshidaMath::Length(Vector2{ velocity_.x,velocity_.z });
     moveSpeed_ = (playerCommand->Sneak() || length <= 0.5f) ? PlayerConst::kSneakSpeed : PlayerConst::kWalkSpeed;
 
-    //計算を入れる
-    bodyObj_->SetTransform(transform_);
-    bodyObj_->Update();
-
     if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
         //前の方向を取得
-        Vector3 forward = YoshidaMath::GetForward(bodyObj_->GetWorldMatrix());
-        forward.y = 0.0f;
+        forward_ = YoshidaMath::GetForward(bodyObj_->GetWorldMatrix());
+        forward_.y = 0.0f;
 
         // forwardに垂直な右方向ベクトルを計算
-        Vector3 right = Function::Cross({ 0.0f, 1.0f, 0.0f }, forward);
+        Vector3 right = Function::Cross({ 0.0f, 1.0f, 0.0f }, forward_);
         right = Function::Normalize(right);
         //速度を正規化しそれぞれ足す
-        transform_.translate += forward * horizontal.z * moveSpeed_;
+        transform_.translate += forward_ * horizontal.z * moveSpeed_;
         transform_.translate += right * horizontal.x * moveSpeed_;
     }
 

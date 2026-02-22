@@ -234,6 +234,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\WarpPos\WarpPos1.cpp" />
     <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoard.cpp" />
     <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoardManager.cpp" />
+    <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -330,6 +331,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\WarpPos\WarpPos1.h" />
     <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoard.h" />
     <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoardManager.h" />
+    <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

@@ -8,7 +8,7 @@ Portal::Portal()
 
 void Portal::Initialize()
 {
-    transform_ = { .scale = {2.5f,5.0f,2.5f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,2.5f,0.0f} };
+    transform_ = { .scale = {1.5f,3.0f,1.5f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,1.5f,0.0f} };
     ring_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/atHome.jpg");
     ring_->SetTransform(transform_);
     ring_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
