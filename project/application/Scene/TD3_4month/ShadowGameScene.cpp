@@ -261,7 +261,7 @@ void ShadowGameScene::UpdateGameObject()
 
 #pragma region//ゲームオブジェクト
     player_->Update();
-    timeCardWatch_->SetRay(player_->GetTransform().translate, player_->GetForward());
+    timeCardWatch_->SetRay(camera_->GetTranslate(), player_->GetForward());
     timeCardWatch_->Update();
 
     testField_->Update();

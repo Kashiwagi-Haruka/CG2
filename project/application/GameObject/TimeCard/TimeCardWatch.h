@@ -20,5 +20,6 @@ private:
     std::unique_ptr<Primitive> line_ = nullptr;
     Transform* parentTransform_ = nullptr;
     Transform transform_ = {};
+    Transform lineTransform_ = {};
 };
 

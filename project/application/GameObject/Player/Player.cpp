@@ -154,17 +154,18 @@ void Player::Move()
     //ベクトルのXZ長さ
     float length = YoshidaMath::Length(Vector2{ velocity_.x,velocity_.z });
     moveSpeed_ = (playerCommand->Sneak() || length <= 0.5f) ? PlayerConst::kSneakSpeed : PlayerConst::kWalkSpeed;
+    //前の方向を取得
+    forward_ = YoshidaMath::GetForward(bodyObj_->GetWorldMatrix());
 
     if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
-        //前の方向を取得
-        forward_ = YoshidaMath::GetForward(bodyObj_->GetWorldMatrix());
-        forward_.y = 0.0f;
+        Vector3 forward = forward_;
+        forward.y = 0.0f;
 
         // forwardに垂直な右方向ベクトルを計算
-        Vector3 right = Function::Cross({ 0.0f, 1.0f, 0.0f }, forward_);
+        Vector3 right = Function::Cross({ 0.0f, 1.0f, 0.0f }, forward);
         right = Function::Normalize(right);
         //速度を正規化しそれぞれ足す
-        transform_.translate += forward_ * horizontal.z * moveSpeed_;
+        transform_.translate += forward * horizontal.z * moveSpeed_;
         transform_.translate += right * horizontal.x * moveSpeed_;
     }
 
