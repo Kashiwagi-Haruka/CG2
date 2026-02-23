@@ -2,6 +2,7 @@
 #include "Hinstance.h"
 #include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
+#include "Function.h"
 #include "Object3d/Object3d.h"
 #include "Primitive/Primitive.h"
 #ifdef USE_IMGUI
@@ -130,9 +131,13 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 		    {"environmentCoefficient", material.environmentCoefficient                                         },
 		    {"grayscaleEnabled",       material.grayscaleEnabled                                               },
 		    {"sepiaEnabled",           material.sepiaEnabled		                                           },
+		    {"uvScale",                {material.uvScale.x, material.uvScale.y, material.uvScale.z}            },
+		    {"uvRotate",               {material.uvRotate.x, material.uvRotate.y, material.uvRotate.z}         },
+		    {"uvTranslate",            {material.uvTranslate.x, material.uvTranslate.y, material.uvTranslate.z}},
 		};
 		root["objects"].push_back(objectJson);
 	}
+
 
 	for (size_t i = 0; i < primitives_.size(); ++i) {
 		const Primitive* primitive = primitives_[i];
@@ -156,6 +161,9 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 		    {"environmentCoefficient", material.environmentCoefficient                                         },
 		    {"grayscaleEnabled",       material.grayscaleEnabled                                               },
 		    {"sepiaEnabled",           material.sepiaEnabled		                                           },
+		    {"uvScale",                {material.uvScale.x, material.uvScale.y, material.uvScale.z}            },
+		    {"uvRotate",               {material.uvRotate.x, material.uvRotate.y, material.uvRotate.z}         },
+		    {"uvTranslate",            {material.uvTranslate.x, material.uvTranslate.y, material.uvTranslate.z}},
 		};
 		root["primitives"].push_back(primitiveJson);
 	}
@@ -222,6 +230,15 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 				if (materialJson.contains("sepiaEnabled") && materialJson["sepiaEnabled"].is_boolean()) {
 					material.sepiaEnabled = materialJson["sepiaEnabled"].get<bool>();
 				}
+				if (materialJson.contains("uvScale") && materialJson["uvScale"].is_array() && materialJson["uvScale"].size() == 3) {
+					material.uvScale = {materialJson["uvScale"][0].get<float>(), materialJson["uvScale"][1].get<float>(), materialJson["uvScale"][2].get<float>()};
+				}
+				if (materialJson.contains("uvRotate") && materialJson["uvRotate"].is_array() && materialJson["uvRotate"].size() == 3) {
+					material.uvRotate = {materialJson["uvRotate"][0].get<float>(), materialJson["uvRotate"][1].get<float>(), materialJson["uvRotate"][2].get<float>()};
+				}
+				if (materialJson.contains("uvTranslate") && materialJson["uvTranslate"].is_array() && materialJson["uvTranslate"].size() == 3) {
+					material.uvTranslate = {materialJson["uvTranslate"][0].get<float>(), materialJson["uvTranslate"][1].get<float>(), materialJson["uvTranslate"][2].get<float>()};
+				}
 			}
 			editorMaterials_[index] = material;
 			objects_[index]->SetColor(material.color);
@@ -230,6 +247,7 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 			objects_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
 			objects_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
 			objects_[index]->SetSepiaEnabled(material.sepiaEnabled);
+			objects_[index]->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
 		}
 	}
 
@@ -279,6 +297,15 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 				if (materialJson.contains("sepiaEnabled") && materialJson["sepiaEnabled"].is_boolean()) {
 					material.sepiaEnabled = materialJson["sepiaEnabled"].get<bool>();
 				}
+				if (materialJson.contains("uvScale") && materialJson["uvScale"].is_array() && materialJson["uvScale"].size() == 3) {
+					material.uvScale = {materialJson["uvScale"][0].get<float>(), materialJson["uvScale"][1].get<float>(), materialJson["uvScale"][2].get<float>()};
+				}
+				if (materialJson.contains("uvRotate") && materialJson["uvRotate"].is_array() && materialJson["uvRotate"].size() == 3) {
+					material.uvRotate = {materialJson["uvRotate"][0].get<float>(), materialJson["uvRotate"][1].get<float>(), materialJson["uvRotate"][2].get<float>()};
+				}
+				if (materialJson.contains("uvTranslate") && materialJson["uvTranslate"].is_array() && materialJson["uvTranslate"].size() == 3) {
+					material.uvTranslate = {materialJson["uvTranslate"][0].get<float>(), materialJson["uvTranslate"][1].get<float>(), materialJson["uvTranslate"][2].get<float>()};
+				}
 			}
 			primitiveEditorMaterials_[index] = material;
 			primitives_[index]->SetColor(material.color);
@@ -287,6 +314,7 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 			primitives_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
 			primitives_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
 			primitives_[index]->SetSepiaEnabled(material.sepiaEnabled);
+			primitives_[index]->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
 		}
 	}
 
@@ -294,46 +322,46 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 }
 
 void Hinstance::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
-void Hinstance::ApplyEditorValues() {
-	for (size_t i = 0; i < objects_.size(); ++i) {
-		Object3d* object = objects_[i];
-		if (!object) {
-			continue;
-		}
-		const Transform& transform = editorTransforms_[i];
-		const EditorMaterial& material = editorMaterials_[i];
-		object->SetTransform(transform);
-		object->SetColor(material.color);
-		object->SetEnableLighting(material.enableLighting);
-		object->SetShininess(material.shininess);
-		object->SetEnvironmentCoefficient(material.environmentCoefficient);
-		object->SetGrayscaleEnabled(material.grayscaleEnabled);
-		object->SetSepiaEnabled(material.sepiaEnabled);
-	}
 
-	for (size_t i = 0; i < primitives_.size(); ++i) {
-		Primitive* primitive = primitives_[i];
-		if (!primitive) {
-			continue;
-		}
-		const Transform& transform = primitiveEditorTransforms_[i];
-		const EditorMaterial& material = primitiveEditorMaterials_[i];
-		primitive->SetTransform(transform);
-		primitive->SetColor(material.color);
-		primitive->SetEnableLighting(material.enableLighting);
-		primitive->SetShininess(material.shininess);
-		primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
-		primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
-		primitive->SetSepiaEnabled(material.sepiaEnabled);
-	}
-}
 void Hinstance::DrawObjectEditors() {
 #ifdef USE_IMGUI
 	if (objects_.empty() && primitives_.empty()) {
 		return;
 	}
 	if (!isPlaying_) {
-		ApplyEditorValues();
+		for (size_t i = 0; i < objects_.size(); ++i) {
+			Object3d* object = objects_[i];
+			if (!object) {
+				continue;
+			}
+			const Transform& transform = editorTransforms_[i];
+			const EditorMaterial& material = editorMaterials_[i];
+			object->SetTransform(transform);
+			object->SetColor(material.color);
+			object->SetEnableLighting(material.enableLighting);
+			object->SetShininess(material.shininess);
+			object->SetEnvironmentCoefficient(material.environmentCoefficient);
+			object->SetGrayscaleEnabled(material.grayscaleEnabled);
+			object->SetSepiaEnabled(material.sepiaEnabled);
+			object->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
+		}
+
+		for (size_t i = 0; i < primitives_.size(); ++i) {
+			Primitive* primitive = primitives_[i];
+			if (!primitive) {
+				continue;
+			}
+			const Transform& transform = primitiveEditorTransforms_[i];
+			const EditorMaterial& material = primitiveEditorMaterials_[i];
+			primitive->SetTransform(transform);
+			primitive->SetColor(material.color);
+			primitive->SetEnableLighting(material.enableLighting);
+			primitive->SetShininess(material.shininess);
+			primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
+			primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
+			primitive->SetSepiaEnabled(material.sepiaEnabled);
+			primitive->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
+		}
 	}
 	constexpr float kGameWidthRatio = 0.68f;
 	constexpr float kEditorMinWidth = 280.0f;
@@ -378,7 +406,6 @@ void Hinstance::DrawObjectEditors() {
 	} else {
 		if (ImGui::Button("Stop")) {
 			SetPlayMode(false);
-			ApplyEditorValues();
 			saveStatusMessage_ = "Stopped: applied editor values";
 		}
 	}
@@ -418,6 +445,10 @@ void Hinstance::DrawObjectEditors() {
 				materialChanged |= ImGui::DragFloat(("Environment##object_" + std::to_string(i)).c_str(), &material.environmentCoefficient, 0.01f, 0.0f, 1.0f);
 				materialChanged |= ImGui::Checkbox(("Grayscale##object_" + std::to_string(i)).c_str(), &material.grayscaleEnabled);
 				materialChanged |= ImGui::Checkbox(("Sepia##object_" + std::to_string(i)).c_str(), &material.sepiaEnabled);
+				ImGui::SeparatorText("UV Distortion");
+				materialChanged |= ImGui::DragFloat3(("UV Scale##object_" + std::to_string(i)).c_str(), &material.uvScale.x, 0.01f);
+				materialChanged |= ImGui::DragFloat3(("UV Rotate##object_" + std::to_string(i)).c_str(), &material.uvRotate.x, 0.01f);
+				materialChanged |= ImGui::DragFloat3(("UV Translate##object_" + std::to_string(i)).c_str(), &material.uvTranslate.x, 0.01f);
 			}
 			if (transformChanged || materialChanged || nameChanged) {
 				hasUnsavedChanges_ = true;
@@ -432,6 +463,7 @@ void Hinstance::DrawObjectEditors() {
 				object->SetEnvironmentCoefficient(material.environmentCoefficient);
 				object->SetGrayscaleEnabled(material.grayscaleEnabled);
 				object->SetSepiaEnabled(material.sepiaEnabled);
+				object->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
 			}
 			ImGui::TreePop();
 		}
@@ -472,6 +504,10 @@ void Hinstance::DrawObjectEditors() {
 				materialChanged |= ImGui::DragFloat(("Environment##primitive_" + std::to_string(i)).c_str(), &material.environmentCoefficient, 0.01f, 0.0f, 1.0f);
 				materialChanged |= ImGui::Checkbox(("Grayscale##primitive_" + std::to_string(i)).c_str(), &material.grayscaleEnabled);
 				materialChanged |= ImGui::Checkbox(("Sepia##primitive_" + std::to_string(i)).c_str(), &material.sepiaEnabled);
+				ImGui::SeparatorText("UV Distortion");
+				materialChanged |= ImGui::DragFloat3(("UV Scale##primitive_" + std::to_string(i)).c_str(), &material.uvScale.x, 0.01f);
+				materialChanged |= ImGui::DragFloat3(("UV Rotate##primitive_" + std::to_string(i)).c_str(), &material.uvRotate.x, 0.01f);
+				materialChanged |= ImGui::DragFloat3(("UV Translate##primitive_" + std::to_string(i)).c_str(), &material.uvTranslate.x, 0.01f);
 			}
 			if (transformChanged || materialChanged || nameChanged) {
 				hasUnsavedChanges_ = true;
@@ -486,6 +522,7 @@ void Hinstance::DrawObjectEditors() {
 				primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
 				primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
 				primitive->SetSepiaEnabled(material.sepiaEnabled);
+				primitive->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
 			}
 			ImGui::TreePop();
 		}

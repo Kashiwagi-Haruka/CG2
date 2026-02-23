@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Transform.h"
+#include "Vector3.h"
 #include "Vector4.h"
 
 class Object3d;
@@ -19,7 +20,6 @@ public:
 	void UnregisterPrimitive(Primitive* primitive);
 	bool HasRegisteredObjects() const;
 	void DrawObjectEditors();
-	void ApplyEditorValues();
 	void SetPlayMode(bool isPlaying);
 	bool IsPlayMode() const { return isPlaying_; }
 	bool LoadObjectEditorsFromJsonIfExists(const std::string& filePath);
@@ -32,6 +32,9 @@ private:
 		float environmentCoefficient = 0.0f;
 		bool grayscaleEnabled = false;
 		bool sepiaEnabled = false;
+		Vector3 uvScale = {1.0f, 1.0f, 1.0f};
+		Vector3 uvRotate = {0.0f, 0.0f, 0.0f};
+		Vector3 uvTranslate = {0.0f, 0.0f, 0.0f};
 	};
 
 	bool SaveObjectEditorsToJson(const std::string& filePath) const;

@@ -61,6 +61,7 @@ class SampleScene : public BaseScene {
 	bool fullScreenGrayscaleEnabled_ = false;
 	bool fullScreenSepiaEnabled_ = false;
 	float vignetteStrength_ = 0.0f;
+	float distortionStrength_ = 0.0f;
 	bool randomNoiseEnabled_ = false;
 	float randomNoiseScale_ = 512.0f;
 	int randomNoiseBlendMode_ = 0;
