@@ -32,6 +32,8 @@ private:
 		float environmentCoefficient = 0.0f;
 		bool grayscaleEnabled = false;
 		bool sepiaEnabled = false;
+		float distortionStrength = 0.0f;
+		float distortionFalloff = 1.0f;
 		Vector3 uvScale = {1.0f, 1.0f, 1.0f};
 		Vector3 uvRotate = {0.0f, 0.0f, 0.0f};
 		Vector3 uvTranslate = {0.0f, 0.0f, 0.0f};

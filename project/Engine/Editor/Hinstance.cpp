@@ -41,6 +41,8 @@ void Hinstance::RegisterObject3d(Object3d* object) {
 		    object->GetEnvironmentCoefficient(),
 		    object->IsGrayscaleEnabled(),
 		    object->IsSepiaEnabled(),
+		    object->GetDistortionStrength(),
+		    object->GetDistortionFalloff(),
 		});
 	}
 }
@@ -76,6 +78,8 @@ void Hinstance::RegisterPrimitive(Primitive* primitive) {
 		    primitive->GetEnvironmentCoefficient(),
 		    primitive->IsGrayscaleEnabled(),
 		    primitive->IsSepiaEnabled(),
+		    primitive->GetDistortionStrength(),
+		    primitive->GetDistortionFalloff(), 
 		});
 	}
 }
@@ -131,6 +135,8 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 		    {"environmentCoefficient", material.environmentCoefficient                                         },
 		    {"grayscaleEnabled",       material.grayscaleEnabled                                               },
 		    {"sepiaEnabled",           material.sepiaEnabled		                                           },
+		    {"distortionStrength",     material.distortionStrength                                             },
+		    {"distortionFalloff",      material.distortionFalloff                                              },
 		    {"uvScale",                {material.uvScale.x, material.uvScale.y, material.uvScale.z}            },
 		    {"uvRotate",               {material.uvRotate.x, material.uvRotate.y, material.uvRotate.z}         },
 		    {"uvTranslate",            {material.uvTranslate.x, material.uvTranslate.y, material.uvTranslate.z}},
@@ -161,6 +167,8 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 		    {"environmentCoefficient", material.environmentCoefficient                                         },
 		    {"grayscaleEnabled",       material.grayscaleEnabled                                               },
 		    {"sepiaEnabled",           material.sepiaEnabled		                                           },
+		    {"distortionStrength",     material.distortionStrength                                             },
+		    {"distortionFalloff",      material.distortionFalloff                                              },
 		    {"uvScale",                {material.uvScale.x, material.uvScale.y, material.uvScale.z}            },
 		    {"uvRotate",               {material.uvRotate.x, material.uvRotate.y, material.uvRotate.z}         },
 		    {"uvTranslate",            {material.uvTranslate.x, material.uvTranslate.y, material.uvTranslate.z}},
@@ -230,6 +238,12 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 				if (materialJson.contains("sepiaEnabled") && materialJson["sepiaEnabled"].is_boolean()) {
 					material.sepiaEnabled = materialJson["sepiaEnabled"].get<bool>();
 				}
+				if (materialJson.contains("distortionStrength") && materialJson["distortionStrength"].is_number()) {
+					material.distortionStrength = materialJson["distortionStrength"].get<float>();
+				}
+				if (materialJson.contains("distortionFalloff") && materialJson["distortionFalloff"].is_number()) {
+					material.distortionFalloff = materialJson["distortionFalloff"].get<float>();
+				}
 				if (materialJson.contains("uvScale") && materialJson["uvScale"].is_array() && materialJson["uvScale"].size() == 3) {
 					material.uvScale = {materialJson["uvScale"][0].get<float>(), materialJson["uvScale"][1].get<float>(), materialJson["uvScale"][2].get<float>()};
 				}
@@ -247,6 +261,8 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 			objects_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
 			objects_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
 			objects_[index]->SetSepiaEnabled(material.sepiaEnabled);
+			objects_[index]->SetDistortionStrength(material.distortionStrength);
+			objects_[index]->SetDistortionFalloff(material.distortionFalloff);
 			objects_[index]->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
 		}
 	}
@@ -297,6 +313,12 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 				if (materialJson.contains("sepiaEnabled") && materialJson["sepiaEnabled"].is_boolean()) {
 					material.sepiaEnabled = materialJson["sepiaEnabled"].get<bool>();
 				}
+				if (materialJson.contains("distortionStrength") && materialJson["distortionStrength"].is_number()) {
+					material.distortionStrength = materialJson["distortionStrength"].get<float>();
+				}
+				if (materialJson.contains("distortionFalloff") && materialJson["distortionFalloff"].is_number()) {
+					material.distortionFalloff = materialJson["distortionFalloff"].get<float>();
+				}
 				if (materialJson.contains("uvScale") && materialJson["uvScale"].is_array() && materialJson["uvScale"].size() == 3) {
 					material.uvScale = {materialJson["uvScale"][0].get<float>(), materialJson["uvScale"][1].get<float>(), materialJson["uvScale"][2].get<float>()};
 				}
@@ -314,6 +336,8 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 			primitives_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
 			primitives_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
 			primitives_[index]->SetSepiaEnabled(material.sepiaEnabled);
+			primitives_[index]->SetDistortionStrength(material.distortionStrength);
+			primitives_[index]->SetDistortionFalloff(material.distortionFalloff);
 			primitives_[index]->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
 		}
 	}
@@ -343,6 +367,8 @@ void Hinstance::DrawObjectEditors() {
 			object->SetEnvironmentCoefficient(material.environmentCoefficient);
 			object->SetGrayscaleEnabled(material.grayscaleEnabled);
 			object->SetSepiaEnabled(material.sepiaEnabled);
+			object->SetDistortionStrength(material.distortionStrength);
+			object->SetDistortionFalloff(material.distortionFalloff);
 			object->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
 		}
 
@@ -360,6 +386,8 @@ void Hinstance::DrawObjectEditors() {
 			primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
 			primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
 			primitive->SetSepiaEnabled(material.sepiaEnabled);
+			primitive->SetDistortionStrength(material.distortionStrength);
+			primitive->SetDistortionFalloff(material.distortionFalloff);
 			primitive->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
 		}
 	}
@@ -445,6 +473,8 @@ void Hinstance::DrawObjectEditors() {
 				materialChanged |= ImGui::DragFloat(("Environment##object_" + std::to_string(i)).c_str(), &material.environmentCoefficient, 0.01f, 0.0f, 1.0f);
 				materialChanged |= ImGui::Checkbox(("Grayscale##object_" + std::to_string(i)).c_str(), &material.grayscaleEnabled);
 				materialChanged |= ImGui::Checkbox(("Sepia##object_" + std::to_string(i)).c_str(), &material.sepiaEnabled);
+				materialChanged |= ImGui::DragFloat(("Distortion Strength##object_" + std::to_string(i)).c_str(), &material.distortionStrength, 0.01f, -10.0f, 10.0f);
+				materialChanged |= ImGui::DragFloat(("Distortion Falloff##object_" + std::to_string(i)).c_str(), &material.distortionFalloff, 0.01f, 0.0f, 10.0f);
 				ImGui::SeparatorText("UV Distortion");
 				materialChanged |= ImGui::DragFloat3(("UV Scale##object_" + std::to_string(i)).c_str(), &material.uvScale.x, 0.01f);
 				materialChanged |= ImGui::DragFloat3(("UV Rotate##object_" + std::to_string(i)).c_str(), &material.uvRotate.x, 0.01f);
@@ -463,6 +493,8 @@ void Hinstance::DrawObjectEditors() {
 				object->SetEnvironmentCoefficient(material.environmentCoefficient);
 				object->SetGrayscaleEnabled(material.grayscaleEnabled);
 				object->SetSepiaEnabled(material.sepiaEnabled);
+				object->SetDistortionStrength(material.distortionStrength);
+				object->SetDistortionFalloff(material.distortionFalloff);
 				object->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
 			}
 			ImGui::TreePop();
@@ -504,6 +536,8 @@ void Hinstance::DrawObjectEditors() {
 				materialChanged |= ImGui::DragFloat(("Environment##primitive_" + std::to_string(i)).c_str(), &material.environmentCoefficient, 0.01f, 0.0f, 1.0f);
 				materialChanged |= ImGui::Checkbox(("Grayscale##primitive_" + std::to_string(i)).c_str(), &material.grayscaleEnabled);
 				materialChanged |= ImGui::Checkbox(("Sepia##primitive_" + std::to_string(i)).c_str(), &material.sepiaEnabled);
+				materialChanged |= ImGui::DragFloat(("Distortion Strength##primitive_" + std::to_string(i)).c_str(), &material.distortionStrength, 0.01f, -10.0f, 10.0f);
+				materialChanged |= ImGui::DragFloat(("Distortion Falloff##primitive_" + std::to_string(i)).c_str(), &material.distortionFalloff, 0.01f, 0.0f, 10.0f);
 				ImGui::SeparatorText("UV Distortion");
 				materialChanged |= ImGui::DragFloat3(("UV Scale##primitive_" + std::to_string(i)).c_str(), &material.uvScale.x, 0.01f);
 				materialChanged |= ImGui::DragFloat3(("UV Rotate##primitive_" + std::to_string(i)).c_str(), &material.uvRotate.x, 0.01f);
@@ -522,6 +556,8 @@ void Hinstance::DrawObjectEditors() {
 				primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
 				primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
 				primitive->SetSepiaEnabled(material.sepiaEnabled);
+				primitive->SetDistortionStrength(material.distortionStrength);
+				primitive->SetDistortionFalloff(material.distortionFalloff);
 				primitive->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate));
 			}
 			ImGui::TreePop();

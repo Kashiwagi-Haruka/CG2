@@ -103,7 +103,8 @@ void SampleScene::Initialize() {
 	}
 	humanObj_->SetTransform(humanTransform_);
 	ringPrimitive_->SetTransform(ringTransform_);
-	ringPrimitive_->SetColor({1.0f, 0.85f, 0.2f, 1.0f});
+	ringPrimitive_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	ringPrimitive_->SetEnableLighting(false);
 	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
 		humanSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
 		humanSkinCluster_ = CreateSkinCluster(*humanSkeleton_, *walkModel);
@@ -443,6 +444,8 @@ void SampleScene::Update() {
 	planeGltf_->Update();
 	animatedCubeObj_->Update();
 	humanObj_->Update();
+	ringUvRotation_ -= 0.01f;
+	ringPrimitive_->SetUvTransform(Function::MakeAffineMatrix(Vector3(1,1,1),Vector3(0,0,ringUvRotation_),Vector3(0,0,0)));
 	ringPrimitive_->Update();
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
@@ -473,6 +476,7 @@ void SampleScene::Draw() {
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
+	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
 	ringPrimitive_->Draw();
 	if (sampleParticleEmitter_) {
 		Object3dCommon::GetInstance()->DrawCommonNoCullDepth();

@@ -65,6 +65,7 @@ class SampleScene : public BaseScene {
 	bool randomNoiseEnabled_ = false;
 	float randomNoiseScale_ = 512.0f;
 	int randomNoiseBlendMode_ = 0;
+	float ringUvRotation_ = 0.0f;
 
 public:
 	SampleScene();
