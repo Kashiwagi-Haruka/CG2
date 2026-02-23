@@ -20,11 +20,6 @@ namespace YoshidaMath {
         bool collided = false;
         Vector3 normal = { 0.0f,0.0f,0.0f }; //法線
         float penetration = 0;//めり込み量
-        ColliderType type_ = ColliderType::kSphere;
-        uint32_t collisionAttribute_ = 0xffffffff;	// 衝突属性
-        uint32_t collisionMask_ = 0xffffffff;		// 衝突マスク
-        float radius_ = 1.0f;	// 衝突半径
-        AABB AABB_;
     };
     //rayとAABBの衝突を取得する
     bool RayIntersectsAABB(const Ray& ray, const AABB& box, float& tMin, float& tMax);
@@ -42,6 +37,11 @@ namespace YoshidaMath {
     class Collider {
     private:
         YoshidaMath::CollisionInfo collisionInfo_;
+        ColliderType type_ = ColliderType::kSphere;
+        uint32_t collisionAttribute_ = 0xffffffff;	// 衝突属性
+        uint32_t collisionMask_ = 0xffffffff;		// 衝突マスク
+        float radius_ = 1.0f;	// 衝突半径
+        AABB AABB_;
 #ifdef _DEBUG
         //デバック用
         std::unique_ptr<Primitive>primitive_;
@@ -64,26 +64,26 @@ namespace YoshidaMath {
         void SetAABB(const AABB& aabb);
         /// @brief 衝突半径を取得する
         /// @return 衝突半径
-        float GetRadius() const { return collisionInfo_.radius_; }
-        const AABB& GetAABB() const { return collisionInfo_.AABB_; }
+        float GetRadius() const { return radius_; }
+        const AABB& GetAABB() const { return AABB_; }
 
-        ColliderType GetType() const { return collisionInfo_.type_; }
+        ColliderType GetType() const { return type_; }
 
         /// @brief 衝突属性を取得する
         /// @return 衝突属性
-        uint32_t GetCollisionAttribute() const { return collisionInfo_.collisionAttribute_; }
+        uint32_t GetCollisionAttribute() const { return collisionAttribute_; }
 
         /// @brief 衝突属性を設定する
         /// @param attribute 衝突属性
-        void SetCollisionAttribute(uint32_t attribute) { collisionInfo_.collisionAttribute_ = attribute; }
+        void SetCollisionAttribute(uint32_t attribute) { collisionAttribute_ = attribute; }
 
         /// @brief 衝突マスクを取得する
         /// @return 衝突マスク
-        uint32_t GetCollisionMask() const { return collisionInfo_.collisionMask_; }
+        uint32_t GetCollisionMask() const { return collisionMask_; }
 
         /// @brief 衝突マスクを設定する
         /// @param mask 衝突マスク
-        void SetCollisionMask(uint32_t mask) { collisionInfo_.collisionMask_ = mask; }
+        void SetCollisionMask(uint32_t mask) { collisionMask_ = mask; }
         void ColliderUpdate();
         void ColliderDraw();
         void OnCollisionCollider();
@@ -98,4 +98,5 @@ namespace YoshidaMath {
     //Sphereのワールド座標を取得する
     Sphere GetSphereWorldPos(YoshidaMath::Collider* sphere);
     bool IsCollision(const Sphere& s1, const Sphere& s2);
+    bool IsCollision(const AABB& a, const AABB& b);
 }

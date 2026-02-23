@@ -7,8 +7,6 @@ YoshidaMath::Collider::Collider()
 #ifdef _DEBUG
 
     primitive_ = std::make_unique<Primitive>();
-    primitive_->Initialize(Primitive::Sphere);
-    primitive_->SetEnableLighting(false);
 #endif // _DEBUG
 
     collisionInfo_.collided = false;
@@ -25,12 +23,12 @@ void YoshidaMath::Collider::SetCamera(Camera* camera)
 
 void YoshidaMath::Collider::SetRadius(float radius)
 {
-    collisionInfo_.type_ = ColliderType::kSphere;
-    collisionInfo_.radius_ = radius;
+   type_ = ColliderType::kSphere;
+    radius_ = radius;
 #ifdef _DEBUG
     if (primitive_) {
         primitive_->Initialize(Primitive::Sphere);
-        float scale = radius * 1.0f;
+        float scale = radius;
         primitive_->SetScale({ scale,scale,scale });
     }
 #endif // DEBUG
@@ -40,8 +38,8 @@ void YoshidaMath::Collider::SetRadius(float radius)
 
 void YoshidaMath::Collider::SetAABB(const AABB& aabb) {
 
-    collisionInfo_.type_ = ColliderType::kAABB;
-    collisionInfo_.AABB_ = aabb;
+    type_ = ColliderType::kAABB;
+   AABB_ = aabb;
 #ifdef _DEBUG
     if (primitive_) {
         primitive_->Initialize(Primitive::Box);
@@ -62,7 +60,12 @@ void YoshidaMath::Collider::ColliderUpdate()
 #ifdef _DEBUG
 
     primitive_->SetColor({ 1.0f,1.0f,0.0f,0.5f });
-    primitive_->SetTranslate(GetWorldPosition());
+    if (type_ == kAABB) {
+        primitive_->SetTranslate(GetWorldPosition()+YoshidaMath::GetAABBCenter(AABB_));
+    } else {
+        primitive_->SetTranslate(GetWorldPosition());
+    }
+
     primitive_->Update();
 #endif // _DEBUG
 }
@@ -142,7 +145,7 @@ YoshidaMath::CollisionInfo YoshidaMath::GetCollisionInfo(const AABB& a, const AA
 
     CollisionInfo result;
 
-    if (!RigidBody::isCollision(a, b)) {
+    if (!IsCollision(a, b)) {
         result.collided = false;
         return result;
     }
@@ -208,11 +211,23 @@ bool YoshidaMath::IsCollision(const Sphere& s1, const Sphere& s2)
     return false;
 }
 
+bool YoshidaMath::IsCollision(const AABB& a, const AABB& b)
+{
+
+    if ((a.min.x <= b.max.x && a.max.x >= b.min.x) &&//x軸
+        (a.min.y <= b.max.y && a.max.y >= b.min.y) &&//y軸
+        (a.min.z <= b.max.z && a.max.z >= b.min.z)) {
+        return true;
+    }
+
+    return false;
+}
+
 AABB YoshidaMath::GetAABBWorldPos(YoshidaMath::Collider* aabb)
 {
-    Vector3 pos = aabb->GetWorldPosition();
     AABB aabbWorld = aabb->GetAABB();
-    aabbWorld.min += pos;
+    Vector3 pos = aabb->GetWorldPosition();
+    aabbWorld.min += aabbWorld.min+pos;
     aabbWorld.max += pos;
     return aabbWorld;
 

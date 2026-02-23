@@ -26,7 +26,7 @@ Vector3 Portal::GetWorldPosition() const
 Portal::Portal()
 {
 
-    transform_ = { .scale = {1.5f,3.0f,1.5f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,1.5f,0.0f} };
+    transform_ = { .scale = {1.5f,1.5f,1.5f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.75f,0.0f} };
     sphere_ = { .center = {transform_.translate},.radius = 0.5f };
 
     SetRadius(sphere_.radius);

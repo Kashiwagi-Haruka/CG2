@@ -58,7 +58,6 @@ void CollisionManager::CheckCollisionAABBPair(YoshidaMath::Collider* colliderA, 
     if (colliderA->GetCollisionInfo().collided&& colliderB->GetCollisionInfo().collided) {
         colliderA->OnCollision(colliderB);
         colliderB->OnCollision(colliderA);
-
     }
 }
 

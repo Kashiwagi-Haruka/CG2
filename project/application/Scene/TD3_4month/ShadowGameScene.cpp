@@ -132,16 +132,11 @@ void ShadowGameScene::CheckCollision()
     //ホワイトボードとrayの当たり判定作成する
     whiteBoardManager_->CheckCollision(timeCardWatch_.get());
 
-    //めもとの当たり判定
- /*   for (auto& [texture, memo] : memoManager_->GetMemos()) {
-        collisionManager_->AddCollider(memo.get());
-    }*/
-
     collisionManager_->ClearColliders();
 
     collisionManager_->AddCollider(player_.get(), camera_.get());
     collisionManager_->AddCollider(portal_.get(), camera_.get());
-
+    collisionManager_->AddCollider(testField_.get(), camera_.get());
     collisionManager_->CheckAllCollisions();
 
 
@@ -328,6 +323,7 @@ void ShadowGameScene::DrawGameObject()
 
     //Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 
+   
     collisionManager_->DrawColliders();
 
     //テスト地面

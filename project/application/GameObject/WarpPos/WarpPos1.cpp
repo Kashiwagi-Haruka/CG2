@@ -27,11 +27,11 @@ void WarpPos1::SetCamera(Camera* camera)
 
 void WarpPos1::Update()
 {
-    //sinTheta_ += Function::kPi * YoshidaMath::kDeltaTime;
-    //if (sinTheta_ >= Function::kPi*2.0f) {
-    //    sinTheta_ = 0.0f;
-    //}
-    //transform_.translate.y += std::sinf(sinTheta_)*0.0625f;
+    sinTheta_ += Function::kPi * YoshidaMath::kDeltaTime;
+    if (sinTheta_ >= Function::kPi*2.0f) {
+        sinTheta_ = 0.0f;
+    }
+    transform_.translate.y += std::sinf(sinTheta_)*0.0625f;
     object3d_->SetTransform(transform_);
     object3d_->Update();
     
