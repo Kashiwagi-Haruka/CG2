@@ -15,11 +15,11 @@ public:
     void Draw();
     void SetRay(const Vector3& origin,const Vector3& diff);
     void SetTransformPtr(Transform* transform) { parentTransform_ = transform; };
-    void OnCollisionObjOfMakePortal(const AABB& aabb);
+    bool OnCollisionObjOfMakePortal(const AABB& aabb);
 private:
     std::unique_ptr<Object3d> modelObj_ = nullptr;
     Ray ray_;
-    std::unique_ptr<Primitive> line_ = nullptr;
+    std::unique_ptr<Primitive> box_ = nullptr;
     Transform* parentTransform_ = nullptr;
     Transform transform_ = {};
     Transform lineTransform_ = {};

@@ -141,6 +141,10 @@ void ShadowGameScene::CheckCollision()
         isWarpSESound_ = false;
     }
 
+    //ホワイトボードとrayの当たり判定作成する
+    whiteBoardManager_->CheckCollision(timeCardWatch_.get());
+
+
 }
 
 void ShadowGameScene::InitializeLights()
@@ -228,8 +232,9 @@ void ShadowGameScene::UpdateCamera()
             }
             ImGui::TreePop();
         }
-        ImGui::End();
+  
     }
+    ImGui::End();
 #endif
 }
 
@@ -262,7 +267,8 @@ void ShadowGameScene::UpdateGameObject()
 
 #pragma region//ゲームオブジェクト
     player_->Update();
-    timeCardWatch_->SetRay(camera_->GetTranslate(), player_->GetForward());
+    Vector3 forward =  YoshidaMath::GetForward(camera_->GetWorldMatrix());
+    timeCardWatch_->SetRay(camera_->GetTranslate(), forward);
     timeCardWatch_->Update();
 
     testField_->Update();
