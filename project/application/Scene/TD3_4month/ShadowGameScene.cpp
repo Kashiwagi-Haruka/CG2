@@ -11,10 +11,6 @@
 
 ShadowGameScene::ShadowGameScene()
 {
-
-    warpSE_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/magic.mp3");
-    Audio::GetInstance()->SetSoundVolume(&warpSE_, 1.0f);
-
     //シーン遷移の設定
     transition_ = std::make_unique<SceneTransition>();
     //カメラの設定
@@ -33,17 +29,21 @@ ShadowGameScene::ShadowGameScene()
     testField_ = std::make_unique<TestField>();
     //Portal
     portal_ = std::make_unique<Portal>();
+    //SEを読み込む
+    Portal::LoadSE();
     //ワープ座標
     warpPos_ = std::make_unique<WarpPos1>();
     //ホワイトボード管理
     whiteBoardManager_ = std::make_unique<WhiteBoardManager>();
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
+    //衝突管理
+    collisionManager_ = std::make_unique<CollisionManager>();
 }
 
 ShadowGameScene::~ShadowGameScene()
 {
-    Audio::GetInstance()->SoundUnload(&warpSE_);
+
 }
 
 void ShadowGameScene::Initialize()
@@ -71,13 +71,14 @@ void ShadowGameScene::Initialize()
     //ホワイトボード管理
     whiteBoardManager_->Initialize();
     whiteBoardManager_->SetCamera(camera_.get());
-    //ワープSEの再生フラグ
-    isWarpSESound_ = false;
+
     //携帯打刻機
     timeCardWatch_->Initialize();
     timeCardWatch_->SetCamera(camera_.get());
     //Playerの座標のポインタを入れる
     timeCardWatch_->SetTransformPtr(&player_->GetTransform());
+
+
 }
 
 void ShadowGameScene::Update()
@@ -102,8 +103,10 @@ void ShadowGameScene::Draw()
     SpriteCommon::GetInstance()->DrawCommon();
     //シーン遷移の描画処理
     DrawSceneTransition();
+
     //ゲームオブジェクトの描画処理
     DrawGameObject();
+
 }
 
 void ShadowGameScene::Finalize()
@@ -122,27 +125,24 @@ void ShadowGameScene::CheckCollision()
 {
 #ifdef USE_IMGUI
     ImGui::Begin("RigidBodyGetWorldAABB");
-    AABB aabb = player_->GetWorldAABB();
-    ImGui::DragFloat3("playerAABBMin", &aabb.min.x, 0.0f, 100.0f);
-    ImGui::DragFloat3("playerAABBMax", &aabb.max.x, 0.0f, 100.0f);
     ImGui::DragFloat3("portalTranslate", &portal_->GetTranslate().x, 0.0f, 100.0f);
     ImGui::End();
 #endif // USE_IMGUI
 
-    //ポータルとプレイヤーの当たり判定
-    if (RigidBody::isCollision(player_->GetWorldAABB(), portal_->GetSphere())) {
-        if (!isWarpSESound_) {
-            Audio::GetInstance()->SoundPlayWave(warpSE_, false);
-            isWarpSESound_ = true;
-            //ワープする
-            player_->SetTranslate(warpPos_->GetTranslate());
-        }  
-    } else {
-        isWarpSESound_ = false;
-    }
-
     //ホワイトボードとrayの当たり判定作成する
     whiteBoardManager_->CheckCollision(timeCardWatch_.get());
+
+    //めもとの当たり判定
+ /*   for (auto& [texture, memo] : memoManager_->GetMemos()) {
+        collisionManager_->AddCollider(memo.get());
+    }*/
+
+    collisionManager_->ClearColliders();
+
+    collisionManager_->AddCollider(player_.get(), camera_.get());
+    collisionManager_->AddCollider(portal_.get(), camera_.get());
+
+    collisionManager_->CheckAllCollisions();
 
 
 }
@@ -232,7 +232,7 @@ void ShadowGameScene::UpdateCamera()
             }
             ImGui::TreePop();
         }
-  
+
     }
     ImGui::End();
 #endif
@@ -266,8 +266,13 @@ void ShadowGameScene::UpdateGameObject()
 #pragma endregion
 
 #pragma region//ゲームオブジェクト
+
+    if (player_->GetIsWarp()) {
+        player_->SetTranslate(warpPos_->GetTranslate());
+    }
+
     player_->Update();
-    Vector3 forward =  YoshidaMath::GetForward(camera_->GetWorldMatrix());
+    Vector3 forward = YoshidaMath::GetForward(camera_->GetWorldMatrix());
     timeCardWatch_->SetRay(camera_->GetTranslate(), forward);
     timeCardWatch_->Update();
 
@@ -322,6 +327,8 @@ void ShadowGameScene::DrawGameObject()
     Object3dCommon::GetInstance()->DrawCommon();
 
     //Object3dCommon::GetInstance()->DrawCommonSkinningToon();
+
+    collisionManager_->DrawColliders();
 
     //テスト地面
     testField_->Draw();

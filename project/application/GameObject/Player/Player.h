@@ -5,9 +5,12 @@
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
 #include"RigidBody.h"
+#include"GameObject/YoshidaMath/YoshidaMath.h"
+#include"GameObject/YoshidaMath/CollisionManager/Collider.h"
+
 class Camera;
 
-class Player
+class Player : public YoshidaMath::Collider
 {
 private:
 #pragma region//体やメッシュの情報
@@ -35,11 +38,21 @@ private:
     float eyeRotateSpeed_ = 0.3f;
     float eyeRotateX_ = 0.0f;
     AABB localAABB_ = { 0.0f };
+    //衝突情報
+    YoshidaMath::CollisionInfo collisionInfo_;
+    bool isWarp_ = false;
 public:
+    bool GetIsWarp() { return isWarp_; }
+    void OnCollision(Collider* collider)override;
+    /// @brief ワールド座標を取得する
+    /// @return ワールド座標
+    Vector3 GetWorldPosition() const  override;
+    //障害物との衝突処理
+    void OnCollisionObstacle();
     Transform& GetTransform() { return transform_; };
     //前方のベクトルを取得する
     const Vector3& GetForward() const { return forward_; };
-    void SetTranslate(const Vector3& translate) {  transform_.translate = translate; };
+    void SetTranslate(const Vector3& translate) { transform_.translate = translate; };
     //コンストラクタ
     Player();
     //カメラのセッター
@@ -56,11 +69,13 @@ public:
     void Move();
     //回転
     void Rotate();
+    //重力処理
+    void Gravity();
+
     //アニメーション
     void Animation();
     //ワールド行列の取得
-    const Matrix4x4&GetWorldMatrix() const {  return bodyObj_->GetWorldMatrix(); }
-    //ワールド座標のAABBの取得
-    AABB GetWorldAABB();
+    const Matrix4x4& GetWorldMatrix() const { return bodyObj_->GetWorldMatrix(); }
+
 };
 

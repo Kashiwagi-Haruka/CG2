@@ -14,6 +14,9 @@
 #include"GameObject/TimeCard/TimeCardWatch.h"
 
 #pragma endregion
+
+#include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
+
 #include "Light/DirectionalLight.h" 
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h" 
@@ -24,11 +27,7 @@ class ShadowGameScene : public BaseScene
 {
 private:
 
-#pragma region//音の設定
-    //音楽
-    SoundData warpSE_;
-    bool isWarpSESound_ = false;
-#pragma endregion
+
 #pragma region//カメラの設定
     Transform cameraTransform_ = {};
     //カメラの設定
@@ -60,6 +59,8 @@ private:
     //携帯打刻機
     std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
 #pragma endregion
+    //衝突管理
+    std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
 
 #pragma region// light
     //DirectionalLight
