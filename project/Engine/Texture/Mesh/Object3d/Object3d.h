@@ -26,19 +26,6 @@ class Object3d {
 		Matrix4x4 WorldInverseTranspose; // 64 バイト
 	};
 
-	struct Material {
-		Vector4 color;
-		int enableLighting;
-		float padding[3];
-		Matrix4x4 uvTransform;
-		float shininess;
-		float environmentCoefficient;
-		int grayscaleEnabled;
-		int sepiaEnabled;
-		float distortionStrength;
-		float distortionFalloff;
-	};
-
 	Transform transform_ = {
 	    {1.0f, 1.0f, 1.0f},
 	    {0.0f, 0.0f, 0.0f},

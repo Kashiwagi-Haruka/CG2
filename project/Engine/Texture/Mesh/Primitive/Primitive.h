@@ -1,6 +1,7 @@
 #pragma once
 #include "CameraForGPU.h"
 #include "Matrix4x4.h"
+#include "Material.h"
 #include "Transform.h"
 #include "Vector2.h"
 #include "Vector4.h"
@@ -32,18 +33,6 @@ public:
 
 private:
 	PrimitiveName primitiveName_;
-	struct Material {
-		Vector4 color;
-		int enableLighting;
-		float padding[3];
-		Matrix4x4 uvTransform;
-		float shininess;
-		float environmentCoefficient;
-		int grayscaleEnabled;
-		int sepiaEnabled;
-		float distortionStrength;
-		float distortionFalloff;
-	};
 	struct alignas(256) TransformationMatrix {
 		Matrix4x4 WVP;                   // 64 バイト
 		Matrix4x4 LightWVP;              // 64 バイト

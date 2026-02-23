@@ -249,6 +249,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
   <ItemGroup>
     <ClInclude Include="application\GameObject\YoshidaMath\Easing.h" />
     <ClInclude Include="application\GameObject\KeyBindConfig.h" />
+    <ClInclude Include="Engine\Texture\Material.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\AnimationManager.h" />
     <ClInclude Include="Engine\Math\QuaternionTransform.h" />
     <ClInclude Include="Engine\Texture\Color.h" />
