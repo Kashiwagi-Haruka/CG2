@@ -10,8 +10,8 @@
 
 namespace PlayerConst {
     const constexpr float kRotateYSpeed = 0.25f;
-    const constexpr float kSneakSpeed = 0.125f;
-    const constexpr float kWalkSpeed = 0.25f;
+    const constexpr float kSneakSpeed = 0.0625f;
+    const constexpr float kWalkSpeed = 0.125f;
 
 };
 
@@ -43,7 +43,7 @@ void Player::Initialize()
     bodyObj_->SetModel("walk");
     //座標の初期化
     transform_ = {
-    .scale{50.0f,50.0f,50.0f},
+    .scale{1.0f,1.0f,1.0f},
     .rotate{-YoshidaMath::PI / 2.0f, 0.0f, 0.0f  },
     .translate{0.0f,2.0f,0.0f}
     };
