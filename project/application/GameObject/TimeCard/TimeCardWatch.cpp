@@ -2,6 +2,7 @@
 #include"Model/ModelManager.h"
 #include"Function.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
+#include"GameObject/YoshidaMath/CollisionManager/Collider.h"
 #include<imgui.h>
 #include"GameObject/KeyBindConfig.h"
 #include"Audio.h"

@@ -1,5 +1,5 @@
 #include "Player.h"
-#include"GameObject/YoshidaMath/YoshidaMath.h"
+
 #include"Animation/Animation.h"
 #include "Model/ModelManager.h"
 #include"Object3d/Object3dCommon.h"
@@ -17,6 +17,11 @@ namespace PlayerConst {
 
 Player::Player()
 {
+    localAABB_ = { .min = {-0.25f,0.0f,-0.25f},.max = {0.25f,1.5f,0.25f} };
+    SetAABB(localAABB_);
+    SetCollisionAttribute(kCollisionPlayer);
+    SetCollisionMask(kCollisionFloor|kCollisionPortal);
+
     //体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
     //モデルの読み込み
@@ -30,15 +35,17 @@ void Player::SetCamera(Camera* camera)
 }
 void Player::Initialize()
 {
+    isWarp_ = false;
+
     //体の初期化
     bodyObj_->Initialize();
     //体にモデル挿入
     bodyObj_->SetModel("walk");
     //座標の初期化
     transform_ = {
-    .scale{1.0f,1.0f,1.0f},
+    .scale{50.0f,50.0f,50.0f},
     .rotate{-YoshidaMath::PI / 2.0f, 0.0f, 0.0f  },
-    .translate{0.0f,0.0f,0.0f}
+    .translate{0.0f,2.0f,0.0f}
     };
     //速度の初期化
     velocity_ = { 0.0f};
@@ -46,7 +53,6 @@ void Player::Initialize()
 
     moveSpeed_ = { 0.0f };
 
-    localAABB_ = { .min = {-1.0f,0.0f,-1.0f},.max = {1.0f,1.0f,1.0f} };
 
     //カメラの感度をここで宣言していて良くない
     eyeRotateSpeed_ = 0.3f;
@@ -73,9 +79,13 @@ void Player::Initialize()
 
 void Player::Update()
 {
+    isWarp_ = false;
     //移動処理
     Move();
+    //旋回処理
     Rotate();
+    //重力処理
+    Gravity();
     bodyObj_->SetTransform(transform_);
     bodyObj_->Update();
     //アニメーション
@@ -200,10 +210,37 @@ void Player::Rotate()
 
 }
 
+void Player::Gravity()
+{
+    velocity_.y -= YoshidaMath::kDeltaTime * YoshidaMath::kGravity;
+    transform_.translate.y += velocity_.y;
+    velocity_.y = std::clamp(velocity_.y, -1.0f, 1.0f);
+}
+
+void Player::OnCollision(Collider* collider)
+{
+
+ /*   if (collider->GetCollisionAttribute() == kCollisionFloor) {*/
+        OnCollisionObstacle();
+    
+    if (collider->GetCollisionAttribute() == kCollisionPortal) {
+        isWarp_ = true;
+    }
+}
+
+Vector3 Player::GetWorldPosition() const
+{
+    return bodyObj_->GetTranslate();
+}
+
+void Player::OnCollisionObstacle()
+{
+    YoshidaMath::ResolveCollision(transform_.translate, velocity_, GetCollisionInfo());
+}
+
 void Player::Animation()
 {
     float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-
 
     auto* playerCommand = PlayerCommand::GetInstance();
     if (playerCommand->Sneak()) {
@@ -224,9 +261,4 @@ void Player::Animation()
         Matrix4x4 humanWorld = bodyObj_->GetWorldMatrix();
         skeleton_->SetObjectMatrix(humanWorld);
     }
-}
-
-AABB Player::GetWorldAABB()
-{
-    return YoshidaMath::GetAABBWorldPos(localAABB_, transform_.translate);
 }

@@ -16,7 +16,7 @@ void WhiteBoard::Initialize()
     primitive_->Initialize(Primitive::Box);
     primitive_->SetColor({ 1.0f,1.0f,1.0f,0.1f });
 #endif
-    localAABB_ = { .min = { -1.0f,0.0f,-1.0f},.max = {1.0f,1.0f,1.0f} };
+    localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
 }
 
 void WhiteBoard::Update()
@@ -24,8 +24,14 @@ void WhiteBoard::Update()
     obj_->Update();
 #ifdef _DEBUG
     collisionTransform_ = obj_->GetTransform();
+    Vector3 scale =
+    { localAABB_.max.x - localAABB_.min.x,
+        localAABB_.max.y - localAABB_.min.y,
+        localAABB_.max.z - localAABB_.min.z
+    };
+    collisionTransform_.scale = scale;
     collisionTransform_.rotate = { 0.0f };
-    collisionTransform_.translate.y = 1.0f;
+    collisionTransform_.translate.y = 1.5f;
     primitive_->SetTransform(collisionTransform_);
     primitive_->Update();
 #endif
