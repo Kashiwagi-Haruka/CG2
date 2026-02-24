@@ -281,20 +281,20 @@
       "index": 0,
       "material": {
         "color": [
-          1.0,
-          1.0,
+          0.029411792755126953,
+          0.0,
           1.0,
           1.0
         ],
         "distortionFalloff": 1.0,
-        "distortionStrength": 1.4199999570846558,
+        "distortionStrength": 4.989999771118164,
         "enableLighting": false,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
         "shininess": 40.0,
         "uvAnchor": [
-          0.7200000286102295,
+          0.5,
           0.5
         ],
         "uvRotate": [
@@ -313,7 +313,7 @@
           0.0
         ]
       },
-      "name": "Primitive 0",
+      "name": "ring",
       "transform": {
         "rotate": [
           0.0,
@@ -321,8 +321,8 @@
           0.0
         ],
         "scale": [
-          1.0,
-          1.0,
+          2.130000114440918,
+          3.75,
           1.0
         ],
         "translate": [

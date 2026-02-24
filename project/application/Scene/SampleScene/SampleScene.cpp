@@ -447,8 +447,8 @@ void SampleScene::Update() {
 	planeGltf_->Update();
 	animatedCubeObj_->Update();
 	humanObj_->Update();
-	ringUvRotation_ -= 0.01f;
-	ringPrimitive_->SetUvTransform(Function::MakeAffineMatrix(Vector3(1,1,1),Vector3(0,0,ringUvRotation_),Vector3(0,0,0)));
+	ringUvRotation_ -= 0.05f;
+	ringPrimitive_->SetUvTransform(Vector3(1,1,1),Vector3(0,0,ringUvRotation_),Vector3(0,0,0),Vector2(0.5f,0.5f));
 	ringPrimitive_->Update();
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
