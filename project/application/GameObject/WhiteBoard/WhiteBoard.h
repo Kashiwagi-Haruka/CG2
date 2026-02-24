@@ -14,6 +14,7 @@ public:
     void SetCamera(Camera* camera);
     void SetModel(const std::string& filePath);
     AABB GetAABB();
+    Transform& GetTransform() { return collisionTransform_; }
 private:
     std::unique_ptr<Object3d>obj_ = nullptr;
 #ifdef _DEBUG

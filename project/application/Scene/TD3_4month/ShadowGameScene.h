@@ -8,9 +8,8 @@
 #pragma region //GameObject
 #include"GameObject/Player/Player.h"
 #include"GameObject/TestField/TestField.h"
-#include"GameObject/Portal/Portal.h"
-#include"GameObject/WarpPos/WarpPos1.h"
-#include"GameObject/WhiteBoard/WhiteBoardManager.h"
+
+#include"GameObject/Portal/PortalManager.h"
 #include"GameObject/TimeCard/TimeCardWatch.h"
 
 #pragma endregion
@@ -50,12 +49,8 @@ private:
     std::unique_ptr<Player> player_ = nullptr;
     //TestField
     std::unique_ptr<TestField> testField_ = nullptr;
-    //ポータル
-    std::unique_ptr<Portal> portal_ = nullptr;
-    //ワープ座標
-    std::unique_ptr<WarpPos1> warpPos_ = nullptr;
-    //ホワイトボード管理
-    std::unique_ptr<WhiteBoardManager> whiteBoardManager_ = nullptr;
+    //ポータル管理
+    std::unique_ptr<PortalManager> portalManager_ = nullptr;
     //携帯打刻機
     std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
 #pragma endregion

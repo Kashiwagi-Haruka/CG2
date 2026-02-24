@@ -22,7 +22,7 @@ namespace YoshidaMath {
         float penetration = 0;//めり込み量
     };
     //rayとAABBの衝突を取得する
-    bool RayIntersectsAABB(const Ray& ray, const AABB& box, float& tMin, float& tMax);
+    bool RayIntersectsAABB(const Ray& ray, const AABB& box, float tMin, float tMax);
     //衝突情報を取得する
     CollisionInfo GetCollisionInfo(const AABB& a, const AABB& b);
     //衝突情報をもとに座標のめり込みを考える
@@ -57,7 +57,7 @@ namespace YoshidaMath {
         /// @brief ワールド座標を取得する
         /// @return ワールド座標
         virtual Vector3 GetWorldPosition() const = 0;
-
+  
         /// @brief 衝突半径を設定する
         /// @param radius 衝突半径
         void SetRadius(float radius);

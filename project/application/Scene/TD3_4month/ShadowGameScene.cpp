@@ -13,28 +13,28 @@ ShadowGameScene::ShadowGameScene()
 {
     //シーン遷移の設定
     transition_ = std::make_unique<SceneTransition>();
+
     //カメラの設定
     cameraTransform_ = {
     .scale{1.0f, 1.0f, 1.0f  },
     .rotate{0.0f, 0.0f, 0.0f  },
     .translate{0.0f, 5.0f, -10.0f}
     };
+
+    //カメラを生成する
     camera_ = std::make_unique<Camera>();
     camera_->SetTransform(cameraTransform_);
+
     //デバックカメラ
     debugCamera_ = std::make_unique<DebugCamera>();
     //プレイヤーの生成
     player_ = std::make_unique<Player>();
     //テスト地面
     testField_ = std::make_unique<TestField>();
-    //Portal
-    portal_ = std::make_unique<Portal>();
     //SEを読み込む
     Portal::LoadSE();
-    //ワープ座標
-    warpPos_ = std::make_unique<WarpPos1>();
     //ホワイトボード管理
-    whiteBoardManager_ = std::make_unique<WhiteBoardManager>();
+    portalManager_ = std::make_unique<PortalManager>();
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     //衝突管理
@@ -43,7 +43,7 @@ ShadowGameScene::ShadowGameScene()
 
 ShadowGameScene::~ShadowGameScene()
 {
-
+    Portal::UnLoadSE();
 }
 
 void ShadowGameScene::Initialize()
@@ -62,23 +62,16 @@ void ShadowGameScene::Initialize()
     testField_->Initialize();
     testField_->SetCamera(camera_.get());
     InitializeLights();
-    //Portalの初期化処理
-    portal_->Initialize();
-    portal_->SetCamera(camera_.get());
-    //ワープ座標
-    warpPos_->Initialize();
-    warpPos_->SetCamera(camera_.get());
+
     //ホワイトボード管理
-    whiteBoardManager_->Initialize();
-    whiteBoardManager_->SetCamera(camera_.get());
+    portalManager_->Initialize();
+    portalManager_->SetCamera(camera_.get());
 
     //携帯打刻機
     timeCardWatch_->Initialize();
     timeCardWatch_->SetCamera(camera_.get());
     //Playerの座標のポインタを入れる
     timeCardWatch_->SetTransformPtr(&player_->GetTransform());
-
-
 }
 
 void ShadowGameScene::Update()
@@ -123,19 +116,19 @@ void ShadowGameScene::DebugImGui()
 
 void ShadowGameScene::CheckCollision()
 {
-#ifdef USE_IMGUI
-    ImGui::Begin("RigidBodyGetWorldAABB");
-    ImGui::DragFloat3("portalTranslate", &portal_->GetTranslate().x, 0.0f, 100.0f);
-    ImGui::End();
-#endif // USE_IMGUI
+
 
     //ホワイトボードとrayの当たり判定作成する
-    whiteBoardManager_->CheckCollision(timeCardWatch_.get());
+    portalManager_->CheckCollision(timeCardWatch_.get(),camera_.get(),{0.0f,1.5f,0.0f});
 
     collisionManager_->ClearColliders();
 
     collisionManager_->AddCollider(player_.get(), camera_.get());
-    collisionManager_->AddCollider(portal_.get(), camera_.get());
+
+    for (auto& portal : portalManager_->GetPortals()) {
+        collisionManager_->AddCollider(portal.get(), camera_.get());
+    }
+ 
     collisionManager_->AddCollider(testField_.get(), camera_.get());
     collisionManager_->CheckAllCollisions();
 
@@ -263,7 +256,12 @@ void ShadowGameScene::UpdateGameObject()
 #pragma region//ゲームオブジェクト
 
     if (player_->GetIsWarp()) {
-        player_->SetTranslate(warpPos_->GetTranslate());
+        for (auto& portal : portalManager_->GetPortals()) {
+
+            player_->SetTranslate(portal->GetWarpPos());
+            break;
+        }
+   
     }
 
     player_->Update();
@@ -272,9 +270,9 @@ void ShadowGameScene::UpdateGameObject()
     timeCardWatch_->Update();
 
     testField_->Update();
-    portal_->Update();
-    warpPos_->Update();
-    whiteBoardManager_->Update();
+
+
+    portalManager_->Update();
 
 #pragma endregion
 }
@@ -323,17 +321,13 @@ void ShadowGameScene::DrawGameObject()
 
     //Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 
-   
+
     collisionManager_->DrawColliders();
 
     //テスト地面
     testField_->Draw();
-    //Portalの描画処理
-    portal_->Draw();
-    //ワープ地点
-    warpPos_->Draw();
-    //ホワイトボード管理
-    whiteBoardManager_->Draw();
+    //ポータル管理
+    portalManager_->Draw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //プレイヤーの描画処理

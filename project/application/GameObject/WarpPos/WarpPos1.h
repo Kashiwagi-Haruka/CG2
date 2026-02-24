@@ -7,11 +7,12 @@ class WarpPos1
 {
 public:
     WarpPos1();
-    void Initialize();
     void SetCamera(Camera* camera);
+    void SetTransform(const  Vector3& pos) { transform_.translate = pos; }
+    Vector3& GetTranslate() { return transform_.translate; };
+    void Initialize();
     void Update();
     void Draw();
-    Vector3& GetTranslate() { return transform_.translate; };
 private:
     std::unique_ptr<Camera> camera_ = nullptr;
     std::unique_ptr<Object3d>object3d_ = nullptr;
