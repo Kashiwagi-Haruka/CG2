@@ -413,7 +413,35 @@ Vector3 RotateVectorByQuaternion(const Vector3& v, const Vector4& q) {
 Vector3 operator+(const Vector3& v1, const Vector3& v2) { return {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
 // Vector3減算
 Vector3 operator-(const Vector3& v1, const Vector3& v2) { return {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}; }
+// Vector3単項マイナス
+Vector3 operator-(const Vector3& v) { return {-v.x, -v.y, -v.z}; }
 // Vector3スカラー倍
 Vector3 operator*(const Vector3& v, float scalar) { return {v.x * scalar, v.y * scalar, v.z * scalar}; }
+// Vector3スカラー倍（左項）
+Vector3 operator*(float scalar, const Vector3& v) { return v * scalar; }
+// Vector3スカラー除算
+Vector3 operator/(const Vector3& v, float scalar) {
+	assert(std::fabs(scalar) > 1e-6f);
+	float inv = 1.0f / scalar;
+	return {v.x * inv, v.y * inv, v.z * inv};
+}
 // Vector3加算代入
-Vector3 operator+=(Vector3& v1, const Vector3& v2) { return v1 = v1 + v2; }
+Vector3& operator+=(Vector3& v1, const Vector3& v2) {
+	v1 = v1 + v2;
+	return v1;
+}
+// Vector3減算代入
+Vector3& operator-=(Vector3& v1, const Vector3& v2) {
+	v1 = v1 - v2;
+	return v1;
+}
+// Vector3スカラー倍代入
+Vector3& operator*=(Vector3& v, float scalar) {
+	v = v * scalar;
+	return v;
+}
+// Vector3スカラー除算代入
+Vector3& operator/=(Vector3& v, float scalar) {
+	v = v / scalar;
+	return v;
+}

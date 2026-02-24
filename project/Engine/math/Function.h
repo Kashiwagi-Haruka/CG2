@@ -86,8 +86,20 @@ Vector3 RotateVectorByQuaternion(const Vector3& v, const Vector4& q);
 Vector3 operator+(const Vector3& v1, const Vector3& v2);
 // Vector3同士の減算
 Vector3 operator-(const Vector3& v1, const Vector3& v2);
+// 単項マイナス
+Vector3 operator-(const Vector3& v);
 // スカラー倍
 Vector3 operator*(const Vector3& v, float scalar);
+// スカラー倍（左項）
+Vector3 operator*(float scalar, const Vector3& v);
+// スカラー除算
+Vector3 operator/(const Vector3& v, float scalar);
 // 加算代入
-Vector3 operator+=(Vector3& v1, const Vector3& v2);
+Vector3& operator+=(Vector3& v1, const Vector3& v2);
+// 減算代入
+Vector3& operator-=(Vector3& v1, const Vector3& v2);
+// スカラー倍代入
+Vector3& operator*=(Vector3& v, float scalar);
+// スカラー除算代入
+Vector3& operator/=(Vector3& v, float scalar);
 
