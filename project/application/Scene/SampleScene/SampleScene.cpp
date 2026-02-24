@@ -8,9 +8,9 @@
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
+#include "SceneManager.h"
 #include <numbers>
 #include <utility>
-#include "SceneManager.h"
 SampleScene::SampleScene() {
 
 	uvBallObj_ = std::make_unique<Object3d>();
@@ -18,6 +18,7 @@ SampleScene::SampleScene() {
 	planeGltf_ = std::make_unique<Object3d>();
 	animatedCubeObj_ = std::make_unique<Object3d>();
 	humanObj_ = std::make_unique<Object3d>();
+	ringPrimitive_ = std::make_unique<Primitive>();
 	cameraTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -55,6 +56,8 @@ void SampleScene::Initialize() {
 	humanObj_->Initialize();
 	humanObj_->SetCamera(camera_.get());
 	humanObj_->SetModel("walk");
+	ringPrimitive_->Initialize(Primitive::Ring,24);
+	ringPrimitive_->SetCamera(camera_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -73,7 +76,12 @@ void SampleScene::Initialize() {
 	humanTransform_ = {
 	    .scale{100.0f,	                        100.0f,                    100.0f},
         .rotate{-std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0.0f  },
-        .translate{0.0f,                              1.0f,                      -3.0f  }
+        .translate{0.0f,                              1.0f,                      -3.0f }
+    };
+	ringTransform_ = {
+	    .scale{1.0f,  1.0f, 1.0f},
+        .rotate{0.0f,  0.0f, 0.0f},
+        .translate{-3.0f, 1.0f, 0.0f}
     };
 	particleTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f },
@@ -94,7 +102,12 @@ void SampleScene::Initialize() {
 		humanObj_->SetAnimation(&humanAnimationClips_[currentHumanAnimationIndex_], true);
 	}
 	humanObj_->SetTransform(humanTransform_);
-
+	ringPrimitive_->SetTransform(ringTransform_);
+	ringPrimitive_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	ringPrimitive_->SetEnableLighting(false);
+	ringPrimitive_->SetUvAnchor({0.5f, 0.5f});
+	ringPrimitive_->SetRingDiameterXY({0.5f, 0.5f}, {1.0f, 1.0f});
+	ringPrimitive_->SetDistortionFalloff(1.0f);
 	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
 		humanSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
 		humanSkinCluster_ = CreateSkinCluster(*humanSkeleton_, *walkModel);
@@ -155,8 +168,6 @@ void SampleScene::Initialize() {
 	areaLights_[1].height = 2.0f;
 	areaLights_[1].radius = 0.1f;
 	areaLights_[1].decay = 2.0f;
-
-	
 }
 
 void SampleScene::Update() {
@@ -384,7 +395,7 @@ void SampleScene::Update() {
 	}
 	ImGui::End();
 	if (ImGui::Begin("Scene")) {
-	
+
 		if (ImGui::Button("Title")) {
 			SceneManager::GetInstance()->ChangeScene("Title");
 		}
@@ -425,16 +436,20 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetRandomNoiseScale(randomNoiseScale_);
 	Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode_);
 
-	uvBallObj_->SetTransform(uvBallTransform_);
-	planeGltf_->SetTransform(planeGTransform_);
-	animatedCubeObj_->SetTransform(animatedCubeTransform_);
-	animatedCubeObj_->SetTransform(animatedCubeTransform_);
-	humanObj_->SetTransform(humanTransform_);
+	/*uvBallObj_->SetTransform(uvBallTransform_);*/
+	/*planeGltf_->SetTransform(planeGTransform_);*/
+	/*animatedCubeObj_->SetTransform(animatedCubeTransform_);*/
+	/*humanObj_->SetTransform(humanTransform_);*/
+	/*ringPrimitive_->SetTransform(ringTransform_);*/
+	/*ringPrimitive_->SetColor({1.0f, 0.85f, 0.2f, 1.0f});*/
 	uvBallObj_->Update();
 	fieldObj_->Update();
 	planeGltf_->Update();
 	animatedCubeObj_->Update();
 	humanObj_->Update();
+	ringUvRotation_ -= 0.01f;
+	ringPrimitive_->SetUvTransform(Function::MakeAffineMatrix(Vector3(1,1,1),Vector3(0,0,ringUvRotation_),Vector3(0,0,0)));
+	ringPrimitive_->Update();
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	if (humanSkeleton_ && !humanAnimationClips_.empty()) {
@@ -456,22 +471,25 @@ void SampleScene::Draw() {
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
+	ringPrimitive_->Draw();
 	Object3dCommon::GetInstance()->EndShadowMapPass();
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->DrawCommon();
-	 uvBallObj_->Draw();
-	 planeGltf_->Draw();
-	 fieldObj_->Draw();
+	uvBallObj_->Draw();
+	planeGltf_->Draw();
+	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
-	 if (sampleParticleEmitter_) {
+	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
+	ringPrimitive_->Draw();
+	if (sampleParticleEmitter_) {
 		Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
-		 sampleParticleEmitter_->Draw();
-	 }
+		sampleParticleEmitter_->Draw();
+	}
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
-	//if (humanSkeleton_) {
+	// if (humanSkeleton_) {
 	//	humanSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
-	//}
+	// }
 }
 void SampleScene::Finalize() {}

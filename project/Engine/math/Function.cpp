@@ -9,7 +9,8 @@ namespace Function {
 
 // ベクトルの長さを計算する
 float Length(const Vector3& v) { return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z); }
-
+// 長さの二乗
+float LengthSquared(const Vector3& v) { return v.x * v.x + v.y * v.y + v.z * v.z; }
 // direction = 向きたい方向（正規化推奨）
 // forwardAxis = モデルの前方向（Cube は X軸 {1,0,0}）
 // return = 回転角（x, y, z）
@@ -236,7 +237,10 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 }
 
 // SRT行列を作る（オイラー角）
-Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) {
+Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) { return MakeAffineMatrix(scale, rotate, translate, {0.0f, 0.0f}); }
+
+// SRT行列を作る（オイラー角・アンカー指定）
+Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate, Vector2 anchor) {
 	Matrix4x4 result{};
 
 	Matrix4x4 rotateX = MakeRotateXMatrix(rotate.x);
@@ -244,8 +248,11 @@ Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) {
 	Matrix4x4 rotateZ = MakeRotateZMatrix(rotate.z);
 	Matrix4x4 rotateXYZ = Multiply(rotateZ, Multiply(rotateX, rotateY));
 
-	Matrix4x4 ScaleRotateMatrix = Multiply(MakeScaleMatrix(scale), rotateXYZ);
-	result = Multiply(ScaleRotateMatrix, MakeTranslateMatrix(translate));
+	Matrix4x4 scaleRotateMatrix = Multiply(MakeScaleMatrix(scale), rotateXYZ);
+	Matrix4x4 toAnchorMatrix = MakeTranslateMatrix(-anchor.x, -anchor.y, 0.0f);
+	Matrix4x4 fromAnchorMatrix = MakeTranslateMatrix(anchor.x, anchor.y, 0.0f);
+
+	result = Multiply(Multiply(toAnchorMatrix, scaleRotateMatrix), Multiply(fromAnchorMatrix, MakeTranslateMatrix(translate)));
 
 	return result;
 }

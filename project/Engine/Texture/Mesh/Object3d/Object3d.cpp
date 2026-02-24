@@ -21,12 +21,13 @@ void Object3d::Initialize() {
 	animationTime_ = 0.0f;
 	SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	SetEnableLighting(true);
-	SetUvTransform(Function::MakeIdentity4x4());
+	SetUvTransform(uvScale_, uvRotate_, uvTranslate_, uvAnchor_);
 	SetShininess(40.0f);
 	SetEnvironmentCoefficient(0.0f);
 	SetGrayscaleEnabled(false);
 	SetSepiaEnabled(false);
-
+	SetDistortionStrength(0.0f);
+	SetDistortionFalloff(1.0f);
 	Hinstance* hinstance = Hinstance::GetInstance();
 	hinstance->RegisterObject3d(this);
 	hinstance->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
@@ -156,10 +157,31 @@ void Object3d::SetSepiaEnabled(bool enable) {
 		materialData_->sepiaEnabled = enable ? 1 : 0;
 	}
 }
+void Object3d::SetDistortionStrength(float strength) {
+	if (materialData_) {
+		materialData_->distortionStrength = strength;
+	}
+}
+void Object3d::SetDistortionFalloff(float falloff) {
+	if (materialData_) {
+		materialData_->distortionFalloff = falloff;
+	}
+}
 void Object3d::SetUvTransform(const Matrix4x4& uvTransform) {
 	if (materialData_) {
 		materialData_->uvTransform = uvTransform;
 	}
+}
+void Object3d::SetUvTransform(Vector3 scale, Vector3 rotate, Vector3 translate, Vector2 anchor) {
+	uvScale_ = scale;
+	uvRotate_ = rotate;
+	uvTranslate_ = translate;
+	uvAnchor_ = anchor;
+	SetUvTransform(Function::MakeAffineMatrix(uvScale_, uvRotate_, uvTranslate_, uvAnchor_));
+}
+void Object3d::SetUvAnchor(Vector2 anchor) {
+	uvAnchor_ = anchor;
+	SetUvTransform(Function::MakeAffineMatrix(uvScale_, uvRotate_, uvTranslate_, uvAnchor_));
 }
 void Object3d::SetShininess(float shininess) {
 	if (materialData_) {
@@ -200,6 +222,18 @@ bool Object3d::IsGrayscaleEnabled() const {
 		return materialData_->grayscaleEnabled != 0;
 	}
 	return false;
+}
+float Object3d::GetDistortionStrength() const {
+	if (materialData_) {
+		return materialData_->distortionStrength;
+	}
+	return 0.0f;
+}
+float Object3d::GetDistortionFalloff() const {
+	if (materialData_) {
+		return materialData_->distortionFalloff;
+	}
+	return 1.0f;
 }
 bool Object3d::IsSepiaEnabled() const {
 	if (materialData_) {

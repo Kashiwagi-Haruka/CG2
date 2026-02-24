@@ -549,6 +549,7 @@
     <ClInclude Include="application\GameObject\TestField\TestField.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Texture\Material.h">
     <ClInclude Include="application\GameObject\Portal\Portal.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
