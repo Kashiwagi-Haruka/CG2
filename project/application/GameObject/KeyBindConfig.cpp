@@ -30,10 +30,10 @@ bool PlayerCommand::MoveBackward()
     return  Move(K_MoveBackward, C_MoveBackward);
 }
 
-bool PlayerCommand::Jump()
+bool PlayerCommand::Shot()
 {
     auto* input = Input::GetInstance();
-    return input->TriggerKey(K_Jump) || input->TriggerButton(Input::PadButton(C_Jump));
+    return input->TriggerKey(K_Shot) || input->TriggerButton(Input::PadButton(C_Shot));
 }
 
 bool PlayerCommand::Sneak()

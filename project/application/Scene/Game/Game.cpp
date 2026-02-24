@@ -3,7 +3,7 @@
 
 void Game::Initialize() {
 	FrameWork::Initialize();
-	GameBase::GetInstance()->Initialize(L"LE2A_04_カシワギハルカ_氷華", 1280, 720);
+	GameBase::GetInstance()->Initialize(L"3102_p-再打刻", 1280, 720);
 
 	SetUnhandledExceptionFilter(GameBase::GetInstance()->ExportDump);
 

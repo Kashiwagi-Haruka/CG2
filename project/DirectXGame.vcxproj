@@ -156,6 +156,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\Collider.cpp" />
+    <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\Easing.cpp" />
     <ClCompile Include="application\GameObject\KeyBindConfig.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp" />
@@ -227,10 +229,14 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Scene\TD3_4month\ShadowGameScene.cpp" />
     <ClCompile Include="application\GameObject\Player\Player.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\YoshidaMath.cpp" />
-    <ClCompile Include="application\GameObject\Wall\Wall.cpp" />
     <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp" />
     <ClCompile Include="Engine\Editor\Hinstance.cpp" />
     <ClCompile Include="application\GameObject\TestField\TestField.cpp" />
+    <ClCompile Include="application\GameObject\Portal\Portal.cpp" />
+    <ClCompile Include="application\GameObject\WarpPos\WarpPos1.cpp" />
+    <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoard.cpp" />
+    <ClCompile Include="application\GameObject\Portal\PortalManager.cpp" />
+    <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -247,6 +253,9 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <None Include="Resources\shader\Sprite\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\Collider.h" />
+    <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\CollisionConfig.h" />
+    <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\CollisionManager.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\Easing.h" />
     <ClInclude Include="application\GameObject\KeyBindConfig.h" />
     <ClInclude Include="Engine\Texture\Material.h" />
@@ -321,10 +330,14 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Scene\TD3_4month\ShadowGameScene.h" />
     <ClInclude Include="application\GameObject\Player\Player.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\YoshidaMath.h" />
-    <ClInclude Include="application\GameObject\Wall\Wall.h" />
     <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h" />
     <ClInclude Include="Engine\Editor\Hinstance.h" />
     <ClInclude Include="application\GameObject\TestField\TestField.h" />
+    <ClInclude Include="application\GameObject\Portal\Portal.h" />
+    <ClInclude Include="application\GameObject\WarpPos\WarpPos1.h" />
+    <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoard.h" />
+    <ClInclude Include="application\GameObject\Portal\PortalManager.h" />
+    <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

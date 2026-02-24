@@ -9,14 +9,14 @@ enum GameKeyBind
 	K_MoveRight = DIK_D,
 	K_MoveForward = DIK_W,
 	K_MoveBackward = DIK_S,
-	K_Jump = DIK_SPACE,
+	K_Shot = DIK_SPACE,
 	K_Sneak = DIK_LSHIFT,
 	// コントローラー
 	C_MoveLeft = Input::PadButton::kButtonLeft,
 	C_MoveRight = Input::PadButton::kButtonRight,
 	C_MoveForward = Input::PadButton::kButtonUp,
 	C_MoveBackward = Input::PadButton::kButtonDown,
-	C_Jump = Input::PadButton::kButtonA,
+	C_Shot = Input::PadButton::kButtonA,
 	C_Sneak = Input::PadButton::kButtonLeftShoulder,
 };
 
@@ -35,7 +35,7 @@ public:
 	bool MoveRight();
 	bool MoveForward();
 	bool MoveBackward();
-	bool Jump();
+	bool Shot();
 	bool Sneak();
 private:	
 	bool Move(const GameKeyBind key, const GameKeyBind controller);

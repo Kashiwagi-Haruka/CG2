@@ -5,30 +5,45 @@
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
 #include<numbers>
+#include"RigidBody.h"
+#include "WinApp.h"
+#include"GameObject/YoshidaMath/YoshidaMath.h"
 
 ShadowGameScene::ShadowGameScene()
 {
     //シーン遷移の設定
     transition_ = std::make_unique<SceneTransition>();
+
     //カメラの設定
     cameraTransform_ = {
     .scale{1.0f, 1.0f, 1.0f  },
     .rotate{0.0f, 0.0f, 0.0f  },
     .translate{0.0f, 5.0f, -10.0f}
     };
+
+    //カメラを生成する
     camera_ = std::make_unique<Camera>();
     camera_->SetTransform(cameraTransform_);
+
     //デバックカメラ
     debugCamera_ = std::make_unique<DebugCamera>();
     //プレイヤーの生成
     player_ = std::make_unique<Player>();
     //テスト地面
     testField_ = std::make_unique<TestField>();
+    //SEを読み込む
+    Portal::LoadSE();
+    //ホワイトボード管理
+    portalManager_ = std::make_unique<PortalManager>();
+    //携帯打刻機
+    timeCardWatch_ = std::make_unique<TimeCardWatch>();
+    //衝突管理
+    collisionManager_ = std::make_unique<CollisionManager>();
 }
 
 ShadowGameScene::~ShadowGameScene()
 {
-
+    Portal::UnLoadSE();
 }
 
 void ShadowGameScene::Initialize()
@@ -47,18 +62,32 @@ void ShadowGameScene::Initialize()
     testField_->Initialize();
     testField_->SetCamera(camera_.get());
     InitializeLights();
+
+    //ホワイトボード管理
+    portalManager_->Initialize();
+    portalManager_->SetCamera(camera_.get());
+
+    //携帯打刻機
+    timeCardWatch_->Initialize();
+    timeCardWatch_->SetCamera(camera_.get());
+    //Playerの座標のポインタを入れる
+    timeCardWatch_->SetTransformPtr(&player_->GetTransform());
 }
 
 void ShadowGameScene::Update()
 {
+
     //シーン遷移の更新処理
     UpdateSceneTransition();
-    //ライトの更新処理
-    UpdatePointLight();
     //カメラの更新処理
     UpdateCamera();
+    //ライトの更新処理
+    UpdatePointLight();
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
+
+    //オブジェクトの当たり判定
+    CheckCollision();
 }
 
 void ShadowGameScene::Draw()
@@ -67,8 +96,10 @@ void ShadowGameScene::Draw()
     SpriteCommon::GetInstance()->DrawCommon();
     //シーン遷移の描画処理
     DrawSceneTransition();
+
     //ゲームオブジェクトの描画処理
     DrawGameObject();
+
 }
 
 void ShadowGameScene::Finalize()
@@ -82,6 +113,28 @@ void ShadowGameScene::DebugImGui()
     ImGui::End();
 #endif // USE_IMGUI
 }
+
+void ShadowGameScene::CheckCollision()
+{
+
+
+    //ホワイトボードとrayの当たり判定作成する
+    portalManager_->CheckCollision(timeCardWatch_.get(),camera_.get(),{0.0f,1.5f,0.0f});
+
+    collisionManager_->ClearColliders();
+
+    collisionManager_->AddCollider(player_.get(), camera_.get());
+
+    for (auto& portal : portalManager_->GetPortals()) {
+        collisionManager_->AddCollider(portal.get(), camera_.get());
+    }
+ 
+    collisionManager_->AddCollider(testField_.get(), camera_.get());
+    collisionManager_->CheckAllCollisions();
+
+
+}
+
 void ShadowGameScene::InitializeLights()
 {
     activePointLightCount_ = 2;
@@ -167,8 +220,9 @@ void ShadowGameScene::UpdateCamera()
             }
             ImGui::TreePop();
         }
-        ImGui::End();
+
     }
+    ImGui::End();
 #endif
 }
 
@@ -192,13 +246,35 @@ void ShadowGameScene::UpdateSceneTransition()
 
 void ShadowGameScene::UpdateGameObject()
 {
+#pragma region//Lightを組み込む
     Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
     Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
     Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
     Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
+#pragma endregion
+
+#pragma region//ゲームオブジェクト
+
+    if (player_->GetIsWarp()) {
+        for (auto& portal : portalManager_->GetPortals()) {
+
+            player_->SetTranslate(portal->GetWarpPos());
+            break;
+        }
+   
+    }
 
     player_->Update();
+    Vector3 forward = YoshidaMath::GetForward(camera_->GetWorldMatrix());
+    timeCardWatch_->SetRay(camera_->GetTranslate(), forward);
+    timeCardWatch_->Update();
+
     testField_->Update();
+
+
+    portalManager_->Update();
+
+#pragma endregion
 }
 void ShadowGameScene::UpdatePointLight()
 {
@@ -245,9 +321,18 @@ void ShadowGameScene::DrawGameObject()
 
     //Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 
+
+    collisionManager_->DrawColliders();
+
+    //テスト地面
     testField_->Draw();
+    //ポータル管理
+    portalManager_->Draw();
+    //携帯打刻機の描画処理
+    timeCardWatch_->Draw();
     //プレイヤーの描画処理
     player_->Draw();
+
 
 }
 #pragma endregion
