@@ -12,7 +12,6 @@ namespace PlayerConst {
     const constexpr float kRotateYSpeed = 0.25f;
     const constexpr float kSneakSpeed = 0.0625f;
     const constexpr float kWalkSpeed = 0.125f;
-
 };
 
 Player::Player()

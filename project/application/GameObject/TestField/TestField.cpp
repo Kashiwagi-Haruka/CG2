@@ -37,7 +37,7 @@ void TestField::SetCamera(Camera* camera)
 void TestField::OnCollision(Collider* collider)
 {
     if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-        plane_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+
     }
 }
 

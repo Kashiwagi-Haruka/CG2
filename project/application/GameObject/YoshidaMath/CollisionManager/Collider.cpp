@@ -86,10 +86,10 @@ void YoshidaMath::Collider::OnCollisionCollider()
 
 }
 
-bool YoshidaMath::RayIntersectsAABB(const Ray& ray, const AABB& box, float& tMin, float& tMax) {
+bool YoshidaMath::RayIntersectsAABB(const Ray& ray, const AABB& box, float tMin, float tMax) {
 
-    tMin = 0.0f;
-    tMax = std::numeric_limits<float>::max();
+    //tMin = 0.0f;
+    //tMax = std::numeric_limits<float>::max();
 
     float minVal = 0.0f;
     float maxVal = 0.0f;

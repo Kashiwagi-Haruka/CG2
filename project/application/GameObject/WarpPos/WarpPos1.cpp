@@ -8,7 +8,7 @@ WarpPos1::WarpPos1()
 {
     camera_ = std::make_unique<Camera>();
     object3d_ = std::make_unique<Object3d>();
-    transform_= { .scale = {1.0f,1.0f,1.0f},.rotate = { 0.0f,0.0f,0.0f},.translate = { 0.0f,1.0f,-10.0f}};
+    transform_= { .scale = {1.0f,1.0f,1.0f},.rotate = { 0.0f,0.0f,0.0f},.translate = { 0.0f,0.0f,0.0f}};
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/camera", "camera");
     object3d_->SetModel("camera");
     object3d_->SetTransform(transform_);
@@ -34,8 +34,7 @@ void WarpPos1::Update()
     transform_.translate.y += std::sinf(sinTheta_)*0.0625f;
     object3d_->SetTransform(transform_);
     object3d_->Update();
-    
-
+ 
 }
 
 void WarpPos1::Draw()

@@ -2,6 +2,7 @@
 #include"Function.h"
 #include<cmath>
 #include<algorithm>
+#include"Camera.h"
 
 
 float YoshidaMath::Dot(const Vector2& v1, const Vector2& v2)
@@ -38,5 +39,33 @@ Vector3 YoshidaMath::GetWorldPosByMat(const Matrix4x4& mat)
 AABB YoshidaMath::GetAABBWorldPos(const AABB& localAABB, const Vector3& worldPos)
 {
     return  { .min = localAABB.min + worldPos,.max = localAABB.max + worldPos };
+}
+
+Matrix4x4 YoshidaMath::MakeRotateMatrix(const Vector3& rotate)
+{
+    Matrix4x4 rotateX = Function::MakeRotateXMatrix(rotate.x);
+    Matrix4x4 rotateY = Function::MakeRotateYMatrix(rotate.y);
+    Matrix4x4 rotateZ = Function::MakeRotateZMatrix(rotate.z);
+
+    return  Function::Multiply(Function::Multiply(rotateX, rotateY), rotateZ);
+}
+
+Matrix4x4 YoshidaMath::GetBillBordMatrix(Camera* camera)
+{
+    //ビルボードで作成する
+    Matrix4x4 billboardMatrix = camera->GetWorldMatrix();
+    billboardMatrix.m[3][0] = 0.0f;
+    billboardMatrix.m[3][1] = 0.0f;
+    billboardMatrix.m[3][2] = 0.0f;
+    return billboardMatrix;
+}
+
+Vector3 YoshidaMath::GetAABBScale(const AABB& aabb)
+{
+    return  {
+        aabb.max.x - aabb.min.x,
+        aabb.max.y - aabb.min.y,
+        aabb.max.z - aabb.min.z
+    };
 }
 

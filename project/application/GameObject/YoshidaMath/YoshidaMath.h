@@ -4,6 +4,7 @@
 #include"Vector4.h"
 #include"RigidBody.h"
 #include"Matrix4x4.h"
+class Camera;
 class Collider;
 namespace YoshidaMath {
     const constexpr float kDeltaTime = 1.0f / 60.0f;
@@ -17,4 +18,8 @@ namespace YoshidaMath {
     //ワールド行列からワールド座標を取得する
     Vector3 GetWorldPosByMat(const Matrix4x4& mat);
     AABB GetAABBWorldPos(const AABB& localAABB, const Vector3& worldPos);
+    //オイラー角から回転行列を取得する
+    Matrix4x4 MakeRotateMatrix(const Vector3& rotate);
+    Matrix4x4 GetBillBordMatrix(Camera* camera);
+    Vector3 GetAABBScale(const AABB& aabb);
 }

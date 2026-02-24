@@ -24,15 +24,11 @@ void WhiteBoard::Update()
     obj_->Update();
 
     collisionTransform_ = obj_->GetTransform();
-    Vector3 scale =
-    { localAABB_.max.x - localAABB_.min.x,
-        localAABB_.max.y - localAABB_.min.y,
-        localAABB_.max.z - localAABB_.min.z
-    };
 
-    collisionTransform_.scale = scale;
+    collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
     collisionTransform_.rotate = { 0.0f };
-    collisionTransform_.translate.y = 1.5f;
+    //objectからの相対距離
+    collisionTransform_.translate.y += 1.375f;
 
 #ifdef _DEBUG
     primitive_->SetTransform(collisionTransform_);
