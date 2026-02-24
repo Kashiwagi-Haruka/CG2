@@ -21,7 +21,7 @@ void Object3d::Initialize() {
 	animationTime_ = 0.0f;
 	SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	SetEnableLighting(true);
-	SetUvTransform(Function::MakeIdentity4x4());
+	SetUvTransform(uvScale_, uvRotate_, uvTranslate_, uvAnchor_);
 	SetShininess(40.0f);
 	SetEnvironmentCoefficient(0.0f);
 	SetGrayscaleEnabled(false);
@@ -171,6 +171,17 @@ void Object3d::SetUvTransform(const Matrix4x4& uvTransform) {
 	if (materialData_) {
 		materialData_->uvTransform = uvTransform;
 	}
+}
+void Object3d::SetUvTransform(Vector3 scale, Vector3 rotate, Vector3 translate, Vector2 anchor) {
+	uvScale_ = scale;
+	uvRotate_ = rotate;
+	uvTranslate_ = translate;
+	uvAnchor_ = anchor;
+	SetUvTransform(Function::MakeAffineMatrix(uvScale_, uvRotate_, uvTranslate_, uvAnchor_));
+}
+void Object3d::SetUvAnchor(Vector2 anchor) {
+	uvAnchor_ = anchor;
+	SetUvTransform(Function::MakeAffineMatrix(uvScale_, uvRotate_, uvTranslate_, uvAnchor_));
 }
 void Object3d::SetShininess(float shininess) {
 	if (materialData_) {

@@ -64,6 +64,10 @@ private:
 	Matrix4x4 worldMatrix;
 	Matrix4x4 worldViewProjectionMatrix;
 	bool isUseSetWorld;
+	Vector3 uvScale_ = {1.0f, 1.0f, 1.0f};
+	Vector3 uvRotate_ = {0.0f, 0.0f, 0.0f};
+	Vector3 uvTranslate_ = {0.0f, 0.0f, 0.0f};
+	Vector2 uvAnchor_ = {0.0f, 0.0f};
 
 public:
 	~Primitive();
@@ -104,6 +108,8 @@ public:
 	void SetEnableLighting(bool enable);
 	// UV 変換行列を設定
 	void SetUvTransform(const Matrix4x4& uvTransform);
+	void SetUvTransform(Vector3 scale, Vector3 rotate, Vector3 translate, Vector2 anchor = {0.0f, 0.0f});
+	void SetUvAnchor(Vector2 anchor);
 	// スペキュラの鋭さを設定
 	void SetShininess(float shininess);
 	// 環境マップ反射係数を設定
@@ -127,6 +133,7 @@ public:
 	bool IsSepiaEnabled() const;
 	float GetDistortionStrength() const;
 	float GetDistortionFalloff() const;
+	Vector2 GetUvAnchor() const { return uvAnchor_; }
 
 private:
 	// Line 描画時に使う始点

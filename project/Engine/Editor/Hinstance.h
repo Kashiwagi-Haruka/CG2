@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Transform.h"
+#include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
 
@@ -37,6 +38,7 @@ private:
 		Vector3 uvScale = {1.0f, 1.0f, 1.0f};
 		Vector3 uvRotate = {0.0f, 0.0f, 0.0f};
 		Vector3 uvTranslate = {0.0f, 0.0f, 0.0f};
+		Vector2 uvAnchor = {0.0f, 0.0f};
 	};
 
 	bool SaveObjectEditorsToJson(const std::string& filePath) const;

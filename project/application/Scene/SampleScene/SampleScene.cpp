@@ -105,6 +105,9 @@ void SampleScene::Initialize() {
 	ringPrimitive_->SetTransform(ringTransform_);
 	ringPrimitive_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	ringPrimitive_->SetEnableLighting(false);
+	ringPrimitive_->SetUvAnchor({0.5f, 0.5f});
+	ringPrimitive_->SetRingDiameterXY({0.5f, 0.5f}, {1.0f, 1.0f});
+	ringPrimitive_->SetDistortionFalloff(1.0f);
 	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
 		humanSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
 		humanSkinCluster_ = CreateSkinCluster(*humanSkeleton_, *walkModel);

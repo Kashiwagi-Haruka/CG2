@@ -752,6 +752,17 @@ void Primitive::SetUvTransform(const Matrix4x4& uvTransform) {
 	materialData_->uvTransform = uvTransform;
 	materialResource_->Unmap(0, nullptr);
 }
+void Primitive::SetUvTransform(Vector3 scale, Vector3 rotate, Vector3 translate, Vector2 anchor) {
+	uvScale_ = scale;
+	uvRotate_ = rotate;
+	uvTranslate_ = translate;
+	uvAnchor_ = anchor;
+	SetUvTransform(Function::MakeAffineMatrix(uvScale_, uvRotate_, uvTranslate_, uvAnchor_));
+}
+void Primitive::SetUvAnchor(Vector2 anchor) {
+	uvAnchor_ = anchor;
+	SetUvTransform(Function::MakeAffineMatrix(uvScale_, uvRotate_, uvTranslate_, uvAnchor_));
+}
 void Primitive::SetShininess(float shininess) {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->shininess = shininess;

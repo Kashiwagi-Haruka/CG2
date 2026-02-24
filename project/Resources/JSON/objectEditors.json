@@ -9,11 +9,32 @@
           1.0,
           1.0
         ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
         "enableLighting": true,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
-        "shininess": 40.0
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
       },
       "name": "Object uvBall",
       "transform": {
@@ -43,11 +64,32 @@
           1.0,
           1.0
         ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
         "enableLighting": true,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
-        "shininess": 40.0
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
       },
       "name": "field",
       "transform": {
@@ -77,11 +119,32 @@
           1.0,
           1.0
         ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
         "enableLighting": true,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
-        "shininess": 40.0
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
       },
       "name": "plane",
       "transform": {
@@ -111,11 +174,32 @@
           1.0,
           1.0
         ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
         "enableLighting": true,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
-        "shininess": 40.0
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
       },
       "name": "animeCube",
       "transform": {
@@ -145,11 +229,32 @@
           1.0,
           1.0
         ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
         "enableLighting": true,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
-        "shininess": 40.0
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
       },
       "name": "Object 4",
       "transform": {
@@ -181,13 +286,34 @@
           1.0,
           1.0
         ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 1.4199999570846558,
         "enableLighting": false,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
-        "shininess": 40.0
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.7200000286102295,
+          0.5
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.1699999570846558,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
       },
-      "name": "ring",
+      "name": "Primitive 0",
       "transform": {
         "rotate": [
           0.0,
@@ -195,14 +321,14 @@
           0.0
         ],
         "scale": [
-          2.440000057220459,
-          2.569999933242798,
+          1.0,
+          1.0,
           1.0
         ],
         "translate": [
-          0.03999999910593033,
-          2.859999895095825,
-          -3.3399999141693115
+          0.0,
+          2.0,
+          0.0
         ]
       }
     }

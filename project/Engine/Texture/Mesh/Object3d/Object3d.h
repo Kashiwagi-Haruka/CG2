@@ -4,7 +4,9 @@
 #include "CameraForGPU.h"
 #include "Light/DirectionalLight.h"
 #include "Matrix4x4.h"
+#include "Model/Model.h"
 #include "Transform.h"
+#include "Vector2.h"
 #include "Vector4.h"
 #include "VertexData.h"
 #include <Windows.h>
@@ -12,10 +14,8 @@
 #include <memory>
 #include <string>
 #include <wrl.h>
-#include "Model/Model.h"
 class Camera;
 struct SkinCluster;
-
 
 class Object3d {
 
@@ -49,6 +49,10 @@ class Object3d {
 	float animationTime_ = 0.0f;
 	bool isLoopAnimation_ = true;
 	SkinCluster* skinCluster_ = nullptr;
+	Vector3 uvScale_ = {1.0f, 1.0f, 1.0f};
+	Vector3 uvRotate_ = {0.0f, 0.0f, 0.0f};
+	Vector3 uvTranslate_ = {0.0f, 0.0f, 0.0f};
+	Vector2 uvAnchor_ = {0.0f, 0.0f};
 
 public:
 	~Object3d();
@@ -79,6 +83,8 @@ public:
 	void SetDistortionStrength(float strength);
 	void SetDistortionFalloff(float falloff);
 	void SetUvTransform(const Matrix4x4& uvTransform);
+	void SetUvTransform(Vector3 scale, Vector3 rotate, Vector3 translate, Vector2 anchor = {0.0f, 0.0f});
+	void SetUvAnchor(Vector2 anchor);
 	void SetShininess(float shininess);
 	void SetEnvironmentCoefficient(float coefficient);
 	Vector4 GetColor() const;
@@ -89,6 +95,7 @@ public:
 	bool IsSepiaEnabled() const;
 	float GetDistortionStrength() const;
 	float GetDistortionFalloff() const;
+	Vector2 GetUvAnchor() const { return uvAnchor_; }
 	void SetAnimation(const Animation::AnimationData* animation, bool loop = true) {
 		animation_ = animation;
 		isLoopAnimation_ = loop;
