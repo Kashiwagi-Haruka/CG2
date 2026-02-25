@@ -312,7 +312,9 @@ void ShadowGameScene::DrawGameObject()
 {
     Object3dCommon::GetInstance()->BeginShadowMapPass();
     Object3dCommon::GetInstance()->DrawCommonShadow();
-
+	testField_->Draw();
+	portalManager_->Draw();
+	timeCardWatch_->Draw();
     //プレイヤーの描画処理
     player_->Draw();
 
