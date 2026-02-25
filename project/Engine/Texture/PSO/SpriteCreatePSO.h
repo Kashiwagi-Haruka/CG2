@@ -17,7 +17,6 @@ class SpriteCreatePSO {
 
 	HRESULT hr_;
 
-	std::wstring vertexShaderPath_;
 	std::wstring pixelShaderPath_;
 
 	BlendMode blendMode_ = BlendMode::kBlendModeAlpha;
@@ -29,7 +28,7 @@ class SpriteCreatePSO {
 public:
 	explicit SpriteCreatePSO(DirectXCommon* dxCommom);
 	void Create(
-	    const std::wstring& pixelShaderPath = L"Resources/shader/Sprite/Sprite.PS.hlsl", const std::wstring& vertexShaderPath = L"");
+	    const std::wstring& pixelShaderPath = L"Resources/shader/Sprite/Sprite.PS.hlsl");
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetRootSignature() { return rootSignature_; };
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> GetGraphicsPipelineState(BlendMode blendMode) { return graphicsPipelineState_[blendMode]; };
 };
