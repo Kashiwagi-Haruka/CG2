@@ -124,16 +124,13 @@ bool Hinstance::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
 		ResetForSceneChange();
 		loadedSceneName_ = sceneName;
 	}
-	if (hasLoadedForCurrentScene_) {
-		return true;
-	}
 
 	const std::string scopedFilePath = GetSceneScopedEditorFilePath(filePath);
-	hasLoadedForCurrentScene_ = true;
 	if (!HasObjectEditorJsonFile(scopedFilePath)) {
 		return false;
 	}
-	return LoadObjectEditorsFromJson(scopedFilePath);
+	hasLoadedForCurrentScene_ = LoadObjectEditorsFromJson(scopedFilePath);
+	return hasLoadedForCurrentScene_;
 }
 
 bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
