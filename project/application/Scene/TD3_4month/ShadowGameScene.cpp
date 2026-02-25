@@ -13,22 +13,13 @@ ShadowGameScene::ShadowGameScene()
 {
     //シーン遷移の設定
     transition_ = std::make_unique<SceneTransition>();
-
-    //カメラの設定
-    cameraTransform_ = {
-    .scale{1.0f, 1.0f, 1.0f  },
-    .rotate{0.0f, 0.0f, 0.0f  },
-    .translate{0.0f, 5.0f, -10.0f}
-    };
-
-    //カメラを生成する
-    camera_ = std::make_unique<Camera>();
-    camera_->SetTransform(cameraTransform_);
-
     //デバックカメラ
     debugCamera_ = std::make_unique<DebugCamera>();
     //プレイヤーの生成
     player_ = std::make_unique<Player>();
+    //プレイヤー視点のカメラ
+    playerCamera_ = std::make_unique<PlayerCamera>();
+    playerCamera_->SetPlayerTransformPtr(&player_->GetTransform());
     //テスト地面
     testField_ = std::make_unique<TestField>();
     //SEを読み込む
@@ -54,22 +45,22 @@ void ShadowGameScene::Initialize()
     isTransitionOut_ = false;
     //デバックカメラの設定
     debugCamera_->Initialize();
-    debugCamera_->SetTranslation(cameraTransform_.translate);
+    debugCamera_->SetTranslation(playerCamera_->GetTransform().translate);
     //プレイヤーの初期化
     player_->Initialize();
-    player_->SetCamera(camera_.get());
+    player_->SetCamera(playerCamera_->GetCamera());
 
     testField_->Initialize();
-    testField_->SetCamera(camera_.get());
+    testField_->SetCamera(playerCamera_->GetCamera());
     InitializeLights();
 
     //ホワイトボード管理
     portalManager_->Initialize();
-    portalManager_->SetCamera(camera_.get());
+    portalManager_->SetCamera(playerCamera_->GetCamera());
 
     //携帯打刻機
     timeCardWatch_->Initialize();
-    timeCardWatch_->SetCamera(camera_.get());
+    timeCardWatch_->SetCamera(playerCamera_->GetCamera());
     //Playerの座標のポインタを入れる
     timeCardWatch_->SetTransformPtr(&player_->GetTransform());
 }
@@ -116,23 +107,19 @@ void ShadowGameScene::DebugImGui()
 
 void ShadowGameScene::CheckCollision()
 {
-
-
     //ホワイトボードとrayの当たり判定作成する
-    portalManager_->CheckCollision(timeCardWatch_.get(),camera_.get(),{0.0f,1.5f,0.0f});
+    portalManager_->CheckCollision(timeCardWatch_.get(), playerCamera_->GetCamera(),{0.0f,1.5f,0.0f});
 
     collisionManager_->ClearColliders();
 
-    collisionManager_->AddCollider(player_.get(), camera_.get());
+    collisionManager_->AddCollider(player_.get(), playerCamera_->GetCamera());
 
     for (auto& portal : portalManager_->GetPortals()) {
-        collisionManager_->AddCollider(portal.get(), camera_.get());
+        collisionManager_->AddCollider(portal.get(), playerCamera_->GetCamera());
     }
  
-    collisionManager_->AddCollider(testField_.get(), camera_.get());
+    collisionManager_->AddCollider(testField_.get(), playerCamera_->GetCamera());
     collisionManager_->CheckAllCollisions();
-
-
 }
 
 void ShadowGameScene::InitializeLights()
@@ -196,17 +183,11 @@ void ShadowGameScene::UpdateCamera()
 {
     if (useDebugCamera_) {
         debugCamera_->Update();
-        camera_->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
+        playerCamera_->GetCamera()->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
     } else {
-        //Playerからの視点
-        Transform  transform = player_->GetTransform();
-        transform.scale = { 1.0f,1.0f,1.0f };
-        transform.rotate.x += std::numbers::pi_v<float>*0.5f;
-        transform.rotate.z = 0.0f;
-        transform.translate.y += 1.5f;
-        camera_->SetTransform(transform);
-        camera_->Update();
+        playerCamera_->Update();
     }
+
 #ifdef USE_IMGUI
     if (ImGui::Begin("Camera")) {
         ImGui::Checkbox("Use Debug Camera (F1)", &useDebugCamera_);
@@ -214,9 +195,10 @@ void ShadowGameScene::UpdateCamera()
         if (ImGui::TreeNode("Transform")) {
 
             if (!useDebugCamera_) {
-                ImGui::DragFloat3("Scale", &cameraTransform_.scale.x, 0.01f);
-                ImGui::DragFloat3("Rotate", &cameraTransform_.rotate.x, 0.01f);
-                ImGui::DragFloat3("Translate", &cameraTransform_.translate.x, 0.01f);
+                auto& playerCameraT = player_->GetTransform();
+                ImGui::DragFloat3("Scale", &playerCameraT.scale.x, 0.01f);
+                ImGui::DragFloat3("Rotate", &playerCameraT.rotate.x, 0.01f);
+                ImGui::DragFloat3("Translate", &playerCameraT.translate.x, 0.01f);
             }
             ImGui::TreePop();
         }
@@ -265,8 +247,9 @@ void ShadowGameScene::UpdateGameObject()
     }
 
     player_->Update();
-    Vector3 forward = YoshidaMath::GetForward(camera_->GetWorldMatrix());
-    timeCardWatch_->SetRay(camera_->GetTranslate(), forward);
+    auto* playerCamera = playerCamera_->GetCamera();
+    Vector3 forward = YoshidaMath::GetForward(playerCamera->GetWorldMatrix());
+    timeCardWatch_->SetRay(playerCamera->GetTranslate(), forward);
     timeCardWatch_->Update();
 
     testField_->Update();

@@ -52,10 +52,6 @@ void Player::Initialize()
 
     moveSpeed_ = { 0.0f };
 
-
-    //カメラの感度をここで宣言していて良くない
-    eyeRotateSpeed_ = 0.3f;
-    eyeRotateX_ = 0.0f;
     //アニメーションクリップ
     animationClips_ = Animation::LoadAnimationClips("Resources/3d/human", "walk");
     std::vector<Animation::AnimationData> sneakClips = Animation::LoadAnimationClips("Resources/3d/human", "sneakWalk");
@@ -81,8 +77,6 @@ void Player::Update()
     isWarp_ = false;
     //移動処理
     Move();
-    //旋回処理
-    Rotate();
     //重力処理
     Gravity();
     bodyObj_->SetTransform(transform_);
@@ -104,11 +98,6 @@ void Player::Debug()
 #ifdef USE_IMGUI
     if (ImGui::Begin("Human")) {
 
-        if (ImGui::TreeNode("Eye")) {
-            ImGui::DragFloat("eyeRotateSpeed", &eyeRotateSpeed_, 0.1f, 0.1f);
-            ImGui::DragFloat("eyeRotateX", &eyeRotateX_, 0.1f);
-            ImGui::TreePop();
-        }
 
         if (ImGui::TreeNode("Transform")) {
             ImGui::DragFloat3("Scale", &transform_.scale.x, 0.1f);
@@ -177,35 +166,6 @@ void Player::Move()
         transform_.translate += forward * horizontal.z * moveSpeed_;
         transform_.translate += right * horizontal.x * moveSpeed_;
     }
-
-}
-
-void Player::Rotate()
-{
-    auto* input = Input::GetInstance();
-
-    Vector2 inputMovePos = input->GetJoyStickRXY();
-    float dPitch = 0.0f;
-    float dYaw = 0.0f;
-
-    if (fabs(inputMovePos.x) > 0.0f || fabs(inputMovePos.y) > 0.0f) {
-        //スティック処理が優先される
-        dYaw = inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_ * 10.0f;
-        dPitch = -inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_ * 10.0f;
-    } else {
-        //マウス
-        inputMovePos = input->GetMouseMove();
-        dYaw += inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_;
-        dPitch += inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_;
-    }
-
-    eyeRotateX_ += dPitch;
-    transform_.rotate.y += dYaw;
-
-    eyeRotateX_ = std::clamp(
-        eyeRotateX_,
-        -Function::kPi * 0.5f,
-        Function::kPi * 0.5f);
 
 }
 
