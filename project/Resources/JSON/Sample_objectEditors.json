@@ -36,7 +36,7 @@
           0.0
         ]
       },
-      "name": "Object uvBall",
+      "name": "Object 0",
       "transform": {
         "rotate": [
           0.0,
@@ -44,12 +44,12 @@
           0.0
         ],
         "scale": [
-          2.700000047683716,
-          1.9800000190734863,
+          1.0,
+          1.0,
           1.0
         ],
         "translate": [
-          0.23999999463558197,
+          0.0,
           0.0,
           0.0
         ]
@@ -91,7 +91,7 @@
           0.0
         ]
       },
-      "name": "field",
+      "name": "Object 1",
       "transform": {
         "rotate": [
           0.0,
@@ -104,7 +104,7 @@
           1.0
         ],
         "translate": [
-          0.4699999988079071,
+          0.0,
           0.0,
           0.0
         ]
@@ -146,7 +146,7 @@
           0.0
         ]
       },
-      "name": "plane",
+      "name": "Object 2",
       "transform": {
         "rotate": [
           0.0,
@@ -159,8 +159,8 @@
           1.0
         ],
         "translate": [
-          0.18000000715255737,
-          2.490000009536743,
+          0.0,
+          0.0,
           0.0
         ]
       }
@@ -201,7 +201,7 @@
           0.0
         ]
       },
-      "name": "animeCube",
+      "name": "Object 3",
       "transform": {
         "rotate": [
           0.0,
@@ -214,8 +214,8 @@
           1.0
         ],
         "translate": [
-          4.130000114440918,
-          1.409999966621399,
+          0.0,
+          0.0,
           0.0
         ]
       }
@@ -269,8 +269,8 @@
           1.0
         ],
         "translate": [
-          0.2199999988079071,
-          2.509999990463257,
+          0.0,
+          0.0,
           0.0
         ]
       }
@@ -287,15 +287,15 @@
           1.0
         ],
         "distortionFalloff": 1.0,
-        "distortionStrength": 6.360000133514404,
+        "distortionStrength": 0.0,
         "enableLighting": false,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
         "shininess": 40.0,
         "uvAnchor": [
-          0.5,
-          0.5
+          0.0,
+          0.0
         ],
         "uvRotate": [
           0.0,
@@ -303,7 +303,7 @@
           0.0
         ],
         "uvScale": [
-          0.5,
+          1.0,
           1.0,
           1.0
         ],
@@ -321,13 +321,13 @@
           0.0
         ],
         "scale": [
-          2.130000114440918,
-          3.75,
+          1.0,
+          1.0,
           1.0
         ],
         "translate": [
           0.0,
-          2.0,
+          0.0,
           0.0
         ]
       }

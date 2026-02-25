@@ -26,6 +26,9 @@ public:
 	bool LoadObjectEditorsFromJsonIfExists(const std::string& filePath);
 
 private:
+	std::string GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const;
+	void ResetForSceneChange();
+
 	struct EditorMaterial {
 		Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 		bool enableLighting = true;
@@ -56,4 +59,6 @@ private:
 	std::string saveStatusMessage_;
 	bool hasUnsavedChanges_ = false;
 	bool isPlaying_ = false;
+	std::string loadedSceneName_;
+	bool hasLoadedForCurrentScene_ = false;
 };
