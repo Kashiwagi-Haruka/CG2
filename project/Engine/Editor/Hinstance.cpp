@@ -381,6 +381,7 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 	return true;
 }
 void Hinstance::DrawSceneSelector() {
+#ifdef USE_IMGUI
 	SceneManager* sceneManager = SceneManager::GetInstance();
 	if (!sceneManager) {
 		return;
@@ -406,9 +407,16 @@ void Hinstance::DrawSceneSelector() {
 		}
 		ImGui::EndCombo();
 	}
+#else
+	SceneManager* sceneManager = SceneManager::GetInstance();
+	if (!sceneManager) {
+		return;
+	}
+#endif
 }
 
 void Hinstance::DrawGridEditor() {
+#ifdef USE_IMGUI
 	ImGui::Checkbox("Enable Grid Snap", &enableGridSnap_);
 	if (ImGui::DragFloat("Grid Snap Spacing", &gridSnapSpacing_, 0.05f, 0.1f, 100.0f, "%.2f")) {
 		editorGridDirty_ = true;
@@ -422,6 +430,7 @@ void Hinstance::DrawGridEditor() {
 	if (ImGui::DragFloat("Grid Y", &editorGridY_, 0.01f, -100.0f, 100.0f, "%.2f")) {
 		editorGridDirty_ = true;
 	}
+#endif
 
 	gridSnapSpacing_ = std::max(gridSnapSpacing_, 0.1f);
 	gridHalfLineCount_ = std::max(gridHalfLineCount_, 1);
