@@ -8,6 +8,7 @@ struct Material
     float shininess;
     float environmentCoefficient;
     int grayscaleEnabled;
+    int sepiaEnabled;
     float distortionStrength;
     float distortionFalloff;
 };

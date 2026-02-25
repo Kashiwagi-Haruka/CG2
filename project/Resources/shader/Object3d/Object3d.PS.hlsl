@@ -119,7 +119,7 @@ float ComputeMicroShadow(float3 normal, float3 toLight, float3 toEye)
     // シャドウマップ以外の陰りはハーフランバートで制御する。
     // ※toEyeはインターフェース維持のため受け取る。
     float NdotL = saturate(dot(normal, toLight));
-    (float3) toEye;
+    (void) toEye;
     return pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
 }
 

@@ -287,7 +287,7 @@
           1.0
         ],
         "distortionFalloff": 1.0,
-        "distortionStrength": 4.71999979019165,
+        "distortionStrength": 0.0,
         "enableLighting": false,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
@@ -321,13 +321,13 @@
           0.0
         ],
         "scale": [
-          2.9000000953674316,
-          3.5,
+          1.0,
+          1.0,
           1.0
         ],
         "translate": [
           0.0,
-          2.390000104904175,
+          0.0,
           0.0
         ]
       }
