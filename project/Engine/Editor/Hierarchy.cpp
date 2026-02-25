@@ -635,10 +635,7 @@ void Hierarchy::SyncSelectionBoxToTarget() {
 		selectionBoxPrimitive_->SetColor({1.0f, 0.9f, 0.1f, 1.0f});
 	}
 	selectionBoxPrimitive_->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
-	Transform selectedTransform = GetSelectedTransform();
-	selectedTransform.scale.x += 0.05f;
-	selectedTransform.scale.y += 0.05f;
-	selectedTransform.scale.z += 0.05f;
+	const Transform selectedTransform = GetSelectedTransform();
 	selectionBoxPrimitive_->SetTransform(selectedTransform);
 }
 
