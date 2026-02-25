@@ -17,6 +17,7 @@ private:
 	BlendModeManager blendModeManager_;
 
 	std::unique_ptr<SpriteCreatePSO> pso_;
+	std::unique_ptr<SpriteCreatePSO> psoFont_;
 
 	HRESULT hr_;
 
@@ -25,6 +26,7 @@ public:
 	void Initialize(DirectXCommon* dxCommon);
 	void Finalize();
 	void DrawCommon();
+	void DrawCommonFont();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 

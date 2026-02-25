@@ -4,9 +4,8 @@
 #include "DirectXCommon.h"
 SpriteCreatePSO::SpriteCreatePSO(DirectXCommon* dxCommon) : dxCommon_(dxCommon) {}
 
-void SpriteCreatePSO::Create(const std::wstring& pixelShaderPath, const std::wstring& vertexShaderPath) {
+void SpriteCreatePSO::Create(const std::wstring& pixelShaderPath) {
 	pixelShaderPath_ = pixelShaderPath;
-	vertexShaderPath_ = vertexShaderPath;
 	CreateRootSignature();
 	CreateGraphicsPipeline();
 }
@@ -118,7 +117,7 @@ void SpriteCreatePSO::CreateGraphicsPipeline() {
 
 	// --- 通常PSO（裏面カリング） ---
 	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(L"Resources/shader/Sprite/Sprite.VS.hlsl", L"vs_6_0");
-	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(L"Resources/shader/Sprite/Sprite.PS.hlsl", L"ps_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(pixelShaderPath_.c_str(), L"ps_6_0");
 	assert(vsBlob && psBlob);
 
 	// 修正案: IID_PPV_ARGSの引数にgraphicsPipelineState_[i].ReleaseAndGetAddressOf()を使う

@@ -19,10 +19,18 @@ void SpriteCommon::Initialize(DirectXCommon* dxCommon) {
 
 	pso_ = std::make_unique<SpriteCreatePSO>(dxCommon_);
 	pso_->Create();
+	psoFont_ = std::make_unique<SpriteCreatePSO>(dxCommon_);
+	psoFont_->Create(L"Resources/shader/Sprite/Font.PS.hlsl");
 }
 void SpriteCommon::Finalize() { instance_.reset(); }
 void SpriteCommon::DrawCommon() {
 
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(pso_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get()); // 通常
+
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void SpriteCommon::DrawCommonFont(){
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(pso_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get()); // 通常
 
