@@ -298,7 +298,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     }
     output.color.rgb = ApplyGrayscale(output.color.rgb);
     output.color.rgb = ApplySepia(output.color.rgb);
-    if (textureColor.a < 0.5f)
+    if (textureColor.a < 0.1f)
     {
         discard;
     }
