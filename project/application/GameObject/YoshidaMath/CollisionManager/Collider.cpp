@@ -1,7 +1,7 @@
 #define NOMINMAX
 #include "Collider.h"
 #include"Function.h"
-
+#include "Object3d/Object3dCommon.h"
 YoshidaMath::Collider::Collider()
 {
 #ifdef _DEBUG
@@ -73,7 +73,7 @@ void YoshidaMath::Collider::ColliderUpdate()
 void YoshidaMath::Collider::ColliderDraw()
 {
 #ifdef _DEBUG
- 
+
     primitive_->Draw();
 #endif // _DEBUG
 }
