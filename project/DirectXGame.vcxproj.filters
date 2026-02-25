@@ -90,6 +90,7 @@
     <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp" />
     <ClCompile Include="Engine\Editor\EditorGrid.cpp" />
     <ClCompile Include="Engine\Editor\Editor.cpp" />
+    <ClCompile Include="Engine\Texture\PSO\SpriteCreatePSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\Collider.h" />
@@ -179,6 +180,7 @@
     <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h" />
     <ClInclude Include="Engine\Editor\EditorGrid.h" />
     <ClInclude Include="Engine\Editor\Editor.h" />
+    <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

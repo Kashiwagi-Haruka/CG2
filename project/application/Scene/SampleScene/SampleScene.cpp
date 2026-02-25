@@ -9,6 +9,8 @@
 #include <imgui.h>
 #endif // USE_IMGUI
 #include "SceneManager.h"
+#include "Sprite/SpriteCommon.h"
+#include "TextureManager.h"
 #include <numbers>
 #include <utility>
 SampleScene::SampleScene() {
@@ -103,6 +105,13 @@ void SampleScene::Initialize() {
 			humanObj_->SetSkinCluster(&humanSkinCluster_);
 		}
 	}
+
+	uvSprite = std::make_unique<Sprite>();
+	uvSprite->Initialize(TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png"));
+	uvSprite->SetScale(Vector2(100, 100));
+	uvSprite->SetRotation(0);
+	uvSprite->SetPosition(Vector2(0, 0));
+
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
@@ -361,6 +370,8 @@ void SampleScene::Update() {
 	ringPrimitive_->SetUvTransform(Vector3(1,1,1),Vector3(0,0,ringUvRotation_),Vector3(0,0,0),Vector2(0.5f,0.5f));
 	ringPrimitive_->Update();
 
+	uvSprite->Update();
+
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
@@ -403,5 +414,7 @@ void SampleScene::Draw() {
 	// if (humanSkeleton_) {
 	//	humanSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
 	// }
+	SpriteCommon::GetInstance()->DrawCommon();
+	uvSprite->Draw();
 }
 void SampleScene::Finalize() {}
