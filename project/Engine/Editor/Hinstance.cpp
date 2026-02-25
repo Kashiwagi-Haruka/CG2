@@ -434,33 +434,35 @@ void Hinstance::DrawEditorGridLines() {
 		return;
 	}
 
-	if (editorGridDirty_) {
-		editorGridLines_.clear();
-		const std::vector<EditorGridLine> lines = EditorGrid::CreateLines(gridHalfLineCount_, gridSnapSpacing_, 1.0f);
-		editorGridLines_.reserve(lines.size());
-		for (const EditorGridLine& line : lines) {
-			auto primitive = std::make_unique<Primitive>();
-			primitive->SetEditorRegistrationEnabled(false);
-			primitive->Initialize(Primitive::Line);
-			primitive->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
-			primitive->SetEnableLighting(false);
-			primitive->SetColor(line.color);
-			primitive->SetLinePositions({line.start.x, editorGridY_, line.start.z}, {line.end.x, editorGridY_, line.end.z});
-			editorGridLines_.push_back(std::move(primitive));
+	if (editorGridDirty_ || !editorGridPlane_) {
+		if (!editorGridPlane_) {
+			editorGridPlane_ = std::make_unique<Primitive>();
+			editorGridPlane_->SetEditorRegistrationEnabled(false);
+			editorGridPlane_->Initialize(Primitive::Plane);
+			editorGridPlane_->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
+			editorGridPlane_->SetEnableLighting(false);
 		}
+
+		const float extent = static_cast<float>(gridHalfLineCount_) * gridSnapSpacing_;
+		Transform gridTransform{};
+		gridTransform.scale = {extent * 2.0f, extent * 2.0f, 1.0f};
+		gridTransform.rotate = {Function::kPi * 0.5f, 0.0f, 0.0f};
+		gridTransform.translate = {0.0f, editorGridY_, 0.0f};
+		editorGridPlane_->SetTransform(gridTransform);
+		editorGridPlane_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+		editorGridPlane_->SetDistortionFalloff(gridSnapSpacing_);                        // spacing
+		editorGridPlane_->SetDistortionStrength(static_cast<float>(gridHalfLineCount_)); // half line count
+		editorGridPlane_->SetEnvironmentCoefficient(gridSnapSpacing_ * 0.04f);           // line width in world unit
 		editorGridDirty_ = false;
 	}
 
-	if (editorGridLines_.empty()) {
+	if (!editorGridPlane_) {
 		return;
 	}
 
-	Object3dCommon::GetInstance()->DrawCommonLineNoDepth();
-	for (const auto& line : editorGridLines_) {
-		line->Update();
-		line->Draw();
-	}
-	Object3dCommon::GetInstance()->DrawCommon();
+	Object3dCommon::GetInstance()->DrawCommonEditorGrid();
+	editorGridPlane_->Update();
+	editorGridPlane_->Draw();
 #endif
 }
 

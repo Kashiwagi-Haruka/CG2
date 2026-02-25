@@ -71,5 +71,5 @@ private:
 	int gridHalfLineCount_ = 50;
 	float editorGridY_ = 0.0f;
 	bool editorGridDirty_ = true;
-	std::vector<std::unique_ptr<Primitive>> editorGridLines_;
+	std::unique_ptr<Primitive> editorGridPlane_;
 };
