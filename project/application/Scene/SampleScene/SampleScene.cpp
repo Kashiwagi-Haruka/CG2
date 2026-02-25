@@ -382,13 +382,6 @@ void SampleScene::Update() {
 		}
 	}
 	ImGui::End();
-	if (ImGui::Begin("Scene")) {
-
-		if (ImGui::Button("Title")) {
-			SceneManager::GetInstance()->ChangeScene("Title");
-		}
-	}
-	ImGui::End();
 	if (ImGui::Begin("ScreenEffectd")) {
 		static const char* noiseBlendModes[] = {"Overwrite", "Add", "Subtract", "Multiply", "Screen"};
 		ImGui::Checkbox("Fullscreen Grayscale (BT709)", &fullScreenGrayscaleEnabled_);

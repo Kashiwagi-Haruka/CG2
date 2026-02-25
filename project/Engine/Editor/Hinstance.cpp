@@ -452,7 +452,7 @@ void Hinstance::DrawEditorGridLines() {
 		editorGridPlane_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 		editorGridPlane_->SetDistortionFalloff(gridSnapSpacing_);                        // spacing
 		editorGridPlane_->SetDistortionStrength(static_cast<float>(gridHalfLineCount_)); // half line count
-		editorGridPlane_->SetEnvironmentCoefficient(gridSnapSpacing_ * 0.04f);           // line width in world unit
+		editorGridPlane_->SetEnvironmentCoefficient(gridSnapSpacing_ * 0.025f);           // line width in world unit
 		editorGridDirty_ = false;
 	}
 
