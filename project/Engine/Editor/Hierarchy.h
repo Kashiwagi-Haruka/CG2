@@ -17,9 +17,9 @@
 class Object3d;
 class Primitive;
 
-class Hinstance {
+class Hierarchy {
 public:
-	static Hinstance* GetInstance();
+	static Hierarchy* GetInstance();
 
 	void RegisterObject3d(Object3d* object);
 	void UnregisterObject3d(Object3d* object);

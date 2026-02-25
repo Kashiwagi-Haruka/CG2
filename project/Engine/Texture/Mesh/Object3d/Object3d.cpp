@@ -2,7 +2,7 @@
 #include "Camera.h"
 #include "DirectXCommon.h"
 #include "Function.h"
-#include "Engine/Editor/Hinstance.h"
+#include "Engine/Editor/Hierarchy.h"
 #include "Model/Model.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
@@ -11,7 +11,7 @@
 #include <cassert>
 #include <cmath>
 
-Object3d::~Object3d() { Hinstance::GetInstance()->UnregisterObject3d(this); }
+Object3d::~Object3d() { Hierarchy::GetInstance()->UnregisterObject3d(this); }
 
 void Object3d::Initialize() {
 
@@ -28,9 +28,9 @@ void Object3d::Initialize() {
 	SetSepiaEnabled(false);
 	SetDistortionStrength(0.0f);
 	SetDistortionFalloff(1.0f);
-	Hinstance* hinstance = Hinstance::GetInstance();
-	hinstance->RegisterObject3d(this);
-	hinstance->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+	Hierarchy* Hierarchy = Hierarchy::GetInstance();
+	Hierarchy->RegisterObject3d(this);
+	Hierarchy->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
 }
 namespace {
 bool IsIdentityMatrix(const Matrix4x4& matrix) {

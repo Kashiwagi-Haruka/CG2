@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "DirectXCommon.h"
 #include "Function.h"
-#include "Engine/Editor/Hinstance.h"
+#include "Engine/Editor/Hierarchy.h"
 #include "Object3d/Object3dCommon.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
@@ -501,7 +501,7 @@ MeshData BuildMeshByPrimitiveName(Primitive::PrimitiveName primitiveName, uint32
 	}
 }
 } // namespace
-Primitive::~Primitive() { Hinstance::GetInstance()->UnregisterPrimitive(this); }
+Primitive::~Primitive() { Hierarchy::GetInstance()->UnregisterPrimitive(this); }
 // 既定テクスチャでプリミティブを初期化
 void Primitive::Initialize(PrimitiveName name) { Initialize(name, kDefaultSlices); }
 // 指定分割数で既定テクスチャ初期化
@@ -555,8 +555,8 @@ void Primitive::Initialize(PrimitiveName name, uint32_t slices) {
 
 	isUseSetWorld = false;
 	if (editorRegistrationEnabled_) {
-		Hinstance::GetInstance()->RegisterPrimitive(this);
-		Hinstance::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+		Hierarchy::GetInstance()->RegisterPrimitive(this);
+		Hierarchy::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
 	}
 }
 // 指定テクスチャでプリミティブを初期化
@@ -611,8 +611,8 @@ void Primitive::Initialize(PrimitiveName name, const std::string& texturePath, u
 
 	isUseSetWorld = false;
 	if (editorRegistrationEnabled_) {
-		Hinstance::GetInstance()->RegisterPrimitive(this);
-		Hinstance::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+		Hierarchy::GetInstance()->RegisterPrimitive(this);
+		Hierarchy::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
 	}
 }
 // 座標変換やマテリアル定数を更新

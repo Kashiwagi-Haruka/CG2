@@ -1,5 +1,5 @@
 #define NOMINMAX
-#include "Hinstance.h"
+#include "Hierarchy.h"
 #include "EditorGrid.h"
 #include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
@@ -24,11 +24,11 @@ std::filesystem::path ResolveObjectEditorJsonPath(const std::string& filePath) {
 bool HasObjectEditorJsonFile(const std::string& filePath) { return std::filesystem::exists(ResolveObjectEditorJsonPath(filePath)); }
 } // namespace
 
-Hinstance* Hinstance::GetInstance() {
-	static Hinstance instance;
+Hierarchy* Hierarchy::GetInstance() {
+	static Hierarchy instance;
 	return &instance;
 }
-std::string Hinstance::GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const {
+std::string Hierarchy::GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const {
 	const SceneManager* sceneManager = SceneManager::GetInstance();
 	if (!sceneManager) {
 		return defaultFilePath;
@@ -40,7 +40,7 @@ std::string Hinstance::GetSceneScopedEditorFilePath(const std::string& defaultFi
 	return sceneName + "_" + std::filesystem::path(defaultFilePath).filename().string();
 }
 
-void Hinstance::ResetForSceneChange() {
+void Hierarchy::ResetForSceneChange() {
 	hasUnsavedChanges_ = false;
 	saveStatusMessage_.clear();
 	hasLoadedForCurrentScene_ = false;
@@ -55,7 +55,7 @@ void Hinstance::ResetForSceneChange() {
 	editorLightState_.areaLights.clear();
 	Object3dCommon::GetInstance()->SetEditorLightOverride(false);
 }
-void Hinstance::RegisterObject3d(Object3d* object) {
+void Hierarchy::RegisterObject3d(Object3d* object) {
 	if (!object) {
 		return;
 	}
@@ -77,7 +77,7 @@ void Hinstance::RegisterObject3d(Object3d* object) {
 	}
 }
 
-void Hinstance::UnregisterObject3d(Object3d* object) {
+void Hierarchy::UnregisterObject3d(Object3d* object) {
 	if (!object) {
 		return;
 	}
@@ -92,7 +92,7 @@ void Hinstance::UnregisterObject3d(Object3d* object) {
 	}
 }
 
-void Hinstance::RegisterPrimitive(Primitive* primitive) {
+void Hierarchy::RegisterPrimitive(Primitive* primitive) {
 	if (!primitive) {
 		return;
 	}
@@ -114,7 +114,7 @@ void Hinstance::RegisterPrimitive(Primitive* primitive) {
 	}
 }
 
-void Hinstance::UnregisterPrimitive(Primitive* primitive) {
+void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
 	if (!primitive) {
 		return;
 	}
@@ -129,9 +129,9 @@ void Hinstance::UnregisterPrimitive(Primitive* primitive) {
 	}
 }
 
-bool Hinstance::HasRegisteredObjects() const { return !objects_.empty() || !primitives_.empty(); }
+bool Hierarchy::HasRegisteredObjects() const { return !objects_.empty() || !primitives_.empty(); }
 
-bool Hinstance::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
+bool Hierarchy::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
 	const SceneManager* sceneManager = SceneManager::GetInstance();
 	const std::string sceneName = sceneManager ? sceneManager->GetCurrentSceneName() : std::string();
 	if (sceneName != loadedSceneName_) {
@@ -147,7 +147,7 @@ bool Hinstance::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
 	return hasLoadedForCurrentScene_;
 }
 
-bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
+bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 	nlohmann::json root;
 	root["objects"] = nlohmann::json::array();
 	root["primitives"] = nlohmann::json::array();
@@ -222,7 +222,7 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 	return jsonManager->SaveJson(filePath);
 }
 
-bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
+bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 	JsonManager* jsonManager = JsonManager::GetInstance();
 	if (!jsonManager->LoadJson(filePath)) {
 		return false;
@@ -391,7 +391,7 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 
 	return true;
 }
-void Hinstance::DrawSceneSelector() {
+void Hierarchy::DrawSceneSelector() {
 #ifdef USE_IMGUI
 	SceneManager* sceneManager = SceneManager::GetInstance();
 	if (!sceneManager) {
@@ -426,7 +426,7 @@ void Hinstance::DrawSceneSelector() {
 #endif
 }
 
-void Hinstance::DrawGridEditor() {
+void Hierarchy::DrawGridEditor() {
 #ifdef USE_IMGUI
 	ImGui::Checkbox("Enable Grid Snap", &enableGridSnap_);
 	if (ImGui::DragFloat("Grid Snap Spacing", &gridSnapSpacing_, 0.05f, 0.1f, 100.0f, "%.2f")) {
@@ -446,9 +446,9 @@ void Hinstance::DrawGridEditor() {
 	gridSnapSpacing_ = std::max(gridSnapSpacing_, 0.1f);
 	gridHalfLineCount_ = std::max(gridHalfLineCount_, 1);
 }
-void Hinstance::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
+void Hierarchy::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
 
-void Hinstance::DrawEditorGridLines() {
+void Hierarchy::DrawEditorGridLines() {
 #ifdef USE_IMGUI
 	if (!showEditorGridLines_) {
 		return;
@@ -489,7 +489,7 @@ void Hinstance::DrawEditorGridLines() {
 #endif
 }
 
-void Hinstance::DrawLightEditor() {
+void Hierarchy::DrawLightEditor() {
 #ifdef USE_IMGUI
 	bool overrideChanged = ImGui::Checkbox("Use Editor Lights", &editorLightState_.overrideSceneLights);
 	if (overrideChanged) {
@@ -589,7 +589,7 @@ void Hinstance::DrawLightEditor() {
 	}
 #endif
 }
-void Hinstance::DrawObjectEditors() {
+void Hierarchy::DrawObjectEditors() {
 #ifdef USE_IMGUI
 
 	if (!isPlaying_) {
@@ -642,7 +642,7 @@ void Hinstance::DrawObjectEditors() {
 
 	ImGui::SetNextWindowPos(ImVec2(editorPosX, editorPosY), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(editorWidth, viewport->WorkSize.y), ImGuiCond_Always);
-	if (!ImGui::Begin("Hinstance", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
+	if (!ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
 		ImGui::End();
 		return;
 	}
