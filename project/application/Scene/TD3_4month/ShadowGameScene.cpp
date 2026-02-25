@@ -323,7 +323,7 @@ void ShadowGameScene::DrawGameObject()
     //Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 
 
-    collisionManager_->DrawColliders();
+    
 
     //テスト地面
     testField_->Draw();
@@ -332,8 +332,9 @@ void ShadowGameScene::DrawGameObject()
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //プレイヤーの描画処理
+	Object3dCommon::GetInstance()->DrawCommonSkinning();
     player_->Draw();
 
-
+    collisionManager_->DrawColliders();
 }
 #pragma endregion
