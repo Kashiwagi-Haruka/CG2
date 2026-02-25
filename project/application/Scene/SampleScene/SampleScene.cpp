@@ -439,6 +439,8 @@ void SampleScene::Update() {
 	ringPrimitive_->SetUvTransform(Vector3(1,1,1),Vector3(0,0,ringUvRotation_),Vector3(0,0,0),Vector2(0.5f,0.5f));
 	ringPrimitive_->Update();
 
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
+
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	if (humanSkeleton_ && !humanAnimationClips_.empty()) {
 		const Animation::AnimationData& currentAnimation = humanAnimationClips_[currentHumanAnimationIndex_];

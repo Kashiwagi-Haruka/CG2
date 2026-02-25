@@ -69,7 +69,7 @@ private:
 	float gridSnapSpacing_ = 1.0f;
 	bool showEditorGridLines_ = true;
 	int gridHalfLineCount_ = 50;
-	float editorGridY_ = 0.01f;
+	float editorGridY_ = 0.0f;
 	bool editorGridDirty_ = true;
 	std::vector<std::unique_ptr<Primitive>> editorGridLines_;
 };
