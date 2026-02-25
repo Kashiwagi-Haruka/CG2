@@ -24,7 +24,23 @@ Hinstance* Hinstance::GetInstance() {
 	static Hinstance instance;
 	return &instance;
 }
+std::string Hinstance::GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const {
+	const SceneManager* sceneManager = SceneManager::GetInstance();
+	if (!sceneManager) {
+		return defaultFilePath;
+	}
+	const std::string& sceneName = sceneManager->GetCurrentSceneName();
+	if (sceneName.empty()) {
+		return defaultFilePath;
+	}
+	return sceneName + "_" + std::filesystem::path(defaultFilePath).filename().string();
+}
 
+void Hinstance::ResetForSceneChange() {
+	hasUnsavedChanges_ = false;
+	saveStatusMessage_.clear();
+	hasLoadedForCurrentScene_ = false;
+}
 void Hinstance::RegisterObject3d(Object3d* object) {
 	if (!object) {
 		return;
@@ -102,10 +118,22 @@ void Hinstance::UnregisterPrimitive(Primitive* primitive) {
 bool Hinstance::HasRegisteredObjects() const { return !objects_.empty() || !primitives_.empty(); }
 
 bool Hinstance::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
-	if (!HasObjectEditorJsonFile(filePath)) {
+	const SceneManager* sceneManager = SceneManager::GetInstance();
+	const std::string sceneName = sceneManager ? sceneManager->GetCurrentSceneName() : std::string();
+	if (sceneName != loadedSceneName_) {
+		ResetForSceneChange();
+		loadedSceneName_ = sceneName;
+	}
+	if (hasLoadedForCurrentScene_) {
+		return true;
+	}
+
+	const std::string scopedFilePath = GetSceneScopedEditorFilePath(filePath);
+	hasLoadedForCurrentScene_ = true;
+	if (!HasObjectEditorJsonFile(scopedFilePath)) {
 		return false;
 	}
-	return LoadObjectEditorsFromJson(filePath);
+	return LoadObjectEditorsFromJson(scopedFilePath);
 }
 
 bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
@@ -419,11 +447,12 @@ void Hinstance::DrawObjectEditors() {
 	ImGui::Separator();
 
 	if (!isPlaying_ && ImGui::Button("Save To JSON")) {
-		const bool saved = SaveObjectEditorsToJson("objectEditors.json");
+		const std::string saveFilePath = GetSceneScopedEditorFilePath("objectEditors.json");
+		const bool saved = SaveObjectEditorsToJson(saveFilePath);
 		if (saved) {
 			hasUnsavedChanges_ = false;
 		}
-		saveStatusMessage_ = saved ? "Saved: objectEditors.json" : "Save failed: objectEditors.json";
+		saveStatusMessage_ = saved ? ("Saved: " + saveFilePath) : ("Save failed: " + saveFilePath);
 	}
 	if (!saveStatusMessage_.empty()) {
 		ImGui::Text("%s", saveStatusMessage_.c_str());

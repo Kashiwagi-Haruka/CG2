@@ -21,6 +21,8 @@ void SceneManager::Finalize() {
 	}
 
 	nextscene_.reset();
+	currentSceneName_.clear();
+	nextSceneName_.clear();
 
 	// ★ Singleton の instance を解放
 	instance_.reset();
@@ -43,6 +45,8 @@ void SceneManager::Update() {
 		}
 
 		scene_ = std::move(nextscene_);
+		currentSceneName_ = nextSceneName_;
+		nextSceneName_.clear();
 		scene_->SetSceneManager(this);
 		scene_->Initialize();
 		isSceneReinitializeRequested_ = false;
@@ -65,4 +69,5 @@ void SceneManager::ChangeScene(const std::string& sceneName) {
 	assert(nextscene_ == nullptr);
 
 	nextscene_ = sceneFactory_->CreateScene(sceneName);
+	nextSceneName_ = sceneName;
 }
