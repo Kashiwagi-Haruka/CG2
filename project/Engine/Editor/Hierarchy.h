@@ -36,6 +36,10 @@ private:
 	void DrawSceneSelector();
 	void DrawGridEditor();
 	void DrawLightEditor();
+	void DrawSelectionBoxEditor();
+	void SyncSelectionBoxToTarget();
+	Transform GetSelectedTransform() const;
+	bool IsObjectSelected() const;
 	std::string GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const;
 	void ResetForSceneChange();
 
@@ -79,6 +83,13 @@ private:
 	std::vector<Transform> primitiveEditorTransforms_;
 	std::vector<EditorMaterial> primitiveEditorMaterials_;
 	std::string saveStatusMessage_;
+
+	bool showSelectionBox_ = true;
+	std::unique_ptr<Primitive> selectionBoxPrimitive_;
+	bool selectionBoxDirty_ = true;
+	size_t selectedObjectIndex_ = 0;
+	bool selectedIsPrimitive_ = false;
+
 	bool hasUnsavedChanges_ = false;
 	bool isPlaying_ = false;
 	std::string loadedSceneName_;

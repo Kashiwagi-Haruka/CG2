@@ -187,7 +187,7 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 
 	for (size_t i = 0; i < primitives_.size(); ++i) {
 		const Primitive* primitive = primitives_[i];
-		if (!primitive) {
+		if (!primitive || primitive == selectionBoxPrimitive_.get()) {
 			continue;
 		}
 		const Transform& transform = primitiveEditorTransforms_[i];
@@ -317,7 +317,7 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 				continue;
 			}
 			const size_t index = primitiveJson["index"].get<size_t>();
-			if (index >= primitives_.size() || !primitives_[index]) {
+			if (index >= primitives_.size() || !primitives_[index] || primitives_[index] == selectionBoxPrimitive_.get()) {
 				continue;
 			}
 			if (primitiveJson.contains("name") && primitiveJson["name"].is_string()) {
@@ -486,6 +486,20 @@ void Hierarchy::DrawEditorGridLines() {
 	Object3dCommon::GetInstance()->DrawCommonEditorGrid();
 	editorGridPlane_->Update();
 	editorGridPlane_->Draw();
+	if (!showSelectionBox_ || !IsObjectSelected()) {
+		return;
+	}
+	if (selectionBoxDirty_ || !selectionBoxPrimitive_) {
+		SyncSelectionBoxToTarget();
+		selectionBoxDirty_ = false;
+	}
+	if (!selectionBoxPrimitive_) {
+		return;
+	}
+	selectionBoxPrimitive_->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
+	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
+	selectionBoxPrimitive_->Update();
+	selectionBoxPrimitive_->Draw();
 #endif
 }
 
@@ -589,6 +603,52 @@ void Hierarchy::DrawLightEditor() {
 	}
 #endif
 }
+bool Hierarchy::IsObjectSelected() const {
+	if (selectedIsPrimitive_) {
+		return selectedObjectIndex_ < primitives_.size() && primitives_[selectedObjectIndex_] != nullptr;
+	}
+	return selectedObjectIndex_ < objects_.size() && objects_[selectedObjectIndex_] != nullptr;
+}
+
+Transform Hierarchy::GetSelectedTransform() const {
+	if (selectedIsPrimitive_) {
+		if (selectedObjectIndex_ < primitiveEditorTransforms_.size()) {
+			return primitiveEditorTransforms_[selectedObjectIndex_];
+		}
+	} else {
+		if (selectedObjectIndex_ < editorTransforms_.size()) {
+			return editorTransforms_[selectedObjectIndex_];
+		}
+	}
+	return Transform{};
+}
+
+void Hierarchy::SyncSelectionBoxToTarget() {
+	if (!showSelectionBox_ || !IsObjectSelected()) {
+		return;
+	}
+	if (!selectionBoxPrimitive_) {
+		selectionBoxPrimitive_ = std::make_unique<Primitive>();
+		selectionBoxPrimitive_->SetEditorRegistrationEnabled(false);
+		selectionBoxPrimitive_->Initialize(Primitive::Box);
+		selectionBoxPrimitive_->SetEnableLighting(false);
+		selectionBoxPrimitive_->SetColor({1.0f, 0.9f, 0.1f, 1.0f});
+	}
+	selectionBoxPrimitive_->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
+	Transform selectedTransform = GetSelectedTransform();
+	selectedTransform.scale.x += 0.05f;
+	selectedTransform.scale.y += 0.05f;
+	selectedTransform.scale.z += 0.05f;
+	selectionBoxPrimitive_->SetTransform(selectedTransform);
+}
+
+void Hierarchy::DrawSelectionBoxEditor() {
+#ifdef USE_IMGUI
+	if (ImGui::Checkbox("Draw Selection Box", &showSelectionBox_)) {
+		selectionBoxDirty_ = true;
+	}
+#endif
+}
 void Hierarchy::DrawObjectEditors() {
 #ifdef USE_IMGUI
 
@@ -655,6 +715,8 @@ void Hierarchy::DrawObjectEditors() {
 	DrawGridEditor();
 	ImGui::SeparatorText("Light");
 	DrawLightEditor();
+	ImGui::SeparatorText("Selection");
+	DrawSelectionBoxEditor();
 	ImGui::Separator();
 
 	if (!isPlaying_ && ImGui::Button("Save To JSON")) {
@@ -695,7 +757,13 @@ void Hierarchy::DrawObjectEditors() {
 		std::string& objectName = objectNames_[i];
 		std::string nodeLabel = objectName.empty() ? ("Object " + std::to_string(i)) : objectName;
 		const std::string treeNodeLabel = nodeLabel + "###object_node_" + std::to_string(i);
-		if (ImGui::TreeNode(treeNodeLabel.c_str())) {
+		const ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ((!selectedIsPrimitive_ && selectedObjectIndex_ == i) ? ImGuiTreeNodeFlags_Selected : 0);
+		if (ImGui::TreeNodeEx(treeNodeLabel.c_str(), nodeFlags)) {
+			if (ImGui::IsItemClicked()) {
+				selectedObjectIndex_ = i;
+				selectedIsPrimitive_ = false;
+				selectionBoxDirty_ = true;
+			}
 			Transform& transform = editorTransforms_[i];
 			EditorMaterial& material = editorMaterials_[i];
 			bool transformChanged = false;
@@ -733,6 +801,7 @@ void Hierarchy::DrawObjectEditors() {
 				hasUnsavedChanges_ = true;
 			}
 			if (transformChanged) {
+				selectionBoxDirty_ = true;
 				if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
 					transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
 					transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
@@ -764,7 +833,13 @@ void Hierarchy::DrawObjectEditors() {
 		std::string& primitiveName = primitiveNames_[i];
 		std::string nodeLabel = primitiveName.empty() ? ("Primitive " + std::to_string(i)) : primitiveName;
 		const std::string treeNodeLabel = nodeLabel + "###primitive_node_" + std::to_string(i);
-		if (ImGui::TreeNode(treeNodeLabel.c_str())) {
+		const ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ((selectedIsPrimitive_ && selectedObjectIndex_ == i) ? ImGuiTreeNodeFlags_Selected : 0);
+		if (ImGui::TreeNodeEx(treeNodeLabel.c_str(), nodeFlags)) {
+			if (ImGui::IsItemClicked()) {
+				selectedObjectIndex_ = i;
+				selectedIsPrimitive_ = true;
+				selectionBoxDirty_ = true;
+			}
 			Transform& transform = primitiveEditorTransforms_[i];
 			EditorMaterial& material = primitiveEditorMaterials_[i];
 			bool transformChanged = false;
@@ -802,6 +877,7 @@ void Hierarchy::DrawObjectEditors() {
 				hasUnsavedChanges_ = true;
 			}
 			if (transformChanged) {
+				selectionBoxDirty_ = true;
 				if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
 					transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
 					transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
