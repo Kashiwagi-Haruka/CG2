@@ -1,0 +1,216 @@
+#include "Font.h"
+#include"DirectXCommon.h"
+#include"SRVmanager/SrvManager.h"
+
+ID3D12GraphicsCommandList* Font::commandList = nullptr;
+
+Font::Font()
+{
+    commandList = DirectXCommon::GetCommandList();
+}
+
+Font::~Font()
+{
+    if (vertexResource_) {
+        vertexResource_->Unmap(0, nullptr);
+        vertexResource_.Reset();
+    }
+
+    if (transformationMatrixResource_) {
+        transformationMatrixResource_->Unmap(0, nullptr);
+        transformationMatrixResource_.Reset();
+    }
+}
+
+void Font::Create(const TextureFactory::Handle& textureHandle, const Vector2& position, const Vector4& color, const Vector2& size, const Vector2& anchorPoint)
+{
+
+    position_ = position;
+    textureHandle_ = Texture::GetHandle(textureHandle);
+    anchorPoint_ = anchorPoint;
+
+    CreateMaterial(color);
+    CreateVertex();
+    CreateTransformationMatrix();
+    CreateUVTransformationMatrix();
+    AdjustTextureSize(size);
+
+
+}
+
+void Font::Update()
+{
+    UpdateAnchorPoint();
+
+    UpdateUV();
+}
+
+void Font::UpdateAnchorPoint()
+{
+    float left = 0.0f - anchorPoint_.x;
+    float right = 1.0f - anchorPoint_.x;
+    float top = 0.0f - anchorPoint_.y;
+    float bottom = 1.0f - anchorPoint_.y;
+
+    if (isFlipX_) {
+        left = -left;
+        right = -right;
+    }
+
+    if (isFlipY_) {
+        top = -top;
+        bottom = -bottom;
+    }
+
+    vertexData_[0].position = { left,bottom,0.0f,1.0f };//左下
+    vertexData_[1].position = { left,top,0.0f,1.0f };//左上
+    vertexData_[2].position = { right,bottom,0.0f,1.0f };//右下
+    vertexData_[3].position = { right,top,0.0f,1.0f };//右上
+
+    float texelWidth = 1.0f / textureSize.x;
+    float texelHeight = 1.0f / textureSize.y;
+
+    float offset = 0.5f;
+    float tex_left = (textureLeftTop.x + offset) * texelWidth;
+    float tex_right = (textureLeftTop.x + textureSize.x) * texelWidth;
+    float tex_top = (textureLeftTop.y + offset) * texelHeight;
+    float tex_bottom = (textureLeftTop.y + textureSize.y) * texelHeight;
+
+    vertexData_[0].texcoord = { tex_left,tex_bottom };
+    vertexData_[1].texcoord = { tex_left,tex_top };
+    vertexData_[2].texcoord = { tex_right,tex_bottom };
+    vertexData_[3].texcoord = { tex_right,tex_top };
+
+}
+
+void Font::SetColor(const Vector4& color) {
+    materialResource_.SetColor(color);
+}
+
+void Font::SetTexture(const TextureFactory::Handle& textureHandle)
+{
+    textureHandle_ = Texture::GetHandle(textureHandle);
+
+}
+
+void Font::PreDraw(uint32_t blendMode) {
+
+    if (commandList == nullptr) {
+        commandList = DirectXCommon::GetCommandList();
+    }
+
+    commandList->SetPipelineState(PSO::GetGraphicsPipelineStateFont(blendMode).Get());//PSOを設定
+    //形状を設定。PSOに設定している物とはまた別。同じものを設定すると考えておけばよい。
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void Font::Draw(const LightMode& lightMode
+) {
+
+    materialResource_.SetLightMode(lightMode);
+    transform_.scale = { scale_.x * size_.x,scale_.y * size_.y,1.0f };
+    transform_.rotate = { 0.0f,0.0f,rotate_ };
+    transform_.translate = { position_.x,position_.y,0.5f };
+
+    worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+
+    *transformationMatrixData_ = { Multiply(worldMatrix_, SpriteCamera::GetViewProjectionMatrix()),worldMatrix_ };
+
+    //頂点バッファビューを設定
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);//VBVを設定
+    SpriteCommon::SetIndexBuffer(commandList);
+    //マテリアルCBufferの場所を設定　/*RotParameter配列の0番目 0->register(b4)1->register(b0)2->register(b4)*/
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource_.GetMaterialResource()->GetGPUVirtualAddress());
+    //TransformationMatrixCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
+    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
+    SrvManager::SetGraphicsRootDescriptorTable(2, textureHandle_);
+
+    SpriteCommon::DrawCall(commandList);
+
+};
+
+// ===================================//Private関数//===================================
+
+
+void Font::CreateVertex()
+{
+    //VertexResourceとVertexBufferViewを用意 矩形を表現するための三角形を二つ(頂点4つ)
+    vertexResource_ = DirectXCommon::CreateBufferResource(sizeof(VertexData) * 4);
+
+    //頂点バッファビューを作成する
+    //リソースの先頭アドレスから使う
+    vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+    //使用するリソースのサイズ頂点4つ分のサイズ
+    vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+    //1頂点あたりのサイズ
+    vertexBufferView_.StrideInBytes = sizeof(VertexData);
+
+#pragma region //Sprite用の頂点データの設定
+
+    vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+    //1枚目の三角形 四頂点でスプライト描画が完成
+
+    vertexData_[0].position = { 0.0f,1.0f,0.0f,1.0f };//左下
+    vertexData_[1].position = { 0.0f,0.0f,0.0f,1.0f };//左上
+    vertexData_[2].position = { 1.0f,1.0f,0.0f,1.0f };//右下
+    vertexData_[3].position = { 1.0f,0.0f,0.0f,1.0f };//右上
+
+    vertexData_[0].texcoord = { 0.0f,1.0f };
+    vertexData_[0].normal = { 0.0f,0.0f,-1.0f };//法線
+
+    vertexData_[1].texcoord = { 0.0f,0.0f };
+    vertexData_[1].normal = { 0.0f,0.0f,-1.0f };
+
+    vertexData_[2].texcoord = { 1.0f,1.0f };
+    vertexData_[2].normal = { 0.0f,0.0f,-1.0f };
+
+    vertexData_[3].texcoord = { 1.0f,0.0f };
+    vertexData_[3].normal = { 0.0f,0.0f,-1.0f };
+
+#pragma endregion
+
+}
+
+void Font::CreateUVTransformationMatrix()
+{
+    uvTransform_ = {
+     {1.0f,1.0f,1.0f},
+     {0.0f,0.0f,0.0f},
+     {0.0f,0.0f,0.0f},
+    };
+
+    uvTransformMatrix_ = MakeIdentity4x4();
+}
+
+void Font::CreateTransformationMatrix() {
+
+    //Matrix4x4　1つ分のサイズを用意
+    transformationMatrixResource_ = DirectXCommon::CreateBufferResource(sizeof(TransformationMatrixFor2D));
+    //データを書き込む
+    //書き込むためのアドレスを取得
+    transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+
+    transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{ position_.x,position_.y,0.0f } };
+    worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+
+
+}
+
+void Font::CreateMaterial(const Vector4& color) {
+
+    //マテリアルリソースを作成 //ライトなし
+    materialResource_.CreateMaterial(color, LightMode::kLightModeNone);
+
+}
+
+void Font::UpdateUV() {
+    uvTransformMatrix_ = MakeAffineMatrix(uvTransform_.scale, uvTransform_.rotate, uvTransform_.translate);
+    materialResource_.SetUV(uvTransformMatrix_);
+}
+
+void Font::AdjustTextureSize(const Vector2& size)
+{
+    textureSize = size;
+    size_ = textureSize;
+}
