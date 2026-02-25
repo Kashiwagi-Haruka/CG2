@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -21,11 +22,14 @@ public:
 	void UnregisterPrimitive(Primitive* primitive);
 	bool HasRegisteredObjects() const;
 	void DrawObjectEditors();
+	void DrawEditorGridLines();
 	void SetPlayMode(bool isPlaying);
 	bool IsPlayMode() const { return isPlaying_; }
 	bool LoadObjectEditorsFromJsonIfExists(const std::string& filePath);
 
 private:
+	void DrawSceneSelector();
+	void DrawGridEditor();
 	std::string GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const;
 	void ResetForSceneChange();
 
@@ -61,4 +65,11 @@ private:
 	bool isPlaying_ = false;
 	std::string loadedSceneName_;
 	bool hasLoadedForCurrentScene_ = false;
+	bool enableGridSnap_ = true;
+	float gridSnapSpacing_ = 1.0f;
+	bool showEditorGridLines_ = true;
+	int gridHalfLineCount_ = 50;
+	float editorGridY_ = 0.0f;
+	bool editorGridDirty_ = true;
+	std::unique_ptr<Primitive> editorGridPlane_;
 };

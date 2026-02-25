@@ -554,8 +554,10 @@ void Primitive::Initialize(PrimitiveName name, uint32_t slices) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 
 	isUseSetWorld = false;
-	Hinstance::GetInstance()->RegisterPrimitive(this);
-	Hinstance::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+	if (editorRegistrationEnabled_) {
+		Hinstance::GetInstance()->RegisterPrimitive(this);
+		Hinstance::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+	}
 }
 // 指定テクスチャでプリミティブを初期化
 void Primitive::Initialize(PrimitiveName name, const std::string& texturePath) { Initialize(name, texturePath, kDefaultSlices); }
@@ -608,8 +610,10 @@ void Primitive::Initialize(PrimitiveName name, const std::string& texturePath, u
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 
 	isUseSetWorld = false;
-	Hinstance::GetInstance()->RegisterPrimitive(this);
-	Hinstance::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+	if (editorRegistrationEnabled_) {
+		Hinstance::GetInstance()->RegisterPrimitive(this);
+		Hinstance::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+	}
 }
 // 座標変換やマテリアル定数を更新
 void Primitive::Update() {
@@ -626,7 +630,17 @@ void Primitive::Update() {
 		worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	}
 
-	worldViewProjectionMatrix = Function::Multiply(Function::Multiply(worldMatrix, camera_->GetViewMatrix()), camera_->GetProjectionMatrix());
+	Camera* activeCamera = camera_;
+	if (!activeCamera) {
+		activeCamera = Object3dCommon::GetInstance()->GetDefaultCamera();
+	}
+
+	if (activeCamera) {
+		worldViewProjectionMatrix = Function::Multiply(Function::Multiply(worldMatrix, activeCamera->GetViewMatrix()), activeCamera->GetProjectionMatrix());
+	} else {
+		// Camera が未初期化のフレームではクラッシュ回避のため単位行列を使う
+		worldViewProjectionMatrix = worldMatrix;
+	}
 
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
@@ -636,8 +650,8 @@ void Primitive::Update() {
 	transformResource_->Unmap(0, nullptr);
 
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
-	if (camera_) {
-		cameraData_->worldPosition = camera_->GetWorldTranslate();
+	if (activeCamera) {
+		cameraData_->worldPosition = activeCamera->GetWorldTranslate();
 	} else {
 		cameraData_->worldPosition = {transform_.translate};
 	}

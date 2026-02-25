@@ -71,3 +71,9 @@ void SceneManager::ChangeScene(const std::string& sceneName) {
 	nextscene_ = sceneFactory_->CreateScene(sceneName);
 	nextSceneName_ = sceneName;
 }
+std::vector<std::string> SceneManager::GetSceneNames() const {
+	if (!sceneFactory_) {
+		return {};
+	}
+	return sceneFactory_->GetSceneNames();
+}

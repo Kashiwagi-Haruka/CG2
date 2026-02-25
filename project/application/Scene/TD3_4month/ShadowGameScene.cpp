@@ -207,6 +207,7 @@ void ShadowGameScene::UpdateCamera()
         camera_->SetTransform(transform);
         camera_->Update();
     }
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 #ifdef USE_IMGUI
     if (ImGui::Begin("Camera")) {
         ImGui::Checkbox("Use Debug Camera (F1)", &useDebugCamera_);

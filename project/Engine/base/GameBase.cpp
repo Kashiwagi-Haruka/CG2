@@ -1,5 +1,6 @@
 #define NOMINMAX
 #include "GameBase.h"
+#include "Engine/Editor/Hinstance.h"
 #include "ImGuiManager.h"
 #include "Input.h"
 #include "Model/ModelManager.h"
@@ -103,6 +104,7 @@ void GameBase::BeginFlame() {
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
 void GameBase::EndFlame() {
+	Hinstance::GetInstance()->DrawEditorGridLines();
 	imguiM_->End();
 	dxCommon_->DrawSceneTextureToBackBuffer();
 	imguiM_->Draw(srvManager_.get(), dxCommon_.get());

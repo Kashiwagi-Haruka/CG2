@@ -47,6 +47,8 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	psoLine_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
 	psoLineNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoLineNoDepth_->Create(D3D12_CULL_MODE_NONE, false, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+	psoEditorGrid_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoEditorGrid_->Create(D3D12_CULL_MODE_NONE, false, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dGrid.PS.hlsl");
 	psoSkinning_ = std::make_unique<CreatePSO>(dxCommon_, true);
 	psoSkinning_->Create(D3D12_CULL_MODE_BACK);
 	psoSkinningToon_ = std::make_unique<CreatePSO>(dxCommon_, true);
@@ -204,6 +206,12 @@ void Object3dCommon::DrawCommonLineNoDepth() {
 	dxCommon_->GetCommandList()->SetPipelineState(psoLineNoDepth_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+}
+void Object3dCommon::DrawCommonEditorGrid() {
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoEditorGrid_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoEditorGrid_->GetGraphicsPipelineState(blendMode_).Get());
+	DrawSet();
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonSkinning() {
 

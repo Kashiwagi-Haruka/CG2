@@ -1,9 +1,11 @@
 #define NOMINMAX
 #include "Hinstance.h"
+#include "EditorGrid.h"
 #include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
 #include "Object3d/Object3d.h"
+#include "Object3d/Object3dCommon.h"
 #include "Primitive/Primitive.h"
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
@@ -11,6 +13,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <filesystem>
 #include <string>
 
@@ -124,16 +127,13 @@ bool Hinstance::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
 		ResetForSceneChange();
 		loadedSceneName_ = sceneName;
 	}
-	if (hasLoadedForCurrentScene_) {
-		return true;
-	}
 
 	const std::string scopedFilePath = GetSceneScopedEditorFilePath(filePath);
-	hasLoadedForCurrentScene_ = true;
 	if (!HasObjectEditorJsonFile(scopedFilePath)) {
 		return false;
 	}
-	return LoadObjectEditorsFromJson(scopedFilePath);
+	hasLoadedForCurrentScene_ = LoadObjectEditorsFromJson(scopedFilePath);
+	return hasLoadedForCurrentScene_;
 }
 
 bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
@@ -380,14 +380,99 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 
 	return true;
 }
+void Hinstance::DrawSceneSelector() {
+	SceneManager* sceneManager = SceneManager::GetInstance();
+	if (!sceneManager) {
+		return;
+	}
+	const std::vector<std::string> sceneNames = sceneManager->GetSceneNames();
+	if (sceneNames.empty()) {
+		ImGui::TextUnformatted("No scene list available");
+		return;
+	}
 
+	const std::string& currentScene = sceneManager->GetCurrentSceneName();
+	if (ImGui::BeginCombo("Scene", currentScene.empty() ? "(none)" : currentScene.c_str())) {
+		for (const std::string& sceneName : sceneNames) {
+			const bool isSelected = (sceneName == currentScene);
+			if (ImGui::Selectable(sceneName.c_str(), isSelected) && !isSelected) {
+				sceneManager->ChangeScene(sceneName);
+				hasUnsavedChanges_ = false;
+				saveStatusMessage_ = "Scene changed: " + sceneName;
+			}
+			if (isSelected) {
+				ImGui::SetItemDefaultFocus();
+			}
+		}
+		ImGui::EndCombo();
+	}
+}
+
+void Hinstance::DrawGridEditor() {
+	ImGui::Checkbox("Enable Grid Snap", &enableGridSnap_);
+	if (ImGui::DragFloat("Grid Snap Spacing", &gridSnapSpacing_, 0.05f, 0.1f, 100.0f, "%.2f")) {
+		editorGridDirty_ = true;
+	}
+	if (ImGui::Checkbox("Draw Editor Grid Lines", &showEditorGridLines_)) {
+		editorGridDirty_ = true;
+	}
+	if (ImGui::DragInt("Grid Half Line Count", &gridHalfLineCount_, 1.0f, 1, 200)) {
+		editorGridDirty_ = true;
+	}
+	if (ImGui::DragFloat("Grid Y", &editorGridY_, 0.01f, -100.0f, 100.0f, "%.2f")) {
+		editorGridDirty_ = true;
+	}
+
+	gridSnapSpacing_ = std::max(gridSnapSpacing_, 0.1f);
+	gridHalfLineCount_ = std::max(gridHalfLineCount_, 1);
+}
 void Hinstance::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
+
+void Hinstance::DrawEditorGridLines() {
+#ifdef USE_IMGUI
+	if (!showEditorGridLines_) {
+		return;
+	}
+
+	if (editorGridDirty_ || !editorGridPlane_) {
+		if (!editorGridPlane_) {
+			editorGridPlane_ = std::make_unique<Primitive>();
+			editorGridPlane_->SetEditorRegistrationEnabled(false);
+			editorGridPlane_->Initialize(Primitive::Plane);
+			editorGridPlane_->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
+			editorGridPlane_->SetEnableLighting(false);
+		}
+
+		const float extent = static_cast<float>(gridHalfLineCount_) * gridSnapSpacing_;
+		Transform gridTransform{};
+		gridTransform.scale = {extent * 2.0f, extent * 2.0f, 1.0f};
+		gridTransform.rotate = {Function::kPi * 0.5f, 0.0f, 0.0f};
+		gridTransform.translate = {0.0f, editorGridY_, 0.0f};
+		editorGridPlane_->SetTransform(gridTransform);
+		editorGridPlane_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+		editorGridPlane_->SetDistortionFalloff(gridSnapSpacing_);                        // spacing
+		editorGridPlane_->SetDistortionStrength(static_cast<float>(gridHalfLineCount_)); // half line count
+		editorGridPlane_->SetEnvironmentCoefficient(gridSnapSpacing_ * 0.025f);          // line width in world unit
+		editorGridDirty_ = false;
+	}
+
+	if (!editorGridPlane_) {
+		return;
+	}
+
+	// シーン切り替え後にカメラが再生成されるため、毎フレーム最新のカメラを参照する
+	editorGridPlane_->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
+
+	Object3dCommon::GetInstance()->DrawCommonEditorGrid();
+	editorGridPlane_->Update();
+	editorGridPlane_->Draw();
+#endif
+}
+
 
 void Hinstance::DrawObjectEditors() {
 #ifdef USE_IMGUI
-	if (objects_.empty() && primitives_.empty()) {
-		return;
-	}
+
 	if (!isPlaying_) {
 		for (size_t i = 0; i < objects_.size(); ++i) {
 			Object3d* object = objects_[i];
@@ -444,6 +529,11 @@ void Hinstance::DrawObjectEditors() {
 	}
 
 	ImGui::Text("Auto Object Editor");
+	ImGui::Separator();
+	ImGui::SeparatorText("Scene Switch");
+	DrawSceneSelector();
+	ImGui::SeparatorText("Grid");
+	DrawGridEditor();
 	ImGui::Separator();
 
 	if (!isPlaying_ && ImGui::Button("Save To JSON")) {
@@ -522,6 +612,11 @@ void Hinstance::DrawObjectEditors() {
 				hasUnsavedChanges_ = true;
 			}
 			if (transformChanged) {
+				if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
+					transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
+					transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
+					transform.translate.z = std::round(transform.translate.z / gridSnapSpacing_) * gridSnapSpacing_;
+				}
 				object->SetTransform(transform);
 			}
 			if (materialChanged) {
@@ -586,6 +681,11 @@ void Hinstance::DrawObjectEditors() {
 				hasUnsavedChanges_ = true;
 			}
 			if (transformChanged) {
+				if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
+					transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
+					transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
+					transform.translate.z = std::round(transform.translate.z / gridSnapSpacing_) * gridSnapSpacing_;
+				}
 				primitive->SetTransform(transform);
 			}
 			if (materialChanged) {

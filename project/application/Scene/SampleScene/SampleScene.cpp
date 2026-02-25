@@ -382,13 +382,6 @@ void SampleScene::Update() {
 		}
 	}
 	ImGui::End();
-	if (ImGui::Begin("Scene")) {
-
-		if (ImGui::Button("Title")) {
-			SceneManager::GetInstance()->ChangeScene("Title");
-		}
-	}
-	ImGui::End();
 	if (ImGui::Begin("ScreenEffectd")) {
 		static const char* noiseBlendModes[] = {"Overwrite", "Add", "Subtract", "Multiply", "Screen"};
 		ImGui::Checkbox("Fullscreen Grayscale (BT709)", &fullScreenGrayscaleEnabled_);
@@ -438,6 +431,8 @@ void SampleScene::Update() {
 	ringUvRotation_ -= 0.05f;
 	ringPrimitive_->SetUvTransform(Vector3(1,1,1),Vector3(0,0,ringUvRotation_),Vector3(0,0,0),Vector2(0.5f,0.5f));
 	ringPrimitive_->Update();
+
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	if (humanSkeleton_ && !humanAnimationClips_.empty()) {

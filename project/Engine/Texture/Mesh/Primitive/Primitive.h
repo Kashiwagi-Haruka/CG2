@@ -122,6 +122,7 @@ public:
 	void SetDistortionStrength(float strength);
 	// 歪み回転の外側への効き方を設定
 	void SetDistortionFalloff(float falloff);
+	void SetEditorRegistrationEnabled(bool enable) { editorRegistrationEnabled_ = enable; }
 	// 現在の Transform を取得
 	Transform GetTransform() const { return transform_; }
 	// 現在のマテリアル値を取得
@@ -142,6 +143,7 @@ private:
 	Vector3 lineEnd_ = {0.0f, 0.0f, 0.0f};
 	// true の場合は lineStart_/lineEnd_ を優先して線を更新
 	bool useLinePositions_ = false;
+	bool editorRegistrationEnabled_ = true;
 	// 曲面系プリミティブの分割数
 	uint32_t slices_ = 32;
 	// Sphere/Torus の縦分割数
