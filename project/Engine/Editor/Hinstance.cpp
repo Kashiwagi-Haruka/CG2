@@ -430,7 +430,7 @@ void Hinstance::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
 
 void Hinstance::DrawEditorGridLines() {
 #ifdef USE_IMGUI
-	if (!showEditorGridLines_ || !HasRegisteredObjects()) {
+	if (!showEditorGridLines_) {
 		return;
 	}
 
@@ -452,13 +452,16 @@ void Hinstance::DrawEditorGridLines() {
 		editorGridPlane_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 		editorGridPlane_->SetDistortionFalloff(gridSnapSpacing_);                        // spacing
 		editorGridPlane_->SetDistortionStrength(static_cast<float>(gridHalfLineCount_)); // half line count
-		editorGridPlane_->SetEnvironmentCoefficient(gridSnapSpacing_ * 0.025f);           // line width in world unit
+		editorGridPlane_->SetEnvironmentCoefficient(gridSnapSpacing_ * 0.025f);          // line width in world unit
 		editorGridDirty_ = false;
 	}
 
 	if (!editorGridPlane_) {
 		return;
 	}
+
+	// シーン切り替え後にカメラが再生成されるため、毎フレーム最新のカメラを参照する
+	editorGridPlane_->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
 
 	Object3dCommon::GetInstance()->DrawCommonEditorGrid();
 	editorGridPlane_->Update();
