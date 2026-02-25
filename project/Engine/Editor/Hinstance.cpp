@@ -442,6 +442,7 @@ void Hinstance::DrawEditorGridLines() {
 			auto primitive = std::make_unique<Primitive>();
 			primitive->SetEditorRegistrationEnabled(false);
 			primitive->Initialize(Primitive::Line);
+			primitive->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
 			primitive->SetEnableLighting(false);
 			primitive->SetColor(line.color);
 			primitive->SetLinePositions({line.start.x, editorGridY_, line.start.z}, {line.end.x, editorGridY_, line.end.z});
