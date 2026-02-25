@@ -151,7 +151,19 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 	nlohmann::json root;
 	root["objects"] = nlohmann::json::array();
 	root["primitives"] = nlohmann::json::array();
-
+	root["lights"] = {
+	    {"overrideSceneLights", editorLightState_.overrideSceneLights},
+	    {"directional",
+	     {
+	         {"color",
+	          {editorLightState_.directionalLight.color.x, editorLightState_.directionalLight.color.y, editorLightState_.directionalLight.color.z, editorLightState_.directionalLight.color.w}},
+	         {"direction", {editorLightState_.directionalLight.direction.x, editorLightState_.directionalLight.direction.y, editorLightState_.directionalLight.direction.z}},
+	         {"intensity", editorLightState_.directionalLight.intensity},
+	     }	                                                       },
+	    {"point",               nlohmann::json::array()              },
+	    {"spot",                nlohmann::json::array()              },
+	    {"area",                nlohmann::json::array()              },
+	};
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		const Object3d* object = objects_[i];
 		if (!object) {
@@ -216,7 +228,41 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 		};
 		root["primitives"].push_back(primitiveJson);
 	}
+	for (const PointLight& point : editorLightState_.pointLights) {
+		root["lights"]["point"].push_back({
+		    {"color",     {point.color.x, point.color.y, point.color.z, point.color.w}},
+		    {"position",  {point.position.x, point.position.y, point.position.z}      },
+		    {"intensity", point.intensity		                                     },
+		    {"radius",    point.radius		                                        },
+		    {"decay",     point.decay		                                         },
+		});
+	}
 
+	for (const SpotLight& spot : editorLightState_.spotLights) {
+		root["lights"]["spot"].push_back({
+		    {"color",           {spot.color.x, spot.color.y, spot.color.z, spot.color.w}},
+		    {"position",        {spot.position.x, spot.position.y, spot.position.z}     },
+		    {"direction",       {spot.direction.x, spot.direction.y, spot.direction.z}  },
+		    {"intensity",       spot.intensity		                                  },
+		    {"distance",        spot.distance		                                   },
+		    {"decay",           spot.decay		                                      },
+		    {"cosAngle",        spot.cosAngle		                                   },
+		    {"cosFalloffStart", spot.cosFalloffStart                                    },
+		});
+	}
+
+	for (const AreaLight& area : editorLightState_.areaLights) {
+		root["lights"]["area"].push_back({
+		    {"color",     {area.color.x, area.color.y, area.color.z, area.color.w}},
+		    {"position",  {area.position.x, area.position.y, area.position.z}     },
+		    {"normal",    {area.normal.x, area.normal.y, area.normal.z}           },
+		    {"intensity", area.intensity		                                  },
+		    {"width",     area.width		                                      },
+		    {"height",    area.height		                                     },
+		    {"radius",    area.radius		                                     },
+		    {"decay",     area.decay		                                      },
+		});
+	}
 	JsonManager* jsonManager = JsonManager::GetInstance();
 	jsonManager->SetData(root);
 	return jsonManager->SaveJson(filePath);
@@ -387,6 +433,140 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 			primitives_[index]->SetDistortionFalloff(material.distortionFalloff);
 			primitives_[index]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
 		}
+	}
+
+	if (root.contains("lights") && root["lights"].is_object()) {
+		const auto& lightsJson = root["lights"];
+
+		if (lightsJson.contains("overrideSceneLights") && lightsJson["overrideSceneLights"].is_boolean()) {
+			editorLightState_.overrideSceneLights = lightsJson["overrideSceneLights"].get<bool>();
+		}
+
+		if (lightsJson.contains("directional") && lightsJson["directional"].is_object()) {
+			const auto& directionalJson = lightsJson["directional"];
+			if (directionalJson.contains("color") && directionalJson["color"].is_array() && directionalJson["color"].size() == 4) {
+				editorLightState_.directionalLight.color = {
+				    directionalJson["color"][0].get<float>(), directionalJson["color"][1].get<float>(), directionalJson["color"][2].get<float>(), directionalJson["color"][3].get<float>()};
+			}
+			if (directionalJson.contains("direction") && directionalJson["direction"].is_array() && directionalJson["direction"].size() == 3) {
+				editorLightState_.directionalLight.direction = {
+				    directionalJson["direction"][0].get<float>(), directionalJson["direction"][1].get<float>(), directionalJson["direction"][2].get<float>()};
+			}
+			if (directionalJson.contains("intensity") && directionalJson["intensity"].is_number()) {
+				editorLightState_.directionalLight.intensity = directionalJson["intensity"].get<float>();
+			}
+		}
+
+		if (lightsJson.contains("point") && lightsJson["point"].is_array()) {
+			editorLightState_.pointLights.clear();
+			for (const auto& pointJson : lightsJson["point"]) {
+				if (!pointJson.is_object()) {
+					continue;
+				}
+				PointLight point{};
+				if (pointJson.contains("color") && pointJson["color"].is_array() && pointJson["color"].size() == 4) {
+					point.color = {pointJson["color"][0].get<float>(), pointJson["color"][1].get<float>(), pointJson["color"][2].get<float>(), pointJson["color"][3].get<float>()};
+				}
+				if (pointJson.contains("position") && pointJson["position"].is_array() && pointJson["position"].size() == 3) {
+					point.position = {pointJson["position"][0].get<float>(), pointJson["position"][1].get<float>(), pointJson["position"][2].get<float>()};
+				}
+				if (pointJson.contains("intensity") && pointJson["intensity"].is_number()) {
+					point.intensity = pointJson["intensity"].get<float>();
+				}
+				if (pointJson.contains("radius") && pointJson["radius"].is_number()) {
+					point.radius = pointJson["radius"].get<float>();
+				}
+				if (pointJson.contains("decay") && pointJson["decay"].is_number()) {
+					point.decay = pointJson["decay"].get<float>();
+				}
+				editorLightState_.pointLights.push_back(point);
+				if (editorLightState_.pointLights.size() >= kMaxPointLights) {
+					break;
+				}
+			}
+		}
+
+		if (lightsJson.contains("spot") && lightsJson["spot"].is_array()) {
+			editorLightState_.spotLights.clear();
+			for (const auto& spotJson : lightsJson["spot"]) {
+				if (!spotJson.is_object()) {
+					continue;
+				}
+				SpotLight spot{};
+				if (spotJson.contains("color") && spotJson["color"].is_array() && spotJson["color"].size() == 4) {
+					spot.color = {spotJson["color"][0].get<float>(), spotJson["color"][1].get<float>(), spotJson["color"][2].get<float>(), spotJson["color"][3].get<float>()};
+				}
+				if (spotJson.contains("position") && spotJson["position"].is_array() && spotJson["position"].size() == 3) {
+					spot.position = {spotJson["position"][0].get<float>(), spotJson["position"][1].get<float>(), spotJson["position"][2].get<float>()};
+				}
+				if (spotJson.contains("direction") && spotJson["direction"].is_array() && spotJson["direction"].size() == 3) {
+					spot.direction = {spotJson["direction"][0].get<float>(), spotJson["direction"][1].get<float>(), spotJson["direction"][2].get<float>()};
+				}
+				if (spotJson.contains("intensity") && spotJson["intensity"].is_number()) {
+					spot.intensity = spotJson["intensity"].get<float>();
+				}
+				if (spotJson.contains("distance") && spotJson["distance"].is_number()) {
+					spot.distance = spotJson["distance"].get<float>();
+				}
+				if (spotJson.contains("decay") && spotJson["decay"].is_number()) {
+					spot.decay = spotJson["decay"].get<float>();
+				}
+				if (spotJson.contains("cosAngle") && spotJson["cosAngle"].is_number()) {
+					spot.cosAngle = spotJson["cosAngle"].get<float>();
+				}
+				if (spotJson.contains("cosFalloffStart") && spotJson["cosFalloffStart"].is_number()) {
+					spot.cosFalloffStart = spotJson["cosFalloffStart"].get<float>();
+				}
+				editorLightState_.spotLights.push_back(spot);
+				if (editorLightState_.spotLights.size() >= kMaxSpotLights) {
+					break;
+				}
+			}
+		}
+
+		if (lightsJson.contains("area") && lightsJson["area"].is_array()) {
+			editorLightState_.areaLights.clear();
+			for (const auto& areaJson : lightsJson["area"]) {
+				if (!areaJson.is_object()) {
+					continue;
+				}
+				AreaLight area{};
+				if (areaJson.contains("color") && areaJson["color"].is_array() && areaJson["color"].size() == 4) {
+					area.color = {areaJson["color"][0].get<float>(), areaJson["color"][1].get<float>(), areaJson["color"][2].get<float>(), areaJson["color"][3].get<float>()};
+				}
+				if (areaJson.contains("position") && areaJson["position"].is_array() && areaJson["position"].size() == 3) {
+					area.position = {areaJson["position"][0].get<float>(), areaJson["position"][1].get<float>(), areaJson["position"][2].get<float>()};
+				}
+				if (areaJson.contains("normal") && areaJson["normal"].is_array() && areaJson["normal"].size() == 3) {
+					area.normal = {areaJson["normal"][0].get<float>(), areaJson["normal"][1].get<float>(), areaJson["normal"][2].get<float>()};
+				}
+				if (areaJson.contains("intensity") && areaJson["intensity"].is_number()) {
+					area.intensity = areaJson["intensity"].get<float>();
+				}
+				if (areaJson.contains("width") && areaJson["width"].is_number()) {
+					area.width = areaJson["width"].get<float>();
+				}
+				if (areaJson.contains("height") && areaJson["height"].is_number()) {
+					area.height = areaJson["height"].get<float>();
+				}
+				if (areaJson.contains("radius") && areaJson["radius"].is_number()) {
+					area.radius = areaJson["radius"].get<float>();
+				}
+				if (areaJson.contains("decay") && areaJson["decay"].is_number()) {
+					area.decay = areaJson["decay"].get<float>();
+				}
+				editorLightState_.areaLights.push_back(area);
+				if (editorLightState_.areaLights.size() >= kMaxAreaLights) {
+					break;
+				}
+			}
+		}
+
+		Object3dCommon::GetInstance()->SetEditorLightOverride(editorLightState_.overrideSceneLights);
+		Object3dCommon::GetInstance()->SetEditorLights(
+		    editorLightState_.directionalLight, editorLightState_.pointLights.empty() ? nullptr : editorLightState_.pointLights.data(), static_cast<uint32_t>(editorLightState_.pointLights.size()),
+		    editorLightState_.spotLights.empty() ? nullptr : editorLightState_.spotLights.data(), static_cast<uint32_t>(editorLightState_.spotLights.size()),
+		    editorLightState_.areaLights.empty() ? nullptr : editorLightState_.areaLights.data(), static_cast<uint32_t>(editorLightState_.areaLights.size()));
 	}
 
 	return true;
