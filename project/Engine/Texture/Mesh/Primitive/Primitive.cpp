@@ -554,8 +554,10 @@ void Primitive::Initialize(PrimitiveName name, uint32_t slices) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 
 	isUseSetWorld = false;
-	Hinstance::GetInstance()->RegisterPrimitive(this);
-	Hinstance::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+	if (editorRegistrationEnabled_) {
+		Hinstance::GetInstance()->RegisterPrimitive(this);
+		Hinstance::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+	}
 }
 // 指定テクスチャでプリミティブを初期化
 void Primitive::Initialize(PrimitiveName name, const std::string& texturePath) { Initialize(name, texturePath, kDefaultSlices); }
@@ -608,8 +610,10 @@ void Primitive::Initialize(PrimitiveName name, const std::string& texturePath, u
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 
 	isUseSetWorld = false;
-	Hinstance::GetInstance()->RegisterPrimitive(this);
-	Hinstance::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+	if (editorRegistrationEnabled_) {
+		Hinstance::GetInstance()->RegisterPrimitive(this);
+		Hinstance::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+	}
 }
 // 座標変換やマテリアル定数を更新
 void Primitive::Update() {

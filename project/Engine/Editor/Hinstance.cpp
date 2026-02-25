@@ -1,9 +1,11 @@
 #define NOMINMAX
 #include "Hinstance.h"
+#include "EditorGrid.h"
 #include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
 #include "Object3d/Object3d.h"
+#include "Object3d/Object3dCommon.h"
 #include "Primitive/Primitive.h"
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
@@ -408,11 +410,59 @@ void Hinstance::DrawSceneSelector() {
 
 void Hinstance::DrawGridEditor() {
 	ImGui::Checkbox("Enable Grid Snap", &enableGridSnap_);
-	if (enableGridSnap_) {
-		ImGui::DragFloat("Grid Snap Spacing", &gridSnapSpacing_, 0.05f, 0.1f, 100.0f, "%.2f");
+	if (ImGui::DragFloat("Grid Snap Spacing", &gridSnapSpacing_, 0.05f, 0.1f, 100.0f, "%.2f")) {
+		editorGridDirty_ = true;
 	}
+	if (ImGui::Checkbox("Draw Editor Grid Lines", &showEditorGridLines_)) {
+		editorGridDirty_ = true;
+	}
+	if (ImGui::DragInt("Grid Half Line Count", &gridHalfLineCount_, 1.0f, 1, 200)) {
+		editorGridDirty_ = true;
+	}
+	if (ImGui::DragFloat("Grid Y", &editorGridY_, 0.01f, -100.0f, 100.0f, "%.2f")) {
+		editorGridDirty_ = true;
+	}
+
+	gridSnapSpacing_ = std::max(gridSnapSpacing_, 0.1f);
+	gridHalfLineCount_ = std::max(gridHalfLineCount_, 1);
 }
 void Hinstance::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
+
+void Hinstance::DrawEditorGridLines() {
+#ifdef USE_IMGUI
+	if (!showEditorGridLines_ || !HasRegisteredObjects()) {
+		return;
+	}
+
+	if (editorGridDirty_) {
+		editorGridLines_.clear();
+		const std::vector<EditorGridLine> lines = EditorGrid::CreateLines(gridHalfLineCount_, gridSnapSpacing_, 1.0f);
+		editorGridLines_.reserve(lines.size());
+		for (const EditorGridLine& line : lines) {
+			auto primitive = std::make_unique<Primitive>();
+			primitive->SetEditorRegistrationEnabled(false);
+			primitive->Initialize(Primitive::Line);
+			primitive->SetEnableLighting(false);
+			primitive->SetColor(line.color);
+			primitive->SetLinePositions({line.start.x, editorGridY_, line.start.z}, {line.end.x, editorGridY_, line.end.z});
+			editorGridLines_.push_back(std::move(primitive));
+		}
+		editorGridDirty_ = false;
+	}
+
+	if (editorGridLines_.empty()) {
+		return;
+	}
+
+	Object3dCommon::GetInstance()->DrawCommonLineNoDepth();
+	for (const auto& line : editorGridLines_) {
+		line->Update();
+		line->Draw();
+	}
+	Object3dCommon::GetInstance()->DrawCommon();
+#endif
+}
+
 
 void Hinstance::DrawObjectEditors() {
 #ifdef USE_IMGUI
