@@ -3,6 +3,7 @@
 #include "BaseScene.h"
 #include <memory>
 #include <string>
+#include <vector>
 class SceneManager {
 
 	static std::unique_ptr<SceneManager> instance_;
@@ -23,5 +24,6 @@ public:
 	void Draw();
 	void Finalize();
 	const std::string& GetCurrentSceneName() const { return currentSceneName_; }
+	std::vector<std::string> GetSceneNames() const;
 	static SceneManager* GetInstance();
 };

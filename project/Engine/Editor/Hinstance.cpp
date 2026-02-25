@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <filesystem>
 #include <string>
 
@@ -377,14 +378,45 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 
 	return true;
 }
+void Hinstance::DrawSceneSelector() {
+	SceneManager* sceneManager = SceneManager::GetInstance();
+	if (!sceneManager) {
+		return;
+	}
+	const std::vector<std::string> sceneNames = sceneManager->GetSceneNames();
+	if (sceneNames.empty()) {
+		ImGui::TextUnformatted("No scene list available");
+		return;
+	}
 
+	const std::string& currentScene = sceneManager->GetCurrentSceneName();
+	if (ImGui::BeginCombo("Scene", currentScene.empty() ? "(none)" : currentScene.c_str())) {
+		for (const std::string& sceneName : sceneNames) {
+			const bool isSelected = (sceneName == currentScene);
+			if (ImGui::Selectable(sceneName.c_str(), isSelected) && !isSelected) {
+				sceneManager->ChangeScene(sceneName);
+				hasUnsavedChanges_ = false;
+				saveStatusMessage_ = "Scene changed: " + sceneName;
+			}
+			if (isSelected) {
+				ImGui::SetItemDefaultFocus();
+			}
+		}
+		ImGui::EndCombo();
+	}
+}
+
+void Hinstance::DrawGridEditor() {
+	ImGui::Checkbox("Enable Grid Snap", &enableGridSnap_);
+	if (enableGridSnap_) {
+		ImGui::DragFloat("Grid Snap Spacing", &gridSnapSpacing_, 0.05f, 0.1f, 100.0f, "%.2f");
+	}
+}
 void Hinstance::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
 
 void Hinstance::DrawObjectEditors() {
 #ifdef USE_IMGUI
-	if (objects_.empty() && primitives_.empty()) {
-		return;
-	}
+
 	if (!isPlaying_) {
 		for (size_t i = 0; i < objects_.size(); ++i) {
 			Object3d* object = objects_[i];
@@ -441,6 +473,11 @@ void Hinstance::DrawObjectEditors() {
 	}
 
 	ImGui::Text("Auto Object Editor");
+	ImGui::Separator();
+	ImGui::SeparatorText("Scene Switch");
+	DrawSceneSelector();
+	ImGui::SeparatorText("Grid");
+	DrawGridEditor();
 	ImGui::Separator();
 
 	if (!isPlaying_ && ImGui::Button("Save To JSON")) {
@@ -519,6 +556,11 @@ void Hinstance::DrawObjectEditors() {
 				hasUnsavedChanges_ = true;
 			}
 			if (transformChanged) {
+				if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
+					transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
+					transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
+					transform.translate.z = std::round(transform.translate.z / gridSnapSpacing_) * gridSnapSpacing_;
+				}
 				object->SetTransform(transform);
 			}
 			if (materialChanged) {
@@ -583,6 +625,11 @@ void Hinstance::DrawObjectEditors() {
 				hasUnsavedChanges_ = true;
 			}
 			if (transformChanged) {
+				if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
+					transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
+					transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
+					transform.translate.z = std::round(transform.translate.z / gridSnapSpacing_) * gridSnapSpacing_;
+				}
 				primitive->SetTransform(transform);
 			}
 			if (materialChanged) {
