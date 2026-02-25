@@ -56,7 +56,7 @@ void SampleScene::Initialize() {
 	humanObj_->Initialize();
 	humanObj_->SetCamera(camera_.get());
 	humanObj_->SetModel("walk");
-	ringPrimitive_->Initialize(Primitive::Ring,24);
+	ringPrimitive_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 24);
 	ringPrimitive_->SetCamera(camera_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
@@ -78,18 +78,12 @@ void SampleScene::Initialize() {
         .rotate{-std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0.0f  },
         .translate{0.0f,                              1.0f,                      -3.0f }
     };
-	ringTransform_ = {
-	    .scale{1.0f,  1.0f, 1.0f},
-        .rotate{0.0f,  0.0f, 0.0f},
-        .translate{-3.0f, 1.0f, 0.0f}
-    };
 	particleTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f },
         .rotate{0.0f, 0.0f, 0.0f },
         .translate{0.0f, 1.0f, -3.0f}
     };
 	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample", particleTransform_, 0.1f, 5, Vector3{0.0f, 0.0f, 0.0f}, Vector3{-0.5f, -0.5f, -0.5f}, Vector3{0.5f, 0.5f, 0.5f});
-	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);
 	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
 	animatedCubeObj_->SetAnimation(&animatedCubeAnimation_, true);
@@ -102,7 +96,6 @@ void SampleScene::Initialize() {
 		humanObj_->SetAnimation(&humanAnimationClips_[currentHumanAnimationIndex_], true);
 	}
 	humanObj_->SetTransform(humanTransform_);
-	ringPrimitive_->SetTransform(ringTransform_);
 	ringPrimitive_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	ringPrimitive_->SetEnableLighting(false);
 	ringPrimitive_->SetUvAnchor({0.5f, 0.5f});
@@ -447,8 +440,8 @@ void SampleScene::Update() {
 	planeGltf_->Update();
 	animatedCubeObj_->Update();
 	humanObj_->Update();
-	ringUvRotation_ -= 0.01f;
-	ringPrimitive_->SetUvTransform(Function::MakeAffineMatrix(Vector3(1,1,1),Vector3(0,0,ringUvRotation_),Vector3(0,0,0)));
+	ringUvRotation_ -= 0.05f;
+	ringPrimitive_->SetUvTransform(Vector3(1,1,1),Vector3(0,0,ringUvRotation_),Vector3(0,0,0),Vector2(0.5f,0.5f));
 	ringPrimitive_->Update();
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
