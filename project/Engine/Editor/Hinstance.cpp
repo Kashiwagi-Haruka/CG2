@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdint>
 #include <filesystem>
 #include <string>
 
@@ -43,6 +44,16 @@ void Hinstance::ResetForSceneChange() {
 	hasUnsavedChanges_ = false;
 	saveStatusMessage_.clear();
 	hasLoadedForCurrentScene_ = false;
+	editorLightState_.overrideSceneLights = false;
+	editorLightState_.directionalLight = {
+	    {1.0f, 1.0f, 1.0f, 1.0f},
+        {0.0f, -1.0f, 0.0f},
+        1.0f
+    };
+	editorLightState_.pointLights.clear();
+	editorLightState_.spotLights.clear();
+	editorLightState_.areaLights.clear();
+	Object3dCommon::GetInstance()->SetEditorLightOverride(false);
 }
 void Hinstance::RegisterObject3d(Object3d* object) {
 	if (!object) {
@@ -478,7 +489,106 @@ void Hinstance::DrawEditorGridLines() {
 #endif
 }
 
+void Hinstance::DrawLightEditor() {
+#ifdef USE_IMGUI
+	bool overrideChanged = ImGui::Checkbox("Use Editor Lights", &editorLightState_.overrideSceneLights);
+	if (overrideChanged) {
+		Object3dCommon::GetInstance()->SetEditorLightOverride(editorLightState_.overrideSceneLights);
+		hasUnsavedChanges_ = true;
+	}
 
+	bool lightChanged = false;
+	if (ImGui::TreeNode("Directional Light")) {
+		if (!isPlaying_) {
+			lightChanged |= ImGui::ColorEdit4("Dir Color", &editorLightState_.directionalLight.color.x);
+			lightChanged |= ImGui::DragFloat3("Dir Direction", &editorLightState_.directionalLight.direction.x, 0.01f, -1.0f, 1.0f);
+			lightChanged |= ImGui::DragFloat("Dir Intensity", &editorLightState_.directionalLight.intensity, 0.01f, 0.0f, 10.0f);
+		}
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Point Lights")) {
+		int pointCount = static_cast<int>(editorLightState_.pointLights.size());
+		if (!isPlaying_ && ImGui::SliderInt("Point Count", &pointCount, 0, static_cast<int>(kMaxPointLights))) {
+			editorLightState_.pointLights.resize(static_cast<size_t>(pointCount));
+			lightChanged = true;
+		}
+		for (size_t i = 0; i < editorLightState_.pointLights.size(); ++i) {
+			PointLight& point = editorLightState_.pointLights[i];
+			const std::string label = "Point " + std::to_string(i);
+			if (ImGui::TreeNode((label + "##point").c_str())) {
+				if (!isPlaying_) {
+					lightChanged |= ImGui::ColorEdit4(("Color##point_" + std::to_string(i)).c_str(), &point.color.x);
+					lightChanged |= ImGui::DragFloat3(("Position##point_" + std::to_string(i)).c_str(), &point.position.x, 0.05f);
+					lightChanged |= ImGui::DragFloat(("Intensity##point_" + std::to_string(i)).c_str(), &point.intensity, 0.01f, 0.0f, 10.0f);
+					lightChanged |= ImGui::DragFloat(("Radius##point_" + std::to_string(i)).c_str(), &point.radius, 0.05f, 0.0f, 500.0f);
+					lightChanged |= ImGui::DragFloat(("Decay##point_" + std::to_string(i)).c_str(), &point.decay, 0.01f, 0.0f, 10.0f);
+				}
+				ImGui::TreePop();
+			}
+		}
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Spot Lights")) {
+		int spotCount = static_cast<int>(editorLightState_.spotLights.size());
+		if (!isPlaying_ && ImGui::SliderInt("Spot Count", &spotCount, 0, static_cast<int>(kMaxSpotLights))) {
+			editorLightState_.spotLights.resize(static_cast<size_t>(spotCount));
+			lightChanged = true;
+		}
+		for (size_t i = 0; i < editorLightState_.spotLights.size(); ++i) {
+			SpotLight& spot = editorLightState_.spotLights[i];
+			if (ImGui::TreeNode(("Spot " + std::to_string(i) + "##spot").c_str())) {
+				if (!isPlaying_) {
+					lightChanged |= ImGui::ColorEdit4(("Color##spot_" + std::to_string(i)).c_str(), &spot.color.x);
+					lightChanged |= ImGui::DragFloat3(("Position##spot_" + std::to_string(i)).c_str(), &spot.position.x, 0.05f);
+					lightChanged |= ImGui::DragFloat3(("Direction##spot_" + std::to_string(i)).c_str(), &spot.direction.x, 0.01f, -1.0f, 1.0f);
+					lightChanged |= ImGui::DragFloat(("Intensity##spot_" + std::to_string(i)).c_str(), &spot.intensity, 0.01f, 0.0f, 10.0f);
+					lightChanged |= ImGui::DragFloat(("Distance##spot_" + std::to_string(i)).c_str(), &spot.distance, 0.05f, 0.0f, 500.0f);
+					lightChanged |= ImGui::DragFloat(("Decay##spot_" + std::to_string(i)).c_str(), &spot.decay, 0.01f, 0.0f, 10.0f);
+					lightChanged |= ImGui::DragFloat(("Cos Angle##spot_" + std::to_string(i)).c_str(), &spot.cosAngle, 0.001f, -1.0f, 1.0f);
+					lightChanged |= ImGui::DragFloat(("Cos Falloff##spot_" + std::to_string(i)).c_str(), &spot.cosFalloffStart, 0.001f, -1.0f, 1.0f);
+				}
+				ImGui::TreePop();
+			}
+		}
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Area Lights")) {
+		int areaCount = static_cast<int>(editorLightState_.areaLights.size());
+		if (!isPlaying_ && ImGui::SliderInt("Area Count", &areaCount, 0, static_cast<int>(kMaxAreaLights))) {
+			editorLightState_.areaLights.resize(static_cast<size_t>(areaCount));
+			lightChanged = true;
+		}
+		for (size_t i = 0; i < editorLightState_.areaLights.size(); ++i) {
+			AreaLight& area = editorLightState_.areaLights[i];
+			if (ImGui::TreeNode(("Area " + std::to_string(i) + "##area").c_str())) {
+				if (!isPlaying_) {
+					lightChanged |= ImGui::ColorEdit4(("Color##area_" + std::to_string(i)).c_str(), &area.color.x);
+					lightChanged |= ImGui::DragFloat3(("Position##area_" + std::to_string(i)).c_str(), &area.position.x, 0.05f);
+					lightChanged |= ImGui::DragFloat3(("Normal##area_" + std::to_string(i)).c_str(), &area.normal.x, 0.01f, -1.0f, 1.0f);
+					lightChanged |= ImGui::DragFloat(("Intensity##area_" + std::to_string(i)).c_str(), &area.intensity, 0.01f, 0.0f, 10.0f);
+					lightChanged |= ImGui::DragFloat(("Width##area_" + std::to_string(i)).c_str(), &area.width, 0.05f, 0.0f, 500.0f);
+					lightChanged |= ImGui::DragFloat(("Height##area_" + std::to_string(i)).c_str(), &area.height, 0.05f, 0.0f, 500.0f);
+					lightChanged |= ImGui::DragFloat(("Radius##area_" + std::to_string(i)).c_str(), &area.radius, 0.05f, 0.0f, 500.0f);
+					lightChanged |= ImGui::DragFloat(("Decay##area_" + std::to_string(i)).c_str(), &area.decay, 0.01f, 0.0f, 10.0f);
+				}
+				ImGui::TreePop();
+			}
+		}
+		ImGui::TreePop();
+	}
+
+	if (lightChanged || editorLightState_.overrideSceneLights) {
+		hasUnsavedChanges_ = hasUnsavedChanges_ || lightChanged;
+		Object3dCommon::GetInstance()->SetEditorLights(
+		    editorLightState_.directionalLight, editorLightState_.pointLights.empty() ? nullptr : editorLightState_.pointLights.data(), static_cast<uint32_t>(editorLightState_.pointLights.size()),
+		    editorLightState_.spotLights.empty() ? nullptr : editorLightState_.spotLights.data(), static_cast<uint32_t>(editorLightState_.spotLights.size()),
+		    editorLightState_.areaLights.empty() ? nullptr : editorLightState_.areaLights.data(), static_cast<uint32_t>(editorLightState_.areaLights.size()));
+	}
+#endif
+}
 void Hinstance::DrawObjectEditors() {
 #ifdef USE_IMGUI
 
@@ -543,6 +653,8 @@ void Hinstance::DrawObjectEditors() {
 	DrawSceneSelector();
 	ImGui::SeparatorText("Grid");
 	DrawGridEditor();
+	ImGui::SeparatorText("Light");
+	DrawLightEditor();
 	ImGui::Separator();
 
 	if (!isPlaying_ && ImGui::Button("Save To JSON")) {

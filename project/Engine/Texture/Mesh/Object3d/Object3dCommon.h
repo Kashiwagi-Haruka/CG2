@@ -6,6 +6,7 @@
 #include "PSO/CreatePSO.h"
 #include "Matrix4x4.h"
 #include <Windows.h>
+#include <array>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -77,6 +78,18 @@ private:
 	float shadowOrthoHalfHeight_ = 80.0f;
 	bool fullScreenGrayscaleEnabled_ = false;
 	bool fullScreenSepiaEnabled_ = false;
+	bool useEditorLights_ = false;
+	DirectionalLight editorDirectionalLight_ = {
+	    {1.0f, 1.0f, 1.0f, 1.0f},
+        {0.0f, -1.0f, 0.0f},
+        1.0f
+    };
+	std::array<PointLight, kMaxPointLights> editorPointLights_{};
+	uint32_t editorPointLightCount_ = 0;
+	std::array<SpotLight, kMaxSpotLights> editorSpotLights_{};
+	uint32_t editorSpotLightCount_ = 0;
+	std::array<AreaLight, kMaxAreaLights> editorAreaLights_{};
+	uint32_t editorAreaLightCount_ = 0;
 	void DrawSet();
 
 public:
@@ -124,6 +137,10 @@ public:
 	void SetPointLights(const PointLight* pointLights, uint32_t count);
 	void SetSpotLights(const SpotLight* spotLights, uint32_t count);
 	void SetAreaLights(const AreaLight* areaLights, uint32_t count);
+	void SetEditorLightOverride(bool enabled) { useEditorLights_ = enabled; }
+	bool IsEditorLightOverrideEnabled() const { return useEditorLights_; }
+	void SetEditorLights(
+	    const DirectionalLight& directionalLight, const PointLight* pointLights, uint32_t pointCount, const SpotLight* spotLights, uint32_t spotCount, const AreaLight* areaLights, uint32_t areaCount);
 
 	Matrix4x4 GetDirectionalLightViewProjectionMatrix() const;
 

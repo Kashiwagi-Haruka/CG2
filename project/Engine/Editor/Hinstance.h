@@ -9,6 +9,11 @@
 #include "Vector3.h"
 #include "Vector4.h"
 
+#include "Light/AreaLight.h"
+#include "Light/DirectionalLight.h"
+#include "Light/PointLight.h"
+#include "Light/SpotLight.h"
+
 class Object3d;
 class Primitive;
 
@@ -30,8 +35,21 @@ public:
 private:
 	void DrawSceneSelector();
 	void DrawGridEditor();
+	void DrawLightEditor();
 	std::string GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const;
 	void ResetForSceneChange();
+
+	struct EditorLightState {
+		bool overrideSceneLights = false;
+		DirectionalLight directionalLight = {
+		    {1.0f, 1.0f, 1.0f, 1.0f},
+            {0.0f, -1.0f, 0.0f},
+            1.0f
+        };
+		std::vector<PointLight> pointLights;
+		std::vector<SpotLight> spotLights;
+		std::vector<AreaLight> areaLights;
+	};
 
 	struct EditorMaterial {
 		Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -72,4 +90,5 @@ private:
 	float editorGridY_ = 0.0f;
 	bool editorGridDirty_ = true;
 	std::unique_ptr<Primitive> editorGridPlane_;
+	EditorLightState editorLightState_{};
 };
