@@ -81,7 +81,7 @@
     <ClCompile Include="application\GameObject\Player\Player.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\YoshidaMath.cpp" />
     <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp" />
-    <ClCompile Include="Engine\Editor\Hinstance.cpp" />
+    <ClCompile Include="Engine\Editor\Hierarchy.cpp" />
     <ClCompile Include="application\GameObject\TestField\TestField.cpp" />
     <ClCompile Include="application\GameObject\Portal\Portal.cpp" />
     <ClCompile Include="application\GameObject\WarpPos\WarpPos1.cpp" />
@@ -90,6 +90,7 @@
     <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp" />
     <ClCompile Include="Engine\Editor\EditorGrid.cpp" />
     <ClCompile Include="Engine\Editor\Editor.cpp" />
+    <ClCompile Include="Engine\Texture\PSO\SpriteCreatePSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\Collider.h" />
@@ -170,7 +171,7 @@
     <ClInclude Include="application\GameObject\Player\Player.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\YoshidaMath.h" />
     <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h" />
-    <ClInclude Include="Engine\Editor\Hinstance.h" />
+    <ClInclude Include="Engine\Editor\Hierarchy.h" />
     <ClInclude Include="application\GameObject\TestField\TestField.h" />
     <ClInclude Include="application\GameObject\Portal\Portal.h" />
     <ClInclude Include="application\GameObject\WarpPos\WarpPos1.h" />
@@ -179,6 +180,7 @@
     <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h" />
     <ClInclude Include="Engine\Editor\EditorGrid.h" />
     <ClInclude Include="Engine\Editor\Editor.h" />
+    <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

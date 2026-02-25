@@ -1,5 +1,5 @@
 #include "SceneManager.h"
-#include "Engine/Editor/Hinstance.h"
+#include "Engine/Editor/Hierarchy.h"
 #include <cassert>
 
 std::unique_ptr<SceneManager> SceneManager::instance_ = nullptr;

@@ -9,6 +9,8 @@
 #include <imgui.h>
 #endif // USE_IMGUI
 #include "SceneManager.h"
+#include "Sprite/SpriteCommon.h"
+#include "TextureManager.h"
 #include <numbers>
 #include <utility>
 SampleScene::SampleScene() {
@@ -103,6 +105,13 @@ void SampleScene::Initialize() {
 			humanObj_->SetSkinCluster(&humanSkinCluster_);
 		}
 	}
+
+	uvSprite = std::make_unique<Sprite>();
+	uvSprite->Initialize(TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png"));
+	uvSprite->SetScale(Vector2(100, 100));
+	uvSprite->SetRotation(0);
+	uvSprite->SetPosition(Vector2(0, 0));
+
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
@@ -174,77 +183,6 @@ void SampleScene::Update() {
 		}
 		ImGui::End();
 	}
-	if (ImGui::Begin("SampleLight")) {
-		if (ImGui::TreeNode("DirectionalLight")) {
-			ImGui::ColorEdit4("LightColor", &directionalLight_.color.x);
-			ImGui::DragFloat3("LightDirection", &directionalLight_.direction.x, 0.1f, -1.0f, 1.0f);
-			ImGui::DragFloat("LightIntensity", &directionalLight_.intensity, 0.1f, 0.0f, 10.0f);
-			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("PointLight")) {
-			ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);
-			ImGui::DragFloat("PointLightIntensity", &pointLights_[0].intensity, 0.1f);
-			ImGui::DragFloat3("PointLightPosition", &pointLights_[0].position.x, 0.1f);
-			ImGui::DragFloat("PointLightRadius", &pointLights_[0].radius, 0.1f);
-			ImGui::DragFloat("PointLightDecay", &pointLights_[0].decay, 0.1f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("PointLight1")) {
-			ImGui::ColorEdit4("PointLightColor1", &pointLights_[1].color.x);
-			ImGui::DragFloat("PointLightIntensity1", &pointLights_[1].intensity, 0.1f);
-			ImGui::DragFloat3("PointLightPosition1", &pointLights_[1].position.x, 0.1f);
-			ImGui::DragFloat("PointLightRadius1", &pointLights_[1].radius, 0.1f);
-			ImGui::DragFloat("PointLightDecay1", &pointLights_[1].decay, 0.1f);
-			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("SpotLight")) {
-			ImGui::ColorEdit4("SpotLightColor", &spotLights_[0].color.x);
-			ImGui::DragFloat("SpotLightIntensity", &spotLights_[0].intensity, 0.1f);
-			ImGui::DragFloat3("SpotLightPosition", &spotLights_[0].position.x, 0.1f);
-			ImGui::DragFloat3("SpotLightDirection", &spotLights_[0].direction.x, 0.1f);
-			ImGui::DragFloat("SpotLightDistance", &spotLights_[0].distance, 0.1f);
-			ImGui::DragFloat("SpotLightDecay", &spotLights_[0].decay, 0.1f);
-			ImGui::DragFloat("SpotLightCosAngle", &spotLights_[0].cosAngle, 0.1f, 0.0f, 1.0f);
-			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLights_[0].cosFalloffStart, 0.1f, 0.0f, 1.0f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("SpotLight1")) {
-			ImGui::ColorEdit4("SpotLightColor1", &spotLights_[1].color.x);
-			ImGui::DragFloat("SpotLightIntensity1", &spotLights_[1].intensity, 0.1f);
-			ImGui::DragFloat3("SpotLightPosition1", &spotLights_[1].position.x, 0.1f);
-			ImGui::DragFloat3("SpotLightDirection1", &spotLights_[1].direction.x, 0.1f);
-			ImGui::DragFloat("SpotLightDistance1", &spotLights_[1].distance, 0.1f);
-			ImGui::DragFloat("SpotLightDecay1", &spotLights_[1].decay, 0.1f);
-			ImGui::DragFloat("SpotLightCosAngle1", &spotLights_[1].cosAngle, 0.1f, 0.0f, 1.0f);
-			ImGui::DragFloat("SpotLightCosFalloffStart1", &spotLights_[1].cosFalloffStart, 0.1f, 0.0f, 1.0f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("AreaLight")) {
-			ImGui::ColorEdit4("AreaLightColor", &areaLights_[0].color.x);
-			ImGui::DragFloat("AreaLightIntensity", &areaLights_[0].intensity, 0.1f);
-			ImGui::DragFloat3("AreaLightPosition", &areaLights_[0].position.x, 0.1f);
-			ImGui::DragFloat3("AreaLightNormal", &areaLights_[0].normal.x, 0.1f);
-			ImGui::DragFloat("AreaLightWidth", &areaLights_[0].width, 0.1f);
-			ImGui::DragFloat("AreaLightHeight", &areaLights_[0].height, 0.1f);
-			ImGui::DragFloat("AreaLightRadius", &areaLights_[0].radius, 0.1f);
-			ImGui::DragFloat("AreaLightDecay", &areaLights_[0].decay, 0.1f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("AreaLight1")) {
-			ImGui::ColorEdit4("AreaLightColor1", &areaLights_[1].color.x);
-			ImGui::DragFloat("AreaLightIntensity1", &areaLights_[1].intensity, 0.1f);
-			ImGui::DragFloat3("AreaLightPosition1", &areaLights_[1].position.x, 0.1f);
-			ImGui::DragFloat3("AreaLightNormal1", &areaLights_[1].normal.x, 0.1f);
-			ImGui::DragFloat("AreaLightWidth1", &areaLights_[1].width, 0.1f);
-			ImGui::DragFloat("AreaLightHeight1", &areaLights_[1].height, 0.1f);
-			ImGui::DragFloat("AreaLightRadius1", &areaLights_[1].radius, 0.1f);
-			ImGui::DragFloat("AreaLightDecay1", &areaLights_[1].decay, 0.1f);
-			ImGui::TreePop();
-		}
-	}
-	ImGui::End();
 	if (ImGui::Begin("Pad Input")) {
 		ImGui::Text("押されているパッドボタン");
 		const std::array<std::pair<Input::PadButton, const char*>, 14> padButtons = {
@@ -432,6 +370,8 @@ void SampleScene::Update() {
 	ringPrimitive_->SetUvTransform(Vector3(1,1,1),Vector3(0,0,ringUvRotation_),Vector3(0,0,0),Vector2(0.5f,0.5f));
 	ringPrimitive_->Update();
 
+	uvSprite->Update();
+
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
@@ -474,5 +414,7 @@ void SampleScene::Draw() {
 	// if (humanSkeleton_) {
 	//	humanSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
 	// }
+	SpriteCommon::GetInstance()->DrawCommon();
+	uvSprite->Draw();
 }
 void SampleScene::Finalize() {}

@@ -1,5 +1,5 @@
 #define NOMINMAX
-#include "Hinstance.h"
+#include "Hierarchy.h"
 #include "EditorGrid.h"
 #include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdint>
 #include <filesystem>
 #include <string>
 
@@ -23,11 +24,11 @@ std::filesystem::path ResolveObjectEditorJsonPath(const std::string& filePath) {
 bool HasObjectEditorJsonFile(const std::string& filePath) { return std::filesystem::exists(ResolveObjectEditorJsonPath(filePath)); }
 } // namespace
 
-Hinstance* Hinstance::GetInstance() {
-	static Hinstance instance;
+Hierarchy* Hierarchy::GetInstance() {
+	static Hierarchy instance;
 	return &instance;
 }
-std::string Hinstance::GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const {
+std::string Hierarchy::GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const {
 	const SceneManager* sceneManager = SceneManager::GetInstance();
 	if (!sceneManager) {
 		return defaultFilePath;
@@ -39,12 +40,22 @@ std::string Hinstance::GetSceneScopedEditorFilePath(const std::string& defaultFi
 	return sceneName + "_" + std::filesystem::path(defaultFilePath).filename().string();
 }
 
-void Hinstance::ResetForSceneChange() {
+void Hierarchy::ResetForSceneChange() {
 	hasUnsavedChanges_ = false;
 	saveStatusMessage_.clear();
 	hasLoadedForCurrentScene_ = false;
+	editorLightState_.overrideSceneLights = false;
+	editorLightState_.directionalLight = {
+	    {1.0f, 1.0f, 1.0f, 1.0f},
+        {0.0f, -1.0f, 0.0f},
+        1.0f
+    };
+	editorLightState_.pointLights.clear();
+	editorLightState_.spotLights.clear();
+	editorLightState_.areaLights.clear();
+	Object3dCommon::GetInstance()->SetEditorLightOverride(false);
 }
-void Hinstance::RegisterObject3d(Object3d* object) {
+void Hierarchy::RegisterObject3d(Object3d* object) {
 	if (!object) {
 		return;
 	}
@@ -66,7 +77,7 @@ void Hinstance::RegisterObject3d(Object3d* object) {
 	}
 }
 
-void Hinstance::UnregisterObject3d(Object3d* object) {
+void Hierarchy::UnregisterObject3d(Object3d* object) {
 	if (!object) {
 		return;
 	}
@@ -81,7 +92,7 @@ void Hinstance::UnregisterObject3d(Object3d* object) {
 	}
 }
 
-void Hinstance::RegisterPrimitive(Primitive* primitive) {
+void Hierarchy::RegisterPrimitive(Primitive* primitive) {
 	if (!primitive) {
 		return;
 	}
@@ -103,7 +114,7 @@ void Hinstance::RegisterPrimitive(Primitive* primitive) {
 	}
 }
 
-void Hinstance::UnregisterPrimitive(Primitive* primitive) {
+void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
 	if (!primitive) {
 		return;
 	}
@@ -118,9 +129,9 @@ void Hinstance::UnregisterPrimitive(Primitive* primitive) {
 	}
 }
 
-bool Hinstance::HasRegisteredObjects() const { return !objects_.empty() || !primitives_.empty(); }
+bool Hierarchy::HasRegisteredObjects() const { return !objects_.empty() || !primitives_.empty(); }
 
-bool Hinstance::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
+bool Hierarchy::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
 	const SceneManager* sceneManager = SceneManager::GetInstance();
 	const std::string sceneName = sceneManager ? sceneManager->GetCurrentSceneName() : std::string();
 	if (sceneName != loadedSceneName_) {
@@ -136,7 +147,7 @@ bool Hinstance::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
 	return hasLoadedForCurrentScene_;
 }
 
-bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
+bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 	nlohmann::json root;
 	root["objects"] = nlohmann::json::array();
 	root["primitives"] = nlohmann::json::array();
@@ -176,7 +187,7 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 
 	for (size_t i = 0; i < primitives_.size(); ++i) {
 		const Primitive* primitive = primitives_[i];
-		if (!primitive) {
+		if (!primitive || primitive == selectionBoxPrimitive_.get()) {
 			continue;
 		}
 		const Transform& transform = primitiveEditorTransforms_[i];
@@ -211,7 +222,7 @@ bool Hinstance::SaveObjectEditorsToJson(const std::string& filePath) const {
 	return jsonManager->SaveJson(filePath);
 }
 
-bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
+bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 	JsonManager* jsonManager = JsonManager::GetInstance();
 	if (!jsonManager->LoadJson(filePath)) {
 		return false;
@@ -306,7 +317,7 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 				continue;
 			}
 			const size_t index = primitiveJson["index"].get<size_t>();
-			if (index >= primitives_.size() || !primitives_[index]) {
+			if (index >= primitives_.size() || !primitives_[index] || primitives_[index] == selectionBoxPrimitive_.get()) {
 				continue;
 			}
 			if (primitiveJson.contains("name") && primitiveJson["name"].is_string()) {
@@ -380,7 +391,7 @@ bool Hinstance::LoadObjectEditorsFromJson(const std::string& filePath) {
 
 	return true;
 }
-void Hinstance::DrawSceneSelector() {
+void Hierarchy::DrawSceneSelector() {
 #ifdef USE_IMGUI
 	SceneManager* sceneManager = SceneManager::GetInstance();
 	if (!sceneManager) {
@@ -415,7 +426,7 @@ void Hinstance::DrawSceneSelector() {
 #endif
 }
 
-void Hinstance::DrawGridEditor() {
+void Hierarchy::DrawGridEditor() {
 #ifdef USE_IMGUI
 	ImGui::Checkbox("Enable Grid Snap", &enableGridSnap_);
 	if (ImGui::DragFloat("Grid Snap Spacing", &gridSnapSpacing_, 0.05f, 0.1f, 100.0f, "%.2f")) {
@@ -435,9 +446,9 @@ void Hinstance::DrawGridEditor() {
 	gridSnapSpacing_ = std::max(gridSnapSpacing_, 0.1f);
 	gridHalfLineCount_ = std::max(gridHalfLineCount_, 1);
 }
-void Hinstance::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
+void Hierarchy::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
 
-void Hinstance::DrawEditorGridLines() {
+void Hierarchy::DrawEditorGridLines() {
 #ifdef USE_IMGUI
 	if (!showEditorGridLines_) {
 		return;
@@ -475,11 +486,167 @@ void Hinstance::DrawEditorGridLines() {
 	Object3dCommon::GetInstance()->DrawCommonEditorGrid();
 	editorGridPlane_->Update();
 	editorGridPlane_->Draw();
+	if (!showSelectionBox_ || !IsObjectSelected()) {
+		return;
+	}
+	if (selectionBoxDirty_ || !selectionBoxPrimitive_) {
+		SyncSelectionBoxToTarget();
+		selectionBoxDirty_ = false;
+	}
+	if (!selectionBoxPrimitive_) {
+		return;
+	}
+	selectionBoxPrimitive_->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
+	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
+	selectionBoxPrimitive_->Update();
+	selectionBoxPrimitive_->Draw();
 #endif
 }
 
+void Hierarchy::DrawLightEditor() {
+#ifdef USE_IMGUI
+	bool overrideChanged = ImGui::Checkbox("Use Editor Lights", &editorLightState_.overrideSceneLights);
+	if (overrideChanged) {
+		Object3dCommon::GetInstance()->SetEditorLightOverride(editorLightState_.overrideSceneLights);
+		hasUnsavedChanges_ = true;
+	}
 
-void Hinstance::DrawObjectEditors() {
+	bool lightChanged = false;
+	if (ImGui::TreeNode("Directional Light")) {
+		if (!isPlaying_) {
+			lightChanged |= ImGui::ColorEdit4("Dir Color", &editorLightState_.directionalLight.color.x);
+			lightChanged |= ImGui::DragFloat3("Dir Direction", &editorLightState_.directionalLight.direction.x, 0.01f, -1.0f, 1.0f);
+			lightChanged |= ImGui::DragFloat("Dir Intensity", &editorLightState_.directionalLight.intensity, 0.01f, 0.0f, 10.0f);
+		}
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Point Lights")) {
+		int pointCount = static_cast<int>(editorLightState_.pointLights.size());
+		if (!isPlaying_ && ImGui::SliderInt("Point Count", &pointCount, 0, static_cast<int>(kMaxPointLights))) {
+			editorLightState_.pointLights.resize(static_cast<size_t>(pointCount));
+			lightChanged = true;
+		}
+		for (size_t i = 0; i < editorLightState_.pointLights.size(); ++i) {
+			PointLight& point = editorLightState_.pointLights[i];
+			const std::string label = "Point " + std::to_string(i);
+			if (ImGui::TreeNode((label + "##point").c_str())) {
+				if (!isPlaying_) {
+					lightChanged |= ImGui::ColorEdit4(("Color##point_" + std::to_string(i)).c_str(), &point.color.x);
+					lightChanged |= ImGui::DragFloat3(("Position##point_" + std::to_string(i)).c_str(), &point.position.x, 0.05f);
+					lightChanged |= ImGui::DragFloat(("Intensity##point_" + std::to_string(i)).c_str(), &point.intensity, 0.01f, 0.0f, 10.0f);
+					lightChanged |= ImGui::DragFloat(("Radius##point_" + std::to_string(i)).c_str(), &point.radius, 0.05f, 0.0f, 500.0f);
+					lightChanged |= ImGui::DragFloat(("Decay##point_" + std::to_string(i)).c_str(), &point.decay, 0.01f, 0.0f, 10.0f);
+				}
+				ImGui::TreePop();
+			}
+		}
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Spot Lights")) {
+		int spotCount = static_cast<int>(editorLightState_.spotLights.size());
+		if (!isPlaying_ && ImGui::SliderInt("Spot Count", &spotCount, 0, static_cast<int>(kMaxSpotLights))) {
+			editorLightState_.spotLights.resize(static_cast<size_t>(spotCount));
+			lightChanged = true;
+		}
+		for (size_t i = 0; i < editorLightState_.spotLights.size(); ++i) {
+			SpotLight& spot = editorLightState_.spotLights[i];
+			if (ImGui::TreeNode(("Spot " + std::to_string(i) + "##spot").c_str())) {
+				if (!isPlaying_) {
+					lightChanged |= ImGui::ColorEdit4(("Color##spot_" + std::to_string(i)).c_str(), &spot.color.x);
+					lightChanged |= ImGui::DragFloat3(("Position##spot_" + std::to_string(i)).c_str(), &spot.position.x, 0.05f);
+					lightChanged |= ImGui::DragFloat3(("Direction##spot_" + std::to_string(i)).c_str(), &spot.direction.x, 0.01f, -1.0f, 1.0f);
+					lightChanged |= ImGui::DragFloat(("Intensity##spot_" + std::to_string(i)).c_str(), &spot.intensity, 0.01f, 0.0f, 10.0f);
+					lightChanged |= ImGui::DragFloat(("Distance##spot_" + std::to_string(i)).c_str(), &spot.distance, 0.05f, 0.0f, 500.0f);
+					lightChanged |= ImGui::DragFloat(("Decay##spot_" + std::to_string(i)).c_str(), &spot.decay, 0.01f, 0.0f, 10.0f);
+					lightChanged |= ImGui::DragFloat(("Cos Angle##spot_" + std::to_string(i)).c_str(), &spot.cosAngle, 0.001f, -1.0f, 1.0f);
+					lightChanged |= ImGui::DragFloat(("Cos Falloff##spot_" + std::to_string(i)).c_str(), &spot.cosFalloffStart, 0.001f, -1.0f, 1.0f);
+				}
+				ImGui::TreePop();
+			}
+		}
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Area Lights")) {
+		int areaCount = static_cast<int>(editorLightState_.areaLights.size());
+		if (!isPlaying_ && ImGui::SliderInt("Area Count", &areaCount, 0, static_cast<int>(kMaxAreaLights))) {
+			editorLightState_.areaLights.resize(static_cast<size_t>(areaCount));
+			lightChanged = true;
+		}
+		for (size_t i = 0; i < editorLightState_.areaLights.size(); ++i) {
+			AreaLight& area = editorLightState_.areaLights[i];
+			if (ImGui::TreeNode(("Area " + std::to_string(i) + "##area").c_str())) {
+				if (!isPlaying_) {
+					lightChanged |= ImGui::ColorEdit4(("Color##area_" + std::to_string(i)).c_str(), &area.color.x);
+					lightChanged |= ImGui::DragFloat3(("Position##area_" + std::to_string(i)).c_str(), &area.position.x, 0.05f);
+					lightChanged |= ImGui::DragFloat3(("Normal##area_" + std::to_string(i)).c_str(), &area.normal.x, 0.01f, -1.0f, 1.0f);
+					lightChanged |= ImGui::DragFloat(("Intensity##area_" + std::to_string(i)).c_str(), &area.intensity, 0.01f, 0.0f, 10.0f);
+					lightChanged |= ImGui::DragFloat(("Width##area_" + std::to_string(i)).c_str(), &area.width, 0.05f, 0.0f, 500.0f);
+					lightChanged |= ImGui::DragFloat(("Height##area_" + std::to_string(i)).c_str(), &area.height, 0.05f, 0.0f, 500.0f);
+					lightChanged |= ImGui::DragFloat(("Radius##area_" + std::to_string(i)).c_str(), &area.radius, 0.05f, 0.0f, 500.0f);
+					lightChanged |= ImGui::DragFloat(("Decay##area_" + std::to_string(i)).c_str(), &area.decay, 0.01f, 0.0f, 10.0f);
+				}
+				ImGui::TreePop();
+			}
+		}
+		ImGui::TreePop();
+	}
+
+	if (lightChanged || editorLightState_.overrideSceneLights) {
+		hasUnsavedChanges_ = hasUnsavedChanges_ || lightChanged;
+		Object3dCommon::GetInstance()->SetEditorLights(
+		    editorLightState_.directionalLight, editorLightState_.pointLights.empty() ? nullptr : editorLightState_.pointLights.data(), static_cast<uint32_t>(editorLightState_.pointLights.size()),
+		    editorLightState_.spotLights.empty() ? nullptr : editorLightState_.spotLights.data(), static_cast<uint32_t>(editorLightState_.spotLights.size()),
+		    editorLightState_.areaLights.empty() ? nullptr : editorLightState_.areaLights.data(), static_cast<uint32_t>(editorLightState_.areaLights.size()));
+	}
+#endif
+}
+bool Hierarchy::IsObjectSelected() const {
+	if (selectedIsPrimitive_) {
+		return selectedObjectIndex_ < primitives_.size() && primitives_[selectedObjectIndex_] != nullptr;
+	}
+	return selectedObjectIndex_ < objects_.size() && objects_[selectedObjectIndex_] != nullptr;
+}
+
+Transform Hierarchy::GetSelectedTransform() const {
+	if (selectedIsPrimitive_) {
+		if (selectedObjectIndex_ < primitiveEditorTransforms_.size()) {
+			return primitiveEditorTransforms_[selectedObjectIndex_];
+		}
+	} else {
+		if (selectedObjectIndex_ < editorTransforms_.size()) {
+			return editorTransforms_[selectedObjectIndex_];
+		}
+	}
+	return Transform{};
+}
+
+void Hierarchy::SyncSelectionBoxToTarget() {
+	if (!showSelectionBox_ || !IsObjectSelected()) {
+		return;
+	}
+	if (!selectionBoxPrimitive_) {
+		selectionBoxPrimitive_ = std::make_unique<Primitive>();
+		selectionBoxPrimitive_->SetEditorRegistrationEnabled(false);
+		selectionBoxPrimitive_->Initialize(Primitive::Box);
+		selectionBoxPrimitive_->SetEnableLighting(false);
+		selectionBoxPrimitive_->SetColor({1.0f, 0.9f, 0.1f, 1.0f});
+	}
+	selectionBoxPrimitive_->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
+	const Transform selectedTransform = GetSelectedTransform();
+	selectionBoxPrimitive_->SetTransform(selectedTransform);
+}
+
+void Hierarchy::DrawSelectionBoxEditor() {
+#ifdef USE_IMGUI
+	if (ImGui::Checkbox("Draw Selection Box", &showSelectionBox_)) {
+		selectionBoxDirty_ = true;
+	}
+#endif
+}
+void Hierarchy::DrawObjectEditors() {
 #ifdef USE_IMGUI
 
 	if (!isPlaying_) {
@@ -532,7 +699,7 @@ void Hinstance::DrawObjectEditors() {
 
 	ImGui::SetNextWindowPos(ImVec2(editorPosX, editorPosY), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(editorWidth, viewport->WorkSize.y), ImGuiCond_Always);
-	if (!ImGui::Begin("Hinstance", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
+	if (!ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
 		ImGui::End();
 		return;
 	}
@@ -543,6 +710,10 @@ void Hinstance::DrawObjectEditors() {
 	DrawSceneSelector();
 	ImGui::SeparatorText("Grid");
 	DrawGridEditor();
+	ImGui::SeparatorText("Light");
+	DrawLightEditor();
+	ImGui::SeparatorText("Selection");
+	DrawSelectionBoxEditor();
 	ImGui::Separator();
 
 	if (!isPlaying_ && ImGui::Button("Save To JSON")) {
@@ -583,7 +754,13 @@ void Hinstance::DrawObjectEditors() {
 		std::string& objectName = objectNames_[i];
 		std::string nodeLabel = objectName.empty() ? ("Object " + std::to_string(i)) : objectName;
 		const std::string treeNodeLabel = nodeLabel + "###object_node_" + std::to_string(i);
-		if (ImGui::TreeNode(treeNodeLabel.c_str())) {
+		const ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ((!selectedIsPrimitive_ && selectedObjectIndex_ == i) ? ImGuiTreeNodeFlags_Selected : 0);
+		if (ImGui::TreeNodeEx(treeNodeLabel.c_str(), nodeFlags)) {
+			if (ImGui::IsItemClicked()) {
+				selectedObjectIndex_ = i;
+				selectedIsPrimitive_ = false;
+				selectionBoxDirty_ = true;
+			}
 			Transform& transform = editorTransforms_[i];
 			EditorMaterial& material = editorMaterials_[i];
 			bool transformChanged = false;
@@ -621,6 +798,7 @@ void Hinstance::DrawObjectEditors() {
 				hasUnsavedChanges_ = true;
 			}
 			if (transformChanged) {
+				selectionBoxDirty_ = true;
 				if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
 					transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
 					transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
@@ -652,7 +830,13 @@ void Hinstance::DrawObjectEditors() {
 		std::string& primitiveName = primitiveNames_[i];
 		std::string nodeLabel = primitiveName.empty() ? ("Primitive " + std::to_string(i)) : primitiveName;
 		const std::string treeNodeLabel = nodeLabel + "###primitive_node_" + std::to_string(i);
-		if (ImGui::TreeNode(treeNodeLabel.c_str())) {
+		const ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ((selectedIsPrimitive_ && selectedObjectIndex_ == i) ? ImGuiTreeNodeFlags_Selected : 0);
+		if (ImGui::TreeNodeEx(treeNodeLabel.c_str(), nodeFlags)) {
+			if (ImGui::IsItemClicked()) {
+				selectedObjectIndex_ = i;
+				selectedIsPrimitive_ = true;
+				selectionBoxDirty_ = true;
+			}
 			Transform& transform = primitiveEditorTransforms_[i];
 			EditorMaterial& material = primitiveEditorMaterials_[i];
 			bool transformChanged = false;
@@ -690,6 +874,7 @@ void Hinstance::DrawObjectEditors() {
 				hasUnsavedChanges_ = true;
 			}
 			if (transformChanged) {
+				selectionBoxDirty_ = true;
 				if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
 					transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
 					transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;

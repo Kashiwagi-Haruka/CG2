@@ -10,6 +10,7 @@
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
 #include "Object3d/Object3d.h"
+#include "Sprite/Sprite.h"
 #include "ParticleEmitter.h"
 #include "Transform.h"
 #include <array>
@@ -18,6 +19,7 @@
 #include <vector>
 class SampleScene : public BaseScene {
 
+	std::unique_ptr<Sprite> uvSprite = nullptr;
 	std::unique_ptr<Object3d> uvBallObj_ = nullptr;
 	std::unique_ptr<Object3d> fieldObj_ = nullptr;
 	std::unique_ptr<Object3d> planeGltf_ = nullptr;

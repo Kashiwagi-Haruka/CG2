@@ -232,13 +232,14 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Player\Player.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\YoshidaMath.cpp" />
     <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp" />
-    <ClCompile Include="Engine\Editor\Hinstance.cpp" />
+    <ClCompile Include="Engine\Editor\Hierarchy.cpp" />
     <ClCompile Include="application\GameObject\TestField\TestField.cpp" />
     <ClCompile Include="application\GameObject\Portal\Portal.cpp" />
     <ClCompile Include="application\GameObject\WarpPos\WarpPos1.cpp" />
     <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoard.cpp" />
     <ClCompile Include="application\GameObject\Portal\PortalManager.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp" />
+    <ClCompile Include="Engine\Texture\PSO\SpriteCreatePSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -335,13 +336,14 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Player\Player.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\YoshidaMath.h" />
     <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h" />
-    <ClInclude Include="Engine\Editor\Hinstance.h" />
+    <ClInclude Include="Engine\Editor\Hierarchy.h" />
     <ClInclude Include="application\GameObject\TestField\TestField.h" />
     <ClInclude Include="application\GameObject\Portal\Portal.h" />
     <ClInclude Include="application\GameObject\WarpPos\WarpPos1.h" />
     <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoard.h" />
     <ClInclude Include="application\GameObject\Portal\PortalManager.h" />
     <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h" />
+    <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

@@ -9,12 +9,17 @@
 #include "Vector3.h"
 #include "Vector4.h"
 
+#include "Light/AreaLight.h"
+#include "Light/DirectionalLight.h"
+#include "Light/PointLight.h"
+#include "Light/SpotLight.h"
+
 class Object3d;
 class Primitive;
 
-class Hinstance {
+class Hierarchy {
 public:
-	static Hinstance* GetInstance();
+	static Hierarchy* GetInstance();
 
 	void RegisterObject3d(Object3d* object);
 	void UnregisterObject3d(Object3d* object);
@@ -30,8 +35,25 @@ public:
 private:
 	void DrawSceneSelector();
 	void DrawGridEditor();
+	void DrawLightEditor();
+	void DrawSelectionBoxEditor();
+	void SyncSelectionBoxToTarget();
+	Transform GetSelectedTransform() const;
+	bool IsObjectSelected() const;
 	std::string GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const;
 	void ResetForSceneChange();
+
+	struct EditorLightState {
+		bool overrideSceneLights = false;
+		DirectionalLight directionalLight = {
+		    {1.0f, 1.0f, 1.0f, 1.0f},
+            {0.0f, -1.0f, 0.0f},
+            1.0f
+        };
+		std::vector<PointLight> pointLights;
+		std::vector<SpotLight> spotLights;
+		std::vector<AreaLight> areaLights;
+	};
 
 	struct EditorMaterial {
 		Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -61,6 +83,13 @@ private:
 	std::vector<Transform> primitiveEditorTransforms_;
 	std::vector<EditorMaterial> primitiveEditorMaterials_;
 	std::string saveStatusMessage_;
+
+	bool showSelectionBox_ = true;
+	std::unique_ptr<Primitive> selectionBoxPrimitive_;
+	bool selectionBoxDirty_ = true;
+	size_t selectedObjectIndex_ = 0;
+	bool selectedIsPrimitive_ = false;
+
 	bool hasUnsavedChanges_ = false;
 	bool isPlaying_ = false;
 	std::string loadedSceneName_;
@@ -72,4 +101,5 @@ private:
 	float editorGridY_ = 0.0f;
 	bool editorGridDirty_ = true;
 	std::unique_ptr<Primitive> editorGridPlane_;
+	EditorLightState editorLightState_{};
 };
