@@ -1,6 +1,7 @@
 #define NOMINMAX
 #include "Hierarchy.h"
 #include "EditorGrid.h"
+#include "ToolBar.h"
 #include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
@@ -868,14 +869,38 @@ void Hierarchy::DrawObjectEditors() {
 		}
 	}
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
-	const float kLeftPanelRatio = 0.18f;
-	const float kRightPanelRatio = 0.22f;
+	const float kTopToolbarHeight = 44.0f;
+	const float kLeftPanelRatio = 0.22f;
+	const float kRightPanelRatio = 0.24f;
 	const float kPanelMinWidth = 260.0f;
+	const float availableHeight = std::max(1.0f, viewport->WorkSize.y - kTopToolbarHeight);
 	const float leftPanelWidth = std::max(kPanelMinWidth, viewport->WorkSize.x * kLeftPanelRatio);
 	const float rightPanelWidth = std::max(kPanelMinWidth, viewport->WorkSize.x * kRightPanelRatio);
 
+
 	ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(leftPanelWidth, viewport->WorkSize.y), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, kTopToolbarHeight), ImGuiCond_Always);
+	if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
+		ToolBar::Result toolbarResult = ToolBar::Draw(isPlaying_, hasUnsavedChanges_);
+		if (toolbarResult.playRequested) {
+			if (hasUnsavedChanges_) {
+				saveStatusMessage_ = "Warning: unsaved changes. Save To JSON before Play";
+			} else {
+				SceneManager::GetInstance()->RequestReinitializeCurrentScene();
+				SetPlayMode(true);
+				saveStatusMessage_ = "Playing";
+			}
+		}
+		if (toolbarResult.stopRequested) {
+			SetPlayMode(false);
+			saveStatusMessage_ = "Stopped: applied editor values";
+		}
+	}
+	ImGui::End();
+
+	const float contentStartY = viewport->WorkPos.y + kTopToolbarHeight;
+	ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, contentStartY), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(leftPanelWidth, availableHeight), ImGuiCond_Always);
 	if (ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
 		ImGui::Text("Auto Object Editor");
 		ImGui::Separator();
@@ -899,23 +924,6 @@ void Hierarchy::DrawObjectEditors() {
 		}
 		if (!saveStatusMessage_.empty()) {
 			ImGui::Text("%s", saveStatusMessage_.c_str());
-		}
-
-		if (!isPlaying_) {
-			if (ImGui::Button("Play")) {
-				if (hasUnsavedChanges_) {
-					saveStatusMessage_ = "Warning: unsaved changes. Save To JSON before Play";
-				} else {
-					SceneManager::GetInstance()->RequestReinitializeCurrentScene();
-					SetPlayMode(true);
-					saveStatusMessage_ = "Playing";
-				}
-			}
-		} else {
-			if (ImGui::Button("Stop")) {
-				SetPlayMode(false);
-				saveStatusMessage_ = "Stopped: applied editor values";
-			}
 		}
 
 		ImGui::SeparatorText("Object3d");
@@ -951,8 +959,8 @@ void Hierarchy::DrawObjectEditors() {
 	ImGui::End();
 
 	const float inspectorPosX = viewport->WorkPos.x + viewport->WorkSize.x - rightPanelWidth;
-	ImGui::SetNextWindowPos(ImVec2(inspectorPosX, viewport->WorkPos.y), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(rightPanelWidth, viewport->WorkSize.y), ImGuiCond_Always);
+	ImGui::SetNextWindowPos(ImVec2(inspectorPosX, contentStartY), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(rightPanelWidth, availableHeight), ImGuiCond_Always);
 	if (ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
 		if (!IsObjectSelected()) {
 			ImGui::TextUnformatted("No object selected.");
