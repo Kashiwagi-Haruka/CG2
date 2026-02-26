@@ -112,3 +112,9 @@ void GameBase::EndFlame() {
 }
 
 float GameBase::GetDeltaTime() { return dxCommon_->GetDeltaTime(); }
+ID3D12Device* GameBase::GetD3D12Device() {
+	if (!dxCommon_) {
+		return nullptr;
+	}
+	return dxCommon_->GetDevice();
+}
