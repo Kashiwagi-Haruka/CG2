@@ -629,10 +629,14 @@ void DirectXCommon::DrawSceneTextureToBackBuffer() {
 	D3D12_VIEWPORT gameViewport = viewport_;
 	D3D12_RECT gameScissor = scissorRect_;
 	if (editorLayoutEnabled_) {
-		const float gameWidthRatio = 0.68f;
+		const float kTopToolbarHeight = 44.0f;
+		const float kLeftPanelRatio = 0.22f;
+		const float kRightPanelRatio = 0.24f;
 		const float kGameAspect = 16.0f / 9.0f;
-		const float availableWidth = viewport_.Width * gameWidthRatio;
-		const float availableHeight = viewport_.Height;
+		const float availableWidth = viewport_.Width * (1.0f - kLeftPanelRatio - kRightPanelRatio);
+		const float availableHeight = std::max(1.0f, viewport_.Height - kTopToolbarHeight);
+		const float availableStartX = viewport_.Width * kLeftPanelRatio;
+		const float availableStartY = kTopToolbarHeight;
 
 		float gameWidth = availableWidth;
 		float gameHeight = gameWidth / kGameAspect;
@@ -643,6 +647,10 @@ void DirectXCommon::DrawSceneTextureToBackBuffer() {
 
 		gameViewport.Width = std::max(1.0f, gameWidth);
 		gameViewport.Height = std::max(1.0f, gameHeight);
+		gameViewport.TopLeftX = availableStartX + (availableWidth - gameViewport.Width) * 0.5f;
+		gameViewport.TopLeftY = availableStartY + (availableHeight - gameViewport.Height) * 0.5f;
+		gameScissor.left = static_cast<LONG>(gameViewport.TopLeftX);
+		gameScissor.top = static_cast<LONG>(gameViewport.TopLeftY);
 		gameScissor.right = gameScissor.left + static_cast<LONG>(gameViewport.Width);
 		gameScissor.bottom = gameScissor.top + static_cast<LONG>(gameViewport.Height);
 	}

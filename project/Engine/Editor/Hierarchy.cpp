@@ -1,6 +1,7 @@
 #define NOMINMAX
 #include "Hierarchy.h"
 #include "EditorGrid.h"
+#include "ToolBar.h"
 #include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
@@ -12,7 +13,6 @@
 #endif
 
 #include <algorithm>
-#include <array>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
@@ -45,6 +45,8 @@ void Hierarchy::ResetForSceneChange() {
 	saveStatusMessage_.clear();
 	hasLoadedForCurrentScene_ = false;
 	editorLightState_.overrideSceneLights = false;
+	undoStack_.clear();
+	redoStack_.clear();
 	editorLightState_.directionalLight = {
 	    {1.0f, 1.0f, 1.0f, 1.0f},
         {0.0f, -1.0f, 0.0f},
@@ -54,6 +56,49 @@ void Hierarchy::ResetForSceneChange() {
 	editorLightState_.spotLights.clear();
 	editorLightState_.areaLights.clear();
 	Object3dCommon::GetInstance()->SetEditorLightOverride(false);
+}
+void Hierarchy::ApplyEditorSnapshot(const EditorSnapshot& snapshot) {
+	editorTransforms_ = snapshot.objectTransforms;
+	editorMaterials_ = snapshot.objectMaterials;
+	objectNames_ = snapshot.objectNames;
+	primitiveEditorTransforms_ = snapshot.primitiveTransforms;
+	primitiveEditorMaterials_ = snapshot.primitiveMaterials;
+	primitiveNames_ = snapshot.primitiveNames;
+	selectionBoxDirty_ = true;
+}
+
+void Hierarchy::UndoEditorChange() {
+	if (undoStack_.empty()) {
+		return;
+	}
+	EditorSnapshot current{};
+	current.objectTransforms = editorTransforms_;
+	current.objectMaterials = editorMaterials_;
+	current.objectNames = objectNames_;
+	current.primitiveTransforms = primitiveEditorTransforms_;
+	current.primitiveMaterials = primitiveEditorMaterials_;
+	current.primitiveNames = primitiveNames_;
+	redoStack_.push_back(std::move(current));
+	ApplyEditorSnapshot(undoStack_.back());
+	undoStack_.pop_back();
+	hasUnsavedChanges_ = true;
+}
+
+void Hierarchy::RedoEditorChange() {
+	if (redoStack_.empty()) {
+		return;
+	}
+	EditorSnapshot current{};
+	current.objectTransforms = editorTransforms_;
+	current.objectMaterials = editorMaterials_;
+	current.objectNames = objectNames_;
+	current.primitiveTransforms = primitiveEditorTransforms_;
+	current.primitiveMaterials = primitiveEditorMaterials_;
+	current.primitiveNames = primitiveNames_;
+	undoStack_.push_back(std::move(current));
+	ApplyEditorSnapshot(redoStack_.back());
+	redoStack_.pop_back();
+	hasUnsavedChanges_ = true;
 }
 void Hierarchy::RegisterObject3d(Object3d* object) {
 	if (!object) {
@@ -151,14 +196,26 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 	nlohmann::json root;
 	root["objects"] = nlohmann::json::array();
 	root["primitives"] = nlohmann::json::array();
-
+	root["lights"] = {
+	    {"overrideSceneLights", editorLightState_.overrideSceneLights},
+	    {"directional",
+	     {
+	         {"color",
+	          {editorLightState_.directionalLight.color.x, editorLightState_.directionalLight.color.y, editorLightState_.directionalLight.color.z, editorLightState_.directionalLight.color.w}},
+	         {"direction", {editorLightState_.directionalLight.direction.x, editorLightState_.directionalLight.direction.y, editorLightState_.directionalLight.direction.z}},
+	         {"intensity", editorLightState_.directionalLight.intensity},
+	     }	                                                       },
+	    {"point",               nlohmann::json::array()              },
+	    {"spot",                nlohmann::json::array()              },
+	    {"area",                nlohmann::json::array()              },
+	};
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		const Object3d* object = objects_[i];
 		if (!object) {
 			continue;
 		}
 		const Transform& transform = editorTransforms_[i];
-		const EditorMaterial& material = editorMaterials_[i];
+		const InspectorMaterial& material = editorMaterials_[i];
 		nlohmann::json objectJson;
 		objectJson["index"] = i;
 		objectJson["name"] = objectNames_[i];
@@ -191,7 +248,7 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 			continue;
 		}
 		const Transform& transform = primitiveEditorTransforms_[i];
-		const EditorMaterial& material = primitiveEditorMaterials_[i];
+		const InspectorMaterial& material = editorMaterials_[i];
 		nlohmann::json primitiveJson;
 		primitiveJson["index"] = i;
 		primitiveJson["name"] = primitiveNames_[i];
@@ -216,7 +273,41 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 		};
 		root["primitives"].push_back(primitiveJson);
 	}
+	for (const PointLight& point : editorLightState_.pointLights) {
+		root["lights"]["point"].push_back({
+		    {"color",     {point.color.x, point.color.y, point.color.z, point.color.w}},
+		    {"position",  {point.position.x, point.position.y, point.position.z}      },
+		    {"intensity", point.intensity		                                     },
+		    {"radius",    point.radius		                                        },
+		    {"decay",     point.decay		                                         },
+		});
+	}
 
+	for (const SpotLight& spot : editorLightState_.spotLights) {
+		root["lights"]["spot"].push_back({
+		    {"color",           {spot.color.x, spot.color.y, spot.color.z, spot.color.w}},
+		    {"position",        {spot.position.x, spot.position.y, spot.position.z}     },
+		    {"direction",       {spot.direction.x, spot.direction.y, spot.direction.z}  },
+		    {"intensity",       spot.intensity		                                  },
+		    {"distance",        spot.distance		                                   },
+		    {"decay",           spot.decay		                                      },
+		    {"cosAngle",        spot.cosAngle		                                   },
+		    {"cosFalloffStart", spot.cosFalloffStart                                    },
+		});
+	}
+
+	for (const AreaLight& area : editorLightState_.areaLights) {
+		root["lights"]["area"].push_back({
+		    {"color",     {area.color.x, area.color.y, area.color.z, area.color.w}},
+		    {"position",  {area.position.x, area.position.y, area.position.z}     },
+		    {"normal",    {area.normal.x, area.normal.y, area.normal.z}           },
+		    {"intensity", area.intensity		                                  },
+		    {"width",     area.width		                                      },
+		    {"height",    area.height		                                     },
+		    {"radius",    area.radius		                                     },
+		    {"decay",     area.decay		                                      },
+		});
+	}
 	JsonManager* jsonManager = JsonManager::GetInstance();
 	jsonManager->SetData(root);
 	return jsonManager->SaveJson(filePath);
@@ -258,7 +349,7 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 					objects_[index]->SetTransform(transform);
 				}
 			}
-			EditorMaterial material = editorMaterials_[index];
+			InspectorMaterial material = editorMaterials_[index];
 			if (objectJson.contains("material") && objectJson["material"].is_object()) {
 				const auto& materialJson = objectJson["material"];
 				if (materialJson.contains("color") && materialJson["color"].is_array() && materialJson["color"].size() == 4) {
@@ -336,7 +427,7 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 					primitives_[index]->SetTransform(transform);
 				}
 			}
-			EditorMaterial material = primitiveEditorMaterials_[index];
+			InspectorMaterial material = primitiveEditorMaterials_[index];
 			if (primitiveJson.contains("material") && primitiveJson["material"].is_object()) {
 				const auto& materialJson = primitiveJson["material"];
 				if (materialJson.contains("color") && materialJson["color"].is_array() && materialJson["color"].size() == 4) {
@@ -387,6 +478,140 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 			primitives_[index]->SetDistortionFalloff(material.distortionFalloff);
 			primitives_[index]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
 		}
+	}
+
+	if (root.contains("lights") && root["lights"].is_object()) {
+		const auto& lightsJson = root["lights"];
+
+		if (lightsJson.contains("overrideSceneLights") && lightsJson["overrideSceneLights"].is_boolean()) {
+			editorLightState_.overrideSceneLights = lightsJson["overrideSceneLights"].get<bool>();
+		}
+
+		if (lightsJson.contains("directional") && lightsJson["directional"].is_object()) {
+			const auto& directionalJson = lightsJson["directional"];
+			if (directionalJson.contains("color") && directionalJson["color"].is_array() && directionalJson["color"].size() == 4) {
+				editorLightState_.directionalLight.color = {
+				    directionalJson["color"][0].get<float>(), directionalJson["color"][1].get<float>(), directionalJson["color"][2].get<float>(), directionalJson["color"][3].get<float>()};
+			}
+			if (directionalJson.contains("direction") && directionalJson["direction"].is_array() && directionalJson["direction"].size() == 3) {
+				editorLightState_.directionalLight.direction = {
+				    directionalJson["direction"][0].get<float>(), directionalJson["direction"][1].get<float>(), directionalJson["direction"][2].get<float>()};
+			}
+			if (directionalJson.contains("intensity") && directionalJson["intensity"].is_number()) {
+				editorLightState_.directionalLight.intensity = directionalJson["intensity"].get<float>();
+			}
+		}
+
+		if (lightsJson.contains("point") && lightsJson["point"].is_array()) {
+			editorLightState_.pointLights.clear();
+			for (const auto& pointJson : lightsJson["point"]) {
+				if (!pointJson.is_object()) {
+					continue;
+				}
+				PointLight point{};
+				if (pointJson.contains("color") && pointJson["color"].is_array() && pointJson["color"].size() == 4) {
+					point.color = {pointJson["color"][0].get<float>(), pointJson["color"][1].get<float>(), pointJson["color"][2].get<float>(), pointJson["color"][3].get<float>()};
+				}
+				if (pointJson.contains("position") && pointJson["position"].is_array() && pointJson["position"].size() == 3) {
+					point.position = {pointJson["position"][0].get<float>(), pointJson["position"][1].get<float>(), pointJson["position"][2].get<float>()};
+				}
+				if (pointJson.contains("intensity") && pointJson["intensity"].is_number()) {
+					point.intensity = pointJson["intensity"].get<float>();
+				}
+				if (pointJson.contains("radius") && pointJson["radius"].is_number()) {
+					point.radius = pointJson["radius"].get<float>();
+				}
+				if (pointJson.contains("decay") && pointJson["decay"].is_number()) {
+					point.decay = pointJson["decay"].get<float>();
+				}
+				editorLightState_.pointLights.push_back(point);
+				if (editorLightState_.pointLights.size() >= kMaxPointLights) {
+					break;
+				}
+			}
+		}
+
+		if (lightsJson.contains("spot") && lightsJson["spot"].is_array()) {
+			editorLightState_.spotLights.clear();
+			for (const auto& spotJson : lightsJson["spot"]) {
+				if (!spotJson.is_object()) {
+					continue;
+				}
+				SpotLight spot{};
+				if (spotJson.contains("color") && spotJson["color"].is_array() && spotJson["color"].size() == 4) {
+					spot.color = {spotJson["color"][0].get<float>(), spotJson["color"][1].get<float>(), spotJson["color"][2].get<float>(), spotJson["color"][3].get<float>()};
+				}
+				if (spotJson.contains("position") && spotJson["position"].is_array() && spotJson["position"].size() == 3) {
+					spot.position = {spotJson["position"][0].get<float>(), spotJson["position"][1].get<float>(), spotJson["position"][2].get<float>()};
+				}
+				if (spotJson.contains("direction") && spotJson["direction"].is_array() && spotJson["direction"].size() == 3) {
+					spot.direction = {spotJson["direction"][0].get<float>(), spotJson["direction"][1].get<float>(), spotJson["direction"][2].get<float>()};
+				}
+				if (spotJson.contains("intensity") && spotJson["intensity"].is_number()) {
+					spot.intensity = spotJson["intensity"].get<float>();
+				}
+				if (spotJson.contains("distance") && spotJson["distance"].is_number()) {
+					spot.distance = spotJson["distance"].get<float>();
+				}
+				if (spotJson.contains("decay") && spotJson["decay"].is_number()) {
+					spot.decay = spotJson["decay"].get<float>();
+				}
+				if (spotJson.contains("cosAngle") && spotJson["cosAngle"].is_number()) {
+					spot.cosAngle = spotJson["cosAngle"].get<float>();
+				}
+				if (spotJson.contains("cosFalloffStart") && spotJson["cosFalloffStart"].is_number()) {
+					spot.cosFalloffStart = spotJson["cosFalloffStart"].get<float>();
+				}
+				editorLightState_.spotLights.push_back(spot);
+				if (editorLightState_.spotLights.size() >= kMaxSpotLights) {
+					break;
+				}
+			}
+		}
+
+		if (lightsJson.contains("area") && lightsJson["area"].is_array()) {
+			editorLightState_.areaLights.clear();
+			for (const auto& areaJson : lightsJson["area"]) {
+				if (!areaJson.is_object()) {
+					continue;
+				}
+				AreaLight area{};
+				if (areaJson.contains("color") && areaJson["color"].is_array() && areaJson["color"].size() == 4) {
+					area.color = {areaJson["color"][0].get<float>(), areaJson["color"][1].get<float>(), areaJson["color"][2].get<float>(), areaJson["color"][3].get<float>()};
+				}
+				if (areaJson.contains("position") && areaJson["position"].is_array() && areaJson["position"].size() == 3) {
+					area.position = {areaJson["position"][0].get<float>(), areaJson["position"][1].get<float>(), areaJson["position"][2].get<float>()};
+				}
+				if (areaJson.contains("normal") && areaJson["normal"].is_array() && areaJson["normal"].size() == 3) {
+					area.normal = {areaJson["normal"][0].get<float>(), areaJson["normal"][1].get<float>(), areaJson["normal"][2].get<float>()};
+				}
+				if (areaJson.contains("intensity") && areaJson["intensity"].is_number()) {
+					area.intensity = areaJson["intensity"].get<float>();
+				}
+				if (areaJson.contains("width") && areaJson["width"].is_number()) {
+					area.width = areaJson["width"].get<float>();
+				}
+				if (areaJson.contains("height") && areaJson["height"].is_number()) {
+					area.height = areaJson["height"].get<float>();
+				}
+				if (areaJson.contains("radius") && areaJson["radius"].is_number()) {
+					area.radius = areaJson["radius"].get<float>();
+				}
+				if (areaJson.contains("decay") && areaJson["decay"].is_number()) {
+					area.decay = areaJson["decay"].get<float>();
+				}
+				editorLightState_.areaLights.push_back(area);
+				if (editorLightState_.areaLights.size() >= kMaxAreaLights) {
+					break;
+				}
+			}
+		}
+
+		Object3dCommon::GetInstance()->SetEditorLightOverride(editorLightState_.overrideSceneLights);
+		Object3dCommon::GetInstance()->SetEditorLights(
+		    editorLightState_.directionalLight, editorLightState_.pointLights.empty() ? nullptr : editorLightState_.pointLights.data(), static_cast<uint32_t>(editorLightState_.pointLights.size()),
+		    editorLightState_.spotLights.empty() ? nullptr : editorLightState_.spotLights.data(), static_cast<uint32_t>(editorLightState_.spotLights.size()),
+		    editorLightState_.areaLights.empty() ? nullptr : editorLightState_.areaLights.data(), static_cast<uint32_t>(editorLightState_.areaLights.size()));
 	}
 
 	return true;
@@ -656,7 +881,7 @@ void Hierarchy::DrawObjectEditors() {
 				continue;
 			}
 			const Transform& transform = editorTransforms_[i];
-			const EditorMaterial& material = editorMaterials_[i];
+			const InspectorMaterial& material = editorMaterials_[i];
 			object->SetTransform(transform);
 			object->SetColor(material.color);
 			object->SetEnableLighting(material.enableLighting);
@@ -675,7 +900,7 @@ void Hierarchy::DrawObjectEditors() {
 				continue;
 			}
 			const Transform& transform = primitiveEditorTransforms_[i];
-			const EditorMaterial& material = primitiveEditorMaterials_[i];
+			const InspectorMaterial& material = primitiveEditorMaterials_[i];
 			primitive->SetTransform(transform);
 			primitive->SetColor(material.color);
 			primitive->SetEnableLighting(material.enableLighting);
@@ -685,51 +910,32 @@ void Hierarchy::DrawObjectEditors() {
 			primitive->SetSepiaEnabled(material.sepiaEnabled);
 			primitive->SetDistortionStrength(material.distortionStrength);
 			primitive->SetDistortionFalloff(material.distortionFalloff);
-			primitive->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate,material.uvAnchor));
+			primitive->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor));
 		}
 	}
-	constexpr float kGameWidthRatio = 0.68f;
-	constexpr float kEditorMinWidth = 280.0f;
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
-	const float editorWidthMax = viewport->WorkSize.x * (1.0f - kGameWidthRatio);
-	const float editorMinWidth = std::min(kEditorMinWidth, viewport->WorkSize.x);
-	const float editorWidth = std::clamp(editorWidthMax, editorMinWidth, viewport->WorkSize.x);
-	const float editorPosX = viewport->WorkPos.x + viewport->WorkSize.x - editorWidth;
-	const float editorPosY = viewport->WorkPos.y;
+	const float kTopToolbarHeight = 44.0f;
+	const float kLeftPanelRatio = 0.22f;
+	const float kRightPanelRatio = 0.24f;
+	const float kPanelMinWidth = 260.0f;
+	const float availableHeight = std::max(1.0f, viewport->WorkSize.y - kTopToolbarHeight);
+	const float leftPanelWidth = std::max(kPanelMinWidth, viewport->WorkSize.x * kLeftPanelRatio);
+	const float rightPanelWidth = std::max(kPanelMinWidth, viewport->WorkSize.x * kRightPanelRatio);
 
-	ImGui::SetNextWindowPos(ImVec2(editorPosX, editorPosY), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(editorWidth, viewport->WorkSize.y), ImGuiCond_Always);
-	if (!ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
-		ImGui::End();
-		return;
-	}
 
-	ImGui::Text("Auto Object Editor");
-	ImGui::Separator();
-	ImGui::SeparatorText("Scene Switch");
-	DrawSceneSelector();
-	ImGui::SeparatorText("Grid");
-	DrawGridEditor();
-	ImGui::SeparatorText("Light");
-	DrawLightEditor();
-	ImGui::SeparatorText("Selection");
-	DrawSelectionBoxEditor();
-	ImGui::Separator();
-
-	if (!isPlaying_ && ImGui::Button("Save To JSON")) {
-		const std::string saveFilePath = GetSceneScopedEditorFilePath("objectEditors.json");
-		const bool saved = SaveObjectEditorsToJson(saveFilePath);
-		if (saved) {
-			hasUnsavedChanges_ = false;
+	ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, kTopToolbarHeight), ImGuiCond_Always);
+	if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
+		ToolBar::Result toolbarResult = ToolBar::Draw(isPlaying_, hasUnsavedChanges_, !undoStack_.empty(), !redoStack_.empty());
+		if (toolbarResult.undoRequested) {
+			UndoEditorChange();
+			saveStatusMessage_ = "Undo";
 		}
-		saveStatusMessage_ = saved ? ("Saved: " + saveFilePath) : ("Save failed: " + saveFilePath);
-	}
-	if (!saveStatusMessage_.empty()) {
-		ImGui::Text("%s", saveStatusMessage_.c_str());
-	}
-
-	if (!isPlaying_) {
-		if (ImGui::Button("Play")) {
+		if (toolbarResult.redoRequested) {
+			RedoEditorChange();
+			saveStatusMessage_ = "Redo";
+		}
+		if (toolbarResult.playRequested) {
 			if (hasUnsavedChanges_) {
 				saveStatusMessage_ = "Warning: unsaved changes. Save To JSON before Play";
 			} else {
@@ -738,165 +944,154 @@ void Hierarchy::DrawObjectEditors() {
 				saveStatusMessage_ = "Playing";
 			}
 		}
-	} else {
-		if (ImGui::Button("Stop")) {
+		if (toolbarResult.stopRequested) {
 			SetPlayMode(false);
 			saveStatusMessage_ = "Stopped: applied editor values";
 		}
 	}
+	ImGui::End();
 
-	ImGui::SeparatorText("Object3d");
-	for (size_t i = 0; i < objects_.size(); ++i) {
-		Object3d* object = objects_[i];
-		if (!object) {
-			continue;
+	const float contentStartY = viewport->WorkPos.y + kTopToolbarHeight;
+	ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, contentStartY), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(leftPanelWidth, availableHeight), ImGuiCond_Always);
+	if (ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
+		ImGui::Text("Auto Object Editor");
+		ImGui::Separator();
+		ImGui::SeparatorText("Scene Switch");
+		DrawSceneSelector();
+		ImGui::SeparatorText("Grid");
+		DrawGridEditor();
+		ImGui::SeparatorText("Light");
+		DrawLightEditor();
+		ImGui::SeparatorText("Selection");
+		DrawSelectionBoxEditor();
+		ImGui::Separator();
+
+		if (!isPlaying_ && ImGui::Button("Save To JSON")) {
+			const std::string saveFilePath = GetSceneScopedEditorFilePath("objectEditors.json");
+			const bool saved = SaveObjectEditorsToJson(saveFilePath);
+			if (saved) {
+				hasUnsavedChanges_ = false;
+			}
+			saveStatusMessage_ = saved ? ("Saved: " + saveFilePath) : ("Save failed: " + saveFilePath);
 		}
-		std::string& objectName = objectNames_[i];
-		std::string nodeLabel = objectName.empty() ? ("Object " + std::to_string(i)) : objectName;
-		const std::string treeNodeLabel = nodeLabel + "###object_node_" + std::to_string(i);
-		const ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ((!selectedIsPrimitive_ && selectedObjectIndex_ == i) ? ImGuiTreeNodeFlags_Selected : 0);
-		if (ImGui::TreeNodeEx(treeNodeLabel.c_str(), nodeFlags)) {
-			if (ImGui::IsItemClicked()) {
+		if (!saveStatusMessage_.empty()) {
+			ImGui::Text("%s", saveStatusMessage_.c_str());
+		}
+
+		ImGui::SeparatorText("Object3d");
+		for (size_t i = 0; i < objects_.size(); ++i) {
+			Object3d* object = objects_[i];
+			if (!object) {
+				continue;
+			}
+			std::string displayName = objectNames_[i].empty() ? ("Object " + std::to_string(i)) : objectNames_[i];
+			const bool selected = (!selectedIsPrimitive_ && selectedObjectIndex_ == i);
+			if (ImGui::Selectable((displayName + "##object_select_" + std::to_string(i)).c_str(), selected)) {
 				selectedObjectIndex_ = i;
 				selectedIsPrimitive_ = false;
 				selectionBoxDirty_ = true;
 			}
-			Transform& transform = editorTransforms_[i];
-			EditorMaterial& material = editorMaterials_[i];
-			bool transformChanged = false;
-			bool materialChanged = false;
-			bool nameChanged = false;
-			if (isPlaying_) {
-				ImGui::TextUnformatted("Playing... editor values are locked");
-			} else {
-				std::array<char, 128> nameBuffer{};
-				const size_t copyLength = std::min(nameBuffer.size() - 1, objectName.size());
-				std::copy_n(objectName.begin(), copyLength, nameBuffer.begin());
-				if (ImGui::InputText(("Name##object_" + std::to_string(i)).c_str(), nameBuffer.data(), nameBuffer.size())) {
-					objectName = nameBuffer.data();
-					nameChanged = true;
-				}
-				transformChanged |= ImGui::DragFloat3(("Scale##object_" + std::to_string(i)).c_str(), &transform.scale.x, 0.01f);
-				transformChanged |= ImGui::DragFloat3(("Rotate##object_" + std::to_string(i)).c_str(), &transform.rotate.x, 0.01f);
-				transformChanged |= ImGui::DragFloat3(("Translate##object_" + std::to_string(i)).c_str(), &transform.translate.x, 0.01f);
-				ImGui::SeparatorText("Material");
-				materialChanged |= ImGui::ColorEdit4(("Color##object_" + std::to_string(i)).c_str(), &material.color.x);
-				materialChanged |= ImGui::Checkbox(("Enable Lighting##object_" + std::to_string(i)).c_str(), &material.enableLighting);
-				materialChanged |= ImGui::DragFloat(("Shininess##object_" + std::to_string(i)).c_str(), &material.shininess, 0.1f, 0.0f, 256.0f);
-				materialChanged |= ImGui::DragFloat(("Environment##object_" + std::to_string(i)).c_str(), &material.environmentCoefficient, 0.01f, 0.0f, 1.0f);
-				materialChanged |= ImGui::Checkbox(("Grayscale##object_" + std::to_string(i)).c_str(), &material.grayscaleEnabled);
-				materialChanged |= ImGui::Checkbox(("Sepia##object_" + std::to_string(i)).c_str(), &material.sepiaEnabled);
-				materialChanged |= ImGui::DragFloat(("Distortion Strength##object_" + std::to_string(i)).c_str(), &material.distortionStrength, 0.01f, -10.0f, 10.0f);
-				materialChanged |= ImGui::DragFloat(("Distortion Falloff##object_" + std::to_string(i)).c_str(), &material.distortionFalloff, 0.01f, 0.0f, 10.0f);
-				ImGui::SeparatorText("UV Distortion");
-				materialChanged |= ImGui::DragFloat3(("UV Scale##object_" + std::to_string(i)).c_str(), &material.uvScale.x, 0.01f);
-				materialChanged |= ImGui::DragFloat3(("UV Rotate##object_" + std::to_string(i)).c_str(), &material.uvRotate.x, 0.01f);
-				materialChanged |= ImGui::DragFloat3(("UV Translate##object_" + std::to_string(i)).c_str(), &material.uvTranslate.x, 0.01f);
-				materialChanged |= ImGui::DragFloat2(("UV Anchor##object_" + std::to_string(i)).c_str(), &material.uvAnchor.x, 0.01f);
-			}
-			if (transformChanged || materialChanged || nameChanged) {
-				hasUnsavedChanges_ = true;
-			}
-			if (transformChanged) {
-				selectionBoxDirty_ = true;
-				if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
-					transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
-					transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
-					transform.translate.z = std::round(transform.translate.z / gridSnapSpacing_) * gridSnapSpacing_;
-				}
-				object->SetTransform(transform);
-			}
-			if (materialChanged) {
-				object->SetColor(material.color);
-				object->SetEnableLighting(material.enableLighting);
-				object->SetShininess(material.shininess);
-				object->SetEnvironmentCoefficient(material.environmentCoefficient);
-				object->SetGrayscaleEnabled(material.grayscaleEnabled);
-				object->SetSepiaEnabled(material.sepiaEnabled);
-				object->SetDistortionStrength(material.distortionStrength);
-				object->SetDistortionFalloff(material.distortionFalloff);
-				object->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
-			}
-			ImGui::TreePop();
 		}
-	}
 
-	ImGui::SeparatorText("Primitive");
-	for (size_t i = 0; i < primitives_.size(); ++i) {
-		Primitive* primitive = primitives_[i];
-		if (!primitive) {
-			continue;
-		}
-		std::string& primitiveName = primitiveNames_[i];
-		std::string nodeLabel = primitiveName.empty() ? ("Primitive " + std::to_string(i)) : primitiveName;
-		const std::string treeNodeLabel = nodeLabel + "###primitive_node_" + std::to_string(i);
-		const ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ((selectedIsPrimitive_ && selectedObjectIndex_ == i) ? ImGuiTreeNodeFlags_Selected : 0);
-		if (ImGui::TreeNodeEx(treeNodeLabel.c_str(), nodeFlags)) {
-			if (ImGui::IsItemClicked()) {
+		ImGui::SeparatorText("Primitive");
+		for (size_t i = 0; i < primitives_.size(); ++i) {
+			Primitive* primitive = primitives_[i];
+			if (!primitive) {
+				continue;
+			}
+			std::string displayName = primitiveNames_[i].empty() ? ("Primitive " + std::to_string(i)) : primitiveNames_[i];
+			const bool selected = (selectedIsPrimitive_ && selectedObjectIndex_ == i);
+			if (ImGui::Selectable((displayName + "##primitive_select_" + std::to_string(i)).c_str(), selected)) {
 				selectedObjectIndex_ = i;
 				selectedIsPrimitive_ = true;
 				selectionBoxDirty_ = true;
 			}
-			Transform& transform = primitiveEditorTransforms_[i];
-			EditorMaterial& material = primitiveEditorMaterials_[i];
+		}
+	}
+	ImGui::End();
+
+	const float inspectorPosX = viewport->WorkPos.x + viewport->WorkSize.x - rightPanelWidth;
+	ImGui::SetNextWindowPos(ImVec2(inspectorPosX, contentStartY), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(rightPanelWidth, availableHeight), ImGuiCond_Always);
+	if (ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize)) {
+		if (!IsObjectSelected()) {
+			ImGui::TextUnformatted("No object selected.");
+		} else {
+			EditorSnapshot beforeEdit{};
+			beforeEdit.objectTransforms = editorTransforms_;
+			beforeEdit.objectMaterials = editorMaterials_;
+			beforeEdit.objectNames = objectNames_;
+			beforeEdit.primitiveTransforms = primitiveEditorTransforms_;
+			beforeEdit.primitiveMaterials = primitiveEditorMaterials_;
+			beforeEdit.primitiveNames = primitiveNames_;
 			bool transformChanged = false;
 			bool materialChanged = false;
 			bool nameChanged = false;
-			if (isPlaying_) {
-				ImGui::TextUnformatted("Playing... editor values are locked");
-			} else {
-				std::array<char, 128> nameBuffer{};
-				const size_t copyLength = std::min(nameBuffer.size() - 1, primitiveName.size());
-				std::copy_n(primitiveName.begin(), copyLength, nameBuffer.begin());
-				if (ImGui::InputText(("Name##primitive_" + std::to_string(i)).c_str(), nameBuffer.data(), nameBuffer.size())) {
-					primitiveName = nameBuffer.data();
-					nameChanged = true;
+			if (selectedIsPrimitive_) {
+				Primitive* primitive = primitives_[selectedObjectIndex_];
+				if (primitive) {
+					Transform& transform = primitiveEditorTransforms_[selectedObjectIndex_];
+					InspectorMaterial& material = primitiveEditorMaterials_[selectedObjectIndex_];
+					std::string& name = primitiveNames_[selectedObjectIndex_];
+					Inspector::DrawPrimitiveInspector(selectedObjectIndex_, name, transform, material, isPlaying_, transformChanged, materialChanged, nameChanged);
+					if (transformChanged) {
+						selectionBoxDirty_ = true;
+						if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
+							transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
+							transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
+							transform.translate.z = std::round(transform.translate.z / gridSnapSpacing_) * gridSnapSpacing_;
+						}
+						primitive->SetTransform(transform);
+					}
+					if (materialChanged) {
+						primitive->SetColor(material.color);
+						primitive->SetEnableLighting(material.enableLighting);
+						primitive->SetShininess(material.shininess);
+						primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
+						primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
+						primitive->SetSepiaEnabled(material.sepiaEnabled);
+						primitive->SetDistortionStrength(material.distortionStrength);
+						primitive->SetDistortionFalloff(material.distortionFalloff);
+						primitive->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+					}
 				}
-				transformChanged |= ImGui::DragFloat3(("Scale##primitive_" + std::to_string(i)).c_str(), &transform.scale.x, 0.01f);
-				transformChanged |= ImGui::DragFloat3(("Rotate##primitive_" + std::to_string(i)).c_str(), &transform.rotate.x, 0.01f);
-				transformChanged |= ImGui::DragFloat3(("Translate##primitive_" + std::to_string(i)).c_str(), &transform.translate.x, 0.01f);
-				ImGui::SeparatorText("Material");
-				materialChanged |= ImGui::ColorEdit4(("Color##primitive_" + std::to_string(i)).c_str(), &material.color.x);
-				materialChanged |= ImGui::Checkbox(("Enable Lighting##primitive_" + std::to_string(i)).c_str(), &material.enableLighting);
-				materialChanged |= ImGui::DragFloat(("Shininess##primitive_" + std::to_string(i)).c_str(), &material.shininess, 0.1f, 0.0f, 256.0f);
-				materialChanged |= ImGui::DragFloat(("Environment##primitive_" + std::to_string(i)).c_str(), &material.environmentCoefficient, 0.01f, 0.0f, 1.0f);
-				materialChanged |= ImGui::Checkbox(("Grayscale##primitive_" + std::to_string(i)).c_str(), &material.grayscaleEnabled);
-				materialChanged |= ImGui::Checkbox(("Sepia##primitive_" + std::to_string(i)).c_str(), &material.sepiaEnabled);
-				materialChanged |= ImGui::DragFloat(("Distortion Strength##primitive_" + std::to_string(i)).c_str(), &material.distortionStrength, 0.01f, -10.0f, 10.0f);
-				materialChanged |= ImGui::DragFloat(("Distortion Falloff##primitive_" + std::to_string(i)).c_str(), &material.distortionFalloff, 0.01f, 0.0f, 10.0f);
-				ImGui::SeparatorText("UV Distortion");
-				materialChanged |= ImGui::DragFloat3(("UV Scale##primitive_" + std::to_string(i)).c_str(), &material.uvScale.x, 0.01f);
-				materialChanged |= ImGui::DragFloat3(("UV Rotate##primitive_" + std::to_string(i)).c_str(), &material.uvRotate.x, 0.01f);
-				materialChanged |= ImGui::DragFloat3(("UV Translate##primitive_" + std::to_string(i)).c_str(), &material.uvTranslate.x, 0.01f);
-				materialChanged |= ImGui::DragFloat2(("UV Anchor##primitive_" + std::to_string(i)).c_str(), &material.uvAnchor.x, 0.01f);
+			} else {
+				Object3d* object = objects_[selectedObjectIndex_];
+				if (object) {
+					Transform& transform = editorTransforms_[selectedObjectIndex_];
+					InspectorMaterial& material = editorMaterials_[selectedObjectIndex_];
+					std::string& name = objectNames_[selectedObjectIndex_];
+					Inspector::DrawObjectInspector(selectedObjectIndex_, name, transform, material, isPlaying_, transformChanged, materialChanged, nameChanged);
+					if (transformChanged) {
+						selectionBoxDirty_ = true;
+						if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
+							transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
+							transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
+							transform.translate.z = std::round(transform.translate.z / gridSnapSpacing_) * gridSnapSpacing_;
+						}
+						object->SetTransform(transform);
+					}
+					if (materialChanged) {
+						object->SetColor(material.color);
+						object->SetEnableLighting(material.enableLighting);
+						object->SetShininess(material.shininess);
+						object->SetEnvironmentCoefficient(material.environmentCoefficient);
+						object->SetGrayscaleEnabled(material.grayscaleEnabled);
+						object->SetSepiaEnabled(material.sepiaEnabled);
+						object->SetDistortionStrength(material.distortionStrength);
+						object->SetDistortionFalloff(material.distortionFalloff);
+						object->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+					}
+				}
 			}
 			if (transformChanged || materialChanged || nameChanged) {
+				undoStack_.push_back(std::move(beforeEdit));
+				redoStack_.clear();
 				hasUnsavedChanges_ = true;
 			}
-			if (transformChanged) {
-				selectionBoxDirty_ = true;
-				if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
-					transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
-					transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
-					transform.translate.z = std::round(transform.translate.z / gridSnapSpacing_) * gridSnapSpacing_;
-				}
-				primitive->SetTransform(transform);
-			}
-			if (materialChanged) {
-				primitive->SetColor(material.color);
-				primitive->SetEnableLighting(material.enableLighting);
-				primitive->SetShininess(material.shininess);
-				primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
-				primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
-				primitive->SetSepiaEnabled(material.sepiaEnabled);
-				primitive->SetDistortionStrength(material.distortionStrength);
-				primitive->SetDistortionFalloff(material.distortionFalloff);
-				primitive->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
-			}
-			ImGui::TreePop();
 		}
 	}
-
 	ImGui::End();
 #endif
 }

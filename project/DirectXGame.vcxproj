@@ -160,7 +160,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\Easing.cpp" />
     <ClCompile Include="application\GameObject\KeyBindConfig.cpp" />
-    <ClCompile Include="Engine\Editor\Editor.cpp" />
     <ClCompile Include="Engine\Editor\EditorGrid.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp" />
@@ -240,6 +239,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Portal\PortalManager.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp" />
     <ClCompile Include="Engine\Texture\PSO\SpriteCreatePSO.cpp" />
+    <ClCompile Include="Engine\Editor\Inspector.cpp" />
+    <ClCompile Include="Engine\Editor\ToolBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -261,7 +262,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\CollisionManager.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\Easing.h" />
     <ClInclude Include="application\GameObject\KeyBindConfig.h" />
-    <ClInclude Include="Engine\Editor\Editor.h" />
     <ClInclude Include="Engine\Editor\EditorGrid.h" />
     <ClInclude Include="Engine\Texture\Material.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\AnimationManager.h" />
@@ -344,6 +344,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Portal\PortalManager.h" />
     <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h" />
     <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h" />
+    <ClInclude Include="Engine\Editor\Inspector.h" />
+    <ClInclude Include="Engine\Editor\ToolBar.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
