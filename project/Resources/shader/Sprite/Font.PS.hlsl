@@ -9,7 +9,7 @@ struct Material
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
-Texture2D<float4> gTexture : register(t2); 
+Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 
 struct PixelShaderOutput
