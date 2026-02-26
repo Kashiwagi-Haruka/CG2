@@ -185,7 +185,7 @@ void ShadowGameScene::UpdateCamera()
         debugCamera_->Update();
         playerCamera_->GetCamera()->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
     }
-
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 #ifdef USE_IMGUI
     if (ImGui::Begin("Camera")) {
         ImGui::Checkbox("Use Debug Camera (F1)", &useDebugCamera_);
@@ -299,7 +299,9 @@ void ShadowGameScene::DrawGameObject()
 {
     Object3dCommon::GetInstance()->BeginShadowMapPass();
     Object3dCommon::GetInstance()->DrawCommonShadow();
-
+	testField_->Draw();
+	portalManager_->Draw();
+	timeCardWatch_->Draw();
     //プレイヤーの描画処理
     player_->Draw();
 
@@ -310,7 +312,7 @@ void ShadowGameScene::DrawGameObject()
     //Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 
 
-    collisionManager_->DrawColliders();
+    
 
     //テスト地面
     testField_->Draw();
@@ -319,8 +321,9 @@ void ShadowGameScene::DrawGameObject()
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //プレイヤーの描画処理
+	Object3dCommon::GetInstance()->DrawCommonSkinning();
     player_->Draw();
 
-
+    collisionManager_->DrawColliders();
 }
 #pragma endregion

@@ -8,9 +8,11 @@
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
+#include "SceneManager.h"
+#include "Sprite/SpriteCommon.h"
+#include "TextureManager.h"
 #include <numbers>
 #include <utility>
-#include "SceneManager.h"
 SampleScene::SampleScene() {
 
 	uvBallObj_ = std::make_unique<Object3d>();
@@ -18,6 +20,7 @@ SampleScene::SampleScene() {
 	planeGltf_ = std::make_unique<Object3d>();
 	animatedCubeObj_ = std::make_unique<Object3d>();
 	humanObj_ = std::make_unique<Object3d>();
+	ringPrimitive_ = std::make_unique<Primitive>();
 	cameraTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -55,6 +58,8 @@ void SampleScene::Initialize() {
 	humanObj_->Initialize();
 	humanObj_->SetCamera(camera_.get());
 	humanObj_->SetModel("walk");
+	ringPrimitive_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 24);
+	ringPrimitive_->SetCamera(camera_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -73,7 +78,7 @@ void SampleScene::Initialize() {
 	humanTransform_ = {
 	    .scale{100.0f,	                        100.0f,                    100.0f},
         .rotate{-std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0.0f  },
-        .translate{0.0f,                              1.0f,                      -3.0f  }
+        .translate{0.0f,                              1.0f,                      -3.0f }
     };
 	particleTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f },
@@ -81,7 +86,6 @@ void SampleScene::Initialize() {
         .translate{0.0f, 1.0f, -3.0f}
     };
 	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample", particleTransform_, 0.1f, 5, Vector3{0.0f, 0.0f, 0.0f}, Vector3{-0.5f, -0.5f, -0.5f}, Vector3{0.5f, 0.5f, 0.5f});
-	uvBallObj_->SetTransform(uvBallTransform_);
 	planeGltf_->SetTransform(planeGTransform_);
 	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
 	animatedCubeObj_->SetAnimation(&animatedCubeAnimation_, true);
@@ -94,7 +98,6 @@ void SampleScene::Initialize() {
 		humanObj_->SetAnimation(&humanAnimationClips_[currentHumanAnimationIndex_], true);
 	}
 	humanObj_->SetTransform(humanTransform_);
-
 	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
 		humanSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
 		humanSkinCluster_ = CreateSkinCluster(*humanSkeleton_, *walkModel);
@@ -102,6 +105,13 @@ void SampleScene::Initialize() {
 			humanObj_->SetSkinCluster(&humanSkinCluster_);
 		}
 	}
+
+	uvSprite = std::make_unique<Sprite>();
+	uvSprite->Initialize(TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png"));
+	uvSprite->SetScale(Vector2(100, 100));
+	uvSprite->SetRotation(0);
+	uvSprite->SetPosition(Vector2(0, 0));
+
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
@@ -155,8 +165,6 @@ void SampleScene::Initialize() {
 	areaLights_[1].height = 2.0f;
 	areaLights_[1].radius = 0.1f;
 	areaLights_[1].decay = 2.0f;
-
-	
 }
 
 void SampleScene::Update() {
@@ -175,77 +183,6 @@ void SampleScene::Update() {
 		}
 		ImGui::End();
 	}
-	if (ImGui::Begin("SampleLight")) {
-		if (ImGui::TreeNode("DirectionalLight")) {
-			ImGui::ColorEdit4("LightColor", &directionalLight_.color.x);
-			ImGui::DragFloat3("LightDirection", &directionalLight_.direction.x, 0.1f, -1.0f, 1.0f);
-			ImGui::DragFloat("LightIntensity", &directionalLight_.intensity, 0.1f, 0.0f, 10.0f);
-			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("PointLight")) {
-			ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);
-			ImGui::DragFloat("PointLightIntensity", &pointLights_[0].intensity, 0.1f);
-			ImGui::DragFloat3("PointLightPosition", &pointLights_[0].position.x, 0.1f);
-			ImGui::DragFloat("PointLightRadius", &pointLights_[0].radius, 0.1f);
-			ImGui::DragFloat("PointLightDecay", &pointLights_[0].decay, 0.1f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("PointLight1")) {
-			ImGui::ColorEdit4("PointLightColor1", &pointLights_[1].color.x);
-			ImGui::DragFloat("PointLightIntensity1", &pointLights_[1].intensity, 0.1f);
-			ImGui::DragFloat3("PointLightPosition1", &pointLights_[1].position.x, 0.1f);
-			ImGui::DragFloat("PointLightRadius1", &pointLights_[1].radius, 0.1f);
-			ImGui::DragFloat("PointLightDecay1", &pointLights_[1].decay, 0.1f);
-			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("SpotLight")) {
-			ImGui::ColorEdit4("SpotLightColor", &spotLights_[0].color.x);
-			ImGui::DragFloat("SpotLightIntensity", &spotLights_[0].intensity, 0.1f);
-			ImGui::DragFloat3("SpotLightPosition", &spotLights_[0].position.x, 0.1f);
-			ImGui::DragFloat3("SpotLightDirection", &spotLights_[0].direction.x, 0.1f);
-			ImGui::DragFloat("SpotLightDistance", &spotLights_[0].distance, 0.1f);
-			ImGui::DragFloat("SpotLightDecay", &spotLights_[0].decay, 0.1f);
-			ImGui::DragFloat("SpotLightCosAngle", &spotLights_[0].cosAngle, 0.1f, 0.0f, 1.0f);
-			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLights_[0].cosFalloffStart, 0.1f, 0.0f, 1.0f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("SpotLight1")) {
-			ImGui::ColorEdit4("SpotLightColor1", &spotLights_[1].color.x);
-			ImGui::DragFloat("SpotLightIntensity1", &spotLights_[1].intensity, 0.1f);
-			ImGui::DragFloat3("SpotLightPosition1", &spotLights_[1].position.x, 0.1f);
-			ImGui::DragFloat3("SpotLightDirection1", &spotLights_[1].direction.x, 0.1f);
-			ImGui::DragFloat("SpotLightDistance1", &spotLights_[1].distance, 0.1f);
-			ImGui::DragFloat("SpotLightDecay1", &spotLights_[1].decay, 0.1f);
-			ImGui::DragFloat("SpotLightCosAngle1", &spotLights_[1].cosAngle, 0.1f, 0.0f, 1.0f);
-			ImGui::DragFloat("SpotLightCosFalloffStart1", &spotLights_[1].cosFalloffStart, 0.1f, 0.0f, 1.0f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("AreaLight")) {
-			ImGui::ColorEdit4("AreaLightColor", &areaLights_[0].color.x);
-			ImGui::DragFloat("AreaLightIntensity", &areaLights_[0].intensity, 0.1f);
-			ImGui::DragFloat3("AreaLightPosition", &areaLights_[0].position.x, 0.1f);
-			ImGui::DragFloat3("AreaLightNormal", &areaLights_[0].normal.x, 0.1f);
-			ImGui::DragFloat("AreaLightWidth", &areaLights_[0].width, 0.1f);
-			ImGui::DragFloat("AreaLightHeight", &areaLights_[0].height, 0.1f);
-			ImGui::DragFloat("AreaLightRadius", &areaLights_[0].radius, 0.1f);
-			ImGui::DragFloat("AreaLightDecay", &areaLights_[0].decay, 0.1f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("AreaLight1")) {
-			ImGui::ColorEdit4("AreaLightColor1", &areaLights_[1].color.x);
-			ImGui::DragFloat("AreaLightIntensity1", &areaLights_[1].intensity, 0.1f);
-			ImGui::DragFloat3("AreaLightPosition1", &areaLights_[1].position.x, 0.1f);
-			ImGui::DragFloat3("AreaLightNormal1", &areaLights_[1].normal.x, 0.1f);
-			ImGui::DragFloat("AreaLightWidth1", &areaLights_[1].width, 0.1f);
-			ImGui::DragFloat("AreaLightHeight1", &areaLights_[1].height, 0.1f);
-			ImGui::DragFloat("AreaLightRadius1", &areaLights_[1].radius, 0.1f);
-			ImGui::DragFloat("AreaLightDecay1", &areaLights_[1].decay, 0.1f);
-			ImGui::TreePop();
-		}
-	}
-	ImGui::End();
 	if (ImGui::Begin("Pad Input")) {
 		ImGui::Text("押されているパッドボタン");
 		const std::array<std::pair<Input::PadButton, const char*>, 14> padButtons = {
@@ -383,13 +320,6 @@ void SampleScene::Update() {
 		}
 	}
 	ImGui::End();
-	if (ImGui::Begin("Scene")) {
-	
-		if (ImGui::Button("Title")) {
-			SceneManager::GetInstance()->ChangeScene("Title");
-		}
-	}
-	ImGui::End();
 	if (ImGui::Begin("ScreenEffectd")) {
 		static const char* noiseBlendModes[] = {"Overwrite", "Add", "Subtract", "Multiply", "Screen"};
 		ImGui::Checkbox("Fullscreen Grayscale (BT709)", &fullScreenGrayscaleEnabled_);
@@ -425,16 +355,24 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetRandomNoiseScale(randomNoiseScale_);
 	Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode_);
 
-	uvBallObj_->SetTransform(uvBallTransform_);
-	planeGltf_->SetTransform(planeGTransform_);
-	animatedCubeObj_->SetTransform(animatedCubeTransform_);
-	animatedCubeObj_->SetTransform(animatedCubeTransform_);
-	humanObj_->SetTransform(humanTransform_);
+	/*uvBallObj_->SetTransform(uvBallTransform_);*/
+	/*planeGltf_->SetTransform(planeGTransform_);*/
+	/*animatedCubeObj_->SetTransform(animatedCubeTransform_);*/
+	/*humanObj_->SetTransform(humanTransform_);*/
+	/*ringPrimitive_->SetTransform(ringTransform_);*/
+	/*ringPrimitive_->SetColor({1.0f, 0.85f, 0.2f, 1.0f});*/
 	uvBallObj_->Update();
 	fieldObj_->Update();
 	planeGltf_->Update();
 	animatedCubeObj_->Update();
 	humanObj_->Update();
+	ringUvRotation_ -= 0.05f;
+	ringPrimitive_->SetUvTransform(Vector3(1,1,1),Vector3(0,0,ringUvRotation_),Vector3(0,0,0),Vector2(0.5f,0.5f));
+	ringPrimitive_->Update();
+
+	uvSprite->Update();
+
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	if (humanSkeleton_ && !humanAnimationClips_.empty()) {
@@ -456,22 +394,27 @@ void SampleScene::Draw() {
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
+	ringPrimitive_->Draw();
 	Object3dCommon::GetInstance()->EndShadowMapPass();
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->DrawCommon();
-	 uvBallObj_->Draw();
-	 planeGltf_->Draw();
-	 fieldObj_->Draw();
+	uvBallObj_->Draw();
+	planeGltf_->Draw();
+	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
-	 if (sampleParticleEmitter_) {
+	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
+	ringPrimitive_->Draw();
+	if (sampleParticleEmitter_) {
 		Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
-		 sampleParticleEmitter_->Draw();
-	 }
+		sampleParticleEmitter_->Draw();
+	}
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
-	//if (humanSkeleton_) {
+	// if (humanSkeleton_) {
 	//	humanSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
-	//}
+	// }
+	SpriteCommon::GetInstance()->DrawCommon();
+	uvSprite->Draw();
 }
 void SampleScene::Finalize() {}

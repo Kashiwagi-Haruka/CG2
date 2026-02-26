@@ -9,7 +9,8 @@ struct Material
     float environmentCoefficient;
     int grayscaleEnabled;
     int sepiaEnabled;
-    float2 padding2;
+    float distortionStrength;
+    float distortionFalloff;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 struct Camera

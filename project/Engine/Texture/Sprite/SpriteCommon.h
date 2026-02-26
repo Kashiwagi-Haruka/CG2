@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <memory>
 #include <wrl.h>
+#include "PSO/SpriteCreatePSO.h"
 class DirectXCommon;
 
 class SpriteCommon {
@@ -11,14 +12,12 @@ private:
 	static std::unique_ptr<SpriteCommon> instance_;
 
 	DirectXCommon* dxCommon_;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_[6];
-
-	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob_;
-	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob_;
 
 	BlendMode blendMode_ = BlendMode::kBlendModeAlpha;
 	BlendModeManager blendModeManager_;
+
+	std::unique_ptr<SpriteCreatePSO> pso_;
+	std::unique_ptr<SpriteCreatePSO> psoFont_;
 
 	HRESULT hr_;
 
@@ -27,10 +26,7 @@ public:
 	void Initialize(DirectXCommon* dxCommon);
 	void Finalize();
 	void DrawCommon();
-
-	void CreateRootSignatures();
-
-	void CreateGraphicsPipeline();
+	void DrawCommonFont();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 

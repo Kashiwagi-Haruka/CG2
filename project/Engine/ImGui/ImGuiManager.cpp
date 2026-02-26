@@ -1,6 +1,6 @@
 #define NOMINMAX
 #include "ImGuiManager.h"
-#include "Engine/Editor/Hinstance.h"
+#include "Engine/Editor/Hierarchy.h"
 #include <dxgi1_6.h>
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
@@ -93,13 +93,13 @@ void ImGuiManager::Begin() {
 	}
 	ImGui::End();
 
-	Hinstance* hinstance = Hinstance::GetInstance();
-	const bool isEditorLayoutEnabled = hinstance->HasRegisteredObjects();
+	Hierarchy* Hierarchy = Hierarchy::GetInstance();
+	const bool isEditorLayoutEnabled = Hierarchy->HasRegisteredObjects();
 	if (dxCommon_) {
 		dxCommon_->SetEditorLayoutEnabled(isEditorLayoutEnabled);
 	}
 	prevEditorLayoutEnabled_ = isEditorLayoutEnabled;
-	hinstance->DrawObjectEditors();
+	Hierarchy->DrawObjectEditors();
 #endif
 }
 

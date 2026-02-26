@@ -10,6 +10,7 @@
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
 #include "Object3d/Object3d.h"
+#include "Sprite/Sprite.h"
 #include "ParticleEmitter.h"
 #include "Transform.h"
 #include <array>
@@ -18,11 +19,13 @@
 #include <vector>
 class SampleScene : public BaseScene {
 
+	std::unique_ptr<Sprite> uvSprite = nullptr;
 	std::unique_ptr<Object3d> uvBallObj_ = nullptr;
 	std::unique_ptr<Object3d> fieldObj_ = nullptr;
 	std::unique_ptr<Object3d> planeGltf_ = nullptr;
 	std::unique_ptr<Object3d> animatedCubeObj_ = nullptr;
 	std::unique_ptr<Object3d> humanObj_ = nullptr;
+	std::unique_ptr<Primitive> ringPrimitive_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	bool useDebugCamera_ = false;
@@ -40,6 +43,7 @@ class SampleScene : public BaseScene {
 	Transform planeGTransform_{};
 	Transform animatedCubeTransform_{};
 	Transform humanTransform_{};
+	Transform ringTransform_{};
 	Transform particleTransform_{};
 	std::unique_ptr<ParticleEmitter> sampleParticleEmitter_ = nullptr;
 
@@ -59,9 +63,11 @@ class SampleScene : public BaseScene {
 	bool fullScreenGrayscaleEnabled_ = false;
 	bool fullScreenSepiaEnabled_ = false;
 	float vignetteStrength_ = 0.0f;
+	float distortionStrength_ = 0.0f;
 	bool randomNoiseEnabled_ = false;
 	float randomNoiseScale_ = 512.0f;
 	int randomNoiseBlendMode_ = 0;
+	float ringUvRotation_ = 0.0f;
 
 public:
 	SampleScene();

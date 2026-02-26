@@ -47,6 +47,8 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	psoLine_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
 	psoLineNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoLineNoDepth_->Create(D3D12_CULL_MODE_NONE, false, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+	psoEditorGrid_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoEditorGrid_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dGrid.PS.hlsl");
 	psoSkinning_ = std::make_unique<CreatePSO>(dxCommon_, true);
 	psoSkinning_->Create(D3D12_CULL_MODE_BACK);
 	psoSkinningToon_ = std::make_unique<CreatePSO>(dxCommon_, true);
@@ -92,7 +94,13 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 
 	areaLightSrvIndex_ = srvManager->Allocate();
 	srvManager->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaLight));
-
+	editorDirectionalLight_ = *directionalLightData_;
+	editorPointLightCount_ = 0;
+	editorSpotLightCount_ = 0;
+	editorAreaLightCount_ = 0;
+	std::fill(editorPointLights_.begin(), editorPointLights_.end(), PointLight{});
+	std::fill(editorSpotLights_.begin(), editorSpotLights_.end(), SpotLight{});
+	std::fill(editorAreaLights_.begin(), editorAreaLights_.end(), AreaLight{});
 	D3D12_HEAP_PROPERTIES heapProps{};
 	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 
@@ -149,6 +157,12 @@ void Object3dCommon::SetEnvironmentMapTextureResource(ID3D12Resource* resource, 
 	srvManager->CreateSRVforTexture2D(environmentMapSrvIndex_, resource, format, 1);
 }
 void Object3dCommon::DrawSet(){
+	if (useEditorLights_) {
+		SetDirectionalLight(editorDirectionalLight_);
+		SetPointLights(editorPointLights_.data(), editorPointLightCount_);
+		SetSpotLights(editorSpotLights_.data(), editorSpotLightCount_);
+		SetAreaLights(editorAreaLights_.data(), editorAreaLightCount_);
+	}
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, Object3dCommon::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, Object3dCommon::GetInstance()->GetPointLightCountResource()->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, Object3dCommon::GetInstance()->GetSpotLightCountResource()->GetGPUVirtualAddress());
@@ -204,6 +218,12 @@ void Object3dCommon::DrawCommonLineNoDepth() {
 	dxCommon_->GetCommandList()->SetPipelineState(psoLineNoDepth_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+}
+void Object3dCommon::DrawCommonEditorGrid() {
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoEditorGrid_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoEditorGrid_->GetGraphicsPipelineState(blendMode_).Get());
+	DrawSet();
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonSkinning() {
 
@@ -340,6 +360,32 @@ void Object3dCommon::SetAreaLights(const AreaLight* areaLights, uint32_t count) 
 	areaLightCountResource_->Map(0, nullptr, reinterpret_cast<void**>(&areaLightCountData_));
 	areaLightCountData_->count = clampedCount;
 	areaLightCountResource_->Unmap(0, nullptr);
+}
+void Object3dCommon::SetEditorLights(
+    const DirectionalLight& directionalLight, const PointLight* pointLights, uint32_t pointCount, const SpotLight* spotLights, uint32_t spotCount, const AreaLight* areaLights, uint32_t areaCount) {
+	editorDirectionalLight_ = directionalLight;
+	editorDirectionalLight_.direction = Function::Normalize(editorDirectionalLight_.direction);
+	if (Function::Length(editorDirectionalLight_.direction) < 1.0e-5f) {
+		editorDirectionalLight_.direction = {0.0f, -1.0f, 0.0f};
+	}
+
+	editorPointLightCount_ = std::min(pointCount, static_cast<uint32_t>(kMaxPointLights));
+	std::fill(editorPointLights_.begin(), editorPointLights_.end(), PointLight{});
+	if (pointLights && editorPointLightCount_ > 0) {
+		std::copy_n(pointLights, editorPointLightCount_, editorPointLights_.begin());
+	}
+
+	editorSpotLightCount_ = std::min(spotCount, static_cast<uint32_t>(kMaxSpotLights));
+	std::fill(editorSpotLights_.begin(), editorSpotLights_.end(), SpotLight{});
+	if (spotLights && editorSpotLightCount_ > 0) {
+		std::copy_n(spotLights, editorSpotLightCount_, editorSpotLights_.begin());
+	}
+
+	editorAreaLightCount_ = std::min(areaCount, static_cast<uint32_t>(kMaxAreaLights));
+	std::fill(editorAreaLights_.begin(), editorAreaLights_.end(), AreaLight{});
+	if (areaLights && editorAreaLightCount_ > 0) {
+		std::copy_n(areaLights, editorAreaLightCount_, editorAreaLights_.begin());
+	}
 }
 void Object3dCommon::SetVignetteStrength(float strength) { dxCommon_->SetVignetteStrength(strength); }
 
