@@ -185,7 +185,7 @@ void ShadowGameScene::UpdateCamera()
         debugCamera_->Update();
         playerCamera_->GetCamera()->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
     }
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
+	Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
 #ifdef USE_IMGUI
     if (ImGui::Begin("Camera")) {
         ImGui::Checkbox("Use Debug Camera (F1)", &useDebugCamera_);
