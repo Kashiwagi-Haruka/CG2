@@ -108,7 +108,7 @@ void ShadowGameScene::DebugImGui()
 void ShadowGameScene::CheckCollision()
 {
     //ホワイトボードとrayの当たり判定作成する
-    portalManager_->CheckCollision(timeCardWatch_.get(), playerCamera_->GetCamera(),{0.0f,1.5f,0.0f});
+    portalManager_->CheckCollision(timeCardWatch_.get(), playerCamera_->GetCamera(), { 0.0f,1.5f,0.0f });
 
     collisionManager_->ClearColliders();
 
@@ -117,7 +117,7 @@ void ShadowGameScene::CheckCollision()
     for (auto& portal : portalManager_->GetPortals()) {
         collisionManager_->AddCollider(portal.get(), playerCamera_->GetCamera());
     }
- 
+
     collisionManager_->AddCollider(testField_.get(), playerCamera_->GetCamera());
     collisionManager_->CheckAllCollisions();
 }
@@ -184,8 +184,6 @@ void ShadowGameScene::UpdateCamera()
     if (useDebugCamera_) {
         debugCamera_->Update();
         playerCamera_->GetCamera()->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
-    } else {
-        playerCamera_->Update();
     }
 
 #ifdef USE_IMGUI
@@ -243,14 +241,21 @@ void ShadowGameScene::UpdateGameObject()
             player_->SetTranslate(portal->GetWarpPos());
             break;
         }
-   
+
     }
 
-    player_->Update();
+    
+    if (!useDebugCamera_) {
+        playerCamera_->Update();
+    }
     auto* playerCamera = playerCamera_->GetCamera();
     Vector3 forward = YoshidaMath::GetForward(playerCamera->GetWorldMatrix());
     timeCardWatch_->SetRay(playerCamera->GetTranslate(), forward);
     timeCardWatch_->Update();
+
+
+    player_->Update();
+
 
     testField_->Update();
 

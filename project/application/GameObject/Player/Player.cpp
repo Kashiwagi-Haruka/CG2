@@ -23,9 +23,10 @@ Player::Player()
 
     //体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
+
     //モデルの読み込み
-    ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "walk");
-    ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "sneakWalk");
+    ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
+  
 }
 void Player::SetCamera(Camera* camera)
 {
@@ -39,11 +40,11 @@ void Player::Initialize()
     //体の初期化
     bodyObj_->Initialize();
     //体にモデル挿入
-    bodyObj_->SetModel("walk");
+    bodyObj_->SetModel("gentleman");
     //座標の初期化
     transform_ = {
     .scale{1.0f,1.0f,1.0f},
-    .rotate{-YoshidaMath::PI / 2.0f, 0.0f, 0.0f  },
+    .rotate{0.0f, 0.0f, 0.0f  },
     .translate{0.0f,2.0f,0.0f}
     };
     //速度の初期化
@@ -53,17 +54,14 @@ void Player::Initialize()
     moveSpeed_ = { 0.0f };
 
     //アニメーションクリップ
-    animationClips_ = Animation::LoadAnimationClips("Resources/3d/human", "walk");
-    std::vector<Animation::AnimationData> sneakClips = Animation::LoadAnimationClips("Resources/3d/human", "sneakWalk");
-    animationClips_.insert(animationClips_.end(), sneakClips.begin(), sneakClips.end());
+    animationClips_ = Animation::LoadAnimationClips("Resources/TD3_3102/3d/gentleman", "gentleman");
 
     if (!animationClips_.empty()) {
         currentAnimationIndex_ = 0;
         bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
     }
 
-
-    if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
+    if (Model* walkModel = ModelManager::GetInstance()->FindModel("gentleman")) {
         skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
         skinCluster_ = CreateSkinCluster(*skeleton_, *walkModel);
         if (!skinCluster_.mappedPalette.empty()) {
@@ -79,10 +77,11 @@ void Player::Update()
     Move();
     //重力処理
     Gravity();
-    bodyObj_->SetTransform(transform_);
-    bodyObj_->Update();
     //アニメーション
     Animation();
+    bodyObj_->SetTransform(transform_);
+    bodyObj_->Update();
+
     //デバック
     Debug();
 }
@@ -203,7 +202,7 @@ void Player::Animation()
 
     auto* playerCommand = PlayerCommand::GetInstance();
     if (playerCommand->Sneak()) {
-        currentAnimationIndex_ = 1;
+        //currentAnimationIndex_ = 1;
     } else {
         currentAnimationIndex_ = 0;
     }
