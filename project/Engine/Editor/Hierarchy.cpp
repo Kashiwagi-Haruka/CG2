@@ -3,6 +3,7 @@
 #include "EditorGrid.h"
 #include "ToolBar.h"
 #include "Engine/BaseScene/SceneManager.h"
+#include "Engine/Audio/Audio.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
 #include "Object3d/Object3d.h"
@@ -47,6 +48,7 @@ void Hierarchy::ResetForSceneChange() {
 	editorLightState_.overrideSceneLights = false;
 	undoStack_.clear();
 	redoStack_.clear();
+	savedAudioVolumes_.clear();
 	editorLightState_.directionalLight = {
 	    {1.0f, 1.0f, 1.0f, 1.0f},
         {0.0f, -1.0f, 0.0f},
@@ -209,6 +211,9 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 	    {"spot",                nlohmann::json::array()              },
 	    {"area",                nlohmann::json::array()              },
 	};
+	root["audio"] = {
+	    {"sounds", nlohmann::json::array()}
+    };
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		const Object3d* object = objects_[i];
 		if (!object) {
@@ -307,6 +312,18 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 		    {"radius",    area.radius		                                     },
 		    {"decay",     area.decay		                                      },
 		});
+	}
+	Audio* audio = Audio::GetInstance();
+	if (audio) {
+		for (const auto& entry : audio->GetEditorSoundEntries()) {
+			if (!entry.soundData || entry.name.empty()) {
+				continue;
+			}
+			root["audio"]["sounds"].push_back({
+			    {"name",   entry.name             },
+			    {"volume", entry.soundData->volume},
+			});
+		}
 	}
 	JsonManager* jsonManager = JsonManager::GetInstance();
 	jsonManager->SetData(root);
@@ -613,7 +630,25 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 		    editorLightState_.spotLights.empty() ? nullptr : editorLightState_.spotLights.data(), static_cast<uint32_t>(editorLightState_.spotLights.size()),
 		    editorLightState_.areaLights.empty() ? nullptr : editorLightState_.areaLights.data(), static_cast<uint32_t>(editorLightState_.areaLights.size()));
 	}
-
+	if (root.contains("audio") && root["audio"].is_object()) {
+		const auto& audioJson = root["audio"];
+		if (audioJson.contains("sounds") && audioJson["sounds"].is_array()) {
+			for (const auto& soundJson : audioJson["sounds"]) {
+				if (!soundJson.is_object()) {
+					continue;
+				}
+				if (!soundJson.contains("name") || !soundJson["name"].is_string()) {
+					continue;
+				}
+				if (!soundJson.contains("volume") || !soundJson["volume"].is_number()) {
+					continue;
+				}
+				const std::string name = soundJson["name"].get<std::string>();
+				const float volume = std::clamp(soundJson["volume"].get<float>(), 0.0f, 1.0f);
+				savedAudioVolumes_[name] = volume;
+			}
+		}
+	}
 	return true;
 }
 void Hierarchy::DrawSceneSelector() {
@@ -828,6 +863,52 @@ void Hierarchy::DrawLightEditor() {
 	}
 #endif
 }
+void Hierarchy::DrawAudioEditor() {
+#ifdef USE_IMGUI
+	Audio* audio = Audio::GetInstance();
+	if (!audio) {
+		ImGui::TextUnformatted("Audio system unavailable");
+		return;
+	}
+	auto entries = audio->GetEditorSoundEntries();
+	if (entries.empty()) {
+		ImGui::TextUnformatted("No tracked sounds.");
+		return;
+	}
+	for (size_t i = 0; i < entries.size(); ++i) {
+		auto& entry = entries[i];
+		if (!entry.soundData) {
+			continue;
+		}
+		if (ImGui::TreeNode((entry.name + "##audio_" + std::to_string(i)).c_str())) {
+			const auto savedIt = savedAudioVolumes_.find(entry.name);
+			if (savedIt != savedAudioVolumes_.end()) {
+				audio->SetSoundVolume(entry.soundData, savedIt->second);
+			}
+			float volume = entry.soundData->volume;
+			if (ImGui::SliderFloat(("Volume##audio_volume_" + std::to_string(i)).c_str(), &volume, 0.0f, 1.0f)) {
+				audio->SetSoundVolume(entry.soundData, volume);
+				savedAudioVolumes_[entry.name] = volume;
+				hasUnsavedChanges_ = true;
+			}
+			if (entry.isPlaying) {
+				ImGui::Text("Playing (%s)", entry.isLoop ? "Loop" : "One-shot");
+			} else {
+				ImGui::TextUnformatted("Stopped");
+			}
+			if (ImGui::Button(("Play##audio_play_" + std::to_string(i)).c_str())) {
+				audio->SoundPlayWave(*entry.soundData, false);
+			}
+			ImGui::SameLine();
+			if (ImGui::Button(("Loop##audio_loop_" + std::to_string(i)).c_str())) {
+				audio->SoundPlayWave(*entry.soundData, true);
+			}
+			ImGui::TreePop();
+		}
+	}
+#endif
+}
+
 bool Hierarchy::IsObjectSelected() const {
 	if (selectedIsPrimitive_) {
 		return selectedObjectIndex_ < primitives_.size() && primitives_[selectedObjectIndex_] != nullptr;

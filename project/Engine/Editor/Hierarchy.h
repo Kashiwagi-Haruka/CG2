@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "Transform.h"
 #include "Vector2.h"
@@ -47,6 +48,7 @@ private:
 	void DrawGridEditor();
 	void DrawLightEditor();
 	void DrawSelectionBoxEditor();
+	void DrawAudioEditor();
 	void SyncSelectionBoxToTarget();
 	Transform GetSelectedTransform() const;
 	bool IsObjectSelected() const;
@@ -103,4 +105,5 @@ private:
 	bool editorGridDirty_ = true;
 	std::unique_ptr<Primitive> editorGridPlane_;
 	EditorLightState editorLightState_{};
+	std::unordered_map<std::string, float> savedAudioVolumes_;
 };
