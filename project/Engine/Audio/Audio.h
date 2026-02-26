@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <memory>
+#include <string>
 #include <vector>
 #include <wrl.h>
 #include <xaudio2.h>
@@ -30,10 +31,21 @@ struct SoundData {
 	std::vector<BYTE> buffer;
 	// このサウンドの既定音量(0.0f～1.0f)
 	float volume = 1.0f;
+	// エディター表示用の名前
+	std::string debugName;
 };
 
 class Audio {
 
+public:
+	struct EditorSoundEntry {
+		SoundData* soundData = nullptr;
+		std::string name;
+		bool isPlaying = false;
+		bool isLoop = false;
+	};
+
+private:
 	static std::unique_ptr<Audio> instance;
 
 	// XAudio2 本体
@@ -53,13 +65,21 @@ class Audio {
 		bool isLoop;
 	};
 
+	struct EditorTrackedSound {
+		SoundData* soundData = nullptr;
+	};
+
 	// 現在再生中のボイス一覧
 	std::vector<ActiveVoice> activeVoices_;
+	// エディター表示対象のサウンド一覧
+	std::vector<EditorTrackedSound> editorTrackedSounds_;
 
 	// 指定サウンドに紐づく再生中ボイスのみ停止
 	void StopVoicesForSound(const SoundData& soundData);
 	// 全ボイスを停止
 	void StopAllVoices();
+	// エディター表示対象へ登録
+	void TrackSoundForEditor(SoundData* soundData);
 
 public:
 	// 非ループ音声の終了監視と後始末
@@ -78,6 +98,8 @@ public:
 	void SoundPlayWave(const SoundData& sounddata, bool isLoop = false);
 	// 音量設定
 	void SetSoundVolume(SoundData* soundData, float volume);
+	// エディター表示用のサウンド情報を取得
+	std::vector<EditorSoundEntry> GetEditorSoundEntries() const;
 	// XAudio2 へのアクセス用 getter
 	Microsoft::WRL::ComPtr<IXAudio2> GetIXAudio2() { return xAudio2_; };
 };

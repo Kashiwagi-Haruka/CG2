@@ -1,10 +1,12 @@
 #include "Audio.h"
 #include "fstream"
 #include <algorithm>
+#include <filesystem>
 #include <assert.h>
 #include <mfapi.h>
 #include <mfidl.h>
 #include <mfreadwrite.h>
+#include <string>
 #pragma comment(lib, "xAudio2.lib")
 #pragma comment(lib, "mfuuid.lib")
 #pragma comment(lib, "mfplat.lib")
@@ -69,7 +71,17 @@ void Audio::Update() {
 
 	activeVoices_.erase(std::remove_if(activeVoices_.begin(), activeVoices_.end(), [](const ActiveVoice& active) { return active.voice == nullptr; }), activeVoices_.end());
 }
-
+void Audio::TrackSoundForEditor(SoundData* soundData) {
+	if (!soundData) {
+		return;
+	}
+	for (const auto& tracked : editorTrackedSounds_) {
+		if (tracked.soundData == soundData) {
+			return;
+		}
+	}
+	editorTrackedSounds_.push_back({soundData});
+}
 // 音声ファイルを PCM として読み込んで SoundData を生成する
 SoundData Audio::SoundLoadFile(const char* filename) {
 	// フルパス → UTF-16 変換
@@ -149,7 +161,7 @@ SoundData Audio::SoundLoadFile(const char* filename) {
 		}
 	}
 
-	// 必要ないので解放
+	soundData.debugName = std::filesystem::path(filename).filename().string();
 
 	return soundData;
 }
@@ -162,10 +174,16 @@ void Audio::SoundUnload(SoundData* soundData) {
 	StopVoicesForSound(*soundData);
 	soundData->buffer.clear();
 	soundData->wfex = {};
+	for (auto& tracked : editorTrackedSounds_) {
+		if (tracked.soundData == soundData) {
+			tracked.soundData = nullptr;
+		}
+	}
 }
 
 // サウンドを再生する(必要ならループ再生)
 void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
+	TrackSoundForEditor(const_cast<SoundData*>(&soundData));
 	if (!xAudio2_) {
 		OutputDebugStringA("SoundPlayWave: xAudio2 is null!\n");
 		return;
@@ -218,6 +236,7 @@ void Audio::StopVoicesForSound(const SoundData& soundData) {
 }
 // サウンド音量を更新し、再生中ボイスにも反映する
 void Audio::SetSoundVolume(SoundData* soundData, float volume) {
+	TrackSoundForEditor(soundData);
 	if (!soundData) {
 		return;
 	}
@@ -233,6 +252,29 @@ void Audio::SetSoundVolume(SoundData* soundData, float volume) {
 		}
 	}
 }
+
+std::vector<Audio::EditorSoundEntry> Audio::GetEditorSoundEntries() const {
+	std::vector<EditorSoundEntry> entries;
+	entries.reserve(editorTrackedSounds_.size());
+	for (const auto& tracked : editorTrackedSounds_) {
+		if (!tracked.soundData || tracked.soundData->buffer.empty()) {
+			continue;
+		}
+		EditorSoundEntry entry{};
+		entry.soundData = tracked.soundData;
+		entry.name = tracked.soundData->debugName.empty() ? "(unnamed sound)" : tracked.soundData->debugName;
+		for (const auto& active : activeVoices_) {
+			if (!active.voice || active.audioData != tracked.soundData->buffer.data()) {
+				continue;
+			}
+			entry.isPlaying = true;
+			entry.isLoop = entry.isLoop || active.isLoop;
+		}
+		entries.push_back(std::move(entry));
+	}
+	return entries;
+}
+
 // すべての再生中ボイスを停止する
 void Audio::StopAllVoices() {
 	for (auto& active : activeVoices_) {
