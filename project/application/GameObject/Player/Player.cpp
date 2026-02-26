@@ -23,9 +23,10 @@ Player::Player()
 
     //体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
+
     //モデルの読み込み
-    ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "walk");
-    ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "sneakWalk");
+    ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
+  
 }
 void Player::SetCamera(Camera* camera)
 {
@@ -39,11 +40,11 @@ void Player::Initialize()
     //体の初期化
     bodyObj_->Initialize();
     //体にモデル挿入
-    bodyObj_->SetModel("walk");
+    bodyObj_->SetModel("gentleman");
     //座標の初期化
     transform_ = {
     .scale{1.0f,1.0f,1.0f},
-    .rotate{-YoshidaMath::PI / 2.0f, 0.0f, 0.0f  },
+    .rotate{0.0f, 0.0f, 0.0f  },
     .translate{0.0f,2.0f,0.0f}
     };
     //速度の初期化
@@ -52,22 +53,15 @@ void Player::Initialize()
 
     moveSpeed_ = { 0.0f };
 
-
-    //カメラの感度をここで宣言していて良くない
-    eyeRotateSpeed_ = 0.3f;
-    eyeRotateX_ = 0.0f;
     //アニメーションクリップ
-    animationClips_ = Animation::LoadAnimationClips("Resources/3d/human", "walk");
-    std::vector<Animation::AnimationData> sneakClips = Animation::LoadAnimationClips("Resources/3d/human", "sneakWalk");
-    animationClips_.insert(animationClips_.end(), sneakClips.begin(), sneakClips.end());
+    animationClips_ = Animation::LoadAnimationClips("Resources/TD3_3102/3d/gentleman", "gentleman");
 
     if (!animationClips_.empty()) {
         currentAnimationIndex_ = 0;
         bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
     }
 
-
-    if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
+    if (Model* walkModel = ModelManager::GetInstance()->FindModel("gentleman")) {
         skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
         skinCluster_ = CreateSkinCluster(*skeleton_, *walkModel);
         if (!skinCluster_.mappedPalette.empty()) {
@@ -81,14 +75,13 @@ void Player::Update()
     isWarp_ = false;
     //移動処理
     Move();
-    //旋回処理
-    Rotate();
     //重力処理
     Gravity();
-    bodyObj_->SetTransform(transform_);
-    bodyObj_->Update();
     //アニメーション
     Animation();
+    bodyObj_->SetTransform(transform_);
+    bodyObj_->Update();
+
     //デバック
     Debug();
 }
@@ -104,11 +97,6 @@ void Player::Debug()
 #ifdef USE_IMGUI
     if (ImGui::Begin("Human")) {
 
-        if (ImGui::TreeNode("Eye")) {
-            ImGui::DragFloat("eyeRotateSpeed", &eyeRotateSpeed_, 0.1f, 0.1f);
-            ImGui::DragFloat("eyeRotateX", &eyeRotateX_, 0.1f);
-            ImGui::TreePop();
-        }
 
         if (ImGui::TreeNode("Transform")) {
             ImGui::DragFloat3("Scale", &transform_.scale.x, 0.1f);
@@ -180,35 +168,6 @@ void Player::Move()
 
 }
 
-void Player::Rotate()
-{
-    auto* input = Input::GetInstance();
-
-    Vector2 inputMovePos = input->GetJoyStickRXY();
-    float dPitch = 0.0f;
-    float dYaw = 0.0f;
-
-    if (fabs(inputMovePos.x) > 0.0f || fabs(inputMovePos.y) > 0.0f) {
-        //スティック処理が優先される
-        dYaw = inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_ * 10.0f;
-        dPitch = -inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_ * 10.0f;
-    } else {
-        //マウス
-        inputMovePos = input->GetMouseMove();
-        dYaw += inputMovePos.x * YoshidaMath::kDeltaTime * eyeRotateSpeed_;
-        dPitch += inputMovePos.y * YoshidaMath::kDeltaTime * eyeRotateSpeed_;
-    }
-
-    eyeRotateX_ += dPitch;
-    transform_.rotate.y += dYaw;
-
-    eyeRotateX_ = std::clamp(
-        eyeRotateX_,
-        -Function::kPi * 0.5f,
-        Function::kPi * 0.5f);
-
-}
-
 void Player::Gravity()
 {
     velocity_.y -= YoshidaMath::kDeltaTime * YoshidaMath::kGravity;
@@ -243,7 +202,7 @@ void Player::Animation()
 
     auto* playerCommand = PlayerCommand::GetInstance();
     if (playerCommand->Sneak()) {
-        currentAnimationIndex_ = 1;
+        //currentAnimationIndex_ = 1;
     } else {
         currentAnimationIndex_ = 0;
     }

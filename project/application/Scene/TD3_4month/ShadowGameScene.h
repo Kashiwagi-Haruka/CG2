@@ -3,12 +3,12 @@
 #include <memory>
 #include <imgui.h>
 #include "SceneTransition/SceneTransition.h"
-#include "Camera.h"
+
 #include "DebugCamera.h"
 #pragma region //GameObject
 #include"GameObject/Player/Player.h"
 #include"GameObject/TestField/TestField.h"
-
+#include"GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/TimeCard/TimeCardWatch.h"
 
@@ -28,9 +28,8 @@ private:
 
 
 #pragma region//カメラの設定
-    Transform cameraTransform_ = {};
-    //カメラの設定
-    std::unique_ptr<Camera> camera_ = nullptr;
+
+    std::unique_ptr<PlayerCamera> playerCamera_ = nullptr;
     std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
     bool useDebugCamera_ = false;
 #pragma endregion

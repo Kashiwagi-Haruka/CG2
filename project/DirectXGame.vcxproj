@@ -238,6 +238,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoard.cpp" />
     <ClCompile Include="application\GameObject\Portal\PortalManager.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp" />
+    <ClCompile Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.cpp" />
     <ClCompile Include="Engine\Texture\PSO\SpriteCreatePSO.cpp" />
     <ClCompile Include="Engine\Editor\Inspector.cpp" />
     <ClCompile Include="Engine\Editor\ToolBar.cpp" />
@@ -343,6 +344,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoard.h" />
     <ClInclude Include="application\GameObject\Portal\PortalManager.h" />
     <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h" />
+    <ClInclude Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.h" />
     <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h" />
     <ClInclude Include="Engine\Editor\Inspector.h" />
     <ClInclude Include="Engine\Editor\ToolBar.h" />

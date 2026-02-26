@@ -1,6 +1,7 @@
 #pragma once
 #include"Input.h"
 #include<memory>
+#include"Vector2.h"
 
 enum GameKeyBind
 {
@@ -18,6 +19,9 @@ enum GameKeyBind
 	C_MoveBackward = Input::PadButton::kButtonDown,
 	C_Shot = Input::PadButton::kButtonA,
 	C_Sneak = Input::PadButton::kButtonLeftShoulder,
+
+	//マウス
+	M_Shot = Input::MouseButton::kLeft,
 };
 
 class PlayerCommand {
@@ -37,7 +41,9 @@ public:
 	bool MoveBackward();
 	bool Shot();
 	bool Sneak();
+	Vector2 Rotate(float rotateSpeed);
 private:	
+
 	bool Move(const GameKeyBind key, const GameKeyBind controller);
 	PlayerCommand() = default;
 };

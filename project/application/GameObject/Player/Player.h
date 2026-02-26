@@ -34,9 +34,7 @@ private:
     Vector3 forward_ = { 0.0f };
     //移動の速さ
     float moveSpeed_ = { 0.0f };
-    //カメラの感度をここで宣言していて良くない
-    float eyeRotateSpeed_ = 0.3f;
-    float eyeRotateX_ = 0.0f;
+
     AABB localAABB_ = { 0.0f };
     //衝突情報
     YoshidaMath::CollisionInfo collisionInfo_;
@@ -67,8 +65,6 @@ public:
     void Debug();
     //移動
     void Move();
-    //回転
-    void Rotate();
     //重力処理
     void Gravity();
 
