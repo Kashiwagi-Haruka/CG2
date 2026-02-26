@@ -34,6 +34,15 @@ public:
 	bool LoadObjectEditorsFromJsonIfExists(const std::string& filePath);
 
 private:
+	struct EditorSnapshot {
+		std::vector<Transform> objectTransforms;
+		std::vector<InspectorMaterial> objectMaterials;
+		std::vector<std::string> objectNames;
+		std::vector<Transform> primitiveTransforms;
+		std::vector<InspectorMaterial> primitiveMaterials;
+		std::vector<std::string> primitiveNames;
+	};
+
 	void DrawSceneSelector();
 	void DrawGridEditor();
 	void DrawLightEditor();
@@ -43,6 +52,9 @@ private:
 	bool IsObjectSelected() const;
 	std::string GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const;
 	void ResetForSceneChange();
+	void ApplyEditorSnapshot(const EditorSnapshot& snapshot);
+	void UndoEditorChange();
+	void RedoEditorChange();
 
 	struct EditorLightState {
 		bool overrideSceneLights = false;
@@ -58,6 +70,9 @@ private:
 
 	bool SaveObjectEditorsToJson(const std::string& filePath) const;
 	bool LoadObjectEditorsFromJson(const std::string& filePath);
+
+	std::vector<EditorSnapshot> undoStack_;
+	std::vector<EditorSnapshot> redoStack_;
 
 	std::vector<Object3d*> objects_;
 	std::vector<std::string> objectNames_;

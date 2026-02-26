@@ -4,9 +4,31 @@
 #include "externals/imgui/imgui.h"
 #endif
 
-ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges) {
+ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo) {
 	Result result{};
 #ifdef USE_IMGUI
+	if (!canUndo) {
+		ImGui::BeginDisabled();
+	}
+	if (ImGui::Button("Undo")) {
+		result.undoRequested = true;
+	}
+	if (!canUndo) {
+		ImGui::EndDisabled();
+	}
+
+	ImGui::SameLine();
+	if (!canRedo) {
+		ImGui::BeginDisabled();
+	}
+	if (ImGui::Button("Redo")) {
+		result.redoRequested = true;
+	}
+	if (!canRedo) {
+		ImGui::EndDisabled();
+	}
+
+	ImGui::SameLine();
 	ImGui::TextUnformatted("Mode");
 	ImGui::SameLine();
 	if (!isPlaying) {
@@ -27,6 +49,8 @@ ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges) {
 #else
 	(void)isPlaying;
 	(void)hasUnsavedChanges;
+	(void)canUndo;
+	(void)canRedo;
 #endif
 	return result;
 }

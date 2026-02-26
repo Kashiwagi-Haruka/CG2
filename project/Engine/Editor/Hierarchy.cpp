@@ -45,6 +45,8 @@ void Hierarchy::ResetForSceneChange() {
 	saveStatusMessage_.clear();
 	hasLoadedForCurrentScene_ = false;
 	editorLightState_.overrideSceneLights = false;
+	undoStack_.clear();
+	redoStack_.clear();
 	editorLightState_.directionalLight = {
 	    {1.0f, 1.0f, 1.0f, 1.0f},
         {0.0f, -1.0f, 0.0f},
@@ -54,6 +56,49 @@ void Hierarchy::ResetForSceneChange() {
 	editorLightState_.spotLights.clear();
 	editorLightState_.areaLights.clear();
 	Object3dCommon::GetInstance()->SetEditorLightOverride(false);
+}
+void Hierarchy::ApplyEditorSnapshot(const EditorSnapshot& snapshot) {
+	editorTransforms_ = snapshot.objectTransforms;
+	editorMaterials_ = snapshot.objectMaterials;
+	objectNames_ = snapshot.objectNames;
+	primitiveEditorTransforms_ = snapshot.primitiveTransforms;
+	primitiveEditorMaterials_ = snapshot.primitiveMaterials;
+	primitiveNames_ = snapshot.primitiveNames;
+	selectionBoxDirty_ = true;
+}
+
+void Hierarchy::UndoEditorChange() {
+	if (undoStack_.empty()) {
+		return;
+	}
+	EditorSnapshot current{};
+	current.objectTransforms = editorTransforms_;
+	current.objectMaterials = editorMaterials_;
+	current.objectNames = objectNames_;
+	current.primitiveTransforms = primitiveEditorTransforms_;
+	current.primitiveMaterials = primitiveEditorMaterials_;
+	current.primitiveNames = primitiveNames_;
+	redoStack_.push_back(std::move(current));
+	ApplyEditorSnapshot(undoStack_.back());
+	undoStack_.pop_back();
+	hasUnsavedChanges_ = true;
+}
+
+void Hierarchy::RedoEditorChange() {
+	if (redoStack_.empty()) {
+		return;
+	}
+	EditorSnapshot current{};
+	current.objectTransforms = editorTransforms_;
+	current.objectMaterials = editorMaterials_;
+	current.objectNames = objectNames_;
+	current.primitiveTransforms = primitiveEditorTransforms_;
+	current.primitiveMaterials = primitiveEditorMaterials_;
+	current.primitiveNames = primitiveNames_;
+	undoStack_.push_back(std::move(current));
+	ApplyEditorSnapshot(redoStack_.back());
+	redoStack_.pop_back();
+	hasUnsavedChanges_ = true;
 }
 void Hierarchy::RegisterObject3d(Object3d* object) {
 	if (!object) {
@@ -881,7 +926,15 @@ void Hierarchy::DrawObjectEditors() {
 	ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, kTopToolbarHeight), ImGuiCond_Always);
 	if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
-		ToolBar::Result toolbarResult = ToolBar::Draw(isPlaying_, hasUnsavedChanges_);
+		ToolBar::Result toolbarResult = ToolBar::Draw(isPlaying_, hasUnsavedChanges_, !undoStack_.empty(), !redoStack_.empty());
+		if (toolbarResult.undoRequested) {
+			UndoEditorChange();
+			saveStatusMessage_ = "Undo";
+		}
+		if (toolbarResult.redoRequested) {
+			RedoEditorChange();
+			saveStatusMessage_ = "Redo";
+		}
 		if (toolbarResult.playRequested) {
 			if (hasUnsavedChanges_) {
 				saveStatusMessage_ = "Warning: unsaved changes. Save To JSON before Play";
@@ -965,6 +1018,13 @@ void Hierarchy::DrawObjectEditors() {
 		if (!IsObjectSelected()) {
 			ImGui::TextUnformatted("No object selected.");
 		} else {
+			EditorSnapshot beforeEdit{};
+			beforeEdit.objectTransforms = editorTransforms_;
+			beforeEdit.objectMaterials = editorMaterials_;
+			beforeEdit.objectNames = objectNames_;
+			beforeEdit.primitiveTransforms = primitiveEditorTransforms_;
+			beforeEdit.primitiveMaterials = primitiveEditorMaterials_;
+			beforeEdit.primitiveNames = primitiveNames_;
 			bool transformChanged = false;
 			bool materialChanged = false;
 			bool nameChanged = false;
@@ -1026,6 +1086,8 @@ void Hierarchy::DrawObjectEditors() {
 				}
 			}
 			if (transformChanged || materialChanged || nameChanged) {
+				undoStack_.push_back(std::move(beforeEdit));
+				redoStack_.clear();
 				hasUnsavedChanges_ = true;
 			}
 		}
