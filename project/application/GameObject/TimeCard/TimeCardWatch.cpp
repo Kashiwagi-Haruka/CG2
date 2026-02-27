@@ -18,17 +18,17 @@ TimeCardWatch::TimeCardWatch()
     modelObj_ = std::make_unique<Object3d>();
     modelObj_->SetModel("timeCard");
     ring_ = std::make_unique<Primitive>();
-
 }
 
 void TimeCardWatch::Initialize()
 {
+    canMakePortal_ = false;
     modelObj_->Initialize();
     ring_->Initialize(Primitive::Ring);
     ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
     ring_->SetEnableLighting(false);
-    transform_ = { .scale = {10.0f,10.0f,10.0f},.rotate = {-1.5f,0.0f,2.55f},.translate = {1.5f,-1.2f,0.75f} };
-    lineTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
+    transform_ = { .scale = {20.0f,20.0f,20.0f},.rotate = {-Function::kPi,0.0f,2.55f},.translate = {1.5f,-1.2f,1.5f} };
+    ringTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
 }
 
 void TimeCardWatch::SetCamera(Camera* camera)
@@ -44,12 +44,16 @@ void TimeCardWatch::Update()
 {
     Matrix4x4 child = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
     assert(parentTransform_);
-    Matrix4x4 parent = Function::MakeAffineMatrix(parentTransform_->scale, parentTransform_->rotate, parentTransform_->translate);
+    Matrix4x4 parent = camera_->GetWorldMatrix();
     child = Function::Multiply(child, parent);
 
-    Vector3 worldPos = YoshidaMath::GetWorldPosByMat(child);
+    if (canMakePortal_) {
+        MakeBillboardWorldMat();
+    } else {
+        MakeWorldMat();
+    }
 
-    MakeBillboardWorldMat();
+    ring_->SetWorldMatrix(ringMatWorld_);
     ring_->Update();
 
     modelObj_->SetWorldMatrix(child);
@@ -74,30 +78,34 @@ void TimeCardWatch::Draw()
 bool TimeCardWatch::OnCollisionObjOfMakePortal(const Ray& ray, const AABB& aabb, const Transform& transform)
 {
     //ポータル作れるよ
-    bool canMakePortal = YoshidaMath::RayIntersectsAABB(ray, aabb, tMin_, tMax_);
+    canMakePortal_ = YoshidaMath::RayIntersectsAABB(ray, aabb, tMin_, tMax_);
 
-    if (canMakePortal) {
+    if (canMakePortal_) {
         ring_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
-        lineTransform_ = transform;
-
+        ringTransform_ = transform;
+        Vector3 forward = YoshidaMath::GetForward(camera_->GetWorldMatrix());
+        ringTransform_.translate -= forward * 0.125f;
     } else {
         ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-        Vector3 end = ray.origin + ray.diff * tMax_;
-        lineTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = end };
-
+        ringTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,tMax_} };
     }
 
-    return canMakePortal;
+    return canMakePortal_;
+}
+
+void TimeCardWatch::MakeWorldMat()
+{
+    Matrix4x4 child = Function::MakeAffineMatrix(ringTransform_.scale, ringTransform_.rotate, ringTransform_.translate);
+    child = Function::Multiply(child, camera_->GetWorldMatrix());
+    ringMatWorld_ = child;
 }
 
 void TimeCardWatch::MakeBillboardWorldMat()
 {
-
-    Vector3 forward = YoshidaMath::GetForward(camera_->GetWorldMatrix());
-    Matrix4x4 scaleMatrix = Function::MakeScaleMatrix(lineTransform_.scale);
-    Matrix4x4 translateMatrix = Function::MakeTranslateMatrix(lineTransform_.translate - forward * 0.125f);
-    Matrix4x4 rotateMatrix = Function::Multiply(YoshidaMath::MakeRotateMatrix(lineTransform_.rotate), YoshidaMath::GetBillBordMatrix(camera_));
+    Matrix4x4 scaleMatrix = Function::MakeScaleMatrix(ringTransform_.scale);
+    Matrix4x4 translateMatrix = Function::MakeTranslateMatrix(ringTransform_.translate);
+    Matrix4x4 rotateMatrix = Function::Multiply(YoshidaMath::MakeRotateMatrix(ringTransform_.rotate), YoshidaMath::GetBillBordMatrix(camera_));
     Matrix4x4 worldMatrix = Function::Multiply(Function::Multiply(scaleMatrix, rotateMatrix), translateMatrix);
+    ringMatWorld_ = worldMatrix;
 
-    ring_->SetWorldMatrix(worldMatrix);
 }
