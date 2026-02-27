@@ -327,3 +327,5 @@ FodyWeavers.xsd
 **/Dumps/
 *.ini
 *.pdb
+**/Log/
+*.log

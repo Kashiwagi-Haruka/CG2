@@ -840,6 +840,16 @@ void DirectXCommon::Finalize() {
 		fenceEvent_ = nullptr;
 	}
 
+	// --- PostEffect ---
+	postEffectParameterMappedData_ = nullptr;
+	postEffectParameterResource_.Reset();
+
+	// --- Scene color / copy pipeline ---
+	sceneColorResource_.Reset();
+	sceneSrvDescriptorHeap_.Reset();
+	copyRootSignature_.Reset();
+	copyPipelineState_.Reset();
+
 	// --- SwapChain Resources ---
 	for (auto& bb : swapChainResources_) {
 		bb.Reset();
@@ -853,17 +863,27 @@ void DirectXCommon::Finalize() {
 	srvDescriptorHeap_.Reset();
 	dsvDescriptorHeap_.Reset();
 
+	// --- DXC ---
+	includeHandler_.Reset();
+	dxcCompiler_.Reset();
+	dxcUtils_.Reset();
+
 	// --- Command ---
 	commandList_.Reset();
-	for (auto& alloc : commandAllocators_)
+	for (auto& alloc : commandAllocators_) {
 		alloc.Reset();
+	}
 	commandQueue_.Reset();
+
+	// --- Synchronization ---
+	fence_.Reset();
 
 	// --- Swap chain ---
 	swapChain_.Reset();
 
 	// --- Device ---
 	device_.Reset();
+	debugController_.Reset();
 	dxgiFactory_.Reset();
 	useAdapter_.Reset();
 }
