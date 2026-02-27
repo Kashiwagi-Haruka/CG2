@@ -84,8 +84,15 @@ void Object3d::Update() {
 		worldMatrix = Function::Multiply(localMatrix, worldMatrix);
 	}
 
-	worldViewProjectionMatrix = Function::Multiply(worldMatrix, Function::Multiply(camera_->GetViewMatrix(), camera_->GetProjectionMatrix()));
-	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+	UpdateCameraMatrices();
+}
+
+void Object3d::UpdateCameraMatrices() {
+	if (camera_) {
+		worldViewProjectionMatrix = Function::Multiply(worldMatrix, Function::Multiply(camera_->GetViewMatrix(), camera_->GetProjectionMatrix()));
+	} else {
+		worldViewProjectionMatrix = worldMatrix;
+	}
 
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;

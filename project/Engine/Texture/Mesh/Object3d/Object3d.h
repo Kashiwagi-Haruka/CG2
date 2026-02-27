@@ -58,6 +58,7 @@ public:
 	~Object3d();
 	void Initialize();
 	void Update();
+	void UpdateCameraMatrices();
 	void Draw();
 
 	void CreateResources();

@@ -81,6 +81,8 @@ public:
 	void Initialize(PrimitiveName name, const std::string& texturePath, uint32_t slices);
 	// 行列・マテリアルなど GPU に渡す定数を更新
 	void Update();
+	// 現在のワールド行列を使ってカメラ依存の定数だけ更新
+	void UpdateCameraMatrices();
 	// 現在の設定で描画
 	void Draw();
 

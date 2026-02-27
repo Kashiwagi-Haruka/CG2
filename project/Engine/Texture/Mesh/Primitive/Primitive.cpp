@@ -635,6 +635,15 @@ void Primitive::Update() {
 		activeCamera = Object3dCommon::GetInstance()->GetDefaultCamera();
 	}
 
+	UpdateCameraMatrices();
+}
+
+void Primitive::UpdateCameraMatrices() {
+	Camera* activeCamera = camera_;
+	if (!activeCamera) {
+		activeCamera = Object3dCommon::GetInstance()->GetDefaultCamera();
+	}
+
 	if (activeCamera) {
 		worldViewProjectionMatrix = Function::Multiply(Function::Multiply(worldMatrix, activeCamera->GetViewMatrix()), activeCamera->GetProjectionMatrix());
 	} else {

@@ -16,8 +16,8 @@ public:
 	ID3D12Resource* GetResource() const { return resource_.Get(); }
 
 	void TransitionToRenderTarget(ID3D12GraphicsCommandList* commandList);
-	void TransitionToShaderResource(ID3D12GraphicsCommandList* commandList);
-	void BeginRender(ID3D12GraphicsCommandList* commandList);
+	void TransitionToShaderResource();
+	void BeginRender();
 
 private:
 

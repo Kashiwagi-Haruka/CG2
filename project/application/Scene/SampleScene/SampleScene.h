@@ -83,6 +83,7 @@ class SampleScene : public BaseScene {
 
 	void UpdatePortalCamera(const Transform& sourcePortal, const Transform& destinationPortal, Camera* outCamera);
 	void SetSceneCameraForDraw(Camera* camera);
+	void UpdateSceneCameraMatricesForDraw();
 	void DrawSceneGeometry(bool includePortalA, bool includePortalB);
 
 public:

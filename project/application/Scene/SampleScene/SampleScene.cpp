@@ -412,12 +412,8 @@ void SampleScene::Update() {
 	/*ringPrimitive_->SetColor({1.0f, 0.85f, 0.2f, 1.0f});*/
 	portalA_->Update();
 	portalB_->Update();
-	portalCameraFromA_->SetRotate(portalATransform_.rotate);
-	portalCameraFromA_->SetTranslate(portalATransform_.translate);
-	portalCameraFromA_->Update();
-	portalCameraFromB_->SetRotate(portalBTransform_.rotate);
-	portalCameraFromB_->SetTranslate(portalBTransform_.translate);
-	portalCameraFromB_->Update();
+	UpdatePortalCamera(portalATransform_, portalBTransform_, portalCameraFromA_.get());
+	UpdatePortalCamera(portalBTransform_, portalATransform_, portalCameraFromB_.get());
 	portalRingA_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, ringUvRotation_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
 	portalRingB_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, -ringUvRotation_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
 	portalRingA_->Update();
@@ -472,6 +468,19 @@ void SampleScene::SetSceneCameraForDraw(Camera* camera) {
 	portalRingA_->SetCamera(camera);
 	portalRingB_->SetCamera(camera);
 }
+void SampleScene::UpdateSceneCameraMatricesForDraw() {
+	uvBallObj_->UpdateCameraMatrices();
+	fieldObj_->UpdateCameraMatrices();
+	planeGltf_->UpdateCameraMatrices();
+	animatedCubeObj_->UpdateCameraMatrices();
+	humanObj_->UpdateCameraMatrices();
+	spherePrimitive_->UpdateCameraMatrices();
+	portalA_->UpdateCameraMatrices();
+	portalB_->UpdateCameraMatrices();
+	portalRingA_->UpdateCameraMatrices();
+	portalRingB_->UpdateCameraMatrices();
+}
+
 void SampleScene::DrawSceneGeometry(bool includePortalA, bool includePortalB) {
 	Object3dCommon::GetInstance()->DrawCommon();
 	uvBallObj_->Draw();
@@ -508,26 +517,27 @@ void SampleScene::Draw() {
 	portalRingB_->Draw();
 	Object3dCommon::GetInstance()->EndShadowMapPass();
 
-	auto* dxCommon = Object3dCommon::GetInstance()->GetDxCommon();
-	auto* commandList = dxCommon->GetCommandList();
 	if (portalRenderTextureA_ && portalRenderTextureA_->IsReady()) {
-		portalRenderTextureA_->BeginRender(commandList);
+		portalRenderTextureA_->BeginRender();
 		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromA_.get());
 		SetSceneCameraForDraw(portalCameraFromA_.get());
+		UpdateSceneCameraMatricesForDraw();
 		DrawSceneGeometry(false, true);
-		portalRenderTextureA_->TransitionToShaderResource(commandList);
+		portalRenderTextureA_->TransitionToShaderResource();
 	}
 	if (portalRenderTextureB_ && portalRenderTextureB_->IsReady()) {
-		portalRenderTextureB_->BeginRender(commandList);
+		portalRenderTextureB_->BeginRender();
 		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromB_.get());
 		SetSceneCameraForDraw(portalCameraFromB_.get());
+		UpdateSceneCameraMatricesForDraw();
 		DrawSceneGeometry(true, false);
-		portalRenderTextureB_->TransitionToShaderResource(commandList);
+		portalRenderTextureB_->TransitionToShaderResource();
 	}
 
-	dxCommon->SetMainRenderTarget();
+	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	SetSceneCameraForDraw(camera_.get());
+	UpdateSceneCameraMatricesForDraw();
 	DrawSceneGeometry(true, true);
 	SpriteCommon::GetInstance()->DrawCommon();
 	uvSprite->Draw();
