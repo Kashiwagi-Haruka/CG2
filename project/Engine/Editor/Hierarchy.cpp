@@ -106,22 +106,40 @@ void Hierarchy::RegisterObject3d(Object3d* object) {
 	if (!object) {
 		return;
 	}
-	if (std::find(objects_.begin(), objects_.end(), object) == objects_.end()) {
-		const size_t index = objects_.size();
-		objects_.push_back(object);
-		objectNames_.push_back("Object " + std::to_string(index));
-		editorTransforms_.push_back(object->GetTransform());
-		editorMaterials_.push_back({
-		    object->GetColor(),
-		    object->IsLightingEnabled(),
-		    object->GetShininess(),
-		    object->GetEnvironmentCoefficient(),
-		    object->IsGrayscaleEnabled(),
-		    object->IsSepiaEnabled(),
-		    object->GetDistortionStrength(),
-		    object->GetDistortionFalloff(),
-		});
+	if (std::find(objects_.begin(), objects_.end(), object) != objects_.end()) {
+		return;
 	}
+	auto emptyIt = std::find(objects_.begin(), objects_.end(), nullptr);
+	if (emptyIt != objects_.end()) {
+		const size_t index = static_cast<size_t>(std::distance(objects_.begin(), emptyIt));
+		objects_[index] = object;
+		object->SetTransform(editorTransforms_[index]);
+		const InspectorMaterial& material = editorMaterials_[index];
+		object->SetColor(material.color);
+		object->SetEnableLighting(material.enableLighting);
+		object->SetShininess(material.shininess);
+		object->SetEnvironmentCoefficient(material.environmentCoefficient);
+		object->SetGrayscaleEnabled(material.grayscaleEnabled);
+		object->SetSepiaEnabled(material.sepiaEnabled);
+		object->SetDistortionStrength(material.distortionStrength);
+		object->SetDistortionFalloff(material.distortionFalloff);
+		object->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+		return;
+	}
+	const size_t index = objects_.size();
+	objects_.push_back(object);
+	objectNames_.push_back("Object " + std::to_string(index));
+	editorTransforms_.push_back(object->GetTransform());
+	editorMaterials_.push_back({
+	    object->GetColor(),
+	    object->IsLightingEnabled(),
+	    object->GetShininess(),
+	    object->GetEnvironmentCoefficient(),
+	    object->IsGrayscaleEnabled(),
+	    object->IsSepiaEnabled(),
+	    object->GetDistortionStrength(),
+	    object->GetDistortionFalloff(),
+	});
 }
 
 void Hierarchy::UnregisterObject3d(Object3d* object) {
@@ -130,10 +148,10 @@ void Hierarchy::UnregisterObject3d(Object3d* object) {
 	}
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		if (objects_[i] == object) {
-			objects_.erase(objects_.begin() + i);
-			objectNames_.erase(objectNames_.begin() + i);
-			editorTransforms_.erase(editorTransforms_.begin() + i);
-			editorMaterials_.erase(editorMaterials_.begin() + i);
+			objects_[i] = nullptr;
+			if (!selectedIsPrimitive_ && selectedObjectIndex_ == i) {
+				selectedObjectIndex_ = 0;
+			}
 			break;
 		}
 	}
@@ -143,22 +161,40 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive) {
 	if (!primitive) {
 		return;
 	}
-	if (std::find(primitives_.begin(), primitives_.end(), primitive) == primitives_.end()) {
-		const size_t index = primitives_.size();
-		primitives_.push_back(primitive);
-		primitiveNames_.push_back("Primitive " + std::to_string(index));
-		primitiveEditorTransforms_.push_back(primitive->GetTransform());
-		primitiveEditorMaterials_.push_back({
-		    primitive->GetColor(),
-		    primitive->IsLightingEnabled(),
-		    primitive->GetShininess(),
-		    primitive->GetEnvironmentCoefficient(),
-		    primitive->IsGrayscaleEnabled(),
-		    primitive->IsSepiaEnabled(),
-		    primitive->GetDistortionStrength(),
-		    primitive->GetDistortionFalloff(), 
-		});
+	if (std::find(primitives_.begin(), primitives_.end(), primitive) != primitives_.end()) {
+		return;
 	}
+	auto emptyIt = std::find(primitives_.begin(), primitives_.end(), nullptr);
+	if (emptyIt != primitives_.end()) {
+		const size_t index = static_cast<size_t>(std::distance(primitives_.begin(), emptyIt));
+		primitives_[index] = primitive;
+		primitive->SetTransform(primitiveEditorTransforms_[index]);
+		const InspectorMaterial& material = primitiveEditorMaterials_[index];
+		primitive->SetColor(material.color);
+		primitive->SetEnableLighting(material.enableLighting);
+		primitive->SetShininess(material.shininess);
+		primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
+		primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
+		primitive->SetSepiaEnabled(material.sepiaEnabled);
+		primitive->SetDistortionStrength(material.distortionStrength);
+		primitive->SetDistortionFalloff(material.distortionFalloff);
+		primitive->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+		return;
+	}
+	const size_t index = primitives_.size();
+	primitives_.push_back(primitive);
+	primitiveNames_.push_back("Primitive " + std::to_string(index));
+	primitiveEditorTransforms_.push_back(primitive->GetTransform());
+	primitiveEditorMaterials_.push_back({
+	    primitive->GetColor(),
+	    primitive->IsLightingEnabled(),
+	    primitive->GetShininess(),
+	    primitive->GetEnvironmentCoefficient(),
+	    primitive->IsGrayscaleEnabled(),
+	    primitive->IsSepiaEnabled(),
+	    primitive->GetDistortionStrength(),
+	    primitive->GetDistortionFalloff(),
+	});
 }
 
 void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
@@ -167,10 +203,10 @@ void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
 	}
 	for (size_t i = 0; i < primitives_.size(); ++i) {
 		if (primitives_[i] == primitive) {
-			primitives_.erase(primitives_.begin() + i);
-			primitiveNames_.erase(primitiveNames_.begin() + i);
-			primitiveEditorTransforms_.erase(primitiveEditorTransforms_.begin() + i);
-			primitiveEditorMaterials_.erase(primitiveEditorMaterials_.begin() + i);
+			primitives_[i] = nullptr;
+			if (selectedIsPrimitive_ && selectedObjectIndex_ == i) {
+				selectedObjectIndex_ = 0;
+			}
 			break;
 		}
 	}
@@ -189,6 +225,9 @@ bool Hierarchy::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
 	const std::string scopedFilePath = GetSceneScopedEditorFilePath(filePath);
 	if (!HasObjectEditorJsonFile(scopedFilePath)) {
 		return false;
+	}
+	if (hasLoadedForCurrentScene_) {
+		return true;
 	}
 	hasLoadedForCurrentScene_ = LoadObjectEditorsFromJson(scopedFilePath);
 	return hasLoadedForCurrentScene_;
@@ -954,7 +993,7 @@ void Hierarchy::DrawSelectionBoxEditor() {
 }
 void Hierarchy::DrawObjectEditors() {
 #ifdef USE_IMGUI
-
+	LoadObjectEditorsFromJsonIfExists("objectEditors.json");
 	if (!isPlaying_) {
 		for (size_t i = 0; i < objects_.size(); ++i) {
 			Object3d* object = objects_[i];
@@ -1118,11 +1157,6 @@ void Hierarchy::DrawObjectEditors() {
 					Inspector::DrawPrimitiveInspector(selectedObjectIndex_, name, transform, material, isPlaying_, transformChanged, materialChanged, nameChanged);
 					if (transformChanged) {
 						selectionBoxDirty_ = true;
-						if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
-							transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
-							transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
-							transform.translate.z = std::round(transform.translate.z / gridSnapSpacing_) * gridSnapSpacing_;
-						}
 						primitive->SetTransform(transform);
 					}
 					if (materialChanged) {
@@ -1146,11 +1180,6 @@ void Hierarchy::DrawObjectEditors() {
 					Inspector::DrawObjectInspector(selectedObjectIndex_, name, transform, material, isPlaying_, transformChanged, materialChanged, nameChanged);
 					if (transformChanged) {
 						selectionBoxDirty_ = true;
-						if (enableGridSnap_ && gridSnapSpacing_ > 0.0f) {
-							transform.translate.x = std::round(transform.translate.x / gridSnapSpacing_) * gridSnapSpacing_;
-							transform.translate.y = std::round(transform.translate.y / gridSnapSpacing_) * gridSnapSpacing_;
-							transform.translate.z = std::round(transform.translate.z / gridSnapSpacing_) * gridSnapSpacing_;
-						}
 						object->SetTransform(transform);
 					}
 					if (materialChanged) {
