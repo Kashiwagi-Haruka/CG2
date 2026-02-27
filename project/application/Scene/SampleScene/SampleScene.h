@@ -26,10 +26,12 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Object3d> planeGltf_ = nullptr;
 	std::unique_ptr<Object3d> animatedCubeObj_ = nullptr;
 	std::unique_ptr<Object3d> humanObj_ = nullptr;
-	std::unique_ptr<Primitive> ringPrimitive_ = nullptr;
 	std::unique_ptr<Primitive> portalA_ = nullptr;
 	std::unique_ptr<Primitive> portalB_ = nullptr;
-	std::unique_ptr<Camera> portalCamera_ = nullptr;
+	std::unique_ptr<Primitive> portalRingA_ = nullptr;
+	std::unique_ptr<Primitive> portalRingB_ = nullptr;
+	std::unique_ptr<Camera> portalCameraFromA_ = nullptr;
+	std::unique_ptr<Camera> portalCameraFromB_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	bool useDebugCamera_ = false;
@@ -75,10 +77,11 @@ class SampleScene : public BaseScene {
 	int randomNoiseBlendMode_ = 0;
 	float ringUvRotation_ = 0.0f;
 
-	std::unique_ptr<RenderTexture2D> portalRenderTexture_ = nullptr;
+	std::unique_ptr<RenderTexture2D> portalRenderTextureA_ = nullptr;
+	std::unique_ptr<RenderTexture2D> portalRenderTextureB_ = nullptr;
 
-	void UpdatePortalCamera();
-	void DrawSceneGeometry(bool includePortalSurface);
+	void UpdatePortalCamera(const Transform& sourcePortal, const Transform& destinationPortal, Camera* outCamera);
+	void DrawSceneGeometry(bool includePortalA, bool includePortalB);
 
 public:
 	SampleScene();
