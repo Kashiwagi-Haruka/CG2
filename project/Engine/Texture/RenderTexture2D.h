@@ -4,6 +4,8 @@
 #include <d3d12.h>
 #include <wrl.h>
 
+class DirectXCommon;
+
 class RenderTexture2D {
 
 public:
@@ -18,6 +20,7 @@ public:
 	void BeginRender(ID3D12GraphicsCommandList* commandList);
 
 private:
+
 	DirectXCommon* dxCommon_ = nullptr;
 	DXGI_FORMAT format_ = DXGI_FORMAT_R8G8B8A8_UNORM;
 	std::array<float, 4> clearColor_ = {0.0f, 0.0f, 0.0f, 1.0f};
