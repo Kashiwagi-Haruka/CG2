@@ -442,10 +442,10 @@ void SampleScene::DrawSceneGeometry(bool includePortalSurface) {
 	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
 	ringPrimitive_->Draw();
 	portalA_->Draw();
-	if (sampleParticleEmitter_) {
-		Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
-		sampleParticleEmitter_->Draw();
-	}
+	//if (sampleParticleEmitter_) {
+	//	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
+	//	sampleParticleEmitter_->Draw();
+	//}
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
