@@ -24,6 +24,7 @@ SampleScene::SampleScene() {
 	portalB_ = std::make_unique<Primitive>();
 	portalRingA_ = std::make_unique<Primitive>();
 	portalRingB_ = std::make_unique<Primitive>();
+	spherePrimitive_ = std::make_unique<Primitive>();
 	cameraTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -78,6 +79,9 @@ void SampleScene::Initialize() {
 	portalRingB_->SetCamera(camera_.get());
 	portalRingB_->SetEnableLighting(false);
 	portalRingB_->SetColor({1.0f, 0.55f, 0.1f, 1.0f});
+	spherePrimitive_->Initialize(Primitive::Sphere, 32);
+	spherePrimitive_->SetCamera(camera_.get());
+	spherePrimitive_->SetEnableLighting(true);
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -414,6 +418,7 @@ void SampleScene::Update() {
 	portalRingB_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, -ringUvRotation_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
 	portalRingA_->Update();
 	portalRingB_->Update();
+	spherePrimitive_->Update();
 	uvBallObj_->Update();
 	fieldObj_->Update();
 	planeGltf_->Update();
@@ -462,6 +467,7 @@ void SampleScene::DrawSceneGeometry(bool includePortalA, bool includePortalB) {
 	if (includePortalB) {
 		portalB_->Draw();
 	}
+	spherePrimitive_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
 	portalRingA_->Draw();
 	portalRingB_->Draw();

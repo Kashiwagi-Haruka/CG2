@@ -30,6 +30,7 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Primitive> portalB_ = nullptr;
 	std::unique_ptr<Primitive> portalRingA_ = nullptr;
 	std::unique_ptr<Primitive> portalRingB_ = nullptr;
+	std::unique_ptr<Primitive> spherePrimitive_ = nullptr;
 	std::unique_ptr<Camera> portalCameraFromA_ = nullptr;
 	std::unique_ptr<Camera> portalCameraFromB_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
