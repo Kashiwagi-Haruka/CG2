@@ -44,6 +44,12 @@ bool PlayerCommand::Sneak()
     return input->PushKey(K_Sneak) || input->PushButton(Input::PadButton(C_Sneak));
 }
 
+bool PlayerCommand::Interact()
+{
+    auto* input = Input::GetInstance();
+    return input->PushKey(K_Interact) || input->PushButton(Input::PadButton(C_Interact));
+}
+
 Vector2 PlayerCommand::Rotate(float rotateSpeed)
 {
     auto* input = Input::GetInstance();

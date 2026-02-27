@@ -24,6 +24,15 @@ void PlayerCamera::Update()
     SetTransform();
 
     camera_->Update();
+
+    // レイの判定&インタラクト
+    auto* playerCommand = PlayerCommand::GetInstance();
+    
+	if (playerCommand->Interact()) {
+		// インタラクトの処理
+        
+	}
+    
 }
 
 void PlayerCamera::Rotate()

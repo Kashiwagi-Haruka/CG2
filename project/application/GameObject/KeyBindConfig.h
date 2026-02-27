@@ -12,6 +12,8 @@ enum GameKeyBind
 	K_MoveBackward = DIK_S,
 	K_Shot = DIK_SPACE,
 	K_Sneak = DIK_LSHIFT,
+	K_Interact = DIK_E,
+
 	// コントローラー
 	C_MoveLeft = Input::PadButton::kButtonLeft,
 	C_MoveRight = Input::PadButton::kButtonRight,
@@ -19,6 +21,7 @@ enum GameKeyBind
 	C_MoveBackward = Input::PadButton::kButtonDown,
 	C_Shot = Input::PadButton::kButtonA,
 	C_Sneak = Input::PadButton::kButtonLeftShoulder,
+	C_Interact = Input::PadButton::kButtonX,
 
 	//マウス
 	M_Shot = Input::MouseButton::kLeft,
@@ -41,6 +44,7 @@ public:
 	bool MoveBackward();
 	bool Shot();
 	bool Sneak();
+	bool Interact();
 	Vector2 Rotate(float rotateSpeed);
 private:	
 
