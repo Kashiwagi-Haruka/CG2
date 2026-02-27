@@ -22,6 +22,10 @@ public:
 private:
 
 	DirectXCommon* dxCommon_ = nullptr;
+
+	uint32_t width_ = 0;
+	uint32_t height_ = 0;
+
 	DXGI_FORMAT format_ = DXGI_FORMAT_R8G8B8A8_UNORM;
 	std::array<float, 4> clearColor_ = {0.0f, 0.0f, 0.0f, 1.0f};
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
