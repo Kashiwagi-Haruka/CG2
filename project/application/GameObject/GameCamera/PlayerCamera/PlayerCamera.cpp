@@ -92,13 +92,13 @@ void PlayerCamera::SetTransform()
         std::clamp(
             cameraTransform_.rotate.x,
             -halfPi,
-            halfPi);
+            halfPi- halfPi * 0.25f);
 
     cameraTransform_.rotate.y = playerTransform_->rotate.y;
     cameraTransform_.rotate.z = 0.0f;
 
     cameraTransform_.translate = playerTransform_->translate;
-    cameraTransform_.translate.y += 1.5f;
+    cameraTransform_.translate.y += 1.6f;
     cameraTransform_.translate += ray_.diff*1.25f;
     camera_->SetTransform(cameraTransform_);
 
