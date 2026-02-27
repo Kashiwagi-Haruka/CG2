@@ -71,7 +71,7 @@ void TimeCardWatch::Draw()
     ring_->Draw();
 }
 
-bool TimeCardWatch::OnCollisionObjOfMakePortal(const Ray& ray,const AABB& aabb, const Transform& transform)
+bool TimeCardWatch::OnCollisionObjOfMakePortal(const Ray& ray, const AABB& aabb, const Transform& transform)
 {
     //ポータル作れるよ
     bool canMakePortal = YoshidaMath::RayIntersectsAABB(ray, aabb, tMin_, tMax_);
@@ -82,14 +82,9 @@ bool TimeCardWatch::OnCollisionObjOfMakePortal(const Ray& ray,const AABB& aabb, 
 
     } else {
         ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-
-        Vector3 end = {
-       .x = ray.origin.x + ray.diff.x * tMax_,
-       .y = ray.origin.y + ray.diff.y * tMax_,
-       .z = ray.origin.z + ray.diff.z * tMax_,
-        };
+        Vector3 end = ray.origin + ray.diff * tMax_;
         lineTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = end };
-  
+
     }
 
     return canMakePortal;
