@@ -60,22 +60,22 @@ void D3DResourceLeakChecker::LeakChecker() {
 	std::error_code errorCode;
 	std::filesystem::create_directories(logDirectory, errorCode);
 
-	const std::filesystem::path reportPath = logDirectory / ("D3DResourceLeakReport_" + MakeTimestamp() + ".txt");
-	std::ofstream reportFile(reportPath, std::ios::out | std::ios::trunc);
+	const std::filesystem::path reportPath = logDirectory / "D3DResourceLeakReport.txt";
+	std::ofstream reportFile(reportPath, std::ios::out | std::ios::app);
 	if (!reportFile.is_open()) {
 		return;
 	}
 
-	reportFile << "D3D12 Leak Check Report\n";
-	reportFile << "======================\n\n";
+	reportFile << "\n========================================\n";
+	reportFile << "D3D12 Leak Check Report (" << MakeTimestamp() << ")\n";
+	reportFile << "========================================\n\n";
 	WriteCallPath(reportFile);
 
-	if (FAILED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-		reportFile << "Failed to acquire IDXGIDebug1. Leak information could not be collected.\n";
-		return;
+	const bool hasDxgiDebug = SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)));
+	if (!hasDxgiDebug) {
+		reportFile << "Warning: Failed to acquire IDXGIDebug1. "
+		           << "Some leak information may be unavailable.\n\n";
 	}
-
-
 
 	std::vector<std::string> liveObjectMessages;
 	std::vector<std::string> errorMessages;
@@ -103,10 +103,14 @@ void D3DResourceLeakChecker::LeakChecker() {
 				errorMessages.push_back(description);
 			}
 		}
+	} else {
+		reportFile << "Warning: Failed to acquire IDXGIInfoQueue. "
+		           << "Stored DXGI live-object messages were not collected.\n\n";
 	}
 
 	// 実際の Device インスタンスからも RefCount を直接取得
-	ID3D12Device* currentDevice = GameBase::GetInstance()->GetD3D12Device();
+	GameBase* gameBase = GameBase::GetInstance();
+	ID3D12Device* currentDevice = gameBase ? gameBase->GetD3D12Device() : nullptr;
 	if (currentDevice) {
 		ULONG deviceRefCount = currentDevice->AddRef();
 		currentDevice->Release();
@@ -128,6 +132,8 @@ void D3DResourceLeakChecker::LeakChecker() {
 			oss << ", Name: " << ToNarrow(deviceName);
 		}
 		liveObjectMessages.push_back(oss.str());
+	} else {
+		liveObjectMessages.push_back("ID3D12Device is null. Refcount could not be sampled.");
 	}
 
 	reportFile << "[RefCount Summary]\n";
@@ -156,7 +162,9 @@ void D3DResourceLeakChecker::LeakChecker() {
 		infoQueue->ClearStoredMessages(DXGI_DEBUG_ALL);
 	}
 	// 既存のデバッグ出力にもリーク情報を表示
-	debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
+	if (debug) {
+		/*debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);*/
+	}
 #else
 	// Releaseビルドでは何もしない
 #endif
