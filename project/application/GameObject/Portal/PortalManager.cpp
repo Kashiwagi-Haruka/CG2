@@ -3,7 +3,7 @@
 #include"GameObject/TimeCard/TimeCardWatch.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
-
+#include"GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 namespace {
     const constexpr uint32_t kMaxWhiteBoards = 6;
 }
@@ -47,18 +47,19 @@ void PortalManager::Draw()
     }
 }
 
-void PortalManager::SetCamera(Camera* camera)
+void PortalManager::SetPlayerCamera(PlayerCamera* camera)
 {
+    playerCamera_ = camera;
     for (auto& board : whiteBoards_) {
-        board->SetCamera(camera);
+        board->SetCamera(camera->GetCamera());
     }
 }
 
-void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch, Camera* camera,const Vector3& warpPos)
+void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch,const Vector3& warpPos)
 {
     //whiteBoardとrayの当たり判定
     for (auto& board : whiteBoards_) {
-        if (timeCardWatch->OnCollisionObjOfMakePortal(board->GetAABB(), board->GetTransform())) {
+        if (timeCardWatch->OnCollisionObjOfMakePortal(playerCamera_->GetRay(), board->GetAABB(), board->GetTransform())) {
 
             if (PlayerCommand::GetInstance()->Shot()) {
                //前回のポータルを削除
@@ -69,6 +70,7 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch, Camera* camera,
                
                //Portalの初期化処理
                portal->Initialize();
+               Camera* camera = playerCamera_->GetCamera();
                portal->SetCamera(camera);
                portal->SetTransform(board->GetTransform());
                portal->SetRingWorldMatrix(camera);
