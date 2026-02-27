@@ -26,6 +26,7 @@ ShadowGameScene::ShadowGameScene()
     Portal::LoadSE();
     //ホワイトボード管理
     portalManager_ = std::make_unique<PortalManager>();
+    portalManager_->SetPlayerCamera(playerCamera_.get());
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     //衝突管理
@@ -56,7 +57,7 @@ void ShadowGameScene::Initialize()
 
     //ホワイトボード管理
     portalManager_->Initialize();
-    portalManager_->SetCamera(playerCamera_->GetCamera());
+    portalManager_->SetPlayerCamera(playerCamera_.get());
 
     //携帯打刻機
     timeCardWatch_->Initialize();
@@ -108,7 +109,7 @@ void ShadowGameScene::DebugImGui()
 void ShadowGameScene::CheckCollision()
 {
     //ホワイトボードとrayの当たり判定作成する
-    portalManager_->CheckCollision(timeCardWatch_.get(), playerCamera_->GetCamera(), { 0.0f,1.5f,0.0f });
+    portalManager_->CheckCollision(timeCardWatch_.get(), { 0.0f,1.5f,0.0f });
 
     collisionManager_->ClearColliders();
 
@@ -248,9 +249,7 @@ void ShadowGameScene::UpdateGameObject()
     if (!useDebugCamera_) {
         playerCamera_->Update();
     }
-    auto* playerCamera = playerCamera_->GetCamera();
-    Vector3 forward = YoshidaMath::GetForward(playerCamera->GetWorldMatrix());
-    timeCardWatch_->SetRay(playerCamera->GetTranslate(), forward);
+
     timeCardWatch_->Update();
 
 
