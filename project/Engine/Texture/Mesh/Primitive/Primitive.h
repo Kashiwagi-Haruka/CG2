@@ -122,6 +122,8 @@ public:
 	void SetDistortionStrength(float strength);
 	// 歪み回転の外側への効き方を設定
 	void SetDistortionFalloff(float falloff);
+	// 使用テクスチャの SRV インデックスを直接設定
+	void SetTextureIndex(uint32_t textureIndex);
 	void SetEditorRegistrationEnabled(bool enable) { editorRegistrationEnabled_ = enable; }
 	// 現在の Transform を取得
 	Transform GetTransform() const { return transform_; }

@@ -813,6 +813,7 @@ void Primitive::SetDistortionFalloff(float falloff) {
 	materialData_->distortionFalloff = falloff;
 	materialResource_->Unmap(0, nullptr);
 }
+void Primitive::SetTextureIndex(uint32_t textureIndex) { textureIndex_ = textureIndex; }
 Vector4 Primitive::GetColor() const {
 	if (materialData_) {
 		return materialData_->color;
