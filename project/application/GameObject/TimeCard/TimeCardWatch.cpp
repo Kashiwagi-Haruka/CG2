@@ -61,6 +61,7 @@ void TimeCardWatch::Update()
     ImGui::DragFloat3("translate", &transform_.translate.x, 0.3f);
     ImGui::DragFloat3("scale", &transform_.scale.x, 0.3f);
     ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.3f);
+    ImGui::End();
 #endif
 }
 
