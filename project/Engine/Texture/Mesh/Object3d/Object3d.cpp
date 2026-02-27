@@ -30,7 +30,6 @@ void Object3d::Initialize() {
 	SetDistortionFalloff(1.0f);
 	Hierarchy* Hierarchy = Hierarchy::GetInstance();
 	Hierarchy->RegisterObject3d(this);
-	Hierarchy->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
 }
 namespace {
 bool IsIdentityMatrix(const Matrix4x4& matrix) {

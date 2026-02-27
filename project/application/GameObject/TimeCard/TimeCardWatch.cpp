@@ -18,7 +18,7 @@ TimeCardWatch::TimeCardWatch()
     modelObj_ = std::make_unique<Object3d>();
     modelObj_->SetModel("timeCard");
     ring_ = std::make_unique<Primitive>();
-    ray_ = { .origin = {0.0f},.diff = {0.0f} };
+
 }
 
 void TimeCardWatch::Initialize()
@@ -61,10 +61,6 @@ void TimeCardWatch::Update()
     ImGui::DragFloat3("translate", &transform_.translate.x, 0.3f);
     ImGui::DragFloat3("scale", &transform_.scale.x, 0.3f);
     ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.3f);
-
-    ImGui::DragFloat3("origin", &ray_.origin.x, 0.3f);
-    ImGui::DragFloat3("diff", &ray_.diff.x, 0.3f);
-    ImGui::End();
 #endif
 }
 
@@ -74,16 +70,10 @@ void TimeCardWatch::Draw()
     ring_->Draw();
 }
 
-void TimeCardWatch::SetRay(const Vector3& origin, const Vector3& diff)
-{
-    ray_.origin = origin;
-    ray_.diff = diff;
-}
-
-bool TimeCardWatch::OnCollisionObjOfMakePortal(const AABB& aabb, const Transform& transform)
+bool TimeCardWatch::OnCollisionObjOfMakePortal(const Ray& ray,const AABB& aabb, const Transform& transform)
 {
     //ポータル作れるよ
-    bool canMakePortal = YoshidaMath::RayIntersectsAABB(ray_, aabb, tMin_, tMax_);
+    bool canMakePortal = YoshidaMath::RayIntersectsAABB(ray, aabb, tMin_, tMax_);
 
     if (canMakePortal) {
         ring_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
@@ -93,9 +83,9 @@ bool TimeCardWatch::OnCollisionObjOfMakePortal(const AABB& aabb, const Transform
         ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
 
         Vector3 end = {
-       .x = ray_.origin.x + ray_.diff.x * tMax_,
-       .y = ray_.origin.y + ray_.diff.y * tMax_,
-       .z = ray_.origin.z + ray_.diff.z * tMax_,
+       .x = ray.origin.x + ray.diff.x * tMax_,
+       .y = ray.origin.y + ray.diff.y * tMax_,
+       .z = ray.origin.z + ray.diff.z * tMax_,
         };
         lineTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = end };
   

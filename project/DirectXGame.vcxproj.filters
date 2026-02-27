@@ -279,9 +279,6 @@
     <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\Hinstance.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="application\GameObject\TestField\TestField.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -328,6 +325,9 @@
     <FxCompile Include="Resources\shader\Sprite\Sprite.VS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\Object3dGrid.PS.hlsl" />
     <FxCompile Include="Resources\shader\Sprite\Font.PS.hlsl" />
+    <ClCompile Include="Engine\Texture\RenderTexture2D.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\Collider.cpp" />
@@ -625,9 +625,6 @@
     <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\Hinstance.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="application\GameObject\TestField\TestField.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -747,6 +744,9 @@
     <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h" />
     <ClInclude Include="Engine\Editor\Inspector.h" />
     <ClInclude Include="Engine\Editor\ToolBar.h" />
+    <ClInclude Include="Engine\Texture\RenderTexture2D.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

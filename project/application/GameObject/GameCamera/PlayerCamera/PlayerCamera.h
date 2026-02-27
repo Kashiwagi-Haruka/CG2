@@ -2,6 +2,7 @@
 #include <memory>
 #include "Camera.h"
 #include"Transform.h"
+#include"RigidBody.h"
 
 class PlayerCamera
 {
@@ -15,9 +16,15 @@ public:
     }
     //回転
     void Rotate();
+    //Rayをセットする
+    void SetRay();
+    Ray& GetRay() { return ray_; };
 private:
     void SetTransform();
+    Vector3 GetForward();
     Transform cameraTransform_ = {};
+    //カメラからのRay
+    Ray ray_;
     //カメラの設定
     std::unique_ptr<Camera> camera_ = nullptr;
     Transform* playerTransform_ = nullptr;

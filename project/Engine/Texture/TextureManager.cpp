@@ -274,7 +274,8 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t srvIndex) {
 			return data.srvHandleGPU;
 		}
 	}
-	assert(false && "Invalid srvIndex");
-	D3D12_GPU_DESCRIPTOR_HANDLE dummy{};
-	return dummy;
+	// RenderTexture など TextureManager で管理していない SRV は
+	// SRV マネージャーから直接ハンドルを取得する。
+	assert(srvManager_ != nullptr);
+	return srvManager_->GetGPUDescriptorHandle(srvIndex);
 }

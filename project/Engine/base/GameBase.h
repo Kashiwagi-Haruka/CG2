@@ -41,7 +41,7 @@ public:
 	bool ProcessMessage();
 
 	float GetDeltaTime();
-
+	ID3D12Device* GetD3D12Device();
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
 
 
