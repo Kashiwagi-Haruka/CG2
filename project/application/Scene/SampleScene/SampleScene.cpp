@@ -410,10 +410,14 @@ void SampleScene::Update() {
 	/*humanObj_->SetTransform(humanTransform_);*/
 	/*ringPrimitive_->SetTransform(ringTransform_);*/
 	/*ringPrimitive_->SetColor({1.0f, 0.85f, 0.2f, 1.0f});*/
-	UpdatePortalCamera(portalATransform_, portalBTransform_, portalCameraFromA_.get());
-	UpdatePortalCamera(portalBTransform_, portalATransform_, portalCameraFromB_.get());
 	portalA_->Update();
 	portalB_->Update();
+	portalCameraFromA_->SetRotate(portalATransform_.rotate);
+	portalCameraFromA_->SetTranslate(portalATransform_.translate);
+	portalCameraFromA_->Update();
+	portalCameraFromB_->SetRotate(portalBTransform_.rotate);
+	portalCameraFromB_->SetTranslate(portalBTransform_.translate);
+	portalCameraFromB_->Update();
 	portalRingA_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, ringUvRotation_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
 	portalRingB_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, -ringUvRotation_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
 	portalRingA_->Update();
@@ -443,16 +447,18 @@ void SampleScene::Update() {
 		humanSkeleton_->SetObjectMatrix(humanWorld);
 	}
 }
-void SampleScene::UpdatePortalCamera(const Transform& sourcePortal, const Transform& destinationPortal, Camera* outCamera) {
-	if (!outCamera) {
-		return;
-	}
-	const Matrix4x4 mainCameraWorld = camera_->GetWorldMatrix();
-	const Matrix4x4 sourcePortalWorld = Function::MakeAffineMatrix(sourcePortal.scale, sourcePortal.rotate, sourcePortal.translate);
-	const Matrix4x4 destinationPortalWorld = Function::MakeAffineMatrix(destinationPortal.scale, destinationPortal.rotate, destinationPortal.translate);
-	const Matrix4x4 portalViewWorld = Function::Multiply(Function::Multiply(mainCameraWorld, Function::Inverse(sourcePortalWorld)), destinationPortalWorld);
-	const Matrix4x4 portalViewMatrix = Function::Inverse(portalViewWorld);
-	outCamera->SetViewProjectionMatrix(portalViewMatrix, camera_->GetProjectionMatrix());
+
+void SampleScene::ApplySceneCamera(Camera* camera) {
+	uvBallObj_->SetCamera(camera);
+	fieldObj_->SetCamera(camera);
+	planeGltf_->SetCamera(camera);
+	animatedCubeObj_->SetCamera(camera);
+	humanObj_->SetCamera(camera);
+	portalA_->SetCamera(camera);
+	portalB_->SetCamera(camera);
+	portalRingA_->SetCamera(camera);
+	portalRingB_->SetCamera(camera);
+	spherePrimitive_->SetCamera(camera);
 }
 
 void SampleScene::DrawSceneGeometry(bool includePortalA, bool includePortalB) {
@@ -495,19 +501,22 @@ void SampleScene::Draw() {
 	auto* commandList = dxCommon->GetCommandList();
 	if (portalRenderTextureA_ && portalRenderTextureA_->IsReady()) {
 		portalRenderTextureA_->BeginRender(commandList);
-		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromA_.get());
+		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromB_.get());
+		ApplySceneCamera(portalCameraFromB_.get());
 		DrawSceneGeometry(false, true);
 		portalRenderTextureA_->TransitionToShaderResource(commandList);
 	}
 	if (portalRenderTextureB_ && portalRenderTextureB_->IsReady()) {
 		portalRenderTextureB_->BeginRender(commandList);
-		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromB_.get());
+		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromA_.get());
+		ApplySceneCamera(portalCameraFromA_.get());
 		DrawSceneGeometry(true, false);
 		portalRenderTextureB_->TransitionToShaderResource(commandList);
 	}
 
 	dxCommon->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
+	ApplySceneCamera(camera_.get());
 	DrawSceneGeometry(true, true);
 	SpriteCommon::GetInstance()->DrawCommon();
 	uvSprite->Draw();

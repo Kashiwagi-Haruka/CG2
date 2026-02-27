@@ -81,7 +81,7 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<RenderTexture2D> portalRenderTextureA_ = nullptr;
 	std::unique_ptr<RenderTexture2D> portalRenderTextureB_ = nullptr;
 
-	void UpdatePortalCamera(const Transform& sourcePortal, const Transform& destinationPortal, Camera* outCamera);
+	void ApplySceneCamera(Camera* camera);
 	void DrawSceneGeometry(bool includePortalA, bool includePortalB);
 
 public:
