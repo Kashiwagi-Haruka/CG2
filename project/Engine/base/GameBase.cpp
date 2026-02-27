@@ -30,7 +30,10 @@ GameBase* GameBase::GetInstance() {
 }
 void GameBase::Finalize() {
 
-	imguiM_->Finalize();
+	if (imguiM_) {
+		imguiM_->Finalize();
+		imguiM_.reset();
+	}
 	Audio::GetInstance()->Finalize();
 
 	TextureManager::GetInstance()->Finalize();
@@ -41,8 +44,18 @@ void GameBase::Finalize() {
 	SpriteCommon::GetInstance()->Finalize();
 	Object3dCommon::GetInstance()->Finalize();
 
-	dxCommon_->Finalize();
-	winApp_->Finalize();
+	// SRVディスクリプタヒープが Device を参照するため、
+	// DirectXCommon を解放する前に破棄して live object を残さない。
+	srvManager_.reset();
+
+	if (dxCommon_) {
+		dxCommon_->Finalize();
+		dxCommon_.reset();
+	}
+	if (winApp_) {
+		winApp_->Finalize();
+		winApp_.reset();
+	}
 	instance.reset();
 }
 
