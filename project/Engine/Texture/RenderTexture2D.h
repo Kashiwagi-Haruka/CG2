@@ -4,13 +4,10 @@
 #include <d3d12.h>
 #include <wrl.h>
 
-class DirectXCommon;
-class SrvManager;
-
 class RenderTexture2D {
 
 public:
-	void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, uint32_t width, uint32_t height, DXGI_FORMAT format, const std::array<float, 4>& clearColor);
+	void Initialize(uint32_t width, uint32_t height, DXGI_FORMAT format, const std::array<float, 4>& clearColor);
 	bool IsReady() const { return initialized_; }
 	uint32_t GetSrvIndex() const { return srvIndex_; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle() const { return rtvHandle_; }

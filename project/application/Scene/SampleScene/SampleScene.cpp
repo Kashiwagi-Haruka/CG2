@@ -137,7 +137,7 @@ void SampleScene::Initialize() {
 
 	portalRenderTexture_ = std::make_unique<RenderTexture2D>();
 	portalRenderTexture_->Initialize(
-	    Object3dCommon::GetInstance()->GetDxCommon(), TextureManager::GetInstance()->GetSrvManager(), WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM,
+		WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
 	    {0.05f, 0.05f, 0.1f, 1.0f});
 	if (portalRenderTexture_->IsReady()) {
 		portalB_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());

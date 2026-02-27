@@ -1,14 +1,16 @@
 #include "RenderTexture2D.h"
 #include "DirectXCommon.h"
 #include "SrvManager/SrvManager.h"
+#include "TextureManager.h"
+#include "Object3d/Object3dCommon.h"
 #include <cassert>
 
-void RenderTexture2D::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager, uint32_t width, uint32_t height, DXGI_FORMAT format, const std::array<float, 4>& clearColor) {
-	dxCommon_ = dxCommon;
+void RenderTexture2D::Initialize(uint32_t width, uint32_t height, DXGI_FORMAT format, const std::array<float, 4>& clearColor) {
+	dxCommon_ = Object3dCommon::GetInstance()->GetDxCommon();
 	format_ = format;
 	clearColor_ = clearColor;
 
-	if (!dxCommon_ || !srvManager) {
+	if (!dxCommon_ || !TextureManager::GetInstance()) {
 		initialized_ = false;
 		return;
 	}
@@ -52,8 +54,8 @@ void RenderTexture2D::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
 	rtvHandle_ = rtvHeap_->GetCPUDescriptorHandleForHeapStart();
 	dxCommon_->GetDevice()->CreateRenderTargetView(resource_.Get(), nullptr, rtvHandle_);
 
-	srvIndex_ = srvManager->Allocate();
-	srvManager->CreateSRVforTexture2D(srvIndex_, resource_.Get(), format_, 1);
+	srvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
+	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforTexture2D(srvIndex_, resource_.Get(), format_, 1);
 
 	currentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	initialized_ = true;
