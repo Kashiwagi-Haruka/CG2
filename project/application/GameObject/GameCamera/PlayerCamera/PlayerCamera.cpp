@@ -4,6 +4,7 @@
 #include"GameObject/KeyBindConfig.h"
 #include<algorithm>
 #include"GameObject/YoshidaMath/YoshidaMath.h"
+#include"WinApp.h"
 
 
 PlayerCamera::PlayerCamera()
@@ -42,7 +43,7 @@ void PlayerCamera::Rotate()
 
         ImGui::DragFloat3("origin", &ray_.origin.x, 0.3f);
         ImGui::DragFloat3("diff", &ray_.diff.x, 0.3f);
-        ImGui::End();
+
 
         ImGui::TreePop();
     }
@@ -51,9 +52,31 @@ void PlayerCamera::Rotate()
 
 void PlayerCamera::SetRay()
 {
+  
+
     ray_.origin = cameraTransform_.translate;
     ray_.diff = GetForward();
+
+    //// 左下が０、右上が１とした時のマウスポジション
+    //float ndcX = (cameraTransform_.translate.x / WinApp::kClientWidth) * 2.0f - 1.0f;
+    //float ndcY = 1.0f - (cameraTransform_.translate.y / WinApp::kClientHeight) * 2.0f; // Yは上下反転
+
+    //// クリップ空間でZ=0(near)とZ=1(far)の2点を作る
+    //Vector3 nearPoint = { ndcX, ndcY, 0.0f };
+    //Vector3 farPoint = { ndcX, ndcY, 1.0f };
+
+    //// 逆射影行列
+    //Matrix4x4 inverseViewProj = Function::Inverse(camera_->GetViewProjectionMatrix());
+
+    //// ワールド空間に変換
+    //Vector3 nearWorld = Function::TransformVM(nearPoint, inverseViewProj);
+    //Vector3 farWorld = Function::TransformVM(farPoint, inverseViewProj);
+
+    //// マウスレイの始点・方向
+    //ray_.origin = nearWorld;
+    //ray_.diff = Function::Normalize(farWorld- ray_.origin);
 }
+
 
 void PlayerCamera::SetTransform()
 {
@@ -76,6 +99,7 @@ void PlayerCamera::SetTransform()
 
     cameraTransform_.translate = playerTransform_->translate;
     cameraTransform_.translate.y += 1.5f;
+    cameraTransform_.translate += ray_.diff*1.25f;
     camera_->SetTransform(cameraTransform_);
 
 }
