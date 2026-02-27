@@ -201,9 +201,9 @@ void ShadowGameScene::UpdateCamera()
             }
             ImGui::TreePop();
         }
-
+        ImGui::End();
     }
-    ImGui::End();
+  
 #endif
 }
 
