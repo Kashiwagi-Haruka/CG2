@@ -93,6 +93,7 @@ void Object3d::UpdateCameraMatrices() {
 	} else {
 		worldViewProjectionMatrix = worldMatrix;
 	}
+	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
