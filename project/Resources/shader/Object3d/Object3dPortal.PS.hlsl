@@ -22,6 +22,10 @@ struct Camera
     int fullscreenGrayscaleEnabled;
     int fullscreenSepiaEnabled;
     float2 padding2;
+    float4x4 textureViewProjection0;
+    float4x4 textureViewProjection1;
+    int usePortalProjection;
+    float3 padding3;
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
@@ -63,9 +67,26 @@ PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
 
-    float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-    float4 cameraTexture0Color = gCameraTexture0.Sample(gSampler, transformedUV.xy);
-    float4 cameraTexture1Color = gCameraTexture1.Sample(gSampler, transformedUV.xy);
+    float2 uv0;
+    float2 uv1;
+    if (gCamera.usePortalProjection != 0)
+    {
+        float4 clip0 = mul(float4(input.worldPosition, 1.0f), gCamera.textureViewProjection0);
+        float4 clip1 = mul(float4(input.worldPosition, 1.0f), gCamera.textureViewProjection1);
+        float2 ndc0 = clip0.xy / max(clip0.w, 0.0001f);
+        float2 ndc1 = clip1.xy / max(clip1.w, 0.0001f);
+        uv0 = float2(ndc0.x * 0.5f + 0.5f, -ndc0.y * 0.5f + 0.5f);
+        uv1 = float2(ndc1.x * 0.5f + 0.5f, -ndc1.y * 0.5f + 0.5f);
+    }
+    else
+    {
+        float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
+        uv0 = transformedUV.xy;
+        uv1 = transformedUV.xy;
+    }
+
+    float4 cameraTexture0Color = gCameraTexture0.Sample(gSampler, saturate(uv0));
+    float4 cameraTexture1Color = gCameraTexture1.Sample(gSampler, saturate(uv1));
     float cameraBlend = saturate(gMaterial.environmentCoefficient);
     float4 textureColor = lerp(cameraTexture0Color, cameraTexture1Color, cameraBlend);
 

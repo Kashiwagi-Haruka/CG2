@@ -10,7 +10,8 @@ SampleScenePortalSystem::SampleScenePortalSystem() {
 	portalB_ = std::make_unique<Primitive>();
 	portalRingA_ = std::make_unique<Primitive>();
 	portalRingB_ = std::make_unique<Primitive>();
-	portalTextureCamera_ = std::make_unique<Camera>();
+	portalTextureCameraA_ = std::make_unique<Camera>();
+	portalTextureCameraB_ = std::make_unique<Camera>();
 }
 
 void SampleScenePortalSystem::Initialize(Camera* mainCamera, const Transform& portalATransform, const Transform& portalBTransform) {
@@ -40,12 +41,16 @@ void SampleScenePortalSystem::Initialize(Camera* mainCamera, const Transform& po
 	portalRenderTextureA_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.05f, 0.05f, 0.1f, 1.0f});
 	if (portalRenderTextureA_->IsReady()) {
 		portalB_->SetTextureIndex(portalRenderTextureA_->GetSrvIndex());
+		portalB_->SetSecondaryTextureIndex(portalRenderTextureA_->GetSrvIndex());
 	}
 	portalRenderTextureB_ = std::make_unique<RenderTexture2D>();
 	portalRenderTextureB_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.05f, 0.05f, 0.1f, 1.0f});
 	if (portalRenderTextureB_->IsReady()) {
 		portalA_->SetTextureIndex(portalRenderTextureB_->GetSrvIndex());
+		portalA_->SetSecondaryTextureIndex(portalRenderTextureB_->GetSrvIndex());
 	}
+	portalA_->SetPortalProjectionEnabled(true);
+	portalB_->SetPortalProjectionEnabled(true);
 }
 
 void SampleScenePortalSystem::Update(Camera* mainCamera, float ringUvRotation) {
@@ -63,7 +68,7 @@ void SampleScenePortalSystem::Update(Camera* mainCamera, float ringUvRotation) {
 }
 
 void SampleScenePortalSystem::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals) {
-	if (!sceneCamera_ || !portalTextureCamera_) {
+	if (!sceneCamera_ || !portalTextureCameraA_ || !portalTextureCameraB_) {
 		return;
 	}
 
@@ -71,17 +76,20 @@ void SampleScenePortalSystem::RenderPortalTextures(const std::function<void(Came
 	const Transform portalBTransform = portalB_->GetTransform();
 
 	if (portalRenderTextureA_ && portalRenderTextureA_->IsReady()) {
-		UpdatePortalCamera(sceneCamera_, portalATransform, portalBTransform, portalTextureCamera_.get());
+		UpdatePortalCamera(sceneCamera_, portalATransform, portalBTransform, portalTextureCameraA_.get());
 		portalRenderTextureA_->BeginRender();
-		drawSceneWithoutPortals(portalTextureCamera_.get());
+		drawSceneWithoutPortals(portalTextureCameraA_.get());
 		portalRenderTextureA_->TransitionToShaderResource();
 	}
 	if (portalRenderTextureB_ && portalRenderTextureB_->IsReady()) {
-		UpdatePortalCamera(sceneCamera_, portalBTransform, portalATransform, portalTextureCamera_.get());
+		UpdatePortalCamera(sceneCamera_, portalBTransform, portalATransform, portalTextureCameraB_.get());
 		portalRenderTextureB_->BeginRender();
-		drawSceneWithoutPortals(portalTextureCamera_.get());
+		drawSceneWithoutPortals(portalTextureCameraB_.get());
 		portalRenderTextureB_->TransitionToShaderResource();
 	}
+
+	portalA_->SetPortalProjectionMatrices(portalTextureCameraB_->GetViewProjectionMatrix(), portalTextureCameraB_->GetViewProjectionMatrix());
+	portalB_->SetPortalProjectionMatrices(portalTextureCameraA_->GetViewProjectionMatrix(), portalTextureCameraA_->GetViewProjectionMatrix());
 }
 
 void SampleScenePortalSystem::SetCamera(Camera* camera) {
@@ -100,7 +108,7 @@ void SampleScenePortalSystem::UpdateCameraMatrices() {
 }
 
 void SampleScenePortalSystem::DrawPortals() {
-	Object3dCommon::GetInstance()->DrawCommonNoCull();
+	Object3dCommon::GetInstance()->DrawCommonPortal();
 	portalA_->Draw();
 	portalB_->Draw();
 }

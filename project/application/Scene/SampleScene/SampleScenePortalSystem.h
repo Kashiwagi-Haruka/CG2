@@ -29,7 +29,8 @@ private:
 	std::unique_ptr<Primitive> portalB_ = nullptr;
 	std::unique_ptr<Primitive> portalRingA_ = nullptr;
 	std::unique_ptr<Primitive> portalRingB_ = nullptr;
-	std::unique_ptr<Camera> portalTextureCamera_ = nullptr;
+	std::unique_ptr<Camera> portalTextureCameraA_ = nullptr;
+	std::unique_ptr<Camera> portalTextureCameraB_ = nullptr;
 	std::unique_ptr<RenderTexture2D> portalRenderTextureA_ = nullptr;
 	std::unique_ptr<RenderTexture2D> portalRenderTextureB_ = nullptr;
 	Camera* sceneCamera_ = nullptr;

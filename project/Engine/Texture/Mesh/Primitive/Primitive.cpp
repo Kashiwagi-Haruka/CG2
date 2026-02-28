@@ -512,7 +512,9 @@ void Primitive::Initialize(PrimitiveName name, uint32_t slices) {
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
-
+	textureViewProjection0_ = Function::MakeIdentity4x4();
+	textureViewProjection1_ = Function::MakeIdentity4x4();
+	usePortalProjection_ = false;
 	MeshData mesh = BuildMeshByPrimitiveName(primitiveName_, slices_, stacks_);
 	vertices_ = std::move(mesh.vertices);
 	indices_ = std::move(mesh.indices);
@@ -569,7 +571,9 @@ void Primitive::Initialize(PrimitiveName name, const std::string& texturePath, u
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
-
+	textureViewProjection0_ = Function::MakeIdentity4x4();
+	textureViewProjection1_ = Function::MakeIdentity4x4();
+	usePortalProjection_ = false;
 	MeshData mesh = BuildMeshByPrimitiveName(primitiveName_, slices_, stacks_);
 	vertices_ = std::move(mesh.vertices);
 	indices_ = std::move(mesh.indices);
@@ -667,6 +671,9 @@ void Primitive::UpdateCameraMatrices() {
 	cameraData_->screenSize = {static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)};
 	cameraData_->fullscreenGrayscaleEnabled = Object3dCommon::GetInstance()->IsFullScreenGrayscaleEnabled() ? 1 : 0;
 	cameraData_->fullscreenSepiaEnabled = Object3dCommon::GetInstance()->IsFullScreenSepiaEnabled() ? 1 : 0;
+	cameraData_->textureViewProjection0 = textureViewProjection0_;
+	cameraData_->textureViewProjection1 = textureViewProjection1_;
+	cameraData_->usePortalProjection = usePortalProjection_ ? 1 : 0;
 	cameraResource_->Unmap(0, nullptr);
 }
 // 設定済みのメッシュを描画
@@ -830,6 +837,11 @@ void Primitive::SetTextureIndex(uint32_t textureIndex) { textureIndex_ = texture
 void Primitive::SetSecondaryTextureIndex(uint32_t textureIndex) { secondaryTextureIndex_ = textureIndex; }
 
 void Primitive::ClearSecondaryTextureIndex() { secondaryTextureIndex_ = UINT32_MAX; }
+void Primitive::SetPortalProjectionMatrices(const Matrix4x4& textureViewProjection0, const Matrix4x4& textureViewProjection1) {
+	textureViewProjection0_ = textureViewProjection0;
+	textureViewProjection1_ = textureViewProjection1;
+}
+void Primitive::SetPortalProjectionEnabled(bool enabled) { usePortalProjection_ = enabled; }
 Vector4 Primitive::GetColor() const {
 	if (materialData_) {
 		return materialData_->color;

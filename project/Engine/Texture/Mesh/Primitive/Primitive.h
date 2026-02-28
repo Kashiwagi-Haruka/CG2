@@ -69,6 +69,9 @@ private:
 	Vector3 uvRotate_ = {0.0f, 0.0f, 0.0f};
 	Vector3 uvTranslate_ = {0.0f, 0.0f, 0.0f};
 	Vector2 uvAnchor_ = {0.0f, 0.0f};
+	Matrix4x4 textureViewProjection0_{};
+	Matrix4x4 textureViewProjection1_{};
+	bool usePortalProjection_ = false;
 
 public:
 	~Primitive();
@@ -131,6 +134,9 @@ public:
 	void SetSecondaryTextureIndex(uint32_t textureIndex);
 	void ClearSecondaryTextureIndex();
 	void SetEditorRegistrationEnabled(bool enable) { editorRegistrationEnabled_ = enable; }
+	// ポータル投影 UV 用の 2 つのカメラ ViewProjection を設定
+	void SetPortalProjectionMatrices(const Matrix4x4& textureViewProjection0, const Matrix4x4& textureViewProjection1);
+	void SetPortalProjectionEnabled(bool enabled);
 	// 現在の Transform を取得
 	Transform GetTransform() const { return transform_; }
 	// 現在のマテリアル値を取得
