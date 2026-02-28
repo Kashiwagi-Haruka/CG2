@@ -1,6 +1,6 @@
 #include "SampleScenePortalSystem.h"
-#include "Object3d/Object3dCommon.h"
 #include "Function.h"
+#include "Object3d/Object3dCommon.h"
 #include "WinApp.h"
 #include <cmath>
 #include <numbers>
@@ -10,8 +10,7 @@ SampleScenePortalSystem::SampleScenePortalSystem() {
 	portalB_ = std::make_unique<Primitive>();
 	portalRingA_ = std::make_unique<Primitive>();
 	portalRingB_ = std::make_unique<Primitive>();
-	portalCameraFromA_ = std::make_unique<Camera>();
-	portalCameraFromB_ = std::make_unique<Camera>();
+	portalTextureCamera_ = std::make_unique<Camera>();
 }
 
 void SampleScenePortalSystem::Initialize(Camera* mainCamera, const Transform& portalATransform, const Transform& portalBTransform) {
@@ -36,10 +35,6 @@ void SampleScenePortalSystem::Initialize(Camera* mainCamera, const Transform& po
 	portalB_->SetTransform(portalBTransform);
 	portalRingA_->SetTransform(portalATransform);
 	portalRingB_->SetTransform(portalBTransform);
-	if (mainCamera) {
-		portalCameraFromA_->SetViewProjectionMatrix(mainCamera->GetViewMatrix(), mainCamera->GetProjectionMatrix());
-		portalCameraFromB_->SetViewProjectionMatrix(mainCamera->GetViewMatrix(), mainCamera->GetProjectionMatrix());
-	}
 
 	portalRenderTextureA_ = std::make_unique<RenderTexture2D>();
 	portalRenderTextureA_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.05f, 0.05f, 0.1f, 1.0f});
@@ -54,12 +49,11 @@ void SampleScenePortalSystem::Initialize(Camera* mainCamera, const Transform& po
 }
 
 void SampleScenePortalSystem::Update(Camera* mainCamera, float ringUvRotation) {
+	sceneCamera_ = mainCamera;
 	portalA_->Update();
 	portalB_->Update();
 	const Transform portalATransform = portalA_->GetTransform();
 	const Transform portalBTransform = portalB_->GetTransform();
-	UpdatePortalCamera(mainCamera, portalATransform, portalBTransform, portalCameraFromA_.get());
-	UpdatePortalCamera(mainCamera, portalBTransform, portalATransform, portalCameraFromB_.get());
 	portalRingA_->SetTransform(portalATransform);
 	portalRingB_->SetTransform(portalBTransform);
 	portalRingA_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, ringUvRotation), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
@@ -69,19 +63,29 @@ void SampleScenePortalSystem::Update(Camera* mainCamera, float ringUvRotation) {
 }
 
 void SampleScenePortalSystem::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals) {
+	if (!sceneCamera_ || !portalTextureCamera_) {
+		return;
+	}
+
+	const Transform portalATransform = portalA_->GetTransform();
+	const Transform portalBTransform = portalB_->GetTransform();
+
 	if (portalRenderTextureA_ && portalRenderTextureA_->IsReady()) {
+		UpdatePortalCamera(sceneCamera_, portalATransform, portalBTransform, portalTextureCamera_.get());
 		portalRenderTextureA_->BeginRender();
-		drawSceneWithoutPortals(portalCameraFromA_.get());
+		drawSceneWithoutPortals(portalTextureCamera_.get());
 		portalRenderTextureA_->TransitionToShaderResource();
 	}
 	if (portalRenderTextureB_ && portalRenderTextureB_->IsReady()) {
+		UpdatePortalCamera(sceneCamera_, portalBTransform, portalATransform, portalTextureCamera_.get());
 		portalRenderTextureB_->BeginRender();
-		drawSceneWithoutPortals(portalCameraFromB_.get());
+		drawSceneWithoutPortals(portalTextureCamera_.get());
 		portalRenderTextureB_->TransitionToShaderResource();
 	}
 }
 
 void SampleScenePortalSystem::SetCamera(Camera* camera) {
+	sceneCamera_ = camera;
 	portalA_->SetCamera(camera);
 	portalB_->SetCamera(camera);
 	portalRingA_->SetCamera(camera);
@@ -106,6 +110,7 @@ void SampleScenePortalSystem::DrawRings() {
 	portalRingA_->Draw();
 	portalRingB_->Draw();
 }
+
 
 void SampleScenePortalSystem::UpdatePortalCamera(Camera* mainCamera, const Transform& sourcePortal, const Transform& destinationPortal, Camera* outCamera) {
 	if (!mainCamera || !outCamera) {

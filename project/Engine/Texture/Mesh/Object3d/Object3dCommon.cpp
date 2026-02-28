@@ -56,6 +56,8 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	SetEnvironmentMapTexture("Resources/3d/skydome.png");
 	psoMirror_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoMirror_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dMirror.PS.hlsl");
+	psoPortal_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoPortal_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dPortal.PS.hlsl");
 	psoShadow_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoShadow_->CreateShadow();
 	// Directional Light の共通バッファ作成
@@ -243,6 +245,13 @@ void Object3dCommon::DrawCommonMirror() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoMirror_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoMirror_->GetGraphicsPipelineState(blendMode_).Get());
+	DrawSet();
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::DrawCommonPortal() {
+
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoPortal_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoPortal_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

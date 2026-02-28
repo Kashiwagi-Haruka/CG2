@@ -686,7 +686,11 @@ void Primitive::Draw() {
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(9, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(11, Object3dCommon::GetInstance()->GetEnvironmentMapSrvIndex());
+	uint32_t secondaryTexture = secondaryTextureIndex_;
+	if (secondaryTexture == UINT32_MAX) {
+		secondaryTexture = Object3dCommon::GetInstance()->GetEnvironmentMapSrvIndex();
+	}
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(11, secondaryTexture);
 	if (!Object3dCommon::GetInstance()->IsShadowMapPassActive()) {
 		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetShadowMapSrvIndex());
 	}
@@ -823,6 +827,9 @@ void Primitive::SetDistortionFalloff(float falloff) {
 	materialResource_->Unmap(0, nullptr);
 }
 void Primitive::SetTextureIndex(uint32_t textureIndex) { textureIndex_ = textureIndex; }
+void Primitive::SetSecondaryTextureIndex(uint32_t textureIndex) { secondaryTextureIndex_ = textureIndex; }
+
+void Primitive::ClearSecondaryTextureIndex() { secondaryTextureIndex_ = UINT32_MAX; }
 Vector4 Primitive::GetColor() const {
 	if (materialData_) {
 		return materialData_->color;

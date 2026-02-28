@@ -61,6 +61,7 @@ private:
 	std::vector<VertexData> vertices_;
 	std::vector<uint32_t> indices_;
 	uint32_t textureIndex_ = 0;
+	uint32_t secondaryTextureIndex_ = UINT32_MAX;
 	Matrix4x4 worldMatrix;
 	Matrix4x4 worldViewProjectionMatrix;
 	bool isUseSetWorld;
@@ -126,6 +127,9 @@ public:
 	void SetDistortionFalloff(float falloff);
 	// 使用テクスチャの SRV インデックスを直接設定
 	void SetTextureIndex(uint32_t textureIndex);
+	// サブテクスチャの SRV インデックスを設定 (portal shader の t4)
+	void SetSecondaryTextureIndex(uint32_t textureIndex);
+	void ClearSecondaryTextureIndex();
 	void SetEditorRegistrationEnabled(bool enable) { editorRegistrationEnabled_ = enable; }
 	// 現在の Transform を取得
 	Transform GetTransform() const { return transform_; }

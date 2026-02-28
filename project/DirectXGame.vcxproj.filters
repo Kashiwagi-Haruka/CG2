@@ -764,4 +764,7 @@
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\shader\Object3d\Object3dPortal.PS.hlsl" />
+  </ItemGroup>
 </Project>
