@@ -42,10 +42,12 @@ void PlayerCamera::Rotate()
 
         ImGui::DragFloat3("origin", &ray_.origin.x, 0.3f);
         ImGui::DragFloat3("diff", &ray_.diff.x, 0.3f);
+		ImGui::TreePop();
         ImGui::End();
+	}
 #endif
-        ImGui::TreePop();
-    }
+        
+    
 }
 
 void PlayerCamera::SetRay()

@@ -452,20 +452,38 @@ void SampleScene::UpdatePortalCamera(const Transform& sourcePortal, const Transf
 	if (!outCamera) {
 		return;
 	}
-	const Matrix4x4 mainCameraWorld = camera_->GetWorldMatrix();
-	const Matrix4x4 sourcePortalWorld = Function::MakeAffineMatrix(sourcePortal.scale, sourcePortal.rotate, sourcePortal.translate);
-	const Matrix4x4 destinationPortalWorld = Function::MakeAffineMatrix(destinationPortal.scale, destinationPortal.rotate, destinationPortal.translate);
+
+	const Matrix4x4 mainCameraView = camera_->GetViewMatrix();
+	const Matrix4x4 sourcePortalWorld = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, sourcePortal.rotate, sourcePortal.translate);
+	const Matrix4x4 destinationPortalWorld = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, destinationPortal.rotate, destinationPortal.translate);
+	const Matrix4x4 destinationPortalInverse = Function::Inverse(destinationPortalWorld);
 	const Matrix4x4 halfTurn = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
-	const Matrix4x4 portalViewWorld = Function::Multiply(Function::Multiply(Function::Multiply(mainCameraWorld, Function::Inverse(sourcePortalWorld)), halfTurn), destinationPortalWorld);
 
-	Matrix4x4 portalViewWorldAdjusted = portalViewWorld;
-	const Matrix4x4 destinationWorldNoScale = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, destinationPortal.rotate, destinationPortal.translate);
-	Vector3 destinationForward = {destinationWorldNoScale.m[2][0], destinationWorldNoScale.m[2][1], destinationWorldNoScale.m[2][2]};
-	portalViewWorldAdjusted.m[3][0] += destinationForward.x * 0.05f;
-	portalViewWorldAdjusted.m[3][1] += destinationForward.y * 0.05f;
-	portalViewWorldAdjusted.m[3][2] += destinationForward.z * 0.05f;
+	// 行列規約に合わせ、View行列側でポータル変換を適用する。
+	Matrix4x4 portalViewMatrix = Function::Multiply(Function::Multiply(Function::Multiply(mainCameraView, sourcePortalWorld), halfTurn), destinationPortalInverse);
 
-	const Matrix4x4 portalViewMatrix = Function::Inverse(portalViewWorldAdjusted);
+	// ビューがメインカメラとほぼ一致した場合は、ワールド側組み立てへフォールバックする。
+	float diffSum = 0.0f;
+	for (int row = 0; row < 4; ++row) {
+		for (int column = 0; column < 4; ++column) {
+			diffSum += std::abs(portalViewMatrix.m[row][column] - mainCameraView.m[row][column]);
+		}
+	}
+	if (diffSum < 0.001f) {
+		const Matrix4x4 sourcePortalInverse = Function::Inverse(sourcePortalWorld);
+		const Matrix4x4 mainCameraWorld = camera_->GetWorldMatrix();
+		Matrix4x4 fallbackWorld = Function::Multiply(Function::Multiply(Function::Multiply(mainCameraWorld, sourcePortalInverse), halfTurn), destinationPortalWorld);
+		portalViewMatrix = Function::Inverse(fallbackWorld);
+	}
+
+	// 出口面との自己交差を避けるため、対応するWorld側へオフセットして再度Viewへ反映する。
+	Matrix4x4 portalCameraWorld = Function::Inverse(portalViewMatrix);
+	const Vector3 destinationForward = Function::Normalize({destinationPortalWorld.m[2][0], destinationPortalWorld.m[2][1], destinationPortalWorld.m[2][2]});
+	portalCameraWorld.m[3][0] += destinationForward.x * 0.05f;
+	portalCameraWorld.m[3][1] += destinationForward.y * 0.05f;
+	portalCameraWorld.m[3][2] += destinationForward.z * 0.05f;
+	portalViewMatrix = Function::Inverse(portalCameraWorld);
+
 	outCamera->SetViewProjectionMatrix(portalViewMatrix, camera_->GetProjectionMatrix());
 }
 
@@ -532,16 +550,18 @@ void SampleScene::Draw() {
 
 	if (portalRenderTextureA_ && portalRenderTextureA_->IsReady()) {
 		portalRenderTextureA_->BeginRender();
-		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromB_.get());
-		SetSceneCameraForDraw(portalCameraFromB_.get());
+		// portalRenderTextureA は portalB に貼るので、A→B 変換で得たカメラを使う
+		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromA_.get());
+		SetSceneCameraForDraw(portalCameraFromA_.get());
 		UpdateSceneCameraMatricesForDraw();
 		DrawSceneGeometry(false, false);
 		portalRenderTextureA_->TransitionToShaderResource();
 	}
 	if (portalRenderTextureB_ && portalRenderTextureB_->IsReady()) {
 		portalRenderTextureB_->BeginRender();
-		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromA_.get());
-		SetSceneCameraForDraw(portalCameraFromA_.get());
+		// portalRenderTextureB は portalA に貼るので、B→A 変換で得たカメラを使う
+		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromB_.get());
+		SetSceneCameraForDraw(portalCameraFromB_.get());
 		UpdateSceneCameraMatricesForDraw();
 		DrawSceneGeometry(false, false);
 		portalRenderTextureB_->TransitionToShaderResource();
