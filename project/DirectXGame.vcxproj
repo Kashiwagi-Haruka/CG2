@@ -243,6 +243,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Editor\Inspector.cpp" />
     <ClCompile Include="Engine\Editor\ToolBar.cpp" />
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
+    <ClCompile Include="application\Scene\SampleScene\SampleScenePortalSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -350,6 +351,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Editor\Inspector.h" />
     <ClInclude Include="Engine\Editor\ToolBar.h" />
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
+    <ClInclude Include="application\Scene\SampleScene\SampleScenePortalSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

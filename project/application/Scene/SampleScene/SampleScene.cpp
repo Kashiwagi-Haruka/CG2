@@ -20,10 +20,7 @@ SampleScene::SampleScene() {
 	planeGltf_ = std::make_unique<Object3d>();
 	animatedCubeObj_ = std::make_unique<Object3d>();
 	humanObj_ = std::make_unique<Object3d>();
-	portalA_ = std::make_unique<Primitive>();
-	portalB_ = std::make_unique<Primitive>();
-	portalRingA_ = std::make_unique<Primitive>();
-	portalRingB_ = std::make_unique<Primitive>();
+	portalSystem_ = std::make_unique<SampleScenePortalSystem>();
 	spherePrimitive_ = std::make_unique<Primitive>();
 	cameraTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f  },
@@ -32,8 +29,6 @@ SampleScene::SampleScene() {
     };
 
 	camera_ = std::make_unique<Camera>();
-	portalCameraFromA_ = std::make_unique<Camera>();
-	portalCameraFromB_ = std::make_unique<Camera>();
 	debugCamera_ = std::make_unique<DebugCamera>();
 	camera_->SetTransform(cameraTransform_);
 
@@ -64,21 +59,7 @@ void SampleScene::Initialize() {
 	humanObj_->Initialize();
 	humanObj_->SetCamera(camera_.get());
 	humanObj_->SetModel("walk");
-	portalA_->Initialize(Primitive::Circle, 48);
-	portalA_->SetCamera(camera_.get());
-	portalA_->SetColor({0.3f, 0.7f, 1.0f, 1.0f});
-	portalA_->SetEnableLighting(false);
-	portalB_->Initialize(Primitive::Circle, 48);
-	portalB_->SetCamera(camera_.get());
-	portalB_->SetEnableLighting(false);
-	portalRingA_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 48);
-	portalRingA_->SetCamera(camera_.get());
-	portalRingA_->SetEnableLighting(false);
-	portalRingA_->SetColor({0.3f, 0.7f, 1.0f, 1.0f});
-	portalRingB_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 48);
-	portalRingB_->SetCamera(camera_.get());
-	portalRingB_->SetEnableLighting(false);
-	portalRingB_->SetColor({1.0f, 0.55f, 0.1f, 1.0f});
+
 	spherePrimitive_->Initialize(Primitive::Sphere, 32);
 	spherePrimitive_->SetCamera(camera_.get());
 	spherePrimitive_->SetEnableLighting(true);
@@ -144,22 +125,7 @@ void SampleScene::Initialize() {
 	uvSprite->SetRotation(0);
 	uvSprite->SetPosition(Vector2(0, 0));
 
-	portalA_->SetTransform(portalATransform_);
-	portalB_->SetTransform(portalBTransform_);
-
-	portalRingA_->SetTransform(portalATransform_);
-	portalRingB_->SetTransform(portalBTransform_);
-
-	portalRenderTextureA_ = std::make_unique<RenderTexture2D>();
-	portalRenderTextureA_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.05f, 0.05f, 0.1f, 1.0f});
-	if (portalRenderTextureA_->IsReady()) {
-		portalB_->SetTextureIndex(portalRenderTextureA_->GetSrvIndex());
-	}
-	portalRenderTextureB_ = std::make_unique<RenderTexture2D>();
-	portalRenderTextureB_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.05f, 0.05f, 0.1f, 1.0f});
-	if (portalRenderTextureB_->IsReady()) {
-		portalA_->SetTextureIndex(portalRenderTextureB_->GetSrvIndex());
-	}
+	portalSystem_->Initialize(camera_.get(), portalATransform_, portalBTransform_);
 
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -410,18 +376,7 @@ void SampleScene::Update() {
 	/*humanObj_->SetTransform(humanTransform_);*/
 	/*ringPrimitive_->SetTransform(ringTransform_);*/
 	/*ringPrimitive_->SetColor({1.0f, 0.85f, 0.2f, 1.0f});*/
-	portalA_->Update();
-	portalB_->Update();
-	const Transform portalATransform = portalA_->GetTransform();
-	const Transform portalBTransform = portalB_->GetTransform();
-	UpdatePortalCamera(portalATransform, portalBTransform, portalCameraFromA_.get());
-	UpdatePortalCamera(portalBTransform, portalATransform, portalCameraFromB_.get());
-	portalRingA_->SetTransform(portalATransform);
-	portalRingB_->SetTransform(portalBTransform);
-	portalRingA_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, ringUvRotation_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
-	portalRingB_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, -ringUvRotation_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
-	portalRingA_->Update();
-	portalRingB_->Update();
+	portalSystem_->Update(camera_.get(), ringUvRotation_);
 	spherePrimitive_->Update();
 	uvBallObj_->Update();
 	fieldObj_->Update();
@@ -447,44 +402,36 @@ void SampleScene::Update() {
 		humanSkeleton_->SetObjectMatrix(humanWorld);
 	}
 }
+void SampleScene::Draw() {
+	Object3dCommon::GetInstance()->BeginShadowMapPass();
+	Object3dCommon::GetInstance()->DrawCommonShadow();
+	uvBallObj_->Draw();
+	planeGltf_->Draw();
+	fieldObj_->Draw();
+	animatedCubeObj_->Draw();
+	portalSystem_->SetCamera(camera_.get());
+	portalSystem_->UpdateCameraMatrices();
+	portalSystem_->DrawRings();
+	Object3dCommon::GetInstance()->EndShadowMapPass();
 
-void SampleScene::UpdatePortalCamera(const Transform& sourcePortal, const Transform& destinationPortal, Camera* outCamera) {
-	if (!outCamera) {
-		return;
-	}
+	portalSystem_->RenderPortalTextures([this](Camera* camera) {
+		Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+		SetSceneCameraForDraw(camera);
+		UpdateSceneCameraMatricesForDraw();
+		DrawSceneGeometry();
+	});
 
-	const Matrix4x4 mainCameraView = camera_->GetViewMatrix();
-	const Matrix4x4 sourcePortalWorld = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, sourcePortal.rotate, sourcePortal.translate);
-	const Matrix4x4 destinationPortalWorld = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, destinationPortal.rotate, destinationPortal.translate);
-	const Matrix4x4 destinationPortalInverse = Function::Inverse(destinationPortalWorld);
-	const Matrix4x4 halfTurn = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
-
-	// 行列規約に合わせ、View行列側でポータル変換を適用する。
-	Matrix4x4 portalViewMatrix = Function::Multiply(Function::Multiply(Function::Multiply(mainCameraView, sourcePortalWorld), halfTurn), destinationPortalInverse);
-
-	// ビューがメインカメラとほぼ一致した場合は、ワールド側組み立てへフォールバックする。
-	float diffSum = 0.0f;
-	for (int row = 0; row < 4; ++row) {
-		for (int column = 0; column < 4; ++column) {
-			diffSum += std::abs(portalViewMatrix.m[row][column] - mainCameraView.m[row][column]);
-		}
-	}
-	if (diffSum < 0.001f) {
-		const Matrix4x4 sourcePortalInverse = Function::Inverse(sourcePortalWorld);
-		const Matrix4x4 mainCameraWorld = camera_->GetWorldMatrix();
-		Matrix4x4 fallbackWorld = Function::Multiply(Function::Multiply(Function::Multiply(mainCameraWorld, sourcePortalInverse), halfTurn), destinationPortalWorld);
-		portalViewMatrix = Function::Inverse(fallbackWorld);
-	}
-
-	// 出口面との自己交差を避けるため、対応するWorld側へオフセットして再度Viewへ反映する。
-	Matrix4x4 portalCameraWorld = Function::Inverse(portalViewMatrix);
-	const Vector3 destinationForward = Function::Normalize({destinationPortalWorld.m[2][0], destinationPortalWorld.m[2][1], destinationPortalWorld.m[2][2]});
-	portalCameraWorld.m[3][0] += destinationForward.x * 0.05f;
-	portalCameraWorld.m[3][1] += destinationForward.y * 0.05f;
-	portalCameraWorld.m[3][2] += destinationForward.z * 0.05f;
-	portalViewMatrix = Function::Inverse(portalCameraWorld);
-
-	outCamera->SetViewProjectionMatrix(portalViewMatrix, camera_->GetProjectionMatrix());
+	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
+	SetSceneCameraForDraw(camera_.get());
+	UpdateSceneCameraMatricesForDraw();
+	DrawSceneGeometry();
+	portalSystem_->SetCamera(camera_.get());
+	portalSystem_->UpdateCameraMatrices();
+	portalSystem_->DrawPortals();
+	portalSystem_->DrawRings();
+	SpriteCommon::GetInstance()->DrawCommon();
+	uvSprite->Draw();
 }
 
 void SampleScene::SetSceneCameraForDraw(Camera* camera) {
@@ -494,11 +441,8 @@ void SampleScene::SetSceneCameraForDraw(Camera* camera) {
 	animatedCubeObj_->SetCamera(camera);
 	humanObj_->SetCamera(camera);
 	spherePrimitive_->SetCamera(camera);
-	portalA_->SetCamera(camera);
-	portalB_->SetCamera(camera);
-	portalRingA_->SetCamera(camera);
-	portalRingB_->SetCamera(camera);
 }
+
 void SampleScene::UpdateSceneCameraMatricesForDraw() {
 	uvBallObj_->UpdateCameraMatrices();
 	fieldObj_->UpdateCameraMatrices();
@@ -506,74 +450,18 @@ void SampleScene::UpdateSceneCameraMatricesForDraw() {
 	animatedCubeObj_->UpdateCameraMatrices();
 	humanObj_->UpdateCameraMatrices();
 	spherePrimitive_->UpdateCameraMatrices();
-	portalA_->UpdateCameraMatrices();
-	portalB_->UpdateCameraMatrices();
-	portalRingA_->UpdateCameraMatrices();
-	portalRingB_->UpdateCameraMatrices();
 }
 
-void SampleScene::DrawSceneGeometry(bool includePortalA, bool includePortalB) {
+void SampleScene::DrawSceneGeometry() {
 	Object3dCommon::GetInstance()->DrawCommon();
 	uvBallObj_->Draw();
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
-	if (includePortalA) {
-		portalA_->Draw();
-	}
-	if (includePortalB) {
-		portalB_->Draw();
-	}
 	spherePrimitive_->Draw();
-	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
-	portalRingA_->Draw();
-	portalRingB_->Draw();
-	// if (sampleParticleEmitter_) {
-	//	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
-	//	sampleParticleEmitter_->Draw();
-	// }
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
-}
-
-void SampleScene::Draw() {
-	Object3dCommon::GetInstance()->BeginShadowMapPass();
-	Object3dCommon::GetInstance()->DrawCommonShadow();
-	uvBallObj_->Draw();
-	planeGltf_->Draw();
-	fieldObj_->Draw();
-	animatedCubeObj_->Draw();
-	portalRingA_->Draw();
-	portalRingB_->Draw();
-	Object3dCommon::GetInstance()->EndShadowMapPass();
-
-	if (portalRenderTextureA_ && portalRenderTextureA_->IsReady()) {
-		portalRenderTextureA_->BeginRender();
-		// portalRenderTextureA は portalB に貼るので、A→B 変換で得たカメラを使う
-		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromA_.get());
-		SetSceneCameraForDraw(portalCameraFromA_.get());
-		UpdateSceneCameraMatricesForDraw();
-		DrawSceneGeometry(false, false);
-		portalRenderTextureA_->TransitionToShaderResource();
-	}
-	if (portalRenderTextureB_ && portalRenderTextureB_->IsReady()) {
-		portalRenderTextureB_->BeginRender();
-		// portalRenderTextureB は portalA に貼るので、B→A 変換で得たカメラを使う
-		Object3dCommon::GetInstance()->SetDefaultCamera(portalCameraFromB_.get());
-		SetSceneCameraForDraw(portalCameraFromB_.get());
-		UpdateSceneCameraMatricesForDraw();
-		DrawSceneGeometry(false, false);
-		portalRenderTextureB_->TransitionToShaderResource();
-	}
-
-	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
-	SetSceneCameraForDraw(camera_.get());
-	UpdateSceneCameraMatricesForDraw();
-	DrawSceneGeometry(true, true);
-	SpriteCommon::GetInstance()->DrawCommon();
-	uvSprite->Draw();
 }
 
 void SampleScene::Finalize() {}
