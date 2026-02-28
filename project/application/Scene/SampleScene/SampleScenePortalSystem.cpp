@@ -36,6 +36,10 @@ void SampleScenePortalSystem::Initialize(Camera* mainCamera, const Transform& po
 	portalB_->SetTransform(portalBTransform);
 	portalRingA_->SetTransform(portalATransform);
 	portalRingB_->SetTransform(portalBTransform);
+	if (mainCamera) {
+		portalCameraFromA_->SetViewProjectionMatrix(mainCamera->GetViewMatrix(), mainCamera->GetProjectionMatrix());
+		portalCameraFromB_->SetViewProjectionMatrix(mainCamera->GetViewMatrix(), mainCamera->GetProjectionMatrix());
+	}
 
 	portalRenderTextureA_ = std::make_unique<RenderTexture2D>();
 	portalRenderTextureA_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.05f, 0.05f, 0.1f, 1.0f});
@@ -146,5 +150,6 @@ void SampleScenePortalSystem::UpdatePortalCamera(Camera* mainCamera, const Trans
 		portalViewMatrix = Function::Inverse(portalCameraWorld);
 	}
 
-	outCamera->SetViewProjectionMatrix(portalViewMatrix, mainCamera->GetProjectionMatrix());
+	// ポータルの描画にはメインカメラ由来ではなく、各ポータルカメラが保持している投影行列を使う。
+	outCamera->SetViewProjectionMatrix(portalViewMatrix, outCamera->GetProjectionMatrix());
 }
