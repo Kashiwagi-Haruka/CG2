@@ -76,13 +76,13 @@ void SampleScenePortalSystem::RenderPortalTextures(const std::function<void(Came
 	const Transform portalBTransform = portalB_->GetTransform();
 
 	if (portalRenderTextureA_ && portalRenderTextureA_->IsReady()) {
-		UpdatePortalCamera(sceneCamera_, portalATransform, portalBTransform, portalTextureCameraA_.get());
+		UpdatePortalCamera(portalBTransform, portalTextureCameraA_.get());
 		portalRenderTextureA_->BeginRender();
 		drawSceneWithoutPortals(portalTextureCameraA_.get());
 		portalRenderTextureA_->TransitionToShaderResource();
 	}
 	if (portalRenderTextureB_ && portalRenderTextureB_->IsReady()) {
-		UpdatePortalCamera(sceneCamera_, portalBTransform, portalATransform, portalTextureCameraB_.get());
+		UpdatePortalCamera(portalATransform, portalTextureCameraB_.get());
 		portalRenderTextureB_->BeginRender();
 		drawSceneWithoutPortals(portalTextureCameraB_.get());
 		portalRenderTextureB_->TransitionToShaderResource();
@@ -119,20 +119,14 @@ void SampleScenePortalSystem::DrawRings() {
 	portalRingB_->Draw();
 }
 
-
-void SampleScenePortalSystem::UpdatePortalCamera(Camera* mainCamera, const Transform& sourcePortal, const Transform& destinationPortal, Camera* outCamera) {
-	if (!mainCamera || !outCamera) {
+void SampleScenePortalSystem::UpdatePortalCamera(const Transform& destinationPortal, Camera* outCamera) {
+	if (!outCamera) {
 		return;
 	}
 
-	const Matrix4x4 mainCameraWorld = mainCamera->GetWorldMatrix();
-	const Matrix4x4 mainCameraView = mainCamera->GetViewMatrix();
-	const Matrix4x4 sourcePortalWorld = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, sourcePortal.rotate, sourcePortal.translate);
 	const Matrix4x4 destinationPortalWorld = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, destinationPortal.rotate, destinationPortal.translate);
-	const Matrix4x4 sourcePortalInverse = Function::Inverse(sourcePortalWorld);
 	const Matrix4x4 halfTurn = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
-
-	Matrix4x4 portalCameraWorld = Function::Multiply(Function::Multiply(Function::Multiply(mainCameraWorld, sourcePortalInverse), halfTurn), destinationPortalWorld);
+	Matrix4x4 portalCameraWorld = Function::Multiply(halfTurn, destinationPortalWorld);
 
 	Vector3 destinationForward = {destinationPortalWorld.m[2][0], destinationPortalWorld.m[2][1], destinationPortalWorld.m[2][2]};
 	if (Function::LengthSquared(destinationForward) < 0.0001f) {
@@ -143,26 +137,8 @@ void SampleScenePortalSystem::UpdatePortalCamera(Camera* mainCamera, const Trans
 	portalCameraWorld.m[3][1] += destinationForward.y * 0.05f;
 	portalCameraWorld.m[3][2] += destinationForward.z * 0.05f;
 
-	Matrix4x4 portalViewMatrix = Function::Inverse(portalCameraWorld);
+	const Matrix4x4 portalViewMatrix = Function::Inverse(portalCameraWorld);
 
-	float diffSum = 0.0f;
-	for (int row = 0; row < 4; ++row) {
-		for (int column = 0; column < 4; ++column) {
-			diffSum += std::abs(portalViewMatrix.m[row][column] - mainCameraView.m[row][column]);
-		}
-	}
-	if (diffSum < 0.001f) {
-		Vector3 destinationRight = {destinationPortalWorld.m[0][0], destinationPortalWorld.m[0][1], destinationPortalWorld.m[0][2]};
-		if (Function::LengthSquared(destinationRight) < 0.0001f) {
-			destinationRight = {1.0f, 0.0f, 0.0f};
-		}
-		destinationRight = Function::Normalize(destinationRight);
-		portalCameraWorld.m[3][0] += destinationRight.x * 0.1f;
-		portalCameraWorld.m[3][1] += destinationRight.y * 0.1f;
-		portalCameraWorld.m[3][2] += destinationRight.z * 0.1f;
-		portalViewMatrix = Function::Inverse(portalCameraWorld);
-	}
-
-	// ポータルの描画にはメインカメラ由来ではなく、各ポータルカメラが保持している投影行列を使う。
+	// ポータルテクスチャ専用カメラはメインカメラに追従させず、ポータルの位置・角度だけで固定する。
 	outCamera->SetViewProjectionMatrix(portalViewMatrix, outCamera->GetProjectionMatrix());
 }

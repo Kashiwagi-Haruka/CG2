@@ -23,7 +23,7 @@ public:
 	void DrawRings();
 
 private:
-	void UpdatePortalCamera(Camera* mainCamera, const Transform& sourcePortal, const Transform& destinationPortal, Camera* outCamera);
+	void UpdatePortalCamera(const Transform& destinationPortal, Camera* outCamera);
 
 	std::unique_ptr<Primitive> portalA_ = nullptr;
 	std::unique_ptr<Primitive> portalB_ = nullptr;
