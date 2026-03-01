@@ -79,3 +79,17 @@ Vector3 YoshidaMath::GetAABBScale(const AABB& aabb)
     };
 }
 
+void YoshidaMath::LookTarget(const Vector3& target, Transform& transform)
+{
+    Vector3 direction = target - transform.translate;
+    if (Function::Length(direction) > 0.0f) {
+        transform.rotate.y = std::atan2(direction.x, direction.z); // Y軸回転（ラジアン）
+    }
+}
+
+Vector3 YoshidaMath::GetToTargetVec(const Vector3& target,const  Vector3& pos)
+{
+    Vector3 velocity = target - pos;
+    velocity = Function::Normalize(velocity);
+    return velocity;
+}

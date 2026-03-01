@@ -2,13 +2,14 @@
 #include"GameObject/WhiteBoard/WhiteBoard.h"
 #include"GameObject/Portal/Portal.h"
 #include<array>
+#include"Vector3.h"
 
 class TimeCardWatch;
 class PlayerCamera;
 class PortalManager
 {
 public:
-    PortalManager();
+    PortalManager(Vector3* pos);
     void Initialize();
     void UpdateWhiteBoard();
     void UpdatePortal();

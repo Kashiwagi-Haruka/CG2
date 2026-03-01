@@ -10,12 +10,13 @@ namespace {
     const constexpr uint32_t kMaxWhiteBoards = 6;
 }
 
-PortalManager::PortalManager()
+PortalManager::PortalManager(Vector3* pos)
 {
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
     std::unique_ptr<WalkWhiteBoard>  walkWhite = std::make_unique<WalkWhiteBoard>();
     WalkWhiteBoard::LoadAnimation("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
     walkWhite->SetModel("whiteBoard");
+    walkWhite->SetTargetPosPtr(pos);
     whiteBoards_.push_back(std::move(walkWhite));
 
     for (int i = 0; i < kMaxWhiteBoards; ++i) {
