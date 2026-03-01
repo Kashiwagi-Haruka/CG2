@@ -235,15 +235,17 @@ void ShadowGameScene::UpdateGameObject()
     Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
 #pragma endregion
 
-    //bool vignetteStrength = true;
-    //bool randomNoiseEnabled = true;
-    //float randomNoiseScale = 0.01f;
-    //BlendMode randomNoiseBlendMode = kBlendModeMultipy;
-    //Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength);
-    //Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength);
-    //Object3dCommon::GetInstance()->SetRandomNoiseEnabled(randomNoiseEnabled);
-    //Object3dCommon::GetInstance()->SetRandomNoiseScale(randomNoiseScale);
-    //Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode);
+    bool vignetteStrength = true;
+    bool randomNoiseEnabled = true;
+    float randomNoiseScale = 1.0f;
+    BlendMode randomNoiseBlendMode = kBlendModeSub;
+    Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(false);
+    Object3dCommon::GetInstance()->SetFullScreenSepiaEnabled(false);
+    Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength);
+    Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength);
+    Object3dCommon::GetInstance()->SetRandomNoiseEnabled(randomNoiseEnabled);
+    Object3dCommon::GetInstance()->SetRandomNoiseScale(randomNoiseScale);
+    Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode);
 
 #pragma region//ゲームオブジェクト
 
@@ -342,7 +344,7 @@ void ShadowGameScene::DrawSceneGeometry()
     //プレイヤーの描画処理
     Object3dCommon::GetInstance()->DrawCommonSkinning();
     player_->Draw();
-   /* collisionManager_->DrawColliders();*/
+    /* collisionManager_->DrawColliders();*/
 }
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
 {
