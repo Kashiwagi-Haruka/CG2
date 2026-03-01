@@ -121,9 +121,7 @@ void Camera::SaveEditorData() {
 
 void Camera::DrawEditorInHierarchy() {
 #ifdef USE_IMGUI
-	if (editorId_ != 0) {
-		return;
-	}
+
 
 	if (ImGui::TreeNode("Camera Transform")) {
 		ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);

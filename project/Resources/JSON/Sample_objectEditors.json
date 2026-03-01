@@ -336,7 +336,7 @@
           0.0
         ]
       },
-      "name": "portal1",
+      "name": "sphere",
       "transform": {
         "rotate": [
           0.0,
@@ -446,7 +446,7 @@
           0.0
         ]
       },
-      "name": "ring1",
+      "name": "portal1",
       "transform": {
         "rotate": [
           0.0,
