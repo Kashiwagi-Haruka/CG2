@@ -61,6 +61,7 @@ private:
 	std::vector<VertexData> vertices_;
 	std::vector<uint32_t> indices_;
 	uint32_t textureIndex_ = 0;
+	uint32_t secondaryTextureIndex_ = UINT32_MAX;
 	Matrix4x4 worldMatrix;
 	Matrix4x4 worldViewProjectionMatrix;
 	bool isUseSetWorld;
@@ -68,6 +69,9 @@ private:
 	Vector3 uvRotate_ = {0.0f, 0.0f, 0.0f};
 	Vector3 uvTranslate_ = {0.0f, 0.0f, 0.0f};
 	Vector2 uvAnchor_ = {0.0f, 0.0f};
+	Matrix4x4 textureViewProjection0_{};
+	Matrix4x4 textureViewProjection1_{};
+	bool usePortalProjection_ = false;
 
 public:
 	~Primitive();
@@ -81,6 +85,8 @@ public:
 	void Initialize(PrimitiveName name, const std::string& texturePath, uint32_t slices);
 	// 行列・マテリアルなど GPU に渡す定数を更新
 	void Update();
+	// 現在のワールド行列を使ってカメラ依存の定数だけ更新
+	void UpdateCameraMatrices();
 	// 現在の設定で描画
 	void Draw();
 
@@ -124,7 +130,13 @@ public:
 	void SetDistortionFalloff(float falloff);
 	// 使用テクスチャの SRV インデックスを直接設定
 	void SetTextureIndex(uint32_t textureIndex);
+	// サブテクスチャの SRV インデックスを設定 (portal shader の t4)
+	void SetSecondaryTextureIndex(uint32_t textureIndex);
+	void ClearSecondaryTextureIndex();
 	void SetEditorRegistrationEnabled(bool enable) { editorRegistrationEnabled_ = enable; }
+	// ポータル投影 UV 用の 2 つのカメラ ViewProjection を設定
+	void SetPortalProjectionMatrices(const Matrix4x4& textureViewProjection0, const Matrix4x4& textureViewProjection1);
+	void SetPortalProjectionEnabled(bool enabled);
 	// 現在の Transform を取得
 	Transform GetTransform() const { return transform_; }
 	// 現在のマテリアル値を取得

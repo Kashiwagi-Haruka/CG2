@@ -512,7 +512,9 @@ void Primitive::Initialize(PrimitiveName name, uint32_t slices) {
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
-
+	textureViewProjection0_ = Function::MakeIdentity4x4();
+	textureViewProjection1_ = Function::MakeIdentity4x4();
+	usePortalProjection_ = false;
 	MeshData mesh = BuildMeshByPrimitiveName(primitiveName_, slices_, stacks_);
 	vertices_ = std::move(mesh.vertices);
 	indices_ = std::move(mesh.indices);
@@ -569,7 +571,9 @@ void Primitive::Initialize(PrimitiveName name, const std::string& texturePath, u
 	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
-
+	textureViewProjection0_ = Function::MakeIdentity4x4();
+	textureViewProjection1_ = Function::MakeIdentity4x4();
+	usePortalProjection_ = false;
 	MeshData mesh = BuildMeshByPrimitiveName(primitiveName_, slices_, stacks_);
 	vertices_ = std::move(mesh.vertices);
 	indices_ = std::move(mesh.indices);
@@ -635,6 +639,15 @@ void Primitive::Update() {
 		activeCamera = Object3dCommon::GetInstance()->GetDefaultCamera();
 	}
 
+	UpdateCameraMatrices();
+}
+
+void Primitive::UpdateCameraMatrices() {
+	Camera* activeCamera = camera_;
+	if (!activeCamera) {
+		activeCamera = Object3dCommon::GetInstance()->GetDefaultCamera();
+	}
+
 	if (activeCamera) {
 		worldViewProjectionMatrix = Function::Multiply(Function::Multiply(worldMatrix, activeCamera->GetViewMatrix()), activeCamera->GetProjectionMatrix());
 	} else {
@@ -658,6 +671,9 @@ void Primitive::Update() {
 	cameraData_->screenSize = {static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)};
 	cameraData_->fullscreenGrayscaleEnabled = Object3dCommon::GetInstance()->IsFullScreenGrayscaleEnabled() ? 1 : 0;
 	cameraData_->fullscreenSepiaEnabled = Object3dCommon::GetInstance()->IsFullScreenSepiaEnabled() ? 1 : 0;
+	cameraData_->textureViewProjection0 = textureViewProjection0_;
+	cameraData_->textureViewProjection1 = textureViewProjection1_;
+	cameraData_->usePortalProjection = usePortalProjection_ ? 1 : 0;
 	cameraResource_->Unmap(0, nullptr);
 }
 // 設定済みのメッシュを描画
@@ -677,7 +693,11 @@ void Primitive::Draw() {
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(9, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(11, Object3dCommon::GetInstance()->GetEnvironmentMapSrvIndex());
+	uint32_t secondaryTexture = secondaryTextureIndex_;
+	if (secondaryTexture == UINT32_MAX) {
+		secondaryTexture = Object3dCommon::GetInstance()->GetEnvironmentMapSrvIndex();
+	}
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(11, secondaryTexture);
 	if (!Object3dCommon::GetInstance()->IsShadowMapPassActive()) {
 		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetShadowMapSrvIndex());
 	}
@@ -814,6 +834,14 @@ void Primitive::SetDistortionFalloff(float falloff) {
 	materialResource_->Unmap(0, nullptr);
 }
 void Primitive::SetTextureIndex(uint32_t textureIndex) { textureIndex_ = textureIndex; }
+void Primitive::SetSecondaryTextureIndex(uint32_t textureIndex) { secondaryTextureIndex_ = textureIndex; }
+
+void Primitive::ClearSecondaryTextureIndex() { secondaryTextureIndex_ = UINT32_MAX; }
+void Primitive::SetPortalProjectionMatrices(const Matrix4x4& textureViewProjection0, const Matrix4x4& textureViewProjection1) {
+	textureViewProjection0_ = textureViewProjection0;
+	textureViewProjection1_ = textureViewProjection1;
+}
+void Primitive::SetPortalProjectionEnabled(bool enabled) { usePortalProjection_ = enabled; }
 Vector4 Primitive::GetColor() const {
 	if (materialData_) {
 		return materialData_->color;
