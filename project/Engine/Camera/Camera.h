@@ -3,6 +3,7 @@
 #include "Transform.h"
 #include "WinApp.h"
 #include <numbers>
+#include <string>
 class Camera {
 
 	// カメラのローカル状態（回転・位置）
@@ -18,6 +19,13 @@ class Camera {
 	float nearZ = 0.1f;                   // ニアクリップ距離
 	float farZ = 10000.0f;                // ファークリップ距離
 
+	void LoadEditorData();
+	void SaveEditorData();
+
+	int editorId_ = -1;
+	std::string editorStatusMessage_;
+	static int nextEditorId_;
+
 public:
 	// デフォルト設定でカメラを初期化
 	Camera();
@@ -25,6 +33,7 @@ public:
 	void Update();
 	// 外部で計算済みのビュー・プロジェクション行列を反映
 	void SetViewProjectionMatrix(const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix);
+	void DrawEditorInHierarchy();
 
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
