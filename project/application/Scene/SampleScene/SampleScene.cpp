@@ -376,6 +376,7 @@ void SampleScene::Update() {
 	/*humanObj_->SetTransform(humanTransform_);*/
 	/*ringPrimitive_->SetTransform(ringTransform_);*/
 	/*ringPrimitive_->SetColor({1.0f, 0.85f, 0.2f, 1.0f});*/
+	portalSystem_->SetPortalTransforms(portalATransform_, portalBTransform_);
 	portalSystem_->Update(camera_.get(), ringUvRotation_);
 	spherePrimitive_->Update();
 	uvBallObj_->Update();

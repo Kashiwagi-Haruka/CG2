@@ -30,6 +30,7 @@ public:
 	void RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals);
 
 	void SetCamera(Camera* camera);
+	void SetPortalTransforms(const Transform& portalATransform, const Transform& portalBTransform);
 	void UpdateCameraMatrices();
 	void DrawPortals();
 	void DrawRings();

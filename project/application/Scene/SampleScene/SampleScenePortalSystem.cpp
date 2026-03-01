@@ -66,7 +66,12 @@ void SampleScenePortalSystem::Update(Camera* mainCamera, float ringUvRotation) {
 	portalRingA_->Update();
 	portalRingB_->Update();
 }
-
+void SampleScenePortalSystem::SetPortalTransforms(const Transform& portalATransform, const Transform& portalBTransform) {
+	portalA_->SetTransform(portalATransform);
+	portalB_->SetTransform(portalBTransform);
+	portalRingA_->SetTransform(portalATransform);
+	portalRingB_->SetTransform(portalBTransform);
+}
 void SampleScenePortalSystem::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals) {
 	if (!sceneCamera_ || !portalTextureCameraA_ || !portalTextureCameraB_) {
 		return;
