@@ -8,14 +8,14 @@ class WhiteBoard
 {
 public:
     WhiteBoard();
-    void Initialize();
-    void Update();
-    void Draw();
+    virtual void Initialize();
+    virtual void Update();
+    virtual void Draw();
     void SetCamera(Camera* camera);
     void SetModel(const std::string& filePath);
     AABB GetAABB();
     Transform& GetTransform() { return collisionTransform_; }
-private:
+protected:
     std::unique_ptr<Object3d>obj_ = nullptr;
 #ifdef _DEBUG
     std::unique_ptr<Primitive>primitive_ = nullptr;
