@@ -42,6 +42,7 @@ private:
 	std::unique_ptr<CreatePSO> psoSkinning_;
 	std::unique_ptr<CreatePSO> psoSkinningToon_;
 	std::unique_ptr<CreatePSO> psoMirror_;
+	std::unique_ptr<CreatePSO> psoPortal_;
 	std::unique_ptr<CreatePSO> psoShadow_;
 
 	// Directional Light（共通）
@@ -112,6 +113,7 @@ public:
 	void DrawCommonSkinning();
 	void DrawCommonSkinningToon();
 	void DrawCommonMirror();
+	void DrawCommonPortal();
 	void DrawCommonShadow();
 	void BeginShadowMapPass();
 	void EndShadowMapPass();
