@@ -26,7 +26,7 @@ ShadowGameScene::ShadowGameScene()
     //SEを読み込む
     Portal::LoadSE();
     //ホワイトボード管理
-    portalManager_ = std::make_unique<PortalManager>();
+    portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate);
     portalManager_->SetPlayerCamera(playerCamera_.get());
 
     //携帯打刻機
