@@ -10,6 +10,18 @@
 #include <functional>
 #include <memory>
 
+#pragma once
+
+#include "Camera.h"
+#include "Object3d/Object3d.h"
+#include "Primitive/Primitive.h"
+#include "RenderTexture2D.h"
+#include "Transform.h"
+#include "Vector2.h"
+#include "Vector3.h"
+#include <functional>
+#include <memory>
+
 class SampleScenePortalSystem {
 public:
 	SampleScenePortalSystem();
@@ -23,7 +35,7 @@ public:
 	void DrawRings();
 
 private:
-	void UpdatePortalCamera(const Transform& destinationPortal, Camera* outCamera);
+	void UpdatePortalCamera(const Transform& sourcePortal, const Transform& destinationPortal, Camera* outCamera);
 
 	std::unique_ptr<Primitive> portalA_ = nullptr;
 	std::unique_ptr<Primitive> portalB_ = nullptr;
