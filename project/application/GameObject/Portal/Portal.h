@@ -34,6 +34,8 @@ public:
     void SetPortalWorldMatrix();
     //ワープ先の座標を取得する
     Vector3& GetWarpTranslate() { return warpPos_->GetTranslate(); };
+    Vector3& GetWarpRotate() { return warpPos_->GetRotate(); };
+
     //ワープ先の座標をセットする
     void SetWarpTransform(const Vector3& pos) { warpPos_->SetTransform(pos); };
     const Sphere& GetSphere();

@@ -32,7 +32,7 @@
       "index": 0,
       "material": {
         "color": [
-          1.0,
+          0.9098039269447327,
           1.0,
           1.0,
           1.0
@@ -64,15 +64,15 @@
           0.0
         ]
       },
-      "name": "Object 0",
+      "name": "Human",
       "transform": {
         "rotate": [
-          -0.05999999865889549,
+          0.0,
           0.0,
           0.0
         ],
         "scale": [
-          1.2200000286102295,
+          1.0,
           1.0,
           1.0
         ],
@@ -147,8 +147,8 @@
           1.0,
           1.0
         ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
+        "distortionFalloff": 1.2000000476837158,
+        "distortionStrength": 2.4200000762939453,
         "enableLighting": true,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
@@ -584,7 +584,7 @@
       "index": 0,
       "material": {
         "color": [
-          1.0,
+          0.9098039269447327,
           1.0,
           1.0,
           1.0
@@ -699,8 +699,8 @@
           1.0,
           1.0
         ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
+        "distortionFalloff": 1.2000000476837158,
+        "distortionStrength": 2.4200000762939453,
         "enableLighting": true,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
