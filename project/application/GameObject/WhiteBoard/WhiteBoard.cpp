@@ -9,6 +9,16 @@ WhiteBoard::WhiteBoard()
 #endif
 }
 
+void WhiteBoard::OnCollision(Collider* collider)
+{
+
+}
+
+Vector3 WhiteBoard::GetWorldPosition() const
+{
+    return obj_->GetTransform().translate;
+}
+
 void WhiteBoard::Initialize()
 {
     obj_->Initialize();
@@ -17,6 +27,11 @@ void WhiteBoard::Initialize()
     primitive_->SetColor({ 1.0f,1.0f,1.0f,0.1f });
 #endif
     localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
+
+   /* SetRadius(1.0f);*/
+    SetAABB(AABB{ .min = {-1.0f,0.0f,-1.0f}, .max = {1.0f,1.5f,1.0f} });
+    SetCollisionAttribute(kCollisionFloor);
+    SetCollisionMask(kCollisionPlayer);
 }
 
 void WhiteBoard::Update()

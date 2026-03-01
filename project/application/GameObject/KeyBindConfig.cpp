@@ -12,6 +12,7 @@ PlayerCommand* PlayerCommand::GetInstance()
     return instance_.get();
 }
 
+
 bool PlayerCommand::MoveLeft()
 {
     return Move(K_MoveLeft, C_MoveLeft);

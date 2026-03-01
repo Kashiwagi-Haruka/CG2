@@ -10,6 +10,9 @@ namespace {
     constexpr uint64_t kCollisionItem = 0b1 << 2;
     // ポータル
     constexpr uint32_t kCollisionPortal = 0b1 << 3;
+    //敵陣営
+    constexpr uint32_t kCollisionEnemy = 0b1 << 4;
+    
     // 何の陣営にも属さない
     constexpr uint32_t kCollisionNone = 0b0;
 }

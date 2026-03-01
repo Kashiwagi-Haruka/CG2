@@ -3,11 +3,17 @@
 #include<memory>
 #include"RigidBody.h"
 #include"Primitive/Primitive.h"
+#include"GameObject/YoshidaMath/CollisionManager/Collider.h"
 
-class WhiteBoard
+class WhiteBoard  : public YoshidaMath::Collider
 {
 public:
     WhiteBoard();
+    void OnCollision(Collider* collider)override;
+    /// @brief ワールド座標を取得する
+    /// @return ワールド座標
+    Vector3 GetWorldPosition() const  override;
+
     virtual void Initialize();
     virtual void Update();
     virtual void Draw();

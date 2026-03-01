@@ -26,7 +26,7 @@ class ShadowGameScene : public BaseScene
 {
 private:
 
-
+    bool isPause_ = false;
 #pragma region//カメラの設定
 
     std::unique_ptr<PlayerCamera> playerCamera_ = nullptr;

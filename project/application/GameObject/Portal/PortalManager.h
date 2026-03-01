@@ -22,6 +22,7 @@ public:
     /// @param warpPos ワープ地点の設定をする
     void CheckCollision(TimeCardWatch* timeCardWatch,const Vector3& warpPos);
     std::vector<std::unique_ptr<Portal>>& GetPortals() { return portals_; };
+    std::vector<std::unique_ptr<WhiteBoard>>& GetWhiteBoards() { return whiteBoards_; }
 private:
     void DrawWhiteBoard();
     std::vector<std::unique_ptr<WhiteBoard>> whiteBoards_;
