@@ -6,6 +6,9 @@
 #include"Audio.h"
 #include"GameObject/YoshidaMath/CollisionManager/Collider.h"
 #include"GameObject/WarpPos/WarpPos1.h"
+#include "RenderTexture2D.h"
+#include "Object3d/Object3dCommon.h"
+#include <functional>
 
 class Camera;
 class Portal : public YoshidaMath::Collider
@@ -23,28 +26,39 @@ public:
     ~Portal();
     void Initialize();
     void Update();
-    void Draw();
     void SetCamera(Camera* camera);
     //Portal自身の座標を取得する
     Vector3& GetTranslate() { return transform_.translate; };
     //PortalのSRTをセットする
-    void SetTransform(const Transform& transform) { transform_ = transform; };
-    void SetRingWorldMatrix(Camera* camera);
+    void SetParentTransform(Transform* transform) { parentTransform = transform; };
+    void SetPortalWorldMatrix();
     //ワープ先の座標を取得する
-    Vector3& GetWarpPos() { return warpPos_->GetTranslate(); };
+    Vector3& GetWarpTranslate() { return warpPos_->GetTranslate(); };
     //ワープ先の座標をセットする
-    void SetWarpPos(const Vector3& pos) { warpPos_->SetTransform(pos); };
+    void SetWarpTransform(const Vector3& pos) { warpPos_->SetTransform(pos); };
     const Sphere& GetSphere();
-private:
+    //ワープ先を取得する
+    WarpPos1* GetWarpPos() { return warpPos_.get(); }
 
+    void RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals);
+    void UpdateCameraMatrices();
+    void DrawPortals();
+    void DrawRings();
+    void DrawWarpPos();
+private:
+    float scaleTimer_ = 0.0f;
+    void UpdatePortalCamera(const Transform& destinationPortal, Camera* outCamera);
+    Camera* sceneCamera_ = nullptr;
     //音楽
     static SoundData warpSE_;
     std::unique_ptr<Primitive>ring_ = nullptr;
+    std::unique_ptr<Primitive>portalCircle_ = nullptr;
     Transform transform_ = {};
-    Matrix4x4 uvMat_ = { 0.0f };
-    float uvTranslateY_ = 0.0f;
+    float uvRotateZ_ = 0.0f;
     Sphere sphere_ = { 0.0f };
     //ワープ座標
     std::unique_ptr<WarpPos1> warpPos_ = nullptr;
+    std::unique_ptr<RenderTexture2D> portalRenderTexture_ = nullptr;
+    Transform* parentTransform = nullptr;
 };
 

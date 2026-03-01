@@ -26,6 +26,7 @@ void TestField::Update()
 
 void TestField::Draw()
 {
+    plane_->UpdateCameraMatrices();
     plane_->Draw();
 }
 

@@ -13,6 +13,7 @@ public:
     void Initialize();
     void Update();
     void Draw();
+    Camera* GetWarpPosCamera() { return camera_.get(); };
 private:
     std::unique_ptr<Camera> camera_ = nullptr;
     std::unique_ptr<Object3d>object3d_ = nullptr;

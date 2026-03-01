@@ -88,6 +88,7 @@ void Player::Update()
 
 void Player::Draw()
 {
+    bodyObj_->UpdateCameraMatrices();
     bodyObj_->Draw();
 
 }

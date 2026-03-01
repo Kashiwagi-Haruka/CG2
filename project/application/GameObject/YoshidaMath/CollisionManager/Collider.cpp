@@ -73,7 +73,7 @@ void YoshidaMath::Collider::ColliderUpdate()
 void YoshidaMath::Collider::ColliderDraw()
 {
 #ifdef _DEBUG
-
+    primitive_->UpdateCameraMatrices();
     primitive_->Draw();
 #endif // _DEBUG
 }

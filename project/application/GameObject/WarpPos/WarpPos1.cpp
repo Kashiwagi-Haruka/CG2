@@ -16,6 +16,7 @@ WarpPos1::WarpPos1()
 
 void WarpPos1::Initialize()
 {
+   
     object3d_->Initialize();
     sinTheta_ = 0.0f;
 }
@@ -32,6 +33,9 @@ void WarpPos1::Update()
         sinTheta_ = 0.0f;
     }
     transform_.translate.y += std::sinf(sinTheta_)*0.0625f;
+
+    camera_->SetTransform(transform_);
+    camera_->Update();
     object3d_->SetTransform(transform_);
     object3d_->Update();
  
@@ -39,5 +43,6 @@ void WarpPos1::Update()
 
 void WarpPos1::Draw()
 {
+    object3d_->UpdateCameraMatrices();
     object3d_->Draw();
 }
