@@ -120,6 +120,10 @@ void ShadowGameScene::CheckCollision()
         collisionManager_->AddCollider(portal.get(), playerCamera_->GetCamera());
     }
 
+    for (auto& whiteBoard : portalManager_->GetWhiteBoards()) {
+        collisionManager_->AddCollider(whiteBoard.get(), playerCamera_->GetCamera());
+    }
+
     collisionManager_->AddCollider(testField_.get(), playerCamera_->GetCamera());
     collisionManager_->CheckAllCollisions();
 }
