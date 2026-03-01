@@ -21,5 +21,6 @@ namespace YoshidaMath {
     //オイラー角から回転行列を取得する
     Matrix4x4 MakeRotateMatrix(const Vector3& rotate);
     Matrix4x4 GetBillBordMatrix(Camera* camera);
+    Matrix4x4 GetBillBordMatrix(const Matrix4x4& mat);
     Vector3 GetAABBScale(const AABB& aabb);
 }

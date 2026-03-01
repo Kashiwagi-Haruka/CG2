@@ -48,7 +48,7 @@ void TimeCardWatch::Update()
     child = Function::Multiply(child, parent);
 
     if (canMakePortal_) {
-        MakeBillboardWorldMat();
+        MakeChildMat();
     } else {
         MakeWorldMat();
     }
@@ -71,6 +71,8 @@ void TimeCardWatch::Update()
 
 void TimeCardWatch::Draw()
 {
+    modelObj_->UpdateCameraMatrices();
+    ring_->UpdateCameraMatrices();
     modelObj_->Draw();
     ring_->Draw();
 }
@@ -100,12 +102,13 @@ void TimeCardWatch::MakeWorldMat()
     ringMatWorld_ = child;
 }
 
-void TimeCardWatch::MakeBillboardWorldMat()
+void TimeCardWatch::MakeChildMat()
 {
-    Matrix4x4 scaleMatrix = Function::MakeScaleMatrix(ringTransform_.scale);
-    Matrix4x4 translateMatrix = Function::MakeTranslateMatrix(ringTransform_.translate);
-    Matrix4x4 rotateMatrix = Function::Multiply(YoshidaMath::MakeRotateMatrix(ringTransform_.rotate), YoshidaMath::GetBillBordMatrix(camera_));
-    Matrix4x4 worldMatrix = Function::Multiply(Function::Multiply(scaleMatrix, rotateMatrix), translateMatrix);
-    ringMatWorld_ = worldMatrix;
+    Matrix4x4 child = Function::MakeAffineMatrix(ringTransform_.scale, ringTransform_.rotate, ringTransform_.translate);
+    //Matrix4x4 scaleMatrix = Function::MakeScaleMatrix(ringTransform_.scale);
+    //Matrix4x4 translateMatrix = Function::MakeTranslateMatrix(ringTransform_.translate);
+    //Matrix4x4 rotateMatrix = Function::Multiply(YoshidaMath::MakeRotateMatrix(ringTransform_.rotate), YoshidaMath::GetBillBordMatrix(camera_));
+    //Matrix4x4 worldMatrix = Function::Multiply(Function::Multiply(scaleMatrix, rotateMatrix), translateMatrix);
+    ringMatWorld_ = child;
 
 }

@@ -60,6 +60,16 @@ Matrix4x4 YoshidaMath::GetBillBordMatrix(Camera* camera)
     return billboardMatrix;
 }
 
+Matrix4x4 YoshidaMath::GetBillBordMatrix(const Matrix4x4& mat)
+{
+    //ビルボードで作成する
+    Matrix4x4 billboardMatrix = mat;
+    billboardMatrix.m[3][0] = 0.0f;
+    billboardMatrix.m[3][1] = 0.0f;
+    billboardMatrix.m[3][2] = 0.0f;
+    return billboardMatrix;
+}
+
 Vector3 YoshidaMath::GetAABBScale(const AABB& aabb)
 {
     return  {

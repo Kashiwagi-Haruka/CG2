@@ -24,9 +24,8 @@ void WhiteBoard::Update()
     obj_->Update();
 
     collisionTransform_ = obj_->GetTransform();
-
     collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
-    collisionTransform_.rotate = { 0.0f };
+
     //objectからの相対距離
     collisionTransform_.translate.y += 1.375f;
 
@@ -38,8 +37,10 @@ void WhiteBoard::Update()
 
 void WhiteBoard::Draw()
 {
+    obj_->UpdateCameraMatrices();
     obj_->Draw();
 #ifdef _DEBUG
+    primitive_->UpdateCameraMatrices();
     primitive_->Draw();
 #endif
 }

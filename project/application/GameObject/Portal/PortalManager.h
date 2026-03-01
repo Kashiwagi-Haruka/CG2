@@ -10,8 +10,11 @@ class PortalManager
 public:
     PortalManager();
     void Initialize();
-    void Update();
-    void Draw();
+    void UpdateWhiteBoard();
+    void UpdatePortal();
+
+    void ShadowDraw();
+    void ObjDraw();
     void SetPlayerCamera(PlayerCamera* camera);
     /// @brief 作成できるポータル地点との当たり判定を作成する
     /// @param timeCardWatch 携帯打刻機
@@ -20,6 +23,7 @@ public:
     void CheckCollision(TimeCardWatch* timeCardWatch,const Vector3& warpPos);
     std::vector<std::unique_ptr<Portal>>& GetPortals() { return portals_; };
 private:
+    void DrawWhiteBoard();
     std::vector<std::unique_ptr<WhiteBoard>> whiteBoards_;
     std::vector<std::unique_ptr<Portal>> portals_;
     PlayerCamera* playerCamera_ = nullptr;

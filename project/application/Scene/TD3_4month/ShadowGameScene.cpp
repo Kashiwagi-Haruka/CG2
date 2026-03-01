@@ -27,6 +27,7 @@ ShadowGameScene::ShadowGameScene()
     //ホワイトボード管理
     portalManager_ = std::make_unique<PortalManager>();
     portalManager_->SetPlayerCamera(playerCamera_.get());
+
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     //衝突管理
@@ -186,7 +187,7 @@ void ShadowGameScene::UpdateCamera()
         debugCamera_->Update();
         playerCamera_->GetCamera()->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
     }
-	Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
+    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
 #ifdef USE_IMGUI
     if (ImGui::Begin("Camera")) {
         ImGui::Checkbox("Use Debug Camera (F1)", &useDebugCamera_);
@@ -203,7 +204,7 @@ void ShadowGameScene::UpdateCamera()
         }
         ImGui::End();
     }
-  
+
 #endif
 }
 
@@ -234,32 +235,39 @@ void ShadowGameScene::UpdateGameObject()
     Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
 #pragma endregion
 
+    //bool vignetteStrength = true;
+    //bool randomNoiseEnabled = true;
+    //float randomNoiseScale = 0.01f;
+    //BlendMode randomNoiseBlendMode = kBlendModeMultipy;
+    //Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength);
+    //Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength);
+    //Object3dCommon::GetInstance()->SetRandomNoiseEnabled(randomNoiseEnabled);
+    //Object3dCommon::GetInstance()->SetRandomNoiseScale(randomNoiseScale);
+    //Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode);
+
 #pragma region//ゲームオブジェクト
 
     if (player_->GetIsWarp()) {
         for (auto& portal : portalManager_->GetPortals()) {
-
-            player_->SetTranslate(portal->GetWarpPos());
+            player_->SetTranslate(portal->GetWarpTranslate());
             break;
         }
-
     }
 
-    
     if (!useDebugCamera_) {
         playerCamera_->Update();
     }
 
     timeCardWatch_->Update();
 
-
     player_->Update();
-
 
     testField_->Update();
 
+    portalManager_->UpdateWhiteBoard();
+    portalManager_->UpdatePortal();
 
-    portalManager_->Update();
+    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
 
 #pragma endregion
 }
@@ -298,31 +306,50 @@ void ShadowGameScene::DrawGameObject()
 {
     Object3dCommon::GetInstance()->BeginShadowMapPass();
     Object3dCommon::GetInstance()->DrawCommonShadow();
-	testField_->Draw();
-	portalManager_->Draw();
-	timeCardWatch_->Draw();
+    testField_->Draw();
+    timeCardWatch_->Draw();
     //プレイヤーの描画処理
     player_->Draw();
+    //ポータルとホワイトボードの描画
+    portalManager_->ShadowDraw();
 
     Object3dCommon::GetInstance()->EndShadowMapPass();
+
+    for (auto& portal : portalManager_->GetPortals()) {
+        portal->RenderPortalTextures([this](Camera* camera) {
+            Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+            SetSceneCameraForDraw(camera);
+            DrawSceneGeometry();
+            });
+    }
+
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
+
+    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
+    SetSceneCameraForDraw(playerCamera_->GetCamera());
+    DrawSceneGeometry();
+
+}
+void ShadowGameScene::DrawSceneGeometry()
+{
     Object3dCommon::GetInstance()->DrawCommon();
-
-    //Object3dCommon::GetInstance()->DrawCommonSkinningToon();
-
-
-    
-
     //テスト地面
     testField_->Draw();
     //ポータル管理
-    portalManager_->Draw();
+    portalManager_->ObjDraw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //プレイヤーの描画処理
-	Object3dCommon::GetInstance()->DrawCommonSkinning();
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
     player_->Draw();
-
-    collisionManager_->DrawColliders();
+   /* collisionManager_->DrawColliders();*/
+}
+void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
+{
+    player_->SetCamera(camera);
+    testField_->SetCamera(camera);
+    portalManager_->SetPlayerCamera(playerCamera_.get());
+    //携帯打刻機
+    timeCardWatch_->SetCamera(camera);
 }
 #pragma endregion

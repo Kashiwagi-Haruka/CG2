@@ -32,25 +32,50 @@ void PortalManager::Initialize()
     }
 }
 
-void PortalManager::Update()
+void PortalManager::UpdateWhiteBoard()
 {
     for (auto& board : whiteBoards_) {
         board->Update();
     }
+}
+
+void PortalManager::UpdatePortal() {
 
     for (auto& portal : portals_) {
+      
         portal->Update();
+    }
+};
+
+void PortalManager::DrawWhiteBoard()
+{
+    for (auto& board : whiteBoards_) { 
+        board->Draw();
     }
 }
 
-void PortalManager::Draw()
+void PortalManager::ShadowDraw()
 {
-    for (auto& board : whiteBoards_) {
-        board->Draw();
-    }
+    DrawWhiteBoard();
 
     for (auto& portal : portals_) {
-        portal->Draw();
+        portal->SetCamera(playerCamera_->GetCamera());
+        portal->UpdateCameraMatrices();
+        portal->DrawRings();
+        portal->DrawWarpPos();
+    }
+}
+
+void PortalManager::ObjDraw()
+{
+    DrawWhiteBoard();
+
+    for (auto& portal : portals_) {
+        portal->SetCamera(playerCamera_->GetCamera());
+        portal->UpdateCameraMatrices();
+        portal->DrawPortals();
+        portal->DrawRings();
+        portal->DrawWarpPos();
     }
 }
 
@@ -79,10 +104,8 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch,const Vector3& w
                portal->Initialize();
                Camera* camera = playerCamera_->GetCamera();
                portal->SetCamera(camera);
-               portal->SetTransform(board->GetTransform());
-               portal->SetRingWorldMatrix(camera);
-               portal->SetWarpPos(warpPos);
-               
+               portal->SetParentTransform(&board->GetTransform());
+               portal->SetWarpTransform(warpPos);
                portals_.push_back(std::move(portal));
 
 
