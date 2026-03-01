@@ -10,6 +10,7 @@ public:
     void SetCamera(Camera* camera);
     void SetTransform(const  Vector3& pos) { transform_.translate = pos; }
     Vector3& GetTranslate() { return transform_.translate; };
+    Vector3& GetRotate() { return transform_.rotate; };
     void Initialize();
     void Update();
     void Draw();

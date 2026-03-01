@@ -42,7 +42,6 @@ void PortalManager::UpdateWhiteBoard()
 void PortalManager::UpdatePortal() {
 
     for (auto& portal : portals_) {
-      
         portal->Update();
     }
 };
@@ -89,6 +88,8 @@ void PortalManager::SetPlayerCamera(PlayerCamera* camera)
 
 void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch,const Vector3& warpPos)
 {
+
+
     //whiteBoardとrayの当たり判定
     for (auto& board : whiteBoards_) {
         if (timeCardWatch->OnCollisionObjOfMakePortal(playerCamera_->GetRay(), board->GetAABB(), board->GetTransform())) {
@@ -97,14 +98,23 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch,const Vector3& w
                //前回のポータルを削除
                 portals_.clear();
 
+
+                if (whiteBoard_) { 
+                    whiteBoard_->SetCollisionAttribute(preCollision_);
+                }
                 //ショットしたらポータル作る
                std::unique_ptr  portal = std::make_unique<Portal>();
-               
+               whiteBoard_ = board.get();
+               preCollision_ = whiteBoard_->GetCollisionAttribute();
+               whiteBoard_->SetCollisionAttribute(kCollisionNone);
+
                //Portalの初期化処理
+               
                portal->Initialize();
+
                Camera* camera = playerCamera_->GetCamera();
                portal->SetCamera(camera);
-               portal->SetParentTransform(&board->GetTransform());
+               portal->SetParentTransform(&whiteBoard_->GetTransform());
                portal->SetWarpTransform(warpPos);
                portals_.push_back(std::move(portal));
 

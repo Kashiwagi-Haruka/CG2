@@ -28,7 +28,8 @@ private:
     std::vector<std::unique_ptr<WhiteBoard>> whiteBoards_;
     std::vector<std::unique_ptr<Portal>> portals_;
     PlayerCamera* playerCamera_ = nullptr;
-
+    WhiteBoard* whiteBoard_ = nullptr;
+    uint64_t preCollision_;
 
 };
 

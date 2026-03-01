@@ -8,6 +8,7 @@
 #include"RigidBody.h"
 #include "WinApp.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
+#include"GameObject/KeyBindConfig.h"
 
 ShadowGameScene::ShadowGameScene()
 {
@@ -42,6 +43,9 @@ ShadowGameScene::~ShadowGameScene()
 void ShadowGameScene::Initialize()
 {
     isPause_ = false;
+    noiseTimer_ = kNoiseTimer_;
+    isNoise_ = false;
+
     //シーン遷移の設定
     transition_->Initialize(false);
     isTransitionIn_ = true;
@@ -130,7 +134,7 @@ void ShadowGameScene::DebugImGui()
 void ShadowGameScene::CheckCollision()
 {
     //ホワイトボードとrayの当たり判定作成する
-    portalManager_->CheckCollision(timeCardWatch_.get(), { 0.0f,1.5f,0.0f });
+    portalManager_->CheckCollision(timeCardWatch_.get(), { 10.0f,1.5f,5.0f });
 
     collisionManager_->ClearColliders();
 
@@ -260,15 +264,32 @@ void ShadowGameScene::UpdateGameObject()
 #pragma endregion
 
     bool vignetteStrength = true;
-    bool randomNoiseEnabled = true;
-    float randomNoiseScale = 1.0f;
-    BlendMode randomNoiseBlendMode = kBlendModeSub;
+
     Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(false);
     Object3dCommon::GetInstance()->SetFullScreenSepiaEnabled(false);
     Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength);
     Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength);
-    Object3dCommon::GetInstance()->SetRandomNoiseEnabled(randomNoiseEnabled);
-    Object3dCommon::GetInstance()->SetRandomNoiseScale(randomNoiseScale);
+
+
+
+    if (PlayerCommand::GetInstance()->Shot()) {
+        if (!isNoise_) {
+            isNoise_ = true;
+        }
+    }
+    if (isNoise_) {
+        float randomNoiseScale = 1.0f;
+        noiseTimer_ -= YoshidaMath::kDeltaTime;
+        if (noiseTimer_ <= 0.0f) {
+            isNoise_ = false;
+            noiseTimer_ = kNoiseTimer_;
+        }
+
+    }
+    BlendMode randomNoiseBlendMode = kBlendModeSub;
+
+    Object3dCommon::GetInstance()->SetRandomNoiseEnabled(isNoise_);
+    Object3dCommon::GetInstance()->SetRandomNoiseScale(noiseTimer_);
     Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode);
 
 #pragma region//ゲームオブジェクト
@@ -276,6 +297,7 @@ void ShadowGameScene::UpdateGameObject()
     if (player_->GetIsWarp()) {
         for (auto& portal : portalManager_->GetPortals()) {
             player_->SetTranslate(portal->GetWarpTranslate());
+            player_->SetRotate(portal->GetWarpRotate());
             break;
         }
     }
