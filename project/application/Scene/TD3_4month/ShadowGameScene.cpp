@@ -41,6 +41,7 @@ ShadowGameScene::~ShadowGameScene()
 
 void ShadowGameScene::Initialize()
 {
+    isPause_ = false;
     //シーン遷移の設定
     transition_->Initialize(false);
     isTransitionIn_ = true;
@@ -69,6 +70,25 @@ void ShadowGameScene::Initialize()
 
 void ShadowGameScene::Update()
 {
+    //カーソルを画面中央に設定する
+    auto* input = Input::GetInstance();
+
+    if (input->TriggerKey(DIK_TAB)) {
+        //Tabキーでポーズ
+        isPause_ = (isPause_)?false:true;
+
+        if (isPause_) {
+            input->SetIsCursorVisible(true);
+            input->SetIsCursorStability(false);
+        } else {
+            input->SetIsCursorVisible(false);
+            input->SetIsCursorStability(true);
+        }
+    }
+
+    if (isPause_) {
+        return;
+    }
 
     //シーン遷移の更新処理
     UpdateSceneTransition();
@@ -345,10 +365,11 @@ void ShadowGameScene::DrawSceneGeometry()
     portalManager_->ObjDraw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
+    //collisionManager_->DrawColliders();
     //プレイヤーの描画処理
     Object3dCommon::GetInstance()->DrawCommonSkinning();
     player_->Draw();
-    /* collisionManager_->DrawColliders();*/
+
 }
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
 {

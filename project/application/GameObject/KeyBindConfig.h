@@ -34,7 +34,6 @@ public:
 	PlayerCommand& operator=(const PlayerCommand&) = delete;
 	PlayerCommand(PlayerCommand&&) = delete;
 	PlayerCommand& operator=(PlayerCommand&&) = delete;
-
 	bool MoveLeft();
 	bool MoveRight();
 	bool MoveForward();
