@@ -1,4 +1,32 @@
 {
+  "audio": {
+    "sounds": [
+      {
+        "name": "magic.mp3",
+        "volume": 1.0
+      }
+    ]
+  },
+  "lights": {
+    "area": [],
+    "directional": {
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "direction": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "intensity": 1.100000023841858
+    },
+    "overrideSceneLights": true,
+    "point": [],
+    "spot": []
+  },
   "objects": [
     {
       "index": 0,
@@ -39,12 +67,12 @@
       "name": "Object 0",
       "transform": {
         "rotate": [
-          0.0,
+          -0.05999999865889549,
           0.0,
           0.0
         ],
         "scale": [
-          1.0,
+          1.2200000286102295,
           1.0,
           1.0
         ],
@@ -91,7 +119,7 @@
           0.0
         ]
       },
-      "name": "Object 1",
+      "name": "moveWhiteBoard",
       "transform": {
         "rotate": [
           0.0,
@@ -104,7 +132,7 @@
           1.0
         ],
         "translate": [
-          0.0,
+          3.0,
           0.0,
           0.0
         ]
@@ -146,11 +174,11 @@
           0.0
         ]
       },
-      "name": "Object 2",
+      "name": "whiteBoard1",
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          1.5,
           0.0
         ],
         "scale": [
@@ -159,9 +187,9 @@
           1.0
         ],
         "translate": [
+          -2.869999885559082,
           0.0,
-          0.0,
-          0.0
+          -2.0
         ]
       }
     },
@@ -201,11 +229,11 @@
           0.0
         ]
       },
-      "name": "Object 3",
+      "name": "whiteBoard2",
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          0.8600000143051147,
           0.0
         ],
         "scale": [
@@ -214,9 +242,9 @@
           1.0
         ],
         "translate": [
+          3.0,
           0.0,
-          0.0,
-          0.0
+          2.0
         ]
       }
     },
@@ -256,7 +284,7 @@
           0.0
         ]
       },
-      "name": "Object 4",
+      "name": "whiteBoard3",
       "transform": {
         "rotate": [
           0.0,
@@ -269,8 +297,8 @@
           1.0
         ],
         "translate": [
-          0.0,
-          0.0,
+          -0.03999999910593033,
+          -3.299999952316284,
           0.0
         ]
       }
@@ -311,11 +339,11 @@
           0.0
         ]
       },
-      "name": "Object 5",
+      "name": "whiteBoard4",
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          -0.8100000023841858,
           0.0
         ],
         "scale": [
@@ -324,9 +352,9 @@
           1.0
         ],
         "translate": [
+          -2.0,
           0.0,
-          0.0,
-          0.0
+          0.4099999964237213
         ]
       }
     },
@@ -366,11 +394,11 @@
           0.0
         ]
       },
-      "name": "Object 6",
+      "name": "whiteBoard5",
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          3.140000104904175,
           0.0
         ],
         "scale": [
@@ -379,9 +407,9 @@
           1.0
         ],
         "translate": [
+          -1.0,
           0.0,
-          0.0,
-          0.0
+          -4.0
         ]
       }
     },
@@ -421,7 +449,62 @@
           0.0
         ]
       },
-      "name": "Object 7",
+      "name": "whiteBoard6",
+      "transform": {
+        "rotate": [
+          0.0,
+          -0.6399999856948853,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          3.5,
+          0.0,
+          -1.1200000047683716
+        ]
+      }
+    },
+    {
+      "index": 8,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "wire",
       "transform": {
         "rotate": [
           0.0,
@@ -434,7 +517,7 @@
           1.0
         ],
         "translate": [
-          0.0,
+          0.05999999865889549,
           0.0,
           0.0
         ]

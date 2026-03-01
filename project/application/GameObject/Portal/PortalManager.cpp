@@ -4,13 +4,20 @@
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
 #include"GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
+#include"GameObject/WhiteBoard/WalkWhiteBoard.h"
+
 namespace {
     const constexpr uint32_t kMaxWhiteBoards = 6;
 }
 
 PortalManager::PortalManager()
 {
-    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
+    ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
+    std::unique_ptr<WalkWhiteBoard>  walkWhite = std::make_unique<WalkWhiteBoard>();
+    WalkWhiteBoard::LoadAnimation("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
+    walkWhite->SetModel("whiteBoard");
+    whiteBoards_.push_back(std::move(walkWhite));
+
     for (int i = 0; i < kMaxWhiteBoards; ++i) {
         std::unique_ptr<WhiteBoard>  white = std::make_unique<WhiteBoard>();
         white->SetModel("whiteBoard");
