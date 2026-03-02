@@ -78,7 +78,12 @@ PixelShaderOutput main(VertexShaderOutput input)
 
     // ポータル描画は投影テクスチャのみを使い、メインカメラ/メッシュUVへのフォールバックを行わない。
     // これで「メイン描画がポータルテクスチャへ混ざる」見え方を防ぐ。
-    float4 projected1 = gTextureSecondary.Sample(gSampler, saturate(uv1));
+    if (inside1 < 0.5f)
+    {
+        discard;
+    }
+
+    float4 projected1 = gTextureSecondary.Sample(gSampler, uv1);
     output.color = projected1 * gMaterial.color;
     return output;
 }
