@@ -673,6 +673,8 @@ void Primitive::UpdateCameraMatrices() {
 	cameraData_->fullscreenSepiaEnabled = Object3dCommon::GetInstance()->IsFullScreenSepiaEnabled() ? 1 : 0;
 	cameraData_->textureViewProjection0 = textureViewProjection0_;
 	cameraData_->textureViewProjection1 = textureViewProjection1_;
+	cameraData_->portalCameraWorld0 = portalCameraWorld0_;
+	cameraData_->portalCameraWorld1 = portalCameraWorld1_;
 	cameraData_->usePortalProjection = usePortalProjection_ ? 1 : 0;
 	cameraResource_->Unmap(0, nullptr);
 }
