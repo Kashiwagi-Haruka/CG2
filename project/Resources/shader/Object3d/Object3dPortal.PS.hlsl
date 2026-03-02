@@ -22,16 +22,21 @@ struct Camera
     int fullscreenGrayscaleEnabled;
     int fullscreenSepiaEnabled;
     float2 padding2;
+};
+
+struct TextureCamera
+{
     float4x4 textureViewProjection0;
     float4x4 textureViewProjection1;
     float4x4 portalCameraWorld0;
     float4x4 portalCameraWorld1;
     int usePortalProjection;
-    float3 padding3;
+    float3 padding;
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<Camera> gCamera : register(b4);
+ConstantBuffer<TextureCamera> gTextureCamera : register(b5);
 
 Texture2D<float4> gTexture : register(t0);
 Texture2D<float4> gTextureSecondary : register(t4);
@@ -65,14 +70,14 @@ PixelShaderOutput main(VertexShaderOutput input)
     float4 baseUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 baseColor = gTexture.Sample(gSampler, baseUV.xy) * gMaterial.color;
 
-    if (gCamera.usePortalProjection == 0)
+    if (gTextureCamera.usePortalProjection == 0)
     {
         output.color = baseColor;
         return output;
     }
 
-    float2 uv0 = ComputeProjectedUV(input.worldPosition, gCamera.textureViewProjection0, gCamera.portalCameraWorld0);
-    float2 uv1 = ComputeProjectedUV(input.worldPosition, gCamera.textureViewProjection1, gCamera.portalCameraWorld1);
+    float2 uv0 = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection0, gTextureCamera.portalCameraWorld0);
+    float2 uv1 = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection1, gTextureCamera.portalCameraWorld1);
 
     float inside0 = step(0.0f, uv0.x) * step(0.0f, uv0.y) * step(uv0.x, 1.0f) * step(uv0.y, 1.0f);
     float inside1 = step(0.0f, uv1.x) * step(0.0f, uv1.y) * step(uv1.x, 1.0f) * step(uv1.y, 1.0f);
