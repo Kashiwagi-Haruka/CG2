@@ -1007,8 +1007,9 @@ void Hierarchy::DrawSelectionBoxEditor() {
 #endif
 }
 void Hierarchy::DrawObjectEditors() {
-#ifdef USE_IMGUI
 	LoadObjectEditorsFromJsonIfExists("objectEditors.json");
+#ifdef USE_IMGUI
+
 	if (!isPlaying_) {
 		for (size_t i = 0; i < objects_.size(); ++i) {
 			Object3d* object = objects_[i];

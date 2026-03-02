@@ -147,7 +147,7 @@ void Portal::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneW
         portalRenderTexture_->TransitionToShaderResource();
     }
 
-    portalCircle_->SetPortalProjectionMatrices(camera->GetViewProjectionMatrix(), camera->GetViewProjectionMatrix());
+    portalCircle_->SetPortalProjectionMatrices(camera->GetViewProjectionMatrix(), camera->GetViewProjectionMatrix(),camera->GetWorldMatrix(),camera->GetWorldMatrix());
 
 }
 

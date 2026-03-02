@@ -92,15 +92,16 @@ void ImGuiManager::Begin() {
 		ImGui::Text("FPS: %.1f", io.Framerate);
 	}
 	ImGui::End();
-
+#endif
 	Hierarchy* Hierarchy = Hierarchy::GetInstance();
+#ifdef USE_IMGUI
 	const bool isEditorLayoutEnabled = Hierarchy->HasRegisteredObjects();
 	if (dxCommon_) {
 		dxCommon_->SetEditorLayoutEnabled(isEditorLayoutEnabled);
 	}
 	prevEditorLayoutEnabled_ = isEditorLayoutEnabled;
-	Hierarchy->DrawObjectEditors();
 #endif
+	Hierarchy->DrawObjectEditors();
 }
 
 void ImGuiManager::End() {
