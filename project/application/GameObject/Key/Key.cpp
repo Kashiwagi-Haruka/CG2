@@ -3,6 +3,7 @@
 #include <Model/ModelManager.h>
 #include <GameObject/KeyBindConfig.h>
 #include <GameObject/YoshidaMath/CollisionManager/Collider.h>
+#include <Function.h>
 
 namespace {
 	float tMin_ = 0.0f;
@@ -88,7 +89,10 @@ void Key::CheckCollision()
 	//keyとrayの当たり判定
 	if (OnCollisionRay()) {
 		if (PlayerCommand::GetInstance()->Interact()) {
-			obj_->Update();
+			// カーソルに追従させて持ち上げる処理
+			Vector3 origin = playerCamera_->GetTransform().translate;
+			origin.y -= 1.0f;
+			worldTransform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
 		}
 	}
 }
