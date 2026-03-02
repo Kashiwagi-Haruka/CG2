@@ -85,10 +85,11 @@ void SampleScene::Initialize() {
         .rotate{std::numbers::pi_v<float> * 3.0f / 2.0f, 0.0f, 0.0f},
         .translate{3.0f,                                    3.5f, 2.0f}
     };
-	portalTextureCameraATransform_ = portalBTransform_;
+	portalTextureCameraATransform_.scale = {1.0f, 1.0f, 1.0f};
 	portalTextureCameraA_->SetTransform(MakeOppositeSidePortalCameraTransform(portalTextureCameraATransform_));
 	portalTextureCameraA_->Update();
 	portalTextureCameraBTransform_ = portalATransform_;
+	portalTextureCameraBTransform_.scale = {1.0f, 1.0f, 1.0f};
 	portalTextureCameraB_->SetTransform(MakeOppositeSidePortalCameraTransform(portalTextureCameraBTransform_));
 	portalTextureCameraB_->Update();
 
@@ -422,8 +423,10 @@ void SampleScene::Update() {
 	portalObjectCamera_->Update();*/
 	//portalTextureCameraATransform_ = portalATransform_;
 	//portalTextureCameraBTransform_ = portalBTransform_;
+	portalTextureCameraATransform_.scale = {1.0f, 1.0f, 1.0f};
 	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
 	portalTextureCameraA_->Update();
+	portalTextureCameraBTransform_.scale = {1.0f, 1.0f, 1.0f};
 	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
 	portalTextureCameraB_->Update();
 	portalMeshA_->SetTransform(portalATransform_);

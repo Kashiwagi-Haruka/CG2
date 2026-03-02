@@ -82,7 +82,7 @@ void PortalMesh::Update() {
 	textureCameraData_->textureViewProjection1 = textureCameraData_->textureViewProjection0;
 	textureCameraData_->portalCameraWorld0 = activeTextureCamera ? activeTextureCamera->GetWorldMatrix() : Function::MakeIdentity4x4();
 	textureCameraData_->portalCameraWorld1 = textureCameraData_->portalCameraWorld0;
-	textureCameraData_->usePortalProjection = activeTextureCamera ? 1 : 0;
+	textureCameraData_->usePortalProjection = 1;
 	textureCameraResource_->Unmap(0, nullptr);
 
 	objectCameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&objectCameraData_));
@@ -90,7 +90,7 @@ void PortalMesh::Update() {
 	objectCameraData_->screenSize = {static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)};
 	objectCameraData_->fullscreenGrayscaleEnabled = Object3dCommon::GetInstance()->IsFullScreenGrayscaleEnabled() ? 1 : 0;
 	objectCameraData_->fullscreenSepiaEnabled = Object3dCommon::GetInstance()->IsFullScreenSepiaEnabled() ? 1 : 0;
-	objectCameraData_->usePortalProjection = textureCameraData_->usePortalProjection;
+	objectCameraData_->usePortalProjection = 1;
 	objectCameraResource_->Unmap(0, nullptr);
 }
 
