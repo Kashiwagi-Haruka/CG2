@@ -75,16 +75,8 @@ PixelShaderOutput main(VertexShaderOutput input)
         return output;
     }
     float2 uv1 = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection1, gTextureCamera.portalCameraWorld1);
-    float inside1 = step(0.0f, uv1.x) * step(0.0f, uv1.y) * step(uv1.x, 1.0f) * step(uv1.y, 1.0f);
-
-    // ポータル描画は投影テクスチャのみを使い、メインカメラ/メッシュUVへのフォールバックを行わない。
-    // これで「メイン描画がポータルテクスチャへ混ざる」見え方を防ぐ。
-    if (inside1 < 0.5f)
-    {
-        discard;
-    }
-
-    float4 projected1 = gTextureSecondary.Sample(gSampler, uv1);
+    // 投影UVが画面外でも破棄せず、端をクランプして常にテクスチャカメラ映像を表示する。
+    float4 projected1 = gTextureSecondary.Sample(gSampler, saturate(uv1));
     output.color = projected1 * gMaterial.color;
     return output;
 }
