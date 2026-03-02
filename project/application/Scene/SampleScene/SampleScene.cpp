@@ -198,6 +198,28 @@ void SampleScene::Update() {
 		}
 		ImGui::End();
 	}
+	if (ImGui::Begin("Portal Camera")) {
+
+		ImGui::DragFloat3("Portal A Position", &portalATransform_.translate.x, 0.01f);
+		ImGui::DragFloat3("Portal A Rotation", &portalATransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Portal B Position", &portalBTransform_.translate.x, 0.01f);
+		ImGui::DragFloat3("Portal B Rotation", &portalBTransform_.rotate.x, 0.01f);
+		Vector3 portalCameraPositionOffset = portalSystem_->GetPortalCameraPositionOffset();
+		Vector3 portalCameraRotationOffset = portalSystem_->GetPortalCameraRotationOffset();
+		bool changed = false;
+		changed |= ImGui::DragFloat3("Position Offset", &portalCameraPositionOffset.x, 0.01f);
+		changed |= ImGui::DragFloat3("Rotation Offset", &portalCameraRotationOffset.x, 0.01f);
+		if (ImGui::Button("Reset##PortalCameraOffset")) {
+			portalCameraPositionOffset = {0.0f, 0.0f, 0.0f};
+			portalCameraRotationOffset = {0.0f, 0.0f, 0.0f};
+			changed = true;
+		}
+		if (changed) {
+			portalSystem_->SetPortalCameraPositionOffset(portalCameraPositionOffset);
+			portalSystem_->SetPortalCameraRotationOffset(portalCameraRotationOffset);
+		}
+	}
+	ImGui::End();
 	if (ImGui::Begin("Pad Input")) {
 		ImGui::Text("押されているパッドボタン");
 		const std::array<std::pair<Input::PadButton, const char*>, 14> padButtons = {

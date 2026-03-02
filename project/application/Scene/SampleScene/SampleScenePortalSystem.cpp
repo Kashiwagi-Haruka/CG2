@@ -132,6 +132,14 @@ void SampleScenePortalSystem::DrawRings() {
 	portalRingB_->Draw();
 }
 
+void SampleScenePortalSystem::SetPortalCameraPositionOffset(const Vector3& offset) { portalCameraPositionOffset_ = offset; }
+
+void SampleScenePortalSystem::SetPortalCameraRotationOffset(const Vector3& offset) { portalCameraRotationOffset_ = offset; }
+
+const Vector3& SampleScenePortalSystem::GetPortalCameraPositionOffset() const { return portalCameraPositionOffset_; }
+
+const Vector3& SampleScenePortalSystem::GetPortalCameraRotationOffset() const { return portalCameraRotationOffset_; }
+
 void SampleScenePortalSystem::UpdatePortalCamera(const Transform& sourcePortal, const Transform& destinationPortal, Camera* outCamera) {
 	if (!outCamera) {
 		return;
@@ -139,15 +147,22 @@ void SampleScenePortalSystem::UpdatePortalCamera(const Transform& sourcePortal, 
 
 	const Matrix4x4 sourcePortalWorld = Function::MakeAffineMatrix(sourcePortal.scale, sourcePortal.rotate, sourcePortal.translate);
 	const Matrix4x4 destinationPortalWorld = Function::MakeAffineMatrix(destinationPortal.scale, destinationPortal.rotate, destinationPortal.translate);
-	const Matrix4x4 halfTurn = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
-
-const Matrix4x4 sourceInverse = Function::Inverse(sourcePortalWorld);
+	const Matrix4x4 sourceInverse = Function::Inverse(sourcePortalWorld);
 
 	// ローカル空間へ
 	const Matrix4x4 cameraInSourceSpace = Function::Multiply(sceneCamera_->GetWorldMatrix(), sourceInverse);
 
 	// destinationへ変換
 	Matrix4x4 portalCameraWorld = Function::Multiply(cameraInSourceSpace, destinationPortalWorld);
+	if (Function::LengthSquared(portalCameraRotationOffset_) > 0.0001f) {
+		const Matrix4x4 rotationOffset = Function::Multiply(
+		    Function::Multiply(Function::MakeRotateXMatrix(portalCameraRotationOffset_.x), Function::MakeRotateYMatrix(portalCameraRotationOffset_.y)),
+		    Function::MakeRotateZMatrix(portalCameraRotationOffset_.z));
+		portalCameraWorld = Function::Multiply(rotationOffset, portalCameraWorld);
+	}
+	portalCameraWorld.m[3][0] += portalCameraPositionOffset_.x;
+	portalCameraWorld.m[3][1] += portalCameraPositionOffset_.y;
+	portalCameraWorld.m[3][2] += portalCameraPositionOffset_.z;
 
 	Vector3 destinationForward = {destinationPortalWorld.m[2][0], destinationPortalWorld.m[2][1], destinationPortalWorld.m[2][2]};
 	if (Function::LengthSquared(destinationForward) < 0.0001f) {
@@ -166,5 +181,4 @@ const Matrix4x4 sourceInverse = Function::Inverse(sourcePortalWorld);
 
 	// ViewProjection更新
 	outCamera->SetViewProjectionMatrix(portalViewMatrix, sceneCamera_->GetProjectionMatrix());
-	
 }
