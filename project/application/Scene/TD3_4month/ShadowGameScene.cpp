@@ -141,6 +141,7 @@ void ShadowGameScene::CheckCollision()
 {
     //ホワイトボードとrayの当たり判定作成する
     portalManager_->CheckCollision(timeCardWatch_.get(), { 10.0f,1.5f,5.0f });
+	key_->CheckCollision();
 
     collisionManager_->ClearColliders();
 

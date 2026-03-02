@@ -2,6 +2,12 @@
 #include <GameObject/YoshidaMath/YoshidaMath.h>
 #include <Model/ModelManager.h>
 #include <GameObject/KeyBindConfig.h>
+#include <GameObject/YoshidaMath/CollisionManager/Collider.h>
+
+namespace {
+	float tMin_ = 0.0f;
+	float tMax_ = 5.0f;
+}
 
 Key::Key()
 {
@@ -77,12 +83,17 @@ AABB Key::GetAABB()
 	return YoshidaMath::GetAABBWorldPos(localAABB_, collisionTransform_.translate);
 }
 
-void Key::CheckCollision(TimeCardWatch* timeCardWatch, const Vector3& warpPos)
+void Key::CheckCollision()
 {
 	//keyとrayの当たり判定
-	if (timeCardWatch->OnCollisionObjOfMakePortal(playerCamera_->GetRay(), GetAABB(), GetTransform())) {
+	if (OnCollisionRay()) {
 		if (PlayerCommand::GetInstance()->Interact()) {
 			obj_->Update();
 		}
 	}
+}
+
+bool Key::OnCollisionRay()
+{
+	return YoshidaMath::RayIntersectsAABB(playerCamera_->GetRay(), GetAABB(), tMin_, tMax_);
 }
