@@ -3,14 +3,18 @@
 #include"Object3d/Object3dCommon.h"
 #include "Model/ModelManager.h"
 #include"DirectXCommon.h"
+#include<imgui.h>
 
 //アニメーションクリップ
 std::vector<Animation::AnimationData>WalkWhiteBoard:: animationClips_;
 
 void WalkWhiteBoard::OnCollision(Collider* collider)
 {
+    
     if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-        isMove_ = true;
+      /*  isMove_ = true;*/
+
+
     }
 }
 
@@ -81,7 +85,15 @@ void WalkWhiteBoard::Update()
 #ifdef _DEBUG
     primitive_->SetTransform(collisionTransform_);
     primitive_->Update();
+
+
 #endif
+#ifdef USE_IMGUI
+    ImGui::Begin("WalkWhiteBoard");
+    ImGui::Checkbox("isMove", &isMove_);
+    ImGui::End();
+#endif
+
 
 }
 

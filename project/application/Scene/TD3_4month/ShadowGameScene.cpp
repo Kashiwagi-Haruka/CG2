@@ -31,6 +31,8 @@ ShadowGameScene::ShadowGameScene()
 
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
+    //懐中電灯
+    flashlight_ = std::make_unique<Flashlight>();
     // 鍵管理
 	key_ = std::make_unique<Key>();
     //衝突管理
@@ -70,6 +72,9 @@ void ShadowGameScene::Initialize()
     //携帯打刻機
     timeCardWatch_->Initialize();
     timeCardWatch_->SetCamera(playerCamera_->GetCamera());
+    //懐中電灯
+    flashlight_->Initialize();
+    flashlight_->SetCamera(playerCamera_->GetCamera());
     //Playerの座標のポインタを入れる
     timeCardWatch_->SetTransformPtr(&player_->GetTransform());
 
@@ -85,7 +90,7 @@ void ShadowGameScene::Update()
 
     if (input->TriggerKey(DIK_TAB)) {
         //Tabキーでポーズ
-        isPause_ = (isPause_)?false:true;
+        isPause_ = (isPause_) ? false : true;
 
         if (isPause_) {
             input->SetIsCursorVisible(true);
@@ -318,7 +323,8 @@ void ShadowGameScene::UpdateGameObject()
     player_->Update();
 
     testField_->Update();
-
+    //懐中電灯
+    flashlight_->Update();
     portalManager_->UpdateWhiteBoard();
     portalManager_->UpdatePortal();
 
@@ -369,6 +375,8 @@ void ShadowGameScene::DrawGameObject()
     player_->Draw();
     //ポータルとホワイトボードの描画
     portalManager_->ShadowDraw();
+    //懐中電灯
+    flashlight_->Draw();
 
     Object3dCommon::GetInstance()->EndShadowMapPass();
 
@@ -396,6 +404,9 @@ void ShadowGameScene::DrawSceneGeometry()
     portalManager_->ObjDraw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
+    //懐中電灯
+    flashlight_->Draw();
+    //collisionManager_->DrawColliders();
 	// 鍵の描画処理
 	key_->Draw();
     //プレイヤーの描画処理
@@ -410,5 +421,6 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     portalManager_->SetPlayerCamera(playerCamera_.get());
     //携帯打刻機
     timeCardWatch_->SetCamera(camera);
+    flashlight_->SetCamera(camera);
 }
 #pragma endregion

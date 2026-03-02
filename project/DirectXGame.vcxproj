@@ -245,6 +245,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
     <ClCompile Include="application\GameObject\WhiteBoard\WalkWhiteBoard.cpp" />
     <ClCompile Include="application\Scene\SampleScene\SampleScenePortalSystem.cpp" />
+    <ClCompile Include="application\GameObject\Flashlight\Flashlight.cpp" />
     <ClCompile Include="application\GameObject\Key\Key.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -355,6 +356,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
     <ClInclude Include="application\GameObject\WhiteBoard\WalkWhiteBoard.h" />
     <ClInclude Include="application\Scene\SampleScene\SampleScenePortalSystem.h" />
+    <ClInclude Include="application\GameObject\Flashlight\Flashlight.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

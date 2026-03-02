@@ -28,7 +28,7 @@ public:
     void Draw()override;
     void SetAnimationIndex(const size_t& index) { currentAnimationIndex_ = index; }
 private:
-    float isMove_ = false;
+    bool isMove_ = false;
   
     Vector3 velocity_ = { 0.0f };
     Transform transform_ = {};
