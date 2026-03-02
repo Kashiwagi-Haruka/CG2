@@ -49,6 +49,5 @@ void SceneTransition::Update() {
 	fadeSPData.sprite->Update();
 }
 void SceneTransition::Draw() { 
-	SpriteCommon::GetInstance()->DrawCommon();	
 	fadeSPData.sprite->Draw(); 
 }

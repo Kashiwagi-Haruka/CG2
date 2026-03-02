@@ -21,6 +21,11 @@ PlayerCamera::PlayerCamera()
     camera_->SetTransform(cameraTransform_);
     //Rayの設定
     ray_ = { .origin = {0.0f},.diff = {0.0f} };
+
+    //raySpriteの設定   
+    raySprite_ = std::make_unique<RaySprite>();
+
+
 }
 
 void PlayerCamera::Update()
@@ -28,6 +33,15 @@ void PlayerCamera::Update()
     SetTransform();
     SetRay();
     camera_->Update();
+
+    // レイの判定&インタラクト
+    auto* playerCommand = PlayerCommand::GetInstance();
+    
+    if (playerCommand->Interact()) {
+    }
+  
+    raySprite_->Update();
+    
 }
 
 void PlayerCamera::Rotate()
@@ -75,6 +89,16 @@ void PlayerCamera::SetRay()
     //// マウスレイの始点・方向
     //ray_.origin = nearWorld;
     //ray_.diff = Function::Normalize(farWorld- ray_.origin);
+}
+
+void PlayerCamera::DrawRaySprite()
+{
+    raySprite_->Draw();
+}
+
+void PlayerCamera::Initialize()
+{
+    raySprite_->Initialize();
 }
 
 

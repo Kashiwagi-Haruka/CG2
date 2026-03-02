@@ -10,9 +10,11 @@ public:
     void SetCamera(Camera* camera);
     void SetTransform(const  Vector3& pos) { transform_.translate = pos; }
     Vector3& GetTranslate() { return transform_.translate; };
+    Vector3& GetRotate() { return transform_.rotate; };
     void Initialize();
     void Update();
     void Draw();
+    Camera* GetWarpPosCamera() { return camera_.get(); };
 private:
     std::unique_ptr<Camera> camera_ = nullptr;
     std::unique_ptr<Object3d>object3d_ = nullptr;

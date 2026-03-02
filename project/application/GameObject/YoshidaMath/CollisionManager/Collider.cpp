@@ -58,30 +58,35 @@ void YoshidaMath::Collider::SetAABB(const AABB& aabb) {
 void YoshidaMath::Collider::ColliderUpdate()
 {
 #ifdef _DEBUG
+    if (primitive_) {
+        primitive_->SetColor({ 1.0f,1.0f,0.0f,0.5f });
+        if (type_ == kAABB) {
+            primitive_->SetTranslate(GetWorldPosition() + YoshidaMath::GetAABBCenter(AABB_));
+        } else {
+            primitive_->SetTranslate(GetWorldPosition());
+        }
 
-    primitive_->SetColor({ 1.0f,1.0f,0.0f,0.5f });
-    if (type_ == kAABB) {
-        primitive_->SetTranslate(GetWorldPosition()+YoshidaMath::GetAABBCenter(AABB_));
-    } else {
-        primitive_->SetTranslate(GetWorldPosition());
+        primitive_->Update();
     }
-
-    primitive_->Update();
 #endif // _DEBUG
 }
 
 void YoshidaMath::Collider::ColliderDraw()
 {
 #ifdef _DEBUG
-
-    primitive_->Draw();
+    if (primitive_) {
+        primitive_->UpdateCameraMatrices();
+        primitive_->Draw();
+    }
 #endif // _DEBUG
 }
 
 void YoshidaMath::Collider::OnCollisionCollider()
 {
 #ifdef _DEBUG
-    primitive_->SetColor({ 1.0f,0.0f,0.0f,0.5f });
+    if (primitive_) {
+        primitive_->SetColor({ 1.0f,0.0f,0.0f,0.5f });
+    }
 #endif // _DEBUG
 
 }

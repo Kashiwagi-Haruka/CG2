@@ -80,7 +80,7 @@ public:
 	void Update();
 
 	void Draw();
-
+	void SetTextureHandle(uint32_t Handle) { textureIndex = Handle; }
 	void SetPosition(const Vector2& pos) {
 		transform_.translate.x = pos.x;
 		transform_.translate.y = pos.y;

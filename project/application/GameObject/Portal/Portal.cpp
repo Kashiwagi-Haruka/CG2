@@ -2,6 +2,7 @@
 #include"Function.h"
 #include"application/GameObject/YoshidaMath/YoshidaMath.h"
 #include<cassert>
+#include"GameObject/YoshidaMath/Easing.h"
 
 //音楽
 SoundData Portal::warpSE_;
@@ -39,7 +40,7 @@ Portal::Portal()
     SetCollisionMask(kCollisionPlayer);
 
     ring_ = std::make_unique<Primitive>();
-
+    portalCircle_ = std::make_unique<Primitive>();
     //ワープ座標
     warpPos_ = std::make_unique<WarpPos1>();
 }
@@ -51,58 +52,148 @@ Portal::~Portal()
 
 void Portal::Initialize()
 {
-
-    transform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
-    ring_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/atHome.jpg");
-    ring_->SetTransform(transform_);
-    ring_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+    scaleTimer_ = 0.0f;
+    transform_ = { .scale = {0.0f,0.0f,0.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
+    
+    portalCircle_->Initialize(Primitive::Circle, 48);
+ /*   portalCircle_->SetColor({ 0.3f, 0.7f, 1.0f, 1.0f });*/
+    portalCircle_->SetEnableLighting(false);
+    
+    ring_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 128);
     //ライティングしない
     ring_->SetEnableLighting(false);
-    uvTranslateY_ = 0.0f;
-    uvMat_ = Function::MakeTranslateMatrix({ 0.0f,uvTranslateY_ ,0.0f });
+    ring_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+ /*   ring_->SetColor({ 0.3f, 0.7f, 1.0f, 1.0f });*/
+
+    uvRotateZ_ = 0.0f;
     sphere_ = { .center = {transform_.translate},.radius = 0.5f };
     //ワープ座標
     warpPos_->Initialize();
 
+    portalRenderTexture_ = std::make_unique<RenderTexture2D>();
+    portalRenderTexture_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, { 0.05f, 0.05f, 0.1f, 1.0f });
+    if (portalRenderTexture_->IsReady()) {
+        portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
+        portalCircle_->SetSecondaryTextureIndex(portalRenderTexture_->GetSrvIndex());
+    }
+
+    portalCircle_->SetPortalProjectionEnabled(true);
 }
 
 void Portal::Update()
 {
-    uvTranslateY_ += YoshidaMath::kDeltaTime;
-    uvMat_ = Function::MakeTranslateMatrix({ 0.0f,uvTranslateY_ ,0.0f });
-    ring_->SetUvTransform(uvMat_);
-
+    uvRotateZ_ += YoshidaMath::kDeltaTime*2.0f;
+    ring_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, uvRotateZ_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
+    SetPortalWorldMatrix();
     ring_->Update();
     //ワープ地点
     warpPos_->Update();
+}
 
+
+void Portal::DrawPortals() {
+    Object3dCommon::GetInstance()->DrawCommonPortal();
+    portalCircle_->Draw();
+}
+
+void Portal::DrawRings() {
+    //Object3dCommon::GetInstance()->DrawCommonNoCull();
+
+        ring_->Draw();
+  
+    
+}
+
+void Portal::DrawWarpPos()
+{
+    warpPos_->Draw();
+}
+
+void Portal::UpdatePortalCamera(const Transform& destinationPortal, Camera* outCamera) {
+    if (!outCamera) {
+        return;
+    }
+
+    const Matrix4x4 destinationPortalWorld = Function::MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, destinationPortal.rotate, destinationPortal.translate);
+    const Matrix4x4 halfTurn = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
+    Matrix4x4 portalCameraWorld = Function::Multiply(halfTurn, destinationPortalWorld);
+
+    Vector3 destinationForward = { destinationPortalWorld.m[2][0], destinationPortalWorld.m[2][1], destinationPortalWorld.m[2][2] };
+    if (Function::LengthSquared(destinationForward) < 0.0001f) {
+        destinationForward = { 0.0f, 0.0f, 1.0f };
+    }
+    destinationForward = Function::Normalize(destinationForward);
+    portalCameraWorld.m[3][0] += destinationForward.x * 0.05f;
+    portalCameraWorld.m[3][1] += destinationForward.y * 0.05f;
+    portalCameraWorld.m[3][2] += destinationForward.z * 0.05f;
+
+    const Matrix4x4 portalViewMatrix = Function::Inverse(portalCameraWorld);
+
+    // ポータルテクスチャ専用カメラはメインカメラに追従させず、ポータルの位置・角度だけで固定する。
+    outCamera->SetViewProjectionMatrix(portalViewMatrix, outCamera->GetProjectionMatrix());
+}
+
+void Portal::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals)
+{
+    auto* camera = warpPos_->GetWarpPosCamera();
+    if (!sceneCamera_ || !camera) {
+        return;
+    }
+
+    if (portalRenderTexture_ && portalRenderTexture_->IsReady()) {
+        UpdatePortalCamera(transform_, camera);
+        portalRenderTexture_->BeginRender();
+        drawSceneWithoutPortals(camera);
+        portalRenderTexture_->TransitionToShaderResource();
+    }
+
+    portalCircle_->SetPortalProjectionMatrices(camera->GetViewProjectionMatrix(), camera->GetViewProjectionMatrix());
 
 }
 
-void Portal::Draw()
-{
-    ring_->Draw();
-    //ワープ地点
-    warpPos_->Draw();
+void Portal::UpdateCameraMatrices() {
+    portalCircle_->UpdateCameraMatrices();
+    ring_->UpdateCameraMatrices();
 }
 
 void Portal::SetCamera(Camera* camera)
 {
+    sceneCamera_ = camera;
+    portalCircle_->SetCamera(camera);
     ring_->SetCamera(camera);
     //ワープ地点
     warpPos_->SetCamera(camera);
 }
 
-void Portal::SetRingWorldMatrix(Camera* camera)
+void Portal::SetPortalWorldMatrix()
 {
-    Vector3 forward = YoshidaMath::GetForward(camera->GetWorldMatrix());
+    if (sceneCamera_ == nullptr) {
+        return;
+    }
 
-    Matrix4x4 scaleMatrix = Function::MakeScaleMatrix(transform_.scale);
-    Matrix4x4 translateMatrix = Function::MakeTranslateMatrix(transform_.translate - forward*0.125f);
-    Matrix4x4 rotateMatrix = Function::Multiply(YoshidaMath::MakeRotateMatrix(transform_.rotate), YoshidaMath::GetBillBordMatrix(camera));
-    Matrix4x4 worldMatrix = Function::Multiply(Function::Multiply(scaleMatrix, rotateMatrix), translateMatrix);
+    if (parentTransform == nullptr) {
+        return;
+    }
+    Vector3 forward = YoshidaMath::GetForward(sceneCamera_->GetWorldMatrix());
+
+    transform_ = *parentTransform;
+
+
+    scaleTimer_ += YoshidaMath::kDeltaTime;
+    scaleTimer_ = std::clamp(scaleTimer_, 0.0f, 1.0f);
+
+    transform_.scale = YoshidaMath::Easing::EaseInOutBack({ 0.0f,0.0f,0.0f }, parentTransform->scale, scaleTimer_);
+
+    transform_.translate -= forward * 0.125f;
+
+    Matrix4x4  worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+
+    portalCircle_->SetWorldMatrix(worldMatrix);
+    transform_.translate -= forward * 0.125f;
+     worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
     ring_->SetWorldMatrix(worldMatrix);
+
 }
 
 const Sphere& Portal::GetSphere()

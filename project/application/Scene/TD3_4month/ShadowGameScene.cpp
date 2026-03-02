@@ -8,6 +8,7 @@
 #include"RigidBody.h"
 #include "WinApp.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
+#include"GameObject/KeyBindConfig.h"
 
 ShadowGameScene::ShadowGameScene()
 {
@@ -25,10 +26,17 @@ ShadowGameScene::ShadowGameScene()
     //SEを読み込む
     Portal::LoadSE();
     //ホワイトボード管理
-    portalManager_ = std::make_unique<PortalManager>();
+    portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate);
     portalManager_->SetPlayerCamera(playerCamera_.get());
+
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
+    //懐中電灯
+    flashlight_ = std::make_unique<Flashlight>();
+    // 鍵管理
+	key_ = std::make_unique<Key>();
+    // 枝豆管理
+	edamame_ = std::make_unique<Edamame>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 }
@@ -40,10 +48,17 @@ ShadowGameScene::~ShadowGameScene()
 
 void ShadowGameScene::Initialize()
 {
+    isPause_ = false;
+    noiseTimer_ = kNoiseTimer_;
+    isNoise_ = false;
+
     //シーン遷移の設定
     transition_->Initialize(false);
     isTransitionIn_ = true;
     isTransitionOut_ = false;
+
+    playerCamera_->Initialize();
+
     //デバックカメラの設定
     debugCamera_->Initialize();
     debugCamera_->SetTranslation(playerCamera_->GetTransform().translate);
@@ -53,6 +68,9 @@ void ShadowGameScene::Initialize()
 
     testField_->Initialize();
     testField_->SetCamera(playerCamera_->GetCamera());
+   
+ 
+    
     InitializeLights();
 
     //ホワイトボード管理
@@ -62,19 +80,48 @@ void ShadowGameScene::Initialize()
     //携帯打刻機
     timeCardWatch_->Initialize();
     timeCardWatch_->SetCamera(playerCamera_->GetCamera());
+
     //Playerの座標のポインタを入れる
     timeCardWatch_->SetTransformPtr(&player_->GetTransform());
+
+	// 鍵
+	key_->Initialize();
+	key_->SetPlayerCamera(playerCamera_.get());
+
+	// 枝豆
+	edamame_->Initialize();
+	edamame_->SetPlayerCamera(playerCamera_.get());
+
 }
 
 void ShadowGameScene::Update()
 {
+    //カーソルを画面中央に設定する
+    auto* input = Input::GetInstance();
+
+    if (input->TriggerKey(DIK_TAB)) {
+        //Tabキーでポーズ
+        isPause_ = (isPause_) ? false : true;
+
+        if (isPause_) {
+            input->SetIsCursorVisible(true);
+            input->SetIsCursorStability(false);
+        } else {
+            input->SetIsCursorVisible(false);
+            input->SetIsCursorStability(true);
+        }
+    }
+
+    if (isPause_) {
+        return;
+    }
 
     //シーン遷移の更新処理
     UpdateSceneTransition();
     //カメラの更新処理
     UpdateCamera();
     //ライトの更新処理
-    UpdatePointLight();
+    UpdateLight();
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
 
@@ -84,14 +131,14 @@ void ShadowGameScene::Update()
 
 void ShadowGameScene::Draw()
 {
-    //スプライト共通
-    SpriteCommon::GetInstance()->DrawCommon();
-    //シーン遷移の描画処理
-    DrawSceneTransition();
-
     //ゲームオブジェクトの描画処理
     DrawGameObject();
 
+    //スプライト共通
+    SpriteCommon::GetInstance()->DrawCommon();
+    playerCamera_->DrawRaySprite();
+    //シーン遷移の描画処理
+    DrawSceneTransition();
 }
 
 void ShadowGameScene::Finalize()
@@ -109,22 +156,37 @@ void ShadowGameScene::DebugImGui()
 void ShadowGameScene::CheckCollision()
 {
     //ホワイトボードとrayの当たり判定作成する
-    portalManager_->CheckCollision(timeCardWatch_.get(), { 0.0f,1.5f,0.0f });
+    portalManager_->CheckCollision(timeCardWatch_.get(), { 10.0f,1.5f,5.0f });
+	key_->CheckCollision();
+
+	edamame_->CheckCollision();
 
     collisionManager_->ClearColliders();
 
-    collisionManager_->AddCollider(player_.get(), playerCamera_->GetCamera());
+    collisionManager_->AddCollider(player_.get());
 
     for (auto& portal : portalManager_->GetPortals()) {
-        collisionManager_->AddCollider(portal.get(), playerCamera_->GetCamera());
+        collisionManager_->AddCollider(portal.get());
     }
 
-    collisionManager_->AddCollider(testField_.get(), playerCamera_->GetCamera());
+    for (auto& whiteBoard : portalManager_->GetWhiteBoards()) {
+        collisionManager_->AddCollider(whiteBoard.get());
+    }
+
+    collisionManager_->AddCollider(flashlight_.get());
+    collisionManager_->AddCollider(testField_.get());
+
+    collisionManager_->SetCamera(playerCamera_->GetCamera());
+   
     collisionManager_->CheckAllCollisions();
 }
 
 void ShadowGameScene::InitializeLights()
 {
+    //懐中電灯
+    flashlight_->Initialize();
+    flashlight_->SetCamera(playerCamera_->GetCamera());
+
     activePointLightCount_ = 2;
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     pointLights_[0].position = { 0.0f, 5.0f, 0.0f };
@@ -150,16 +212,7 @@ void ShadowGameScene::InitializeLights()
     spotLights_[0].decay = 2.0f;
     spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
     spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
-
-    spotLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    spotLights_[1].position = { 2.0f, 1.25f, 0.0f };
-    spotLights_[1].direction = { -1.0f, -1.0f, 0.0f };
-    spotLights_[1].intensity = 4.0f;
-    spotLights_[1].distance = 7.0f;
-    spotLights_[1].decay = 2.0f;
-    spotLights_[1].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-    spotLights_[1].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
-
+     
     activeAreaLightCount_ = 2;
     areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     areaLights_[0].position = { 0.0f, 3.0f, 0.0f };
@@ -186,7 +239,7 @@ void ShadowGameScene::UpdateCamera()
         debugCamera_->Update();
         playerCamera_->GetCamera()->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
     }
-	Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
+    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
 #ifdef USE_IMGUI
     if (ImGui::Begin("Camera")) {
         ImGui::Checkbox("Use Debug Camera (F1)", &useDebugCamera_);
@@ -203,7 +256,7 @@ void ShadowGameScene::UpdateCamera()
         }
         ImGui::End();
     }
-  
+
 #endif
 }
 
@@ -234,37 +287,73 @@ void ShadowGameScene::UpdateGameObject()
     Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
 #pragma endregion
 
+    bool vignetteStrength = true;
+
+    Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(false);
+    Object3dCommon::GetInstance()->SetFullScreenSepiaEnabled(false);
+    Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength);
+    Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength);
+
+
+
+    if (PlayerCommand::GetInstance()->Shot()) {
+        if (!isNoise_) {
+            isNoise_ = true;
+        }
+    }
+    if (isNoise_) {
+        float randomNoiseScale = 1.0f;
+        noiseTimer_ -= YoshidaMath::kDeltaTime;
+        if (noiseTimer_ <= 0.0f) {
+            isNoise_ = false;
+            noiseTimer_ = kNoiseTimer_;
+        }
+
+    }
+    BlendMode randomNoiseBlendMode = kBlendModeSub;
+
+    Object3dCommon::GetInstance()->SetRandomNoiseEnabled(isNoise_);
+    Object3dCommon::GetInstance()->SetRandomNoiseScale(noiseTimer_);
+    Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode);
+
 #pragma region//ゲームオブジェクト
 
     if (player_->GetIsWarp()) {
         for (auto& portal : portalManager_->GetPortals()) {
-
-            player_->SetTranslate(portal->GetWarpPos());
+            player_->SetTranslate(portal->GetWarpTranslate());
+            player_->SetRotate(portal->GetWarpRotate());
             break;
         }
-
     }
 
-    
     if (!useDebugCamera_) {
         playerCamera_->Update();
     }
 
     timeCardWatch_->Update();
 
-
     player_->Update();
-
 
     testField_->Update();
 
+    portalManager_->UpdateWhiteBoard();
+    portalManager_->UpdatePortal();
 
-    portalManager_->Update();
+    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
+
+    key_->Update();
+	edamame_->Update();
 
 #pragma endregion
 }
-void ShadowGameScene::UpdatePointLight()
+void ShadowGameScene::UpdateLight()
 {
+
+    //懐中電灯
+    flashlight_->Update();
+    spotLights_[1] = flashlight_->GetSpotLight();
+
+
 #ifdef USE_IMGUI
     if (ImGui::TreeNode("PointLight")) {
         ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);
@@ -298,31 +387,60 @@ void ShadowGameScene::DrawGameObject()
 {
     Object3dCommon::GetInstance()->BeginShadowMapPass();
     Object3dCommon::GetInstance()->DrawCommonShadow();
-	testField_->Draw();
-	portalManager_->Draw();
-	timeCardWatch_->Draw();
+    testField_->Draw();
+    timeCardWatch_->Draw();
     //プレイヤーの描画処理
     player_->Draw();
+    //ポータルとホワイトボードの描画
+    portalManager_->ShadowDraw();
+    //懐中電灯
+    flashlight_->Draw();
 
     Object3dCommon::GetInstance()->EndShadowMapPass();
+
+    for (auto& portal : portalManager_->GetPortals()) {
+        portal->RenderPortalTextures([this](Camera* camera) {
+            Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+            SetSceneCameraForDraw(camera);
+            DrawSceneGeometry();
+            });
+    }
+
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
+
+    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
+    SetSceneCameraForDraw(playerCamera_->GetCamera());
+    DrawSceneGeometry();
+
+}
+void ShadowGameScene::DrawSceneGeometry()
+{
     Object3dCommon::GetInstance()->DrawCommon();
-
-    //Object3dCommon::GetInstance()->DrawCommonSkinningToon();
-
-
-    
-
     //テスト地面
     testField_->Draw();
     //ポータル管理
-    portalManager_->Draw();
+    portalManager_->ObjDraw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
+    //懐中電灯
+    flashlight_->Draw();
+    collisionManager_->DrawColliders();
+	// 鍵の描画処理
+	key_->Draw();
+	// 枝豆の描画処理
+	edamame_->Draw();
     //プレイヤーの描画処理
-	Object3dCommon::GetInstance()->DrawCommonSkinning();
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
     player_->Draw();
 
-    collisionManager_->DrawColliders();
+}
+void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
+{
+    player_->SetCamera(camera);
+    testField_->SetCamera(camera);
+    portalManager_->SetPlayerCamera(playerCamera_.get());
+    //携帯打刻機
+    timeCardWatch_->SetCamera(camera);
+    flashlight_->SetCamera(camera);
 }
 #pragma endregion

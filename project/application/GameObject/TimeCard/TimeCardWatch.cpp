@@ -7,6 +7,8 @@
 #include"Camera.h"
 #include"Audio.h"
 
+bool TimeCardWatch::canMakePortal_ = false;
+
 namespace {
     float tMin_ = 0.0f;
     float tMax_ = 5.0f;
@@ -48,7 +50,7 @@ void TimeCardWatch::Update()
     child = Function::Multiply(child, parent);
 
     if (canMakePortal_) {
-        MakeBillboardWorldMat();
+        MakeChildMat();
     } else {
         MakeWorldMat();
     }
@@ -71,8 +73,13 @@ void TimeCardWatch::Update()
 
 void TimeCardWatch::Draw()
 {
-    modelObj_->Draw();
-    ring_->Draw();
+    modelObj_->UpdateCameraMatrices();
+    modelObj_->Draw();   
+
+    if (canMakePortal_) {
+        ring_->UpdateCameraMatrices();
+        ring_->Draw();
+    }
 }
 
 bool TimeCardWatch::OnCollisionObjOfMakePortal(const Ray& ray, const AABB& aabb, const Transform& transform)
@@ -86,8 +93,8 @@ bool TimeCardWatch::OnCollisionObjOfMakePortal(const Ray& ray, const AABB& aabb,
         Vector3 forward = YoshidaMath::GetForward(camera_->GetWorldMatrix());
         ringTransform_.translate -= forward * 0.125f;
     } else {
-        ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-        ringTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,tMax_} };
+     /*   ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+        ringTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,tMax_} };*/
     }
 
     return canMakePortal_;
@@ -100,12 +107,13 @@ void TimeCardWatch::MakeWorldMat()
     ringMatWorld_ = child;
 }
 
-void TimeCardWatch::MakeBillboardWorldMat()
+void TimeCardWatch::MakeChildMat()
 {
-    Matrix4x4 scaleMatrix = Function::MakeScaleMatrix(ringTransform_.scale);
-    Matrix4x4 translateMatrix = Function::MakeTranslateMatrix(ringTransform_.translate);
-    Matrix4x4 rotateMatrix = Function::Multiply(YoshidaMath::MakeRotateMatrix(ringTransform_.rotate), YoshidaMath::GetBillBordMatrix(camera_));
-    Matrix4x4 worldMatrix = Function::Multiply(Function::Multiply(scaleMatrix, rotateMatrix), translateMatrix);
-    ringMatWorld_ = worldMatrix;
+    Matrix4x4 child = Function::MakeAffineMatrix(ringTransform_.scale, ringTransform_.rotate, ringTransform_.translate);
+    //Matrix4x4 scaleMatrix = Function::MakeScaleMatrix(ringTransform_.scale);
+    //Matrix4x4 translateMatrix = Function::MakeTranslateMatrix(ringTransform_.translate);
+    //Matrix4x4 rotateMatrix = Function::Multiply(YoshidaMath::MakeRotateMatrix(ringTransform_.rotate), YoshidaMath::GetBillBordMatrix(camera_));
+    //Matrix4x4 worldMatrix = Function::Multiply(Function::Multiply(scaleMatrix, rotateMatrix), translateMatrix);
+    ringMatWorld_ = child;
 
 }

@@ -11,6 +11,8 @@
 #include"GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/TimeCard/TimeCardWatch.h"
+#include"GameObject/Flashlight/Flashlight.h"
+#include"GameObject/Key/Key.h"
 
 #pragma endregion
 
@@ -21,11 +23,16 @@
 #include "Light/SpotLight.h" 
 #include "Light/AreaLight.h"
 #include"Audio.h"
+#include <GameObject/Edamame/Edamame.h>
 
 class ShadowGameScene : public BaseScene
 {
 private:
 
+    bool isPause_ = false;
+    const float kNoiseTimer_ = 0.5f;
+    float noiseTimer_ = kNoiseTimer_;
+    bool isNoise_ = false;
 
 #pragma region//カメラの設定
 
@@ -52,6 +59,12 @@ private:
     std::unique_ptr<PortalManager> portalManager_ = nullptr;
     //携帯打刻機
     std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
+    //懐中電灯
+    std::unique_ptr<Flashlight> flashlight_ = nullptr;
+    // 鍵
+	std::unique_ptr<Key> key_ = nullptr;
+    // 枝豆
+	std::unique_ptr<Edamame> edamame_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
@@ -101,7 +114,7 @@ private:
     //ゲームオブジェクトの更新処理
     void UpdateGameObject();
     //ポイントライトの更新処理
-    void UpdatePointLight();
+    void UpdateLight();
     // =======================================
     // プライベート描画処理
     // =======================================
@@ -109,6 +122,7 @@ private:
     void DrawSceneTransition();
     //ゲームオブジェクトの描画処理
     void DrawGameObject();
-
+    void DrawSceneGeometry();
+    void SetSceneCameraForDraw(Camera* camera);
 };
 

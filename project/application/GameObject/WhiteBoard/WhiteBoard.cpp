@@ -9,6 +9,16 @@ WhiteBoard::WhiteBoard()
 #endif
 }
 
+void WhiteBoard::OnCollision(Collider* collider)
+{
+
+}
+
+Vector3 WhiteBoard::GetWorldPosition() const
+{
+    return obj_->GetTransform().translate;
+}
+
 void WhiteBoard::Initialize()
 {
     obj_->Initialize();
@@ -17,6 +27,11 @@ void WhiteBoard::Initialize()
     primitive_->SetColor({ 1.0f,1.0f,1.0f,0.1f });
 #endif
     localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
+
+   /* SetRadius(1.0f);*/
+    SetAABB(AABB{ .min = {-1.0f,0.0f,-1.0f}, .max = {1.0f,1.5f,1.0f} });
+    SetCollisionAttribute(kCollisionFloor);
+    SetCollisionMask(kCollisionPlayer);
 }
 
 void WhiteBoard::Update()
@@ -24,9 +39,8 @@ void WhiteBoard::Update()
     obj_->Update();
 
     collisionTransform_ = obj_->GetTransform();
-
     collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
-    collisionTransform_.rotate = { 0.0f };
+
     //objectからの相対距離
     collisionTransform_.translate.y += 1.375f;
 
@@ -38,8 +52,10 @@ void WhiteBoard::Update()
 
 void WhiteBoard::Draw()
 {
+    obj_->UpdateCameraMatrices();
     obj_->Draw();
 #ifdef _DEBUG
+    primitive_->UpdateCameraMatrices();
     primitive_->Draw();
 #endif
 }

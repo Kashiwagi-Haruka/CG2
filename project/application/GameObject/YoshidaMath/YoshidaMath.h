@@ -4,6 +4,8 @@
 #include"Vector4.h"
 #include"RigidBody.h"
 #include"Matrix4x4.h"
+#include"Transform.h"
+
 class Camera;
 class Collider;
 namespace YoshidaMath {
@@ -21,5 +23,8 @@ namespace YoshidaMath {
     //オイラー角から回転行列を取得する
     Matrix4x4 MakeRotateMatrix(const Vector3& rotate);
     Matrix4x4 GetBillBordMatrix(Camera* camera);
+    Matrix4x4 GetBillBordMatrix(const Matrix4x4& mat);
     Vector3 GetAABBScale(const AABB& aabb);
+    void LookTarget(const Vector3& target, Transform& transform);
+    Vector3 GetToTargetVec(const Vector3& target,const Vector3& pos);
 }

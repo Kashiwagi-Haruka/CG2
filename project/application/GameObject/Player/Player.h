@@ -51,6 +51,7 @@ public:
     //前方のベクトルを取得する
     const Vector3& GetForward() const { return forward_; };
     void SetTranslate(const Vector3& translate) { transform_.translate = translate; };
+    void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
     //コンストラクタ
     Player();
     //カメラのセッター
@@ -59,6 +60,7 @@ public:
     void Initialize();
     //更新処理
     void Update();
+
     //描画処理
     void Draw();
     //デバック

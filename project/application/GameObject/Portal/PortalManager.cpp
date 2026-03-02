@@ -4,13 +4,21 @@
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
 #include"GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
+#include"GameObject/WhiteBoard/WalkWhiteBoard.h"
+
 namespace {
     const constexpr uint32_t kMaxWhiteBoards = 6;
 }
 
-PortalManager::PortalManager()
+PortalManager::PortalManager(Vector3* pos)
 {
-    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
+    ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
+    std::unique_ptr<WalkWhiteBoard>  walkWhite = std::make_unique<WalkWhiteBoard>();
+    WalkWhiteBoard::LoadAnimation("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
+    walkWhite->SetModel("whiteBoard");
+    walkWhite->SetTargetPosPtr(pos);
+    whiteBoards_.push_back(std::move(walkWhite));
+
     for (int i = 0; i < kMaxWhiteBoards; ++i) {
         std::unique_ptr<WhiteBoard>  white = std::make_unique<WhiteBoard>();
         white->SetModel("whiteBoard");
@@ -25,25 +33,49 @@ void PortalManager::Initialize()
     }
 }
 
-void PortalManager::Update()
+void PortalManager::UpdateWhiteBoard()
 {
     for (auto& board : whiteBoards_) {
         board->Update();
     }
+}
+
+void PortalManager::UpdatePortal() {
 
     for (auto& portal : portals_) {
         portal->Update();
     }
-}
+};
 
-void PortalManager::Draw()
+void PortalManager::DrawWhiteBoard()
 {
-    for (auto& board : whiteBoards_) {
+    for (auto& board : whiteBoards_) { 
         board->Draw();
     }
+}
+
+void PortalManager::ShadowDraw()
+{
+    DrawWhiteBoard();
 
     for (auto& portal : portals_) {
-        portal->Draw();
+        portal->SetCamera(playerCamera_->GetCamera());
+        portal->UpdateCameraMatrices();
+        portal->DrawRings();
+        portal->DrawWarpPos();
+    }
+}
+
+void PortalManager::ObjDraw()
+{
+    DrawWhiteBoard();
+
+    for (auto& portal : portals_) {
+        portal->SetCamera(playerCamera_->GetCamera());
+        portal->UpdateCameraMatrices();
+        portal->DrawPortals();
+        portal->DrawRings();
+        portal->DrawWarpPos();
     }
 }
 
@@ -57,6 +89,8 @@ void PortalManager::SetPlayerCamera(PlayerCamera* camera)
 
 void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch,const Vector3& warpPos)
 {
+
+
     //whiteBoardとrayの当たり判定
     for (auto& board : whiteBoards_) {
         if (timeCardWatch->OnCollisionObjOfMakePortal(playerCamera_->GetRay(), board->GetAABB(), board->GetTransform())) {
@@ -65,17 +99,24 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch,const Vector3& w
                //前回のポータルを削除
                 portals_.clear();
 
+                if (whiteBoard_) { 
+                    whiteBoard_->SetCollisionAttribute(preCollision_);
+                }
+
                 //ショットしたらポータル作る
                std::unique_ptr  portal = std::make_unique<Portal>();
-               
+               whiteBoard_ = board.get();
+               preCollision_ = whiteBoard_->GetCollisionAttribute();
+               whiteBoard_->SetCollisionAttribute(kCollisionNone);
+
                //Portalの初期化処理
+               
                portal->Initialize();
+
                Camera* camera = playerCamera_->GetCamera();
                portal->SetCamera(camera);
-               portal->SetTransform(board->GetTransform());
-               portal->SetRingWorldMatrix(camera);
-               portal->SetWarpPos(warpPos);
-               
+               portal->SetParentTransform(&whiteBoard_->GetTransform());
+               portal->SetWarpTransform(warpPos);
                portals_.push_back(std::move(portal));
 
 

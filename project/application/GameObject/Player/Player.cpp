@@ -19,7 +19,7 @@ Player::Player()
     localAABB_ = { .min = {-0.25f,0.0f,-0.25f},.max = {0.25f,1.5f,0.25f} };
     SetAABB(localAABB_);
     SetCollisionAttribute(kCollisionPlayer);
-    SetCollisionMask(kCollisionFloor|kCollisionPortal);
+    SetCollisionMask(kCollisionFloor|kCollisionPortal|kCollisionEnemy|kCollisionItem);
 
     //体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
@@ -88,6 +88,7 @@ void Player::Update()
 
 void Player::Draw()
 {
+    bodyObj_->UpdateCameraMatrices();
     bodyObj_->Draw();
 
 }
@@ -179,7 +180,7 @@ void Player::OnCollision(Collider* collider)
 {
 
  /*   if (collider->GetCollisionAttribute() == kCollisionFloor) {*/
-        OnCollisionObstacle();
+     OnCollisionObstacle();
     
     if (collider->GetCollisionAttribute() == kCollisionPortal) {
         isWarp_ = true;

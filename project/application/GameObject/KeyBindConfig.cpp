@@ -12,6 +12,7 @@ PlayerCommand* PlayerCommand::GetInstance()
     return instance_.get();
 }
 
+
 bool PlayerCommand::MoveLeft()
 {
     return Move(K_MoveLeft, C_MoveLeft);
@@ -42,6 +43,12 @@ bool PlayerCommand::Sneak()
 {
     auto* input = Input::GetInstance();
     return input->PushKey(K_Sneak) || input->PushButton(Input::PadButton(C_Sneak));
+}
+
+bool PlayerCommand::Interact()
+{
+    auto* input = Input::GetInstance();
+    return input->PushKey(K_Interact) || input->PushButton(Input::PadButton(C_Interact));
 }
 
 Vector2 PlayerCommand::Rotate(float rotateSpeed)

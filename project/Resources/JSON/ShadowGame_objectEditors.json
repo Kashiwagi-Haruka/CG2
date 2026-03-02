@@ -1,10 +1,38 @@
 {
+  "audio": {
+    "sounds": [
+      {
+        "name": "magic.mp3",
+        "volume": 1.0
+      }
+    ]
+  },
+  "lights": {
+    "area": [],
+    "directional": {
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "direction": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "intensity": 1.100000023841858
+    },
+    "overrideSceneLights": false,
+    "point": [],
+    "spot": []
+  },
   "objects": [
     {
       "index": 0,
       "material": {
         "color": [
-          1.0,
+          0.9098039269447327,
           1.0,
           1.0,
           1.0
@@ -36,7 +64,7 @@
           0.0
         ]
       },
-      "name": "Object 0",
+      "name": "Human",
       "transform": {
         "rotate": [
           0.0,
@@ -91,7 +119,7 @@
           0.0
         ]
       },
-      "name": "Object 1",
+      "name": "FlashLight",
       "transform": {
         "rotate": [
           0.0,
@@ -104,8 +132,8 @@
           1.0
         ],
         "translate": [
-          0.0,
-          0.0,
+          1.0,
+          0.36000001430511475,
           0.0
         ]
       }
@@ -119,8 +147,8 @@
           1.0,
           1.0
         ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
+        "distortionFalloff": 1.2000000476837158,
+        "distortionStrength": 2.4200000762939453,
         "enableLighting": true,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
@@ -146,11 +174,11 @@
           0.0
         ]
       },
-      "name": "Object 2",
+      "name": "whiteBoard1",
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          1.5,
           0.0
         ],
         "scale": [
@@ -159,9 +187,9 @@
           1.0
         ],
         "translate": [
+          -2.869999885559082,
           0.0,
-          0.0,
-          0.0
+          -2.0
         ]
       }
     },
@@ -201,11 +229,11 @@
           0.0
         ]
       },
-      "name": "Object 3",
+      "name": "whiteBoard2",
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          0.8600000143051147,
           0.0
         ],
         "scale": [
@@ -214,9 +242,9 @@
           1.0
         ],
         "translate": [
+          3.0,
           0.0,
-          0.0,
-          0.0
+          2.0
         ]
       }
     },
@@ -256,7 +284,7 @@
           0.0
         ]
       },
-      "name": "Object 4",
+      "name": "whiteBoard3",
       "transform": {
         "rotate": [
           0.0,
@@ -269,7 +297,7 @@
           1.0
         ],
         "translate": [
-          0.0,
+          10.0,
           0.0,
           0.0
         ]
@@ -311,11 +339,11 @@
           0.0
         ]
       },
-      "name": "Object 5",
+      "name": "whiteBoard4",
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          -0.8100000023841858,
           0.0
         ],
         "scale": [
@@ -324,9 +352,9 @@
           1.0
         ],
         "translate": [
+          -2.0,
           0.0,
-          0.0,
-          0.0
+          0.4099999964237213
         ]
       }
     },
@@ -366,11 +394,11 @@
           0.0
         ]
       },
-      "name": "Object 6",
+      "name": "whiteBoard5",
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          3.140000104904175,
           0.0
         ],
         "scale": [
@@ -379,9 +407,9 @@
           1.0
         ],
         "translate": [
+          -1.0,
           0.0,
-          0.0,
-          0.0
+          -4.0
         ]
       }
     },
@@ -421,11 +449,11 @@
           0.0
         ]
       },
-      "name": "Object 7",
+      "name": "whiteBoard6",
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          -0.6399999856948853,
           0.0
         ],
         "scale": [
@@ -434,16 +462,14 @@
           1.0
         ],
         "translate": [
+          3.5,
           0.0,
-          0.0,
-          0.0
+          -1.1200000047683716
         ]
       }
-    }
-  ],
-  "primitives": [
+    },
     {
-      "index": 0,
+      "index": 8,
       "material": {
         "color": [
           1.0,
@@ -478,7 +504,62 @@
           0.0
         ]
       },
-      "name": "Primitive 0",
+      "name": "whiteBoard7",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          -1.0099999904632568,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 9,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Object 9",
       "transform": {
         "rotate": [
           0.0,
@@ -494,6 +575,173 @@
           0.0,
           0.0,
           0.0
+        ]
+      }
+    },
+    {
+      "index": 10,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Object 10",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 11,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Object 11",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    }
+  ],
+  "primitives": [
+    {
+      "index": 0,
+      "material": {
+        "color": [
+          0.9098039269447327,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "poster",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.75,
+          0.75,
+          0.75
+        ],
+        "translate": [
+          10.0,
+          1.5,
+          -0.029999999329447746
         ]
       }
     },
@@ -547,6 +795,116 @@
         ],
         "translate": [
           0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.2000000476837158,
+        "distortionStrength": 2.4200000762939453,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "ring1",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          -0.18000000715255737,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "ring2",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          -4.110000133514404,
           0.0,
           0.0
         ]
