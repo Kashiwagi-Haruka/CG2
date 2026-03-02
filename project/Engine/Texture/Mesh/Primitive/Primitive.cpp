@@ -837,9 +837,12 @@ void Primitive::SetTextureIndex(uint32_t textureIndex) { textureIndex_ = texture
 void Primitive::SetSecondaryTextureIndex(uint32_t textureIndex) { secondaryTextureIndex_ = textureIndex; }
 
 void Primitive::ClearSecondaryTextureIndex() { secondaryTextureIndex_ = UINT32_MAX; }
-void Primitive::SetPortalProjectionMatrices(const Matrix4x4& textureViewProjection0, const Matrix4x4& textureViewProjection1) {
+void Primitive::SetPortalProjectionMatrices(
+    const Matrix4x4& textureViewProjection0, const Matrix4x4& textureViewProjection1, const Matrix4x4& portalCameraWorld0, const Matrix4x4& portalCameraWorld1) {
 	textureViewProjection0_ = textureViewProjection0;
 	textureViewProjection1_ = textureViewProjection1;
+	portalCameraWorld0_ = portalCameraWorld0;
+	portalCameraWorld1_ = portalCameraWorld1;
 }
 void Primitive::SetPortalProjectionEnabled(bool enabled) { usePortalProjection_ = enabled; }
 Vector4 Primitive::GetColor() const {

@@ -93,8 +93,10 @@ void SampleScenePortalSystem::RenderPortalTextures(const std::function<void(Came
 		portalRenderTextureB_->TransitionToShaderResource();
 	}
 
-	portalA_->SetPortalProjectionMatrices(portalTextureCameraB_->GetViewProjectionMatrix(), portalTextureCameraB_->GetViewProjectionMatrix());
-	portalB_->SetPortalProjectionMatrices(portalTextureCameraA_->GetViewProjectionMatrix(), portalTextureCameraA_->GetViewProjectionMatrix());
+	portalA_->SetPortalProjectionMatrices(
+	    portalTextureCameraB_->GetViewProjectionMatrix(), portalTextureCameraB_->GetViewProjectionMatrix(), portalTextureCameraB_->GetWorldMatrix(), portalTextureCameraB_->GetWorldMatrix());
+	portalB_->SetPortalProjectionMatrices(
+	    portalTextureCameraA_->GetViewProjectionMatrix(), portalTextureCameraA_->GetViewProjectionMatrix(), portalTextureCameraA_->GetWorldMatrix(), portalTextureCameraA_->GetWorldMatrix());
 }
 
 void SampleScenePortalSystem::SetCamera(Camera* camera) {

@@ -24,6 +24,8 @@ struct Camera
     float2 padding2;
     float4x4 textureViewProjection0;
     float4x4 textureViewProjection1;
+    float4x4 portalCameraWorld0;
+    float4x4 portalCameraWorld1;
     int usePortalProjection;
     float3 padding3;
 };
@@ -69,6 +71,8 @@ PixelShaderOutput main(VertexShaderOutput input)
 
     float2 uv0;
     float2 uv1;
+    float validMask0 = 1.0f;
+    float validMask1 = 1.0f;
     if (gCamera.usePortalProjection != 0)
     {
         float4 clip0 = mul(float4(input.worldPosition, 1.0f), gCamera.textureViewProjection0);
@@ -77,6 +81,18 @@ PixelShaderOutput main(VertexShaderOutput input)
         float2 ndc1 = clip1.xy / max(clip1.w, 0.0001f);
         uv0 = float2(ndc0.x * 0.5f + 0.5f, -ndc0.y * 0.5f + 0.5f);
         uv1 = float2(ndc1.x * 0.5f + 0.5f, -ndc1.y * 0.5f + 0.5f);
+
+        float3 cameraPosition0 = gCamera.portalCameraWorld0[3].xyz;
+        float3 cameraPosition1 = gCamera.portalCameraWorld1[3].xyz;
+        float3 cameraForward0 = normalize(gCamera.portalCameraWorld0[2].xyz);
+        float3 cameraForward1 = normalize(gCamera.portalCameraWorld1[2].xyz);
+        float front0 = dot(input.worldPosition - cameraPosition0, cameraForward0);
+        float front1 = dot(input.worldPosition - cameraPosition1, cameraForward1);
+
+        bool isInUv0 = uv0.x >= 0.0f && uv0.x <= 1.0f && uv0.y >= 0.0f && uv0.y <= 1.0f;
+        bool isInUv1 = uv1.x >= 0.0f && uv1.x <= 1.0f && uv1.y >= 0.0f && uv1.y <= 1.0f;
+        validMask0 = (clip0.w > 0.0f && front0 > 0.0f && isInUv0) ? 1.0f : 0.0f;
+        validMask1 = (clip1.w > 0.0f && front1 > 0.0f && isInUv1) ? 1.0f : 0.0f;
     }
     else
     {
@@ -87,6 +103,8 @@ PixelShaderOutput main(VertexShaderOutput input)
 
     float4 cameraTexture0Color = gCameraTexture0.Sample(gSampler, saturate(uv0));
     float4 cameraTexture1Color = gCameraTexture1.Sample(gSampler, saturate(uv1));
+    cameraTexture0Color *= validMask0;
+    cameraTexture1Color *= validMask1;
     float cameraBlend = saturate(gMaterial.environmentCoefficient);
     float4 textureColor = lerp(cameraTexture0Color, cameraTexture1Color, cameraBlend);
 
