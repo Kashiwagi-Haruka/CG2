@@ -24,7 +24,7 @@ SampleScene::SampleScene() {
 	spherePrimitive_ = std::make_unique<Primitive>();
 	portalMeshA_ = std::make_unique<PortalMesh>();
 	portalMeshB_ = std::make_unique<PortalMesh>();
-	portalObjectCamera_ = std::make_unique<Camera>();
+	/*portalObjectCamera_ = std::make_unique<Camera>();*/
 	portalTextureCameraA_ = std::make_unique<Camera>();
 	portalTextureCameraB_ = std::make_unique<Camera>();
 	cameraTransform_ = {
@@ -94,8 +94,8 @@ void SampleScene::Initialize() {
 	portalMeshB_->SetSecondaryTextureIndex(portalRenderTextureA_.GetSrvIndex());
 	portalMeshA_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	portalMeshB_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-	portalMeshA_->SetObjectCamera(portalObjectCamera_.get());
-	portalMeshB_->SetObjectCamera(portalObjectCamera_.get());
+	portalMeshA_->SetObjectCamera(/*portalObjectCamera_.get()*/camera_.get());
+	portalMeshB_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
 	portalMeshA_->SetTextureCamera(portalTextureCameraA_.get());
 	portalMeshB_->SetTextureCamera(portalTextureCameraB_.get());
 	uvBallTransform_ = {
@@ -133,13 +133,13 @@ void SampleScene::Initialize() {
         .rotate{std::numbers::pi_v<float>*3.0f/2.0f, 0.0f, 0.0f},
         .translate{3.0f, 3.5f, 2.0f}
     };
-	portalObjectCameraTransform_ = {
+	/*portalObjectCameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
         .rotate{0.0f, 0.0f, 0.0f  },
         .translate{0.0f, 5.0f, -10.0f}
     };
 	portalObjectCamera_->SetTransform(portalObjectCameraTransform_);
-	portalObjectCamera_->Update();
+	portalObjectCamera_->Update();*/
 	portalMeshA_->SetTransform(portalATransform_);
 	portalMeshB_->SetTransform(portalBTransform_);
 	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample", particleTransform_, 0.1f, 5, Vector3{0.0f, 0.0f, 0.0f}, Vector3{-0.5f, -0.5f, -0.5f}, Vector3{0.5f, 0.5f, 0.5f});
@@ -388,7 +388,17 @@ void SampleScene::Update() {
 		ImGui::Combo("Random Noise Blend", &randomNoiseBlendMode_, noiseBlendModes, IM_ARRAYSIZE(noiseBlendModes));
 	}
 	ImGui::End();
-	if (ImGui::Begin("Portal Texture Camera")) {
+	if (ImGui::Begin("Portal")) {
+		ImGui::Text("Portal A object transform");
+		ImGui::DragFloat3("Scale##PortalA", &portalATransform_.scale.x, 0.01f, 0.01f, 100.0f);
+		ImGui::DragFloat3("Rotate##PortalA", &portalATransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Translate##PortalA", &portalATransform_.translate.x, 0.01f);
+		ImGui::Separator();
+		ImGui::Text("Portal B object transform");
+		ImGui::DragFloat3("Scale##PortalB", &portalBTransform_.scale.x, 0.01f, 0.01f, 100.0f);
+		ImGui::DragFloat3("Rotate##PortalB", &portalBTransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Translate##PortalB", &portalBTransform_.translate.x, 0.01f);
+		ImGui::Separator();
 		ImGui::Text("Portal A render texture camera transform");
 		ImGui::DragFloat3("Scale##PortalTextureCameraA", &portalTextureCameraATransform_.scale.x, 0.01f, 0.01f, 100.0f);
 		ImGui::DragFloat3("Rotate##PortalTextureCameraA", &portalTextureCameraATransform_.rotate.x, 0.01f);
@@ -409,16 +419,18 @@ void SampleScene::Update() {
 		camera_->SetTransform(cameraTransform_);
 		camera_->Update();
 	}
-	portalObjectCamera_->SetTransform(portalObjectCameraTransform_);
-	portalObjectCamera_->Update();
+	/*portalObjectCamera_->SetTransform(portalObjectCameraTransform_);
+	portalObjectCamera_->Update();*/
 	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
 	portalTextureCameraA_->Update();
 	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
 	portalTextureCameraB_->Update();
+	portalMeshA_->SetTransform(portalATransform_);
 	portalMeshA_->SetTextureCamera(portalTextureCameraA_.get());
-	portalMeshA_->SetObjectCamera(portalObjectCamera_.get());
+	portalMeshA_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
+	portalMeshB_->SetTransform(portalBTransform_);
 	portalMeshB_->SetTextureCamera(portalTextureCameraB_.get());
-	portalMeshB_->SetObjectCamera(portalObjectCamera_.get());
+	portalMeshB_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
 	portalMeshA_->Update();
 	portalMeshB_->Update();
 	ParticleManager::GetInstance()->Update(camera_.get());
@@ -506,8 +518,8 @@ void SampleScene::SetSceneCameraForDraw(Camera* camera) {
 	animatedCubeObj_->SetCamera(camera);
 	humanObj_->SetCamera(camera);
 	spherePrimitive_->SetCamera(camera);
-	portalMeshA_->SetObjectCamera(portalObjectCamera_.get());
-	portalMeshB_->SetObjectCamera(portalObjectCamera_.get());
+	portalMeshA_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
+	portalMeshB_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
 }
 
 void SampleScene::UpdateSceneCameraMatricesForDraw() {

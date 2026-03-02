@@ -32,7 +32,7 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<PortalMesh> portalMeshB_ = nullptr;
 	RenderTexture2D portalRenderTextureA_{};
 	RenderTexture2D portalRenderTextureB_{};
-	std::unique_ptr<Camera> portalObjectCamera_ = nullptr;
+	/*std::unique_ptr<Camera> portalObjectCamera_ = nullptr;*/
 	std::unique_ptr<Camera> portalTextureCameraA_ = nullptr;
 	std::unique_ptr<Camera> portalTextureCameraB_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
@@ -57,7 +57,7 @@ class SampleScene : public BaseScene {
 	Transform portalBTransform_{};
 	Transform portalTextureCameraATransform_{};
 	Transform portalTextureCameraBTransform_{};
-	Transform portalObjectCameraTransform_{};
+	/*Transform portalObjectCameraTransform_{};*/
 	Transform particleTransform_{};
 	std::unique_ptr<ParticleEmitter> sampleParticleEmitter_ = nullptr;
 
