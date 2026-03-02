@@ -161,6 +161,8 @@ void ShadowGameScene::CheckCollision()
         collisionManager_->AddCollider(whiteBoard.get(), playerCamera_->GetCamera());
     }
 
+    collisionManager_->AddCollider(flashlight_.get(), playerCamera_->GetCamera());
+
     collisionManager_->AddCollider(testField_.get(), playerCamera_->GetCamera());
     collisionManager_->CheckAllCollisions();
 }
@@ -408,7 +410,7 @@ void ShadowGameScene::DrawSceneGeometry()
     timeCardWatch_->Draw();
     //懐中電灯
     flashlight_->Draw();
-    //collisionManager_->DrawColliders();
+    collisionManager_->DrawColliders();
 	// 鍵の描画処理
 	key_->Draw();
     //プレイヤーの描画処理

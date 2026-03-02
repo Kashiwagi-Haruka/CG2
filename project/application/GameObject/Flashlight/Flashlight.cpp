@@ -10,12 +10,15 @@ Flashlight::Flashlight()
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/light", "light");
     obj_->SetModel("light");
     SetAABB({ .min = {-0.1f,-0.2f,-0.1f},.max = {0.1f,0.1f,0.1f} });
-    
+    SetCollisionAttribute(kCollisionItem);
+    SetCollisionMask(kCollisionPlayer);
 }
 
 void Flashlight::OnCollision(Collider* collider)
 {
-
+    if (collider->GetCollisionAttribute() == kCollisionPlayer) {
+        isRotateY_ = true;
+    }
 }
 
 Vector3 Flashlight::GetWorldPosition() const
@@ -30,6 +33,13 @@ void Flashlight::SetCamera(Camera* camera)
 
 void Flashlight::Update()
 {
+    if (isRotateY_) {
+        transform_.rotate.y += YoshidaMath::kDeltaTime;
+        obj_->SetRotate(transform_.rotate);
+    }
+    isRotateY_ = false;
+
+    obj_->SetTransform(transform_);
     obj_->Update();
    
     spotLight_.position = obj_->GetTranslate();
@@ -40,7 +50,11 @@ void Flashlight::Update()
 
 void Flashlight::Initialize()
 {
+    isRotateY_ = false;
     obj_->Initialize();
+    transform_.translate = {1.0f,0.1f,1.0f};
+    transform_.rotate = { 0.0f,0.0f,0.0f };
+    transform_.scale = { 1.0f,1.0f,1.0f };
     SetLight();
 }
 
