@@ -7,6 +7,8 @@
 #include"Camera.h"
 #include"Audio.h"
 
+bool TimeCardWatch::canMakePortal_ = false;
+
 namespace {
     float tMin_ = 0.0f;
     float tMax_ = 5.0f;
@@ -72,9 +74,12 @@ void TimeCardWatch::Update()
 void TimeCardWatch::Draw()
 {
     modelObj_->UpdateCameraMatrices();
-    ring_->UpdateCameraMatrices();
-    modelObj_->Draw();
-    ring_->Draw();
+    modelObj_->Draw();   
+
+    if (canMakePortal_) {
+        ring_->UpdateCameraMatrices();
+        ring_->Draw();
+    }
 }
 
 bool TimeCardWatch::OnCollisionObjOfMakePortal(const Ray& ray, const AABB& aabb, const Transform& transform)
@@ -88,8 +93,8 @@ bool TimeCardWatch::OnCollisionObjOfMakePortal(const Ray& ray, const AABB& aabb,
         Vector3 forward = YoshidaMath::GetForward(camera_->GetWorldMatrix());
         ringTransform_.translate -= forward * 0.125f;
     } else {
-        ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-        ringTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,tMax_} };
+     /*   ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+        ringTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,tMax_} };*/
     }
 
     return canMakePortal_;

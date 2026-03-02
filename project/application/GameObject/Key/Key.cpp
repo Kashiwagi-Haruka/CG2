@@ -90,6 +90,8 @@ void Key::CheckCollision()
 		if (PlayerCommand::GetInstance()->Interact()) {
 			isGrabbed_ = true;
 		}
+
+	  
 	}
 
 	if (isGrabbed_ && !PlayerCommand::GetInstance()->Interact()) {

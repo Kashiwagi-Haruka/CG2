@@ -12,9 +12,7 @@ void WalkWhiteBoard::OnCollision(Collider* collider)
 {
     
     if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-      /*  isMove_ = true;*/
-
-
+        isMove_ = true;
     }
 }
 

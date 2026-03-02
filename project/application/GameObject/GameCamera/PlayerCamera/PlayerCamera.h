@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include"Transform.h"
 #include"RigidBody.h"
+#include"GameObject/UI/RaySprite.h"
 
 class PlayerCamera
 {
@@ -19,6 +20,8 @@ public:
     //Rayをセットする
     void SetRay();
     Ray& GetRay() { return ray_; };
+    void DrawRaySprite();
+    void Initialize();
 private:
     void SetTransform();
     Vector3 GetForward();
@@ -30,5 +33,8 @@ private:
     Transform* playerTransform_ = nullptr;
     //カメラの感度
     float eyeRotateSpeed_ = 0.3f;
+    //raySprite
+    std::unique_ptr<RaySprite> raySprite_ = nullptr;
+  
 };
 
