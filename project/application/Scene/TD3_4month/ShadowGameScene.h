@@ -23,6 +23,7 @@
 #include "Light/SpotLight.h" 
 #include "Light/AreaLight.h"
 #include"Audio.h"
+#include <GameObject/Edamame/Edamame.h>
 
 class ShadowGameScene : public BaseScene
 {
@@ -62,6 +63,8 @@ private:
     std::unique_ptr<Flashlight> flashlight_ = nullptr;
     // 鍵
 	std::unique_ptr<Key> key_ = nullptr;
+    // 枝豆
+	std::unique_ptr<Edamame> edamame_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
