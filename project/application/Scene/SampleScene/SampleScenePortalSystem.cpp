@@ -1,10 +1,10 @@
 #include "SampleScenePortalSystem.h"
+
 #include "Function.h"
 #include "Object3d/Object3dCommon.h"
 #include "WinApp.h"
-#include <cmath>
+
 #include <numbers>
-#include "Engine/Log/Logger.h"
 
 SampleScenePortalSystem::SampleScenePortalSystem() {
 	portalA_ = std::make_unique<Primitive>();
@@ -16,73 +16,67 @@ SampleScenePortalSystem::SampleScenePortalSystem() {
 }
 
 void SampleScenePortalSystem::Initialize(Camera* mainCamera, const Transform& portalATransform, const Transform& portalBTransform) {
-	portalA_->Initialize(Primitive::Circle, 48);
-	portalA_->SetCamera(mainCamera);
-	portalA_->SetColor({0.3f, 0.7f, 1.0f, 1.0f});
-	portalA_->SetEnableLighting(false);
-	portalB_->Initialize(Primitive::Circle, 48);
-	portalB_->SetCamera(mainCamera);
-	portalB_->SetEnableLighting(false);
+	sceneCamera_ = mainCamera;
 
-	portalRingA_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 48);
-	portalRingA_->SetCamera(mainCamera);
+	portalA_->Initialize(Primitive::Circle, 64);
+	portalB_->Initialize(Primitive::Circle, 64);
+	portalA_->SetEnableLighting(false);
+	portalB_->SetEnableLighting(false);
+	portalA_->SetColor({0.95f, 0.95f, 1.0f, 1.0f});
+	portalB_->SetColor({0.95f, 0.95f, 1.0f, 1.0f});
+	portalA_->SetPortalProjectionEnabled(true);
+	portalB_->SetPortalProjectionEnabled(true);
+
+	portalRingA_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 64);
+	portalRingB_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 64);
 	portalRingA_->SetEnableLighting(false);
-	portalRingA_->SetColor({0.3f, 0.7f, 1.0f, 1.0f});
-	portalRingB_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 48);
-	portalRingB_->SetCamera(mainCamera);
 	portalRingB_->SetEnableLighting(false);
+	portalRingA_->SetColor({0.2f, 0.7f, 1.0f, 1.0f});
 	portalRingB_->SetColor({1.0f, 0.55f, 0.1f, 1.0f});
 
-	portalA_->SetTransform(portalATransform);
-	portalB_->SetTransform(portalBTransform);
-	portalRingA_->SetTransform(portalATransform);
-	portalRingB_->SetTransform(portalBTransform);
+	SetCamera(mainCamera);
+	SetPortalTransforms(portalATransform, portalBTransform);
 
 	portalRenderTextureA_ = std::make_unique<RenderTexture2D>();
-	portalRenderTextureA_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.05f, 0.05f, 0.1f, 1.0f});
+	portalRenderTextureA_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.02f, 0.02f, 0.05f, 1.0f});
 	if (portalRenderTextureA_->IsReady()) {
 		portalB_->SetTextureIndex(portalRenderTextureA_->GetSrvIndex());
 		portalB_->SetSecondaryTextureIndex(portalRenderTextureA_->GetSrvIndex());
 	}
+
 	portalRenderTextureB_ = std::make_unique<RenderTexture2D>();
-	portalRenderTextureB_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.05f, 0.05f, 0.1f, 1.0f});
+	portalRenderTextureB_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.02f, 0.02f, 0.05f, 1.0f});
 	if (portalRenderTextureB_->IsReady()) {
 		portalA_->SetTextureIndex(portalRenderTextureB_->GetSrvIndex());
 		portalA_->SetSecondaryTextureIndex(portalRenderTextureB_->GetSrvIndex());
 	}
-	portalA_->SetPortalProjectionEnabled(true);
-	portalB_->SetPortalProjectionEnabled(true);
 }
 
 void SampleScenePortalSystem::Update(Camera* mainCamera, float ringUvRotation) {
 	sceneCamera_ = mainCamera;
+
 	portalA_->Update();
 	portalB_->Update();
+
 	const Transform portalATransform = portalA_->GetTransform();
 	const Transform portalBTransform = portalB_->GetTransform();
 	portalRingA_->SetTransform(portalATransform);
 	portalRingB_->SetTransform(portalBTransform);
-	portalRingA_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, ringUvRotation), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
-	portalRingB_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, -ringUvRotation), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
+	portalRingA_->SetUvTransform(Vector3{1.0f, 1.0f, 1.0f}, Vector3{0.0f, 0.0f, ringUvRotation}, Vector3{0.0f, 0.0f, 0.0f}, Vector2{0.5f, 0.5f});
+	portalRingB_->SetUvTransform(Vector3{1.0f, 1.0f, 1.0f}, Vector3{0.0f, 0.0f, -ringUvRotation}, Vector3{0.0f, 0.0f, 0.0f}, Vector2{0.5f, 0.5f});
 	portalRingA_->Update();
 	portalRingB_->Update();
 }
-void SampleScenePortalSystem::SetPortalTransforms(const Transform& portalATransform, const Transform& portalBTransform) {
-	portalA_->SetTransform(portalATransform);
-	portalB_->SetTransform(portalBTransform);
-	portalRingA_->SetTransform(portalATransform);
-	portalRingB_->SetTransform(portalBTransform);
-}
+
 void SampleScenePortalSystem::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals, const std::function<void(Camera*)>& drawPortals) {
-	if (!sceneCamera_ || !portalTextureCameraA_ || !portalTextureCameraB_) {
+	if (!sceneCamera_) {
 		return;
 	}
 
 	const Transform portalATransform = portalA_->GetTransform();
 	const Transform portalBTransform = portalB_->GetTransform();
-	constexpr int kPortalRecursionPassCount = 2;
 
-	for (int pass = 0; pass < kPortalRecursionPassCount; ++pass) {
+	for (int pass = 0; pass < recursionPassCount_; ++pass) {
 		if (portalRenderTextureA_ && portalRenderTextureA_->IsReady()) {
 			UpdatePortalCamera(portalBTransform, portalATransform, portalTextureCameraA_.get());
 			portalRenderTextureA_->BeginRender();
@@ -90,6 +84,7 @@ void SampleScenePortalSystem::RenderPortalTextures(const std::function<void(Came
 			drawPortals(portalTextureCameraA_.get());
 			portalRenderTextureA_->TransitionToShaderResource();
 		}
+
 		if (portalRenderTextureB_ && portalRenderTextureB_->IsReady()) {
 			UpdatePortalCamera(portalATransform, portalBTransform, portalTextureCameraB_.get());
 			portalRenderTextureB_->BeginRender();
@@ -118,6 +113,13 @@ void SampleScenePortalSystem::SetCamera(Camera* camera) {
 	portalRingB_->SetCamera(camera);
 }
 
+void SampleScenePortalSystem::SetPortalTransforms(const Transform& portalATransform, const Transform& portalBTransform) {
+	portalA_->SetTransform(portalATransform);
+	portalB_->SetTransform(portalBTransform);
+	portalRingA_->SetTransform(portalATransform);
+	portalRingB_->SetTransform(portalBTransform);
+}
+
 void SampleScenePortalSystem::UpdateCameraMatrices() {
 	portalA_->UpdateCameraMatrices();
 	portalB_->UpdateCameraMatrices();
@@ -138,62 +140,46 @@ void SampleScenePortalSystem::DrawRings() {
 }
 
 void SampleScenePortalSystem::SetPortalCameraPositionOffset(const Vector3& offset) { portalCameraPositionOffset_ = offset; }
-
 void SampleScenePortalSystem::SetPortalCameraRotationOffset(const Vector3& offset) { portalCameraRotationOffset_ = offset; }
-
 const Vector3& SampleScenePortalSystem::GetPortalCameraPositionOffset() const { return portalCameraPositionOffset_; }
-
 const Vector3& SampleScenePortalSystem::GetPortalCameraRotationOffset() const { return portalCameraRotationOffset_; }
 
 void SampleScenePortalSystem::UpdatePortalCamera(const Transform& sourcePortal, const Transform& destinationPortal, Camera* outCamera) {
-	if (!outCamera) {
+	if (!sceneCamera_ || !outCamera) {
 		return;
 	}
 
-	const Matrix4x4 sourcePortalWorld = Function::MakeAffineMatrix(sourcePortal.scale, sourcePortal.rotate, sourcePortal.translate);
-	const Matrix4x4 destinationPortalWorld = Function::MakeAffineMatrix(destinationPortal.scale, destinationPortal.rotate, destinationPortal.translate);
-	const Matrix4x4 sourceInverse = Function::Inverse(sourcePortalWorld);
-
-// ローカル空間へ
+	const Matrix4x4 sourceWorld = Function::MakeAffineMatrix(sourcePortal.scale, sourcePortal.rotate, sourcePortal.translate);
+	const Matrix4x4 destinationWorld = Function::MakeAffineMatrix(destinationPortal.scale, destinationPortal.rotate, destinationPortal.translate);
+	const Matrix4x4 sourceInverse = Function::Inverse(sourceWorld);
 	const Matrix4x4 cameraInSourceSpace = Function::Multiply(sourceInverse, sceneCamera_->GetWorldMatrix());
 
-	// destinationへ変換
-	Matrix4x4 portalCameraWorld = Function::Multiply(destinationPortalWorld, cameraInSourceSpace);
-	if (Function::LengthSquared(portalCameraRotationOffset_) > 0.0001f) {
+	const Matrix4x4 halfTurn = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
+	Matrix4x4 portalCameraWorld = Function::Multiply(destinationWorld, Function::Multiply(halfTurn, cameraInSourceSpace));
+
+	if (Function::LengthSquared(portalCameraRotationOffset_) > 0.000001f) {
 		const Matrix4x4 rotationOffset = Function::Multiply(
 		    Function::Multiply(Function::MakeRotateXMatrix(portalCameraRotationOffset_.x), Function::MakeRotateYMatrix(portalCameraRotationOffset_.y)),
 		    Function::MakeRotateZMatrix(portalCameraRotationOffset_.z));
 		portalCameraWorld = Function::Multiply(rotationOffset, portalCameraWorld);
 	}
+
 	portalCameraWorld.m[3][0] += portalCameraPositionOffset_.x;
 	portalCameraWorld.m[3][1] += portalCameraPositionOffset_.y;
 	portalCameraWorld.m[3][2] += portalCameraPositionOffset_.z;
 
-	Vector3 destinationForward = {destinationPortalWorld.m[2][0], destinationPortalWorld.m[2][1], destinationPortalWorld.m[2][2]};
-	if (Function::LengthSquared(destinationForward) < 0.0001f) {
+	Vector3 destinationForward = {destinationWorld.m[2][0], destinationWorld.m[2][1], destinationWorld.m[2][2]};
+	if (Function::LengthSquared(destinationForward) < 0.000001f) {
 		destinationForward = {0.0f, 0.0f, 1.0f};
 	}
 	destinationForward = Function::Normalize(destinationForward);
-	portalCameraWorld.m[3][0] += destinationForward.x * 0.05f;
-	portalCameraWorld.m[3][1] += destinationForward.y * 0.05f;
-	portalCameraWorld.m[3][2] += destinationForward.z * 0.05f;
+	portalCameraWorld.m[3][0] += destinationForward.x * nearPlanePush_;
+	portalCameraWorld.m[3][1] += destinationForward.y * nearPlanePush_;
+	portalCameraWorld.m[3][2] += destinationForward.z * nearPlanePush_;
 
-	// View更新
-	const Matrix4x4 portalViewMatrix = Function::Inverse(portalCameraWorld);
-
-	// ★ Worldも更新する
 	outCamera->SetWorldMatrix(portalCameraWorld);
-
-	// ViewProjection更新
-
-	float aspect = sceneCamera_->GetAspectRatio();
-	float nearZ = sceneCamera_->GetNearZ();
-	float farZ = sceneCamera_->GetFarZ();
-	float fovY = sceneCamera_->GetFovY();
-
-	Matrix4x4 projection = Function::MakePerspectiveFovMatrix(fovY, aspect, nearZ, farZ);
-
-	outCamera->SetViewProjectionMatrix(portalViewMatrix, projection);
+	const Matrix4x4 view = Function::Inverse(portalCameraWorld);
+	const Matrix4x4 projection = Function::MakePerspectiveFovMatrix(sceneCamera_->GetFovY(), sceneCamera_->GetAspectRatio(), sceneCamera_->GetNearZ(), sceneCamera_->GetFarZ());
+	outCamera->SetViewProjectionMatrix(view, projection);
 	outCamera->Update();
-
 }

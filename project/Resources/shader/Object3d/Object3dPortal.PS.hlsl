@@ -57,7 +57,6 @@ float3 ApplySepia(float3 color)
     {
         return color;
     }
-
     float3 sepia;
     sepia.r = dot(color, float3(0.393f, 0.769f, 0.189f));
     sepia.g = dot(color, float3(0.349f, 0.686f, 0.168f));
@@ -69,18 +68,24 @@ PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
 
-    float2 uv0;
-    float2 uv1;
+    float2 uv0 = input.texcoord;
+    float2 uv1 = input.texcoord;
     float validMask0 = 1.0f;
     float validMask1 = 1.0f;
+
     if (gCamera.usePortalProjection != 0)
     {
         float4 clip0 = mul(float4(input.worldPosition, 1.0f), gCamera.textureViewProjection0);
         float4 clip1 = mul(float4(input.worldPosition, 1.0f), gCamera.textureViewProjection1);
-        float2 ndc0 = clip0.xy / max(clip0.w, 0.0001f);
-        float2 ndc1 = clip1.xy / max(clip1.w, 0.0001f);
+
+        float2 ndc0 = clip0.xy / max(clip0.w, 1e-5f);
+        float2 ndc1 = clip1.xy / max(clip1.w, 1e-5f);
+
         uv0 = float2(ndc0.x * 0.5f + 0.5f, -ndc0.y * 0.5f + 0.5f);
         uv1 = float2(ndc1.x * 0.5f + 0.5f, -ndc1.y * 0.5f + 0.5f);
+
+        bool inUv0 = all(uv0 >= 0.0f.xx) && all(uv0 <= 1.0f.xx);
+        bool inUv1 = all(uv1 >= 0.0f.xx) && all(uv1 <= 1.0f.xx);
 
         float3 cameraPosition0 = gCamera.portalCameraWorld0[3].xyz;
         float3 cameraPosition1 = gCamera.portalCameraWorld1[3].xyz;
@@ -89,30 +94,25 @@ PixelShaderOutput main(VertexShaderOutput input)
         float front0 = dot(input.worldPosition - cameraPosition0, cameraForward0);
         float front1 = dot(input.worldPosition - cameraPosition1, cameraForward1);
 
-        bool isInUv0 = uv0.x >= 0.0f && uv0.x <= 1.0f && uv0.y >= 0.0f && uv0.y <= 1.0f;
-        bool isInUv1 = uv1.x >= 0.0f && uv1.x <= 1.0f && uv1.y >= 0.0f && uv1.y <= 1.0f;
-        validMask0 = (clip0.w > 0.0f && front0 > 0.0f && isInUv0) ? 1.0f : 0.0f;
-        validMask1 = (clip1.w > 0.0f && front1 > 0.0f && isInUv1) ? 1.0f : 0.0f;
-    }
-    else
-    {
-        float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-        uv0 = transformedUV.xy;
-        uv1 = transformedUV.xy;
+        validMask0 = (clip0.w > 0.0f && front0 > 0.0f && inUv0) ? 1.0f : 0.0f;
+        validMask1 = (clip1.w > 0.0f && front1 > 0.0f && inUv1) ? 1.0f : 0.0f;
     }
 
-    float4 cameraTexture0Color = gCameraTexture0.Sample(gSampler, saturate(uv0));
-    float4 cameraTexture1Color = gCameraTexture1.Sample(gSampler, saturate(uv1));
-    cameraTexture0Color *= validMask0;
-    cameraTexture1Color *= validMask1;
-    float cameraBlend = saturate(gMaterial.environmentCoefficient);
-    float4 textureColor = lerp(cameraTexture0Color, cameraTexture1Color, cameraBlend);
+    float4 tex0 = gCameraTexture0.Sample(gSampler, saturate(uv0)) * validMask0;
+    float4 tex1 = gCameraTexture1.Sample(gSampler, saturate(uv1)) * validMask1;
 
-    output.color = gMaterial.color * textureColor;
+    float4 portalColor = lerp(tex0, tex1, saturate(gMaterial.environmentCoefficient));
+
+    float2 centeredUv = input.texcoord * 2.0f - 1.0f;
+    float radial = length(centeredUv);
+    float rim = smoothstep(0.7f, 1.0f, radial);
+    portalColor.rgb = lerp(portalColor.rgb, gMaterial.color.rgb, rim * 0.35f);
+
+    output.color = gMaterial.color * portalColor;
     output.color.rgb = ApplyGrayscale(output.color.rgb);
     output.color.rgb = ApplySepia(output.color.rgb);
 
-    if (textureColor.a < 0.001f || output.color.a < 0.001f)
+    if (output.color.a < 0.001f)
     {
         discard;
     }
