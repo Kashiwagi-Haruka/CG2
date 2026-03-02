@@ -1,16 +1,16 @@
-#include "Key.h"
-#include <GameObject/YoshidaMath/YoshidaMath.h>
+#include "Edamame.h"
 #include <Model/ModelManager.h>
+#include <GameObject/YoshidaMath/YoshidaMath.h>
 #include <GameObject/KeyBindConfig.h>
-#include <GameObject/YoshidaMath/CollisionManager/Collider.h>
 #include <Function.h>
+#include <GameObject/YoshidaMath/CollisionManager/Collider.h>
 
 namespace {
 	float tMin_ = 0.0f;
 	float tMax_ = 5.0f;
 }
 
-Key::Key()
+Edamame::Edamame()
 {
 	obj_ = std::make_unique<Object3d>();
 
@@ -23,7 +23,7 @@ Key::Key()
 #endif
 }
 
-void Key::Initialize()
+void Edamame::Initialize()
 {
 	worldTransform_ = {
 		.scale{1.0f, 1.0f, 1.0f},
@@ -39,7 +39,7 @@ void Key::Initialize()
 	localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
 }
 
-void Key::Update()
+void Edamame::Update()
 {
 	obj_->SetTransform(worldTransform_);
 	obj_->Update();
@@ -57,7 +57,7 @@ void Key::Update()
 #endif
 }
 
-void Key::Draw()
+void Edamame::Draw()
 {
 	obj_->Draw();
 #ifdef _DEBUG
@@ -65,7 +65,7 @@ void Key::Draw()
 #endif
 }
 
-void Key::SetPlayerCamera(PlayerCamera* camera)
+void Edamame::SetPlayerCamera(PlayerCamera* camera)
 {
 	obj_->SetCamera(camera->GetCamera());
 #ifdef _DEBUG
@@ -74,39 +74,30 @@ void Key::SetPlayerCamera(PlayerCamera* camera)
 	playerCamera_ = camera;
 }
 
-void Key::SetModel(const std::string& filePath)
+void Edamame::SetModel(const std::string& filePath)
 {
 	obj_->SetModel(filePath);
 }
 
-AABB Key::GetAABB()
+AABB Edamame::GetAABB()
 {
 	return YoshidaMath::GetAABBWorldPos(localAABB_, collisionTransform_.translate);
 }
 
-void Key::CheckCollision()
+void Edamame::CheckCollision()
 {
 	//keyとrayの当たり判定
 	if (OnCollisionRay()) {
 		if (PlayerCommand::GetInstance()->Interact()) {
-			isGrabbed_ = true;
+			// カーソルに追従させて持ち上げる処理
+			Vector3 origin = playerCamera_->GetTransform().translate;
+			origin.y -= 1.0f;
+			worldTransform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
 		}
-	}
-
-	if (isGrabbed_ && !PlayerCommand::GetInstance()->Interact()) {
-		isGrabbed_ = false;
-	}
-
-	if (isGrabbed_) {
-		// カーソルに追従させて持ち上げる処理
-		Vector3 origin = playerCamera_->GetTransform().translate;
-		origin.y -= 1.0f;
-		worldTransform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
-		worldTransform_.translate.y = (std::max)(worldTransform_.translate.y, 0.0f);
 	}
 }
 
-bool Key::OnCollisionRay()
+bool Edamame::OnCollisionRay()
 {
 	return YoshidaMath::RayIntersectsAABB(playerCamera_->GetRay(), GetAABB(), tMin_, tMax_);
 }

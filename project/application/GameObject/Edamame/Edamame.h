@@ -1,17 +1,12 @@
 #pragma once
-#include <Transform.h>
-#include <string>
-#include <Camera.h>
-#include <RigidBody.h>
-#include <memory>
-#include <Object3d/Object3d.h>
-#include <GameObject/TimeCard/TimeCardWatch.h>
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
+#include <string>
+#include <Object3d/Object3d.h>
 
-class Key
+class Edamame
 {
 public:
-    Key();
+    Edamame();
     void Initialize();
     void Update();
     void Draw();
@@ -30,8 +25,6 @@ private:
     Transform collisionTransform_ = {};
     PlayerCamera* playerCamera_ = nullptr;
 
-	Transform worldTransform_ = {};
-
-	bool isGrabbed_ = false;
+    Transform worldTransform_ = {};
 };
 

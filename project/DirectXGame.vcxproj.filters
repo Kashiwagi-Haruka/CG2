@@ -99,6 +99,8 @@
     <ClCompile Include="application\GameObject\WhiteBoard\WalkWhiteBoard.cpp" />
     <ClCompile Include="application\Scene\SampleScene\SampleScenePortalSystem.cpp" />
     <ClCompile Include="application\GameObject\Flashlight\Flashlight.cpp" />
+    <ClCompile Include="application\GameObject\Key\Key.cpp" />
+    <ClCompile Include="application\GameObject\Edamame\Edamame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\Collider.h" />
@@ -195,6 +197,7 @@
     <ClInclude Include="application\GameObject\WhiteBoard\WalkWhiteBoard.h" />
     <ClInclude Include="application\Scene\SampleScene\SampleScenePortalSystem.h" />
     <ClInclude Include="application\GameObject\Flashlight\Flashlight.h" />
+    <ClInclude Include="application\GameObject\Edamame\Edamame.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
