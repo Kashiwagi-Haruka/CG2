@@ -75,10 +75,20 @@ void SampleScene::Initialize() {
 	spherePrimitive_->Initialize(Primitive::Sphere, 32);
 	spherePrimitive_->SetCamera(camera_.get());
 	spherePrimitive_->SetEnableLighting(true);
-
+	portalATransform_ = {
+	    .scale{1.8f,  1.8f,                      1.0f},
+        .rotate{0.0f,  std::numbers::pi_v<float>, 0.0f},
+        .translate{-3.0f, 1.5f,                      2.0f}
+    };
+	portalBTransform_ = {
+	    .scale{1.8f,	                                1.8f, 1.0f},
+        .rotate{std::numbers::pi_v<float> * 3.0f / 2.0f, 0.0f, 0.0f},
+        .translate{3.0f,                                    3.5f, 2.0f}
+    };
 	portalTextureCameraATransform_ = portalBTransform_;
 	portalTextureCameraA_->SetTransform(MakeOppositeSidePortalCameraTransform(portalTextureCameraATransform_));
 	portalTextureCameraA_->Update();
+	portalTextureCameraBTransform_ = portalATransform_;
 	portalTextureCameraB_->SetTransform(MakeOppositeSidePortalCameraTransform(portalTextureCameraBTransform_));
 	portalTextureCameraB_->Update();
 
@@ -121,16 +131,7 @@ void SampleScene::Initialize() {
         .rotate{0.0f, 0.0f, 0.0f },
         .translate{0.0f, 1.0f, -3.0f}
     };
-	portalATransform_ = {
-	    .scale{1.8f,  1.8f,                      1.0f},
-        .rotate{0.0f,  std::numbers::pi_v<float>, 0.0f},
-        .translate{-3.0f, 1.5f,                      2.0f}
-    };
-	portalBTransform_ = {
-	    .scale{1.8f, 1.8f, 1.0f},
-        .rotate{std::numbers::pi_v<float>*3.0f/2.0f, 0.0f, 0.0f},
-        .translate{3.0f, 3.5f, 2.0f}
-    };
+
 	/*portalObjectCameraTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f  },
         .rotate{0.0f, 0.0f, 0.0f  },

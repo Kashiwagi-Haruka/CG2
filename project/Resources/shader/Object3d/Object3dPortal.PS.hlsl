@@ -50,11 +50,7 @@ struct PixelShaderOutput
 float2 ComputeProjectedUV(float3 worldPosition, float4x4 viewProjection, float4x4 cameraWorld)
 {
     float4 clip = mul(float4(worldPosition, 1.0f), viewProjection);
-    const float safeW = abs(clip.w);
-    if (safeW <= 0.0001f)
-    {
-        return float2(-1.0f, -1.0f);
-    }
+    float safeW = max(abs(clip.w), 0.0001f);
 
     float3 ndc = clip.xyz / safeW;
     float2 uv = float2(ndc.x * 0.5f + 0.5f, -ndc.y * 0.5f + 0.5f);
@@ -74,9 +70,11 @@ PixelShaderOutput main(VertexShaderOutput input)
         output.color = baseColor;
         return output;
     }
-    float2 uv1 = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection1, gTextureCamera.portalCameraWorld1);
-    // 投影UVが画面外でも破棄せず、端をクランプして常にテクスチャカメラ映像を表示する。
-    float4 projected1 = gTextureSecondary.Sample(gSampler, saturate(uv1));
+    float2 projectedUV = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection1, gTextureCamera.portalCameraWorld1);
+
+    // 投影は常に使用し、画面外はラップして端クランプ由来の引き伸ばしを防ぐ。
+    float2 wrappedProjectedUV = frac(projectedUV);
+    float4 projected1 = gTextureSecondary.Sample(gSampler, wrappedProjectedUV);
     output.color = projected1 * gMaterial.color;
     return output;
 }
