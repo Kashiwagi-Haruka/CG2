@@ -522,8 +522,8 @@ void SampleScene::SetSceneCameraForDraw(Camera* camera) {
 	animatedCubeObj_->SetCamera(camera);
 	humanObj_->SetCamera(camera);
 	spherePrimitive_->SetCamera(camera);
-	portalMeshA_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
-	portalMeshB_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
+	portalMeshA_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera);
+	portalMeshB_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera);
 }
 
 void SampleScene::UpdateSceneCameraMatricesForDraw() {
