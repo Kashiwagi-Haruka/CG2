@@ -11,6 +11,7 @@
 #include "SceneManager.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
+#include "WinApp.h"
 #include <numbers>
 #include <utility>
 SampleScene::SampleScene() {
@@ -66,6 +67,8 @@ void SampleScene::Initialize() {
 	spherePrimitive_->SetCamera(camera_.get());
 	spherePrimitive_->SetEnableLighting(true);
 	portalMesh_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
+	portalRenderTexture_.Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, {0.05f, 0.05f, 0.08f, 1.0f});
+	portalMesh_->SetTextureIndex(portalRenderTexture_.GetSrvIndex());
 	portalMesh_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	portalMesh_->SetObjectCamera(portalObjectCamera_.get());
 	portalMesh_->SetTextureCamera(portalTextureCamera_.get());
@@ -428,6 +431,13 @@ void SampleScene::Draw() {
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
 	Object3dCommon::GetInstance()->EndShadowMapPass();
+
+	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
+	portalRenderTexture_.BeginRender();
+	SetSceneCameraForDraw(portalTextureCamera_.get());
+	UpdateSceneCameraMatricesForDraw();
+	DrawSceneGeometry();
+	portalRenderTexture_.TransitionToShaderResource();
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());

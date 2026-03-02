@@ -12,6 +12,7 @@
 #include "Object3d/Object3d.h"
 #include "ParticleEmitter.h"
 #include "Portal/PortalMesh.h"
+#include "RenderTexture2D.h"
 #include "Sprite/Sprite.h"
 #include "Transform.h"
 #include <array>
@@ -28,6 +29,7 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Object3d> humanObj_ = nullptr;
 	std::unique_ptr<Primitive> spherePrimitive_ = nullptr;
 	std::unique_ptr<PortalMesh> portalMesh_ = nullptr;
+	RenderTexture2D portalRenderTexture_{};
 	std::unique_ptr<Camera> portalObjectCamera_ = nullptr;
 	std::unique_ptr<Camera> portalTextureCamera_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
