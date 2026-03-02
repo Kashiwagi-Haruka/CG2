@@ -363,6 +363,13 @@ void SampleScene::Update() {
 		ImGui::Combo("Random Noise Blend", &randomNoiseBlendMode_, noiseBlendModes, IM_ARRAYSIZE(noiseBlendModes));
 	}
 	ImGui::End();
+	if (ImGui::Begin("Portal Texture Camera")) {
+		ImGui::Text("Portal render texture camera transform");
+		ImGui::DragFloat3("Scale##PortalTextureCamera", &portalTextureCameraTransform_.scale.x, 0.01f, 0.01f, 100.0f);
+		ImGui::DragFloat3("Rotate##PortalTextureCamera", &portalTextureCameraTransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Translate##PortalTextureCamera", &portalTextureCameraTransform_.translate.x, 0.01f);
+	}
+	ImGui::End();
 
 #endif // USE_IMGUI
 	if (useDebugCamera_) {
@@ -456,10 +463,6 @@ void SampleScene::SetSceneCameraForDraw(Camera* camera) {
 	animatedCubeObj_->SetCamera(camera);
 	humanObj_->SetCamera(camera);
 	spherePrimitive_->SetCamera(camera);
-	portalObjectCamera_->SetTransform(camera->GetTransform());
-	portalObjectCamera_->Update();
-	portalMesh_->SetObjectCamera(portalObjectCamera_.get());
-	portalMesh_->SetTextureCamera(portalTextureCamera_.get());
 }
 
 void SampleScene::UpdateSceneCameraMatricesForDraw() {
@@ -472,14 +475,14 @@ void SampleScene::UpdateSceneCameraMatricesForDraw() {
 }
 
 void SampleScene::DrawSceneGeometry(Camera* camera) {
-	Object3dCommon::GetInstance()->DrawCommon(camera);
+	Object3dCommon::GetInstance()->DrawCommon();
 	uvBallObj_->Draw();
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
 	spherePrimitive_->Draw();
 
-	Object3dCommon::GetInstance()->DrawCommonPortal(camera);
+	Object3dCommon::GetInstance()->DrawCommonPortal();
 	portalMesh_->Draw();
 
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
