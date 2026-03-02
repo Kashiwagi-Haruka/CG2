@@ -133,7 +133,13 @@ void SampleScene::Initialize() {
         .rotate{std::numbers::pi_v<float>*3.0f/2.0f, 0.0f, 0.0f},
         .translate{3.0f, 3.5f, 2.0f}
     };
-
+	portalObjectCameraTransform_ = {
+	    .scale{1.0f, 1.0f, 1.0f  },
+        .rotate{0.0f, 0.0f, 0.0f  },
+        .translate{0.0f, 5.0f, -10.0f}
+    };
+	portalObjectCamera_->SetTransform(portalObjectCameraTransform_);
+	portalObjectCamera_->Update();
 	portalMeshA_->SetTransform(portalATransform_);
 	portalMeshB_->SetTransform(portalBTransform_);
 	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample", particleTransform_, 0.1f, 5, Vector3{0.0f, 0.0f, 0.0f}, Vector3{-0.5f, -0.5f, -0.5f}, Vector3{0.5f, 0.5f, 0.5f});
@@ -403,7 +409,7 @@ void SampleScene::Update() {
 		camera_->SetTransform(cameraTransform_);
 		camera_->Update();
 	}
-	portalObjectCamera_->SetTransform(camera_->GetTransform());
+	portalObjectCamera_->SetTransform(portalObjectCameraTransform_);
 	portalObjectCamera_->Update();
 	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
 	portalTextureCameraA_->Update();
@@ -500,8 +506,8 @@ void SampleScene::SetSceneCameraForDraw(Camera* camera) {
 	animatedCubeObj_->SetCamera(camera);
 	humanObj_->SetCamera(camera);
 	spherePrimitive_->SetCamera(camera);
-	portalMeshA_->SetObjectCamera(camera);
-	portalMeshB_->SetObjectCamera(camera);
+	portalMeshA_->SetObjectCamera(portalObjectCamera_.get());
+	portalMeshB_->SetObjectCamera(portalObjectCamera_.get());
 }
 
 void SampleScene::UpdateSceneCameraMatricesForDraw() {
@@ -516,14 +522,14 @@ void SampleScene::UpdateSceneCameraMatricesForDraw() {
 void SampleScene::DrawSceneGeometry(Camera* camera) {
 	portalMeshA_->Update();
 	portalMeshB_->Update();
-	Object3dCommon::GetInstance()->DrawCommon();
+	Object3dCommon::GetInstance()->DrawCommon(camera);
 	uvBallObj_->Draw();
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
 	spherePrimitive_->Draw();
 
-	Object3dCommon::GetInstance()->DrawCommonPortal();
+	Object3dCommon::GetInstance()->DrawCommonPortal(camera);
 	portalMeshA_->Draw();
 	portalMeshB_->Draw();
 

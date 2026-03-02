@@ -57,6 +57,7 @@ class SampleScene : public BaseScene {
 	Transform portalBTransform_{};
 	Transform portalTextureCameraATransform_{};
 	Transform portalTextureCameraBTransform_{};
+	Transform portalObjectCameraTransform_{};
 	Transform particleTransform_{};
 	std::unique_ptr<ParticleEmitter> sampleParticleEmitter_ = nullptr;
 
