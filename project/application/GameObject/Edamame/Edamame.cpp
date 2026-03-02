@@ -16,8 +16,8 @@ Edamame::Edamame()
 	obj_ = std::make_unique<Object3d>();
 
 	// モデルをセット
-	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/gentleman", "gentleman");
-	obj_->SetModel("gentleman");
+	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/edamame_billboard", "edamame_billboard");
+	obj_->SetModel("edamame_billboard");
 
 #ifdef _DEBUG
 	primitive_ = std::make_unique<Primitive>();
@@ -27,7 +27,7 @@ Edamame::Edamame()
 void Edamame::Initialize()
 {
 	worldTransform_ = {
-		.scale{1.0f, 1.0f, 1.0f},
+		.scale{0.5f, 0.5f, 0.5f},
 		.rotate{0.0f, 0.0f, 0.0f},
 		.translate{4.0f, 0.0f, 0.0f}
 	};
@@ -42,8 +42,9 @@ void Edamame::Initialize()
 
 void Edamame::Update()
 {
+
 	obj_->SetTransform(worldTransform_);
-	obj_->Update();
+	obj_->UpdateBillboard();
 
 	collisionTransform_ = obj_->GetTransform();
 

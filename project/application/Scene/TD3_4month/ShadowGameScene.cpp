@@ -35,6 +35,8 @@ ShadowGameScene::ShadowGameScene()
     flashlight_ = std::make_unique<Flashlight>();
     // 鍵管理
 	key_ = std::make_unique<Key>();
+    // 枝豆管理
+	edamame_ = std::make_unique<Edamame>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 }
@@ -82,6 +84,11 @@ void ShadowGameScene::Initialize()
 	// 鍵
 	key_->Initialize();
 	key_->SetPlayerCamera(playerCamera_.get());
+
+	// 枝豆
+	edamame_->Initialize();
+	edamame_->SetPlayerCamera(playerCamera_.get());
+
 }
 
 void ShadowGameScene::Update()
@@ -148,6 +155,8 @@ void ShadowGameScene::CheckCollision()
     //ホワイトボードとrayの当たり判定作成する
     portalManager_->CheckCollision(timeCardWatch_.get(), { 10.0f,1.5f,5.0f });
 	key_->CheckCollision();
+
+	edamame_->CheckCollision();
 
     collisionManager_->ClearColliders();
 
@@ -331,6 +340,7 @@ void ShadowGameScene::UpdateGameObject()
     Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
 
     key_->Update();
+	edamame_->Update();
 
 #pragma endregion
 }
@@ -415,6 +425,8 @@ void ShadowGameScene::DrawSceneGeometry()
     collisionManager_->DrawColliders();
 	// 鍵の描画処理
 	key_->Draw();
+	// 枝豆の描画処理
+	edamame_->Draw();
     //プレイヤーの描画処理
     Object3dCommon::GetInstance()->DrawCommonSkinning();
     player_->Draw();

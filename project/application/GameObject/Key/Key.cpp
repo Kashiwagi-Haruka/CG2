@@ -2,7 +2,6 @@
 #include <GameObject/YoshidaMath/YoshidaMath.h>
 #include <Model/ModelManager.h>
 #include <GameObject/KeyBindConfig.h>
-#include <GameObject/YoshidaMath/CollisionManager/Collider.h>
 #include <Function.h>
 
 namespace {
@@ -109,4 +108,13 @@ void Key::CheckCollision()
 bool Key::OnCollisionRay()
 {
 	return YoshidaMath::RayIntersectsAABB(playerCamera_->GetRay(), GetAABB(), tMin_, tMax_);
+}
+
+void Key::OnCollision(Collider* collider)
+{
+}
+
+Vector3 Key::GetWorldPosition() const
+{
+	return Vector3();
 }
