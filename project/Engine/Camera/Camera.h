@@ -33,6 +33,9 @@ public:
 	void Update();
 	// 外部で計算済みのビュー・プロジェクション行列を反映
 	void SetViewProjectionMatrix(const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix);
+	void SetWorldMatrix(const Matrix4x4& worldMatrix) {
+		worldMatrix_ = worldMatrix;
+	}
 	void DrawEditorInHierarchy();
 
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }

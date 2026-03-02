@@ -4,6 +4,7 @@
 #include "WinApp.h"
 #include <cmath>
 #include <numbers>
+#include "Engine/Log/Logger.h"
 
 SampleScenePortalSystem::SampleScenePortalSystem() {
 	portalA_ = std::make_unique<Primitive>();
@@ -140,38 +141,13 @@ void SampleScenePortalSystem::UpdatePortalCamera(const Transform& sourcePortal, 
 	const Matrix4x4 destinationPortalWorld = Function::MakeAffineMatrix(destinationPortal.scale, destinationPortal.rotate, destinationPortal.translate);
 	const Matrix4x4 halfTurn = Function::MakeRotateYMatrix(std::numbers::pi_v<float>);
 
-	// メインカメラを sourcePortal 空間へ持っていき、180度反転して destinationPortal 空間へ写像する。
-	const Matrix4x4 sourcePortalInverse = Function::Inverse(sourcePortalWorld);
-	const Matrix4x4 portalMapping = Function::Multiply(Function::Multiply(sourcePortalInverse, halfTurn), destinationPortalWorld);
-	const Matrix4x4 cameraWorld = sceneCamera_->GetWorldMatrix();
+const Matrix4x4 sourceInverse = Function::Inverse(sourcePortalWorld);
 
-	Vector3 cameraPosition = {cameraWorld.m[3][0], cameraWorld.m[3][1], cameraWorld.m[3][2]};
-	Vector3 cameraRight = Function::Normalize({cameraWorld.m[0][0], cameraWorld.m[0][1], cameraWorld.m[0][2]});
-	Vector3 cameraUp = Function::Normalize({cameraWorld.m[1][0], cameraWorld.m[1][1], cameraWorld.m[1][2]});
-	Vector3 cameraForward = Function::Normalize({cameraWorld.m[2][0], cameraWorld.m[2][1], cameraWorld.m[2][2]});
+	// ローカル空間へ
+	const Matrix4x4 cameraInSourceSpace = Function::Multiply(sceneCamera_->GetWorldMatrix(), sourceInverse);
 
-	Vector3 mappedPosition = Function::TransformVM(cameraPosition, portalMapping);
-	Vector3 mappedRightPoint = Function::TransformVM(cameraPosition + cameraRight, portalMapping);
-	Vector3 mappedUpPoint = Function::TransformVM(cameraPosition + cameraUp, portalMapping);
-	Vector3 mappedForwardPoint = Function::TransformVM(cameraPosition + cameraForward, portalMapping);
-
-	Vector3 mappedRight = Function::Normalize(mappedRightPoint - mappedPosition);
-	Vector3 mappedUp = Function::Normalize(mappedUpPoint - mappedPosition);
-	Vector3 mappedForward = Function::Normalize(mappedForwardPoint - mappedPosition);
-
-	Matrix4x4 portalCameraWorld = Function::MakeIdentity4x4();
-	portalCameraWorld.m[0][0] = mappedRight.x;
-	portalCameraWorld.m[0][1] = mappedRight.y;
-	portalCameraWorld.m[0][2] = mappedRight.z;
-	portalCameraWorld.m[1][0] = mappedUp.x;
-	portalCameraWorld.m[1][1] = mappedUp.y;
-	portalCameraWorld.m[1][2] = mappedUp.z;
-	portalCameraWorld.m[2][0] = mappedForward.x;
-	portalCameraWorld.m[2][1] = mappedForward.y;
-	portalCameraWorld.m[2][2] = mappedForward.z;
-	portalCameraWorld.m[3][0] = mappedPosition.x;
-	portalCameraWorld.m[3][1] = mappedPosition.y;
-	portalCameraWorld.m[3][2] = mappedPosition.z;
+	// destinationへ変換
+	Matrix4x4 portalCameraWorld = Function::Multiply(cameraInSourceSpace, destinationPortalWorld);
 
 	Vector3 destinationForward = {destinationPortalWorld.m[2][0], destinationPortalWorld.m[2][1], destinationPortalWorld.m[2][2]};
 	if (Function::LengthSquared(destinationForward) < 0.0001f) {
@@ -182,6 +158,13 @@ void SampleScenePortalSystem::UpdatePortalCamera(const Transform& sourcePortal, 
 	portalCameraWorld.m[3][1] += destinationForward.y * 0.05f;
 	portalCameraWorld.m[3][2] += destinationForward.z * 0.05f;
 
+	// View更新
 	const Matrix4x4 portalViewMatrix = Function::Inverse(portalCameraWorld);
+
+	// ★ Worldも更新する
+	outCamera->SetWorldMatrix(portalCameraWorld);
+
+	// ViewProjection更新
 	outCamera->SetViewProjectionMatrix(portalViewMatrix, sceneCamera_->GetProjectionMatrix());
+	
 }
