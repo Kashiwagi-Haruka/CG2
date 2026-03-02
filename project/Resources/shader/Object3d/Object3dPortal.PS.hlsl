@@ -50,12 +50,13 @@ struct PixelShaderOutput
 float2 ComputeProjectedUV(float3 worldPosition, float4x4 viewProjection, float4x4 cameraWorld)
 {
     float4 clip = mul(float4(worldPosition, 1.0f), viewProjection);
-    if (clip.w <= 0.0001f)
+    const float safeW = abs(clip.w);
+    if (safeW <= 0.0001f)
     {
         return float2(-1.0f, -1.0f);
     }
 
-    float3 ndc = clip.xyz / clip.w;
+    float3 ndc = clip.xyz / safeW;
     float2 uv = float2(ndc.x * 0.5f + 0.5f, -ndc.y * 0.5f + 0.5f);
 
     return uv;

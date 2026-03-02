@@ -14,6 +14,13 @@
 #include "WinApp.h"
 #include <numbers>
 #include <utility>
+namespace {
+Transform MakeOppositeSidePortalCameraTransform(const Transform& baseTransform) {
+	Transform oppositeTransform = baseTransform;
+	oppositeTransform.rotate.y += std::numbers::pi_v<float>;
+	return oppositeTransform;
+}
+} // namespace
 SampleScene::SampleScene() {
 
 	uvBallObj_ = std::make_unique<Object3d>();
@@ -69,19 +76,10 @@ void SampleScene::Initialize() {
 	spherePrimitive_->SetCamera(camera_.get());
 	spherePrimitive_->SetEnableLighting(true);
 
-	portalTextureCameraATransform_ = {
-	    .scale{1.0f, 1.0f,                      1.0f},
-        .rotate{0.0f, std::numbers::pi_v<float>, 0.0f},
-        .translate{3.0f, 1.5f,                      2.0f}
-    };
-	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
+	portalTextureCameraATransform_ = portalBTransform_;
+	portalTextureCameraA_->SetTransform(MakeOppositeSidePortalCameraTransform(portalTextureCameraATransform_));
 	portalTextureCameraA_->Update();
-	portalTextureCameraBTransform_ = {
-	    .scale{1.0f,  1.0f, 1.0f},
-        .rotate{0.0f,  0.0f, 0.0f},
-        .translate{-3.0f, 1.5f, 2.0f}
-    };
-	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
+	portalTextureCameraB_->SetTransform(MakeOppositeSidePortalCameraTransform(portalTextureCameraBTransform_));
 	portalTextureCameraB_->Update();
 
 	portalMeshA_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
@@ -421,6 +419,8 @@ void SampleScene::Update() {
 	}
 	/*portalObjectCamera_->SetTransform(portalObjectCameraTransform_);
 	portalObjectCamera_->Update();*/
+	//portalTextureCameraATransform_ = portalATransform_;
+	//portalTextureCameraBTransform_ = portalBTransform_;
 	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
 	portalTextureCameraA_->Update();
 	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
@@ -492,15 +492,15 @@ void SampleScene::Draw() {
 
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
 	portalRenderTextureA_.BeginRender();
-	SetSceneCameraForDraw(portalTextureCameraB_.get());
-	UpdateSceneCameraMatricesForDraw();
-	DrawSceneGeometry(portalTextureCameraB_.get());
-	portalRenderTextureA_.TransitionToShaderResource();
-
-	portalRenderTextureB_.BeginRender();
 	SetSceneCameraForDraw(portalTextureCameraA_.get());
 	UpdateSceneCameraMatricesForDraw();
 	DrawSceneGeometry(portalTextureCameraA_.get());
+	portalRenderTextureA_.TransitionToShaderResource();
+
+	portalRenderTextureB_.BeginRender();
+	SetSceneCameraForDraw(portalTextureCameraB_.get());
+	UpdateSceneCameraMatricesForDraw();
+	DrawSceneGeometry(portalTextureCameraB_.get());
 	portalRenderTextureB_.TransitionToShaderResource();
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
