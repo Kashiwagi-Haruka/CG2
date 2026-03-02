@@ -2,6 +2,7 @@
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
 #include <string>
 #include <Object3d/Object3d.h>
+#include "Primitive/Primitive.h"
 
 class Edamame
 {

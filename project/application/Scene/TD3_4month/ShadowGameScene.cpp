@@ -151,19 +151,21 @@ void ShadowGameScene::CheckCollision()
 
     collisionManager_->ClearColliders();
 
-    collisionManager_->AddCollider(player_.get(), playerCamera_->GetCamera());
+    collisionManager_->AddCollider(player_.get());
 
     for (auto& portal : portalManager_->GetPortals()) {
-        collisionManager_->AddCollider(portal.get(), playerCamera_->GetCamera());
+        collisionManager_->AddCollider(portal.get());
     }
 
     for (auto& whiteBoard : portalManager_->GetWhiteBoards()) {
-        collisionManager_->AddCollider(whiteBoard.get(), playerCamera_->GetCamera());
+        collisionManager_->AddCollider(whiteBoard.get());
     }
 
-    collisionManager_->AddCollider(flashlight_.get(), playerCamera_->GetCamera());
+    collisionManager_->AddCollider(flashlight_.get());
+    collisionManager_->AddCollider(testField_.get());
 
-    collisionManager_->AddCollider(testField_.get(), playerCamera_->GetCamera());
+    collisionManager_->SetCamera(playerCamera_->GetCamera());
+   
     collisionManager_->CheckAllCollisions();
 }
 
