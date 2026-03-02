@@ -177,6 +177,14 @@ void Object3dCommon::DrawCommon() {
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
+void Object3dCommon::DrawCommon(Camera* camera) {
+	Camera* previousCamera = defaultCamera;
+	if (camera) {
+		defaultCamera = camera;
+	}
+	DrawCommon();
+	defaultCamera = previousCamera;
+}
 void Object3dCommon::DrawCommonEmissive() {
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoEmissive_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoEmissive_->GetGraphicsPipelineState(blendMode_).Get());
@@ -254,6 +262,14 @@ void Object3dCommon::DrawCommonPortal() {
 	dxCommon_->GetCommandList()->SetPipelineState(psoPortal_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::DrawCommonPortal(Camera* camera) {
+	Camera* previousCamera = defaultCamera;
+	if (camera) {
+		defaultCamera = camera;
+	}
+	DrawCommonPortal();
+	defaultCamera = previousCamera;
 }
 void Object3dCommon::DrawCommonShadow() {
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoShadow_->GetRootSignature().Get());

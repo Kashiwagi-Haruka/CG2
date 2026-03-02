@@ -66,6 +66,14 @@ void SampleScene::Initialize() {
 	spherePrimitive_->Initialize(Primitive::Sphere, 32);
 	spherePrimitive_->SetCamera(camera_.get());
 	spherePrimitive_->SetEnableLighting(true);
+
+	portalTextureCameraTransform_ = {
+	    .scale{1.0f, 1.0f,                      1.0f},
+        .rotate{0.0f, std::numbers::pi_v<float>, 0.0f},
+        .translate{3.0f, 1.5f,                      2.0f}
+    };
+	portalTextureCamera_->SetTransform(portalTextureCameraTransform_);
+	portalTextureCamera_->Update();
 	portalMesh_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
 	portalRenderTexture_.Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, {0.05f, 0.05f, 0.08f, 1.0f});
 	portalMesh_->SetTextureIndex(portalRenderTexture_.GetSrvIndex());
@@ -107,14 +115,8 @@ void SampleScene::Initialize() {
         .rotate{std::numbers::pi_v<float>*3.0f/2.0f, 0.0f, 0.0f},
         .translate{3.0f, 3.5f, 2.0f}
     };
-	portalTextureCameraTransform_ = {
-	    .scale{1.0f, 1.0f,                      1.0f},
-        .rotate{0.0f, std::numbers::pi_v<float>, 0.0f},
-        .translate{3.0f, 1.5f,                      2.0f}
-    };
+
 	portalMesh_->SetTransform(portalATransform_);
-	portalTextureCamera_->SetTransform(portalTextureCameraTransform_);
-	portalTextureCamera_->Update();
 	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample", particleTransform_, 0.1f, 5, Vector3{0.0f, 0.0f, 0.0f}, Vector3{-0.5f, -0.5f, -0.5f}, Vector3{0.5f, 0.5f, 0.5f});
 	planeGltf_->SetTransform(planeGTransform_);
 	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
@@ -434,17 +436,15 @@ void SampleScene::Draw() {
 
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
 	portalRenderTexture_.BeginRender();
-	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCamera_.get());
 	SetSceneCameraForDraw(portalTextureCamera_.get());
 	UpdateSceneCameraMatricesForDraw();
-	DrawSceneGeometry();
+	DrawSceneGeometry(portalTextureCamera_.get());
 	portalRenderTexture_.TransitionToShaderResource();
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	SetSceneCameraForDraw(camera_.get());
 	UpdateSceneCameraMatricesForDraw();
-	DrawSceneGeometry();
+	DrawSceneGeometry(camera_.get());
 	SpriteCommon::GetInstance()->DrawCommon();
 	uvSprite->Draw();
 }
@@ -471,15 +471,15 @@ void SampleScene::UpdateSceneCameraMatricesForDraw() {
 	spherePrimitive_->UpdateCameraMatrices();
 }
 
-void SampleScene::DrawSceneGeometry() {
-	Object3dCommon::GetInstance()->DrawCommon();
+void SampleScene::DrawSceneGeometry(Camera* camera) {
+	Object3dCommon::GetInstance()->DrawCommon(camera);
 	uvBallObj_->Draw();
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
 	spherePrimitive_->Draw();
 
-	Object3dCommon::GetInstance()->DrawCommonPortal();
+	Object3dCommon::GetInstance()->DrawCommonPortal(camera);
 	portalMesh_->Draw();
 
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();

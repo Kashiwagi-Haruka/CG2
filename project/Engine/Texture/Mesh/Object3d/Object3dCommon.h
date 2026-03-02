@@ -102,6 +102,7 @@ public:
 	void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
 	Camera* GetDefaultCamera() const { return defaultCamera; };
 	void DrawCommon();
+	void DrawCommon(Camera* camera);
 	void DrawCommonToon();
 	void DrawCommonEmissive();
 	void DrawCommonNoCull();
@@ -114,6 +115,7 @@ public:
 	void DrawCommonSkinningToon();
 	void DrawCommonMirror();
 	void DrawCommonPortal();
+	void DrawCommonPortal(Camera* camera);
 	void DrawCommonShadow();
 	void BeginShadowMapPass();
 	void EndShadowMapPass();
