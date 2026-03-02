@@ -19,6 +19,10 @@ struct CameraForGpu {
 	Matrix4x4 textureViewProjection0{};
 	// テクスチャ投影用のカメラ ViewProjection（t4 用）
 	Matrix4x4 textureViewProjection1{};
+	// ポータル描画元カメラのワールド変換（t0 用）
+	Matrix4x4 portalCameraWorld0{};
+	// ポータル描画元カメラのワールド変換（t4 用）
+	Matrix4x4 portalCameraWorld1{};
 	// 1 のときポータルの投影 UV を有効化
 	int usePortalProjection = 0;
 	float padding3[3] = {0.0f, 0.0f, 0.0f};

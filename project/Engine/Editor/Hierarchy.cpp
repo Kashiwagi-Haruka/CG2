@@ -2,6 +2,7 @@
 #include "Hierarchy.h"
 #include "EditorGrid.h"
 #include "ToolBar.h"
+#include "Camera.h"
 #include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Audio/Audio.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
@@ -801,7 +802,21 @@ void Hierarchy::DrawEditorGridLines() {
 	selectionBoxPrimitive_->Draw();
 #endif
 }
-
+void Hierarchy::DrawCameraEditor() {
+#ifdef USE_IMGUI
+	Object3dCommon* object3dCommon = Object3dCommon::GetInstance();
+	if (!object3dCommon) {
+		ImGui::TextUnformatted("Object3dCommon unavailable");
+		return;
+	}
+	Camera* camera = object3dCommon->GetDefaultCamera();
+	if (!camera) {
+		ImGui::TextUnformatted("No default camera");
+		return;
+	}
+	camera->DrawEditorInHierarchy();
+#endif
+}
 void Hierarchy::DrawLightEditor() {
 #ifdef USE_IMGUI
 	bool overrideChanged = ImGui::Checkbox("Use Editor Lights", &editorLightState_.overrideSceneLights);
@@ -1083,6 +1098,8 @@ void Hierarchy::DrawObjectEditors() {
 		DrawGridEditor();
 		ImGui::SeparatorText("Light");
 		DrawLightEditor();
+		ImGui::SeparatorText("Camera");
+		DrawCameraEditor();
 		ImGui::SeparatorText("Selection");
 		DrawSelectionBoxEditor();
 		ImGui::Separator();

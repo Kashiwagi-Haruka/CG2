@@ -22,16 +22,24 @@ struct Camera
     int fullscreenGrayscaleEnabled;
     int fullscreenSepiaEnabled;
     float2 padding2;
+};
+
+struct TextureCamera
+{
     float4x4 textureViewProjection0;
     float4x4 textureViewProjection1;
+    float4x4 portalCameraWorld0;
+    float4x4 portalCameraWorld1;
     int usePortalProjection;
-    float3 padding3;
+    float3 padding;
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<Camera> gCamera : register(b4);
-Texture2D<float4> gCameraTexture0 : register(t0);
-Texture2D<float4> gCameraTexture1 : register(t4);
+ConstantBuffer<TextureCamera> gTextureCamera : register(b5);
+
+Texture2D<float4> gTexture : register(t0);
+Texture2D<float4> gTextureSecondary : register(t4);
 SamplerState gSampler : register(s0);
 
 struct PixelShaderOutput
@@ -39,65 +47,34 @@ struct PixelShaderOutput
     float4 color : SV_TARGET0;
 };
 
-float3 ApplyGrayscale(float3 color)
+float2 ComputeProjectedUV(float3 worldPosition, float4x4 viewProjection, float4x4 cameraWorld)
 {
-    if (gMaterial.grayscaleEnabled == 0 && gCamera.fullscreenGrayscaleEnabled == 0)
-    {
-        return color;
-    }
-    float y = dot(color, float3(0.2125f, 0.7154f, 0.0721f));
-    return float3(y, y, y);
-}
+    float4 clip = mul(float4(worldPosition, 1.0f), viewProjection);
+    float safeW = max(abs(clip.w), 0.0001f);
 
-float3 ApplySepia(float3 color)
-{
-    if (gMaterial.sepiaEnabled == 0 && gCamera.fullscreenSepiaEnabled == 0)
-    {
-        return color;
-    }
+    float3 ndc = clip.xyz / safeW;
+    float2 uv = float2(ndc.x * 0.5f + 0.5f, -ndc.y * 0.5f + 0.5f);
 
-    float3 sepia;
-    sepia.r = dot(color, float3(0.393f, 0.769f, 0.189f));
-    sepia.g = dot(color, float3(0.349f, 0.686f, 0.168f));
-    sepia.b = dot(color, float3(0.272f, 0.534f, 0.131f));
-    return saturate(sepia);
+    return uv;
 }
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
 
-    float2 uv0;
-    float2 uv1;
-    if (gCamera.usePortalProjection != 0)
+    float4 baseUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
+    float4 baseColor = gTexture.Sample(gSampler, baseUV.xy) * gMaterial.color;
+
+    if (gTextureCamera.usePortalProjection == 0)
     {
-        float4 clip0 = mul(float4(input.worldPosition, 1.0f), gCamera.textureViewProjection0);
-        float4 clip1 = mul(float4(input.worldPosition, 1.0f), gCamera.textureViewProjection1);
-        float2 ndc0 = clip0.xy / max(clip0.w, 0.0001f);
-        float2 ndc1 = clip1.xy / max(clip1.w, 0.0001f);
-        uv0 = float2(ndc0.x * 0.5f + 0.5f, -ndc0.y * 0.5f + 0.5f);
-        uv1 = float2(ndc1.x * 0.5f + 0.5f, -ndc1.y * 0.5f + 0.5f);
+        output.color = baseColor;
+        return output;
     }
-    else
-    {
-        float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-        uv0 = transformedUV.xy;
-        uv1 = transformedUV.xy;
-    }
+    float2 projectedUV = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection1, gTextureCamera.portalCameraWorld1);
 
-    float4 cameraTexture0Color = gCameraTexture0.Sample(gSampler, saturate(uv0));
-    float4 cameraTexture1Color = gCameraTexture1.Sample(gSampler, saturate(uv1));
-    float cameraBlend = saturate(gMaterial.environmentCoefficient);
-    float4 textureColor = lerp(cameraTexture0Color, cameraTexture1Color, cameraBlend);
-
-    output.color = gMaterial.color * textureColor;
-    output.color.rgb = ApplyGrayscale(output.color.rgb);
-    output.color.rgb = ApplySepia(output.color.rgb);
-
-    if (textureColor.a < 0.001f || output.color.a < 0.001f)
-    {
-        discard;
-    }
-
+    // 投影は常に使用し、画面外はラップして端クランプ由来の引き伸ばしを防ぐ。
+    float2 wrappedProjectedUV = frac(projectedUV);
+    float4 projected1 = gTextureSecondary.Sample(gSampler, wrappedProjectedUV);
+    output.color = projected1 * gMaterial.color;
     return output;
 }

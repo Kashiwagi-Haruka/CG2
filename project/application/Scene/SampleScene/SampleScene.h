@@ -11,7 +11,8 @@
 #include "Light/SpotLight.h"
 #include "Object3d/Object3d.h"
 #include "ParticleEmitter.h"
-#include "SampleScenePortalSystem.h"
+#include "Portal/PortalMesh.h"
+#include "RenderTexture2D.h"
 #include "Sprite/Sprite.h"
 #include "Transform.h"
 #include <array>
@@ -27,7 +28,13 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Object3d> animatedCubeObj_ = nullptr;
 	std::unique_ptr<Object3d> humanObj_ = nullptr;
 	std::unique_ptr<Primitive> spherePrimitive_ = nullptr;
-	std::unique_ptr<SampleScenePortalSystem> portalSystem_ = nullptr;
+	std::unique_ptr<PortalMesh> portalMeshA_ = nullptr;
+	std::unique_ptr<PortalMesh> portalMeshB_ = nullptr;
+	RenderTexture2D portalRenderTextureA_{};
+	RenderTexture2D portalRenderTextureB_{};
+	/*std::unique_ptr<Camera> portalObjectCamera_ = nullptr;*/
+	std::unique_ptr<Camera> portalTextureCameraA_ = nullptr;
+	std::unique_ptr<Camera> portalTextureCameraB_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	bool useDebugCamera_ = false;
@@ -48,6 +55,9 @@ class SampleScene : public BaseScene {
 	Transform ringTransform_{};
 	Transform portalATransform_{};
 	Transform portalBTransform_{};
+	Transform portalTextureCameraATransform_{};
+	Transform portalTextureCameraBTransform_{};
+	/*Transform portalObjectCameraTransform_{};*/
 	Transform particleTransform_{};
 	std::unique_ptr<ParticleEmitter> sampleParticleEmitter_ = nullptr;
 
@@ -75,7 +85,7 @@ class SampleScene : public BaseScene {
 
 	void SetSceneCameraForDraw(Camera* camera);
 	void UpdateSceneCameraMatricesForDraw();
-	void DrawSceneGeometry();
+	void DrawSceneGeometry(Camera* camera);
 
 public:
 	SampleScene();

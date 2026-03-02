@@ -21,6 +21,14 @@
     <FxCompile Include="Resources\shader\Sprite\Font.PS.hlsl" />
     <FxCompile Include="Resources\shader\Sprite\Sprite.PS.hlsl" />
     <FxCompile Include="Resources\shader\Sprite\Sprite.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\Object3dGrid.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Sprite\Font.PS.hlsl" />
+    <ClCompile Include="Engine\Texture\RenderTexture2D.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Portal\PortalMesh.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\Collider.cpp" />
@@ -194,6 +202,12 @@
     <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h" />
     <ClInclude Include="Engine\Editor\Inspector.h" />
     <ClInclude Include="Engine\Editor\ToolBar.h" />
+    <ClInclude Include="Engine\Texture\RenderTexture2D.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Portal\PortalMesh.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
     <ClInclude Include="application\GameObject\WhiteBoard\WalkWhiteBoard.h" />
     <ClInclude Include="application\Scene\SampleScene\SampleScenePortalSystem.h" />

@@ -49,6 +49,7 @@ private:
 	void DrawLightEditor();
 	void DrawSelectionBoxEditor();
 	void DrawAudioEditor();
+	void DrawCameraEditor();
 	void SyncSelectionBoxToTarget();
 	Transform GetSelectedTransform() const;
 	bool IsObjectSelected() const;

@@ -509,7 +509,7 @@ void Primitive::Initialize(PrimitiveName name, uint32_t slices) {
 	primitiveName_ = name;
 	slices_ = ClampSlices(slices);
 	stacks_ = ComputeStacksFromSlices(slices_);
-	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
+	camera_ = nullptr;
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
 	textureViewProjection0_ = Function::MakeIdentity4x4();
@@ -568,7 +568,7 @@ void Primitive::Initialize(PrimitiveName name, const std::string& texturePath, u
 	primitiveName_ = name;
 	slices_ = ClampSlices(slices);
 	stacks_ = ComputeStacksFromSlices(slices_);
-	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
+	camera_ = nullptr;
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
 	textureViewProjection0_ = Function::MakeIdentity4x4();
@@ -673,6 +673,8 @@ void Primitive::UpdateCameraMatrices() {
 	cameraData_->fullscreenSepiaEnabled = Object3dCommon::GetInstance()->IsFullScreenSepiaEnabled() ? 1 : 0;
 	cameraData_->textureViewProjection0 = textureViewProjection0_;
 	cameraData_->textureViewProjection1 = textureViewProjection1_;
+	cameraData_->portalCameraWorld0 = portalCameraWorld0_;
+	cameraData_->portalCameraWorld1 = portalCameraWorld1_;
 	cameraData_->usePortalProjection = usePortalProjection_ ? 1 : 0;
 	cameraResource_->Unmap(0, nullptr);
 }
@@ -837,9 +839,12 @@ void Primitive::SetTextureIndex(uint32_t textureIndex) { textureIndex_ = texture
 void Primitive::SetSecondaryTextureIndex(uint32_t textureIndex) { secondaryTextureIndex_ = textureIndex; }
 
 void Primitive::ClearSecondaryTextureIndex() { secondaryTextureIndex_ = UINT32_MAX; }
-void Primitive::SetPortalProjectionMatrices(const Matrix4x4& textureViewProjection0, const Matrix4x4& textureViewProjection1) {
+void Primitive::SetPortalProjectionMatrices(
+    const Matrix4x4& textureViewProjection0, const Matrix4x4& textureViewProjection1, const Matrix4x4& portalCameraWorld0, const Matrix4x4& portalCameraWorld1) {
 	textureViewProjection0_ = textureViewProjection0;
 	textureViewProjection1_ = textureViewProjection1;
+	portalCameraWorld0_ = portalCameraWorld0;
+	portalCameraWorld1_ = portalCameraWorld1;
 }
 void Primitive::SetPortalProjectionEnabled(bool enabled) { usePortalProjection_ = enabled; }
 Vector4 Primitive::GetColor() const {
