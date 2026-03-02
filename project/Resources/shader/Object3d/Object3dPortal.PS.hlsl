@@ -58,9 +58,7 @@ float2 ComputeProjectedUV(float3 worldPosition, float4x4 viewProjection, float4x
     float3 ndc = clip.xyz / clip.w;
     float2 uv = float2(ndc.x * 0.5f + 0.5f, -ndc.y * 0.5f + 0.5f);
 
-    float3 camPos = cameraWorld[3].xyz;
-    float fade = saturate(1.0f - length(worldPosition - camPos) * 0.05f);
-    return lerp(float2(-1.0f, -1.0f), uv, fade);
+    return uv;
 }
 
 PixelShaderOutput main(VertexShaderOutput input)
