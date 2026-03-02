@@ -75,23 +75,12 @@ PixelShaderOutput main(VertexShaderOutput input)
         output.color = baseColor;
         return output;
     }
-
-    float2 uv0 = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection0, gTextureCamera.portalCameraWorld0);
     float2 uv1 = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection1, gTextureCamera.portalCameraWorld1);
-
-    float inside0 = step(0.0f, uv0.x) * step(0.0f, uv0.y) * step(uv0.x, 1.0f) * step(uv0.y, 1.0f);
     float inside1 = step(0.0f, uv1.x) * step(0.0f, uv1.y) * step(uv1.x, 1.0f) * step(uv1.y, 1.0f);
 
-    // 投影UVが有効なときはそれを使い、無効なときはメッシュUVへフォールバックすることで、
-    // カメラ角度を動かさなくても常にテクスチャカメラ映像を表示する。
-    float2 sampleUV0 = lerp(baseUV.xy, saturate(uv0), inside0);
-    float2 sampleUV1 = lerp(baseUV.xy, saturate(uv1), inside1);
-
-    float4 projected0 = gTexture.Sample(gSampler, sampleUV0);
-    float4 projected1 = gTextureSecondary.Sample(gSampler, sampleUV1);
-
-    float portalSelect = saturate(inside1);
-    float4 portalColor = lerp(projected0, projected1, 1);
-    output.color = portalColor * gMaterial.color;
+    // ポータル描画は投影テクスチャのみを使い、メインカメラ/メッシュUVへのフォールバックを行わない。
+    // これで「メイン描画がポータルテクスチャへ混ざる」見え方を防ぐ。
+    float4 projected1 = gTextureSecondary.Sample(gSampler, saturate(uv1));
+    output.color = projected1 * inside1 * gMaterial.color;
     return output;
 }
