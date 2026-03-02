@@ -51,6 +51,11 @@ public:
 	const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
 	const Matrix4x4& GetViewProjectionMatrix() const { return viewProjectionMatrix_; }
 
+	const float GetFovY() const { return fovY; }
+	const float GetAspectRatio() const { return aspectRatio; }
+	const float GetNearZ() const { return nearZ; }
+	const float GetFarZ() const { return farZ; }
+
 	const Vector3& GetRotate() const { return transform_.rotate; }
 	const Vector3& GetTranslate() const { return transform_.translate; }
 	Vector3 GetWorldTranslate() const { return {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]}; }

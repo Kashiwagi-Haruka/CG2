@@ -103,6 +103,11 @@ void SampleScenePortalSystem::RenderPortalTextures(const std::function<void(Came
 	    portalTextureCameraB_->GetViewProjectionMatrix(), portalTextureCameraB_->GetViewProjectionMatrix(), portalTextureCameraB_->GetWorldMatrix(), portalTextureCameraB_->GetWorldMatrix());
 	portalB_->SetPortalProjectionMatrices(
 	    portalTextureCameraA_->GetViewProjectionMatrix(), portalTextureCameraA_->GetViewProjectionMatrix(), portalTextureCameraA_->GetWorldMatrix(), portalTextureCameraA_->GetWorldMatrix());
+
+	portalA_->Update();
+	portalB_->Update();
+	portalA_->UpdateCameraMatrices();
+	portalB_->UpdateCameraMatrices();
 }
 
 void SampleScenePortalSystem::SetCamera(Camera* camera) {
@@ -149,11 +154,11 @@ void SampleScenePortalSystem::UpdatePortalCamera(const Transform& sourcePortal, 
 	const Matrix4x4 destinationPortalWorld = Function::MakeAffineMatrix(destinationPortal.scale, destinationPortal.rotate, destinationPortal.translate);
 	const Matrix4x4 sourceInverse = Function::Inverse(sourcePortalWorld);
 
-	// ローカル空間へ
-	const Matrix4x4 cameraInSourceSpace = Function::Multiply(sceneCamera_->GetWorldMatrix(), sourceInverse);
+// ローカル空間へ
+	const Matrix4x4 cameraInSourceSpace = Function::Multiply(sourceInverse, sceneCamera_->GetWorldMatrix());
 
 	// destinationへ変換
-	Matrix4x4 portalCameraWorld = Function::Multiply(cameraInSourceSpace, destinationPortalWorld);
+	Matrix4x4 portalCameraWorld = Function::Multiply(destinationPortalWorld, cameraInSourceSpace);
 	if (Function::LengthSquared(portalCameraRotationOffset_) > 0.0001f) {
 		const Matrix4x4 rotationOffset = Function::Multiply(
 		    Function::Multiply(Function::MakeRotateXMatrix(portalCameraRotationOffset_.x), Function::MakeRotateYMatrix(portalCameraRotationOffset_.y)),
@@ -180,6 +185,15 @@ void SampleScenePortalSystem::UpdatePortalCamera(const Transform& sourcePortal, 
 	outCamera->SetWorldMatrix(portalCameraWorld);
 
 	// ViewProjection更新
-	outCamera->SetViewProjectionMatrix(portalViewMatrix, sceneCamera_->GetProjectionMatrix());
-	outCamera->SetFovY(1.2f);
+
+	float aspect = sceneCamera_->GetAspectRatio();
+	float nearZ = sceneCamera_->GetNearZ();
+	float farZ = sceneCamera_->GetFarZ();
+	float fovY = sceneCamera_->GetFovY();
+
+	Matrix4x4 projection = Function::MakePerspectiveFovMatrix(fovY, aspect, nearZ, farZ);
+
+	outCamera->SetViewProjectionMatrix(portalViewMatrix, projection);
+	outCamera->Update();
+
 }
