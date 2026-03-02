@@ -328,6 +328,9 @@
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Portal\PortalMesh.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\Collider.cpp" />
@@ -747,6 +750,9 @@
     <ClInclude Include="Engine\Texture\RenderTexture2D.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Portal\PortalMesh.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -757,5 +763,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\shader\Object3d\Object3dPortal.PS.hlsl" />
   </ItemGroup>
 </Project>

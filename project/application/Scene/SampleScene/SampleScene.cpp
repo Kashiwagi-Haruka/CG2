@@ -21,6 +21,9 @@ SampleScene::SampleScene() {
 	animatedCubeObj_ = std::make_unique<Object3d>();
 	humanObj_ = std::make_unique<Object3d>();
 	spherePrimitive_ = std::make_unique<Primitive>();
+	portalMesh_ = std::make_unique<PortalMesh>();
+	portalObjectCamera_ = std::make_unique<Camera>();
+	portalTextureCamera_ = std::make_unique<Camera>();
 	cameraTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -62,6 +65,10 @@ void SampleScene::Initialize() {
 	spherePrimitive_->Initialize(Primitive::Sphere, 32);
 	spherePrimitive_->SetCamera(camera_.get());
 	spherePrimitive_->SetEnableLighting(true);
+	portalMesh_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
+	portalMesh_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	portalMesh_->SetObjectCamera(portalObjectCamera_.get());
+	portalMesh_->SetTextureCamera(portalTextureCamera_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -97,6 +104,14 @@ void SampleScene::Initialize() {
         .rotate{std::numbers::pi_v<float>*3.0f/2.0f, 0.0f, 0.0f},
         .translate{3.0f, 3.5f, 2.0f}
     };
+	portalTextureCameraTransform_ = {
+	    .scale{1.0f, 1.0f,                      1.0f},
+        .rotate{0.0f, std::numbers::pi_v<float>, 0.0f},
+        .translate{3.0f, 1.5f,                      2.0f}
+    };
+	portalMesh_->SetTransform(portalATransform_);
+	portalTextureCamera_->SetTransform(portalTextureCameraTransform_);
+	portalTextureCamera_->Update();
 	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample", particleTransform_, 0.1f, 5, Vector3{0.0f, 0.0f, 0.0f}, Vector3{-0.5f, -0.5f, -0.5f}, Vector3{0.5f, 0.5f, 0.5f});
 	planeGltf_->SetTransform(planeGTransform_);
 	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
@@ -352,6 +367,11 @@ void SampleScene::Update() {
 		camera_->SetTransform(cameraTransform_);
 		camera_->Update();
 	}
+	portalObjectCamera_->SetTransform(camera_->GetTransform());
+	portalObjectCamera_->Update();
+	portalTextureCamera_->SetTransform(portalTextureCameraTransform_);
+	portalTextureCamera_->Update();
+	portalMesh_->Update();
 	ParticleManager::GetInstance()->Update(camera_.get());
 	if (sampleParticleEmitter_) {
 		sampleParticleEmitter_->Update(particleTransform_);
@@ -425,6 +445,10 @@ void SampleScene::SetSceneCameraForDraw(Camera* camera) {
 	animatedCubeObj_->SetCamera(camera);
 	humanObj_->SetCamera(camera);
 	spherePrimitive_->SetCamera(camera);
+	portalObjectCamera_->SetTransform(camera->GetTransform());
+	portalObjectCamera_->Update();
+	portalMesh_->SetObjectCamera(portalObjectCamera_.get());
+	portalMesh_->SetTextureCamera(portalTextureCamera_.get());
 }
 
 void SampleScene::UpdateSceneCameraMatricesForDraw() {
@@ -443,6 +467,10 @@ void SampleScene::DrawSceneGeometry() {
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
 	spherePrimitive_->Draw();
+
+	Object3dCommon::GetInstance()->DrawCommonPortal();
+	portalMesh_->Draw();
+
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
