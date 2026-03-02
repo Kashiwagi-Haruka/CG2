@@ -141,12 +141,6 @@ void Object3d::UpdateBillboard()
 	// ワールド行列構築
 	worldMatrix = Function::Multiply(Function::Multiply(scaleMat, rotMat), transMat);
 
-	/*if (!isUseSetWorld) {
-		worldMatrix = Function::Multiply(localMatrix, Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
-	} else {
-		worldMatrix = Function::Multiply(localMatrix, worldMatrix);
-	}*/
-
 	UpdateCameraMatrices();
 }
 
