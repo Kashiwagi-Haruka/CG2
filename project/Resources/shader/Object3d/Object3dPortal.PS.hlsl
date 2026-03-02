@@ -91,7 +91,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     float4 projected1 = gTextureSecondary.Sample(gSampler, sampleUV1);
 
     float portalSelect = saturate(inside1);
-    float4 portalColor = lerp(projected0, projected1, portalSelect);
+    float4 portalColor = lerp(projected0, projected1, 1);
     output.color = portalColor * gMaterial.color;
     return output;
 }

@@ -409,6 +409,10 @@ void SampleScene::Update() {
 	portalTextureCameraA_->Update();
 	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
 	portalTextureCameraB_->Update();
+	portalMeshA_->SetTextureCamera(portalTextureCameraA_.get());
+	portalMeshA_->SetObjectCamera(portalObjectCamera_.get());
+	portalMeshB_->SetTextureCamera(portalTextureCameraB_.get());
+	portalMeshB_->SetObjectCamera(portalObjectCamera_.get());
 	portalMeshA_->Update();
 	portalMeshB_->Update();
 	ParticleManager::GetInstance()->Update(camera_.get());
@@ -470,15 +474,15 @@ void SampleScene::Draw() {
 
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
 	portalRenderTextureA_.BeginRender();
-	SetSceneCameraForDraw(portalTextureCameraA_.get());
-	UpdateSceneCameraMatricesForDraw();
-	DrawSceneGeometry(portalTextureCameraA_.get());
-	portalRenderTextureA_.TransitionToShaderResource();
-
-	portalRenderTextureB_.BeginRender();
 	SetSceneCameraForDraw(portalTextureCameraB_.get());
 	UpdateSceneCameraMatricesForDraw();
 	DrawSceneGeometry(portalTextureCameraB_.get());
+	portalRenderTextureA_.TransitionToShaderResource();
+
+	portalRenderTextureB_.BeginRender();
+	SetSceneCameraForDraw(portalTextureCameraA_.get());
+	UpdateSceneCameraMatricesForDraw();
+	DrawSceneGeometry(portalTextureCameraA_.get());
 	portalRenderTextureB_.TransitionToShaderResource();
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
@@ -496,6 +500,8 @@ void SampleScene::SetSceneCameraForDraw(Camera* camera) {
 	animatedCubeObj_->SetCamera(camera);
 	humanObj_->SetCamera(camera);
 	spherePrimitive_->SetCamera(camera);
+	portalMeshA_->SetObjectCamera(camera);
+	portalMeshB_->SetObjectCamera(camera);
 }
 
 void SampleScene::UpdateSceneCameraMatricesForDraw() {
@@ -508,6 +514,8 @@ void SampleScene::UpdateSceneCameraMatricesForDraw() {
 }
 
 void SampleScene::DrawSceneGeometry(Camera* camera) {
+	portalMeshA_->Update();
+	portalMeshB_->Update();
 	Object3dCommon::GetInstance()->DrawCommon();
 	uvBallObj_->Draw();
 	planeGltf_->Draw();
