@@ -33,6 +33,8 @@ ShadowGameScene::ShadowGameScene()
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     //懐中電灯
     flashlight_ = std::make_unique<Flashlight>();
+    // 鍵管理
+	key_ = std::make_unique<Key>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 }
@@ -75,6 +77,10 @@ void ShadowGameScene::Initialize()
     flashlight_->SetCamera(playerCamera_->GetCamera());
     //Playerの座標のポインタを入れる
     timeCardWatch_->SetTransformPtr(&player_->GetTransform());
+
+	// 鍵
+	key_->Initialize();
+	key_->SetPlayerCamera(playerCamera_.get());
 }
 
 void ShadowGameScene::Update()
@@ -140,6 +146,7 @@ void ShadowGameScene::CheckCollision()
 {
     //ホワイトボードとrayの当たり判定作成する
     portalManager_->CheckCollision(timeCardWatch_.get(), { 10.0f,1.5f,5.0f });
+	key_->CheckCollision();
 
     collisionManager_->ClearColliders();
 
@@ -323,6 +330,8 @@ void ShadowGameScene::UpdateGameObject()
 
     Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
 
+    key_->Update();
+
 #pragma endregion
 }
 void ShadowGameScene::UpdatePointLight()
@@ -398,6 +407,8 @@ void ShadowGameScene::DrawSceneGeometry()
     //懐中電灯
     flashlight_->Draw();
     //collisionManager_->DrawColliders();
+	// 鍵の描画処理
+	key_->Draw();
     //プレイヤーの描画処理
     Object3dCommon::GetInstance()->DrawCommonSkinning();
     player_->Draw();
