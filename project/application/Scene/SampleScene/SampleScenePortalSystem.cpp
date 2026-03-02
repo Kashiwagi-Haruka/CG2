@@ -181,4 +181,5 @@ void SampleScenePortalSystem::UpdatePortalCamera(const Transform& sourcePortal, 
 
 	// ViewProjection更新
 	outCamera->SetViewProjectionMatrix(portalViewMatrix, sceneCamera_->GetProjectionMatrix());
+	outCamera->SetFovY(1.2f);
 }

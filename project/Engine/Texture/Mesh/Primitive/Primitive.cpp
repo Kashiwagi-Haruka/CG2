@@ -509,7 +509,7 @@ void Primitive::Initialize(PrimitiveName name, uint32_t slices) {
 	primitiveName_ = name;
 	slices_ = ClampSlices(slices);
 	stacks_ = ComputeStacksFromSlices(slices_);
-	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
+	camera_ = nullptr;
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
 	textureViewProjection0_ = Function::MakeIdentity4x4();
@@ -568,7 +568,7 @@ void Primitive::Initialize(PrimitiveName name, const std::string& texturePath, u
 	primitiveName_ = name;
 	slices_ = ClampSlices(slices);
 	stacks_ = ComputeStacksFromSlices(slices_);
-	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
+	camera_ = nullptr;
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));
 	textureViewProjection0_ = Function::MakeIdentity4x4();
