@@ -4,6 +4,7 @@
 #include <GameObject/KeyBindConfig.h>
 #include <Function.h>
 #include <GameObject/YoshidaMath/CollisionManager/Collider.h>
+#include"Object3d/Object3dCommon.h"
 
 namespace {
 	float tMin_ = 0.0f;
@@ -69,7 +70,7 @@ void Edamame::SetPlayerCamera(PlayerCamera* camera)
 {
 	obj_->SetCamera(camera->GetCamera());
 #ifdef _DEBUG
-	primitive_->SetCamera(camera);
+	primitive_->SetCamera(camera->GetCamera());
 #endif
 	playerCamera_ = camera;
 }

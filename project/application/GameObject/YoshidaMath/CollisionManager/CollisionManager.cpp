@@ -1,7 +1,7 @@
 #include "CollisionManager.h"
 #include "Collider.h"
 #include"RigidBody.h"
-
+#include"Object3d/Object3dCommon.h"
 using namespace YoshidaMath;
 
 void CollisionManager::CheckAllCollisions() {
@@ -32,8 +32,17 @@ void CollisionManager::DrawColliders()
     std::list<YoshidaMath::Collider*>::iterator itrA = colliders_.begin();
     for (; itrA != colliders_.end(); ++itrA) {
 #ifdef _DEBUG
+        Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
         (*itrA)->ColliderDraw();
+        Object3dCommon::GetInstance()->DrawCommon();
 #endif
+    }
+}
+
+void CollisionManager::SetCamera(Camera* camera)
+{
+    for (auto& collider : colliders_) {
+        collider->SetCamera(camera);
     }
 }
 
