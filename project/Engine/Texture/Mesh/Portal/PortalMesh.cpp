@@ -107,8 +107,7 @@ void PortalMesh::Draw() {
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(9, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(
-	    11, secondaryTextureIndex_ == UINT32_MAX ? Object3dCommon::GetInstance()->GetEnvironmentMapSrvIndex() : secondaryTextureIndex_);
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(11, secondaryTextureIndex_ == UINT32_MAX ? textureIndex_ : secondaryTextureIndex_);
 	if (!Object3dCommon::GetInstance()->IsShadowMapPassActive()) {
 		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetShadowMapSrvIndex());
 	}
