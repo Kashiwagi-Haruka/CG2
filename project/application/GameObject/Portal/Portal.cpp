@@ -97,8 +97,11 @@ void Portal::DrawPortals() {
 }
 
 void Portal::DrawRings() {
-    Object3dCommon::GetInstance()->DrawCommonNoCull();
-    ring_->Draw();
+    //Object3dCommon::GetInstance()->DrawCommonNoCull();
+
+        ring_->Draw();
+  
+    
 }
 
 void Portal::DrawWarpPos()

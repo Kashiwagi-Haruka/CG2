@@ -2,6 +2,8 @@
 #include "GameObject/YoshidaMath/CollisionManager/Collider.h"
 #include"Object3d/Object3d.h"
 #include<memory>
+#include "Light/SpotLight.h" 
+
 class Camera;
 
 class Flashlight :
@@ -18,8 +20,12 @@ public:
     void Update();
     void Initialize();
     void Draw();
+    void SetLight();
+    SpotLight& GetSpotLight() { return spotLight_; };
 private:
     Transform transform_ = {};
     std::unique_ptr<Object3d>obj_ = nullptr;
+    //SpotLight
+    SpotLight spotLight_;
 };
 

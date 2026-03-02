@@ -30,7 +30,7 @@ private:
     std::vector<std::unique_ptr<Portal>> portals_;
     PlayerCamera* playerCamera_ = nullptr;
     WhiteBoard* whiteBoard_ = nullptr;
-    uint64_t preCollision_;
+    uint32_t preCollision_;
 
 };
 

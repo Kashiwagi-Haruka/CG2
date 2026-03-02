@@ -63,6 +63,9 @@ void ShadowGameScene::Initialize()
 
     testField_->Initialize();
     testField_->SetCamera(playerCamera_->GetCamera());
+   
+ 
+    
     InitializeLights();
 
     //ホワイトボード管理
@@ -72,9 +75,7 @@ void ShadowGameScene::Initialize()
     //携帯打刻機
     timeCardWatch_->Initialize();
     timeCardWatch_->SetCamera(playerCamera_->GetCamera());
-    //懐中電灯
-    flashlight_->Initialize();
-    flashlight_->SetCamera(playerCamera_->GetCamera());
+
     //Playerの座標のポインタを入れる
     timeCardWatch_->SetTransformPtr(&player_->GetTransform());
 
@@ -110,7 +111,7 @@ void ShadowGameScene::Update()
     //カメラの更新処理
     UpdateCamera();
     //ライトの更新処理
-    UpdatePointLight();
+    UpdateLight();
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
 
@@ -166,6 +167,10 @@ void ShadowGameScene::CheckCollision()
 
 void ShadowGameScene::InitializeLights()
 {
+    //懐中電灯
+    flashlight_->Initialize();
+    flashlight_->SetCamera(playerCamera_->GetCamera());
+
     activePointLightCount_ = 2;
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     pointLights_[0].position = { 0.0f, 5.0f, 0.0f };
@@ -191,16 +196,7 @@ void ShadowGameScene::InitializeLights()
     spotLights_[0].decay = 2.0f;
     spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
     spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
-
-    spotLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    spotLights_[1].position = { 2.0f, 1.25f, 0.0f };
-    spotLights_[1].direction = { -1.0f, -1.0f, 0.0f };
-    spotLights_[1].intensity = 4.0f;
-    spotLights_[1].distance = 7.0f;
-    spotLights_[1].decay = 2.0f;
-    spotLights_[1].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-    spotLights_[1].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
-
+     
     activeAreaLightCount_ = 2;
     areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     areaLights_[0].position = { 0.0f, 3.0f, 0.0f };
@@ -323,8 +319,8 @@ void ShadowGameScene::UpdateGameObject()
     player_->Update();
 
     testField_->Update();
-    //懐中電灯
-    flashlight_->Update();
+
+
     portalManager_->UpdateWhiteBoard();
     portalManager_->UpdatePortal();
 
@@ -334,8 +330,14 @@ void ShadowGameScene::UpdateGameObject()
 
 #pragma endregion
 }
-void ShadowGameScene::UpdatePointLight()
+void ShadowGameScene::UpdateLight()
 {
+
+    //懐中電灯
+    flashlight_->Update();
+    spotLights_[1] = flashlight_->GetSpotLight();
+
+
 #ifdef USE_IMGUI
     if (ImGui::TreeNode("PointLight")) {
         ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);
