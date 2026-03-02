@@ -434,6 +434,7 @@ void SampleScene::Draw() {
 
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
 	portalRenderTexture_.BeginRender();
+	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCamera_.get());
 	SetSceneCameraForDraw(portalTextureCamera_.get());
 	UpdateSceneCameraMatricesForDraw();
 	DrawSceneGeometry();

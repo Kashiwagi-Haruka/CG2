@@ -60,7 +60,7 @@ void PortalMesh::Initialize(const std::string& texturePath) {
 
 void PortalMesh::Update() {
 	Camera* activeObjectCamera = objectCamera_ ? objectCamera_ : Object3dCommon::GetInstance()->GetDefaultCamera();
-	Camera* activeTextureCamera = textureCamera_ ? textureCamera_ : activeObjectCamera;
+	Camera* activeTextureCamera = textureCamera_;
 	if (!activeObjectCamera) {
 		return;
 	}
@@ -82,7 +82,7 @@ void PortalMesh::Update() {
 	textureCameraData_->textureViewProjection1 = textureCameraData_->textureViewProjection0;
 	textureCameraData_->portalCameraWorld0 = activeTextureCamera ? activeTextureCamera->GetWorldMatrix() : Function::MakeIdentity4x4();
 	textureCameraData_->portalCameraWorld1 = textureCameraData_->portalCameraWorld0;
-	textureCameraData_->usePortalProjection = 1;
+	textureCameraData_->usePortalProjection = activeTextureCamera ? 1 : 0;
 	textureCameraResource_->Unmap(0, nullptr);
 
 	objectCameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&objectCameraData_));
