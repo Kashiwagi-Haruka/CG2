@@ -99,10 +99,10 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch,const Vector3& w
                //前回のポータルを削除
                 portals_.clear();
 
-
                 if (whiteBoard_) { 
                     whiteBoard_->SetCollisionAttribute(preCollision_);
                 }
+
                 //ショットしたらポータル作る
                std::unique_ptr  portal = std::make_unique<Portal>();
                whiteBoard_ = board.get();
