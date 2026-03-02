@@ -11,6 +11,7 @@
 #include"GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/TimeCard/TimeCardWatch.h"
+#include"GameObject/Key/Key.h"
 
 #pragma endregion
 
@@ -52,6 +53,8 @@ private:
     std::unique_ptr<PortalManager> portalManager_ = nullptr;
     //携帯打刻機
     std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
+    // 鍵
+	std::unique_ptr<Key> key_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

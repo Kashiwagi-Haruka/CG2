@@ -29,6 +29,8 @@ ShadowGameScene::ShadowGameScene()
     portalManager_->SetPlayerCamera(playerCamera_.get());
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
+    // 鍵管理
+	key_ = std::make_unique<Key>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 }
@@ -64,6 +66,10 @@ void ShadowGameScene::Initialize()
     timeCardWatch_->SetCamera(playerCamera_->GetCamera());
     //Playerの座標のポインタを入れる
     timeCardWatch_->SetTransformPtr(&player_->GetTransform());
+
+	// 鍵
+	key_->Initialize();
+	key_->SetPlayerCamera(playerCamera_.get());
 }
 
 void ShadowGameScene::Update()
@@ -261,6 +267,8 @@ void ShadowGameScene::UpdateGameObject()
 
     portalManager_->Update();
 
+    key_->Update();
+
 #pragma endregion
 }
 void ShadowGameScene::UpdatePointLight()
@@ -319,6 +327,8 @@ void ShadowGameScene::DrawGameObject()
     portalManager_->Draw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
+	// 鍵の描画処理
+	key_->Draw();
     //プレイヤーの描画処理
 	Object3dCommon::GetInstance()->DrawCommonSkinning();
     player_->Draw();
