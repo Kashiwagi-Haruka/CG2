@@ -248,6 +248,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Scene\SampleScene\SampleScenePortalSystem.cpp" />
     <ClCompile Include="application\GameObject\Flashlight\Flashlight.cpp" />
     <ClCompile Include="application\GameObject\Key\Key.cpp" />
+    <ClCompile Include="application\GameObject\UI\RaySprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -359,6 +360,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\WhiteBoard\WalkWhiteBoard.h" />
     <ClInclude Include="application\Scene\SampleScene\SampleScenePortalSystem.h" />
     <ClInclude Include="application\GameObject\Flashlight\Flashlight.h" />
+    <ClInclude Include="application\GameObject\UI\RaySprite.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

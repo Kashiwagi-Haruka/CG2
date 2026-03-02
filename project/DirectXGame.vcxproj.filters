@@ -101,6 +101,7 @@
     <ClCompile Include="application\GameObject\Flashlight\Flashlight.cpp" />
     <ClCompile Include="application\GameObject\Key\Key.cpp" />
     <ClCompile Include="application\GameObject\Edamame\Edamame.cpp" />
+    <ClCompile Include="application\GameObject\UI\RaySprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\Collider.h" />
@@ -198,6 +199,7 @@
     <ClInclude Include="application\Scene\SampleScene\SampleScenePortalSystem.h" />
     <ClInclude Include="application\GameObject\Flashlight\Flashlight.h" />
     <ClInclude Include="application\GameObject\Edamame\Edamame.h" />
+    <ClInclude Include="application\GameObject\UI\RaySprite.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

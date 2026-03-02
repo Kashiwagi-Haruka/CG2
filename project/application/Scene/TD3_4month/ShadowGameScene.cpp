@@ -54,6 +54,9 @@ void ShadowGameScene::Initialize()
     transition_->Initialize(false);
     isTransitionIn_ = true;
     isTransitionOut_ = false;
+
+    playerCamera_->Initialize();
+
     //デバックカメラの設定
     debugCamera_->Initialize();
     debugCamera_->SetTranslation(playerCamera_->GetTransform().translate);
@@ -121,14 +124,14 @@ void ShadowGameScene::Update()
 
 void ShadowGameScene::Draw()
 {
-    //スプライト共通
-    SpriteCommon::GetInstance()->DrawCommon();
-    //シーン遷移の描画処理
-    DrawSceneTransition();
-
     //ゲームオブジェクトの描画処理
     DrawGameObject();
 
+    //スプライト共通
+    SpriteCommon::GetInstance()->DrawCommon();
+    playerCamera_->DrawRaySprite();
+    //シーン遷移の描画処理
+    DrawSceneTransition();
 }
 
 void ShadowGameScene::Finalize()
@@ -323,7 +326,6 @@ void ShadowGameScene::UpdateGameObject()
     player_->Update();
 
     testField_->Update();
-
 
     portalManager_->UpdateWhiteBoard();
     portalManager_->UpdatePortal();
