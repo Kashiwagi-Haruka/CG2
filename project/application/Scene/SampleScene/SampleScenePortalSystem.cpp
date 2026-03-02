@@ -72,25 +72,30 @@ void SampleScenePortalSystem::SetPortalTransforms(const Transform& portalATransf
 	portalRingA_->SetTransform(portalATransform);
 	portalRingB_->SetTransform(portalBTransform);
 }
-void SampleScenePortalSystem::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals) {
+void SampleScenePortalSystem::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals, const std::function<void(Camera*)>& drawPortals) {
 	if (!sceneCamera_ || !portalTextureCameraA_ || !portalTextureCameraB_) {
 		return;
 	}
 
 	const Transform portalATransform = portalA_->GetTransform();
 	const Transform portalBTransform = portalB_->GetTransform();
+	constexpr int kPortalRecursionPassCount = 2;
 
-	if (portalRenderTextureA_ && portalRenderTextureA_->IsReady()) {
-		UpdatePortalCamera(portalBTransform, portalATransform, portalTextureCameraA_.get());
-		portalRenderTextureA_->BeginRender();
-		drawSceneWithoutPortals(portalTextureCameraA_.get());
-		portalRenderTextureA_->TransitionToShaderResource();
-	}
-	if (portalRenderTextureB_ && portalRenderTextureB_->IsReady()) {
-		UpdatePortalCamera(portalATransform, portalBTransform, portalTextureCameraB_.get());
-		portalRenderTextureB_->BeginRender();
-		drawSceneWithoutPortals(portalTextureCameraB_.get());
-		portalRenderTextureB_->TransitionToShaderResource();
+	for (int pass = 0; pass < kPortalRecursionPassCount; ++pass) {
+		if (portalRenderTextureA_ && portalRenderTextureA_->IsReady()) {
+			UpdatePortalCamera(portalBTransform, portalATransform, portalTextureCameraA_.get());
+			portalRenderTextureA_->BeginRender();
+			drawSceneWithoutPortals(portalTextureCameraA_.get());
+			drawPortals(portalTextureCameraA_.get());
+			portalRenderTextureA_->TransitionToShaderResource();
+		}
+		if (portalRenderTextureB_ && portalRenderTextureB_->IsReady()) {
+			UpdatePortalCamera(portalATransform, portalBTransform, portalTextureCameraB_.get());
+			portalRenderTextureB_->BeginRender();
+			drawSceneWithoutPortals(portalTextureCameraB_.get());
+			drawPortals(portalTextureCameraB_.get());
+			portalRenderTextureB_->TransitionToShaderResource();
+		}
 	}
 
 	portalA_->SetPortalProjectionMatrices(

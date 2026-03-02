@@ -27,7 +27,7 @@ public:
 	SampleScenePortalSystem();
 	void Initialize(Camera* mainCamera, const Transform& portalATransform, const Transform& portalBTransform);
 	void Update(Camera* mainCamera, float ringUvRotation);
-	void RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals);
+	void RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals, const std::function<void(Camera*)>& drawPortals);
 
 	void SetCamera(Camera* camera);
 	void SetPortalTransforms(const Transform& portalATransform, const Transform& portalBTransform);

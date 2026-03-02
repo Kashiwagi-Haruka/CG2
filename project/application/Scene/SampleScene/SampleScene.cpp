@@ -415,12 +415,19 @@ void SampleScene::Draw() {
 	portalSystem_->DrawRings();
 	Object3dCommon::GetInstance()->EndShadowMapPass();
 
-	portalSystem_->RenderPortalTextures([this](Camera* camera) {
-		Object3dCommon::GetInstance()->SetDefaultCamera(camera);
-		SetSceneCameraForDraw(camera);
-		UpdateSceneCameraMatricesForDraw();
-		DrawSceneGeometry();
-	});
+	portalSystem_->RenderPortalTextures(
+	    [this](Camera* camera) {
+		    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+		    SetSceneCameraForDraw(camera);
+		    UpdateSceneCameraMatricesForDraw();
+		    DrawSceneGeometry();
+	    },
+	    [this](Camera* camera) {
+		    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+		    portalSystem_->SetCamera(camera);
+		    portalSystem_->UpdateCameraMatrices();
+		    portalSystem_->DrawPortals();
+	    });
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
