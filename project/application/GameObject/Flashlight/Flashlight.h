@@ -27,5 +27,6 @@ private:
     std::unique_ptr<Object3d>obj_ = nullptr;
     //SpotLight
     SpotLight spotLight_;
+    bool isRotateY_ = false;
 };
 
