@@ -11,7 +11,6 @@
 #include "Light/SpotLight.h"
 #include "Object3d/Object3d.h"
 #include "ParticleEmitter.h"
-#include "SampleScenePortalSystem.h"
 #include "Sprite/Sprite.h"
 #include "Transform.h"
 #include <array>
@@ -27,7 +26,6 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Object3d> animatedCubeObj_ = nullptr;
 	std::unique_ptr<Object3d> humanObj_ = nullptr;
 	std::unique_ptr<Primitive> spherePrimitive_ = nullptr;
-	std::unique_ptr<SampleScenePortalSystem> portalSystem_ = nullptr;
 	std::unique_ptr<Camera> camera_ = nullptr;
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	bool useDebugCamera_ = false;

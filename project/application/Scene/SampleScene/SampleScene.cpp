@@ -20,7 +20,6 @@ SampleScene::SampleScene() {
 	planeGltf_ = std::make_unique<Object3d>();
 	animatedCubeObj_ = std::make_unique<Object3d>();
 	humanObj_ = std::make_unique<Object3d>();
-	portalSystem_ = std::make_unique<SampleScenePortalSystem>();
 	spherePrimitive_ = std::make_unique<Primitive>();
 	cameraTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f  },
@@ -125,8 +124,6 @@ void SampleScene::Initialize() {
 	uvSprite->SetRotation(0);
 	uvSprite->SetPosition(Vector2(0, 0));
 
-	portalSystem_->Initialize(camera_.get(), portalATransform_, portalBTransform_);
-
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
@@ -198,28 +195,7 @@ void SampleScene::Update() {
 		}
 		ImGui::End();
 	}
-	if (ImGui::Begin("Portal Camera")) {
 
-		ImGui::DragFloat3("Portal A Position", &portalATransform_.translate.x, 0.01f);
-		ImGui::DragFloat3("Portal A Rotation", &portalATransform_.rotate.x, 0.01f);
-		ImGui::DragFloat3("Portal B Position", &portalBTransform_.translate.x, 0.01f);
-		ImGui::DragFloat3("Portal B Rotation", &portalBTransform_.rotate.x, 0.01f);
-		Vector3 portalCameraPositionOffset = portalSystem_->GetPortalCameraPositionOffset();
-		Vector3 portalCameraRotationOffset = portalSystem_->GetPortalCameraRotationOffset();
-		bool changed = false;
-		changed |= ImGui::DragFloat3("Position Offset", &portalCameraPositionOffset.x, 0.01f);
-		changed |= ImGui::DragFloat3("Rotation Offset", &portalCameraRotationOffset.x, 0.01f);
-		if (ImGui::Button("Reset##PortalCameraOffset")) {
-			portalCameraPositionOffset = {0.0f, 0.0f, 0.0f};
-			portalCameraRotationOffset = {0.0f, 0.0f, 0.0f};
-			changed = true;
-		}
-		if (changed) {
-			portalSystem_->SetPortalCameraPositionOffset(portalCameraPositionOffset);
-			portalSystem_->SetPortalCameraRotationOffset(portalCameraRotationOffset);
-		}
-	}
-	ImGui::End();
 	if (ImGui::Begin("Pad Input")) {
 		ImGui::Text("押されているパッドボタン");
 		const std::array<std::pair<Input::PadButton, const char*>, 14> padButtons = {
@@ -398,8 +374,7 @@ void SampleScene::Update() {
 	/*humanObj_->SetTransform(humanTransform_);*/
 	/*ringPrimitive_->SetTransform(ringTransform_);*/
 	/*ringPrimitive_->SetColor({1.0f, 0.85f, 0.2f, 1.0f});*/
-	portalSystem_->SetPortalTransforms(portalATransform_, portalBTransform_);
-	portalSystem_->Update(camera_.get(), ringUvRotation_);
+	
 	spherePrimitive_->Update();
 	uvBallObj_->Update();
 	fieldObj_->Update();
@@ -432,34 +407,13 @@ void SampleScene::Draw() {
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
-	portalSystem_->SetCamera(camera_.get());
-	portalSystem_->UpdateCameraMatrices();
-	portalSystem_->DrawRings();
 	Object3dCommon::GetInstance()->EndShadowMapPass();
-
-	portalSystem_->RenderPortalTextures(
-	    [this](Camera* camera) {
-		    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
-		    SetSceneCameraForDraw(camera);
-		    UpdateSceneCameraMatricesForDraw();
-		    DrawSceneGeometry();
-	    },
-	    [this](Camera* camera) {
-		    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
-		    portalSystem_->SetCamera(camera);
-		    portalSystem_->UpdateCameraMatrices();
-		    portalSystem_->DrawPortals();
-	    });
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	SetSceneCameraForDraw(camera_.get());
 	UpdateSceneCameraMatricesForDraw();
 	DrawSceneGeometry();
-	portalSystem_->SetCamera(camera_.get());
-	portalSystem_->UpdateCameraMatrices();
-	portalSystem_->DrawPortals();
-	portalSystem_->DrawRings();
 	SpriteCommon::GetInstance()->DrawCommon();
 	uvSprite->Draw();
 }
