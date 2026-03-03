@@ -15,8 +15,8 @@ PortalParticle::PortalParticle() {
 	emitter_->SetCount(24);
 	emitter_->SetLife(0.35f);
 	emitter_->SetAcceleration({0.0f, 0.0f, 0.0f});
-	emitter_->SetAreaMin({-0.4f, -0.4f, -0.4f});
-	emitter_->SetAreaMax({0.4f, 0.4f, 0.4f});
+	emitter_->SetAreaMin({-0.5f, -0.5f, -0.5f});
+	emitter_->SetAreaMax({0.5f, 0.5f, 0.5f});
 	emitter_->SetBeforeColor({0.2f, 0.5f, 1.0f, 1.0f});
 	emitter_->SetAfterColor({0.2f, 0.5f, 1.0f, 0.0f});
 	emitter_->SetEmissionAngle(2.0f * 3.1415926535f);
@@ -59,6 +59,18 @@ void PortalParticle::Start(const Vector3& from, const Vector3& to) {
 	effectTimer_ = 0.0f;
 	isActive_ = true;
 	isVisible_ = true;
+	if (pathEmitter_) {
+		Transform pathTransform{};
+		pathTransform.scale = particleTransform_.scale;
+		pathTransform.translate = from_;
+		pathEmitter_->SetTransform(pathTransform);
+		pathEmitter_->Emit();
+	}
+	if (emitter_) {
+		particleTransform_.translate = to_;
+		emitter_->SetTransform(particleTransform_);
+		emitter_->Emit();
+	}
 	Update();
 }
 
@@ -109,7 +121,7 @@ void PortalParticle::Update() {
 	}
 
 	transform_.translate = to_;
-	particleTransform_.translate = to_;
+	particleTransform_.translate = beamCurrent;
 
 	if (emitter_) {
 		emitter_->SetTransform(particleTransform_);
