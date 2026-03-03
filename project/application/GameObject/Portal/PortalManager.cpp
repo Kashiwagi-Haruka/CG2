@@ -90,6 +90,7 @@ void PortalManager::ObjDraw(bool drawParticle) {
 	if (drawParticle && portalParticle_) {
 		portalParticle_->Draw();
 	}
+	Object3dCommon::GetInstance()->DrawCommon();
 }
 
 void PortalManager::SetPlayerCamera(PlayerCamera* camera) {
