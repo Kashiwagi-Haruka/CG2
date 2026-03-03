@@ -87,7 +87,6 @@ void PortalManager::ObjDraw() {
 		portal->DrawRings();
 		portal->DrawWarpPos();
 	}
-	Object3dCommon::GetInstance()->DrawCommon();
 	if (portalParticle_) {
 		portalParticle_->Draw();
 	}

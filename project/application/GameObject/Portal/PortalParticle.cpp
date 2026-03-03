@@ -46,6 +46,7 @@ void PortalParticle::SetCamera(Camera* camera) {
 	if (primitive_) {
 		primitive_->SetCamera(camera);
 	}
+	ParticleManager::GetInstance()->SetCamera(camera);
 }
 
 void PortalParticle::Start(const Vector3& from, const Vector3& to) {
