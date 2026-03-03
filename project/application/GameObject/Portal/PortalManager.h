@@ -15,7 +15,7 @@ public:
 	void UpdatePortal();
 
 	void ShadowDraw();
-	void ObjDraw();
+	void ObjDraw(bool drawParticle = true);
 	void SetPlayerCamera(PlayerCamera* camera);
 	/// @brief 作成できるポータル地点との当たり判定を作成する
 	/// @param timeCardWatch 携帯打刻機

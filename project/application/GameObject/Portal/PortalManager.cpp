@@ -76,7 +76,7 @@ void PortalManager::ShadowDraw() {
 	}
 }
 
-void PortalManager::ObjDraw() {
+void PortalManager::ObjDraw(bool drawParticle) {
 
 	DrawWhiteBoard();
 
@@ -87,7 +87,7 @@ void PortalManager::ObjDraw() {
 		portal->DrawRings();
 		portal->DrawWarpPos();
 	}
-	if (portalParticle_) {
+	if (drawParticle && portalParticle_) {
 		portalParticle_->Draw();
 	}
 }

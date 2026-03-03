@@ -55,6 +55,7 @@ void PortalParticle::Start(const Vector3& from, const Vector3& to) {
 	effectTimer_ = 0.0f;
 	isActive_ = true;
 	isVisible_ = true;
+	Update();
 }
 
 void PortalParticle::Update() {
