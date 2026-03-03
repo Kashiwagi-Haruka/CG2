@@ -53,7 +53,9 @@ public:
 	static ParticleManager* GetInstance();
 	void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager);
 	void CreateParticleGroup(const std::string& name, const std::string& textureFilePath);
-	void Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life, const Vector4& beforeColor, const Vector4& afterColor);
+	void Emit(
+	    const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life, const Vector4& beforeColor, const Vector4& afterColor,
+	    float emissionAngle);
 	void SetCamera(Camera* camera);
 	void SetBlendMode(BlendMode mode);
 
@@ -76,10 +78,12 @@ private:
 		Vector3 particleScale{1.0f, 1.0f, 1.0f};
 		Vector4 beforeColor{1.0f, 1.0f, 1.0f, 1.0f};
 		Vector4 afterColor{1.0f, 1.0f, 1.0f, 0.0f};
+		float emissionAngle = 6.283185307f;
+		float emissionAnglePadding[3] = {0.0f, 0.0f, 0.0f};
 	};
 	static_assert(offsetof(EmitterSphere, beforeColor) == 64, "EmitterSphere.beforeColor layout mismatch with shader cbuffer");
 	static_assert(offsetof(EmitterSphere, afterColor) == 80, "EmitterSphere.afterColor layout mismatch with shader cbuffer");
-	static_assert(sizeof(EmitterSphere) == 96, "EmitterSphere size mismatch with shader cbuffer");
+	static_assert(sizeof(EmitterSphere) == 112, "EmitterSphere size mismatch with shader cbuffer");
 
 	struct PerFrame {
 		float time = 0.0f;

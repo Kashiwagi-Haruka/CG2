@@ -49,12 +49,24 @@ void main(uint3 DTid : SV_DispatchThreadID)
         {
             int emitIndex = gFreeList[freeListIndex];
 
-            float3 randomDirection = generator.Generate3d() * 2.0f - 1.0f;
+            const float kPi = 3.14159265f;
+            float spreadFactor = saturate((gEmitter.emissionAngle - kPi) / kPi);
             float randomLength = generator.Generate1d() * gEmitter.radius;
+            float randomAngle = generator.Generate1d() * 2.0f * kPi;
+            float2 radialDir = float2(cos(randomAngle), sin(randomAngle));
+
+            // emissionAngle が PI のときは直線、2PI のときは円形に広がる
+            float2 planarDirection = lerp(float2(1.0f, 0.0f), radialDir, spreadFactor);
+            if (length(planarDirection) < 0.0001f)
+            {
+                planarDirection = float2(1.0f, 0.0f);
+            }
+            planarDirection = normalize(planarDirection);
+            float3 randomDirection = float3(planarDirection.x, planarDirection.y, 0.0f);
 
             gParticles[emitIndex].scale = gEmitter.particleScale;
             gParticles[emitIndex].translate = gEmitter.translate + randomDirection * randomLength;
-            gParticles[emitIndex].velocity = float3(0.0f, 0.0f, 0.0f);
+            gParticles[emitIndex].velocity = randomDirection;
             gParticles[emitIndex].lifeTime = gEmitter.lifeTime;
             gParticles[emitIndex].currentTime = 0.0f;
             gParticles[emitIndex].beforeColor = gEmitter.beforeColor;

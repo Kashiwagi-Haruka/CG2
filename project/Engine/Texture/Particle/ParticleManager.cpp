@@ -191,7 +191,7 @@ void ParticleManager::Draw(const std::string& name) {
 		perView.viewProjection = Function::Multiply(view, proj);
 		Matrix4x4 billboard = Function::Inverse(view);
 		billboard.m[3][0] = billboard.m[3][1] = billboard.m[3][2] = 0.0f;
-		perView.billboardMatrix = Function::Multiply(billboard, Function::MakeRotateYMatrix(std::numbers::pi_v<float>));
+		perView.billboardMatrix = billboard;
 	} else {
 		perView.viewProjection = Function::MakeIdentity4x4();
 		perView.billboardMatrix = Function::MakeIdentity4x4();
@@ -228,7 +228,8 @@ void ParticleManager::Draw(const std::string& name) {
 }
 
 void ParticleManager::Emit(
-    const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life, const Vector4& beforeColor, const Vector4& afterColor) {
+    const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life, const Vector4& beforeColor, const Vector4& afterColor,
+    float emissionAngle) {
 	(void)name;
 	if (!isParticleInitialized_) {
 		InitializeParticlesByCompute();
@@ -246,6 +247,7 @@ void ParticleManager::Emit(
 	emitterData_->particleScale = transform.scale;
 	emitterData_->beforeColor = beforeColor;
 	emitterData_->afterColor = afterColor;
+	emitterData_->emissionAngle = std::max(emissionAngle, 0.0f);
 	emitterData_->emit = 1;
 
 	perFrameData_->time = 0.0f;

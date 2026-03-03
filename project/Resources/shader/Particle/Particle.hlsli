@@ -31,6 +31,8 @@ struct EmitterSphere
     float3 particleScale;
     float4 beforeColor;
     float4 afterColor;
+    float emissionAngle;
+    float3 emissionAnglePadding;
 };
 
 struct PerFrame

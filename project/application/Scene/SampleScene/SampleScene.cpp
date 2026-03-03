@@ -558,7 +558,9 @@ void SampleScene::DrawSceneGeometry(Camera* camera) {
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
 	spherePrimitive_->Draw();
-
+	if (sampleParticleEmitter_) {
+		sampleParticleEmitter_->Draw();
+	}
 	Object3dCommon::GetInstance()->DrawCommonPortal(camera);
 	portalMeshA_->Draw();
 	portalMeshB_->Draw();
