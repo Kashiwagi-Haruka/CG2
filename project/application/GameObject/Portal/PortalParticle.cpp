@@ -40,7 +40,7 @@ PortalParticle::PortalParticle() {
 	primitive_->SetColor({0.2f, 0.6f, 1.0f, 1.0f});
 	primitive_->SetScale({0.12f, 0.12f, 0.12f});
 
-	transform_.scale = {1.0f, 1.0f, 1.0f};
+	transform_.scale = {0.25f, 0.25f, 0.25f};
 	particleTransform_.scale = {0.05f, 0.05f, 0.05f};
 }
 
@@ -81,6 +81,7 @@ void PortalParticle::Update() {
 	    from_.z + (to_.z - from_.z) * t,
 	};
 	if (primitive_) {
+		primitive_->SetEnableLighting(false);
 		primitive_->SetTranslate(beamCurrent);
 		primitive_->Update();
 	}
