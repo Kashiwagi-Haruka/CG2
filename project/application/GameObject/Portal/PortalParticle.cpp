@@ -38,6 +38,8 @@ PortalParticle::PortalParticle() {
 	primitive_->Initialize(Primitive::Line);
 	primitive_->SetEnableLighting(false);
 	primitive_->SetColor({0.2f, 0.6f, 1.0f, 1.0f});
+
+	transform_.scale = {0.1f, 0.1f, 0.1f};
 }
 
 void PortalParticle::Initialize() {}
