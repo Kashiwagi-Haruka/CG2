@@ -35,11 +35,13 @@ PortalParticle::PortalParticle() {
 	pathEmitter_->SetEmissionAngle(2.0f * 3.1415926535f);
 
 	primitive_ = std::make_unique<Primitive>();
-	primitive_->Initialize(Primitive::Line);
+	primitive_->Initialize(Primitive::Sphere);
 	primitive_->SetEnableLighting(false);
 	primitive_->SetColor({0.2f, 0.6f, 1.0f, 1.0f});
+	primitive_->SetScale({0.12f, 0.12f, 0.12f});
 
 	transform_.scale = {1.0f, 1.0f, 1.0f};
+	particleTransform_.scale = {0.05f, 0.05f, 0.05f};
 }
 
 void PortalParticle::Initialize() {}
@@ -79,22 +81,24 @@ void PortalParticle::Update() {
 	    from_.z + (to_.z - from_.z) * t,
 	};
 	if (primitive_) {
-		primitive_->SetLinePositions(from_, beamCurrent);
+		primitive_->SetTranslate(beamCurrent);
 		primitive_->Update();
 	}
 
 	if (pathEmitter_) {
 		Transform pathTransform{};
+		pathTransform.scale = particleTransform_.scale;
 		pathTransform.translate = beamCurrent;
 		pathEmitter_->SetTransform(pathTransform);
 		pathEmitter_->Update(pathTransform);
 	}
 
 	transform_.translate = to_;
+	particleTransform_.translate = to_;
 
 	if (emitter_) {
-		emitter_->SetTransform(transform_);
-		emitter_->Update(transform_);
+		emitter_->SetTransform(particleTransform_);
+		emitter_->Update(particleTransform_);
 	}
 }
 

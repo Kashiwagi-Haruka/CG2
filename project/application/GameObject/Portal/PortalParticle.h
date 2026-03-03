@@ -27,6 +27,7 @@ private:
 	std::unique_ptr<ParticleEmitter> emitter_ = nullptr;
 	std::unique_ptr<ParticleEmitter> pathEmitter_ = nullptr;
 	Transform transform_{};
+	Transform particleTransform_{};
 	Vector3 from_{};
 	Vector3 to_{};
 	float effectTimer_ = 0.0f;
