@@ -11,8 +11,8 @@ PortalParticle::PortalParticle() {
 	ParticleManager::GetInstance()->CreateParticleGroup("portalBall", "Resources/2d/defaultParticle.png");
 
 	emitter_ = std::make_unique<ParticleEmitter>("portalBall");
-	emitter_->SetFrequency(0.02f);
-	emitter_->SetCount(10);
+	emitter_->SetFrequency(0.008f);
+	emitter_->SetCount(24);
 	emitter_->SetLife(0.35f);
 	emitter_->SetAcceleration({0.0f, 0.0f, 0.0f});
 	emitter_->SetAreaMin({-0.4f, -0.4f, -0.4f});
@@ -24,8 +24,8 @@ PortalParticle::PortalParticle() {
 	const std::string pathGroup = "portalPath" + std::to_string(nextId_++);
 	ParticleManager::GetInstance()->CreateParticleGroup(pathGroup, "Resources/2d/defaultParticle.png");
 	pathEmitter_ = std::make_unique<ParticleEmitter>(pathGroup);
-	pathEmitter_->SetFrequency(0.01f);
-	pathEmitter_->SetCount(12);
+	pathEmitter_->SetFrequency(0.004f);
+	pathEmitter_->SetCount(28);
 	pathEmitter_->SetLife(0.2f);
 	pathEmitter_->SetAcceleration({0.0f, 0.0f, 0.0f});
 	pathEmitter_->SetAreaMin({-0.12f, -0.12f, -0.12f});
@@ -88,7 +88,21 @@ void PortalParticle::Update() {
 	if (pathEmitter_) {
 		Transform pathTransform{};
 		pathTransform.scale = particleTransform_.scale;
-		pathTransform.translate = beamCurrent;
+		constexpr float kRingRadius = 0.18f;
+		constexpr float kVerticalRadius = 0.08f;
+		constexpr float kRingAngularSpeed = 24.0f;
+		const float swirlAngle = effectTimer_ * kRingAngularSpeed;
+		Vector3 ringOffset{
+		    std::cos(swirlAngle) * kRingRadius,
+		    std::sin(swirlAngle * 1.7f) * kVerticalRadius,
+		    std::sin(swirlAngle) * kRingRadius,
+		};
+
+		pathTransform.translate = {
+		    beamCurrent.x + ringOffset.x,
+		    beamCurrent.y + ringOffset.y,
+		    beamCurrent.z + ringOffset.z,
+		};
 		pathEmitter_->SetTransform(pathTransform);
 		pathEmitter_->Update(pathTransform);
 	}
