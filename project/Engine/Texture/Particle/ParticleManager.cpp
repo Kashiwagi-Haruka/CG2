@@ -77,12 +77,12 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
 	memcpy(mapped, vertices, sizeof(vertices));
 	vertexBuffer_->Unmap(0, nullptr);
 
-	particleResource_ = CreateDefaultBufferResource(dxCommon_, sizeof(float) * 16 * kMaxParticles_, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON);
+	particleResource_ = CreateDefaultBufferResource(dxCommon_, sizeof(float) * 20 * kMaxParticles_, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON);
 	particleResourceState_ = D3D12_RESOURCE_STATE_COMMON;
 	particleSrvIndex_ = srvManager_->Allocate();
-	srvManager_->CreateSRVforStructuredBuffer(particleSrvIndex_, particleResource_.Get(), kMaxParticles_, sizeof(float) * 16);
+	srvManager_->CreateSRVforStructuredBuffer(particleSrvIndex_, particleResource_.Get(), kMaxParticles_, sizeof(float) * 20);
 	particleUavIndex_ = srvManager_->Allocate();
-	srvManager_->CreateUAVforStructuredBuffer(particleUavIndex_, particleResource_.Get(), kMaxParticles_, sizeof(float) * 16);
+	srvManager_->CreateUAVforStructuredBuffer(particleUavIndex_, particleResource_.Get(), kMaxParticles_, sizeof(float) * 20);
 	freeListIndexResource_ = CreateDefaultBufferResource(dxCommon_, sizeof(int32_t), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON);
 	freeListIndexResourceState_ = D3D12_RESOURCE_STATE_COMMON;
 	freeListIndexUavIndex_ = srvManager_->Allocate();
@@ -191,7 +191,7 @@ void ParticleManager::Draw(const std::string& name) {
 		perView.viewProjection = Function::Multiply(view, proj);
 		Matrix4x4 billboard = Function::Inverse(view);
 		billboard.m[3][0] = billboard.m[3][1] = billboard.m[3][2] = 0.0f;
-		perView.billboardMatrix = Function::Multiply(billboard, Function::MakeRotateYMatrix(std::numbers::pi_v<float>));
+		perView.billboardMatrix = billboard;
 	} else {
 		perView.viewProjection = Function::MakeIdentity4x4();
 		perView.billboardMatrix = Function::MakeIdentity4x4();
@@ -227,7 +227,9 @@ void ParticleManager::Draw(const std::string& name) {
 	dxCommon_->GetCommandList()->DrawInstanced(6, kMaxParticles_, 0, 0);
 }
 
-void ParticleManager::Emit(const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life, const Vector4& color) {
+void ParticleManager::Emit(
+    const std::string& name, const Transform& transform, uint32_t count, const Vector3& accel, const AABB& area, float life, const Vector4& beforeColor, const Vector4& afterColor,
+    float emissionAngle) {
 	(void)name;
 	if (!isParticleInitialized_) {
 		InitializeParticlesByCompute();
@@ -243,7 +245,9 @@ void ParticleManager::Emit(const std::string& name, const Transform& transform, 
 	emitterData_->lifeTime = std::max(life, 1.0f / 60.0f);
 	emitterData_->acceleration = accel;
 	emitterData_->particleScale = transform.scale;
-	emitterData_->color = color;
+	emitterData_->beforeColor = beforeColor;
+	emitterData_->afterColor = afterColor;
+	emitterData_->emissionAngle = std::max(emissionAngle, 0.0f);
 	emitterData_->emit = 1;
 
 	perFrameData_->time = 0.0f;

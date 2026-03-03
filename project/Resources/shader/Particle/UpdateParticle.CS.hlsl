@@ -18,7 +18,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     }
 
     Particle particle = gParticles[particleIndex];
-    if (particle.color.a == 0.0f)
+    if (particle.beforeColor.a == 0.0f && particle.afterColor.a == 0.0f)
     {
         return;
     }
@@ -29,15 +29,15 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
     if (particle.lifeTime <= 0.0f || particle.currentTime >= particle.lifeTime)
     {
-        particle.color.a = 0.0f;
+        particle.beforeColor.a = 0.0f;
+        particle.afterColor.a = 0.0f;
     }
     else
     {
-        float alpha = 1.0f - (particle.currentTime / particle.lifeTime);
-        particle.color.a = saturate(alpha);
+        // フェードは描画時に currentTime / lifeTime から算出する
     }
 
-    if (particle.color.a <= 0.0f)
+    if (particle.beforeColor.a <= 0.0f && particle.afterColor.a <= 0.0f)
     {
         particle.scale = float3(0.0f, 0.0f, 0.0f);
 

@@ -122,7 +122,7 @@ private:
     void DrawSceneTransition();
     //ゲームオブジェクトの描画処理
     void DrawGameObject();
-    void DrawSceneGeometry();
+	void DrawSceneGeometry(bool drawPortalParticle = true);
     void SetSceneCameraForDraw(Camera* camera);
 };
 

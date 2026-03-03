@@ -9,6 +9,7 @@
 #include "WinApp.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
+#include "Particle/ParticleManager.h"
 
 ShadowGameScene::ShadowGameScene()
 {
@@ -338,7 +339,7 @@ void ShadowGameScene::UpdateGameObject()
 
     portalManager_->UpdateWhiteBoard();
     portalManager_->UpdatePortal();
-
+	ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
     Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
 
     key_->Update();
@@ -399,27 +400,26 @@ void ShadowGameScene::DrawGameObject()
     Object3dCommon::GetInstance()->EndShadowMapPass();
 
     for (auto& portal : portalManager_->GetPortals()) {
-        portal->RenderPortalTextures([this](Camera* camera) {
-            Object3dCommon::GetInstance()->SetDefaultCamera(camera);
-            SetSceneCameraForDraw(camera);
-            DrawSceneGeometry();
-            });
-    }
+		portal->RenderPortalTextures([this](Camera* camera) {
+			Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+			SetSceneCameraForDraw(camera);
+			DrawSceneGeometry(false);
+		});
+	}
 
-    Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
+	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 
-    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
-    SetSceneCameraForDraw(playerCamera_->GetCamera());
-    DrawSceneGeometry();
+	Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
+	SetSceneCameraForDraw(playerCamera_->GetCamera());
+	DrawSceneGeometry(true);
 
 }
-void ShadowGameScene::DrawSceneGeometry()
-{
-    Object3dCommon::GetInstance()->DrawCommon();
-    //テスト地面
-    testField_->Draw();
-    //ポータル管理
-    portalManager_->ObjDraw();
+void ShadowGameScene::DrawSceneGeometry(bool drawPortalParticle) {
+	Object3dCommon::GetInstance()->DrawCommon();
+	// テスト地面
+	testField_->Draw();
+	// ポータル管理
+	portalManager_->ObjDraw(drawPortalParticle);
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //懐中電灯

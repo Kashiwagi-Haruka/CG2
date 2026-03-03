@@ -105,6 +105,7 @@
     <ClCompile Include="application\GameObject\UI\RaySprite.cpp" />
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Portal\PortalMesh.cpp" />
+    <ClCompile Include="application\GameObject\Portal\PortalParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\Collider.h" />
@@ -204,6 +205,7 @@
     <ClInclude Include="application\GameObject\UI\RaySprite.h" />
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
     <ClInclude Include="Engine\Texture\Mesh\Portal\PortalMesh.h" />
+    <ClInclude Include="application\GameObject\Portal\PortalParticle.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
