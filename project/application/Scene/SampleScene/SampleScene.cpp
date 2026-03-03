@@ -142,7 +142,13 @@ void SampleScene::Initialize() {
 	portalObjectCamera_->Update();*/
 	portalMeshA_->SetTransform(portalATransform_);
 	portalMeshB_->SetTransform(portalBTransform_);
-	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample", particleTransform_, 0.1f, 5, Vector3{0.0f, 0.0f, 0.0f}, Vector3{-0.5f, -0.5f, -0.5f}, Vector3{0.5f, 0.5f, 0.5f});
+	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample");
+	sampleParticleEmitter_->SetTransform(particleTransform_);
+	sampleParticleEmitter_->SetFrequency(0.1f);
+	sampleParticleEmitter_->SetCount(5);
+	sampleParticleEmitter_->SetAcceleration({0.0f, 0.0f, 0.0f});
+	sampleParticleEmitter_->SetAreaMin({-0.5f, -0.5f, -0.5f});
+	sampleParticleEmitter_->SetAreaMax({0.5f, 0.5f, 0.5f});
 	planeGltf_->SetTransform(planeGTransform_);
 	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
 	animatedCubeObj_->SetAnimation(&animatedCubeAnimation_, true);
@@ -371,7 +377,15 @@ void SampleScene::Update() {
 			if (ImGui::DragFloat("Life", &life, 1.0f, 0.0f, 10000.0f)) {
 				sampleParticleEmitter_->SetLife(life);
 			}
+			Vector4 beforeColor = sampleParticleEmitter_->GetBeforeColor();
+			if (ImGui::ColorEdit4("BeforeColor", &beforeColor.x)) {
+				sampleParticleEmitter_->SetBeforeColor(beforeColor);
+			}
 
+			Vector4 afterColor = sampleParticleEmitter_->GetAfterColor();
+			if (ImGui::ColorEdit4("AfterColor", &afterColor.x)) {
+				sampleParticleEmitter_->SetAfterColor(afterColor);
+			}
 			if (ImGui::Button("Emit Now")) {
 				sampleParticleEmitter_->Emit();
 			}

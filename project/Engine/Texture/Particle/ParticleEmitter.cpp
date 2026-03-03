@@ -4,10 +4,7 @@
 // -----------------------------------------
 // コンストラクタ
 // -----------------------------------------
-ParticleEmitter::ParticleEmitter(
-    const std::string& groupName, const Transform& transform, float emitFrequency, uint32_t emitCount, Vector3 acceleration, Vector3 areaMin, Vector3 areaMax, Vector4 color)
-    : name(groupName), transform_(transform), frequency(emitFrequency), count(emitCount), acceleration_(acceleration), areaMin_(areaMin), areaMax_(areaMax), timer(0.0f), color_(color) // 明示する
-{}
+ParticleEmitter::ParticleEmitter(const std::string& groupName) : name(groupName) {}
 
 void ParticleEmitter::Update(const Transform& parentTransform) {
 	transform_ = parentTransform;
@@ -24,7 +21,7 @@ void ParticleEmitter::Update(const Transform& parentTransform) {
 		// ★ SetFieldArea も使わない
 
 		// Emit() に emitter の個別フィールドを渡す
-		ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea, life, color_);
+		ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea, life, beforeColor_, afterColor_);
 
 		timer -= 1.0f;
 	}
@@ -48,8 +45,9 @@ void ParticleEmitter::Emit() {
 	fieldArea.min = areaMin_;
 	fieldArea.max = areaMax_;
 
-	ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea, life, color_);
+	ParticleManager::GetInstance()->Emit(name, transform_, count, acceleration_, fieldArea, life, beforeColor_, afterColor_);
 }
+
 
 void ParticleEmitter::SetAcceleration(Vector3 acceleration) { acceleration_ = acceleration; }
 void ParticleEmitter::SetCount(uint32_t cou) { count = cou; }

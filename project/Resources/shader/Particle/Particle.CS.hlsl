@@ -57,7 +57,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
             gParticles[emitIndex].velocity = float3(0.0f, 0.0f, 0.0f);
             gParticles[emitIndex].lifeTime = gEmitter.lifeTime;
             gParticles[emitIndex].currentTime = 0.0f;
-            gParticles[emitIndex].color = gEmitter.color;
+            gParticles[emitIndex].beforeColor = gEmitter.beforeColor;
+            gParticles[emitIndex].afterColor = gEmitter.afterColor;
         }
         else
         {
