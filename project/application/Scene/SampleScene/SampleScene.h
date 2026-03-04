@@ -57,6 +57,8 @@ class SampleScene : public BaseScene {
 	Transform ringTransform_{};
 	Transform portalATransform_{};
 	Transform portalBTransform_{};
+	Transform portalTextureCameraAAdjust_{};
+	Transform portalTextureCameraBAdjust_{};
 	Transform portalTextureCameraATransform_{};
 	Transform portalTextureCameraBTransform_{};
 	/*Transform portalObjectCameraTransform_{};*/
