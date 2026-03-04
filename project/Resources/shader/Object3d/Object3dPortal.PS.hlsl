@@ -22,14 +22,23 @@ struct Camera
     int fullscreenGrayscaleEnabled;
     int fullscreenSepiaEnabled;
     float2 padding2;
+    float4x4 textureViewProjection0;
+    float4x4 textureViewProjection1;
+    float4x4 portalCameraWorld0;
+    float4x4 portalCameraWorld1;
+    int usePortalProjection;
+    float3 padding3;
 };
 
 struct TextureCamera
 {
     float4x4 textureViewProjection;
     float4x4 portalCameraWorld;
+    float4x4 textureWorldViewProjection;
+    float3 textureWorldPosition;
     int usePortalProjection;
-    float3 padding;
+    int useTextureCameraForVertex;
+    float2 padding;
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
@@ -76,5 +85,7 @@ PixelShaderOutput main(PortalVertexShaderOutput input)
     const float2 screenTexcoord = ComputeScreenUV(input.position, gCamera.screenSize);
 
     output.color = gTextureSecondary.Sample(gSampler, screenTexcoord) * gMaterial.color;
+    // テクスチャカメラ使用時にシェーダーから参照できるよう、
+    // texture camera の position / WVP を定数バッファで保持している。
     return output;
 }

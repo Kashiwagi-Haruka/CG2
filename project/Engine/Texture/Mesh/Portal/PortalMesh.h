@@ -43,6 +43,8 @@ private:
 	struct alignas(256) PortalTextureCameraForGpu {
 		Matrix4x4 textureViewProjection;
 		Matrix4x4 portalCameraWorld;
+		Matrix4x4 textureWorldViewProjection;
+		Vector3 textureWorldPosition;
 		int usePortalProjection;
 		int useTextureCameraForVertex;
 		float padding[2];

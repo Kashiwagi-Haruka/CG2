@@ -12,6 +12,8 @@ struct TextureCamera
 {
     float4x4 textureViewProjection;
     float4x4 portalCameraWorld;
+    float4x4 textureWorldViewProjection;
+    float3 textureWorldPosition;
     int usePortalProjection;
     int useTextureCameraForVertex;
     float2 padding;
@@ -40,9 +42,11 @@ PortalVertexShaderOutput main(VertexShaderInput input)
 {
     PortalVertexShaderOutput output;
 
-    // ポータル形状はメインカメラ基準でラスタライズし、
-    // 画面投影したテクスチャを PS 側で切り抜く。
     output.position = mul(input.position, gTransformationMatrix.WVP);
+    if (gTextureCamera.useTextureCameraForVertex != 0)
+    {
+        output.position = mul(input.position, gTextureCamera.textureWorldViewProjection);
+    }
     output.normal = normalize(mul(input.normal, (float3x3) gTransformationMatrix.WorldInverseTranspose));
     output.texcoord = input.texcoord;
     output.worldPosition = mul(input.position, gTransformationMatrix.World).xyz;
