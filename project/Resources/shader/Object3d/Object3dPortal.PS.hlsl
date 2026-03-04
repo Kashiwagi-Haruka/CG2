@@ -78,19 +78,7 @@ PixelShaderOutput main(PortalVertexShaderOutput input)
     float4 baseUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 baseColor = gTexture.Sample(gSampler, baseUV.xy) * gMaterial.color;
 
-    if (gTextureCamera.usePortalProjection == 0)
-    {
-        output.color = baseColor;
-        return output;
-    }
-
     const float2 projectedTexcoord = ComputeTextureCameraUV(input.worldPosition, gTextureCamera.textureViewProjection);
-    const bool isInsideProjection = all(projectedTexcoord >= float2(0.0f, 0.0f)) && all(projectedTexcoord <= float2(1.0f, 1.0f));
-    if (!isInsideProjection)
-    {
-        output.color = baseColor;
-        return output;
-    }
 
     output.color = gTextureSecondary.Sample(gSampler, projectedTexcoord) * gMaterial.color;
     return output;
