@@ -687,6 +687,61 @@
           0.0
         ]
       }
+    },
+    {
+      "index": 12,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Object 12",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
     }
   ],
   "primitives": [
@@ -782,6 +837,171 @@
         ]
       },
       "name": "Primitive 1",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.2000000476837158,
+        "distortionStrength": 2.4200000762939453,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Primitive 2",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Primitive 3",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Primitive 4",
       "transform": {
         "rotate": [
           0.0,

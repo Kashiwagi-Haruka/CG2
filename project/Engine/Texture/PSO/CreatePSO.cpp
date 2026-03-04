@@ -86,7 +86,7 @@ void CreatePSO::CreateRootSignature() {
 	rootParameters[4].Descriptor.ShaderRegister = 4;
 
 	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	rootParameters[5].Descriptor.ShaderRegister = 5;
 
 	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;

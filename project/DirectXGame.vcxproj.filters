@@ -23,6 +23,7 @@
     <FxCompile Include="Resources\shader\Sprite\Sprite.VS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\Object3dGrid.PS.hlsl" />
     <FxCompile Include="Resources\shader\Sprite\Font.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\Object3dPortal.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\Collider.cpp" />

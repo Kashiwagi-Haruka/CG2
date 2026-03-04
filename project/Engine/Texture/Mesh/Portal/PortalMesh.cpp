@@ -68,7 +68,10 @@ void PortalMesh::Update() {
 	if (!useWorldMatrix_) {
 		worldMatrix_ = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	}
-	const Matrix4x4 worldViewProjectionMatrix = Function::Multiply(Function::Multiply(worldMatrix_, activeObjectCamera->GetViewMatrix()), activeObjectCamera->GetProjectionMatrix());
+	const bool hasTextureCamera = (activeTextureCamera != nullptr);
+	const bool useTextureCameraForVertex = hasTextureCamera && useTextureCameraForVertex_;
+	Camera* activeVertexCamera = useTextureCameraForVertex ? activeTextureCamera : activeObjectCamera;
+	const Matrix4x4 worldViewProjectionMatrix = Function::Multiply(Function::Multiply(worldMatrix_, activeVertexCamera->GetViewMatrix()), activeVertexCamera->GetProjectionMatrix());
 
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
@@ -78,11 +81,13 @@ void PortalMesh::Update() {
 	transformResource_->Unmap(0, nullptr);
 
 	textureCameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&textureCameraData_));
-	textureCameraData_->textureViewProjection0 = activeTextureCamera ? activeTextureCamera->GetViewProjectionMatrix() : Function::MakeIdentity4x4();
-	textureCameraData_->textureViewProjection1 = textureCameraData_->textureViewProjection0;
-	textureCameraData_->portalCameraWorld0 = activeTextureCamera ? activeTextureCamera->GetWorldMatrix() : Function::MakeIdentity4x4();
-	textureCameraData_->portalCameraWorld1 = textureCameraData_->portalCameraWorld0;
-	textureCameraData_->usePortalProjection = 1;
+	textureCameraData_->textureViewProjection = hasTextureCamera ? activeTextureCamera->GetViewProjectionMatrix() : Function::MakeIdentity4x4();
+	textureCameraData_->portalCameraWorld = hasTextureCamera ? activeTextureCamera->GetWorldMatrix() : Function::MakeIdentity4x4();
+	textureCameraData_->textureWorldViewProjection =
+	    hasTextureCamera ? Function::Multiply(Function::Multiply(worldMatrix_, activeTextureCamera->GetViewMatrix()), activeTextureCamera->GetProjectionMatrix()) : Function::MakeIdentity4x4();
+	textureCameraData_->textureWorldPosition = hasTextureCamera ? activeTextureCamera->GetWorldTranslate() : Vector3{0.0f, 0.0f, 0.0f};
+	textureCameraData_->usePortalProjection = hasTextureCamera ? 1 : 0;
+	textureCameraData_->useTextureCameraForVertex = useTextureCameraForVertex ? 1 : 0;
 	textureCameraResource_->Unmap(0, nullptr);
 
 	objectCameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&objectCameraData_));

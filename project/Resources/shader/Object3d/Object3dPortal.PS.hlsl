@@ -22,16 +22,23 @@ struct Camera
     int fullscreenGrayscaleEnabled;
     int fullscreenSepiaEnabled;
     float2 padding2;
-};
-
-struct TextureCamera
-{
     float4x4 textureViewProjection0;
     float4x4 textureViewProjection1;
     float4x4 portalCameraWorld0;
     float4x4 portalCameraWorld1;
     int usePortalProjection;
-    float3 padding;
+    float3 padding3;
+};
+
+struct TextureCamera
+{
+    float4x4 textureViewProjection;
+    float4x4 portalCameraWorld;
+    float4x4 textureWorldViewProjection;
+    float3 textureWorldPosition;
+    int usePortalProjection;
+    int useTextureCameraForVertex;
+    float2 padding;
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
@@ -47,34 +54,32 @@ struct PixelShaderOutput
     float4 color : SV_TARGET0;
 };
 
-float2 ComputeProjectedUV(float3 worldPosition, float4x4 viewProjection, float4x4 cameraWorld)
+struct PortalVertexShaderOutput
 {
-    float4 clip = mul(float4(worldPosition, 1.0f), viewProjection);
-    float safeW = max(abs(clip.w), 0.0001f);
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+    float3 normal : NORMAL0;
+    float3 worldPosition : POSITION0;
+    float4 shadowPosition : TEXCOORD1;
+};
 
-    float3 ndc = clip.xyz / safeW;
-    float2 uv = float2(ndc.x * 0.5f + 0.5f, -ndc.y * 0.5f + 0.5f);
-
-    return uv;
+float2 ComputeTextureCameraUV(float3 worldPosition, float4x4 textureViewProjection)
+{
+    const float4 projectedPosition = mul(float4(worldPosition, 1.0f), textureViewProjection);
+    const float safeW = max(abs(projectedPosition.w), 0.00001f);
+    const float2 ndc = projectedPosition.xy / safeW;
+    return float2(ndc.x * 0.5f + 0.5f, 1.0f - (ndc.y * 0.5f + 0.5f));
 }
 
-PixelShaderOutput main(VertexShaderOutput input)
+PixelShaderOutput main(PortalVertexShaderOutput input)
 {
     PixelShaderOutput output;
 
     float4 baseUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 baseColor = gTexture.Sample(gSampler, baseUV.xy) * gMaterial.color;
 
-    if (gTextureCamera.usePortalProjection == 0)
-    {
-        output.color = baseColor;
-        return output;
-    }
-    float2 projectedUV = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection1, gTextureCamera.portalCameraWorld1);
+    const float2 projectedTexcoord = ComputeTextureCameraUV(input.worldPosition, gTextureCamera.textureViewProjection);
 
-    // 投影は常に使用し、画面外はラップして端クランプ由来の引き伸ばしを防ぐ。
-    float2 wrappedProjectedUV = frac(projectedUV);
-    float4 projected1 = gTextureSecondary.Sample(gSampler, wrappedProjectedUV);
-    output.color = projected1 * gMaterial.color;
+    output.color = gTextureSecondary.Sample(gSampler, projectedTexcoord) * gMaterial.color;
     return output;
 }
