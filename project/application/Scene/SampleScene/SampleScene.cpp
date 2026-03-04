@@ -27,9 +27,9 @@ Transform MakePortalAnchoredTextureCameraTransform(const Transform& portalTransf
 	cameraTransform.rotate += adjustmentTransform.rotate;
 
 	const Matrix4x4 cameraWorld = Function::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-	Vector3 right = {cameraWorld.m[0][0], cameraWorld.m[1][0], cameraWorld.m[2][0]};
-	Vector3 up = {cameraWorld.m[0][1], cameraWorld.m[1][1], cameraWorld.m[2][1]};
-	Vector3 forward = {cameraWorld.m[0][2], cameraWorld.m[1][2], cameraWorld.m[2][2]};
+	Vector3 right = {cameraWorld.m[0][0], cameraWorld.m[0][1], cameraWorld.m[0][2]};
+	Vector3 up = {cameraWorld.m[1][0], cameraWorld.m[1][1], cameraWorld.m[1][2]};
+	Vector3 forward = {cameraWorld.m[2][0], cameraWorld.m[2][1], cameraWorld.m[2][2]};
 	if (Function::LengthSquared(right) > 0.000001f) {
 		right = Function::Normalize(right);
 	}
