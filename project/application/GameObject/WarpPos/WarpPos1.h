@@ -8,9 +8,10 @@ class WarpPos1
 public:
     WarpPos1();
     void SetCamera(Camera* camera);
-    void SetTransform(const  Vector3& pos) { transform_.translate = pos; }
+    void SetTransform(Transform& transform) {transform_ = transform; };
     Vector3& GetTranslate() { return transform_.translate; };
     Vector3& GetRotate() { return transform_.rotate; };
+    Transform& GetTransform() { return transform_; }
     void Initialize();
     void Update();
     void Draw();

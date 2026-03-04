@@ -135,13 +135,13 @@ void Portal::UpdatePortalCamera(const Transform& destinationPortal, Camera* outC
 
 void Portal::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals)
 {
-    auto* camera = warpPos_->GetWarpPosCamera();
-    if (!sceneCamera_ || !camera) {
+    auto* camera = GetCamera();
+    if (!sceneCamera_  && !camera) {
         return;
     }
 
     if (portalRenderTexture_ && portalRenderTexture_->IsReady()) {
-        UpdatePortalCamera(transform_, camera);
+        UpdatePortalCamera(warpPos_->GetTransform(), camera);
         portalRenderTexture_->BeginRender();
         drawSceneWithoutPortals(camera);
         portalRenderTexture_->TransitionToShaderResource();

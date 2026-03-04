@@ -27,6 +27,7 @@ public:
     void Initialize();
     void Update();
     void SetCamera(Camera* camera);
+    Camera* GetCamera() { return warpPos_->GetWarpPosCamera(); };
     //Portal自身の座標を取得する
     Vector3& GetTranslate() { return transform_.translate; };
     //PortalのSRTをセットする
@@ -37,7 +38,7 @@ public:
     Vector3& GetWarpRotate() { return warpPos_->GetRotate(); };
 
     //ワープ先の座標をセットする
-    void SetWarpTransform(const Vector3& pos) { warpPos_->SetTransform(pos); };
+    void SetWarpTransform(Transform& pos) { warpPos_->SetTransform(pos); };
     const Sphere& GetSphere();
     //ワープ先を取得する
     WarpPos1* GetWarpPos() { return warpPos_.get(); }

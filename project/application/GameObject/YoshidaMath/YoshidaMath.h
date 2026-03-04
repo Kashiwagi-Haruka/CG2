@@ -27,4 +27,9 @@ namespace YoshidaMath {
     Vector3 GetAABBScale(const AABB& aabb);
     void LookTarget(const Vector3& target, Transform& transform);
     Vector3 GetToTargetVec(const Vector3& target,const Vector3& pos);
+    Matrix4x4 CalculateObliqueMatrix(const Matrix4x4& projection, const Vector4& clipPlane);
+    // 内積を計算する
+    float Dot(const Vector4& v1, const Vector4& v2);
+    float sgn(float num);
+
 }
