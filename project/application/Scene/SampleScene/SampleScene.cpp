@@ -176,6 +176,12 @@ void SampleScene::Initialize() {
 	uvSprite->SetRotation(0);
 	uvSprite->SetPosition(Vector2(0, 0));
 
+		overlayCameraSprite_ = std::make_unique<Sprite>();
+	overlayCameraSprite_->Initialize(portalRenderTextureA_.GetSrvIndex());
+	overlayCameraSprite_->SetScale(Vector2(static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)));
+	overlayCameraSprite_->SetRotation(0.0f);
+	overlayCameraSprite_->SetPosition(Vector2(0.0f, 0.0f));
+
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
@@ -482,6 +488,9 @@ void SampleScene::Update() {
 	ringUvRotation_ -= 0.05f;
 
 	uvSprite->Update();
+	if (overlayCameraSprite_) {
+		overlayCameraSprite_->Update();
+	}
 
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 
@@ -531,6 +540,9 @@ void SampleScene::Draw() {
 	DrawSceneGeometry(camera_.get());
 	SpriteCommon::GetInstance()->DrawCommon();
 	uvSprite->Draw();
+	if (overlayCameraSprite_) {
+		overlayCameraSprite_->Draw();
+	}
 }
 
 void SampleScene::SetSceneCameraForDraw(Camera* camera) {
