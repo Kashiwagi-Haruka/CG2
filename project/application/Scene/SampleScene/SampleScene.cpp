@@ -106,8 +106,8 @@ void SampleScene::Initialize() {
 	portalMeshB_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	portalMeshA_->SetObjectCamera(/*portalObjectCamera_.get()*/camera_.get());
 	portalMeshB_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
-	portalMeshA_->SetTextureCamera(portalTextureCameraA_.get());
-	portalMeshB_->SetTextureCamera(portalTextureCameraB_.get());
+	portalMeshA_->SetTextureCamera(portalTextureCameraB_.get());
+	portalMeshB_->SetTextureCamera(portalTextureCameraA_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -451,10 +451,10 @@ void SampleScene::Update() {
 	portalTextureCameraB_->SetTransform(MakeOppositeSidePortalCameraTransform(portalTextureCameraBTransform_));
 	portalTextureCameraB_->Update();
 	portalMeshA_->SetTransform(portalATransform_);
-	portalMeshA_->SetTextureCamera(portalTextureCameraA_.get());
+	portalMeshA_->SetTextureCamera(portalTextureCameraB_.get());
 
 	portalMeshB_->SetTransform(portalBTransform_);
-	portalMeshB_->SetTextureCamera(portalTextureCameraB_.get());
+	portalMeshB_->SetTextureCamera(portalTextureCameraA_.get());
 
 	ParticleManager::GetInstance()->Update(camera_.get());
 	if (sampleParticleEmitter_) {
@@ -541,7 +541,7 @@ void SampleScene::Draw() {
 	SpriteCommon::GetInstance()->DrawCommon();
 	uvSprite->Draw();
 	if (overlayCameraSprite_) {
-		overlayCameraSprite_->Draw();
+		/*overlayCameraSprite_->Draw();*/
 	}
 }
 
