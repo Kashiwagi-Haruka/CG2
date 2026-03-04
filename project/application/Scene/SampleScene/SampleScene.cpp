@@ -132,15 +132,15 @@ void SampleScene::Initialize() {
 	portalRenderTextureA_.Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, {0.05f, 0.05f, 0.08f, 1.0f});
 	portalRenderTextureB_.Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, {0.05f, 0.05f, 0.08f, 1.0f});
 	portalMeshA_->SetTextureIndex(portalRenderTextureA_.GetSrvIndex());
-	portalMeshA_->SetSecondaryTextureIndex(portalRenderTextureB_.GetSrvIndex());
+	portalMeshA_->SetSecondaryTextureIndex(portalRenderTextureA_.GetSrvIndex());
 	portalMeshB_->SetTextureIndex(portalRenderTextureB_.GetSrvIndex());
-	portalMeshB_->SetSecondaryTextureIndex(portalRenderTextureA_.GetSrvIndex());
+	portalMeshB_->SetSecondaryTextureIndex(portalRenderTextureB_.GetSrvIndex());
 	portalMeshA_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	portalMeshB_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-	portalMeshA_->SetObjectCamera(/*portalObjectCamera_.get()*/camera_.get());
+	portalMeshA_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
 	portalMeshB_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
-	portalMeshA_->SetTextureCamera(portalTextureCameraB_.get());
-	portalMeshB_->SetTextureCamera(portalTextureCameraA_.get());
+	portalMeshA_->SetTextureCamera(portalTextureCameraA_.get());
+	portalMeshB_->SetTextureCamera(portalTextureCameraB_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -487,10 +487,10 @@ void SampleScene::Update() {
 	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
 	portalTextureCameraB_->Update();
 	portalMeshA_->SetTransform(portalATransform_);
-	portalMeshA_->SetTextureCamera(portalTextureCameraB_.get());
+	portalMeshA_->SetTextureCamera(portalTextureCameraA_.get());
 
 	portalMeshB_->SetTransform(portalBTransform_);
-	portalMeshB_->SetTextureCamera(portalTextureCameraA_.get());
+	portalMeshB_->SetTextureCamera(portalTextureCameraB_.get());
 
 	ParticleManager::GetInstance()->Update(camera_.get());
 	if (sampleParticleEmitter_) {
