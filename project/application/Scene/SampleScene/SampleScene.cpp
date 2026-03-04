@@ -509,14 +509,14 @@ void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->EndShadowMapPass();
 
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
-	portalMeshA_->SetUseTextureCameraForVertex(false);
+	portalMeshA_->SetUseTextureCameraForVertex(true);
 	portalRenderTextureA_.BeginRender();
 	SetSceneCameraForDraw(portalTextureCameraA_.get());
 	UpdateSceneCameraMatricesForDraw();
 	DrawSceneGeometry(portalTextureCameraA_.get());
 	portalRenderTextureA_.TransitionToShaderResource();
 
-	portalMeshB_->SetUseTextureCameraForVertex(false);
+	portalMeshB_->SetUseTextureCameraForVertex(true);
 	portalRenderTextureB_.BeginRender();
 	SetSceneCameraForDraw(portalTextureCameraB_.get());
 	UpdateSceneCameraMatricesForDraw();
@@ -524,8 +524,8 @@ void SampleScene::Draw() {
 	portalRenderTextureB_.TransitionToShaderResource();
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-	portalMeshA_->SetUseTextureCameraForVertex(true);
-	portalMeshB_->SetUseTextureCameraForVertex(true);
+	portalMeshA_->SetUseTextureCameraForVertex(false);
+	portalMeshB_->SetUseTextureCameraForVertex(false);
 	SetSceneCameraForDraw(camera_.get());
 	UpdateSceneCameraMatricesForDraw();
 	DrawSceneGeometry(camera_.get());

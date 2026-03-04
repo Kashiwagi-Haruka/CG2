@@ -54,13 +54,10 @@ struct PortalVertexShaderOutput
     float4 shadowPosition : TEXCOORD1;
 };
 
-float2 ComputeProjectedUV(float3 worldPosition, float4x4 viewProjection)
+float2 ComputeScreenUV(float4 position, float2 screenSize)
 {
-    const float4 clip = mul(float4(worldPosition, 1.0f), viewProjection);
-    const float safeW = (abs(clip.w) > 0.0001f) ? clip.w : (clip.w >= 0.0f ? 0.0001f : -0.0001f);
-    const float3 ndc = clip.xyz / safeW;
-    const float2 uv = float2(ndc.x * 0.5f + 0.5f, -ndc.y * 0.5f + 0.5f);
-    return saturate(uv);
+    const float2 safeScreenSize = max(screenSize, float2(1.0f, 1.0f));
+    return saturate(position.xy / safeScreenSize);
 }
 
 PixelShaderOutput main(PortalVertexShaderOutput input)
@@ -76,8 +73,8 @@ PixelShaderOutput main(PortalVertexShaderOutput input)
         return output;
     }
 
-    const float2 projectedTexcoord = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection);
+    const float2 screenTexcoord = ComputeScreenUV(input.position, gCamera.screenSize);
 
-    output.color = gTextureSecondary.Sample(gSampler, projectedTexcoord) * gMaterial.color;
+    output.color = gTextureSecondary.Sample(gSampler, screenTexcoord) * gMaterial.color;
     return output;
 }

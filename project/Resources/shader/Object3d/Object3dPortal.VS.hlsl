@@ -40,13 +40,9 @@ PortalVertexShaderOutput main(VertexShaderInput input)
 {
     PortalVertexShaderOutput output;
 
-    float4x4 vertexWvp = gTransformationMatrix.WVP;
-    if (gTextureCamera.useTextureCameraForVertex != 0)
-    {
-        vertexWvp = mul(gTransformationMatrix.World, gTextureCamera.textureViewProjection);
-    }
-
-    output.position = mul(input.position, vertexWvp);
+    // ポータル形状はメインカメラ基準でラスタライズし、
+    // 画面投影したテクスチャを PS 側で切り抜く。
+    output.position = mul(input.position, gTransformationMatrix.WVP);
     output.normal = normalize(mul(input.normal, (float3x3) gTransformationMatrix.WorldInverseTranspose));
     output.texcoord = input.texcoord;
     output.worldPosition = mul(input.position, gTransformationMatrix.World).xyz;
