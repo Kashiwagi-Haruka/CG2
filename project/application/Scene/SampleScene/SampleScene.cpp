@@ -77,7 +77,7 @@ void SampleScene::Initialize() {
 	spherePrimitive_->SetEnableLighting(true);
 	portalATransform_ = {
 	    .scale{1.8f,  1.8f,                      1.0f},
-        .rotate{0.0f,  std::numbers::pi_v<float>, 0.0f},
+        .rotate{0.0f,0.0f, 0.0f},
         .translate{-3.0f, 1.5f,                      2.0f}
     };
 	portalBTransform_ = {

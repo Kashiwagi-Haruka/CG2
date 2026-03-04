@@ -29,37 +29,54 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	pso_ = std::make_unique<CreatePSO>(dxCommon_);
 	pso_->Create(D3D12_CULL_MODE_BACK);
+
 	psoToon_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoToon_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dToon.PS.hlsl");
+
 	psoEmissive_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoEmissive_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dEmissive.PS.hlsl");
+
 	psoNoCull_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoNoCull_->Create(D3D12_CULL_MODE_NONE);
+
 	psoNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoNoDepth_->Create(D3D12_CULL_MODE_BACK, false);
+
 	psoNoCullDepth_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoNoCullDepth_->Create(D3D12_CULL_MODE_NONE, false);
+
 	psoWireframe_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoWireframe_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_WIREFRAME);
+
 	psoWireframeNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoWireframeNoDepth_->Create(D3D12_CULL_MODE_NONE, false, D3D12_FILL_MODE_WIREFRAME);
+
 	psoLine_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoLine_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+
 	psoLineNoDepth_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoLineNoDepth_->Create(D3D12_CULL_MODE_NONE, false, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+
 	psoEditorGrid_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoEditorGrid_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dGrid.PS.hlsl");
+
 	psoSkinning_ = std::make_unique<CreatePSO>(dxCommon_, true);
 	psoSkinning_->Create(D3D12_CULL_MODE_BACK);
+
 	psoSkinningToon_ = std::make_unique<CreatePSO>(dxCommon_, true);
 	psoSkinningToon_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dToon.PS.hlsl");
+
 	SetEnvironmentMapTexture("Resources/3d/skydome.png");
+
 	psoMirror_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoMirror_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dMirror.PS.hlsl");
+
 	psoPortal_ = std::make_unique<CreatePSO>(dxCommon_);
-	psoPortal_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dPortal.PS.hlsl");
+	psoPortal_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dPortal.PS.hlsl");
+
 	psoShadow_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoShadow_->CreateShadow();
+
 	// Directional Light の共通バッファ作成
 	directionalLightResource_ = CreateBufferResource(sizeof(DirectionalLight));
 	assert(directionalLightResource_);
