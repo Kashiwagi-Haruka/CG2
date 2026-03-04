@@ -40,10 +40,8 @@ private:
 	};
 
 	struct alignas(256) PortalTextureCameraForGpu {
-		Matrix4x4 textureViewProjection0;
-		Matrix4x4 textureViewProjection1;
-		Matrix4x4 portalCameraWorld0;
-		Matrix4x4 portalCameraWorld1;
+		Matrix4x4 textureViewProjection;
+		Matrix4x4 portalCameraWorld;
 		int usePortalProjection;
 		float padding[3];
 	};

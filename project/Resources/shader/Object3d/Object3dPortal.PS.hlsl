@@ -26,10 +26,8 @@ struct Camera
 
 struct TextureCamera
 {
-    float4x4 textureViewProjection0;
-    float4x4 textureViewProjection1;
-    float4x4 portalCameraWorld0;
-    float4x4 portalCameraWorld1;
+    float4x4 textureViewProjection;
+    float4x4 portalCameraWorld;
     int usePortalProjection;
     float3 padding;
 };
@@ -85,7 +83,8 @@ PixelShaderOutput main(PortalVertexShaderOutput input)
     }
 
     bool projectedValid = false;
-    const float2 projectedTexcoord = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection1, projectedValid);
+    const float2 projectedTexcoord = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection, projectedValid);
+
 
     if (!projectedValid)
     {

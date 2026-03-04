@@ -10,10 +10,8 @@ struct TransformationMatrix
 
 struct TextureCamera
 {
-    float4x4 textureViewProjection0;
-    float4x4 textureViewProjection1;
-    float4x4 portalCameraWorld0;
-    float4x4 portalCameraWorld1;
+    float4x4 textureViewProjection;
+    float4x4 portalCameraWorld;
     int usePortalProjection;
     float3 padding;
 };
