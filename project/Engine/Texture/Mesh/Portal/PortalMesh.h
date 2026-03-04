@@ -30,6 +30,7 @@ public:
 	void SetSecondaryTextureIndex(uint32_t textureIndex) { secondaryTextureIndex_ = textureIndex; }
 	void SetObjectCamera(Camera* camera) { objectCamera_ = camera; }
 	void SetTextureCamera(Camera* camera) { textureCamera_ = camera; }
+	void SetUseTextureCameraForVertex(bool useTextureCameraForVertex) { useTextureCameraForVertex_ = useTextureCameraForVertex; }
 
 private:
 	struct alignas(256) TransformationMatrix {
@@ -43,7 +44,8 @@ private:
 		Matrix4x4 textureViewProjection;
 		Matrix4x4 portalCameraWorld;
 		int usePortalProjection;
-		float padding[3];
+		int useTextureCameraForVertex;
+		float padding[2];
 	};
 
 	Transform transform_{
@@ -56,6 +58,7 @@ private:
 
 	Camera* objectCamera_ = nullptr;
 	Camera* textureCamera_ = nullptr;
+	bool useTextureCameraForVertex_ = false;
 
 	uint32_t textureIndex_ = 0;
 	uint32_t secondaryTextureIndex_ = UINT32_MAX;

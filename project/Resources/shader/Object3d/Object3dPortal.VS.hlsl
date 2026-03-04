@@ -13,7 +13,8 @@ struct TextureCamera
     float4x4 textureViewProjection;
     float4x4 portalCameraWorld;
     int usePortalProjection;
-    float3 padding;
+    int useTextureCameraForVertex;
+    float2 padding;
 };
 
 struct VertexShaderInput
@@ -39,7 +40,13 @@ PortalVertexShaderOutput main(VertexShaderInput input)
 {
     PortalVertexShaderOutput output;
 
-    output.position = mul(input.position, gTransformationMatrix.WVP);
+    float4x4 vertexWvp = gTransformationMatrix.WVP;
+    if (gTextureCamera.useTextureCameraForVertex != 0)
+    {
+        vertexWvp = mul(gTransformationMatrix.World, gTextureCamera.textureViewProjection);
+    }
+
+    output.position = mul(input.position, vertexWvp);
     output.normal = normalize(mul(input.normal, (float3x3) gTransformationMatrix.WorldInverseTranspose));
     output.texcoord = input.texcoord;
     output.worldPosition = mul(input.position, gTransformationMatrix.World).xyz;

@@ -81,6 +81,7 @@ void PortalMesh::Update() {
 	textureCameraData_->textureViewProjection = activeTextureCamera ? activeTextureCamera->GetViewProjectionMatrix() : Function::MakeIdentity4x4();
 	textureCameraData_->portalCameraWorld = activeTextureCamera ? activeTextureCamera->GetWorldMatrix() : Function::MakeIdentity4x4();
 	textureCameraData_->usePortalProjection = 1;
+	textureCameraData_->useTextureCameraForVertex = useTextureCameraForVertex_ ? 1 : 0;
 	textureCameraResource_->Unmap(0, nullptr);
 
 	objectCameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&objectCameraData_));
