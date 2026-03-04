@@ -54,19 +54,13 @@ struct PortalVertexShaderOutput
     float4 shadowPosition : TEXCOORD1;
 };
 
-float2 ComputeProjectedUV(float3 worldPosition, float4x4 viewProjection, out bool valid)
+float2 ComputeProjectedUV(float3 worldPosition, float4x4 viewProjection)
 {
     const float4 clip = mul(float4(worldPosition, 1.0f), viewProjection);
-    if (clip.w <= 0.0001f)
-    {
-        valid = false;
-        return float2(0.0f, 0.0f);
-    }
-
-    const float3 ndc = clip.xyz / clip.w;
+    const float safeW = (abs(clip.w) > 0.0001f) ? clip.w : (clip.w >= 0.0f ? 0.0001f : -0.0001f);
+    const float3 ndc = clip.xyz / safeW;
     const float2 uv = float2(ndc.x * 0.5f + 0.5f, -ndc.y * 0.5f + 0.5f);
-    valid = all(uv >= float2(0.0f, 0.0f)) && all(uv <= float2(1.0f, 1.0f));
-    return uv;
+    return saturate(uv);
 }
 
 PixelShaderOutput main(PortalVertexShaderOutput input)
@@ -82,15 +76,7 @@ PixelShaderOutput main(PortalVertexShaderOutput input)
         return output;
     }
 
-    bool projectedValid = false;
-    const float2 projectedTexcoord = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection, projectedValid);
-
-
-    if (!projectedValid)
-    {
-        output.color = baseColor;
-        return output;
-    }
+    const float2 projectedTexcoord = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection);
 
     output.color = gTextureSecondary.Sample(gSampler, projectedTexcoord) * gMaterial.color;
     return output;
