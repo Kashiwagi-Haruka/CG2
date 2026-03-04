@@ -445,12 +445,10 @@ void SampleScene::Update() {
 	portalTextureCameraB_->Update();
 	portalMeshA_->SetTransform(portalATransform_);
 	portalMeshA_->SetTextureCamera(portalTextureCameraA_.get());
-	portalMeshA_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
+
 	portalMeshB_->SetTransform(portalBTransform_);
 	portalMeshB_->SetTextureCamera(portalTextureCameraB_.get());
-	portalMeshB_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
-	portalMeshA_->Update();
-	portalMeshB_->Update();
+
 	ParticleManager::GetInstance()->Update(camera_.get());
 	if (sampleParticleEmitter_) {
 		sampleParticleEmitter_->Update(particleTransform_);
