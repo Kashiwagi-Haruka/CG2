@@ -404,24 +404,24 @@ void SampleScene::Update() {
 	ImGui::End();
 	if (ImGui::Begin("Portal")) {
 		ImGui::Text("Portal A object transform");
-		ImGui::DragFloat3("Scale##PortalA", &portalATransform_.scale.x, 0.01f, 0.01f, 100.0f);
-		ImGui::DragFloat3("Rotate##PortalA", &portalATransform_.rotate.x, 0.01f);
-		ImGui::DragFloat3("Translate##PortalA", &portalATransform_.translate.x, 0.01f);
+		ImGui::DragFloat3("Scale##PortalAScale", &portalATransform_.scale.x, 0.01f, 0.01f, 100.0f);
+		ImGui::DragFloat3("Rotate##PortalARotate", &portalATransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Translate##PortalATranslate", &portalATransform_.translate.x, 0.01f);
 		ImGui::Separator();
 		ImGui::Text("Portal B object transform");
-		ImGui::DragFloat3("Scale##PortalB", &portalBTransform_.scale.x, 0.01f, 0.01f, 100.0f);
-		ImGui::DragFloat3("Rotate##PortalB", &portalBTransform_.rotate.x, 0.01f);
-		ImGui::DragFloat3("Translate##PortalB", &portalBTransform_.translate.x, 0.01f);
+		ImGui::DragFloat3("Scale##PortalBScale", &portalBTransform_.scale.x, 0.01f, 0.01f, 100.0f);
+		ImGui::DragFloat3("Rotate##PortalBRotate", &portalBTransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Translate##PortalBTranslate", &portalBTransform_.translate.x, 0.01f);
 		ImGui::Separator();
 		ImGui::Text("Portal A render texture camera transform");
-		ImGui::DragFloat3("Scale##PortalTextureCameraA", &portalTextureCameraATransform_.scale.x, 0.01f, 0.01f, 100.0f);
-		ImGui::DragFloat3("Rotate##PortalTextureCameraA", &portalTextureCameraATransform_.rotate.x, 0.01f);
-		ImGui::DragFloat3("Translate##PortalTextureCameraA", &portalTextureCameraATransform_.translate.x, 0.01f);
+		ImGui::DragFloat3("Scale##PortalTextureCameraAScale", &portalTextureCameraATransform_.scale.x, 0.01f, 0.01f, 100.0f);
+		ImGui::DragFloat3("Rotate##PortalTextureCameraARotate", &portalTextureCameraATransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Translate##PortalTextureCameraATranslate", &portalTextureCameraATransform_.translate.x, 0.01f);
 		ImGui::Separator();
 		ImGui::Text("Portal B render texture camera transform");
-		ImGui::DragFloat3("Scale##PortalTextureCameraB", &portalTextureCameraBTransform_.scale.x, 0.01f, 0.01f, 100.0f);
-		ImGui::DragFloat3("Rotate##PortalTextureCameraB", &portalTextureCameraBTransform_.rotate.x, 0.01f);
-		ImGui::DragFloat3("Translate##PortalTextureCameraB", &portalTextureCameraBTransform_.translate.x, 0.01f);
+		ImGui::DragFloat3("Scale##PortalTextureCameraBScale", &portalTextureCameraBTransform_.scale.x, 0.01f, 0.01f, 100.0f);
+		ImGui::DragFloat3("Rotate##PortalTextureCameraBRotate", &portalTextureCameraBTransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Translate##PortalTextureCameraBTranslate", &portalTextureCameraBTransform_.translate.x, 0.01f);
 	}
 	ImGui::End();
 

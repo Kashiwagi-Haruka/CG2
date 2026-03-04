@@ -47,15 +47,16 @@ struct PixelShaderOutput
     float4 color : SV_TARGET0;
 };
 
-float2 ComputeProjectedUV(float3 worldPosition, float4x4 viewProjection, float4x4 cameraWorld)
+float2 ComputeProjectedUV(float3 worldPosition, float4x4 viewProjection)
 {
-    float4 clip = mul(float4(worldPosition, 1.0f), viewProjection);
-    float safeW = max(abs(clip.w), 0.0001f);
+    const float4 clip = mul(float4(worldPosition, 1.0f), viewProjection);
+    if (clip.w <= 0.0001f)
+    {
+        return float2(-1.0f, -1.0f);
+    }
 
-    float3 ndc = clip.xyz / safeW;
-    float2 uv = float2(ndc.x * 0.5f + 0.5f, -ndc.y * 0.5f + 0.5f);
-
-    return uv;
+    const float3 ndc = clip.xyz / clip.w;
+    return float2(ndc.x * 0.5f + 0.5f, -ndc.y * 0.5f + 0.5f);
 }
 
 PixelShaderOutput main(VertexShaderOutput input)
@@ -70,11 +71,13 @@ PixelShaderOutput main(VertexShaderOutput input)
         output.color = baseColor;
         return output;
     }
-    float2 projectedUV = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection1, gTextureCamera.portalCameraWorld1);
 
-    // 投影は常に使用し、画面外はラップして端クランプ由来の引き伸ばしを防ぐ。
-    float2 wrappedProjectedUV = frac(projectedUV);
-    float4 projected1 = gTextureSecondary.Sample(gSampler, wrappedProjectedUV);
-    output.color = projected1 * gMaterial.color;
+    // ポータル用レンダーテクスチャを、テクスチャカメラ行列で投影して取得。
+    // 画面外はラップせず通常UVへフォールバックして、Z移動時の引き伸ばし/反復を防ぐ。
+    const float2 projectedUV = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection1);
+    const bool inRange = all(projectedUV >= float2(0.0f, 0.0f)) && all(projectedUV <= float2(1.0f, 1.0f));
+
+    float4 projected = gTextureSecondary.Sample(gSampler, inRange ? projectedUV : baseUV.xy);
+    output.color = projected * gMaterial.color;
     return output;
 }
