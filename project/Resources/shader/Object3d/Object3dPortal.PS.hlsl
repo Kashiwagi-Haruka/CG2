@@ -47,19 +47,18 @@ struct PixelShaderOutput
     float4 color : SV_TARGET0;
 };
 
-float2 ComputeProjectedUV(float3 worldPosition, float4x4 viewProjection)
+struct PortalVertexShaderOutput
 {
-    const float4 clip = mul(float4(worldPosition, 1.0f), viewProjection);
-    if (clip.w <= 0.0001f)
-    {
-        return float2(-1.0f, -1.0f);
-    }
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+    float3 normal : NORMAL0;
+    float3 worldPosition : POSITION0;
+    float4 shadowPosition : TEXCOORD1;
+    float2 projectedTexcoord : TEXCOORD2;
+    float projectedValid : TEXCOORD3;
+};
 
-    const float3 ndc = clip.xyz / clip.w;
-    return float2(ndc.x * 0.5f + 0.5f, -ndc.y * 0.5f + 0.5f);
-}
-
-PixelShaderOutput main(VertexShaderOutput input)
+PixelShaderOutput main(PortalVertexShaderOutput input)
 {
     PixelShaderOutput output;
 
@@ -74,10 +73,9 @@ PixelShaderOutput main(VertexShaderOutput input)
 
     // ポータル用レンダーテクスチャを、テクスチャカメラ行列で投影して取得。
     // 画面外はラップせず通常UVへフォールバックして、Z移動時の引き伸ばし/反復を防ぐ。
-    const float2 projectedUV = ComputeProjectedUV(input.worldPosition, gTextureCamera.textureViewProjection1);
-    const bool inRange = all(projectedUV >= float2(0.0f, 0.0f)) && all(projectedUV <= float2(1.0f, 1.0f));
+    const bool inRange = input.projectedValid > 0.5f;
 
-    float4 projected = gTextureSecondary.Sample(gSampler, inRange ? projectedUV : baseUV.xy);
+    float4 projected = gTextureSecondary.Sample(gSampler, inRange ? input.projectedTexcoord : baseUV.xy);
     output.color = projected * gMaterial.color;
     return output;
 }

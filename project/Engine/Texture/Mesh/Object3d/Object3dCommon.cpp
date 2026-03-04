@@ -72,7 +72,9 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	psoMirror_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dMirror.PS.hlsl");
 
 	psoPortal_ = std::make_unique<CreatePSO>(dxCommon_);
-	psoPortal_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dPortal.PS.hlsl");
+	psoPortal_->Create(
+	    D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dPortal.PS.hlsl",
+	    L"Resources/shader/Object3d/Object3dPortal.VS.hlsl");
 
 	psoShadow_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoShadow_->CreateShadow();
