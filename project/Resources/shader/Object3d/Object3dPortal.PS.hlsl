@@ -63,10 +63,12 @@ struct PortalVertexShaderOutput
     float4 shadowPosition : TEXCOORD1;
 };
 
-float2 ComputeScreenUV(float4 position, float2 screenSize)
+float2 ComputeTextureCameraUV(float3 worldPosition, float4x4 textureViewProjection)
 {
-    const float2 safeScreenSize = max(screenSize, float2(1.0f, 1.0f));
-    return saturate(position.xy / safeScreenSize);
+    const float4 projectedPosition = mul(float4(worldPosition, 1.0f), textureViewProjection);
+    const float safeW = max(abs(projectedPosition.w), 0.00001f);
+    const float2 ndc = projectedPosition.xy / safeW;
+    return float2(ndc.x * 0.5f + 0.5f, 1.0f - (ndc.y * 0.5f + 0.5f));
 }
 
 PixelShaderOutput main(PortalVertexShaderOutput input)
@@ -82,10 +84,14 @@ PixelShaderOutput main(PortalVertexShaderOutput input)
         return output;
     }
 
-    const float2 screenTexcoord = ComputeScreenUV(input.position, gCamera.screenSize);
+    const float2 projectedTexcoord = ComputeTextureCameraUV(input.worldPosition, gTextureCamera.textureViewProjection);
+    const bool isInsideProjection = all(projectedTexcoord >= float2(0.0f, 0.0f)) && all(projectedTexcoord <= float2(1.0f, 1.0f));
+    if (!isInsideProjection)
+    {
+        output.color = baseColor;
+        return output;
+    }
 
-    output.color = gTextureSecondary.Sample(gSampler, screenTexcoord) * gMaterial.color;
-    // テクスチャカメラ使用時にシェーダーから参照できるよう、
-    // texture camera の position / WVP を定数バッファで保持している。
+    output.color = gTextureSecondary.Sample(gSampler, projectedTexcoord) * gMaterial.color;
     return output;
 }
