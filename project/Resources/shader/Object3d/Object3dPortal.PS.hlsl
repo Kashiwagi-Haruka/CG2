@@ -68,7 +68,7 @@ float2 ComputeTextureCameraUV(float4 projectedPosition)
 {
     const float safeW = max(abs(projectedPosition.w), 0.00001f);
     const float2 ndc = projectedPosition.xy / safeW;
-    return float2(ndc.x * 0.5f + 0.5f, 1.0f - (ndc.y * 0.5f + 0.5f));
+    return float2(ndc.x * 0.5f , 1.0f - (ndc.y * 0.5f + 0.5f));
 }
 
 
@@ -78,6 +78,6 @@ PixelShaderOutput main(PortalVertexShaderOutput input)
 
     // Use VS-computed texture-camera clip position to avoid viewer-camera-dependent drift.
     const float2 projectedTexcoord = ComputeTextureCameraUV(input.textureProjectedPosition);
-    output.color = gTextureSecondary.Sample(gSampler, projectedTexcoord) * gMaterial.color;
+    output.color = gTextureSecondary.Sample(gSampler, projectedTexcoord);
     return output;
 }
