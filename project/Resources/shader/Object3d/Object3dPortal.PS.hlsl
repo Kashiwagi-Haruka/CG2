@@ -69,6 +69,6 @@ PixelShaderOutput main(PortalVertexShaderOutput input)
     PixelShaderOutput output;
 
     // テクスチャカメラの映像を投影計算せず、そのままメッシュUVで貼り付ける。
-    output.color = gTextureSecondary.Sample(gSampler, input.texcoord);
+    output.color = gTexture.Sample(gSampler, input.texcoord);
     return output;
 }

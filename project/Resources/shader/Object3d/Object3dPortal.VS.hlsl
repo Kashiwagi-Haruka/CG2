@@ -44,10 +44,6 @@ PortalVertexShaderOutput main(VertexShaderInput input)
     PortalVertexShaderOutput output;
 
     output.position = mul(input.position, gTransformationMatrix.WVP);
-    if (gTextureCamera.useTextureCameraForVertex != 0)
-    {
-        output.position = mul(input.position, gTextureCamera.textureWorldViewProjection);
-    }
     output.normal = normalize(mul(input.normal, (float3x3) gTransformationMatrix.WorldInverseTranspose));
     output.texcoord = input.texcoord;
     output.worldPosition = mul(input.position, gTransformationMatrix.World).xyz;

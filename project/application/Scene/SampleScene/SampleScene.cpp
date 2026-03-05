@@ -556,23 +556,20 @@ void SampleScene::Draw() {
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
 	portalMeshA_->SetUseTextureCameraForVertex(true);
 	portalRenderTextureA_.BeginRender();
-	SetSceneCameraForDraw(portalTextureCameraA_.get());
-	UpdateSceneCameraMatricesForDraw();
+	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraA_.get());
 	DrawSceneGeometry(portalTextureCameraA_.get(), false);
 	portalRenderTextureA_.TransitionToShaderResource();
 
 	portalMeshB_->SetUseTextureCameraForVertex(true);
 	portalRenderTextureB_.BeginRender();
-	SetSceneCameraForDraw(portalTextureCameraB_.get());
-	UpdateSceneCameraMatricesForDraw();
+	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraB_.get());
 	DrawSceneGeometry(portalTextureCameraB_.get(), false);
 	portalRenderTextureB_.TransitionToShaderResource();
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	portalMeshA_->SetUseTextureCameraForVertex(false);
 	portalMeshB_->SetUseTextureCameraForVertex(false);
-	SetSceneCameraForDraw(camera_.get());
-	UpdateSceneCameraMatricesForDraw();
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	DrawSceneGeometry(camera_.get(), true);
 	SpriteCommon::GetInstance()->DrawCommon();
 	uvSprite->Draw();
@@ -602,9 +599,12 @@ void SampleScene::UpdateSceneCameraMatricesForDraw() {
 }
 
 void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
+	SetSceneCameraForDraw(camera);
+	UpdateSceneCameraMatricesForDraw();
+
 	portalMeshA_->Update();
 	portalMeshB_->Update();
-	Object3dCommon::GetInstance()->DrawCommon(camera);
+	Object3dCommon::GetInstance()->DrawCommon();
 	uvBallObj_->Draw();
 	planeGltf_->Draw();
 	fieldObj_->Draw();
@@ -614,7 +614,7 @@ void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 		sampleParticleEmitter_->Draw();
 	}
 	if (drawPortals) {
-		Object3dCommon::GetInstance()->DrawCommonPortal(camera);
+		Object3dCommon::GetInstance()->DrawCommonPortal();
 		portalMeshA_->Draw();
 		portalMeshB_->Draw();
 	}
