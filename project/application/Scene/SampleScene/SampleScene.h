@@ -89,7 +89,7 @@ class SampleScene : public BaseScene {
 
 	void SetSceneCameraForDraw(Camera* camera);
 	void UpdateSceneCameraMatricesForDraw();
-	void DrawSceneGeometry(Camera* camera);
+	void DrawSceneGeometry(Camera* camera, bool drawPortals);
 
 public:
 	SampleScene();

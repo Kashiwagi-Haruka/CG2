@@ -33,6 +33,7 @@ struct PortalVertexShaderOutput
     float3 normal : NORMAL0;
     float3 worldPosition : POSITION0;
     float4 shadowPosition : TEXCOORD1;
+    float4 textureProjectedPosition : TEXCOORD2;
 };
 
 ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b1);
@@ -51,5 +52,6 @@ PortalVertexShaderOutput main(VertexShaderInput input)
     output.texcoord = input.texcoord;
     output.worldPosition = mul(input.position, gTransformationMatrix.World).xyz;
     output.shadowPosition = mul(input.position, gTransformationMatrix.LightWVP);
+    output.textureProjectedPosition = mul(input.position, mul(gTransformationMatrix.World, gTextureCamera.textureViewProjection));
     return output;
 }

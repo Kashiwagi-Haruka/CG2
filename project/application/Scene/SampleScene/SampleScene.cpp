@@ -558,14 +558,14 @@ void SampleScene::Draw() {
 	portalRenderTextureA_.BeginRender();
 	SetSceneCameraForDraw(portalTextureCameraA_.get());
 	UpdateSceneCameraMatricesForDraw();
-	DrawSceneGeometry(portalTextureCameraA_.get());
+	DrawSceneGeometry(portalTextureCameraA_.get(), false);
 	portalRenderTextureA_.TransitionToShaderResource();
 
 	portalMeshB_->SetUseTextureCameraForVertex(true);
 	portalRenderTextureB_.BeginRender();
 	SetSceneCameraForDraw(portalTextureCameraB_.get());
 	UpdateSceneCameraMatricesForDraw();
-	DrawSceneGeometry(portalTextureCameraB_.get());
+	DrawSceneGeometry(portalTextureCameraB_.get(), false);
 	portalRenderTextureB_.TransitionToShaderResource();
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
@@ -573,7 +573,7 @@ void SampleScene::Draw() {
 	portalMeshB_->SetUseTextureCameraForVertex(false);
 	SetSceneCameraForDraw(camera_.get());
 	UpdateSceneCameraMatricesForDraw();
-	DrawSceneGeometry(camera_.get());
+	DrawSceneGeometry(camera_.get(), true);
 	SpriteCommon::GetInstance()->DrawCommon();
 	uvSprite->Draw();
 	if (overlayCameraSprite_) {
@@ -601,7 +601,7 @@ void SampleScene::UpdateSceneCameraMatricesForDraw() {
 	spherePrimitive_->UpdateCameraMatrices();
 }
 
-void SampleScene::DrawSceneGeometry(Camera* camera) {
+void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 	portalMeshA_->Update();
 	portalMeshB_->Update();
 	Object3dCommon::GetInstance()->DrawCommon(camera);
@@ -613,9 +613,11 @@ void SampleScene::DrawSceneGeometry(Camera* camera) {
 	if (sampleParticleEmitter_) {
 		sampleParticleEmitter_->Draw();
 	}
-	Object3dCommon::GetInstance()->DrawCommonPortal(camera);
-	portalMeshA_->Draw();
-	portalMeshB_->Draw();
+	if (drawPortals) {
+		Object3dCommon::GetInstance()->DrawCommonPortal(camera);
+		portalMeshA_->Draw();
+		portalMeshB_->Draw();
+	}
 
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
