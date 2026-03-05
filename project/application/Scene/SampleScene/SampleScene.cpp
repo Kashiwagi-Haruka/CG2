@@ -528,7 +528,7 @@ void SampleScene::Update() {
 		overlayCameraSprite_->Update();
 	}
 
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
+	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraA_.get());
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	if (humanSkeleton_ && !humanAnimationClips_.empty()) {
