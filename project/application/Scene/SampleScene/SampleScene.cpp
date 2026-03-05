@@ -600,7 +600,12 @@ void SampleScene::UpdateSceneCameraMatricesForDraw() {
 }
 
 void SampleScene::DrawSceneGeometryForPortalTexture(Camera* camera) {
-	SetSceneCameraForDraw(camera);
+	uvBallObj_->SetCamera(camera);
+	fieldObj_->SetCamera(camera);
+	planeGltf_->SetCamera(camera);
+	animatedCubeObj_->SetCamera(camera);
+	humanObj_->SetCamera(camera);
+	spherePrimitive_->SetCamera(camera);
 	UpdateSceneCameraMatricesForDraw();
 
 	Object3dCommon::GetInstance()->DrawCommon();

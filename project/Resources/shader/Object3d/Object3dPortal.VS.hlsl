@@ -15,8 +15,7 @@ struct TextureCamera
     float4x4 textureWorldViewProjection;
     float3 textureWorldPosition;
     int usePortalProjection;
-    int useTextureCameraForVertex;
-    float2 padding;
+    float3 padding;
 };
 
 struct VertexShaderInput
