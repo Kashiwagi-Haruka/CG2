@@ -554,21 +554,22 @@ void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->EndShadowMapPass();
 
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
-	portalMeshA_->SetUseTextureCameraForVertex(true);
+	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
+	portalTextureCameraA_->Update();
+	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
+	portalTextureCameraB_->Update();
+
 	portalRenderTextureA_.BeginRender();
 	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraA_.get());
-	DrawSceneGeometry(portalTextureCameraA_.get(), false);
+	DrawSceneGeometryForPortalTexture(portalTextureCameraA_.get());
 	portalRenderTextureA_.TransitionToShaderResource();
 
-	portalMeshB_->SetUseTextureCameraForVertex(true);
 	portalRenderTextureB_.BeginRender();
 	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraB_.get());
-	DrawSceneGeometry(portalTextureCameraB_.get(), false);
+	DrawSceneGeometryForPortalTexture(portalTextureCameraB_.get());
 	portalRenderTextureB_.TransitionToShaderResource();
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-	portalMeshA_->SetUseTextureCameraForVertex(false);
-	portalMeshB_->SetUseTextureCameraForVertex(false);
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	DrawSceneGeometry(camera_.get(), true);
 	SpriteCommon::GetInstance()->DrawCommon();
@@ -598,12 +599,28 @@ void SampleScene::UpdateSceneCameraMatricesForDraw() {
 	spherePrimitive_->UpdateCameraMatrices();
 }
 
-void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
+void SampleScene::DrawSceneGeometryForPortalTexture(Camera* camera) {
 	SetSceneCameraForDraw(camera);
 	UpdateSceneCameraMatricesForDraw();
 
-	portalMeshA_->Update();
-	portalMeshB_->Update();
+	Object3dCommon::GetInstance()->DrawCommon();
+	uvBallObj_->Draw();
+	planeGltf_->Draw();
+	fieldObj_->Draw();
+	animatedCubeObj_->Draw();
+	spherePrimitive_->Draw();
+	if (sampleParticleEmitter_) {
+		sampleParticleEmitter_->Draw();
+	}
+
+	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
+	humanObj_->Draw();
+	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
+}
+
+void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
+	SetSceneCameraForDraw(camera);
+	UpdateSceneCameraMatricesForDraw();
 	Object3dCommon::GetInstance()->DrawCommon();
 	uvBallObj_->Draw();
 	planeGltf_->Draw();
@@ -614,6 +631,8 @@ void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 		sampleParticleEmitter_->Draw();
 	}
 	if (drawPortals) {
+		portalMeshA_->Update();
+		portalMeshB_->Update();
 		Object3dCommon::GetInstance()->DrawCommonPortal();
 		portalMeshA_->Draw();
 		portalMeshB_->Draw();
