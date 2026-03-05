@@ -107,7 +107,7 @@ void SampleScene::Initialize() {
     };
 	portalBTransform_ = {
 	    .scale{1.8f,	                                1.8f, 1.0f},
-        .rotate{std::numbers::pi_v<float> * 3.0f / 2.0f, 0.0f, 0.0f},
+        .rotate{std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f},
         .translate{3.0f,                                    3.5f, 2.0f}
     };
 	portalTextureCameraAAdjust_ = {

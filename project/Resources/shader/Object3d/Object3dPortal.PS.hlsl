@@ -66,13 +66,9 @@ struct PortalVertexShaderOutput
 
 float2 ComputeTextureCameraUV(float4 projectedPosition)
 {
-    if (projectedPosition.w <= 0.00001f)
-    {
-        return float2(-1.0f, -1.0f);
-    }
-
-    const float2 ndc = projectedPosition.xy / projectedPosition.w;
-    return float2(ndc.x * 0.5f + 0.5f, 1.0f - (ndc.y * 0.5f + 0.5f));
+    const float safeW = max(abs(projectedPosition.w), 0.00001f);
+    const float2 ndc = projectedPosition.xy / safeW;
+        return float2(ndc.x * 0.5f + 0.5f, 1.0f - (ndc.y * 0.5f + 0.5f));
 }
 
 
@@ -80,8 +76,10 @@ PixelShaderOutput main(PortalVertexShaderOutput input)
 {
     PixelShaderOutput output;
 
-    // Use VS-computed texture-camera clip position to avoid viewer-camera-dependent drift.
-    const float2 projectedTexcoord = ComputeTextureCameraUV(input.textureProjectedPosition);
+    // Recompute projection from world position per pixel so projected imagery stays locked
+    // to world space even when the receiver object moves.
+    const float4 textureProjectedPosition = mul(float4(input.worldPosition, 1.0f), gTextureCamera.textureViewProjection);
+    const float2 projectedTexcoord = ComputeTextureCameraUV(textureProjectedPosition);
     if (projectedTexcoord.x < 0.0f || projectedTexcoord.x > 1.0f || projectedTexcoord.y < 0.0f || projectedTexcoord.y > 1.0f)
     {
         output.color = float4(0.05f, 0.05f, 0.1f, 1.0f);
