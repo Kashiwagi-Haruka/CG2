@@ -117,6 +117,7 @@ public:
 	void PreDraw();
 	void PostDraw();
 	void SetMainRenderTarget();
+	void ExecuteCommandListAndWait();
 	void DrawSceneTextureToBackBuffer();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void Finalize();

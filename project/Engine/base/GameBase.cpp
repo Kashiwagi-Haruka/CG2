@@ -46,7 +46,7 @@ void GameBase::Finalize() {
 
 	// SRVディスクリプタヒープが Device を参照するため、
 	// DirectXCommon を解放する前に破棄して live object を残さない。
-	srvManager_.reset();
+	SrvManager::GetInstance()->Finalize();
 
 	if (dxCommon_) {
 		dxCommon_->Finalize();
@@ -66,15 +66,14 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 	dxCommon_ = std::make_unique<DirectXCommon>();
 	dxCommon_->initialize(winApp_.get());
-	srvManager_ = std::make_unique<SrvManager>();
-	srvManager_->Initialize(dxCommon_.get());
+	SrvManager::GetInstance()->Initialize(dxCommon_.get());
 
 	Input::GetInstance()->Initialize(winApp_.get());
 	imguiM_ = std::make_unique<ImGuiManager>();
-	imguiM_->Initialize(winApp_.get(), dxCommon_.get(), srvManager_.get());
+	imguiM_->Initialize(winApp_.get(), dxCommon_.get());
 	Audio::GetInstance()->InitializeIXAudio();
-	TextureManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
-	ParticleManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
+	TextureManager::GetInstance()->Initialize(dxCommon_.get());
+	ParticleManager::GetInstance()->Initialize(dxCommon_.get());
 	ModelManager::GetInstance()->Initialize(dxCommon_.get());
 
 	Object3dCommon::GetInstance()->Initialize(dxCommon_.get());
@@ -120,7 +119,7 @@ void GameBase::EndFlame() {
 	Hierarchy::GetInstance()->DrawEditorGridLines();
 	imguiM_->End();
 	dxCommon_->DrawSceneTextureToBackBuffer();
-	imguiM_->Draw(srvManager_.get(), dxCommon_.get());
+	imguiM_->Draw(dxCommon_.get());
 	dxCommon_->PostDraw();
 }
 

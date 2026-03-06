@@ -15,9 +15,9 @@ TextureManager* TextureManager::GetInstance() {
 }
 
 // 利用する DirectX 共通機能と SRV マネージャーを設定する
-void TextureManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
+void TextureManager::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
-	srvManager_ = srvManager;
+	srvManager_ = SrvManager::GetInstance();
 	textureDatas.reserve(srvManager_->kMaxSRVCount_);
 }
 

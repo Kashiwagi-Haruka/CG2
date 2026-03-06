@@ -27,10 +27,8 @@ public:
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetColor(const Vector4& color);
 	void SetTextureIndex(uint32_t textureIndex) { textureIndex_ = textureIndex; }
-	void SetSecondaryTextureIndex(uint32_t textureIndex) { secondaryTextureIndex_ = textureIndex; }
 	void SetObjectCamera(Camera* camera) { objectCamera_ = camera; }
 	void SetTextureCamera(Camera* camera) { textureCamera_ = camera; }
-	void SetUseTextureCameraForVertex(bool useTextureCameraForVertex) { useTextureCameraForVertex_ = useTextureCameraForVertex; }
 
 private:
 	struct alignas(256) TransformationMatrix {
@@ -46,8 +44,7 @@ private:
 		Matrix4x4 textureWorldViewProjection;
 		Vector3 textureWorldPosition;
 		int usePortalProjection;
-		int useTextureCameraForVertex;
-		float padding[2];
+		float padding[3];
 	};
 
 	Transform transform_{
@@ -60,10 +57,8 @@ private:
 
 	Camera* objectCamera_ = nullptr;
 	Camera* textureCamera_ = nullptr;
-	bool useTextureCameraForVertex_ = false;
 
 	uint32_t textureIndex_ = 0;
-	uint32_t secondaryTextureIndex_ = UINT32_MAX;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> objectCameraResource_;

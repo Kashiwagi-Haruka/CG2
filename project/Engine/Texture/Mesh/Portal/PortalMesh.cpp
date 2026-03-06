@@ -59,7 +59,7 @@ void PortalMesh::Initialize(const std::string& texturePath) {
 }
 
 void PortalMesh::Update() {
-	Camera* activeObjectCamera = objectCamera_ ? objectCamera_ : Object3dCommon::GetInstance()->GetDefaultCamera();
+	Camera* activeObjectCamera = Object3dCommon::GetInstance()->GetDefaultCamera();
 	Camera* activeTextureCamera = textureCamera_;
 	if (!activeObjectCamera) {
 		return;
@@ -69,9 +69,7 @@ void PortalMesh::Update() {
 		worldMatrix_ = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	}
 	const bool hasTextureCamera = (activeTextureCamera != nullptr);
-	const bool useTextureCameraForVertex = hasTextureCamera && useTextureCameraForVertex_;
-	Camera* activeVertexCamera = useTextureCameraForVertex ? activeTextureCamera : activeObjectCamera;
-	const Matrix4x4 worldViewProjectionMatrix = Function::Multiply(Function::Multiply(worldMatrix_, activeVertexCamera->GetViewMatrix()), activeVertexCamera->GetProjectionMatrix());
+	const Matrix4x4 worldViewProjectionMatrix = Function::Multiply(Function::Multiply(worldMatrix_, activeObjectCamera->GetViewMatrix()), activeObjectCamera->GetProjectionMatrix());
 
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
@@ -87,7 +85,7 @@ void PortalMesh::Update() {
 	    hasTextureCamera ? Function::Multiply(Function::Multiply(worldMatrix_, activeTextureCamera->GetViewMatrix()), activeTextureCamera->GetProjectionMatrix()) : Function::MakeIdentity4x4();
 	textureCameraData_->textureWorldPosition = hasTextureCamera ? activeTextureCamera->GetWorldTranslate() : Vector3{0.0f, 0.0f, 0.0f};
 	textureCameraData_->usePortalProjection = hasTextureCamera ? 1 : 0;
-	textureCameraData_->useTextureCameraForVertex = useTextureCameraForVertex ? 1 : 0;
+
 	textureCameraResource_->Unmap(0, nullptr);
 
 	objectCameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&objectCameraData_));
@@ -100,7 +98,7 @@ void PortalMesh::Update() {
 }
 
 void PortalMesh::Draw() {
-	ID3D12DescriptorHeap* descriptorHeaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
+	ID3D12DescriptorHeap* descriptorHeaps[] = {SrvManager::GetInstance()->GetDescriptorHeap().Get()};
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
@@ -109,12 +107,11 @@ void PortalMesh::Draw() {
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, objectCameraResource_->GetGPUVirtualAddress());
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, textureCameraResource_->GetGPUVirtualAddress());
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(9, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(11, secondaryTextureIndex_ == UINT32_MAX ? textureIndex_ : secondaryTextureIndex_);
+	SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
+	SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(9, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
+	SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());
 	if (!Object3dCommon::GetInstance()->IsShadowMapPassActive()) {
-		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetShadowMapSrvIndex());
+		SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetShadowMapSrvIndex());
 	}
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }

@@ -15,8 +15,9 @@
 #include <format>
 #include <string>
 
-void ImGuiManager::Initialize([[maybe_unused]] WinApp* winApp, [[maybe_unused]] DirectXCommon* dxCommon, [[maybe_unused]] SrvManager* srvManager) {
+void ImGuiManager::Initialize([[maybe_unused]] WinApp* winApp, [[maybe_unused]] DirectXCommon* dxCommon) {
 #ifdef USE_IMGUI
+	auto* srvManager = SrvManager::GetInstance();
 	dxCommon_ = dxCommon;
 	winApp_ = winApp;
 	IMGUI_CHECKVERSION();
@@ -110,8 +111,9 @@ void ImGuiManager::End() {
 #endif
 }
 
-void ImGuiManager::Draw([[maybe_unused]] SrvManager* srvManager, [[maybe_unused]] DirectXCommon* dxCommon) {
+void ImGuiManager::Draw([[maybe_unused]] DirectXCommon* dxCommon) {
 #ifdef USE_IMGUI
+	auto* srvManager = SrvManager::GetInstance();
 	if (!srvManager->GetDescriptorHeap().Get() || !dxCommon->GetCommandList()) {
 		OutputDebugStringA("ImGui Render Error: srvDescriptorHeap_ or commandList_ is null\n");
 		return;

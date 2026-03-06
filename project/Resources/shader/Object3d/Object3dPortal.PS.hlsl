@@ -37,8 +37,7 @@ struct TextureCamera
     float4x4 textureWorldViewProjection;
     float3 textureWorldPosition;
     int usePortalProjection;
-    int useTextureCameraForVertex;
-    float2 padding;
+    float3 padding;
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);
@@ -46,7 +45,6 @@ ConstantBuffer<Camera> gCamera : register(b4);
 ConstantBuffer<TextureCamera> gTextureCamera : register(b5);
 
 Texture2D<float4> gTexture : register(t0);
-Texture2D<float4> gTextureSecondary : register(t4);
 SamplerState gSampler : register(s0);
 
 struct PixelShaderOutput
@@ -61,25 +59,14 @@ struct PortalVertexShaderOutput
     float3 normal : NORMAL0;
     float3 worldPosition : POSITION0;
     float4 shadowPosition : TEXCOORD1;
+    float4 textureProjectedPosition : TEXCOORD2;
 };
-
-float2 ComputeTextureCameraUV(float3 worldPosition, float4x4 textureViewProjection)
-{
-    const float4 projectedPosition = mul(float4(worldPosition, 1.0f), textureViewProjection);
-    const float safeW = max(abs(projectedPosition.w), 0.00001f);
-    const float2 ndc = projectedPosition.xy / safeW;
-    return float2(ndc.x * 0.5f + 0.5f, 1.0f - (ndc.y * 0.5f + 0.5f));
-}
 
 PixelShaderOutput main(PortalVertexShaderOutput input)
 {
     PixelShaderOutput output;
 
-    float4 baseUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-    float4 baseColor = gTexture.Sample(gSampler, baseUV.xy) * gMaterial.color;
+    output.color = gTexture.Sample(gSampler, input.texcoord);
 
-    const float2 projectedTexcoord = ComputeTextureCameraUV(input.worldPosition, gTextureCamera.textureViewProjection);
-
-    output.color = gTextureSecondary.Sample(gSampler, projectedTexcoord) * gMaterial.color;
     return output;
 }

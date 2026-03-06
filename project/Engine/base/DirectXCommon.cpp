@@ -611,6 +611,24 @@ void DirectXCommon::PostDraw() {
 	hr_ = commandList_->Reset(commandAllocators_[frameIndex_].Get(), nullptr);
 	assert(SUCCEEDED(hr_));
 }
+void DirectXCommon::ExecuteCommandListAndWait() {
+	hr_ = commandList_->Close();
+	assert(SUCCEEDED(hr_));
+	Microsoft::WRL::ComPtr<ID3D12CommandList> lists[] = {commandList_.Get()};
+	commandQueue_->ExecuteCommandLists(1, lists->GetAddressOf());
+
+	fenceValue_++;
+	commandQueue_->Signal(fence_.Get(), fenceValue_);
+	if (fence_->GetCompletedValue() < fenceValue_) {
+		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
+		WaitForSingleObject(fenceEvent_, INFINITE);
+	}
+
+	hr_ = commandAllocators_[frameIndex_]->Reset();
+	assert(SUCCEEDED(hr_));
+	hr_ = commandList_->Reset(commandAllocators_[frameIndex_].Get(), nullptr);
+	assert(SUCCEEDED(hr_));
+}
 void DirectXCommon::DrawSceneTextureToBackBuffer() {
 	D3D12_RESOURCE_BARRIER barriers[2]{};
 	barriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;

@@ -49,9 +49,9 @@ ParticleManager* ParticleManager::GetInstance() {
 
 void ParticleManager::SetBlendMode(BlendMode mode) { currentBlendMode_ = mode; }
 
-void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
+void ParticleManager::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
-	srvManager_ = srvManager;
+	srvManager_ = SrvManager::GetInstance();
 
 	srand((unsigned int)time(nullptr));
 

@@ -21,7 +21,6 @@ private:
 	std::unique_ptr<WinApp> winApp_ = nullptr;
 
 	std::unique_ptr<DirectXCommon> dxCommon_ = nullptr;
-	std::unique_ptr<SrvManager> srvManager_ = nullptr;
 
 	std::unique_ptr<ImGuiManager> imguiM_ = nullptr;
 
