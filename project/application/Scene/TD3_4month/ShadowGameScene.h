@@ -13,7 +13,7 @@
 #include"GameObject/TimeCard/TimeCardWatch.h"
 #include"GameObject/Flashlight/Flashlight.h"
 #include"GameObject/Key/Key.h"
-
+#include <GameObject/Chair/Chair.h>
 #pragma endregion
 
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
@@ -24,6 +24,7 @@
 #include "Light/AreaLight.h"
 #include"Audio.h"
 #include <GameObject/Edamame/Edamame.h>
+
 
 class ShadowGameScene : public BaseScene
 {
@@ -61,10 +62,12 @@ private:
     std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
     //懐中電灯
     std::unique_ptr<Flashlight> flashlight_ = nullptr;
-    // 鍵
-	std::unique_ptr<Key> key_ = nullptr;
-    // 枝豆
-	std::unique_ptr<Edamame> edamame_ = nullptr;
+    //鍵
+    std::unique_ptr<Key> key_ = nullptr;
+    //枝豆
+    std::unique_ptr<Edamame> edamame_ = nullptr;
+    //椅子
+    std::unique_ptr<Chair> chair_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
@@ -121,8 +124,9 @@ private:
     //シーン遷移の描画処理
     void DrawSceneTransition();
     //ゲームオブジェクトの描画処理
-    void DrawGameObject();
-	void DrawSceneGeometry(bool drawPortalParticle = true);
+    void DrawModel();
+    void DrawGameObject(bool isShadow, bool isDrawParticle);
+    void DrawSceneGeometry(bool drawPortalParticle = true);
     void SetSceneCameraForDraw(Camera* camera);
 };
 

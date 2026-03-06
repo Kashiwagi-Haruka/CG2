@@ -19,7 +19,7 @@ Player::Player()
     localAABB_ = { .min = {-0.25f,0.0f,-0.25f},.max = {0.25f,1.5f,0.25f} };
     SetAABB(localAABB_);
     SetCollisionAttribute(kCollisionPlayer);
-    SetCollisionMask(kCollisionFloor|kCollisionPortal|kCollisionEnemy|kCollisionItem);
+    SetCollisionMask(kCollisionFloor|kCollisionPortal|kCollisionEnemy|kCollisionItem| kCollisionChair);
 
     //体のObject3d
     bodyObj_ = std::make_unique<Object3d>();

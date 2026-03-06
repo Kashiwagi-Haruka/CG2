@@ -4,6 +4,7 @@
 #include"GameObject/KeyBindConfig.h"
 #include<algorithm>
 #include"GameObject/YoshidaMath/YoshidaMath.h"
+#include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include"WinApp.h"
 
 
@@ -67,7 +68,6 @@ void PlayerCamera::Rotate()
 void PlayerCamera::SetRay()
 {
   
-
     ray_.origin = cameraTransform_.translate;
     ray_.diff = GetForward();
 
@@ -99,6 +99,11 @@ void PlayerCamera::DrawRaySprite()
 void PlayerCamera::Initialize()
 {
     raySprite_->Initialize();
+}
+
+bool PlayerCamera::OnCollisionRay(const AABB& localAABB,const Vector3& translate)
+{
+    return YoshidaMath::RayIntersectsAABB(GetRay(), YoshidaMath::GetAABBWorldPos(localAABB, translate), kTMin_, kTMax_);
 }
 
 

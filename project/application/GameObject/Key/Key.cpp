@@ -4,11 +4,6 @@
 #include <GameObject/KeyBindConfig.h>
 #include <Function.h>
 
-namespace {
-	float tMin_ = 0.0f;
-	float tMax_ = 5.0f;
-}
-
 Key::Key()
 {
 	obj_ = std::make_unique<Object3d>();
@@ -66,21 +61,22 @@ void Key::Draw()
 
 void Key::SetPlayerCamera(PlayerCamera* camera)
 {
-	obj_->SetCamera(camera->GetCamera());
-#ifdef _DEBUG
-	primitive_->SetCamera(camera->GetCamera());
-#endif
+
 	playerCamera_ = camera;
+}
+
+void Key::SetCamera(Camera* camera)
+{
+	obj_->SetCamera(camera);
+
+#ifdef _DEBUG
+	primitive_->SetCamera(camera);
+#endif
 }
 
 void Key::SetModel(const std::string& filePath)
 {
 	obj_->SetModel(filePath);
-}
-
-AABB Key::GetAABB()
-{
-	return YoshidaMath::GetAABBWorldPos(localAABB_, collisionTransform_.translate);
 }
 
 void Key::CheckCollision()
@@ -109,7 +105,7 @@ void Key::CheckCollision()
 
 bool Key::OnCollisionRay()
 {
-	return YoshidaMath::RayIntersectsAABB(playerCamera_->GetRay(), GetAABB(), tMin_, tMax_);
+	return playerCamera_->OnCollisionRay(localAABB_, collisionTransform_.translate);
 }
 
 void Key::OnCollision(Collider* collider)

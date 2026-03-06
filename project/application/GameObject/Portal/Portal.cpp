@@ -42,7 +42,7 @@ Portal::Portal()
     ring_ = std::make_unique<Primitive>();
     portalCircle_ = std::make_unique<Primitive>();
     //ワープ座標
-    warpPos_ = std::make_unique<WarpPos1>();
+    warpPos_ = std::make_unique<WarpPos>();
 }
 
 Portal::~Portal()

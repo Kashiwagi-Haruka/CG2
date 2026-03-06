@@ -5,7 +5,7 @@
 #include"RigidBody.h"
 #include"Audio.h"
 #include"GameObject/YoshidaMath/CollisionManager/Collider.h"
-#include"GameObject/WarpPos/WarpPos1.h"
+#include"GameObject/WarpPos/WarpPos.h"
 #include "RenderTexture2D.h"
 #include "Object3d/Object3dCommon.h"
 #include <functional>
@@ -41,7 +41,7 @@ public:
     void SetWarpTransform(Transform& pos) { warpPos_->SetTransform(pos); };
     const Sphere& GetSphere();
     //ワープ先を取得する
-    WarpPos1* GetWarpPos() { return warpPos_.get(); }
+    WarpPos* GetWarpPos() { return warpPos_.get(); }
 
     void RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals);
     void UpdateCameraMatrices();
@@ -60,7 +60,7 @@ private:
     float uvRotateZ_ = 0.0f;
     Sphere sphere_ = { 0.0f };
     //ワープ座標
-    std::unique_ptr<WarpPos1> warpPos_ = nullptr;
+    std::unique_ptr<WarpPos> warpPos_ = nullptr;
     std::unique_ptr<RenderTexture2D> portalRenderTexture_ = nullptr;
     Transform* parentTransform = nullptr;
 };
