@@ -107,7 +107,6 @@
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Portal\PortalMesh.cpp" />
     <ClCompile Include="application\GameObject\Portal\PortalParticle.cpp" />
-    <ClCompile Include="application\Scene\TD3_4month\ProtoPush.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\Collider.h" />
@@ -208,7 +207,6 @@
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
     <ClInclude Include="Engine\Texture\Mesh\Portal\PortalMesh.h" />
     <ClInclude Include="application\GameObject\Portal\PortalParticle.h" />
-    <ClInclude Include="application\Scene\TD3_4month\ProtoPush.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
