@@ -39,6 +39,8 @@ private:
     //衝突情報
     YoshidaMath::CollisionInfo collisionInfo_;
     bool isWarp_ = false;
+    const float kWarpTime_ = 2.0f;
+    float warpCoolTimer_ = kWarpTime_;
 public:
     bool GetIsWarp() { return isWarp_; }
     void OnCollision(Collider* collider)override;

@@ -28,15 +28,11 @@ public:
     void Update();
     void SetCamera(Camera* camera);
     Camera* GetCamera() { return warpPos_->GetWarpPosCamera(); };
-    //Portal自身の座標を取得する
-    Vector3& GetTranslate() { return transform_.translate; };
     //PortalのSRTをセットする
     void SetParentTransform(Transform* transform) { parentTransform = transform; };
     void SetPortalWorldMatrix();
-    //ワープ先の座標を取得する
-    Vector3& GetWarpTranslate() { return warpPos_->GetTranslate(); };
-    Vector3& GetWarpRotate() { return warpPos_->GetRotate(); };
-
+    Transform& GetWarpPosTransform() { return warpPos_->GetTransform(); }
+    Transform& GetTransform() { return transform_; };
     //ワープ先の座標をセットする
     void SetWarpTransform(Transform& pos) { warpPos_->SetTransform(pos); };
     const Sphere& GetSphere();
@@ -48,7 +44,9 @@ public:
     void DrawPortals();
     void DrawRings();
     void DrawWarpPos();
+    bool GetIsPlayerHit() { return isPlayerHit_; };
 private:
+    bool isPlayerHit_ = false;
     float scaleTimer_ = 0.0f;
     void UpdatePortalCamera(const Transform& destinationPortal, Camera* outCamera);
     Camera* sceneCamera_ = nullptr;

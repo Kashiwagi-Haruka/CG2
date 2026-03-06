@@ -22,6 +22,7 @@ void Portal::OnCollision(Collider* collider)
 {
     if (collider->GetCollisionAttribute() == kCollisionPlayer) {
         Audio::GetInstance()->SoundPlayWave(warpSE_, false);
+        isPlayerHit_ = true;
     }
 }
 
@@ -52,6 +53,7 @@ Portal::~Portal()
 
 void Portal::Initialize()
 {
+    isPlayerHit_ = false;
     scaleTimer_ = 0.0f;
     transform_ = { .scale = {0.0f,0.0f,0.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
     
@@ -82,6 +84,8 @@ void Portal::Initialize()
 
 void Portal::Update()
 {
+    isPlayerHit_ = false;
+
     uvRotateZ_ += YoshidaMath::kDeltaTime*2.0f;
     ring_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, uvRotateZ_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
     SetPortalWorldMatrix();
