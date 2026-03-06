@@ -1,11 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <FxCompile Include="Resources\shader\Object3d\CS_Shader\Skinning.CS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\VS_Shader\SkinningObject3d.VS.hlsl" />
-    <FxCompile Include="Resources\shader\Particle\UpdateParticle.CS.hlsl" />
-    <FxCompile Include="Resources\shader\Sprite\Sprite.PS.hlsl" />
-    <FxCompile Include="Resources\shader\Sprite\Sprite.VS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\Object3dGrid.PS.hlsl" />
     <FxCompile Include="Resources\shader\Sprite\Font.PS.hlsl" />
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
@@ -56,51 +51,24 @@
     <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3d.PS.hlsl">
       <Filter>Resources</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\shader\Object3d\CS_Shader\Skinning.CS.hlsl">
+      <Filter>Resources</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\SkinningObject3d.VS.hlsl">
+      <Filter>Resources</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Sprite\Sprite.VS.hlsl">
+      <Filter>Resources</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Sprite\Sprite.PS.hlsl">
+      <Filter>Resources</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Particle\UpdateParticle.CS.hlsl">
+      <Filter>Resources</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Engine\Math\RigidBody.cpp" />
-    <ClCompile Include="application\main.cpp" />
-    <ClCompile Include="Engine\base\WinApp.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3d.cpp" />
-    <ClCompile Include="Engine\StringUtillity\StringUtility.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3dCommon.cpp" />
-    <ClCompile Include="Engine\Texture\Sprite\Sprite.cpp" />
-    <ClCompile Include="Engine\Texture\Sprite\SpriteCommon.cpp" />
-    <ClCompile Include="Engine\Texture\TextureManager.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Model\Model.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Model\ModelCommon.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Model\ModelManager.cpp" />
-    <ClCompile Include="Engine\Texture\SrvManager\SrvManager.cpp" />
-    <ClCompile Include="Engine\Texture\Particle\ParticleManager.cpp" />
-    <ClCompile Include="Engine\Texture\Particle\ParticleEmitter.cpp" />
-    <ClCompile Include="application\Scene\ResultScene.cpp" />
-    <ClCompile Include="application\Scene\TitleScene.cpp" />
-    <ClCompile Include="application\SceneTransition\SceneTransition.cpp" />
-    <ClCompile Include="Engine\BaseScene\SceneManager.cpp" />
-    <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp" />
-    <ClCompile Include="application\Scene\SampleScene\SampleScene.cpp" />
-    <ClCompile Include="application\Pause\Pause.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Primitive\Primitive.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Animation\Skeleton.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Animation\SkinCluster.cpp" />
-    <ClCompile Include="application\Scene\TD3_4month\ShadowGameScene.cpp" />
-    <ClCompile Include="application\GameObject\Player\Player.cpp" />
-    <ClCompile Include="application\GameObject\YoshidaMath\YoshidaMath.cpp" />
-    <ClCompile Include="application\GameObject\TestField\TestField.cpp" />
-    <ClCompile Include="application\GameObject\Portal\Portal.cpp" />
-    <ClCompile Include="application\GameObject\WarpPos\WarpPos.cpp" />
-    <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoard.cpp" />
-    <ClCompile Include="application\GameObject\Portal\PortalManager.cpp" />
-    <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp" />
-    <ClCompile Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.cpp" />
-    <ClCompile Include="Engine\Texture\PSO\SpriteCreatePSO.cpp" />
-    <ClCompile Include="Engine\Editor\ToolBar.cpp" />
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
-    <ClCompile Include="application\GameObject\WhiteBoard\WalkWhiteBoard.cpp" />
-    <ClCompile Include="application\GameObject\UI\RaySprite.cpp" />
-    <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
-    <ClCompile Include="Engine\Texture\Mesh\Portal\PortalMesh.cpp" />
-    <ClCompile Include="application\GameObject\Portal\PortalParticle.cpp" />
     <ClCompile Include="Engine\Texture\BlendMode\BlendModeManager.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
@@ -206,12 +174,6 @@
     <ClCompile Include="Engine\Input\Input.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\Inspector.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
     <ClCompile Include="application\GameObject\Key\Key.cpp">
       <Filter>Application</Filter>
     </ClCompile>
@@ -221,61 +183,141 @@
     <ClCompile Include="Engine\Log\Logger.cpp">
       <Filter>Engine\Logger</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Editor\Inspector.cpp">
+      <Filter>Engine\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp">
+      <Filter>Engine\LoadFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Model\Model.cpp">
+      <Filter>Engine\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Model\ModelCommon.cpp">
+      <Filter>Engine\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Model\ModelManager.cpp">
+      <Filter>Engine\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3d.cpp">
+      <Filter>Engine\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3dCommon.cpp">
+      <Filter>Engine\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Particle\ParticleEmitter.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Particle\ParticleManager.cpp">
+      <Filter>Engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="application\main.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Pause\Pause.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Player\Player.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Portal\Portal.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Portal\PortalManager.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Portal\PortalMesh.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Primitive\Primitive.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Portal\PortalParticle.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\UI\RaySprite.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\RenderTexture2D.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Scene\ResultScene.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\RigidBody.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Scene\SampleScene\SampleScene.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Scene\SceneFactory\SceneFactory.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\SceneTransition\SceneTransition.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Scene\TD3_4month\ShadowGameScene.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\BaseScene\SceneManager.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Animation\Skeleton.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Animation\SkinCluster.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Sprite\Sprite.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\Sprite\SpriteCommon.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\PSO\SpriteCreatePSO.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\SrvManager\SrvManager.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\StringUtillity\StringUtility.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\TestField\TestField.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Texture\TextureManager.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Scene\TitleScene.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\ToolBar.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\base\WinApp.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\WhiteBoard\WalkWhiteBoard.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\WarpPos\WarpPos.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoard.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\YoshidaMath\YoshidaMath.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\Texture\Material.h" />
-    <ClInclude Include="Engine\Math\QuaternionTransform.h" />
-    <ClInclude Include="Engine\Math\RigidBody.h" />
-    <ClInclude Include="Engine\Math\Transform.h" />
-    <ClInclude Include="Engine\Texture\Light\PointLight.h" />
-    <ClInclude Include="Engine\Texture\Light\SpotLight.h" />
-    <ClInclude Include="Engine\Texture\SkinningData.h" />
-    <ClInclude Include="Engine\Math\Matrix4x4.h" />
-    <ClInclude Include="Engine\Math\Vector2.h" />
-    <ClInclude Include="Engine\Math\Vector3.h" />
-    <ClInclude Include="Engine\Math\Vector4.h" />
-    <ClInclude Include="Engine\Texture\VertexData.h" />
-    <ClInclude Include="Engine\base\WinApp.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3d.h" />
-    <ClInclude Include="Engine\StringUtillity\StringUtility.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3dCommon.h" />
-    <ClInclude Include="Engine\Texture\Sprite\Sprite.h" />
-    <ClInclude Include="Engine\Texture\Sprite\SpriteCommon.h" />
-    <ClInclude Include="Engine\Texture\TextureManager.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Model\Model.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Model\ModelCommon.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Model\ModelManager.h" />
-    <ClInclude Include="Engine\Texture\SrvManager\SrvManager.h" />
-    <ClInclude Include="Engine\Texture\Particle\ParticleManager.h" />
-    <ClInclude Include="Engine\Texture\Particle\ParticleEmitter.h" />
-    <ClInclude Include="application\Scene\ResultScene.h" />
-    <ClInclude Include="application\Scene\TitleScene.h" />
-    <ClInclude Include="application\SceneTransition\SceneTransition.h" />
-    <ClInclude Include="Engine\BaseScene\SceneManager.h" />
-    <ClInclude Include="application\Scene\SceneFactory\SceneFactory.h" />
-    <ClInclude Include="application\Scene\SampleScene\SampleScene.h" />
-    <ClInclude Include="application\Pause\Pause.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Primitive\Primitive.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Animation\Skeleton.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Animation\SkinCluster.h" />
-    <ClInclude Include="application\Scene\TD3_4month\ShadowGameScene.h" />
-    <ClInclude Include="application\GameObject\Player\Player.h" />
-    <ClInclude Include="application\GameObject\YoshidaMath\YoshidaMath.h" />
-    <ClInclude Include="application\GameObject\TestField\TestField.h" />
-    <ClInclude Include="application\GameObject\Portal\Portal.h" />
-    <ClInclude Include="application\GameObject\WarpPos\WarpPos.h" />
-    <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoard.h" />
-    <ClInclude Include="application\GameObject\Portal\PortalManager.h" />
-    <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h" />
-    <ClInclude Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.h" />
-    <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h" />
-    <ClInclude Include="Engine\Editor\ToolBar.h" />
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
-    <ClInclude Include="application\GameObject\WhiteBoard\WalkWhiteBoard.h" />
-    <ClInclude Include="application\GameObject\UI\RaySprite.h" />
-    <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
-    <ClInclude Include="Engine\Texture\Mesh\Portal\PortalMesh.h" />
-    <ClInclude Include="application\GameObject\Portal\PortalParticle.h" />
     <ClInclude Include="Engine\Texture\BlendMode\BlendModeManager.h">
       <Filter>Engine</Filter>
     </ClInclude>
@@ -405,22 +447,177 @@
     <ClInclude Include="Engine\Input\Input.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\Inspector.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="application\GameObject\KeyBindConfig.h">
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Log\Logger.h">
       <Filter>Engine\Logger</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Editor\Inspector.h">
+      <Filter>Engine\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h">
+      <Filter>Engine\LoadFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Model\Model.h">
+      <Filter>Engine\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Model\ModelCommon.h">
+      <Filter>Engine\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Model\ModelManager.h">
+      <Filter>Engine\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3d.h">
+      <Filter>Engine\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3dCommon.h">
+      <Filter>Engine\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Particle\ParticleEmitter.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Particle\ParticleManager.h">
+      <Filter>Engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Light\PointLight.h">
+      <Filter>Engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Material.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Matrix4x4.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Pause\Pause.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Player\Player.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Portal\Portal.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Portal\PortalManager.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Portal\PortalMesh.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Primitive\Primitive.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\Portal\PortalParticle.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\QuaternionTransform.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\UI\RaySprite.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\RenderTexture2D.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\ResultScene.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\RigidBody.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\SampleScene\SampleScene.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\SceneFactory\SceneFactory.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\SceneTransition\SceneTransition.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\TD3_4month\ShadowGameScene.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BaseScene\SceneManager.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Animation\Skeleton.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Mesh\Animation\SkinCluster.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\SkinningData.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Light\SpotLight.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Sprite\Sprite.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\Sprite\SpriteCommon.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\SrvManager\SrvManager.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\StringUtillity\StringUtility.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\TestField\TestField.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\TextureManager.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Scene\TitleScene.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\ToolBar.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Transform.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Vector2.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Vector3.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\Vector4.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture\VertexData.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\base\WinApp.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\WhiteBoard\WalkWhiteBoard.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\WarpPos\WarpPos.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoard.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\YoshidaMath\YoshidaMath.h">
+      <Filter>Application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
-    <None Include="Resources\shader\Sprite\Sprite.hlsli" />
     <None Include="Resources\shader\FullScreenCopy\CopyImage.hlsli">
       <Filter>Resources</Filter>
     </None>
@@ -428,6 +625,9 @@
       <Filter>Resources</Filter>
     </None>
     <None Include="Resources\shader\Object3d\Object3d.hlsli">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="Resources\shader\Sprite\Sprite.hlsli">
       <Filter>Resources</Filter>
     </None>
   </ItemGroup>
@@ -479,6 +679,12 @@
     </Filter>
     <Filter Include="Engine\Logger">
       <UniqueIdentifier>{27de33ab-02da-4769-835c-c24dfa293796}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Mesh">
+      <UniqueIdentifier>{d904df5c-578e-4531-b9a4-f80dd3cda660}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Particle">
+      <UniqueIdentifier>{f3d93c29-dd7e-4967-b98e-2d418f066cab}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

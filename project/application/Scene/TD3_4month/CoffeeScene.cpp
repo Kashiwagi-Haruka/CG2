@@ -46,9 +46,9 @@ void CoffeeScene::Initialize() {
 	}
 
 	// 床 (+Y を向く)
-	roomWalls_[1]->SetScale({kRoomWidth, kRoomDepth, 1.0f});
-	roomWalls_[1]->SetRotate({std::numbers::pi_v<float> * 0.5f, 0.0f, 0.0f});
-	roomWalls_[1]->SetTranslate({0.0f, -halfHeight, 0.0f});
+	roomWalls_[0]->SetScale({kRoomWidth, kRoomDepth, 1.0f});
+	roomWalls_[0]->SetRotate({std::numbers::pi_v<float> * 0.5f, 0.0f, 0.0f});
+	roomWalls_[0]->SetTranslate({0.0f, -halfHeight, 0.0f});
 
 	// 天井 (-Y を向く)
 	roomWalls_[1]->SetScale({kRoomWidth, kRoomDepth, 1.0f});
@@ -119,11 +119,10 @@ void CoffeeScene::Update() {
 }
 
 void CoffeeScene::Draw() {
-	Object3dCommon::GetInstance()->DrawCommonNoCull();
-	//for (auto& wall : roomWalls_) {
-	//	wall->Draw();
-	//}
-	roomWalls_[0]->Draw();
+	Object3dCommon::GetInstance()->DrawCommon();
+	for (auto& wall : roomWalls_) {
+		wall->Draw();
+	}
 }
 
 void CoffeeScene::Finalize() {}
