@@ -1,4 +1,4 @@
-#include "Object3d.hlsli"
+#include "../Object3d.hlsli"
 struct TransformationMatrix
 {
     float4x4 WVP;
@@ -19,11 +19,10 @@ struct VertexShaderInput
 VertexShaderOutput main(VertexShaderInput input)
 {
     VertexShaderOutput output;
-    output.position = mul(input.position, gTransformationMatrix.LightWVP);
+    output.position = mul(input.position, gTransformationMatrix.WVP);
     output.normal = normalize(mul(input.normal, (float3x3) gTransformationMatrix.WorldInverseTranspose));
     output.texcoord = input.texcoord;
     output.worldPosition = mul(input.position, gTransformationMatrix.World).xyz;
-    // PS側で常に参照されるため、未初期化にならないように必ず書き込む
     output.shadowPosition = mul(input.position, gTransformationMatrix.LightWVP);
     return output;
 }

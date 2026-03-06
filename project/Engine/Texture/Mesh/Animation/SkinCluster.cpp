@@ -80,7 +80,7 @@ void CreateSkinningComputePipeline(SkinCluster& skinCluster) {
 	hr = dxCommon->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&skinCluster.computeRootSignature));
 	assert(SUCCEEDED(hr));
 
-	auto csBlob = dxCommon->CompileShader(L"Resources/shader/Object3d/Skinning.CS.hlsl", L"cs_6_0");
+		auto csBlob = dxCommon->CompileShader(L"Resources/shader/Object3d/CS_Shader/Skinning.CS.hlsl", L"cs_6_0");
 	D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineDesc{};
 	computePipelineDesc.pRootSignature = skinCluster.computeRootSignature.Get();
 	computePipelineDesc.CS = {csBlob->GetBufferPointer(), csBlob->GetBufferSize()};

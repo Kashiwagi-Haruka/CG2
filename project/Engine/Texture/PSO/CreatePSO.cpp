@@ -16,8 +16,8 @@ void CreatePSO::Create(
 }
 void CreatePSO::CreateShadow(D3D12_CULL_MODE cullMode, D3D12_FILL_MODE fillMode) {
 	isShadowPass_ = true;
-	vertexShaderPath_ = L"Resources/shader/Object3d/Object3dShadowMap.VS.hlsl";
-	pixelShaderPath_ = L"Resources/shader/Object3d/Object3dShadowMap.PS.hlsl";
+	vertexShaderPath_ = L"Resources/shader/Object3d/VS_Shader/Object3dShadowMap.VS.hlsl";
+	pixelShaderPath_ = L"Resources/shader/Object3d/PS_Shader/Object3dShadowMap.PS.hlsl";
 	CreateRootSignature();
 	CreateGraphicsPipeline(cullMode, true, fillMode, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 }
@@ -242,7 +242,8 @@ void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnabl
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	// --- シェーダーコンパイル ---
-	std::wstring vsPath = vertexShaderPath_.empty() ? (useSkinning_ ? L"Resources/shader/Object3d/SkinningObject3d.VS.hlsl" : L"Resources/shader/Object3d/Object3d.VS.hlsl") : vertexShaderPath_;
+	std::wstring vsPath =
+	    vertexShaderPath_.empty() ? (useSkinning_ ? L"Resources/shader/Object3d/VS_Shader/SkinningObject3d.VS.hlsl" : L"Resources/shader/Object3d/VS_Shader/Object3d.VS.hlsl") : vertexShaderPath_;
 	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(vsPath.c_str(), L"vs_6_0");
 	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(pixelShaderPath_.c_str(), L"ps_6_0");
 	assert(vsBlob && psBlob);

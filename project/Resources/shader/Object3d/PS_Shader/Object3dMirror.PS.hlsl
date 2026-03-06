@@ -1,4 +1,4 @@
-#include "Object3d.hlsli"
+#include "../Object3d.hlsli"
 struct Material
 {
     float4 color;
@@ -12,7 +12,6 @@ struct Material
     float distortionStrength;
     float distortionFalloff;
 };
-ConstantBuffer<Material> gMaterial : register(b0);
 struct Camera
 {
     float3 worldPosition;
@@ -22,10 +21,11 @@ struct Camera
     int fullscreenSepiaEnabled;
     float2 padding2;
 };
+ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<Camera> gCamera : register(b4);
 Texture2D<float4> gTexture : register(t0);
+Texture2D<float4> gEnvironmentTexture : register(t4);
 SamplerState gSampler : register(s0);
-
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
@@ -52,28 +52,27 @@ float3 ApplySepia(float3 color)
     sepia.b = dot(color, float3(0.272f, 0.534f, 0.131f));
     return saturate(sepia);
 }
+
+
 PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
-
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
+    float3 baseColor = (gMaterial.color * textureColor).rgb;
 
-    float3 baseColor = textureColor.rgb * gMaterial.color.rgb;
     float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
-    float3 normal = normalize(input.normal);
-    float rim = 1.0f - saturate(dot(normal, toEye));
-    float softRim = smoothstep(0.0f, 0.9f, rim);
-    float glow = pow(softRim, 1.4f);
-    float halo = pow(softRim, 3.0f);
-    float luminance = dot(baseColor, float3(0.2126f, 0.7152f, 0.0722f));
-    float glowMask = smoothstep(0.2f, 0.85f, luminance);
-    float glowRamp = smoothstep(0.35f, 0.95f, softRim);
-    float glowStrength = 1.0f + saturate(gMaterial.environmentCoefficient) * 2.0f;
-    float3 glowColor = baseColor * glowStrength * (glowMask * 1.2f + glowRamp * 1.6f);
+    float2 screenUV = input.position.xy / gCamera.screenSize;
+    screenUV.x = 1.0f - screenUV.x;
+    float3 environmentColor = gEnvironmentTexture.Sample(gSampler, saturate(screenUV)).rgb;
 
-    output.color.rgb = baseColor * (1.4f + glow * 3.0f) + baseColor * (halo * 2.5f) + glowColor;
-    output.color.a = textureColor.a * gMaterial.color.a;
+    float fresnel = pow(1.0f - saturate(dot(normalize(input.normal), toEye)), 5.0f);
+    float mirrorStrength = saturate(gMaterial.environmentCoefficient);
+    float reflectionFactor = saturate(mirrorStrength + fresnel * (1.0f - mirrorStrength));
+
+    output.color.rgb = lerp(baseColor, environmentColor, reflectionFactor);
+    output.color.a = gMaterial.color.a * textureColor.a;
+
     output.color.rgb = ApplyGrayscale(output.color.rgb);
     output.color.rgb = ApplySepia(output.color.rgb);
     if (textureColor.a < 0.5f)
