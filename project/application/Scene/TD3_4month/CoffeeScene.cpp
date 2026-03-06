@@ -1,7 +1,11 @@
 #include "CoffeeScene.h"
 #include "Function.h"
+#include "Input.h"
 #include "Light/DirectionalLight.h"
 #include "Object3d/Object3dCommon.h"
+#ifdef USE_IMGUI
+#include <imgui.h>
+#endif // USE_IMGUI
 #include <numbers>
 
 namespace {
@@ -15,6 +19,7 @@ CoffeeScene::CoffeeScene() {
 		wall = std::make_unique<Primitive>();
 	}
 	camera_ = std::make_unique<Camera>();
+	debugCamera_ = std::make_unique<DebugCamera>();
 	cameraTransform_ = {
 	    .scale = {1.0f, 1.0f, 1.0f},
 	    .rotate = {0.0f, 0.0f, 0.0f},
@@ -28,6 +33,8 @@ void CoffeeScene::Initialize() {
 	const float halfDepth = kRoomDepth * 0.5f;
 
 	camera_->SetTransform(cameraTransform_);
+	debugCamera_->Initialize();
+	debugCamera_->SetTranslation(cameraTransform_.translate);
 
 	for (auto& wall : roomWalls_) {
 		wall->Initialize(Primitive::Plane);
@@ -68,8 +75,34 @@ void CoffeeScene::Initialize() {
 }
 
 void CoffeeScene::Update() {
-	camera_->SetTransform(cameraTransform_);
-	camera_->Update();
+	auto* input = Input::GetInstance();
+	if (input->TriggerKey(DIK_F1)) {
+		useDebugCamera_ = !useDebugCamera_;
+	}
+
+#ifdef USE_IMGUI
+	if (ImGui::Begin("CoffeeCamera")) {
+		ImGui::Checkbox("Use Debug Camera (F1)", &useDebugCamera_);
+		ImGui::Text("Debug: LMB drag rotate, Shift+LMB drag pan, Wheel zoom");
+		if (ImGui::TreeNode("Transform")) {
+			if (!useDebugCamera_) {
+				ImGui::DragFloat3("Scale", &cameraTransform_.scale.x, 0.01f);
+				ImGui::DragFloat3("Rotate", &cameraTransform_.rotate.x, 0.01f);
+				ImGui::DragFloat3("Translate", &cameraTransform_.translate.x, 0.01f);
+			}
+			ImGui::TreePop();
+		}
+	}
+	ImGui::End();
+#endif // USE_IMGUI
+
+	if (useDebugCamera_) {
+		debugCamera_->Update();
+		camera_->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
+	} else {
+		camera_->SetTransform(cameraTransform_);
+		camera_->Update();
+	}
 
 	for (auto& wall : roomWalls_) {
 		wall->Update();

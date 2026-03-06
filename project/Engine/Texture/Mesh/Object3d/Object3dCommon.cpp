@@ -31,10 +31,10 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	pso_->Create(D3D12_CULL_MODE_BACK);
 
 	psoToon_ = std::make_unique<CreatePSO>(dxCommon_);
-	psoToon_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dToon.PS.hlsl");
+	psoToon_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dToon.PS.hlsl");
 
 	psoEmissive_ = std::make_unique<CreatePSO>(dxCommon_);
-	psoEmissive_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dEmissive.PS.hlsl");
+	psoEmissive_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dEmissive.PS.hlsl");
 
 	psoNoCull_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoNoCull_->Create(D3D12_CULL_MODE_NONE);
@@ -58,23 +58,23 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	psoLineNoDepth_->Create(D3D12_CULL_MODE_NONE, false, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
 
 	psoEditorGrid_ = std::make_unique<CreatePSO>(dxCommon_);
-	psoEditorGrid_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dGrid.PS.hlsl");
+	psoEditorGrid_->Create(D3D12_CULL_MODE_NONE, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dGrid.PS.hlsl");
 
 	psoSkinning_ = std::make_unique<CreatePSO>(dxCommon_, true);
 	psoSkinning_->Create(D3D12_CULL_MODE_BACK);
 
 	psoSkinningToon_ = std::make_unique<CreatePSO>(dxCommon_, true);
-	psoSkinningToon_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dToon.PS.hlsl");
+	psoSkinningToon_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dToon.PS.hlsl");
 
 	SetEnvironmentMapTexture("Resources/3d/skydome.png");
 
 	psoMirror_ = std::make_unique<CreatePSO>(dxCommon_);
-	psoMirror_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dMirror.PS.hlsl");
+	psoMirror_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dMirror.PS.hlsl");
 
 	psoPortal_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoPortal_->Create(
-	    D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/Object3dPortal.PS.hlsl",
-	    L"Resources/shader/Object3d/Object3dPortal.VS.hlsl");
+	    D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dPortal.PS.hlsl",
+	    L"Resources/shader/Object3d/VS_Shader/Object3dPortal.VS.hlsl");
 
 	psoShadow_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoShadow_->CreateShadow();
