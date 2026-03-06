@@ -2,9 +2,11 @@
 #include <Windows.h>
 #include <cstdint>
 #include <d3d12.h>
+#include <memory>
 #include <wrl.h>
 class DirectXCommon;
 class SrvManager {
+	static std::unique_ptr<SrvManager> instance;
 
 	DirectXCommon* directXCommon_ = nullptr;
 
@@ -13,8 +15,16 @@ class SrvManager {
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
 
 	uint32_t useIndex = 0;
+	SrvManager(SrvManager&) = delete;
+	SrvManager& operator=(SrvManager&) = delete;
 
 public:
+	SrvManager() = default;
+	~SrvManager() = default;
+
+	static SrvManager* GetInstance();
+	void Finalize();
+
 	void Initialize(DirectXCommon* dxCommon);
 
 	uint32_t Allocate();

@@ -94,8 +94,8 @@ void RenderTexture2D::Initialize(uint32_t width, uint32_t height, DXGI_FORMAT fo
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 	dxCommon_->GetDevice()->CreateDepthStencilView(depthResource_.Get(), &dsvDesc, dsvHandle_);
 
-	srvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
-	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforTexture2D(srvIndex_, resource_.Get(), format_, 1);
+	srvIndex_ = SrvManager::GetInstance()->Allocate();
+	SrvManager::GetInstance()->CreateSRVforTexture2D(srvIndex_, resource_.Get(), format_, 1);
 
 	currentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	initialized_ = true;

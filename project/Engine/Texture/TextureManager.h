@@ -48,7 +48,7 @@ public:
 	static TextureManager* GetInstance();
 
 	// 初期化
-	void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager);
+	void Initialize(DirectXCommon* dxCommon);
 	// ファイルからテクスチャを読み込む（未読み込み時のみ）
 	void LoadTextureName(const std::string& filePath);
 	// メモリ上の画像データからテクスチャを読み込む
@@ -67,8 +67,6 @@ public:
 	DirectX::TexMetadata& GetMetaData(uint32_t srvIndex);
 	// SRV インデックスから GPU SRV ハンドルを取得する
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(uint32_t srvIndex);
-	// 内部で使っている SRV マネージャーを返す
-	SrvManager* GetSrvManager() const { return srvManager_; }
 
 	// 終了
 	void Finalize();

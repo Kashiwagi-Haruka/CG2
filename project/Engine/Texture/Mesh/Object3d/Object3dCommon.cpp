@@ -96,25 +96,24 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	pointLightCountResource_ = CreateBufferResource(sizeof(PointLightCount));
 	assert(pointLightCountResource_);
 
-	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
-	pointLightSrvIndex_ = srvManager->Allocate();
-	srvManager->CreateSRVforStructuredBuffer(pointLightSrvIndex_, pointLightResource_.Get(), static_cast<UINT>(kMaxPointLights), sizeof(PointLight));
+	pointLightSrvIndex_ = SrvManager::GetInstance()->Allocate();
+	SrvManager::GetInstance()->CreateSRVforStructuredBuffer(pointLightSrvIndex_, pointLightResource_.Get(), static_cast<UINT>(kMaxPointLights), sizeof(PointLight));
 
 	spotLightResource_ = CreateBufferResource(sizeof(SpotLight) * kMaxSpotLights);
 	assert(spotLightResource_);
 	spotLightCountResource_ = CreateBufferResource(sizeof(SpotLightCount));
 	assert(spotLightCountResource_);
 
-	spotLightSrvIndex_ = srvManager->Allocate();
-	srvManager->CreateSRVforStructuredBuffer(spotLightSrvIndex_, spotLightResource_.Get(), static_cast<UINT>(kMaxSpotLights), sizeof(SpotLight));
+	spotLightSrvIndex_ = SrvManager::GetInstance()->Allocate();
+	SrvManager::GetInstance()->CreateSRVforStructuredBuffer(spotLightSrvIndex_, spotLightResource_.Get(), static_cast<UINT>(kMaxSpotLights), sizeof(SpotLight));
 
 	areaLightResource_ = CreateBufferResource(sizeof(AreaLight) * kMaxAreaLights);
 	assert(areaLightResource_);
 	areaLightCountResource_ = CreateBufferResource(sizeof(AreaLightCount));
 	assert(areaLightCountResource_);
 
-	areaLightSrvIndex_ = srvManager->Allocate();
-	srvManager->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaLight));
+	areaLightSrvIndex_ = SrvManager::GetInstance()->Allocate();
+	SrvManager::GetInstance()->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaLight));
 	editorDirectionalLight_ = *directionalLightData_;
 	editorPointLightCount_ = 0;
 	editorSpotLightCount_ = 0;
@@ -150,8 +149,8 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	shadowDsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	dxCommon_->GetDevice()->CreateDepthStencilView(shadowMapResource_.Get(), &shadowDsvDesc, shadowDsvHeap_->GetCPUDescriptorHandleForHeapStart());
 
-	shadowMapSrvIndex_ = srvManager->Allocate();
-	srvManager->CreateSRVforTexture2D(shadowMapSrvIndex_, shadowMapResource_.Get(), DXGI_FORMAT_R32_FLOAT, 1);
+	shadowMapSrvIndex_ = SrvManager::GetInstance()->Allocate();
+	SrvManager::GetInstance()->CreateSRVforTexture2D(shadowMapSrvIndex_, shadowMapResource_.Get(), DXGI_FORMAT_R32_FLOAT, 1);
 
 	shadowViewport_.TopLeftX = 0.0f;
 	shadowViewport_.TopLeftY = 0.0f;
@@ -173,9 +172,8 @@ void Object3dCommon::SetEnvironmentMapTextureResource(ID3D12Resource* resource, 
 	if (!resource) {
 		return;
 	}
-	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
-	environmentMapSrvIndex_ = srvManager->Allocate();
-	srvManager->CreateSRVforTexture2D(environmentMapSrvIndex_, resource, format, 1);
+	environmentMapSrvIndex_ = SrvManager::GetInstance()->Allocate();
+	SrvManager::GetInstance()->CreateSRVforTexture2D(environmentMapSrvIndex_, resource, format, 1);
 }
 void Object3dCommon::DrawSet(){
 	if (useEditorLights_) {

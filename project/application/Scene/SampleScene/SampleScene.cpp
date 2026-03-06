@@ -135,8 +135,6 @@ void SampleScene::Initialize() {
 	portalMeshB_->SetTextureIndex(portalRenderTextureA_.GetSrvIndex());
 	portalMeshA_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	portalMeshB_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-	portalMeshA_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
-	portalMeshB_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera_.get());
 	portalMeshA_->SetTextureCamera(portalTextureCameraA_.get());
 	portalMeshB_->SetTextureCamera(portalTextureCameraB_.get());
 	uvBallTransform_ = {

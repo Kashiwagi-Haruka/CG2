@@ -15,10 +15,10 @@ class ImGuiManager {
 	bool prevEditorLayoutEnabled_ = false;
 
 public:
-	void Initialize(WinApp* winapp, DirectXCommon* dxCommon, SrvManager* srvManager);
+	void Initialize(WinApp* winapp, DirectXCommon* dxCommon);
 	void Begin();
 	void End();
-	void Draw(SrvManager* srvManager, DirectXCommon* dxCommon);
+	void Draw(DirectXCommon* dxCommon);
 
 	void Finalize();
 };
