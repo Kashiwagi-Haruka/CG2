@@ -550,27 +550,7 @@ void SampleScene::Draw() {
 	animatedCubeObj_->Draw();
 	Object3dCommon::GetInstance()->EndShadowMapPass();
 
-	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
-	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
-	portalTextureCameraA_->Update();
-	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
-	portalTextureCameraB_->Update();
-
-	portalRenderTextureA_.BeginRender();
-	portalTextureCameraA_->Update(); 
-	assert(Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList() != nullptr);
-	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraA_.get());
-	DrawSceneGeometryForPortalTexture(portalTextureCameraA_.get());
-	portalRenderTextureA_.TransitionToShaderResource();
-
-
-	portalRenderTextureB_.BeginRender();
-	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraB_.get());
-	DrawSceneGeometryForPortalTexture(portalTextureCameraB_.get());
-	portalRenderTextureB_.TransitionToShaderResource();
-
-
-
+	// まずはメイン描画を実施(ポータルは前フレームのテクスチャを参照)
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	portalMeshA_->Update();
@@ -581,6 +561,23 @@ void SampleScene::Draw() {
 	if (overlayCameraSprite_) {
 		/*overlayCameraSprite_->Draw();*/
 	}
+
+	// 次フレーム用にポータルテクスチャをオフスクリーン描画
+	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
+	portalTextureCameraA_->Update();
+	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
+	portalTextureCameraB_->Update();
+
+	portalRenderTextureA_.BeginRender();
+	assert(Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList() != nullptr);
+	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraA_.get());
+	DrawSceneGeometryForPortalTexture(portalTextureCameraA_.get());
+	portalRenderTextureA_.TransitionToShaderResource();
+
+	portalRenderTextureB_.BeginRender();
+	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraB_.get());
+	DrawSceneGeometryForPortalTexture(portalTextureCameraB_.get());
+	portalRenderTextureB_.TransitionToShaderResource();
 }
 
 void SampleScene::SetSceneCameraForDraw(Camera* camera) {
@@ -609,6 +606,7 @@ void SampleScene::DrawSceneGeometryForPortalTexture(Camera* camera) {
 	animatedCubeObj_->SetCamera(camera);
 	humanObj_->SetCamera(camera);
 	spherePrimitive_->SetCamera(camera);
+	ParticleManager::GetInstance()->SetCamera(camera);
 	UpdateSceneCameraMatricesForDraw();
 
 	Object3dCommon::GetInstance()->DrawCommon();
@@ -628,6 +626,7 @@ void SampleScene::DrawSceneGeometryForPortalTexture(Camera* camera) {
 
 void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 	SetSceneCameraForDraw(camera);
+	ParticleManager::GetInstance()->SetCamera(camera);
 	UpdateSceneCameraMatricesForDraw();
 	Object3dCommon::GetInstance()->DrawCommon();
 	uvBallObj_->Draw();
