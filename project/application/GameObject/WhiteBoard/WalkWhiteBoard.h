@@ -27,6 +27,7 @@ public:
     void Update()override;
     void Draw()override;
     void SetAnimationIndex(const size_t& index) { currentAnimationIndex_ = index; }
+    void ResetCollisionAttribute()override;
 private:
     bool isMove_ = false;
   

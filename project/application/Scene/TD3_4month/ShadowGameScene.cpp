@@ -158,7 +158,7 @@ void ShadowGameScene::DebugImGui()
 void ShadowGameScene::CheckCollision()
 {
     //ホワイトボードとrayの当たり判定作成する
-    portalManager_->CheckCollision(timeCardWatch_.get(), { 10.0f,1.5f,5.0f });
+    portalManager_->CheckCollision(timeCardWatch_.get());
     key_->CheckCollision();
 
     edamame_->CheckCollision();
@@ -321,17 +321,16 @@ void ShadowGameScene::UpdateGameObject()
 
 #pragma region//ゲームオブジェクト
 
-    if (player_->GetIsWarp()) {
-        for (auto& portal : portalManager_->GetPortals()) {
-            if (portal->GetIsPlayerHit()) {
-                Transform& portalTransform = portal->GetWarpPosTransform();
-                player_->SetTranslate(portalTransform.translate + playerCamera_->GetRay().diff);
-                player_->SetRotate(portalTransform.rotate);
-                break;
-            }
-        
+    for (auto& portal : portalManager_->GetPortals()) {
+        if (portal->GetIsPlayerHit()) {
+            Transform* portalTransform = portal->GetWarpPosParent();
+            player_->SetTranslate(portalTransform->translate + playerCamera_->GetRay().diff);
+            player_->SetRotate(portalTransform->rotate);
+            break;
         }
+
     }
+
 
     if (!useDebugCamera_) {
         playerCamera_->Update();
@@ -396,7 +395,7 @@ void ShadowGameScene::DrawModel()
     Object3dCommon::GetInstance()->BeginShadowMapPass();
     Object3dCommon::GetInstance()->DrawCommonShadow();
 
-    DrawGameObject(true,false);
+    DrawGameObject(true, false);
 
     Object3dCommon::GetInstance()->EndShadowMapPass();
 
@@ -414,7 +413,7 @@ void ShadowGameScene::DrawModel()
     SetSceneCameraForDraw(playerCamera_->GetCamera());
     DrawSceneGeometry(true);
 }
-void ShadowGameScene::DrawGameObject(bool isShadow,bool isDrawParticle)
+void ShadowGameScene::DrawGameObject(bool isShadow, bool isDrawParticle)
 {
     // テスト地面
     testField_->Draw();

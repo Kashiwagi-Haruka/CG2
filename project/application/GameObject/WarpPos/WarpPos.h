@@ -8,18 +8,18 @@ class WarpPos
 public:
     WarpPos();
     void SetCamera(Camera* camera);
-    
-    void SetTransform(Transform& transform) {transform_ = transform; };
     Transform& GetTransform() { return transform_; }
-
+    Vector3 GetWorldPos();
     void Initialize();
     void Update();
     void Draw();
     Camera* GetWarpPosCamera() { return camera_.get(); };
+    void SetParent(Transform* transform) { parentTransform_ = transform; }
+    Transform* GetParent() { return parentTransform_; }
 private:
     std::unique_ptr<Camera> camera_ = nullptr;
     std::unique_ptr<Object3d>object3d_ = nullptr;
-
+    Transform* parentTransform_;
     Transform transform_ = {};
     float sinTheta_ = 0.0f;
 

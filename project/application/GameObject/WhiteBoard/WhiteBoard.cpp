@@ -77,3 +77,8 @@ AABB WhiteBoard::GetAABB()
 {
     return YoshidaMath::GetAABBWorldPos(localAABB_, collisionTransform_.translate);
 }
+
+void WhiteBoard::ResetCollisionAttribute()
+{
+    SetCollisionAttribute(kCollisionFloor);
+}

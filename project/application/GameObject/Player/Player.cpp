@@ -35,9 +35,7 @@ void Player::SetCamera(Camera* camera)
 }
 void Player::Initialize()
 {
-    isWarp_ = false;
 
-   warpCoolTimer_ = kWarpTime_;
     //体の初期化
     bodyObj_->Initialize();
     //体にモデル挿入
@@ -73,10 +71,6 @@ void Player::Initialize()
 
 void Player::Update()
 {
-    isWarp_ = false;
-    warpCoolTimer_ += YoshidaMath::kDeltaTime;
-    warpCoolTimer_ = std::clamp(warpCoolTimer_, 0.0f, kWarpTime_);
-
     //移動処理
     Move();
     //重力処理
@@ -183,14 +177,10 @@ void Player::Gravity()
 void Player::OnCollision(Collider* collider)
 {
 
- /*   if (collider->GetCollisionAttribute() == kCollisionFloor) {*/
+  /*if (collider->GetCollisionAttribute() == kCollisionFloor) {*/
      OnCollisionObstacle();
     
     if (collider->GetCollisionAttribute() == kCollisionPortal) {
-        if (warpCoolTimer_ == kWarpTime_) {
-            isWarp_ = true;
-            warpCoolTimer_ = 0.0f;
-        }
 
     }
 }

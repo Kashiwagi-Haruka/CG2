@@ -38,11 +38,8 @@ private:
     AABB localAABB_ = { 0.0f };
     //衝突情報
     YoshidaMath::CollisionInfo collisionInfo_;
-    bool isWarp_ = false;
-    const float kWarpTime_ = 2.0f;
-    float warpCoolTimer_ = kWarpTime_;
+
 public:
-    bool GetIsWarp() { return isWarp_; }
     void OnCollision(Collider* collider)override;
     /// @brief ワールド座標を取得する
     /// @return ワールド座標

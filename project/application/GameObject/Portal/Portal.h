@@ -27,15 +27,19 @@ public:
     void Initialize();
     void Update();
     void SetCamera(Camera* camera);
-    Camera* GetCamera() { return warpPos_->GetWarpPosCamera(); };
+
+    Transform& GetTransform() { return transform_; };
+    const Sphere& GetSphere();
+
     //PortalのSRTをセットする
     void SetParentTransform(Transform* transform) { parentTransform = transform; };
+
     void SetPortalWorldMatrix();
-    Transform& GetWarpPosTransform() { return warpPos_->GetTransform(); }
-    Transform& GetTransform() { return transform_; };
+
+    Camera* GetCamera() { return warpPos_->GetWarpPosCamera(); };
     //ワープ先の座標をセットする
-    void SetWarpTransform(Transform& pos) { warpPos_->SetTransform(pos); };
-    const Sphere& GetSphere();
+    Transform* GetWarpPosParent() { return warpPos_->GetParent(); }
+    void SetWarpPosParent(Transform* transform) { warpPos_->SetParent(transform); };
     //ワープ先を取得する
     WarpPos* GetWarpPos() { return warpPos_.get(); }
 
@@ -46,7 +50,10 @@ public:
     void DrawWarpPos();
     bool GetIsPlayerHit() { return isPlayerHit_; };
 private:
-    bool isPlayerHit_ = false;
+    const float kWarpTime_ = 2.0f;
+    float warpCoolTimer_ = kWarpTime_;
+
+    static bool isPlayerHit_;
     float scaleTimer_ = 0.0f;
     void UpdatePortalCamera(const Transform& destinationPortal, Camera* outCamera);
     Camera* sceneCamera_ = nullptr;

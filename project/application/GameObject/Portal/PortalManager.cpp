@@ -12,7 +12,11 @@ namespace {
 }
 
 PortalManager::PortalManager(Vector3* pos) {
+
     playerPos_ = pos;
+
+    firstWarpPosTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = { 10.0f, 1.5f, 5.0f } };
+
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
     std::unique_ptr<WalkWhiteBoard> walkWhite = std::make_unique<WalkWhiteBoard>();
     WalkWhiteBoard::LoadAnimation("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
@@ -48,7 +52,7 @@ void PortalManager::UpdatePortal() {
     if (isPendingPortalSpawn_ && portalParticle_) {
         portalParticle_->Update();
         if (portalParticle_->IsFinished() && pendingWhiteBoard_) {
-            SpawnPortal(pendingWhiteBoard_, pendingWarpPos_);
+            SpawnPortal(pendingWhiteBoard_);
             pendingWhiteBoard_ = nullptr;
             isPendingPortalSpawn_ = false;
         }
@@ -105,11 +109,10 @@ void PortalManager::Draw(bool isShadow, bool drawParticle) {
 void PortalManager::SetPlayerCamera(PlayerCamera* camera) {
 
     playerCamera_ = camera;
-
-
 }
 
-void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch, const Vector3& warpPos) {
+void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
+    
     if (isPendingPortalSpawn_) {
         return;
     }
@@ -120,20 +123,22 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch, const Vector3& 
 
             if (PlayerCommand::GetInstance()->Shot()) {
 
-                if (whiteBoard_) {
-                    whiteBoard_->SetCollisionAttribute(preCollision_);
+                if (preWhiteBoards_.size() >= 2) {
+                    //ポータルの生成が2個以上になったら
+                    preWhiteBoards_.at(0)->ResetCollisionAttribute();
+                    preWhiteBoards_.erase(preWhiteBoards_.begin());
                 }
 
-                // ショットしたらポータル作る
-                whiteBoard_ = board.get();
-                preCollision_ = whiteBoard_->GetCollisionAttribute();
-                whiteBoard_->SetCollisionAttribute(kCollisionNone);
+                preWhiteBoards_.push_back(board.get());
+ 
+                preWhiteBoards_.back()->SetCollisionAttribute(kCollisionNone);
 
-                pendingWhiteBoard_ = whiteBoard_;
-                pendingWarpPos_ = warpPos;
+                pendingWhiteBoard_ = preWhiteBoards_.back();
+
                 isPendingPortalSpawn_ = true;
+
                 if (portalParticle_) {
-                    portalParticle_->Start(*playerPos_, whiteBoard_->GetTransform().translate);
+                    portalParticle_->Start(*playerPos_, preWhiteBoards_.back()->GetTransform().translate);
                 }
             }
             break;
@@ -141,26 +146,23 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch, const Vector3& 
     }
 }
 
-void PortalManager::SpawnPortal(WhiteBoard* board, const Vector3& warpPos) {
+void PortalManager::SpawnPortal(WhiteBoard* board) {
 
-    Transform newWarpTransform = { 0.0f };
+    Transform* newWarpTransform = nullptr;
+
 
     if (portals_.size() >= 2) {
+        //ポータルの生成が2個以上になったら
         portals_.erase(portals_.begin());
     }
 
     //ポータルがないとき
     if (portals_.empty()) {
         //最初の位置に入れる
-        newWarpTransform = { .scale = {0.1f,0.1f,0.1f},.rotate = {0.0f,0.0f,0.0f},.translate = { warpPos} };
+        newWarpTransform = &firstWarpPosTransform_;
     } else {
-        //前回の位置を入れる
-        Transform preTransform = board->GetTransform();
-        preTransform.scale = { 0.1f,0.1f,0.1f };
-        portals_.at(0)->SetWarpTransform(preTransform);
-
-        newWarpTransform = portals_.at(0)->GetTransform();
-
+        portals_.at(0)->SetWarpPosParent(&board->GetTransform());
+        newWarpTransform = &portals_.at(0)->GetTransform();
     }
     //ポータルを新たに作る
     std::unique_ptr portal = std::make_unique<Portal>();
@@ -170,7 +172,6 @@ void PortalManager::SpawnPortal(WhiteBoard* board, const Vector3& warpPos) {
     Camera* camera = playerCamera_->GetCamera();
     portal->SetCamera(camera);
     portal->SetParentTransform(&board->GetTransform());
-    newWarpTransform.scale = { 0.1f,0.1f,0.1f };
-    portal->SetWarpTransform(newWarpTransform);
+    portal->SetWarpPosParent(newWarpTransform);
     portals_.push_back(std::move(portal));
 }

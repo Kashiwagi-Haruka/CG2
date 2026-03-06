@@ -14,6 +14,11 @@ WarpPos::WarpPos()
     object3d_->SetTransform(transform_);
 }
 
+Vector3 WarpPos::GetWorldPos()
+{
+    return YoshidaMath::GetWorldPosByMat(object3d_->GetWorldMatrix());
+}
+
 void WarpPos::Initialize()
 {
    
@@ -28,6 +33,14 @@ void WarpPos::SetCamera(Camera* camera)
 
 void WarpPos::Update()
 {
+
+    Matrix4x4 child = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+
+    if (parentTransform_) {
+        Matrix4x4 parent = Function::MakeAffineMatrix(parentTransform_->scale, parentTransform_->rotate, parentTransform_->translate);
+        child = Function::Multiply( child, parent);
+    } 
+
     sinTheta_ += Function::kPi * YoshidaMath::kDeltaTime;
    
     if (sinTheta_ >= Function::kPi*2.0f) {
@@ -36,9 +49,10 @@ void WarpPos::Update()
 
     transform_.translate.y += std::sinf(sinTheta_)*0.0625f;
 
-    camera_->SetTransform(transform_);
+    camera_->SetWorldMatrix(child);
+    object3d_->SetWorldMatrix(child);
+
     camera_->Update();
-    object3d_->SetTransform(transform_);
     object3d_->Update();
 }
 
