@@ -136,8 +136,6 @@ void RenderTexture2D::BeginRender() {
 	TransitionToRenderTarget(Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList());
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->OMSetRenderTargets(1, &rtvHandle_, false, &dsvHandle_);
 
-	float debugColor[4] = {1.0f, 0.0f, 0.0f, 1.0f};
-	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->ClearRenderTargetView(rtvHandle_, debugColor, 0, nullptr);
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	D3D12_VIEWPORT viewport{};
 	viewport.TopLeftX = 0.0f;
@@ -155,6 +153,6 @@ void RenderTexture2D::BeginRender() {
 	scissorRect.bottom = static_cast<LONG>(height_);
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->RSSetScissorRects(1, &scissorRect);
 
-	/*Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->ClearRenderTargetView(rtvHandle_, clearColor_.data(), 0, nullptr);*/
+	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->ClearRenderTargetView(rtvHandle_, clearColor_.data(), 0, nullptr);
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
