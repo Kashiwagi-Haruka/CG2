@@ -40,7 +40,7 @@ void GameBase::Finalize() {
 
 	ParticleManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
-
+	Hierarchy::GetInstance()->Finalize();
 	SpriteCommon::GetInstance()->Finalize();
 	Object3dCommon::GetInstance()->Finalize();
 
