@@ -272,8 +272,16 @@ DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t srvIndex) {
 			return data.metadata;
 		}
 	}
-	assert(false && "Invalid srvIndex");
+
+	// RenderTexture など TextureManager の map 管理外の SRV が来るケースでは
+	// 参照可能なダミー値を返してアサート終了を避ける。
 	static DirectX::TexMetadata dummy{};
+	dummy.width = 1;
+	dummy.height = 1;
+	dummy.mipLevels = 1;
+
+	std::string log = "[TextureManager] Warning: metadata not found for srvIndex=" + std::to_string(srvIndex) + "\n";
+	OutputDebugStringA(log.c_str());
 	return dummy;
 }
 // SRV インデックスから GPU SRV ハンドルを取得する
