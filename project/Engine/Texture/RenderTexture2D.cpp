@@ -53,8 +53,46 @@ void RenderTexture2D::Initialize(uint32_t width, uint32_t height, DXGI_FORMAT fo
 		return;
 	}
 
+	D3D12_RESOURCE_DESC depthDesc{};
+	depthDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	depthDesc.Width = width_;
+	depthDesc.Height = height_;
+	depthDesc.DepthOrArraySize = 1;
+	depthDesc.MipLevels = 1;
+	depthDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthDesc.SampleDesc.Count = 1;
+	depthDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	depthDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	D3D12_CLEAR_VALUE depthClearValue{};
+	depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	depthClearValue.DepthStencil.Depth = 1.0f;
+	depthClearValue.DepthStencil.Stencil = 0;
+
+	hr = dxCommon_->GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &depthDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthClearValue, IID_PPV_ARGS(&depthResource_));
+	if (FAILED(hr)) {
+		initialized_ = false;
+		return;
+	}
+
+	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc{};
+	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	dsvHeapDesc.NumDescriptors = 1;
+	hr = dxCommon_->GetDevice()->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&dsvHeap_));
+	if (FAILED(hr)) {
+		initialized_ = false;
+		return;
+	}
+
 	rtvHandle_ = rtvHeap_->GetCPUDescriptorHandleForHeapStart();
 	dxCommon_->GetDevice()->CreateRenderTargetView(resource_.Get(), nullptr, rtvHandle_);
+
+	dsvHandle_ = dsvHeap_->GetCPUDescriptorHandleForHeapStart();
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+	dxCommon_->GetDevice()->CreateDepthStencilView(depthResource_.Get(), &dsvDesc, dsvHandle_);
 
 	srvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
 	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforTexture2D(srvIndex_, resource_.Get(), format_, 1);
@@ -96,12 +134,11 @@ void RenderTexture2D::BeginRender() {
 		return;
 	}
 	TransitionToRenderTarget(Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList());
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dxCommon_->GetDepthStencilViewHandle();
-	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->OMSetRenderTargets(1, &rtvHandle_, false, &dsvHandle);
+	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->OMSetRenderTargets(1, &rtvHandle_, false, &dsvHandle_);
 
 	float debugColor[4] = {1.0f, 0.0f, 0.0f, 1.0f};
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->ClearRenderTargetView(rtvHandle_, debugColor, 0, nullptr);
-	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	D3D12_VIEWPORT viewport{};
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
@@ -119,5 +156,5 @@ void RenderTexture2D::BeginRender() {
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->RSSetScissorRects(1, &scissorRect);
 
 	/*Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->ClearRenderTargetView(rtvHandle_, clearColor_.data(), 0, nullptr);*/
-	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }

@@ -523,6 +523,7 @@ void SampleScene::Update() {
 	humanObj_->Update();
 	ringUvRotation_ -= 0.05f;
 
+
 	uvSprite->Update();
 	if (overlayCameraSprite_) {
 		overlayCameraSprite_->Update();
@@ -572,8 +573,12 @@ void SampleScene::Draw() {
 	DrawSceneGeometryForPortalTexture(portalTextureCameraB_.get());
 	portalRenderTextureB_.TransitionToShaderResource();
 
+
+
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
+	portalMeshA_->Update();
+	portalMeshB_->Update();
 	DrawSceneGeometry(camera_.get(), true);
 	SpriteCommon::GetInstance()->DrawCommon();
 	uvSprite->Draw();
@@ -638,8 +643,6 @@ void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 		sampleParticleEmitter_->Draw();
 	}
 	if (drawPortals) {
-		portalMeshA_->Update();
-		portalMeshB_->Update();
 		Object3dCommon::GetInstance()->DrawCommonPortal();
 		portalMeshA_->Draw();
 		portalMeshB_->Draw();
