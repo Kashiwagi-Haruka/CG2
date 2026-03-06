@@ -27,7 +27,6 @@ public:
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetColor(const Vector4& color);
 	void SetTextureIndex(uint32_t textureIndex) { textureIndex_ = textureIndex; }
-	void SetSecondaryTextureIndex(uint32_t textureIndex) { secondaryTextureIndex_ = textureIndex; }
 	void SetObjectCamera(Camera* camera) { objectCamera_ = camera; }
 	void SetTextureCamera(Camera* camera) { textureCamera_ = camera; }
 
@@ -60,7 +59,6 @@ private:
 	Camera* textureCamera_ = nullptr;
 
 	uint32_t textureIndex_ = 0;
-	uint32_t secondaryTextureIndex_ = UINT32_MAX;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> objectCameraResource_;

@@ -45,7 +45,6 @@ ConstantBuffer<Camera> gCamera : register(b4);
 ConstantBuffer<TextureCamera> gTextureCamera : register(b5);
 
 Texture2D<float4> gTexture : register(t0);
-Texture2D<float4> gTextureSecondary : register(t4);
 SamplerState gSampler : register(s0);
 
 struct PixelShaderOutput
@@ -67,7 +66,7 @@ PixelShaderOutput main(PortalVertexShaderOutput input)
 {
     PixelShaderOutput output;
 
-    output.color = gTextureSecondary.Sample(gSampler, input.texcoord);
+    output.color = gTexture.Sample(gSampler, input.texcoord);
 
     return output;
 }
