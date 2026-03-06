@@ -323,9 +323,13 @@ void ShadowGameScene::UpdateGameObject()
 
     if (player_->GetIsWarp()) {
         for (auto& portal : portalManager_->GetPortals()) {
-            player_->SetTranslate(portal->GetWarpTranslate());
-            player_->SetRotate(portal->GetWarpRotate());
-            break;
+            if (portal->GetIsPlayerHit()) {
+                Transform& portalTransform = portal->GetWarpPosTransform();
+                player_->SetTranslate(portalTransform.translate + playerCamera_->GetRay().diff);
+                player_->SetRotate(portalTransform.rotate);
+                break;
+            }
+        
         }
     }
 

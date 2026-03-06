@@ -119,8 +119,6 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch, const Vector3& 
         if (timeCardWatch->OnCollisionObjOfMakePortal(playerCamera_->GetRay(), board->GetAABB(), board->GetTransform())) {
 
             if (PlayerCommand::GetInstance()->Shot()) {
-                // 前回のポータルを削除
-                portals_.clear();
 
                 if (whiteBoard_) {
                     whiteBoard_->SetCollisionAttribute(preCollision_);
@@ -144,6 +142,27 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch, const Vector3& 
 }
 
 void PortalManager::SpawnPortal(WhiteBoard* board, const Vector3& warpPos) {
+
+    Transform newWarpTransform = { 0.0f };
+
+    if (portals_.size() >= 2) {
+        portals_.erase(portals_.begin());
+    }
+
+    //ポータルがないとき
+    if (portals_.empty()) {
+        //最初の位置に入れる
+        newWarpTransform = { .scale = {0.1f,0.1f,0.1f},.rotate = {0.0f,0.0f,0.0f},.translate = { warpPos} };
+    } else {
+        //前回の位置を入れる
+        Transform preTransform = board->GetTransform();
+        preTransform.scale = { 0.1f,0.1f,0.1f };
+        portals_.at(0)->SetWarpTransform(preTransform);
+
+        newWarpTransform = portals_.at(0)->GetTransform();
+
+    }
+    //ポータルを新たに作る
     std::unique_ptr portal = std::make_unique<Portal>();
 
     portal->Initialize();
@@ -151,7 +170,7 @@ void PortalManager::SpawnPortal(WhiteBoard* board, const Vector3& warpPos) {
     Camera* camera = playerCamera_->GetCamera();
     portal->SetCamera(camera);
     portal->SetParentTransform(&board->GetTransform());
-    Transform transform = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = { warpPos} };
-    portal->SetWarpTransform(transform);
+    newWarpTransform.scale = { 0.1f,0.1f,0.1f };
+    portal->SetWarpTransform(newWarpTransform);
     portals_.push_back(std::move(portal));
 }
