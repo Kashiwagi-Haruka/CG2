@@ -23,7 +23,7 @@ CoffeeScene::CoffeeScene() {
 	cameraTransform_ = {
 	    .scale = {1.0f, 1.0f, 1.0f},
 	    .rotate = {0.0f, 0.0f, 0.0f},
-	    .translate = {0.0f, 1.5f, 0.0f},
+	    .translate = {0.0f, 0.0f, 0.0f},
 	};
 }
 
@@ -32,11 +32,11 @@ void CoffeeScene::Initialize() {
 	const float halfHeight = kRoomHeight * 0.5f;
 	const float halfDepth = kRoomDepth * 0.5f;
 
+	Object3dCommon::GetInstance()->SetRandomNoiseEnabled(false);
+
 	camera_->SetTransform(cameraTransform_);
 	debugCamera_->Initialize();
 	debugCamera_->SetTranslation(cameraTransform_.translate);
-
-	Object3dCommon::GetInstance()->SetRandomNoiseEnabled(false);
 
 	for (auto& wall : roomWalls_) {
 		wall->Initialize(Primitive::Plane);
@@ -57,12 +57,12 @@ void CoffeeScene::Initialize() {
 
 	// 手前壁 (-Z を向く)
 	roomWalls_[2]->SetScale({kRoomWidth, kRoomHeight, 1.0f});
-	roomWalls_[2]->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
+	roomWalls_[2]->SetRotate({0.0f, 0.0f, 0.0f});
 	roomWalls_[2]->SetTranslate({0.0f, 0.0f, halfDepth});
 
 	// 奥壁 (+Z を向く)
 	roomWalls_[3]->SetScale({kRoomWidth, kRoomHeight, 1.0f});
-	roomWalls_[3]->SetRotate({0.0f, 0.0f, 0.0f});
+	roomWalls_[3]->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
 	roomWalls_[3]->SetTranslate({0.0f, 0.0f, -halfDepth});
 
 	// 左壁 (+X を向く)
@@ -105,12 +105,12 @@ void CoffeeScene::Update() {
 		camera_->SetTransform(cameraTransform_);
 		camera_->Update();
 	}
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
+
 	for (auto& wall : roomWalls_) {
 		wall->SetCamera(camera_.get());
 		wall->Update();
 	}
-
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	DirectionalLight directionalLight{};
 	directionalLight.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight.direction = Function::Normalize({0.1f, -1.0f, -0.2f});
