@@ -72,6 +72,8 @@ void CoffeeScene::Initialize() {
 	roomWalls_[5]->SetScale({kRoomDepth, kRoomHeight, 1.0f});
 	roomWalls_[5]->SetRotate({0.0f, std::numbers::pi_v<float> * 0.5f, 0.0f});
 	roomWalls_[5]->SetTranslate({halfWidth, 0.0f, 0.0f});
+
+	
 }
 
 void CoffeeScene::Update() {
@@ -103,8 +105,9 @@ void CoffeeScene::Update() {
 		camera_->SetTransform(cameraTransform_);
 		camera_->Update();
 	}
-
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	for (auto& wall : roomWalls_) {
+		wall->SetCamera(camera_.get());
 		wall->Update();
 	}
 
