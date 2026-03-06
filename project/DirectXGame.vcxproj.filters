@@ -3,17 +3,17 @@
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl" />
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.VS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\Object3d.PS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\Object3d.VS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\Object3dEmissive.PS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\Object3dGrid.PS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\Object3dMirror.PS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\Object3dPortal.PS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\Object3dShadowMap.PS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\Object3dShadowMap.VS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\Object3dToon.PS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\Skinning.CS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\SkinningObject3d.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3d.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\Object3d.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dEmissive.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dGrid.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dMirror.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dPortal.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dShadowMap.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\Object3dShadowMap.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dToon.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\CS_Shader\Skinning.CS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\SkinningObject3d.VS.hlsl" />
     <FxCompile Include="Resources\shader\Particle\Particle.CS.hlsl" />
     <FxCompile Include="Resources\shader\Particle\Particle.PS.hlsl" />
     <FxCompile Include="Resources\shader\Particle\Particle.VS.hlsl" />
@@ -23,7 +23,7 @@
     <FxCompile Include="Resources\shader\Sprite\Sprite.VS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\Object3dGrid.PS.hlsl" />
     <FxCompile Include="Resources\shader\Sprite\Font.PS.hlsl" />
-    <FxCompile Include="Resources\shader\Object3d\Object3dPortal.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\Object3dPortal.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\Collider.cpp" />
