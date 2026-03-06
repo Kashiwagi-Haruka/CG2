@@ -59,13 +59,13 @@ void RenderTexture2D::Initialize(uint32_t width, uint32_t height, DXGI_FORMAT fo
 	depthDesc.Height = height_;
 	depthDesc.DepthOrArraySize = 1;
 	depthDesc.MipLevels = 1;
-	depthDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthDesc.SampleDesc.Count = 1;
 	depthDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	depthDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
 	D3D12_CLEAR_VALUE depthClearValue{};
-	depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthClearValue.DepthStencil.Depth = 1.0f;
 	depthClearValue.DepthStencil.Stencil = 0;
 
@@ -89,7 +89,7 @@ void RenderTexture2D::Initialize(uint32_t width, uint32_t height, DXGI_FORMAT fo
 
 	dsvHandle_ = dsvHeap_->GetCPUDescriptorHandleForHeapStart();
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 	dxCommon_->GetDevice()->CreateDepthStencilView(depthResource_.Get(), &dsvDesc, dsvHandle_);
