@@ -3,6 +3,7 @@
 #include "Scene/GameScene.h"
 #include "Scene/ResultScene.h"
 #include "Scene/SampleScene/SampleScene.h"
+#include "Scene/TD3_4month/CoffeeScene.h"
 #include "Scene/TD3_4month/ShadowGameScene.h"
 #include "Scene/TitleScene.h"
 #include <memory>
@@ -22,11 +23,13 @@ std::unique_ptr<BaseScene> SceneFactory::CreateScene(const std::string& sceneNam
 	} else if (sceneName == "ShadowGame") {
 		// TD3用のシーンの追加
 		scene = std::make_unique<ShadowGameScene>();
+	} else if (sceneName == "Coffee") {
+		scene = std::make_unique<CoffeeScene>();
 	}
 	return scene;
 }
 std::vector<std::string> SceneFactory::GetSceneNames() const {
 	return {
-	    "Title", "Game", "Result", "GameOver", "Sample", "ShadowGame",
+	    "Title", "Game", "Result", "GameOver", "Sample", "ShadowGame", "Coffee",
 	};
 }
