@@ -119,7 +119,7 @@ void CoffeeScene::Update() {
 }
 
 void CoffeeScene::Draw() {
-	Object3dCommon::GetInstance()->DrawCommon();
+	Object3dCommon::GetInstance()->DrawCommonNoCull();
 	for (auto& wall : roomWalls_) {
 		wall->Draw();
 	}
