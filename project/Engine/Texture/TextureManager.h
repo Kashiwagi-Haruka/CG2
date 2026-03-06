@@ -39,7 +39,7 @@ private:
 	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 
 	DirectXCommon* dxCommon_ = nullptr;
-	SrvManager* srvManager_ = nullptr;
+	std::unique_ptr<SrvManager> srvManager_;
 
 public:
 	TextureManager() = default;
@@ -67,6 +67,9 @@ public:
 	DirectX::TexMetadata& GetMetaData(uint32_t srvIndex);
 	// SRV インデックスから GPU SRV ハンドルを取得する
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(uint32_t srvIndex);
+
+		// TextureManager が保持する SRV マネージャーを取得する
+	SrvManager* GetSrvManager() const { return srvManager_.get(); }
 
 	// 終了
 	void Finalize();

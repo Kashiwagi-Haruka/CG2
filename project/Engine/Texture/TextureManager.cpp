@@ -17,12 +17,21 @@ TextureManager* TextureManager::GetInstance() {
 // 利用する DirectX 共通機能と SRV マネージャーを設定する
 void TextureManager::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
-	srvManager_ = SrvManager::GetInstance();
+	srvManager_ = std::make_unique<SrvManager>();
+	srvManager_->Initialize(dxCommon_);
 	textureDatas.reserve(srvManager_->kMaxSRVCount_);
 }
 
 // インスタンスを破棄して終了処理を行う
-void TextureManager::Finalize() { instance.reset(); }
+void TextureManager::Finalize() {
+	if (srvManager_) {
+		srvManager_->Finalize();
+		srvManager_.reset();
+	}
+	textureDatas.clear();
+	dxCommon_ = nullptr;
+	instance.reset();
+}
 
 // ファイルパス指定でテクスチャを読み込み、SRV を作成する
 void TextureManager::LoadTextureName(const std::string& filePath) {

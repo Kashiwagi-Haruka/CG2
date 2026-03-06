@@ -51,7 +51,7 @@ void ParticleManager::SetBlendMode(BlendMode mode) { currentBlendMode_ = mode; }
 
 void ParticleManager::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
-	srvManager_ = SrvManager::GetInstance();
+	srvManager_ = TextureManager::GetInstance()->GetSrvManager();
 
 	srand((unsigned int)time(nullptr));
 
