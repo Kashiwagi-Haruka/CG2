@@ -560,9 +560,12 @@ void SampleScene::Draw() {
 	portalTextureCameraB_->Update();
 
 	portalRenderTextureA_.BeginRender();
+	portalTextureCameraA_->Update(); 
+	assert(Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList() != nullptr);
 	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraA_.get());
 	DrawSceneGeometryForPortalTexture(portalTextureCameraA_.get());
 	portalRenderTextureA_.TransitionToShaderResource();
+
 
 	portalRenderTextureB_.BeginRender();
 	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraB_.get());
@@ -586,8 +589,6 @@ void SampleScene::SetSceneCameraForDraw(Camera* camera) {
 	animatedCubeObj_->SetCamera(camera);
 	humanObj_->SetCamera(camera);
 	spherePrimitive_->SetCamera(camera);
-	portalMeshA_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera);
-	portalMeshB_->SetObjectCamera(/*portalObjectCamera_.get()*/ camera);
 }
 
 void SampleScene::UpdateSceneCameraMatricesForDraw() {
@@ -600,6 +601,7 @@ void SampleScene::UpdateSceneCameraMatricesForDraw() {
 }
 
 void SampleScene::DrawSceneGeometryForPortalTexture(Camera* camera) {
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera);
 	uvBallObj_->SetCamera(camera);
 	fieldObj_->SetCamera(camera);
 	planeGltf_->SetCamera(camera);
