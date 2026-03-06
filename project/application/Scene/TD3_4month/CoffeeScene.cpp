@@ -36,6 +36,8 @@ void CoffeeScene::Initialize() {
 	debugCamera_->Initialize();
 	debugCamera_->SetTranslation(cameraTransform_.translate);
 
+	Object3dCommon::GetInstance()->SetRandomNoiseEnabled(false);
+
 	for (auto& wall : roomWalls_) {
 		wall->Initialize(Primitive::Plane);
 		wall->SetCamera(camera_.get());
@@ -44,9 +46,9 @@ void CoffeeScene::Initialize() {
 	}
 
 	// 床 (+Y を向く)
-	roomWalls_[0]->SetScale({kRoomWidth, kRoomDepth, 1.0f});
-	roomWalls_[0]->SetRotate({std::numbers::pi_v<float> * 0.5f, 0.0f, 0.0f});
-	roomWalls_[0]->SetTranslate({0.0f, -halfHeight, 0.0f});
+	roomWalls_[1]->SetScale({kRoomWidth, kRoomDepth, 1.0f});
+	roomWalls_[1]->SetRotate({std::numbers::pi_v<float> * 0.5f, 0.0f, 0.0f});
+	roomWalls_[1]->SetTranslate({0.0f, -halfHeight, 0.0f});
 
 	// 天井 (-Y を向く)
 	roomWalls_[1]->SetScale({kRoomWidth, kRoomDepth, 1.0f});
@@ -55,12 +57,12 @@ void CoffeeScene::Initialize() {
 
 	// 手前壁 (-Z を向く)
 	roomWalls_[2]->SetScale({kRoomWidth, kRoomHeight, 1.0f});
-	roomWalls_[2]->SetRotate({0.0f, 0.0f, 0.0f});
+	roomWalls_[2]->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
 	roomWalls_[2]->SetTranslate({0.0f, 0.0f, halfDepth});
 
 	// 奥壁 (+Z を向く)
 	roomWalls_[3]->SetScale({kRoomWidth, kRoomHeight, 1.0f});
-	roomWalls_[3]->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
+	roomWalls_[3]->SetRotate({0.0f, 0.0f, 0.0f});
 	roomWalls_[3]->SetTranslate({0.0f, 0.0f, -halfDepth});
 
 	// 左壁 (+X を向く)
@@ -72,8 +74,6 @@ void CoffeeScene::Initialize() {
 	roomWalls_[5]->SetScale({kRoomDepth, kRoomHeight, 1.0f});
 	roomWalls_[5]->SetRotate({0.0f, std::numbers::pi_v<float> * 0.5f, 0.0f});
 	roomWalls_[5]->SetTranslate({halfWidth, 0.0f, 0.0f});
-
-	
 }
 
 void CoffeeScene::Update() {
@@ -120,9 +120,10 @@ void CoffeeScene::Update() {
 
 void CoffeeScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommonNoCull();
-	for (auto& wall : roomWalls_) {
-		wall->Draw();
-	}
+	//for (auto& wall : roomWalls_) {
+	//	wall->Draw();
+	//}
+	roomWalls_[0]->Draw();
 }
 
 void CoffeeScene::Finalize() {}

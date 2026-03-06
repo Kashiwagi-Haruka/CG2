@@ -58,21 +58,10 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="application\GameObject\KeyBindConfig.cpp" />
-    <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Math\RigidBody.cpp" />
-    <ClCompile Include="externals\imgui\imgui.cpp" />
-    <ClCompile Include="externals\imgui\imgui_demo.cpp" />
-    <ClCompile Include="externals\imgui\imgui_draw.cpp" />
-    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp" />
-    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
-    <ClCompile Include="externals\imgui\imgui_tables.cpp" />
-    <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Engine\ImGui\ImGuiManager.cpp" />
     <ClCompile Include="application\main.cpp" />
     <ClCompile Include="Engine\base\WinApp.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3d.cpp" />
-    <ClCompile Include="Engine\Log\Logger.cpp" />
     <ClCompile Include="Engine\StringUtillity\StringUtility.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Object3d\Object3dCommon.cpp" />
     <ClCompile Include="Engine\Texture\Sprite\Sprite.cpp" />
@@ -97,8 +86,6 @@
     <ClCompile Include="application\Scene\TD3_4month\ShadowGameScene.cpp" />
     <ClCompile Include="application\GameObject\Player\Player.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\YoshidaMath.cpp" />
-    <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp" />
-    <ClCompile Include="Engine\Editor\Hierarchy.cpp" />
     <ClCompile Include="application\GameObject\TestField\TestField.cpp" />
     <ClCompile Include="application\GameObject\Portal\Portal.cpp" />
     <ClCompile Include="application\GameObject\WarpPos\WarpPos.cpp" />
@@ -107,11 +94,9 @@
     <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp" />
     <ClCompile Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.cpp" />
     <ClCompile Include="Engine\Texture\PSO\SpriteCreatePSO.cpp" />
-    <ClCompile Include="Engine\Editor\Inspector.cpp" />
     <ClCompile Include="Engine\Editor\ToolBar.cpp" />
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
     <ClCompile Include="application\GameObject\WhiteBoard\WalkWhiteBoard.cpp" />
-    <ClCompile Include="application\GameObject\Key\Key.cpp" />
     <ClCompile Include="application\GameObject\UI\RaySprite.cpp" />
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Portal\PortalMesh.cpp" />
@@ -191,26 +176,60 @@
     <ClCompile Include="application\GameTimer\GameTimer.cpp">
       <Filter>Application</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Editor\Hierarchy.cpp">
+      <Filter>Engine\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui.cpp">
+      <Filter>Extarnals</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_demo.cpp">
+      <Filter>Extarnals</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_draw.cpp">
+      <Filter>Extarnals</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
+      <Filter>Extarnals</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
+      <Filter>Extarnals</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_tables.cpp">
+      <Filter>Extarnals</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
+      <Filter>Extarnals</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\ImGui\ImGuiManager.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Input\Input.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\Inspector.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\Key\Key.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\GameObject\KeyBindConfig.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Log\Logger.cpp">
+      <Filter>Engine\Logger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="application\GameObject\KeyBindConfig.h" />
     <ClInclude Include="Engine\Texture\Material.h" />
     <ClInclude Include="Engine\Math\QuaternionTransform.h" />
-    <ClInclude Include="Engine\Input\Input.h" />
     <ClInclude Include="Engine\Math\RigidBody.h" />
     <ClInclude Include="Engine\Math\Transform.h" />
     <ClInclude Include="Engine\Texture\Light\PointLight.h" />
     <ClInclude Include="Engine\Texture\Light\SpotLight.h" />
     <ClInclude Include="Engine\Texture\SkinningData.h" />
-    <ClInclude Include="externals\imgui\imconfig.h" />
-    <ClInclude Include="externals\imgui\imgui.h" />
-    <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
-    <ClInclude Include="externals\imgui\imgui_impl_win32.h" />
-    <ClInclude Include="externals\imgui\imgui_internal.h" />
-    <ClInclude Include="externals\imgui\imstb_rectpack.h" />
-    <ClInclude Include="externals\imgui\imstb_textedit.h" />
-    <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="Engine\ImGui\ImGuiManager.h" />
     <ClInclude Include="Engine\Math\Matrix4x4.h" />
     <ClInclude Include="Engine\Math\Vector2.h" />
     <ClInclude Include="Engine\Math\Vector3.h" />
@@ -218,7 +237,6 @@
     <ClInclude Include="Engine\Texture\VertexData.h" />
     <ClInclude Include="Engine\base\WinApp.h" />
     <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3d.h" />
-    <ClInclude Include="Engine\Log\Logger.h" />
     <ClInclude Include="Engine\StringUtillity\StringUtility.h" />
     <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3dCommon.h" />
     <ClInclude Include="Engine\Texture\Sprite\Sprite.h" />
@@ -243,8 +261,6 @@
     <ClInclude Include="application\Scene\TD3_4month\ShadowGameScene.h" />
     <ClInclude Include="application\GameObject\Player\Player.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\YoshidaMath.h" />
-    <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h" />
-    <ClInclude Include="Engine\Editor\Hierarchy.h" />
     <ClInclude Include="application\GameObject\TestField\TestField.h" />
     <ClInclude Include="application\GameObject\Portal\Portal.h" />
     <ClInclude Include="application\GameObject\WarpPos\WarpPos.h" />
@@ -253,7 +269,6 @@
     <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h" />
     <ClInclude Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.h" />
     <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h" />
-    <ClInclude Include="Engine\Editor\Inspector.h" />
     <ClInclude Include="Engine\Editor\ToolBar.h" />
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
     <ClInclude Include="application\GameObject\WhiteBoard\WalkWhiteBoard.h" />
@@ -357,6 +372,51 @@
     <ClInclude Include="application\Scene\GameScene.h">
       <Filter>Application</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Editor\Hierarchy.h">
+      <Filter>Engine\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imconfig.h">
+      <Filter>Extarnals</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui.h">
+      <Filter>Extarnals</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
+      <Filter>Extarnals</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_impl_win32.h">
+      <Filter>Extarnals</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_internal.h">
+      <Filter>Extarnals</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imstb_truetype.h">
+      <Filter>Extarnals</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imstb_rectpack.h">
+      <Filter>Extarnals</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imstb_textedit.h">
+      <Filter>Extarnals</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ImGui\ImGuiManager.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Input\Input.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\Inspector.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="application\GameObject\KeyBindConfig.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Log\Logger.h">
+      <Filter>Engine\Logger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -413,6 +473,12 @@
     </Filter>
     <Filter Include="Engine\Editor">
       <UniqueIdentifier>{ee1ad1f2-04fb-4685-be96-b6570dac8dc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extarnals">
+      <UniqueIdentifier>{1b71dfba-33f3-4d56-934b-c8ff02b5df3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Logger">
+      <UniqueIdentifier>{27de33ab-02da-4769-835c-c24dfa293796}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
