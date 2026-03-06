@@ -23,7 +23,7 @@ CoffeeScene::CoffeeScene() {
 	cameraTransform_ = {
 	    .scale = {1.0f, 1.0f, 1.0f},
 	    .rotate = {0.0f, 0.0f, 0.0f},
-	    .translate = {0.0f, 0.0f, 0.0f},
+	    .translate = {0.0f, 1.5f, 0.0f},
 	};
 }
 
@@ -48,32 +48,32 @@ void CoffeeScene::Initialize() {
 	// 床 (+Y を向く)
 	roomWalls_[0]->SetScale({kRoomWidth, kRoomDepth, 1.0f});
 	roomWalls_[0]->SetRotate({std::numbers::pi_v<float> * 0.5f, 0.0f, 0.0f});
-	roomWalls_[0]->SetTranslate({0.0f, -halfHeight, 0.0f});
+	roomWalls_[0]->SetTranslate({0.0f, 0.0f, 0.0f});
 
 	// 天井 (-Y を向く)
 	roomWalls_[1]->SetScale({kRoomWidth, kRoomDepth, 1.0f});
 	roomWalls_[1]->SetRotate({-std::numbers::pi_v<float> * 0.5f, 0.0f, 0.0f});
-	roomWalls_[1]->SetTranslate({0.0f, halfHeight, 0.0f});
+	roomWalls_[1]->SetTranslate({0.0f, kRoomHeight, 0.0f});
 
 	// 手前壁 (-Z を向く)
 	roomWalls_[2]->SetScale({kRoomWidth, kRoomHeight, 1.0f});
 	roomWalls_[2]->SetRotate({0.0f, 0.0f, 0.0f});
-	roomWalls_[2]->SetTranslate({0.0f, 0.0f, halfDepth});
+	roomWalls_[2]->SetTranslate({0.0f, halfHeight, halfDepth});
 
 	// 奥壁 (+Z を向く)
 	roomWalls_[3]->SetScale({kRoomWidth, kRoomHeight, 1.0f});
 	roomWalls_[3]->SetRotate({0.0f, std::numbers::pi_v<float>, 0.0f});
-	roomWalls_[3]->SetTranslate({0.0f, 0.0f, -halfDepth});
+	roomWalls_[3]->SetTranslate({0.0f, halfHeight, -halfDepth});
 
 	// 左壁 (+X を向く)
 	roomWalls_[4]->SetScale({kRoomDepth, kRoomHeight, 1.0f});
 	roomWalls_[4]->SetRotate({0.0f, -std::numbers::pi_v<float> * 0.5f, 0.0f});
-	roomWalls_[4]->SetTranslate({-halfWidth, 0.0f, 0.0f});
+	roomWalls_[4]->SetTranslate({-halfWidth, halfHeight, 0.0f});
 
 	// 右壁 (-X を向く)
 	roomWalls_[5]->SetScale({kRoomDepth, kRoomHeight, 1.0f});
 	roomWalls_[5]->SetRotate({0.0f, std::numbers::pi_v<float> * 0.5f, 0.0f});
-	roomWalls_[5]->SetTranslate({halfWidth, 0.0f, 0.0f});
+	roomWalls_[5]->SetTranslate({halfWidth, halfHeight, 0.0f});
 }
 
 void CoffeeScene::Update() {
@@ -113,7 +113,7 @@ void CoffeeScene::Update() {
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	DirectionalLight directionalLight{};
 	directionalLight.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	directionalLight.direction = Function::Normalize({0.1f, -1.0f, -0.2f});
+	directionalLight.direction = {0.1f, -0.5f, -0.2f};
 	directionalLight.intensity = 1.0f;
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight);
 }
