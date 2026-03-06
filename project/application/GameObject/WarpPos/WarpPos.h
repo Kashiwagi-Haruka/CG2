@@ -3,10 +3,10 @@
 #include<memory>
 #include"Object3d/Object3d.h"
 #include"Primitive/Primitive.h"
-class WarpPos1
+class WarpPos
 {
 public:
-    WarpPos1();
+    WarpPos();
     void SetCamera(Camera* camera);
     void SetTransform(Transform& transform) {transform_ = transform; };
     Vector3& GetTranslate() { return transform_.translate; };

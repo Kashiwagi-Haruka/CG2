@@ -42,7 +42,8 @@ namespace YoshidaMath {
         uint32_t collisionMask_ = 0xffffffff;		// 衝突マスク
         float radius_ = 1.0f;	// 衝突半径
         AABB AABB_;
-#ifdef _DEBUG
+
+#ifdef USE_IMGUI
         //デバック用
         std::unique_ptr<Primitive>primitive_;
 #endif // DEBUG

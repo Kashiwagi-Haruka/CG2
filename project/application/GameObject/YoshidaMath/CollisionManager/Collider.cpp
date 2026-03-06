@@ -4,7 +4,8 @@
 #include "Object3d/Object3dCommon.h"
 YoshidaMath::Collider::Collider()
 {
-#ifdef _DEBUG
+
+#ifdef USE_IMGUI
 
     primitive_ = std::make_unique<Primitive>();
 #endif // _DEBUG
@@ -16,7 +17,8 @@ YoshidaMath::Collider::Collider()
 
 void YoshidaMath::Collider::SetCamera(Camera* camera)
 {
-#ifdef _DEBUG
+
+#ifdef USE_IMGUI
     primitive_->SetCamera(camera);
 #endif // _DEBUG
 }
@@ -25,7 +27,8 @@ void YoshidaMath::Collider::SetRadius(float radius)
 {
    type_ = ColliderType::kSphere;
     radius_ = radius;
-#ifdef _DEBUG
+
+#ifdef USE_IMGUI
     if (primitive_) {
         primitive_->Initialize(Primitive::Sphere);
         float scale = radius;
@@ -40,7 +43,8 @@ void YoshidaMath::Collider::SetAABB(const AABB& aabb) {
 
     type_ = ColliderType::kAABB;
    AABB_ = aabb;
-#ifdef _DEBUG
+
+#ifdef USE_IMGUI
     if (primitive_) {
         primitive_->Initialize(Primitive::Box);
         Vector3 scale =
@@ -57,7 +61,8 @@ void YoshidaMath::Collider::SetAABB(const AABB& aabb) {
 
 void YoshidaMath::Collider::ColliderUpdate()
 {
-#ifdef _DEBUG
+
+#ifdef USE_IMGUI
     if (primitive_) {
         primitive_->SetColor({ 1.0f,1.0f,0.0f,0.5f });
         if (type_ == kAABB) {
@@ -73,7 +78,8 @@ void YoshidaMath::Collider::ColliderUpdate()
 
 void YoshidaMath::Collider::ColliderDraw()
 {
-#ifdef _DEBUG
+
+#ifdef USE_IMGUI
     if (primitive_) {
         primitive_->UpdateCameraMatrices();
         primitive_->Draw();
@@ -83,7 +89,8 @@ void YoshidaMath::Collider::ColliderDraw()
 
 void YoshidaMath::Collider::OnCollisionCollider()
 {
-#ifdef _DEBUG
+
+#ifdef USE_IMGUI
     if (primitive_) {
         primitive_->SetColor({ 1.0f,0.0f,0.0f,0.5f });
     }

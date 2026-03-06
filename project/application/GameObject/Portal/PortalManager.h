@@ -13,10 +13,9 @@ public:
 	void Initialize();
 	void UpdateWhiteBoard();
 	void UpdatePortal();
-
-	void ShadowDraw();
-	void ObjDraw(bool drawParticle = true);
-	void SetPlayerCamera(PlayerCamera* camera);
+	void SetCamera(Camera* camera);
+	void Draw(bool isShadow, bool drawParticle = true);
+	void SetPlayerCamera(PlayerCamera* playerCamera);
 	/// @brief 作成できるポータル地点との当たり判定を作成する
 	/// @param timeCardWatch 携帯打刻機
 	/// @param camera かめら
@@ -26,8 +25,10 @@ public:
 	std::vector<std::unique_ptr<WhiteBoard>>& GetWhiteBoards() { return whiteBoards_; }
 
 private:
+
 	void SpawnPortal(WhiteBoard* board, const Vector3& warpPos);
 	void DrawWhiteBoard();
+	void DrawPortal(bool isShadow);
 	std::vector<std::unique_ptr<WhiteBoard>> whiteBoards_;
 	std::vector<std::unique_ptr<Portal>> portals_;
 	std::unique_ptr<PortalParticle> portalParticle_ = nullptr;

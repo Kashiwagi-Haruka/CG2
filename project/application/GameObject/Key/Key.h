@@ -17,8 +17,8 @@ public:
     void Update();
     void Draw();
     void SetPlayerCamera(PlayerCamera* camera);
+    void SetCamera(Camera* camera);
     void SetModel(const std::string& filePath);
-    AABB GetAABB();
     Transform& GetTransform() { return collisionTransform_; }
     void CheckCollision();
     bool OnCollisionRay();

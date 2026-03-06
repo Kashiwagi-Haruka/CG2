@@ -23,6 +23,7 @@ void TestField::Initialize()
 void TestField::Update()
 {
     plane_->SetTransform(transform_);
+    plane_->SetUvTransform({ 100.0f,100.0f,100.0f }, {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f});
     plane_->Update();
 }
 
