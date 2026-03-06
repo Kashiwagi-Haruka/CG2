@@ -40,13 +40,9 @@ void GameBase::Finalize() {
 
 	ParticleManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
-
+	Hierarchy::GetInstance()->Finalize();
 	SpriteCommon::GetInstance()->Finalize();
 	Object3dCommon::GetInstance()->Finalize();
-
-	// SRVディスクリプタヒープが Device を参照するため、
-	// DirectXCommon を解放する前に破棄して live object を残さない。
-	SrvManager::GetInstance()->Finalize();
 
 	if (dxCommon_) {
 		dxCommon_->Finalize();
@@ -66,13 +62,12 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 	dxCommon_ = std::make_unique<DirectXCommon>();
 	dxCommon_->initialize(winApp_.get());
-	SrvManager::GetInstance()->Initialize(dxCommon_.get());
+	TextureManager::GetInstance()->Initialize(dxCommon_.get());
 
 	Input::GetInstance()->Initialize(winApp_.get());
 	imguiM_ = std::make_unique<ImGuiManager>();
 	imguiM_->Initialize(winApp_.get(), dxCommon_.get());
 	Audio::GetInstance()->InitializeIXAudio();
-	TextureManager::GetInstance()->Initialize(dxCommon_.get());
 	ParticleManager::GetInstance()->Initialize(dxCommon_.get());
 	ModelManager::GetInstance()->Initialize(dxCommon_.get());
 

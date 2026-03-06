@@ -30,6 +30,27 @@ Hierarchy* Hierarchy::GetInstance() {
 	static Hierarchy instance;
 	return &instance;
 }
+void Hierarchy::Finalize() {
+	objects_.clear();
+	objectNames_.clear();
+	editorTransforms_.clear();
+	editorMaterials_.clear();
+
+	primitives_.clear();
+	primitiveNames_.clear();
+	primitiveEditorTransforms_.clear();
+	primitiveEditorMaterials_.clear();
+
+	selectionBoxPrimitive_.reset();
+	editorGridPlane_.reset();
+
+	selectedObjectIndex_ = 0;
+	selectedIsPrimitive_ = false;
+	selectionBoxDirty_ = true;
+	editorGridDirty_ = true;
+	loadedSceneName_.clear();
+	ResetForSceneChange();
+}
 std::string Hierarchy::GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const {
 	const SceneManager* sceneManager = SceneManager::GetInstance();
 	if (!sceneManager) {

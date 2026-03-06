@@ -1,13 +1,8 @@
-#pragma once
-#include <Windows.h>
-#include <cstdint>
-#include <d3d12.h>
-#include <memory>
 #include <wrl.h>
+#include <d3d12.h>
+#include <cstdint>
 class DirectXCommon;
 class SrvManager {
-	static std::unique_ptr<SrvManager> instance;
-
 	DirectXCommon* directXCommon_ = nullptr;
 
 	uint32_t descriptorSize_;
@@ -22,7 +17,6 @@ public:
 	SrvManager() = default;
 	~SrvManager() = default;
 
-	static SrvManager* GetInstance();
 	void Finalize();
 
 	void Initialize(DirectXCommon* dxCommon);

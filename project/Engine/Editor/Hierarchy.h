@@ -33,6 +33,7 @@ public:
 	void SetPlayMode(bool isPlaying);
 	bool IsPlayMode() const { return isPlaying_; }
 	bool LoadObjectEditorsFromJsonIfExists(const std::string& filePath);
+	void Finalize();
 
 private:
 	struct EditorSnapshot {

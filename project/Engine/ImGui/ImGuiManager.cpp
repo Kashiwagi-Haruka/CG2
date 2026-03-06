@@ -8,6 +8,7 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #endif
 #include "DirectXCommon.h"
+#include "TextureManager.h"
 #include "SrvManager/SrvManager.h"
 #include "WinApp.h"
 #include <algorithm>
@@ -17,7 +18,7 @@
 
 void ImGuiManager::Initialize([[maybe_unused]] WinApp* winApp, [[maybe_unused]] DirectXCommon* dxCommon) {
 #ifdef USE_IMGUI
-	auto* srvManager = SrvManager::GetInstance();
+	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
 	dxCommon_ = dxCommon;
 	winApp_ = winApp;
 	IMGUI_CHECKVERSION();
@@ -113,7 +114,7 @@ void ImGuiManager::End() {
 
 void ImGuiManager::Draw([[maybe_unused]] DirectXCommon* dxCommon) {
 #ifdef USE_IMGUI
-	auto* srvManager = SrvManager::GetInstance();
+	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
 	if (!srvManager->GetDescriptorHeap().Get() || !dxCommon->GetCommandList()) {
 		OutputDebugStringA("ImGui Render Error: srvDescriptorHeap_ or commandList_ is null\n");
 		return;

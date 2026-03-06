@@ -17,12 +17,21 @@ TextureManager* TextureManager::GetInstance() {
 // 利用する DirectX 共通機能と SRV マネージャーを設定する
 void TextureManager::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
-	srvManager_ = SrvManager::GetInstance();
+	srvManager_ = std::make_unique<SrvManager>();
+	srvManager_->Initialize(dxCommon_);
 	textureDatas.reserve(srvManager_->kMaxSRVCount_);
 }
 
 // インスタンスを破棄して終了処理を行う
-void TextureManager::Finalize() { instance.reset(); }
+void TextureManager::Finalize() {
+	if (srvManager_) {
+		srvManager_->Finalize();
+		srvManager_.reset();
+	}
+	textureDatas.clear();
+	dxCommon_ = nullptr;
+	instance.reset();
+}
 
 // ファイルパス指定でテクスチャを読み込み、SRV を作成する
 void TextureManager::LoadTextureName(const std::string& filePath) {
@@ -263,8 +272,16 @@ DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t srvIndex) {
 			return data.metadata;
 		}
 	}
-	assert(false && "Invalid srvIndex");
+
+	// RenderTexture など TextureManager の map 管理外の SRV が来るケースでは
+	// 参照可能なダミー値を返してアサート終了を避ける。
 	static DirectX::TexMetadata dummy{};
+	dummy.width = 1;
+	dummy.height = 1;
+	dummy.mipLevels = 1;
+
+	std::string log = "[TextureManager] Warning: metadata not found for srvIndex=" + std::to_string(srvIndex) + "\n";
+	OutputDebugStringA(log.c_str());
 	return dummy;
 }
 // SRV インデックスから GPU SRV ハンドルを取得する

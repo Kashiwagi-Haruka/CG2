@@ -88,7 +88,7 @@ void Sprite::Draw() {
 	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&ibv);
 
 	// ヒープ、ルートパラメータ等をセット（すでにやってる場合は不要）
-	ID3D12DescriptorHeap* heaps[] = {SrvManager::GetInstance()->GetDescriptorHeap().Get()};
+	ID3D12DescriptorHeap* heaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
 	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(heaps), heaps);
 	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 	SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource->GetGPUVirtualAddress());

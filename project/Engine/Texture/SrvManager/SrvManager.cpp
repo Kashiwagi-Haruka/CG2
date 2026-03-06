@@ -1,16 +1,11 @@
 #include "SrvManager.h"
 #include "DirectXCommon.h"
 #include <cassert>
-#include <memory>
-std::unique_ptr<SrvManager> SrvManager::instance = nullptr;
-SrvManager* SrvManager::GetInstance() {
-	if (instance == nullptr) {
-		instance = std::make_unique<SrvManager>();
-	}
-	return instance.get();
+void SrvManager::Finalize() {
+	descriptorHeap_.Reset();
+	directXCommon_ = nullptr;
+	useIndex = 0;
 }
-
-void SrvManager::Finalize() { instance.reset(); }
 const uint32_t SrvManager::kMaxSRVCount_ = 512;
 void SrvManager::Initialize(DirectXCommon* dxCommon) {
 	directXCommon_ = dxCommon;

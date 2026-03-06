@@ -81,7 +81,7 @@ void Model::Draw() { Draw(nullptr); }
 void Model::Draw(const SkinCluster* skinCluster) { Draw(skinCluster, nullptr); }
 void Model::Draw(const SkinCluster* skinCluster, const ID3D12Resource* materialResourceOverride) {
 	// --- SRVヒープをバインド ---
-	ID3D12DescriptorHeap* descriptorHeaps[] = {SrvManager::GetInstance()->GetDescriptorHeap().Get()};
+	ID3D12DescriptorHeap* descriptorHeaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
 
 	ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
@@ -108,18 +108,18 @@ void Model::Draw(const SkinCluster* skinCluster, const ID3D12Resource* materialR
 	ModelCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvHandle);
 
 	// --- PointLight SRVのDescriptorTableを設定 ---
-	SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
 
 	// --- SpotLight SRVのDescriptorTableを設定 ---
-	SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(9, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(9, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
 
 	// --- AreaLight SRVのDescriptorTableを設定 ---
-	SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());
 
 	// --- Environment Map SRVのDescriptorTableを設定 ---
-	SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(11, Object3dCommon::GetInstance()->GetEnvironmentMapSrvIndex());
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(11, Object3dCommon::GetInstance()->GetEnvironmentMapSrvIndex());
 	if (!Object3dCommon::GetInstance()->IsShadowMapPassActive()) {
-		SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetShadowMapSrvIndex());
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetShadowMapSrvIndex());
 	}
 	// --- 描画！（DrawCall）---
 	if (!modelData_.indices.empty()) {
