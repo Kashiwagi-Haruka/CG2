@@ -103,6 +103,11 @@ void WalkWhiteBoard::Draw()
 #endif
 }
 
+void WalkWhiteBoard::ResetCollisionAttribute()
+{
+    SetCollisionAttribute(kCollisionEnemy);
+}
+
 void WalkWhiteBoard::Animation()
 {
     float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();

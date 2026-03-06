@@ -21,6 +21,7 @@ public:
     void SetModel(const std::string& filePath);
     AABB GetAABB();
     Transform& GetTransform() { return collisionTransform_; }
+    virtual void ResetCollisionAttribute();
 protected:
     std::unique_ptr<Object3d>obj_ = nullptr;
 #ifdef _DEBUG

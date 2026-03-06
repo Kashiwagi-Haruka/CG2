@@ -4,6 +4,7 @@
 #include<cassert>
 #include"GameObject/YoshidaMath/Easing.h"
 
+bool Portal::isPlayerHit_ = false;
 //音楽
 SoundData Portal::warpSE_;
 
@@ -20,9 +21,14 @@ void Portal::UnLoadSE()
 
 void Portal::OnCollision(Collider* collider)
 {
-    if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-        Audio::GetInstance()->SoundPlayWave(warpSE_, false);
-        isPlayerHit_ = true;
+    if (!isPlayerHit_) {
+        if (collider->GetCollisionAttribute() == kCollisionPlayer) {
+            if (warpCoolTimer_ == kWarpTime_) {
+                warpCoolTimer_ = 0.0f;
+                Audio::GetInstance()->SoundPlayWave(warpSE_, false);
+                isPlayerHit_ = true;
+            }
+        }
     }
 }
 
@@ -48,24 +54,26 @@ Portal::Portal()
 
 Portal::~Portal()
 {
-   
+
 }
 
 void Portal::Initialize()
 {
+    warpCoolTimer_ = kWarpTime_;
+
     isPlayerHit_ = false;
     scaleTimer_ = 0.0f;
     transform_ = { .scale = {0.0f,0.0f,0.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
-    
+
     portalCircle_->Initialize(Primitive::Circle, 48);
- /*   portalCircle_->SetColor({ 0.3f, 0.7f, 1.0f, 1.0f });*/
+    /*   portalCircle_->SetColor({ 0.3f, 0.7f, 1.0f, 1.0f });*/
     portalCircle_->SetEnableLighting(false);
-    
+
     ring_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 128);
     //ライティングしない
     ring_->SetEnableLighting(false);
     ring_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
- /*   ring_->SetColor({ 0.3f, 0.7f, 1.0f, 1.0f });*/
+    /*   ring_->SetColor({ 0.3f, 0.7f, 1.0f, 1.0f });*/
 
     uvRotateZ_ = 0.0f;
     sphere_ = { .center = {transform_.translate},.radius = 0.5f };
@@ -86,7 +94,10 @@ void Portal::Update()
 {
     isPlayerHit_ = false;
 
-    uvRotateZ_ += YoshidaMath::kDeltaTime*2.0f;
+    warpCoolTimer_ += YoshidaMath::kDeltaTime;
+    warpCoolTimer_ = std::clamp(warpCoolTimer_, 0.0f, kWarpTime_);
+
+    uvRotateZ_ += YoshidaMath::kDeltaTime * 2.0f;
     ring_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, uvRotateZ_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
     SetPortalWorldMatrix();
     ring_->Update();
@@ -102,10 +113,7 @@ void Portal::DrawPortals() {
 
 void Portal::DrawRings() {
     //Object3dCommon::GetInstance()->DrawCommonNoCull();
-
-        ring_->Draw();
-  
-    
+    ring_->Draw();
 }
 
 void Portal::DrawWarpPos()
@@ -140,7 +148,7 @@ void Portal::UpdatePortalCamera(const Transform& destinationPortal, Camera* outC
 void Portal::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals)
 {
     auto* camera = GetCamera();
-    if (!sceneCamera_  && !camera) {
+    if (!sceneCamera_ && !camera) {
         return;
     }
 
@@ -151,7 +159,7 @@ void Portal::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneW
         portalRenderTexture_->TransitionToShaderResource();
     }
 
-    portalCircle_->SetPortalProjectionMatrices(camera->GetViewProjectionMatrix(), camera->GetViewProjectionMatrix(),camera->GetWorldMatrix(),camera->GetWorldMatrix());
+    portalCircle_->SetPortalProjectionMatrices(camera->GetViewProjectionMatrix(), camera->GetViewProjectionMatrix(), camera->GetWorldMatrix(), camera->GetWorldMatrix());
 
 }
 
@@ -194,7 +202,7 @@ void Portal::SetPortalWorldMatrix()
 
     portalCircle_->SetWorldMatrix(worldMatrix);
     transform_.translate -= forward * 0.125f;
-     worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+    worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
     ring_->SetWorldMatrix(worldMatrix);
 
