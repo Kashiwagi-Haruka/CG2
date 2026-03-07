@@ -395,6 +395,7 @@ void ShadowGameScene::DrawModel()
     Object3dCommon::GetInstance()->BeginShadowMapPass();
     Object3dCommon::GetInstance()->DrawCommonShadow();
 
+
     DrawGameObject(true, false);
 
     Object3dCommon::GetInstance()->EndShadowMapPass();
@@ -421,7 +422,9 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool isDrawParticle)
     timeCardWatch_->Draw();
     //懐中電灯
     flashlight_->Draw();
-    collisionManager_->DrawColliders();
+	if (!isShadow) {
+		collisionManager_->DrawColliders();
+	}
     // 鍵の描画処理
     key_->Draw();
     // 枝豆の描画処理
