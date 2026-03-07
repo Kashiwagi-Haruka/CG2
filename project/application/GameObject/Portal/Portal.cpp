@@ -47,7 +47,7 @@ Portal::Portal()
     SetCollisionMask(kCollisionPlayer);
 
     ring_ = std::make_unique<Primitive>();
-    portalCircle_ = std::make_unique<Primitive>();
+    portalCircle_ = std::make_unique<PortalMesh>();
     //ワープ座標
     warpPos_ = std::make_unique<WarpPos>();
 }

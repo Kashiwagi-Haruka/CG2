@@ -9,6 +9,7 @@
 #include "RenderTexture2D.h"
 #include "Object3d/Object3dCommon.h"
 #include <functional>
+#include "Mesh/Portal/PortalMesh.h"
 
 class Camera;
 class Portal : public YoshidaMath::Collider
@@ -60,7 +61,7 @@ private:
     //音楽
     static SoundData warpSE_;
     std::unique_ptr<Primitive>ring_ = nullptr;
-    std::unique_ptr<Primitive>portalCircle_ = nullptr;
+    std::unique_ptr<PortalMesh>portalCircle_ = nullptr;
     Transform transform_ = {};
     float uvRotateZ_ = 0.0f;
     Sphere sphere_ = { 0.0f };
