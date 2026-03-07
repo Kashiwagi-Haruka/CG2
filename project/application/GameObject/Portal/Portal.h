@@ -68,6 +68,7 @@ private:
     //ワープ座標
     std::unique_ptr<WarpPos> warpPos_ = nullptr;
     std::unique_ptr<RenderTexture2D> portalRenderTexture_ = nullptr;
+	std::unique_ptr<Camera> portalTextureCamera_ = nullptr;
     Transform* parentTransform = nullptr;
 };
 

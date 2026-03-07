@@ -3,6 +3,8 @@
 #include"application/GameObject/YoshidaMath/YoshidaMath.h"
 #include<cassert>
 #include"GameObject/YoshidaMath/Easing.h"
+#include "Object3d/Object3dCommon.h"
+#include "DirectXCommon.h"
 
 bool Portal::isPlayerHit_ = false;
 //音楽
@@ -151,8 +153,11 @@ void Portal::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneW
     if (portalRenderTexture_ && portalRenderTexture_->IsReady()) {
         UpdatePortalCamera(warpPos_->GetTransform(), camera);
         portalRenderTexture_->BeginRender();
-        drawSceneWithoutPortals(camera);
-        portalRenderTexture_->TransitionToShaderResource();
+		Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCamera_.get());
+		DrawSceneGeometryForPortalTexture(portalTextureCamera_.get());
+		portalRenderTexture_->TransitionToShaderResource();
+		Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
+		
     }
 }
 
