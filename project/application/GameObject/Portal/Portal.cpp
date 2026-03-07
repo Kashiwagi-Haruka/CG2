@@ -65,9 +65,8 @@ void Portal::Initialize()
     scaleTimer_ = 0.0f;
     transform_ = { .scale = {0.0f,0.0f,0.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
 
-    portalCircle_->Initialize(Primitive::Circle, 48);
+    portalCircle_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
     /*   portalCircle_->SetColor({ 0.3f, 0.7f, 1.0f, 1.0f });*/
-    portalCircle_->SetEnableLighting(false);
 
     ring_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 128);
     //ライティングしない
@@ -84,10 +83,7 @@ void Portal::Initialize()
     portalRenderTexture_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, { 0.05f, 0.05f, 0.1f, 1.0f });
     if (portalRenderTexture_->IsReady()) {
         portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
-        portalCircle_->SetSecondaryTextureIndex(portalRenderTexture_->GetSrvIndex());
     }
-
-    portalCircle_->SetPortalProjectionEnabled(true);
 }
 
 void Portal::Update()
@@ -158,20 +154,16 @@ void Portal::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneW
         drawSceneWithoutPortals(camera);
         portalRenderTexture_->TransitionToShaderResource();
     }
-
-    portalCircle_->SetPortalProjectionMatrices(camera->GetViewProjectionMatrix(), camera->GetViewProjectionMatrix(), camera->GetWorldMatrix(), camera->GetWorldMatrix());
-
 }
 
 void Portal::UpdateCameraMatrices() {
-    portalCircle_->UpdateCameraMatrices();
     ring_->UpdateCameraMatrices();
 }
 
 void Portal::SetCamera(Camera* camera)
 {
     sceneCamera_ = camera;
-    portalCircle_->SetCamera(camera);
+	portalCircle_->SetObjectCamera(camera);
     ring_->SetCamera(camera);
     //ワープ地点
     warpPos_->SetCamera(camera);
