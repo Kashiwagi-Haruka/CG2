@@ -154,7 +154,6 @@ void Portal::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneW
         UpdatePortalCamera(warpPos_->GetTransform(), camera);
         portalRenderTexture_->BeginRender();
 		Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCamera_.get());
-		DrawSceneGeometryForPortalTexture(portalTextureCamera_.get());
 		portalRenderTexture_->TransitionToShaderResource();
 		Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
 		
