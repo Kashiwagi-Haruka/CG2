@@ -31,6 +31,15 @@ void InstancedObject3d::Initialize() {
 	/*Hierarchy* Hierarchy = Hierarchy::GetInstance();
 	Hierarchy->RegisterInstancedObject3d(this);*/
 }
+void InstancedObject3d::Initialize(const std::string& filePath) {
+	Initialize();
+	SetModel(filePath);
+	SetInstanceCount(2);
+	if (instanceTransforms_.size() >= 2) {
+		instanceTransforms_[0].translate = {-0.5f, 0.0f, 0.0f};
+		instanceTransforms_[1].translate = {0.5f, 0.0f, 0.0f};
+	}
+}
 namespace {
 bool IsIdentityMatrix(const Matrix4x4& matrix) {
 	const Matrix4x4 identity = Function::MakeIdentity4x4();
@@ -86,7 +95,14 @@ void InstancedObject3d::Update() {
 
 	UpdateCameraMatrices();
 }
-
+void InstancedObject3d::Update(Camera* camera, const Vector3& lightDirection) {
+	SetCamera(camera);
+	if (materialData_) {
+		const float lighting = std::clamp(-lightDirection.y, 0.2f, 1.0f);
+		materialData_->color = {lighting, lighting, lighting, 1.0f};
+	}
+	Update();
+}
 void InstancedObject3d::UpdateBillboard() {
 	// [0]=モデル描画用で使う
 
@@ -176,7 +192,24 @@ void InstancedObject3d::Draw() {
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
 	// --- 平行光源CBufferの場所を設定 ---
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
-	if (model_) {
+	if (!model_) {
+		return;
+	}
+	if (instanceTransforms_.empty()) {
+		model_->Draw(skinCluster_, materialResource_.Get());
+		return;
+	}
+
+	for (const Transform& instance : instanceTransforms_) {
+		const Vector3 finalTranslate = {
+		    spawnOrigin_.x + instance.translate.x,
+		    spawnOrigin_.y + instance.translate.y,
+		    spawnOrigin_.z + instance.translate.z,
+		};
+		const Matrix4x4 instanceWorld = Function::MakeAffineMatrix(instance.scale, instance.rotate, finalTranslate);
+		worldMatrix = Function::Multiply(instanceWorld, Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
+		UpdateCameraMatrices();
+		Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
 		model_->Draw(skinCluster_, materialResource_.Get());
 	}
 }
@@ -306,6 +339,29 @@ bool InstancedObject3d::IsSepiaEnabled() const {
 	}
 	return false;
 }
+void InstancedObject3d::SetInstanceCount(size_t count) {
+	instanceTransforms_.resize(
+	    count, Transform{
+	               {1.0f, 1.0f, 1.0f},
+                   {0.0f, 0.0f, 0.0f},
+                   {0.0f, 0.0f, 0.0f}
+    });
+}
+
+void InstancedObject3d::SetInstanceScale(size_t index, const Vector3& scale) {
+	if (index >= instanceTransforms_.size()) {
+		return;
+	}
+	instanceTransforms_[index].scale = scale;
+}
+
+void InstancedObject3d::SetInstanceOffset(size_t index, const Vector3& offset) {
+	if (index >= instanceTransforms_.size()) {
+		return;
+	}
+	instanceTransforms_[index].translate = offset;
+}
+
 void InstancedObject3d::CreateResources() {
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	cameraResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGpu));

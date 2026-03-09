@@ -13,6 +13,7 @@
 #include <d3d12.h>
 #include <memory>
 #include <string>
+#include <vector>
 #include <wrl.h>
 class Camera;
 struct SkinCluster;
@@ -53,11 +54,15 @@ class InstancedObject3d {
 	Vector3 uvRotate_ = {0.0f, 0.0f, 0.0f};
 	Vector3 uvTranslate_ = {0.0f, 0.0f, 0.0f};
 	Vector2 uvAnchor_ = {0.0f, 0.0f};
+	Vector3 spawnOrigin_ = {0.0f, 0.0f, 0.0f};
+	std::vector<Transform> instanceTransforms_{};
 
 public:
 	~InstancedObject3d();
 	void Initialize();
+	void Initialize(const std::string& filePath);
 	void Update();
+	void Update(Camera* camera, const Vector3& lightDirection);
 	void UpdateBillboard();
 	void UpdateCameraMatrices();
 	void Draw();
@@ -110,4 +115,10 @@ public:
 	Vector3 GetScale() { return transform_.scale; }
 	Transform GetTransform() const { return transform_; }
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix; }
+	void SetSpawnOrigin(const Vector3& origin) { spawnOrigin_ = origin; }
+	Vector3 GetSpawnOrigin() const { return spawnOrigin_; }
+	void SetInstanceCount(size_t count);
+	uint32_t GetInstanceCount() const { return static_cast<uint32_t>(instanceTransforms_.size()); }
+	void SetInstanceScale(size_t index, const Vector3& scale);
+	void SetInstanceOffset(size_t index, const Vector3& offset);
 };

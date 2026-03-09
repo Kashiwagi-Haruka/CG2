@@ -68,8 +68,14 @@ void CoffeeScene::Initialize() {
 	roomWalls_[5]->SetRotate({0.0f, std::numbers::pi_v<float> * 0.5f, 0.0f});
 	roomWalls_[5]->SetTranslate({halfWidth, halfHeight, 0.0f});
 
-		ModelManager::GetInstance()->LoadModel(kCoffeeModelDirectory, kCoffeeModelName);
+	ModelManager::GetInstance()->LoadModel(kCoffeeModelDirectory, kCoffeeModelName);
 	coffeeInstancedObject_->Initialize(kCoffeeModelName);
+	coffeeInstancedObject_->SetSpawnOrigin({0.0f, 0.35f, 0.0f});
+	coffeeInstancedObject_->SetInstanceCount(2);
+	coffeeInstancedObject_->SetInstanceScale(0, {0.45f, 0.45f, 0.45f});
+	coffeeInstancedObject_->SetInstanceScale(1, {0.65f, 0.65f, 0.65f});
+	coffeeInstancedObject_->SetInstanceOffset(0, {-0.9f, 0.0f, 0.0f});
+	coffeeInstancedObject_->SetInstanceOffset(1, {0.9f, 0.0f, 0.0f});
 }
 
 void CoffeeScene::Update() {
@@ -118,9 +124,9 @@ void CoffeeScene::Update() {
 
 void CoffeeScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
-	for (auto& wall : roomWalls_) {
-		wall->Draw();
-	}
+	//for (auto& wall : roomWalls_) {
+	//	wall->Draw();
+	//}
 	coffeeInstancedObject_->Draw();
 }
 

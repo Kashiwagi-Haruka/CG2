@@ -318,6 +318,7 @@
       <Filter>Engine\Texture</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.cpp" />
+    <ClCompile Include="application\GameSave\GameSave.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -620,6 +621,7 @@
     </ClInclude>
     <ClInclude Include="application\GameObject\Key\Key.h" />
     <ClInclude Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.h" />
+    <ClInclude Include="application\GameSave\GameSave.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
