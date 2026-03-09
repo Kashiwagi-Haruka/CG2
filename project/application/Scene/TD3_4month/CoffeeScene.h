@@ -8,6 +8,7 @@
 #include <array>
 #include <cstddef>
 #include <memory>
+#include <vector>
 
 class CoffeeScene : public BaseScene {
 private:
@@ -17,6 +18,9 @@ private:
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	std::unique_ptr<InstancedObject3d> coffeeInstancedObject_ = nullptr;
 	Transform cameraTransform_{};
+	std::vector<Vector3> coffeeOffsets_{};
+	std::vector<float> coffeeVelocitiesY_{};
+	std::vector<float> coffeeCollisionRadius_{};
 	bool useDebugCamera_ = false;
 
 public:
