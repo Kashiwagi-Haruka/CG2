@@ -319,6 +319,7 @@
     </ClCompile>
     <ClCompile Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.cpp" />
     <ClCompile Include="application\GameSave\GameSave.cpp" />
+    <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -622,6 +623,7 @@
     <ClInclude Include="application\GameObject\Key\Key.h" />
     <ClInclude Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.h" />
     <ClInclude Include="application\GameSave\GameSave.h" />
+    <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
