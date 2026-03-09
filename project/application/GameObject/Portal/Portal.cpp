@@ -3,6 +3,8 @@
 #include"application/GameObject/YoshidaMath/YoshidaMath.h"
 #include<cassert>
 #include"GameObject/YoshidaMath/Easing.h"
+#include "Object3d/Object3dCommon.h"
+#include "DirectXCommon.h"
 
 bool Portal::isPlayerHit_ = false;
 //音楽
@@ -47,7 +49,7 @@ Portal::Portal()
     SetCollisionMask(kCollisionPlayer);
 
     ring_ = std::make_unique<Primitive>();
-    portalCircle_ = std::make_unique<Primitive>();
+    portalCircle_ = std::make_unique<PortalMesh>();
     //ワープ座標
     warpPos_ = std::make_unique<WarpPos>();
 }
@@ -65,9 +67,8 @@ void Portal::Initialize()
     scaleTimer_ = 0.0f;
     transform_ = { .scale = {0.0f,0.0f,0.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
 
-    portalCircle_->Initialize(Primitive::Circle, 48);
+    portalCircle_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
     /*   portalCircle_->SetColor({ 0.3f, 0.7f, 1.0f, 1.0f });*/
-    portalCircle_->SetEnableLighting(false);
 
     ring_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 128);
     //ライティングしない
@@ -84,10 +85,8 @@ void Portal::Initialize()
     portalRenderTexture_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, { 0.05f, 0.05f, 0.1f, 1.0f });
     if (portalRenderTexture_->IsReady()) {
         portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
-        portalCircle_->SetSecondaryTextureIndex(portalRenderTexture_->GetSrvIndex());
     }
-
-    portalCircle_->SetPortalProjectionEnabled(true);
+	portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
 }
 
 void Portal::Update()
@@ -109,6 +108,7 @@ void Portal::Update()
 void Portal::DrawPortals() {
     Object3dCommon::GetInstance()->DrawCommonPortal();
     portalCircle_->Draw();
+	portalRenderTexture_->TransitionToShaderResource();
 }
 
 void Portal::DrawRings() {
@@ -155,23 +155,21 @@ void Portal::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneW
     if (portalRenderTexture_ && portalRenderTexture_->IsReady()) {
         UpdatePortalCamera(warpPos_->GetTransform(), camera);
         portalRenderTexture_->BeginRender();
-        drawSceneWithoutPortals(camera);
-        portalRenderTexture_->TransitionToShaderResource();
+		Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCamera_.get());
+		portalRenderTexture_->TransitionToShaderResource();
+		Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
+		
     }
-
-    portalCircle_->SetPortalProjectionMatrices(camera->GetViewProjectionMatrix(), camera->GetViewProjectionMatrix(), camera->GetWorldMatrix(), camera->GetWorldMatrix());
-
 }
 
 void Portal::UpdateCameraMatrices() {
-    portalCircle_->UpdateCameraMatrices();
     ring_->UpdateCameraMatrices();
 }
 
 void Portal::SetCamera(Camera* camera)
 {
     sceneCamera_ = camera;
-    portalCircle_->SetCamera(camera);
+	portalCircle_->SetObjectCamera(camera);
     ring_->SetCamera(camera);
     //ワープ地点
     warpPos_->SetCamera(camera);

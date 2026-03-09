@@ -85,15 +85,16 @@ void PortalManager::DrawPortal(bool isShadow)
 
         portal->SetCamera(playerCamera_->GetCamera());
         portal->UpdateCameraMatrices();
-
+		portal->DrawWarpPos();
         if (!isShadow) {
-            portal->DrawPortals();
+
             portal->DrawRings();
+			portal->DrawPortals();
         }
 
-        portal->DrawWarpPos();
+        
     }
-
+    
 }
 
 void PortalManager::Draw(bool isShadow, bool drawParticle) {
