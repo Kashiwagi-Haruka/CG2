@@ -1,11 +1,11 @@
 #define NOMINMAX
 #include "Coffee.h"
+#include "DirectXCommon.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
-#include "DirectXCommon.h"
 #include <algorithm>
 #include <cmath>
-#include <unordered_map>
+#include <cstdint>
 
 namespace {
 constexpr const char* kCoffeeModelDirectory = "Resources/TD3_3102/3d/Coffee";
@@ -31,6 +31,17 @@ struct CellCoord {
 	int32_t x;
 	int32_t y;
 	int32_t z;
+};
+
+struct CellEntry {
+	int64_t key;
+	uint32_t index;
+};
+
+struct CellRange {
+	int64_t key;
+	uint32_t begin;
+	uint32_t end;
 };
 
 CellCoord ComputeCellCoord(const Vector3& position) {
@@ -115,7 +126,16 @@ void Coffee::RunSimulation() {
 		instancedObject_->SetInstanceOffset(spawnIndex, spawnInstance.position);
 	}
 
-	std::vector<Vector3> pendingPush(activeInstanceCount_, {0.0f, 0.0f, 0.0f});
+	static std::vector<Vector3> pendingPush;
+	static std::vector<CellCoord> cellCoords;
+	static std::vector<CellEntry> cellEntries;
+	static std::vector<CellRange> cellRanges;
+
+	pendingPush.resize(activeInstanceCount_);
+	std::fill(pendingPush.begin(), pendingPush.end(), Vector3{0.0f, 0.0f, 0.0f});
+
+	cellCoords.resize(activeInstanceCount_);
+	cellEntries.resize(activeInstanceCount_);
 
 	for (size_t i = 0; i < activeInstanceCount_; ++i) {
 		auto& instance = instances_[i];
@@ -131,23 +151,44 @@ void Coffee::RunSimulation() {
 		}
 	}
 
-	std::unordered_map<int64_t, std::vector<uint32_t>> cellMap;
-	cellMap.reserve(activeInstanceCount_);
 	for (uint32_t i = 0; i < activeInstanceCount_; ++i) {
 		const CellCoord coord = ComputeCellCoord(instances_[i].position);
-		cellMap[HashCell(coord.x, coord.y, coord.z)].push_back(i);
+		cellCoords[i] = coord;
+		cellEntries[i] = {HashCell(coord.x, coord.y, coord.z), i};
 	}
 
+	std::sort(cellEntries.begin(), cellEntries.end(), [](const CellEntry& lhs, const CellEntry& rhs) { return lhs.key < rhs.key; });
+	cellRanges.clear();
+	cellRanges.reserve(cellEntries.size());
+	for (uint32_t begin = 0; begin < cellEntries.size();) {
+		const int64_t key = cellEntries[begin].key;
+		uint32_t end = begin + 1;
+		while (end < cellEntries.size() && cellEntries[end].key == key) {
+			++end;
+		}
+		cellRanges.push_back({key, begin, end});
+		begin = end;
+	}
+
+	const auto findCellRange = [](const std::vector<CellRange>& cellRanges, int64_t key) -> const CellRange* {
+		auto it = std::lower_bound(cellRanges.begin(), cellRanges.end(), key, [](const CellRange& range, int64_t value) { return range.key < value; });
+		if (it == cellRanges.end() || it->key != key) {
+			return nullptr;
+		}
+		return &(*it);
+	};
+
 	for (size_t i = 0; i < activeInstanceCount_; ++i) {
-		const CellCoord coord = ComputeCellCoord(instances_[i].position);
+		const CellCoord coord = cellCoords[i];
 		for (int32_t dz = -1; dz <= 1; ++dz) {
 			for (int32_t dy = -1; dy <= 1; ++dy) {
 				for (int32_t dx = -1; dx <= 1; ++dx) {
-					auto it = cellMap.find(HashCell(coord.x + dx, coord.y + dy, coord.z + dz));
-					if (it == cellMap.end()) {
+					const CellRange* range = findCellRange(cellRanges, HashCell(coord.x + dx, coord.y + dy, coord.z + dz));
+					if (!range) {
 						continue;
 					}
-					for (const uint32_t j : it->second) {
+					for (uint32_t entryIndex = range->begin; entryIndex < range->end; ++entryIndex) {
+						const uint32_t j = cellEntries[entryIndex].index;
 						if (j <= i) {
 							continue;
 						}
