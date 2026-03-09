@@ -13,7 +13,7 @@
 namespace {
 constexpr const char* kCoffeeModelDirectory = "Resources/TD3_3102/3d/Coffee";
 constexpr const char* kCoffeeModelName = "Coffee";
-constexpr uint32_t kCoffeeInstanceCount = 100;
+constexpr uint32_t kCoffeeInstanceCount = 10000;
 constexpr Vector3 kCoffeeSpawnOrigin = {0.0f, 5.0f, 0.0f};
 constexpr float kCoffeeMinScale = 0.22f;
 constexpr float kCoffeeScaleStep = 0.0f;
@@ -209,7 +209,7 @@ void Coffee::RunSimulation() {
 		++activeInstanceCount_;
 	}
 
-	std::vector<Vector2> pendingPush(instances_.size(), {0.0f, 0.0f});
+	std::vector<Vector3> pendingPush(instances_.size(), {0.0f, 0.0f, 0.0f});
 
 	for (size_t i = 0; i < activeInstanceCount_; ++i) {
 		auto& instance = instances_[i];
@@ -227,36 +227,44 @@ void Coffee::RunSimulation() {
 
 	for (size_t i = 0; i < activeInstanceCount_; ++i) {
 		for (size_t j = i + 1; j < activeInstanceCount_; ++j) {
-			const Vector2 posI = {instances_[i].position.x, instances_[i].position.z};
-			const Vector2 posJ = {instances_[j].position.x, instances_[j].position.z};
 			const float minDist = instances_[i].radius + instances_[j].radius;
-			const Vector2 delta = {posI.x - posJ.x, posI.y - posJ.y};
-			const float distSq = delta.x * delta.x + delta.y * delta.y;
+			const Vector3 delta = {
+			    instances_[i].position.x - instances_[j].position.x,
+			    instances_[i].position.y - instances_[j].position.y,
+			    instances_[i].position.z - instances_[j].position.z,
+			};
+			const float distSq = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
 			const float minDistSq = minDist * minDist;
 
 			if (distSq < minDistSq && distSq > 1e-7f) {
 				const float dist = std::sqrt(distSq);
 				const float overlap = minDist - dist;
 				const float scale = (overlap * 0.5f + separationBias) / dist;
-				const Vector2 normal = {delta.x / dist, delta.y / dist};
-				const Vector2 push = {delta.x * scale, delta.y * scale};
+				const Vector3 normal = {delta.x / dist, delta.y / dist, delta.z / dist};
+				const Vector3 push = {delta.x * scale, delta.y * scale, delta.z * scale};
 				pendingPush[i].x += push.x;
 				pendingPush[i].y += push.y;
+				pendingPush[i].z += push.z;
 				pendingPush[j].x -= push.x;
 				pendingPush[j].y -= push.y;
+				pendingPush[j].z -= push.z;
 
-				const Vector2 velocityI = {instances_[i].velocity.x, instances_[i].velocity.z};
-				const Vector2 velocityJ = {instances_[j].velocity.x, instances_[j].velocity.z};
-				const Vector2 relative = {velocityI.x - velocityJ.x, velocityI.y - velocityJ.y};
-				const float relativeAlongNormal = relative.x * normal.x + relative.y * normal.y;
+				const Vector3 relative = {
+				    instances_[i].velocity.x - instances_[j].velocity.x,
+				    instances_[i].velocity.y - instances_[j].velocity.y,
+				    instances_[i].velocity.z - instances_[j].velocity.z,
+				};
+				const float relativeAlongNormal = relative.x * normal.x + relative.y * normal.y + relative.z * normal.z;
 
 				if (relativeAlongNormal < 0.0f) {
 					const float impulse = -(1.0f + kCoffeeCollisionDamping) * relativeAlongNormal * 0.5f;
-					const Vector2 impulseVec = {normal.x * impulse, normal.y * impulse};
+					const Vector3 impulseVec = {normal.x * impulse, normal.y * impulse, normal.z * impulse};
 					instances_[i].velocity.x += impulseVec.x;
-					instances_[i].velocity.z += impulseVec.y;
+					instances_[i].velocity.y += impulseVec.y;
+					instances_[i].velocity.z += impulseVec.z;
 					instances_[j].velocity.x -= impulseVec.x;
-					instances_[j].velocity.z -= impulseVec.y;
+					instances_[j].velocity.y -= impulseVec.y;
+					instances_[j].velocity.z -= impulseVec.z;
 				}
 			}
 		}
@@ -265,7 +273,12 @@ void Coffee::RunSimulation() {
 	for (size_t i = 0; i < activeInstanceCount_; ++i) {
 		auto& instance = instances_[i];
 		instance.position.x = std::clamp(instance.position.x + pendingPush[i].x, roomMinX, roomMaxX);
-		instance.position.z = std::clamp(instance.position.z + pendingPush[i].y, roomMinZ, roomMaxZ);
+		instance.position.y += pendingPush[i].y;
+		instance.position.z = std::clamp(instance.position.z + pendingPush[i].z, roomMinZ, roomMaxZ);
+		if (instance.position.y < floorY) {
+			instance.position.y = floorY;
+			instance.velocity.y = std::max(instance.velocity.y, 0.0f);
+		}
 		if (instance.position.x <= roomMinX || instance.position.x >= roomMaxX) {
 			instance.velocity.x *= -kCoffeeCollisionDamping;
 		}
