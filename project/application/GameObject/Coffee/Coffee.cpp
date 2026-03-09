@@ -17,13 +17,15 @@ constexpr uint32_t kCoffeeInstanceCount = 100;
 constexpr Vector3 kCoffeeSpawnOrigin = {0.0f, 5.0f, 0.0f};
 constexpr float kCoffeeMinScale = 0.22f;
 constexpr float kCoffeeScaleStep = 0.04f;
-constexpr float kCoffeeSpawnIntervalSeconds = 0.08f;
-constexpr uint32_t kCoffeeSpawnRowSize = 10;
-constexpr float kCoffeeSpawnSpacing = 0.55f;
-constexpr float kCoffeeLayerHeight = 0.45f;
 constexpr float kCoffeeGravity = -15.0f;
-constexpr float kCoffeeBounceDamping = 0.8f;
+constexpr float kCoffeeBounceDamping = 0.75f;
+constexpr float kCoffeeGroundFriction = 0.93f;
+constexpr float kCoffeeCollisionDamping = 0.85f;
 constexpr float kCoffeeSeparationBias = 0.001f;
+constexpr float kCoffeeMinSpawnInterval = 0.035f;
+constexpr float kCoffeeMaxSpawnInterval = 0.18f;
+constexpr float kCoffeeSpawnAreaRadius = 0.35f;
+
 
 Microsoft::WRL::ComPtr<ID3D12Resource> CreateDefaultBufferResource(DirectXCommon* dxCommon, size_t sizeInBytes, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState) {
 	D3D12_HEAP_PROPERTIES heapProperties{};
@@ -77,7 +79,8 @@ void Coffee::Initialize() {
 
 	instances_.resize(kCoffeeInstanceCount);
 	activeInstanceCount_ = 0;
-	spawnAccumulator_ = 0.0f;
+	spawnTimer_ = 0.0f;
+	nextSpawnInterval_ = kCoffeeMaxSpawnInterval;
 
 	for (uint32_t i = 0; i < kCoffeeInstanceCount; ++i) {
 		const float scale = kCoffeeMinScale + static_cast<float>(i % 4u) * kCoffeeScaleStep;
@@ -86,6 +89,7 @@ void Coffee::Initialize() {
 		instances_[i].position = kCoffeeSpawnOrigin;
 		instances_[i].scale = scale;
 		instances_[i].radius = 0.2f + scale * 0.35f;
+		instances_[i].velocity = {0.0f, 0.0f, 0.0f};
 		instances_[i].isActive = false;
 		instancedObject_->SetInstanceOffset(i, {0.0f, -1000.0f, 0.0f});
 	}
@@ -185,21 +189,21 @@ void Coffee::RunSimulation() {
 	const float roomMinZ = simulationParamsData_->roomMinZ;
 	const float roomMaxZ = simulationParamsData_->roomMaxZ;
 
-	spawnAccumulator_ += deltaTime;
-	while (spawnAccumulator_ >= kCoffeeSpawnIntervalSeconds && activeInstanceCount_ < static_cast<uint32_t>(instances_.size())) {
-		spawnAccumulator_ -= kCoffeeSpawnIntervalSeconds;
+	spawnTimer_ += deltaTime;
+	while (spawnTimer_ >= nextSpawnInterval_ && activeInstanceCount_ < static_cast<uint32_t>(instances_.size())) {
+		spawnTimer_ -= nextSpawnInterval_;
 		const uint32_t spawnIndex = activeInstanceCount_;
-		const uint32_t layer = spawnIndex / (kCoffeeSpawnRowSize * kCoffeeSpawnRowSize);
-		const uint32_t inLayerIndex = spawnIndex % (kCoffeeSpawnRowSize * kCoffeeSpawnRowSize);
-		const uint32_t row = inLayerIndex / kCoffeeSpawnRowSize;
-		const uint32_t column = inLayerIndex % kCoffeeSpawnRowSize;
-		const float half = (static_cast<float>(kCoffeeSpawnRowSize) - 1.0f) * 0.5f;
+		const float t = static_cast<float>(spawnIndex) / static_cast<float>(instances_.size() - 1u);
+		nextSpawnInterval_ = kCoffeeMaxSpawnInterval + (kCoffeeMinSpawnInterval - kCoffeeMaxSpawnInterval) * t;
 
 		auto& spawnInstance = instances_[spawnIndex];
-		spawnInstance.position.x = kCoffeeSpawnOrigin.x + (static_cast<float>(column) - half) * kCoffeeSpawnSpacing;
-		spawnInstance.position.z = kCoffeeSpawnOrigin.z + (static_cast<float>(row) - half) * kCoffeeSpawnSpacing;
-		spawnInstance.position.y = kCoffeeSpawnOrigin.y + static_cast<float>(layer) * kCoffeeLayerHeight;
-		spawnInstance.velocityY = 0.0f;
+		const float seed = static_cast<float>(spawnIndex) * 1.6180339f;
+		const float angle = seed * 6.2831853f;
+		const float radial = std::fmod(seed * 0.73f, 1.0f) * kCoffeeSpawnAreaRadius;
+		spawnInstance.position.x = kCoffeeSpawnOrigin.x + std::cos(angle) * radial;
+		spawnInstance.position.z = kCoffeeSpawnOrigin.z + std::sin(angle) * radial;
+		spawnInstance.position.y = kCoffeeSpawnOrigin.y;
+		spawnInstance.velocity = {0.0f, 0.0f, 0.0f};
 		spawnInstance.isActive = true;
 		instancedObject_->SetInstanceOffset(spawnIndex, spawnInstance.position);
 		++activeInstanceCount_;
@@ -209,11 +213,17 @@ void Coffee::RunSimulation() {
 
 	for (size_t i = 0; i < activeInstanceCount_; ++i) {
 		auto& instance = instances_[i];
-		instance.velocityY += gravity * deltaTime;
-		instance.position.y += instance.velocityY * deltaTime;
+		instance.velocity.y += gravity * deltaTime;
+		instance.position.x += instance.velocity.x * deltaTime;
+		instance.position.y += instance.velocity.y * deltaTime;
+		instance.position.z += instance.velocity.z * deltaTime;
 		if (instance.position.y <= floorY) {
 			instance.position.y = floorY;
-			instance.velocityY = -instance.velocityY * bounceDamping;
+			if (instance.velocity.y < 0.0f) {
+				instance.velocity.y = -instance.velocity.y * bounceDamping;
+			}
+			instance.velocity.x *= kCoffeeGroundFriction;
+			instance.velocity.z *= kCoffeeGroundFriction;
 		}
 	}
 
@@ -230,11 +240,26 @@ void Coffee::RunSimulation() {
 				const float dist = std::sqrt(distSq);
 				const float overlap = minDist - dist;
 				const float scale = (overlap * 0.5f + separationBias) / dist;
+				const Vector2 normal = {delta.x / dist, delta.y / dist};
 				const Vector2 push = {delta.x * scale, delta.y * scale};
 				pendingPush[i].x += push.x;
 				pendingPush[i].y += push.y;
 				pendingPush[j].x -= push.x;
 				pendingPush[j].y -= push.y;
+
+				const Vector2 velocityI = {instances_[i].velocity.x, instances_[i].velocity.z};
+				const Vector2 velocityJ = {instances_[j].velocity.x, instances_[j].velocity.z};
+				const Vector2 relative = {velocityI.x - velocityJ.x, velocityI.y - velocityJ.y};
+				const float relativeAlongNormal = relative.x * normal.x + relative.y * normal.y;
+
+				if (relativeAlongNormal < 0.0f) {
+					const float impulse = -(1.0f + kCoffeeCollisionDamping) * relativeAlongNormal * 0.5f;
+					const Vector2 impulseVec = {normal.x * impulse, normal.y * impulse};
+					instances_[i].velocity.x += impulseVec.x;
+					instances_[i].velocity.z += impulseVec.y;
+					instances_[j].velocity.x -= impulseVec.x;
+					instances_[j].velocity.z -= impulseVec.y;
+				}
 			}
 		}
 	}
@@ -243,6 +268,12 @@ void Coffee::RunSimulation() {
 		auto& instance = instances_[i];
 		instance.position.x = std::clamp(instance.position.x + pendingPush[i].x, roomMinX, roomMaxX);
 		instance.position.z = std::clamp(instance.position.z + pendingPush[i].y, roomMinZ, roomMaxZ);
+		if (instance.position.x <= roomMinX || instance.position.x >= roomMaxX) {
+			instance.velocity.x *= -kCoffeeCollisionDamping;
+		}
+		if (instance.position.z <= roomMinZ || instance.position.z >= roomMaxZ) {
+			instance.velocity.z *= -kCoffeeCollisionDamping;
+		}
 		instancedObject_->SetInstanceOffset(i, instance.position);
 	}
 }
