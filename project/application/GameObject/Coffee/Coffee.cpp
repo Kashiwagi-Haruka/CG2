@@ -16,9 +16,9 @@ constexpr const char* kCoffeeModelName = "Coffee";
 constexpr uint32_t kCoffeeInstanceCount = 100;
 constexpr Vector3 kCoffeeSpawnOrigin = {0.0f, 5.0f, 0.0f};
 constexpr float kCoffeeMinScale = 0.22f;
-constexpr float kCoffeeScaleStep = 0.04f;
+constexpr float kCoffeeScaleStep = 0.0f;
 constexpr float kCoffeeGravity = -15.0f;
-constexpr float kCoffeeBounceDamping = 0.75f;
+constexpr float kCoffeeBounceDamping = 0.0f;
 constexpr float kCoffeeGroundFriction = 0.93f;
 constexpr float kCoffeeCollisionDamping = 0.85f;
 constexpr float kCoffeeSeparationBias = 0.001f;
@@ -219,9 +219,7 @@ void Coffee::RunSimulation() {
 		instance.position.z += instance.velocity.z * deltaTime;
 		if (instance.position.y <= floorY) {
 			instance.position.y = floorY;
-			if (instance.velocity.y < 0.0f) {
-				instance.velocity.y = -instance.velocity.y * bounceDamping;
-			}
+			instance.velocity.y = 0.0f;
 			instance.velocity.x *= kCoffeeGroundFriction;
 			instance.velocity.z *= kCoffeeGroundFriction;
 		}
