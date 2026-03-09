@@ -328,24 +328,18 @@ void ShadowGameScene::UpdateGameObject()
             player_->SetRotate(portalTransform->rotate);
             break;
         }
-
     }
-
 
     if (!useDebugCamera_) {
         playerCamera_->Update();
     }
 
-    timeCardWatch_->Update();
-
     player_->Update();
-
+    timeCardWatch_->Update();
     testField_->Update();
+    portalManager_->Update();
 
-    portalManager_->UpdateWhiteBoard();
-    portalManager_->UpdatePortal();
     ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
-    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
 
     key_->Update();
     edamame_->Update();

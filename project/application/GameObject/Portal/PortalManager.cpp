@@ -34,9 +34,13 @@ PortalManager::PortalManager(Vector3* pos) {
 }
 
 void PortalManager::Initialize() {
+
     for (auto& board : whiteBoards_) {
         board->Initialize();
     }
+
+    portals_.clear();
+    preWhiteBoards_.clear();
 
     portalParticle_->Initialize();
 }
@@ -71,6 +75,10 @@ void PortalManager::SetCamera(Camera* camera)
     if (portalParticle_) {
         portalParticle_->SetCamera(camera);
     }
+
+    for (auto& portal : portals_) {
+        portal->SetCamera(camera);
+    }
 };
 
 void PortalManager::DrawWhiteBoard() {
@@ -101,6 +109,10 @@ void PortalManager::BeginRender(uint32_t index)
 
 }
 
+void PortalManager::TransitionToShaderResource(uint32_t index)
+{
+}
+
 void PortalManager::Draw(bool isShadow, bool drawParticle) {
 
     DrawWhiteBoard();
@@ -114,6 +126,12 @@ void PortalManager::Draw(bool isShadow, bool drawParticle) {
 void PortalManager::SetPlayerCamera(PlayerCamera* camera) {
 
     playerCamera_ = camera;
+}
+
+void PortalManager::Update()
+{
+    UpdateWhiteBoard();
+    UpdatePortal();
 }
 
 void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {

@@ -107,12 +107,13 @@ void Portal::Update()
 
 void Portal::DrawPortals() {
     Object3dCommon::GetInstance()->DrawCommonPortal();
+    portalCircle_->Update();
     portalCircle_->Draw();
-	portalRenderTexture_->TransitionToShaderResource();
 }
 
 void Portal::DrawRings() {
     //Object3dCommon::GetInstance()->DrawCommonNoCull();
+    ring_->UpdateCameraMatrices();
     ring_->Draw();
 }
 
@@ -167,6 +168,7 @@ void Portal::UpdateCameraMatrices() {
 void Portal::SetCamera(Camera* camera)
 {
     sceneCamera_ = camera;
+  
 	portalCircle_->SetObjectCamera(camera);
     ring_->SetCamera(camera);
     //ワープ地点
@@ -197,7 +199,7 @@ void Portal::SetPortalWorldMatrix()
     Matrix4x4  worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
     portalCircle_->SetWorldMatrix(worldMatrix);
-    transform_.translate -= forward * 0.125f;
+    transform_.translate -= forward * 0.0625f;
     worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
     ring_->SetWorldMatrix(worldMatrix);

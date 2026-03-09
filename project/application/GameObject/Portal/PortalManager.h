@@ -12,11 +12,17 @@ class PortalManager {
 public:
 	PortalManager(Vector3* pos);
 	void Initialize();
-	void UpdateWhiteBoard();
-	void UpdatePortal();
-	void SetCamera(Camera* camera);
+	void Update();
 	void Draw(bool isShadow, bool drawParticle = true);
+
+	//ポータル画像の作成を始める
+	void BeginRender(uint32_t index);
+	//SRVに作成した画像を移植する
+	void TransitionToShaderResource(uint32_t index);
+
+	void SetCamera(Camera* camera);
 	void SetPlayerCamera(PlayerCamera* playerCamera);
+
 	/// @brief 作成できるポータル地点との当たり判定を作成する
 	/// @param timeCardWatch 携帯打刻機
 	/// @param camera かめら
@@ -24,22 +30,24 @@ public:
 	void CheckCollision(TimeCardWatch* timeCardWatch);
 	std::vector<std::unique_ptr<Portal>>& GetPortals() { return portals_; };
 	std::vector<std::unique_ptr<WhiteBoard>>& GetWhiteBoards() { return whiteBoards_; }
-
 private:
-
+	void UpdateWhiteBoard();
+	void UpdatePortal();
+	//ポータルの作成
 	void SpawnPortal(WhiteBoard* board);
 	void DrawWhiteBoard();
 	void DrawPortal(bool isShadow);
-	void BeginRender(uint32_t index);
-	void TransitionToShaderResource(uint32_t index);
-	Transform firstWarpPosTransform_ = { 0.0f };
 
+	std::vector<WhiteBoard*> preWhiteBoards_;
 	std::vector<std::unique_ptr<WhiteBoard>> whiteBoards_;
-	std::vector<std::unique_ptr<Portal>> portals_;
-	std::unique_ptr<PortalParticle> portalParticle_ = nullptr;
+	WhiteBoard* pendingWhiteBoard_ = nullptr;
+
 	PlayerCamera* playerCamera_ = nullptr;
 	Vector3* playerPos_ = nullptr;
-	std::vector<WhiteBoard*> preWhiteBoards_;
-	WhiteBoard* pendingWhiteBoard_ = nullptr;
+	//初回のワープ地点
+	Transform firstWarpPosTransform_ = { 0.0f };
+
 	bool isPendingPortalSpawn_ = false;
+	std::vector<std::unique_ptr<Portal>> portals_;
+	std::unique_ptr<PortalParticle> portalParticle_ = nullptr;
 };
