@@ -13,14 +13,14 @@
 namespace {
 constexpr const char* kCoffeeModelDirectory = "Resources/TD3_3102/3d/Coffee";
 constexpr const char* kCoffeeModelName = "Coffee";
-constexpr float kCoffeeStartHeight = 3.0f;
-constexpr float kCoffeeSpawnHeightJitter = 0.25f;
-constexpr uint32_t kCoffeeInstanceCount = 1000;
-constexpr uint32_t kCoffeeSpawnColumns = 4;
-constexpr float kCoffeeSpawnSpacingX = 2.4f;
-constexpr float kCoffeeSpawnSpacingZ = 2.8f;
+constexpr uint32_t kCoffeeInstanceCount = 100;
+constexpr Vector3 kCoffeeSpawnOrigin = {0.0f, 5.0f, 0.0f};
 constexpr float kCoffeeMinScale = 0.22f;
 constexpr float kCoffeeScaleStep = 0.04f;
+constexpr float kCoffeeSpawnIntervalSeconds = 0.08f;
+constexpr uint32_t kCoffeeSpawnRowSize = 10;
+constexpr float kCoffeeSpawnSpacing = 0.55f;
+constexpr float kCoffeeLayerHeight = 0.45f;
 constexpr float kCoffeeGravity = -15.0f;
 constexpr float kCoffeeBounceDamping = 0.8f;
 constexpr float kCoffeeSeparationBias = 0.001f;
@@ -72,27 +72,22 @@ Coffee::Coffee() { instancedObject_ = std::make_unique<InstancedObject3d>(); }
 void Coffee::Initialize() {
 	ModelManager::GetInstance()->LoadModel(kCoffeeModelDirectory, kCoffeeModelName);
 	instancedObject_->Initialize(kCoffeeModelName);
-	instancedObject_->SetSpawnOrigin({0.0f, 0.0f, 0.0f});
+	instancedObject_->SetSpawnOrigin(kCoffeeSpawnOrigin);
 	instancedObject_->SetInstanceCount(kCoffeeInstanceCount);
 
 	instances_.resize(kCoffeeInstanceCount);
+	activeInstanceCount_ = 0;
+	spawnAccumulator_ = 0.0f;
 
-	const float columnOffset = (static_cast<float>(kCoffeeSpawnColumns) - 1.0f) * 0.5f;
-	const uint32_t rowCount = (kCoffeeInstanceCount + kCoffeeSpawnColumns - 1u) / kCoffeeSpawnColumns;
-	const float rowOffset = (static_cast<float>(rowCount) - 1.0f) * 0.5f;
 	for (uint32_t i = 0; i < kCoffeeInstanceCount; ++i) {
-		const uint32_t column = i % kCoffeeSpawnColumns;
-		const uint32_t row = i / kCoffeeSpawnColumns;
 		const float scale = kCoffeeMinScale + static_cast<float>(i % 4u) * kCoffeeScaleStep;
 		instancedObject_->SetInstanceScale(i, {scale, scale, scale});
 
-		const float x = (static_cast<float>(column) - columnOffset) * kCoffeeSpawnSpacingX;
-		const float z = (static_cast<float>(row) - rowOffset) * kCoffeeSpawnSpacingZ;
-		const float y = kCoffeeStartHeight + static_cast<float>((i * 5u) % 9u) * kCoffeeSpawnHeightJitter;
-		instances_[i].position = {x, y, z};
+		instances_[i].position = kCoffeeSpawnOrigin;
 		instances_[i].scale = scale;
 		instances_[i].radius = 0.2f + scale * 0.35f;
-		instancedObject_->SetInstanceOffset(i, instances_[i].position);
+		instances_[i].isActive = false;
+		instancedObject_->SetInstanceOffset(i, {0.0f, -1000.0f, 0.0f});
 	}
 
 	InitializeSimulationResources();
@@ -190,9 +185,29 @@ void Coffee::RunSimulation() {
 	const float roomMinZ = simulationParamsData_->roomMinZ;
 	const float roomMaxZ = simulationParamsData_->roomMaxZ;
 
+	spawnAccumulator_ += deltaTime;
+	while (spawnAccumulator_ >= kCoffeeSpawnIntervalSeconds && activeInstanceCount_ < static_cast<uint32_t>(instances_.size())) {
+		spawnAccumulator_ -= kCoffeeSpawnIntervalSeconds;
+		const uint32_t spawnIndex = activeInstanceCount_;
+		const uint32_t layer = spawnIndex / (kCoffeeSpawnRowSize * kCoffeeSpawnRowSize);
+		const uint32_t inLayerIndex = spawnIndex % (kCoffeeSpawnRowSize * kCoffeeSpawnRowSize);
+		const uint32_t row = inLayerIndex / kCoffeeSpawnRowSize;
+		const uint32_t column = inLayerIndex % kCoffeeSpawnRowSize;
+		const float half = (static_cast<float>(kCoffeeSpawnRowSize) - 1.0f) * 0.5f;
+
+		auto& spawnInstance = instances_[spawnIndex];
+		spawnInstance.position.x = kCoffeeSpawnOrigin.x + (static_cast<float>(column) - half) * kCoffeeSpawnSpacing;
+		spawnInstance.position.z = kCoffeeSpawnOrigin.z + (static_cast<float>(row) - half) * kCoffeeSpawnSpacing;
+		spawnInstance.position.y = kCoffeeSpawnOrigin.y + static_cast<float>(layer) * kCoffeeLayerHeight;
+		spawnInstance.velocityY = 0.0f;
+		spawnInstance.isActive = true;
+		instancedObject_->SetInstanceOffset(spawnIndex, spawnInstance.position);
+		++activeInstanceCount_;
+	}
+
 	std::vector<Vector2> pendingPush(instances_.size(), {0.0f, 0.0f});
 
-	for (size_t i = 0; i < instances_.size(); ++i) {
+	for (size_t i = 0; i < activeInstanceCount_; ++i) {
 		auto& instance = instances_[i];
 		instance.velocityY += gravity * deltaTime;
 		instance.position.y += instance.velocityY * deltaTime;
@@ -202,8 +217,8 @@ void Coffee::RunSimulation() {
 		}
 	}
 
-	for (size_t i = 0; i < instances_.size(); ++i) {
-		for (size_t j = i + 1; j < instances_.size(); ++j) {
+	for (size_t i = 0; i < activeInstanceCount_; ++i) {
+		for (size_t j = i + 1; j < activeInstanceCount_; ++j) {
 			const Vector2 posI = {instances_[i].position.x, instances_[i].position.z};
 			const Vector2 posJ = {instances_[j].position.x, instances_[j].position.z};
 			const float minDist = instances_[i].radius + instances_[j].radius;
@@ -224,7 +239,7 @@ void Coffee::RunSimulation() {
 		}
 	}
 
-	for (size_t i = 0; i < instances_.size(); ++i) {
+	for (size_t i = 0; i < activeInstanceCount_; ++i) {
 		auto& instance = instances_[i];
 		instance.position.x = std::clamp(instance.position.x + pendingPush[i].x, roomMinX, roomMaxX);
 		instance.position.z = std::clamp(instance.position.z + pendingPush[i].y, roomMinZ, roomMaxZ);
@@ -242,4 +257,4 @@ void Coffee::Update(Camera* camera, const Vector3& lightDirection) {
 
 void Coffee::Draw() { instancedObject_->Draw(); }
 
-uint32_t Coffee::GetInstanceCount() const { return instancedObject_->GetInstanceCount(); }
+uint32_t Coffee::GetInstanceCount() const { return activeInstanceCount_; }

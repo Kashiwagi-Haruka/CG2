@@ -22,7 +22,8 @@ private:
 		float scale = 1.0f;
 		float velocityY = 0.0f;
 		float radius = 0.25f;
-		float padding[2] = {0.0f, 0.0f};
+		bool isActive = false;
+		float padding = 0.0f;
 	};
 
 	struct alignas(256) SimulationParams {
@@ -54,4 +55,6 @@ private:
 	SimulationParams* simulationParamsData_ = nullptr;
 	uint32_t instanceDataUavIndex_ = 0;
 	D3D12_RESOURCE_STATES instanceDataState_ = D3D12_RESOURCE_STATE_COPY_DEST;
+	uint32_t activeInstanceCount_ = 0;
+	float spawnAccumulator_ = 0.0f;
 };
