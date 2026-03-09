@@ -200,7 +200,8 @@ void InstancedObject3d::Draw() {
 		return;
 	}
 
-	for (const Transform& instance : instanceTransforms_) {
+	for (size_t i = 0; i < instanceTransforms_.size(); ++i) {
+		const Transform& instance = instanceTransforms_[i];
 		const Vector3 finalTranslate = {
 		    spawnOrigin_.x + instance.translate.x,
 		    spawnOrigin_.y + instance.translate.y,
@@ -208,11 +209,26 @@ void InstancedObject3d::Draw() {
 		};
 		const Matrix4x4 instanceWorld = Function::MakeAffineMatrix(instance.scale, instance.rotate, finalTranslate);
 		worldMatrix = Function::Multiply(instanceWorld, Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
-		UpdateCameraMatrices();
-		Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
+
+		if (camera_) {
+			worldViewProjectionMatrix = Function::Multiply(worldMatrix, Function::Multiply(camera_->GetViewMatrix(), camera_->GetProjectionMatrix()));
+		} else {
+			worldViewProjectionMatrix = worldMatrix;
+		}
+
+		TransformationMatrix* instanceMatrixData = nullptr;
+		instanceTransformResources_[i]->Map(0, nullptr, reinterpret_cast<void**>(&instanceMatrixData));
+		instanceMatrixData->WVP = worldViewProjectionMatrix;
+		instanceMatrixData->World = worldMatrix;
+		instanceMatrixData->LightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetDirectionalLightViewProjectionMatrix());
+		instanceMatrixData->WorldInverseTranspose = Function::Inverse(worldMatrix);
+		instanceTransformResources_[i]->Unmap(0, nullptr);
+
+		Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, instanceTransformResources_[i]->GetGPUVirtualAddress());
 		model_->Draw(skinCluster_, materialResource_.Get());
 	}
 }
+
 
 void InstancedObject3d::SetModel(const std::string& filePath) {
 	modelInstance_ = ModelManager::GetInstance()->CreateModelInstance(filePath);
@@ -346,7 +362,14 @@ void InstancedObject3d::SetInstanceCount(size_t count) {
                    {0.0f, 0.0f, 0.0f},
                    {0.0f, 0.0f, 0.0f}
     });
+	instanceTransformResources_.resize(count);
+	for (size_t i = 0; i < count; ++i) {
+		if (!instanceTransformResources_[i]) {
+			instanceTransformResources_[i] = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
+		}
+	}
 }
+
 
 void InstancedObject3d::SetInstanceScale(size_t index, const Vector3& scale) {
 	if (index >= instanceTransforms_.size()) {

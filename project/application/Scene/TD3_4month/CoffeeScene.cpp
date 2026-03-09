@@ -20,8 +20,12 @@ constexpr float kCoffeeGroundY = 0.0f;
 constexpr float kCoffeeGravity = -0.015f;
 constexpr float kCoffeeBounceDamping = 0.8f;
 constexpr float kCoffeeSeparationBias = 0.001f;
-constexpr float kCoffeeSpawnSeparationX = 1.8f;
-constexpr float kCoffeeSpawnSeparationZ = 1.0f;
+constexpr uint32_t kCoffeeInstanceCount = 1000;
+constexpr uint32_t kCoffeeSpawnColumns = 4;
+constexpr float kCoffeeSpawnSpacingX = 2.4f;
+constexpr float kCoffeeSpawnSpacingZ = 2.8f;
+constexpr float kCoffeeMinScale = 0.22f;
+constexpr float kCoffeeScaleStep = 0.04f;
 } // namespace
 
 
@@ -79,20 +83,31 @@ void CoffeeScene::Initialize() {
 	ModelManager::GetInstance()->LoadModel(kCoffeeModelDirectory, kCoffeeModelName);
 	coffeeInstancedObject_->Initialize(kCoffeeModelName);
 	coffeeInstancedObject_->SetSpawnOrigin({0.0f, 0.0f, 0.0f});
-	coffeeInstancedObject_->SetInstanceCount(2);
-	coffeeInstancedObject_->SetInstanceScale(0, {0.45f, 0.45f, 0.45f});
-	coffeeInstancedObject_->SetInstanceScale(1, {0.65f, 0.65f, 0.65f});
+	coffeeInstancedObject_->SetInstanceCount(kCoffeeInstanceCount);
 
-	coffeeOffsets_.resize(2);
-	coffeeVelocitiesY_.assign(2, 0.0f);
-	coffeeCollisionRadius_.resize(2);
-	coffeeOffsets_[0] = {-kCoffeeSpawnSeparationX, kCoffeeStartHeight-2.0f, -kCoffeeSpawnSeparationZ};
-	coffeeOffsets_[1] = {kCoffeeSpawnSeparationX, kCoffeeStartHeight + 1.0f, kCoffeeSpawnSeparationZ};
-	coffeeCollisionRadius_[0] = 0.75f;
-	coffeeCollisionRadius_[1] = 1.0f;
-	coffeeInstancedObject_->SetInstanceOffset(0, coffeeOffsets_[0]);
-	coffeeInstancedObject_->SetInstanceOffset(1, coffeeOffsets_[1]);
+	coffeeOffsets_.resize(kCoffeeInstanceCount);
+	coffeeVelocitiesY_.assign(kCoffeeInstanceCount, 0.0f);
+	coffeeCollisionRadius_.resize(kCoffeeInstanceCount);
+
+	const float columnOffset = (static_cast<float>(kCoffeeSpawnColumns) - 1.0f) * 0.5f;
+	const uint32_t rowCount = (kCoffeeInstanceCount + kCoffeeSpawnColumns - 1u) / kCoffeeSpawnColumns;
+	const float rowOffset = (static_cast<float>(rowCount) - 1.0f) * 0.5f;
+	for (uint32_t i = 0; i < kCoffeeInstanceCount; ++i) {
+		const uint32_t column = i % kCoffeeSpawnColumns;
+		const uint32_t row = i / kCoffeeSpawnColumns;
+		const float scale = kCoffeeMinScale + static_cast<float>(i % 4u) * kCoffeeScaleStep;
+		const Vector3 instanceScale = {scale, scale, scale};
+		coffeeInstancedObject_->SetInstanceScale(i, instanceScale);
+
+		const float x = (static_cast<float>(column) - columnOffset) * kCoffeeSpawnSpacingX;
+		const float z = (static_cast<float>(row) - rowOffset) * kCoffeeSpawnSpacingZ;
+		const float y = kCoffeeStartHeight + static_cast<float>((i * 5u) % 9u) * 0.25f;
+		coffeeOffsets_[i] = {x, y, z};
+		coffeeCollisionRadius_[i] = 0.2f + scale * 0.35f;
+		coffeeInstancedObject_->SetInstanceOffset(i, coffeeOffsets_[i]);
+	}
 }
+
 
 void CoffeeScene::Update() {
 	auto* input = Input::GetInstance();

@@ -56,6 +56,7 @@ class InstancedObject3d {
 	Vector2 uvAnchor_ = {0.0f, 0.0f};
 	Vector3 spawnOrigin_ = {0.0f, 0.0f, 0.0f};
 	std::vector<Transform> instanceTransforms_{};
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> instanceTransformResources_{};
 
 public:
 	~InstancedObject3d();

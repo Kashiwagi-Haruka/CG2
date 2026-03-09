@@ -1,2 +1,11 @@
 #pragma once
-class GameSave {};
+class GameSave {
+
+
+
+	void Save();
+	void Load();
+
+
+
+};
