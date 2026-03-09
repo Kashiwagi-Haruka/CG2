@@ -13,7 +13,7 @@
 namespace {
 constexpr const char* kCoffeeModelDirectory = "Resources/TD3_3102/3d/Coffee";
 constexpr const char* kCoffeeModelName = "Coffee";
-constexpr uint32_t kCoffeeInstanceCount = 100;
+constexpr uint32_t kCoffeeInstanceCount = 1000;
 constexpr Vector3 kCoffeeSpawnOrigin = {0.0f, 5.0f, 0.0f};
 constexpr float kCoffeeMinScale = 0.22f;
 constexpr float kCoffeeScaleStep = 0.0f;
@@ -74,7 +74,7 @@ Coffee::Coffee() { instancedObject_ = std::make_unique<InstancedObject3d>(); }
 void Coffee::Initialize() {
 	ModelManager::GetInstance()->LoadModel(kCoffeeModelDirectory, kCoffeeModelName);
 	instancedObject_->Initialize(kCoffeeModelName);
-	instancedObject_->SetSpawnOrigin(kCoffeeSpawnOrigin);
+	instancedObject_->SetSpawnOrigin({0.0f, 0.0f, 0.0f});
 	instancedObject_->SetInstanceCount(kCoffeeInstanceCount);
 
 	instances_.resize(kCoffeeInstanceCount);
