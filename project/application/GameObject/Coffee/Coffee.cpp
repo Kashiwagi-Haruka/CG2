@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstring>
+#include <unordered_map>
 
 namespace {
 constexpr const char* kCoffeeModelDirectory = "Resources/TD3_3102/3d/Coffee";
@@ -25,8 +26,23 @@ constexpr float kCoffeeSeparationBias = 0.001f;
 constexpr float kCoffeeMinSpawnInterval = 0.035f;
 constexpr float kCoffeeMaxSpawnInterval = 0.18f;
 constexpr float kCoffeeSpawnAreaRadius = 0.35f;
+constexpr float kCoffeeSpatialCellSize = 0.6f;
 
+int64_t HashCell(int32_t x, int32_t y, int32_t z) { return (static_cast<int64_t>(x) << 42) ^ (static_cast<int64_t>(y) << 21) ^ static_cast<int64_t>(z); }
 
+struct CellCoord {
+	int32_t x;
+	int32_t y;
+	int32_t z;
+};
+
+CellCoord ComputeCellCoord(const Vector3& position) {
+	return {
+	    static_cast<int32_t>(std::floor(position.x / kCoffeeSpatialCellSize)),
+	    static_cast<int32_t>(std::floor(position.y / kCoffeeSpatialCellSize)),
+	    static_cast<int32_t>(std::floor(position.z / kCoffeeSpatialCellSize)),
+	};
+}
 Microsoft::WRL::ComPtr<ID3D12Resource> CreateDefaultBufferResource(DirectXCommon* dxCommon, size_t sizeInBytes, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState) {
 	D3D12_HEAP_PROPERTIES heapProperties{};
 	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -209,7 +225,7 @@ void Coffee::RunSimulation() {
 		++activeInstanceCount_;
 	}
 
-	std::vector<Vector3> pendingPush(instances_.size(), {0.0f, 0.0f, 0.0f});
+	std::vector<Vector3> pendingPush(activeInstanceCount_, {0.0f, 0.0f, 0.0f});
 
 	for (size_t i = 0; i < activeInstanceCount_; ++i) {
 		auto& instance = instances_[i];
@@ -225,70 +241,91 @@ void Coffee::RunSimulation() {
 		}
 	}
 
+	std::unordered_map<int64_t, std::vector<uint32_t>> cellMap;
+	cellMap.reserve(activeInstanceCount_);
+	for (uint32_t i = 0; i < activeInstanceCount_; ++i) {
+		const CellCoord coord = ComputeCellCoord(instances_[i].position);
+		cellMap[HashCell(coord.x, coord.y, coord.z)].push_back(i);
+	}
+
 	for (size_t i = 0; i < activeInstanceCount_; ++i) {
-		for (size_t j = i + 1; j < activeInstanceCount_; ++j) {
-			const float minDist = instances_[i].radius + instances_[j].radius;
-			const Vector3 delta = {
-			    instances_[i].position.x - instances_[j].position.x,
-			    instances_[i].position.y - instances_[j].position.y,
-			    instances_[i].position.z - instances_[j].position.z,
-			};
-			const float distSq = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
-			const float minDistSq = minDist * minDist;
+		const CellCoord coord = ComputeCellCoord(instances_[i].position);
+		for (int32_t dz = -1; dz <= 1; ++dz) {
+			for (int32_t dy = -1; dy <= 1; ++dy) {
+				for (int32_t dx = -1; dx <= 1; ++dx) {
+					auto it = cellMap.find(HashCell(coord.x + dx, coord.y + dy, coord.z + dz));
+					if (it == cellMap.end()) {
+						continue;
+					}
+					for (const uint32_t j : it->second) {
+						if (j <= i) {
+							continue;
+						}
+						const float minDist = instances_[i].radius + instances_[j].radius;
+						const Vector3 delta = {
+						    instances_[i].position.x - instances_[j].position.x,
+						    instances_[i].position.y - instances_[j].position.y,
+						    instances_[i].position.z - instances_[j].position.z,
+						};
+						const float distSq = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
+						const float minDistSq = minDist * minDist;
 
-			if (distSq < minDistSq && distSq > 1e-7f) {
-				const float dist = std::sqrt(distSq);
-				const float overlap = minDist - dist;
-				const float scale = (overlap * 0.5f + separationBias) / dist;
-				const Vector3 normal = {delta.x / dist, delta.y / dist, delta.z / dist};
-				const Vector3 push = {delta.x * scale, delta.y * scale, delta.z * scale};
-				pendingPush[i].x += push.x;
-				pendingPush[i].y += push.y;
-				pendingPush[i].z += push.z;
-				pendingPush[j].x -= push.x;
-				pendingPush[j].y -= push.y;
-				pendingPush[j].z -= push.z;
+						if (distSq < minDistSq && distSq > 1e-7f) {
+							const float dist = std::sqrt(distSq);
+							const float overlap = minDist - dist;
+							const float scale = (overlap * 0.5f + separationBias) / dist;
+							const Vector3 normal = {delta.x / dist, delta.y / dist, delta.z / dist};
+							const Vector3 push = {delta.x * scale, delta.y * scale, delta.z * scale};
+							pendingPush[i].x += push.x;
+							pendingPush[i].y += push.y;
+							pendingPush[i].z += push.z;
+							pendingPush[j].x -= push.x;
+							pendingPush[j].y -= push.y;
+							pendingPush[j].z -= push.z;
 
-				const Vector3 relative = {
-				    instances_[i].velocity.x - instances_[j].velocity.x,
-				    instances_[i].velocity.y - instances_[j].velocity.y,
-				    instances_[i].velocity.z - instances_[j].velocity.z,
-				};
-				const float relativeAlongNormal = relative.x * normal.x + relative.y * normal.y + relative.z * normal.z;
+							const Vector3 relative = {
+							    instances_[i].velocity.x - instances_[j].velocity.x,
+							    instances_[i].velocity.y - instances_[j].velocity.y,
+							    instances_[i].velocity.z - instances_[j].velocity.z,
+							};
+							const float relativeAlongNormal = relative.x * normal.x + relative.y * normal.y + relative.z * normal.z;
 
-				if (relativeAlongNormal < 0.0f) {
-					const float impulse = -(1.0f + kCoffeeCollisionDamping) * relativeAlongNormal * 0.5f;
-					const Vector3 impulseVec = {normal.x * impulse, normal.y * impulse, normal.z * impulse};
-					instances_[i].velocity.x += impulseVec.x;
-					instances_[i].velocity.y += impulseVec.y;
-					instances_[i].velocity.z += impulseVec.z;
-					instances_[j].velocity.x -= impulseVec.x;
-					instances_[j].velocity.y -= impulseVec.y;
-					instances_[j].velocity.z -= impulseVec.z;
+							if (relativeAlongNormal < 0.0f) {
+								const float impulse = -(1.0f + kCoffeeCollisionDamping) * relativeAlongNormal * 0.5f;
+								const Vector3 impulseVec = {normal.x * impulse, normal.y * impulse, normal.z * impulse};
+								instances_[i].velocity.x += impulseVec.x;
+								instances_[i].velocity.y += impulseVec.y;
+								instances_[i].velocity.z += impulseVec.z;
+								instances_[j].velocity.x -= impulseVec.x;
+								instances_[j].velocity.y -= impulseVec.y;
+								instances_[j].velocity.z -= impulseVec.z;
+							}
+						}
+					}
 				}
 			}
 		}
+
+		for (size_t i = 0; i < activeInstanceCount_; ++i) {
+			auto& instance = instances_[i];
+			instance.position.x = std::clamp(instance.position.x + pendingPush[i].x, roomMinX, roomMaxX);
+			instance.position.y += pendingPush[i].y;
+			instance.position.z = std::clamp(instance.position.z + pendingPush[i].z, roomMinZ, roomMaxZ);
+			if (instance.position.y < floorY) {
+				instance.position.y = floorY;
+				instance.velocity.y = std::max(instance.velocity.y, 0.0f);
+			}
+			if (instance.position.x <= roomMinX || instance.position.x >= roomMaxX) {
+				instance.velocity.x *= -kCoffeeCollisionDamping;
+			}
+			if (instance.position.z <= roomMinZ || instance.position.z >= roomMaxZ) {
+				instance.velocity.z *= -kCoffeeCollisionDamping;
+			}
+			instancedObject_->SetInstanceOffset(i, instance.position);
+		}
 	}
 
-	for (size_t i = 0; i < activeInstanceCount_; ++i) {
-		auto& instance = instances_[i];
-		instance.position.x = std::clamp(instance.position.x + pendingPush[i].x, roomMinX, roomMaxX);
-		instance.position.y += pendingPush[i].y;
-		instance.position.z = std::clamp(instance.position.z + pendingPush[i].z, roomMinZ, roomMaxZ);
-		if (instance.position.y < floorY) {
-			instance.position.y = floorY;
-			instance.velocity.y = std::max(instance.velocity.y, 0.0f);
-		}
-		if (instance.position.x <= roomMinX || instance.position.x >= roomMaxX) {
-			instance.velocity.x *= -kCoffeeCollisionDamping;
-		}
-		if (instance.position.z <= roomMinZ || instance.position.z >= roomMaxZ) {
-			instance.velocity.z *= -kCoffeeCollisionDamping;
-		}
-		instancedObject_->SetInstanceOffset(i, instance.position);
-	}
 }
-
 void Coffee::Update(Camera* camera, const Vector3& lightDirection) {
 	if (simulationParamsData_) {
 		simulationParamsData_->deltaTime = std::max(Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime(), 1.0f / 120.0f);
