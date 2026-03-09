@@ -20,6 +20,8 @@ constexpr float kCoffeeGroundY = 0.0f;
 constexpr float kCoffeeGravity = -0.015f;
 constexpr float kCoffeeBounceDamping = 0.8f;
 constexpr float kCoffeeSeparationBias = 0.001f;
+constexpr float kCoffeeSpawnSeparationX = 1.8f;
+constexpr float kCoffeeSpawnSeparationZ = 1.0f;
 } // namespace
 
 
@@ -84,10 +86,10 @@ void CoffeeScene::Initialize() {
 	coffeeOffsets_.resize(2);
 	coffeeVelocitiesY_.assign(2, 0.0f);
 	coffeeCollisionRadius_.resize(2);
-	coffeeOffsets_[0] = {-0.9f, kCoffeeStartHeight, 0.0f};
-	coffeeOffsets_[1] = {0.9f, kCoffeeStartHeight, 0.0f};
-	coffeeCollisionRadius_[0] = 0.45f;
-	coffeeCollisionRadius_[1] = 0.65f;
+	coffeeOffsets_[0] = {-kCoffeeSpawnSeparationX, kCoffeeStartHeight-2.0f, -kCoffeeSpawnSeparationZ};
+	coffeeOffsets_[1] = {kCoffeeSpawnSeparationX, kCoffeeStartHeight + 1.0f, kCoffeeSpawnSeparationZ};
+	coffeeCollisionRadius_[0] = 0.75f;
+	coffeeCollisionRadius_[1] = 1.0f;
 	coffeeInstancedObject_->SetInstanceOffset(0, coffeeOffsets_[0]);
 	coffeeInstancedObject_->SetInstanceOffset(1, coffeeOffsets_[1]);
 }
