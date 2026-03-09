@@ -279,10 +279,10 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Chair\Chair.h" />
     <ClInclude Include="application\Scene\TD3_4month\CoffeeScene.h" />
     <ClInclude Include="Engine\Editor\EditorGrid.h" />
-    <ClInclude Include="Engine\Texture\Material.h" />
+    <ClInclude Include="Engine\Texture\Data\Material.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\AnimationManager.h" />
     <ClInclude Include="Engine\Math\QuaternionTransform.h" />
-    <ClInclude Include="Engine\Texture\Color.h" />
+    <ClInclude Include="Engine\Texture\Data\Color.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h" />
     <ClInclude Include="Engine\Texture\Light\AreaLight.h" />
     <ClInclude Include="Engine\Texture\PSO\CreatePSO.h" />
@@ -301,7 +301,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\LeakChecker\D3DResourceLeakChecker.h" />
     <ClInclude Include="Engine\Texture\Light\PointLight.h" />
     <ClInclude Include="Engine\Texture\Light\SpotLight.h" />
-    <ClInclude Include="Engine\Texture\SkinningData.h" />
+    <ClInclude Include="Engine\Texture\Data\SkinningData.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -317,7 +317,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Math\Vector2.h" />
     <ClInclude Include="Engine\Math\Vector3.h" />
     <ClInclude Include="Engine\Math\Vector4.h" />
-    <ClInclude Include="Engine\Texture\VertexData.h" />
+    <ClInclude Include="Engine\Texture\Data\VertexData.h" />
     <ClInclude Include="Engine\base\WinApp.h" />
     <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3d.h" />
     <ClInclude Include="Engine\Log\Logger.h" />

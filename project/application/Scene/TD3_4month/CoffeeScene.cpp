@@ -1,6 +1,7 @@
 #include "CoffeeScene.h"
 #include "Input.h"
 #include "Light/DirectionalLight.h"
+#include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #ifdef USE_IMGUI
 #include <imgui.h>
@@ -11,7 +12,10 @@ namespace {
 constexpr float kRoomWidth = 9.0f;
 constexpr float kRoomHeight = 2.4f;
 constexpr float kRoomDepth = 15.0f;
+constexpr const char* kCoffeeModelDirectory = "Resources/TD3_3102/3d/Coffee";
+constexpr const char* kCoffeeModelName = "Coffee";
 } // namespace
+
 
 CoffeeScene::CoffeeScene() {
 	for (auto& wall : roomWalls_) {
@@ -64,7 +68,8 @@ void CoffeeScene::Initialize() {
 	roomWalls_[5]->SetRotate({0.0f, std::numbers::pi_v<float> * 0.5f, 0.0f});
 	roomWalls_[5]->SetTranslate({halfWidth, halfHeight, 0.0f});
 
-	coffeeInstancedObject_->Initialize();
+		ModelManager::GetInstance()->LoadModel(kCoffeeModelDirectory, kCoffeeModelName);
+	coffeeInstancedObject_->Initialize(kCoffeeModelName);
 }
 
 void CoffeeScene::Update() {

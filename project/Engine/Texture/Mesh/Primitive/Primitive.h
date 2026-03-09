@@ -1,11 +1,11 @@
 #pragma once
 #include "CameraForGPU.h"
 #include "Matrix4x4.h"
-#include "Material.h"
+#include "Data/Material.h"
 #include "Transform.h"
 #include "Vector2.h"
 #include "Vector4.h"
-#include "VertexData.h"
+#include "Data/VertexData.h"
 #include <cstdint>
 #include <d3d12.h>
 #include <string>

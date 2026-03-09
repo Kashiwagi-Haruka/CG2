@@ -1,16 +1,19 @@
 #pragma once
 #include "Camera.h"
 #include "Matrix4x4.h"
+#include "PSO/CreatePSO.h"
 #include "Vector3.h"
 #include "Vector4.h"
 #include <cstdint>
 #include <d3d12.h>
+#include <memory>
+#include <string>
 #include <vector>
 #include <wrl.h>
 
-struct ID3D12PipelineState;
+class Model;
+
 struct ID3D12Resource;
-struct ID3D12RootSignature;
 
 class InstancedObject3d {
 private:
@@ -29,8 +32,7 @@ private:
 	std::vector<CoffeeVertex> coffeeVertices_{};
 	std::vector<uint32_t> coffeeIndices_{};
 
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_ = nullptr;
+	std::unique_ptr<CreatePSO> pso_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> instanceResource_ = nullptr;
@@ -39,13 +41,19 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 	uint32_t instanceSrvIndex_ = 0;
+	bool hasInstanceSrvIndex_ = false;
+	std::string modelPath_{};
+	bool isInitialized_ = false;
 
+	void CreateDefaultMesh();
+	void CreateMeshFromModel(const Model& model);
 	void CreateMesh();
 	void CreateInstancingPipeline();
 	void CreateBuffers();
 
 public:
-	void Initialize();
+	void Initialize(const std::string& modelPath = "");
+	void SetModel(const std::string& modelPath);
 	void Update(const Camera* camera, const Vector3& lightDirection);
 	void Draw();
 	uint32_t GetInstanceCount() const { return kCoffeeInstanceCount_; }

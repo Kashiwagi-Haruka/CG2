@@ -1,9 +1,11 @@
 #include "InstancedObject3d.h"
-#include "Function.h"
-#include "Object3d/Object3dCommon.h"
 #include "DirectXCommon.h"
-#include "TextureManager.h"
+#include "Function.h"
+#include "Model/Model.h"
+#include "Model/ModelManager.h"
+#include "Object3d/Object3dCommon.h"
 #include "SrvManager/SrvManager.h"
+#include "TextureManager.h"
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -24,7 +26,7 @@ constexpr float kCellSize = kCoffeeRadius * 2.1f;
 constexpr float kCollisionRadius = kCoffeeRadius * 1.4f;
 } // namespace
 
-void InstancedObject3d::CreateMesh() {
+void InstancedObject3d::CreateDefaultMesh() {
 	coffeeVertices_.clear();
 	coffeeIndices_.clear();
 	for (uint32_t i = 0; i < kCoffeeSlices; ++i) {
@@ -62,69 +64,55 @@ void InstancedObject3d::CreateMesh() {
 	}
 }
 
-void InstancedObject3d::CreateInstancingPipeline() {
-	auto* dxCommon = Object3dCommon::GetInstance()->GetDxCommon();
-	auto* device = dxCommon->GetDevice();
-	const std::wstring vsPath = L"Resources/shader/Object3d/VS_Shader/InstancedObject3d.VS.hlsl";
-	const std::wstring psPath = L"Resources/shader/Object3d/PS_Shader/InstancedObject3d.PS.hlsl";
+void InstancedObject3d::CreateMeshFromModel(const Model& model) {
+	coffeeVertices_.clear();
+	coffeeIndices_.clear();
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange{};
-	descriptorRange.BaseShaderRegister = 13;
-	descriptorRange.NumDescriptors = 1;
-	descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	descriptorRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	const auto& modelData = model.GetModelData();
+	coffeeVertices_.reserve(modelData.vertices.size());
+	for (const auto& vertex : modelData.vertices) {
+		coffeeVertices_.push_back({
+		    {vertex.position.x, vertex.position.y, vertex.position.z},
+		    vertex.normal,
+		});
+	}
 
-	D3D12_ROOT_PARAMETER rootParameters[2]{};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
-	rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRange;
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameters[1].Descriptor.ShaderRegister = 13;
-
-	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
-	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	rootSignatureDesc.NumParameters = _countof(rootParameters);
-	rootSignatureDesc.pParameters = rootParameters;
-
-	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
-	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
-	HRESULT hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-	assert(SUCCEEDED(hr));
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
-	assert(SUCCEEDED(hr));
-
-	auto vsBlob = dxCommon->CompileShader(vsPath.c_str(), L"vs_6_0");
-	auto psBlob = dxCommon->CompileShader(psPath.c_str(), L"ps_6_0");
-
-	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-	    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-	    {"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-	};
-
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
-	psoDesc.pRootSignature = rootSignature_.Get();
-	psoDesc.InputLayout = {inputLayout, _countof(inputLayout)};
-	psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
-	psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
-	psoDesc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
-	psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
-	psoDesc.RasterizerState.DepthClipEnable = TRUE;
-	psoDesc.DepthStencilState.DepthEnable = true;
-	psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-	psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	psoDesc.NumRenderTargets = 1;
-	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	psoDesc.SampleDesc.Count = 1;
-	hr = device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pipelineState_));
-	assert(SUCCEEDED(hr));
+	coffeeIndices_ = modelData.indices;
+	if (coffeeIndices_.empty()) {
+		coffeeIndices_.resize(coffeeVertices_.size());
+		for (uint32_t i = 0; i < coffeeIndices_.size(); ++i) {
+			coffeeIndices_[i] = i;
+		}
+	}
 }
 
+void InstancedObject3d::CreateMesh() {
+	if (modelPath_.empty()) {
+		CreateDefaultMesh();
+		return;
+	}
+
+	std::unique_ptr<Model> modelInstance = ModelManager::GetInstance()->CreateModelInstance(modelPath_);
+	if (modelInstance) {
+		CreateMeshFromModel(*modelInstance);
+		return;
+	}
+
+	Model* model = ModelManager::GetInstance()->FindModel(modelPath_);
+	if (model) {
+		CreateMeshFromModel(*model);
+		return;
+	}
+
+	CreateDefaultMesh();
+}
+
+void InstancedObject3d::CreateInstancingPipeline() {
+	const std::wstring vsPath = L"Resources/shader/Object3d/VS_Shader/InstancedObject3d.VS.hlsl";
+	const std::wstring psPath = L"Resources/shader/Object3d/PS_Shader/InstancedObject3d.PS.hlsl";
+	pso_ = std::make_unique<CreatePSO>(Object3dCommon::GetInstance()->GetDxCommon());
+	pso_->CreateInstancedObject3d(psPath, vsPath);
+}
 void InstancedObject3d::CreateBuffers() {
 	auto* object3dCommon = Object3dCommon::GetInstance();
 	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
@@ -197,7 +185,10 @@ void InstancedObject3d::CreateBuffers() {
 		mappedInstance[i] = Function::MakeAffineMatrix(Vector3{scale, scale, scale}, Vector3{0.0f, yaw, 0.0f}, position);
 	}
 
-	instanceSrvIndex_ = srvManager->Allocate();
+		if (!hasInstanceSrvIndex_) {
+		instanceSrvIndex_ = srvManager->Allocate();
+		hasInstanceSrvIndex_ = true;
+	}
 	srvManager->CreateSRVforStructuredBuffer(instanceSrvIndex_, instanceResource_.Get(), kCoffeeInstanceCount_, sizeof(Matrix4x4));
 
 	sceneConstantResource_ = object3dCommon->CreateBufferResource(sizeof(CoffeeSceneConstants));
@@ -206,9 +197,20 @@ void InstancedObject3d::CreateBuffers() {
 	sceneConstants_->lightDirection = {0.1f, -0.5f, -0.2f, 1.0f};
 }
 
-void InstancedObject3d::Initialize() {
+void InstancedObject3d::Initialize(const std::string& modelPath) {
+	modelPath_ = modelPath;
 	CreateMesh();
 	CreateInstancingPipeline();
+	CreateBuffers();
+	isInitialized_ = true;
+}
+
+void InstancedObject3d::SetModel(const std::string& modelPath) {
+	modelPath_ = modelPath;
+	if (!isInitialized_) {
+		return;
+	}
+	CreateMesh();
 	CreateBuffers();
 }
 
@@ -223,8 +225,8 @@ void InstancedObject3d::Draw() {
 	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
 	ID3D12DescriptorHeap* descriptorHeaps[] = {srvManager->GetDescriptorHeap().Get()};
 	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-	commandList->SetGraphicsRootSignature(rootSignature_.Get());
-	commandList->SetPipelineState(pipelineState_.Get());
+	commandList->SetGraphicsRootSignature(pso_->GetRootSignature().Get());
+	commandList->SetPipelineState(pso_->GetGraphicsPipelineState(BlendMode::kBlendModeNone).Get());
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	commandList->IASetIndexBuffer(&indexBufferView_);

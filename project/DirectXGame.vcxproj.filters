@@ -560,7 +560,7 @@
     <ClInclude Include="Engine\Math\RigidBody.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\SkinningData.h">
+    <ClInclude Include="Engine\Texture\Data\SkinningData.h">
       <Filter>Engine\Animation</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\Mesh\Animation\Skeleton.h">
@@ -587,10 +587,10 @@
     <ClInclude Include="Engine\Math\Vector2.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Color.h">
+    <ClInclude Include="Engine\Texture\Data\Color.h">
       <Filter>Engine\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Material.h">
+    <ClInclude Include="Engine\Texture\Data\Material.h">
       <Filter>Engine\Texture</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h">
@@ -611,7 +611,7 @@
     <ClInclude Include="Engine\StringUtillity\StringUtility.h">
       <Filter>Engine\Logger</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\VertexData.h">
+    <ClInclude Include="Engine\Texture\Data\VertexData.h">
       <Filter>Engine\Texture</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\TextureManager.h">
