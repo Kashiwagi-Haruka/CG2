@@ -206,20 +206,19 @@ void InstancedObject3d::CreateBuffers() {
 		mappedInstanceData[i].padding = {0.0f, 0.0f, 0.0f};
 	}
 
-	if (!hasInstanceSrvIndex_) {
-		instanceSrvIndex_ = srvManager->Allocate();
-		instanceDataUavIndex_ = srvManager->Allocate();
-		instanceWorldUavIndex_ = srvManager->Allocate();
-		hasInstanceSrvIndex_ = true;
-	}
-	srvManager->CreateSRVforStructuredBuffer(instanceSrvIndex_, instanceResource_.Get(), kCoffeeInstanceCount_, sizeof(Matrix4x4));
-	srvManager->CreateUAVforStructuredBuffer(instanceDataUavIndex_, instanceDataResource_.Get(), kCoffeeInstanceCount_, sizeof(InstanceData));
-	srvManager->CreateUAVforStructuredBuffer(instanceWorldUavIndex_, instanceResource_.Get(), kCoffeeInstanceCount_, sizeof(Matrix4x4));
-
 	if (!hasCollisionDescriptor_) {
 		collisionParamResource_ = object3dCommon->CreateBufferResource(sizeof(CollisionParams));
+		if (!collisionParamResource_) {
+			hasCollisionDescriptor_ = false;
+			return;
+		}
 		CollisionParams* params = nullptr;
-		collisionParamResource_->Map(0, nullptr, reinterpret_cast<void**>(&params));
+		const HRESULT hr = collisionParamResource_->Map(0, nullptr, reinterpret_cast<void**>(&params));
+		if (FAILED(hr) || !params) {
+			collisionParamResource_.Reset();
+			hasCollisionDescriptor_ = false;
+			return;
+		}
 		params->instanceCount = kCoffeeInstanceCount_;
 		params->minDistance = kCollisionRadius * 2.0f;
 		params->roomMinX = minX;
@@ -232,12 +231,25 @@ void InstancedObject3d::CreateBuffers() {
 	}
 
 	sceneConstantResource_ = object3dCommon->CreateBufferResource(sizeof(CoffeeSceneConstants));
-	sceneConstantResource_->Map(0, nullptr, reinterpret_cast<void**>(&sceneConstants_));
+	if (!sceneConstantResource_) {
+		sceneConstants_ = nullptr;
+		return;
+	}
+	const HRESULT sceneMapHr = sceneConstantResource_->Map(0, nullptr, reinterpret_cast<void**>(&sceneConstants_));
+	if (FAILED(sceneMapHr) || !sceneConstants_) {
+		sceneConstantResource_.Reset();
+		sceneConstants_ = nullptr;
+		return;
+	}
 	sceneConstants_->viewProjection = Function::MakeIdentity4x4();
 	sceneConstants_->lightDirection = {0.1f, -0.5f, -0.2f, 1.0f};
 }
 
 void InstancedObject3d::DispatchCollision() {
+	if (!collisionPipelineState_ || !collisionRootSignature_ || !instanceDataResource_ || !instanceResource_ || !collisionParamResource_) {
+		return;
+	}
+
 	auto* dxCommon = Object3dCommon::GetInstance()->GetDxCommon();
 	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
 	auto* commandList = dxCommon->GetCommandList();
@@ -306,12 +318,20 @@ void InstancedObject3d::SetModel(const std::string& modelPath) {
 }
 
 void InstancedObject3d::Update(const Camera* camera, const Vector3& lightDirection) {
+	if (!camera || !sceneConstants_) {
+		return;
+	}
+
 	sceneConstants_->viewProjection = camera->GetViewProjectionMatrix();
 	sceneConstants_->lightDirection = {lightDirection.x, lightDirection.y, lightDirection.z, 1.0f};
 	DispatchCollision();
 }
 
 void InstancedObject3d::Draw() {
+	if (!pso_ || !sceneConstantResource_ || !vertexResource_ || !indexResource_ || !hasInstanceSrvIndex_) {
+		return;
+	}
+
 	auto* dxCommon = Object3dCommon::GetInstance()->GetDxCommon();
 	auto* commandList = dxCommon->GetCommandList();
 	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
