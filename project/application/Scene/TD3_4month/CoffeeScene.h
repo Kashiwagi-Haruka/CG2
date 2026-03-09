@@ -2,13 +2,12 @@
 #include "BaseScene.h"
 #include "Camera.h"
 #include "DebugCamera.h"
-#include "Object3d/InstancedObject3d/InstancedObject3d.h"
+#include "GameObject/Coffee/Coffee.h"
 #include "Primitive/Primitive.h"
 #include "Transform.h"
 #include <array>
 #include <cstddef>
 #include <memory>
-#include <vector>
 
 class CoffeeScene : public BaseScene {
 private:
@@ -16,11 +15,8 @@ private:
 	std::array<std::unique_ptr<Primitive>, kWallCount_> roomWalls_{};
 	std::unique_ptr<Camera> camera_ = nullptr;
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
-	std::unique_ptr<InstancedObject3d> coffeeInstancedObject_ = nullptr;
+	std::unique_ptr<Coffee> coffee_ = nullptr;
 	Transform cameraTransform_{};
-	std::vector<Vector3> coffeeOffsets_{};
-	std::vector<float> coffeeVelocitiesY_{};
-	std::vector<float> coffeeCollisionRadius_{};
 	bool useDebugCamera_ = false;
 
 public:

@@ -93,6 +93,7 @@ struct PixelShaderOutput
 };
 
 static const float kToonShadowThreshold = 0.5f;
+static const float kToonShadowSoftness = 0.04f;
 static const float kToonShadowStrength = 0.35f;
 static const float kToonLightIntensityMax = 1.00f;
 float3 ApplyGrayscale(float3 color)
@@ -119,7 +120,11 @@ float3 ApplySepia(float3 color)
 }
 float ComputeToonShadowMask(float NdotL)
 {
-    return step(kToonShadowThreshold, saturate(NdotL));
+    float saturatedNdotL = saturate(NdotL);
+    return smoothstep(
+        kToonShadowThreshold - kToonShadowSoftness,
+        kToonShadowThreshold + kToonShadowSoftness,
+        saturatedNdotL);
 }
 
 
