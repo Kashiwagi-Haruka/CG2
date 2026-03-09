@@ -59,7 +59,6 @@ private:
 	std::string modelPath_{};
 	bool isInitialized_ = false;
 
-	void CreateDefaultMesh();
 	void CreateMeshFromModel(const Model& model);
 	void CreateMesh();
 	void CreateInstancingPipeline();
