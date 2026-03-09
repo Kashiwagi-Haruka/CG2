@@ -17,13 +17,15 @@ constexpr float kCoffeeMinScale = 0.22f;
 constexpr float kCoffeeScaleStep = 0.0f;
 constexpr float kCoffeeGravity = -15.0f;
 constexpr float kCoffeeBounceDamping = 0.0f;
-constexpr float kCoffeeGroundFriction = 0.93f;
-constexpr float kCoffeeCollisionDamping = 0.85f;
+constexpr float kCoffeeGroundFriction = 0.82f;
+constexpr float kCoffeeStaticFrictionSpeed = 0.07f;
+constexpr float kCoffeeCollisionDamping = 0.75f;
+constexpr float kCoffeeCollisionTangentialDamping = 0.65f;
 constexpr float kCoffeeSeparationBias = 0.001f;
 constexpr float kCoffeeMinSpawnInterval = 0.001f;
 constexpr float kCoffeeMaxSpawnInterval = 0.005f;
 constexpr float kCoffeeSpawnAreaRadius = 0.35f;
-constexpr float kCoffeeSpatialCellSize = 0.6f;
+constexpr float kCoffeeSpatialCellSize = 0.7f;
 constexpr float kCoffeeCanTopY = 0.85f;
 constexpr float kCoffeeCanTopRadius = 0.7f;
 
@@ -75,7 +77,8 @@ void Coffee::Initialize() {
 
 		instances_[i].position = kCoffeeSpawnOrigin;
 		instances_[i].scale = scale;
-		instances_[i].radius = 0.2f + scale * 0.35f;
+		instances_[i].radius = 0.12f + scale * 0.22f;
+		instances_[i].halfHeight = 0.18f + scale * 0.35f;
 		instances_[i].velocity = {0.0f, 0.0f, 0.0f};
 		instances_[i].isActive = false;
 		instancedObject_->SetInstanceOffset(i, {0.0f, -1000.0f, 0.0f});
@@ -103,7 +106,6 @@ void Coffee::RunSimulation() {
 	const float deltaTime = simulationParams_.deltaTime;
 	const float gravity = simulationParams_.gravity;
 	const float floorY = simulationParams_.floorY;
-	const float bounceDamping = simulationParams_.bounceDamping;
 	const Vector3 canTopCenter = simulationParams_.canTopCenter;
 	const float canTopY = simulationParams_.canTopY;
 	const float canTopRadius = simulationParams_.canTopRadius;
@@ -141,7 +143,6 @@ void Coffee::RunSimulation() {
 
 	pendingPush.resize(activeInstanceCount_);
 	std::fill(pendingPush.begin(), pendingPush.end(), Vector3{0.0f, 0.0f, 0.0f});
-
 	cellCoords.resize(activeInstanceCount_);
 	cellEntries.resize(activeInstanceCount_);
 
@@ -151,6 +152,7 @@ void Coffee::RunSimulation() {
 		instance.position.x += instance.velocity.x * deltaTime;
 		instance.position.y += instance.velocity.y * deltaTime;
 		instance.position.z += instance.velocity.z * deltaTime;
+
 		const float offsetXFromCan = instance.position.x - canTopCenter.x;
 		const float offsetZFromCan = instance.position.z - canTopCenter.z;
 		const float horizontalDistSqFromCan = offsetXFromCan * offsetXFromCan + offsetZFromCan * offsetZFromCan;
@@ -167,6 +169,12 @@ void Coffee::RunSimulation() {
 			instance.velocity.y = 0.0f;
 			instance.velocity.x *= kCoffeeGroundFriction;
 			instance.velocity.z *= kCoffeeGroundFriction;
+		}
+
+		const float horizontalSpeedSq = instance.velocity.x * instance.velocity.x + instance.velocity.z * instance.velocity.z;
+		if (horizontalSpeedSq < kCoffeeStaticFrictionSpeed * kCoffeeStaticFrictionSpeed && instance.velocity.y == 0.0f) {
+			instance.velocity.x = 0.0f;
+			instance.velocity.z = 0.0f;
 		}
 	}
 
@@ -189,9 +197,9 @@ void Coffee::RunSimulation() {
 		begin = end;
 	}
 
-	const auto findCellRange = [](const std::vector<CellRange>& cellRanges, int64_t key) -> const CellRange* {
-		auto it = std::lower_bound(cellRanges.begin(), cellRanges.end(), key, [](const CellRange& range, int64_t value) { return range.key < value; });
-		if (it == cellRanges.end() || it->key != key) {
+	const auto findCellRange = [](const std::vector<CellRange>& ranges, int64_t key) -> const CellRange* {
+		auto it = std::lower_bound(ranges.begin(), ranges.end(), key, [](const CellRange& range, int64_t value) { return range.key < value; });
+		if (it == ranges.end() || it->key != key) {
 			return nullptr;
 		}
 		return &(*it);
@@ -211,44 +219,56 @@ void Coffee::RunSimulation() {
 						if (j <= i) {
 							continue;
 						}
-						const float minDist = instances_[i].radius + instances_[j].radius;
-						const Vector3 delta = {
-						    instances_[i].position.x - instances_[j].position.x,
-						    instances_[i].position.y - instances_[j].position.y,
-						    instances_[i].position.z - instances_[j].position.z,
-						};
-						const float distSq = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
-						const float minDistSq = minDist * minDist;
 
-						if (distSq < minDistSq && distSq > 1e-7f) {
-							const float dist = std::sqrt(distSq);
+						const float minDist = instances_[i].radius + instances_[j].radius;
+						const float deltaX = instances_[i].position.x - instances_[j].position.x;
+						const float deltaZ = instances_[i].position.z - instances_[j].position.z;
+						const float distSqXZ = deltaX * deltaX + deltaZ * deltaZ;
+						const float minDistSq = minDist * minDist;
+						const float deltaY = std::abs(instances_[i].position.y - instances_[j].position.y);
+						const float minHeight = instances_[i].halfHeight + instances_[j].halfHeight;
+
+						if (distSqXZ < minDistSq && distSqXZ > 1e-7f && deltaY < minHeight) {
+							const float dist = std::sqrt(distSqXZ);
 							const float overlap = minDist - dist;
 							const float scale = (overlap * 0.5f + separationBias) / dist;
-							const Vector3 normal = {delta.x / dist, delta.y / dist, delta.z / dist};
-							const Vector3 push = {delta.x * scale, delta.y * scale, delta.z * scale};
+							const Vector3 normal = {deltaX / dist, 0.0f, deltaZ / dist};
+							const Vector3 push = {deltaX * scale, 0.0f, deltaZ * scale};
 							pendingPush[i].x += push.x;
-							pendingPush[i].y += push.y;
 							pendingPush[i].z += push.z;
 							pendingPush[j].x -= push.x;
-							pendingPush[j].y -= push.y;
 							pendingPush[j].z -= push.z;
 
-							const Vector3 relative = {
+							const Vector3 relativeVelocity = {
 							    instances_[i].velocity.x - instances_[j].velocity.x,
-							    instances_[i].velocity.y - instances_[j].velocity.y,
+							    0.0f,
 							    instances_[i].velocity.z - instances_[j].velocity.z,
 							};
-							const float relativeAlongNormal = relative.x * normal.x + relative.y * normal.y + relative.z * normal.z;
+							const float relativeAlongNormal = relativeVelocity.x * normal.x + relativeVelocity.z * normal.z;
 
 							if (relativeAlongNormal < 0.0f) {
 								const float impulse = -(1.0f + kCoffeeCollisionDamping) * relativeAlongNormal * 0.5f;
-								const Vector3 impulseVec = {normal.x * impulse, normal.y * impulse, normal.z * impulse};
+								const Vector3 impulseVec = {normal.x * impulse, 0.0f, normal.z * impulse};
 								instances_[i].velocity.x += impulseVec.x;
-								instances_[i].velocity.y += impulseVec.y;
 								instances_[i].velocity.z += impulseVec.z;
 								instances_[j].velocity.x -= impulseVec.x;
-								instances_[j].velocity.y -= impulseVec.y;
 								instances_[j].velocity.z -= impulseVec.z;
+
+								const Vector3 relativeAfter = {
+								    instances_[i].velocity.x - instances_[j].velocity.x,
+								    0.0f,
+								    instances_[i].velocity.z - instances_[j].velocity.z,
+								};
+								const float relNormalAfter = relativeAfter.x * normal.x + relativeAfter.z * normal.z;
+								const Vector3 tangent = {
+								    relativeAfter.x - normal.x * relNormalAfter,
+								    0.0f,
+								    relativeAfter.z - normal.z * relNormalAfter,
+								};
+								instances_[i].velocity.x -= tangent.x * (1.0f - kCoffeeCollisionTangentialDamping) * 0.5f;
+								instances_[i].velocity.z -= tangent.z * (1.0f - kCoffeeCollisionTangentialDamping) * 0.5f;
+								instances_[j].velocity.x += tangent.x * (1.0f - kCoffeeCollisionTangentialDamping) * 0.5f;
+								instances_[j].velocity.z += tangent.z * (1.0f - kCoffeeCollisionTangentialDamping) * 0.5f;
 							}
 						}
 					}
@@ -262,6 +282,7 @@ void Coffee::RunSimulation() {
 		instance.position.x = std::clamp(instance.position.x + pendingPush[i].x, roomMinX, roomMaxX);
 		instance.position.y += pendingPush[i].y;
 		instance.position.z = std::clamp(instance.position.z + pendingPush[i].z, roomMinZ, roomMaxZ);
+
 		const float offsetXFromCan = instance.position.x - canTopCenter.x;
 		const float offsetZFromCan = instance.position.z - canTopCenter.z;
 		const float horizontalDistSqFromCan = offsetXFromCan * offsetXFromCan + offsetZFromCan * offsetZFromCan;
