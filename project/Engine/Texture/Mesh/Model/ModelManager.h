@@ -29,6 +29,7 @@ public:
 	void Initialize(DirectXCommon* dxCommon);
 	void LoadModel(const std::string& directionalPath, const std::string& filePath);
 	void LoadGltfModel(const std::string& directionalPath, const std::string& filePath);
+	void UnloadModel(const std::string& filePath);
 	Model* FindModel(const std::string& filePath);
 	std::unique_ptr<Model> CreateModelInstance(const std::string& filePath);
 	void Finalize();

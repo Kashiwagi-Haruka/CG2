@@ -33,6 +33,7 @@ void CoffeeScene::Initialize() {
 	const float halfDepth = kRoomDepth * 0.5f;
 
 	Object3dCommon::GetInstance()->SetRandomNoiseEnabled(false);
+	Object3dCommon::GetInstance()->SetVignetteStrength(0.0f);
 
 	camera_->SetTransform(cameraTransform_);
 	debugCamera_->Initialize();
@@ -105,7 +106,7 @@ void CoffeeScene::Update() {
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	DirectionalLight directionalLight{};
 	directionalLight.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	directionalLight.direction = {0.1f, -0.5f, -0.2f};
+	directionalLight.direction = {0.0f, 0.5f, 1.0f};
 	directionalLight.intensity = 1.0f;
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight);
 	coffee_->Update(camera_.get(), directionalLight.direction);
