@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <FxCompile Include="Resources\shader\Object3d\Object3dGrid.PS.hlsl" />
     <FxCompile Include="Resources\shader\Sprite\Font.PS.hlsl" />
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
       <Filter>Resources</Filter>
@@ -315,6 +314,7 @@
     <ClCompile Include="Engine\Texture\TextureManager.cpp">
       <Filter>Engine\Texture</Filter>
     </ClCompile>
+    <ClCompile Include="application\GameObject\Wall\Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -615,6 +615,7 @@
     <ClInclude Include="Engine\Texture\TextureManager.h">
       <Filter>Engine\Texture</Filter>
     </ClInclude>
+    <ClInclude Include="application\GameObject\Wall\Wall.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
