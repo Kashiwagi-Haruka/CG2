@@ -229,6 +229,14 @@ void Coffee::RunSimulation() {
 						const float minHeight = instances_[i].halfHeight + instances_[j].halfHeight;
 
 						if (distSqXZ < minDistSq && distSqXZ > 1e-7f && deltaY < minHeight) {
+							const uint32_t upperIndex = instances_[i].position.y >= instances_[j].position.y ? static_cast<uint32_t>(i) : j;
+							const uint32_t lowerIndex = upperIndex == static_cast<uint32_t>(i) ? j : static_cast<uint32_t>(i);
+							const float upperBottom = instances_[upperIndex].position.y - instances_[upperIndex].halfHeight;
+							const float lowerTop = instances_[lowerIndex].position.y + instances_[lowerIndex].halfHeight;
+							if (upperBottom < lowerTop) {
+								pendingPush[upperIndex].y += (lowerTop - upperBottom) + separationBias;
+								instances_[upperIndex].velocity.y = std::max(instances_[upperIndex].velocity.y, 0.0f);
+							}
 							const float dist = std::sqrt(distSqXZ);
 							const float overlap = minDist - dist;
 							const float scale = (overlap * 0.5f + separationBias) / dist;
