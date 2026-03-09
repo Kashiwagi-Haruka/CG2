@@ -30,6 +30,8 @@ private:
 	void SpawnPortal(WhiteBoard* board);
 	void DrawWhiteBoard();
 	void DrawPortal(bool isShadow);
+	void BeginRender(uint32_t index);
+	void TransitionToShaderResource(uint32_t index);
 	Transform firstWarpPosTransform_ = { 0.0f };
 
 	std::vector<std::unique_ptr<WhiteBoard>> whiteBoards_;

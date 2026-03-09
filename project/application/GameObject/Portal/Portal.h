@@ -43,8 +43,8 @@ public:
     void SetWarpPosParent(Transform* transform) { warpPos_->SetParent(transform); };
     //ワープ先を取得する
     WarpPos* GetWarpPos() { return warpPos_.get(); }
-
-    void RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals);
+    void BeginRender();
+    void TransitionToShaderResource();
     void UpdateCameraMatrices();
     void DrawPortals();
     void DrawRings();
@@ -68,7 +68,6 @@ private:
     //ワープ座標
     std::unique_ptr<WarpPos> warpPos_ = nullptr;
     std::unique_ptr<RenderTexture2D> portalRenderTexture_ = nullptr;
-	std::unique_ptr<Camera> portalTextureCamera_ = nullptr;
     Transform* parentTransform = nullptr;
 };
 

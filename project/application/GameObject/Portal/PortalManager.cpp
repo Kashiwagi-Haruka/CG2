@@ -85,16 +85,20 @@ void PortalManager::DrawPortal(bool isShadow)
 
         portal->SetCamera(playerCamera_->GetCamera());
         portal->UpdateCameraMatrices();
-		portal->DrawWarpPos();
+        portal->DrawWarpPos();
         if (!isShadow) {
-
             portal->DrawRings();
-			portal->DrawPortals();
+            portal->DrawPortals();
         }
-
-        
     }
-    
+
+}
+
+void PortalManager::BeginRender(uint32_t index)
+{
+    if(portals_.size())
+    portals_[index]->BeginRender();
+
 }
 
 void PortalManager::Draw(bool isShadow, bool drawParticle) {
@@ -113,7 +117,7 @@ void PortalManager::SetPlayerCamera(PlayerCamera* camera) {
 }
 
 void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
-    
+
     if (isPendingPortalSpawn_) {
         return;
     }
@@ -131,7 +135,7 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
                 }
 
                 preWhiteBoards_.push_back(board.get());
- 
+
                 preWhiteBoards_.back()->SetCollisionAttribute(kCollisionNone);
 
                 pendingWhiteBoard_ = preWhiteBoards_.back();

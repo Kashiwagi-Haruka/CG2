@@ -145,21 +145,19 @@ void Portal::UpdatePortalCamera(const Transform& destinationPortal, Camera* outC
     outCamera->SetViewProjectionMatrix(portalViewMatrix, outCamera->GetProjectionMatrix());
 }
 
-void Portal::RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals)
+
+void Portal::BeginRender()
 {
     auto* camera = GetCamera();
-    if (!sceneCamera_ && !camera) {
-        return;
-    }
+    portalRenderTexture_->BeginRender();
+    assert(Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList() != nullptr);
+    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+}
 
-    if (portalRenderTexture_ && portalRenderTexture_->IsReady()) {
-        UpdatePortalCamera(warpPos_->GetTransform(), camera);
-        portalRenderTexture_->BeginRender();
-		Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCamera_.get());
-		portalRenderTexture_->TransitionToShaderResource();
-		Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
-		
-    }
+void Portal::TransitionToShaderResource()
+{
+    portalRenderTexture_->TransitionToShaderResource();
+    Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
 }
 
 void Portal::UpdateCameraMatrices() {
