@@ -53,4 +53,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> simulationParamsResource_;
 	SimulationParams* simulationParamsData_ = nullptr;
 	uint32_t instanceDataUavIndex_ = 0;
+	D3D12_RESOURCE_STATES instanceDataState_ = D3D12_RESOURCE_STATE_COPY_DEST;
 };

@@ -5,6 +5,7 @@
 #include "Object3d/Object3dCommon.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstring>
@@ -155,6 +156,7 @@ void Coffee::InitializeSimulationResources() {
 	initBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	commandList->ResourceBarrier(1, &initBarrier);
 	dxCommon->ExecuteCommandListAndWait();
+	instanceDataState_ = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 
 	instanceDataUavIndex_ = srvManager->Allocate();
 	srvManager->CreateUAVforStructuredBuffer(instanceDataUavIndex_, instanceDataResource_.Get(), static_cast<UINT>(instances_.size()), sizeof(InstanceData));
@@ -174,36 +176,60 @@ void Coffee::InitializeSimulationResources() {
 }
 
 void Coffee::RunSimulation() {
-	auto* dxCommon = Object3dCommon::GetInstance()->GetDxCommon();
-	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
-	auto* commandList = dxCommon->GetCommandList();
-
-	ID3D12DescriptorHeap* descriptorHeaps[] = {srvManager->GetDescriptorHeap().Get()};
-	commandList->SetDescriptorHeaps(1, descriptorHeaps);
-	commandList->SetComputeRootSignature(simulationRootSignature_.Get());
-	commandList->SetPipelineState(simulationPipelineState_.Get());
-	commandList->SetComputeRootDescriptorTable(0, srvManager->GetGPUDescriptorHandle(instanceDataUavIndex_));
-	commandList->SetComputeRootConstantBufferView(1, simulationParamsResource_->GetGPUVirtualAddress());
-
-	const UINT dispatchCount = (static_cast<UINT>(instances_.size()) + 63u) / 64u;
-	commandList->Dispatch(dispatchCount, 1, 1);
-
-	D3D12_RESOURCE_BARRIER uavBarrier{};
-	uavBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-	uavBarrier.UAV.pResource = instanceDataResource_.Get();
-	commandList->ResourceBarrier(1, &uavBarrier);
-	commandList->CopyResource(instanceDataReadbackResource_.Get(), instanceDataResource_.Get());
-	dxCommon->ExecuteCommandListAndWait();
-
-	InstanceData* mappedReadback = nullptr;
-	D3D12_RANGE readRange{0, sizeof(InstanceData) * instances_.size()};
-	instanceDataReadbackResource_->Map(0, &readRange, reinterpret_cast<void**>(&mappedReadback));
-	for (size_t i = 0; i < instances_.size(); ++i) {
-		instances_[i] = mappedReadback[i];
-		instancedObject_->SetInstanceOffset(i, instances_[i].position);
+	if (instances_.empty() || !simulationParamsData_) {
+		return;
 	}
-	D3D12_RANGE writeRange{0, 0};
-	instanceDataReadbackResource_->Unmap(0, &writeRange);
+
+	const float deltaTime = simulationParamsData_->deltaTime;
+	const float gravity = simulationParamsData_->gravity;
+	const float floorY = simulationParamsData_->floorY;
+	const float bounceDamping = simulationParamsData_->bounceDamping;
+	const float separationBias = simulationParamsData_->separationBias;
+	const float roomMinX = simulationParamsData_->roomMinX;
+	const float roomMaxX = simulationParamsData_->roomMaxX;
+	const float roomMinZ = simulationParamsData_->roomMinZ;
+	const float roomMaxZ = simulationParamsData_->roomMaxZ;
+
+	std::vector<Vector2> pendingPush(instances_.size(), {0.0f, 0.0f});
+
+	for (size_t i = 0; i < instances_.size(); ++i) {
+		auto& instance = instances_[i];
+		instance.velocityY += gravity * deltaTime;
+		instance.position.y += instance.velocityY * deltaTime;
+		if (instance.position.y <= floorY) {
+			instance.position.y = floorY;
+			instance.velocityY = -instance.velocityY * bounceDamping;
+		}
+	}
+
+	for (size_t i = 0; i < instances_.size(); ++i) {
+		for (size_t j = i + 1; j < instances_.size(); ++j) {
+			const Vector2 posI = {instances_[i].position.x, instances_[i].position.z};
+			const Vector2 posJ = {instances_[j].position.x, instances_[j].position.z};
+			const float minDist = instances_[i].radius + instances_[j].radius;
+			const Vector2 delta = {posI.x - posJ.x, posI.y - posJ.y};
+			const float distSq = delta.x * delta.x + delta.y * delta.y;
+			const float minDistSq = minDist * minDist;
+
+			if (distSq < minDistSq && distSq > 1e-7f) {
+				const float dist = std::sqrt(distSq);
+				const float overlap = minDist - dist;
+				const float scale = (overlap * 0.5f + separationBias) / dist;
+				const Vector2 push = {delta.x * scale, delta.y * scale};
+				pendingPush[i].x += push.x;
+				pendingPush[i].y += push.y;
+				pendingPush[j].x -= push.x;
+				pendingPush[j].y -= push.y;
+			}
+		}
+	}
+
+	for (size_t i = 0; i < instances_.size(); ++i) {
+		auto& instance = instances_[i];
+		instance.position.x = std::clamp(instance.position.x + pendingPush[i].x, roomMinX, roomMaxX);
+		instance.position.z = std::clamp(instance.position.z + pendingPush[i].y, roomMinZ, roomMaxZ);
+		instancedObject_->SetInstanceOffset(i, instance.position);
+	}
 }
 
 void Coffee::Update(Camera* camera, const Vector3& lightDirection) {
