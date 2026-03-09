@@ -65,6 +65,8 @@
     <FxCompile Include="Resources\shader\Particle\UpdateParticle.CS.hlsl">
       <Filter>Resources</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\InstancedObject3d.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\InstancedObject3d.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
@@ -314,6 +316,7 @@
     <ClCompile Include="Engine\Texture\TextureManager.cpp">
       <Filter>Engine\Texture</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -615,6 +618,7 @@
       <Filter>Engine\Texture</Filter>
     </ClInclude>
     <ClInclude Include="application\GameObject\Key\Key.h" />
+    <ClInclude Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
