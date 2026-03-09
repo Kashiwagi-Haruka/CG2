@@ -14,11 +14,11 @@
 #include <random>
 
 namespace {
-constexpr float kCoffeeRadius = 0.03f;
+constexpr float kObjectRadius = 0.03f;
 constexpr float kRoomWidth = 9.0f;
 constexpr float kRoomDepth = 15.0f;
 constexpr float kSpawnMargin = 0.08f;
-constexpr float kCollisionRadius = kCoffeeRadius * 1.4f;
+constexpr float kCollisionRadius = kObjectRadius * 1.4f;
 constexpr uint32_t kCollisionThreadGroupSize = 64;
 constexpr uint32_t kCollisionRelaxationIterations = 2;
 
@@ -33,33 +33,51 @@ struct CollisionParams {
 	float pad0;
 };
 
+Matrix4x4 MakeWorldMatrix(const Vector3& position, float yaw, float scale) {
+	Matrix4x4 world = Function::MakeRotateYMatrix(yaw);
+	world.m[0][0] *= scale;
+	world.m[0][1] *= scale;
+	world.m[0][2] *= scale;
+	world.m[1][0] *= scale;
+	world.m[1][1] *= scale;
+	world.m[1][2] *= scale;
+	world.m[2][0] *= scale;
+	world.m[2][1] *= scale;
+	world.m[2][2] *= scale;
+	world.m[3][0] = position.x;
+	world.m[3][1] = position.y;
+	world.m[3][2] = position.z;
+	world.m[3][3] = 1.0f;
+	return world;
+}
+
 } // namespace
 
 void InstancedObject3d::CreateMeshFromModel(const Model& model) {
-	coffeeVertices_.clear();
-	coffeeIndices_.clear();
+	vertices_.clear();
+	indices_.clear();
 
 	const auto& modelData = model.GetModelData();
-	coffeeVertices_.reserve(modelData.vertices.size());
+	vertices_.reserve(modelData.vertices.size());
 	for (const auto& vertex : modelData.vertices) {
-		coffeeVertices_.push_back({
+		vertices_.push_back({
 		    {vertex.position.x, vertex.position.y, vertex.position.z},
 		    vertex.normal,
 		});
 	}
 
-	coffeeIndices_ = modelData.indices;
-	if (coffeeIndices_.empty()) {
-		coffeeIndices_.resize(coffeeVertices_.size());
-		for (uint32_t i = 0; i < coffeeIndices_.size(); ++i) {
-			coffeeIndices_[i] = i;
+	indices_ = modelData.indices;
+	if (indices_.empty()) {
+		indices_.resize(vertices_.size());
+		for (uint32_t i = 0; i < indices_.size(); ++i) {
+			indices_[i] = i;
 		}
 	}
 }
 
 void InstancedObject3d::CreateMesh() {
-	coffeeVertices_.clear();
-	coffeeIndices_.clear();
+	vertices_.clear();
+	indices_.clear();
 	if (modelPath_.empty()) {
 		return;
 	}
@@ -75,6 +93,7 @@ void InstancedObject3d::CreateMesh() {
 		CreateMeshFromModel(*model);
 	}
 }
+
 void InstancedObject3d::CreateInstancingPipeline() {
 	const std::wstring vsPath = L"Resources/shader/Object3d/VS_Shader/InstancedObject3d.VS.hlsl";
 	const std::wstring psPath = L"Resources/shader/Object3d/PS_Shader/InstancedObject3d.PS.hlsl";
@@ -123,32 +142,60 @@ void InstancedObject3d::CreateCollisionPipeline() {
 void InstancedObject3d::CreateBuffers() {
 	auto* object3dCommon = Object3dCommon::GetInstance();
 	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
-	if (coffeeVertices_.empty() || coffeeIndices_.empty()) {
+	if (vertices_.empty() || indices_.empty()) {
 		vertexResource_.Reset();
 		indexResource_.Reset();
+		instanceWorldResource_.Reset();
+		instanceDataResource_.Reset();
 		sceneConstantResource_.Reset();
 		sceneConstants_ = nullptr;
 		return;
 	}
 
-	vertexResource_ = object3dCommon->CreateBufferResource(sizeof(CoffeeVertex) * coffeeVertices_.size());
-	CoffeeVertex* mappedVertex = nullptr;
+	vertexResource_ = object3dCommon->CreateBufferResource(sizeof(Vertex) * vertices_.size());
+	Vertex* mappedVertex = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedVertex));
-	std::memcpy(mappedVertex, coffeeVertices_.data(), sizeof(CoffeeVertex) * coffeeVertices_.size());
-	vertexBufferView_ = {vertexResource_->GetGPUVirtualAddress(), static_cast<UINT>(sizeof(CoffeeVertex) * coffeeVertices_.size()), sizeof(CoffeeVertex)};
+	std::memcpy(mappedVertex, vertices_.data(), sizeof(Vertex) * vertices_.size());
+	vertexBufferView_ = {vertexResource_->GetGPUVirtualAddress(), static_cast<UINT>(sizeof(Vertex) * vertices_.size()), sizeof(Vertex)};
 
-	indexResource_ = object3dCommon->CreateBufferResource(sizeof(uint32_t) * coffeeIndices_.size());
+	indexResource_ = object3dCommon->CreateBufferResource(sizeof(uint32_t) * indices_.size());
 	uint32_t* mappedIndex = nullptr;
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedIndex));
-	std::memcpy(mappedIndex, coffeeIndices_.data(), sizeof(uint32_t) * coffeeIndices_.size());
+	std::memcpy(mappedIndex, indices_.data(), sizeof(uint32_t) * indices_.size());
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-	indexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * coffeeIndices_.size());
+	indexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * indices_.size());
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
-	instanceResource_ = object3dCommon->CreateBufferResource(sizeof(Matrix4x4) * kCoffeeInstanceCount_);
-	instanceDataResource_ = object3dCommon->CreateBufferResource(sizeof(InstanceData) * kCoffeeInstanceCount_);
+	instanceWorldResource_ = object3dCommon->CreateBufferResource(sizeof(Matrix4x4) * kInstanceCount_);
+	instanceDataResource_ = object3dCommon->CreateBufferResource(sizeof(InstanceData) * kInstanceCount_);
+	if (!instanceWorldResource_ || !instanceDataResource_) {
+		return;
+	}
+
+	if (!hasInstanceDescriptors_) {
+		if (!srvManager->CanAllocate()) {
+			return;
+		}
+		instanceSrvIndex_ = srvManager->Allocate();
+		if (!srvManager->CanAllocate()) {
+			return;
+		}
+		instanceDataUavIndex_ = srvManager->Allocate();
+		if (!srvManager->CanAllocate()) {
+			return;
+		}
+		instanceWorldUavIndex_ = srvManager->Allocate();
+		hasInstanceDescriptors_ = true;
+	}
+
+	srvManager->CreateSRVforStructuredBuffer(instanceSrvIndex_, instanceWorldResource_.Get(), kInstanceCount_, sizeof(Matrix4x4));
+	srvManager->CreateUAVforStructuredBuffer(instanceDataUavIndex_, instanceDataResource_.Get(), kInstanceCount_, sizeof(InstanceData));
+	srvManager->CreateUAVforStructuredBuffer(instanceWorldUavIndex_, instanceWorldResource_.Get(), kInstanceCount_, sizeof(Matrix4x4));
+
 	InstanceData* mappedInstanceData = nullptr;
 	instanceDataResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedInstanceData));
+	Matrix4x4* mappedInstanceWorld = nullptr;
+	instanceWorldResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedInstanceWorld));
 
 	const float minX = -kRoomWidth * 0.5f + kSpawnMargin;
 	const float maxX = kRoomWidth * 0.5f - kSpawnMargin;
@@ -161,11 +208,12 @@ void InstancedObject3d::CreateBuffers() {
 	std::uniform_real_distribution<float> rotYDist(0.0f, std::numbers::pi_v<float> * 2.0f);
 	std::uniform_real_distribution<float> scaleDist(0.75f, 1.15f);
 
-	for (uint32_t i = 0; i < kCoffeeInstanceCount_; ++i) {
+	for (uint32_t i = 0; i < kInstanceCount_; ++i) {
 		mappedInstanceData[i].position = {posXDist(randomEngine), kCollisionRadius, posZDist(randomEngine)};
 		mappedInstanceData[i].yaw = rotYDist(randomEngine);
 		mappedInstanceData[i].scale = scaleDist(randomEngine);
 		mappedInstanceData[i].padding = {0.0f, 0.0f, 0.0f};
+		mappedInstanceWorld[i] = MakeWorldMatrix(mappedInstanceData[i].position, mappedInstanceData[i].yaw, mappedInstanceData[i].scale);
 	}
 
 	if (!hasCollisionDescriptor_) {
@@ -181,7 +229,7 @@ void InstancedObject3d::CreateBuffers() {
 			hasCollisionDescriptor_ = false;
 			return;
 		}
-		params->instanceCount = kCoffeeInstanceCount_;
+		params->instanceCount = kInstanceCount_;
 		params->minDistance = kCollisionRadius * 2.0f;
 		params->roomMinX = minX;
 		params->roomMaxX = maxX;
@@ -192,7 +240,7 @@ void InstancedObject3d::CreateBuffers() {
 		hasCollisionDescriptor_ = true;
 	}
 
-	sceneConstantResource_ = object3dCommon->CreateBufferResource(sizeof(CoffeeSceneConstants));
+	sceneConstantResource_ = object3dCommon->CreateBufferResource(sizeof(SceneConstants));
 	if (!sceneConstantResource_) {
 		sceneConstants_ = nullptr;
 		return;
@@ -208,7 +256,7 @@ void InstancedObject3d::CreateBuffers() {
 }
 
 void InstancedObject3d::DispatchCollision() {
-	if (!collisionPipelineState_ || !collisionRootSignature_ || !instanceDataResource_ || !instanceResource_ || !collisionParamResource_) {
+	if (!collisionPipelineState_ || !collisionRootSignature_ || !instanceDataResource_ || !instanceWorldResource_ || !collisionParamResource_) {
 		return;
 	}
 
@@ -223,7 +271,7 @@ void InstancedObject3d::DispatchCollision() {
 	toUavBarriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 	toUavBarriers[0].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	toUavBarriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	toUavBarriers[1].Transition.pResource = instanceResource_.Get();
+	toUavBarriers[1].Transition.pResource = instanceWorldResource_.Get();
 	toUavBarriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
 	toUavBarriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 	toUavBarriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -236,14 +284,14 @@ void InstancedObject3d::DispatchCollision() {
 	commandList->SetComputeRootDescriptorTable(0, srvManager->GetGPUDescriptorHandle(instanceDataUavIndex_));
 	commandList->SetComputeRootConstantBufferView(1, collisionParamResource_->GetGPUVirtualAddress());
 
-	const uint32_t dispatchCount = (kCoffeeInstanceCount_ + kCollisionThreadGroupSize - 1u) / kCollisionThreadGroupSize;
+	const uint32_t dispatchCount = (kInstanceCount_ + kCollisionThreadGroupSize - 1u) / kCollisionThreadGroupSize;
 	for (uint32_t i = 0; i < kCollisionRelaxationIterations; ++i) {
 		commandList->Dispatch(dispatchCount, 1, 1);
 		D3D12_RESOURCE_BARRIER uavBarrier[2] = {};
 		uavBarrier[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
 		uavBarrier[0].UAV.pResource = instanceDataResource_.Get();
 		uavBarrier[1].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-		uavBarrier[1].UAV.pResource = instanceResource_.Get();
+		uavBarrier[1].UAV.pResource = instanceWorldResource_.Get();
 		commandList->ResourceBarrier(2, uavBarrier);
 	}
 
@@ -254,7 +302,7 @@ void InstancedObject3d::DispatchCollision() {
 	toReadBarriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
 	toReadBarriers[0].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	toReadBarriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	toReadBarriers[1].Transition.pResource = instanceResource_.Get();
+	toReadBarriers[1].Transition.pResource = instanceWorldResource_.Get();
 	toReadBarriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 	toReadBarriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
 	toReadBarriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -263,6 +311,7 @@ void InstancedObject3d::DispatchCollision() {
 
 void InstancedObject3d::Initialize(const std::string& modelPath) {
 	modelPath_ = modelPath;
+	camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
 	CreateMesh();
 	CreateInstancingPipeline();
 	CreateCollisionPipeline();
@@ -280,17 +329,20 @@ void InstancedObject3d::SetModel(const std::string& modelPath) {
 }
 
 void InstancedObject3d::Update(const Camera* camera, const Vector3& lightDirection) {
-	if (!camera || !sceneConstants_) {
+	if (camera) {
+		camera_ = camera;
+	}
+	if (!camera_ || !sceneConstants_) {
 		return;
 	}
 
-	sceneConstants_->viewProjection = camera->GetViewProjectionMatrix();
+	sceneConstants_->viewProjection = camera_->GetViewProjectionMatrix();
 	sceneConstants_->lightDirection = {lightDirection.x, lightDirection.y, lightDirection.z, 1.0f};
 	DispatchCollision();
 }
 
 void InstancedObject3d::Draw() {
-	if (!pso_ || !sceneConstantResource_ || !vertexResource_ || !indexResource_ || !hasInstanceSrvIndex_) {
+	if (!pso_ || !sceneConstantResource_ || !vertexResource_ || !indexResource_ || !hasInstanceDescriptors_) {
 		return;
 	}
 
@@ -306,5 +358,5 @@ void InstancedObject3d::Draw() {
 	commandList->IASetIndexBuffer(&indexBufferView_);
 	srvManager->SetGraphicsRootDescriptorTable(0, instanceSrvIndex_);
 	commandList->SetGraphicsRootConstantBufferView(1, sceneConstantResource_->GetGPUVirtualAddress());
-	commandList->DrawIndexedInstanced(static_cast<UINT>(coffeeIndices_.size()), kCoffeeInstanceCount_, 0, 0, 0);
+	commandList->DrawIndexedInstanced(static_cast<UINT>(indices_.size()), kInstanceCount_, 0, 0, 0);
 }
