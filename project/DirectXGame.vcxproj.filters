@@ -67,6 +67,7 @@
     </FxCompile>
     <FxCompile Include="Resources\shader\Object3d\PS_Shader\InstancedObject3d.PS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\VS_Shader\InstancedObject3d.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\CS_Shader\InstancedObject3dCollision.CS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
