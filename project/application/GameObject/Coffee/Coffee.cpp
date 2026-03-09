@@ -305,26 +305,25 @@ void Coffee::RunSimulation() {
 				}
 			}
 		}
-
-		for (size_t i = 0; i < activeInstanceCount_; ++i) {
-			auto& instance = instances_[i];
-			instance.position.x = std::clamp(instance.position.x + pendingPush[i].x, roomMinX, roomMaxX);
-			instance.position.y += pendingPush[i].y;
-			instance.position.z = std::clamp(instance.position.z + pendingPush[i].z, roomMinZ, roomMaxZ);
-			if (instance.position.y < floorY) {
-				instance.position.y = floorY;
-				instance.velocity.y = std::max(instance.velocity.y, 0.0f);
-			}
-			if (instance.position.x <= roomMinX || instance.position.x >= roomMaxX) {
-				instance.velocity.x *= -kCoffeeCollisionDamping;
-			}
-			if (instance.position.z <= roomMinZ || instance.position.z >= roomMaxZ) {
-				instance.velocity.z *= -kCoffeeCollisionDamping;
-			}
-			instancedObject_->SetInstanceOffset(i, instance.position);
-		}
 	}
 
+	for (size_t i = 0; i < activeInstanceCount_; ++i) {
+		auto& instance = instances_[i];
+		instance.position.x = std::clamp(instance.position.x + pendingPush[i].x, roomMinX, roomMaxX);
+		instance.position.y += pendingPush[i].y;
+		instance.position.z = std::clamp(instance.position.z + pendingPush[i].z, roomMinZ, roomMaxZ);
+		if (instance.position.y < floorY) {
+			instance.position.y = floorY;
+			instance.velocity.y = std::max(instance.velocity.y, 0.0f);
+		}
+		if (instance.position.x <= roomMinX || instance.position.x >= roomMaxX) {
+			instance.velocity.x *= -kCoffeeCollisionDamping;
+		}
+		if (instance.position.z <= roomMinZ || instance.position.z >= roomMaxZ) {
+			instance.velocity.z *= -kCoffeeCollisionDamping;
+		}
+		instancedObject_->SetInstanceOffset(i, instance.position);
+	}
 }
 void Coffee::Update(Camera* camera, const Vector3& lightDirection) {
 	if (simulationParamsData_) {
