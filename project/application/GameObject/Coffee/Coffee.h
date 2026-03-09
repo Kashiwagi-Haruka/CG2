@@ -31,6 +31,9 @@ private:
 		float roomMinZ = -10.0f;
 		float roomMaxZ = 10.0f;
 		float floorY = 0.0f;
+		Vector3 canTopCenter = {0.0f, 0.0f, 0.0f};
+		float canTopY = 0.0f;
+		float canTopRadius = 0.0f;
 		float gravity = -1.0f;
 		float bounceDamping = 0.8f;
 		float separationBias = 0.001f;
