@@ -86,6 +86,7 @@ void Portal::Initialize()
     if (portalRenderTexture_->IsReady()) {
         portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
     }
+	portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
 }
 
 void Portal::Update()
@@ -107,6 +108,7 @@ void Portal::Update()
 void Portal::DrawPortals() {
     Object3dCommon::GetInstance()->DrawCommonPortal();
     portalCircle_->Draw();
+	portalRenderTexture_->TransitionToShaderResource();
 }
 
 void Portal::DrawRings() {
