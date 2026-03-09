@@ -3,35 +3,27 @@ struct InstanceData
     float3 position;
     float yaw;
     float scale;
-    float3 padding;
+    float velocityY;
+    float radius;
+    float2 padding;
 };
 
 RWStructuredBuffer<InstanceData> gInstanceData : register(u0);
-RWStructuredBuffer<float4x4> gInstanceWorld : register(u1);
 
 cbuffer CollisionParams : register(b0)
 {
     uint gInstanceCount;
-    float gMinDistance;
+    float gDeltaTime;
     float gRoomMinX;
     float gRoomMaxX;
     float gRoomMinZ;
     float gRoomMaxZ;
     float gFloorY;
-    float gPad0;
+    float gGravity;
+    float gBounceDamping;
+    float gSeparationBias;
+    float2 gPad0;
 };
-
-float4x4 MakeWorld(float3 position, float yaw, float scale)
-{
-    const float s = sin(yaw);
-    const float c = cos(yaw);
-
-    return float4x4(
-        scale * c, 0.0f, -scale * s, 0.0f,
-        0.0f, scale, 0.0f, 0.0f,
-        scale * s, 0.0f, scale * c, 0.0f,
-        position.x, position.y, position.z, 1.0f);
-}
 
 [numthreads(64, 1, 1)]
 void main(uint3 dtid : SV_DispatchThreadID)
@@ -43,6 +35,15 @@ void main(uint3 dtid : SV_DispatchThreadID)
     }
 
     InstanceData instance = gInstanceData[index];
+
+    instance.velocityY += gGravity * gDeltaTime;
+    instance.position.y += instance.velocityY * gDeltaTime;
+    if (instance.position.y <= gFloorY)
+    {
+        instance.position.y = gFloorY;
+        instance.velocityY = -instance.velocityY * gBounceDamping;
+    }
+
     float2 pos = instance.position.xz;
     float2 push = float2(0.0f, 0.0f);
 
@@ -54,16 +55,18 @@ void main(uint3 dtid : SV_DispatchThreadID)
             continue;
         }
 
-        const float2 other = gInstanceData[i].position.xz;
+        const InstanceData otherData = gInstanceData[i];
+        const float2 other = otherData.position.xz;
+        const float minDist = instance.radius + otherData.radius;
         float2 delta = pos - other;
         const float distSq = dot(delta, delta);
-        const float minDistSq = gMinDistance * gMinDistance;
+        const float minDistSq = minDist * minDist;
 
         if (distSq < minDistSq && distSq > 1e-7f)
         {
             const float dist = sqrt(distSq);
-            const float overlap = gMinDistance - dist;
-            push += (delta / dist) * overlap * 0.5f;
+            const float overlap = minDist - dist;
+            push += (delta / dist) * (overlap * 0.5f + gSeparationBias);
         }
     }
 
@@ -72,9 +75,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     pos.y = clamp(pos.y, gRoomMinZ, gRoomMaxZ);
 
     instance.position.x = pos.x;
-    instance.position.y = gFloorY;
     instance.position.z = pos.y;
 
     gInstanceData[index] = instance;
-    gInstanceWorld[index] = MakeWorld(instance.position, instance.yaw, instance.scale);
 }
