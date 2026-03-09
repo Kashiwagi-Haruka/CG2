@@ -37,12 +37,14 @@ private:
 	};
 
 	void RunSimulation();
+	void EnsureInstanceCapacity(uint32_t requiredCount);
 
 	std::unique_ptr<InstancedObject3d> instancedObject_ = nullptr;
 	std::vector<InstanceData> instances_{};
 
 	SimulationParams simulationParams_{};
 	uint32_t activeInstanceCount_ = 0;
+	uint32_t renderedInstanceCapacity_ = 0;
 	float spawnTimer_ = 0.0f;
 	float nextSpawnInterval_ = 0.0f;
 };

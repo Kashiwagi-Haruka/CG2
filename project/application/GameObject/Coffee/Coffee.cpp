@@ -11,6 +11,7 @@ namespace {
 constexpr const char* kCoffeeModelDirectory = "Resources/TD3_3102/3d/Coffee";
 constexpr const char* kCoffeeModelName = "Coffee";
 constexpr uint32_t kCoffeeInstanceCount = 10000;
+constexpr uint32_t kCoffeeInitialVisibleCount = 100;
 constexpr Vector3 kCoffeeSpawnOrigin = {0.0f, 5.0f, 0.0f};
 constexpr float kCoffeeMinScale = 0.22f;
 constexpr float kCoffeeScaleStep = 0.0f;
@@ -19,8 +20,8 @@ constexpr float kCoffeeBounceDamping = 0.0f;
 constexpr float kCoffeeGroundFriction = 0.93f;
 constexpr float kCoffeeCollisionDamping = 0.85f;
 constexpr float kCoffeeSeparationBias = 0.001f;
-constexpr float kCoffeeMinSpawnInterval = 0.035f;
-constexpr float kCoffeeMaxSpawnInterval = 0.18f;
+constexpr float kCoffeeMinSpawnInterval = 0.001f;
+constexpr float kCoffeeMaxSpawnInterval = 0.005f;
 constexpr float kCoffeeSpawnAreaRadius = 0.35f;
 constexpr float kCoffeeSpatialCellSize = 0.6f;
 
@@ -47,7 +48,8 @@ void Coffee::Initialize() {
 	ModelManager::GetInstance()->LoadModel(kCoffeeModelDirectory, kCoffeeModelName);
 	instancedObject_->Initialize(kCoffeeModelName);
 	instancedObject_->SetSpawnOrigin({0.0f, 0.0f, 0.0f});
-	instancedObject_->SetInstanceCount(kCoffeeInstanceCount);
+	renderedInstanceCapacity_ = std::min(kCoffeeInitialVisibleCount, kCoffeeInstanceCount);
+	instancedObject_->SetInstanceCount(renderedInstanceCapacity_);
 
 	instances_.resize(kCoffeeInstanceCount);
 	activeInstanceCount_ = 0;
@@ -108,8 +110,9 @@ void Coffee::RunSimulation() {
 		spawnInstance.position.y = kCoffeeSpawnOrigin.y;
 		spawnInstance.velocity = {0.0f, 0.0f, 0.0f};
 		spawnInstance.isActive = true;
-		instancedObject_->SetInstanceOffset(spawnIndex, spawnInstance.position);
 		++activeInstanceCount_;
+		EnsureInstanceCapacity(activeInstanceCount_);
+		instancedObject_->SetInstanceOffset(spawnIndex, spawnInstance.position);
 	}
 
 	std::vector<Vector3> pendingPush(activeInstanceCount_, {0.0f, 0.0f, 0.0f});
@@ -210,6 +213,27 @@ void Coffee::RunSimulation() {
 			instance.velocity.z *= -kCoffeeCollisionDamping;
 		}
 		instancedObject_->SetInstanceOffset(i, instance.position);
+	}
+}
+void Coffee::EnsureInstanceCapacity(uint32_t requiredCount) {
+	if (requiredCount <= renderedInstanceCapacity_) {
+		return;
+	}
+
+	uint32_t newCapacity = std::max(requiredCount, std::min(kCoffeeInstanceCount, std::max(renderedInstanceCapacity_ * 2u, 1u)));
+	newCapacity = std::min(newCapacity, kCoffeeInstanceCount);
+	const uint32_t previousCapacity = renderedInstanceCapacity_;
+	renderedInstanceCapacity_ = newCapacity;
+	instancedObject_->SetInstanceCount(renderedInstanceCapacity_);
+
+	for (uint32_t i = 0; i < renderedInstanceCapacity_; ++i) {
+		const float scale = instances_[i].scale;
+		instancedObject_->SetInstanceScale(i, {scale, scale, scale});
+		if (i < activeInstanceCount_ && instances_[i].isActive) {
+			instancedObject_->SetInstanceOffset(i, instances_[i].position);
+		} else if (i >= previousCapacity) {
+			instancedObject_->SetInstanceOffset(i, {0.0f, -1000.0f, 0.0f});
+		}
 	}
 }
 void Coffee::Update(Camera* camera, const Vector3& lightDirection) {
