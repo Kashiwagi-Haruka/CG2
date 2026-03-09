@@ -13,7 +13,7 @@
 namespace {
 constexpr const char* kCoffeeModelDirectory = "Resources/TD3_3102/3d/Coffee";
 constexpr const char* kCoffeeModelName = "Coffee";
-constexpr uint32_t kCoffeeInstanceCount = 1000;
+constexpr uint32_t kCoffeeInstanceCount = 100;
 constexpr Vector3 kCoffeeSpawnOrigin = {0.0f, 5.0f, 0.0f};
 constexpr float kCoffeeMinScale = 0.22f;
 constexpr float kCoffeeScaleStep = 0.0f;
