@@ -215,7 +215,6 @@ void PortalManager::SpawnPortal(WhiteBoard* board) {
     if (!portals_.empty()) {
         // すでにポータルがある場合、お互いをつなぐ
         Portal* existingPortal = portals_.back().get();
-        Transform* newTransform;
         newPortal->GetWarpPos()->SetParent(&existingPortal->GetTransform());
         existingPortal->GetWarpPos()->SetParent(&newPortal->GetTransform());
 
