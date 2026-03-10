@@ -1,7 +1,7 @@
 #pragma once
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
 #include "GameObject/YoshidaMath/CollisionManager/Collider.h"
-#include"Object3d/Object3d.h"
+#include"Primitive/Primitive.h"
 #include<memory>
 
 class Camera;
@@ -21,7 +21,6 @@ public:
     void Draw();
     void SetCamera(Camera* camera);
 private:
-    Transform transform_ = {};
-    std::unique_ptr<Object3d>obj_ = nullptr;
+    std::unique_ptr<Primitive>primitive_ = nullptr;
 };
 

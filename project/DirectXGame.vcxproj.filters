@@ -315,6 +315,7 @@
       <Filter>Engine\Texture</Filter>
     </ClCompile>
     <ClCompile Include="application\GameObject\Wall\Wall.cpp" />
+    <ClCompile Include="application\GameObject\Wall\WallManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -616,6 +617,7 @@
       <Filter>Engine\Texture</Filter>
     </ClInclude>
     <ClInclude Include="application\GameObject\Wall\Wall.h" />
+    <ClInclude Include="application\GameObject\Wall\WallManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
