@@ -6,9 +6,11 @@
 Wall::Wall()
 {
     primitive_ = std::make_unique<Primitive>();
-    SetAABB({ .min = {-0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} });
+    Vector3 halfScale = Vector3{1.0f,1.0f,1.0f} *0.5f;
+    SetAABB({ .min = -halfScale,.max = halfScale });
     SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
+   
 }
 
 void Wall::OnCollision(Collider* collider)
@@ -27,6 +29,7 @@ Vector3 Wall::GetWorldPosition() const
 
 void Wall::Update()
 {
+    primitive_->SetTransform(primitive_->GetTransform());
     primitive_->Update();
 }
 
@@ -45,4 +48,13 @@ void Wall::SetCamera(Camera* camera)
 {
     primitive_->SetCamera(camera);
     primitive_->UpdateCameraMatrices();
+}
+
+void Wall::SetTransformAndAABB(const Vector3& translate, const Vector3& scale)
+{
+    Vector3 halfScale = scale * 0.5f;
+    SetAABB({ .min = -halfScale,.max = halfScale });
+
+    primitive_->SetTranslate(translate);
+    primitive_->SetScale(scale);
 }

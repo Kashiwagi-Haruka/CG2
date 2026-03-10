@@ -47,13 +47,7 @@ void PortalManager::Initialize() {
     portalParticle_->Initialize();
 }
 
-void PortalManager::UpdateWarpPosCameras()
-{
 
-    for (auto& portal : portals_) {
-        portal->UpdateWarpPosCamera();
-    }
-}
 
 void PortalManager::WarpPlayer(Player* player)
 {
@@ -215,16 +209,13 @@ void PortalManager::SpawnPortal(WhiteBoard* board) {
         Portal* existingPortal = portals_.back().get();
         newPortal->GetWarpPos()->SetParent(&existingPortal->GetTransform());
         existingPortal->GetWarpPos()->SetParent(&newPortal->GetTransform());
-
-        ////テクスチャの入れ替え
-        existingPortal->SetTextureIndex(existingPortal->GetRenderTexture2D()->GetSrvIndex());
-        newPortal->SetTextureIndex(newPortal->GetRenderTexture2D()->GetSrvIndex());
+        //テクスチャの入れ替え
+        //existingPortal->SetTextureIndex(existingPortal->GetRenderTexture2D()->GetSrvIndex());
+        //newPortal->SetTextureIndex(newPortal->GetRenderTexture2D()->GetSrvIndex());
 
     } else {
         //ポータルがないとき
         newPortal->GetWarpPos()->SetParent(&firstWarpPosTransform_);
- /*       uint32_t textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/atHome.jpg");
-        newPortal->SetTextureIndex(textureIndex);*/
     }
 
 

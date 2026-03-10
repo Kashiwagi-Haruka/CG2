@@ -14,6 +14,8 @@
 #include"GameObject/Flashlight/Flashlight.h"
 #include"GameObject/Key/Key.h"
 #include <GameObject/Chair/Chair.h>
+#include"GameObject/Wall/WallManager.h"
+
 #pragma endregion
 
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
@@ -68,6 +70,8 @@ private:
     std::unique_ptr<Edamame> edamame_ = nullptr;
     //椅子
     std::unique_ptr<Chair> chair_ = nullptr;
+    //壁管理
+    std::unique_ptr<WallManager> wallManager_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

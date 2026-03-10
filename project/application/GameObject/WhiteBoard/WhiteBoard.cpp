@@ -12,7 +12,7 @@ WhiteBoard::WhiteBoard()
 
 void WhiteBoard::OnCollision(Collider* collider)
 {
-
+   
 }
 
 Vector3 WhiteBoard::GetWorldPosition() const
