@@ -1,5 +1,6 @@
 #include "WhiteBoard.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
+#include"Function.h"
 
 WhiteBoard::WhiteBoard()
 {
@@ -22,6 +23,7 @@ Vector3 WhiteBoard::GetWorldPosition() const
 void WhiteBoard::Initialize()
 {
     obj_->Initialize();
+    obj_->SetRotate({ 0.0f,Function::kPi,0.0f });
 #ifdef _DEBUG
     primitive_->Initialize(Primitive::Box);
     primitive_->SetColor({ 1.0f,1.0f,1.0f,0.1f });
@@ -38,6 +40,7 @@ void WhiteBoard::Update()
 {
     obj_->Update();
 
+    
     collisionTransform_ = obj_->GetTransform();
     collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
 

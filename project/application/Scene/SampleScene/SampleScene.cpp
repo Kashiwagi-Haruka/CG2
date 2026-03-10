@@ -574,6 +574,7 @@ void SampleScene::Draw() {
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	portalMeshA_->Update();
 	portalMeshB_->Update();
+
 	DrawSceneGeometry(camera_.get(), true);
 	SpriteCommon::GetInstance()->DrawCommon();
 	uvSprite->Draw();

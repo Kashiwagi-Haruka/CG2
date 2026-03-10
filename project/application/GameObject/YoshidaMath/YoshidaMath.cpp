@@ -44,6 +44,16 @@ float YoshidaMath::sgn(float num)
     return  (num < 0.0f) ? -1.0f : 1.0f;
 }
 
+Vector3 YoshidaMath::GetDirectionFromRotateY(float rotateY)
+{
+    // Y軸回転（Yaw）から前方向ベクトルを計算
+    float x = std::sin(rotateY);
+    float y = 0.0f;
+    float z = std::cos(rotateY);
+
+    return { x, y, z };
+}
+
 float YoshidaMath::Dot(const Vector2& v1, const Vector2& v2)
 {
     return { v1.x * v2.x + v1.y * v2.y };
