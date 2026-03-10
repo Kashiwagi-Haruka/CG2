@@ -20,7 +20,7 @@ public:
     void SetCamera(Camera* camera);
     void SetModel(const std::string& filePath);
     AABB GetAABB();
-    Transform& GetTransform() { return collisionTransform_; }
+    Transform& GetCollisionTransform() { return collisionTransform_; }
     virtual void ResetCollisionAttribute();
 protected:
     std::unique_ptr<Object3d>obj_ = nullptr;

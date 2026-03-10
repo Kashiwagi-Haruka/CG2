@@ -6,6 +6,8 @@
 #include "GameObject/WhiteBoard/WalkWhiteBoard.h"
 #include "GameObject/YoshidaMath/YoshidaMath.h"
 #include "Model/ModelManager.h"
+#include"TextureManager.h"
+#include"DirectXCommon.h"
 
 namespace {
     const constexpr uint32_t kMaxWhiteBoards = 6;
@@ -41,8 +43,15 @@ void PortalManager::Initialize() {
 
     portals_.clear();
     preWhiteBoards_.clear();
-
     portalParticle_->Initialize();
+}
+
+void PortalManager::UpdateWarpPosCameras()
+{
+
+    for (auto& portal : portals_) {
+        portal->UpdateWarpPosCamera();
+    }
 }
 
 void PortalManager::UpdateWhiteBoard() {
@@ -65,7 +74,9 @@ void PortalManager::UpdatePortal() {
     for (auto& portal : portals_) {
         portal->Update();
     }
+
 }
+
 void PortalManager::SetCamera(Camera* camera)
 {
     for (auto& board : whiteBoards_) {
@@ -76,9 +87,9 @@ void PortalManager::SetCamera(Camera* camera)
         portalParticle_->SetCamera(camera);
     }
 
-    for (auto& portal : portals_) {
-        portal->SetCamera(camera);
-    }
+    //for (auto& portal : portals_) {
+    //    portal->SetCamera(camera);
+    //}                                    
 };
 
 void PortalManager::DrawWhiteBoard() {
@@ -87,36 +98,29 @@ void PortalManager::DrawWhiteBoard() {
     }
 }
 
-void PortalManager::DrawPortal(bool isShadow)
+void PortalManager::DrawPortal()
 {
     for (auto& portal : portals_) {
-
-        portal->SetCamera(playerCamera_->GetCamera());
-        portal->UpdateCameraMatrices();
-        portal->DrawWarpPos();
-        if (!isShadow) {
-            portal->DrawRings();
-            portal->DrawPortals();
-        }
+        portal->DrawRings();
+        Object3dCommon::GetInstance()->DrawCommonPortal();
+        portal->DrawPortals();
     }
 
-}
-
-void PortalManager::BeginRender(uint32_t index)
-{
-    if(portals_.size())
-    portals_[index]->BeginRender();
 
 }
 
-void PortalManager::TransitionToShaderResource(uint32_t index)
-{
-}
 
-void PortalManager::Draw(bool isShadow, bool drawParticle) {
+void PortalManager::Draw(bool isShadow, bool drawPortal, bool drawParticle) {
 
     DrawWhiteBoard();
-    DrawPortal(isShadow);
+
+    if (drawPortal) {
+        DrawPortal();
+    }
+
+    for (auto& portal : portals_) {
+        portal->GetWarpPos()->Draw();
+    }
 
     if (drawParticle && portalParticle_) {
         portalParticle_->Draw();
@@ -142,7 +146,7 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
 
     // whiteBoardとrayの当たり判定
     for (auto& board : whiteBoards_) {
-        if (timeCardWatch->OnCollisionObjOfMakePortal(playerCamera_->GetRay(), board->GetAABB(), board->GetTransform())) {
+        if (timeCardWatch->OnCollisionObjOfMakePortal(playerCamera_->GetRay(), board->GetAABB(), board->GetCollisionTransform())) {
 
             if (PlayerCommand::GetInstance()->Shot()) {
 
@@ -161,7 +165,7 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
                 isPendingPortalSpawn_ = true;
 
                 if (portalParticle_) {
-                    portalParticle_->Start(*playerPos_, preWhiteBoards_.back()->GetTransform().translate);
+                    portalParticle_->Start(*playerPos_, preWhiteBoards_.back()->GetCollisionTransform().translate);
                 }
             }
             break;
@@ -171,29 +175,38 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
 
 void PortalManager::SpawnPortal(WhiteBoard* board) {
 
-    Transform* newWarpTransform = nullptr;
-
 
     if (portals_.size() >= 2) {
-        //ポータルの生成が2個以上になったら
+           //ポータルの生成が2個以上になったら
         portals_.erase(portals_.begin());
     }
 
-    //ポータルがないとき
-    if (portals_.empty()) {
-        //最初の位置に入れる
-        newWarpTransform = &firstWarpPosTransform_;
-    } else {
-        portals_.at(0)->SetWarpPosParent(&board->GetTransform());
-        newWarpTransform = &portals_.at(0)->GetTransform();
-    }
     //ポータルを新たに作る
-    std::unique_ptr portal = std::make_unique<Portal>();
+    std::unique_ptr newPortal = std::make_unique<Portal>();
+    newPortal->Initialize();
+    //カメラをセットする
+    newPortal->SetCamera(playerCamera_->GetCamera());
+    newPortal->SetParentTransform(&board->GetCollisionTransform());
 
-    portal->Initialize();
+    if (portals_.empty()) {
+        //ポータルがないとき
+        newPortal->GetWarpPos()->SetParent(&firstWarpPosTransform_);
+        uint32_t textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/atHome.jpg");
+        newPortal->SetTextureIndex(textureIndex);
+    } else {
+        //ポータルがあるとき
+        auto& firstPortal = portals_.at(0);
 
-    Camera* camera = playerCamera_->GetCamera();
-    portal->SetCamera(camera);
-    portal->SetParentTransform(&board->GetTransform());
-    portals_.push_back(std::move(portal));
+        auto* newPortalTransform = &newPortal->GetTransform();
+        uint32_t newPortalSRV = newPortal->GetRenderTexture2D()->GetSrvIndex();
+        uint32_t firstPortalSRV = firstPortal->GetRenderTexture2D()->GetSrvIndex();
+
+        firstPortal->SetTextureIndex(newPortalSRV);
+        newPortal->SetTextureIndex(firstPortalSRV);
+
+        newPortal->GetWarpPos()->SetParent(newPortalTransform);
+        firstPortal->GetWarpPos()->SetParent(&firstPortal->GetTransform());
+    }
+
+    portals_.push_back(std::move(newPortal));
 }
