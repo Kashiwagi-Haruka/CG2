@@ -195,6 +195,5 @@ void PortalManager::SpawnPortal(WhiteBoard* board) {
     Camera* camera = playerCamera_->GetCamera();
     portal->SetCamera(camera);
     portal->SetParentTransform(&board->GetTransform());
-    portal->SetWarpPosParent(newWarpTransform);
     portals_.push_back(std::move(portal));
 }
