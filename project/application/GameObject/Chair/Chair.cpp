@@ -42,7 +42,7 @@ void Chair::Initialize()
 
 void Chair::Draw()
 {
-    obj_->UpdateCameraMatrices();
+
     obj_->Draw();
 }
 
@@ -73,4 +73,5 @@ void Chair::SetPlayerCamera(PlayerCamera* camera)
 void Chair::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
+    obj_->UpdateCameraMatrices();
 }

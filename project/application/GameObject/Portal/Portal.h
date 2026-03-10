@@ -33,26 +33,19 @@ public:
     void UpdateWarpPosCamera();
     void SetCamera(Camera* camera);
     const Sphere& GetSphere();
-    Transform& GetTransform() {return transform_
-            ;
-    };
+    Transform& GetTransform() {return transform_ ;};
     //PortalのSRTをセットする
     void SetParentTransform(Transform* transform) { parentTransform = transform; };
-
     void SetPortalWorldMatrix();
-
     Camera* GetCamera() { return warpPos_->GetWarpPosCamera(); };
     //ワープ先を取得する
     WarpPos* GetWarpPos() { return warpPos_.get(); }
-
     void BeginRender();
+    void SetDefaultCamera();
     void TransitionToShaderResource();
     void DrawPortals();
     void DrawRings();
-
     bool GetIsPlayerHit() { return isPlayerHit_; };
-
-
 private:
     bool isPlayerHit_ = false;
     float scaleTimer_ = 0.0f;

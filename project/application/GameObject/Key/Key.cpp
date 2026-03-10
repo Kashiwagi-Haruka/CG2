@@ -68,9 +68,10 @@ void Key::SetPlayerCamera(PlayerCamera* camera)
 void Key::SetCamera(Camera* camera)
 {
 	obj_->SetCamera(camera);
-
+	obj_->UpdateCameraMatrices();
 #ifdef _DEBUG
 	primitive_->SetCamera(camera);
+	primitive_->UpdateCameraMatrices();
 #endif
 }
 

@@ -41,6 +41,15 @@ void Camera::Update() {
 	viewProjectionMatrix_ = Function::Multiply(viewMatrix_, projectionMatrix_);
 }
 
+//追加しました。
+void Camera::UpdateViewProjection(const Matrix4x4& worldMatrix) {
+	// 現在のTransformと投影設定をもとに各行列を更新
+	worldMatrix_ = worldMatrix;
+	viewMatrix_ =  Function::Inverse(worldMatrix);
+	projectionMatrix_ = Function::MakePerspectiveFovMatrix(fovY, aspectRatio, nearZ, farZ);
+	viewProjectionMatrix_ = Function::Multiply(viewMatrix_, projectionMatrix_);
+}
+
 void Camera::SetViewProjectionMatrix(const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix) {
 	// 受け取った行列を採用し、派生行列と位置情報を同期
 	viewMatrix_ = viewMatrix;
