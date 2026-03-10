@@ -192,7 +192,7 @@ void Portal::UpdateWorldMatrix()
 
 void Portal::SetTranslate(const Vector3& forward)
 {
-    transform_.translate = parentTransform->translate - forward * 0.125f;
+    transform_.translate = parentTransform->translate - forward * 0.0625f;
     ringTranslate_ = transform_.translate - forward * 0.0625f * 0.125f;
 }
 

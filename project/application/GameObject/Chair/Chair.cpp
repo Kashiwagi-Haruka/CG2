@@ -28,6 +28,8 @@ Vector3 Chair::GetWorldPosition() const
 
 void Chair::Update()
 {
+
+    obj_->SetShininess(30.0f);
     obj_->SetTransform(transform_);
     obj_->Update();
 }
