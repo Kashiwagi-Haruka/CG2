@@ -40,7 +40,7 @@ void WhiteBoard::Update()
 {
     obj_->Update();
 
-
+    obj_->SetShininess(80.0f);
     collisionTransform_ = obj_->GetTransform();
     collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
 
