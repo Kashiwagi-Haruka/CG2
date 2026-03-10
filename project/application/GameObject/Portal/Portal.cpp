@@ -87,6 +87,7 @@ void Portal::Initialize()
     portalCircle_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
     //テクスチャここで設定するよーん
     portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
+    preRotY_ = { 0.0f };
 }
 
 void Portal::Update()
@@ -95,7 +96,7 @@ void Portal::Update()
 
     uvRotateZ_ += YoshidaMath::kDeltaTime * 2.0f;
     ring_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, uvRotateZ_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
-    SetPortalWorldMatrix();
+    UpdatePortalWorldMatrix();
     ring_->Update();
 
     portalCircle_->Update();
@@ -140,38 +141,71 @@ void Portal::SetCamera(Camera* camera)
 
 void Portal::SetPortalWorldMatrix()
 {
-    assert(sceneCamera_);
-    assert(parentTransform);
+    SetParentTransformToTransform();
+    Vector3 forward = SetSceneCameraAndParentAndGetForward();
+    //回転を方向別でセットする
 
-    Vector3 forward = YoshidaMath::GetForward(sceneCamera_->GetWorldMatrix());
+    SetRotateFromDirection(forward);
+    SetTranslate(forward);
+    UpdateWorldMatrix();
+}
+
+void Portal::UpdatePortalWorldMatrix()
+{
+    Vector3 forward = SetSceneCameraAndParentAndGetForward();
+    SetTranslate(forward);
+    transform_.rotate.y = preRotY_+ parentTransform->rotate.y;
+    UpdateScale();
+    UpdateWorldMatrix();
+}
+
+void Portal::SetRotateFromDirection(const Vector3& forward)
+{
     Vector3 direction = YoshidaMath::GetDirectionFromRotateY(parentTransform->rotate.y);
-
     float dot = Function::Dot(forward, direction);
-
-    transform_ = *parentTransform;
 
     if (dot < 0.0f) {
         //向き合っている
         ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-        transform_.rotate.y = Function::kPi + parentTransform->rotate.y;
+        preRotY_ = Function::kPi;
     } else {
         ring_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
-        transform_.rotate.y = parentTransform->rotate.y;
+        preRotY_ =0.0f;
     }
+    transform_.rotate.y = preRotY_ + parentTransform->rotate.y;
+}
 
+void Portal::UpdateScale()
+{
     scaleTimer_ += YoshidaMath::kDeltaTime;
     scaleTimer_ = std::clamp(scaleTimer_, 0.0f, 1.0f);
-
     transform_.scale = YoshidaMath::Easing::EaseInOutBack({ 0.0f,0.0f,0.0f }, parentTransform->scale, scaleTimer_);
-    transform_.translate -= forward * 0.125f;
+}
 
+void Portal::UpdateWorldMatrix()
+{
     Matrix4x4  worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+    Matrix4x4  worldMatrix1 = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, ringTranslate_);
     portalCircle_->SetWorldMatrix(worldMatrix);
-    transform_.translate -= forward * 0.0625f * 0.125f;
-    worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+    ring_->SetWorldMatrix(worldMatrix1);
+}
 
-    ring_->SetWorldMatrix(worldMatrix);
+void Portal::SetTranslate(const Vector3& forward)
+{
+    transform_.translate = parentTransform->translate - forward * 0.125f;
+    ringTranslate_ = transform_.translate - forward * 0.0625f * 0.125f;
+}
 
+Vector3 Portal::SetSceneCameraAndParentAndGetForward()
+{
+    assert(sceneCamera_);
+    return YoshidaMath::GetForward(sceneCamera_->GetWorldMatrix());
+}
+
+void Portal::SetParentTransformToTransform()
+{
+    assert(parentTransform);
+    transform_ = *parentTransform;
 }
 
 const Sphere& Portal::GetSphere()

@@ -10,8 +10,8 @@ Wall::Wall()
     SetAABB({ .min = -halfScale,.max = halfScale });
     SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
-   
 }
+
 
 void Wall::OnCollision(Collider* collider)
 {
@@ -29,13 +29,14 @@ Vector3 Wall::GetWorldPosition() const
 
 void Wall::Update()
 {
-    primitive_->SetTransform(primitive_->GetTransform());
+    AdjustAABB();
+    //primitive_->SetTransform(primitive_->GetTransform());
     primitive_->Update();
 }
 
 void Wall::Initialize()
 {
-    primitive_->Initialize(Primitive::Box);
+    primitive_->Initialize(Primitive::Box, "Resources/TD3_3102/2d/wall.png");
 }
 
 void Wall::Draw()
@@ -50,11 +51,9 @@ void Wall::SetCamera(Camera* camera)
     primitive_->UpdateCameraMatrices();
 }
 
-void Wall::SetTransformAndAABB(const Vector3& translate, const Vector3& scale)
+void Wall::AdjustAABB()
 {
-    Vector3 halfScale = scale * 0.5f;
+    Vector3 halfScale = primitive_->GetTransform().scale * 0.5f;
     SetAABB({ .min = -halfScale,.max = halfScale });
 
-    primitive_->SetTranslate(translate);
-    primitive_->SetScale(scale);
 }
