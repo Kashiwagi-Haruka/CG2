@@ -8,6 +8,7 @@
 #include "Model/ModelManager.h"
 #include"TextureManager.h"
 #include"DirectXCommon.h"
+#include"GameObject/Player/Player.h"
 
 namespace {
     const constexpr uint32_t kMaxWhiteBoards = 6;
@@ -40,7 +41,7 @@ void PortalManager::Initialize() {
     for (auto& board : whiteBoards_) {
         board->Initialize();
     }
-
+    warpCoolTimer_ = kWarpTime_;
     portals_.clear();
     preWhiteBoards_.clear();
     portalParticle_->Initialize();
@@ -54,6 +55,22 @@ void PortalManager::UpdateWarpPosCameras()
     }
 }
 
+void PortalManager::WarpPlayer(Player* player)
+{
+
+    for (auto& portal : portals_) {
+        if (portal->GetIsPlayerHit()) {
+            if (warpCoolTimer_ == kWarpTime_) {
+                warpCoolTimer_ = 0.0f;
+                Transform* portalTransform = portal->GetWarpPos()->GetParent();
+                player->SetTranslate(portalTransform->translate);
+                player->SetRotate(portalTransform->rotate);
+                break;
+            }
+        }
+    }
+}
+
 void PortalManager::UpdateWhiteBoard() {
     for (auto& board : whiteBoards_) {
         board->Update();
@@ -61,6 +78,10 @@ void PortalManager::UpdateWhiteBoard() {
 }
 
 void PortalManager::UpdatePortal() {
+
+
+    warpCoolTimer_ += YoshidaMath::kDeltaTime;
+    warpCoolTimer_ = std::clamp(warpCoolTimer_, 0.0f, kWarpTime_);
 
     if (isPendingPortalSpawn_ && portalParticle_) {
         portalParticle_->Update();
@@ -74,6 +95,7 @@ void PortalManager::UpdatePortal() {
     for (auto& portal : portals_) {
         portal->Update();
     }
+
 
 }
 
@@ -156,6 +178,11 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
                     preWhiteBoards_.erase(preWhiteBoards_.begin());
                 }
 
+                if (portals_.size() >= 2) {
+                    //ポータルの生成が2個以上になったら
+                    portals_.erase(portals_.begin());
+                }
+
                 preWhiteBoards_.push_back(board.get());
 
                 preWhiteBoards_.back()->SetCollisionAttribute(kCollisionNone);
@@ -176,37 +203,37 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
 void PortalManager::SpawnPortal(WhiteBoard* board) {
 
 
-    if (portals_.size() >= 2) {
-           //ポータルの生成が2個以上になったら
-        portals_.erase(portals_.begin());
-    }
 
     //ポータルを新たに作る
-    std::unique_ptr newPortal = std::make_unique<Portal>();
+    std::unique_ptr<Portal> newPortal = std::make_unique<Portal>();
     newPortal->Initialize();
     //カメラをセットする
     newPortal->SetCamera(playerCamera_->GetCamera());
     newPortal->SetParentTransform(&board->GetCollisionTransform());
+    newPortal->SetPortalWorldMatrix();
 
-    if (portals_.empty()) {
+    if (!portals_.empty()) {
+        // すでにポータルがある場合、お互いをつなぐ
+        Portal* existingPortal = portals_.back().get();
+        Transform* newTransform;
+        newPortal->GetWarpPos()->SetParent(&existingPortal->GetTransform());
+        existingPortal->GetWarpPos()->SetParent(&newPortal->GetTransform());
+
+        //テクスチャの入れ替え
+        uint32_t newPortalSRV = newPortal->GetRenderTexture2D()->GetSrvIndex();
+        uint32_t firstPortalSRV = existingPortal->GetRenderTexture2D()->GetSrvIndex();
+
+        existingPortal->SetTextureIndex(newPortalSRV);
+        newPortal->SetTextureIndex(firstPortalSRV);
+
+    } else {
         //ポータルがないとき
         newPortal->GetWarpPos()->SetParent(&firstWarpPosTransform_);
         uint32_t textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/atHome.jpg");
         newPortal->SetTextureIndex(textureIndex);
-    } else {
-        //ポータルがあるとき
-        auto& firstPortal = portals_.at(0);
-
-        auto* newPortalTransform = &newPortal->GetTransform();
-        uint32_t newPortalSRV = newPortal->GetRenderTexture2D()->GetSrvIndex();
-        uint32_t firstPortalSRV = firstPortal->GetRenderTexture2D()->GetSrvIndex();
-
-        firstPortal->SetTextureIndex(newPortalSRV);
-        newPortal->SetTextureIndex(firstPortalSRV);
-
-        newPortal->GetWarpPos()->SetParent(newPortalTransform);
-        firstPortal->GetWarpPos()->SetParent(&firstPortal->GetTransform());
     }
 
+
     portals_.push_back(std::move(newPortal));
+
 }
