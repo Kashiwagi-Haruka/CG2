@@ -8,7 +8,6 @@
 #include<algorithm>
 #include"Camera.h"
 
-bool Portal::isPlayerHit_ = false;
 Camera* Portal::sceneCamera_ = nullptr;
 //音楽
 SoundData Portal::warpSE_;
@@ -29,11 +28,10 @@ void Portal::OnCollision(Collider* collider)
 {
     if (!isPlayerHit_) {
         if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-            if (warpCoolTimer_ == kWarpTime_) {
-                warpCoolTimer_ = 0.0f;
+  
                 Audio::GetInstance()->SoundPlayWave(warpSE_, false);
                 isPlayerHit_ = true;
-            }
+            
         }
     }
 }
@@ -76,7 +74,7 @@ Portal::~Portal()
 
 void Portal::Initialize()
 {
-    warpCoolTimer_ = kWarpTime_;
+
 
     isPlayerHit_ = false;
     scaleTimer_ = 0.0f;
@@ -102,9 +100,6 @@ void Portal::Initialize()
 void Portal::Update()
 {
     isPlayerHit_ = false;
-
-    warpCoolTimer_ += YoshidaMath::kDeltaTime;
-    warpCoolTimer_ = std::clamp(warpCoolTimer_, 0.0f, kWarpTime_);
 
     uvRotateZ_ += YoshidaMath::kDeltaTime * 2.0f;
     ring_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, uvRotateZ_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));

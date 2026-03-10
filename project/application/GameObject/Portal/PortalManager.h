@@ -5,7 +5,7 @@
 #include "Vector3.h"
 #include"Transform.h"
 #include <array>
-
+class Player;
 class TimeCardWatch;
 class PlayerCamera;
 class PortalManager {
@@ -25,6 +25,7 @@ public:
 	std::vector<std::unique_ptr<Portal>>& GetPortals() { return portals_; };
 	std::vector<std::unique_ptr<WhiteBoard>>& GetWhiteBoards() { return whiteBoards_; }
 	void UpdateWarpPosCameras();
+	void WarpPlayer(Player* player);
 private:
 	void UpdateWhiteBoard();
 	void UpdatePortal();
@@ -46,4 +47,8 @@ private:
 	bool isPendingPortalSpawn_ = false;
 	std::vector<std::unique_ptr<Portal>> portals_;
 	std::unique_ptr<PortalParticle> portalParticle_ = nullptr;
+
+	const float kWarpTime_ = 2.0f;
+	float warpCoolTimer_ = kWarpTime_;
+
 };

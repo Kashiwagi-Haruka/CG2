@@ -322,14 +322,7 @@ void ShadowGameScene::UpdateGameObject()
 
 #pragma region//ゲームオブジェクト
 
-    for (auto& portal : portalManager_->GetPortals()) {
-        if (portal->GetIsPlayerHit()) {
-            Transform* portalTransform = portal->GetWarpPos()->GetParent();
-            player_->SetTranslate(portalTransform->translate + playerCamera_->GetRay().diff);
-            player_->SetRotate(portalTransform->rotate);
-            break;
-        }
-    }
+    portalManager_->WarpPlayer(player_.get());
 
     if (!useDebugCamera_) {
         playerCamera_->Update();

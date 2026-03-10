@@ -32,10 +32,10 @@ public:
     void Update();
     void UpdateWarpPosCamera();
     void SetCamera(Camera* camera);
-
-    Transform& GetTransform() { return transform_; };
     const Sphere& GetSphere();
-
+    Transform& GetTransform() {return transform_
+            ;
+    };
     //PortalのSRTをセットする
     void SetParentTransform(Transform* transform) { parentTransform = transform; };
 
@@ -54,10 +54,7 @@ public:
 
 
 private:
-    const float kWarpTime_ = 2.0f;
-    float warpCoolTimer_ = kWarpTime_;
-
-    static bool isPlayerHit_;
+    bool isPlayerHit_ = false;
     float scaleTimer_ = 0.0f;
     static Camera* sceneCamera_;
     //音楽
