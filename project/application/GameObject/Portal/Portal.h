@@ -9,6 +9,7 @@
 #include "RenderTexture2D.h"
 #include "Object3d/Object3dCommon.h"
 #include <functional>
+#include "Mesh/Portal/PortalMesh.h"
 
 class Camera;
 class Portal : public YoshidaMath::Collider
@@ -21,46 +22,38 @@ public:
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
     Vector3 GetWorldPosition() const  override;
-
+    void SetTextureIndex(uint32_t index);
+    RenderTexture2D* GetRenderTexture2D() {
+        return portalRenderTexture_.get();
+    }
     Portal();
     ~Portal();
     void Initialize();
     void Update();
+    void UpdateWarpPosCamera();
     void SetCamera(Camera* camera);
-
-    Transform& GetTransform() { return transform_; };
     const Sphere& GetSphere();
-
+    Transform& GetTransform() {return transform_ ;};
     //PortalのSRTをセットする
     void SetParentTransform(Transform* transform) { parentTransform = transform; };
-
     void SetPortalWorldMatrix();
-
     Camera* GetCamera() { return warpPos_->GetWarpPosCamera(); };
-    //ワープ先の座標をセットする
-    Transform* GetWarpPosParent() { return warpPos_->GetParent(); }
-    void SetWarpPosParent(Transform* transform) { warpPos_->SetParent(transform); };
     //ワープ先を取得する
     WarpPos* GetWarpPos() { return warpPos_.get(); }
-
-    void RenderPortalTextures(const std::function<void(Camera*)>& drawSceneWithoutPortals);
-    void UpdateCameraMatrices();
+    void BeginRender();
+    void SetDefaultCamera();
+    void TransitionToShaderResource();
     void DrawPortals();
     void DrawRings();
-    void DrawWarpPos();
     bool GetIsPlayerHit() { return isPlayerHit_; };
 private:
-    const float kWarpTime_ = 2.0f;
-    float warpCoolTimer_ = kWarpTime_;
-
-    static bool isPlayerHit_;
+    bool isPlayerHit_ = false;
     float scaleTimer_ = 0.0f;
-    void UpdatePortalCamera(const Transform& destinationPortal, Camera* outCamera);
-    Camera* sceneCamera_ = nullptr;
+    static Camera* sceneCamera_;
     //音楽
     static SoundData warpSE_;
     std::unique_ptr<Primitive>ring_ = nullptr;
-    std::unique_ptr<Primitive>portalCircle_ = nullptr;
+    std::unique_ptr<PortalMesh>portalCircle_ = nullptr;
     Transform transform_ = {};
     float uvRotateZ_ = 0.0f;
     Sphere sphere_ = { 0.0f };

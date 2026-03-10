@@ -26,9 +26,9 @@ void WalkWhiteBoard::Initialize()
 {
     isMove_ = false;
     obj_->Initialize();
-    transform_ = obj_->GetTransform();
+    transform_ = { .scale = {1.0f,1.0f,1.0f}, .rotate = {0.0f,Function::kPi ,0.0f},.translate = {-10.0f,0.0f,10.0f} };
     velocity_ = { 0.0f };
-    localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
+    localAABB_ = { .min = { -0.5f,0.0f,-0.5f},.max = {0.5f,0.5f,0.5f} };
     /* SetRadius(1.0f);*/
     SetAABB(AABB{ .min = {-1.0f,0.0f,-1.0f}, .max = {1.0f,1.5f,1.0f} });
     SetCollisionAttribute(kCollisionEnemy);
@@ -38,7 +38,7 @@ void WalkWhiteBoard::Initialize()
     primitive_->Initialize(Primitive::Box);
     primitive_->SetColor({ 1.0f,1.0f,1.0f,0.1f });
 #endif
-    localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
+
 
     if (!animationClips_.empty()) {
         SetAnimationIndex(1);
@@ -72,11 +72,10 @@ void WalkWhiteBoard::Update()
     }
 
     obj_->Update();
-
+    
     collisionTransform_ = transform_;
 
     collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
-    collisionTransform_.rotate = { 0.0f };
     //objectからの相対距離
     collisionTransform_.translate.y += 1.375f;
 

@@ -125,8 +125,8 @@ private:
     void DrawSceneTransition();
     //ゲームオブジェクトの描画処理
     void DrawModel();
-    void DrawGameObject(bool isShadow, bool isDrawParticle);
-    void DrawSceneGeometry(bool drawPortalParticle = true);
+    void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle);
     void SetSceneCameraForDraw(Camera* camera);
+    void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle);
 };
 

@@ -6,6 +6,9 @@
 #include "GameObject/WhiteBoard/WalkWhiteBoard.h"
 #include "GameObject/YoshidaMath/YoshidaMath.h"
 #include "Model/ModelManager.h"
+#include"TextureManager.h"
+#include"DirectXCommon.h"
+#include"GameObject/Player/Player.h"
 
 namespace {
     const constexpr uint32_t kMaxWhiteBoards = 6;
@@ -34,11 +37,38 @@ PortalManager::PortalManager(Vector3* pos) {
 }
 
 void PortalManager::Initialize() {
+
     for (auto& board : whiteBoards_) {
         board->Initialize();
     }
-
+    warpCoolTimer_ = kWarpTime_;
+    portals_.clear();
+    preWhiteBoards_.clear();
     portalParticle_->Initialize();
+}
+
+void PortalManager::UpdateWarpPosCameras()
+{
+
+    for (auto& portal : portals_) {
+        portal->UpdateWarpPosCamera();
+    }
+}
+
+void PortalManager::WarpPlayer(Player* player)
+{
+
+    for (auto& portal : portals_) {
+        if (portal->GetIsPlayerHit()) {
+            if (warpCoolTimer_ == kWarpTime_) {
+                warpCoolTimer_ = 0.0f;
+                Transform* portalTransform = portal->GetWarpPos()->GetParent();
+                player->SetTranslate(portalTransform->translate);
+                player->SetRotate(portalTransform->rotate);
+                break;
+            }
+        }
+    }
 }
 
 void PortalManager::UpdateWhiteBoard() {
@@ -48,6 +78,10 @@ void PortalManager::UpdateWhiteBoard() {
 }
 
 void PortalManager::UpdatePortal() {
+
+
+    warpCoolTimer_ += YoshidaMath::kDeltaTime;
+    warpCoolTimer_ = std::clamp(warpCoolTimer_, 0.0f, kWarpTime_);
 
     if (isPendingPortalSpawn_ && portalParticle_) {
         portalParticle_->Update();
@@ -61,7 +95,10 @@ void PortalManager::UpdatePortal() {
     for (auto& portal : portals_) {
         portal->Update();
     }
+
+
 }
+
 void PortalManager::SetCamera(Camera* camera)
 {
     for (auto& board : whiteBoards_) {
@@ -71,6 +108,10 @@ void PortalManager::SetCamera(Camera* camera)
     if (portalParticle_) {
         portalParticle_->SetCamera(camera);
     }
+
+    //for (auto& portal : portals_) {
+    //    portal->SetCamera(camera);
+    //}                                    
 };
 
 void PortalManager::DrawWhiteBoard() {
@@ -79,27 +120,29 @@ void PortalManager::DrawWhiteBoard() {
     }
 }
 
-void PortalManager::DrawPortal(bool isShadow)
+void PortalManager::DrawPortal()
 {
     for (auto& portal : portals_) {
-
-        portal->SetCamera(playerCamera_->GetCamera());
-        portal->UpdateCameraMatrices();
-
-        if (!isShadow) {
-            portal->DrawPortals();
-            portal->DrawRings();
-        }
-
-        portal->DrawWarpPos();
+        portal->DrawRings();
+        Object3dCommon::GetInstance()->DrawCommonPortal();
+        portal->DrawPortals();
     }
+
 
 }
 
-void PortalManager::Draw(bool isShadow, bool drawParticle) {
+
+void PortalManager::Draw(bool isShadow, bool drawPortal, bool drawParticle) {
 
     DrawWhiteBoard();
-    DrawPortal(isShadow);
+
+    if (drawPortal) {
+        DrawPortal();
+    }
+
+    for (auto& portal : portals_) {
+        portal->GetWarpPos()->Draw();
+    }
 
     if (drawParticle && portalParticle_) {
         portalParticle_->Draw();
@@ -111,15 +154,21 @@ void PortalManager::SetPlayerCamera(PlayerCamera* camera) {
     playerCamera_ = camera;
 }
 
+void PortalManager::Update()
+{
+    UpdateWhiteBoard();
+    UpdatePortal();
+}
+
 void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
-    
+
     if (isPendingPortalSpawn_) {
         return;
     }
 
     // whiteBoardとrayの当たり判定
     for (auto& board : whiteBoards_) {
-        if (timeCardWatch->OnCollisionObjOfMakePortal(playerCamera_->GetRay(), board->GetAABB(), board->GetTransform())) {
+        if (timeCardWatch->OnCollisionObjOfMakePortal(playerCamera_->GetRay(), board->GetAABB(), board->GetCollisionTransform())) {
 
             if (PlayerCommand::GetInstance()->Shot()) {
 
@@ -129,8 +178,13 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
                     preWhiteBoards_.erase(preWhiteBoards_.begin());
                 }
 
+                if (portals_.size() >= 2) {
+                    //ポータルの生成が2個以上になったら
+                    portals_.erase(portals_.begin());
+                }
+
                 preWhiteBoards_.push_back(board.get());
- 
+
                 preWhiteBoards_.back()->SetCollisionAttribute(kCollisionNone);
 
                 pendingWhiteBoard_ = preWhiteBoards_.back();
@@ -138,7 +192,7 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
                 isPendingPortalSpawn_ = true;
 
                 if (portalParticle_) {
-                    portalParticle_->Start(*playerPos_, preWhiteBoards_.back()->GetTransform().translate);
+                    portalParticle_->Start(*playerPos_, preWhiteBoards_.back()->GetCollisionTransform().translate);
                 }
             }
             break;
@@ -148,30 +202,32 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
 
 void PortalManager::SpawnPortal(WhiteBoard* board) {
 
-    Transform* newWarpTransform = nullptr;
-
-
-    if (portals_.size() >= 2) {
-        //ポータルの生成が2個以上になったら
-        portals_.erase(portals_.begin());
-    }
-
-    //ポータルがないとき
-    if (portals_.empty()) {
-        //最初の位置に入れる
-        newWarpTransform = &firstWarpPosTransform_;
-    } else {
-        portals_.at(0)->SetWarpPosParent(&board->GetTransform());
-        newWarpTransform = &portals_.at(0)->GetTransform();
-    }
     //ポータルを新たに作る
-    std::unique_ptr portal = std::make_unique<Portal>();
+    std::unique_ptr<Portal> newPortal = std::make_unique<Portal>();
+    newPortal->Initialize();
+    //カメラをセットする
+    newPortal->SetCamera(playerCamera_->GetCamera());
+    newPortal->SetParentTransform(&board->GetCollisionTransform());
+    newPortal->SetPortalWorldMatrix();
 
-    portal->Initialize();
+    if (!portals_.empty()) {
+        // すでにポータルがある場合、お互いをつなぐ
+        Portal* existingPortal = portals_.back().get();
+        newPortal->GetWarpPos()->SetParent(&existingPortal->GetTransform());
+        existingPortal->GetWarpPos()->SetParent(&newPortal->GetTransform());
 
-    Camera* camera = playerCamera_->GetCamera();
-    portal->SetCamera(camera);
-    portal->SetParentTransform(&board->GetTransform());
-    portal->SetWarpPosParent(newWarpTransform);
-    portals_.push_back(std::move(portal));
+        ////テクスチャの入れ替え
+        existingPortal->SetTextureIndex(existingPortal->GetRenderTexture2D()->GetSrvIndex());
+        newPortal->SetTextureIndex(newPortal->GetRenderTexture2D()->GetSrvIndex());
+
+    } else {
+        //ポータルがないとき
+        newPortal->GetWarpPos()->SetParent(&firstWarpPosTransform_);
+ /*       uint32_t textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/atHome.jpg");
+        newPortal->SetTextureIndex(textureIndex);*/
+    }
+
+
+    portals_.push_back(std::move(newPortal));
+
 }

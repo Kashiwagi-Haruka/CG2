@@ -76,6 +76,7 @@ void ShadowGameScene::Initialize()
     portalManager_->Initialize();
     portalManager_->SetPlayerCamera(playerCamera_.get());
 
+
     //携帯打刻機
     timeCardWatch_->Initialize();
     //Playerの座標のポインタを入れる
@@ -321,31 +322,18 @@ void ShadowGameScene::UpdateGameObject()
 
 #pragma region//ゲームオブジェクト
 
-    for (auto& portal : portalManager_->GetPortals()) {
-        if (portal->GetIsPlayerHit()) {
-            Transform* portalTransform = portal->GetWarpPosParent();
-            player_->SetTranslate(portalTransform->translate + playerCamera_->GetRay().diff);
-            player_->SetRotate(portalTransform->rotate);
-            break;
-        }
-
-    }
-
+    portalManager_->WarpPlayer(player_.get());
 
     if (!useDebugCamera_) {
         playerCamera_->Update();
     }
 
-    timeCardWatch_->Update();
-
     player_->Update();
-
+    timeCardWatch_->Update();
     testField_->Update();
-
-    portalManager_->UpdateWhiteBoard();
-    portalManager_->UpdatePortal();
+    portalManager_->Update();
+    portalManager_->UpdateWarpPosCameras();
     ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
-    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
 
     key_->Update();
     edamame_->Update();
@@ -395,55 +383,44 @@ void ShadowGameScene::DrawModel()
     Object3dCommon::GetInstance()->BeginShadowMapPass();
     Object3dCommon::GetInstance()->DrawCommonShadow();
 
-    DrawGameObject(true, false);
+    DrawGameObject(true, false,false);
 
     Object3dCommon::GetInstance()->EndShadowMapPass();
 
-    for (auto& portal : portalManager_->GetPortals()) {
-        portal->RenderPortalTextures([this](Camera* camera) {
-            Object3dCommon::GetInstance()->SetDefaultCamera(camera);
-            SetSceneCameraForDraw(camera);
-            DrawSceneGeometry(false);
-            });
+    for (auto& portal : portalManager_->GetPortals()) {   
+        portal->BeginRender();
+        auto* portalCamera = portal->GetCamera();
+        SetCameraAndDraw(portalCamera,false,false);
+        portal->TransitionToShaderResource();
     }
 
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-
-    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
-    SetSceneCameraForDraw(playerCamera_->GetCamera());
-    DrawSceneGeometry(true);
+    SetCameraAndDraw(playerCamera_->GetCamera(), true, true);
 }
-void ShadowGameScene::DrawGameObject(bool isShadow, bool isDrawParticle)
+void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal,bool isDrawParticle)
 {
+
     // テスト地面
     testField_->Draw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //懐中電灯
     flashlight_->Draw();
-    collisionManager_->DrawColliders();
+
     // 鍵の描画処理
     key_->Draw();
     // 枝豆の描画処理
     edamame_->Draw();
     //椅子の描画
     chair_->Draw();
+	if (!isShadow) {
+		Object3dCommon::GetInstance()->DrawCommonSkinning();
+	}
+
+	// プレイヤーの描画処理
+	player_->Draw();
     //ポータル管理の描画
-    portalManager_->Draw(isShadow, isDrawParticle);
-
-    if (!isShadow) {
-        Object3dCommon::GetInstance()->DrawCommonSkinning();
-    }
-
-    //プレイヤーの描画処理
-    player_->Draw();
-
-}
-void ShadowGameScene::DrawSceneGeometry(bool drawPortalParticle) {
-
-    Object3dCommon::GetInstance()->DrawCommon();
-    //影じゃない
-    DrawGameObject(false, drawPortalParticle);
+    portalManager_->Draw(isShadow, drawPortal,isDrawParticle);
 }
 
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
@@ -456,5 +433,13 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     key_->SetCamera(camera);
     edamame_->SetCamera(camera);
     chair_->SetCamera(camera);
+
+}
+void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle)
+{
+    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+    SetSceneCameraForDraw(camera);
+    Object3dCommon::GetInstance()->DrawCommon();
+    DrawGameObject(false, drawPortal, isDrawParticle);
 }
 #pragma endregion
