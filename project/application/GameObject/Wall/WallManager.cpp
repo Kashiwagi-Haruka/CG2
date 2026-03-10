@@ -1,7 +1,7 @@
 #include "WallManager.h"
 
 namespace {
-    const int kMaxWall = 16;
+    const int kMaxWall = 4;
 }
 
 WallManager::WallManager()
@@ -26,6 +26,7 @@ WallManager::~WallManager()
 
 void WallManager::Initialize()
 {
+    // 壁の初期化
     for (auto& wall : walls_) {
         wall->Initialize();
     }

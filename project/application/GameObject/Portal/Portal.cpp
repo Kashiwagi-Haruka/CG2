@@ -41,12 +41,6 @@ Vector3 Portal::GetWorldPosition() const
     return transform_.translate;
 }
 
-void Portal::SetTextureIndex(uint32_t index)
-{
-    portalCircle_->SetTextureIndex(index);
-}
-
-
 Portal::Portal()
 {
     transform_ = { .scale = {1.5f,1.5f,1.5f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.75f,0.0f} };
@@ -74,8 +68,6 @@ Portal::~Portal()
 
 void Portal::Initialize()
 {
-
-
     isPlayerHit_ = false;
     scaleTimer_ = 0.0f;
     transform_ = { .scale = {0.0f,0.0f,0.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
@@ -93,7 +85,8 @@ void Portal::Initialize()
     portalRenderTexture_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, { 0.05f, 0.05f, 0.1f, 1.0f });
     portalCircle_ = std::make_unique<PortalMesh>();
     portalCircle_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
-
+    //テクスチャここで設定するよーん
+    portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
 }
 
 void Portal::Update()
@@ -106,14 +99,9 @@ void Portal::Update()
     ring_->Update();
 
     portalCircle_->Update();
-}
-
-void Portal::UpdateWarpPosCamera()
-{
     //ワープ地点
     warpPos_->Update();
 }
-
 
 void Portal::DrawPortals() {
     if (portalCircle_) {
@@ -123,7 +111,6 @@ void Portal::DrawPortals() {
 
 void Portal::DrawRings() {
     //Object3dCommon::GetInstance()->DrawCommonNoCull();
-
     ring_->Draw();
 }
 
@@ -131,11 +118,6 @@ void Portal::DrawRings() {
 void Portal::BeginRender()
 {
     portalRenderTexture_->BeginRender();
-
-}
-
-void Portal::SetDefaultCamera()
-{
 
 }
 

@@ -22,7 +22,7 @@ public:
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
     Vector3 GetWorldPosition() const  override;
-    void SetTextureIndex(uint32_t index);
+    void SetTextureIndex(uint32_t index) { portalCircle_->SetTextureIndex(index); };
     RenderTexture2D* GetRenderTexture2D() {
         return portalRenderTexture_.get();
     }
@@ -30,7 +30,6 @@ public:
     ~Portal();
     void Initialize();
     void Update();
-    void UpdateWarpPosCamera();
     void SetCamera(Camera* camera);
     const Sphere& GetSphere();
     Transform& GetTransform() {return transform_ ;};
@@ -41,7 +40,7 @@ public:
     //ワープ先を取得する
     WarpPos* GetWarpPos() { return warpPos_.get(); }
     void BeginRender();
-    void SetDefaultCamera();
+
     void TransitionToShaderResource();
     void DrawPortals();
     void DrawRings();

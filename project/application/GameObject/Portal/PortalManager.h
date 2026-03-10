@@ -24,7 +24,6 @@ public:
 	void CheckCollision(TimeCardWatch* timeCardWatch);
 	std::vector<std::unique_ptr<Portal>>& GetPortals() { return portals_; };
 	std::vector<std::unique_ptr<WhiteBoard>>& GetWhiteBoards() { return whiteBoards_; }
-	void UpdateWarpPosCameras();
 	void WarpPlayer(Player* player);
 private:
 	void UpdateWhiteBoard();
