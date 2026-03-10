@@ -20,7 +20,7 @@ public:
     void Initialize();
     void Draw();
     void SetCamera(Camera* camera);
-    void SetTransformAndAABB(const Vector3& translate,const Vector3& scale);
+    void AdjustAABB();
 private:
     std::unique_ptr<Primitive>primitive_ = nullptr;
 };

@@ -12,7 +12,10 @@ void WalkWhiteBoard::OnCollision(Collider* collider)
 {
     
     if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-        isMove_ = true;
+        if (!isMove_) {
+            isMove_ = true;
+        }
+    
     }
 }
 
@@ -26,7 +29,7 @@ void WalkWhiteBoard::Initialize()
 {
     isMove_ = false;
     obj_->Initialize();
-    transform_ = { .scale = {1.0f,1.0f,1.0f}, .rotate = {0.0f,Function::kPi ,0.0f},.translate = {-10.0f,0.0f,10.0f} };
+    transform_ = { .scale = {1.0f,1.0f,1.0f}, .rotate = {0.0f,Function::kPi ,0.0f},.translate = {-5.0f,0.0f,7.0f} };
     velocity_ = { 0.0f };
     localAABB_ = { .min = { -0.5f,0.0f,-0.5f},.max = {0.5f,0.5f,0.5f} };
     /* SetRadius(1.0f);*/
@@ -39,7 +42,7 @@ void WalkWhiteBoard::Initialize()
     primitive_->SetColor({ 1.0f,1.0f,1.0f,0.1f });
 #endif
 
-
+    animationTime_ = 0.0f;
     if (!animationClips_.empty()) {
         SetAnimationIndex(1);
         obj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
@@ -66,11 +69,12 @@ void WalkWhiteBoard::Update()
             /*       transform_.translate.y += velocity;*/
             transform_.translate.z += velocity_.z;
         }
-        obj_->SetTransform(transform_);
+
 
         Animation();
     }
 
+    obj_->SetTransform(transform_);
     obj_->Update();
     
     collisionTransform_ = transform_;
@@ -109,10 +113,12 @@ void WalkWhiteBoard::ResetCollisionAttribute()
 
 void WalkWhiteBoard::Animation()
 {
+
     float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 
     if (skeleton_ && !animationClips_.empty()) {
         const Animation::AnimationData& currentAnimation = animationClips_[currentAnimationIndex_];
+
         animationTime_ = Animation::AdvanceTime(currentAnimation, animationTime_, deltaTime, true);
         skeleton_->ApplyAnimation(currentAnimation, animationTime_);
         skeleton_->Update();

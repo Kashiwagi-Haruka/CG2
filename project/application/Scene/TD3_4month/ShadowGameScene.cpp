@@ -182,7 +182,9 @@ void ShadowGameScene::CheckCollision()
     for (auto& whiteBoard : portalManager_->GetWhiteBoards()) {
         collisionManager_->AddCollider(whiteBoard.get());
     }
-
+    for (auto& wall : wallManager_->GetWalls()) {
+        collisionManager_->AddCollider(wall.get());
+    }
     collisionManager_->AddCollider(flashlight_.get());
     collisionManager_->AddCollider(testField_.get());
 

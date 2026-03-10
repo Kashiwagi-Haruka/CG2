@@ -36,6 +36,7 @@ public:
     //PortalのSRTをセットする
     void SetParentTransform(Transform* transform) { parentTransform = transform; };
     void SetPortalWorldMatrix();
+
     Camera* GetCamera() { return warpPos_->GetWarpPosCamera(); };
     //ワープ先を取得する
     WarpPos* GetWarpPos() { return warpPos_.get(); }
@@ -46,6 +47,15 @@ public:
     void DrawRings();
     bool GetIsPlayerHit() { return isPlayerHit_; };
 private:
+    void UpdatePortalWorldMatrix();
+    void SetRotateFromDirection(const Vector3& forward);
+    void UpdateScale();
+    void UpdateWorldMatrix();
+    void SetTranslate(const Vector3& forward);
+    Vector3 SetSceneCameraAndParentAndGetForward();
+    void SetParentTransformToTransform();
+private:
+    float  preRotY_ = { 0.0f };
     bool isPlayerHit_ = false;
     float scaleTimer_ = 0.0f;
     static Camera* sceneCamera_;
@@ -53,6 +63,7 @@ private:
     static SoundData warpSE_;
     std::unique_ptr<Primitive>ring_ = nullptr;
     std::unique_ptr<PortalMesh>portalCircle_ = nullptr;
+    Vector3 ringTranslate_ = { 0.0f };
     Transform transform_ = {};
     float uvRotateZ_ = 0.0f;
     Sphere sphere_ = { 0.0f };
