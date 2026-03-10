@@ -8,7 +8,7 @@ WallManager::WallManager()
 {
     for (int i = 0; i < kMaxWall; ++i) {
         std::unique_ptr<Wall> wall = std::make_unique<Wall>();
-        walls_.push_back(wall);
+        walls_.push_back(std::move(wall));
     }
 }
 
