@@ -29,13 +29,14 @@ void TestField::Update()
 
 void TestField::Draw()
 {
-    plane_->UpdateCameraMatrices();
+
     plane_->Draw();
 }
 
 void TestField::SetCamera(Camera* camera)
 {
     plane_->SetCamera(camera);
+    plane_->UpdateCameraMatrices();
 }
 
 void TestField::OnCollision(Collider* collider)

@@ -28,10 +28,10 @@ void Portal::OnCollision(Collider* collider)
 {
     if (!isPlayerHit_) {
         if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-  
-                Audio::GetInstance()->SoundPlayWave(warpSE_, false);
-                isPlayerHit_ = true;
-            
+
+            Audio::GetInstance()->SoundPlayWave(warpSE_, false);
+            isPlayerHit_ = true;
+
         }
     }
 }
@@ -91,7 +91,6 @@ void Portal::Initialize()
 
     portalRenderTexture_ = std::make_unique<RenderTexture2D>();
     portalRenderTexture_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, { 0.05f, 0.05f, 0.1f, 1.0f });
-
     portalCircle_ = std::make_unique<PortalMesh>();
     portalCircle_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
 
@@ -124,71 +123,69 @@ void Portal::DrawPortals() {
 
 void Portal::DrawRings() {
     //Object3dCommon::GetInstance()->DrawCommonNoCull();
-    ring_->UpdateCameraMatrices();
+
     ring_->Draw();
 }
 
 
 void Portal::BeginRender()
 {
-    auto* camera = GetCamera();
-    assert(camera);
     portalRenderTexture_->BeginRender();
-    assert(Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList() != nullptr);
-    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+
+}
+
+void Portal::SetDefaultCamera()
+{
+
 }
 
 void Portal::TransitionToShaderResource()
 {
     portalRenderTexture_->TransitionToShaderResource();
-
+    Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
 }
 
 void Portal::SetCamera(Camera* camera)
 {
     sceneCamera_ = camera;
     portalCircle_->SetObjectCamera(camera);
+
     ring_->SetCamera(camera);
+    ring_->UpdateCameraMatrices();
     warpPos_->SetCamera(camera);
+
 }
 
 void Portal::SetPortalWorldMatrix()
 {
     assert(sceneCamera_);
-
     assert(parentTransform);
 
     Vector3 forward = YoshidaMath::GetForward(sceneCamera_->GetWorldMatrix());
     Vector3 direction = YoshidaMath::GetDirectionFromRotateY(parentTransform->rotate.y);
 
-    float dot =  Function::Dot(forward, direction);
+    float dot = Function::Dot(forward, direction);
 
     transform_ = *parentTransform;
 
     if (dot < 0.0f) {
         //向き合っている
         ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-        transform_.rotate.y = Function::kPi+parentTransform->rotate.y;
+        transform_.rotate.y = Function::kPi + parentTransform->rotate.y;
     } else {
         ring_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
         transform_.rotate.y = parentTransform->rotate.y;
     }
 
-
-
-
     scaleTimer_ += YoshidaMath::kDeltaTime;
     scaleTimer_ = std::clamp(scaleTimer_, 0.0f, 1.0f);
 
     transform_.scale = YoshidaMath::Easing::EaseInOutBack({ 0.0f,0.0f,0.0f }, parentTransform->scale, scaleTimer_);
-
     transform_.translate -= forward * 0.125f;
 
     Matrix4x4  worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-
-
     portalCircle_->SetWorldMatrix(worldMatrix);
-    transform_.translate -= forward * 0.0625f*0.125f;
+    transform_.translate -= forward * 0.0625f * 0.125f;
     worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
     ring_->SetWorldMatrix(worldMatrix);

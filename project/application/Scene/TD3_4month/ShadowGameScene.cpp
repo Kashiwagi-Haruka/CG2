@@ -332,7 +332,7 @@ void ShadowGameScene::UpdateGameObject()
     timeCardWatch_->Update();
     testField_->Update();
     portalManager_->Update();
-
+    portalManager_->UpdateWarpPosCameras();
     ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
 
     key_->Update();
@@ -387,27 +387,19 @@ void ShadowGameScene::DrawModel()
 
     Object3dCommon::GetInstance()->EndShadowMapPass();
 
-    portalManager_->UpdateWarpPosCameras();
-
-    for (auto& portal: portalManager_->GetPortals()) {
+    for (auto& portal : portalManager_->GetPortals()) {   
         portal->BeginRender();
         auto* portalCamera = portal->GetCamera();
-        assert(portalCamera);
-        SetSceneCameraForDraw(portalCamera);
-        DrawGameObject(false, false,false);
+        SetCameraAndDraw(portalCamera,false,false);
         portal->TransitionToShaderResource();
     }
 
-    Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
-
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-
-    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera()); 
-    SetSceneCameraForDraw(playerCamera_->GetCamera());
-    DrawSceneGeometry(true);
+    SetCameraAndDraw(playerCamera_->GetCamera(), true, true);
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal,bool isDrawParticle)
 {
+
     // テスト地面
     testField_->Draw();
     //携帯打刻機の描画処理
@@ -430,12 +422,6 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal,bool isDrawP
     //ポータル管理の描画
     portalManager_->Draw(isShadow, drawPortal,isDrawParticle);
 }
-void ShadowGameScene::DrawSceneGeometry(bool drawPortalParticle) {
-
-    Object3dCommon::GetInstance()->DrawCommon();
-    //影じゃない
-    DrawGameObject(false, true,drawPortalParticle);
-}
 
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
 {
@@ -448,5 +434,12 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     edamame_->SetCamera(camera);
     chair_->SetCamera(camera);
 
+}
+void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle)
+{
+    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+    SetSceneCameraForDraw(camera);
+    Object3dCommon::GetInstance()->DrawCommon();
+    DrawGameObject(false, drawPortal, isDrawParticle);
 }
 #pragma endregion

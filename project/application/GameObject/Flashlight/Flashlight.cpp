@@ -29,6 +29,7 @@ Vector3 Flashlight::GetWorldPosition() const
 void Flashlight::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
+    obj_->UpdateCameraMatrices();
 }
 
 void Flashlight::Update()
@@ -60,7 +61,7 @@ void Flashlight::Initialize()
 
 void Flashlight::Draw()
 {
-    obj_->UpdateCameraMatrices();
+ 
     obj_->Draw();
 }
 

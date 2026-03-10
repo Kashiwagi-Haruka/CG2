@@ -30,7 +30,7 @@ void WhiteBoard::Initialize()
 #endif
     localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
 
-   /* SetRadius(1.0f);*/
+    /* SetRadius(1.0f);*/
     SetAABB(AABB{ .min = {-1.0f,0.0f,-1.0f}, .max = {1.0f,1.5f,1.0f} });
     SetCollisionAttribute(kCollisionFloor);
     SetCollisionMask(kCollisionPlayer);
@@ -40,7 +40,7 @@ void WhiteBoard::Update()
 {
     obj_->Update();
 
-    
+
     collisionTransform_ = obj_->GetTransform();
     collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
 
@@ -53,12 +53,10 @@ void WhiteBoard::Update()
 #endif
 }
 
-void WhiteBoard::Draw()
-{
-    obj_->UpdateCameraMatrices();
+void WhiteBoard::Draw() {
+
     obj_->Draw();
 #ifdef _DEBUG
-    primitive_->UpdateCameraMatrices();
     primitive_->Draw();
 #endif
 }
@@ -66,8 +64,11 @@ void WhiteBoard::Draw()
 void WhiteBoard::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
+    obj_->UpdateCameraMatrices();
+
 #ifdef _DEBUG
     primitive_->SetCamera(camera);
+    primitive_->UpdateCameraMatrices();
 #endif
 }
 

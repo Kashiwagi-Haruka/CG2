@@ -32,6 +32,7 @@ void Player::SetCamera(Camera* camera)
 {
     //カメラのセット
     bodyObj_->SetCamera(camera);
+    bodyObj_->UpdateCameraMatrices();
 }
 void Player::Initialize()
 {
@@ -86,7 +87,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-    bodyObj_->UpdateCameraMatrices();
+
     bodyObj_->Draw();
 
 }

@@ -202,8 +202,6 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
 
 void PortalManager::SpawnPortal(WhiteBoard* board) {
 
-
-
     //ポータルを新たに作る
     std::unique_ptr<Portal> newPortal = std::make_unique<Portal>();
     newPortal->Initialize();
@@ -218,18 +216,15 @@ void PortalManager::SpawnPortal(WhiteBoard* board) {
         newPortal->GetWarpPos()->SetParent(&existingPortal->GetTransform());
         existingPortal->GetWarpPos()->SetParent(&newPortal->GetTransform());
 
-        //テクスチャの入れ替え
-        uint32_t newPortalSRV = newPortal->GetRenderTexture2D()->GetSrvIndex();
-        uint32_t firstPortalSRV = existingPortal->GetRenderTexture2D()->GetSrvIndex();
-
-        existingPortal->SetTextureIndex(newPortalSRV);
-        newPortal->SetTextureIndex(firstPortalSRV);
+        ////テクスチャの入れ替え
+        existingPortal->SetTextureIndex(existingPortal->GetRenderTexture2D()->GetSrvIndex());
+        newPortal->SetTextureIndex(newPortal->GetRenderTexture2D()->GetSrvIndex());
 
     } else {
         //ポータルがないとき
         newPortal->GetWarpPos()->SetParent(&firstWarpPosTransform_);
-        uint32_t textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/atHome.jpg");
-        newPortal->SetTextureIndex(textureIndex);
+ /*       uint32_t textureIndex = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/atHome.jpg");
+        newPortal->SetTextureIndex(textureIndex);*/
     }
 
 

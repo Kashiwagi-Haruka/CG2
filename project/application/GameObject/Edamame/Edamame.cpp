@@ -71,8 +71,10 @@ void Edamame::SetPlayerCamera(PlayerCamera* camera)
 void Edamame::SetCamera(Camera* camera)
 {
 	obj_->SetCamera(camera);
+	obj_->UpdateCameraMatrices();
 #ifdef _DEBUG
 	primitive_->SetCamera(camera);
+	primitive_->UpdateCameraMatrices();
 #endif
 }
 
