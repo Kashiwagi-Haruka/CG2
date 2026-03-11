@@ -151,7 +151,7 @@ public:
 	float GetDistortionStrength() const;
 	float GetDistortionFalloff() const;
 	Vector2 GetUvAnchor() const { return uvAnchor_; }
-
+	const Matrix4x4& GetWorldMatrix()const { return worldMatrix; };
 private:
 	// Line 描画時に使う始点
 	Vector3 lineStart_ = {0.0f, 0.0f, 0.0f};

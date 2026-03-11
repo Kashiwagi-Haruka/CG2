@@ -2,12 +2,12 @@
 #include"Model/ModelManager.h"
 #include"Function.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
+#include<assert.h>
 
 Wall::Wall()
 {
-
     primitive_ = std::make_unique<Primitive>();
-    Vector3 halfScale = Vector3{1.0f,1.0f,1.0f} *0.5f;
+    Vector3 halfScale = Vector3{ 1.0f,1.0f,1.0f } *0.5f;
     SetAABB({ .min = -halfScale,.max = halfScale });
     SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
@@ -26,12 +26,15 @@ void Wall::OnCollision(Collider* collider)
 
 Vector3 Wall::GetWorldPosition() const
 {
-    return primitive_->GetTransform().translate;
+   return YoshidaMath::GetWorldPosByMat(primitive_->GetWorldMatrix());
 }
 
 void Wall::Update()
 {
     AdjustAABB();
+    assert(parentMat_);
+    Matrix4x4 worldMat = Function::MakeAffineMatrix(primitive_->GetTransform().scale, primitive_->GetTransform().rotate, primitive_->GetTransform().translate);
+    primitive_->SetWorldMatrix(Function::Multiply(worldMat, *parentMat_));
     primitive_->Update();
 }
 

@@ -82,7 +82,7 @@ Vector3 YoshidaMath::GetForward(const Matrix4x4& m) {
 
 Vector3 YoshidaMath::GetWorldPosByMat(const Matrix4x4& mat)
 {
-    return { mat.m[2][0], mat.m[2][1], mat.m[2][2] };
+    return { mat.m[3][0], mat.m[3][1], mat.m[3][2] };
 }
 
 AABB YoshidaMath::GetAABBWorldPos(const AABB& localAABB, const Vector3& worldPos)
