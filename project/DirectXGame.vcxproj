@@ -165,6 +165,10 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Scene\TD3_4month\CoffeeScene.cpp" />
     <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
     <ClCompile Include="Engine\Editor\EditorGrid.cpp" />
+    <ClCompile Include="Engine\Texture\Light\AreaLight\AreaLight.cpp" />
+    <ClCompile Include="Engine\Texture\Light\DirectionalLight\DirectionalLight.cpp" />
+    <ClCompile Include="Engine\Texture\Light\PointLight\PointLight.cpp" />
+    <ClCompile Include="Engine\Texture\Light\SpotLight\SpotLight.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp" />
     <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp" />
@@ -289,7 +293,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Math\QuaternionTransform.h" />
     <ClInclude Include="Engine\Texture\Data\Color.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h" />
-    <ClInclude Include="Engine\Texture\Light\AreaLight.h" />
+    <ClInclude Include="Engine\Texture\Light\AreaLight\AreaLight.h" />
     <ClInclude Include="Engine\Texture\PSO\CreatePSO.h" />
     <ClInclude Include="Engine\BaseScene\AbstractSceneFactory.h" />
     <ClInclude Include="Engine\BaseScene\BaseScene.h" />
@@ -304,8 +308,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\BlendMode\BlendModeManager.h" />
     <ClInclude Include="Engine\base\DirectXCommon.h" />
     <ClInclude Include="Engine\LeakChecker\D3DResourceLeakChecker.h" />
-    <ClInclude Include="Engine\Texture\Light\PointLight.h" />
-    <ClInclude Include="Engine\Texture\Light\SpotLight.h" />
+    <ClInclude Include="Engine\Texture\Light\PointLight\PointLight.h" />
+    <ClInclude Include="Engine\Texture\Light\SpotLight\SpotLight.h" />
     <ClInclude Include="Engine\Texture\Data\SkinningData.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
@@ -345,7 +349,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\BaseScene\FrameWork.h" />
     <ClInclude Include="application\Scene\Game\Game.h" />
     <ClInclude Include="application\Scene\GameOverScene.h" />
-    <ClInclude Include="Engine\Texture\Light\DirectionalLight.h" />
+    <ClInclude Include="Engine\Texture\Light\DirectionalLight\DirectionalLight.h" />
     <ClInclude Include="application\Scene\SceneFactory\SceneFactory.h" />
     <ClInclude Include="application\Scene\SampleScene\SampleScene.h" />
     <ClInclude Include="application\GameTimer\GameTimer.h" />

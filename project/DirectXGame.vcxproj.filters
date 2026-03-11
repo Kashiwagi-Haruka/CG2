@@ -322,6 +322,10 @@
     <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
     <ClCompile Include="application\GameObject\Wall\Wall.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManager.cpp" />
+    <ClCompile Include="Engine\Texture\Light\AreaLight\AreaLight.cpp" />
+    <ClCompile Include="Engine\Texture\Light\DirectionalLight\DirectionalLight.cpp" />
+    <ClCompile Include="Engine\Texture\Light\PointLight\PointLight.cpp" />
+    <ClCompile Include="Engine\Texture\Light\SpotLight\SpotLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -361,10 +365,10 @@
     <ClInclude Include="Engine\base\DirectXCommon.h">
       <Filter>Engine\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Light\AreaLight.h">
+    <ClInclude Include="Engine\Texture\Light\AreaLight\AreaLight.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Light\DirectionalLight.h">
+    <ClInclude Include="Engine\Texture\Light\DirectionalLight\DirectionalLight.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="Engine\BaseScene\AbstractSceneFactory.h">
@@ -472,7 +476,7 @@
     <ClInclude Include="Engine\Texture\Particle\ParticleManager.h">
       <Filter>Engine\Texture\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Light\PointLight.h">
+    <ClInclude Include="Engine\Texture\Light\PointLight\PointLight.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="application\Pause\Pause.h">
@@ -538,7 +542,7 @@
     <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h">
       <Filter>Engine\Texture\PSO</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Light\SpotLight.h">
+    <ClInclude Include="Engine\Texture\Light\SpotLight\SpotLight.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Input\Input.h">
