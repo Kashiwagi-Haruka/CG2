@@ -6,7 +6,7 @@
 #include "Logger.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
-#include "VertexData.h"
+#include "Data/VertexData.h"
 #include <algorithm>
 #include <cassert>
 #include <cmath>

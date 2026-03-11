@@ -3,7 +3,7 @@
 #include "Transform.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include "VertexData.h"
+#include "Data/VertexData.h"
 #include <Windows.h>
 #include <d3d12.h>
 #include <stdint.h>

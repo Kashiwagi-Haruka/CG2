@@ -2,10 +2,10 @@
 #pragma once
 
 #include "CameraForGPU.h"
-#include "Material.h"
+#include "Data/Material.h"
 #include "Matrix4x4.h"
 #include "Transform.h"
-#include "VertexData.h"
+#include "Data/VertexData.h"
 
 #include <d3d12.h>
 #include <string>
@@ -69,6 +69,7 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
+	uint32_t indexCount_ = 0;
 
 	TransformationMatrix* transformationMatrixData_ = nullptr;
 	CameraForGpu* objectCameraData_ = nullptr;

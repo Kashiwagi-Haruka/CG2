@@ -1,9 +1,9 @@
 #pragma once
 #include "Matrix4x4.h"
-#include "Material.h"
+#include "Data/Material.h"
 #include "QuaternionTransform.h"
-#include "SkinningData.h"
-#include "VertexData.h"
+#include "Data/SkinningData.h"
+#include "Data/VertexData.h"
 #include <Windows.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>

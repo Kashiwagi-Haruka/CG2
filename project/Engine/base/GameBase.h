@@ -7,7 +7,7 @@
 
 #include "TextureManager.h"
 #include "Vector4.h"
-#include "VertexData.h"
+#include "Data/VertexData.h"
 #include "WinApp.h"
 #include <memory>
 class SrvManager;

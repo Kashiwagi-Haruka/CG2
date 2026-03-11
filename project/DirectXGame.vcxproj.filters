@@ -65,6 +65,9 @@
     <FxCompile Include="Resources\shader\Particle\UpdateParticle.CS.hlsl">
       <Filter>Resources</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\InstancedObject3d.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\InstancedObject3d.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\CS_Shader\InstancedObject3dCollision.CS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
@@ -314,6 +317,9 @@
     <ClCompile Include="Engine\Texture\TextureManager.cpp">
       <Filter>Engine\Texture</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.cpp" />
+    <ClCompile Include="application\GameSave\GameSave.cpp" />
+    <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
     <ClCompile Include="application\GameObject\Wall\Wall.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManager.cpp" />
   </ItemGroup>
@@ -559,7 +565,7 @@
     <ClInclude Include="Engine\Math\RigidBody.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\SkinningData.h">
+    <ClInclude Include="Engine\Texture\Data\SkinningData.h">
       <Filter>Engine\Animation</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\Mesh\Animation\Skeleton.h">
@@ -586,10 +592,10 @@
     <ClInclude Include="Engine\Math\Vector2.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Color.h">
+    <ClInclude Include="Engine\Texture\Data\Color.h">
       <Filter>Engine\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Material.h">
+    <ClInclude Include="Engine\Texture\Data\Material.h">
       <Filter>Engine\Texture</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h">
@@ -610,7 +616,7 @@
     <ClInclude Include="Engine\StringUtillity\StringUtility.h">
       <Filter>Engine\Logger</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\VertexData.h">
+    <ClInclude Include="Engine\Texture\Data\VertexData.h">
       <Filter>Engine\Texture</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture\TextureManager.h">
@@ -619,6 +625,9 @@
     <ClInclude Include="application\GameObject\Wall\Wall.h" />
     <ClInclude Include="application\GameObject\Wall\WallManager.h" />
     <ClInclude Include="application\GameObject\Key\Key.h" />
+    <ClInclude Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.h" />
+    <ClInclude Include="application\GameSave\GameSave.h" />
+    <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
