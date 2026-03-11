@@ -5,6 +5,7 @@
 
 Wall::Wall()
 {
+
     primitive_ = std::make_unique<Primitive>();
     Vector3 halfScale = Vector3{1.0f,1.0f,1.0f} *0.5f;
     SetAABB({ .min = -halfScale,.max = halfScale });
@@ -15,6 +16,7 @@ Wall::Wall()
 
 void Wall::OnCollision(Collider* collider)
 {
+
     if (collider->GetCollisionAttribute() == kCollisionPlayer) {
         primitive_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
     } else {
@@ -30,7 +32,6 @@ Vector3 Wall::GetWorldPosition() const
 void Wall::Update()
 {
     AdjustAABB();
-    //primitive_->SetTransform(primitive_->GetTransform());
     primitive_->Update();
 }
 
