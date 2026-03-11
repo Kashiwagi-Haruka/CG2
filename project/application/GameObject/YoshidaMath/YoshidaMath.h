@@ -32,4 +32,7 @@ namespace YoshidaMath {
     float Dot(const Vector4& v1, const Vector4& v2);
     float sgn(float num);
 
+    //Yカラ方向を求める
+    Vector3 GetDirectionFromRotateY(float rotateY);
+
 }

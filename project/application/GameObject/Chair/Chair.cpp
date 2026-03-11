@@ -28,6 +28,8 @@ Vector3 Chair::GetWorldPosition() const
 
 void Chair::Update()
 {
+
+    obj_->SetShininess(30.0f);
     obj_->SetTransform(transform_);
     obj_->Update();
 }
@@ -42,7 +44,7 @@ void Chair::Initialize()
 
 void Chair::Draw()
 {
-    obj_->UpdateCameraMatrices();
+
     obj_->Draw();
 }
 
@@ -73,4 +75,5 @@ void Chair::SetPlayerCamera(PlayerCamera* camera)
 void Chair::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
+    obj_->UpdateCameraMatrices();
 }

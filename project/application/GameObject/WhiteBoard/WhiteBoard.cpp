@@ -1,5 +1,6 @@
 #include "WhiteBoard.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
+#include"Function.h"
 
 WhiteBoard::WhiteBoard()
 {
@@ -11,7 +12,7 @@ WhiteBoard::WhiteBoard()
 
 void WhiteBoard::OnCollision(Collider* collider)
 {
-
+   
 }
 
 Vector3 WhiteBoard::GetWorldPosition() const
@@ -22,13 +23,14 @@ Vector3 WhiteBoard::GetWorldPosition() const
 void WhiteBoard::Initialize()
 {
     obj_->Initialize();
+    obj_->SetRotate({ 0.0f,Function::kPi,0.0f });
 #ifdef _DEBUG
     primitive_->Initialize(Primitive::Box);
     primitive_->SetColor({ 1.0f,1.0f,1.0f,0.1f });
 #endif
     localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
 
-   /* SetRadius(1.0f);*/
+    /* SetRadius(1.0f);*/
     SetAABB(AABB{ .min = {-1.0f,0.0f,-1.0f}, .max = {1.0f,1.5f,1.0f} });
     SetCollisionAttribute(kCollisionFloor);
     SetCollisionMask(kCollisionPlayer);
@@ -38,6 +40,7 @@ void WhiteBoard::Update()
 {
     obj_->Update();
 
+    obj_->SetShininess(80.0f);
     collisionTransform_ = obj_->GetTransform();
     collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
 
@@ -50,12 +53,10 @@ void WhiteBoard::Update()
 #endif
 }
 
-void WhiteBoard::Draw()
-{
-    obj_->UpdateCameraMatrices();
+void WhiteBoard::Draw() {
+
     obj_->Draw();
 #ifdef _DEBUG
-    primitive_->UpdateCameraMatrices();
     primitive_->Draw();
 #endif
 }
@@ -63,8 +64,11 @@ void WhiteBoard::Draw()
 void WhiteBoard::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
+    obj_->UpdateCameraMatrices();
+
 #ifdef _DEBUG
     primitive_->SetCamera(camera);
+    primitive_->UpdateCameraMatrices();
 #endif
 }
 

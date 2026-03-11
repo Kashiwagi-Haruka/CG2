@@ -31,6 +31,8 @@ public:
 	Camera();
 	// transform_ や投影パラメータから行列を再計算
 	void Update();
+	//ワールド行列から行列を作成する
+	void UpdateViewProjection(const Matrix4x4& worldMatrix);
 	// 外部で計算済みのビュー・プロジェクション行列を反映
 	void SetViewProjectionMatrix(const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix);
 	void SetWorldMatrix(const Matrix4x4& worldMatrix) {

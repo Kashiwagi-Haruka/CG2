@@ -40,6 +40,9 @@ void TimeCardWatch::SetCamera(Camera* camera)
     ring_->SetCamera(camera);
     camera_ = camera;
     assert(camera_);
+    modelObj_->UpdateCameraMatrices();
+    ring_->UpdateCameraMatrices();
+
 }
 
 void TimeCardWatch::Update()
@@ -73,11 +76,11 @@ void TimeCardWatch::Update()
 
 void TimeCardWatch::Draw()
 {
-    modelObj_->UpdateCameraMatrices();
+
     modelObj_->Draw();   
 
     if (canMakePortal_) {
-        ring_->UpdateCameraMatrices();
+ 
         ring_->Draw();
     }
 }
