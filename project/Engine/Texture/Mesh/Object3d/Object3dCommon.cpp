@@ -91,8 +91,6 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
         1.0f
     };
 	*directionalLightData_ = defaultDirectionalLight;
-	editorDirectionalLight_.SetColor(defaultDirectionalLight.color);
-	editorDirectionalLight_.SetDirection(defaultDirectionalLight.direction);
 	directionalLightResource_->Unmap(0, nullptr);
 
 	pointLightResource_ = CreateBufferResource(sizeof(PointLightGpu) * kMaxPointLights);
@@ -119,12 +117,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	areaLightSrvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
 	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaLightGpu));
 
-	editorPointLightCount_ = 0;
-	editorSpotLightCount_ = 0;
-	editorAreaLightCount_ = 0;
-	editorPointLights_.ClearLights();
-	editorSpotLights_.ClearSpotLights();
-	editorAreaLights_.ClearAreaLights();
+
 	D3D12_HEAP_PROPERTIES heapProps{};
 	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 
@@ -180,12 +173,6 @@ void Object3dCommon::SetEnvironmentMapTextureResource(ID3D12Resource* resource, 
 	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforTexture2D(environmentMapSrvIndex_, resource, format, 1);
 }
 void Object3dCommon::DrawSet(){
-	if (useEditorLights_) {
-		SetDirectionalLight(editorDirectionalLight_);
-		SetPointLights(editorPointLights_);
-		SetSpotLights(editorSpotLights_);
-		SetAreaLights(editorAreaLights_);
-	}
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, Object3dCommon::GetInstance()->GetDirectionalLightResource()->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, Object3dCommon::GetInstance()->GetPointLightCountResource()->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, Object3dCommon::GetInstance()->GetSpotLightCountResource()->GetGPUVirtualAddress());
@@ -370,7 +357,8 @@ void Object3dCommon::SetBlendMode(BlendMode blendMode) {
 	blendMode_ = blendMode;
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get());
 }
-void Object3dCommon::SetPointLights(const PointLight& pointLights) {
+void Object3dCommon::SetPointLights(PointLight& pointLights) {
+	pointLightSource_ = &pointLights;
 	uint32_t clampedCount = std::min<uint32_t>(static_cast<uint32_t>(pointLights.GetLightCount()), kMaxPointLights);
 	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointlightData_));
 	std::memset(pointlightData_, 0, sizeof(PointLightGpu) * kMaxPointLights);
@@ -388,7 +376,8 @@ void Object3dCommon::SetPointLights(const PointLight& pointLights) {
 	pointLightCountData_->count = clampedCount;
 	pointLightCountResource_->Unmap(0, nullptr);
 }
-void Object3dCommon::SetSpotLights(const SpotLight& spotLights) {
+void Object3dCommon::SetSpotLights(SpotLight& spotLights) {
+	spotLightSource_ = &spotLights;
 	uint32_t clampedCount = std::min<uint32_t>(static_cast<uint32_t>(spotLights.GetSpotLightCount()), kMaxSpotLights);
 	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData_));
 	std::memset(spotLightData_, 0, sizeof(SpotLightGpu) * kMaxSpotLights);
@@ -409,7 +398,8 @@ void Object3dCommon::SetSpotLights(const SpotLight& spotLights) {
 	spotLightCountData_->count = clampedCount;
 	spotLightCountResource_->Unmap(0, nullptr);
 }
-void Object3dCommon::SetAreaLights(const AreaLight& areaLights) {
+void Object3dCommon::SetAreaLights(AreaLight& areaLights) {
+	areaLightSource_ = &areaLights;
 	uint32_t clampedCount = std::min<uint32_t>(static_cast<uint32_t>(areaLights.GetAreaLightCount()), kMaxAreaLights);
 	areaLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&areaLightData_));
 	std::memset(areaLightData_, 0, sizeof(AreaLightGpu) * kMaxAreaLights);
@@ -430,17 +420,6 @@ void Object3dCommon::SetAreaLights(const AreaLight& areaLights) {
 	areaLightCountResource_->Map(0, nullptr, reinterpret_cast<void**>(&areaLightCountData_));
 	areaLightCountData_->count = clampedCount;
 	areaLightCountResource_->Unmap(0, nullptr);
-}
-void Object3dCommon::SetEditorLights(const DirectionalLight& directionalLight, const PointLight& pointLights, const SpotLight& spotLights, const AreaLight& areaLights) {
-	editorDirectionalLight_ = directionalLight;
-	Vector3 dir = Function::Normalize(editorDirectionalLight_.GetDirection());
-	if (Function::Length(dir) < 1.0e-5f) {
-		dir = {0.0f, -1.0f, 0.0f};
-	}
-	editorDirectionalLight_.SetDirection(dir);
-	editorPointLights_ = pointLights;
-	editorSpotLights_ = spotLights;
-	editorAreaLights_ = areaLights;
 }
 void Object3dCommon::SetVignetteStrength(float strength) { dxCommon_->SetVignetteStrength(strength); }
 

@@ -24,6 +24,9 @@ namespace {
 std::filesystem::path ResolveObjectEditorJsonPath(const std::string& filePath) { return std::filesystem::path("Resources") / "JSON" / std::filesystem::path(filePath).filename(); }
 
 bool HasObjectEditorJsonFile(const std::string& filePath) { return std::filesystem::exists(ResolveObjectEditorJsonPath(filePath)); }
+constexpr uint32_t kMaxPointLights = 20;
+constexpr uint32_t kMaxSpotLights = 20;
+constexpr uint32_t kMaxAreaLights = 20;
 } // namespace
 
 Hierarchy* Hierarchy::GetInstance() {
@@ -67,19 +70,10 @@ void Hierarchy::ResetForSceneChange() {
 	hasUnsavedChanges_ = false;
 	saveStatusMessage_.clear();
 	hasLoadedForCurrentScene_ = false;
-	editorLightState_.overrideSceneLights = false;
 	undoStack_.clear();
 	redoStack_.clear();
 	savedAudioVolumes_.clear();
-	editorLightState_.directionalLight = {
-	    {1.0f, 1.0f, 1.0f, 1.0f},
-        {0.0f, -1.0f, 0.0f},
-        1.0f
-    };
-	editorLightState_.pointLights.clear();
-	editorLightState_.spotLights.clear();
-	editorLightState_.areaLights.clear();
-	Object3dCommon::GetInstance()->SetEditorLightOverride(false);
+	editorLightState_ = {};
 }
 void Hierarchy::ApplyEditorSnapshot(const EditorSnapshot& snapshot) {
 	editorTransforms_ = snapshot.objectTransforms;
@@ -259,19 +253,7 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 	nlohmann::json root;
 	root["objects"] = nlohmann::json::array();
 	root["primitives"] = nlohmann::json::array();
-	root["lights"] = {
-	    {"overrideSceneLights", editorLightState_.overrideSceneLights},
-	    {"directional",
-	     {
-	         {"color",
-	          {editorLightState_.directionalLight.color.x, editorLightState_.directionalLight.color.y, editorLightState_.directionalLight.color.z, editorLightState_.directionalLight.color.w}},
-	         {"direction", {editorLightState_.directionalLight.direction.x, editorLightState_.directionalLight.direction.y, editorLightState_.directionalLight.direction.z}},
-	         {"intensity", editorLightState_.directionalLight.intensity},
-	     }	                                                       },
-	    {"point",               nlohmann::json::array()              },
-	    {"spot",                nlohmann::json::array()              },
-	    {"area",                nlohmann::json::array()              },
-	};
+	root["lights"] = nlohmann::json::object();
 	root["audio"] = {
 	    {"sounds", nlohmann::json::array()}
     };
@@ -338,41 +320,6 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 		    {"uvAnchor",               {material.uvAnchor.x, material.uvAnchor.y}                              },
 		};
 		root["primitives"].push_back(primitiveJson);
-	}
-	for (const PointLight& point : editorLightState_.pointLights) {
-		root["lights"]["point"].push_back({
-		    {"color",     {point.color.x, point.color.y, point.color.z, point.color.w}},
-		    {"position",  {point.position.x, point.position.y, point.position.z}      },
-		    {"intensity", point.intensity		                                     },
-		    {"radius",    point.radius		                                        },
-		    {"decay",     point.decay		                                         },
-		});
-	}
-
-	for (const SpotLight& spot : editorLightState_.spotLights) {
-		root["lights"]["spot"].push_back({
-		    {"color",           {spot.color.x, spot.color.y, spot.color.z, spot.color.w}},
-		    {"position",        {spot.position.x, spot.position.y, spot.position.z}     },
-		    {"direction",       {spot.direction.x, spot.direction.y, spot.direction.z}  },
-		    {"intensity",       spot.intensity		                                  },
-		    {"distance",        spot.distance		                                   },
-		    {"decay",           spot.decay		                                      },
-		    {"cosAngle",        spot.cosAngle		                                   },
-		    {"cosFalloffStart", spot.cosFalloffStart                                    },
-		});
-	}
-
-	for (const AreaLight& area : editorLightState_.areaLights) {
-		root["lights"]["area"].push_back({
-		    {"color",     {area.color.x, area.color.y, area.color.z, area.color.w}},
-		    {"position",  {area.position.x, area.position.y, area.position.z}     },
-		    {"normal",    {area.normal.x, area.normal.y, area.normal.z}           },
-		    {"intensity", area.intensity		                                  },
-		    {"width",     area.width		                                      },
-		    {"height",    area.height		                                     },
-		    {"radius",    area.radius		                                     },
-		    {"decay",     area.decay		                                      },
-		});
 	}
 	Audio* audio = Audio::GetInstance();
 	if (audio) {
@@ -558,138 +505,12 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 		}
 	}
 
-	if (root.contains("lights") && root["lights"].is_object()) {
-		const auto& lightsJson = root["lights"];
-
-		if (lightsJson.contains("overrideSceneLights") && lightsJson["overrideSceneLights"].is_boolean()) {
-			editorLightState_.overrideSceneLights = lightsJson["overrideSceneLights"].get<bool>();
-		}
-
-		if (lightsJson.contains("directional") && lightsJson["directional"].is_object()) {
-			const auto& directionalJson = lightsJson["directional"];
-			if (directionalJson.contains("color") && directionalJson["color"].is_array() && directionalJson["color"].size() == 4) {
-				editorLightState_.directionalLight.color = {
-				    directionalJson["color"][0].get<float>(), directionalJson["color"][1].get<float>(), directionalJson["color"][2].get<float>(), directionalJson["color"][3].get<float>()};
-			}
-			if (directionalJson.contains("direction") && directionalJson["direction"].is_array() && directionalJson["direction"].size() == 3) {
-				editorLightState_.directionalLight.direction = {
-				    directionalJson["direction"][0].get<float>(), directionalJson["direction"][1].get<float>(), directionalJson["direction"][2].get<float>()};
-			}
-			if (directionalJson.contains("intensity") && directionalJson["intensity"].is_number()) {
-				editorLightState_.directionalLight.intensity = directionalJson["intensity"].get<float>();
-			}
-		}
-
-		if (lightsJson.contains("point") && lightsJson["point"].is_array()) {
-			editorLightState_.pointLights.clear();
-			for (const auto& pointJson : lightsJson["point"]) {
-				if (!pointJson.is_object()) {
-					continue;
-				}
-				PointLight point{};
-				if (pointJson.contains("color") && pointJson["color"].is_array() && pointJson["color"].size() == 4) {
-					point.color = {pointJson["color"][0].get<float>(), pointJson["color"][1].get<float>(), pointJson["color"][2].get<float>(), pointJson["color"][3].get<float>()};
-				}
-				if (pointJson.contains("position") && pointJson["position"].is_array() && pointJson["position"].size() == 3) {
-					point.position = {pointJson["position"][0].get<float>(), pointJson["position"][1].get<float>(), pointJson["position"][2].get<float>()};
-				}
-				if (pointJson.contains("intensity") && pointJson["intensity"].is_number()) {
-					point.intensity = pointJson["intensity"].get<float>();
-				}
-				if (pointJson.contains("radius") && pointJson["radius"].is_number()) {
-					point.radius = pointJson["radius"].get<float>();
-				}
-				if (pointJson.contains("decay") && pointJson["decay"].is_number()) {
-					point.decay = pointJson["decay"].get<float>();
-				}
-				editorLightState_.pointLights.push_back(point);
-				if (editorLightState_.pointLights.size() >= kMaxPointLights) {
-					break;
-				}
-			}
-		}
-
-		if (lightsJson.contains("spot") && lightsJson["spot"].is_array()) {
-			editorLightState_.spotLights.clear();
-			for (const auto& spotJson : lightsJson["spot"]) {
-				if (!spotJson.is_object()) {
-					continue;
-				}
-				SpotLight spot{};
-				if (spotJson.contains("color") && spotJson["color"].is_array() && spotJson["color"].size() == 4) {
-					spot.color = {spotJson["color"][0].get<float>(), spotJson["color"][1].get<float>(), spotJson["color"][2].get<float>(), spotJson["color"][3].get<float>()};
-				}
-				if (spotJson.contains("position") && spotJson["position"].is_array() && spotJson["position"].size() == 3) {
-					spot.position = {spotJson["position"][0].get<float>(), spotJson["position"][1].get<float>(), spotJson["position"][2].get<float>()};
-				}
-				if (spotJson.contains("direction") && spotJson["direction"].is_array() && spotJson["direction"].size() == 3) {
-					spot.direction = {spotJson["direction"][0].get<float>(), spotJson["direction"][1].get<float>(), spotJson["direction"][2].get<float>()};
-				}
-				if (spotJson.contains("intensity") && spotJson["intensity"].is_number()) {
-					spot.intensity = spotJson["intensity"].get<float>();
-				}
-				if (spotJson.contains("distance") && spotJson["distance"].is_number()) {
-					spot.distance = spotJson["distance"].get<float>();
-				}
-				if (spotJson.contains("decay") && spotJson["decay"].is_number()) {
-					spot.decay = spotJson["decay"].get<float>();
-				}
-				if (spotJson.contains("cosAngle") && spotJson["cosAngle"].is_number()) {
-					spot.cosAngle = spotJson["cosAngle"].get<float>();
-				}
-				if (spotJson.contains("cosFalloffStart") && spotJson["cosFalloffStart"].is_number()) {
-					spot.cosFalloffStart = spotJson["cosFalloffStart"].get<float>();
-				}
-				editorLightState_.spotLights.push_back(spot);
-				if (editorLightState_.spotLights.size() >= kMaxSpotLights) {
-					break;
-				}
-			}
-		}
-
-		if (lightsJson.contains("area") && lightsJson["area"].is_array()) {
-			editorLightState_.areaLights.clear();
-			for (const auto& areaJson : lightsJson["area"]) {
-				if (!areaJson.is_object()) {
-					continue;
-				}
-				AreaLight area{};
-				if (areaJson.contains("color") && areaJson["color"].is_array() && areaJson["color"].size() == 4) {
-					area.color = {areaJson["color"][0].get<float>(), areaJson["color"][1].get<float>(), areaJson["color"][2].get<float>(), areaJson["color"][3].get<float>()};
-				}
-				if (areaJson.contains("position") && areaJson["position"].is_array() && areaJson["position"].size() == 3) {
-					area.position = {areaJson["position"][0].get<float>(), areaJson["position"][1].get<float>(), areaJson["position"][2].get<float>()};
-				}
-				if (areaJson.contains("normal") && areaJson["normal"].is_array() && areaJson["normal"].size() == 3) {
-					area.normal = {areaJson["normal"][0].get<float>(), areaJson["normal"][1].get<float>(), areaJson["normal"][2].get<float>()};
-				}
-				if (areaJson.contains("intensity") && areaJson["intensity"].is_number()) {
-					area.intensity = areaJson["intensity"].get<float>();
-				}
-				if (areaJson.contains("width") && areaJson["width"].is_number()) {
-					area.width = areaJson["width"].get<float>();
-				}
-				if (areaJson.contains("height") && areaJson["height"].is_number()) {
-					area.height = areaJson["height"].get<float>();
-				}
-				if (areaJson.contains("radius") && areaJson["radius"].is_number()) {
-					area.radius = areaJson["radius"].get<float>();
-				}
-				if (areaJson.contains("decay") && areaJson["decay"].is_number()) {
-					area.decay = areaJson["decay"].get<float>();
-				}
-				editorLightState_.areaLights.push_back(area);
-				if (editorLightState_.areaLights.size() >= kMaxAreaLights) {
-					break;
-				}
-			}
-		}
-
-		Object3dCommon::GetInstance()->SetEditorLightOverride(editorLightState_.overrideSceneLights);
-		Object3dCommon::GetInstance()->SetEditorLights(
-		    editorLightState_.directionalLight, editorLightState_.pointLights.empty() ? nullptr : editorLightState_.pointLights.data(), static_cast<uint32_t>(editorLightState_.pointLights.size()),
-		    editorLightState_.spotLights.empty() ? nullptr : editorLightState_.spotLights.data(), static_cast<uint32_t>(editorLightState_.spotLights.size()),
-		    editorLightState_.areaLights.empty() ? nullptr : editorLightState_.areaLights.data(), static_cast<uint32_t>(editorLightState_.areaLights.size()));
+	Object3dCommon* object3dCommon = Object3dCommon::GetInstance();
+	if (object3dCommon) {
+		editorLightState_.directionalLight = object3dCommon->GetDirectionalLightSource();
+		editorLightState_.pointLights = object3dCommon->GetPointLightSource();
+		editorLightState_.spotLights = object3dCommon->GetSpotLightSource();
+		editorLightState_.areaLights = object3dCommon->GetAreaLightSource();
 	}
 	if (root.contains("audio") && root["audio"].is_object()) {
 		const auto& audioJson = root["audio"];
@@ -840,101 +661,185 @@ void Hierarchy::DrawCameraEditor() {
 }
 void Hierarchy::DrawLightEditor() {
 #ifdef USE_IMGUI
-	bool overrideChanged = ImGui::Checkbox("Use Editor Lights", &editorLightState_.overrideSceneLights);
-	if (overrideChanged) {
-		Object3dCommon::GetInstance()->SetEditorLightOverride(editorLightState_.overrideSceneLights);
-		hasUnsavedChanges_ = true;
+	Object3dCommon* object3dCommon = Object3dCommon::GetInstance();
+	if (!object3dCommon) {
+		ImGui::TextUnformatted("Object3dCommon unavailable");
+		return;
 	}
+	editorLightState_.directionalLight = object3dCommon->GetDirectionalLightSource();
+	editorLightState_.pointLights = object3dCommon->GetPointLightSource();
+	editorLightState_.spotLights = object3dCommon->GetSpotLightSource();
+	editorLightState_.areaLights = object3dCommon->GetAreaLightSource();
 
 	bool lightChanged = false;
 	if (ImGui::TreeNode("Directional Light")) {
-		if (!isPlaying_) {
-			lightChanged |= ImGui::ColorEdit4("Dir Color", &editorLightState_.directionalLight.color.x);
-			lightChanged |= ImGui::DragFloat3("Dir Direction", &editorLightState_.directionalLight.direction.x, 0.01f, -1.0f, 1.0f);
-			lightChanged |= ImGui::DragFloat("Dir Intensity", &editorLightState_.directionalLight.intensity, 0.01f, 0.0f, 10.0f);
+		if (!editorLightState_.directionalLight) {
+			ImGui::TextUnformatted("No directional light source");
+		} else if (!isPlaying_) {
+			Vector4 color = editorLightState_.directionalLight->GetColor();
+			if (ImGui::ColorEdit4("Dir Color", &color.x)) {
+				editorLightState_.directionalLight->SetColor(color);
+				lightChanged = true;
+			}
+			Vector3 direction = editorLightState_.directionalLight->GetDirection();
+			if (ImGui::DragFloat3("Dir Direction", &direction.x, 0.01f, -1.0f, 1.0f)) {
+				editorLightState_.directionalLight->SetDirection(direction);
+				lightChanged = true;
+			}
+			float intensity = editorLightState_.directionalLight->GetIntensity();
+			if (ImGui::DragFloat("Dir Intensity", &intensity, 0.01f, 0.0f, 10.0f)) {
+				editorLightState_.directionalLight->SetIntensity(intensity);
+				lightChanged = true;
+			}
 		}
 		ImGui::TreePop();
 	}
 
 	if (ImGui::TreeNode("Point Lights")) {
-		int pointCount = static_cast<int>(editorLightState_.pointLights.size());
-		if (!isPlaying_ && ImGui::SliderInt("Point Count", &pointCount, 0, static_cast<int>(kMaxPointLights))) {
-			editorLightState_.pointLights.resize(static_cast<size_t>(pointCount));
-			lightChanged = true;
-		}
-		for (size_t i = 0; i < editorLightState_.pointLights.size(); ++i) {
-			PointLight& point = editorLightState_.pointLights[i];
-			const std::string label = "Point " + std::to_string(i);
-			if (ImGui::TreeNode((label + "##point").c_str())) {
-				if (!isPlaying_) {
-					lightChanged |= ImGui::ColorEdit4(("Color##point_" + std::to_string(i)).c_str(), &point.color.x);
-					lightChanged |= ImGui::DragFloat3(("Position##point_" + std::to_string(i)).c_str(), &point.position.x, 0.05f);
-					lightChanged |= ImGui::DragFloat(("Intensity##point_" + std::to_string(i)).c_str(), &point.intensity, 0.01f, 0.0f, 10.0f);
-					lightChanged |= ImGui::DragFloat(("Radius##point_" + std::to_string(i)).c_str(), &point.radius, 0.05f, 0.0f, 500.0f);
-					lightChanged |= ImGui::DragFloat(("Decay##point_" + std::to_string(i)).c_str(), &point.decay, 0.01f, 0.0f, 10.0f);
+		if (!editorLightState_.pointLights) {
+			ImGui::TextUnformatted("No point light source");
+		} else {
+			int pointCount = editorLightState_.pointLights->GetLightCount();
+			if (!isPlaying_ && ImGui::SliderInt("Point Count", &pointCount, 0, static_cast<int>(kMaxPointLights))) {
+				int current = editorLightState_.pointLights->GetLightCount();
+				while (current < pointCount) {
+					editorLightState_.pointLights->AddPointLight("Point" + std::to_string(current++));
 				}
-				ImGui::TreePop();
+				while (current > pointCount) {
+					editorLightState_.pointLights->RemovePointLight("Point" + std::to_string(--current));
+				}
+				lightChanged = true;
+			}
+			for (int i = 0; i < editorLightState_.pointLights->GetLightCount(); ++i) {
+				std::string n = "Point" + std::to_string(i);
+				if (ImGui::TreeNode((n + "##point").c_str())) {
+					if (!isPlaying_) {
+						Vector4 c = editorLightState_.pointLights->GetLightColor(n);
+						Vector3 p = editorLightState_.pointLights->GetLightPosition(n);
+						float in = editorLightState_.pointLights->GetLightIntensity(n);
+						float r = editorLightState_.pointLights->GetLightRadius(n);
+						float d = editorLightState_.pointLights->GetLightDecay(n);
+						lightChanged |= ImGui::ColorEdit4(("Color##" + n).c_str(), &c.x);
+						lightChanged |= ImGui::DragFloat3(("Position##" + n).c_str(), &p.x, 0.05f);
+						lightChanged |= ImGui::DragFloat(("Intensity##" + n).c_str(), &in, 0.01f, 0.0f, 10.0f);
+						lightChanged |= ImGui::DragFloat(("Radius##" + n).c_str(), &r, 0.05f, 0.0f, 500.0f);
+						lightChanged |= ImGui::DragFloat(("Decay##" + n).c_str(), &d, 0.01f, 0.0f, 10.0f);
+						editorLightState_.pointLights->SetLightProperties(n, c, p, in, r, d);
+					}
+					ImGui::TreePop();
+				}
 			}
 		}
 		ImGui::TreePop();
 	}
 
 	if (ImGui::TreeNode("Spot Lights")) {
-		int spotCount = static_cast<int>(editorLightState_.spotLights.size());
-		if (!isPlaying_ && ImGui::SliderInt("Spot Count", &spotCount, 0, static_cast<int>(kMaxSpotLights))) {
-			editorLightState_.spotLights.resize(static_cast<size_t>(spotCount));
-			lightChanged = true;
-		}
-		for (size_t i = 0; i < editorLightState_.spotLights.size(); ++i) {
-			SpotLight& spot = editorLightState_.spotLights[i];
-			if (ImGui::TreeNode(("Spot " + std::to_string(i) + "##spot").c_str())) {
-				if (!isPlaying_) {
-					lightChanged |= ImGui::ColorEdit4(("Color##spot_" + std::to_string(i)).c_str(), &spot.color.x);
-					lightChanged |= ImGui::DragFloat3(("Position##spot_" + std::to_string(i)).c_str(), &spot.position.x, 0.05f);
-					lightChanged |= ImGui::DragFloat3(("Direction##spot_" + std::to_string(i)).c_str(), &spot.direction.x, 0.01f, -1.0f, 1.0f);
-					lightChanged |= ImGui::DragFloat(("Intensity##spot_" + std::to_string(i)).c_str(), &spot.intensity, 0.01f, 0.0f, 10.0f);
-					lightChanged |= ImGui::DragFloat(("Distance##spot_" + std::to_string(i)).c_str(), &spot.distance, 0.05f, 0.0f, 500.0f);
-					lightChanged |= ImGui::DragFloat(("Decay##spot_" + std::to_string(i)).c_str(), &spot.decay, 0.01f, 0.0f, 10.0f);
-					lightChanged |= ImGui::DragFloat(("Cos Angle##spot_" + std::to_string(i)).c_str(), &spot.cosAngle, 0.001f, -1.0f, 1.0f);
-					lightChanged |= ImGui::DragFloat(("Cos Falloff##spot_" + std::to_string(i)).c_str(), &spot.cosFalloffStart, 0.001f, -1.0f, 1.0f);
+		if (!editorLightState_.spotLights) {
+			ImGui::TextUnformatted("No spot light source");
+		} else {
+			int spotCount = editorLightState_.spotLights->GetSpotLightCount();
+			if (!isPlaying_ && ImGui::SliderInt("Spot Count", &spotCount, 0, static_cast<int>(kMaxSpotLights))) {
+				int current = editorLightState_.spotLights->GetSpotLightCount();
+				while (current < spotCount) {
+					editorLightState_.spotLights->AddSpotLight("Spot" + std::to_string(current++));
 				}
-				ImGui::TreePop();
+				while (current > spotCount) {
+					editorLightState_.spotLights->RemoveSpotLight("Spot" + std::to_string(--current));
+				}
+				lightChanged = true;
+			}
+			for (int i = 0; i < editorLightState_.spotLights->GetSpotLightCount(); ++i) {
+				std::string n = "Spot" + std::to_string(i);
+				if (ImGui::TreeNode((n + "##spot").c_str())) {
+					if (!isPlaying_) {
+						Vector4 c = editorLightState_.spotLights->GetSpotLightColor(n);
+						Vector3 p = editorLightState_.spotLights->GetSpotLightPosition(n);
+						Vector3 dir = editorLightState_.spotLights->GetSpotLightDirection(n);
+						float in = editorLightState_.spotLights->GetSpotLightIntensity(n);
+						float dist = editorLightState_.spotLights->GetSpotLightDistance(n);
+						float dec = editorLightState_.spotLights->GetSpotLightDecay(n);
+						float ang = editorLightState_.spotLights->GetSpotLightAngle(n);
+						float fall = editorLightState_.spotLights->GetSpotLightFalloffStartAngle(n);
+						lightChanged |= ImGui::ColorEdit4(("Color##" + n).c_str(), &c.x);
+						lightChanged |= ImGui::DragFloat3(("Position##" + n).c_str(), &p.x, 0.05f);
+						lightChanged |= ImGui::DragFloat3(("Direction##" + n).c_str(), &dir.x, 0.01f, -1.0f, 1.0f);
+						lightChanged |= ImGui::DragFloat(("Intensity##" + n).c_str(), &in, 0.01f, 0.0f, 10.0f);
+						lightChanged |= ImGui::DragFloat(("Distance##" + n).c_str(), &dist, 0.05f, 0.0f, 500.0f);
+						lightChanged |= ImGui::DragFloat(("Decay##" + n).c_str(), &dec, 0.01f, 0.0f, 10.0f);
+						lightChanged |= ImGui::DragFloat(("Angle##" + n).c_str(), &ang, 0.001f, 0.0f, 3.14159f);
+						lightChanged |= ImGui::DragFloat(("Falloff##" + n).c_str(), &fall, 0.001f, 0.0f, 3.14159f);
+						editorLightState_.spotLights->SetSpotLightProperties(n, c, p, in, dir, dist, dec, ang, fall);
+					}
+					ImGui::TreePop();
+				}
 			}
 		}
 		ImGui::TreePop();
 	}
 
 	if (ImGui::TreeNode("Area Lights")) {
-		int areaCount = static_cast<int>(editorLightState_.areaLights.size());
-		if (!isPlaying_ && ImGui::SliderInt("Area Count", &areaCount, 0, static_cast<int>(kMaxAreaLights))) {
-			editorLightState_.areaLights.resize(static_cast<size_t>(areaCount));
-			lightChanged = true;
-		}
-		for (size_t i = 0; i < editorLightState_.areaLights.size(); ++i) {
-			AreaLight& area = editorLightState_.areaLights[i];
-			if (ImGui::TreeNode(("Area " + std::to_string(i) + "##area").c_str())) {
-				if (!isPlaying_) {
-					lightChanged |= ImGui::ColorEdit4(("Color##area_" + std::to_string(i)).c_str(), &area.color.x);
-					lightChanged |= ImGui::DragFloat3(("Position##area_" + std::to_string(i)).c_str(), &area.position.x, 0.05f);
-					lightChanged |= ImGui::DragFloat3(("Normal##area_" + std::to_string(i)).c_str(), &area.normal.x, 0.01f, -1.0f, 1.0f);
-					lightChanged |= ImGui::DragFloat(("Intensity##area_" + std::to_string(i)).c_str(), &area.intensity, 0.01f, 0.0f, 10.0f);
-					lightChanged |= ImGui::DragFloat(("Width##area_" + std::to_string(i)).c_str(), &area.width, 0.05f, 0.0f, 500.0f);
-					lightChanged |= ImGui::DragFloat(("Height##area_" + std::to_string(i)).c_str(), &area.height, 0.05f, 0.0f, 500.0f);
-					lightChanged |= ImGui::DragFloat(("Radius##area_" + std::to_string(i)).c_str(), &area.radius, 0.05f, 0.0f, 500.0f);
-					lightChanged |= ImGui::DragFloat(("Decay##area_" + std::to_string(i)).c_str(), &area.decay, 0.01f, 0.0f, 10.0f);
+		if (!editorLightState_.areaLights) {
+			ImGui::TextUnformatted("No area light source");
+		} else {
+			int areaCount = editorLightState_.areaLights->GetAreaLightCount();
+			if (!isPlaying_ && ImGui::SliderInt("Area Count", &areaCount, 0, static_cast<int>(kMaxAreaLights))) {
+				int current = editorLightState_.areaLights->GetAreaLightCount();
+				while (current < areaCount) {
+					editorLightState_.areaLights->AddAreaLight("Area" + std::to_string(current++));
 				}
-				ImGui::TreePop();
+				while (current > areaCount) {
+					editorLightState_.areaLights->RemoveAreaLight("Area" + std::to_string(--current));
+				}
+				lightChanged = true;
+			}
+			for (int i = 0; i < editorLightState_.areaLights->GetAreaLightCount(); ++i) {
+				std::string n = "Area" + std::to_string(i);
+				if (ImGui::TreeNode((n + "##area").c_str())) {
+					if (!isPlaying_) {
+						Vector4 c = editorLightState_.areaLights->GetAreaLightColor(n);
+						Vector3 p = editorLightState_.areaLights->GetAreaLightPosition(n);
+						Vector3 norm = editorLightState_.areaLights->GetAreaLightNormal(n);
+						float in = editorLightState_.areaLights->GetAreaLightIntensity(n);
+						Vector2 sz = editorLightState_.areaLights->GetAreaLightSize(n);
+						float r = editorLightState_.areaLights->GetAreaLightDistance(n);
+						float d = editorLightState_.areaLights->GetAreaLightDecay(n);
+						lightChanged |= ImGui::ColorEdit4(("Color##" + n).c_str(), &c.x);
+						lightChanged |= ImGui::DragFloat3(("Position##" + n).c_str(), &p.x, 0.05f);
+						lightChanged |= ImGui::DragFloat3(("Normal##" + n).c_str(), &norm.x, 0.01f, -1.0f, 1.0f);
+						lightChanged |= ImGui::DragFloat(("Intensity##" + n).c_str(), &in, 0.01f, 0.0f, 10.0f);
+						lightChanged |= ImGui::DragFloat(("Width##" + n).c_str(), &sz.x, 0.05f, 0.0f, 500.0f);
+						lightChanged |= ImGui::DragFloat(("Height##" + n).c_str(), &sz.y, 0.05f, 0.0f, 500.0f);
+						lightChanged |= ImGui::DragFloat(("Radius##" + n).c_str(), &r, 0.05f, 0.0f, 500.0f);
+						lightChanged |= ImGui::DragFloat(("Decay##" + n).c_str(), &d, 0.01f, 0.0f, 10.0f);
+						editorLightState_.areaLights->SetAreaLightColor(n, c);
+						editorLightState_.areaLights->SetAreaLightPosition(n, p);
+						editorLightState_.areaLights->SetAreaLightNormal(n, norm);
+						editorLightState_.areaLights->SetAreaLightIntensity(n, in);
+						editorLightState_.areaLights->SetAreaLightSize(n, sz.x, sz.y);
+						editorLightState_.areaLights->SetAreaLightDistance(n, r);
+						editorLightState_.areaLights->SetAreaLightDecay(n, d);
+					}
+					ImGui::TreePop();
+				}
 			}
 		}
 		ImGui::TreePop();
 	}
 
-	if (lightChanged || editorLightState_.overrideSceneLights) {
-		hasUnsavedChanges_ = hasUnsavedChanges_ || lightChanged;
-		Object3dCommon::GetInstance()->SetEditorLights(
-		    editorLightState_.directionalLight, editorLightState_.pointLights.empty() ? nullptr : editorLightState_.pointLights.data(), static_cast<uint32_t>(editorLightState_.pointLights.size()),
-		    editorLightState_.spotLights.empty() ? nullptr : editorLightState_.spotLights.data(), static_cast<uint32_t>(editorLightState_.spotLights.size()),
-		    editorLightState_.areaLights.empty() ? nullptr : editorLightState_.areaLights.data(), static_cast<uint32_t>(editorLightState_.areaLights.size()));
+	if (lightChanged) {
+		hasUnsavedChanges_ = true;
+		if (editorLightState_.directionalLight) {
+			object3dCommon->SetDirectionalLight(*editorLightState_.directionalLight);
+		}
+		if (editorLightState_.pointLights) {
+			object3dCommon->SetPointLights(*editorLightState_.pointLights);
+		}
+		if (editorLightState_.spotLights) {
+			object3dCommon->SetSpotLights(*editorLightState_.spotLights);
+		}
+		if (editorLightState_.areaLights) {
+			object3dCommon->SetAreaLights(*editorLightState_.areaLights);
+		}
 	}
 #endif
 }

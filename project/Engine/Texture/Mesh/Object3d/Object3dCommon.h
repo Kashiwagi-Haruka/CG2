@@ -176,22 +176,10 @@ private:
 	bool fullScreenGrayscaleEnabled_ = false;
 	// 全画面セピア有効化フラグ
 	bool fullScreenSepiaEnabled_ = false;
-	// エディタ指定ライトを強制使用するか
-	bool useEditorLights_ = false;
-	// エディタ指定のディレクショナルライト
-	DirectionalLight editorDirectionalLight_{};
-	// エディタ指定のポイントライト配列
-	PointLight editorPointLights_{};
-	// エディタ指定ポイントライト有効数
-	uint32_t editorPointLightCount_ = 0;
-	// エディタ指定のスポットライト配列
-	SpotLight editorSpotLights_{};
-	// エディタ指定スポットライト有効数
-	uint32_t editorSpotLightCount_ = 0;
-	// エディタ指定のエリアライト配列
-	AreaLight editorAreaLights_{};
-	// エディタ指定エリアライト有効数
-	uint32_t editorAreaLightCount_ = 0;
+	DirectionalLight* directionalLightSource_ = nullptr;
+	PointLight* pointLightSource_ = nullptr;
+	SpotLight* spotLightSource_ = nullptr;
+	AreaLight* areaLightSource_ = nullptr;
 	// ルートシグネチャ・DescriptorHeap共通設定
 	void DrawSet();
 
@@ -280,20 +268,19 @@ public:
 	// 既存リソースを環境マップとして設定
 	void SetEnvironmentMapTextureResource(ID3D12Resource* resource, DXGI_FORMAT format);
 
-	// ディレクショナルライト設定
+		// ディレクショナルライト設定
 	void SetDirectionalLight(DirectionalLight& light);
 	// ポイントライト配列設定
-	void SetPointLights(const PointLight& pointLights);
+	void SetPointLights(PointLight& pointLights);
 	// スポットライト配列設定
-	void SetSpotLights(const SpotLight& spotLights);
+	void SetSpotLights(SpotLight& spotLights);
 	// エリアライト配列設定
-	void SetAreaLights(const AreaLight& areaLights);
-	// エディタライト上書き有効化
-	void SetEditorLightOverride(bool enabled) { useEditorLights_ = enabled; }
-	// エディタライト上書き有効状態取得
-	bool IsEditorLightOverrideEnabled() const { return useEditorLights_; }
-	// エディタライト一式を設定
-	void SetEditorLights(const DirectionalLight& directionalLight, const PointLight& pointLights, const SpotLight& spotLights, const AreaLight& areaLights);
+	void SetAreaLights(AreaLight& areaLights);
+
+	DirectionalLight* GetDirectionalLightSource() const { return directionalLightSource_; }
+	PointLight* GetPointLightSource() const { return pointLightSource_; }
+	SpotLight* GetSpotLightSource() const { return spotLightSource_; }
+	AreaLight* GetAreaLightSource() const { return areaLightSource_; }
 
 	// ディレクショナルライト視点のViewProjection行列取得
 	Matrix4x4 GetDirectionalLightViewProjectionMatrix() const;

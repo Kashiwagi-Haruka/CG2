@@ -61,12 +61,12 @@ private:
 	void RedoEditorChange();
 
 	struct EditorLightState {
-		bool overrideSceneLights = false;
-		DirectionalLight directionalLight;
-		std::vector<PointLight> pointLights;
-		std::vector<SpotLight> spotLights;
-		std::vector<AreaLight> areaLights;
+		DirectionalLight* directionalLight = nullptr;
+		PointLight* pointLights = nullptr;
+		SpotLight* spotLights = nullptr;
+		AreaLight* areaLights = nullptr;
 	};
+
 
 	bool SaveObjectEditorsToJson(const std::string& filePath) const;
 	bool LoadObjectEditorsFromJson(const std::string& filePath);
