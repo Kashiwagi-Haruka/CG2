@@ -85,12 +85,16 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
 	assert(directionalLightData_);
 
-	*directionalLightData_ = {
+	const DirectionalLightGpu defaultDirectionalLight = {
 	    {1.0f, 1.0f, 1.0f, 1.0f},
         {0.0f, -1.0f, 0.0f},
         1.0f
     };
+	*directionalLightData_ = defaultDirectionalLight;
+	editorDirectionalLight_.SetColor(defaultDirectionalLight.color);
+	editorDirectionalLight_.SetDirection(defaultDirectionalLight.direction);
 	directionalLightResource_->Unmap(0, nullptr);
+
 	pointLightResource_ = CreateBufferResource(sizeof(PointLightGpu) * kMaxPointLights);
 	assert(pointLightResource_);
 	pointLightCountResource_ = CreateBufferResource(sizeof(LightCount));
@@ -114,7 +118,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 
 	areaLightSrvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
 	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaLightGpu));
-	editorDirectionalLight_ = *directionalLightData_;
+
 	editorPointLightCount_ = 0;
 	editorSpotLightCount_ = 0;
 	editorAreaLightCount_ = 0;
