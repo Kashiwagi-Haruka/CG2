@@ -9,10 +9,6 @@ void CollisionManager::CheckAllCollisions() {
     std::list<YoshidaMath::Collider*>::iterator itrA = colliders_.begin();
     for (; itrA != colliders_.end(); ++itrA) {
 
-#ifdef USE_IMGUI
-        (*itrA)->ColliderUpdate();
-#endif
-  
         std::list<YoshidaMath::Collider*>::iterator itrB = itrA;
         for (++itrB; itrB != colliders_.end(); ++itrB) {
             // 衝突フィルタリング
@@ -24,28 +20,6 @@ void CollisionManager::CheckAllCollisions() {
             CheckCollisionPair(*itrA, *itrB);
 
         }
-    }
-}
-
-void CollisionManager::DrawColliders()
-{
-    // リスト内のペアを総当たり
-    std::list<YoshidaMath::Collider*>::iterator itrA = colliders_.begin();
-    for (; itrA != colliders_.end(); ++itrA) {
-
-#ifdef USE_IMGUI
-        Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
-        (*itrA)->ColliderDraw();
-        Object3dCommon::GetInstance()->DrawCommon();
-#endif
-
-    }
-}
-
-void CollisionManager::SetCamera(Camera* camera)
-{
-    for (auto& collider : colliders_) {
-        collider->SetCamera(camera);
     }
 }
 

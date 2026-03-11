@@ -25,9 +25,6 @@ public:
     void ClearColliders() { colliders_.clear(); }
     /// @brief 衝突判定と応答
     void CheckAllCollisions();
-    //コライダーを描画する
-    void DrawColliders();
-    void SetCamera(Camera* camera);
 private:
     std::list<YoshidaMath::Collider*> colliders_; // コライダーのリスト
 
