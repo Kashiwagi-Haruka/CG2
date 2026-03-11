@@ -257,6 +257,71 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 	root["audio"] = {
 	    {"sounds", nlohmann::json::array()}
     };
+	if (editorLightState_.directionalLight) {
+		const Vector4 color = editorLightState_.directionalLight->GetColor();
+		const Vector3 direction = editorLightState_.directionalLight->GetDirection();
+		root["lights"]["directional"] = {
+		    {"color",     {color.x, color.y, color.z, color.w}              },
+		    {"direction", {direction.x, direction.y, direction.z}           },
+		    {"intensity", editorLightState_.directionalLight->GetIntensity()},
+		};
+	}
+	if (editorLightState_.pointLights) {
+		nlohmann::json pointLightsJson = nlohmann::json::array();
+		for (int i = 0; i < editorLightState_.pointLights->GetLightCount(); ++i) {
+			const std::string name = "Point" + std::to_string(i);
+			const Vector4 color = editorLightState_.pointLights->GetLightColor(name);
+			const Vector3 position = editorLightState_.pointLights->GetLightPosition(name);
+			pointLightsJson.push_back({
+			    {"color",     {color.x, color.y, color.z, color.w}                  },
+			    {"position",  {position.x, position.y, position.z}                  },
+			    {"intensity", editorLightState_.pointLights->GetLightIntensity(name)},
+			    {"radius",    editorLightState_.pointLights->GetLightRadius(name)   },
+			    {"decay",     editorLightState_.pointLights->GetLightDecay(name)    },
+			});
+		}
+		root["lights"]["pointLights"] = pointLightsJson;
+	}
+	if (editorLightState_.spotLights) {
+		nlohmann::json spotLightsJson = nlohmann::json::array();
+		for (int i = 0; i < editorLightState_.spotLights->GetSpotLightCount(); ++i) {
+			const std::string name = "Spot" + std::to_string(i);
+			const Vector4 color = editorLightState_.spotLights->GetSpotLightColor(name);
+			const Vector3 position = editorLightState_.spotLights->GetSpotLightPosition(name);
+			const Vector3 direction = editorLightState_.spotLights->GetSpotLightDirection(name);
+			spotLightsJson.push_back({
+			    {"color",             {color.x, color.y, color.z, color.w}                             },
+			    {"position",          {position.x, position.y, position.z}                             },
+			    {"direction",         {direction.x, direction.y, direction.z}                          },
+			    {"intensity",         editorLightState_.spotLights->GetSpotLightIntensity(name)        },
+			    {"distance",          editorLightState_.spotLights->GetSpotLightDistance(name)         },
+			    {"decay",             editorLightState_.spotLights->GetSpotLightDecay(name)            },
+			    {"angle",             editorLightState_.spotLights->GetSpotLightAngle(name)            },
+			    {"falloffStartAngle", editorLightState_.spotLights->GetSpotLightFalloffStartAngle(name)},
+			});
+		}
+		root["lights"]["spotLights"] = spotLightsJson;
+	}
+	if (editorLightState_.areaLights) {
+		nlohmann::json areaLightsJson = nlohmann::json::array();
+		for (int i = 0; i < editorLightState_.areaLights->GetAreaLightCount(); ++i) {
+			const std::string name = "Area" + std::to_string(i);
+			const Vector4 color = editorLightState_.areaLights->GetAreaLightColor(name);
+			const Vector3 position = editorLightState_.areaLights->GetAreaLightPosition(name);
+			const Vector3 normal = editorLightState_.areaLights->GetAreaLightNormal(name);
+			const Vector2 size = editorLightState_.areaLights->GetAreaLightSize(name);
+			areaLightsJson.push_back({
+			    {"color",     {color.x, color.y, color.z, color.w}                     },
+			    {"position",  {position.x, position.y, position.z}                     },
+			    {"normal",    {normal.x, normal.y, normal.z}                           },
+			    {"intensity", editorLightState_.areaLights->GetAreaLightIntensity(name)},
+			    {"size",      {size.x, size.y}			                             },
+			    {"radius",    editorLightState_.areaLights->GetAreaLightDistance(name) },
+			    {"decay",     editorLightState_.areaLights->GetAreaLightDecay(name)    },
+			});
+		}
+		root["lights"]["areaLights"] = areaLightsJson;
+	}
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		const Object3d* object = objects_[i];
 		if (!object) {
@@ -511,6 +576,156 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 		editorLightState_.pointLights = object3dCommon->GetPointLightSource();
 		editorLightState_.spotLights = object3dCommon->GetSpotLightSource();
 		editorLightState_.areaLights = object3dCommon->GetAreaLightSource();
+	}
+	if (root.contains("lights") && root["lights"].is_object() && root["lights"].contains("directional") && root["lights"]["directional"].is_object() && editorLightState_.directionalLight) {
+		const auto& directionalJson = root["lights"]["directional"];
+		Vector4 color = editorLightState_.directionalLight->GetColor();
+		Vector3 direction = editorLightState_.directionalLight->GetDirection();
+		float intensity = editorLightState_.directionalLight->GetIntensity();
+		if (directionalJson.contains("color") && directionalJson["color"].is_array() && directionalJson["color"].size() == 4) {
+			color = {directionalJson["color"][0].get<float>(), directionalJson["color"][1].get<float>(), directionalJson["color"][2].get<float>(), directionalJson["color"][3].get<float>()};
+		}
+		if (directionalJson.contains("direction") && directionalJson["direction"].is_array() && directionalJson["direction"].size() == 3) {
+			direction = {directionalJson["direction"][0].get<float>(), directionalJson["direction"][1].get<float>(), directionalJson["direction"][2].get<float>()};
+		}
+		if (directionalJson.contains("intensity") && directionalJson["intensity"].is_number()) {
+			intensity = directionalJson["intensity"].get<float>();
+		}
+		editorLightState_.directionalLight->SetColor(color);
+		editorLightState_.directionalLight->SetDirection(direction);
+		editorLightState_.directionalLight->SetIntensity(intensity);
+		object3dCommon->SetDirectionalLight(*editorLightState_.directionalLight);
+	}
+	if (root.contains("lights") && root["lights"].is_object()) {
+		const auto& lightsJson = root["lights"];
+		if (editorLightState_.pointLights && lightsJson.contains("pointLights") && lightsJson["pointLights"].is_array()) {
+			editorLightState_.pointLights->ClearLights();
+			const auto& pointLightsJson = lightsJson["pointLights"];
+			for (size_t i = 0; i < pointLightsJson.size(); ++i) {
+				const auto& pointJson = pointLightsJson[i];
+				if (!pointJson.is_object()) {
+					continue;
+				}
+				const std::string name = "Point" + std::to_string(i);
+				editorLightState_.pointLights->AddPointLight(name);
+				Vector4 color = editorLightState_.pointLights->GetLightColor(name);
+				Vector3 position = editorLightState_.pointLights->GetLightPosition(name);
+				float intensity = editorLightState_.pointLights->GetLightIntensity(name);
+				float radius = editorLightState_.pointLights->GetLightRadius(name);
+				float decay = editorLightState_.pointLights->GetLightDecay(name);
+				if (pointJson.contains("color") && pointJson["color"].is_array() && pointJson["color"].size() == 4) {
+					color = {pointJson["color"][0].get<float>(), pointJson["color"][1].get<float>(), pointJson["color"][2].get<float>(), pointJson["color"][3].get<float>()};
+				}
+				if (pointJson.contains("position") && pointJson["position"].is_array() && pointJson["position"].size() == 3) {
+					position = {pointJson["position"][0].get<float>(), pointJson["position"][1].get<float>(), pointJson["position"][2].get<float>()};
+				}
+				if (pointJson.contains("intensity") && pointJson["intensity"].is_number()) {
+					intensity = pointJson["intensity"].get<float>();
+				}
+				if (pointJson.contains("radius") && pointJson["radius"].is_number()) {
+					radius = pointJson["radius"].get<float>();
+				}
+				if (pointJson.contains("decay") && pointJson["decay"].is_number()) {
+					decay = pointJson["decay"].get<float>();
+				}
+				editorLightState_.pointLights->SetLightProperties(name, color, position, intensity, radius, decay);
+			}
+			object3dCommon->SetPointLights(*editorLightState_.pointLights);
+		}
+		if (editorLightState_.spotLights && lightsJson.contains("spotLights") && lightsJson["spotLights"].is_array()) {
+			editorLightState_.spotLights->ClearSpotLights();
+			const auto& spotLightsJson = lightsJson["spotLights"];
+			for (size_t i = 0; i < spotLightsJson.size(); ++i) {
+				const auto& spotJson = spotLightsJson[i];
+				if (!spotJson.is_object()) {
+					continue;
+				}
+				const std::string name = "Spot" + std::to_string(i);
+				editorLightState_.spotLights->AddSpotLight(name);
+				Vector4 color = editorLightState_.spotLights->GetSpotLightColor(name);
+				Vector3 position = editorLightState_.spotLights->GetSpotLightPosition(name);
+				Vector3 direction = editorLightState_.spotLights->GetSpotLightDirection(name);
+				float intensity = editorLightState_.spotLights->GetSpotLightIntensity(name);
+				float distance = editorLightState_.spotLights->GetSpotLightDistance(name);
+				float decay = editorLightState_.spotLights->GetSpotLightDecay(name);
+				float angle = editorLightState_.spotLights->GetSpotLightAngle(name);
+				float falloffStartAngle = editorLightState_.spotLights->GetSpotLightFalloffStartAngle(name);
+				if (spotJson.contains("color") && spotJson["color"].is_array() && spotJson["color"].size() == 4) {
+					color = {spotJson["color"][0].get<float>(), spotJson["color"][1].get<float>(), spotJson["color"][2].get<float>(), spotJson["color"][3].get<float>()};
+				}
+				if (spotJson.contains("position") && spotJson["position"].is_array() && spotJson["position"].size() == 3) {
+					position = {spotJson["position"][0].get<float>(), spotJson["position"][1].get<float>(), spotJson["position"][2].get<float>()};
+				}
+				if (spotJson.contains("direction") && spotJson["direction"].is_array() && spotJson["direction"].size() == 3) {
+					direction = {spotJson["direction"][0].get<float>(), spotJson["direction"][1].get<float>(), spotJson["direction"][2].get<float>()};
+				}
+				if (spotJson.contains("intensity") && spotJson["intensity"].is_number()) {
+					intensity = spotJson["intensity"].get<float>();
+				}
+				if (spotJson.contains("distance") && spotJson["distance"].is_number()) {
+					distance = spotJson["distance"].get<float>();
+				}
+				if (spotJson.contains("decay") && spotJson["decay"].is_number()) {
+					decay = spotJson["decay"].get<float>();
+				}
+				if (spotJson.contains("angle") && spotJson["angle"].is_number()) {
+					angle = spotJson["angle"].get<float>();
+				}
+				if (spotJson.contains("falloffStartAngle") && spotJson["falloffStartAngle"].is_number()) {
+					falloffStartAngle = spotJson["falloffStartAngle"].get<float>();
+				}
+				editorLightState_.spotLights->SetSpotLightProperties(name, color, position, intensity, direction, distance, decay, angle, falloffStartAngle);
+			}
+			object3dCommon->SetSpotLights(*editorLightState_.spotLights);
+		}
+		if (editorLightState_.areaLights && lightsJson.contains("areaLights") && lightsJson["areaLights"].is_array()) {
+			editorLightState_.areaLights->ClearAreaLights();
+			const auto& areaLightsJson = lightsJson["areaLights"];
+			for (size_t i = 0; i < areaLightsJson.size(); ++i) {
+				const auto& areaJson = areaLightsJson[i];
+				if (!areaJson.is_object()) {
+					continue;
+				}
+				const std::string name = "Area" + std::to_string(i);
+				editorLightState_.areaLights->AddAreaLight(name);
+				Vector4 color = editorLightState_.areaLights->GetAreaLightColor(name);
+				Vector3 position = editorLightState_.areaLights->GetAreaLightPosition(name);
+				Vector3 normal = editorLightState_.areaLights->GetAreaLightNormal(name);
+				float intensity = editorLightState_.areaLights->GetAreaLightIntensity(name);
+				Vector2 size = editorLightState_.areaLights->GetAreaLightSize(name);
+				float radius = editorLightState_.areaLights->GetAreaLightDistance(name);
+				float decay = editorLightState_.areaLights->GetAreaLightDecay(name);
+				if (areaJson.contains("color") && areaJson["color"].is_array() && areaJson["color"].size() == 4) {
+					color = {areaJson["color"][0].get<float>(), areaJson["color"][1].get<float>(), areaJson["color"][2].get<float>(), areaJson["color"][3].get<float>()};
+				}
+				if (areaJson.contains("position") && areaJson["position"].is_array() && areaJson["position"].size() == 3) {
+					position = {areaJson["position"][0].get<float>(), areaJson["position"][1].get<float>(), areaJson["position"][2].get<float>()};
+				}
+				if (areaJson.contains("normal") && areaJson["normal"].is_array() && areaJson["normal"].size() == 3) {
+					normal = {areaJson["normal"][0].get<float>(), areaJson["normal"][1].get<float>(), areaJson["normal"][2].get<float>()};
+				}
+				if (areaJson.contains("intensity") && areaJson["intensity"].is_number()) {
+					intensity = areaJson["intensity"].get<float>();
+				}
+				if (areaJson.contains("size") && areaJson["size"].is_array() && areaJson["size"].size() == 2) {
+					size = {areaJson["size"][0].get<float>(), areaJson["size"][1].get<float>()};
+				}
+				if (areaJson.contains("radius") && areaJson["radius"].is_number()) {
+					radius = areaJson["radius"].get<float>();
+				}
+				if (areaJson.contains("decay") && areaJson["decay"].is_number()) {
+					decay = areaJson["decay"].get<float>();
+				}
+				editorLightState_.areaLights->SetAreaLightColor(name, color);
+				editorLightState_.areaLights->SetAreaLightPosition(name, position);
+				editorLightState_.areaLights->SetAreaLightNormal(name, normal);
+				editorLightState_.areaLights->SetAreaLightIntensity(name, intensity);
+				editorLightState_.areaLights->SetAreaLightSize(name, size.x, size.y);
+				editorLightState_.areaLights->SetAreaLightDistance(name, radius);
+				editorLightState_.areaLights->SetAreaLightDecay(name, decay);
+			}
+			object3dCommon->SetAreaLights(*editorLightState_.areaLights);
+		}
 	}
 	if (root.contains("audio") && root["audio"].is_object()) {
 		const auto& audioJson = root["audio"];

@@ -12,7 +12,12 @@
 
 std::unique_ptr<Object3dCommon> Object3dCommon::instance = nullptr;
 
-Object3dCommon::Object3dCommon() {}
+Object3dCommon::Object3dCommon() {
+	directionalLightSource_ = &directionalLight_;
+	pointLightSource_ = &pointLights_;
+	spotLightSource_ = &spotLights_;
+	areaLightSource_ = &areaLights_;
+}
 Object3dCommon::~Object3dCommon() {}
 
 Object3dCommon* Object3dCommon::GetInstance() {
@@ -159,6 +164,10 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	shadowScissorRect_.top = 0;
 	shadowScissorRect_.right = static_cast<LONG>(kShadowMapSize_);
 	shadowScissorRect_.bottom = static_cast<LONG>(kShadowMapSize_);
+	SetDirectionalLight(directionalLight_);
+	SetPointLights(pointLights_);
+	SetSpotLights(spotLights_);
+	SetAreaLights(areaLights_);
 }
 void Object3dCommon::SetEnvironmentMapTexture(const std::string& filePath) {
 	environmentMapPath_ = filePath;
@@ -320,6 +329,7 @@ void Object3dCommon::EndShadowMapPass() {
 	isShadowMapPassActive_ = false;
 }
 void Object3dCommon::SetDirectionalLight(DirectionalLight& light) {
+	directionalLightSource_ = &light;
 	directionalLightData_->color = light.GetColor();
 	directionalLightData_->direction = light.GetDirection();
 	directionalLightData_->intensity = light.GetIntensity();

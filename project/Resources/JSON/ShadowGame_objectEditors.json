@@ -8,7 +8,58 @@
     ]
   },
   "lights": {
-    "area": [],
+    "areaLights": [
+      {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "decay": 2.0,
+        "intensity": 4.0,
+        "normal": [
+          1.0,
+          -1.0,
+          0.0
+        ],
+        "position": [
+          0.0,
+          3.0,
+          0.0
+        ],
+        "radius": 0.10000000149011612,
+        "size": [
+          2.0,
+          2.0
+        ]
+      },
+      {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "decay": 2.0,
+        "intensity": 4.0,
+        "normal": [
+          1.0,
+          -1.0,
+          0.0
+        ],
+        "position": [
+          -5.0,
+          3.0,
+          0.0
+        ],
+        "radius": 0.10000000149011612,
+        "size": [
+          2.0,
+          2.0
+        ]
+      }
+    ],
     "directional": {
       "color": [
         1.0,
@@ -18,14 +69,93 @@
       ],
       "direction": [
         0.0,
-        -1.0,
+        1.0,
         0.0
       ],
-      "intensity": 1.100000023841858
+      "intensity": 0.10000000149011612
     },
-    "overrideSceneLights": false,
-    "point": [],
-    "spot": []
+    "pointLights": [
+      {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "decay": 1.0,
+        "intensity": 1.0,
+        "position": [
+          0.0,
+          5.0,
+          0.0
+        ],
+        "radius": 10.0
+      },
+      {
+        "color": [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "decay": 1.0,
+        "intensity": 1.0,
+        "position": [
+          5.0,
+          5.0,
+          5.0
+        ],
+        "radius": 10.0
+      }
+    ],
+    "spotLights": [
+      {
+        "angle": 1.0471975803375244,
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "decay": 2.0,
+        "direction": [
+          -1.0,
+          -1.0,
+          0.0
+        ],
+        "distance": 7.0,
+        "falloffStartAngle": 0.7853981852531433,
+        "intensity": 4.0,
+        "position": [
+          2.0,
+          1.25,
+          0.0
+        ]
+      },
+      {
+        "angle": 1.0471975803375244,
+        "color": [
+          1.0,
+          1.0,
+          0.5,
+          1.0
+        ],
+        "decay": 2.0,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "distance": 7.0,
+        "falloffStartAngle": 0.7853981852531433,
+        "intensity": 10.0,
+        "position": [
+          1.0,
+          0.10000000149011612,
+          1.0
+        ]
+      }
+    ]
   },
   "objects": [
     {
@@ -725,6 +855,61 @@
         ]
       },
       "name": "Object 12",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 13,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Object 13",
       "transform": {
         "rotate": [
           0.0,
@@ -1461,499 +1646,499 @@
       }
     },
     {
-        "index": 13,
-        "material": {
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "distortionFalloff": 0.0,
-            "distortionStrength": 0.0,
-            "enableLighting": true,
-            "environmentCoefficient": 0.0,
-            "grayscaleEnabled": false,
-            "sepiaEnabled": false,
-            "shininess": 40.0,
-            "uvAnchor": [
-                0.0,
-                0.0
-            ],
-            "uvRotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "uvScale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "uvTranslate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "name": "Primitive 13",
-        "transform": {
-            "rotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "translate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        }
+      "index": 13,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Primitive 13",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
     },
     {
-        "index": 14,
-        "material": {
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "distortionFalloff": 0.0,
-            "distortionStrength": 0.0,
-            "enableLighting": true,
-            "environmentCoefficient": 0.0,
-            "grayscaleEnabled": false,
-            "sepiaEnabled": false,
-            "shininess": 40.0,
-            "uvAnchor": [
-                0.0,
-                0.0
-            ],
-            "uvRotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "uvScale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "uvTranslate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "name": "Primitive 14",
-        "transform": {
-            "rotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "translate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        }
+      "index": 14,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Primitive 14",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
     },
     {
-        "index": 15,
-        "material": {
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "distortionFalloff": 0.0,
-            "distortionStrength": 0.0,
-            "enableLighting": true,
-            "environmentCoefficient": 0.0,
-            "grayscaleEnabled": false,
-            "sepiaEnabled": false,
-            "shininess": 40.0,
-            "uvAnchor": [
-                0.0,
-                0.0
-            ],
-            "uvRotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "uvScale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "uvTranslate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "name": "Primitive 15",
-        "transform": {
-            "rotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "translate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        }
+      "index": 15,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Primitive 15",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
     },
     {
-        "index": 16,
-        "material": {
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "distortionFalloff": 0.0,
-            "distortionStrength": 0.0,
-            "enableLighting": true,
-            "environmentCoefficient": 0.0,
-            "grayscaleEnabled": false,
-            "sepiaEnabled": false,
-            "shininess": 40.0,
-            "uvAnchor": [
-                0.0,
-                0.0
-            ],
-            "uvRotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "uvScale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "uvTranslate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "name": "Primitive 16",
-        "transform": {
-            "rotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "translate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        }
+      "index": 16,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Primitive 16",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
     },
     {
-        "index": 17,
-        "material": {
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "distortionFalloff": 0.0,
-            "distortionStrength": 0.0,
-            "enableLighting": true,
-            "environmentCoefficient": 0.0,
-            "grayscaleEnabled": false,
-            "sepiaEnabled": false,
-            "shininess": 40.0,
-            "uvAnchor": [
-                0.0,
-                0.0
-            ],
-            "uvRotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "uvScale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "uvTranslate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "name": "Primitive 17",
-        "transform": {
-            "rotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "translate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        }
+      "index": 17,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Primitive 17",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
     },
     {
-        "index": 18,
-        "material": {
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "distortionFalloff": 0.0,
-            "distortionStrength": 0.0,
-            "enableLighting": true,
-            "environmentCoefficient": 0.0,
-            "grayscaleEnabled": false,
-            "sepiaEnabled": false,
-            "shininess": 40.0,
-            "uvAnchor": [
-                0.0,
-                0.0
-            ],
-            "uvRotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "uvScale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "uvTranslate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "name": "WallR",
-        "transform": {
-            "rotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scale": [
-                1.0,
-                4.0,
-                14.0
-            ],
-            "translate": [
-                7.0,
-                2.0,
-                0.0
-            ]
-        }
+      "index": 18,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "WallR",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          4.0,
+          14.0
+        ],
+        "translate": [
+          7.0,
+          2.0,
+          0.0
+        ]
+      }
     },
     {
-        "index": 19,
-        "material": {
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "distortionFalloff": 0.0,
-            "distortionStrength": 0.0,
-            "enableLighting": true,
-            "environmentCoefficient": 0.0,
-            "grayscaleEnabled": false,
-            "sepiaEnabled": false,
-            "shininess": 40.0,
-            "uvAnchor": [
-                0.0,
-                0.0
-            ],
-            "uvRotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "uvScale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "uvTranslate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "name": "WallL",
-        "transform": {
-            "rotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scale": [
-                1.0,
-                4.0,
-                14.0
-            ],
-            "translate": [
-                -7.0,
-                2.0,
-                0.0
-            ]
-        }
+      "index": 19,
+      "material": {
+        "color": [
+          7.496946784137771e-43,
+          3.536037984862208e+16,
+          7.496946784137771e-43,
+          -7.524933893710608e-19
+        ],
+        "distortionFalloff": 2.543194884973481e-34,
+        "distortionStrength": 7.496946784137771e-43,
+        "enableLighting": true,
+        "environmentCoefficient": 7.496946784137771e-43,
+        "grayscaleEnabled": true,
+        "sepiaEnabled": true,
+        "shininess": 7968.1640625,
+        "uvAnchor": [
+          8.407790785948902e-45,
+          7.006492321624085e-45
+        ],
+        "uvRotate": [
+          2.802596928649634e-45,
+          1.401298464324817e-45,
+          0.0
+        ],
+        "uvScale": [
+          2.059658670196654e-35,
+          3.3415120440786944e+16,
+          7.496946784137771e-43
+        ],
+        "uvTranslate": [
+          4.203895392974451e-45,
+          2.802596928649634e-45,
+          0.0
+        ]
+      },
+      "name": "WallL",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          4.0,
+          14.0
+        ],
+        "translate": [
+          -7.0,
+          2.0,
+          0.0
+        ]
+      }
     },
     {
-        "index": 20,
-        "material": {
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "distortionFalloff": 0.0,
-            "distortionStrength": 0.0,
-            "enableLighting": true,
-            "environmentCoefficient": 0.0,
-            "grayscaleEnabled": false,
-            "sepiaEnabled": false,
-            "shininess": 40.0,
-            "uvAnchor": [
-                0.0,
-                0.0
-            ],
-            "uvRotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "uvScale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "uvTranslate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "name": "WallF",
-        "transform": {
-            "rotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scale": [
-                14.0,
-                4.0,
-                1.0
-            ],
-            "translate": [
-                0.0,
-                2.0,
-                7.0
-            ]
-        }
+      "index": 20,
+      "material": {
+        "color": [
+          5.605193857299268e-45,
+          9.80908925027372e-45,
+          8.407790785948902e-45,
+          5.605193857299268e-45
+        ],
+        "distortionFalloff": 9.80908925027372e-45,
+        "distortionStrength": 1.1210387714598537e-44,
+        "enableLighting": true,
+        "environmentCoefficient": 9.80908925027372e-45,
+        "grayscaleEnabled": true,
+        "sepiaEnabled": false,
+        "shininess": 8.407790785948902e-45,
+        "uvAnchor": [
+          1.8216880036222622e-44,
+          1.6815581571897805e-44
+        ],
+        "uvRotate": [
+          1.5414283107572988e-44,
+          1.401298464324817e-44,
+          1.2611686178923354e-44
+        ],
+        "uvScale": [
+          1.401298464324817e-44,
+          1.1210387714598537e-44,
+          1.2611686178923354e-44
+        ],
+        "uvTranslate": [
+          1.6815581571897805e-44,
+          1.401298464324817e-44,
+          1.5414283107572988e-44
+        ]
+      },
+      "name": "WallF",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          14.0,
+          4.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          2.0,
+          7.0
+        ]
+      }
     },
     {
-        "index": 21,
-        "material": {
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "distortionFalloff": 0.0,
-            "distortionStrength": 0.0,
-            "enableLighting": true,
-            "environmentCoefficient": 0.0,
-            "grayscaleEnabled": false,
-            "sepiaEnabled": false,
-            "shininess": 40.0,
-            "uvAnchor": [
-                0.0,
-                0.0
-            ],
-            "uvRotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "uvScale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "uvTranslate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "name": "WallB",
-        "transform": {
-            "rotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scale": [
-                14.0,
-                4.0,
-                1.0
-            ],
-            "translate": [
-                0.0,
-                2.0,
-                -7.0
-            ]
-        }
+      "index": 21,
+      "material": {
+        "color": [
+          1.5414283107572988e-44,
+          1.401298464324817e-45,
+          1.6815581571897805e-44,
+          1.8216880036222622e-44
+        ],
+        "distortionFalloff": 4.203895392974451e-45,
+        "distortionStrength": 2.802596928649634e-45,
+        "enableLighting": false,
+        "environmentCoefficient": 1.8216880036222622e-44,
+        "grayscaleEnabled": true,
+        "sepiaEnabled": false,
+        "shininess": 1.401298464324817e-45,
+        "uvAnchor": [
+          2.5223372357846707e-44,
+          1.8216880036222622e-44
+        ],
+        "uvRotate": [
+          2.2420775429197073e-44,
+          1.5414283107572988e-44,
+          1.2611686178923354e-44
+        ],
+        "uvScale": [
+          2.1019476964872256e-44,
+          1.961817850054744e-44,
+          4.203895392974451e-45
+        ],
+        "uvTranslate": [
+          2.2420775429197073e-44,
+          2.382207389352189e-44,
+          1.5414283107572988e-44
+        ]
+      },
+      "name": "WallB",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          14.0,
+          4.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          2.0,
+          -7.0
+        ]
+      }
     }
   ]
 }

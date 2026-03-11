@@ -176,6 +176,11 @@ private:
 	bool fullScreenGrayscaleEnabled_ = false;
 	// 全画面セピア有効化フラグ
 	bool fullScreenSepiaEnabled_ = false;
+
+	DirectionalLight directionalLight_{};
+	PointLight pointLights_{};
+	SpotLight spotLights_{};
+	AreaLight areaLights_{};
 	DirectionalLight* directionalLightSource_ = nullptr;
 	PointLight* pointLightSource_ = nullptr;
 	SpotLight* spotLightSource_ = nullptr;
