@@ -1,6 +1,5 @@
 #include "CoffeeScene.h"
 #include "Input.h"
-#include "Light/DirectionalLight.h"
 #include "Object3d/Object3dCommon.h"
 #ifdef USE_IMGUI
 #include <imgui.h>
@@ -66,6 +65,9 @@ void CoffeeScene::Initialize() {
 	roomWalls_[5]->SetTranslate({halfWidth, halfHeight, 0.0f});
 
 	coffee_->Initialize();
+	directionalLight_.SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	directionalLight_.SetDirection({0.0f, 0.5f, 1.0f});
+	directionalLight_.SetIntensity(1.0f);
 }
 
 void CoffeeScene::Update() {
@@ -104,13 +106,10 @@ void CoffeeScene::Update() {
 		wall->Update();
 	}
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
-	DirectionalLight directionalLight{};
-	directionalLight.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	directionalLight.direction = {0.0f, 0.5f, 1.0f};
-	directionalLight.intensity = 1.0f;
-	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight);
-	coffee_->Update(camera_.get(), directionalLight.direction);
+	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+	coffee_->Update(camera_.get(), directionalLight_.GetDirection());
 }
+
 
 void CoffeeScene::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();

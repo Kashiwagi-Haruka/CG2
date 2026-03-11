@@ -11,10 +11,10 @@
 #include "Vector4.h"
 
 #include "Inspector.h"
-#include "Light/AreaLight.h"
-#include "Light/DirectionalLight.h"
-#include "Light/PointLight.h"
-#include "Light/SpotLight.h"
+#include "Light/AreaLight/AreaLight.h"
+#include "Light/DirectionalLight/DirectionalLight.h"
+#include "Light/PointLight/PointLight.h"
+#include "Light/SpotLight/SpotLight.h"
 
 class Object3d;
 class Primitive;
@@ -62,11 +62,7 @@ private:
 
 	struct EditorLightState {
 		bool overrideSceneLights = false;
-		DirectionalLight directionalLight = {
-		    {1.0f, 1.0f, 1.0f, 1.0f},
-            {0.0f, -1.0f, 0.0f},
-            1.0f
-        };
+		DirectionalLight directionalLight;
 		std::vector<PointLight> pointLights;
 		std::vector<SpotLight> spotLights;
 		std::vector<AreaLight> areaLights;

@@ -1,4 +1,5 @@
 #include "SampleScene.h"
+#include "Data/Color.h"
 #include "Function.h"
 #include "GameBase.h"
 #include "Input.h"
@@ -217,9 +218,9 @@ void SampleScene::Initialize() {
 	pointLights_.AddPointLight("Point1");
 	pointLights_.SetLightProperties("Point1", {1.0f, 0.0f, 0.0f, 1.0f}, {5.0f, 5.0f, 5.0f}, 1.0f, 10.0f, 1.0f);
 
-	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
-	directionalLight_.intensity = 1.0f;
+	directionalLight_.SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	directionalLight_.SetDirection({0.0f, -1.0f, 0.0f});
+	directionalLight_.SetIntensity(1.0f);
 
 	spotLights_.ClearSpotLights();
 	spotLights_.AddSpotLight("Spot0");

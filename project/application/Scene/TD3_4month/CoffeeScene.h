@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "DebugCamera.h"
 #include "GameObject/Coffee/Coffee.h"
+#include "Light/DirectionalLight/DirectionalLight.h"
 #include "Primitive/Primitive.h"
 #include "Transform.h"
 #include <array>
@@ -16,6 +17,7 @@ private:
 	std::unique_ptr<Camera> camera_ = nullptr;
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	std::unique_ptr<Coffee> coffee_ = nullptr;
+	DirectionalLight directionalLight_{};
 	Transform cameraTransform_{};
 	bool useDebugCamera_ = false;
 

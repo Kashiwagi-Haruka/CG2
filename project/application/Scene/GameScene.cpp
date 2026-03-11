@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include "Engine/Texture/Data/Color.h"
 
 GameScene::GameScene() {
 	sceneTransition = std::make_unique<SceneTransition>();
@@ -43,9 +44,9 @@ void GameScene::Initialize() {
 	pointLights_.AddPointLight("Point2");
 	pointLights_.SetLightProperties("Point2", {0.4f, 0.4f, 1.0f, 1.0f}, {-75.0f, 5.0f, 75.0f}, 1.0f, 5.0f, 0.7f);
 
-	directionalLight_.color = {76.0f / 255.0f, 96.0f / 255.0f, 178 / 255.0f, 1.0f};
-	directionalLight_.direction = {0.0f, -1.0f, 0.5f};
-	directionalLight_.intensity = 1.0f;
+	directionalLight_.SetColor(Color::RGBAToVector4(76.0f, 96.0f, 178.0f, 1.0f));
+	directionalLight_.SetDirection({0.0f, -1.0f, 0.5f});
+	directionalLight_.SetIntensity(1.0f);
 
 	spotLights_.ClearSpotLights();
 	spotLights_.AddSpotLight("Spot0");
@@ -59,9 +60,18 @@ void GameScene::DebugImGui() {
 #ifdef USE_IMGUI
 	if (ImGui::Begin("SampleLight")) {
 		if (ImGui::TreeNode("DirectionalLight")) {
-			ImGui::ColorEdit4("LightColor", &directionalLight_.color.x);
-			ImGui::DragFloat3("LightDirection", &directionalLight_.direction.x, 0.1f, -1.0f, 1.0f);
-			ImGui::DragFloat("LightIntensity", &directionalLight_.intensity, 0.1f, 0.0f, 10.0f);
+			Vector4 lightColor = directionalLight_.GetColor();
+			if (ImGui::ColorEdit4("LightColor", &lightColor.x)) {
+				directionalLight_.SetColor(lightColor);
+			}
+			Vector3 lightDirection = directionalLight_.GetDirection();
+			if (ImGui::DragFloat3("LightDirection", &lightDirection.x, 0.1f, -1.0f, 1.0f)) {
+				directionalLight_.SetDirection(lightDirection);
+			}
+			float lightIntensity = directionalLight_.GetIntensity();
+			if (ImGui::DragFloat("LightIntensity", &lightIntensity, 0.1f, 0.0f, 10.0f)) {
+				directionalLight_.SetIntensity(lightIntensity);
+			}
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("PointLight")) {
