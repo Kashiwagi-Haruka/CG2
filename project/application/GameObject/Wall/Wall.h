@@ -21,7 +21,10 @@ public:
     void Draw();
     void SetCamera(Camera* camera);
     void AdjustAABB();
+    //親を設定する
+    void SetParentMatrix(Matrix4x4* parent) { parentMat_ = parent; }
 private:
+    Matrix4x4* parentMat_ = nullptr;
     std::unique_ptr<Primitive>primitive_ = nullptr;
 };
 
