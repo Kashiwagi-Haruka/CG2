@@ -69,6 +69,7 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
+	uint32_t indexCount_ = 0;
 
 	TransformationMatrix* transformationMatrixData_ = nullptr;
 	CameraForGpu* objectCameraData_ = nullptr;

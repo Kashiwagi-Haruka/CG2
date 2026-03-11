@@ -9,7 +9,8 @@ class GameSave {
 	struct CameraSaveData{
 		Transform transform;
 	};
-
+	struct ProgressSaveData {
+	};
 	PlayerSaveData playerSaveData_;
 	CameraSaveData cameraSaveData_;
 

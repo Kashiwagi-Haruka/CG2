@@ -1,42 +1,68 @@
 #include "PortalMesh.h"
 
 #include "Camera.h"
+#include "Engine/Texture/TextureManager.h"
+#include "Engine/base/DirectXCommon.h"
 #include "Function.h"
 #include "Object3d/Object3dCommon.h"
-#include "Engine/Texture/TextureManager.h"
-#include "WinApp.h"
-#include "Engine/base/DirectXCommon.h"
 #include "SrvManager/SrvManager.h"
+#include "WinApp.h"
+#include <array>
+#include <cmath>
 #include <cstring>
+#include <numbers>
 
 void PortalMesh::Initialize(const std::string& texturePath) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 	worldMatrix_ = Function::MakeIdentity4x4();
 
-	VertexData vertices[4] = {
-	    {{-0.5f, 0.5f, 0.0f, 1.0f},  {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-	    {{0.5f, 0.5f, 0.0f, 1.0f},   {1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-	    {{-0.5f, -0.5f, 0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}},
-	    {{0.5f, -0.5f, 0.0f, 1.0f},  {1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}},
-	};
-	uint32_t indices[6] = {0, 1, 2, 2, 1, 3};
+	constexpr uint32_t kPortalSegments = 64;
+	constexpr uint32_t kPortalVertexCount = kPortalSegments + 1;
+	constexpr uint32_t kPortalIndexCount = kPortalSegments * 3;
+	constexpr float kPortalRadius = 0.5f;
 
-	vertexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(vertices));
+	std::array<VertexData, kPortalVertexCount> vertices{};
+	std::array<uint32_t, kPortalIndexCount> indices{};
+
+	vertices[0] = {
+	    {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.5f, 0.5f},
+        {0.0f, 0.0f, -1.0f}
+    };
+	for (uint32_t segment = 0; segment < kPortalSegments; ++segment) {
+		const float angle = (2.0f * std::numbers::pi_v<float> * static_cast<float>(segment)) / static_cast<float>(kPortalSegments);
+		const float x = std::cos(angle) * kPortalRadius;
+		const float y = std::sin(angle) * kPortalRadius;
+		vertices[segment + 1] = {
+		    {x, y, 0.0f, 1.0f},
+            {x / (kPortalRadius * 2.0f) + 0.5f, 0.5f - y / (kPortalRadius * 2.0f)},
+            {0.0f, 0.0f, -1.0f}
+        };
+
+		const uint32_t nextSegmentIndex = (segment + 1) % kPortalSegments;
+		const uint32_t indexOffset = segment * 3;
+		indices[indexOffset + 0] = 0;
+		indices[indexOffset + 1] = segment + 1;
+		indices[indexOffset + 2] = nextSegmentIndex + 1;
+	}
+	indexCount_ = kPortalIndexCount;
+
+	vertexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * vertices.size());
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = sizeof(vertices);
+	vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * vertices.size());
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	VertexData* mappedVertices = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedVertices));
-	std::memcpy(mappedVertices, vertices, sizeof(vertices));
+	std::memcpy(mappedVertices, vertices.data(), sizeof(VertexData) * vertices.size());
 	vertexResource_->Unmap(0, nullptr);
 
-	indexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(indices));
+	indexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * indices.size());
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-	indexBufferView_.SizeInBytes = sizeof(indices);
+	indexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * indices.size());
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 	uint32_t* mappedIndices = nullptr;
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedIndices));
-	std::memcpy(mappedIndices, indices, sizeof(indices));
+	std::memcpy(mappedIndices, indices.data(), sizeof(uint32_t) * indices.size());
 	indexResource_->Unmap(0, nullptr);
 
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
@@ -113,7 +139,7 @@ void PortalMesh::Draw() {
 	if (!Object3dCommon::GetInstance()->IsShadowMapPassActive()) {
 		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetShadowMapSrvIndex());
 	}
-	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(indexCount_, 1, 0, 0, 0);
 }
 
 void PortalMesh::SetUvTransform(const Matrix4x4& uvTransform) {
