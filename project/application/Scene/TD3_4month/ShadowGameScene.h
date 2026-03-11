@@ -72,6 +72,8 @@ private:
     std::unique_ptr<Chair> chair_ = nullptr;
     //壁管理
     std::unique_ptr<WallManager> wallManager_ = nullptr;
+    //壁管理2こめ
+    std::unique_ptr<WallManager> wallManager2_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

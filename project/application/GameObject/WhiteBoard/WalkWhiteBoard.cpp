@@ -31,7 +31,7 @@ void WalkWhiteBoard::Initialize()
     obj_->Initialize();
     transform_ = { .scale = {1.0f,1.0f,1.0f}, .rotate = {0.0f,Function::kPi ,0.0f},.translate = {-5.0f,0.0f,7.0f} };
     velocity_ = { 0.0f };
-    localAABB_ = { .min = { -0.5f,0.0f,-0.5f},.max = {0.5f,0.5f,0.5f} };
+    localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
     /* SetRadius(1.0f);*/
     SetAABB(AABB{ .min = {-1.0f,0.0f,-1.0f}, .max = {1.0f,1.5f,1.0f} });
     SetCollisionAttribute(kCollisionEnemy);

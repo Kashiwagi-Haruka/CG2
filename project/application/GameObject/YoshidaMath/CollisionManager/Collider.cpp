@@ -4,38 +4,16 @@
 #include "Object3d/Object3dCommon.h"
 YoshidaMath::Collider::Collider()
 {
-
-#ifdef USE_IMGUI
-
-    primitive_ = std::make_unique<Primitive>();
-#endif // _DEBUG
-
     collisionInfo_.collided = false;
     collisionInfo_.normal = { 0.0f,0.0f,0.0f };
     collisionInfo_.penetration = { 0.0f };
 }
 
-void YoshidaMath::Collider::SetCamera(Camera* camera)
-{
-
-#ifdef USE_IMGUI
-    primitive_->SetCamera(camera);
-#endif // _DEBUG
-}
 
 void YoshidaMath::Collider::SetRadius(float radius)
 {
    type_ = ColliderType::kSphere;
     radius_ = radius;
-
-#ifdef USE_IMGUI
-    if (primitive_) {
-        primitive_->Initialize(Primitive::Sphere);
-        float scale = radius;
-        primitive_->SetScale({ scale,scale,scale });
-    }
-#endif // DEBUG
-
 }
 
 
@@ -44,59 +22,7 @@ void YoshidaMath::Collider::SetAABB(const AABB& aabb) {
     type_ = ColliderType::kAABB;
    AABB_ = aabb;
 
-#ifdef USE_IMGUI
-    if (primitive_) {
-        primitive_->Initialize(Primitive::Box);
-        Vector3 scale =
-        {
-        aabb.max.x - aabb.min.x,
-        aabb.max.y - aabb.min.y,
-        aabb.max.z - aabb.min.z
-        };
-        primitive_->SetScale(scale);
-    }
-#endif // DEBUG
-
 };
-
-void YoshidaMath::Collider::ColliderUpdate()
-{
-
-#ifdef USE_IMGUI
-    if (primitive_) {
-        primitive_->SetColor({ 1.0f,1.0f,0.0f,0.5f });
-        if (type_ == kAABB) {
-            primitive_->SetTranslate(GetWorldPosition() + YoshidaMath::GetAABBCenter(AABB_));
-        } else {
-            primitive_->SetTranslate(GetWorldPosition());
-        }
-
-        primitive_->Update();
-    }
-#endif // _DEBUG
-}
-
-void YoshidaMath::Collider::ColliderDraw()
-{
-
-#ifdef USE_IMGUI
-    if (primitive_) {
-        primitive_->UpdateCameraMatrices();
-        primitive_->Draw();
-    }
-#endif // _DEBUG
-}
-
-void YoshidaMath::Collider::OnCollisionCollider()
-{
-
-#ifdef USE_IMGUI
-    if (primitive_) {
-        primitive_->SetColor({ 1.0f,0.0f,0.0f,0.5f });
-    }
-#endif // _DEBUG
-
-}
 
 bool YoshidaMath::RayIntersectsAABB(const Ray& ray, const AABB& box, float tMin, float tMax) {
 

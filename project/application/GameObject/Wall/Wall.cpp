@@ -61,3 +61,9 @@ void Wall::AdjustAABB()
     SetAABB({ .min = -halfScale,.max = halfScale });
 
 }
+
+void Wall::SetST(const Vector3& scale, const Vector3& translate)
+{
+    primitive_->SetScale(scale);
+    primitive_->SetTranslate(translate);
+}

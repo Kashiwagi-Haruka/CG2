@@ -42,6 +42,9 @@ ShadowGameScene::ShadowGameScene()
     chair_ = std::make_unique<Chair>();
     //壁管理
     wallManager_ = std::make_unique<WallManager>();
+    //壁管理
+    wallManager2_ = std::make_unique<WallManager>();
+
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 }
@@ -97,6 +100,8 @@ void ShadowGameScene::Initialize()
     chair_->SetPlayerCamera(playerCamera_.get());
     //壁
     wallManager_->Initialize();
+    //壁
+    wallManager2_->Initialize();
 
     SetSceneCameraForDraw(playerCamera_->GetCamera());
 }
@@ -185,10 +190,12 @@ void ShadowGameScene::CheckCollision()
     for (auto& wall : wallManager_->GetWalls()) {
         collisionManager_->AddCollider(wall.get());
     }
+
+    for (auto& wall : wallManager2_->GetWalls()) {
+        collisionManager_->AddCollider(wall.get());
+    }
     collisionManager_->AddCollider(flashlight_.get());
     collisionManager_->AddCollider(testField_.get());
-
-    collisionManager_->SetCamera(playerCamera_->GetCamera());
 
     collisionManager_->CheckAllCollisions();
 }
@@ -347,6 +354,8 @@ void ShadowGameScene::UpdateGameObject()
     testField_->Update();
     //壁管理
     wallManager_->Update();
+    //壁管理
+    wallManager2_->Update();
     //ポータル管理
     portalManager_->Update();
     ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
@@ -415,6 +424,8 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     testField_->Draw();
     //壁管理
     wallManager_->Draw();
+    //壁管理
+    wallManager2_->Draw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //懐中電灯
@@ -447,6 +458,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     edamame_->SetCamera(camera);
     chair_->SetCamera(camera);
     wallManager_->SetCamera(camera);
+    wallManager2_->SetCamera(camera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle)
 {
