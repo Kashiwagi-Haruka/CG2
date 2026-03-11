@@ -184,7 +184,7 @@ void Portal::UpdateScale()
 
 void Portal::UpdateWorldMatrix()
 {
-    Matrix4x4  worldMatrix = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+    Matrix4x4  worldMatrix = Function::MakeAffineMatrix(transform_.scale*0.9f, transform_.rotate, transform_.translate);
     Matrix4x4  worldMatrix1 = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, ringTranslate_);
     portalCircle_->SetWorldMatrix(worldMatrix);
     ring_->SetWorldMatrix(worldMatrix1);
