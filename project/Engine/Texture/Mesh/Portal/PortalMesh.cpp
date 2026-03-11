@@ -27,7 +27,7 @@ void PortalMesh::Initialize(const std::string& texturePath) {
 	vertices[0] = {
 	    {0.0f, 0.0f, 0.0f, 1.0f},
         {0.5f, 0.5f},
-        {0.0f, 0.0f, -1.0f}
+        {0.0f, 0.0f, 1.0f}
     };
 	for (uint32_t segment = 0; segment < kPortalSegments; ++segment) {
 		const float angle = (2.0f * std::numbers::pi_v<float> * static_cast<float>(segment)) / static_cast<float>(kPortalSegments);
@@ -36,14 +36,14 @@ void PortalMesh::Initialize(const std::string& texturePath) {
 		vertices[segment + 1] = {
 		    {x, y, 0.0f, 1.0f},
             {x / (kPortalRadius * 2.0f) + 0.5f, 0.5f - y / (kPortalRadius * 2.0f)},
-            {0.0f, 0.0f, -1.0f}
+            {0.0f, 0.0f, 1.0f}
         };
 
 		const uint32_t nextSegmentIndex = (segment + 1) % kPortalSegments;
 		const uint32_t indexOffset = segment * 3;
 		indices[indexOffset + 0] = 0;
-		indices[indexOffset + 1] = segment + 1;
-		indices[indexOffset + 2] = nextSegmentIndex + 1;
+		indices[indexOffset + 1] = nextSegmentIndex + 1;
+		indices[indexOffset + 2] = segment + 1;
 	}
 	indexCount_ = kPortalIndexCount;
 
@@ -133,9 +133,9 @@ void PortalMesh::Draw() {
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(4, objectCameraResource_->GetGPUVirtualAddress());
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(5, textureCameraResource_->GetGPUVirtualAddress());
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
+	/*TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(8, Object3dCommon::GetInstance()->GetPointLightSrvIndex());
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(9, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());*/
 	if (!Object3dCommon::GetInstance()->IsShadowMapPassActive()) {
 		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetShadowMapSrvIndex());
 	}
