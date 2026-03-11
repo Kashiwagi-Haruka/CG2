@@ -16,10 +16,10 @@ void PortalMesh::Initialize(const std::string& texturePath) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 	worldMatrix_ = Function::MakeIdentity4x4();
 
-	constexpr uint32_t kPortalSegments = 64;
+	constexpr uint32_t kPortalSegments = 32;
 	constexpr uint32_t kPortalVertexCount = kPortalSegments + 1;
 	constexpr uint32_t kPortalIndexCount = kPortalSegments * 3;
-	constexpr float kPortalRadius = 0.5f;
+	float kPortalRadius = transform_.scale.x / 2.0f;
 
 	std::array<VertexData, kPortalVertexCount> vertices{};
 	std::array<uint32_t, kPortalIndexCount> indices{};
