@@ -30,41 +30,27 @@ void GameScene::Initialize() {
 	sceneEndClear = false;
 	sceneEndOver = false;
 	isBGMPlaying = false;
-	
+
 	sceneTransition->Initialize(false);
 	isTransitionIn = true;
 	isTransitionOut = false;
 	nextSceneName.clear();
-	activePointLightCount_ = 3;
-	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLights_[0].position = {-75.0f, 10.0f, -75.0f};
-	pointLights_[0].intensity = 1.0f;
-	pointLights_[0].radius = 10.0f;
-	pointLights_[0].decay = 0.7f;
-	pointLights_[1].color = {1.0f, 0.9f, 0.9f, 1.0f};
-	pointLights_[1].position = {75.0f, 5.0f, 75.0f};
-	pointLights_[1].intensity = 0.0f;
-	pointLights_[1].radius = 10.0f;
-	pointLights_[1].decay = 0.7f;
-	pointLights_[2].color = {0.4f, 0.4f, 1.0f, 1.0f};
-	pointLights_[2].position = {-75.0f, 5.0f, 75.0f};
-	pointLights_[2].intensity = 1.0f;
-	pointLights_[2].radius = 5.0f;
-	pointLights_[2].decay = 0.7f;
+	pointLights_.ClearLights();
+	pointLights_.AddPointLight("Point0");
+	pointLights_.SetLightProperties("Point0", {1.0f, 1.0f, 1.0f, 1.0f}, {-75.0f, 10.0f, -75.0f}, 1.0f, 10.0f, 0.7f);
+	pointLights_.AddPointLight("Point1");
+	pointLights_.SetLightProperties("Point1", {1.0f, 0.9f, 0.9f, 1.0f}, {75.0f, 5.0f, 75.0f}, 0.0f, 10.0f, 0.7f);
+	pointLights_.AddPointLight("Point2");
+	pointLights_.SetLightProperties("Point2", {0.4f, 0.4f, 1.0f, 1.0f}, {-75.0f, 5.0f, 75.0f}, 1.0f, 5.0f, 0.7f);
 
-	directionalLight_.color = {76.0f/255.0f, 96.0f/255.0f, 178/255.0f, 1.0f};
+	directionalLight_.color = {76.0f / 255.0f, 96.0f / 255.0f, 178 / 255.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.5f};
 	directionalLight_.intensity = 1.0f;
 
-	activeSpotLightCount_ = 1;
-	spotLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	spotLights_[0].position = {-50.0f, 5.0f, -50.0f};
-	spotLights_[0].direction = {0.0f, 1.0f, 0.0f};
-	spotLights_[0].intensity = 0.0f;
-	spotLights_[0].distance = 7.0f;
-	spotLights_[0].decay = 2.0f;
-	spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-	spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+	spotLights_.ClearSpotLights();
+	spotLights_.AddSpotLight("Spot0");
+	spotLights_.SetSpotLightProperties(
+	    "Spot0", {1.0f, 1.0f, 1.0f, 1.0f}, {-50.0f, 5.0f, -50.0f}, 0.0f, {0.0f, 1.0f, 0.0f}, 7.0f, 2.0f, std::numbers::pi_v<float> / 3.0f, std::numbers::pi_v<float> / 4.0f);
 	pause->Initialize();
 }
 
@@ -80,14 +66,30 @@ void GameScene::DebugImGui() {
 		}
 		if (ImGui::TreeNode("PointLight")) {
 
-			for (uint32_t index = 0; index < activePointLightCount_; ++index) {
+			for (int index = 0; index < pointLights_.GetLightCount(); ++index) {
 				ImGui::PushID(static_cast<int>(index));
 				if (ImGui::TreeNode("PointLight")) {
-					ImGui::ColorEdit4("PointLightColor", &pointLights_[index].color.x);
-					ImGui::DragFloat("PointLightIntensity", &pointLights_[index].intensity, 0.1f);
-					ImGui::DragFloat3("PointLightPosition", &pointLights_[index].position.x, 0.1f);
-					ImGui::DragFloat("PointLightRadius", &pointLights_[index].radius, 0.1f);
-					ImGui::DragFloat("PointLightDecay", &pointLights_[index].decay, 0.1f);
+					const std::string pointName = "Point" + std::to_string(index);
+					Vector4 pointColor = pointLights_.GetLightColor(pointName);
+					if (ImGui::ColorEdit4("PointLightColor", &pointColor.x)) {
+						pointLights_.SetLightColor(pointName, pointColor);
+					}
+					float pointIntensity = pointLights_.GetLightIntensity(pointName);
+					if (ImGui::DragFloat("PointLightIntensity", &pointIntensity, 0.1f)) {
+						pointLights_.SetLightIntensity(pointName, pointIntensity);
+					}
+					Vector3 pointPosition = pointLights_.GetLightPosition(pointName);
+					if (ImGui::DragFloat3("PointLightPosition", &pointPosition.x, 0.1f)) {
+						pointLights_.SetLightPosition(pointName, pointPosition);
+					}
+					float pointRadius = pointLights_.GetLightRadius(pointName);
+					if (ImGui::DragFloat("PointLightRadius", &pointRadius, 0.1f)) {
+						pointLights_.SetLightRadius(pointName, pointRadius);
+					}
+					float pointDecay = pointLights_.GetLightDecay(pointName);
+					if (ImGui::DragFloat("PointLightDecay", &pointDecay, 0.1f)) {
+						pointLights_.SetLightDecay(pointName, pointDecay);
+					}
 					ImGui::TreePop();
 				}
 				ImGui::PopID();
@@ -95,23 +97,45 @@ void GameScene::DebugImGui() {
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("SpotLight")) {
-			ImGui::ColorEdit4("SpotLightColor", &spotLights_[0].color.x);
-			ImGui::DragFloat("SpotLightIntensity", &spotLights_[0].intensity, 0.1f);
-			ImGui::DragFloat3("SpotLightPosition", &spotLights_[0].position.x, 0.1f);
-			ImGui::DragFloat3("SpotLightDirection", &spotLights_[0].direction.x, 0.1f);
-			ImGui::DragFloat("SpotLightDistance", &spotLights_[0].distance, 0.1f);
-			ImGui::DragFloat("SpotLightDecay", &spotLights_[0].decay, 0.1f);
-			ImGui::DragFloat("SpotLightCosAngle", &spotLights_[0].cosAngle, 0.1f, 0.0f, 1.0f);
-			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLights_[0].cosFalloffStart, 0.1f, 0.0f, 1.0f);
+			Vector4 spotColor = spotLights_.GetSpotLightColor("Spot0");
+			if (ImGui::ColorEdit4("SpotLightColor", &spotColor.x)) {
+				spotLights_.SetSpotLightColor("Spot0", spotColor);
+			}
+			float spotIntensity = spotLights_.GetSpotLightIntensity("Spot0");
+			if (ImGui::DragFloat("SpotLightIntensity", &spotIntensity, 0.1f)) {
+				spotLights_.SetSpotLightIntensity("Spot0", spotIntensity);
+			}
+			Vector3 spotPosition = spotLights_.GetSpotLightPosition("Spot0");
+			if (ImGui::DragFloat3("SpotLightPosition", &spotPosition.x, 0.1f)) {
+				spotLights_.SetSpotLightPosition("Spot0", spotPosition);
+			}
+			Vector3 spotDirection = spotLights_.GetSpotLightDirection("Spot0");
+			if (ImGui::DragFloat3("SpotLightDirection", &spotDirection.x, 0.1f)) {
+				spotLights_.SetSpotLightDirection("Spot0", spotDirection);
+			}
+			float spotDistance = spotLights_.GetSpotLightDistance("Spot0");
+			if (ImGui::DragFloat("SpotLightDistance", &spotDistance, 0.1f)) {
+				spotLights_.SetSpotLightDistance("Spot0", spotDistance);
+			}
+			float spotDecay = spotLights_.GetSpotLightDecay("Spot0");
+			if (ImGui::DragFloat("SpotLightDecay", &spotDecay, 0.1f)) {
+				spotLights_.SetSpotLightDecay("Spot0", spotDecay);
+			}
+			float spotAngle = spotLights_.GetSpotLightAngle("Spot0");
+			if (ImGui::DragFloat("SpotLightAngle", &spotAngle, 0.01f, 0.0f, std::numbers::pi_v<float>)) {
+				spotLights_.SetSpotLightAngle("Spot0", spotAngle);
+			}
+			float spotFalloffStartAngle = spotLights_.GetSpotLightFalloffStartAngle("Spot0");
+			if (ImGui::DragFloat("SpotLightFalloffStartAngle", &spotFalloffStartAngle, 0.01f, 0.0f, std::numbers::pi_v<float>)) {
+				spotLights_.SetSpotLightFalloffStartAngle("Spot0", spotFalloffStartAngle);
+			}
 			ImGui::TreePop();
 		}
 	}
 	ImGui::End();
-	
 
 #endif // USE_IMGUI
 }
-
 
 void GameScene::Update() {
 	if (!isBGMPlaying) {
@@ -123,11 +147,9 @@ void GameScene::Update() {
 	pause->Update(isPause);
 	Pause::Action pauseAction = pause->ConsumeAction();
 
-
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
-	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
-
+	Object3dCommon::GetInstance()->SetPointLights(pointLights_);
+	Object3dCommon::GetInstance()->SetSpotLights(spotLights_);
 
 	if (isTransitionIn || isTransitionOut) {
 		sceneTransition->Update();

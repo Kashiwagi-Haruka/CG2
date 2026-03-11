@@ -5,10 +5,10 @@
 #include "BaseScene.h"
 #include "Camera.h"
 #include "DebugCamera.h"
-#include "Light/AreaLight.h"
-#include "Light/DirectionalLight.h"
-#include "Light/PointLight.h"
-#include "Light/SpotLight.h"
+#include "Light/AreaLight/AreaLight.h"
+#include "Light/DirectionalLight/DirectionalLight.h"
+#include "Light/PointLight/PointLight.h"
+#include "Light/SpotLight/SpotLight.h"
 #include "Object3d/Object3d.h"
 #include "ParticleEmitter.h"
 #include "Portal/PortalMesh.h"
@@ -42,12 +42,9 @@ class SampleScene : public BaseScene {
 	bool useDebugCamera_ = false;
 
 	DirectionalLight directionalLight_{};
-	std::array<PointLight, kMaxPointLights> pointLights_{};
-	uint32_t activePointLightCount_ = 0;
-	std::array<SpotLight, kMaxSpotLights> spotLights_{};
-	uint32_t activeSpotLightCount_ = 0;
-	std::array<AreaLight, kMaxAreaLights> areaLights_{};
-	uint32_t activeAreaLightCount_ = 0;
+	PointLight pointLights_{};
+	SpotLight spotLights_{};
+	AreaLight areaLights_{};
 
 	Transform uvBallTransform_{};
 	Transform cameraTransform_{};

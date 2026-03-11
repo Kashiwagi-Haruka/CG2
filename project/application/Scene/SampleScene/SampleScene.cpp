@@ -211,59 +211,41 @@ void SampleScene::Initialize() {
 	overlayCameraSprite_->SetRotation(0.0f);
 	overlayCameraSprite_->SetPosition(Vector2(0.0f, 0.0f));
 
-	activePointLightCount_ = 2;
-	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
-	pointLights_[0].intensity = 1.0f;
-	pointLights_[0].radius = 10.0f;
-	pointLights_[0].decay = 1.0f;
-	pointLights_[1].color = {1.0f, 0.0f, 0.0f, 1.0f};
-	pointLights_[1].position = {5.0f, 5.0f, 5.0f};
-	pointLights_[1].intensity = 1.0f;
-	pointLights_[1].radius = 10.0f;
-	pointLights_[1].decay = 1.0f;
+	pointLights_.ClearLights();
+	pointLights_.AddPointLight("Point0");
+	pointLights_.SetLightProperties("Point0", {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 5.0f, 0.0f}, 1.0f, 10.0f, 1.0f);
+	pointLights_.AddPointLight("Point1");
+	pointLights_.SetLightProperties("Point1", {1.0f, 0.0f, 0.0f, 1.0f}, {5.0f, 5.0f, 5.0f}, 1.0f, 10.0f, 1.0f);
 
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
 	directionalLight_.intensity = 1.0f;
 
-	activeSpotLightCount_ = 2;
-	spotLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	spotLights_[0].position = {2.0f, 1.25f, 0.0f};
-	spotLights_[0].direction = {-1.0f, -1.0f, 0.0f};
-	spotLights_[0].intensity = 4.0f;
-	spotLights_[0].distance = 7.0f;
-	spotLights_[0].decay = 2.0f;
-	spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-	spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+	spotLights_.ClearSpotLights();
+	spotLights_.AddSpotLight("Spot0");
+	spotLights_.SetSpotLightProperties(
+	    "Spot0", {1.0f, 1.0f, 1.0f, 1.0f}, {2.0f, 1.25f, 0.0f}, 4.0f, {-1.0f, -1.0f, 0.0f}, 7.0f, 2.0f, std::numbers::pi_v<float> / 3.0f, std::numbers::pi_v<float> / 4.0f);
+	spotLights_.AddSpotLight("Spot1");
+	spotLights_.SetSpotLightProperties(
+	    "Spot1", {1.0f, 1.0f, 1.0f, 1.0f}, {2.0f, 1.25f, 0.0f}, 4.0f, {-1.0f, -1.0f, 0.0f}, 7.0f, 2.0f, std::numbers::pi_v<float> / 3.0f, std::numbers::pi_v<float> / 4.0f);
 
-	spotLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	spotLights_[1].position = {2.0f, 1.25f, 0.0f};
-	spotLights_[1].direction = {-1.0f, -1.0f, 0.0f};
-	spotLights_[1].intensity = 4.0f;
-	spotLights_[1].distance = 7.0f;
-	spotLights_[1].decay = 2.0f;
-	spotLights_[1].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-	spotLights_[1].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
-
-	activeAreaLightCount_ = 2;
-	areaLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	areaLights_[0].position = {0.0f, 3.0f, 0.0f};
-	areaLights_[0].normal = {1.0f, -1.0f, 0.0f};
-	areaLights_[0].intensity = 4.0f;
-	areaLights_[0].width = 2.0f;
-	areaLights_[0].height = 2.0f;
-	areaLights_[0].radius = 0.1f;
-	areaLights_[0].decay = 2.0f;
-
-	areaLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	areaLights_[1].position = {-5.0f, 3.0f, 0.0f};
-	areaLights_[1].normal = {1.0f, -1.0f, 0.0f};
-	areaLights_[1].intensity = 4.0f;
-	areaLights_[1].width = 2.0f;
-	areaLights_[1].height = 2.0f;
-	areaLights_[1].radius = 0.1f;
-	areaLights_[1].decay = 2.0f;
+	areaLights_.ClearAreaLights();
+	areaLights_.AddAreaLight("Area0");
+	areaLights_.SetAreaLightColor("Area0", {1.0f, 1.0f, 1.0f, 1.0f});
+	areaLights_.SetAreaLightPosition("Area0", {0.0f, 3.0f, 0.0f});
+	areaLights_.SetAreaLightNormal("Area0", {1.0f, -1.0f, 0.0f});
+	areaLights_.SetAreaLightIntensity("Area0", 4.0f);
+	areaLights_.SetAreaLightSize("Area0", 2.0f, 2.0f);
+	areaLights_.SetAreaLightDistance("Area0", 0.1f);
+	areaLights_.SetAreaLightDecay("Area0", 2.0f);
+	areaLights_.AddAreaLight("Area1");
+	areaLights_.SetAreaLightColor("Area1", {1.0f, 1.0f, 1.0f, 1.0f});
+	areaLights_.SetAreaLightPosition("Area1", {-5.0f, 3.0f, 0.0f});
+	areaLights_.SetAreaLightNormal("Area1", {1.0f, -1.0f, 0.0f});
+	areaLights_.SetAreaLightIntensity("Area1", 4.0f);
+	areaLights_.SetAreaLightSize("Area1", 2.0f, 2.0f);
+	areaLights_.SetAreaLightDistance("Area1", 0.1f);
+	areaLights_.SetAreaLightDecay("Area1", 2.0f);
 }
 
 void SampleScene::Update() {
@@ -493,9 +475,9 @@ void SampleScene::Update() {
 		sampleParticleEmitter_->Update(particleTransform_);
 	}
 	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
-	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
-	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
+	Object3dCommon::GetInstance()->SetPointLights(pointLights_);
+	Object3dCommon::GetInstance()->SetSpotLights(spotLights_);
+	Object3dCommon::GetInstance()->SetAreaLights(areaLights_);
 	Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(fullScreenGrayscaleEnabled_);
 	Object3dCommon::GetInstance()->SetFullScreenSepiaEnabled(fullScreenSepiaEnabled_);
 	Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength_);

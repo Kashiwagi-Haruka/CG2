@@ -193,56 +193,45 @@ void ShadowGameScene::CheckCollision()
     collisionManager_->CheckAllCollisions();
 }
 
-void ShadowGameScene::InitializeLights()
-{
-    //懐中電灯
-    flashlight_->Initialize();
-    flashlight_->SetCamera(playerCamera_->GetCamera());
+void ShadowGameScene::InitializeLights() {
+	// 懐中電灯
+	flashlight_->Initialize();
+	flashlight_->SetCamera(playerCamera_->GetCamera());
 
-    activePointLightCount_ = 2;
-    pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    pointLights_[0].position = { 0.0f, 5.0f, 0.0f };
-    pointLights_[0].intensity = 1.0f;
-    pointLights_[0].radius = 10.0f;
-    pointLights_[0].decay = 1.0f;
-    pointLights_[1].color = { 1.0f, 0.0f, 0.0f, 1.0f };
-    pointLights_[1].position = { 5.0f, 5.0f, 5.0f };
-    pointLights_[1].intensity = 1.0f;
-    pointLights_[1].radius = 10.0f;
-    pointLights_[1].decay = 1.0f;
+	pointLights_.ClearLights();
+	pointLights_.AddPointLight("Point0");
+	pointLights_.SetLightProperties("Point0", {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 5.0f, 0.0f}, 1.0f, 10.0f, 1.0f);
+	pointLights_.AddPointLight("Point1");
+	pointLights_.SetLightProperties("Point1", {1.0f, 0.0f, 0.0f, 1.0f}, {5.0f, 5.0f, 5.0f}, 1.0f, 10.0f, 1.0f);
 
-    directionalLight_.color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
-    directionalLight_.intensity = 0.1f;
+	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	directionalLight_.direction = {0.0f, 1.0f, 0.0f};
+	directionalLight_.intensity = 0.1f;
 
-    activeSpotLightCount_ = 2;
-    spotLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    spotLights_[0].position = { 2.0f, 1.25f, 0.0f };
-    spotLights_[0].direction = { -1.0f, -1.0f, 0.0f };
-    spotLights_[0].intensity = 4.0f;
-    spotLights_[0].distance = 7.0f;
-    spotLights_[0].decay = 2.0f;
-    spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-    spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+	spotLights_.ClearSpotLights();
+	spotLights_.AddSpotLight("Spot0");
+	spotLights_.SetSpotLightProperties(
+	    "Spot0", {1.0f, 1.0f, 1.0f, 1.0f}, {2.0f, 1.25f, 0.0f}, 4.0f, {-1.0f, -1.0f, 0.0f}, 7.0f, 2.0f, std::numbers::pi_v<float> / 3.0f, std::numbers::pi_v<float> / 4.0f);
+	spotLights_.AddSpotLight("Spot1");
 
-    activeAreaLightCount_ = 2;
-    areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    areaLights_[0].position = { 0.0f, 3.0f, 0.0f };
-    areaLights_[0].normal = { 1.0f, -1.0f, 0.0f };
-    areaLights_[0].intensity = 4.0f;
-    areaLights_[0].width = 2.0f;
-    areaLights_[0].height = 2.0f;
-    areaLights_[0].radius = 0.1f;
-    areaLights_[0].decay = 2.0f;
+	areaLights_.ClearAreaLights();
+	areaLights_.AddAreaLight("Area0");
+	areaLights_.SetAreaLightColor("Area0", {1.0f, 1.0f, 1.0f, 1.0f});
+	areaLights_.SetAreaLightPosition("Area0", {0.0f, 3.0f, 0.0f});
+	areaLights_.SetAreaLightNormal("Area0", {1.0f, -1.0f, 0.0f});
+	areaLights_.SetAreaLightIntensity("Area0", 4.0f);
+	areaLights_.SetAreaLightSize("Area0", 2.0f, 2.0f);
+	areaLights_.SetAreaLightDistance("Area0", 0.1f);
+	areaLights_.SetAreaLightDecay("Area0", 2.0f);
 
-    areaLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    areaLights_[1].position = { -5.0f, 3.0f, 0.0f };
-    areaLights_[1].normal = { 1.0f, -1.0f, 0.0f };
-    areaLights_[1].intensity = 4.0f;
-    areaLights_[1].width = 2.0f;
-    areaLights_[1].height = 2.0f;
-    areaLights_[1].radius = 0.1f;
-    areaLights_[1].decay = 2.0f;
+	areaLights_.AddAreaLight("Area1");
+	areaLights_.SetAreaLightColor("Area1", {1.0f, 1.0f, 1.0f, 1.0f});
+	areaLights_.SetAreaLightPosition("Area1", {-5.0f, 3.0f, 0.0f});
+	areaLights_.SetAreaLightNormal("Area1", {1.0f, -1.0f, 0.0f});
+	areaLights_.SetAreaLightIntensity("Area1", 4.0f);
+	areaLights_.SetAreaLightSize("Area1", 2.0f, 2.0f);
+	areaLights_.SetAreaLightDistance("Area1", 0.1f);
+	areaLights_.SetAreaLightDecay("Area1", 2.0f);
 }
 #pragma region //private更新処理
 void ShadowGameScene::UpdateCamera()
@@ -293,10 +282,10 @@ void ShadowGameScene::UpdateSceneTransition()
 void ShadowGameScene::UpdateGameObject()
 {
 #pragma region//Lightを組み込む
-    Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-    Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
-    Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
-    Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
+	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+	Object3dCommon::GetInstance()->SetPointLights(pointLights_);
+	Object3dCommon::GetInstance()->SetSpotLights(spotLights_);
+	Object3dCommon::GetInstance()->SetAreaLights(areaLights_);
 #pragma endregion
 
     bool vignetteStrength = true;
@@ -352,31 +341,59 @@ void ShadowGameScene::UpdateGameObject()
     ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
 #pragma endregion
 }
-void ShadowGameScene::UpdateLight()
-{
+void ShadowGameScene::UpdateLight() {
 
-    //懐中電灯
-    flashlight_->Update();
-    spotLights_[1] = flashlight_->GetSpotLight();
-
+	// 懐中電灯
+	flashlight_->Update();
+	flashlight_->ApplyToSpotLight(spotLights_, "Spot1");
 
 #ifdef USE_IMGUI
-    if (ImGui::TreeNode("PointLight")) {
-        ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);
-        ImGui::DragFloat("PointLightIntensity", &pointLights_[0].intensity, 0.1f);
-        ImGui::DragFloat3("PointLightPosition", &pointLights_[0].position.x, 0.1f);
-        ImGui::DragFloat("PointLightRadius", &pointLights_[0].radius, 0.1f);
-        ImGui::DragFloat("PointLightDecay", &pointLights_[0].decay, 0.1f);
-        ImGui::TreePop();
-    }
-    if (ImGui::TreeNode("PointLight1")) {
-        ImGui::ColorEdit4("PointLightColor1", &pointLights_[1].color.x);
-        ImGui::DragFloat("PointLightIntensity1", &pointLights_[1].intensity, 0.1f);
-        ImGui::DragFloat3("PointLightPosition1", &pointLights_[1].position.x, 0.1f);
-        ImGui::DragFloat("PointLightRadius1", &pointLights_[1].radius, 0.1f);
-        ImGui::DragFloat("PointLightDecay1", &pointLights_[1].decay, 0.1f);
-        ImGui::TreePop();
-    }
+	if (ImGui::TreeNode("PointLight")) {
+		Vector4 point0Color = pointLights_.GetLightColor("Point0");
+		if (ImGui::ColorEdit4("PointLightColor", &point0Color.x)) {
+			pointLights_.SetLightColor("Point0", point0Color);
+		}
+		float point0Intensity = pointLights_.GetLightIntensity("Point0");
+		if (ImGui::DragFloat("PointLightIntensity", &point0Intensity, 0.1f)) {
+			pointLights_.SetLightIntensity("Point0", point0Intensity);
+		}
+		Vector3 point0Position = pointLights_.GetLightPosition("Point0");
+		if (ImGui::DragFloat3("PointLightPosition", &point0Position.x, 0.1f)) {
+			pointLights_.SetLightPosition("Point0", point0Position);
+		}
+		float point0Radius = pointLights_.GetLightRadius("Point0");
+		if (ImGui::DragFloat("PointLightRadius", &point0Radius, 0.1f)) {
+			pointLights_.SetLightRadius("Point0", point0Radius);
+		}
+		float point0Decay = pointLights_.GetLightDecay("Point0");
+		if (ImGui::DragFloat("PointLightDecay", &point0Decay, 0.1f)) {
+			pointLights_.SetLightDecay("Point0", point0Decay);
+		}
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("PointLight1")) {
+		Vector4 point1Color = pointLights_.GetLightColor("Point1");
+		if (ImGui::ColorEdit4("PointLightColor1", &point1Color.x)) {
+			pointLights_.SetLightColor("Point1", point1Color);
+		}
+		float point1Intensity = pointLights_.GetLightIntensity("Point1");
+		if (ImGui::DragFloat("PointLightIntensity1", &point1Intensity, 0.1f)) {
+			pointLights_.SetLightIntensity("Point1", point1Intensity);
+		}
+		Vector3 point1Position = pointLights_.GetLightPosition("Point1");
+		if (ImGui::DragFloat3("PointLightPosition1", &point1Position.x, 0.1f)) {
+			pointLights_.SetLightPosition("Point1", point1Position);
+		}
+		float point1Radius = pointLights_.GetLightRadius("Point1");
+		if (ImGui::DragFloat("PointLightRadius1", &point1Radius, 0.1f)) {
+			pointLights_.SetLightRadius("Point1", point1Radius);
+		}
+		float point1Decay = pointLights_.GetLightDecay("Point1");
+		if (ImGui::DragFloat("PointLightDecay1", &point1Decay, 0.1f)) {
+			pointLights_.SetLightDecay("Point1", point1Decay);
+		}
+		ImGui::TreePop();
+	}
 #endif
 }
 #pragma endregion

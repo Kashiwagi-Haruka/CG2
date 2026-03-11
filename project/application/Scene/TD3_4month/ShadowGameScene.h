@@ -20,10 +20,10 @@
 
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 
-#include "Light/DirectionalLight.h" 
-#include "Light/PointLight.h"
-#include "Light/SpotLight.h" 
-#include "Light/AreaLight.h"
+#include "Light/DirectionalLight/DirectionalLight.h" 
+#include "Light/PointLight/PointLight.h"
+#include "Light/SpotLight/SpotLight.h" 
+#include "Light/AreaLight/AreaLight.h"
 #include"Audio.h"
 #include <GameObject/Edamame/Edamame.h>
 
@@ -79,15 +79,12 @@ private:
 #pragma region// light
     //DirectionalLight
     DirectionalLight directionalLight_{};
-    //PointLight
-    std::array<PointLight, kMaxPointLights> pointLights_{};
-    uint32_t activePointLightCount_ = 0;
-    //SpotLight
-    std::array<SpotLight, kMaxSpotLights> spotLights_{};
-    uint32_t activeSpotLightCount_ = 0;
-    //AreaLight
-    std::array<AreaLight, kMaxAreaLights> areaLights_{};
-    uint32_t activeAreaLightCount_ = 0;
+	// PointLight
+	PointLight pointLights_{};
+	// SpotLight
+	SpotLight spotLights_{};
+	// AreaLight
+	AreaLight areaLights_{};
 #pragma endregion
 public:
     //シーンのコンストラクタ
