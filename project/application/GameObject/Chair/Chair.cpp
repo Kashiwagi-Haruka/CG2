@@ -55,7 +55,7 @@ void Chair::CheckCollision()
         if (PlayerCommand::GetInstance()->Interact()) {
             // カーソルに追従させて持ち上げる処理
             Vector3 origin = playerCamera_->GetTransform().translate;
-            origin.y -= 1.0f;
+            origin.y -= 0.5f;
             transform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
             transform_.translate.y = (std::max)(transform_.translate.y, 0.0f);
         }

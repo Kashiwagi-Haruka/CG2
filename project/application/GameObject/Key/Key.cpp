@@ -7,14 +7,10 @@
 Key::Key()
 {
 	obj_ = std::make_unique<Object3d>();
-
 	// モデルをセット
 	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/gentleman", "gentleman");
 	obj_->SetModel("gentleman");
 
-#ifdef _DEBUG
-	primitive_ = std::make_unique<Primitive>();
-#endif
 }
 
 void Key::Initialize()
@@ -26,42 +22,25 @@ void Key::Initialize()
 	};
 
 	obj_->Initialize();
-#ifdef _DEBUG
-	primitive_->Initialize(Primitive::Box);
-	primitive_->SetColor({ 1.0f,1.0f,1.0f,0.1f });
-#endif
-	localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
+	//上に伸びてる
+	SetAABB({.min = { -0.5f,0.0f,-0.5f }, .max = { 0.5f,1.0f,0.5f }
+});
+
 }
 
 void Key::Update()
 {
 	obj_->SetTransform(worldTransform_);
 	obj_->Update();
-
-	collisionTransform_ = obj_->GetTransform();
-
-	collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
-	collisionTransform_.rotate = { 0.0f };
-	//objectからの相対距離
-	collisionTransform_.translate.y += 1.375f;
-
-#ifdef _DEBUG
-	primitive_->SetTransform(collisionTransform_);
-	primitive_->Update();
-#endif
 }
 
 void Key::Draw()
 {
 	obj_->Draw();
-#ifdef _DEBUG
-	primitive_->Draw();
-#endif
 }
 
 void Key::SetPlayerCamera(PlayerCamera* camera)
 {
-
 	playerCamera_ = camera;
 }
 
@@ -69,10 +48,7 @@ void Key::SetCamera(Camera* camera)
 {
 	obj_->SetCamera(camera);
 	obj_->UpdateCameraMatrices();
-#ifdef _DEBUG
-	primitive_->SetCamera(camera);
-	primitive_->UpdateCameraMatrices();
-#endif
+
 }
 
 void Key::SetModel(const std::string& filePath)
@@ -86,9 +62,7 @@ void Key::CheckCollision()
 	if (OnCollisionRay()) {
 		if (PlayerCommand::GetInstance()->Interact()) {
 			isGrabbed_ = true;
-		}
-
-	  
+		}  
 	}
 
 	if (isGrabbed_ && !PlayerCommand::GetInstance()->Interact()) {
@@ -106,7 +80,7 @@ void Key::CheckCollision()
 
 bool Key::OnCollisionRay()
 {
-	return playerCamera_->OnCollisionRay(localAABB_, collisionTransform_.translate);
+	return playerCamera_->OnCollisionRay(GetAABB(), worldTransform_.translate);
 }
 
 void Key::OnCollision(Collider* collider)
@@ -115,5 +89,8 @@ void Key::OnCollision(Collider* collider)
 
 Vector3 Key::GetWorldPosition() const
 {
-	return Vector3();
+
+	return worldTransform_.translate;
+	//親子関係を付けている場合はこれ
+//YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
 }
