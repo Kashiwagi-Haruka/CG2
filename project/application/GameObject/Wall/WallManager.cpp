@@ -50,9 +50,9 @@ void WallManager::Update()
 
 void WallManager::Draw()
 {
- /*   for (auto& wall : walls_) {
+    for (auto& wall : walls_) {
         wall->Draw();
-    }*/
+    }
     room1_->Draw();
 }
 
