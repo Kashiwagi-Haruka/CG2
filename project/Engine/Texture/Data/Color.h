@@ -5,9 +5,9 @@
 #include <cstdint>
 namespace Color {
 // 0-255 の RGBA 値を 0.0-1.0 の Vector4 に変換する
-Vector4 RGBAToVector4(int r, int g, int b, int a) { return {static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f}; }
+inline Vector4 RGBAToVector4(int r, int g, int b, int a) { return {static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f}; }
 // 0xRRGGBBAA 形式のカラーコードを Vector4(RGBA) に変換する
-Vector4 ColorCodeToVector4(uint32_t color) {
+inline Vector4 ColorCodeToVector4(uint32_t color) {
 	float r = ((color >> 24) & 0xFF) / 255.0f;
 	float g = ((color >> 16) & 0xFF) / 255.0f;
 	float b = ((color >> 8) & 0xFF) / 255.0f;
@@ -16,7 +16,7 @@ Vector4 ColorCodeToVector4(uint32_t color) {
 	return {r, g, b, a};
 }
 // HSV(0-360, 0-100, 0-100) + Alpha(0-100) を Vector4(RGBA) に変換する
-Vector4 HSVIntToVector4(int h, int s, int v, int a = 100) {
+inline Vector4 HSVIntToVector4(int h, int s, int v, int a = 100) {
 	h = h % 360;
 	if (h < 0)
 		h += 360;

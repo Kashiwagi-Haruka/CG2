@@ -44,7 +44,7 @@ void GameScene::Initialize() {
 	pointLights_.AddPointLight("Point2");
 	pointLights_.SetLightProperties("Point2", {0.4f, 0.4f, 1.0f, 1.0f}, {-75.0f, 5.0f, 75.0f}, 1.0f, 5.0f, 0.7f);
 
-	directionalLight_.SetColor(Color::RGBAToVector4(76.0f, 96.0f, 178.0f, 1.0f));
+	directionalLight_.SetColor(Color::RGBAToVector4(76, 96, 178, 255));
 	directionalLight_.SetDirection({0.0f, -1.0f, 0.5f});
 	directionalLight_.SetIntensity(1.0f);
 
