@@ -19,7 +19,6 @@ public:
     void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
     void SetModel(const std::string& filePath);
-    Transform& GetTransform() { return collisionTransform_; }
     void CheckCollision();
     bool OnCollisionRay();
     /// @brief 衝突時コールバック関数
@@ -29,11 +28,6 @@ public:
     Vector3 GetWorldPosition() const override;
 private:
     std::unique_ptr<Object3d>obj_ = nullptr;
-#ifdef _DEBUG
-    std::unique_ptr<Primitive>primitive_ = nullptr;
-#endif
-    AABB localAABB_ = {};
-    Transform collisionTransform_ = {};
     PlayerCamera* playerCamera_ = nullptr;
 
 	Transform worldTransform_ = {};

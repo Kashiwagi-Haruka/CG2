@@ -18,7 +18,7 @@ PortalManager::PortalManager(Vector3* pos) {
 
     playerPos_ = pos;
 
-    firstWarpPosTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = { 10.0f, 1.5f, 5.0f } };
+    firstWarpPosTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = { 0.0f, 1.5f, 14.0f } };
 
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
     std::unique_ptr<WalkWhiteBoard> walkWhite = std::make_unique<WalkWhiteBoard>();

@@ -69,8 +69,9 @@ void WallManager::Draw()
 
 void WallManager::SetCamera(Camera* camera)
 {
+   
     room1_->SetCamera(camera);
-
+    room1_->UpdateCameraMatrices();
     for (auto& wall : walls_) {
         wall->SetCamera(camera);
     }
