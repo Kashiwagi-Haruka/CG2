@@ -24,8 +24,6 @@ ShadowGameScene::ShadowGameScene()
     playerCamera_->SetPlayerTransformPtr(&player_->GetTransform());
     //テスト地面
     testField_ = std::make_unique<TestField>();
-    //SEを読み込む
-    Portal::LoadSE();
     //ホワイトボード管理
     portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate);
     portalManager_->SetPlayerCamera(playerCamera_.get());
@@ -52,7 +50,7 @@ ShadowGameScene::ShadowGameScene()
 
 ShadowGameScene::~ShadowGameScene()
 {
-    Portal::UnLoadSE();
+    
 }
 
 void ShadowGameScene::Initialize()

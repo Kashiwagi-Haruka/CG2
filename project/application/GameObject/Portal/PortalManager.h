@@ -11,6 +11,7 @@ class PlayerCamera;
 class PortalManager {
 public:
 	PortalManager(Vector3* pos);
+	~PortalManager();
 	void Initialize();
 	void Update();
 	void WarpPlayer(Player* player);
@@ -54,5 +55,8 @@ private:
 
 	const float kWarpTime_ = 2.0f;
 	float warpCoolTimer_ = kWarpTime_;
-
+	//音楽
+	SoundData warpSE_;
+	//ポータル生成時
+	SoundData portalSpawnSE_;
 };

@@ -9,28 +9,12 @@
 #include"Camera.h"
 
 Camera* Portal::sceneCamera_ = nullptr;
-//音楽
-SoundData Portal::warpSE_;
-
-void Portal::LoadSE()
-{
-    warpSE_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/SE/magic.mp3");
-    Audio::GetInstance()->SetSoundVolume(&warpSE_, 1.0f);
-}
-
-void Portal::UnLoadSE()
-{
-    Audio::GetInstance()->SoundUnload(&warpSE_);
-}
-
 
 void Portal::OnCollision(Collider* collider)
 {
     if (!isPlayerHit_) {
         if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-            Audio::GetInstance()->SoundPlayWave(warpSE_, false);
             isPlayerHit_ = true;
-
         }
     }
 }
