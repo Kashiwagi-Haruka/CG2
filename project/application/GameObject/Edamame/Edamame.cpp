@@ -6,12 +6,21 @@
 #include <GameObject/YoshidaMath/CollisionManager/Collider.h>
 #include"Object3d/Object3dCommon.h"
 
+
 Edamame::Edamame()
 {
 	obj_ = std::make_unique<Object3d>();
 	// モデルをセット
 	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/edamame_billboard", "edamame_billboard");
 	obj_->SetModel("edamame_billboard");
+	//枝豆
+	edamameBGM_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/BGM/scl_k1_cb.mp3");
+	Audio::GetInstance()->SetSoundVolume(&edamameBGM_, 1.0f);
+}
+
+Edamame::~Edamame()
+{
+	Audio::GetInstance()->SoundUnload(&edamameBGM_);
 }
 
 void Edamame::Initialize()
@@ -24,6 +33,8 @@ void Edamame::Initialize()
 
 	obj_->Initialize();
 	localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
+
+	isPlaySound_ = false;
 }
 
 void Edamame::Update()
@@ -63,6 +74,34 @@ void Edamame::CheckCollision()
 			worldTransform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
 			worldTransform_.translate.y = (std::max)(worldTransform_.translate.y, 0.25f);
 		}
+
+		if (PlayerCommand::GetInstance()->InteractTrigger()) {
+			if (!isPlaySound_) {
+				isPlaySound_ = true;
+				Audio::GetInstance()->SoundPlayWave(edamameBGM_, false);
+			}
+		}
+	}
+
+	if (isPlaySound_) {
+
+		Vector3 distance = Function::Distance(playerCamera_->GetRay().origin, worldTransform_.translate);
+		float  length = Function::Length(distance);
+
+		if (length >= 100.0f) {
+			Audio::GetInstance()->SetSoundVolume(&edamameBGM_, 0.0f);
+		} else {
+
+			if (length <= 1.0f) {
+				Audio::GetInstance()->SetSoundVolume(&edamameBGM_, 0.25f);
+			} else {
+				Audio::GetInstance()->SetSoundVolume(&edamameBGM_, 1.0f / length * 0.25f);
+			}
+		
+		}
+
+
+
 	}
 }
 

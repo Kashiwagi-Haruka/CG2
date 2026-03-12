@@ -51,6 +51,12 @@ bool PlayerCommand::Interact()
     return input->PushKey(K_Interact) || input->PushButton(Input::PadButton(C_Interact));
 }
 
+bool PlayerCommand::InteractTrigger()
+{
+    auto* input = Input::GetInstance();
+    return input->TriggerKey(K_Interact) || input->TriggerButton(Input::PadButton(C_Interact));
+}
+
 Vector2 PlayerCommand::Rotate(float rotateSpeed)
 {
     auto* input = Input::GetInstance();

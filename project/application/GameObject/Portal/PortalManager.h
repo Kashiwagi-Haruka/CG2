@@ -13,7 +13,7 @@ public:
 	PortalManager(Vector3* pos);
 	void Initialize();
 	void Update();
-	void Draw(bool isShadow, bool drawPortal, bool drawParticle = true);
+	void Draw(bool isShadow, bool drawPortal, bool drawParticle);
 	void SetCamera(Camera* camera);
 	void SetPlayerCamera(PlayerCamera* playerCamera);
 

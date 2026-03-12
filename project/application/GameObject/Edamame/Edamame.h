@@ -3,11 +3,13 @@
 #include <string>
 #include <Object3d/Object3d.h>
 #include "Primitive/Primitive.h"
+#include"Audio.h"
 
 class Edamame
 {
 public:
     Edamame();
+    ~Edamame();
     void Initialize();
     void Update();
     void Draw();
@@ -21,5 +23,7 @@ private:
     AABB localAABB_ = {};
     PlayerCamera* playerCamera_ = nullptr;
     Transform worldTransform_ = {};
+    SoundData edamameBGM_;
+    bool isPlaySound_ = false;
 };
 

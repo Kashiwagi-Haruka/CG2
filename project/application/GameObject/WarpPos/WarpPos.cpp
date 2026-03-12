@@ -30,6 +30,7 @@ void WarpPos::Initialize()
    
     object3d_->Initialize();
     sinTheta_ = 0.0f;
+    camera_->SetFovY(-180.0f);
 }
 
 void WarpPos::SetCamera(Camera* camera)

@@ -128,7 +128,7 @@ void PlayerCamera::SetTransform()
 
     cameraTransform_.translate = playerTransform_->translate;
     cameraTransform_.translate.y += 1.6f;
-    cameraTransform_.translate += ray_.diff*1.25f;
+ /*   cameraTransform_.translate += ray_.diff*1.25f;*/
     camera_->SetTransform(cameraTransform_);
 
 }
