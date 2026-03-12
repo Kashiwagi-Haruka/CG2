@@ -59,4 +59,6 @@ private:
 	SoundData warpSE_;
 	//ポータル生成時
 	SoundData portalSpawnSE_;
+	//打刻機の打刻ショット
+	SoundData shotSE_;
 };

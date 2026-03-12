@@ -41,13 +41,15 @@ PortalManager::PortalManager(Vector3* pos) {
     portalSpawnSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/warp1.mp3");
     Audio::GetInstance()->SetSoundVolume(&portalSpawnSE_, 0.25f);
 
-
+    shotSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/shot.mp3");
+    Audio::GetInstance()->SetSoundVolume(&shotSE_, 0.25f);
 }
 
 PortalManager::~PortalManager()
 {
     Audio::GetInstance()->SoundUnload(&warpSE_);
     Audio::GetInstance()->SoundUnload(&portalSpawnSE_);
+    Audio::GetInstance()->SoundUnload(&shotSE_);
 }
 
 void PortalManager::Initialize() {
@@ -72,9 +74,10 @@ void PortalManager::WarpPlayer(Player* player)
         if (portal->GetIsPlayerHit()) {
             if (warpCoolTimer_ == kWarpTime_) {
                 warpCoolTimer_ = 0.0f;
-                Transform* portalTransform = portal->GetWarpPos()->GetParent();
-                player->SetTranslate(portalTransform->translate);
-                player->SetRotate(portalTransform->rotate);
+
+                Transform*transform = portal->GetWarpPos()->GetParent();
+                player->SetTranslate(transform->translate);
+                player->SetRotate(portal->GetWarpPos()->GetTransform().rotate+ transform->rotate);
 
                 Audio::GetInstance()->SoundPlayWave(warpSE_, false);
                 break;
@@ -83,7 +86,7 @@ void PortalManager::WarpPlayer(Player* player)
     }
 }
 
-bool PortalManager::OnCollisionRay(const AABB& AABB,const Vector3& pos)
+bool PortalManager::OnCollisionRay(const AABB& AABB, const Vector3& pos)
 {
     //打刻機を携帯できるようになった時
     canMakePortal_ = playerCamera_->OnCollisionRay(AABB, pos);
@@ -126,7 +129,7 @@ void PortalManager::SetCamera(Camera* camera)
 
     if (portalParticle_) {
         portalParticle_->SetCamera(camera);
-    }                              
+    }
 };
 
 void PortalManager::DrawWhiteBoard() {
@@ -185,6 +188,9 @@ void PortalManager::CheckCollision() {
         if (OnCollisionRay(board->GetAABB(), board->GetCollisionTransform().translate)) {
 
             if (PlayerCommand::GetInstance()->Shot()) {
+
+                //ショットSE鳴らす
+                Audio::GetInstance()->SoundPlayWave(shotSE_, false);
 
                 if (preWhiteBoards_.size() >= 2) {
                     //ポータルの生成が2個以上になったら
