@@ -10,9 +10,12 @@
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
 #include "Particle/ParticleManager.h"
+#include"GameObject/BGMManager/BGMManager.h"
 
 ShadowGameScene::ShadowGameScene()
 {
+    //BGMの管理
+    BGMManager::Load();
     //シーン遷移の設定
     transition_ = std::make_unique<SceneTransition>();
     //デバックカメラ
@@ -50,11 +53,14 @@ ShadowGameScene::ShadowGameScene()
 
 ShadowGameScene::~ShadowGameScene()
 {
-    
+    //BGMの管理
+    BGMManager::UnLoad();
 }
 
 void ShadowGameScene::Initialize()
 {
+
+    BGMManager::Initialize();
     isPause_ = false;
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;
@@ -102,7 +108,7 @@ void ShadowGameScene::Initialize()
     wallManager2_->Initialize();
 
     SetSceneCameraForDraw(playerCamera_->GetCamera());
-  
+
     //カーソルを画面中央に設定する
     auto* input = Input::GetInstance();
     input->SetIsCursorVisible(false);
@@ -112,6 +118,8 @@ void ShadowGameScene::Initialize()
 
 void ShadowGameScene::Update()
 {
+
+
     //カーソルを画面中央に設定する
     auto* input = Input::GetInstance();
 
@@ -181,14 +189,14 @@ void ShadowGameScene::CheckCollision()
 
     collisionManager_->AddCollider(player_.get());
 
-    
+
     for (auto& portal : portalManager_->GetPortals()) {
         if (!portal->GetIsPlayerHit()) {
             //プレイヤーがヒットしてないときコライダーリストに追加する
             collisionManager_->AddCollider(portal.get());
         } else {
             break;
-        }   
+        }
     }
 
     for (auto& whiteBoard : portalManager_->GetWhiteBoards()) {
@@ -322,11 +330,15 @@ void ShadowGameScene::UpdateGameObject()
     Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength);
     Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength);
 
-    if (PlayerCommand::GetInstance()->Shot()) {
-        if (!isNoise_) {
-            isNoise_ = true;
+
+    for (auto& portal : portalManager_->GetPortals()) {
+        if (portal->GetIsPlayerHit()) {
+            if (!isNoise_) {
+                isNoise_ = true;
+            }
         }
     }
+
     if (isNoise_) {
         float randomNoiseScale = 1.0f;
         noiseTimer_ -= YoshidaMath::kDeltaTime;
@@ -412,19 +424,19 @@ void ShadowGameScene::DrawModel()
     //=======================shadowマップの開始↓=======================
     Object3dCommon::GetInstance()->BeginShadowMapPass();
     Object3dCommon::GetInstance()->DrawCommonShadow();
-    DrawGameObject(true, false, false,true);
+    DrawGameObject(true, false, false, true);
     Object3dCommon::GetInstance()->EndShadowMapPass();
     //=======================shadowマップの終了↑=======================
 
     for (auto& portal : portalManager_->GetPortals()) {
         portal->BeginRender();
         auto* portalCamera = portal->GetCamera();
-        SetCameraAndDraw(portalCamera, false, false,true);
+        SetCameraAndDraw(portalCamera, false, false, true);
         portal->TransitionToShaderResource();
     }
 
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-    SetCameraAndDraw(playerCamera_->GetCamera(), true, true,false);
+    SetCameraAndDraw(playerCamera_->GetCamera(), true, true, false);
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
@@ -472,7 +484,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     wallManager_->SetCamera(camera);
     wallManager2_->SetCamera(camera);
 }
-void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle,bool drawPlayer)
+void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
     Object3dCommon::GetInstance()->SetDefaultCamera(camera);
     SetSceneCameraForDraw(camera);
