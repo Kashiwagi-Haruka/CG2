@@ -2,7 +2,6 @@
 #include "Object3d/Object3dCommon.h"
 #include "GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include "GameObject/KeyBindConfig.h"
-#include "GameObject/TimeCard/TimeCardWatch.h"
 #include "GameObject/WhiteBoard/WalkWhiteBoard.h"
 #include "GameObject/YoshidaMath/YoshidaMath.h"
 #include "Model/ModelManager.h"
@@ -13,6 +12,8 @@
 namespace {
     const constexpr uint32_t kMaxWhiteBoards = 6;
 }
+
+bool PortalManager::canMakePortal_ = false;
 
 PortalManager::PortalManager(Vector3* pos) {
 
@@ -37,6 +38,8 @@ PortalManager::PortalManager(Vector3* pos) {
 }
 
 void PortalManager::Initialize() {
+
+    canMakePortal_ = false;
 
     for (auto& board : whiteBoards_) {
         board->Initialize();
@@ -63,6 +66,13 @@ void PortalManager::WarpPlayer(Player* player)
             }
         }
     }
+}
+
+bool PortalManager::OnCollisionRay(const AABB& AABB,const Vector3& pos)
+{
+    //打刻機を携帯できるようになった時
+    canMakePortal_ = playerCamera_->OnCollisionRay(AABB, pos);
+    return canMakePortal_;
 }
 
 void PortalManager::UpdateWhiteBoard() {
@@ -148,7 +158,7 @@ void PortalManager::Update()
     UpdatePortal();
 }
 
-void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
+void PortalManager::CheckCollision() {
 
     if (isPendingPortalSpawn_) {
         return;
@@ -156,7 +166,8 @@ void PortalManager::CheckCollision(TimeCardWatch* timeCardWatch) {
 
     // whiteBoardとrayの当たり判定
     for (auto& board : whiteBoards_) {
-        if (timeCardWatch->OnCollisionObjOfMakePortal(playerCamera_->GetRay(), board->GetAABB(), board->GetCollisionTransform())) {
+
+        if (OnCollisionRay(board->GetAABB(), board->GetCollisionTransform().translate)) {
 
             if (PlayerCommand::GetInstance()->Shot()) {
 

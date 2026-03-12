@@ -79,7 +79,7 @@ void WhiteBoard::SetModel(const std::string& filePath)
 
 AABB WhiteBoard::GetAABB()
 {
-    return YoshidaMath::GetAABBWorldPos(localAABB_, collisionTransform_.translate);
+    return localAABB_;
 }
 
 void WhiteBoard::ResetCollisionAttribute()

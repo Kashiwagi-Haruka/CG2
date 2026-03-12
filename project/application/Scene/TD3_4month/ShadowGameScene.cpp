@@ -32,6 +32,7 @@ ShadowGameScene::ShadowGameScene()
 
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
+
     //懐中電灯
     flashlight_ = std::make_unique<Flashlight>();
     // 鍵管理
@@ -80,7 +81,6 @@ void ShadowGameScene::Initialize()
     //ホワイトボード管理
     portalManager_->Initialize();
     portalManager_->SetPlayerCamera(playerCamera_.get());
-
 
     //携帯打刻機
     timeCardWatch_->Initialize();
@@ -174,7 +174,7 @@ void ShadowGameScene::DebugImGui()
 void ShadowGameScene::CheckCollision()
 {
     //ホワイトボードとrayの当たり判定作成する
-    portalManager_->CheckCollision(timeCardWatch_.get());
+    portalManager_->CheckCollision();
     key_->CheckCollision();
     edamame_->CheckCollision();
     chair_->CheckCollision();

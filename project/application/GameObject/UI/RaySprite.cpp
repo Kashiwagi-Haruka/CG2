@@ -3,7 +3,7 @@
 #include "Sprite/SpriteCommon.h"
 #include"WinApp.h"
 #include"GameObject/KeyBindConfig.h"
-#include"GameObject/TimeCard/TimeCardWatch.h"
+#include"GameObject/Portal/PortalManager.h"
 
 RaySprite::RaySprite()
 {
@@ -33,7 +33,7 @@ void RaySprite::Update()
 	if (playerCommand->Interact()) {
 		// インタラクトの処理
 		SetTexture(RaySprite::GRAB);
-	} else if(TimeCardWatch::GetCanMakePortal()){
+	} else if(PortalManager::GetCanMakePortal()){
 		SetTexture(RaySprite::PORTAL);
 	} else {
 		SetTexture(RaySprite::HAND);
