@@ -35,6 +35,19 @@ PortalManager::PortalManager(Vector3* pos) {
     }
 
     portalParticle_ = std::make_unique<PortalParticle>();
+    warpSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/warp0.mp3");
+    Audio::GetInstance()->SetSoundVolume(&warpSE_, 0.25f);
+
+    portalSpawnSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/warp1.mp3");
+    Audio::GetInstance()->SetSoundVolume(&portalSpawnSE_, 0.25f);
+
+
+}
+
+PortalManager::~PortalManager()
+{
+    Audio::GetInstance()->SoundUnload(&warpSE_);
+    Audio::GetInstance()->SoundUnload(&portalSpawnSE_);
 }
 
 void PortalManager::Initialize() {
@@ -62,6 +75,8 @@ void PortalManager::WarpPlayer(Player* player)
                 Transform* portalTransform = portal->GetWarpPos()->GetParent();
                 player->SetTranslate(portalTransform->translate);
                 player->SetRotate(portalTransform->rotate);
+
+                Audio::GetInstance()->SoundPlayWave(warpSE_, false);
                 break;
             }
         }
@@ -225,5 +240,5 @@ void PortalManager::SpawnPortal(WhiteBoard* board) {
 
 
     portals_.push_back(std::move(newPortal));
-
+    Audio::GetInstance()->SoundPlayWave(portalSpawnSE_, false);
 }

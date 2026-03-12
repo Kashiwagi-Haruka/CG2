@@ -15,9 +15,6 @@ class Camera;
 class Portal : public YoshidaMath::Collider
 {
 public:
-    //音の設定
-    static void LoadSE();
-    static void UnLoadSE();
     void OnCollision(Collider* collider)override;
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
@@ -58,8 +55,7 @@ private:
     bool isPlayerHit_ = false;
     float scaleTimer_ = 0.0f;
     static Camera* sceneCamera_;
-    //音楽
-    static SoundData warpSE_;
+
     std::unique_ptr<Primitive>ring_ = nullptr;
     std::unique_ptr<PortalMesh>portalCircle_ = nullptr;
     Vector3 ringTranslate_ = { 0.0f };
