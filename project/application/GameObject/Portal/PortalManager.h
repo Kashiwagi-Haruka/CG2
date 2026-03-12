@@ -6,26 +6,29 @@
 #include"Transform.h"
 #include <array>
 class Player;
-class TimeCardWatch;
+
 class PlayerCamera;
 class PortalManager {
 public:
 	PortalManager(Vector3* pos);
 	void Initialize();
 	void Update();
+	void WarpPlayer(Player* player);
 	void Draw(bool isShadow, bool drawPortal, bool drawParticle);
+
 	void SetCamera(Camera* camera);
 	void SetPlayerCamera(PlayerCamera* playerCamera);
-
 	/// @brief 作成できるポータル地点との当たり判定を作成する
 	/// @param timeCardWatch 携帯打刻機
 	/// @param camera かめら
 	/// @param warpPos ワープ地点の設定をする
-	void CheckCollision(TimeCardWatch* timeCardWatch);
+	void CheckCollision();
 	std::vector<std::unique_ptr<Portal>>& GetPortals() { return portals_; };
 	std::vector<std::unique_ptr<WhiteBoard>>& GetWhiteBoards() { return whiteBoards_; }
-	void WarpPlayer(Player* player);
+
+	static bool GetCanMakePortal() { return canMakePortal_; };
 private:
+	bool OnCollisionRay(const AABB& AABB, const Vector3& pos);
 	void UpdateWhiteBoard();
 	void UpdatePortal();
 
@@ -33,6 +36,8 @@ private:
 	void SpawnPortal(WhiteBoard* board);
 	void DrawWhiteBoard();
 	void DrawPortal();
+
+	static bool canMakePortal_;
 
 	std::vector<WhiteBoard*> preWhiteBoards_;
 	std::vector<std::unique_ptr<WhiteBoard>> whiteBoards_;
