@@ -104,6 +104,12 @@ void ShadowGameScene::Initialize()
     wallManager2_->Initialize();
 
     SetSceneCameraForDraw(playerCamera_->GetCamera());
+  
+    //カーソルを画面中央に設定する
+    auto* input = Input::GetInstance();
+    input->SetIsCursorVisible(false);
+    input->SetIsCursorStability(true);
+
 }
 
 void ShadowGameScene::Update()
@@ -170,18 +176,21 @@ void ShadowGameScene::CheckCollision()
     //ホワイトボードとrayの当たり判定作成する
     portalManager_->CheckCollision(timeCardWatch_.get());
     key_->CheckCollision();
-
     edamame_->CheckCollision();
     chair_->CheckCollision();
 
     collisionManager_->ClearColliders();
 
     collisionManager_->AddCollider(player_.get());
-    collisionManager_->AddCollider(chair_.get());
 
-
+    
     for (auto& portal : portalManager_->GetPortals()) {
-        collisionManager_->AddCollider(portal.get());
+        if (!portal->GetIsPlayerHit()) {
+            //プレイヤーがヒットしてないときコライダーリストに追加する
+            collisionManager_->AddCollider(portal.get());
+        } else {
+            break;
+        }   
     }
 
     for (auto& whiteBoard : portalManager_->GetWhiteBoards()) {
@@ -194,8 +203,10 @@ void ShadowGameScene::CheckCollision()
     for (auto& wall : wallManager2_->GetWalls()) {
         collisionManager_->AddCollider(wall.get());
     }
+
     collisionManager_->AddCollider(flashlight_.get());
     collisionManager_->AddCollider(testField_.get());
+    collisionManager_->AddCollider(chair_.get());
 
     collisionManager_->CheckAllCollisions();
 }
@@ -403,21 +414,21 @@ void ShadowGameScene::DrawModel()
     //=======================shadowマップの開始↓=======================
     Object3dCommon::GetInstance()->BeginShadowMapPass();
     Object3dCommon::GetInstance()->DrawCommonShadow();
-    DrawGameObject(true, false, false);
+    DrawGameObject(true, false, false,true);
     Object3dCommon::GetInstance()->EndShadowMapPass();
     //=======================shadowマップの終了↑=======================
 
     for (auto& portal : portalManager_->GetPortals()) {
         portal->BeginRender();
         auto* portalCamera = portal->GetCamera();
-        SetCameraAndDraw(portalCamera, false, false);
+        SetCameraAndDraw(portalCamera, false, false,true);
         portal->TransitionToShaderResource();
     }
 
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-    SetCameraAndDraw(playerCamera_->GetCamera(), true, true);
+    SetCameraAndDraw(playerCamera_->GetCamera(), true, true,false);
 }
-void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle)
+void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
 
     // テスト地面
@@ -441,8 +452,11 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
         Object3dCommon::GetInstance()->DrawCommonSkinning();
     }
 
-    // プレイヤーの描画処理
-    player_->Draw();
+    if (drawPlayer) {
+        // プレイヤーの描画処理
+        player_->Draw();
+    }
+
     //ポータル管理の描画
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
@@ -460,11 +474,11 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     wallManager_->SetCamera(camera);
     wallManager2_->SetCamera(camera);
 }
-void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle)
+void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle,bool drawPlayer)
 {
     Object3dCommon::GetInstance()->SetDefaultCamera(camera);
     SetSceneCameraForDraw(camera);
     Object3dCommon::GetInstance()->DrawCommon();
-    DrawGameObject(false, drawPortal, isDrawParticle);
+    DrawGameObject(false, drawPortal, isDrawParticle, drawPlayer);
 }
 #pragma endregion

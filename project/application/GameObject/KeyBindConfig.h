@@ -44,6 +44,7 @@ public:
 	bool Shot();
 	bool Sneak();
 	bool Interact();
+	bool InteractTrigger();
 	Vector2 Rotate(float rotateSpeed);
 private:	
 

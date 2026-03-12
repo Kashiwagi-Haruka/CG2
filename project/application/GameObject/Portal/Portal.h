@@ -31,7 +31,6 @@ public:
     void Initialize();
     void Update();
     void SetCamera(Camera* camera);
-    const Sphere& GetSphere();
     Transform& GetTransform() {return transform_ ;};
     //PortalのSRTをセットする
     void SetParentTransform(Transform* transform) { parentTransform = transform; };

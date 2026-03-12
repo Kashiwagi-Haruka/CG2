@@ -101,11 +101,7 @@ void PortalManager::SetCamera(Camera* camera)
 
     if (portalParticle_) {
         portalParticle_->SetCamera(camera);
-    }
-
-    //for (auto& portal : portals_) {
-    //    portal->SetCamera(camera);
-    //}                                    
+    }                              
 };
 
 void PortalManager::DrawWhiteBoard() {
@@ -121,18 +117,16 @@ void PortalManager::DrawPortal()
         Object3dCommon::GetInstance()->DrawCommonPortal();
         portal->DrawPortals();
     }
-
-
 }
 
 
 void PortalManager::Draw(bool isShadow, bool drawPortal, bool drawParticle) {
 
     DrawWhiteBoard();
-
     if (drawPortal) {
         DrawPortal();
     }
+
 
     for (auto& portal : portals_) {
         portal->GetWarpPos()->Draw();

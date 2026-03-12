@@ -31,7 +31,7 @@ void WhiteBoard::Initialize()
     localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
 
     /* SetRadius(1.0f);*/
-    SetAABB(AABB{ .min = {-1.0f,0.0f,-1.0f}, .max = {1.0f,1.5f,1.0f} });
+    SetAABB(AABB{ .min = {-0.5f,0.0f,-0.5f}, .max = {0.5f,1.5f,0.5f} });
     SetCollisionAttribute(kCollisionFloor);
     SetCollisionMask(kCollisionPlayer);
 }

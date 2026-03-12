@@ -28,7 +28,6 @@ void Portal::OnCollision(Collider* collider)
 {
     if (!isPlayerHit_) {
         if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-
             Audio::GetInstance()->SoundPlayWave(warpSE_, false);
             isPlayerHit_ = true;
 
@@ -43,18 +42,14 @@ Vector3 Portal::GetWorldPosition() const
 
 Portal::Portal()
 {
-    transform_ = { .scale = {1.5f,1.5f,1.5f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.75f,0.0f} };
-    sphere_ = { .center = {transform_.translate},.radius = 0.5f };
-
+    sphere_ = { .center = {transform_.translate},.radius = 0.0625f*0.25f };
     SetRadius(sphere_.radius);
     SetCollisionAttribute(kCollisionPortal);
     SetCollisionMask(kCollisionPlayer);
 
     ring_ = std::make_unique<Primitive>();
-
     //ワープ座標
     warpPos_ = std::make_unique<WarpPos>();
-
 }
 
 Portal::~Portal()
@@ -70,14 +65,12 @@ void Portal::Initialize()
 {
     isPlayerHit_ = false;
     scaleTimer_ = 0.0f;
+    uvRotateZ_ = 0.0f;
     transform_ = { .scale = {0.0f,0.0f,0.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
     ring_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 128);
     //ライティングしない
     ring_->SetEnableLighting(false);
     ring_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-
-    uvRotateZ_ = 0.0f;
-    sphere_ = { .center = {transform_.translate},.radius = 0.5f };
     //ワープ座標
     warpPos_->Initialize();
 
@@ -206,10 +199,4 @@ void Portal::SetParentTransformToTransform()
 {
     assert(parentTransform);
     transform_ = *parentTransform;
-}
-
-const Sphere& Portal::GetSphere()
-{
-    sphere_ = { .center = {transform_.translate},.radius = 0.5f };
-    return sphere_;
 }
