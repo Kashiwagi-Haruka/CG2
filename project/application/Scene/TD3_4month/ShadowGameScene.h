@@ -36,7 +36,6 @@ private:
     const float kNoiseTimer_ = 0.5f;
     float noiseTimer_ = kNoiseTimer_;
     bool isNoise_ = false;
-
 #pragma region//カメラの設定
 
     std::unique_ptr<PlayerCamera> playerCamera_ = nullptr;

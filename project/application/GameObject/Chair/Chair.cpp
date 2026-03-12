@@ -9,7 +9,7 @@ Chair::Chair()
     obj_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/chair", "chair");
     obj_->SetModel("chair");
-    SetAABB({ .min = {-0.5f,0.0f,-0.5f},.max = {0.25f,0.5f,0.25f} });
+    SetAABB({ .min = {-0.125f,0.0f,-0.125f},.max = {0.125f,0.5f,0.125f} });
     SetCollisionAttribute(kCollisionChair);
     SetCollisionMask(kCollisionPlayer);
 }
