@@ -16,6 +16,8 @@ Edamame::Edamame()
 	//枝豆
 	edamameBGM_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/BGM/scl_k1_cb.mp3");
 	Audio::GetInstance()->SetSoundVolume(&edamameBGM_, 1.0f);
+
+	edamameTrivia_ = std::make_unique<EdamameTrivia>();
 }
 
 Edamame::~Edamame()
@@ -35,12 +37,15 @@ void Edamame::Initialize()
 	localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
 
 	isPlaySound_ = false;
+	edamameTrivia_->Initialize();
+
 }
 
 void Edamame::Update()
 {
 	obj_->SetTransform(worldTransform_);
 	obj_->UpdateBillboard();
+
 }
 
 void Edamame::Draw()
@@ -81,31 +86,38 @@ void Edamame::CheckCollision()
 				Audio::GetInstance()->SoundPlayWave(edamameBGM_, false);
 			}
 		}
+		Trivia();
 	}
 
+}
+
+bool Edamame::OnCollisionRay()
+{
+	return playerCamera_->OnCollisionRay(localAABB_, worldTransform_.translate);
+}
+
+void Edamame::Trivia()
+{
 	if (isPlaySound_) {
+
+		edamameTrivia_->Update();
 
 		Vector3 distance = Function::Distance(playerCamera_->GetRay().origin, worldTransform_.translate);
 		float  length = Function::Length(distance);
 
 		if (length >= 100.0f) {
 			Audio::GetInstance()->SetSoundVolume(&edamameBGM_, 0.0f);
+			edamameTrivia_->SetVol(0.0f);
 		} else {
 
 			if (length <= 1.0f) {
 				Audio::GetInstance()->SetSoundVolume(&edamameBGM_, 0.25f);
+				edamameTrivia_->SetVol(1.0f);
 			} else {
-				Audio::GetInstance()->SetSoundVolume(&edamameBGM_, 1.0f / length * 0.25f);
+				float vol = 1.0f / length;
+				Audio::GetInstance()->SetSoundVolume(&edamameBGM_, vol * 0.25f);
+				edamameTrivia_->SetVol(vol);
 			}
-		
 		}
-
-
-
 	}
-}
-
-bool Edamame::OnCollisionRay()
-{
-	return playerCamera_->OnCollisionRay(localAABB_, worldTransform_.translate);
 }
