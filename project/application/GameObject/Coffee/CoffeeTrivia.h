@@ -7,7 +7,7 @@ class CoffeeTrivia
 private:
     SoundData triviaVoice_;
     std::array<std::string, 6> strings_;
-    uint32_t triviaNum_ = 0;
+    size_t triviaNum_ = 0;
 public:
     CoffeeTrivia();
     ~CoffeeTrivia();
