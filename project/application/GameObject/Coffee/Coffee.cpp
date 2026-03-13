@@ -1,6 +1,8 @@
 #define NOMINMAX
 #include "Coffee.h"
+#include "Camera.h"
 #include "DirectXCommon.h"
+#include "Function.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #include <algorithm>
@@ -10,7 +12,7 @@
 namespace {
 constexpr const char* kCoffeeModelDirectory = "Resources/TD3_3102/3d/Coffee";
 constexpr const char* kCoffeeModelName = "Coffee";
-constexpr uint32_t kCoffeeInstanceCount = 10000;
+constexpr uint32_t kCoffeeInstanceCount = 1000;
 constexpr uint32_t kCoffeeInitialVisibleCount = 100;
 constexpr Vector3 kCoffeeSpawnOrigin = {0.0f, 5.0f, 0.0f};
 constexpr float kCoffeeMinScale = 0.22f;
@@ -47,6 +49,33 @@ struct CellRange {
 	uint32_t begin;
 	uint32_t end;
 };
+
+bool IsVisibleFromCamera(const Camera* camera, const Vector3& position, float radius) {
+	if (camera == nullptr) {
+		return false;
+	}
+
+	const Vector3 viewPosition = Function::TransformVM(position, camera->GetViewMatrix());
+	const float nearZ = camera->GetNearZ();
+	const float farZ = camera->GetFarZ();
+
+	if (viewPosition.z + radius < nearZ || viewPosition.z - radius > farZ) {
+		return false;
+	}
+
+	const float halfFovY = camera->GetFovY() * 0.5f;
+	const float halfHeight = std::tan(halfFovY) * viewPosition.z;
+	const float halfWidth = halfHeight * camera->GetAspectRatio();
+
+	if (std::abs(viewPosition.x) > halfWidth + radius) {
+		return false;
+	}
+	if (std::abs(viewPosition.y) > halfHeight + radius) {
+		return false;
+	}
+
+	return true;
+}
 
 CellCoord ComputeCellCoord(const Vector3& position) {
 	return {
@@ -106,9 +135,7 @@ void Coffee::RunSimulation() {
 	const float deltaTime = simulationParams_.deltaTime;
 	const float gravity = simulationParams_.gravity;
 	const float floorY = simulationParams_.floorY;
-	const Vector3 canTopCenter = simulationParams_.canTopCenter;
 	const float canTopY = simulationParams_.canTopY;
-	const float canTopRadius = simulationParams_.canTopRadius;
 	const float separationBias = simulationParams_.separationBias;
 	const float roomMinX = simulationParams_.roomMinX;
 	const float roomMaxX = simulationParams_.roomMaxX;
@@ -153,19 +180,8 @@ void Coffee::RunSimulation() {
 		instance.position.y += instance.velocity.y * deltaTime;
 		instance.position.z += instance.velocity.z * deltaTime;
 
-		const float offsetXFromCan = instance.position.x - canTopCenter.x;
-		const float offsetZFromCan = instance.position.z - canTopCenter.z;
-		const float horizontalDistSqFromCan = offsetXFromCan * offsetXFromCan + offsetZFromCan * offsetZFromCan;
-		const float canRadius = std::max(canTopRadius - instance.radius, 0.0f);
-		const bool isInsideCanTop = horizontalDistSqFromCan <= canRadius * canRadius;
-
-		if (isInsideCanTop && instance.position.y <= canTopY) {
+		if (instance.position.y <= canTopY) {
 			instance.position.y = canTopY;
-			instance.velocity.y = 0.0f;
-			instance.velocity.x *= kCoffeeGroundFriction;
-			instance.velocity.z *= kCoffeeGroundFriction;
-		} else if (instance.position.y <= floorY) {
-			instance.position.y = floorY;
 			instance.velocity.y = 0.0f;
 			instance.velocity.x *= kCoffeeGroundFriction;
 			instance.velocity.z *= kCoffeeGroundFriction;
@@ -234,8 +250,7 @@ void Coffee::RunSimulation() {
 							const float upperBottom = instances_[upperIndex].position.y - instances_[upperIndex].halfHeight;
 							const float lowerTop = instances_[lowerIndex].position.y + instances_[lowerIndex].halfHeight;
 							if (upperBottom < lowerTop) {
-								pendingPush[upperIndex].y += (lowerTop - upperBottom) + separationBias;
-								instances_[upperIndex].velocity.y = std::max(instances_[upperIndex].velocity.y, 0.0f);
+								instances_[upperIndex].velocity.y = 0.0f;
 							}
 							const float dist = std::sqrt(distSqXZ);
 							const float overlap = minDist - dist;
@@ -291,17 +306,9 @@ void Coffee::RunSimulation() {
 		instance.position.y += pendingPush[i].y;
 		instance.position.z = std::clamp(instance.position.z + pendingPush[i].z, roomMinZ, roomMaxZ);
 
-		const float offsetXFromCan = instance.position.x - canTopCenter.x;
-		const float offsetZFromCan = instance.position.z - canTopCenter.z;
-		const float horizontalDistSqFromCan = offsetXFromCan * offsetXFromCan + offsetZFromCan * offsetZFromCan;
-		const float canRadius = std::max(canTopRadius - instance.radius, 0.0f);
-		const bool isInsideCanTop = horizontalDistSqFromCan <= canRadius * canRadius;
-		if (isInsideCanTop && instance.position.y < canTopY) {
+		if (instance.position.y < canTopY) {
 			instance.position.y = canTopY;
-			instance.velocity.y = std::max(instance.velocity.y, 0.0f);
-		} else if (instance.position.y < floorY) {
-			instance.position.y = floorY;
-			instance.velocity.y = std::max(instance.velocity.y, 0.0f);
+			instance.velocity.y = 0.0f;
 		}
 		if (instance.position.x <= roomMinX || instance.position.x >= roomMaxX) {
 			instance.velocity.x *= -kCoffeeCollisionDamping;
@@ -311,6 +318,7 @@ void Coffee::RunSimulation() {
 		}
 		instancedObject_->SetInstanceOffset(i, instance.position);
 	}
+
 }
 void Coffee::EnsureInstanceCapacity(uint32_t requiredCount) {
 	if (requiredCount <= renderedInstanceCapacity_) {
@@ -336,6 +344,15 @@ void Coffee::EnsureInstanceCapacity(uint32_t requiredCount) {
 void Coffee::Update(Camera* camera, const Vector3& lightDirection) {
 	simulationParams_.deltaTime = std::max(Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime(), 1.0f / 120.0f);
 	RunSimulation();
+
+	for (uint32_t i = 0; i < renderedInstanceCapacity_; ++i) {
+		if (i < activeInstanceCount_ && instances_[i].isActive && IsVisibleFromCamera(camera, instances_[i].position, instances_[i].radius)) {
+			instancedObject_->SetInstanceOffset(i, instances_[i].position);
+		} else {
+			instancedObject_->SetInstanceOffset(i, {0.0f, -1000.0f, 0.0f});
+		}
+	}
+
 	instancedObject_->Update(camera, lightDirection);
 }
 
