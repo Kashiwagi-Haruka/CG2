@@ -15,11 +15,15 @@
       },
       {
         "name": "scl_k1_cb.mp3",
-        "volume": 1.0
+        "volume": 0.25
       },
       {
         "name": "bgm1.mp3",
         "volume": 0.125
+      },
+      {
+        "name": "0.mp3",
+        "volume": 1.0
       }
     ]
   },
@@ -960,11 +964,11 @@
           0.0
         ]
       },
-      "name": "Object 16",
+      "name": "door",
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          -1.5,
           0.0
         ],
         "scale": [
@@ -973,68 +977,68 @@
           1.0
         ],
         "translate": [
+          7.0,
           0.0,
-          0.0,
-          0.0
+          5.0
         ]
       }
     }
   ],
   "primitives": [
     {
-        "index": 0,
-        "material": {
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "distortionFalloff": 1.0,
-            "distortionStrength": 0.0,
-            "enableLighting": true,
-            "environmentCoefficient": 0.0,
-            "grayscaleEnabled": false,
-            "sepiaEnabled": false,
-            "shininess": 40.0,
-            "uvAnchor": [
-                0.0,
-                0.0
-            ],
-            "uvRotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "uvScale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "uvTranslate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        },
-        "name": "poster",
-        "transform": {
-            "rotate": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scale": [
-                0.75,
-                0.75,
-                0.75
-            ],
-            "translate": [
-                0.0,
-                0.0,
-                0.0
-            ]
-        }
+      "index": 0,
+      "material": {
+        "color": [
+          0.9098039269447327,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "poster",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.75,
+          0.75,
+          0.75
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
     },
     {
       "index": 1,
@@ -1513,116 +1517,6 @@
         ]
       },
       "name": "Primitive 9",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "index": 10,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "Primitive 10",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "index": 11,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "Primitive 11",
       "transform": {
         "rotate": [
           0.0,
