@@ -274,6 +274,30 @@ std::vector<Audio::EditorSoundEntry> Audio::GetEditorSoundEntries() const {
 	}
 	return entries;
 }
+// 指定したサウンドの非ループ再生がすべて完了しているかを返す
+bool Audio::IsSoundFinished(const SoundData& soundData) const {
+	const BYTE* targetData = soundData.buffer.data();
+	if (!targetData) {
+		return true;
+	}
+
+	for (const auto& active : activeVoices_) {
+		if (!active.voice || active.audioData != targetData) {
+			continue;
+		}
+		if (active.isLoop) {
+			return false;
+		}
+
+		XAUDIO2_VOICE_STATE state{};
+		active.voice->GetState(&state);
+		if (state.BuffersQueued > 0) {
+			return false;
+		}
+	}
+
+	return true;
+}
 
 // すべての再生中ボイスを停止する
 void Audio::StopAllVoices() {

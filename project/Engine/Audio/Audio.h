@@ -100,6 +100,8 @@ public:
 	void SetSoundVolume(SoundData* soundData, float volume);
 	// エディター表示用のサウンド情報を取得
 	std::vector<EditorSoundEntry> GetEditorSoundEntries() const;
+	// 指定したサウンドが再生完了しているか
+	bool IsSoundFinished(const SoundData& soundData) const;
 	// XAudio2 へのアクセス用 getter
 	Microsoft::WRL::ComPtr<IXAudio2> GetIXAudio2() { return xAudio2_; };
 };
