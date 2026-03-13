@@ -16,6 +16,8 @@ namespace {
     constexpr uint64_t kCollisionChair = 0b1 << 5;
     //壁
     constexpr uint64_t kCollisionWall = 0b1 << 6;
+    //自販機
+    constexpr uint64_t kCollisionVendingMac = 0b1 << 7; 
     //何の陣営にも属さない
     constexpr uint32_t kCollisionNone = 0b0;
 }

@@ -260,6 +260,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameSave\GameSave.cpp" />
     <ClCompile Include="application\GameObject\Wall\Wall.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManager.cpp" />
+    <ClCompile Include="application\GameObject\VendingMac\VendingMac.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -384,6 +385,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameSave\GameSave.h" />
     <ClInclude Include="application\GameObject\Wall\Wall.h" />
     <ClInclude Include="application\GameObject\Wall\WallManager.h" />
+    <ClInclude Include="application\GameObject\VendingMac\VendingMac.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
