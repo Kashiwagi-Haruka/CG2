@@ -16,7 +16,7 @@
 #include <GameObject/Chair/Chair.h>
 #include"GameObject/Wall/WallManager.h"
 #include"GameObject/VendingMac/VendingMac.h"
-
+#include"GameObject/Door/Door.h"
 #pragma endregion
 
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
@@ -76,6 +76,8 @@ private:
     std::unique_ptr<WallManager> wallManager2_ = nullptr;
     //自販機
     std::unique_ptr<VendingMac> vendingMac_ = nullptr;
+    //ドア
+    std::unique_ptr<Door> door_ = nullptr;
 
 #pragma endregion
     //衝突管理

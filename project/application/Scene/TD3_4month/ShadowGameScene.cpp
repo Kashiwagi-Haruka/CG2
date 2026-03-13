@@ -47,6 +47,8 @@ ShadowGameScene::ShadowGameScene()
     wallManager2_ = std::make_unique<WallManager>();
     //自販機
     vendingMac_ = std::make_unique<VendingMac>();
+    //ドア
+    door_ = std::make_unique<Door>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 
@@ -57,6 +59,7 @@ ShadowGameScene::ShadowGameScene()
     edamame_->SetPlayerCamera(playerCamera_.get());
     chair_->SetPlayerCamera(playerCamera_.get());
     vendingMac_->SetPlayerCamera(playerCamera_.get());
+    door_->SetPlayerCamera(playerCamera_.get());
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -83,35 +86,31 @@ void ShadowGameScene::Initialize()
     //デバックカメラの設定
     debugCamera_->Initialize();
     debugCamera_->SetTranslation(playerCamera_->GetTransform().translate);
+
+    InitializeLights();
     //プレイヤーの初期化
     player_->Initialize();
     //テスト地面
     testField_->Initialize();
-
-    InitializeLights();
-
     //ホワイトボード管理
     portalManager_->Initialize();
-
     //携帯打刻機
     timeCardWatch_->Initialize();
-
-
     // 鍵
     key_->Initialize();
-
     // 枝豆
     edamame_->Initialize();
-  
     //椅子
     chair_->Initialize();
-
     //壁
     wallManager_->Initialize();
     //壁
     wallManager2_->Initialize();
     //自販機
     vendingMac_->Initialize();
+    //ドア
+    door_->Initialize();
+
     SetSceneCameraForDraw(playerCamera_->GetCamera());
 
     //カーソルを画面中央に設定する
@@ -219,6 +218,7 @@ void ShadowGameScene::CheckCollision()
     collisionManager_->AddCollider(flashlight_.get());
     collisionManager_->AddCollider(testField_.get());
     collisionManager_->AddCollider(chair_.get());
+    collisionManager_->AddCollider(door_.get());
 
     collisionManager_->CheckAllCollisions();
 }
@@ -385,6 +385,8 @@ void ShadowGameScene::UpdateGameObject()
     wallManager2_->Update();
     //自販機
     vendingMac_->Update();
+    //ドア
+    door_->Update();
     //ポータル管理
     portalManager_->Update();
     ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
@@ -457,6 +459,8 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     wallManager2_->Draw();
     //自販機
     vendingMac_->Draw();
+    //ドア
+    door_->Draw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //懐中電灯
@@ -494,6 +498,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     wallManager_->SetCamera(camera);
     wallManager2_->SetCamera(camera);
     vendingMac_->SetCamera(camera);
+    door_->SetCamera(camera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
