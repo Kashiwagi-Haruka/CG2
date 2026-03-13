@@ -21,6 +21,7 @@ private:
     std::unique_ptr<Primitive>obj_ = nullptr;
     Matrix4x4* parentMat_ = nullptr;
     bool isPlayerHit_ = false;
+   
 };
 
 

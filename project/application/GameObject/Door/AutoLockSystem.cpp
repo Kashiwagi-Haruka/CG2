@@ -7,7 +7,7 @@
 AutoLockSystem::AutoLockSystem()
 {
     obj_ = std::make_unique<Primitive>();
-    SetAABB({ .min = {-0.5f,0.0f,-0.5f},.max = {0.5f,0.2f,0.5f} });
+    SetAABB({ .min = {-0.5f,0.0f,-0.375f},.max = {0.5f,0.02f,0.375f} });
     SetCollisionAttribute(kCollisionMat);
     SetCollisionMask(kCollisionPlayer);
 }
@@ -29,7 +29,9 @@ void AutoLockSystem::Update()
 {
     isPlayerHit_ = false;
     assert(parentMat_);
-    obj_->SetTranslate({ 0.0f,0.0f,-0.5f });
+    obj_->SetTranslate({ 0.0f,0.0f,-0.75f });
+    obj_->SetScale(YoshidaMath::GetAABBScale(GetAABB()));
+
     Transform transform = obj_->GetTransform();
     Matrix4x4 worldMat = Function::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
     worldMat = Function::Multiply(worldMat, *parentMat_);
@@ -41,7 +43,7 @@ void AutoLockSystem::Initialize()
 {
     isPlayerHit_ = false;
     obj_->Initialize(Primitive::Box);
-    obj_->SetScale(YoshidaMath::GetAABBScale(GetAABB()));
+
 }
 
 void AutoLockSystem::Draw()
