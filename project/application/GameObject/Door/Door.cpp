@@ -14,15 +14,24 @@ Door::Door()
     obj_->SetModel("door");
     SetAABB({ .min = {-0.5f,0.0f,-0.5f},.max = {0.5f,1.9f,0.5f} });
     SetCollisionAttribute(kCollisionDoor);
-    SetCollisionMask(kCollisionPlayer);
+    SetCollisionMask(kCollisionPlayer | kCollisionKey);
+
+    autoLockSystem_ = std::make_unique<AutoLockSystem>();
+
+    worldMat_ = Function::MakeIdentity4x4();
+    autoLockSystem_->SetParentMat(&worldMat_);
 }
 
-void Door::OnCollision(Collider* collider)
-{
-    if (collider->GetCollisionAttribute() == kCollisionPlayer) {
+void Door::OnCollision(Collider* collider) {
 
+    if (!isGetKey_) {
+        //キーを持っていなかったら
+        if (collider->GetCollisionAttribute() == kCollisionKey) {
+            isGetKey_ = true;
+        }
     }
 }
+
 
 Vector3 Door::GetWorldPosition() const
 {
@@ -30,16 +39,28 @@ Vector3 Door::GetWorldPosition() const
 }
 
 void Door::Update()
-{   
-    Matrix4x4 worldMat = Function::MakeAffineMatrix(obj_->GetScale(), obj_->GetRotate(), obj_->GetTranslate());
-    obj_->SetWorldMatrix(worldMat);
-    obj_->Update(); 
+{
+    worldMat_ = Function::MakeAffineMatrix(obj_->GetScale(), obj_->GetRotate(), obj_->GetTranslate());
+    obj_->SetWorldMatrix(worldMat_);
+    obj_->Update();
     Animation();
+
+    if (isGetKey_ && isOpen_) {
+        if (autoLockSystem_->GetIsPlayerHit()) {
+            desiredAnimationName = "3Close";
+        }
+    }
+
+    autoLockSystem_->Update();
 }
 
 void Door::Initialize()
 {
     obj_->Initialize();
+    autoLockSystem_->Initialize();
+
+    isGetKey_ = false;
+    isOpen_ = false;
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/door", "door");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "0Idle", true);
@@ -54,19 +75,25 @@ void Door::Initialize()
             obj_->SetSkinCluster(&skinCluster_);
         }
     }
- 
+
 }
 
 void Door::Draw()
 {
     obj_->Draw();
+    autoLockSystem_->Draw();
 }
 
 void Door::CheckCollision()
 {
     //自販機とrayの当たり判定
     if (OnCollisionRay()) {
-        if (PlayerCommand::GetInstance()->Interact()) {
+        if (PlayerCommand::GetInstance()->InteractTrigger()) {
+            if (isGetKey_) {
+                desiredAnimationName = "2Open";
+            } else {
+                desiredAnimationName = "1Lock";
+            }
 
         }
     }
@@ -75,15 +102,7 @@ void Door::CheckCollision()
 void Door::Animation()
 {
 
-    bool loopAnimation = true;
-    desiredAnimationName = "2Open";
-    if (desiredAnimationName == "0Idle") {
-        loopAnimation = false;
-    } else if (desiredAnimationName == "1Lock") {
-        loopAnimation = false;
-    } else if (desiredAnimationName == "2Open") {
-        loopAnimation = true;
-    }
+    bool loopAnimation = false;
 
     const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
     AnimationManager::PlaybackResult playbackResult{};
@@ -102,6 +121,16 @@ void Door::Animation()
         }
     }
 
+    if (playbackResult.animationFinished) {
+        if (desiredAnimationName == "1Lock") {
+            desiredAnimationName = "0Idle";
+        } else if (desiredAnimationName == "2Open") {
+            isOpen_ = true;
+        } else if (desiredAnimationName == "3Close") {
+            isOpen_ = false;
+            desiredAnimationName = "0Idle";
+        }
+    }
 }
 
 bool Door::OnCollisionRay()
@@ -118,4 +147,6 @@ void Door::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
     obj_->UpdateCameraMatrices();
+
+    autoLockSystem_->SetCamera(camera);
 }

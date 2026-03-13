@@ -5,6 +5,7 @@
 #include "Animation/Animation.h"
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
+#include"AutoLockSystem.h"
 
 #include<memory>
 
@@ -26,11 +27,17 @@ public:
     void CheckCollision();
     void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
-  
+    void SetIsGetKey(bool flag) { isGetKey_ = flag; };
+    std::unique_ptr<AutoLockSystem>& GetAutoLockSystem() { return autoLockSystem_; };
+    void SetAnimationName(const std::string& name) { desiredAnimationName = name; }
+    bool GetIsOpen() { return isOpen_; };
 private:
+    bool isGetKey_ = false;
+    bool isOpen_ = false;
+
     void Animation();
     bool OnCollisionRay();
-    const std::string animationGroupName_ = "sizuku";
+    const std::string animationGroupName_ = "Door";
     //骨
     std::unique_ptr<Skeleton> skeleton_{};
     //スキン
@@ -41,5 +48,8 @@ private:
     Animation::AnimationData blendedPoseAnimation_{};
     PlayerCamera* playerCamera_ = nullptr;
     std::unique_ptr<Object3d>obj_ = nullptr;
+    Matrix4x4 worldMat_ = {};
+    //オートロック
+    std::unique_ptr<AutoLockSystem>autoLockSystem_ = nullptr;
 };
 

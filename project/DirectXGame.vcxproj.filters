@@ -327,6 +327,7 @@
     <ClCompile Include="application\GameObject\BGMManager\BGMManager.cpp" />
     <ClCompile Include="application\GameObject\VendingMac\VendingMac.cpp" />
     <ClCompile Include="application\GameObject\Door\Door.cpp" />
+    <ClCompile Include="application\GameObject\Door\AutoLockSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -638,6 +639,7 @@
     <ClInclude Include="application\GameObject\BGMManager\BGMManager.h" />
     <ClInclude Include="application\GameObject\VendingMac\VendingMac.h" />
     <ClInclude Include="application\GameObject\Door\Door.h" />
+    <ClInclude Include="application\GameObject\Door\AutoLockSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
