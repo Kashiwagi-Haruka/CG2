@@ -263,8 +263,7 @@ void Coffee::RunSimulation() {
 							const float upperBottom = instances_[upperIndex].position.y - instances_[upperIndex].halfHeight;
 							const float lowerTop = instances_[lowerIndex].position.y + instances_[lowerIndex].halfHeight;
 							if (upperBottom < lowerTop) {
-								pendingPush[upperIndex].y += (lowerTop - upperBottom) + separationBias;
-								instances_[upperIndex].velocity.y = std::max(instances_[upperIndex].velocity.y, 0.0f);
+								instances_[upperIndex].velocity.y = 0.0f;
 							}
 							const float dist = std::sqrt(distSqXZ);
 							const float overlap = minDist - dist;
@@ -327,10 +326,10 @@ void Coffee::RunSimulation() {
 		const bool isInsideCanTop = horizontalDistSqFromCan <= canRadius * canRadius;
 		if (isInsideCanTop && instance.position.y < canTopY) {
 			instance.position.y = canTopY;
-			instance.velocity.y = std::max(instance.velocity.y, 0.0f);
+			instance.velocity.y = 0.0f;
 		} else if (instance.position.y < floorY) {
 			instance.position.y = floorY;
-			instance.velocity.y = std::max(instance.velocity.y, 0.0f);
+			instance.velocity.y = 0.0f;
 		}
 		if (instance.position.x <= roomMinX || instance.position.x >= roomMaxX) {
 			instance.velocity.x *= -kCoffeeCollisionDamping;
