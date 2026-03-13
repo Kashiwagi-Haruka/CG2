@@ -1,6 +1,8 @@
 #define NOMINMAX
 #include "Coffee.h"
+#include "Camera.h"
 #include "DirectXCommon.h"
+#include "Function.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #include <algorithm>
@@ -47,6 +49,33 @@ struct CellRange {
 	uint32_t begin;
 	uint32_t end;
 };
+
+bool IsVisibleFromCamera(const Camera* camera, const Vector3& position, float radius) {
+	if (camera == nullptr) {
+		return false;
+	}
+
+	const Vector3 viewPosition = Function::TransformVM(position, camera->GetViewMatrix());
+	const float nearZ = camera->GetNearZ();
+	const float farZ = camera->GetFarZ();
+
+	if (viewPosition.z + radius < nearZ || viewPosition.z - radius > farZ) {
+		return false;
+	}
+
+	const float halfFovY = camera->GetFovY() * 0.5f;
+	const float halfHeight = std::tan(halfFovY) * viewPosition.z;
+	const float halfWidth = halfHeight * camera->GetAspectRatio();
+
+	if (std::abs(viewPosition.x) > halfWidth + radius) {
+		return false;
+	}
+	if (std::abs(viewPosition.y) > halfHeight + radius) {
+		return false;
+	}
+
+	return true;
+}
 
 CellCoord ComputeCellCoord(const Vector3& position) {
 	return {
@@ -336,6 +365,15 @@ void Coffee::EnsureInstanceCapacity(uint32_t requiredCount) {
 void Coffee::Update(Camera* camera, const Vector3& lightDirection) {
 	simulationParams_.deltaTime = std::max(Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime(), 1.0f / 120.0f);
 	RunSimulation();
+
+	for (uint32_t i = 0; i < renderedInstanceCapacity_; ++i) {
+		if (i < activeInstanceCount_ && instances_[i].isActive && IsVisibleFromCamera(camera, instances_[i].position, instances_[i].radius)) {
+			instancedObject_->SetInstanceOffset(i, instances_[i].position);
+		} else {
+			instancedObject_->SetInstanceOffset(i, {0.0f, -1000.0f, 0.0f});
+		}
+	}
+
 	instancedObject_->Update(camera, lightDirection);
 }
 
