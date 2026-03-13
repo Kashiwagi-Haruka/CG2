@@ -23,9 +23,9 @@ void Key::Initialize()
 
 	obj_->Initialize();
 	//上に伸びてる
-	SetAABB({.min = { -0.5f,0.0f,-0.5f }, .max = { 0.5f,1.0f,0.5f }
-});
-
+	SetAABB({.min = { -0.5f,0.0f,-0.5f }, .max = { 0.5f,1.0f,0.5f }});
+	SetCollisionAttribute(kCollisionKey);
+	SetCollisionMask(kCollisionDoor);
 }
 
 void Key::Update()
@@ -85,6 +85,7 @@ bool Key::OnCollisionRay()
 
 void Key::OnCollision(Collider* collider)
 {
+
 }
 
 Vector3 Key::GetWorldPosition() const

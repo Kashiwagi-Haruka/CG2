@@ -188,6 +188,7 @@ void ShadowGameScene::CheckCollision()
     key_->CheckCollision();
     edamame_->CheckCollision();
     chair_->CheckCollision();
+    door_->CheckCollision();
 
     collisionManager_->ClearColliders();
 
@@ -218,7 +219,14 @@ void ShadowGameScene::CheckCollision()
     collisionManager_->AddCollider(flashlight_.get());
     collisionManager_->AddCollider(testField_.get());
     collisionManager_->AddCollider(chair_.get());
-    collisionManager_->AddCollider(door_.get());
+
+    collisionManager_->AddCollider(door_->GetAutoLockSystem().get());
+
+    if (!door_->GetIsOpen()) {
+        collisionManager_->AddCollider(door_.get());
+    }
+  
+    collisionManager_->AddCollider(key_.get());
 
     collisionManager_->CheckAllCollisions();
 }
