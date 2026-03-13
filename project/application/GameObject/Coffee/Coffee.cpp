@@ -12,7 +12,7 @@
 namespace {
 constexpr const char* kCoffeeModelDirectory = "Resources/TD3_3102/3d/Coffee";
 constexpr const char* kCoffeeModelName = "Coffee";
-constexpr uint32_t kCoffeeInstanceCount = 10000;
+constexpr uint32_t kCoffeeInstanceCount = 1000;
 constexpr uint32_t kCoffeeInitialVisibleCount = 100;
 constexpr Vector3 kCoffeeSpawnOrigin = {0.0f, 5.0f, 0.0f};
 constexpr float kCoffeeMinScale = 0.22f;
@@ -135,9 +135,7 @@ void Coffee::RunSimulation() {
 	const float deltaTime = simulationParams_.deltaTime;
 	const float gravity = simulationParams_.gravity;
 	const float floorY = simulationParams_.floorY;
-	const Vector3 canTopCenter = simulationParams_.canTopCenter;
 	const float canTopY = simulationParams_.canTopY;
-	const float canTopRadius = simulationParams_.canTopRadius;
 	const float separationBias = simulationParams_.separationBias;
 	const float roomMinX = simulationParams_.roomMinX;
 	const float roomMaxX = simulationParams_.roomMaxX;
@@ -182,19 +180,8 @@ void Coffee::RunSimulation() {
 		instance.position.y += instance.velocity.y * deltaTime;
 		instance.position.z += instance.velocity.z * deltaTime;
 
-		const float offsetXFromCan = instance.position.x - canTopCenter.x;
-		const float offsetZFromCan = instance.position.z - canTopCenter.z;
-		const float horizontalDistSqFromCan = offsetXFromCan * offsetXFromCan + offsetZFromCan * offsetZFromCan;
-		const float canRadius = std::max(canTopRadius - instance.radius, 0.0f);
-		const bool isInsideCanTop = horizontalDistSqFromCan <= canRadius * canRadius;
-
-		if (isInsideCanTop && instance.position.y <= canTopY) {
+		if (instance.position.y <= canTopY) {
 			instance.position.y = canTopY;
-			instance.velocity.y = 0.0f;
-			instance.velocity.x *= kCoffeeGroundFriction;
-			instance.velocity.z *= kCoffeeGroundFriction;
-		} else if (instance.position.y <= floorY) {
-			instance.position.y = floorY;
 			instance.velocity.y = 0.0f;
 			instance.velocity.x *= kCoffeeGroundFriction;
 			instance.velocity.z *= kCoffeeGroundFriction;
@@ -319,16 +306,8 @@ void Coffee::RunSimulation() {
 		instance.position.y += pendingPush[i].y;
 		instance.position.z = std::clamp(instance.position.z + pendingPush[i].z, roomMinZ, roomMaxZ);
 
-		const float offsetXFromCan = instance.position.x - canTopCenter.x;
-		const float offsetZFromCan = instance.position.z - canTopCenter.z;
-		const float horizontalDistSqFromCan = offsetXFromCan * offsetXFromCan + offsetZFromCan * offsetZFromCan;
-		const float canRadius = std::max(canTopRadius - instance.radius, 0.0f);
-		const bool isInsideCanTop = horizontalDistSqFromCan <= canRadius * canRadius;
-		if (isInsideCanTop && instance.position.y < canTopY) {
+		if (instance.position.y < canTopY) {
 			instance.position.y = canTopY;
-			instance.velocity.y = 0.0f;
-		} else if (instance.position.y < floorY) {
-			instance.position.y = floorY;
 			instance.velocity.y = 0.0f;
 		}
 		if (instance.position.x <= roomMinX || instance.position.x >= roomMaxX) {
@@ -339,6 +318,7 @@ void Coffee::RunSimulation() {
 		}
 		instancedObject_->SetInstanceOffset(i, instance.position);
 	}
+
 }
 void Coffee::EnsureInstanceCapacity(uint32_t requiredCount) {
 	if (requiredCount <= renderedInstanceCapacity_) {
