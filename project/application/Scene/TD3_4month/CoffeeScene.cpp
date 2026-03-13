@@ -25,6 +25,7 @@ CoffeeScene::CoffeeScene() {
 	    .rotate = {0.0f, 0.0f, 0.0f },
 	    .translate = {0.0f, 1.5f, -5.0f},
 	};
+
 }
 
 void CoffeeScene::Initialize() {

@@ -33,7 +33,6 @@ ShadowGameScene::ShadowGameScene()
 
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
-
     //懐中電灯
     flashlight_ = std::make_unique<Flashlight>();
     // 鍵管理
@@ -46,9 +45,18 @@ ShadowGameScene::ShadowGameScene()
     wallManager_ = std::make_unique<WallManager>();
     //壁管理
     wallManager2_ = std::make_unique<WallManager>();
-
+    //自販機
+    vendingMac_ = std::make_unique<VendingMac>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
+
+    portalManager_->SetPlayerCamera(playerCamera_.get());
+    //Playerの座標のポインタを入れる
+    timeCardWatch_->SetTransformPtr(&player_->GetTransform());
+    key_->SetPlayerCamera(playerCamera_.get());
+    edamame_->SetPlayerCamera(playerCamera_.get());
+    chair_->SetPlayerCamera(playerCamera_.get());
+    vendingMac_->SetPlayerCamera(playerCamera_.get());
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -84,29 +92,26 @@ void ShadowGameScene::Initialize()
 
     //ホワイトボード管理
     portalManager_->Initialize();
-    portalManager_->SetPlayerCamera(playerCamera_.get());
 
     //携帯打刻機
     timeCardWatch_->Initialize();
-    //Playerの座標のポインタを入れる
-    timeCardWatch_->SetTransformPtr(&player_->GetTransform());
+
 
     // 鍵
     key_->Initialize();
-    key_->SetPlayerCamera(playerCamera_.get());
 
     // 枝豆
     edamame_->Initialize();
-    edamame_->SetPlayerCamera(playerCamera_.get());
-
+  
     //椅子
     chair_->Initialize();
-    chair_->SetPlayerCamera(playerCamera_.get());
+
     //壁
     wallManager_->Initialize();
     //壁
     wallManager2_->Initialize();
-
+    //自販機
+    vendingMac_->Initialize();
     SetSceneCameraForDraw(playerCamera_->GetCamera());
 
     //カーソルを画面中央に設定する
@@ -210,6 +215,7 @@ void ShadowGameScene::CheckCollision()
         collisionManager_->AddCollider(wall.get());
     }
 
+    collisionManager_->AddCollider(vendingMac_.get());
     collisionManager_->AddCollider(flashlight_.get());
     collisionManager_->AddCollider(testField_.get());
     collisionManager_->AddCollider(chair_.get());
@@ -377,6 +383,8 @@ void ShadowGameScene::UpdateGameObject()
     wallManager_->Update();
     //壁管理
     wallManager2_->Update();
+    //自販機
+    vendingMac_->Update();
     //ポータル管理
     portalManager_->Update();
     ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
@@ -447,6 +455,8 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     wallManager_->Draw();
     //壁管理
     wallManager2_->Draw();
+    //自販機
+    vendingMac_->Draw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //懐中電灯
@@ -483,6 +493,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     chair_->SetCamera(camera);
     wallManager_->SetCamera(camera);
     wallManager2_->SetCamera(camera);
+    vendingMac_->SetCamera(camera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {

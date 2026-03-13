@@ -18,7 +18,6 @@ private:
 	std::unique_ptr<Coffee> coffee_ = nullptr;
 	Transform cameraTransform_{};
 	bool useDebugCamera_ = false;
-
 public:
 	CoffeeScene();
 	~CoffeeScene() override = default;

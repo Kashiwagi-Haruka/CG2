@@ -15,6 +15,7 @@
 #include"GameObject/Key/Key.h"
 #include <GameObject/Chair/Chair.h>
 #include"GameObject/Wall/WallManager.h"
+#include"GameObject/VendingMac/VendingMac.h"
 
 #pragma endregion
 
@@ -73,6 +74,9 @@ private:
     std::unique_ptr<WallManager> wallManager_ = nullptr;
     //壁管理2こめ
     std::unique_ptr<WallManager> wallManager2_ = nullptr;
+    //自販機
+    std::unique_ptr<VendingMac> vendingMac_ = nullptr;
+
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

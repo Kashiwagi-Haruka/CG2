@@ -325,6 +325,7 @@
     <ClCompile Include="application\GameObject\Edamame\EdamameTrivia.cpp" />
     <ClCompile Include="application\GameObject\Coffee\CoffeeTrivia.cpp" />
     <ClCompile Include="application\GameObject\BGMManager\BGMManager.cpp" />
+    <ClCompile Include="application\GameObject\VendingMac\VendingMac.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -634,6 +635,7 @@
     <ClInclude Include="application\GameObject\Edamame\EdamameTrivia.h" />
     <ClInclude Include="application\GameObject\Coffee\CoffeeTrivia.h" />
     <ClInclude Include="application\GameObject\BGMManager\BGMManager.h" />
+    <ClInclude Include="application\GameObject\VendingMac\VendingMac.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

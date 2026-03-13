@@ -2,8 +2,24 @@
   "audio": {
     "sounds": [
       {
-        "name": "magic.mp3",
+        "name": "warp0.mp3",
+        "volume": 0.25
+      },
+      {
+        "name": "warp1.mp3",
+        "volume": 0.25
+      },
+      {
+        "name": "shot.mp3",
+        "volume": 0.25
+      },
+      {
+        "name": "scl_k1_cb.mp3",
         "volume": 1.0
+      },
+      {
+        "name": "bgm1.mp3",
+        "volume": 0.125
       }
     ]
   },
@@ -864,7 +880,7 @@
         ],
         "distortionFalloff": 1.0,
         "distortionStrength": 0.0,
-        "enableLighting": true,
+        "enableLighting": false,
         "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
@@ -889,11 +905,11 @@
           0.0
         ]
       },
-      "name": "Object 15",
+      "name": "vendingMac",
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -904,7 +920,7 @@
         "translate": [
           0.0,
           0.0,
-          0.0
+          8.5
         ]
       }
     },
@@ -1056,7 +1072,7 @@
           0.0
         ]
       },
-      "name": "Primitive 1",
+      "name": "poster",
       "transform": {
         "rotate": [
           0.0,
