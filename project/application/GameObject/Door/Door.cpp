@@ -7,6 +7,9 @@
 #include"DirectXCommon.h"
 #include"Animation/AnimationManager.h"
 
+SoundData Door::doorLockSE_;
+SoundData Door::doorOpenSE_;
+
 Door::Door()
 {
     obj_ = std::make_unique<Object3d>();
@@ -20,6 +23,19 @@ Door::Door()
 
     worldMat_ = Function::MakeIdentity4x4();
     autoLockSystem_->SetParentMat(&worldMat_);
+
+    doorLockSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/doorLock.mp3");
+    doorOpenSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/doorOpen.mp3");
+
+    Audio::GetInstance()->SetSoundVolume(&doorLockSE_, 0.25f);
+    Audio::GetInstance()->SetSoundVolume(&doorOpenSE_, 0.25f);
+
+}
+
+Door::~Door()
+{
+    Audio::GetInstance()->SoundUnload(&doorLockSE_);
+    Audio::GetInstance()->SoundUnload(&doorOpenSE_);
 }
 
 void Door::OnCollision(Collider* collider) {
@@ -31,7 +47,6 @@ void Door::OnCollision(Collider* collider) {
         }
     }
 }
-
 
 Vector3 Door::GetWorldPosition() const
 {
@@ -45,10 +60,30 @@ void Door::Update()
     obj_->Update();
     Animation();
 
-    if (isGetKey_ && isOpen_) {
-        if (autoLockSystem_->GetIsPlayerHit()) {
-            desiredAnimationName = "3Close";
+    if (animationFinished_) {
+
+        if (desiredAnimationName == "1Lock") {
+            //アイドル状態に戻す
+            desiredAnimationName = "0Idle";
+
+        } else  if (desiredAnimationName == "2Open") {
+            
+            if (!isOpen_) {
+                isOpen_ = true;
+            }
+
+            if (autoLockSystem_->GetIsPlayerHit()) {
+                desiredAnimationName = "3Close";
+            }
+
+        } else if (desiredAnimationName == "3Close") {
+
+            if (isOpen_) {
+                isOpen_ = false;  
+                desiredAnimationName = "0Idle";
+            } 
         }
+       
     }
 
     autoLockSystem_->Update();
@@ -91,16 +126,19 @@ void Door::CheckCollision()
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (isGetKey_) {
                 desiredAnimationName = "2Open";
+                Audio::GetInstance()->SoundPlayWave(doorOpenSE_, false);
             } else {
                 desiredAnimationName = "1Lock";
+                Audio::GetInstance()->SoundPlayWave(doorLockSE_, false);
             }
-
         }
     }
 }
 
 void Door::Animation()
 {
+
+
 
     bool loopAnimation = false;
 
@@ -121,16 +159,8 @@ void Door::Animation()
         }
     }
 
-    if (playbackResult.animationFinished) {
-        if (desiredAnimationName == "1Lock") {
-            desiredAnimationName = "0Idle";
-        } else if (desiredAnimationName == "2Open") {
-            isOpen_ = true;
-        } else if (desiredAnimationName == "3Close") {
-            isOpen_ = false;
-           /* desiredAnimationName = "0Idle";*/
-        }
-    }
+
+
 }
 
 bool Door::OnCollisionRay()
