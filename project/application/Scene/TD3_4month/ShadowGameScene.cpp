@@ -192,6 +192,7 @@ void ShadowGameScene::CheckCollision()
     edamame_->CheckCollision();
     chair_->CheckCollision();
     door_->CheckCollision();
+    vendingMac_->CheckCollision();
 
     collisionManager_->ClearColliders();
 
@@ -284,14 +285,6 @@ void ShadowGameScene::InitializeLights()
     areaLights_[1].radius = 0.1f;
     areaLights_[1].decay = 2.0f;
 
-    areaLights_[2].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    areaLights_[2].position = { -5.0f, 3.0f, 0.0f };
-    areaLights_[2].normal = { 1.0f, -1.0f, 0.0f };
-    areaLights_[2].intensity = 4.0f;
-    areaLights_[2].width = 2.0f;
-    areaLights_[2].height = 2.0f;
-    areaLights_[2].radius = 0.1f;
-    areaLights_[2].decay = 2.0f;
 }
 #pragma region //private更新処理
 void ShadowGameScene::UpdateCamera()
