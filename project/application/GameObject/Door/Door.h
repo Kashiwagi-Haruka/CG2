@@ -6,6 +6,7 @@
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
 #include"AutoLockSystem.h"
+#include"Audio.h"
 
 #include<memory>
 
@@ -16,6 +17,7 @@ class Door :
 {
 public:
     Door();
+    ~Door();
     /// @brief 衝突時コールバック関数
     void OnCollision(Collider* collider)override;
     /// @brief ワールド座標を取得する
@@ -32,6 +34,8 @@ public:
     void SetAnimationName(const std::string& name) { desiredAnimationName = name; }
     bool GetIsOpen() { return isOpen_; };
 private:
+    static SoundData doorLockSE_;
+    static SoundData doorOpenSE_;
     bool isGetKey_ = false;
     bool isOpen_ = false;
 
