@@ -4,6 +4,7 @@
 #include"Object3d/Object3d.h"
 #include<memory>
 #include "Light/AreaLight.h"
+#include"Audio.h"
 
 class Camera;
 
@@ -12,6 +13,7 @@ class VendingMac :
 {
 public:
     VendingMac();
+    ~VendingMac();
     /// @brief 衝突時コールバック関数
     void OnCollision(Collider* collider)override;
     /// @brief ワールド座標を取得する
@@ -25,6 +27,8 @@ public:
     void SetCamera(Camera* camera);
     AreaLight& GetAreaLight() { return  areaLight_; }
 private:
+    float GetVol(float length, float maxVol);
+    static SoundData noise_;
     bool OnCollisionRay();
     PlayerCamera* playerCamera_ = nullptr;
     std::unique_ptr<Object3d>obj_ = nullptr;
