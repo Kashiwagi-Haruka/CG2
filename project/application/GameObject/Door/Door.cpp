@@ -12,7 +12,7 @@ Door::Door()
     obj_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/door", "door");
     obj_->SetModel("door");
-    SetAABB({ .min = {-0.5f,0.0f,-0.5f},.max = {0.5f,1.9f,0.5f} });
+    SetAABB({ .min = {-0.125f,0.0f,-0.125f},.max = {0.125f,1.9f,0.125f} });
     SetCollisionAttribute(kCollisionDoor);
     SetCollisionMask(kCollisionPlayer | kCollisionKey);
 
@@ -35,7 +35,7 @@ void Door::OnCollision(Collider* collider) {
 
 Vector3 Door::GetWorldPosition() const
 {
-    return obj_->GetTranslate();
+    return YoshidaMath::GetWorldPosByMat(worldMat_);
 }
 
 void Door::Update()
@@ -128,7 +128,7 @@ void Door::Animation()
             isOpen_ = true;
         } else if (desiredAnimationName == "3Close") {
             isOpen_ = false;
-            desiredAnimationName = "0Idle";
+           /* desiredAnimationName = "0Idle";*/
         }
     }
 }
