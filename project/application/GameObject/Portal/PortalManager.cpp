@@ -75,9 +75,10 @@ void PortalManager::WarpPlayer(Player* player)
             if (warpCoolTimer_ == kWarpTime_) {
                 warpCoolTimer_ = 0.0f;
 
-                Transform*transform = portal->GetWarpPos()->GetParent();
-                player->SetTranslate(transform->translate);
-                player->SetRotate(portal->GetWarpPos()->GetTransform().rotate+ transform->rotate);
+                Transform transform = *portal->GetWarpPos()->GetParent();
+                transform.translate.y = 0.0f;
+                player->SetTranslate(transform.translate);
+                player->SetRotate(portal->GetWarpPos()->GetTransform().rotate+ transform.rotate);
 
                 Audio::GetInstance()->SoundPlayWave(warpSE_, false);
                 break;
