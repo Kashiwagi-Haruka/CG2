@@ -28,7 +28,6 @@
 #include"Audio.h"
 #include <GameObject/Edamame/Edamame.h>
 
-
 class ShadowGameScene : public BaseScene
 {
 private:

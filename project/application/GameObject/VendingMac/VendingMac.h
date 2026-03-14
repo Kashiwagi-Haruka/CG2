@@ -3,6 +3,7 @@
 #include "GameObject/YoshidaMath/CollisionManager/Collider.h"
 #include"Object3d/Object3d.h"
 #include<memory>
+#include "Light/AreaLight.h"
 
 class Camera;
 
@@ -22,9 +23,12 @@ public:
     void CheckCollision();
     void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
+    AreaLight& GetAreaLight() { return  areaLight_; }
 private:
     bool OnCollisionRay();
     PlayerCamera* playerCamera_ = nullptr;
     std::unique_ptr<Object3d>obj_ = nullptr;
+    AreaLight areaLight_;
+    Vector3 translate_ = { 0.0f };
 };
 

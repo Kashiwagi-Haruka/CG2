@@ -55,6 +55,7 @@ ShadowGameScene::ShadowGameScene()
     portalManager_->SetPlayerCamera(playerCamera_.get());
     //Playerの座標のポインタを入れる
     timeCardWatch_->SetTransformPtr(&player_->GetTransform());
+
     key_->SetPlayerCamera(playerCamera_.get());
     edamame_->SetPlayerCamera(playerCamera_.get());
     chair_->SetPlayerCamera(playerCamera_.get());
@@ -140,6 +141,9 @@ void ShadowGameScene::Update()
         }
     }
 
+    //ライトの更新処理
+    UpdateLight();
+
     if (isPause_) {
         return;
     }
@@ -148,8 +152,7 @@ void ShadowGameScene::Update()
     UpdateSceneTransition();
     //カメラの更新処理
     UpdateCamera();
-    //ライトの更新処理
-    UpdateLight();
+
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
 
@@ -235,7 +238,6 @@ void ShadowGameScene::InitializeLights()
 {
     //懐中電灯
     flashlight_->Initialize();
-    flashlight_->SetCamera(playerCamera_->GetCamera());
 
     activePointLightCount_ = 2;
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -263,7 +265,7 @@ void ShadowGameScene::InitializeLights()
     spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
     spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 
-    activeAreaLightCount_ = 2;
+    activeAreaLightCount_ = 3;
     areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     areaLights_[0].position = { 0.0f, 3.0f, 0.0f };
     areaLights_[0].normal = { 1.0f, -1.0f, 0.0f };
@@ -281,6 +283,15 @@ void ShadowGameScene::InitializeLights()
     areaLights_[1].height = 2.0f;
     areaLights_[1].radius = 0.1f;
     areaLights_[1].decay = 2.0f;
+
+    areaLights_[2].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    areaLights_[2].position = { -5.0f, 3.0f, 0.0f };
+    areaLights_[2].normal = { 1.0f, -1.0f, 0.0f };
+    areaLights_[2].intensity = 4.0f;
+    areaLights_[2].width = 2.0f;
+    areaLights_[2].height = 2.0f;
+    areaLights_[2].radius = 0.1f;
+    areaLights_[2].decay = 2.0f;
 }
 #pragma region //private更新処理
 void ShadowGameScene::UpdateCamera()
@@ -391,8 +402,7 @@ void ShadowGameScene::UpdateGameObject()
     wallManager_->Update();
     //壁管理
     wallManager2_->Update();
-    //自販機
-    vendingMac_->Update();
+
     //ドア
     door_->Update();
     //ポータル管理
@@ -406,8 +416,9 @@ void ShadowGameScene::UpdateLight()
     //懐中電灯
     flashlight_->Update();
     spotLights_[1] = flashlight_->GetSpotLight();
-
-
+    areaLights_[2] = vendingMac_->GetAreaLight();
+    //自販機
+    vendingMac_->Update();
 #ifdef USE_IMGUI
     if (ImGui::TreeNode("PointLight")) {
         ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);

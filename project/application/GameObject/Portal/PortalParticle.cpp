@@ -8,6 +8,7 @@
 uint32_t PortalParticle::nextId_ = 0;
 
 PortalParticle::PortalParticle() {
+
 	ParticleManager::GetInstance()->CreateParticleGroup("portalBall", "Resources/2d/defaultParticle.png");
 
 	emitter_ = std::make_unique<ParticleEmitter>("portalBall");
@@ -40,7 +41,6 @@ PortalParticle::PortalParticle() {
 	primitive_->SetColor({0.2f, 0.6f, 1.0f, 1.0f});
 	transform_.scale = {0.1f, 0.1f, 0.1f};
 	primitive_->SetScale(transform_.scale);
-
 
 	particleTransform_.scale = {0.01f, 0.01f, 0.01f};
 }
@@ -137,7 +137,6 @@ void PortalParticle::Draw() {
 	if (!isVisible_) {
 		return;
 	}
-
 
 	if (primitive_) {
 		primitive_->Draw();
