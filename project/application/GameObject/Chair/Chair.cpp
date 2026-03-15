@@ -46,12 +46,12 @@ Vector3 Chair::GetWorldPosition() const
 void Chair::Update()
 {
     if (mirrorTransform_ != nullptr) {
-        transform_.translate.x = mirrorTransform_->translate.x;
+        transform_.translate.x =- mirrorTransform_->translate.x;
         transform_.translate.y = mirrorTransform_->translate.y;
-        transform_.translate.z = -mirrorTransform_->translate.z;
+        transform_.translate.z = mirrorTransform_->translate.z;
 
         transform_.rotate.x = mirrorTransform_->rotate.x;
-        transform_.rotate.y = -mirrorTransform_->rotate.y+Function::kPi;
+        transform_.rotate.y = -mirrorTransform_->rotate.y;
         transform_.rotate.z = mirrorTransform_->rotate.z;
 
         transform_.scale.x = mirrorTransform_->scale.x;

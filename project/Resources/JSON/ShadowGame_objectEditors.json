@@ -15,7 +15,7 @@
       },
       {
         "name": "scl_k1_cb.mp3",
-        "volume": 0.1321771889925003
+        "volume": 1.0
       },
       {
         "name": "doorLock.mp3",
@@ -27,15 +27,11 @@
       },
       {
         "name": "noise.mp3",
-        "volume": 0.05061165988445282
+        "volume": 0.055278100073337555
       },
       {
         "name": "bgm1.mp3",
         "volume": 0.125
-      },
-      {
-        "name": "1.mp3",
-        "volume": 0.5287087559700012
       }
     ]
   },
@@ -155,7 +151,7 @@
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          -1.5,
           0.0
         ],
         "scale": [
@@ -164,8 +160,8 @@
           1.0
         ],
         "translate": [
-          1.0,
-          0.36000001430511475,
+          1.5,
+          0.0,
           0.0
         ]
       }
@@ -329,9 +325,9 @@
           1.0
         ],
         "translate": [
-          -5.46999979019165,
+          -11.600000381469727,
           0.0,
-          6.550000190734863
+          0.9300000071525574
         ]
       }
     },
@@ -384,9 +380,9 @@
           1.0
         ],
         "translate": [
-          2.5899999141693115,
+          10.270000457763672,
           0.0,
-          10.0
+          0.12999999523162842
         ]
       }
     },
@@ -430,7 +426,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.140000104904175,
+          1.5,
           0.0
         ],
         "scale": [
@@ -439,9 +435,9 @@
           1.0
         ],
         "translate": [
+          -1.5,
           0.0,
-          0.0,
-          -1.5
+          0.0
         ]
       }
     },
@@ -485,7 +481,7 @@
       "transform": {
         "rotate": [
           0.0,
-          -1.0800000429153442,
+          -1.5,
           0.0
         ],
         "scale": [
@@ -980,7 +976,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.140000104904175,
+          -1.5700000524520874,
           0.0
         ],
         "scale": [
@@ -989,9 +985,9 @@
           1.0
         ],
         "translate": [
+          7.0,
           0.0,
-          0.0,
-          7.0
+          0.0
         ]
       }
     },
@@ -1035,7 +1031,7 @@
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          1.5700000524520874,
           0.0
         ],
         "scale": [
@@ -1044,9 +1040,9 @@
           1.0
         ],
         "translate": [
+          -7.0,
           0.0,
-          0.0,
-          -7.0
+          0.0
         ]
       }
     },
@@ -1090,7 +1086,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.140000104904175,
+          0.0,
           0.0
         ],
         "scale": [
@@ -1099,9 +1095,9 @@
           1.0
         ],
         "translate": [
+          11.649999618530273,
           0.0,
-          0.0,
-          13.0
+          -7.130000114440918
         ]
       }
     },
@@ -1145,7 +1141,7 @@
       "transform": {
         "rotate": [
           0.0,
-          -1.5,
+          0.0,
           0.0
         ],
         "scale": [
@@ -1156,117 +1152,7 @@
         "translate": [
           7.0,
           0.0,
-          5.0
-        ]
-      }
-    },
-    {
-      "index": 20,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "Object 20",
-      "transform": {
-        "rotate": [
-          0.0,
-          3.1415927410125732,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "index": 21,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "Object 21",
-      "transform": {
-        "rotate": [
-          0.0,
-          3.1415927410125732,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          0.0,
-          0.0,
-          0.0
+          -7.0
         ]
       }
     }
@@ -1859,116 +1745,6 @@
         ]
       },
       "name": "Primitive 10",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "index": 11,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "Primitive 11",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "index": 12,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 0.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "Primitive 12",
       "transform": {
         "rotate": [
           0.0,

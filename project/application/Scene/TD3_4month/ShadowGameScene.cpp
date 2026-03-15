@@ -244,7 +244,7 @@ void ShadowGameScene::InitializeLights()
 
     activePointLightCount_ = 2;
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    pointLights_[0].position = { 0.0f, 5.0f, 0.0f };
+    pointLights_[0].position = {7.0f, 0.0f, 0.0f };
     pointLights_[0].intensity = 1.0f;
     pointLights_[0].radius = 10.0f;
     pointLights_[0].decay = 1.0f;
@@ -269,22 +269,22 @@ void ShadowGameScene::InitializeLights()
     spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 
     activeAreaLightCount_ = 3;
-    areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    areaLights_[0].position = { 0.0f, 3.0f, 0.0f };
-    areaLights_[0].normal = { 1.0f, -1.0f, 0.0f };
-    areaLights_[0].intensity = 4.0f;
+    areaLights_[0].color = { 1.0f,1.0f, 1.0f, 1.0f };
+    areaLights_[0].position = { 7.0f, 3.0f, 0.0f };
+    areaLights_[0].normal = { 0.0f, 1.0f, 0.0f };
+    areaLights_[0].intensity = 10.0f;
     areaLights_[0].width = 2.0f;
     areaLights_[0].height = 2.0f;
-    areaLights_[0].radius = 0.1f;
+    areaLights_[0].radius = 5.0f;
     areaLights_[0].decay = 2.0f;
 
     areaLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    areaLights_[1].position = { -5.0f, 3.0f, 0.0f };
-    areaLights_[1].normal = { 1.0f, -1.0f, 0.0f };
-    areaLights_[1].intensity = 4.0f;
+    areaLights_[1].position = { -7.0f, 3.0f, 0.0f };
+    areaLights_[1].normal = { 0.0f, 1.0f, 0.0f };
+    areaLights_[1].intensity = 10.0f;
     areaLights_[1].width = 2.0f;
     areaLights_[1].height = 2.0f;
-    areaLights_[1].radius = 0.1f;
+    areaLights_[1].radius =5.0f;
     areaLights_[1].decay = 2.0f;
 
 }
@@ -412,23 +412,13 @@ void ShadowGameScene::UpdateLight()
     flashlight_->Update();
     spotLights_[1] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
+
     //自販機
     vendingMac_->Update();
 #ifdef USE_IMGUI
-    if (ImGui::TreeNode("PointLight")) {
-        ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);
-        ImGui::DragFloat("PointLightIntensity", &pointLights_[0].intensity, 0.1f);
-        ImGui::DragFloat3("PointLightPosition", &pointLights_[0].position.x, 0.1f);
-        ImGui::DragFloat("PointLightRadius", &pointLights_[0].radius, 0.1f);
-        ImGui::DragFloat("PointLightDecay", &pointLights_[0].decay, 0.1f);
-        ImGui::TreePop();
-    }
-    if (ImGui::TreeNode("PointLight1")) {
-        ImGui::ColorEdit4("PointLightColor1", &pointLights_[1].color.x);
-        ImGui::DragFloat("PointLightIntensity1", &pointLights_[1].intensity, 0.1f);
-        ImGui::DragFloat3("PointLightPosition1", &pointLights_[1].position.x, 0.1f);
-        ImGui::DragFloat("PointLightRadius1", &pointLights_[1].radius, 0.1f);
-        ImGui::DragFloat("PointLightDecay1", &pointLights_[1].decay, 0.1f);
+    if (ImGui::TreeNode("Light")) {
+        ImGui::DragFloat3("Area0Position", &areaLights_[0].position.x, 0.1f);
+        ImGui::DragFloat3("Area1Position", &areaLights_[1].position.x, 0.1f);
         ImGui::TreePop();
     }
 #endif
