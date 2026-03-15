@@ -15,6 +15,8 @@ class ResultScene : public BaseScene {
 	SoundData BGM_;
 	bool isBGMPlaying = false;
 
+	std::unique_ptr<Sprite> sprite_ = nullptr;
+	uint32_t textureHandle_ = 0;
 public:
 	ResultScene();
 	~ResultScene() override = default;

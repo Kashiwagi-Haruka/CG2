@@ -7,16 +7,22 @@
 
 ResultScene::ResultScene() {
 
-	BGM_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/アンドロイドの涙.mp3");
+	BGM_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/BGM/kimigayo01.mp3");
 
 	transition = std::make_unique<SceneTransition>();
+
+	textureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/gameClearImage.png");
+
+	sprite_ = std::make_unique<Sprite>();
 }
 
 void ResultScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGM_); }
 
 void ResultScene::Initialize() {
 	isSceneEnd_ = false;
-
+	sprite_->Initialize(textureHandle_);
+	sprite_->SetScale({ static_cast<float>(WinApp::kClientWidth),static_cast<float>(WinApp::kClientHeight) });
+	sprite_->Update();
 	Input::GetInstance()->SetIsCursorStability(false);
 	Input::GetInstance()->SetIsCursorVisible(true);
 	transition->Initialize(false);
@@ -50,7 +56,7 @@ void ResultScene::Update() {
 
 void ResultScene::Draw() {
 	SpriteCommon::GetInstance()->DrawCommon();
-
+	sprite_->Draw();
 	if (isTransitionIn || isTransitionOut) {
 		transition->Draw();
 	}
