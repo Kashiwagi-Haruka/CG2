@@ -15,7 +15,7 @@
       },
       {
         "name": "scl_k1_cb.mp3",
-        "volume": 1.0
+        "volume": 0.1321771889925003
       },
       {
         "name": "doorLock.mp3",
@@ -26,8 +26,16 @@
         "volume": 0.25
       },
       {
+        "name": "noise.mp3",
+        "volume": 0.05061165988445282
+      },
+      {
         "name": "bgm1.mp3",
         "volume": 0.125
+      },
+      {
+        "name": "1.mp3",
+        "volume": 0.5287087559700012
       }
     ]
   },
@@ -88,7 +96,7 @@
           0.0
         ]
       },
-      "name": "Human",
+      "name": "d",
       "transform": {
         "rotate": [
           0.0,
@@ -257,7 +265,7 @@
       "transform": {
         "rotate": [
           0.0,
-          0.8600000143051147,
+          0.0,
           0.0
         ],
         "scale": [
@@ -266,9 +274,9 @@
           1.0
         ],
         "translate": [
-          3.0,
           0.0,
-          2.0
+          0.0,
+          1.5
         ]
       }
     },
@@ -312,7 +320,7 @@
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          1.0,
           0.0
         ],
         "scale": [
@@ -321,9 +329,9 @@
           1.0
         ],
         "translate": [
+          -5.46999979019165,
           0.0,
-          0.0,
-          14.0
+          6.550000190734863
         ]
       }
     },
@@ -367,7 +375,7 @@
       "transform": {
         "rotate": [
           0.0,
-          -0.8100000023841858,
+          -0.4399999976158142,
           0.0
         ],
         "scale": [
@@ -376,9 +384,9 @@
           1.0
         ],
         "translate": [
-          -3.549999952316284,
+          2.5899999141693115,
           0.0,
-          0.4099999964237213
+          10.0
         ]
       }
     },
@@ -431,9 +439,9 @@
           1.0
         ],
         "translate": [
-          -1.0,
           0.0,
-          -4.0
+          0.0,
+          -1.5
         ]
       }
     },
@@ -477,7 +485,7 @@
       "transform": {
         "rotate": [
           0.0,
-          -0.6399999856948853,
+          -1.0800000429153442,
           0.0
         ],
         "scale": [
@@ -486,9 +494,9 @@
           1.0
         ],
         "translate": [
-          3.5,
+          6.050000190734863,
           0.0,
-          -1.1200000047683716
+          -9.850000381469727
         ]
       }
     },
@@ -543,7 +551,7 @@
         "translate": [
           -2.930000066757202,
           0.0,
-          -7.21999979019165
+          -13.319999694824219
         ]
       }
     },
@@ -597,8 +605,8 @@
         ],
         "translate": [
           0.0,
-          0.0,
-          0.0
+          0.5899999737739563,
+          7.949999809265137
         ]
       }
     },
@@ -652,8 +660,8 @@
         ],
         "translate": [
           0.0,
-          0.0,
-          0.0
+          1.2899999618530273,
+          7.920000076293945
         ]
       }
     },
@@ -708,7 +716,7 @@
         "translate": [
           0.0,
           0.0,
-          0.0
+          8.0
         ]
       }
     },
@@ -748,7 +756,7 @@
           0.0
         ]
       },
-      "name": "Object 12",
+      "name": "chair1",
       "transform": {
         "rotate": [
           0.0,
@@ -763,7 +771,7 @@
         "translate": [
           0.0,
           0.0,
-          0.0
+          8.0
         ]
       }
     },
@@ -803,7 +811,7 @@
           0.0
         ]
       },
-      "name": "Room1",
+      "name": "chair2",
       "transform": {
         "rotate": [
           0.0,
@@ -818,7 +826,7 @@
         "translate": [
           0.0,
           0.0,
-          0.0
+          10.0
         ]
       }
     },
@@ -858,7 +866,7 @@
           0.0
         ]
       },
-      "name": "room2",
+      "name": "chair3",
       "transform": {
         "rotate": [
           0.0,
@@ -873,7 +881,7 @@
         "translate": [
           0.0,
           0.0,
-          14.0
+          12.579999923706055
         ]
       }
     },
@@ -913,7 +921,7 @@
           0.0
         ]
       },
-      "name": "vendingMac",
+      "name": "chair4",
       "transform": {
         "rotate": [
           0.0,
@@ -928,7 +936,7 @@
         "translate": [
           0.0,
           0.0,
-          8.5
+          6.21999979019165
         ]
       }
     },
@@ -968,11 +976,11 @@
           0.0
         ]
       },
-      "name": "door",
+      "name": "room",
       "transform": {
         "rotate": [
           0.0,
-          -1.5,
+          3.140000104904175,
           0.0
         ],
         "scale": [
@@ -981,9 +989,9 @@
           1.0
         ],
         "translate": [
-          7.0,
           0.0,
-          5.0
+          0.0,
+          7.0
         ]
       }
     },
@@ -1023,7 +1031,227 @@
           0.0
         ]
       },
-      "name": "Object 17",
+      "name": "room0",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          -7.0
+        ]
+      }
+    },
+    {
+      "index": 18,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "mac",
+      "transform": {
+        "rotate": [
+          0.0,
+          3.140000104904175,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          13.0
+        ]
+      }
+    },
+    {
+      "index": 19,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "door1",
+      "transform": {
+        "rotate": [
+          0.0,
+          -1.5,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          7.0,
+          0.0,
+          5.0
+        ]
+      }
+    },
+    {
+      "index": 20,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Object 20",
+      "transform": {
+        "rotate": [
+          0.0,
+          3.1415927410125732,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 21,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Object 21",
       "transform": {
         "rotate": [
           0.0,
@@ -1686,6 +1914,61 @@
         ]
       },
       "name": "Primitive 11",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 12,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 0.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Primitive 12",
       "transform": {
         "rotate": [
           0.0,

@@ -39,16 +39,17 @@ ShadowGameScene::ShadowGameScene()
     key_ = std::make_unique<Key>();
     // 枝豆管理
     edamame_ = std::make_unique<Edamame>();
-    //椅子
-    chair_ = std::make_unique<Chair>();
+    //ドア
+    door_ = std::make_unique<Door>();
+
     //壁管理
     wallManager_ = std::make_unique<WallManager>();
     //壁管理
     wallManager2_ = std::make_unique<WallManager>();
     //自販機
     vendingMac_ = std::make_unique<VendingMac>();
-    //ドア
-    door_ = std::make_unique<Door>();
+    //椅子
+    chairManager_ = std::make_unique<ChairManager>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 
@@ -58,7 +59,7 @@ ShadowGameScene::ShadowGameScene()
 
     key_->SetPlayerCamera(playerCamera_.get());
     edamame_->SetPlayerCamera(playerCamera_.get());
-    chair_->SetPlayerCamera(playerCamera_.get());
+    chairManager_->SetPlayerCamera(playerCamera_.get());
     vendingMac_->SetPlayerCamera(playerCamera_.get());
     door_->SetPlayerCamera(playerCamera_.get());
 }
@@ -102,7 +103,7 @@ void ShadowGameScene::Initialize()
     // 枝豆
     edamame_->Initialize();
     //椅子
-    chair_->Initialize();
+    chairManager_->Initialize();
     //壁
     wallManager_->Initialize();
     //壁
@@ -190,7 +191,6 @@ void ShadowGameScene::CheckCollision()
     portalManager_->CheckCollision();
     key_->CheckCollision();
     edamame_->CheckCollision();
-    chair_->CheckCollision();
     door_->CheckCollision();
     vendingMac_->CheckCollision();
 
@@ -222,14 +222,16 @@ void ShadowGameScene::CheckCollision()
     collisionManager_->AddCollider(vendingMac_.get());
     collisionManager_->AddCollider(flashlight_.get());
     collisionManager_->AddCollider(testField_.get());
-    collisionManager_->AddCollider(chair_.get());
+    for (auto& chair : chairManager_->GetChairs()) {
+        collisionManager_->AddCollider(chair.get());
+    }
 
     collisionManager_->AddCollider(door_->GetAutoLockSystem().get());
 
     if (!door_->GetIsOpen()) {
         collisionManager_->AddCollider(door_.get());
     }
-  
+
     collisionManager_->AddCollider(key_.get());
 
     collisionManager_->CheckAllCollisions();
@@ -388,7 +390,7 @@ void ShadowGameScene::UpdateGameObject()
     //枝豆管理
     edamame_->Update();
     //椅子管理
-    chair_->Update();
+    chairManager_->Update();
     //床
     testField_->Update();
     //壁管理
@@ -482,7 +484,7 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     // 枝豆の描画処理
     edamame_->Draw();
     //椅子の描画
-    chair_->Draw();
+    chairManager_->Draw();
 
     if (!isShadow) {
         Object3dCommon::GetInstance()->DrawCommonSkinning();
@@ -506,7 +508,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     flashlight_->SetCamera(camera);
     key_->SetCamera(camera);
     edamame_->SetCamera(camera);
-    chair_->SetCamera(camera);
+    chairManager_->SetCamera(camera);
     wallManager_->SetCamera(camera);
     wallManager2_->SetCamera(camera);
     vendingMac_->SetCamera(camera);

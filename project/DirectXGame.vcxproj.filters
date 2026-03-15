@@ -328,6 +328,7 @@
     <ClCompile Include="application\GameObject\VendingMac\VendingMac.cpp" />
     <ClCompile Include="application\GameObject\Door\Door.cpp" />
     <ClCompile Include="application\GameObject\Door\AutoLockSystem.cpp" />
+    <ClCompile Include="application\GameObject\Chair\ChairManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -640,6 +641,7 @@
     <ClInclude Include="application\GameObject\VendingMac\VendingMac.h" />
     <ClInclude Include="application\GameObject\Door\Door.h" />
     <ClInclude Include="application\GameObject\Door\AutoLockSystem.h" />
+    <ClInclude Include="application\GameObject\Chair\ChairManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

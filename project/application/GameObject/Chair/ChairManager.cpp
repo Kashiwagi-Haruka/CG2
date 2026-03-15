@@ -1,0 +1,70 @@
+#include "ChairManager.h"
+#include"Function.h"
+
+namespace {
+    uint32_t maxNum_ = 4;
+}
+
+ChairManager::ChairManager()
+{
+    for (uint32_t i = 0; i < maxNum_; ++i) {
+        std::unique_ptr<Chair> chair = std::make_unique<Chair>();
+        chairs_.push_back(std::move(chair));
+    }
+}
+
+ChairManager::~ChairManager()
+{
+    for (auto& chair : chairs_) {
+        chair.reset();
+    }
+    chairs_.clear();
+}
+
+void ChairManager::SetCamera(Camera* camera)
+{
+    for (auto& chair:chairs_) {
+        chair->SetCamera(camera);
+    }
+
+
+}
+
+void ChairManager::Initialize()
+{
+    for (auto& chair : chairs_) {
+        chair->Initialize();
+    }
+
+
+
+    for (size_t i = 0; i < maxNum_ - 1; i += 2) {
+        Transform transform = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {10.0f,1.0f,0.0f} };
+        chairs_.at(i)->SetTransform(transform);
+        transform.rotate.y += Function::kPi;
+        transform.translate.x *= -1.0f;
+        chairs_.at(i+1)->SetTransform(transform);
+        chairs_.at(i + 1)->SetMirrorTransform(&chairs_.at(i)->GetTransform());
+        chairs_.at(i)->SetMirrorTransform(&chairs_.at(i + 1)->GetTransform());
+    };
+    
+}
+
+void ChairManager::Update()
+{
+    for (auto& chair : chairs_) {
+        chair->Update();
+    }
+}
+
+void ChairManager::Draw()
+{
+    for (auto& chair : chairs_) {
+        chair->Draw();
+    }
+}
+
+void ChairManager::SetPlayerCamera(PlayerCamera* camera)
+{
+    Chair::SetPlayerCamera(camera);
+}
