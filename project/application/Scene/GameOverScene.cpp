@@ -5,13 +5,20 @@
 #include "TextureManager.h"
 GameOverScene::GameOverScene() {
 	transition = std::make_unique<SceneTransition>();
-	BGM_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/おそろい.mp3");
+	BGM_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/BGM/gameOverBGM.mp3");
+
+	textureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/gameOverImage.png");
+
+	sprite_ = std::make_unique<Sprite>();
 }
 
 void GameOverScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGM_); }
 
 void GameOverScene::Initialize() {
 	
+	sprite_->Initialize(textureHandle_);
+	sprite_->SetScale({ static_cast<float>(WinApp::kClientWidth),static_cast<float>(WinApp::kClientHeight)  });
+	sprite_->Update();
 	transition->Initialize(false);
 	isTransitionIn = true;
 	isTransitionOut = false;
@@ -44,6 +51,8 @@ void GameOverScene::Update() {
 
 void GameOverScene::Draw() {
 	SpriteCommon::GetInstance()->DrawCommon();
+	sprite_->Draw();
+
 	if (isTransitionIn || isTransitionOut) {
 		transition->Draw();
 	}
