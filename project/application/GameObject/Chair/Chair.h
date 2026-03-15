@@ -19,13 +19,17 @@ public:
     void Update();
     void Initialize();
     void Draw();
-    void CheckCollision();
-    void SetPlayerCamera(PlayerCamera* camera);
+  static  void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
+    void SetTransform(const Transform& transform) { transform_ = transform; };
+    void SetMirrorTransform(Transform* transform) { mirrorTransform_ = transform; };
+    Transform& GetTransform() { return transform_; };
 private:
     bool OnCollisionRay();
-    PlayerCamera* playerCamera_ = nullptr;
+   static PlayerCamera* playerCamera_;
     Transform transform_ = {};
     std::unique_ptr<Object3d>obj_ = nullptr;
+    Transform* mirrorTransform_ = nullptr;
+    Vector3 velocity_ = { 0.0f };
 };
 

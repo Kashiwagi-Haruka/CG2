@@ -39,16 +39,17 @@ ShadowGameScene::ShadowGameScene()
     key_ = std::make_unique<Key>();
     // 枝豆管理
     edamame_ = std::make_unique<Edamame>();
-    //椅子
-    chair_ = std::make_unique<Chair>();
+    //ドア
+    door_ = std::make_unique<Door>();
+
     //壁管理
     wallManager_ = std::make_unique<WallManager>();
     //壁管理
     wallManager2_ = std::make_unique<WallManager>();
     //自販機
     vendingMac_ = std::make_unique<VendingMac>();
-    //ドア
-    door_ = std::make_unique<Door>();
+    //椅子
+    chairManager_ = std::make_unique<ChairManager>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 
@@ -58,7 +59,7 @@ ShadowGameScene::ShadowGameScene()
 
     key_->SetPlayerCamera(playerCamera_.get());
     edamame_->SetPlayerCamera(playerCamera_.get());
-    chair_->SetPlayerCamera(playerCamera_.get());
+    chairManager_->SetPlayerCamera(playerCamera_.get());
     vendingMac_->SetPlayerCamera(playerCamera_.get());
     door_->SetPlayerCamera(playerCamera_.get());
 }
@@ -102,7 +103,7 @@ void ShadowGameScene::Initialize()
     // 枝豆
     edamame_->Initialize();
     //椅子
-    chair_->Initialize();
+    chairManager_->Initialize();
     //壁
     wallManager_->Initialize();
     //壁
@@ -190,7 +191,6 @@ void ShadowGameScene::CheckCollision()
     portalManager_->CheckCollision();
     key_->CheckCollision();
     edamame_->CheckCollision();
-    chair_->CheckCollision();
     door_->CheckCollision();
     vendingMac_->CheckCollision();
 
@@ -222,14 +222,16 @@ void ShadowGameScene::CheckCollision()
     collisionManager_->AddCollider(vendingMac_.get());
     collisionManager_->AddCollider(flashlight_.get());
     collisionManager_->AddCollider(testField_.get());
-    collisionManager_->AddCollider(chair_.get());
+    for (auto& chair : chairManager_->GetChairs()) {
+        collisionManager_->AddCollider(chair.get());
+    }
 
     collisionManager_->AddCollider(door_->GetAutoLockSystem().get());
 
     if (!door_->GetIsOpen()) {
         collisionManager_->AddCollider(door_.get());
     }
-  
+
     collisionManager_->AddCollider(key_.get());
 
     collisionManager_->CheckAllCollisions();
@@ -242,7 +244,7 @@ void ShadowGameScene::InitializeLights()
 
     activePointLightCount_ = 2;
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    pointLights_[0].position = { 0.0f, 5.0f, 0.0f };
+    pointLights_[0].position = {7.0f, 0.0f, 0.0f };
     pointLights_[0].intensity = 1.0f;
     pointLights_[0].radius = 10.0f;
     pointLights_[0].decay = 1.0f;
@@ -267,22 +269,22 @@ void ShadowGameScene::InitializeLights()
     spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 
     activeAreaLightCount_ = 3;
-    areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    areaLights_[0].position = { 0.0f, 3.0f, 0.0f };
-    areaLights_[0].normal = { 1.0f, -1.0f, 0.0f };
-    areaLights_[0].intensity = 4.0f;
+    areaLights_[0].color = { 1.0f,1.0f, 1.0f, 1.0f };
+    areaLights_[0].position = { 7.0f, 3.0f, 0.0f };
+    areaLights_[0].normal = { 0.0f, 1.0f, 0.0f };
+    areaLights_[0].intensity = 10.0f;
     areaLights_[0].width = 2.0f;
     areaLights_[0].height = 2.0f;
-    areaLights_[0].radius = 0.1f;
+    areaLights_[0].radius = 5.0f;
     areaLights_[0].decay = 2.0f;
 
     areaLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    areaLights_[1].position = { -5.0f, 3.0f, 0.0f };
-    areaLights_[1].normal = { 1.0f, -1.0f, 0.0f };
-    areaLights_[1].intensity = 4.0f;
+    areaLights_[1].position = { -7.0f, 3.0f, 0.0f };
+    areaLights_[1].normal = { 0.0f, 1.0f, 0.0f };
+    areaLights_[1].intensity = 10.0f;
     areaLights_[1].width = 2.0f;
     areaLights_[1].height = 2.0f;
-    areaLights_[1].radius = 0.1f;
+    areaLights_[1].radius =5.0f;
     areaLights_[1].decay = 2.0f;
 
 }
@@ -388,7 +390,7 @@ void ShadowGameScene::UpdateGameObject()
     //枝豆管理
     edamame_->Update();
     //椅子管理
-    chair_->Update();
+    chairManager_->Update();
     //床
     testField_->Update();
     //壁管理
@@ -410,23 +412,13 @@ void ShadowGameScene::UpdateLight()
     flashlight_->Update();
     spotLights_[1] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
+
     //自販機
     vendingMac_->Update();
 #ifdef USE_IMGUI
-    if (ImGui::TreeNode("PointLight")) {
-        ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);
-        ImGui::DragFloat("PointLightIntensity", &pointLights_[0].intensity, 0.1f);
-        ImGui::DragFloat3("PointLightPosition", &pointLights_[0].position.x, 0.1f);
-        ImGui::DragFloat("PointLightRadius", &pointLights_[0].radius, 0.1f);
-        ImGui::DragFloat("PointLightDecay", &pointLights_[0].decay, 0.1f);
-        ImGui::TreePop();
-    }
-    if (ImGui::TreeNode("PointLight1")) {
-        ImGui::ColorEdit4("PointLightColor1", &pointLights_[1].color.x);
-        ImGui::DragFloat("PointLightIntensity1", &pointLights_[1].intensity, 0.1f);
-        ImGui::DragFloat3("PointLightPosition1", &pointLights_[1].position.x, 0.1f);
-        ImGui::DragFloat("PointLightRadius1", &pointLights_[1].radius, 0.1f);
-        ImGui::DragFloat("PointLightDecay1", &pointLights_[1].decay, 0.1f);
+    if (ImGui::TreeNode("Light")) {
+        ImGui::DragFloat3("Area0Position", &areaLights_[0].position.x, 0.1f);
+        ImGui::DragFloat3("Area1Position", &areaLights_[1].position.x, 0.1f);
         ImGui::TreePop();
     }
 #endif
@@ -482,7 +474,7 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     // 枝豆の描画処理
     edamame_->Draw();
     //椅子の描画
-    chair_->Draw();
+    chairManager_->Draw();
 
     if (!isShadow) {
         Object3dCommon::GetInstance()->DrawCommonSkinning();
@@ -506,7 +498,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     flashlight_->SetCamera(camera);
     key_->SetCamera(camera);
     edamame_->SetCamera(camera);
-    chair_->SetCamera(camera);
+    chairManager_->SetCamera(camera);
     wallManager_->SetCamera(camera);
     wallManager2_->SetCamera(camera);
     vendingMac_->SetCamera(camera);

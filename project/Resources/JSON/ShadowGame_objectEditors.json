@@ -26,6 +26,10 @@
         "volume": 0.25
       },
       {
+        "name": "noise.mp3",
+        "volume": 0.055278100073337555
+      },
+      {
         "name": "bgm1.mp3",
         "volume": 0.125
       }
@@ -88,7 +92,7 @@
           0.0
         ]
       },
-      "name": "Human",
+      "name": "d",
       "transform": {
         "rotate": [
           0.0,
@@ -147,7 +151,7 @@
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          -1.5,
           0.0
         ],
         "scale": [
@@ -156,8 +160,8 @@
           1.0
         ],
         "translate": [
-          1.0,
-          0.36000001430511475,
+          1.5,
+          0.0,
           0.0
         ]
       }
@@ -257,7 +261,7 @@
       "transform": {
         "rotate": [
           0.0,
-          0.8600000143051147,
+          0.0,
           0.0
         ],
         "scale": [
@@ -266,9 +270,9 @@
           1.0
         ],
         "translate": [
-          3.0,
           0.0,
-          2.0
+          0.0,
+          1.5
         ]
       }
     },
@@ -312,7 +316,7 @@
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          1.0,
           0.0
         ],
         "scale": [
@@ -321,9 +325,9 @@
           1.0
         ],
         "translate": [
+          -11.600000381469727,
           0.0,
-          0.0,
-          14.0
+          0.9300000071525574
         ]
       }
     },
@@ -367,7 +371,7 @@
       "transform": {
         "rotate": [
           0.0,
-          -0.8100000023841858,
+          -0.4399999976158142,
           0.0
         ],
         "scale": [
@@ -376,9 +380,9 @@
           1.0
         ],
         "translate": [
-          -3.549999952316284,
+          10.270000457763672,
           0.0,
-          0.4099999964237213
+          0.12999999523162842
         ]
       }
     },
@@ -422,7 +426,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.140000104904175,
+          1.5,
           0.0
         ],
         "scale": [
@@ -431,9 +435,9 @@
           1.0
         ],
         "translate": [
-          -1.0,
+          -1.5,
           0.0,
-          -4.0
+          0.0
         ]
       }
     },
@@ -477,7 +481,7 @@
       "transform": {
         "rotate": [
           0.0,
-          -0.6399999856948853,
+          -1.5,
           0.0
         ],
         "scale": [
@@ -486,9 +490,9 @@
           1.0
         ],
         "translate": [
-          3.5,
+          6.050000190734863,
           0.0,
-          -1.1200000047683716
+          -9.850000381469727
         ]
       }
     },
@@ -543,7 +547,7 @@
         "translate": [
           -2.930000066757202,
           0.0,
-          -7.21999979019165
+          -13.319999694824219
         ]
       }
     },
@@ -597,8 +601,8 @@
         ],
         "translate": [
           0.0,
-          0.0,
-          0.0
+          0.5899999737739563,
+          7.949999809265137
         ]
       }
     },
@@ -652,8 +656,8 @@
         ],
         "translate": [
           0.0,
-          0.0,
-          0.0
+          1.2899999618530273,
+          7.920000076293945
         ]
       }
     },
@@ -708,7 +712,7 @@
         "translate": [
           0.0,
           0.0,
-          0.0
+          8.0
         ]
       }
     },
@@ -748,7 +752,7 @@
           0.0
         ]
       },
-      "name": "Object 12",
+      "name": "chair1",
       "transform": {
         "rotate": [
           0.0,
@@ -763,7 +767,7 @@
         "translate": [
           0.0,
           0.0,
-          0.0
+          8.0
         ]
       }
     },
@@ -803,7 +807,7 @@
           0.0
         ]
       },
-      "name": "Room1",
+      "name": "chair2",
       "transform": {
         "rotate": [
           0.0,
@@ -818,7 +822,7 @@
         "translate": [
           0.0,
           0.0,
-          0.0
+          10.0
         ]
       }
     },
@@ -858,7 +862,7 @@
           0.0
         ]
       },
-      "name": "room2",
+      "name": "chair3",
       "transform": {
         "rotate": [
           0.0,
@@ -873,7 +877,7 @@
         "translate": [
           0.0,
           0.0,
-          14.0
+          12.579999923706055
         ]
       }
     },
@@ -913,7 +917,7 @@
           0.0
         ]
       },
-      "name": "vendingMac",
+      "name": "chair4",
       "transform": {
         "rotate": [
           0.0,
@@ -928,7 +932,7 @@
         "translate": [
           0.0,
           0.0,
-          8.5
+          6.21999979019165
         ]
       }
     },
@@ -968,11 +972,11 @@
           0.0
         ]
       },
-      "name": "door",
+      "name": "room",
       "transform": {
         "rotate": [
           0.0,
-          -1.5,
+          -1.5700000524520874,
           0.0
         ],
         "scale": [
@@ -983,7 +987,7 @@
         "translate": [
           7.0,
           0.0,
-          5.0
+          0.0
         ]
       }
     },
@@ -1023,11 +1027,11 @@
           0.0
         ]
       },
-      "name": "Object 17",
+      "name": "room0",
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          1.5700000524520874,
           0.0
         ],
         "scale": [
@@ -1036,9 +1040,119 @@
           1.0
         ],
         "translate": [
+          -7.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 18,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
           0.0,
           0.0,
           0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "mac",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          11.649999618530273,
+          0.0,
+          -7.130000114440918
+        ]
+      }
+    },
+    {
+      "index": 19,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "door1",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          7.0,
+          0.0,
+          -7.0
         ]
       }
     }
@@ -1631,61 +1745,6 @@
         ]
       },
       "name": "Primitive 10",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "index": 11,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "Primitive 11",
       "transform": {
         "rotate": [
           0.0,
