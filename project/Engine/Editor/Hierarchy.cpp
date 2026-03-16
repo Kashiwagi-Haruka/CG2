@@ -955,11 +955,11 @@ void Hierarchy::DrawAudioEditor() {
 		if (!entry.soundData) {
 			continue;
 		}
+		const auto savedIt = savedAudioVolumes_.find(entry.name);
+		if (savedIt != savedAudioVolumes_.end()) {
+			audio->SetSoundVolume(entry.soundData, savedIt->second);
+		}
 		if (ImGui::TreeNode((entry.name + "##audio_" + std::to_string(i)).c_str())) {
-			const auto savedIt = savedAudioVolumes_.find(entry.name);
-			if (savedIt != savedAudioVolumes_.end()) {
-				audio->SetSoundVolume(entry.soundData, savedIt->second);
-			}
 			float volume = entry.soundData->volume;
 			if (ImGui::SliderFloat(("Volume##audio_volume_" + std::to_string(i)).c_str(), &volume, 0.0f, 1.0f)) {
 				audio->SetSoundVolume(entry.soundData, volume);
@@ -1122,6 +1122,8 @@ void Hierarchy::DrawObjectEditors() {
 		DrawLightEditor();
 		ImGui::SeparatorText("Camera");
 		DrawCameraEditor();
+		ImGui::SeparatorText("Audio");
+		DrawAudioEditor();
 		ImGui::SeparatorText("Selection");
 		DrawSelectionBoxEditor();
 		ImGui::Separator();
