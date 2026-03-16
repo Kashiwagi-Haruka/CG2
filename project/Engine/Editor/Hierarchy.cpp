@@ -24,6 +24,104 @@ namespace {
 std::filesystem::path ResolveObjectEditorJsonPath(const std::string& filePath) { return std::filesystem::path("Resources") / "JSON" / std::filesystem::path(filePath).filename(); }
 
 bool HasObjectEditorJsonFile(const std::string& filePath) { return std::filesystem::exists(ResolveObjectEditorJsonPath(filePath)); }
+
+nlohmann::json SerializeAudioEffect(const Audio::MixerEffectSettings& effect) {
+	nlohmann::json effectJson;
+	effectJson["type"] = static_cast<int>(effect.type);
+	effectJson["enabled"] = effect.enabled;
+	effectJson["reverb"] = {
+	    {"WetDryMix", effect.reverb.WetDryMix}
+    };
+	effectJson["echo"] = {
+	    {"WetDryMix", effect.echo.WetDryMix},
+        {"Feedback",  effect.echo.Feedback },
+        {"Delay",     effect.echo.Delay    }
+    };
+	effectJson["equalizer"] = {
+	    {"FrequencyCenter0", effect.equalizer.FrequencyCenter0},
+        {"Gain0",            effect.equalizer.Gain0           },
+        {"Bandwidth0",       effect.equalizer.Bandwidth0      },
+	    {"FrequencyCenter1", effect.equalizer.FrequencyCenter1},
+        {"Gain1",            effect.equalizer.Gain1           },
+        {"Bandwidth1",       effect.equalizer.Bandwidth1      },
+	    {"FrequencyCenter2", effect.equalizer.FrequencyCenter2},
+        {"Gain2",            effect.equalizer.Gain2           },
+        {"Bandwidth2",       effect.equalizer.Bandwidth2      },
+	    {"FrequencyCenter3", effect.equalizer.FrequencyCenter3},
+        {"Gain3",            effect.equalizer.Gain3           },
+        {"Bandwidth3",       effect.equalizer.Bandwidth3      }
+    };
+	effectJson["limiter"] = {
+	    {"Release",  effect.limiter.Release },
+        {"Loudness", effect.limiter.Loudness}
+    };
+	return effectJson;
+}
+
+bool DeserializeAudioEffect(const nlohmann::json& effectJson, Audio::MixerEffectSettings& effect) {
+	if (!effectJson.is_object()) {
+		return false;
+	}
+	if (effectJson.contains("type") && effectJson["type"].is_number_integer()) {
+		const int type = effectJson["type"].get<int>();
+		if (type >= 0 && type <= static_cast<int>(Audio::MixerEffectType::Limiter)) {
+			effect.type = static_cast<Audio::MixerEffectType>(type);
+		}
+	}
+	if (effectJson.contains("enabled") && effectJson["enabled"].is_boolean()) {
+		effect.enabled = effectJson["enabled"].get<bool>();
+	}
+	if (effectJson.contains("reverb") && effectJson["reverb"].is_object()) {
+		const auto& v = effectJson["reverb"];
+		if (v.contains("WetDryMix") && v["WetDryMix"].is_number())
+			effect.reverb.WetDryMix = v["WetDryMix"].get<float>();
+	}
+	if (effectJson.contains("echo") && effectJson["echo"].is_object()) {
+		const auto& v = effectJson["echo"];
+		if (v.contains("WetDryMix") && v["WetDryMix"].is_number())
+			effect.echo.WetDryMix = v["WetDryMix"].get<float>();
+		if (v.contains("Feedback") && v["Feedback"].is_number())
+			effect.echo.Feedback = v["Feedback"].get<float>();
+		if (v.contains("Delay") && v["Delay"].is_number())
+			effect.echo.Delay = v["Delay"].get<float>();
+	}
+	if (effectJson.contains("equalizer") && effectJson["equalizer"].is_object()) {
+		const auto& v = effectJson["equalizer"];
+		if (v.contains("FrequencyCenter0") && v["FrequencyCenter0"].is_number())
+			effect.equalizer.FrequencyCenter0 = v["FrequencyCenter0"].get<float>();
+		if (v.contains("Gain0") && v["Gain0"].is_number())
+			effect.equalizer.Gain0 = v["Gain0"].get<float>();
+		if (v.contains("Bandwidth0") && v["Bandwidth0"].is_number())
+			effect.equalizer.Bandwidth0 = v["Bandwidth0"].get<float>();
+		if (v.contains("FrequencyCenter1") && v["FrequencyCenter1"].is_number())
+			effect.equalizer.FrequencyCenter1 = v["FrequencyCenter1"].get<float>();
+		if (v.contains("Gain1") && v["Gain1"].is_number())
+			effect.equalizer.Gain1 = v["Gain1"].get<float>();
+		if (v.contains("Bandwidth1") && v["Bandwidth1"].is_number())
+			effect.equalizer.Bandwidth1 = v["Bandwidth1"].get<float>();
+		if (v.contains("FrequencyCenter2") && v["FrequencyCenter2"].is_number())
+			effect.equalizer.FrequencyCenter2 = v["FrequencyCenter2"].get<float>();
+		if (v.contains("Gain2") && v["Gain2"].is_number())
+			effect.equalizer.Gain2 = v["Gain2"].get<float>();
+		if (v.contains("Bandwidth2") && v["Bandwidth2"].is_number())
+			effect.equalizer.Bandwidth2 = v["Bandwidth2"].get<float>();
+		if (v.contains("FrequencyCenter3") && v["FrequencyCenter3"].is_number())
+			effect.equalizer.FrequencyCenter3 = v["FrequencyCenter3"].get<float>();
+		if (v.contains("Gain3") && v["Gain3"].is_number())
+			effect.equalizer.Gain3 = v["Gain3"].get<float>();
+		if (v.contains("Bandwidth3") && v["Bandwidth3"].is_number())
+			effect.equalizer.Bandwidth3 = v["Bandwidth3"].get<float>();
+	}
+	if (effectJson.contains("limiter") && effectJson["limiter"].is_object()) {
+		const auto& v = effectJson["limiter"];
+		if (v.contains("Release") && v["Release"].is_number_unsigned())
+			effect.limiter.Release = v["Release"].get<UINT32>();
+		if (v.contains("Loudness") && v["Loudness"].is_number_unsigned())
+			effect.limiter.Loudness = v["Loudness"].get<UINT32>();
+	}
+	return true;
+}
+
 } // namespace
 
 Hierarchy* Hierarchy::GetInstance() {
@@ -72,6 +170,7 @@ void Hierarchy::ResetForSceneChange() {
 	redoStack_.clear();
 	savedAudioVolumes_.clear();
 	savedAudioLoopEnabled_.clear();
+	savedAudioEffects_.clear();
 	editorLightState_.directionalLight = {
 	    {1.0f, 1.0f, 1.0f, 1.0f},
         {0.0f, -1.0f, 0.0f},
@@ -81,15 +180,6 @@ void Hierarchy::ResetForSceneChange() {
 	editorLightState_.spotLights.clear();
 	editorLightState_.areaLights.clear();
 	Object3dCommon::GetInstance()->SetEditorLightOverride(false);
-}
-void Hierarchy::ApplyEditorSnapshot(const EditorSnapshot& snapshot) {
-	editorTransforms_ = snapshot.objectTransforms;
-	editorMaterials_ = snapshot.objectMaterials;
-	objectNames_ = snapshot.objectNames;
-	primitiveEditorTransforms_ = snapshot.primitiveTransforms;
-	primitiveEditorMaterials_ = snapshot.primitiveMaterials;
-	primitiveNames_ = snapshot.primitiveNames;
-	selectionBoxDirty_ = true;
 }
 
 void Hierarchy::UndoEditorChange() {
@@ -274,8 +364,7 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 	    {"area",                nlohmann::json::array()              },
 	};
 	root["audio"] = {
-	    {"sounds",  nlohmann::json::array()},
-        {"effects", nlohmann::json::array()}
+	    {"sounds", nlohmann::json::array()}
     };
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		const Object3d* object = objects_[i];
@@ -384,45 +473,16 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 			}
 			const auto loopIt = savedAudioLoopEnabled_.find(entry.name);
 			const bool loopEnabled = loopIt != savedAudioLoopEnabled_.end() ? loopIt->second : false;
-			root["audio"]["sounds"].push_back({
+			nlohmann::json soundJson = {
 			    {"name",        entry.name             },
-			    {"volume",      entry.soundData->volume},
-			    {"loopEnabled", loopEnabled            },
-			});
-		}
-	}
-	if (audio) {
-		for (const auto& effect : audio->GetMixerEffects()) {
-			nlohmann::json effectJson;
-			effectJson["type"] = static_cast<int>(effect.type);
-			effectJson["enabled"] = effect.enabled;
-			effectJson["reverb"] = {
-			    {"WetDryMix", effect.reverb.WetDryMix},
-			};
-			effectJson["echo"] = {
-			    {"WetDryMix", effect.echo.WetDryMix},
-			    {"Feedback",  effect.echo.Feedback },
-			    {"Delay",     effect.echo.Delay    },
-			};
-			effectJson["equalizer"] = {
-			    {"FrequencyCenter0", effect.equalizer.FrequencyCenter0},
-                {"Gain0",            effect.equalizer.Gain0           },
-                {"Bandwidth0",       effect.equalizer.Bandwidth0      },
-			    {"FrequencyCenter1", effect.equalizer.FrequencyCenter1},
-                {"Gain1",            effect.equalizer.Gain1           },
-                {"Bandwidth1",       effect.equalizer.Bandwidth1      },
-			    {"FrequencyCenter2", effect.equalizer.FrequencyCenter2},
-                {"Gain2",            effect.equalizer.Gain2           },
-                {"Bandwidth2",       effect.equalizer.Bandwidth2      },
-			    {"FrequencyCenter3", effect.equalizer.FrequencyCenter3},
-                {"Gain3",            effect.equalizer.Gain3           },
-                {"Bandwidth3",       effect.equalizer.Bandwidth3      },
-			};
-			effectJson["limiter"] = {
-			    {"Release",  effect.limiter.Release },
-			    {"Loudness", effect.limiter.Loudness},
-			};
-			root["audio"]["effects"].push_back(effectJson);
+                {"volume",      entry.soundData->volume},
+                {"loopEnabled", loopEnabled            },
+                {"effects",     nlohmann::json::array()}
+            };
+			for (const auto& effect : audio->GetSoundEffects(entry.soundData)) {
+				soundJson["effects"].push_back(SerializeAudioEffect(effect));
+			}
+			root["audio"]["sounds"].push_back(std::move(soundJson));
 		}
 	}
 	JsonManager* jsonManager = JsonManager::GetInstance();
@@ -1061,90 +1121,6 @@ void Hierarchy::DrawAudioEditor() {
 		return;
 	}
 
-	if (ImGui::TreeNode("Mixer Effects")) {
-		auto effects = audio->GetMixerEffects();
-		for (size_t i = 0; i < effects.size(); ++i) {
-			auto& effect = effects[i];
-			if (!ImGui::TreeNode((std::string(Audio::GetMixerEffectTypeName(effect.type)) + "##audio_effect_" + std::to_string(i)).c_str())) {
-				continue;
-			}
-			bool changed = false;
-			changed |= ImGui::Checkbox(("Enabled##audio_effect_enabled_" + std::to_string(i)).c_str(), &effect.enabled);
-			switch (effect.type) {
-			case Audio::MixerEffectType::Reverb:
-				changed |= ImGui::SliderFloat(("WetDryMix##audio_reverb_wd_" + std::to_string(i)).c_str(), &effect.reverb.WetDryMix, 0.0f, 100.0f);
-				break;
-			case Audio::MixerEffectType::Echo:
-				changed |= ImGui::SliderFloat(("WetDryMix##audio_echo_wd_" + std::to_string(i)).c_str(), &effect.echo.WetDryMix, 0.0f, 100.0f);
-				changed |= ImGui::SliderFloat(("Feedback##audio_echo_fb_" + std::to_string(i)).c_str(), &effect.echo.Feedback, 0.0f, 100.0f);
-				changed |= ImGui::SliderFloat(("Delay##audio_echo_delay_" + std::to_string(i)).c_str(), &effect.echo.Delay, FXECHO_MIN_DELAY, FXECHO_MAX_DELAY);
-				break;
-			case Audio::MixerEffectType::Equalizer:
-				changed |= ImGui::SliderFloat(("Gain0##audio_eq_g0_" + std::to_string(i)).c_str(), &effect.equalizer.Gain0, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-				changed |= ImGui::SliderFloat(("Gain1##audio_eq_g1_" + std::to_string(i)).c_str(), &effect.equalizer.Gain1, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-				changed |= ImGui::SliderFloat(("Gain2##audio_eq_g2_" + std::to_string(i)).c_str(), &effect.equalizer.Gain2, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-				changed |= ImGui::SliderFloat(("Gain3##audio_eq_g3_" + std::to_string(i)).c_str(), &effect.equalizer.Gain3, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-				break;
-			case Audio::MixerEffectType::Limiter: {
-				int release = static_cast<int>(effect.limiter.Release);
-				int loudness = static_cast<int>(effect.limiter.Loudness);
-				if (ImGui::SliderInt(("Release##audio_limiter_release_" + std::to_string(i)).c_str(), &release, FXMASTERINGLIMITER_MIN_RELEASE, FXMASTERINGLIMITER_MAX_RELEASE)) {
-					effect.limiter.Release = static_cast<UINT32>(release);
-					changed = true;
-				}
-				if (ImGui::SliderInt(("Loudness##audio_limiter_loudness_" + std::to_string(i)).c_str(), &loudness, FXMASTERINGLIMITER_MIN_LOUDNESS, FXMASTERINGLIMITER_MAX_LOUDNESS)) {
-					effect.limiter.Loudness = static_cast<UINT32>(loudness);
-					changed = true;
-				}
-				break;
-			}
-			}
-			if (ImGui::Button(("Remove##audio_effect_remove_" + std::to_string(i)).c_str())) {
-				audio->RemoveMixerEffect(i);
-				hasUnsavedChanges_ = true;
-				ImGui::TreePop();
-				break;
-			}
-			if (changed) {
-				audio->SetMixerEffects(effects);
-				hasUnsavedChanges_ = true;
-			}
-			ImGui::TreePop();
-		}
-		if (ImGui::Button("Add Reverb##audio_add_reverb")) {
-			Audio::MixerEffectSettings effect{};
-			effect.type = Audio::MixerEffectType::Reverb;
-			audio->AddMixerEffect(effect);
-			hasUnsavedChanges_ = true;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Add Echo##audio_add_echo")) {
-			Audio::MixerEffectSettings effect{};
-			effect.type = Audio::MixerEffectType::Echo;
-			audio->AddMixerEffect(effect);
-			hasUnsavedChanges_ = true;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Add EQ##audio_add_eq")) {
-			Audio::MixerEffectSettings effect{};
-			effect.type = Audio::MixerEffectType::Equalizer;
-			audio->AddMixerEffect(effect);
-			hasUnsavedChanges_ = true;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Add Limiter##audio_add_limiter")) {
-			Audio::MixerEffectSettings effect{};
-			effect.type = Audio::MixerEffectType::Limiter;
-			audio->AddMixerEffect(effect);
-			hasUnsavedChanges_ = true;
-		}
-		if (ImGui::Button("Clear Effects##audio_clear_effects")) {
-			audio->ClearMixerEffects();
-			hasUnsavedChanges_ = true;
-		}
-		ImGui::TreePop();
-	}
-
 	auto entries = audio->GetEditorSoundEntries();
 	if (entries.empty()) {
 		ImGui::TextUnformatted("No tracked sounds.");
@@ -1164,6 +1140,11 @@ void Hierarchy::DrawAudioEditor() {
 		if (loopIt != savedAudioLoopEnabled_.end()) {
 			loopEnabled = loopIt->second;
 		}
+		const auto effectsIt = savedAudioEffects_.find(entry.name);
+		if (effectsIt != savedAudioEffects_.end()) {
+			audio->SetSoundEffects(entry.soundData, effectsIt->second);
+			savedAudioEffects_.erase(effectsIt);
+		}
 		if (ImGui::TreeNode((entry.name + "##audio_" + std::to_string(i)).c_str())) {
 			float volume = entry.soundData->volume;
 			if (ImGui::SliderFloat(("Volume##audio_volume_" + std::to_string(i)).c_str(), &volume, 0.0f, 1.0f)) {
@@ -1174,6 +1155,95 @@ void Hierarchy::DrawAudioEditor() {
 			if (ImGui::Checkbox(("Loop Playback##audio_loop_enabled_" + std::to_string(i)).c_str(), &loopEnabled)) {
 				savedAudioLoopEnabled_[entry.name] = loopEnabled;
 				hasUnsavedChanges_ = true;
+			}
+
+			auto effects = audio->GetSoundEffects(entry.soundData);
+			if (ImGui::TreeNode(("Effects##audio_effects_" + std::to_string(i)).c_str())) {
+				for (size_t effectIndex = 0; effectIndex < effects.size(); ++effectIndex) {
+					auto& effect = effects[effectIndex];
+					if (!ImGui::TreeNode((std::string(Audio::GetMixerEffectTypeName(effect.type)) + "##audio_effect_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str())) {
+						continue;
+					}
+					bool changed = false;
+					changed |= ImGui::Checkbox(("Enabled##audio_effect_enabled_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.enabled);
+					switch (effect.type) {
+					case Audio::MixerEffectType::Reverb:
+						changed |= ImGui::SliderFloat(("WetDryMix##audio_reverb_wd_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.reverb.WetDryMix, 0.0f, 100.0f);
+						break;
+					case Audio::MixerEffectType::Echo:
+						changed |= ImGui::SliderFloat(("WetDryMix##audio_echo_wd_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.echo.WetDryMix, 0.0f, 100.0f);
+						changed |= ImGui::SliderFloat(("Feedback##audio_echo_fb_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.echo.Feedback, 0.0f, 100.0f);
+						changed |=
+						    ImGui::SliderFloat(("Delay##audio_echo_delay_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.echo.Delay, FXECHO_MIN_DELAY, FXECHO_MAX_DELAY);
+						break;
+					case Audio::MixerEffectType::Equalizer:
+						changed |= ImGui::SliderFloat(("Gain0##audio_eq_g0_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.equalizer.Gain0, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
+						changed |= ImGui::SliderFloat(("Gain1##audio_eq_g1_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.equalizer.Gain1, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
+						changed |= ImGui::SliderFloat(("Gain2##audio_eq_g2_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.equalizer.Gain2, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
+						changed |= ImGui::SliderFloat(("Gain3##audio_eq_g3_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.equalizer.Gain3, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
+						break;
+					case Audio::MixerEffectType::Limiter: {
+						int release = static_cast<int>(effect.limiter.Release);
+						int loudness = static_cast<int>(effect.limiter.Loudness);
+						if (ImGui::SliderInt(
+						        ("Release##audio_limiter_release_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &release, FXMASTERINGLIMITER_MIN_RELEASE,
+						        FXMASTERINGLIMITER_MAX_RELEASE)) {
+							effect.limiter.Release = static_cast<UINT32>(release);
+							changed = true;
+						}
+						if (ImGui::SliderInt(
+						        ("Loudness##audio_limiter_loudness_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &loudness, FXMASTERINGLIMITER_MIN_LOUDNESS,
+						        FXMASTERINGLIMITER_MAX_LOUDNESS)) {
+							effect.limiter.Loudness = static_cast<UINT32>(loudness);
+							changed = true;
+						}
+						break;
+					}
+					}
+					if (ImGui::Button(("Remove##audio_effect_remove_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str())) {
+						audio->RemoveSoundEffect(entry.soundData, effectIndex);
+						hasUnsavedChanges_ = true;
+						ImGui::TreePop();
+						break;
+					}
+					if (changed) {
+						audio->SetSoundEffects(entry.soundData, effects);
+						hasUnsavedChanges_ = true;
+					}
+					ImGui::TreePop();
+				}
+				if (ImGui::Button(("Add Reverb##audio_add_reverb_" + std::to_string(i)).c_str())) {
+					Audio::MixerEffectSettings effect{};
+					effect.type = Audio::MixerEffectType::Reverb;
+					audio->AddSoundEffect(entry.soundData, effect);
+					hasUnsavedChanges_ = true;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button(("Add Echo##audio_add_echo_" + std::to_string(i)).c_str())) {
+					Audio::MixerEffectSettings effect{};
+					effect.type = Audio::MixerEffectType::Echo;
+					audio->AddSoundEffect(entry.soundData, effect);
+					hasUnsavedChanges_ = true;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button(("Add EQ##audio_add_eq_" + std::to_string(i)).c_str())) {
+					Audio::MixerEffectSettings effect{};
+					effect.type = Audio::MixerEffectType::Equalizer;
+					audio->AddSoundEffect(entry.soundData, effect);
+					hasUnsavedChanges_ = true;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button(("Add Limiter##audio_add_limiter_" + std::to_string(i)).c_str())) {
+					Audio::MixerEffectSettings effect{};
+					effect.type = Audio::MixerEffectType::Limiter;
+					audio->AddSoundEffect(entry.soundData, effect);
+					hasUnsavedChanges_ = true;
+				}
+				if (ImGui::Button(("Clear Effects##audio_clear_effects_" + std::to_string(i)).c_str())) {
+					audio->ClearSoundEffects(entry.soundData);
+					hasUnsavedChanges_ = true;
+				}
+				ImGui::TreePop();
 			}
 			if (entry.isPlaying) {
 				ImGui::Text("Playing (%s)", entry.isLoop ? "Loop" : "One-shot");

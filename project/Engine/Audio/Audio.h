@@ -45,6 +45,8 @@ struct SoundData {
 	float volume = 1.0f;
 	// エディター表示用の名前
 	std::string debugName;
+	// このサウンド専用のエフェクトチェーン
+	std::vector<AudioMixer::EffectSettings> effects;
 
 private:
 	void RegisterInstance();
@@ -82,6 +84,8 @@ private:
 		const BYTE* audioData;
 		// ループ再生中かどうか
 		bool isLoop;
+		// ボイスに適用しているエフェクトインスタンス保持
+		std::vector<Microsoft::WRL::ComPtr<IUnknown>> effectInstances;
 	};
 
 	// 現在再生中のボイス一覧
@@ -91,6 +95,8 @@ private:
 
 	// 指定サウンドに紐づく再生中ボイスのみ停止
 	void StopVoicesForSound(const SoundData& soundData);
+	// 指定ボイスへエフェクトチェーンを再構築して適用
+	void ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<MixerEffectSettings>& effects, std::vector<Microsoft::WRL::ComPtr<IUnknown>>& outInstances);
 	// 全ボイスを停止
 	void StopAllVoices();
 
@@ -117,6 +123,16 @@ public:
 	void SetSoundVolume(SoundData* soundData, float volume);
 	// エディター表示用のサウンド情報を取得
 	std::vector<EditorSoundEntry> GetEditorSoundEntries() const;
+	// 指定サウンドのエフェクトチェーンを取得
+	std::vector<MixerEffectSettings> GetSoundEffects(const SoundData* soundData) const;
+	// 指定サウンドのエフェクトチェーンを置き換え
+	void SetSoundEffects(SoundData* soundData, const std::vector<MixerEffectSettings>& effects);
+	// 指定サウンドにエフェクトを追加
+	void AddSoundEffect(SoundData* soundData, const MixerEffectSettings& effect);
+	// 指定サウンドのエフェクトを削除
+	void RemoveSoundEffect(SoundData* soundData, size_t index);
+	// 指定サウンドのエフェクトをクリア
+	void ClearSoundEffects(SoundData* soundData);
 	// エディター表示/設定保存用のエフェクトチェーンを取得
 	std::vector<MixerEffectSettings> GetMixerEffects() const;
 	// AudioMixer エフェクトチェーンをまとめて置き換え

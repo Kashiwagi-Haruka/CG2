@@ -2,6 +2,7 @@
 #include "fstream"
 #include <algorithm>
 #include <assert.h>
+#include <combaseapi.h>
 #include <filesystem>
 #include <mfapi.h>
 #include <mfidl.h>
@@ -12,6 +13,7 @@
 #pragma comment(lib, "mfuuid.lib")
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "mfreadwrite.lib")
+#pragma comment(lib, "ole32.lib")
 
 namespace {
 std::vector<SoundData*>& SoundDataRegistry() {
@@ -22,12 +24,13 @@ std::vector<SoundData*>& SoundDataRegistry() {
 
 SoundData::SoundData() { RegisterInstance(); }
 
-SoundData::SoundData(const SoundData& other) : wfex(other.wfex), buffer(other.buffer), volume(other.volume), debugName(other.debugName) { RegisterInstance(); }
+SoundData::SoundData(const SoundData& other) : wfex(other.wfex), buffer(other.buffer), volume(other.volume), debugName(other.debugName), effects(other.effects) { RegisterInstance(); }
 
-SoundData::SoundData(SoundData&& other) noexcept : wfex(other.wfex), buffer(std::move(other.buffer)), volume(other.volume), debugName(std::move(other.debugName)) {
+SoundData::SoundData(SoundData&& other) noexcept : wfex(other.wfex), buffer(std::move(other.buffer)), volume(other.volume), debugName(std::move(other.debugName)), effects(std::move(other.effects)) {
 	RegisterInstance();
 	other.wfex = {};
 	other.volume = 1.0f;
+	other.effects.clear();
 }
 
 SoundData& SoundData::operator=(const SoundData& other) {
@@ -38,6 +41,7 @@ SoundData& SoundData::operator=(const SoundData& other) {
 	buffer = other.buffer;
 	volume = other.volume;
 	debugName = other.debugName;
+	effects = other.effects;
 	return *this;
 }
 
@@ -49,10 +53,12 @@ SoundData& SoundData::operator=(SoundData&& other) noexcept {
 	buffer = std::move(other.buffer);
 	volume = other.volume;
 	debugName = std::move(other.debugName);
+	effects = std::move(other.effects);
 	other.wfex = {};
 	other.volume = 1.0f;
 	return *this;
 }
+
 
 SoundData::~SoundData() { UnregisterInstance(); }
 
@@ -219,6 +225,7 @@ void Audio::SoundUnload(SoundData* soundData) {
 	StopVoicesForSound(*soundData);
 	soundData->buffer.clear();
 	soundData->wfex = {};
+	soundData->effects.clear();
 }
 
 // サウンドを再生する(必要ならループ再生)
@@ -260,7 +267,12 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 
 	result_ = pSourceVoice->Start();
 	assert(SUCCEEDED(result_));
-	activeVoices_.push_back({pSourceVoice, soundData.buffer.data(), isLoop});
+	ActiveVoice activeVoice{};
+	activeVoice.voice = pSourceVoice;
+	activeVoice.audioData = soundData.buffer.data();
+	activeVoice.isLoop = isLoop;
+	ApplyEffectsToVoice(pSourceVoice, soundData.effects, activeVoice.effectInstances);
+	activeVoices_.push_back(std::move(activeVoice));
 }
 
 void Audio::SoundPlayWaveFromStart(const SoundData& soundData, bool isLoop) {
@@ -304,6 +316,134 @@ void Audio::SetSoundVolume(SoundData* soundData, float volume) {
 	}
 }
 
+void Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<MixerEffectSettings>& effects, std::vector<Microsoft::WRL::ComPtr<IUnknown>>& outInstances) {
+	if (!voice) {
+		return;
+	}
+
+	outInstances.clear();
+	std::vector<XAUDIO2_EFFECT_DESCRIPTOR> descriptors;
+	std::vector<const MixerEffectSettings*> appliedEffects;
+	descriptors.reserve(effects.size());
+	appliedEffects.reserve(effects.size());
+
+	for (const auto& effect : effects) {
+		if (!effect.enabled) {
+			continue;
+		}
+
+		Microsoft::WRL::ComPtr<IUnknown> xapo;
+		HRESULT hr = S_OK;
+		switch (effect.type) {
+		case MixerEffectType::Reverb:
+			hr = XAudio2CreateReverb(&xapo, 0);
+			break;
+		case MixerEffectType::Echo:
+			hr = CoCreateInstance(__uuidof(FXEcho), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUnknown), reinterpret_cast<void**>(xapo.GetAddressOf()));
+			break;
+		case MixerEffectType::Equalizer:
+			hr = CoCreateInstance(__uuidof(FXEQ), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUnknown), reinterpret_cast<void**>(xapo.GetAddressOf()));
+			break;
+		case MixerEffectType::Limiter:
+			hr = CoCreateInstance(__uuidof(FXMasteringLimiter), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUnknown), reinterpret_cast<void**>(xapo.GetAddressOf()));
+			break;
+		default:
+			hr = E_FAIL;
+			break;
+		}
+
+		if (FAILED(hr) || !xapo) {
+			continue;
+		}
+
+		outInstances.push_back(xapo);
+		descriptors.push_back({xapo.Get(), TRUE, 1});
+		appliedEffects.push_back(&effect);
+	}
+
+	if (descriptors.empty()) {
+		HRESULT hr = voice->SetEffectChain(nullptr);
+		assert(SUCCEEDED(hr));
+		return;
+	}
+
+	XAUDIO2_EFFECT_CHAIN chain{};
+	chain.EffectCount = static_cast<UINT32>(descriptors.size());
+	chain.pEffectDescriptors = descriptors.data();
+	HRESULT hr = voice->SetEffectChain(&chain);
+	assert(SUCCEEDED(hr));
+
+	for (UINT32 effectIndex = 0; effectIndex < appliedEffects.size(); ++effectIndex) {
+		const auto& effect = *appliedEffects[effectIndex];
+		switch (effect.type) {
+		case MixerEffectType::Reverb:
+			hr = voice->SetEffectParameters(effectIndex, &effect.reverb, sizeof(effect.reverb));
+			break;
+		case MixerEffectType::Echo:
+			hr = voice->SetEffectParameters(effectIndex, &effect.echo, sizeof(effect.echo));
+			break;
+		case MixerEffectType::Equalizer:
+			hr = voice->SetEffectParameters(effectIndex, &effect.equalizer, sizeof(effect.equalizer));
+			break;
+		case MixerEffectType::Limiter:
+			hr = voice->SetEffectParameters(effectIndex, &effect.limiter, sizeof(effect.limiter));
+			break;
+		default:
+			hr = E_FAIL;
+			break;
+		}
+		assert(SUCCEEDED(hr));
+	}
+}
+
+std::vector<Audio::MixerEffectSettings> Audio::GetSoundEffects(const SoundData* soundData) const {
+	if (!soundData) {
+		return {};
+	}
+	return soundData->effects;
+}
+
+void Audio::SetSoundEffects(SoundData* soundData, const std::vector<MixerEffectSettings>& effects) {
+	if (!soundData) {
+		return;
+	}
+	soundData->effects = effects;
+	const BYTE* targetData = soundData->buffer.data();
+	if (!targetData) {
+		return;
+	}
+	for (auto& active : activeVoices_) {
+		if (active.voice && active.audioData == targetData) {
+			ApplyEffectsToVoice(active.voice, soundData->effects, active.effectInstances);
+		}
+	}
+}
+
+void Audio::AddSoundEffect(SoundData* soundData, const MixerEffectSettings& effect) {
+	if (!soundData) {
+		return;
+	}
+	auto effects = soundData->effects;
+	effects.push_back(effect);
+	SetSoundEffects(soundData, effects);
+}
+
+void Audio::RemoveSoundEffect(SoundData* soundData, size_t index) {
+	if (!soundData || index >= soundData->effects.size()) {
+		return;
+	}
+	auto effects = soundData->effects;
+	effects.erase(effects.begin() + index);
+	SetSoundEffects(soundData, effects);
+}
+
+void Audio::ClearSoundEffects(SoundData* soundData) {
+	if (!soundData) {
+		return;
+	}
+	SetSoundEffects(soundData, {});
+}
+
 std::vector<Audio::EditorSoundEntry> Audio::GetEditorSoundEntries() const {
 	std::vector<EditorSoundEntry> entries;
 	const auto& instances = SoundData::GetInstances();
@@ -328,50 +468,3 @@ std::vector<Audio::EditorSoundEntry> Audio::GetEditorSoundEntries() const {
 }
 
 std::vector<Audio::MixerEffectSettings> Audio::GetMixerEffects() const { return mixer_.GetEffects(); }
-
-void Audio::SetMixerEffects(const std::vector<MixerEffectSettings>& effects) { mixer_.SetEffects(effects); }
-
-void Audio::AddMixerEffect(const MixerEffectSettings& effect) { mixer_.AddEffect(effect); }
-
-void Audio::RemoveMixerEffect(size_t index) { mixer_.RemoveEffect(index); }
-
-void Audio::ClearMixerEffects() { mixer_.ClearEffects(); }
-
-const char* Audio::GetMixerEffectTypeName(MixerEffectType type) { return AudioMixer::GetEffectTypeName(type); }
-
-// 指定したサウンドの非ループ再生がすべて完了しているかを返す
-bool Audio::IsSoundFinished(const SoundData& soundData) const {
-	const BYTE* targetData = soundData.buffer.data();
-	if (!targetData) {
-		return true;
-	}
-
-	for (const auto& active : activeVoices_) {
-		if (!active.voice || active.audioData != targetData) {
-			continue;
-		}
-		if (active.isLoop) {
-			return false;
-		}
-
-		XAUDIO2_VOICE_STATE state{};
-		active.voice->GetState(&state);
-		if (state.BuffersQueued > 0) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-// すべての再生中ボイスを停止する
-void Audio::StopAllVoices() {
-	for (auto& active : activeVoices_) {
-		if (active.voice) {
-			active.voice->Stop();
-			active.voice->DestroyVoice();
-			active.voice = nullptr;
-		}
-	}
-	activeVoices_.clear();
-}
