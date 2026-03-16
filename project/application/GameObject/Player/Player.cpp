@@ -8,12 +8,6 @@
 #include<imgui.h>
 #include"GameObject/YoshidaMath/Easing.h"
 
-namespace PlayerConst {
-    const constexpr float kRotateYSpeed = 0.25f;
-    const constexpr float kSneakSpeed = 0.0625f;
-    const constexpr float kWalkSpeed = 0.125f;
-};
-
 Player::Player()
 {
     localAABB_ = { .min = {-0.25f,0.0f,-0.25f},.max = {0.25f,1.5f,0.25f} };
@@ -114,6 +108,12 @@ void Player::Debug()
                 animationTime_ = 0.0f;
             }
         }
+
+        if (ImGui::TreeNode("Parameters")) {
+            ImGui::DragFloat("Walk Speed", &parameters_.kWalkSpeed, 0.1f, 0.0f, 10.0f);
+            ImGui::DragFloat("Sneak Speed", &parameters_.kSneakSpeed, 0.1f, 0.0f, 10.0f);
+			ImGui::TreePop();
+        }
     }
     ImGui::End();
 #endif
@@ -147,7 +147,7 @@ void Player::Move()
     float yaw = std::atan2(horizontal.x, horizontal.y);
     //ベクトルのXZ長さ
     float length = YoshidaMath::Length(Vector2{ velocity_.x,velocity_.z });
-    moveSpeed_ = (playerCommand->Sneak() || length <= 0.5f) ? PlayerConst::kSneakSpeed : PlayerConst::kWalkSpeed;
+    moveSpeed_ = (playerCommand->Sneak() || length <= 0.5f) ? parameters_.kSneakSpeed : parameters_.kWalkSpeed;
     //前の方向を取得
     forward_ = YoshidaMath::GetForward(bodyObj_->GetWorldMatrix());
 

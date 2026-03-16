@@ -7,6 +7,7 @@
 #include"RigidBody.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/YoshidaMath/CollisionManager/Collider.h"
+#include "PlayerParameters.h"
 
 class Camera;
 
@@ -36,6 +37,10 @@ private:
     float moveSpeed_ = { 0.0f };
 
     AABB localAABB_ = { 0.0f };
+
+    // プレイヤーのパラメータ
+    PlayerParameters parameters_{};
+
     //衝突情報
     YoshidaMath::CollisionInfo collisionInfo_;
 
