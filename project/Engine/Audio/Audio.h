@@ -77,6 +77,8 @@ private:
 
 	// API 呼び出し結果保持用
 	HRESULT result_;
+	bool comInitialized_ = false;
+
 	struct ActiveVoice {
 		// 実際に再生中のソースボイス
 		IXAudio2SourceVoice* voice;

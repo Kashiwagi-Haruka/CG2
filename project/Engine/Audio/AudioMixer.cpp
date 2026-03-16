@@ -131,13 +131,13 @@ void AudioMixer::RebuildEffectChain() {
 			hr = XAudio2CreateReverb(&xapo, 0);
 			break;
 		case EffectType::Echo:
-			hr = CoCreateInstance(__uuidof(FXEcho), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUnknown), reinterpret_cast<void**>(xapo.GetAddressOf()));
+			hr = CreateFX(__uuidof(FXEcho), reinterpret_cast<IUnknown**>(xapo.GetAddressOf()), nullptr, 0);
 			break;
 		case EffectType::Equalizer:
-			hr = CoCreateInstance(__uuidof(FXEQ), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUnknown), reinterpret_cast<void**>(xapo.GetAddressOf()));
+			hr = CreateFX(__uuidof(FXEQ), reinterpret_cast<IUnknown**>(xapo.GetAddressOf()), nullptr, 0);
 			break;
 		case EffectType::Limiter:
-			hr = CoCreateInstance(__uuidof(FXMasteringLimiter), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUnknown), reinterpret_cast<void**>(xapo.GetAddressOf()));
+			hr = CreateFX(__uuidof(FXMasteringLimiter), reinterpret_cast<IUnknown**>(xapo.GetAddressOf()), nullptr, 0);
 			break;
 		default:
 			hr = E_FAIL;

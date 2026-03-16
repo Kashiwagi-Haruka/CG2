@@ -14,7 +14,7 @@
 #pragma comment(lib, "mfuuid.lib")
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "mfreadwrite.lib")
-#pragma comment(lib, "ole32.lib")
+
 
 namespace {
 std::vector<SoundData*>& SoundDataRegistry() {
@@ -129,11 +129,27 @@ void Audio::Finalize() {
 	result_ = MFShutdown();
 	assert(SUCCEEDED(result_));
 
+	if (comInitialized_) {
+		CoUninitialize();
+		comInitialized_ = false;
+	}
+
 	instance = nullptr;
 }
 
 // Media Foundation / XAudio2 を初期化する
 void Audio::InitializeIXAudio() {
+	result_ = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	if (SUCCEEDED(result_)) {
+		comInitialized_ = true;
+	} else if (result_ == RPC_E_CHANGED_MODE) {
+		// 既に別モデルで初期化済みでも COM は利用可能
+		comInitialized_ = false;
+		result_ = S_OK;
+	} else {
+		assert(SUCCEEDED(result_));
+	}
+
 	result_ = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
 	assert(SUCCEEDED(result_));
 	result_ = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
@@ -374,13 +390,13 @@ bool Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 			hr = XAudio2CreateReverb(&xapo, 0);
 			break;
 		case MixerEffectType::Echo:
-			hr = CoCreateInstance(__uuidof(FXEcho), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUnknown), reinterpret_cast<void**>(xapo.GetAddressOf()));
+			hr = CreateFX(__uuidof(FXEcho), reinterpret_cast<IUnknown**>(xapo.GetAddressOf()), nullptr, 0);
 			break;
 		case MixerEffectType::Equalizer:
-			hr = CoCreateInstance(__uuidof(FXEQ), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUnknown), reinterpret_cast<void**>(xapo.GetAddressOf()));
+			hr = CreateFX(__uuidof(FXEQ), reinterpret_cast<IUnknown**>(xapo.GetAddressOf()), nullptr, 0);
 			break;
 		case MixerEffectType::Limiter:
-			hr = CoCreateInstance(__uuidof(FXMasteringLimiter), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUnknown), reinterpret_cast<void**>(xapo.GetAddressOf()));
+			hr = CreateFX(__uuidof(FXMasteringLimiter), reinterpret_cast<IUnknown**>(xapo.GetAddressOf()), nullptr, 0);
 			break;
 		default:
 			hr = E_FAIL;
