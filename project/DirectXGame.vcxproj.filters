@@ -617,6 +617,12 @@
     <ClInclude Include="Engine\Texture\Sprite\Sprite.h">
       <Filter>Engine\Texture\Sprite</Filter>
     </ClInclude>
+    <ClInclude Include="externals\freetype\include\ft2build.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\freetype\include\freetype\config\ftheader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Texture\SrvManager\SrvManager.h">
       <Filter>Engine\Texture</Filter>
     </ClInclude>
