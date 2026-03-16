@@ -19,14 +19,11 @@ Player::Player()
     localAABB_ = { .min = {-0.25f,0.0f,-0.25f},.max = {0.25f,1.5f,0.25f} };
     SetAABB(localAABB_);
     SetCollisionAttribute(kCollisionPlayer);
-    SetCollisionMask(kCollisionFloor|kCollisionPortal|kCollisionEnemy|kCollisionItem| kCollisionChair|kCollisionWall);
-
+    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionVendingMac | kCollisionDoor | kCollisionMat);
     //体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
-
     //モデルの読み込み
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
-  
 }
 void Player::SetCamera(Camera* camera)
 {
@@ -48,7 +45,7 @@ void Player::Initialize()
     .translate{0.0f,2.0f,0.0f}
     };
     //速度の初期化
-    velocity_ = { 0.0f};
+    velocity_ = { 0.0f };
     forward_ = { 0.0f };
 
     moveSpeed_ = { 0.0f };
@@ -178,9 +175,10 @@ void Player::Gravity()
 void Player::OnCollision(Collider* collider)
 {
 
-  /*if (collider->GetCollisionAttribute() == kCollisionFloor) {*/
-     OnCollisionObstacle();
-    
+    if (collider->GetCollisionAttribute() != kCollisionMat) {
+        //マットじゃなかったら
+        OnCollisionObstacle();
+    }
     if (collider->GetCollisionAttribute() == kCollisionPortal) {
 
     }

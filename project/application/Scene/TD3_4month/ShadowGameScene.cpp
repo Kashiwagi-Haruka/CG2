@@ -33,22 +33,35 @@ ShadowGameScene::ShadowGameScene()
 
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
-
     //懐中電灯
     flashlight_ = std::make_unique<Flashlight>();
     // 鍵管理
     key_ = std::make_unique<Key>();
     // 枝豆管理
     edamame_ = std::make_unique<Edamame>();
-    //椅子
-    chair_ = std::make_unique<Chair>();
+    //ドア
+    door_ = std::make_unique<Door>();
+
     //壁管理
     wallManager_ = std::make_unique<WallManager>();
     //壁管理
     wallManager2_ = std::make_unique<WallManager>();
-
+    //自販機
+    vendingMac_ = std::make_unique<VendingMac>();
+    //椅子
+    chairManager_ = std::make_unique<ChairManager>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
+
+    portalManager_->SetPlayerCamera(playerCamera_.get());
+    //Playerの座標のポインタを入れる
+    timeCardWatch_->SetTransformPtr(&player_->GetTransform());
+
+    key_->SetPlayerCamera(playerCamera_.get());
+    edamame_->SetPlayerCamera(playerCamera_.get());
+    chairManager_->SetPlayerCamera(playerCamera_.get());
+    vendingMac_->SetPlayerCamera(playerCamera_.get());
+    door_->SetPlayerCamera(playerCamera_.get());
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -75,37 +88,30 @@ void ShadowGameScene::Initialize()
     //デバックカメラの設定
     debugCamera_->Initialize();
     debugCamera_->SetTranslation(playerCamera_->GetTransform().translate);
+
+    InitializeLights();
     //プレイヤーの初期化
     player_->Initialize();
     //テスト地面
     testField_->Initialize();
-
-    InitializeLights();
-
     //ホワイトボード管理
     portalManager_->Initialize();
-    portalManager_->SetPlayerCamera(playerCamera_.get());
-
     //携帯打刻機
     timeCardWatch_->Initialize();
-    //Playerの座標のポインタを入れる
-    timeCardWatch_->SetTransformPtr(&player_->GetTransform());
-
     // 鍵
     key_->Initialize();
-    key_->SetPlayerCamera(playerCamera_.get());
-
     // 枝豆
     edamame_->Initialize();
-    edamame_->SetPlayerCamera(playerCamera_.get());
-
     //椅子
-    chair_->Initialize();
-    chair_->SetPlayerCamera(playerCamera_.get());
+    chairManager_->Initialize();
     //壁
     wallManager_->Initialize();
     //壁
     wallManager2_->Initialize();
+    //自販機
+    vendingMac_->Initialize();
+    //ドア
+    door_->Initialize();
 
     SetSceneCameraForDraw(playerCamera_->GetCamera());
 
@@ -136,6 +142,9 @@ void ShadowGameScene::Update()
         }
     }
 
+    //ライトの更新処理
+    UpdateLight();
+
     if (isPause_) {
         return;
     }
@@ -144,8 +153,7 @@ void ShadowGameScene::Update()
     UpdateSceneTransition();
     //カメラの更新処理
     UpdateCamera();
-    //ライトの更新処理
-    UpdateLight();
+
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
 
@@ -183,7 +191,8 @@ void ShadowGameScene::CheckCollision()
     portalManager_->CheckCollision();
     key_->CheckCollision();
     edamame_->CheckCollision();
-    chair_->CheckCollision();
+    door_->CheckCollision();
+    vendingMac_->CheckCollision();
 
     collisionManager_->ClearColliders();
 
@@ -210,9 +219,20 @@ void ShadowGameScene::CheckCollision()
         collisionManager_->AddCollider(wall.get());
     }
 
+    collisionManager_->AddCollider(vendingMac_.get());
     collisionManager_->AddCollider(flashlight_.get());
     collisionManager_->AddCollider(testField_.get());
-    collisionManager_->AddCollider(chair_.get());
+    for (auto& chair : chairManager_->GetChairs()) {
+        collisionManager_->AddCollider(chair.get());
+    }
+
+    collisionManager_->AddCollider(door_->GetAutoLockSystem().get());
+
+    if (!door_->GetIsOpen()) {
+        collisionManager_->AddCollider(door_.get());
+    }
+
+    collisionManager_->AddCollider(key_.get());
 
     collisionManager_->CheckAllCollisions();
 }
@@ -221,11 +241,10 @@ void ShadowGameScene::InitializeLights()
 {
     //懐中電灯
     flashlight_->Initialize();
-    flashlight_->SetCamera(playerCamera_->GetCamera());
 
     activePointLightCount_ = 2;
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    pointLights_[0].position = { 0.0f, 5.0f, 0.0f };
+    pointLights_[0].position = {7.0f, 0.0f, 0.0f };
     pointLights_[0].intensity = 1.0f;
     pointLights_[0].radius = 10.0f;
     pointLights_[0].decay = 1.0f;
@@ -249,24 +268,25 @@ void ShadowGameScene::InitializeLights()
     spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
     spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 
-    activeAreaLightCount_ = 2;
-    areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    areaLights_[0].position = { 0.0f, 3.0f, 0.0f };
-    areaLights_[0].normal = { 1.0f, -1.0f, 0.0f };
-    areaLights_[0].intensity = 4.0f;
+    activeAreaLightCount_ = 3;
+    areaLights_[0].color = { 1.0f,1.0f, 1.0f, 1.0f };
+    areaLights_[0].position = { 7.0f, 3.0f, 0.0f };
+    areaLights_[0].normal = { 0.0f, 1.0f, 0.0f };
+    areaLights_[0].intensity = 10.0f;
     areaLights_[0].width = 2.0f;
     areaLights_[0].height = 2.0f;
-    areaLights_[0].radius = 0.1f;
+    areaLights_[0].radius = 5.0f;
     areaLights_[0].decay = 2.0f;
 
     areaLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    areaLights_[1].position = { -5.0f, 3.0f, 0.0f };
-    areaLights_[1].normal = { 1.0f, -1.0f, 0.0f };
-    areaLights_[1].intensity = 4.0f;
+    areaLights_[1].position = { -7.0f, 3.0f, 0.0f };
+    areaLights_[1].normal = { 0.0f, 1.0f, 0.0f };
+    areaLights_[1].intensity = 10.0f;
     areaLights_[1].width = 2.0f;
     areaLights_[1].height = 2.0f;
-    areaLights_[1].radius = 0.1f;
+    areaLights_[1].radius =5.0f;
     areaLights_[1].decay = 2.0f;
+
 }
 #pragma region //private更新処理
 void ShadowGameScene::UpdateCamera()
@@ -370,13 +390,16 @@ void ShadowGameScene::UpdateGameObject()
     //枝豆管理
     edamame_->Update();
     //椅子管理
-    chair_->Update();
+    chairManager_->Update();
     //床
     testField_->Update();
     //壁管理
     wallManager_->Update();
     //壁管理
     wallManager2_->Update();
+
+    //ドア
+    door_->Update();
     //ポータル管理
     portalManager_->Update();
     ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
@@ -388,23 +411,14 @@ void ShadowGameScene::UpdateLight()
     //懐中電灯
     flashlight_->Update();
     spotLights_[1] = flashlight_->GetSpotLight();
+    areaLights_[2] = vendingMac_->GetAreaLight();
 
-
+    //自販機
+    vendingMac_->Update();
 #ifdef USE_IMGUI
-    if (ImGui::TreeNode("PointLight")) {
-        ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);
-        ImGui::DragFloat("PointLightIntensity", &pointLights_[0].intensity, 0.1f);
-        ImGui::DragFloat3("PointLightPosition", &pointLights_[0].position.x, 0.1f);
-        ImGui::DragFloat("PointLightRadius", &pointLights_[0].radius, 0.1f);
-        ImGui::DragFloat("PointLightDecay", &pointLights_[0].decay, 0.1f);
-        ImGui::TreePop();
-    }
-    if (ImGui::TreeNode("PointLight1")) {
-        ImGui::ColorEdit4("PointLightColor1", &pointLights_[1].color.x);
-        ImGui::DragFloat("PointLightIntensity1", &pointLights_[1].intensity, 0.1f);
-        ImGui::DragFloat3("PointLightPosition1", &pointLights_[1].position.x, 0.1f);
-        ImGui::DragFloat("PointLightRadius1", &pointLights_[1].radius, 0.1f);
-        ImGui::DragFloat("PointLightDecay1", &pointLights_[1].decay, 0.1f);
+    if (ImGui::TreeNode("Light")) {
+        ImGui::DragFloat3("Area0Position", &areaLights_[0].position.x, 0.1f);
+        ImGui::DragFloat3("Area1Position", &areaLights_[1].position.x, 0.1f);
         ImGui::TreePop();
     }
 #endif
@@ -447,6 +461,10 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     wallManager_->Draw();
     //壁管理
     wallManager2_->Draw();
+    //自販機
+    vendingMac_->Draw();
+    //ドア
+    door_->Draw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //懐中電灯
@@ -456,7 +474,7 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     // 枝豆の描画処理
     edamame_->Draw();
     //椅子の描画
-    chair_->Draw();
+    chairManager_->Draw();
 
     if (!isShadow) {
         Object3dCommon::GetInstance()->DrawCommonSkinning();
@@ -480,9 +498,11 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     flashlight_->SetCamera(camera);
     key_->SetCamera(camera);
     edamame_->SetCamera(camera);
-    chair_->SetCamera(camera);
+    chairManager_->SetCamera(camera);
     wallManager_->SetCamera(camera);
     wallManager2_->SetCamera(camera);
+    vendingMac_->SetCamera(camera);
+    door_->SetCamera(camera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {

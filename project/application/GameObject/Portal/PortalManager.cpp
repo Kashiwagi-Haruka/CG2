@@ -19,7 +19,7 @@ PortalManager::PortalManager(Vector3* pos) {
 
     playerPos_ = pos;
 
-    firstWarpPosTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = { 0.0f, 1.5f, 14.0f } };
+    firstWarpPosTransform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = { -2.0f, 1.5f, 0.0f } };
 
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
     std::unique_ptr<WalkWhiteBoard> walkWhite = std::make_unique<WalkWhiteBoard>();
@@ -47,6 +47,15 @@ PortalManager::PortalManager(Vector3* pos) {
 
 PortalManager::~PortalManager()
 {
+    for (auto& board : whiteBoards_) {
+        board.reset();
+    }
+    whiteBoards_.clear();
+    for (auto& portal : portals_) {
+        portal.reset();
+    }
+    portals_.clear();
+
     Audio::GetInstance()->SoundUnload(&warpSE_);
     Audio::GetInstance()->SoundUnload(&portalSpawnSE_);
     Audio::GetInstance()->SoundUnload(&shotSE_);
@@ -75,9 +84,10 @@ void PortalManager::WarpPlayer(Player* player)
             if (warpCoolTimer_ == kWarpTime_) {
                 warpCoolTimer_ = 0.0f;
 
-                Transform*transform = portal->GetWarpPos()->GetParent();
-                player->SetTranslate(transform->translate);
-                player->SetRotate(portal->GetWarpPos()->GetTransform().rotate+ transform->rotate);
+                Transform transform = *portal->GetWarpPos()->GetParent();
+                transform.translate.y = 0.0f;
+                player->SetTranslate(transform.translate);
+                player->SetRotate(portal->GetWarpPos()->GetTransform().rotate+ transform.rotate);
 
                 Audio::GetInstance()->SoundPlayWave(warpSE_, false);
                 break;

@@ -13,9 +13,10 @@
 #include"GameObject/TimeCard/TimeCardWatch.h"
 #include"GameObject/Flashlight/Flashlight.h"
 #include"GameObject/Key/Key.h"
-#include <GameObject/Chair/Chair.h>
+#include <GameObject/Chair/ChairManager.h>
 #include"GameObject/Wall/WallManager.h"
-
+#include"GameObject/VendingMac/VendingMac.h"
+#include"GameObject/Door/Door.h"
 #pragma endregion
 
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
@@ -26,7 +27,6 @@
 #include "Light/AreaLight.h"
 #include"Audio.h"
 #include <GameObject/Edamame/Edamame.h>
-
 
 class ShadowGameScene : public BaseScene
 {
@@ -68,11 +68,16 @@ private:
     //枝豆
     std::unique_ptr<Edamame> edamame_ = nullptr;
     //椅子
-    std::unique_ptr<Chair> chair_ = nullptr;
+    std::unique_ptr<ChairManager> chairManager_ = nullptr;
     //壁管理
     std::unique_ptr<WallManager> wallManager_ = nullptr;
     //壁管理2こめ
     std::unique_ptr<WallManager> wallManager2_ = nullptr;
+    //自販機
+    std::unique_ptr<VendingMac> vendingMac_ = nullptr;
+    //ドア
+    std::unique_ptr<Door> door_ = nullptr;
+
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

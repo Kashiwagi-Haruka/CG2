@@ -3,14 +3,17 @@
 #include "GameObject/YoshidaMath/CollisionManager/Collider.h"
 #include"Object3d/Object3d.h"
 #include<memory>
+#include "Light/AreaLight.h"
+#include"Audio.h"
 
 class Camera;
 
-class Chair :
+class VendingMac :
     public YoshidaMath::Collider
 {
 public:
-    Chair();
+    VendingMac();
+    ~VendingMac();
     /// @brief 衝突時コールバック関数
     void OnCollision(Collider* collider)override;
     /// @brief ワールド座標を取得する
@@ -19,17 +22,17 @@ public:
     void Update();
     void Initialize();
     void Draw();
-  static  void SetPlayerCamera(PlayerCamera* camera);
+    void CheckCollision();
+    void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
-    void SetTransform(const Transform& transform) { transform_ = transform; };
-    void SetMirrorTransform(Transform* transform) { mirrorTransform_ = transform; };
-    Transform& GetTransform() { return transform_; };
+    AreaLight& GetAreaLight() { return  areaLight_; }
 private:
+    float GetVol(float length, float maxVol);
+    static SoundData noise_;
     bool OnCollisionRay();
-   static PlayerCamera* playerCamera_;
-    Transform transform_ = {};
+    PlayerCamera* playerCamera_ = nullptr;
     std::unique_ptr<Object3d>obj_ = nullptr;
-    Transform* mirrorTransform_ = nullptr;
-    Vector3 velocity_ = { 0.0f };
+    AreaLight areaLight_;
+    Vector3 translate_ = { 0.0f };
 };
 

@@ -49,15 +49,6 @@ void WarpPos::Update()
         child = Function::Multiply( child, parent);
     } 
 
-    //sinTheta_ += Function::kPi * YoshidaMath::kDeltaTime;
-   
-    //if (sinTheta_ >= Function::kPi*2.0f) {
-    //    sinTheta_ = 0.0f;
-    //}
-
-    //transform_.translate.y += std::sinf(sinTheta_)*0.0625f;
-
-    //camera_->SetWorldMatrix(child);
     object3d_->SetWorldMatrix(child);
 
     camera_->UpdateViewProjection(child);
@@ -67,5 +58,4 @@ void WarpPos::Update()
 void WarpPos::Draw()
 {
  
- /*   object3d_->Draw();*/
 }

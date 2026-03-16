@@ -3,7 +3,7 @@
 SoundData BGMManager::bgm1_ ;
 void BGMManager::Load()
 {
-	//枝豆
+	//BGM
 	bgm1_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/BGM/bgm1.mp3");
 
 
