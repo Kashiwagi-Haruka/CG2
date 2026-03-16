@@ -7,6 +7,7 @@
 #include "Object3d/Object3d.h"
 #include "PlayerParameters.h"
 #include "RigidBody.h"
+#include"Audio.h"
 #include <memory>
 #include <string>
 
@@ -50,6 +51,8 @@ private:
 	void SaveParameters();
 	void LoadParameters();
 
+	SoundData footStepSE;
+	float soundTimer_ = 0.0f;
 public:
 	void OnCollision(Collider* collider) override;
 	/// @brief ワールド座標を取得する
