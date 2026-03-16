@@ -28,6 +28,15 @@ struct FormatChunk {
 	WAVEFORMATEX fmt;
 };
 struct SoundData {
+	SoundData();
+	SoundData(const SoundData& other);
+	SoundData(SoundData&& other) noexcept;
+	SoundData& operator=(const SoundData& other);
+	SoundData& operator=(SoundData&& other) noexcept;
+	~SoundData();
+
+	static const std::vector<SoundData*>& GetInstances();
+
 	// 再生時に使う波形フォーマット
 	WAVEFORMATEX wfex;
 	// PCM データ本体
@@ -36,6 +45,10 @@ struct SoundData {
 	float volume = 1.0f;
 	// エディター表示用の名前
 	std::string debugName;
+
+private:
+	void RegisterInstance();
+	void UnregisterInstance();
 };
 
 class Audio {
@@ -71,14 +84,8 @@ private:
 		bool isLoop;
 	};
 
-	struct EditorTrackedSound {
-		SoundData* soundData = nullptr;
-	};
-
 	// 現在再生中のボイス一覧
 	std::vector<ActiveVoice> activeVoices_;
-	// エディター表示対象のサウンド一覧
-	std::vector<EditorTrackedSound> editorTrackedSounds_;
 	// AudioMixer 相当のミキサー
 	AudioMixer mixer_;
 
@@ -86,8 +93,6 @@ private:
 	void StopVoicesForSound(const SoundData& soundData);
 	// 全ボイスを停止
 	void StopAllVoices();
-	// エディター表示対象へ登録
-	void TrackSoundForEditor(SoundData* soundData);
 
 public:
 	// 非ループ音声の終了監視と後始末

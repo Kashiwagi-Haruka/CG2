@@ -7,10 +7,64 @@
 #include <mfidl.h>
 #include <mfreadwrite.h>
 #include <string>
+#include <utility>
 #pragma comment(lib, "xAudio2.lib")
 #pragma comment(lib, "mfuuid.lib")
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "mfreadwrite.lib")
+
+namespace {
+std::vector<SoundData*>& SoundDataRegistry() {
+	static std::vector<SoundData*> instances;
+	return instances;
+}
+} // namespace
+
+SoundData::SoundData() { RegisterInstance(); }
+
+SoundData::SoundData(const SoundData& other) : wfex(other.wfex), buffer(other.buffer), volume(other.volume), debugName(other.debugName) { RegisterInstance(); }
+
+SoundData::SoundData(SoundData&& other) noexcept : wfex(other.wfex), buffer(std::move(other.buffer)), volume(other.volume), debugName(std::move(other.debugName)) {
+	RegisterInstance();
+	other.wfex = {};
+	other.volume = 1.0f;
+}
+
+SoundData& SoundData::operator=(const SoundData& other) {
+	if (this == &other) {
+		return *this;
+	}
+	wfex = other.wfex;
+	buffer = other.buffer;
+	volume = other.volume;
+	debugName = other.debugName;
+	return *this;
+}
+
+SoundData& SoundData::operator=(SoundData&& other) noexcept {
+	if (this == &other) {
+		return *this;
+	}
+	wfex = other.wfex;
+	buffer = std::move(other.buffer);
+	volume = other.volume;
+	debugName = std::move(other.debugName);
+	other.wfex = {};
+	other.volume = 1.0f;
+	return *this;
+}
+
+SoundData::~SoundData() { UnregisterInstance(); }
+
+const std::vector<SoundData*>& SoundData::GetInstances() { return SoundDataRegistry(); }
+
+void SoundData::RegisterInstance() { SoundDataRegistry().push_back(this); }
+
+void SoundData::UnregisterInstance() {
+	auto& instances = SoundDataRegistry();
+	instances.erase(std::remove(instances.begin(), instances.end(), this), instances.end());
+}
+
 
 // Audio シングルトンインスタンス
 std::unique_ptr<Audio> Audio::instance = nullptr;
@@ -72,17 +126,6 @@ void Audio::Update() {
 	}
 
 	activeVoices_.erase(std::remove_if(activeVoices_.begin(), activeVoices_.end(), [](const ActiveVoice& active) { return active.voice == nullptr; }), activeVoices_.end());
-}
-void Audio::TrackSoundForEditor(SoundData* soundData) {
-	if (!soundData) {
-		return;
-	}
-	for (const auto& tracked : editorTrackedSounds_) {
-		if (tracked.soundData == soundData) {
-			return;
-		}
-	}
-	editorTrackedSounds_.push_back({soundData});
 }
 // 音声ファイルを PCM として読み込んで SoundData を生成する
 SoundData Audio::SoundLoadFile(const char* filename) {
@@ -176,16 +219,10 @@ void Audio::SoundUnload(SoundData* soundData) {
 	StopVoicesForSound(*soundData);
 	soundData->buffer.clear();
 	soundData->wfex = {};
-	for (auto& tracked : editorTrackedSounds_) {
-		if (tracked.soundData == soundData) {
-			tracked.soundData = nullptr;
-		}
-	}
 }
 
 // サウンドを再生する(必要ならループ再生)
 void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
-	TrackSoundForEditor(const_cast<SoundData*>(&soundData));
 	if (!xAudio2_) {
 		OutputDebugStringA("SoundPlayWave: xAudio2 is null!\n");
 		return;
@@ -246,7 +283,6 @@ void Audio::StopVoicesForSound(const SoundData& soundData) {
 }
 // サウンド音量を更新し、再生中ボイスにも反映する
 void Audio::SetSoundVolume(SoundData* soundData, float volume) {
-	TrackSoundForEditor(soundData);
 	if (!soundData) {
 		return;
 	}
@@ -265,16 +301,17 @@ void Audio::SetSoundVolume(SoundData* soundData, float volume) {
 
 std::vector<Audio::EditorSoundEntry> Audio::GetEditorSoundEntries() const {
 	std::vector<EditorSoundEntry> entries;
-	entries.reserve(editorTrackedSounds_.size());
-	for (const auto& tracked : editorTrackedSounds_) {
-		if (!tracked.soundData || tracked.soundData->buffer.empty()) {
+	const auto& instances = SoundData::GetInstances();
+	entries.reserve(instances.size());
+	for (SoundData* soundData : instances) {
+		if (!soundData || soundData->buffer.empty()) {
 			continue;
 		}
 		EditorSoundEntry entry{};
-		entry.soundData = tracked.soundData;
-		entry.name = tracked.soundData->debugName.empty() ? "(unnamed sound)" : tracked.soundData->debugName;
+		entry.soundData = soundData;
+		entry.name = soundData->debugName.empty() ? "(unnamed sound)" : soundData->debugName;
 		for (const auto& active : activeVoices_) {
-			if (!active.voice || active.audioData != tracked.soundData->buffer.data()) {
+			if (!active.voice || active.audioData != soundData->buffer.data()) {
 				continue;
 			}
 			entry.isPlaying = true;
