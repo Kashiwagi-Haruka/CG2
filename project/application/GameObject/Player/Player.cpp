@@ -113,9 +113,9 @@ void Player::Debug()
         }
 
         if (ImGui::TreeNode("Parameters")) {
-			ImGui::DragFloat("Rotate Speed", &parameters_.kRotateYSpeed, 0.01f, 0.0f, 10.0f);
-			ImGui::DragFloat("Walk Speed", &parameters_.kWalkSpeed, 0.01f, 0.0f, 10.0f);
-			ImGui::DragFloat("Sneak Speed", &parameters_.kSneakSpeed, 0.01f, 0.0f, 10.0f);
+			ImGui::DragFloat("Rotate Speed", &parameters_.kRotateYSpeed, 0.001f, 0.0f, 10.0f);
+			ImGui::DragFloat("Walk Speed", &parameters_.kWalkSpeed, 0.001f, 0.0f, 10.0f);
+			ImGui::DragFloat("Sneak Speed", &parameters_.kSneakSpeed, 0.001f, 0.0f, 10.0f);
 
 			if (ImGui::Button("Save Player Parameters")) {
 				SaveParameters();
