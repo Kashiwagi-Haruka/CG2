@@ -20,6 +20,7 @@ class GameSave {
 
 public:
 	
+	void PlayerSave(const Transform& transform);
 	void CameraSave(const Transform& transform, float rotateSpeed, bool isFlipHorizontally, bool isFlipVertically);
 
 	void Save();

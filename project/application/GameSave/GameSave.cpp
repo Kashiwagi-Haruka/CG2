@@ -5,3 +5,5 @@ void GameSave::CameraSave(const Transform& transform, float rotateSpeed, bool is
 	cameraSaveData_.isFlipHorizontally = isFlipHorizontally;
 	cameraSaveData_.isFlipVertically = isFlipVertically;
 }
+void GameSave::PlayerSave(const Transform& transform) {
+	playerSaveData_.transform = transform; }
