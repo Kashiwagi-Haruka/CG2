@@ -397,7 +397,9 @@ void Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 
 	if (descriptors.empty()) {
 		HRESULT hr = voice->SetEffectChain(nullptr);
-		assert(SUCCEEDED(hr));
+		if (FAILED(hr)) {
+			return;
+		}
 		return;
 	}
 
@@ -405,7 +407,9 @@ void Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 	chain.EffectCount = static_cast<UINT32>(descriptors.size());
 	chain.pEffectDescriptors = descriptors.data();
 	HRESULT hr = voice->SetEffectChain(&chain);
-	assert(SUCCEEDED(hr));
+	if (FAILED(hr)) {
+		return;
+	}
 
 	for (UINT32 effectIndex = 0; effectIndex < appliedEffects.size(); ++effectIndex) {
 		const auto& effect = *appliedEffects[effectIndex];
@@ -426,7 +430,9 @@ void Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 			hr = E_FAIL;
 			break;
 		}
-		assert(SUCCEEDED(hr));
+		if (FAILED(hr)) {
+			return;
+		}
 	}
 }
 
@@ -442,9 +448,18 @@ void Audio::SetSoundEffects(SoundData* soundData, const std::vector<MixerEffectS
 		return;
 	}
 	soundData->effects = NormalizeEffects(effects);
-	// SetEffectChain は再生中ボイスへの適用で無効呼び出しになることがあり、
-	// エディター操作時に停止・フリーズしたように見える原因になるため、
-	// 新規に再生するボイスへ適用する。
+
+	const BYTE* targetData = soundData->buffer.data();
+	if (!targetData) {
+		return;
+	}
+
+	for (auto& active : activeVoices_) {
+		if (!active.voice || active.audioData != targetData) {
+			continue;
+		}
+		ApplyEffectsToVoice(active.voice, soundData->effects, active.effectInstances);
+	}
 }
 
 void Audio::AddSoundEffect(SoundData* soundData, const MixerEffectSettings& effect) {
