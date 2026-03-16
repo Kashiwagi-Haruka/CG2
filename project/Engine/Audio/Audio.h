@@ -109,6 +109,10 @@ public:
 	void SoundUnload(SoundData* soundData);
 	// 音声再生
 	void SoundPlayWave(const SoundData& sounddata, bool isLoop = false);
+	// 指定サウンドを停止して先頭から再生(重ね再生しない)
+	void SoundPlayWaveFromStart(const SoundData& soundData, bool isLoop = false);
+	// 指定サウンドの再生を停止
+	void StopSound(const SoundData& soundData);
 	// 音量設定
 	void SetSoundVolume(SoundData* soundData, float volume);
 	// エディター表示用のサウンド情報を取得

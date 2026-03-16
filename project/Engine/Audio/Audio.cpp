@@ -263,7 +263,12 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	activeVoices_.push_back({pSourceVoice, soundData.buffer.data(), isLoop});
 }
 
+void Audio::SoundPlayWaveFromStart(const SoundData& soundData, bool isLoop) {
+	StopVoicesForSound(soundData);
+	SoundPlayWave(soundData, isLoop);
+}
 
+void Audio::StopSound(const SoundData& soundData) { StopVoicesForSound(soundData); }
 // 特定サウンドを再生しているボイスだけを停止する
 void Audio::StopVoicesForSound(const SoundData& soundData) {
 	const BYTE* targetData = soundData.buffer.data();

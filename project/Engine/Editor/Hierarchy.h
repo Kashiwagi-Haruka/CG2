@@ -108,4 +108,5 @@ private:
 	std::unique_ptr<Primitive> editorGridPlane_;
 	EditorLightState editorLightState_{};
 	std::unordered_map<std::string, float> savedAudioVolumes_;
+	std::unordered_map<std::string, bool> savedAudioLoopEnabled_;
 };
