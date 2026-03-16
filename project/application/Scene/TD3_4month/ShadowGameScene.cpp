@@ -145,9 +145,9 @@ void ShadowGameScene::Update()
     //ライトの更新処理
     UpdateLight();
 
-    if (isPause_) {
-        return;
-    }
+    //if (isPause_) {
+    //    return;
+    //}
 
     //シーン遷移の更新処理
     UpdateSceneTransition();

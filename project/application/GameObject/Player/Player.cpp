@@ -1,70 +1,67 @@
 #include "Player.h"
 
-#include"Animation/Animation.h"
+#include "Animation/Animation.h"
+#include "DirectXCommon.h"
+#include "Engine/Loadfile/JSON/JsonManager.h"
+#include "GameObject/KeyBindConfig.h"
+#include "GameObject/YoshidaMath/Easing.h"
 #include "Model/ModelManager.h"
-#include"Object3d/Object3dCommon.h"
-#include"DirectXCommon.h"
-#include"GameObject/KeyBindConfig.h"
-#include<imgui.h>
-#include"GameObject/YoshidaMath/Easing.h"
+#include "Object3d/Object3dCommon.h"
+#include <imgui.h>
 
-namespace PlayerConst {
-    const constexpr float kRotateYSpeed = 0.25f;
-    const constexpr float kSneakSpeed = 0.0625f;
-    const constexpr float kWalkSpeed = 0.125f;
-};
-
-Player::Player()
-{
-    localAABB_ = { .min = {-0.25f,0.0f,-0.25f},.max = {0.25f,1.5f,0.25f} };
-    SetAABB(localAABB_);
-    SetCollisionAttribute(kCollisionPlayer);
-    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionVendingMac | kCollisionDoor | kCollisionMat);
-    //体のObject3d
-    bodyObj_ = std::make_unique<Object3d>();
-    //モデルの読み込み
-    ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
-}
-void Player::SetCamera(Camera* camera)
-{
-    //カメラのセット
-    bodyObj_->SetCamera(camera);
-    bodyObj_->UpdateCameraMatrices();
-}
-void Player::Initialize()
-{
-
-    //体の初期化
-    bodyObj_->Initialize();
-    //体にモデル挿入
-    bodyObj_->SetModel("gentleman");
-    //座標の初期化
-    transform_ = {
-    .scale{1.0f,1.0f,1.0f},
-    .rotate{0.0f, 0.0f, 0.0f  },
-    .translate{0.0f,2.0f,0.0f}
+Player::Player() {
+	localAABB_ = {
+	    .min = {-0.25f, 0.0f, -0.25f},
+          .max = {0.25f,  1.5f, 0.25f }
     };
-    //速度の初期化
-    velocity_ = { 0.0f };
-    forward_ = { 0.0f };
+	SetAABB(localAABB_);
+	SetCollisionAttribute(kCollisionPlayer);
+	SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionVendingMac | kCollisionDoor | kCollisionMat);
+	// 体のObject3d
+	bodyObj_ = std::make_unique<Object3d>();
+	// モデルの読み込み
+	ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
+}
+void Player::SetCamera(Camera* camera) {
+	// カメラのセット
+	bodyObj_->SetCamera(camera);
+	bodyObj_->UpdateCameraMatrices();
+}
+void Player::Initialize() {
 
-    moveSpeed_ = { 0.0f };
+	// 体の初期化
+	bodyObj_->Initialize();
+	// 体にモデル挿入
+	bodyObj_->SetModel("gentleman");
+	// 座標の初期化
+	transform_ = {
+	    .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f, 0.0f, 0.0f},
+        .translate{0.0f, 2.0f, 0.0f}
+    };
+	// 速度の初期化
+	velocity_ = {0.0f};
+	forward_ = {0.0f};
 
-    //アニメーションクリップ
-    animationClips_ = Animation::LoadAnimationClips("Resources/TD3_3102/3d/gentleman", "gentleman");
+	moveSpeed_ = {0.0f};
 
-    if (!animationClips_.empty()) {
-        currentAnimationIndex_ = 0;
-        bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
-    }
+	LoadParameters();
 
-    if (Model* walkModel = ModelManager::GetInstance()->FindModel("gentleman")) {
-        skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
-        skinCluster_ = CreateSkinCluster(*skeleton_, *walkModel);
-        if (!skinCluster_.mappedPalette.empty()) {
-            bodyObj_->SetSkinCluster(&skinCluster_);
-        }
-    }
+	// アニメーションクリップ
+	animationClips_ = Animation::LoadAnimationClips("Resources/TD3_3102/3d/gentleman", "gentleman");
+
+	if (!animationClips_.empty()) {
+		currentAnimationIndex_ = 0;
+		bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
+	}
+
+	if (Model* walkModel = ModelManager::GetInstance()->FindModel("gentleman")) {
+		skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
+		skinCluster_ = CreateSkinCluster(*skeleton_, *walkModel);
+		if (!skinCluster_.mappedPalette.empty()) {
+			bodyObj_->SetSkinCluster(&skinCluster_);
+		}
+	}
 }
 
 void Player::Update()
@@ -114,8 +111,26 @@ void Player::Debug()
                 animationTime_ = 0.0f;
             }
         }
-    }
-    ImGui::End();
+
+        if (ImGui::TreeNode("Parameters")) {
+			ImGui::DragFloat("Rotate Speed", &parameters_.kRotateYSpeed, 0.001f, 0.0f, 10.0f);
+			ImGui::DragFloat("Walk Speed", &parameters_.kWalkSpeed, 0.001f, 0.0f, 10.0f);
+			ImGui::DragFloat("Sneak Speed", &parameters_.kSneakSpeed, 0.001f, 0.0f, 10.0f);
+
+			if (ImGui::Button("Save Player Parameters")) {
+				SaveParameters();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Load Player Parameters")) {
+				LoadParameters();
+			}
+			if (!parameterStatusMessage_.empty()) {
+				ImGui::Text("%s", parameterStatusMessage_.c_str());
+			}
+			ImGui::TreePop();
+		}
+	}
+	ImGui::End();
 #endif
 }
 
@@ -147,7 +162,7 @@ void Player::Move()
     float yaw = std::atan2(horizontal.x, horizontal.y);
     //ベクトルのXZ長さ
     float length = YoshidaMath::Length(Vector2{ velocity_.x,velocity_.z });
-    moveSpeed_ = (playerCommand->Sneak() || length <= 0.5f) ? PlayerConst::kSneakSpeed : PlayerConst::kWalkSpeed;
+    moveSpeed_ = (playerCommand->Sneak() || length <= 0.5f) ? parameters_.kSneakSpeed : parameters_.kWalkSpeed;
     //前の方向を取得
     forward_ = YoshidaMath::GetForward(bodyObj_->GetWorldMatrix());
 
@@ -217,4 +232,47 @@ void Player::Animation()
         Matrix4x4 humanWorld = bodyObj_->GetWorldMatrix();
         skeleton_->SetObjectMatrix(humanWorld);
     }
+}
+void Player::SaveParameters() {
+	JsonManager* jsonManager = JsonManager::GetInstance();
+
+	nlohmann::json root;
+	root["playerParameters"] = {
+	    {"rotateYSpeed", parameters_.kRotateYSpeed},
+	    {"walkSpeed",    parameters_.kWalkSpeed   },
+	    {"sneakSpeed",   parameters_.kSneakSpeed  },
+	};
+
+	jsonManager->SetData(root);
+	const bool saved = jsonManager->SaveJson(kParameterFileName);
+	parameterStatusMessage_ = saved ? "Saved: Resources/JSON/playerParameters.json" : "Save failed: Resources/JSON/playerParameters.json";
+}
+
+void Player::LoadParameters() {
+	JsonManager* jsonManager = JsonManager::GetInstance();
+
+	if (!jsonManager->LoadJson(kParameterFileName)) {
+		parameterStatusMessage_ = "Load failed: Resources/JSON/playerParameters.json";
+		return;
+	}
+
+	const nlohmann::json& root = jsonManager->GetData();
+	if (!root.contains("playerParameters") || !root["playerParameters"].is_object()) {
+		parameterStatusMessage_ = "Load failed: invalid player parameter data";
+		return;
+	}
+
+	const nlohmann::json& params = root["playerParameters"];
+
+	if (params.contains("rotateYSpeed") && params["rotateYSpeed"].is_number()) {
+		parameters_.kRotateYSpeed = params["rotateYSpeed"].get<float>();
+	}
+	if (params.contains("walkSpeed") && params["walkSpeed"].is_number()) {
+		parameters_.kWalkSpeed = params["walkSpeed"].get<float>();
+	}
+	if (params.contains("sneakSpeed") && params["sneakSpeed"].is_number()) {
+		parameters_.kSneakSpeed = params["sneakSpeed"].get<float>();
+	}
+
+	parameterStatusMessage_ = "Loaded player parameters";
 }

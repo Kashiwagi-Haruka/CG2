@@ -644,6 +644,7 @@
     <ClInclude Include="application\GameObject\Door\Door.h" />
     <ClInclude Include="application\GameObject\Door\AutoLockSystem.h" />
     <ClInclude Include="application\GameObject\Chair\ChairManager.h" />
+    <ClInclude Include="application\GameObject\Player\PlayerParameters.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
