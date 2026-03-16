@@ -78,17 +78,10 @@ SampleScene::SampleScene() {
 	ParticleManager::GetInstance()->CreateParticleGroup("sample", "Resources/2d/defaultParticle.png");
 	bgmData_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Rendez-vous_2.mp3");
 	Audio::GetInstance()->SetSoundVolume(&bgmData_, 1.0f);
+	Audio::GetInstance()->SetReverb(&bgmData_, true);
 }
 void SampleScene::Initialize() {
 	isBgmPlaying_ = false;
-	Audio::MixerEffectSettings echoEffect{};
-	echoEffect.type = Audio::MixerEffectType::Echo;
-	echoEffect.enabled = true;
-	echoEffect.echo.WetDryMix = 22.0f;
-	echoEffect.echo.Feedback = 18.0f;
-	echoEffect.echo.Delay = 230.0f;
-	Audio::GetInstance()->AddMixerEffect(echoEffect);
-	isAudioEffectApplied_ = true;
 	debugCamera_->Initialize();
 	debugCamera_->SetTranslation(cameraTransform_.translate);
 	uvBallObj_->Initialize();
@@ -666,9 +659,6 @@ void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 }
 
 void SampleScene::Finalize() {
-	if (isAudioEffectApplied_) {
-		Audio::GetInstance()->SetMixerEffects(previousMixerEffects_);
-		isAudioEffectApplied_ = false;
-	}
+
 	Audio::GetInstance()->SoundUnload(&bgmData_);
 }

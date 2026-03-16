@@ -302,7 +302,8 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	activeVoice.voice = pSourceVoice;
 	activeVoice.audioData = soundData.buffer.data();
 	activeVoice.isLoop = isLoop;
-	ApplyEffectsToVoice(pSourceVoice, soundData.effects, activeVoice.effectInstances);
+	const bool effectApplied = ApplyEffectsToVoice(pSourceVoice, soundData.effects, activeVoice.effectInstances);
+	assert(effectApplied);
 
 	result_ = pSourceVoice->Start();
 	assert(SUCCEEDED(result_));
@@ -350,9 +351,9 @@ void Audio::SetSoundVolume(SoundData* soundData, float volume) {
 	}
 }
 
-void Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<MixerEffectSettings>& effects, std::vector<Microsoft::WRL::ComPtr<IUnknown>>& outInstances) {
+bool Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<MixerEffectSettings>& effects, std::vector<Microsoft::WRL::ComPtr<IUnknown>>& outInstances) {
 	if (!voice) {
-		return;
+		return false;
 	}
 
 	outInstances.clear();
@@ -398,9 +399,9 @@ void Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 	if (descriptors.empty()) {
 		HRESULT hr = voice->SetEffectChain(nullptr);
 		if (FAILED(hr)) {
-			return;
+			return false;
 		}
-		return;
+		return true;
 	}
 
 	XAUDIO2_EFFECT_CHAIN chain{};
@@ -408,7 +409,7 @@ void Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 	chain.pEffectDescriptors = descriptors.data();
 	HRESULT hr = voice->SetEffectChain(&chain);
 	if (FAILED(hr)) {
-		return;
+		return false;
 	}
 
 	for (UINT32 effectIndex = 0; effectIndex < appliedEffects.size(); ++effectIndex) {
@@ -431,9 +432,67 @@ void Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 			break;
 		}
 		if (FAILED(hr)) {
-			return;
+			return false;
 		}
 	}
+
+	return true;
+}
+
+bool Audio::RecreateActiveVoice(ActiveVoice& active, const SoundData& soundData) {
+	if (!active.voice) {
+		return false;
+	}
+
+	IXAudio2SourceVoice* oldVoice = active.voice;
+	IXAudio2SourceVoice* newVoice = nullptr;
+	const XAUDIO2_VOICE_SENDS* sendList = mixer_.GetOutputVoiceSends();
+	if (sendList) {
+		result_ = xAudio2_->CreateSourceVoice(&newVoice, &soundData.wfex, 0, XAUDIO2_DEFAULT_FREQ_RATIO, nullptr, sendList, nullptr);
+	} else {
+		result_ = xAudio2_->CreateSourceVoice(&newVoice, &soundData.wfex);
+	}
+	if (FAILED(result_) || !newVoice) {
+		return false;
+	}
+
+	newVoice->SetVolume(soundData.volume);
+
+	XAUDIO2_BUFFER buf{};
+	buf.pAudioData = soundData.buffer.data();
+	buf.AudioBytes = static_cast<UINT32>(soundData.buffer.size());
+	if (active.isLoop) {
+		buf.LoopBegin = 0;
+		buf.LoopLength = 0;
+		buf.LoopCount = XAUDIO2_LOOP_INFINITE;
+		buf.Flags = 0;
+	} else {
+		buf.Flags = XAUDIO2_END_OF_STREAM;
+	}
+
+	result_ = newVoice->SubmitSourceBuffer(&buf);
+	if (FAILED(result_)) {
+		newVoice->DestroyVoice();
+		return false;
+	}
+
+	if (!ApplyEffectsToVoice(newVoice, soundData.effects, active.effectInstances)) {
+		newVoice->DestroyVoice();
+		return false;
+	}
+
+	result_ = newVoice->Start();
+	if (FAILED(result_)) {
+		newVoice->DestroyVoice();
+		return false;
+	}
+
+	oldVoice->Stop();
+	oldVoice->DestroyVoice();
+
+	active.voice = newVoice;
+	active.audioData = soundData.buffer.data();
+	return true;
 }
 
 std::vector<Audio::MixerEffectSettings> Audio::GetSoundEffects(const SoundData* soundData) const {
@@ -458,7 +517,9 @@ void Audio::SetSoundEffects(SoundData* soundData, const std::vector<MixerEffectS
 		if (!active.voice || active.audioData != targetData) {
 			continue;
 		}
-		ApplyEffectsToVoice(active.voice, soundData->effects, active.effectInstances);
+		if (!RecreateActiveVoice(active, *soundData)) {
+			continue;
+		}
 	}
 }
 

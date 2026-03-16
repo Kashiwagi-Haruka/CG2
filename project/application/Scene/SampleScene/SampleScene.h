@@ -90,8 +90,6 @@ class SampleScene : public BaseScene {
 
 	SoundData bgmData_{};
 	bool isBgmPlaying_ = false;
-	std::vector<Audio::MixerEffectSettings> previousMixerEffects_{};
-	bool isAudioEffectApplied_ = false;
 
 	void SetSceneCameraForDraw(Camera* camera);
 	void UpdateSceneCameraMatricesForDraw();

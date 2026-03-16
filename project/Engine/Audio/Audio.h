@@ -96,7 +96,9 @@ private:
 	// 指定サウンドに紐づく再生中ボイスのみ停止
 	void StopVoicesForSound(const SoundData& soundData);
 	// 指定ボイスへエフェクトチェーンを再構築して適用
-	void ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<MixerEffectSettings>& effects, std::vector<Microsoft::WRL::ComPtr<IUnknown>>& outInstances);
+	bool ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<MixerEffectSettings>& effects, std::vector<Microsoft::WRL::ComPtr<IUnknown>>& outInstances);
+	// 再生中ボイスを再作成して最新の設定を反映
+	bool RecreateActiveVoice(ActiveVoice& active, const SoundData& soundData);
 	// 全ボイスを停止
 	void StopAllVoices();
 
