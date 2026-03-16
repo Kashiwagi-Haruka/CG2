@@ -298,14 +298,14 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 
 	result_ = pSourceVoice->SubmitSourceBuffer(&buf);
 	assert(SUCCEEDED(result_));
-
-	result_ = pSourceVoice->Start();
-	assert(SUCCEEDED(result_));
 	ActiveVoice activeVoice{};
 	activeVoice.voice = pSourceVoice;
 	activeVoice.audioData = soundData.buffer.data();
 	activeVoice.isLoop = isLoop;
 	ApplyEffectsToVoice(pSourceVoice, soundData.effects, activeVoice.effectInstances);
+
+	result_ = pSourceVoice->Start();
+	assert(SUCCEEDED(result_));
 	activeVoices_.push_back(std::move(activeVoice));
 }
 
@@ -442,15 +442,9 @@ void Audio::SetSoundEffects(SoundData* soundData, const std::vector<MixerEffectS
 		return;
 	}
 	soundData->effects = NormalizeEffects(effects);
-	const BYTE* targetData = soundData->buffer.data();
-	if (!targetData) {
-		return;
-	}
-	for (auto& active : activeVoices_) {
-		if (active.voice && active.audioData == targetData) {
-			ApplyEffectsToVoice(active.voice, soundData->effects, active.effectInstances);
-		}
-	}
+	// SetEffectChain は再生中ボイスへの適用で無効呼び出しになることがあり、
+	// エディター操作時に停止・フリーズしたように見える原因になるため、
+	// 新規に再生するボイスへ適用する。
 }
 
 void Audio::AddSoundEffect(SoundData* soundData, const MixerEffectSettings& effect) {
