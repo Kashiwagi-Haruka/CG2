@@ -268,7 +268,7 @@ void ShadowGameScene::InitializeLights()
     spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
     spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 
-    activeAreaLightCount_ = 3;
+    activeAreaLightCount_ = 5;
     areaLights_[0].color = { 1.0f,1.0f, 1.0f, 1.0f };
     areaLights_[0].position = { 7.0f, 3.0f, 0.0f };
     areaLights_[0].normal = { 0.0f, 1.0f, 0.0f };
@@ -412,6 +412,8 @@ void ShadowGameScene::UpdateLight()
     flashlight_->Update();
     spotLights_[1] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
+    areaLights_[3] = wallManager_->GetAreaLight();
+    areaLights_[4] = wallManager2_->GetAreaLight();
 
     //自販機
     vendingMac_->Update();
