@@ -468,3 +468,37 @@ std::vector<Audio::EditorSoundEntry> Audio::GetEditorSoundEntries() const {
 }
 
 std::vector<Audio::MixerEffectSettings> Audio::GetMixerEffects() const { return mixer_.GetEffects(); }
+void Audio::SetMixerEffects(const std::vector<MixerEffectSettings>& effects) { mixer_.SetEffects(effects); }
+
+void Audio::AddMixerEffect(const MixerEffectSettings& effect) { mixer_.AddEffect(effect); }
+
+void Audio::RemoveMixerEffect(size_t index) { mixer_.RemoveEffect(index); }
+
+void Audio::ClearMixerEffects() { mixer_.ClearEffects(); }
+
+const char* Audio::GetMixerEffectTypeName(MixerEffectType type) { return AudioMixer::GetEffectTypeName(type); }
+
+bool Audio::IsSoundFinished(const SoundData& soundData) const {
+	const BYTE* targetData = soundData.buffer.data();
+	if (!targetData) {
+		return true;
+	}
+	for (const auto& active : activeVoices_) {
+		if (active.voice && active.audioData == targetData) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void Audio::StopAllVoices() {
+	for (auto& active : activeVoices_) {
+		if (!active.voice) {
+			continue;
+		}
+		active.voice->Stop();
+		active.voice->DestroyVoice();
+		active.voice = nullptr;
+	}
+	activeVoices_.clear();
+}

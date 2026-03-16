@@ -215,6 +215,50 @@ void Hierarchy::RedoEditorChange() {
 	redoStack_.pop_back();
 	hasUnsavedChanges_ = true;
 }
+void Hierarchy::ApplyEditorSnapshot(const EditorSnapshot& snapshot) {
+	editorTransforms_ = snapshot.objectTransforms;
+	editorMaterials_ = snapshot.objectMaterials;
+	objectNames_ = snapshot.objectNames;
+	primitiveEditorTransforms_ = snapshot.primitiveTransforms;
+	primitiveEditorMaterials_ = snapshot.primitiveMaterials;
+	primitiveNames_ = snapshot.primitiveNames;
+
+	for (size_t i = 0; i < objects_.size(); ++i) {
+		if (!objects_[i] || i >= editorTransforms_.size() || i >= editorMaterials_.size()) {
+			continue;
+		}
+		objects_[i]->SetTransform(editorTransforms_[i]);
+		const InspectorMaterial& material = editorMaterials_[i];
+		objects_[i]->SetColor(material.color);
+		objects_[i]->SetEnableLighting(material.enableLighting);
+		objects_[i]->SetShininess(material.shininess);
+		objects_[i]->SetEnvironmentCoefficient(material.environmentCoefficient);
+		objects_[i]->SetGrayscaleEnabled(material.grayscaleEnabled);
+		objects_[i]->SetSepiaEnabled(material.sepiaEnabled);
+		objects_[i]->SetDistortionStrength(material.distortionStrength);
+		objects_[i]->SetDistortionFalloff(material.distortionFalloff);
+		objects_[i]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+	}
+
+	for (size_t i = 0; i < primitives_.size(); ++i) {
+		if (!primitives_[i] || primitives_[i] == selectionBoxPrimitive_.get() || i >= primitiveEditorTransforms_.size() || i >= primitiveEditorMaterials_.size()) {
+			continue;
+		}
+		primitives_[i]->SetTransform(primitiveEditorTransforms_[i]);
+		const InspectorMaterial& material = primitiveEditorMaterials_[i];
+		primitives_[i]->SetColor(material.color);
+		primitives_[i]->SetEnableLighting(material.enableLighting);
+		primitives_[i]->SetShininess(material.shininess);
+		primitives_[i]->SetEnvironmentCoefficient(material.environmentCoefficient);
+		primitives_[i]->SetGrayscaleEnabled(material.grayscaleEnabled);
+		primitives_[i]->SetSepiaEnabled(material.sepiaEnabled);
+		primitives_[i]->SetDistortionStrength(material.distortionStrength);
+		primitives_[i]->SetDistortionFalloff(material.distortionFalloff);
+		primitives_[i]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+	}
+
+	selectionBoxDirty_ = true;
+}
 void Hierarchy::RegisterObject3d(Object3d* object) {
 	if (!object) {
 		return;
