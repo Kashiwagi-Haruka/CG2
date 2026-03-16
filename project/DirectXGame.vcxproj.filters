@@ -329,6 +329,9 @@
     <ClCompile Include="application\GameObject\Door\Door.cpp" />
     <ClCompile Include="application\GameObject\Door\AutoLockSystem.cpp" />
     <ClCompile Include="application\GameObject\Chair\ChairManager.cpp" />
+    <ClCompile Include="application\FreetypeManager\Text.cpp" />
+    <ClCompile Include="application\FreetypeManager\FreeTypeManager.cpp" />
+    <ClCompile Include="application\FreetypeManager\Font\Font.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -617,12 +620,6 @@
     <ClInclude Include="Engine\Texture\Sprite\Sprite.h">
       <Filter>Engine\Texture\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="externals\freetype\include\ft2build.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\freetype\include\freetype\config\ftheader.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Texture\SrvManager\SrvManager.h">
       <Filter>Engine\Texture</Filter>
     </ClInclude>
@@ -648,6 +645,10 @@
     <ClInclude Include="application\GameObject\Door\Door.h" />
     <ClInclude Include="application\GameObject\Door\AutoLockSystem.h" />
     <ClInclude Include="application\GameObject\Chair\ChairManager.h" />
+    <ClInclude Include="Engine\Texture\SkinningData.h" />
+    <ClInclude Include="application\FreetypeManager\Text.h" />
+    <ClInclude Include="application\FreetypeManager\FreeTypeManager.h" />
+    <ClInclude Include="application\FreetypeManager\Font\Font.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

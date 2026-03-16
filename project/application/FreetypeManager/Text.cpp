@@ -93,15 +93,18 @@ void Text::Debug() {
 
     ImGui::ColorEdit4("color", color);
     color_ = { .x = color[0],.y = color[1],.z = color[2],.w = color[3] };
-    ImGui::
-    DebugUI::CheckBlendMode(blendMode_);
     ImGui::SliderFloat2("pos", &position_.x, -1000.0f, 1000.0f);
     UpdateLayout();
     for (size_t i = 0; i < activeFonts_.size(); ++i) {
         auto* font = activeFonts_[i];
         if (font) {
             std::string msg = "Glyph[" + std::to_string(i) + "]";
-            DebugUI::CheckFont(*font, msg.c_str());
+            if (ImGui::TreeNode(msg.c_str())) {
+
+
+                ImGui::TreePop();
+            }
+    
         }
     }
     ImGui::End();

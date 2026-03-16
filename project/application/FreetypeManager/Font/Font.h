@@ -1,114 +1,111 @@
 #pragma once
-
-#include"VertexData.h"
-#include"PSO.h"  
-#include"Transform.h"  
-#include"TransformationMatrix.h"  
-#include"MaterialResource.h"  
-#include"Vector2.h"  
-#include"RootSignature.h"  
-
-#include<d3d12.h>
-#include"SpriteCommon.h"
-
-#include"Texture.h"
-
+#include"Sprite.h"
+#include<memory>
 class Font
 {
 public:
-    Font();
-    ~Font();
-    void Create(const TextureFactory::Handle& textureHandle, const Vector2& position, const Vector4& color = { 1.0f,1.0f,1.0f,1.0f },  const Vector2& size = {64.0f,64.0f},const Vector2& anchorPoint = {0.0f,0.0f});
-
-    void Update();
-    void UpdateAnchorPoint();
-    static void PreDraw(uint32_t blendMode = BlendMode::kBlendModeNormal);
-    void Draw(const LightMode& lightMode = LightMode::kLightModeNone);
-
-    void SetColor(const Vector4& color);
-    void SetTexture(const TextureFactory::Handle& textureHandle);
-    void SetSize(const Vector2& size) { size_ = size; };
-    void SetPosition(const Vector2& position) { position_ = position; }
-    void SetRotate(const float& rotate) { rotate_ = rotate; }
-    void SetScale(const Vector2& scale) { scale_ = scale; };
-
-    void SetUVScale(const Vector3& scale) { uvTransform_.scale = scale; };
-    void SetUVRotate(const Vector3& rotate) { uvTransform_.rotate = rotate; };
-    void SetUVTranslate(const Vector3& translate) { uvTransform_.translate = translate; };
-
-    Vector2& GetSize() { return size_; }
-    Vector2& GetScale() { return scale_; };
-    float& GetRotate() { return rotate_; };
-    Vector2& GetPosition() { return position_; };
-    const Vector2& GetPosition() const { return position_; };
-
-    Material* GetMaterial() { return materialResource_.GetMaterial(); };
-    Vector3& GetUVScale() { return uvTransform_.scale; };
-    Vector3& GetUVRotate() { return uvTransform_.rotate; };
-    Vector3& GetUVTranslate() { return uvTransform_.translate; };
-    Vector4& GetColor() { return materialResource_.GetMaterial()->color; }
-    const Vector4& GetColor() const { return materialResource_.GetMaterial()->color; }
-
-    Vector2& GetAnchorPoint() { return anchorPoint_; }
-    /// @brief アンカーポイント
-    /// @param anchorPoint 0.0f~1.0f
-    
-    void SetAnchorPoint(const Vector2& anchorPoint) { 
-        anchorPoint_ = anchorPoint;
-        UpdateAnchorPoint();
-    }
-    void SetIsFlipX(const bool isFlipX) { isFlipX_ = isFlipX; };
-    void SetIsFlipY(const bool isFlipY) { isFlipY_ = isFlipY; };
-    bool& GetIsFlipX() { return isFlipX_; };
-    bool& GetIsFlipY() { return isFlipY_; };
-
-    void SetTextureLeftTop(const Vector2& leftTop) { textureLeftTop = leftTop; }
-    void SetTextureSize(const Vector2& size) { textureSize = size; };
-    Vector2& GetTextureLeftTop() { return textureLeftTop; };
-    Vector2& GetTextureSize() { return textureSize; };
-    void AdjustTextureSize(const Vector2& size);
+	Font() = default;
+	~Font() = default;
     void SetInUse(bool inUse) { inUse_ = inUse; }
     bool IsInUse() const { return inUse_; }
-private:
-    void CreateVertex();
-    void CreateUVTransformationMatrix();
-    void CreateTransformationMatrix();
-    void CreateMaterial(const Vector4& color);
-    void UpdateUV();
 
+	void Initialize(uint32_t Handle);
+
+	void Update();
+
+	void Draw();
+	void SetTextureHandle(uint32_t Handle) { textureIndex = Handle; }
+	void SetPosition(const Vector2& pos) {
+		transform_.translate.x = pos.x;
+		transform_.translate.y = pos.y;
+		transform_.translate.z = 0.0f;
+	}
+	void SetScale(const Vector2& scale) {
+		transform_.scale.x = scale.x;
+		transform_.scale.y = scale.y;
+		transform_.scale.z = 1.0f;
+	}
+	void SetRotation(const float& rot) {
+
+		transform_.rotate.x = 0.0f;
+		transform_.rotate.y = 0.0f;
+		transform_.rotate.z = rot;
+	}
+	void SetColor(const Vector4& color);
+	void SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize);
+	bool GetIsFlipX() { return isFlipX_; };
+	void SetIsFlipX(const bool isFlipX);
+	bool GetIsFlipY() { return isFripY_; };
+	void SetIsFlipY(const bool isFlipY);
+	void AdjustTextureSize();
+	const Vector2& GetAnchorPoint() const { return anchorPoint; };
+	void SetAnchorPoint(const Vector2 anchorPoint) {
+		this->anchorPoint;
+		left = 0.0f - anchorPoint.x;
+		right = 1.0f - anchorPoint.x;
+		top = 0.0f - anchorPoint.y;
+		bottom = 1.0f - anchorPoint.y;
+	};
 private:
     bool inUse_ = false;
+	/*----------------------------------*/
 
-    uint32_t textureHandle_ = 0;
-    Vector2 anchorPoint_ = { 0.0f,0.0f };
-    bool isFlipX_ = false;
-    bool isFlipY_ = false;
-    Vector2 textureLeftTop = { 0.0f,0.0f };
-    Vector2 textureSize = { 100.0f,100.0f };
-    static ID3D12GraphicsCommandList* commandList;
+	struct alignas(256) TransformationMatrix {
+		Matrix4x4 WVP;   // 64 バイト
+		Matrix4x4 World; // 64 バイト
+		// ここで自動的に 128 バイト分のパディングが入って、
+		// sizeof(TransformationMatrix) == 256 になる
+	};
 
-    Microsoft::WRL::ComPtr <ID3D12Resource> vertexResource_{};
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-    VertexData* vertexData_ = nullptr;
+	struct Material {
 
-    Microsoft::WRL::ComPtr <ID3D12Resource> transformationMatrixResource_ = nullptr;
-    Vector2 position_ = { 0.0f,0.0f };
-    float rotate_ = 0.0f;
-    Vector2 size_ = { 0.0f,0.0f };
-    Vector2 scale_ = { 1.0f,1.0f };
-    EulerTransform transform_{};
-    Matrix4x4 worldMatrix_{};
-    TransformationMatrixFor2D* transformationMatrixData_ = nullptr;
+		Vector4 color;
+		int enableLighting;
+		float padding[3];
+		Matrix4x4 uvTransform;
+	};
 
-    EulerTransform uvTransform_ = { 0.0f };
-    Matrix4x4 uvTransformMatrix_{};
+	Transform transform_{
+		transform_.scale = {1.0f, 1.0f, 1.0f},
+		transform_.rotate = {0.0f, 0.0f, 0.0f},
+		transform_.translate = {0.0f, 0.0f, 0.0f},
+	};
+	Material materialData_;
 
-    MaterialResource materialResource_{};
+	Vector2 anchorPoint = { 0, 0 };
 
+	Vector2 textureLeftTop = { 0, 0 };
+	Vector2 textureSize{};
+	Vector2 textureCutSize{};
 
+	float left = 0.0f - anchorPoint.x;
+	float right = 1.0f - anchorPoint.x;
+	float top = 0.0f - anchorPoint.y;
+	float bottom = 1.0f - anchorPoint.y;
+
+	bool isFlipX_ = false;
+	bool isFripY_ = false;
+
+	int handle_ = 0;
+
+	/*----------------------------------*/
+
+	UINT currentSpriteVertexOffset_ = 0;
+	static const UINT kMaxSpriteVertices = 6 * 10000; // フレーム最大 1000 スプライト分
+
+	// バッファリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource;
+
+	VertexData* vertexData = nullptr;
+	uint32_t* indexData = nullptr;
+	Material* material = nullptr;
+	TransformationMatrix* transformData = nullptr;
+
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+	D3D12_INDEX_BUFFER_VIEW indexBufferView;
+	uint32_t textureIndex = 0;
 };
-
-////Fontとposとの当たり判定
-//bool IsCollision(const Vector2& pos, Font& font);
-////Fontとposとの当たり判定
-//bool (Font& font, const Vector2& pos);

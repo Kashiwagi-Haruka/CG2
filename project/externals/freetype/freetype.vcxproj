@@ -261,6 +261,10 @@
     <ClInclude Include="include\freetype\tttables.h" />
     <ClInclude Include="include\freetype\tttags.h" />
     <ClInclude Include="include\ft2build.h" />
+    <ClInclude Include="src\cid\cidriver.h" />
+    <ClInclude Include="src\pcf\pcf.h" />
+    <ClInclude Include="src\sdf\ftsdf.h" />
+    <ClInclude Include="src\winfonts\winfnt.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\autofit\autofit.c" />
@@ -286,15 +290,19 @@
     <ClCompile Include="src\base\ftwinfnt.c" />
     <ClCompile Include="src\bdf\bdf.c" />
     <ClCompile Include="src\cff\cff.c" />
+    <ClCompile Include="src\cid\cidriver.c" />
     <ClCompile Include="src\pcf\pcf.c" />
     <ClCompile Include="src\psaux\psaux.c" />
     <ClCompile Include="src\pshinter\pshinter.c" />
     <ClCompile Include="src\psnames\psnames.c" />
     <ClCompile Include="src\raster\raster.c" />
+    <ClCompile Include="src\sdf\ftsdf.c" />
     <ClCompile Include="src\sfnt\sfnt.c" />
     <ClCompile Include="src\smooth\smooth.c" />
     <ClCompile Include="src\truetype\truetype.c" />
     <ClCompile Include="src\type1\type1.c" />
+    <ClCompile Include="src\type42\type42.c" />
+    <ClCompile Include="src\winfonts\winfnt.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

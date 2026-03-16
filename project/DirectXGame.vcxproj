@@ -61,14 +61,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\Generated\outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(SolutionDir)freetype;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
     <OutDir>$(SolutionDir)..\Generated\outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(SolutionDir)freetype;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\Generated\outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(SolutionDir)freetype;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -156,6 +159,9 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\FreetypeManager\Font\Font.cpp" />
+    <ClCompile Include="application\FreetypeManager\FreeTypeManager.cpp" />
+    <ClCompile Include="application\FreetypeManager\Text.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\Collider.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\Easing.cpp" />
@@ -280,6 +286,9 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <None Include="Resources\shader\Sprite\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\FreetypeManager\Font\Font.h" />
+    <ClInclude Include="application\FreetypeManager\FreeTypeManager.h" />
+    <ClInclude Include="application\FreetypeManager\Text.h" />
     <ClInclude Include="application\GameObject\Key\Key.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\Collider.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\CollisionConfig.h" />
@@ -320,8 +329,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\Light\PointLight.h" />
     <ClInclude Include="Engine\Texture\Light\SpotLight.h" />
     <ClInclude Include="Engine\Texture\SkinningData.h" />
-    <ClInclude Include="externals\freetype\include\freetype\config\ftheader.h" />
-    <ClInclude Include="externals\freetype\include\ft2build.h" />
     <ClInclude Include="Engine\Texture\Data\SkinningData.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />

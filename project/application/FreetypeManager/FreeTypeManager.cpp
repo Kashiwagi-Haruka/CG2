@@ -5,6 +5,9 @@
 #include<cassert>
 #include"DirectXCommon.h"
 #include"SRVmanager/SrvManager.h"
+#include"Object3d/Object3dCommon.h"
+#include"TextureManager.h"
+#include<d3dx12.h>
 
 using namespace std;
 
@@ -13,7 +16,7 @@ FT_Library FreeTypeManager::library_;
 // フォントごとのFTData（faceとfontData）
 std::unordered_map<uint32_t, FTData> FreeTypeManager::fontFaces_;
 unordered_map<GlyphKey, FTTextureData> FreeTypeManager::glyphTextures_;
-std::unordered_map<GlyphKey, std::vector<std::unique_ptr<Sprite>>> FreeTypeManager::fontPool_;
+std::unordered_map<GlyphKey, std::vector<std::unique_ptr<Font>>> FreeTypeManager::fontPool_;
 
 void FreeTypeManager::Initialize()
 {
@@ -219,10 +222,6 @@ void FreeTypeManager::ShowFontSize(uint32_t faceHandle)
 {
     auto& ftData = fontFaces_.at(faceHandle);
     FT_Face face = ftData.face;
-
-    for (int i = 0; i < face->num_fixed_sizes; ++i) {
-       /* DebugLog("Size[" + to_string(i) + "]:" + to_string(face->available_sizes[i].width) + "x" + to_string(face->available_sizes[i].height) + "\n");*/
-    }
 }
 
 void FreeTypeManager::ResetFontUsage()
@@ -287,7 +286,7 @@ FTResource FreeTypeManager::CreateResourceFromFTBitmap(const FT_Bitmap& bitmap)
     int height = bitmap.rows;
     DXGI_FORMAT format = DXGI_FORMAT_R8_UNORM;
 
-    auto* device = DirectXCommon::GetDevice();
+    auto* device = Object3dCommon::GetInstance()->GetDxCommon()->GetDevice();
 
     // 1. デフォルトヒープにテクスチャ作成
     D3D12_RESOURCE_DESC texDesc = {};
@@ -351,8 +350,8 @@ FTResource FreeTypeManager::CreateResourceFromFTBitmap(const FT_Bitmap& bitmap)
    /*     DebugLog("bitmap.pixel_mode is not GRAY!\n");*/
     }
 
-    auto cmdList = CommandList::GetCommandList();
-    UpdateSubresources(cmdList.Get(), result.resource.Get(), result.intermediateResource.Get(), 0, 0, 1, &subResourceData);
+    auto cmdList = Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList();
+    UpdateSubresources(cmdList, result.resource.Get(), result.intermediateResource.Get(), 0, 0, 1, &subResourceData);
 
     // 4. コピー先を PIXEL_SHADER_RESOURCE に遷移 テクスチャをシェーダーで使える状態に切り替える
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -390,19 +389,19 @@ void FreeTypeManager::CreateGlyphTexture(uint32_t faceHandle, FT_UInt glyphIndex
 
     FTTextureData texData;
     texData.ftResource = CreateResourceFromFTBitmap(bitmap);
-
-    texData.srvIndex = SrvManager::Allocate();
-    Texture::AddTextureHandleByIndex(texData.srvIndex);
-    texData.srvHandleCPU = SrvManager::GetCPUDescriptorHandle(texData.srvIndex);
-    texData.srvHandleGPU = SrvManager::GetGPUDescriptorHandle(texData.srvIndex);
-    SrvManager::CreateSRVforTexture2D(texData.srvIndex, texData.ftResource.resource.Get(), DXGI_FORMAT_R8_UNORM, 1);
+    auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
+    texData.srvIndex = srvManager->Allocate();
+    //Texture::AddTextureHandleByIndex(texData.srvIndex);
+    texData.srvHandleCPU = srvManager->GetCPUDescriptorHandle(texData.srvIndex);
+    texData.srvHandleGPU = srvManager->GetGPUDescriptorHandle(texData.srvIndex);
+    srvManager->CreateSRVforTexture2D(texData.srvIndex, texData.ftResource.resource.Get(), DXGI_FORMAT_R8_UNORM, 1);
     texData.glyphSize = { (float)bitmap.width, (float)bitmap.rows };
     texData.bearingY = face->glyph->metrics.horiBearingY / 64.0f;
 
     glyphTextures_[key] = std::move(texData);
 }
 
-Sprite* FreeTypeManager::CreateFontSprite(uint32_t faceHandle, FT_UInt glyphIndex)
+Font* FreeTypeManager::CreateFontSprite(uint32_t faceHandle, FT_UInt glyphIndex)
 {
     GlyphKey key = { faceHandle ,glyphIndex };
 
@@ -421,7 +420,8 @@ Sprite* FreeTypeManager::CreateFontSprite(uint32_t faceHandle, FT_UInt glyphInde
         auto& pool = fontPool_[key];
         auto& glyphSize = data.glyphSize;
         auto newFont = std::make_unique<Font>();
-        newFont->Create(Texture::GetTextureHandle(srvIndex), { 100.0f, 100.0f },{1.0f,1.0f,1.0f,1.0f}, glyphSize);
+        newFont->Initialize(srvIndex);
+        newFont->SetScale(glyphSize);
         newFont->SetInUse(true);
         Font* ptr = newFont.get();
         pool.push_back(std::move(newFont));
@@ -529,7 +529,7 @@ std::vector<GlyphRun> FreeTypeManager::LayoutString(uint32_t handle, const std::
     return runs;
 }
 
-Sprite* FreeTypeManager::GetOrCreateFont(const GlyphKey& key)
+Font* FreeTypeManager::GetOrCreateFont(const GlyphKey& key)
 {
     auto& pool = fontPool_[key];
     if (!glyphTextures_.contains(key)) {
@@ -542,7 +542,7 @@ Sprite* FreeTypeManager::GetOrCreateFont(const GlyphKey& key)
     for (auto& font : pool) {
         if (!font->IsInUse()) {
             font->SetInUse(true);
-            font->SetSize(texData.glyphSize);
+            font->SetScale(texData.glyphSize);
             return font.get();
         }
     }
