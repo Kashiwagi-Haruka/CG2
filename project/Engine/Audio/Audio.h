@@ -133,6 +133,14 @@ public:
 	void RemoveSoundEffect(SoundData* soundData, size_t index);
 	// 指定サウンドのエフェクトをクリア
 	void ClearSoundEffects(SoundData* soundData);
+	// 指定サウンドの Reverb 有効/無効を設定
+	void SetReverb(SoundData* soundData, bool enabled);
+	// 指定サウンドの Echo 有効/無効を設定
+	void SetEcho(SoundData* soundData, bool enabled);
+	// 指定サウンドの Equalizer 有効/無効を設定
+	void SetEqualizer(SoundData* soundData, bool enabled);
+	// 指定サウンドの Limiter 有効/無効を設定
+	void SetLimiter(SoundData* soundData, bool enabled);
 	// エディター表示/設定保存用のエフェクトチェーンを取得
 	std::vector<MixerEffectSettings> GetMixerEffects() const;
 	// AudioMixer エフェクトチェーンをまとめて置き換え

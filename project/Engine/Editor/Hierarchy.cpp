@@ -1203,88 +1203,61 @@ void Hierarchy::DrawAudioEditor() {
 
 			auto effects = audio->GetSoundEffects(entry.soundData);
 			if (ImGui::TreeNode(("Effects##audio_effects_" + std::to_string(i)).c_str())) {
-				for (size_t effectIndex = 0; effectIndex < effects.size(); ++effectIndex) {
-					auto& effect = effects[effectIndex];
-					if (!ImGui::TreeNode((std::string(Audio::GetMixerEffectTypeName(effect.type)) + "##audio_effect_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str())) {
-						continue;
-					}
-					bool changed = false;
-					changed |= ImGui::Checkbox(("Enabled##audio_effect_enabled_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.enabled);
-					switch (effect.type) {
-					case Audio::MixerEffectType::Reverb:
-						changed |= ImGui::SliderFloat(("WetDryMix##audio_reverb_wd_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.reverb.WetDryMix, 0.0f, 100.0f);
-						break;
-					case Audio::MixerEffectType::Echo:
-						changed |= ImGui::SliderFloat(("WetDryMix##audio_echo_wd_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.echo.WetDryMix, 0.0f, 100.0f);
-						changed |= ImGui::SliderFloat(("Feedback##audio_echo_fb_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.echo.Feedback, 0.0f, 100.0f);
-						changed |=
-						    ImGui::SliderFloat(("Delay##audio_echo_delay_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.echo.Delay, FXECHO_MIN_DELAY, FXECHO_MAX_DELAY);
-						break;
-					case Audio::MixerEffectType::Equalizer:
-						changed |= ImGui::SliderFloat(("Gain0##audio_eq_g0_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.equalizer.Gain0, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-						changed |= ImGui::SliderFloat(("Gain1##audio_eq_g1_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.equalizer.Gain1, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-						changed |= ImGui::SliderFloat(("Gain2##audio_eq_g2_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.equalizer.Gain2, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-						changed |= ImGui::SliderFloat(("Gain3##audio_eq_g3_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &effect.equalizer.Gain3, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-						break;
-					case Audio::MixerEffectType::Limiter: {
-						int release = static_cast<int>(effect.limiter.Release);
-						int loudness = static_cast<int>(effect.limiter.Loudness);
-						if (ImGui::SliderInt(
-						        ("Release##audio_limiter_release_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &release, FXMASTERINGLIMITER_MIN_RELEASE,
-						        FXMASTERINGLIMITER_MAX_RELEASE)) {
-							effect.limiter.Release = static_cast<UINT32>(release);
-							changed = true;
+				auto findSoundEffect = [&](Audio::MixerEffectType type) {
+					for (const auto& effect : effects) {
+						if (effect.type == type) {
+							return effect;
 						}
-						if (ImGui::SliderInt(
-						        ("Loudness##audio_limiter_loudness_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str(), &loudness, FXMASTERINGLIMITER_MIN_LOUDNESS,
-						        FXMASTERINGLIMITER_MAX_LOUDNESS)) {
-							effect.limiter.Loudness = static_cast<UINT32>(loudness);
-							changed = true;
-						}
-						break;
 					}
-					}
-					if (ImGui::Button(("Remove##audio_effect_remove_" + std::to_string(i) + "_" + std::to_string(effectIndex)).c_str())) {
-						audio->RemoveSoundEffect(entry.soundData, effectIndex);
-						hasUnsavedChanges_ = true;
-						ImGui::TreePop();
-						break;
-					}
-					if (changed) {
-						audio->SetSoundEffects(entry.soundData, effects);
-						hasUnsavedChanges_ = true;
-					}
-					ImGui::TreePop();
-				}
-				if (ImGui::Button(("Add Reverb##audio_add_reverb_" + std::to_string(i)).c_str())) {
 					Audio::MixerEffectSettings effect{};
-					effect.type = Audio::MixerEffectType::Reverb;
-					audio->AddSoundEffect(entry.soundData, effect);
-					hasUnsavedChanges_ = true;
+					effect.type = type;
+					effect.enabled = false;
+					return effect;
+				};
+
+				auto reverb = findSoundEffect(Audio::MixerEffectType::Reverb);
+				auto echo = findSoundEffect(Audio::MixerEffectType::Echo);
+				auto equalizer = findSoundEffect(Audio::MixerEffectType::Equalizer);
+				auto limiter = findSoundEffect(Audio::MixerEffectType::Limiter);
+
+				bool changed = false;
+				if (ImGui::Checkbox(("Use Reverb##audio_effect_reverb_" + std::to_string(i)).c_str(), &reverb.enabled)) {
+					audio->SetReverb(entry.soundData, reverb.enabled);
+					changed = true;
 				}
-				ImGui::SameLine();
-				if (ImGui::Button(("Add Echo##audio_add_echo_" + std::to_string(i)).c_str())) {
-					Audio::MixerEffectSettings effect{};
-					effect.type = Audio::MixerEffectType::Echo;
-					audio->AddSoundEffect(entry.soundData, effect);
-					hasUnsavedChanges_ = true;
+				changed |= ImGui::SliderFloat(("Reverb WetDryMix##audio_reverb_wd_" + std::to_string(i)).c_str(), &reverb.reverb.WetDryMix, 0.0f, 100.0f);
+				if (ImGui::Checkbox(("Use Echo##audio_effect_echo_" + std::to_string(i)).c_str(), &echo.enabled)) {
+					audio->SetEcho(entry.soundData, echo.enabled);
+					changed = true;
 				}
-				ImGui::SameLine();
-				if (ImGui::Button(("Add EQ##audio_add_eq_" + std::to_string(i)).c_str())) {
-					Audio::MixerEffectSettings effect{};
-					effect.type = Audio::MixerEffectType::Equalizer;
-					audio->AddSoundEffect(entry.soundData, effect);
-					hasUnsavedChanges_ = true;
+				changed |= ImGui::SliderFloat(("Echo WetDryMix##audio_echo_wd_" + std::to_string(i)).c_str(), &echo.echo.WetDryMix, 0.0f, 100.0f);
+				changed |= ImGui::SliderFloat(("Echo Feedback##audio_echo_fb_" + std::to_string(i)).c_str(), &echo.echo.Feedback, 0.0f, 100.0f);
+				changed |= ImGui::SliderFloat(("Echo Delay##audio_echo_delay_" + std::to_string(i)).c_str(), &echo.echo.Delay, FXECHO_MIN_DELAY, FXECHO_MAX_DELAY);
+				if (ImGui::Checkbox(("Use Equalizer##audio_effect_eq_" + std::to_string(i)).c_str(), &equalizer.enabled)) {
+					audio->SetEqualizer(entry.soundData, equalizer.enabled);
+					changed = true;
 				}
-				ImGui::SameLine();
-				if (ImGui::Button(("Add Limiter##audio_add_limiter_" + std::to_string(i)).c_str())) {
-					Audio::MixerEffectSettings effect{};
-					effect.type = Audio::MixerEffectType::Limiter;
-					audio->AddSoundEffect(entry.soundData, effect);
-					hasUnsavedChanges_ = true;
+				changed |= ImGui::SliderFloat(("EQ Gain0##audio_eq_g0_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain0, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
+				changed |= ImGui::SliderFloat(("EQ Gain1##audio_eq_g1_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain1, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
+				changed |= ImGui::SliderFloat(("EQ Gain2##audio_eq_g2_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain2, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
+				changed |= ImGui::SliderFloat(("EQ Gain3##audio_eq_g3_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain3, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
+				if (ImGui::Checkbox(("Use Limiter##audio_effect_limiter_" + std::to_string(i)).c_str(), &limiter.enabled)) {
+					audio->SetLimiter(entry.soundData, limiter.enabled);
+					changed = true;
 				}
-				if (ImGui::Button(("Clear Effects##audio_clear_effects_" + std::to_string(i)).c_str())) {
-					audio->ClearSoundEffects(entry.soundData);
+				int release = static_cast<int>(limiter.limiter.Release);
+				int loudness = static_cast<int>(limiter.limiter.Loudness);
+				if (ImGui::SliderInt(("Limiter Release##audio_limiter_release_" + std::to_string(i)).c_str(), &release, FXMASTERINGLIMITER_MIN_RELEASE, FXMASTERINGLIMITER_MAX_RELEASE)) {
+					limiter.limiter.Release = static_cast<UINT32>(release);
+					changed = true;
+				}
+				if (ImGui::SliderInt(("Limiter Loudness##audio_limiter_loudness_" + std::to_string(i)).c_str(), &loudness, FXMASTERINGLIMITER_MIN_LOUDNESS, FXMASTERINGLIMITER_MAX_LOUDNESS)) {
+					limiter.limiter.Loudness = static_cast<UINT32>(loudness);
+					changed = true;
+				}
+
+				if (changed) {
+					audio->SetSoundEffects(entry.soundData, {reverb, echo, equalizer, limiter});
 					hasUnsavedChanges_ = true;
 				}
 				ImGui::TreePop();

@@ -1,6 +1,7 @@
 #include "Audio.h"
 #include "fstream"
 #include <algorithm>
+#include <array>
 #include <assert.h>
 #include <combaseapi.h>
 #include <filesystem>
@@ -20,8 +21,41 @@ std::vector<SoundData*>& SoundDataRegistry() {
 	static std::vector<SoundData*> instances;
 	return instances;
 }
-} // namespace
 
+std::vector<Audio::MixerEffectSettings> NormalizeEffects(const std::vector<Audio::MixerEffectSettings>& effects) {
+	const std::array<Audio::MixerEffectType, 4> orderedTypes = {
+	    Audio::MixerEffectType::Reverb,
+	    Audio::MixerEffectType::Echo,
+	    Audio::MixerEffectType::Equalizer,
+	    Audio::MixerEffectType::Limiter,
+	};
+
+	std::vector<Audio::MixerEffectSettings> normalized;
+	normalized.reserve(orderedTypes.size());
+	for (Audio::MixerEffectType type : orderedTypes) {
+		auto found = std::find_if(effects.begin(), effects.end(), [type](const Audio::MixerEffectSettings& effect) { return effect.type == type; });
+		if (found != effects.end()) {
+			normalized.push_back(*found);
+			continue;
+		}
+		Audio::MixerEffectSettings effect{};
+		effect.type = type;
+		effect.enabled = false;
+		normalized.push_back(effect);
+	}
+	return normalized;
+}
+
+void SetEffectEnabled(std::vector<Audio::MixerEffectSettings>& effects, Audio::MixerEffectType type, bool enabled) {
+	auto normalized = NormalizeEffects(effects);
+	auto target = std::find_if(normalized.begin(), normalized.end(), [type](const Audio::MixerEffectSettings& effect) { return effect.type == type; });
+	if (target != normalized.end()) {
+		target->enabled = enabled;
+	}
+	effects = std::move(normalized);
+}
+
+} // namespace
 SoundData::SoundData() { RegisterInstance(); }
 
 SoundData::SoundData(const SoundData& other) : wfex(other.wfex), buffer(other.buffer), volume(other.volume), debugName(other.debugName), effects(other.effects) { RegisterInstance(); }
@@ -400,14 +434,14 @@ std::vector<Audio::MixerEffectSettings> Audio::GetSoundEffects(const SoundData* 
 	if (!soundData) {
 		return {};
 	}
-	return soundData->effects;
+	return NormalizeEffects(soundData->effects);
 }
 
 void Audio::SetSoundEffects(SoundData* soundData, const std::vector<MixerEffectSettings>& effects) {
 	if (!soundData) {
 		return;
 	}
-	soundData->effects = effects;
+	soundData->effects = NormalizeEffects(effects);
 	const BYTE* targetData = soundData->buffer.data();
 	if (!targetData) {
 		return;
@@ -423,17 +457,24 @@ void Audio::AddSoundEffect(SoundData* soundData, const MixerEffectSettings& effe
 	if (!soundData) {
 		return;
 	}
-	auto effects = soundData->effects;
-	effects.push_back(effect);
+	auto effects = NormalizeEffects(soundData->effects);
+	auto target = std::find_if(effects.begin(), effects.end(), [&](const MixerEffectSettings& existing) { return existing.type == effect.type; });
+	if (target != effects.end()) {
+		*target = effect;
+		target->enabled = true;
+	}
 	SetSoundEffects(soundData, effects);
 }
 
 void Audio::RemoveSoundEffect(SoundData* soundData, size_t index) {
-	if (!soundData || index >= soundData->effects.size()) {
+	if (!soundData) {
 		return;
 	}
-	auto effects = soundData->effects;
-	effects.erase(effects.begin() + index);
+	auto effects = NormalizeEffects(soundData->effects);
+	if (index >= effects.size()) {
+		return;
+	}
+	effects[index].enabled = false;
 	SetSoundEffects(soundData, effects);
 }
 
@@ -441,7 +482,47 @@ void Audio::ClearSoundEffects(SoundData* soundData) {
 	if (!soundData) {
 		return;
 	}
-	SetSoundEffects(soundData, {});
+	auto effects = NormalizeEffects(soundData->effects);
+	for (auto& effect : effects) {
+		effect.enabled = false;
+	}
+	SetSoundEffects(soundData, effects);
+}
+
+void Audio::SetReverb(SoundData* soundData, bool enabled) {
+	if (!soundData) {
+		return;
+	}
+	auto effects = NormalizeEffects(soundData->effects);
+	SetEffectEnabled(effects, MixerEffectType::Reverb, enabled);
+	SetSoundEffects(soundData, effects);
+}
+
+void Audio::SetEcho(SoundData* soundData, bool enabled) {
+	if (!soundData) {
+		return;
+	}
+	auto effects = NormalizeEffects(soundData->effects);
+	SetEffectEnabled(effects, MixerEffectType::Echo, enabled);
+	SetSoundEffects(soundData, effects);
+}
+
+void Audio::SetEqualizer(SoundData* soundData, bool enabled) {
+	if (!soundData) {
+		return;
+	}
+	auto effects = NormalizeEffects(soundData->effects);
+	SetEffectEnabled(effects, MixerEffectType::Equalizer, enabled);
+	SetSoundEffects(soundData, effects);
+}
+
+void Audio::SetLimiter(SoundData* soundData, bool enabled) {
+	if (!soundData) {
+		return;
+	}
+	auto effects = NormalizeEffects(soundData->effects);
+	SetEffectEnabled(effects, MixerEffectType::Limiter, enabled);
+	SetSoundEffects(soundData, effects);
 }
 
 std::vector<Audio::EditorSoundEntry> Audio::GetEditorSoundEntries() const {
@@ -467,14 +548,35 @@ std::vector<Audio::EditorSoundEntry> Audio::GetEditorSoundEntries() const {
 	return entries;
 }
 
-std::vector<Audio::MixerEffectSettings> Audio::GetMixerEffects() const { return mixer_.GetEffects(); }
-void Audio::SetMixerEffects(const std::vector<MixerEffectSettings>& effects) { mixer_.SetEffects(effects); }
+std::vector<Audio::MixerEffectSettings> Audio::GetMixerEffects() const { return NormalizeEffects(mixer_.GetEffects()); }
+void Audio::SetMixerEffects(const std::vector<MixerEffectSettings>& effects) { mixer_.SetEffects(NormalizeEffects(effects)); }
 
-void Audio::AddMixerEffect(const MixerEffectSettings& effect) { mixer_.AddEffect(effect); }
+void Audio::AddMixerEffect(const MixerEffectSettings& effect) {
+	auto effects = NormalizeEffects(mixer_.GetEffects());
+	auto target = std::find_if(effects.begin(), effects.end(), [&](const MixerEffectSettings& existing) { return existing.type == effect.type; });
+	if (target != effects.end()) {
+		*target = effect;
+		target->enabled = true;
+	}
+	mixer_.SetEffects(effects);
+}
 
-void Audio::RemoveMixerEffect(size_t index) { mixer_.RemoveEffect(index); }
+void Audio::RemoveMixerEffect(size_t index) {
+	auto effects = NormalizeEffects(mixer_.GetEffects());
+	if (index >= effects.size()) {
+		return;
+	}
+	effects[index].enabled = false;
+	mixer_.SetEffects(effects);
+}
 
-void Audio::ClearMixerEffects() { mixer_.ClearEffects(); }
+void Audio::ClearMixerEffects() {
+	auto effects = NormalizeEffects(mixer_.GetEffects());
+	for (auto& effect : effects) {
+		effect.enabled = false;
+	}
+	mixer_.SetEffects(effects);
+}
 
 const char* Audio::GetMixerEffectTypeName(MixerEffectType type) { return AudioMixer::GetEffectTypeName(type); }
 
