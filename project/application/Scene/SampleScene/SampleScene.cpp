@@ -76,7 +76,7 @@ SampleScene::SampleScene() {
 	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "walk");
 	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "sneakWalk");
 	ParticleManager::GetInstance()->CreateParticleGroup("sample", "Resources/2d/defaultParticle.png");
-	bgmData_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/昼下がり気分.mp3");
+	bgmData_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Rendez-vous_2.mp3");
 	Audio::GetInstance()->SetSoundVolume(&bgmData_, 1.0f);
 }
 void SampleScene::Initialize() {
