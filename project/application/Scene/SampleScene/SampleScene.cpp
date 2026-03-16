@@ -81,12 +81,6 @@ SampleScene::SampleScene() {
 }
 void SampleScene::Initialize() {
 	isBgmPlaying_ = false;
-	previousMixerEffects_ = Audio::GetInstance()->GetMixerEffects();
-	Audio::GetInstance()->ClearMixerEffects();
-	Audio::MixerEffectSettings reverbEffect{};
-	reverbEffect.type = Audio::MixerEffectType::Reverb;
-	reverbEffect.enabled = true;
-	Audio::GetInstance()->AddMixerEffect(reverbEffect);
 	Audio::MixerEffectSettings echoEffect{};
 	echoEffect.type = Audio::MixerEffectType::Echo;
 	echoEffect.enabled = true;
