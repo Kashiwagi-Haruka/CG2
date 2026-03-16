@@ -26,7 +26,8 @@ VertexShaderOutput main(VertexShaderInput input, uint instanceId : SV_InstanceID
 
     output.position = mul(input.position, worldViewProjection);
     output.texcoord = input.texcoord;
-    output.color = particle.color;
+    float t = (particle.lifeTime > 0.0f) ? saturate(particle.currentTime / particle.lifeTime) : 1.0f;
+    output.color = lerp(particle.beforeColor, particle.afterColor, t);
 
     return output;
 }

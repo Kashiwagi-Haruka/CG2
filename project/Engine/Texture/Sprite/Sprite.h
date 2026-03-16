@@ -3,7 +3,7 @@
 #include "Transform.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include "VertexData.h"
+#include "Data/VertexData.h"
 #include <Windows.h>
 #include <d3d12.h>
 #include <stdint.h>
@@ -80,7 +80,7 @@ public:
 	void Update();
 
 	void Draw();
-
+	void SetTextureHandle(uint32_t Handle) { textureIndex = Handle; }
 	void SetPosition(const Vector2& pos) {
 		transform_.translate.x = pos.x;
 		transform_.translate.y = pos.y;

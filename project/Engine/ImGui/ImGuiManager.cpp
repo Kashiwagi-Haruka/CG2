@@ -1,6 +1,6 @@
 #define NOMINMAX
 #include "ImGuiManager.h"
-#include "Engine/Editor/Hinstance.h"
+#include "Engine/Editor/Hierarchy.h"
 #include <dxgi1_6.h>
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
@@ -8,6 +8,7 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #endif
 #include "DirectXCommon.h"
+#include "TextureManager.h"
 #include "SrvManager/SrvManager.h"
 #include "WinApp.h"
 #include <algorithm>
@@ -15,8 +16,9 @@
 #include <format>
 #include <string>
 
-void ImGuiManager::Initialize([[maybe_unused]] WinApp* winApp, [[maybe_unused]] DirectXCommon* dxCommon, [[maybe_unused]] SrvManager* srvManager) {
+void ImGuiManager::Initialize([[maybe_unused]] WinApp* winApp, [[maybe_unused]] DirectXCommon* dxCommon) {
 #ifdef USE_IMGUI
+	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
 	dxCommon_ = dxCommon;
 	winApp_ = winApp;
 	IMGUI_CHECKVERSION();
@@ -92,15 +94,16 @@ void ImGuiManager::Begin() {
 		ImGui::Text("FPS: %.1f", io.Framerate);
 	}
 	ImGui::End();
-
-	Hinstance* hinstance = Hinstance::GetInstance();
-	const bool isEditorLayoutEnabled = hinstance->HasRegisteredObjects();
+#endif
+	Hierarchy* Hierarchy = Hierarchy::GetInstance();
+#ifdef USE_IMGUI
+	const bool isEditorLayoutEnabled = Hierarchy->HasRegisteredObjects();
 	if (dxCommon_) {
 		dxCommon_->SetEditorLayoutEnabled(isEditorLayoutEnabled);
 	}
 	prevEditorLayoutEnabled_ = isEditorLayoutEnabled;
-	hinstance->DrawObjectEditors();
 #endif
+	Hierarchy->DrawObjectEditors();
 }
 
 void ImGuiManager::End() {
@@ -109,8 +112,9 @@ void ImGuiManager::End() {
 #endif
 }
 
-void ImGuiManager::Draw([[maybe_unused]] SrvManager* srvManager, [[maybe_unused]] DirectXCommon* dxCommon) {
+void ImGuiManager::Draw([[maybe_unused]] DirectXCommon* dxCommon) {
 #ifdef USE_IMGUI
+	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
 	if (!srvManager->GetDescriptorHeap().Get() || !dxCommon->GetCommandList()) {
 		OutputDebugStringA("ImGui Render Error: srvDescriptorHeap_ or commandList_ is null\n");
 		return;

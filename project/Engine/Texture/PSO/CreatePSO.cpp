@@ -14,10 +14,86 @@ void CreatePSO::Create(
 	CreateRootSignature();
 	CreateGraphicsPipeline(cullMode, depthEnable, fillMode, topologyType);
 }
+void CreatePSO::CreateInstancedObject3d(const std::wstring& pixelShaderPath, const std::wstring& vertexShaderPath) {
+	D3D12_DESCRIPTOR_RANGE descriptorRange{};
+	descriptorRange.BaseShaderRegister = 13;
+	descriptorRange.NumDescriptors = 1;
+	descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_ROOT_PARAMETER rootParameters[2]{};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRange;
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[1].Descriptor.ShaderRegister = 13;
+
+	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
+	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	rootSignatureDesc.NumParameters = _countof(rootParameters);
+	rootSignatureDesc.pParameters = rootParameters;
+
+	signatureBlob_ = nullptr;
+	errorBlob_ = nullptr;
+	hr_ = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
+	if (FAILED(hr_)) {
+		Logger::Log(reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
+		assert(false);
+	}
+
+	rootSignature_ = nullptr;
+	hr_ = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
+	assert(SUCCEEDED(hr_));
+
+	std::array<D3D12_INPUT_ELEMENT_DESC, 2> inputElementDescs{};
+	inputElementDescs[0].SemanticName = "POSITION";
+	inputElementDescs[0].SemanticIndex = 0;
+	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	inputElementDescs[0].InputSlot = 0;
+	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+	inputElementDescs[0].InstanceDataStepRate = 0;
+
+	inputElementDescs[1].SemanticName = "NORMAL";
+	inputElementDescs[1].SemanticIndex = 0;
+	inputElementDescs[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	inputElementDescs[1].InputSlot = 0;
+	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+	inputElementDescs[1].InstanceDataStepRate = 0;
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
+	psoDesc.pRootSignature = rootSignature_.Get();
+	psoDesc.InputLayout = {inputElementDescs.data(), static_cast<UINT>(inputElementDescs.size())};
+	psoDesc.BlendState = blendModeManager_.SetBlendMode(BlendMode::kBlendModeNone);
+	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+	psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+	psoDesc.RasterizerState.DepthClipEnable = TRUE;
+	psoDesc.DepthStencilState.DepthEnable = true;
+	psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	psoDesc.NumRenderTargets = 1;
+	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	psoDesc.SampleDesc.Count = 1;
+
+	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(vertexShaderPath.c_str(), L"vs_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(pixelShaderPath.c_str(), L"ps_6_0");
+	assert(vsBlob && psBlob);
+	psoDesc.VS = {vsBlob->GetBufferPointer(), vsBlob->GetBufferSize()};
+	psoDesc.PS = {psBlob->GetBufferPointer(), psBlob->GetBufferSize()};
+
+	hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&graphicsPipelineState_[BlendMode::kBlendModeNone]));
+	assert(SUCCEEDED(hr_));
+}
 void CreatePSO::CreateShadow(D3D12_CULL_MODE cullMode, D3D12_FILL_MODE fillMode) {
 	isShadowPass_ = true;
-	vertexShaderPath_ = L"Resources/shader/Object3d/Object3dShadowMap.VS.hlsl";
-	pixelShaderPath_ = L"Resources/shader/Object3d/Object3dShadowMap.PS.hlsl";
+	vertexShaderPath_ = L"Resources/shader/Object3d/VS_Shader/Object3dShadowMap.VS.hlsl";
+	pixelShaderPath_ = L"Resources/shader/Object3d/PS_Shader/Object3dShadowMap.PS.hlsl";
 	CreateRootSignature();
 	CreateGraphicsPipeline(cullMode, true, fillMode, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 }
@@ -86,7 +162,7 @@ void CreatePSO::CreateRootSignature() {
 	rootParameters[4].Descriptor.ShaderRegister = 4;
 
 	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	rootParameters[5].Descriptor.ShaderRegister = 5;
 
 	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -242,7 +318,8 @@ void CreatePSO::CreateGraphicsPipeline(D3D12_CULL_MODE cullMode, bool depthEnabl
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	// --- シェーダーコンパイル ---
-	std::wstring vsPath = vertexShaderPath_.empty() ? (useSkinning_ ? L"Resources/shader/Object3d/SkinningObject3d.VS.hlsl" : L"Resources/shader/Object3d/Object3d.VS.hlsl") : vertexShaderPath_;
+	std::wstring vsPath =
+	    vertexShaderPath_.empty() ? (useSkinning_ ? L"Resources/shader/Object3d/VS_Shader/SkinningObject3d.VS.hlsl" : L"Resources/shader/Object3d/VS_Shader/Object3d.VS.hlsl") : vertexShaderPath_;
 	Microsoft::WRL::ComPtr<IDxcBlob> vsBlob = dxCommon_->CompileShader(vsPath.c_str(), L"vs_6_0");
 	Microsoft::WRL::ComPtr<IDxcBlob> psBlob = dxCommon_->CompileShader(pixelShaderPath_.c_str(), L"ps_6_0");
 	assert(vsBlob && psBlob);

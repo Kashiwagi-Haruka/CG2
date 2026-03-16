@@ -5,6 +5,7 @@
 std::unique_ptr<TextureManager> TextureManager::instance = nullptr;
 uint32_t TextureManager::kSRVIndexTop = 1;
 
+// TextureManager のシングルトンインスタンスを返す
 TextureManager* TextureManager::GetInstance() {
 
 	if (instance == nullptr) {
@@ -13,14 +14,26 @@ TextureManager* TextureManager::GetInstance() {
 	return instance.get();
 }
 
-void TextureManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
+// 利用する DirectX 共通機能と SRV マネージャーを設定する
+void TextureManager::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
-	srvManager_ = srvManager;
+	srvManager_ = std::make_unique<SrvManager>();
+	srvManager_->Initialize(dxCommon_);
 	textureDatas.reserve(srvManager_->kMaxSRVCount_);
 }
 
-void TextureManager::Finalize() { instance.reset(); }
+// インスタンスを破棄して終了処理を行う
+void TextureManager::Finalize() {
+	if (srvManager_) {
+		srvManager_->Finalize();
+		srvManager_.reset();
+	}
+	textureDatas.clear();
+	dxCommon_ = nullptr;
+	instance.reset();
+}
 
+// ファイルパス指定でテクスチャを読み込み、SRV を作成する
 void TextureManager::LoadTextureName(const std::string& filePath) {
 
 	if (textureDatas.contains(filePath)) {
@@ -64,6 +77,7 @@ void TextureManager::LoadTextureName(const std::string& filePath) {
 	std::string log = "Texture Loaded: " + filePath + " | SRV Index: " + std::to_string(textureData.srvIndex) + " | GPU Handle: " + std::to_string(textureData.srvHandleGPU.ptr) + "\n";
 	OutputDebugStringA(log.c_str());
 }
+// メモリ上の画像データを読み込み、SRV を作成する
 void TextureManager::LoadTextureFromMemory(const std::string& key, const uint8_t* data, size_t size) {
 	if (textureDatas.contains(key)) {
 		return;
@@ -101,6 +115,7 @@ void TextureManager::LoadTextureFromMemory(const std::string& key, const uint8_t
 	OutputDebugStringA(log.c_str());
 }
 
+// RGBA8 の生配列からテクスチャを生成して SRV を作成する
 void TextureManager::LoadTextureFromRGBA8(const std::string& key, uint32_t width, uint32_t height, const uint8_t* data) {
 	if (textureDatas.contains(key)) {
 		return;
@@ -141,6 +156,7 @@ void TextureManager::LoadTextureFromRGBA8(const std::string& key, uint32_t width
 	std::string log = "Embedded Texture Loaded (RGBA8): " + key + " | SRV Index: " + std::to_string(textureData.srvIndex) + " | GPU Handle: " + std::to_string(textureData.srvHandleGPU.ptr) + "\n";
 	OutputDebugStringA(log.c_str());
 }
+// メタデータに基づいてテクスチャリソースを作成する
 Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(DirectX::TexMetadata& metadata) {
 
 	// metadataを基にResourceの設定
@@ -188,6 +204,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(Dir
 //	assert(0);
 //	return 0;
 // }
+// ファイルパスから SRV インデックスを取得する
 uint32_t TextureManager::GetTextureIndexByfilePath(const std::string& filePath) {
 	LoadTextureName(filePath);
 
@@ -197,6 +214,7 @@ uint32_t TextureManager::GetTextureIndexByfilePath(const std::string& filePath) 
 	return it->second.srvIndex;
 }
 
+// ファイルパスから SRV インデックスを取得する
 uint32_t TextureManager::GetsrvIndex(const std::string& filePath) {
 	// 未読み込みなら読み込む
 	LoadTextureName(filePath);
@@ -207,6 +225,7 @@ uint32_t TextureManager::GetsrvIndex(const std::string& filePath) {
 	return it->second.srvIndex;
 }
 
+// ファイルパスから GPU SRV ハンドルを取得する
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& filePath) {
 	LoadTextureName(filePath);
 
@@ -216,6 +235,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& f
 	return it->second.srvHandleGPU;
 }
 
+// ファイルパスからテクスチャのメタデータを取得する
 const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filePath) {
 	LoadTextureName(filePath);
 
@@ -225,6 +245,7 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& fileP
 	return it->second.metadata;
 }
 
+// 全 mip レベルの画像データを GPU リソースへ書き込む
 void TextureManager::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages) {
 	// Meta情報を取得
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
@@ -244,23 +265,34 @@ void TextureManager::UploadTextureData(ID3D12Resource* texture, const DirectX::S
 		assert(SUCCEEDED(hr_));
 	}
 }
+// SRV インデックスからテクスチャメタデータを取得する
 DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t srvIndex) {
 	for (auto& [key, data] : textureDatas) {
 		if (data.srvIndex == srvIndex) {
 			return data.metadata;
 		}
 	}
-	assert(false && "Invalid srvIndex");
+
+	// RenderTexture など TextureManager の map 管理外の SRV が来るケースでは
+	// 参照可能なダミー値を返してアサート終了を避ける。
 	static DirectX::TexMetadata dummy{};
+	dummy.width = 1;
+	dummy.height = 1;
+	dummy.mipLevels = 1;
+
+	std::string log = "[TextureManager] Warning: metadata not found for srvIndex=" + std::to_string(srvIndex) + "\n";
+	OutputDebugStringA(log.c_str());
 	return dummy;
 }
+// SRV インデックスから GPU SRV ハンドルを取得する
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t srvIndex) {
 	for (auto& [key, data] : textureDatas) {
 		if (data.srvIndex == srvIndex) {
 			return data.srvHandleGPU;
 		}
 	}
-	assert(false && "Invalid srvIndex");
-	D3D12_GPU_DESCRIPTOR_HANDLE dummy{};
-	return dummy;
+	// RenderTexture など TextureManager で管理していない SRV は
+	// SRV マネージャーから直接ハンドルを取得する。
+	assert(srvManager_ != nullptr);
+	return srvManager_->GetGPUDescriptorHandle(srvIndex);
 }

@@ -135,10 +135,16 @@ void Sprite::SetColor(const Vector4& color) { material->color = color; };
 void Sprite::SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize) {
 
 	const DirectX::TexMetadata& metaData = TextureManager::GetInstance()->GetMetaData(textureIndex);
-	float tex_left = leftTop.x / metaData.width;
-	float tex_right = (leftTop.x + TextureSize.x) / metaData.width;
-	float tex_top = leftTop.y / metaData.height;
-	float tex_bottom = (leftTop.y + TextureSize.y) / metaData.height;
+	float textureWidth = static_cast<float>(metaData.width);
+	float textureHeight = static_cast<float>(metaData.height);
+	if (textureWidth <= 0.0f || textureHeight <= 0.0f) {
+		textureWidth = 1.0f;
+		textureHeight = 1.0f;
+	}
+	float tex_left = leftTop.x / textureWidth;
+	float tex_right = (leftTop.x + TextureSize.x) / textureWidth;
+	float tex_top = leftTop.y / textureHeight;
+	float tex_bottom = (leftTop.y + TextureSize.y) / textureHeight;
 
 	vertexData[0].texcoord = {tex_left, tex_top};
 	vertexData[1].texcoord = {tex_right, tex_top};
@@ -153,8 +159,12 @@ void Sprite::SetIsFlipY(const bool isFlipY) { isFripY_ = isFlipY; }
 void Sprite::AdjustTextureSize() {
 	DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
 
-	textureCutSize.x = static_cast<float>(metadata.width);
-	textureCutSize.y = static_cast<float>(metadata.height);
+	if (metadata.width == 0 || metadata.height == 0) {
+		textureCutSize = {1.0f, 1.0f};
+	} else {
+		textureCutSize.x = static_cast<float>(metadata.width);
+		textureCutSize.y = static_cast<float>(metadata.height);
+	}
 
 	textureSize = textureCutSize;
 }

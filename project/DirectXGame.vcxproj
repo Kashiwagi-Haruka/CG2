@@ -160,6 +160,17 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\Easing.cpp" />
     <ClCompile Include="application\GameObject\KeyBindConfig.cpp" />
+    <ClCompile Include="application\GameObject\Edamame\Edamame.cpp" />
+    <ClCompile Include="application\GameObject\Chair\Chair.cpp" />
+    <ClCompile Include="application\Scene\TD3_4month\CoffeeScene.cpp" />
+    <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
+    <ClCompile Include="application\GameObject\Edamame\EdamameTrivia.cpp" />
+    <ClCompile Include="application\GameObject\Coffee\CoffeeTrivia.cpp" />
+    <ClCompile Include="application\GameObject\BGMManager\BGMManager.cpp" />
+    <ClCompile Include="application\GameObject\Door\Door.cpp" />
+    <ClCompile Include="application\GameObject\Door\AutoLockSystem.cpp" />
+    <ClCompile Include="application\GameObject\Chair\ChairManager.cpp" />
+    <ClCompile Include="Engine\Editor\EditorGrid.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp" />
     <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp" />
@@ -230,13 +241,29 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Player\Player.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\YoshidaMath.cpp" />
     <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp" />
-    <ClCompile Include="Engine\Editor\Hinstance.cpp" />
+    <ClCompile Include="Engine\Editor\Hierarchy.cpp" />
     <ClCompile Include="application\GameObject\TestField\TestField.cpp" />
     <ClCompile Include="application\GameObject\Portal\Portal.cpp" />
-    <ClCompile Include="application\GameObject\WarpPos\WarpPos1.cpp" />
+    <ClCompile Include="application\GameObject\WarpPos\WarpPos.cpp" />
     <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoard.cpp" />
     <ClCompile Include="application\GameObject\Portal\PortalManager.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp" />
+    <ClCompile Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.cpp" />
+    <ClCompile Include="Engine\Texture\PSO\SpriteCreatePSO.cpp" />
+    <ClCompile Include="Engine\Editor\Inspector.cpp" />
+    <ClCompile Include="Engine\Editor\ToolBar.cpp" />
+    <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
+    <ClCompile Include="Engine\Texture\Mesh\Portal\PortalMesh.cpp" />
+    <ClCompile Include="application\GameObject\WhiteBoard\WalkWhiteBoard.cpp" />
+    <ClCompile Include="application\GameObject\Flashlight\Flashlight.cpp" />
+    <ClCompile Include="application\GameObject\Key\Key.cpp" />
+    <ClCompile Include="application\GameObject\UI\RaySprite.cpp" />
+    <ClCompile Include="application\GameObject\Portal\PortalParticle.cpp" />
+    <ClCompile Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.cpp" />
+    <ClCompile Include="application\GameSave\GameSave.cpp" />
+    <ClCompile Include="application\GameObject\Wall\Wall.cpp" />
+    <ClCompile Include="application\GameObject\Wall\WallManager.cpp" />
+    <ClCompile Include="application\GameObject\VendingMac\VendingMac.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -253,14 +280,27 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <None Include="Resources\shader\Sprite\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\GameObject\Key\Key.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\Collider.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\CollisionConfig.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\CollisionManager.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\Easing.h" />
     <ClInclude Include="application\GameObject\KeyBindConfig.h" />
+    <ClInclude Include="application\GameObject\Edamame\Edamame.h" />
+    <ClInclude Include="application\GameObject\Chair\Chair.h" />
+    <ClInclude Include="application\Scene\TD3_4month\CoffeeScene.h" />
+    <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
+    <ClInclude Include="application\GameObject\Edamame\EdamameTrivia.h" />
+    <ClInclude Include="application\GameObject\Coffee\CoffeeTrivia.h" />
+    <ClInclude Include="application\GameObject\BGMManager\BGMManager.h" />
+    <ClInclude Include="application\GameObject\Door\Door.h" />
+    <ClInclude Include="application\GameObject\Door\AutoLockSystem.h" />
+    <ClInclude Include="application\GameObject\Chair\ChairManager.h" />
+    <ClInclude Include="Engine\Editor\EditorGrid.h" />
+    <ClInclude Include="Engine\Texture\Data\Material.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\AnimationManager.h" />
     <ClInclude Include="Engine\Math\QuaternionTransform.h" />
-    <ClInclude Include="Engine\Texture\Color.h" />
+    <ClInclude Include="Engine\Texture\Data\Color.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h" />
     <ClInclude Include="Engine\Texture\Light\AreaLight.h" />
     <ClInclude Include="Engine\Texture\PSO\CreatePSO.h" />
@@ -282,6 +322,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\SkinningData.h" />
     <ClInclude Include="externals\freetype\include\freetype\config\ftheader.h" />
     <ClInclude Include="externals\freetype\include\ft2build.h" />
+    <ClInclude Include="Engine\Texture\Data\SkinningData.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -297,7 +338,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Math\Vector2.h" />
     <ClInclude Include="Engine\Math\Vector3.h" />
     <ClInclude Include="Engine\Math\Vector4.h" />
-    <ClInclude Include="Engine\Texture\VertexData.h" />
+    <ClInclude Include="Engine\Texture\Data\VertexData.h" />
     <ClInclude Include="Engine\base\WinApp.h" />
     <ClInclude Include="Engine\Texture\Mesh\Object3d\Object3d.h" />
     <ClInclude Include="Engine\Log\Logger.h" />
@@ -332,13 +373,28 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Player\Player.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\YoshidaMath.h" />
     <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h" />
-    <ClInclude Include="Engine\Editor\Hinstance.h" />
+    <ClInclude Include="Engine\Editor\Hierarchy.h" />
     <ClInclude Include="application\GameObject\TestField\TestField.h" />
     <ClInclude Include="application\GameObject\Portal\Portal.h" />
-    <ClInclude Include="application\GameObject\WarpPos\WarpPos1.h" />
+    <ClInclude Include="application\GameObject\WarpPos\WarpPos.h" />
     <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoard.h" />
     <ClInclude Include="application\GameObject\Portal\PortalManager.h" />
     <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h" />
+    <ClInclude Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.h" />
+    <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h" />
+    <ClInclude Include="Engine\Editor\Inspector.h" />
+    <ClInclude Include="Engine\Editor\ToolBar.h" />
+    <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
+    <ClInclude Include="Engine\Texture\Mesh\Portal\PortalMesh.h" />
+    <ClInclude Include="application\GameObject\WhiteBoard\WalkWhiteBoard.h" />
+    <ClInclude Include="application\GameObject\Flashlight\Flashlight.h" />
+    <ClInclude Include="application\GameObject\UI\RaySprite.h" />
+    <ClInclude Include="application\GameObject\Portal\PortalParticle.h" />
+    <ClInclude Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.h" />
+    <ClInclude Include="application\GameSave\GameSave.h" />
+    <ClInclude Include="application\GameObject\Wall\Wall.h" />
+    <ClInclude Include="application\GameObject\Wall\WallManager.h" />
+    <ClInclude Include="application\GameObject\VendingMac\VendingMac.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
@@ -357,7 +413,26 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Object3d\Object3d.PS.hlsl">
+    <FxCompile Include="Resources\shader\Object3d\CS_Shader\InstancedObject3dCollision.CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Development|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\InstancedObject3d.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3d.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
@@ -365,7 +440,15 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Object3d\Object3d.VS.hlsl">
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\InstancedObject3d.VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\Object3d.VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Vertex</ShaderType>
@@ -373,7 +456,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Object3d\Object3dEmissive.PS.hlsl">
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dEmissive.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
@@ -381,7 +464,15 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Object3d\Object3dMirror.PS.hlsl">
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dGrid.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dMirror.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
@@ -389,7 +480,23 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Object3d\Object3dShadowMap.PS.hlsl">
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dPortal.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\Object3dPortal.VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dShadowMap.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
@@ -397,7 +504,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Object3d\Object3dShadowMap.VS.hlsl">
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\Object3dShadowMap.VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Vertex</ShaderType>
@@ -405,7 +512,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Object3d\Object3dToon.PS.hlsl">
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dToon.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
@@ -413,7 +520,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Object3d\Skinning.CS.hlsl">
+    <FxCompile Include="Resources\shader\Object3d\CS_Shader\Skinning.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
@@ -424,7 +531,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\shader\Object3d\SkinningObject3d.VS.hlsl">
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\SkinningObject3d.VS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -460,6 +567,11 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Development|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shader\Sprite\Font.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

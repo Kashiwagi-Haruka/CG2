@@ -7,7 +7,7 @@
 
 #include "TextureManager.h"
 #include "Vector4.h"
-#include "VertexData.h"
+#include "Data/VertexData.h"
 #include "WinApp.h"
 #include <memory>
 class SrvManager;
@@ -21,7 +21,6 @@ private:
 	std::unique_ptr<WinApp> winApp_ = nullptr;
 
 	std::unique_ptr<DirectXCommon> dxCommon_ = nullptr;
-	std::unique_ptr<SrvManager> srvManager_ = nullptr;
 
 	std::unique_ptr<ImGuiManager> imguiM_ = nullptr;
 
@@ -41,7 +40,7 @@ public:
 	bool ProcessMessage();
 
 	float GetDeltaTime();
-
+	ID3D12Device* GetD3D12Device();
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
 
 

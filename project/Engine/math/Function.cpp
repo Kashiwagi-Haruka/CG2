@@ -9,7 +9,8 @@ namespace Function {
 
 // ベクトルの長さを計算する
 float Length(const Vector3& v) { return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z); }
-
+// 長さの二乗
+float LengthSquared(const Vector3& v) { return v.x * v.x + v.y * v.y + v.z * v.z; }
 // direction = 向きたい方向（正規化推奨）
 // forwardAxis = モデルの前方向（Cube は X軸 {1,0,0}）
 // return = 回転角（x, y, z）
@@ -236,7 +237,10 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 }
 
 // SRT行列を作る（オイラー角）
-Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) {
+Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) { return MakeAffineMatrix(scale, rotate, translate, {0.0f, 0.0f}); }
+
+// SRT行列を作る（オイラー角・アンカー指定）
+Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate, Vector2 anchor) {
 	Matrix4x4 result{};
 
 	Matrix4x4 rotateX = MakeRotateXMatrix(rotate.x);
@@ -244,8 +248,11 @@ Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate) {
 	Matrix4x4 rotateZ = MakeRotateZMatrix(rotate.z);
 	Matrix4x4 rotateXYZ = Multiply(rotateZ, Multiply(rotateX, rotateY));
 
-	Matrix4x4 ScaleRotateMatrix = Multiply(MakeScaleMatrix(scale), rotateXYZ);
-	result = Multiply(ScaleRotateMatrix, MakeTranslateMatrix(translate));
+	Matrix4x4 scaleRotateMatrix = Multiply(MakeScaleMatrix(scale), rotateXYZ);
+	Matrix4x4 toAnchorMatrix = MakeTranslateMatrix(-anchor.x, -anchor.y, 0.0f);
+	Matrix4x4 fromAnchorMatrix = MakeTranslateMatrix(anchor.x, anchor.y, 0.0f);
+
+	result = Multiply(Multiply(toAnchorMatrix, scaleRotateMatrix), Multiply(fromAnchorMatrix, MakeTranslateMatrix(translate)));
 
 	return result;
 }
@@ -406,7 +413,35 @@ Vector3 RotateVectorByQuaternion(const Vector3& v, const Vector4& q) {
 Vector3 operator+(const Vector3& v1, const Vector3& v2) { return {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
 // Vector3減算
 Vector3 operator-(const Vector3& v1, const Vector3& v2) { return {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}; }
+// Vector3単項マイナス
+Vector3 operator-(const Vector3& v) { return {-v.x, -v.y, -v.z}; }
 // Vector3スカラー倍
 Vector3 operator*(const Vector3& v, float scalar) { return {v.x * scalar, v.y * scalar, v.z * scalar}; }
+// Vector3スカラー倍（左項）
+Vector3 operator*(float scalar, const Vector3& v) { return v * scalar; }
+// Vector3スカラー除算
+Vector3 operator/(const Vector3& v, float scalar) {
+	assert(std::fabs(scalar) > 1e-6f);
+	float inv = 1.0f / scalar;
+	return {v.x * inv, v.y * inv, v.z * inv};
+}
 // Vector3加算代入
-Vector3 operator+=(Vector3& v1, const Vector3& v2) { return v1 = v1 + v2; }
+Vector3& operator+=(Vector3& v1, const Vector3& v2) {
+	v1 = v1 + v2;
+	return v1;
+}
+// Vector3減算代入
+Vector3& operator-=(Vector3& v1, const Vector3& v2) {
+	v1 = v1 - v2;
+	return v1;
+}
+// Vector3スカラー倍代入
+Vector3& operator*=(Vector3& v, float scalar) {
+	v = v * scalar;
+	return v;
+}
+// Vector3スカラー除算代入
+Vector3& operator/=(Vector3& v, float scalar) {
+	v = v / scalar;
+	return v;
+}

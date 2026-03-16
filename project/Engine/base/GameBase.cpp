@@ -1,5 +1,6 @@
 #define NOMINMAX
 #include "GameBase.h"
+#include "Engine/Editor/Hierarchy.h"
 #include "ImGuiManager.h"
 #include "Input.h"
 #include "Model/ModelManager.h"
@@ -29,19 +30,28 @@ GameBase* GameBase::GetInstance() {
 }
 void GameBase::Finalize() {
 
-	imguiM_->Finalize();
+	if (imguiM_) {
+		imguiM_->Finalize();
+		imguiM_.reset();
+	}
 	Audio::GetInstance()->Finalize();
 
 	TextureManager::GetInstance()->Finalize();
 
 	ParticleManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
-
+	Hierarchy::GetInstance()->Finalize();
 	SpriteCommon::GetInstance()->Finalize();
 	Object3dCommon::GetInstance()->Finalize();
 
-	dxCommon_->Finalize();
-	winApp_->Finalize();
+	if (dxCommon_) {
+		dxCommon_->Finalize();
+		dxCommon_.reset();
+	}
+	if (winApp_) {
+		winApp_->Finalize();
+		winApp_.reset();
+	}
 	instance.reset();
 }
 
@@ -52,15 +62,13 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 	dxCommon_ = std::make_unique<DirectXCommon>();
 	dxCommon_->initialize(winApp_.get());
-	srvManager_ = std::make_unique<SrvManager>();
-	srvManager_->Initialize(dxCommon_.get());
+	TextureManager::GetInstance()->Initialize(dxCommon_.get());
 
 	Input::GetInstance()->Initialize(winApp_.get());
 	imguiM_ = std::make_unique<ImGuiManager>();
-	imguiM_->Initialize(winApp_.get(), dxCommon_.get(), srvManager_.get());
+	imguiM_->Initialize(winApp_.get(), dxCommon_.get());
 	Audio::GetInstance()->InitializeIXAudio();
-	TextureManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
-	ParticleManager::GetInstance()->Initialize(dxCommon_.get(), srvManager_.get());
+	ParticleManager::GetInstance()->Initialize(dxCommon_.get());
 	ModelManager::GetInstance()->Initialize(dxCommon_.get());
 
 	Object3dCommon::GetInstance()->Initialize(dxCommon_.get());
@@ -103,10 +111,17 @@ void GameBase::BeginFlame() {
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
 void GameBase::EndFlame() {
+	Hierarchy::GetInstance()->DrawEditorGridLines();
 	imguiM_->End();
 	dxCommon_->DrawSceneTextureToBackBuffer();
-	imguiM_->Draw(srvManager_.get(), dxCommon_.get());
+	imguiM_->Draw(dxCommon_.get());
 	dxCommon_->PostDraw();
 }
 
 float GameBase::GetDeltaTime() { return dxCommon_->GetDeltaTime(); }
+ID3D12Device* GameBase::GetD3D12Device() {
+	if (!dxCommon_) {
+		return nullptr;
+	}
+	return dxCommon_->GetDevice();
+}

@@ -611,6 +611,24 @@ void DirectXCommon::PostDraw() {
 	hr_ = commandList_->Reset(commandAllocators_[frameIndex_].Get(), nullptr);
 	assert(SUCCEEDED(hr_));
 }
+void DirectXCommon::ExecuteCommandListAndWait() {
+	hr_ = commandList_->Close();
+	assert(SUCCEEDED(hr_));
+	Microsoft::WRL::ComPtr<ID3D12CommandList> lists[] = {commandList_.Get()};
+	commandQueue_->ExecuteCommandLists(1, lists->GetAddressOf());
+
+	fenceValue_++;
+	commandQueue_->Signal(fence_.Get(), fenceValue_);
+	if (fence_->GetCompletedValue() < fenceValue_) {
+		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
+		WaitForSingleObject(fenceEvent_, INFINITE);
+	}
+
+	hr_ = commandAllocators_[frameIndex_]->Reset();
+	assert(SUCCEEDED(hr_));
+	hr_ = commandList_->Reset(commandAllocators_[frameIndex_].Get(), nullptr);
+	assert(SUCCEEDED(hr_));
+}
 void DirectXCommon::DrawSceneTextureToBackBuffer() {
 	D3D12_RESOURCE_BARRIER barriers[2]{};
 	barriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -629,10 +647,14 @@ void DirectXCommon::DrawSceneTextureToBackBuffer() {
 	D3D12_VIEWPORT gameViewport = viewport_;
 	D3D12_RECT gameScissor = scissorRect_;
 	if (editorLayoutEnabled_) {
-		const float gameWidthRatio = 0.68f;
+		const float kTopToolbarHeight = 44.0f;
+		const float kLeftPanelRatio = 0.22f;
+		const float kRightPanelRatio = 0.24f;
 		const float kGameAspect = 16.0f / 9.0f;
-		const float availableWidth = viewport_.Width * gameWidthRatio;
-		const float availableHeight = viewport_.Height;
+		const float availableWidth = viewport_.Width * (1.0f - kLeftPanelRatio - kRightPanelRatio);
+		const float availableHeight = std::max(1.0f, viewport_.Height - kTopToolbarHeight);
+		const float availableStartX = viewport_.Width * kLeftPanelRatio;
+		const float availableStartY = kTopToolbarHeight;
 
 		float gameWidth = availableWidth;
 		float gameHeight = gameWidth / kGameAspect;
@@ -643,6 +665,10 @@ void DirectXCommon::DrawSceneTextureToBackBuffer() {
 
 		gameViewport.Width = std::max(1.0f, gameWidth);
 		gameViewport.Height = std::max(1.0f, gameHeight);
+		gameViewport.TopLeftX = availableStartX + (availableWidth - gameViewport.Width) * 0.5f;
+		gameViewport.TopLeftY = availableStartY + (availableHeight - gameViewport.Height) * 0.5f;
+		gameScissor.left = static_cast<LONG>(gameViewport.TopLeftX);
+		gameScissor.top = static_cast<LONG>(gameViewport.TopLeftY);
 		gameScissor.right = gameScissor.left + static_cast<LONG>(gameViewport.Width);
 		gameScissor.bottom = gameScissor.top + static_cast<LONG>(gameViewport.Height);
 	}
@@ -832,6 +858,16 @@ void DirectXCommon::Finalize() {
 		fenceEvent_ = nullptr;
 	}
 
+	// --- PostEffect ---
+	postEffectParameterMappedData_ = nullptr;
+	postEffectParameterResource_.Reset();
+
+	// --- Scene color / copy pipeline ---
+	sceneColorResource_.Reset();
+	sceneSrvDescriptorHeap_.Reset();
+	copyRootSignature_.Reset();
+	copyPipelineState_.Reset();
+
 	// --- SwapChain Resources ---
 	for (auto& bb : swapChainResources_) {
 		bb.Reset();
@@ -845,17 +881,27 @@ void DirectXCommon::Finalize() {
 	srvDescriptorHeap_.Reset();
 	dsvDescriptorHeap_.Reset();
 
+	// --- DXC ---
+	includeHandler_.Reset();
+	dxcCompiler_.Reset();
+	dxcUtils_.Reset();
+
 	// --- Command ---
 	commandList_.Reset();
-	for (auto& alloc : commandAllocators_)
+	for (auto& alloc : commandAllocators_) {
 		alloc.Reset();
+	}
 	commandQueue_.Reset();
+
+	// --- Synchronization ---
+	fence_.Reset();
 
 	// --- Swap chain ---
 	swapChain_.Reset();
 
 	// --- Device ---
 	device_.Reset();
+	debugController_.Reset();
 	dxgiFactory_.Reset();
 	useAdapter_.Reset();
 }

@@ -13,7 +13,8 @@ struct Particle
     float lifeTime;
     float3 velocity;
     float currentTime;
-    float4 color;
+    float4 beforeColor;
+    float4 afterColor;
 };
 
 struct EmitterSphere
@@ -28,7 +29,10 @@ struct EmitterSphere
     float3 acceleration;
     float pad0;
     float3 particleScale;
-    float4 color;
+    float4 beforeColor;
+    float4 afterColor;
+    float emissionAngle;
+    float3 emissionAnglePadding;
 };
 
 struct PerFrame

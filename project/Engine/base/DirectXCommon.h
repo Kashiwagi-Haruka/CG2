@@ -25,7 +25,7 @@
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include "VertexData.h"
+#include "Data/VertexData.h"
 
 class BlendModeManager;
 class SrvManager;
@@ -117,6 +117,7 @@ public:
 	void PreDraw();
 	void PostDraw();
 	void SetMainRenderTarget();
+	void ExecuteCommandListAndWait();
 	void DrawSceneTextureToBackBuffer();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void Finalize();
@@ -133,6 +134,7 @@ public:
 
 	ID3D12Device* GetDevice() { return device_.Get(); };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
+	D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle() const { return dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(); }
 
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc_; }
 

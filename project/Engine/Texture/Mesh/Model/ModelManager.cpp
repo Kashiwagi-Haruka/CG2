@@ -77,7 +77,10 @@ std::unique_ptr<Model> ModelManager::CreateModelInstance(const std::string& file
 	model->Initialize();
 	return model;
 }
-
+void ModelManager::UnloadModel(const std::string& filePath) {
+	models.erase(filePath);
+	modelSources.erase(filePath);
+}
 Model* ModelManager::FindModel(const std::string& filePath) {
 	if (models.contains(filePath)) {
 		return models.at(filePath).get();

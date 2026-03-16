@@ -80,7 +80,7 @@ void CreateSkinningComputePipeline(SkinCluster& skinCluster) {
 	hr = dxCommon->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&skinCluster.computeRootSignature));
 	assert(SUCCEEDED(hr));
 
-	auto csBlob = dxCommon->CompileShader(L"Resources/shader/Object3d/Skinning.CS.hlsl", L"cs_6_0");
+		auto csBlob = dxCommon->CompileShader(L"Resources/shader/Object3d/CS_Shader/Skinning.CS.hlsl", L"cs_6_0");
 	D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineDesc{};
 	computePipelineDesc.pRootSignature = skinCluster.computeRootSignature.Get();
 	computePipelineDesc.CS = {csBlob->GetBufferPointer(), csBlob->GetBufferSize()};
@@ -100,8 +100,6 @@ SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model) {
 	}
 
 	const auto& modelData = model.GetModelData();
-	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
-	assert(srvManager);
 
 	// palette用Resourceを確保
 	skinCluster.paletteResource = ModelCommon::GetInstance()->CreateBufferResource(sizeof(WellForGPU) * joints.size());
@@ -110,11 +108,11 @@ SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model) {
 	skinCluster.mappedPalette = {mappedPalette, joints.size()};
 
 	// palette用SRVを作成
-	assert(srvManager->CanAllocate());
-	skinCluster.paletteSrvIndex = srvManager->Allocate();
-	skinCluster.paletteSrvHandle.first = srvManager->GetCPUDescriptorHandle(skinCluster.paletteSrvIndex);
-	skinCluster.paletteSrvHandle.second = srvManager->GetGPUDescriptorHandle(skinCluster.paletteSrvIndex);
-	srvManager->CreateSRVforStructuredBuffer(skinCluster.paletteSrvIndex, skinCluster.paletteResource.Get(), static_cast<UINT>(joints.size()), sizeof(WellForGPU));
+	assert(TextureManager::GetInstance()->GetSrvManager()->CanAllocate());
+	skinCluster.paletteSrvIndex = TextureManager::GetInstance()->GetSrvManager()->Allocate();
+	skinCluster.paletteSrvHandle.first = TextureManager::GetInstance()->GetSrvManager()->GetCPUDescriptorHandle(skinCluster.paletteSrvIndex);
+	skinCluster.paletteSrvHandle.second = TextureManager::GetInstance()->GetSrvManager()->GetGPUDescriptorHandle(skinCluster.paletteSrvIndex);
+	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(skinCluster.paletteSrvIndex, skinCluster.paletteResource.Get(), static_cast<UINT>(joints.size()), sizeof(WellForGPU));
 
 	// Influence用Resourceを確保
 	skinCluster.influenceResource = ModelCommon::GetInstance()->CreateBufferResource(sizeof(VertexInfluence) * modelData.vertices.size());
@@ -123,15 +121,15 @@ SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model) {
 	std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * modelData.vertices.size());
 	skinCluster.mappedInfluence = {mappedInfluence, modelData.vertices.size()};
 
-	assert(srvManager->CanAllocate());
-	skinCluster.influenceSrvIndex = srvManager->Allocate();
-	srvManager->CreateSRVforStructuredBuffer(skinCluster.influenceSrvIndex, skinCluster.influenceResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexInfluence));
+	assert(TextureManager::GetInstance()->GetSrvManager()->CanAllocate());
+	skinCluster.influenceSrvIndex = TextureManager::GetInstance()->GetSrvManager()->Allocate();
+	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(skinCluster.influenceSrvIndex, skinCluster.influenceResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexInfluence));
 
 	// Compute shader input/output vertex
 	skinCluster.inputVertexResource = model.GetVertexResource();
-	assert(srvManager->CanAllocate());
-	skinCluster.inputVertexSrvIndex = srvManager->Allocate();
-	srvManager->CreateSRVforStructuredBuffer(skinCluster.inputVertexSrvIndex, skinCluster.inputVertexResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexData));
+	assert(TextureManager::GetInstance()->GetSrvManager()->CanAllocate());
+	skinCluster.inputVertexSrvIndex = TextureManager::GetInstance()->GetSrvManager()->Allocate();
+	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(skinCluster.inputVertexSrvIndex, skinCluster.inputVertexResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexData));
 
 		skinCluster.outputVertexResource =
 	    CreateDefaultBufferResource(ModelCommon::GetInstance()->GetDxCommon(), sizeof(VertexData) * modelData.vertices.size(), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COMMON);
@@ -141,13 +139,13 @@ SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model& model) {
 	skinCluster.outputVertexBufferView.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * modelData.vertices.size());
 	skinCluster.outputVertexBufferView.StrideInBytes = sizeof(VertexData);
 
-	assert(srvManager->CanAllocate());
-	skinCluster.outputVertexSrvIndex = srvManager->Allocate();
-	srvManager->CreateSRVforStructuredBuffer(skinCluster.outputVertexSrvIndex, skinCluster.outputVertexResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexData));
+	assert(TextureManager::GetInstance()->GetSrvManager()->CanAllocate());
+	skinCluster.outputVertexSrvIndex = TextureManager::GetInstance()->GetSrvManager()->Allocate();
+	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(skinCluster.outputVertexSrvIndex, skinCluster.outputVertexResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexData));
 
-	assert(srvManager->CanAllocate());
-	skinCluster.outputVertexUavIndex = srvManager->Allocate();
-	srvManager->CreateUAVforStructuredBuffer(skinCluster.outputVertexUavIndex, skinCluster.outputVertexResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexData));
+	assert(TextureManager::GetInstance()->GetSrvManager()->CanAllocate());
+	skinCluster.outputVertexUavIndex = TextureManager::GetInstance()->GetSrvManager()->Allocate();
+	TextureManager::GetInstance()->GetSrvManager()->CreateUAVforStructuredBuffer(skinCluster.outputVertexUavIndex, skinCluster.outputVertexResource.Get(), static_cast<UINT>(modelData.vertices.size()), sizeof(VertexData));
 
 	// SkinningInformation (CBV)
 	const size_t skinningInformationSize = (sizeof(SkinCluster::SkinningInformation) + 0xFF) & ~0xFF;
@@ -225,8 +223,7 @@ void UpdateSkinCluster(SkinCluster& skinCluster, const Skeleton& skeleton) {
 	}
 	auto* dxCommon = ModelCommon::GetInstance()->GetDxCommon();
 	auto* commandList = dxCommon->GetCommandList();
-	auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
-	assert(commandList && srvManager);
+	assert(commandList && TextureManager::GetInstance()->GetSrvManager());
 
 	if (skinCluster.outputVertexCurrentState != D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
 		D3D12_RESOURCE_BARRIER toUavBarrier{};
@@ -240,14 +237,14 @@ void UpdateSkinCluster(SkinCluster& skinCluster, const Skeleton& skeleton) {
 		skinCluster.outputVertexCurrentState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 	}
 
-	ID3D12DescriptorHeap* descriptorHeaps[] = {srvManager->GetDescriptorHeap().Get()};
+	ID3D12DescriptorHeap* descriptorHeaps[] = {TextureManager::GetInstance()->GetSrvManager()->GetDescriptorHeap().Get()};
 	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 	commandList->SetComputeRootSignature(skinCluster.computeRootSignature.Get());
 	commandList->SetPipelineState(skinCluster.computePipelineState.Get());
-	commandList->SetComputeRootDescriptorTable(0, srvManager->GetGPUDescriptorHandle(skinCluster.paletteSrvIndex));
-	commandList->SetComputeRootDescriptorTable(1, srvManager->GetGPUDescriptorHandle(skinCluster.inputVertexSrvIndex));
-	commandList->SetComputeRootDescriptorTable(2, srvManager->GetGPUDescriptorHandle(skinCluster.influenceSrvIndex));
-	commandList->SetComputeRootDescriptorTable(3, srvManager->GetGPUDescriptorHandle(skinCluster.outputVertexUavIndex));
+	commandList->SetComputeRootDescriptorTable(0, TextureManager::GetInstance()->GetSrvManager()->GetGPUDescriptorHandle(skinCluster.paletteSrvIndex));
+	commandList->SetComputeRootDescriptorTable(1, TextureManager::GetInstance()->GetSrvManager()->GetGPUDescriptorHandle(skinCluster.inputVertexSrvIndex));
+	commandList->SetComputeRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvManager()->GetGPUDescriptorHandle(skinCluster.influenceSrvIndex));
+	commandList->SetComputeRootDescriptorTable(3, TextureManager::GetInstance()->GetSrvManager()->GetGPUDescriptorHandle(skinCluster.outputVertexUavIndex));
 	commandList->SetComputeRootConstantBufferView(4, skinCluster.skinningInformationResource->GetGPUVirtualAddress());
 	const UINT threadGroupCountX = (static_cast<UINT>(skinCluster.mappedSkinningInformation[0].numVertices) + 1023u) / 1024u;
 	commandList->Dispatch(threadGroupCountX, 1, 1);

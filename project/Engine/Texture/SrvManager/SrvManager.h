@@ -1,11 +1,8 @@
-#pragma once
-#include <Windows.h>
-#include <cstdint>
-#include <d3d12.h>
 #include <wrl.h>
+#include <d3d12.h>
+#include <cstdint>
 class DirectXCommon;
 class SrvManager {
-
 	DirectXCommon* directXCommon_ = nullptr;
 
 	uint32_t descriptorSize_;
@@ -13,8 +10,15 @@ class SrvManager {
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
 
 	uint32_t useIndex = 0;
+	SrvManager(SrvManager&) = delete;
+	SrvManager& operator=(SrvManager&) = delete;
 
 public:
+	SrvManager() = default;
+	~SrvManager() = default;
+
+	void Finalize();
+
 	void Initialize(DirectXCommon* dxCommon);
 
 	uint32_t Allocate();

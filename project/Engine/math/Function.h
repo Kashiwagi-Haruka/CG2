@@ -1,5 +1,6 @@
 #pragma once
 #include "Matrix4x4.h"
+#include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
 #include <cstdint>
@@ -14,7 +15,8 @@ inline constexpr float kPi = std::numbers::pi_v<float>;
 float Dot(const Vector3& v1, const Vector3& v2);
 // ベクトル長を返す
 float Length(const Vector3& v);
-
+// 長さの二乗
+float LengthSquared(const Vector3& v);
 // direction（向きたい方向）から回転角を計算する
 // forwardAxis：モデルの前方向（Cube は X 軸→ {1,0,0}）
 Vector3 DirectionToRotation(const Vector3& direction, const Vector3& forwardAxis);
@@ -46,6 +48,8 @@ Matrix4x4 MakeTranslateMatrix(float x, float y, float z);
 Matrix4x4 MakeScaleMatrix(Vector3 scale);
 // SRT（オイラー回転）行列を生成する
 Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate);
+// SRT（オイラー回転）行列を生成する（アンカー指定）
+Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate, Vector2 anchor);
 // SRT（クォータニオン回転）行列を生成する
 Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector4 rotate, Vector3 translate);
 
@@ -82,9 +86,20 @@ Vector3 RotateVectorByQuaternion(const Vector3& v, const Vector4& q);
 Vector3 operator+(const Vector3& v1, const Vector3& v2);
 // Vector3同士の減算
 Vector3 operator-(const Vector3& v1, const Vector3& v2);
+// 単項マイナス
+Vector3 operator-(const Vector3& v);
 // スカラー倍
 Vector3 operator*(const Vector3& v, float scalar);
+// スカラー倍（左項）
+Vector3 operator*(float scalar, const Vector3& v);
+// スカラー除算
+Vector3 operator/(const Vector3& v, float scalar);
 // 加算代入
-Vector3 operator+=(Vector3& v1, const Vector3& v2);
-// 長さの二乗
-inline float LengthSquared(const Vector3& v) { return v.x * v.x + v.y * v.y + v.z * v.z; }
+Vector3& operator+=(Vector3& v1, const Vector3& v2);
+// 減算代入
+Vector3& operator-=(Vector3& v1, const Vector3& v2);
+// スカラー倍代入
+Vector3& operator*=(Vector3& v, float scalar);
+// スカラー除算代入
+Vector3& operator/=(Vector3& v, float scalar);
+

@@ -8,9 +8,44 @@
 #ifdef USE_IMGUI
 #include <imgui.h>
 #endif // USE_IMGUI
+#include "SceneManager.h"
+#include "Sprite/SpriteCommon.h"
+#include "TextureManager.h"
+#include "WinApp.h"
 #include <numbers>
 #include <utility>
-#include "SceneManager.h"
+namespace {
+Transform MakeOppositeSidePortalCameraTransform(const Transform& baseTransform) {
+	Transform oppositeTransform = baseTransform;
+	oppositeTransform.rotate.y += std::numbers::pi_v<float>;
+	return oppositeTransform;
+}
+Transform MakePortalAnchoredTextureCameraTransform(const Transform& portalTransform, const Transform& adjustmentTransform) {
+	Transform cameraTransform = portalTransform;
+	cameraTransform.scale = {1.0f, 1.0f, 1.0f};
+	cameraTransform = MakeOppositeSidePortalCameraTransform(cameraTransform);
+	cameraTransform.rotate += adjustmentTransform.rotate;
+
+	const Matrix4x4 cameraWorld = Function::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Vector3 right = {cameraWorld.m[0][0], cameraWorld.m[0][1], cameraWorld.m[0][2]};
+	Vector3 up = {cameraWorld.m[1][0], cameraWorld.m[1][1], cameraWorld.m[1][2]};
+	Vector3 forward = {cameraWorld.m[2][0], cameraWorld.m[2][1], cameraWorld.m[2][2]};
+	if (Function::LengthSquared(right) > 0.000001f) {
+		right = Function::Normalize(right);
+	}
+	if (Function::LengthSquared(up) > 0.000001f) {
+		up = Function::Normalize(up);
+	}
+	if (Function::LengthSquared(forward) > 0.000001f) {
+		forward = Function::Normalize(forward);
+	}
+	cameraTransform.translate += right * adjustmentTransform.translate.x;
+	cameraTransform.translate += up * adjustmentTransform.translate.y;
+	cameraTransform.translate += forward * (0.05f + adjustmentTransform.translate.z);
+
+	return cameraTransform;
+}
+} // namespace
 SampleScene::SampleScene() {
 
 	uvBallObj_ = std::make_unique<Object3d>();
@@ -18,6 +53,12 @@ SampleScene::SampleScene() {
 	planeGltf_ = std::make_unique<Object3d>();
 	animatedCubeObj_ = std::make_unique<Object3d>();
 	humanObj_ = std::make_unique<Object3d>();
+	spherePrimitive_ = std::make_unique<Primitive>();
+	portalMeshA_ = std::make_unique<PortalMesh>();
+	portalMeshB_ = std::make_unique<PortalMesh>();
+	/*portalObjectCamera_ = std::make_unique<Camera>();*/
+	portalTextureCameraA_ = std::make_unique<Camera>();
+	portalTextureCameraB_ = std::make_unique<Camera>();
 	cameraTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f  },
         .rotate{0.0f, 0.0f, 0.0f  },
@@ -55,6 +96,47 @@ void SampleScene::Initialize() {
 	humanObj_->Initialize();
 	humanObj_->SetCamera(camera_.get());
 	humanObj_->SetModel("walk");
+
+	spherePrimitive_->Initialize(Primitive::Sphere, 32);
+	spherePrimitive_->SetCamera(camera_.get());
+	spherePrimitive_->SetEnableLighting(true);
+	portalATransform_ = {
+	    .scale{1.8f,  1.8f,                      1.0f},
+        .rotate{0.0f,0.0f, 0.0f},
+        .translate{-3.0f, 1.5f,                      2.0f}
+    };
+	portalBTransform_ = {
+	    .scale{1.8f,	                                1.8f, 1.0f},
+        .rotate{std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f},
+        .translate{3.0f,                                    3.5f, 2.0f}
+    };
+	portalTextureCameraAAdjust_ = {
+	    .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f, 0.0f, 0.0f},
+        .translate{0.0f, 0.0f, 0.0f}
+    };
+	portalTextureCameraBAdjust_ = {
+	    .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f, 0.0f, 0.0f},
+        .translate{0.0f, 0.0f, 0.0f}
+    };
+	portalTextureCameraATransform_ = MakePortalAnchoredTextureCameraTransform(portalBTransform_, portalTextureCameraAAdjust_);
+	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
+	portalTextureCameraA_->Update();
+	portalTextureCameraBTransform_ = MakePortalAnchoredTextureCameraTransform(portalATransform_, portalTextureCameraBAdjust_);
+	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
+	portalTextureCameraB_->Update();
+
+	portalMeshA_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
+	portalMeshB_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
+	portalRenderTextureA_.Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.05f, 0.05f, 0.08f, 1.0f});
+	portalRenderTextureB_.Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, {0.05f, 0.05f, 0.08f, 1.0f});
+	portalMeshA_->SetTextureIndex(portalRenderTextureB_.GetSrvIndex());
+	portalMeshB_->SetTextureIndex(portalRenderTextureA_.GetSrvIndex());
+	portalMeshA_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	portalMeshB_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	portalMeshA_->SetTextureCamera(portalTextureCameraA_.get());
+	portalMeshB_->SetTextureCamera(portalTextureCameraB_.get());
 	uvBallTransform_ = {
 	    .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -73,15 +155,30 @@ void SampleScene::Initialize() {
 	humanTransform_ = {
 	    .scale{100.0f,	                        100.0f,                    100.0f},
         .rotate{-std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float>, 0.0f  },
-        .translate{0.0f,                              1.0f,                      -3.0f  }
+        .translate{0.0f,                              1.0f,                      -3.0f }
     };
 	particleTransform_ = {
 	    .scale{0.1f, 0.1f, 0.1f },
         .rotate{0.0f, 0.0f, 0.0f },
         .translate{0.0f, 1.0f, -3.0f}
     };
-	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample", particleTransform_, 0.1f, 5, Vector3{0.0f, 0.0f, 0.0f}, Vector3{-0.5f, -0.5f, -0.5f}, Vector3{0.5f, 0.5f, 0.5f});
-	uvBallObj_->SetTransform(uvBallTransform_);
+
+	/*portalObjectCameraTransform_ = {
+	    .scale{1.0f, 1.0f, 1.0f  },
+        .rotate{0.0f, 0.0f, 0.0f  },
+        .translate{0.0f, 5.0f, -10.0f}
+    };
+	portalObjectCamera_->SetTransform(portalObjectCameraTransform_);
+	portalObjectCamera_->Update();*/
+	portalMeshA_->SetTransform(portalATransform_);
+	portalMeshB_->SetTransform(portalBTransform_);
+	sampleParticleEmitter_ = std::make_unique<ParticleEmitter>("sample");
+	sampleParticleEmitter_->SetTransform(particleTransform_);
+	sampleParticleEmitter_->SetFrequency(0.1f);
+	sampleParticleEmitter_->SetCount(5);
+	sampleParticleEmitter_->SetAcceleration({0.0f, 0.0f, 0.0f});
+	sampleParticleEmitter_->SetAreaMin({-0.5f, -0.5f, -0.5f});
+	sampleParticleEmitter_->SetAreaMax({0.5f, 0.5f, 0.5f});
 	planeGltf_->SetTransform(planeGTransform_);
 	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
 	animatedCubeObj_->SetAnimation(&animatedCubeAnimation_, true);
@@ -94,7 +191,6 @@ void SampleScene::Initialize() {
 		humanObj_->SetAnimation(&humanAnimationClips_[currentHumanAnimationIndex_], true);
 	}
 	humanObj_->SetTransform(humanTransform_);
-
 	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
 		humanSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
 		humanSkinCluster_ = CreateSkinCluster(*humanSkeleton_, *walkModel);
@@ -102,6 +198,19 @@ void SampleScene::Initialize() {
 			humanObj_->SetSkinCluster(&humanSkinCluster_);
 		}
 	}
+
+	uvSprite = std::make_unique<Sprite>();
+	uvSprite->Initialize(TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png"));
+	uvSprite->SetScale(Vector2(100, 100));
+	uvSprite->SetRotation(0);
+	uvSprite->SetPosition(Vector2(0, 0));
+
+		overlayCameraSprite_ = std::make_unique<Sprite>();
+	overlayCameraSprite_->Initialize(portalRenderTextureA_.GetSrvIndex());
+	overlayCameraSprite_->SetScale(Vector2(static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)));
+	overlayCameraSprite_->SetRotation(0.0f);
+	overlayCameraSprite_->SetPosition(Vector2(0.0f, 0.0f));
+
 	activePointLightCount_ = 2;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
@@ -155,8 +264,6 @@ void SampleScene::Initialize() {
 	areaLights_[1].height = 2.0f;
 	areaLights_[1].radius = 0.1f;
 	areaLights_[1].decay = 2.0f;
-
-	
 }
 
 void SampleScene::Update() {
@@ -175,77 +282,7 @@ void SampleScene::Update() {
 		}
 		ImGui::End();
 	}
-	if (ImGui::Begin("SampleLight")) {
-		if (ImGui::TreeNode("DirectionalLight")) {
-			ImGui::ColorEdit4("LightColor", &directionalLight_.color.x);
-			ImGui::DragFloat3("LightDirection", &directionalLight_.direction.x, 0.1f, -1.0f, 1.0f);
-			ImGui::DragFloat("LightIntensity", &directionalLight_.intensity, 0.1f, 0.0f, 10.0f);
-			ImGui::TreePop();
-		}
 
-		if (ImGui::TreeNode("PointLight")) {
-			ImGui::ColorEdit4("PointLightColor", &pointLights_[0].color.x);
-			ImGui::DragFloat("PointLightIntensity", &pointLights_[0].intensity, 0.1f);
-			ImGui::DragFloat3("PointLightPosition", &pointLights_[0].position.x, 0.1f);
-			ImGui::DragFloat("PointLightRadius", &pointLights_[0].radius, 0.1f);
-			ImGui::DragFloat("PointLightDecay", &pointLights_[0].decay, 0.1f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("PointLight1")) {
-			ImGui::ColorEdit4("PointLightColor1", &pointLights_[1].color.x);
-			ImGui::DragFloat("PointLightIntensity1", &pointLights_[1].intensity, 0.1f);
-			ImGui::DragFloat3("PointLightPosition1", &pointLights_[1].position.x, 0.1f);
-			ImGui::DragFloat("PointLightRadius1", &pointLights_[1].radius, 0.1f);
-			ImGui::DragFloat("PointLightDecay1", &pointLights_[1].decay, 0.1f);
-			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("SpotLight")) {
-			ImGui::ColorEdit4("SpotLightColor", &spotLights_[0].color.x);
-			ImGui::DragFloat("SpotLightIntensity", &spotLights_[0].intensity, 0.1f);
-			ImGui::DragFloat3("SpotLightPosition", &spotLights_[0].position.x, 0.1f);
-			ImGui::DragFloat3("SpotLightDirection", &spotLights_[0].direction.x, 0.1f);
-			ImGui::DragFloat("SpotLightDistance", &spotLights_[0].distance, 0.1f);
-			ImGui::DragFloat("SpotLightDecay", &spotLights_[0].decay, 0.1f);
-			ImGui::DragFloat("SpotLightCosAngle", &spotLights_[0].cosAngle, 0.1f, 0.0f, 1.0f);
-			ImGui::DragFloat("SpotLightCosFalloffStart", &spotLights_[0].cosFalloffStart, 0.1f, 0.0f, 1.0f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("SpotLight1")) {
-			ImGui::ColorEdit4("SpotLightColor1", &spotLights_[1].color.x);
-			ImGui::DragFloat("SpotLightIntensity1", &spotLights_[1].intensity, 0.1f);
-			ImGui::DragFloat3("SpotLightPosition1", &spotLights_[1].position.x, 0.1f);
-			ImGui::DragFloat3("SpotLightDirection1", &spotLights_[1].direction.x, 0.1f);
-			ImGui::DragFloat("SpotLightDistance1", &spotLights_[1].distance, 0.1f);
-			ImGui::DragFloat("SpotLightDecay1", &spotLights_[1].decay, 0.1f);
-			ImGui::DragFloat("SpotLightCosAngle1", &spotLights_[1].cosAngle, 0.1f, 0.0f, 1.0f);
-			ImGui::DragFloat("SpotLightCosFalloffStart1", &spotLights_[1].cosFalloffStart, 0.1f, 0.0f, 1.0f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("AreaLight")) {
-			ImGui::ColorEdit4("AreaLightColor", &areaLights_[0].color.x);
-			ImGui::DragFloat("AreaLightIntensity", &areaLights_[0].intensity, 0.1f);
-			ImGui::DragFloat3("AreaLightPosition", &areaLights_[0].position.x, 0.1f);
-			ImGui::DragFloat3("AreaLightNormal", &areaLights_[0].normal.x, 0.1f);
-			ImGui::DragFloat("AreaLightWidth", &areaLights_[0].width, 0.1f);
-			ImGui::DragFloat("AreaLightHeight", &areaLights_[0].height, 0.1f);
-			ImGui::DragFloat("AreaLightRadius", &areaLights_[0].radius, 0.1f);
-			ImGui::DragFloat("AreaLightDecay", &areaLights_[0].decay, 0.1f);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("AreaLight1")) {
-			ImGui::ColorEdit4("AreaLightColor1", &areaLights_[1].color.x);
-			ImGui::DragFloat("AreaLightIntensity1", &areaLights_[1].intensity, 0.1f);
-			ImGui::DragFloat3("AreaLightPosition1", &areaLights_[1].position.x, 0.1f);
-			ImGui::DragFloat3("AreaLightNormal1", &areaLights_[1].normal.x, 0.1f);
-			ImGui::DragFloat("AreaLightWidth1", &areaLights_[1].width, 0.1f);
-			ImGui::DragFloat("AreaLightHeight1", &areaLights_[1].height, 0.1f);
-			ImGui::DragFloat("AreaLightRadius1", &areaLights_[1].radius, 0.1f);
-			ImGui::DragFloat("AreaLightDecay1", &areaLights_[1].decay, 0.1f);
-			ImGui::TreePop();
-		}
-	}
-	ImGui::End();
 	if (ImGui::Begin("Pad Input")) {
 		ImGui::Text("押されているパッドボタン");
 		const std::array<std::pair<Input::PadButton, const char*>, 14> padButtons = {
@@ -376,17 +413,18 @@ void SampleScene::Update() {
 			if (ImGui::DragFloat("Life", &life, 1.0f, 0.0f, 10000.0f)) {
 				sampleParticleEmitter_->SetLife(life);
 			}
+			Vector4 beforeColor = sampleParticleEmitter_->GetBeforeColor();
+			if (ImGui::ColorEdit4("BeforeColor", &beforeColor.x)) {
+				sampleParticleEmitter_->SetBeforeColor(beforeColor);
+			}
 
+			Vector4 afterColor = sampleParticleEmitter_->GetAfterColor();
+			if (ImGui::ColorEdit4("AfterColor", &afterColor.x)) {
+				sampleParticleEmitter_->SetAfterColor(afterColor);
+			}
 			if (ImGui::Button("Emit Now")) {
 				sampleParticleEmitter_->Emit();
 			}
-		}
-	}
-	ImGui::End();
-	if (ImGui::Begin("Scene")) {
-	
-		if (ImGui::Button("Title")) {
-			SceneManager::GetInstance()->ChangeScene("Title");
 		}
 	}
 	ImGui::End();
@@ -400,6 +438,33 @@ void SampleScene::Update() {
 		ImGui::Combo("Random Noise Blend", &randomNoiseBlendMode_, noiseBlendModes, IM_ARRAYSIZE(noiseBlendModes));
 	}
 	ImGui::End();
+	if (ImGui::Begin("Portal")) {
+		ImGui::Text("Portal A object transform");
+		ImGui::DragFloat3("Scale##PortalAScale", &portalATransform_.scale.x, 0.01f, 0.01f, 100.0f);
+		ImGui::DragFloat3("Rotate##PortalARotate", &portalATransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Translate##PortalATranslate", &portalATransform_.translate.x, 0.01f);
+		ImGui::Separator();
+		ImGui::Text("Portal B object transform");
+		ImGui::DragFloat3("Scale##PortalBScale", &portalBTransform_.scale.x, 0.01f, 0.01f, 100.0f);
+		ImGui::DragFloat3("Rotate##PortalBRotate", &portalBTransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Translate##PortalBTranslate", &portalBTransform_.translate.x, 0.01f);
+		ImGui::Separator();
+		ImGui::Text("Portal A render texture camera transform");
+		ImGui::TextDisabled("(Portal B transform based + local adjustment)");
+		ImGui::DragFloat3("Adjust Rotate##PortalTextureCameraAAdjustRotate", &portalTextureCameraAAdjust_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Adjust Translate##PortalTextureCameraAAdjustTranslate", &portalTextureCameraAAdjust_.translate.x, 0.01f);
+		ImGui::InputFloat3("Result Rotate##PortalTextureCameraARotate", &portalTextureCameraATransform_.rotate.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("Result Translate##PortalTextureCameraATranslate", &portalTextureCameraATransform_.translate.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::Separator();
+		ImGui::Text("Portal B render texture camera transform");
+		ImGui::TextDisabled("(Portal A transform based + local adjustment)");
+		ImGui::DragFloat3("Adjust Rotate##PortalTextureCameraBAdjustRotate", &portalTextureCameraBAdjust_.rotate.x, 0.01f);
+		ImGui::DragFloat3("Adjust Translate##PortalTextureCameraBAdjustTranslate", &portalTextureCameraBAdjust_.translate.x, 0.01f);
+		ImGui::InputFloat3("Result Rotate##PortalTextureCameraBRotate", &portalTextureCameraBTransform_.rotate.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("Result Translate##PortalTextureCameraBTranslate", &portalTextureCameraBTransform_.translate.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+	}
+	ImGui::End();
+
 
 #endif // USE_IMGUI
 	if (useDebugCamera_) {
@@ -409,6 +474,20 @@ void SampleScene::Update() {
 		camera_->SetTransform(cameraTransform_);
 		camera_->Update();
 	}
+	/*portalObjectCamera_->SetTransform(portalObjectCameraTransform_);
+	portalObjectCamera_->Update();*/
+	portalTextureCameraATransform_ = MakePortalAnchoredTextureCameraTransform(portalBTransform_, portalTextureCameraAAdjust_);
+	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
+	portalTextureCameraA_->Update();
+	portalTextureCameraBTransform_ = MakePortalAnchoredTextureCameraTransform(portalATransform_, portalTextureCameraBAdjust_);
+	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
+	portalTextureCameraB_->Update();
+	portalMeshA_->SetTransform(portalATransform_);
+	portalMeshA_->SetTextureCamera(portalTextureCameraA_.get());
+
+	portalMeshB_->SetTransform(portalBTransform_);
+	portalMeshB_->SetTextureCamera(portalTextureCameraB_.get());
+
 	ParticleManager::GetInstance()->Update(camera_.get());
 	if (sampleParticleEmitter_) {
 		sampleParticleEmitter_->Update(particleTransform_);
@@ -425,16 +504,28 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetRandomNoiseScale(randomNoiseScale_);
 	Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode_);
 
-	uvBallObj_->SetTransform(uvBallTransform_);
-	planeGltf_->SetTransform(planeGTransform_);
-	animatedCubeObj_->SetTransform(animatedCubeTransform_);
-	animatedCubeObj_->SetTransform(animatedCubeTransform_);
-	humanObj_->SetTransform(humanTransform_);
+	/*uvBallObj_->SetTransform(uvBallTransform_);*/
+	/*planeGltf_->SetTransform(planeGTransform_);*/
+	/*animatedCubeObj_->SetTransform(animatedCubeTransform_);*/
+	/*humanObj_->SetTransform(humanTransform_);*/
+	/*ringPrimitive_->SetTransform(ringTransform_);*/
+	/*ringPrimitive_->SetColor({1.0f, 0.85f, 0.2f, 1.0f});*/
+	
+	spherePrimitive_->Update();
 	uvBallObj_->Update();
 	fieldObj_->Update();
 	planeGltf_->Update();
 	animatedCubeObj_->Update();
 	humanObj_->Update();
+	ringUvRotation_ -= 0.05f;
+
+
+	uvSprite->Update();
+	if (overlayCameraSprite_) {
+		overlayCameraSprite_->Update();
+	}
+
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	if (humanSkeleton_ && !humanAnimationClips_.empty()) {
@@ -450,6 +541,7 @@ void SampleScene::Update() {
 	}
 }
 void SampleScene::Draw() {
+
 	Object3dCommon::GetInstance()->BeginShadowMapPass();
 	Object3dCommon::GetInstance()->DrawCommonShadow();
 	uvBallObj_->Draw();
@@ -457,21 +549,106 @@ void SampleScene::Draw() {
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
 	Object3dCommon::GetInstance()->EndShadowMapPass();
+
+	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
+	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
+	portalTextureCameraA_->Update();
+	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
+	portalTextureCameraB_->Update();
+
+	portalRenderTextureA_.BeginRender();
+	assert(Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList() != nullptr);
+	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraB_.get());
+	DrawSceneGeometryForPortalTexture(portalTextureCameraB_.get());
+	portalRenderTextureA_.TransitionToShaderResource();
+	Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
+	portalRenderTextureB_.BeginRender();
+	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraA_.get());
+	DrawSceneGeometryForPortalTexture(portalTextureCameraA_.get());
+	portalRenderTextureB_.TransitionToShaderResource();
+
+	// ポータル描画で更新した定数バッファをこの時点で確定させる
+	Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
+
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
+	portalMeshA_->Update();
+	portalMeshB_->Update();
+
+	DrawSceneGeometry(camera_.get(), true);
+	SpriteCommon::GetInstance()->DrawCommon();
+	uvSprite->Draw();
+	if (overlayCameraSprite_) {
+		/*overlayCameraSprite_->Draw();*/
+	}
+}
+
+void SampleScene::SetSceneCameraForDraw(Camera* camera) {
+	uvBallObj_->SetCamera(camera);
+	fieldObj_->SetCamera(camera);
+	planeGltf_->SetCamera(camera);
+	animatedCubeObj_->SetCamera(camera);
+	humanObj_->SetCamera(camera);
+	spherePrimitive_->SetCamera(camera);
+}
+
+void SampleScene::UpdateSceneCameraMatricesForDraw() {
+	uvBallObj_->UpdateCameraMatrices();
+	fieldObj_->UpdateCameraMatrices();
+	planeGltf_->UpdateCameraMatrices();
+	animatedCubeObj_->UpdateCameraMatrices();
+	humanObj_->UpdateCameraMatrices();
+	spherePrimitive_->UpdateCameraMatrices();
+}
+
+void SampleScene::DrawSceneGeometryForPortalTexture(Camera* camera) {
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+	uvBallObj_->SetCamera(camera);
+	fieldObj_->SetCamera(camera);
+	planeGltf_->SetCamera(camera);
+	animatedCubeObj_->SetCamera(camera);
+	humanObj_->SetCamera(camera);
+	spherePrimitive_->SetCamera(camera);
+	ParticleManager::GetInstance()->SetCamera(camera);
+	UpdateSceneCameraMatricesForDraw();
+
 	Object3dCommon::GetInstance()->DrawCommon();
-	 uvBallObj_->Draw();
-	 planeGltf_->Draw();
-	 fieldObj_->Draw();
+	uvBallObj_->Draw();
+	planeGltf_->Draw();
+	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
-	 if (sampleParticleEmitter_) {
-		Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
-		 sampleParticleEmitter_->Draw();
-	 }
+	spherePrimitive_->Draw();
+	if (sampleParticleEmitter_) {
+		sampleParticleEmitter_->Draw();
+	}
+
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
-	//if (humanSkeleton_) {
-	//	humanSkeleton_->DrawBones(camera_.get(), {0.2f, 0.6f, 1.0f, 1.0f}, {0.1f, 0.3f, 0.9f, 1.0f});
-	//}
 }
+
+void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
+	SetSceneCameraForDraw(camera);
+	ParticleManager::GetInstance()->SetCamera(camera);
+	UpdateSceneCameraMatricesForDraw();
+	Object3dCommon::GetInstance()->DrawCommon();
+	uvBallObj_->Draw();
+	planeGltf_->Draw();
+	fieldObj_->Draw();
+	animatedCubeObj_->Draw();
+	spherePrimitive_->Draw();
+	if (sampleParticleEmitter_) {
+		sampleParticleEmitter_->Draw();
+	}
+	if (drawPortals) {
+		Object3dCommon::GetInstance()->DrawCommonPortal();
+		portalMeshA_->Draw();
+		portalMeshB_->Draw();
+	}
+
+	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
+	humanObj_->Draw();
+	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
+}
+
 void SampleScene::Finalize() {}

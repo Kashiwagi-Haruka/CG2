@@ -1,7 +1,7 @@
 #include "CollisionManager.h"
 #include "Collider.h"
 #include"RigidBody.h"
-
+#include"Object3d/Object3dCommon.h"
 using namespace YoshidaMath;
 
 void CollisionManager::CheckAllCollisions() {
@@ -9,9 +9,6 @@ void CollisionManager::CheckAllCollisions() {
     std::list<YoshidaMath::Collider*>::iterator itrA = colliders_.begin();
     for (; itrA != colliders_.end(); ++itrA) {
 
-#ifdef _DEBUG
-        (*itrA)->ColliderUpdate();
-#endif
         std::list<YoshidaMath::Collider*>::iterator itrB = itrA;
         for (++itrB; itrB != colliders_.end(); ++itrB) {
             // 衝突フィルタリング
@@ -23,17 +20,6 @@ void CollisionManager::CheckAllCollisions() {
             CheckCollisionPair(*itrA, *itrB);
 
         }
-    }
-}
-
-void CollisionManager::DrawColliders()
-{
-    // リスト内のペアを総当たり
-    std::list<YoshidaMath::Collider*>::iterator itrA = colliders_.begin();
-    for (; itrA != colliders_.end(); ++itrA) {
-#ifdef _DEBUG
-        (*itrA)->ColliderDraw();
-#endif
     }
 }
 

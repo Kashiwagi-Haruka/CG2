@@ -34,15 +34,12 @@ private:
     Vector3 forward_ = { 0.0f };
     //移動の速さ
     float moveSpeed_ = { 0.0f };
-    //カメラの感度をここで宣言していて良くない
-    float eyeRotateSpeed_ = 0.3f;
-    float eyeRotateX_ = 0.0f;
+
     AABB localAABB_ = { 0.0f };
     //衝突情報
     YoshidaMath::CollisionInfo collisionInfo_;
-    bool isWarp_ = false;
+
 public:
-    bool GetIsWarp() { return isWarp_; }
     void OnCollision(Collider* collider)override;
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
@@ -53,6 +50,7 @@ public:
     //前方のベクトルを取得する
     const Vector3& GetForward() const { return forward_; };
     void SetTranslate(const Vector3& translate) { transform_.translate = translate; };
+    void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
     //コンストラクタ
     Player();
     //カメラのセッター
@@ -61,14 +59,13 @@ public:
     void Initialize();
     //更新処理
     void Update();
+
     //描画処理
     void Draw();
     //デバック
     void Debug();
     //移動
     void Move();
-    //回転
-    void Rotate();
     //重力処理
     void Gravity();
 

@@ -11,8 +11,7 @@ public:
 
     /// @brief コライダーを追加する
     /// @param collider コライダー
-    void AddCollider(YoshidaMath::Collider* collider,Camera* camera) {
-        collider->SetCamera(camera);
+    void AddCollider(YoshidaMath::Collider* collider) {
         colliders_.emplace_back(collider); }
 
     template <typename Container>
@@ -26,9 +25,6 @@ public:
     void ClearColliders() { colliders_.clear(); }
     /// @brief 衝突判定と応答
     void CheckAllCollisions();
-    //コライダーを描画する
-    void DrawColliders();
-
 private:
     std::list<YoshidaMath::Collider*> colliders_; // コライダーのリスト
 

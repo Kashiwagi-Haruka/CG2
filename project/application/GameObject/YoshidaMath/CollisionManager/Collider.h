@@ -42,15 +42,11 @@ namespace YoshidaMath {
         uint32_t collisionMask_ = 0xffffffff;		// 衝突マスク
         float radius_ = 1.0f;	// 衝突半径
         AABB AABB_;
-#ifdef _DEBUG
-        //デバック用
-        std::unique_ptr<Primitive>primitive_;
-#endif // DEBUG
+
 
     public:
 
         Collider();
-        void SetCamera(Camera* camera);
         /// @brief 衝突時コールバック関数
         virtual void OnCollision(Collider* collider) = 0;
 
@@ -84,9 +80,7 @@ namespace YoshidaMath {
         /// @brief 衝突マスクを設定する
         /// @param mask 衝突マスク
         void SetCollisionMask(uint32_t mask) { collisionMask_ = mask; }
-        void ColliderUpdate();
-        void ColliderDraw();
-        void OnCollisionCollider();
+
         void SetCollisionInfo(const CollisionInfo& info) { collisionInfo_ = info; };
         CollisionInfo& GetCollisionInfo() {
             return collisionInfo_;

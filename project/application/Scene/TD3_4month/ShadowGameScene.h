@@ -3,15 +3,20 @@
 #include <memory>
 #include <imgui.h>
 #include "SceneTransition/SceneTransition.h"
-#include "Camera.h"
+
 #include "DebugCamera.h"
 #pragma region //GameObject
 #include"GameObject/Player/Player.h"
 #include"GameObject/TestField/TestField.h"
-
+#include"GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/TimeCard/TimeCardWatch.h"
-
+#include"GameObject/Flashlight/Flashlight.h"
+#include"GameObject/Key/Key.h"
+#include <GameObject/Chair/ChairManager.h>
+#include"GameObject/Wall/WallManager.h"
+#include"GameObject/VendingMac/VendingMac.h"
+#include"GameObject/Door/Door.h"
 #pragma endregion
 
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
@@ -21,16 +26,19 @@
 #include "Light/SpotLight.h" 
 #include "Light/AreaLight.h"
 #include"Audio.h"
+#include <GameObject/Edamame/Edamame.h>
 
 class ShadowGameScene : public BaseScene
 {
 private:
 
-
+    bool isPause_ = false;
+    const float kNoiseTimer_ = 0.5f;
+    float noiseTimer_ = kNoiseTimer_;
+    bool isNoise_ = false;
 #pragma region//カメラの設定
-    Transform cameraTransform_ = {};
-    //カメラの設定
-    std::unique_ptr<Camera> camera_ = nullptr;
+
+    std::unique_ptr<PlayerCamera> playerCamera_ = nullptr;
     std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
     bool useDebugCamera_ = false;
 #pragma endregion
@@ -53,6 +61,23 @@ private:
     std::unique_ptr<PortalManager> portalManager_ = nullptr;
     //携帯打刻機
     std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
+    //懐中電灯
+    std::unique_ptr<Flashlight> flashlight_ = nullptr;
+    //鍵
+    std::unique_ptr<Key> key_ = nullptr;
+    //枝豆
+    std::unique_ptr<Edamame> edamame_ = nullptr;
+    //椅子
+    std::unique_ptr<ChairManager> chairManager_ = nullptr;
+    //壁管理
+    std::unique_ptr<WallManager> wallManager_ = nullptr;
+    //壁管理2こめ
+    std::unique_ptr<WallManager> wallManager2_ = nullptr;
+    //自販機
+    std::unique_ptr<VendingMac> vendingMac_ = nullptr;
+    //ドア
+    std::unique_ptr<Door> door_ = nullptr;
+
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
@@ -102,14 +127,16 @@ private:
     //ゲームオブジェクトの更新処理
     void UpdateGameObject();
     //ポイントライトの更新処理
-    void UpdatePointLight();
+    void UpdateLight();
     // =======================================
     // プライベート描画処理
     // =======================================
     //シーン遷移の描画処理
     void DrawSceneTransition();
     //ゲームオブジェクトの描画処理
-    void DrawGameObject();
-
+    void DrawModel();
+    void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer);
+    void SetSceneCameraForDraw(Camera* camera);
+    void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer);
 };
 
