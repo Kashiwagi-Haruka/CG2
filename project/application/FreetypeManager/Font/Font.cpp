@@ -141,10 +141,12 @@ void Font::SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize) {
 		textureWidth = 1.0f;
 		textureHeight = 1.0f;
 	}
-	float tex_left = leftTop.x / textureWidth;
-	float tex_right = (leftTop.x + TextureSize.x) / textureWidth;
-	float tex_top = leftTop.y / textureHeight;
-	float tex_bottom = (leftTop.y + TextureSize.y) / textureHeight;
+
+    float offset =0.04f;
+    float tex_left = (leftTop.x + offset) * textureWidth;
+    float tex_right = (leftTop.x + TextureSize.x) * textureWidth;
+    float tex_top = (leftTop.y) * textureHeight;
+    float tex_bottom = (leftTop.y + TextureSize.y- offset) * textureHeight;
 
 	vertexData[0].texcoord = { tex_left, tex_top };
 	vertexData[1].texcoord = { tex_right, tex_top };

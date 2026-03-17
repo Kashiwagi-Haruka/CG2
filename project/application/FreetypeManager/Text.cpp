@@ -8,12 +8,10 @@ void Text::Initialize(uint32_t fontHandle) {
 
 void Text::SetString(const std::u32string& text) {
     text_ = text;
-    UpdateLayout();
 }
 
 void Text::SetPosition(const Vector2& pos) {
     position_ = pos;
-    UpdateLayout();
 }
 
 void Text::SetColor(const Vector4& color) {
@@ -22,7 +20,6 @@ void Text::SetColor(const Vector4& color) {
 
 void Text::SetAlign(TextAlign align) {
     align_ = align;
-    UpdateLayout();
 }
 
 void Text::SetBlendMode(const BlendMode& blendMode) {
@@ -78,35 +75,5 @@ void Text::Draw() {
         font->Draw();
         activeFonts_.push_back(font);
     }
-}
 
-void Text::Debug() {
-
-#ifdef USE_IMGUI
-    ImGui::Begin("Font");
-
-    float  color[4];
-    color[0] = color_.x;
-    color[1] = color_.y; 
-    color[2] = color_.z;
-    color[3] = color_.w;
-
-    ImGui::ColorEdit4("color", color);
-    color_ = { .x = color[0],.y = color[1],.z = color[2],.w = color[3] };
-    ImGui::SliderFloat2("pos", &position_.x, -1000.0f, 1000.0f);
-    UpdateLayout();
-    for (size_t i = 0; i < activeFonts_.size(); ++i) {
-        auto* font = activeFonts_[i];
-        if (font) {
-            std::string msg = "Glyph[" + std::to_string(i) + "]";
-            if (ImGui::TreeNode(msg.c_str())) {
-
-
-                ImGui::TreePop();
-            }
-    
-        }
-    }
-    ImGui::End();
-#endif
 }

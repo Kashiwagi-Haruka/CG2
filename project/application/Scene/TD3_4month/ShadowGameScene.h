@@ -19,6 +19,10 @@
 #include"GameObject/Door/Door.h"
 #pragma endregion
 
+#pragma region //UI
+#include"FreetypeManager/TextUIManager.h"
+#pragma endregion
+
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 
 #include "Light/DirectionalLight.h" 
@@ -36,6 +40,11 @@ private:
     const float kNoiseTimer_ = 0.5f;
     float noiseTimer_ = kNoiseTimer_;
     bool isNoise_ = false;
+
+#pragma region//UI
+    std::unique_ptr<TextUIManager> textUIManager_ = nullptr;
+#pragma endregion
+
 #pragma region//カメラの設定
 
     std::unique_ptr<PlayerCamera> playerCamera_ = nullptr;

@@ -25,11 +25,8 @@ void FreeTypeManager::Initialize()
 
     if (error == 0) {
         //初期化に成功
-   /*     DebugLog("FT_Init_FreeType Success!\n");*/
     } else {
         //失敗
-   /*     std::string msg = "FT_Init_FreeType failed!: " + std::to_string(error) + "\n";
-        DebugLog(msg);*/
         assert(false);
     }
 
@@ -53,8 +50,6 @@ uint32_t FreeTypeManager::CreateFace(const string& fontPath, const uint32_t inde
         // ファイルをバイナリで開く
         std::ifstream file(fontPath, std::ios::binary | std::ios::ate);
         if (!file) {
-     /*       std::string msg = "Cannot Open File: " + fontPath + "\n";
-            DebugLog(msg);*/
             assert(false);
         }
 
@@ -80,11 +75,9 @@ uint32_t FreeTypeManager::CreateFace(const string& fontPath, const uint32_t inde
 
     if (err == FT_Err_Unknown_File_Format)
     {
-    /*    DebugLog("FT_Err_Unknown_File_Format\n");*/
     } else if (err)
     {
         std::string msg = "FT_New_Memory_Face failed!: " + std::to_string(err) + "\n";
-  /*      DebugLog(msg);*/
     }
 
     assert(!err);
@@ -142,7 +135,6 @@ void FreeTypeManager::GetBitMapGlyph(uint32_t faceHandle, FT_UInt glyphIndex)
 
     if (!LoadAndRenderGlyph(ftData.face, glyphIndex, FT_RENDER_MODE_NORMAL))
     {
-   /*     DebugLog("LoadAndRenderGlyph faild\n");*/
         return;
     };
 
@@ -197,13 +189,11 @@ bool FreeTypeManager::LoadAndRenderGlyph(FT_Face& face, FT_UInt glyphIndex, FT_R
 
     //グリフの読み込み
     if (FT_Load_Glyph(face, glyphIndex, FT_LOAD_DEFAULT|FT_LOAD_COLOR)) {
-     /*   DebugLog("FT_Load_Glyph faild\n"); */
         assert(false);
         return false;
     }
 
     if (FT_Render_Glyph(face->glyph, mode)) {
-      /*  DebugLog("FT_Render_Glyph failed!\n");*/
         assert(false);
         return false;
     }
@@ -212,7 +202,6 @@ bool FreeTypeManager::LoadAndRenderGlyph(FT_Face& face, FT_UInt glyphIndex, FT_R
     if (glyph->format == FT_GLYPH_FORMAT_BITMAP &&
         glyph->bitmap.pixel_mode == FT_PIXEL_MODE_BGRA) {
         //カラー絵文字（PNG） face->glyph->bitmapにBGRAビットマップが入ってる
-       /* DebugLog("This is color glyph\n");*/
     }
 
     return true;

@@ -29,9 +29,8 @@ public:
     void SetBlendMode(const BlendMode& blendMode);
     void SetSize(const Vector2 size) { size_ = size; }
     void Draw();
-    void Debug();
-private:
     void UpdateLayout();
+private:
 
 private:
     uint32_t fontHandle_ = 0;
@@ -44,5 +43,4 @@ private:
     std::vector<GlyphRun> glyphRuns_;
     std::vector<Font*> activeFonts_;
     VerticalAlign verticalAlign_ = VerticalAlign::Middle;
-
 };
