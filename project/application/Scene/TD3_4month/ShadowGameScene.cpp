@@ -153,9 +153,9 @@ void ShadowGameScene::Update()
 
 
 
-    if (isPause_) {
-        return;
-    }
+    //if (isPause_) {
+    //    return;
+    //}
 
     //シーン遷移の更新処理
     UpdateSceneTransition();
@@ -287,7 +287,7 @@ void ShadowGameScene::InitializeLights()
     spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
     spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 
-    activeAreaLightCount_ = 3;
+    activeAreaLightCount_ = 5;
     areaLights_[0].color = { 1.0f,1.0f, 1.0f, 1.0f };
     areaLights_[0].position = { 7.0f, 3.0f, 0.0f };
     areaLights_[0].normal = { 0.0f, 1.0f, 0.0f };
@@ -388,8 +388,12 @@ void ShadowGameScene::UpdateGameObject()
 #pragma region//ゲームオブジェクト
 
 
-    //懐中電灯
+     //懐中電灯
     flashlight_->Update();
+    spotLights_[1] = flashlight_->GetSpotLight();
+    areaLights_[2] = vendingMac_->GetAreaLight();
+    areaLights_[3] = wallManager_->GetAreaLight();
+    areaLights_[4] = wallManager2_->GetAreaLight();
     spotLights_[1] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
 
@@ -432,6 +436,13 @@ void ShadowGameScene::UpdateLight()
     Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
 #pragma endregion
 
+#ifdef USE_IMGUI
+    if (ImGui::TreeNode("Light")) {
+        ImGui::DragFloat3("Area0Position", &areaLights_[0].position.x, 0.1f);
+        ImGui::DragFloat3("Area1Position", &areaLights_[1].position.x, 0.1f);
+        ImGui::TreePop();
+    }
+#endif
 }
 #pragma endregion
 

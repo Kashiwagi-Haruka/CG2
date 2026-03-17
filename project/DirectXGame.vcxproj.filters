@@ -325,6 +325,7 @@
     <ClCompile Include="application\GameObject\Edamame\EdamameTrivia.cpp" />
     <ClCompile Include="application\GameObject\Coffee\CoffeeTrivia.cpp" />
     <ClCompile Include="application\GameObject\BGMManager\BGMManager.cpp" />
+    <ClCompile Include="Engine\Audio\AudioMixer.cpp" />
     <ClCompile Include="application\GameObject\VendingMac\VendingMac.cpp" />
     <ClCompile Include="application\GameObject\Door\Door.cpp" />
     <ClCompile Include="application\GameObject\Door\AutoLockSystem.cpp" />
@@ -641,6 +642,7 @@
     <ClInclude Include="application\GameObject\Edamame\EdamameTrivia.h" />
     <ClInclude Include="application\GameObject\Coffee\CoffeeTrivia.h" />
     <ClInclude Include="application\GameObject\BGMManager\BGMManager.h" />
+    <ClInclude Include="Engine\Audio\AudioMixer.h" />
     <ClInclude Include="application\GameObject\VendingMac\VendingMac.h" />
     <ClInclude Include="application\GameObject\Door\Door.h" />
     <ClInclude Include="application\GameObject\Door\AutoLockSystem.h" />
@@ -649,6 +651,7 @@
     <ClInclude Include="application\FreetypeManager\Text.h" />
     <ClInclude Include="application\FreetypeManager\FreeTypeManager.h" />
     <ClInclude Include="application\FreetypeManager\Font\Font.h" />
+    <ClInclude Include="application\GameObject\Player\PlayerParameters.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

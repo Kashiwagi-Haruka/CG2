@@ -76,9 +76,25 @@ SampleScene::SampleScene() {
 	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "walk");
 	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "sneakWalk");
 	ParticleManager::GetInstance()->CreateParticleGroup("sample", "Resources/2d/defaultParticle.png");
+	bgmData_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Rendez-vous_2.mp3");
+	Audio::GetInstance()->SetSoundVolume(&bgmData_, 1.0f);
 }
 void SampleScene::Initialize() {
-
+	isBgmPlaying_ = false;
+	previousMixerEffects_ = Audio::GetInstance()->GetMixerEffects();
+	Audio::GetInstance()->ClearMixerEffects();
+	Audio::MixerEffectSettings reverbEffect{};
+	reverbEffect.type = Audio::MixerEffectType::Reverb;
+	reverbEffect.enabled = true;
+	Audio::GetInstance()->AddMixerEffect(reverbEffect);
+	Audio::MixerEffectSettings echoEffect{};
+	echoEffect.type = Audio::MixerEffectType::Echo;
+	echoEffect.enabled = true;
+	echoEffect.echo.WetDryMix = 22.0f;
+	echoEffect.echo.Feedback = 18.0f;
+	echoEffect.echo.Delay = 230.0f;
+	Audio::GetInstance()->AddMixerEffect(echoEffect);
+	isAudioEffectApplied_ = true;
 	debugCamera_->Initialize();
 	debugCamera_->SetTranslation(cameraTransform_.translate);
 	uvBallObj_->Initialize();
@@ -267,6 +283,10 @@ void SampleScene::Initialize() {
 }
 
 void SampleScene::Update() {
+	if (!isBgmPlaying_) {
+		Audio::GetInstance()->SoundPlayWave(bgmData_, true);
+		isBgmPlaying_ = true;
+	}
 #ifdef USE_IMGUI
 	if (ImGui::Begin("SampleCamera")) {
 		ImGui::Checkbox("Use Debug Camera (F1)", &useDebugCamera_);
@@ -651,4 +671,10 @@ void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 }
 
-void SampleScene::Finalize() {}
+void SampleScene::Finalize() {
+	if (isAudioEffectApplied_) {
+		Audio::GetInstance()->SetMixerEffects(previousMixerEffects_);
+		isAudioEffectApplied_ = false;
+	}
+	Audio::GetInstance()->SoundUnload(&bgmData_);
+}

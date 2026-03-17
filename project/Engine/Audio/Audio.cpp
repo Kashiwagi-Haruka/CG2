@@ -1,8 +1,8 @@
 #include "Audio.h"
 #include "fstream"
 #include <algorithm>
-#include <filesystem>
 #include <assert.h>
+#include <filesystem>
 #include <mfapi.h>
 #include <mfidl.h>
 #include <mfreadwrite.h>
@@ -25,6 +25,7 @@ Audio* Audio::GetInstance() {
 // 再生中ボイスとオーディオAPIを終了する
 void Audio::Finalize() {
 	StopAllVoices();
+	mixer_.Finalize();
 	if (masterVoice_) {
 		masterVoice_->DestroyVoice();
 		masterVoice_ = nullptr;
@@ -42,9 +43,10 @@ void Audio::InitializeIXAudio() {
 	result_ = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
 	assert(SUCCEEDED(result_));
 	result_ = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
-	assert(SUCCEEDED(result_)); // ここ追加
+	assert(SUCCEEDED(result_));
 	result_ = xAudio2_->CreateMasteringVoice(&masterVoice_);
-	assert(SUCCEEDED(result_)); // ここも追加
+	assert(SUCCEEDED(result_));
+	mixer_.Initialize(xAudio2_.Get(), masterVoice_);
 }
 
 // ワンショット再生が終わったボイスを回収する
@@ -192,21 +194,28 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 		OutputDebugStringA("SoundPlayWave: sound buffer is empty!\n");
 		return;
 	}
+
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
-	result_ = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
+	const XAUDIO2_VOICE_SENDS* sendList = mixer_.GetOutputVoiceSends();
+	if (sendList) {
+		result_ = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex, 0, XAUDIO2_DEFAULT_FREQ_RATIO, nullptr, sendList, nullptr);
+	} else {
+		result_ = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
+	}
 	assert(SUCCEEDED(result_));
+
 	pSourceVoice->SetVolume(soundData.volume);
 	XAUDIO2_BUFFER buf{};
 	buf.pAudioData = soundData.buffer.data();
 	buf.AudioBytes = static_cast<UINT32>(soundData.buffer.size());
 
 	if (isLoop) {
-		buf.LoopBegin = 0;                     // バッファ先頭から
-		buf.LoopLength = 0;                    // 0 = 全体をループ
-		buf.LoopCount = XAUDIO2_LOOP_INFINITE; // 無限ループ
-		buf.Flags = 0;                         // ループ時は END_OF_STREAM にしない
+		buf.LoopBegin = 0;
+		buf.LoopLength = 0;
+		buf.LoopCount = XAUDIO2_LOOP_INFINITE;
+		buf.Flags = 0;
 	} else {
-		buf.Flags = XAUDIO2_END_OF_STREAM; // 1回再生のみ
+		buf.Flags = XAUDIO2_END_OF_STREAM;
 	}
 
 	result_ = pSourceVoice->SubmitSourceBuffer(&buf);
@@ -216,6 +225,7 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	assert(SUCCEEDED(result_));
 	activeVoices_.push_back({pSourceVoice, soundData.buffer.data(), isLoop});
 }
+
 
 // 特定サウンドを再生しているボイスだけを停止する
 void Audio::StopVoicesForSound(const SoundData& soundData) {
@@ -274,6 +284,19 @@ std::vector<Audio::EditorSoundEntry> Audio::GetEditorSoundEntries() const {
 	}
 	return entries;
 }
+
+std::vector<Audio::MixerEffectSettings> Audio::GetMixerEffects() const { return mixer_.GetEffects(); }
+
+void Audio::SetMixerEffects(const std::vector<MixerEffectSettings>& effects) { mixer_.SetEffects(effects); }
+
+void Audio::AddMixerEffect(const MixerEffectSettings& effect) { mixer_.AddEffect(effect); }
+
+void Audio::RemoveMixerEffect(size_t index) { mixer_.RemoveEffect(index); }
+
+void Audio::ClearMixerEffects() { mixer_.ClearEffects(); }
+
+const char* Audio::GetMixerEffectTypeName(MixerEffectType type) { return AudioMixer::GetEffectTypeName(type); }
+
 // 指定したサウンドの非ループ再生がすべて完了しているかを返す
 bool Audio::IsSoundFinished(const SoundData& soundData) const {
 	const BYTE* targetData = soundData.buffer.data();

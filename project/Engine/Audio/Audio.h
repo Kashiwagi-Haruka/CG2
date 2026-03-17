@@ -1,10 +1,13 @@
 #pragma once
+#include "AudioMixer.h"
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
 #include <wrl.h>
+#include <xapofx.h>
 #include <xaudio2.h>
+#include <xaudio2fx.h>
 struct ChunkHeader {
 	// チャンク識別子("RIFF" や "fmt " など)
 	char id[4];
@@ -38,6 +41,9 @@ struct SoundData {
 class Audio {
 
 public:
+	using MixerEffectType = AudioMixer::EffectType;
+	using MixerEffectSettings = AudioMixer::EffectSettings;
+
 	struct EditorSoundEntry {
 		SoundData* soundData = nullptr;
 		std::string name;
@@ -52,7 +58,7 @@ private:
 	Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
 
 	// 出力先となるマスターボイス
-	IXAudio2MasteringVoice* masterVoice_;
+	IXAudio2MasteringVoice* masterVoice_ = nullptr;
 
 	// API 呼び出し結果保持用
 	HRESULT result_;
@@ -73,6 +79,8 @@ private:
 	std::vector<ActiveVoice> activeVoices_;
 	// エディター表示対象のサウンド一覧
 	std::vector<EditorTrackedSound> editorTrackedSounds_;
+	// AudioMixer 相当のミキサー
+	AudioMixer mixer_;
 
 	// 指定サウンドに紐づく再生中ボイスのみ停止
 	void StopVoicesForSound(const SoundData& soundData);
@@ -100,6 +108,18 @@ public:
 	void SetSoundVolume(SoundData* soundData, float volume);
 	// エディター表示用のサウンド情報を取得
 	std::vector<EditorSoundEntry> GetEditorSoundEntries() const;
+	// エディター表示/設定保存用のエフェクトチェーンを取得
+	std::vector<MixerEffectSettings> GetMixerEffects() const;
+	// AudioMixer エフェクトチェーンをまとめて置き換え
+	void SetMixerEffects(const std::vector<MixerEffectSettings>& effects);
+	// AudioMixer エフェクトを末尾に追加
+	void AddMixerEffect(const MixerEffectSettings& effect);
+	// AudioMixer エフェクトを削除
+	void RemoveMixerEffect(size_t index);
+	// AudioMixer エフェクトチェーンをクリア(=デフォルト: 何もなし)
+	void ClearMixerEffects();
+	// デバッグ/エディター表示用にエフェクト名を返す
+	static const char* GetMixerEffectTypeName(MixerEffectType type);
 	// 指定したサウンドが再生完了しているか
 	bool IsSoundFinished(const SoundData& soundData) const;
 	// XAudio2 へのアクセス用 getter

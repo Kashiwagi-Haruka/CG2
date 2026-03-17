@@ -173,6 +173,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Edamame\EdamameTrivia.cpp" />
     <ClCompile Include="application\GameObject\Coffee\CoffeeTrivia.cpp" />
     <ClCompile Include="application\GameObject\BGMManager\BGMManager.cpp" />
+    <ClCompile Include="Engine\Audio\AudioMixer.cpp" />
     <ClCompile Include="application\GameObject\Door\Door.cpp" />
     <ClCompile Include="application\GameObject\Door\AutoLockSystem.cpp" />
     <ClCompile Include="application\GameObject\Chair\ChairManager.cpp" />
@@ -291,6 +292,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\FreetypeManager\FreeTypeManager.h" />
     <ClInclude Include="application\FreetypeManager\Text.h" />
     <ClInclude Include="application\GameObject\Key\Key.h" />
+    <ClInclude Include="application\GameObject\Player\PlayerParameters.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\Collider.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\CollisionConfig.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\CollisionManager.h" />
@@ -303,6 +305,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Edamame\EdamameTrivia.h" />
     <ClInclude Include="application\GameObject\Coffee\CoffeeTrivia.h" />
     <ClInclude Include="application\GameObject\BGMManager\BGMManager.h" />
+    <ClInclude Include="Engine\Audio\AudioMixer.h" />
     <ClInclude Include="application\GameObject\Door\Door.h" />
     <ClInclude Include="application\GameObject\Door\AutoLockSystem.h" />
     <ClInclude Include="application\GameObject\Chair\ChairManager.h" />
