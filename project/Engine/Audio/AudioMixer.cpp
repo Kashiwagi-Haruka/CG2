@@ -153,7 +153,7 @@ void AudioMixer::RebuildEffectChain() {
 		}
 
 		effectInstances_.push_back(xapo);
-		descriptors.push_back({xapo.Get(), TRUE, 1});
+		descriptors.push_back({xapo.Get(), TRUE, XAUDIO2_DEFAULT_CHANNELS});
 		appliedEffects.push_back(&effect);
 	}
 
