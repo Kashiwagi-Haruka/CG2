@@ -408,7 +408,7 @@ bool Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 		}
 
 		outInstances.push_back(xapo);
-		descriptors.push_back({xapo.Get(), TRUE, 1});
+		descriptors.push_back({xapo.Get(), TRUE, XAUDIO2_DEFAULT_CHANNELS});
 		appliedEffects.push_back(&effect);
 	}
 

@@ -35,11 +35,11 @@
           },
           {
             "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
+              "Delay": 2000.0,
+              "Feedback": 100.0,
+              "WetDryMix": 100.0
             },
-            "enabled": false,
+            "enabled": true,
             "equalizer": {
               "Bandwidth0": 18.0,
               "Bandwidth1": 18.0,
@@ -126,7 +126,7 @@
         ],
         "loopEnabled": false,
         "name": "bgm1.mp3",
-        "volume": 0.125
+        "volume": 0.1809999942779541
       },
       {
         "effects": [
@@ -162,7 +162,7 @@
           },
           {
             "echo": {
-              "Delay": 800.0,
+              "Delay": 2000.0,
               "Feedback": 100.0,
               "WetDryMix": 100.0
             },
@@ -2139,6 +2139,61 @@
           -7.0
         ]
       }
+    },
+    {
+      "index": 20,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Object 20",
+      "transform": {
+        "rotate": [
+          0.0,
+          3.1415927410125732,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
     }
   ],
   "primitives": [
@@ -2729,6 +2784,61 @@
         ]
       },
       "name": "Primitive 10",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 11,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Primitive 11",
       "transform": {
         "rotate": [
           0.0,
