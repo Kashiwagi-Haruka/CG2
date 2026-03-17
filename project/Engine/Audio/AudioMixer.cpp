@@ -7,22 +7,26 @@
 AudioMixer::EffectSettings::EffectSettings() {
 	type = EffectType::Reverb;
 	enabled = true;
-	const XAUDIO2FX_REVERB_I3DL2_PARAMETERS preset = XAUDIO2FX_I3DL2_PRESET_DEFAULT;
+	// 変化を感じやすいよう、既定は広い空間系のリバーブにする
+	const XAUDIO2FX_REVERB_I3DL2_PARAMETERS preset = XAUDIO2FX_I3DL2_PRESET_AUDITORIUM;
 	ReverbConvertI3DL2ToNative(&preset, &reverb);
-	echo.WetDryMix = 50.0f;
-	echo.Feedback = 50.0f;
-	echo.Delay = 500.0f;
+	reverb.WetDryMix = 65.0f;
+
+	// 既定値を強めて、ON 時に違いが出やすくする
+	echo.WetDryMix = 60.0f;
+	echo.Feedback = 65.0f;
+	echo.Delay = 800.0f;
 	equalizer.FrequencyCenter0 = 800.0f;
-	equalizer.Gain0 = 0.0f;
+	equalizer.Gain0 = 4.5f;
 	equalizer.Bandwidth0 = 18.0f;
 	equalizer.FrequencyCenter1 = 2000.0f;
-	equalizer.Gain1 = 0.0f;
+	equalizer.Gain1 = -5.0f;
 	equalizer.Bandwidth1 = 18.0f;
 	equalizer.FrequencyCenter2 = 8000.0f;
-	equalizer.Gain2 = 0.0f;
+	equalizer.Gain2 = 6.0f;
 	equalizer.Bandwidth2 = 18.0f;
 	equalizer.FrequencyCenter3 = 12000.0f;
-	equalizer.Gain3 = 0.0f;
+	equalizer.Gain3 = 3.0f;
 	equalizer.Bandwidth3 = 18.0f;
 	limiter.Release = FXMASTERINGLIMITER_DEFAULT_RELEASE;
 	limiter.Loudness = FXMASTERINGLIMITER_DEFAULT_LOUDNESS;
