@@ -330,6 +330,9 @@
     <ClCompile Include="application\GameObject\Door\Door.cpp" />
     <ClCompile Include="application\GameObject\Door\AutoLockSystem.cpp" />
     <ClCompile Include="application\GameObject\Chair\ChairManager.cpp" />
+    <ClCompile Include="application\FreetypeManager\Text.cpp" />
+    <ClCompile Include="application\FreetypeManager\FreeTypeManager.cpp" />
+    <ClCompile Include="application\FreetypeManager\Font\Font.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -644,6 +647,10 @@
     <ClInclude Include="application\GameObject\Door\Door.h" />
     <ClInclude Include="application\GameObject\Door\AutoLockSystem.h" />
     <ClInclude Include="application\GameObject\Chair\ChairManager.h" />
+    <ClInclude Include="Engine\Texture\SkinningData.h" />
+    <ClInclude Include="application\FreetypeManager\Text.h" />
+    <ClInclude Include="application\FreetypeManager\FreeTypeManager.h" />
+    <ClInclude Include="application\FreetypeManager\Font\Font.h" />
     <ClInclude Include="application\GameObject\Player\PlayerParameters.h" />
   </ItemGroup>
   <ItemGroup>
