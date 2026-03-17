@@ -78,9 +78,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|X64'">
-    <OutDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</IntDir>
-    <TargetName>DirectXTex</TargetName>
+    <OutDir>$(SolutionDir)..\Generated\outputs\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)..\Generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
     <GenerateManifest>true</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -90,9 +90,9 @@
     <GenerateManifest>true</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|X64'">
-    <OutDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</IntDir>
-    <TargetName>DirectXTex</TargetName>
+    <OutDir>$(SolutionDir)..\Generated\outputs\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)..\Generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
     <GenerateManifest>true</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -107,9 +107,9 @@
     <TargetName>DirectXTex_Spectre</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
-    <TargetName>DirectXTex</TargetName>
-    <OutDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>$(SolutionDir)..\Generated\outputs\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)..\Generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|X64'">
     <ClCompile>
