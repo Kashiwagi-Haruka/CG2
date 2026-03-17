@@ -116,6 +116,10 @@ void AudioMixer::RebuildEffectChain() {
 		return;
 	}
 
+	XAUDIO2_VOICE_DETAILS voiceDetails{};
+	mixerVoice_->GetVoiceDetails(&voiceDetails);
+	const UINT32 outputChannels = voiceDetails.InputChannels > 0 ? voiceDetails.InputChannels : 1;
+
 	effectInstances_.clear();
 	std::vector<XAUDIO2_EFFECT_DESCRIPTOR> descriptors;
 	std::vector<const EffectSettings*> appliedEffects;
@@ -153,7 +157,7 @@ void AudioMixer::RebuildEffectChain() {
 		}
 
 		effectInstances_.push_back(xapo);
-		descriptors.push_back({xapo.Get(), TRUE, XAUDIO2_DEFAULT_CHANNELS});
+		descriptors.push_back({xapo.Get(), TRUE, outputChannels});
 		appliedEffects.push_back(&effect);
 	}
 

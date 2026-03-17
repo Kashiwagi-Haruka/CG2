@@ -372,6 +372,10 @@ bool Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 		return false;
 	}
 
+	XAUDIO2_VOICE_DETAILS voiceDetails{};
+	voice->GetVoiceDetails(&voiceDetails);
+	const UINT32 outputChannels = voiceDetails.InputChannels > 0 ? voiceDetails.InputChannels : 1;
+
 	outInstances.clear();
 	std::vector<XAUDIO2_EFFECT_DESCRIPTOR> descriptors;
 	std::vector<const MixerEffectSettings*> appliedEffects;
@@ -408,7 +412,7 @@ bool Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 		}
 
 		outInstances.push_back(xapo);
-		descriptors.push_back({xapo.Get(), TRUE, XAUDIO2_DEFAULT_CHANNELS});
+		descriptors.push_back({xapo.Get(), TRUE, outputChannels});
 		appliedEffects.push_back(&effect);
 	}
 
