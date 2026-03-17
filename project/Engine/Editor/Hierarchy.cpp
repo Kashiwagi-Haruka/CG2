@@ -1225,22 +1225,46 @@ void Hierarchy::DrawAudioEditor() {
 					audio->SetReverb(entry.soundData, reverb.enabled);
 					changed = true;
 				}
-				changed |= ImGui::SliderFloat(("Reverb WetDryMix##audio_reverb_wd_" + std::to_string(i)).c_str(), &reverb.reverb.WetDryMix, 0.0f, 100.0f);
+				if (ImGui::SliderFloat(("Reverb WetDryMix##audio_reverb_wd_" + std::to_string(i)).c_str(), &reverb.reverb.WetDryMix, 0.0f, 100.0f)) {
+					reverb.enabled = true;
+					changed = true;
+				}
 				if (ImGui::Checkbox(("Use Echo##audio_effect_echo_" + std::to_string(i)).c_str(), &echo.enabled)) {
 					audio->SetEcho(entry.soundData, echo.enabled);
 					changed = true;
 				}
-				changed |= ImGui::SliderFloat(("Echo WetDryMix##audio_echo_wd_" + std::to_string(i)).c_str(), &echo.echo.WetDryMix, 0.0f, 100.0f);
-				changed |= ImGui::SliderFloat(("Echo Feedback##audio_echo_fb_" + std::to_string(i)).c_str(), &echo.echo.Feedback, 0.0f, 100.0f);
-				changed |= ImGui::SliderFloat(("Echo Delay##audio_echo_delay_" + std::to_string(i)).c_str(), &echo.echo.Delay, FXECHO_MIN_DELAY, FXECHO_MAX_DELAY);
+				if (ImGui::SliderFloat(("Echo WetDryMix##audio_echo_wd_" + std::to_string(i)).c_str(), &echo.echo.WetDryMix, 0.0f, 100.0f)) {
+					echo.enabled = true;
+					changed = true;
+				}
+				if (ImGui::SliderFloat(("Echo Feedback##audio_echo_fb_" + std::to_string(i)).c_str(), &echo.echo.Feedback, 0.0f, 100.0f)) {
+					echo.enabled = true;
+					changed = true;
+				}
+				if (ImGui::SliderFloat(("Echo Delay##audio_echo_delay_" + std::to_string(i)).c_str(), &echo.echo.Delay, FXECHO_MIN_DELAY, FXECHO_MAX_DELAY)) {
+					echo.enabled = true;
+					changed = true;
+				}
 				if (ImGui::Checkbox(("Use Equalizer##audio_effect_eq_" + std::to_string(i)).c_str(), &equalizer.enabled)) {
 					audio->SetEqualizer(entry.soundData, equalizer.enabled);
 					changed = true;
 				}
-				changed |= ImGui::SliderFloat(("EQ Gain0##audio_eq_g0_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain0, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-				changed |= ImGui::SliderFloat(("EQ Gain1##audio_eq_g1_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain1, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-				changed |= ImGui::SliderFloat(("EQ Gain2##audio_eq_g2_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain2, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-				changed |= ImGui::SliderFloat(("EQ Gain3##audio_eq_g3_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain3, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
+				if (ImGui::SliderFloat(("EQ Gain0##audio_eq_g0_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain0, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN)) {
+					equalizer.enabled = true;
+					changed = true;
+				}
+				if (ImGui::SliderFloat(("EQ Gain1##audio_eq_g1_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain1, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN)) {
+					equalizer.enabled = true;
+					changed = true;
+				}
+				if (ImGui::SliderFloat(("EQ Gain2##audio_eq_g2_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain2, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN)) {
+					equalizer.enabled = true;
+					changed = true;
+				}
+				if (ImGui::SliderFloat(("EQ Gain3##audio_eq_g3_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain3, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN)) {
+					equalizer.enabled = true;
+					changed = true;
+				}
 				if (ImGui::Checkbox(("Use Limiter##audio_effect_limiter_" + std::to_string(i)).c_str(), &limiter.enabled)) {
 					audio->SetLimiter(entry.soundData, limiter.enabled);
 					changed = true;
@@ -1249,10 +1273,12 @@ void Hierarchy::DrawAudioEditor() {
 				int loudness = static_cast<int>(limiter.limiter.Loudness);
 				if (ImGui::SliderInt(("Limiter Release##audio_limiter_release_" + std::to_string(i)).c_str(), &release, FXMASTERINGLIMITER_MIN_RELEASE, FXMASTERINGLIMITER_MAX_RELEASE)) {
 					limiter.limiter.Release = static_cast<UINT32>(release);
+					limiter.enabled = true;
 					changed = true;
 				}
 				if (ImGui::SliderInt(("Limiter Loudness##audio_limiter_loudness_" + std::to_string(i)).c_str(), &loudness, FXMASTERINGLIMITER_MIN_LOUDNESS, FXMASTERINGLIMITER_MAX_LOUDNESS)) {
 					limiter.limiter.Loudness = static_cast<UINT32>(loudness);
+					limiter.enabled = true;
 					changed = true;
 				}
 
