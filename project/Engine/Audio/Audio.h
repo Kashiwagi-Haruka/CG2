@@ -28,6 +28,15 @@ struct FormatChunk {
 	WAVEFORMATEX fmt;
 };
 struct SoundData {
+	SoundData();
+	SoundData(const SoundData& other);
+	SoundData(SoundData&& other) noexcept;
+	SoundData& operator=(const SoundData& other);
+	SoundData& operator=(SoundData&& other) noexcept;
+	~SoundData();
+
+	static const std::vector<SoundData*>& GetInstances();
+
 	// 再生時に使う波形フォーマット
 	WAVEFORMATEX wfex;
 	// PCM データ本体
@@ -36,6 +45,12 @@ struct SoundData {
 	float volume = 1.0f;
 	// エディター表示用の名前
 	std::string debugName;
+	// このサウンド専用のエフェクトチェーン
+	std::vector<AudioMixer::EffectSettings> effects;
+
+private:
+	void RegisterInstance();
+	void UnregisterInstance();
 };
 
 class Audio {
@@ -62,6 +77,8 @@ private:
 
 	// API 呼び出し結果保持用
 	HRESULT result_;
+	bool comInitialized_ = false;
+
 	struct ActiveVoice {
 		// 実際に再生中のソースボイス
 		IXAudio2SourceVoice* voice;
@@ -69,25 +86,23 @@ private:
 		const BYTE* audioData;
 		// ループ再生中かどうか
 		bool isLoop;
-	};
-
-	struct EditorTrackedSound {
-		SoundData* soundData = nullptr;
+		// ボイスに適用しているエフェクトインスタンス保持
+		std::vector<Microsoft::WRL::ComPtr<IUnknown>> effectInstances;
 	};
 
 	// 現在再生中のボイス一覧
 	std::vector<ActiveVoice> activeVoices_;
-	// エディター表示対象のサウンド一覧
-	std::vector<EditorTrackedSound> editorTrackedSounds_;
 	// AudioMixer 相当のミキサー
 	AudioMixer mixer_;
 
 	// 指定サウンドに紐づく再生中ボイスのみ停止
 	void StopVoicesForSound(const SoundData& soundData);
+	// 指定ボイスへエフェクトチェーンを再構築して適用
+	bool ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<MixerEffectSettings>& effects, std::vector<Microsoft::WRL::ComPtr<IUnknown>>& outInstances);
+	// 再生中ボイスを再作成して最新の設定を反映
+	bool RecreateActiveVoice(ActiveVoice& active, const SoundData& soundData);
 	// 全ボイスを停止
 	void StopAllVoices();
-	// エディター表示対象へ登録
-	void TrackSoundForEditor(SoundData* soundData);
 
 public:
 	// 非ループ音声の終了監視と後始末
@@ -104,10 +119,32 @@ public:
 	void SoundUnload(SoundData* soundData);
 	// 音声再生
 	void SoundPlayWave(const SoundData& sounddata, bool isLoop = false);
+	// 指定サウンドを停止して先頭から再生(重ね再生しない)
+	void SoundPlayWaveFromStart(const SoundData& soundData, bool isLoop = false);
+	// 指定サウンドの再生を停止
+	void StopSound(const SoundData& soundData);
 	// 音量設定
 	void SetSoundVolume(SoundData* soundData, float volume);
 	// エディター表示用のサウンド情報を取得
 	std::vector<EditorSoundEntry> GetEditorSoundEntries() const;
+	// 指定サウンドのエフェクトチェーンを取得
+	std::vector<MixerEffectSettings> GetSoundEffects(const SoundData* soundData) const;
+	// 指定サウンドのエフェクトチェーンを置き換え
+	void SetSoundEffects(SoundData* soundData, const std::vector<MixerEffectSettings>& effects);
+	// 指定サウンドにエフェクトを追加
+	void AddSoundEffect(SoundData* soundData, const MixerEffectSettings& effect);
+	// 指定サウンドのエフェクトを削除
+	void RemoveSoundEffect(SoundData* soundData, size_t index);
+	// 指定サウンドのエフェクトをクリア
+	void ClearSoundEffects(SoundData* soundData);
+	// 指定サウンドの Reverb 有効/無効を設定
+	void SetReverb(SoundData* soundData, bool enabled);
+	// 指定サウンドの Echo 有効/無効を設定
+	void SetEcho(SoundData* soundData, bool enabled);
+	// 指定サウンドの Equalizer 有効/無効を設定
+	void SetEqualizer(SoundData* soundData, bool enabled);
+	// 指定サウンドの Limiter 有効/無効を設定
+	void SetLimiter(SoundData* soundData, bool enabled);
 	// エディター表示/設定保存用のエフェクトチェーンを取得
 	std::vector<MixerEffectSettings> GetMixerEffects() const;
 	// AudioMixer エフェクトチェーンをまとめて置き換え

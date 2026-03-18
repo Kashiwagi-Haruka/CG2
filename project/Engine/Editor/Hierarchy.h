@@ -15,6 +15,7 @@
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
+#include "Engine/Audio/Audio.h"
 
 class Object3d;
 class Primitive;
@@ -108,4 +109,6 @@ private:
 	std::unique_ptr<Primitive> editorGridPlane_;
 	EditorLightState editorLightState_{};
 	std::unordered_map<std::string, float> savedAudioVolumes_;
+	std::unordered_map<std::string, bool> savedAudioLoopEnabled_;
+	std::unordered_map<std::string, std::vector<Audio::MixerEffectSettings>> savedAudioEffects_;
 };
