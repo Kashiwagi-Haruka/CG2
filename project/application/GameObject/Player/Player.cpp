@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "Player.h"
 
 #include "Animation/Animation.h"
@@ -122,6 +123,9 @@ void Player::Initialize() {
 
 void Player::Update()
 {
+	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+	soundTimer_ = std::max(0.0f, soundTimer_ - deltaTime);
+
 	ResetFootContactState();
     //移動処理
     Move();
@@ -317,9 +321,17 @@ bool Player::CheckFootContact(Collider* collider, const char* jointName) const {
 	return YoshidaMath::IsCollision(footAABB, colliderWorldAABB);
 }
 
+bool Player::IsMovingHorizontally() const { return std::abs(velocity_.x) > 0.01f || std::abs(velocity_.z) > 0.01f; }
+
 void Player::PlayFootstepSE() {
+	if (!IsMovingHorizontally() || soundTimer_ > 0.0f) {
+		return;
+	}
+
+	const bool isWalking = moveSpeed_ == parameters_.kWalkSpeed;
 	Audio::GetInstance()->SetSoundVolume(&footStepSE, (moveSpeed_ == parameters_.kWalkSpeed) ? 0.5f : 0.25f);
 	Audio::GetInstance()->SoundPlayWave(footStepSE);
+	soundTimer_ = isWalking ? kWalkFootstepInterval : kSneakFootstepInterval;
 }
 
 void Player::Gravity() {
