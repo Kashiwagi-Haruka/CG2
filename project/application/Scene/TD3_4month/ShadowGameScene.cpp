@@ -184,7 +184,7 @@ void ShadowGameScene::Draw()
     playerCamera_->DrawRaySprite();
 
     textUIManager_->Draw();
-
+        
     //シーン遷移の描画処理
     DrawSceneTransition();
 }
@@ -468,6 +468,7 @@ void ShadowGameScene::DrawModel()
         auto* portalCamera = portal->GetCamera();
         SetCameraAndDraw(portalCamera, false, false, true);
         portal->TransitionToShaderResource();
+
     }
 
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();

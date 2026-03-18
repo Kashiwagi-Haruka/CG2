@@ -5,7 +5,6 @@
 
 TextUIManager::TextUIManager()
 {
-
     /// @brief ライブラリの初期化
     FreeTypeManager::Initialize();
 
