@@ -12,8 +12,10 @@ public:
 private:
     uint32_t fontHandle_;
     Text text_;
+    Text edamameTrivia_;
     const float showTime_ = 1.0f;
     float showTimer_ = showTime_;
     bool isDraw_ = false;
+
 };
 

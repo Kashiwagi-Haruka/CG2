@@ -59,7 +59,7 @@ uint32_t FreeTypeManager::CreateFace(const string& fontPath, const uint32_t inde
         data.fontData.resize(static_cast<size_t>(size));
 
         if (!file.read(reinterpret_cast<char*>(data.fontData.data()), size)) {
-  /*          DebugLog("CannotLoadFontData\n");*/
+            /*          DebugLog("CannotLoadFontData\n");*/
             assert(false);
         }
 
@@ -151,14 +151,14 @@ void FreeTypeManager::GetOutLineGlyph(uint32_t faceIndex, FT_UInt glyphIndex, ui
 
     if (!face) {
         std::string msg = "face[" + std::to_string(faceIndex) + "] is invalid\n";
-  /*      DebugLog(msg);*/
+        /*      DebugLog(msg);*/
         assert(false);
     }
 
     auto& glyph = face->glyph;
 
     if (glyph->format != FT_GLYPH_FORMAT_OUTLINE) {
-       /* DebugLog("This Glyph is not OutLineGlyph type\n");*/
+        /* DebugLog("This Glyph is not OutLineGlyph type\n");*/
         assert(false);
     }
 
@@ -188,7 +188,7 @@ bool FreeTypeManager::LoadAndRenderGlyph(FT_Face& face, FT_UInt glyphIndex, FT_R
 {
 
     //グリフの読み込み
-    if (FT_Load_Glyph(face, glyphIndex, FT_LOAD_DEFAULT|FT_LOAD_COLOR)) {
+    if (FT_Load_Glyph(face, glyphIndex, FT_LOAD_DEFAULT | FT_LOAD_COLOR)) {
         assert(false);
         return false;
     }
@@ -249,6 +249,18 @@ float FreeTypeManager::GetFontDescender(uint32_t handle)
 
     // descenderは負の値なので符号を反転して正にする
     return -static_cast<float>(face->descender) * face->size->metrics.y_ppem / face->units_per_EM / 64.0f;
+}
+
+float FreeTypeManager::GetFontSize(uint32_t handle)
+{
+    if (fontFaces_.contains(handle)) {
+        auto& ftData = fontFaces_.at(handle);
+        uint32_t pixelWidth = ftData.face->size->metrics.max_advance / 64.0f;
+        return pixelWidth;
+    }
+
+    return 0.0f;
+
 }
 
 
@@ -325,7 +337,7 @@ FTResource FreeTypeManager::CreateResourceFromFTBitmap(const FT_Bitmap& bitmap)
     );
 
     if (FAILED(hr)) {
-     /*   DebugLog("Create　IntermediateResource failed!\n");*/
+        /*   DebugLog("Create　IntermediateResource failed!\n");*/
     }
 
 
@@ -333,10 +345,10 @@ FTResource FreeTypeManager::CreateResourceFromFTBitmap(const FT_Bitmap& bitmap)
     D3D12_SUBRESOURCE_DATA subResourceData = {};
     subResourceData.pData = bitmap.buffer;
     subResourceData.RowPitch = bitmap.pitch;
-    subResourceData.SlicePitch =bitmap.pitch * bitmap.rows;
+    subResourceData.SlicePitch = bitmap.pitch * bitmap.rows;
 
     if (bitmap.pixel_mode != FT_PIXEL_MODE_GRAY) {
-   /*     DebugLog("bitmap.pixel_mode is not GRAY!\n");*/
+        /*     DebugLog("bitmap.pixel_mode is not GRAY!\n");*/
     }
 
     auto cmdList = Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList();
@@ -392,6 +404,11 @@ void FreeTypeManager::CreateGlyphTexture(uint32_t faceHandle, FT_UInt glyphIndex
 
 Font* FreeTypeManager::CreateFontSprite(uint32_t faceHandle, FT_UInt glyphIndex)
 {
+    if (glyphIndex == 0) {
+        // 改行や無効な文字はスキップ
+        return nullptr;
+    }
+
     GlyphKey key = { faceHandle ,glyphIndex };
 
     if (!glyphTextures_.contains(key)) {
@@ -450,13 +467,13 @@ FT_UInt FreeTypeManager::GetGlyphID(uint32_t faceHandle, uint32_t unicode, uint3
         FT_UInt glyphIndex = FT_Get_Char_Index(face, unicode);
 
         if (glyphIndex == 0) {
-       /*     DebugLog("Glyph not found: U+" + std::to_string(unicode) + "\n");*/
+            /*     DebugLog("Glyph not found: U+" + std::to_string(unicode) + "\n");*/
 
-            // フォールバック文字（例: '?'）
+                 // フォールバック文字（例: '?'）
             glyphIndex = FT_Get_Char_Index(face, '?');
 
             if (glyphIndex == 0) {
-         /*       DebugLog("Fallback glyph '?' not found either!\n");*/
+                /*       DebugLog("Fallback glyph '?' not found either!\n");*/
             }
 
         }
@@ -483,7 +500,7 @@ void FreeTypeManager::GetBitMap(uint32_t faceHandle, FT_UInt glyphIndex, FT_Int 
 
 }
 
-std::vector<GlyphRun> FreeTypeManager::LayoutString(uint32_t handle, const std::u32string& text, const Vector2& startPos)
+std::vector<GlyphRun> FreeTypeManager::LayoutString(uint32_t handle, const std::u32string& text, const Vector2& startPos, float maxWidth)
 {
     std::vector<GlyphRun> runs;
 
@@ -497,6 +514,14 @@ std::vector<GlyphRun> FreeTypeManager::LayoutString(uint32_t handle, const std::
     FT_UInt prevGlyph = 0;
 
     for (char32_t ch : text) {
+
+        if (ch == U'\n') {
+            penX = startPos.x;
+            penY += face->size->metrics.height / 64.0f;
+            prevGlyph = 0;
+            continue;
+        }
+
         FT_UInt glyphIndex = GetGlyphID(handle, ch, 0);
         if (glyphIndex == 0) continue;
 
@@ -509,9 +534,18 @@ std::vector<GlyphRun> FreeTypeManager::LayoutString(uint32_t handle, const std::
 
         if (FT_Load_Glyph(face, glyphIndex, FT_LOAD_DEFAULT) != 0) continue;
 
-        runs.push_back({ glyphIndex, { penX, penY } });
+        float advance = face->glyph->advance.x / 64.0f;
 
-        penX += face->glyph->advance.x / 64.0f;
+        // 改行判定
+        if (maxWidth > 0.0f && penX + advance > startPos.x + maxWidth) {
+            penX = startPos.x;
+            penY += face->size->metrics.height / 64.0f;
+            prevGlyph = 0;
+        }
+
+        runs.push_back({ glyphIndex, { penX, penY } });
+        penX += advance;
+
         prevGlyph = glyphIndex;
     }
 
@@ -520,6 +554,12 @@ std::vector<GlyphRun> FreeTypeManager::LayoutString(uint32_t handle, const std::
 
 Font* FreeTypeManager::GetOrCreateFont(const GlyphKey& key)
 {
+
+    if (key.glyphIndex == 0) {
+        // 改行や無効な文字はスキップ
+        return nullptr;
+    }
+
     auto& pool = fontPool_[key];
     if (!glyphTextures_.contains(key)) {
         // なければ生成

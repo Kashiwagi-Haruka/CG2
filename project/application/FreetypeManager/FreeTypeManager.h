@@ -127,8 +127,10 @@ public:
     /// @param faceHandle  faceのハンドル
     /// @param text text
     /// @param startPos 始点
+    /// @param maxWidth
     /// @return 文字の情報のvectorを取得する
-    static std::vector<GlyphRun> LayoutString(uint32_t faceHandle, const std::u32string& text, const Vector2& startPos);
+    static std::vector<GlyphRun> LayoutString(uint32_t handle, const std::u32string& text, const Vector2& startPos, float maxWidth = -1.0f);
+
     /// @brief Spriteが作成済みだったら取得し、無かったら作成する
     /// @param key　keyを入れる 
     /// @return Font*
@@ -141,6 +143,7 @@ public:
     /// @return FTTextureData
     static const FTTextureData& GetGlyphTextures(const GlyphKey& key);
     static float GetFontDescender(uint32_t handle);
+    static float GetFontSize(uint32_t handle);
 private:
     /// @brief FreeTypeのResource生成
     /// @param bitmap bitmapを入れる
