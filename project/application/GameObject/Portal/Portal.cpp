@@ -108,13 +108,18 @@ void Portal::TransitionToShaderResource()
 
 void Portal::SetCamera(Camera* camera)
 {
-    sceneCamera_ = camera;
+
     portalCircle_->SetObjectCamera(camera);
 
     ring_->SetCamera(camera);
     ring_->UpdateCameraMatrices();
     warpPos_->SetCamera(camera);
 
+}
+
+void Portal::SetSceneCamera(Camera* camera)
+{
+    sceneCamera_ = camera;
 }
 
 void Portal::SetPortalWorldMatrix()

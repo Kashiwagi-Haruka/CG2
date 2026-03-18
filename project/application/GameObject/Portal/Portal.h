@@ -28,6 +28,7 @@ public:
     void Initialize();
     void Update();
     void SetCamera(Camera* camera);
+    void SetSceneCamera(Camera* camera);
     Transform& GetTransform() {return transform_ ;};
     //PortalのSRTをセットする
     void SetParentTransform(Transform* transform) { parentTransform = transform; };

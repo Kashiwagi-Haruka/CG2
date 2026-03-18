@@ -140,6 +140,10 @@ void PortalManager::SetCamera(Camera* camera)
     if (portalParticle_) {
         portalParticle_->SetCamera(camera);
     }
+
+    for (auto& portal : portals_) {
+        portal->SetCamera(camera);
+    }
 };
 
 void PortalManager::DrawWhiteBoard() {
@@ -179,6 +183,7 @@ void PortalManager::Draw(bool isShadow, bool drawPortal, bool drawParticle) {
 void PortalManager::SetPlayerCamera(PlayerCamera* camera) {
 
     playerCamera_ = camera;
+
 }
 
 void PortalManager::Update()
@@ -238,6 +243,7 @@ void PortalManager::SpawnPortal(WhiteBoard* board) {
     newPortal->Initialize();
     //カメラをセットする
     newPortal->SetCamera(playerCamera_->GetCamera());
+    newPortal->SetSceneCamera(playerCamera_->GetCamera());
     newPortal->SetParentTransform(&board->GetCollisionTransform());
     newPortal->SetPortalWorldMatrix();
 
