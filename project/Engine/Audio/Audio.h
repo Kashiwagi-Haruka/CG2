@@ -36,9 +36,12 @@ struct SoundData {
 	~SoundData();
 
 	static const std::vector<SoundData*>& GetInstances();
+	const WAVEFORMATEX* GetWaveFormat() const;
 
 	// 再生時に使う波形フォーマット
 	WAVEFORMATEX wfex;
+	// WAVEFORMATEXTENSIBLE を含む完全なフォーマット情報
+	std::vector<BYTE> waveFormatBlob;
 	// PCM データ本体
 	std::vector<BYTE> buffer;
 	// このサウンドの既定音量(0.0f～1.0f)
