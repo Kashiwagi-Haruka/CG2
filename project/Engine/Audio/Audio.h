@@ -86,6 +86,10 @@ private:
 		const BYTE* audioData;
 		// ループ再生中かどうか
 		bool isLoop;
+		// 元音声の再生が終わったか(エフェクトテイル中かを判定するため)
+		bool sourceEnded = false;
+		// 元音声の総サンプルフレーム数
+		UINT64 totalSamples = 0;
 		// ボイスに適用しているエフェクトインスタンス保持
 		std::vector<Microsoft::WRL::ComPtr<IUnknown>> effectInstances;
 	};

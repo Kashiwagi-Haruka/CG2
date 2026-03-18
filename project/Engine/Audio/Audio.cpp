@@ -21,7 +21,12 @@ std::vector<SoundData*>& SoundDataRegistry() {
 	static std::vector<SoundData*> instances;
 	return instances;
 }
-
+UINT64 CalculateTotalSamples(const SoundData& soundData) {
+	if (soundData.wfex.nBlockAlign == 0) {
+		return 0;
+	}
+	return static_cast<UINT64>(soundData.buffer.size() / soundData.wfex.nBlockAlign);
+}
 std::vector<Audio::MixerEffectSettings> NormalizeEffects(const std::vector<Audio::MixerEffectSettings>& effects) {
 	const std::array<Audio::MixerEffectType, 4> orderedTypes = {
 	    Audio::MixerEffectType::Reverb,
@@ -175,6 +180,9 @@ void Audio::Update() {
 
 		XAUDIO2_VOICE_STATE state{};
 		active.voice->GetState(&state);
+		if (!active.sourceEnded && active.totalSamples > 0 && state.SamplesPlayed >= active.totalSamples) {
+			active.sourceEnded = true;
+		}
 		if (state.BuffersQueued == 0) {
 			active.voice->DestroyVoice();
 			active.voice = nullptr;
@@ -318,6 +326,8 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	activeVoice.voice = pSourceVoice;
 	activeVoice.audioData = soundData.buffer.data();
 	activeVoice.isLoop = isLoop;
+	activeVoice.sourceEnded = false;
+	activeVoice.totalSamples = isLoop ? 0 : CalculateTotalSamples(soundData);
 	const bool effectApplied = ApplyEffectsToVoice(pSourceVoice, soundData.effects, activeVoice.effectInstances);
 	assert(effectApplied);
 
@@ -627,7 +637,7 @@ std::vector<Audio::EditorSoundEntry> Audio::GetEditorSoundEntries() const {
 		entry.soundData = soundData;
 		entry.name = soundData->debugName.empty() ? "(unnamed sound)" : soundData->debugName;
 		for (const auto& active : activeVoices_) {
-			if (!active.voice || active.audioData != soundData->buffer.data()) {
+			if (!active.voice || active.audioData != soundData->buffer.data() || active.sourceEnded) {
 				continue;
 			}
 			entry.isPlaying = true;
@@ -676,7 +686,7 @@ bool Audio::IsSoundFinished(const SoundData& soundData) const {
 		return true;
 	}
 	for (const auto& active : activeVoices_) {
-		if (active.voice && active.audioData == targetData) {
+		if (active.voice && active.audioData == targetData && !active.sourceEnded) {
 			return false;
 		}
 	}
