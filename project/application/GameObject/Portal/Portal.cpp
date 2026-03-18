@@ -64,6 +64,7 @@ void Portal::Initialize()
     portalCircle_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
     //テクスチャここで設定するよーん
     portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
+    ring_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
     preRotY_ = { 0.0f };
 }
 
@@ -90,7 +91,7 @@ void Portal::DrawPortals() {
 
 void Portal::DrawRings() {
     //Object3dCommon::GetInstance()->DrawCommonNoCull();
-   /* ring_->Draw();*/
+    //ring_->Draw();
 }
 
 
@@ -144,10 +145,10 @@ void Portal::SetRotateFromDirection(const Vector3& forward)
 
     if (dot < 0.0f) {
         //向き合っている
-        ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+        //ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
         preRotY_ = Function::kPi;
     } else {
-        ring_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
+        //ring_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
         preRotY_ =0.0f;
     }
     transform_.rotate.y = preRotY_ + parentTransform->rotate.y;

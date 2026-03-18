@@ -152,7 +152,7 @@ void PortalManager::DrawPortal()
 {
 
     for (auto& portal : portals_) {
-        //portal->DrawRings();
+        portal->DrawRings();
 
         portal->DrawPortals();
     }
