@@ -36,9 +36,12 @@ struct SoundData {
 	~SoundData();
 
 	static const std::vector<SoundData*>& GetInstances();
+	const WAVEFORMATEX* GetWaveFormat() const;
 
 	// 再生時に使う波形フォーマット
 	WAVEFORMATEX wfex;
+	// WAVEFORMATEXTENSIBLE を含む完全なフォーマット情報
+	std::vector<BYTE> waveFormatBlob;
 	// PCM データ本体
 	std::vector<BYTE> buffer;
 	// このサウンドの既定音量(0.0f～1.0f)
@@ -86,6 +89,10 @@ private:
 		const BYTE* audioData;
 		// ループ再生中かどうか
 		bool isLoop;
+		// 元音声の再生が終わったか(エフェクトテイル中かを判定するため)
+		bool sourceEnded = false;
+		// 元音声の総サンプルフレーム数
+		UINT64 totalSamples = 0;
 		// ボイスに適用しているエフェクトインスタンス保持
 		std::vector<Microsoft::WRL::ComPtr<IUnknown>> effectInstances;
 	};

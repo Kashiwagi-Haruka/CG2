@@ -21,7 +21,12 @@ std::vector<SoundData*>& SoundDataRegistry() {
 	static std::vector<SoundData*> instances;
 	return instances;
 }
-
+UINT64 CalculateTotalSamples(const SoundData& soundData) {
+	if (soundData.wfex.nBlockAlign == 0) {
+		return 0;
+	}
+	return static_cast<UINT64>(soundData.buffer.size() / soundData.wfex.nBlockAlign);
+}
 std::vector<Audio::MixerEffectSettings> NormalizeEffects(const std::vector<Audio::MixerEffectSettings>& effects) {
 	const std::array<Audio::MixerEffectType, 4> orderedTypes = {
 	    Audio::MixerEffectType::Reverb,
@@ -58,11 +63,16 @@ void SetEffectEnabled(std::vector<Audio::MixerEffectSettings>& effects, Audio::M
 } // namespace
 SoundData::SoundData() { RegisterInstance(); }
 
-SoundData::SoundData(const SoundData& other) : wfex(other.wfex), buffer(other.buffer), volume(other.volume), debugName(other.debugName), effects(other.effects) { RegisterInstance(); }
+SoundData::SoundData(const SoundData& other) : wfex(other.wfex), waveFormatBlob(other.waveFormatBlob), buffer(other.buffer), volume(other.volume), debugName(other.debugName), effects(other.effects) {
+	RegisterInstance();
+}
 
-SoundData::SoundData(SoundData&& other) noexcept : wfex(other.wfex), buffer(std::move(other.buffer)), volume(other.volume), debugName(std::move(other.debugName)), effects(std::move(other.effects)) {
+SoundData::SoundData(SoundData&& other) noexcept
+    : wfex(other.wfex), waveFormatBlob(std::move(other.waveFormatBlob)), buffer(std::move(other.buffer)), volume(other.volume), debugName(std::move(other.debugName)),
+      effects(std::move(other.effects)) {
 	RegisterInstance();
 	other.wfex = {};
+	other.waveFormatBlob.clear();
 	other.volume = 1.0f;
 	other.effects.clear();
 }
@@ -72,6 +82,7 @@ SoundData& SoundData::operator=(const SoundData& other) {
 		return *this;
 	}
 	wfex = other.wfex;
+	waveFormatBlob = other.waveFormatBlob;
 	buffer = other.buffer;
 	volume = other.volume;
 	debugName = other.debugName;
@@ -84,19 +95,26 @@ SoundData& SoundData::operator=(SoundData&& other) noexcept {
 		return *this;
 	}
 	wfex = other.wfex;
+	waveFormatBlob = std::move(other.waveFormatBlob);
 	buffer = std::move(other.buffer);
 	volume = other.volume;
 	debugName = std::move(other.debugName);
 	effects = std::move(other.effects);
 	other.wfex = {};
+	other.waveFormatBlob.clear();
 	other.volume = 1.0f;
 	return *this;
 }
 
-
 SoundData::~SoundData() { UnregisterInstance(); }
 
 const std::vector<SoundData*>& SoundData::GetInstances() { return SoundDataRegistry(); }
+const WAVEFORMATEX* SoundData::GetWaveFormat() const {
+	if (!waveFormatBlob.empty()) {
+		return reinterpret_cast<const WAVEFORMATEX*>(waveFormatBlob.data());
+	}
+	return &wfex;
+}
 
 void SoundData::RegisterInstance() { SoundDataRegistry().push_back(this); }
 
@@ -175,6 +193,9 @@ void Audio::Update() {
 
 		XAUDIO2_VOICE_STATE state{};
 		active.voice->GetState(&state);
+		if (!active.sourceEnded && active.totalSamples > 0 && state.SamplesPlayed >= active.totalSamples) {
+			active.sourceEnded = true;
+		}
 		if (state.BuffersQueued == 0) {
 			active.voice->DestroyVoice();
 			active.voice = nullptr;
@@ -200,7 +221,8 @@ SoundData Audio::SoundLoadFile(const char* filename) {
 	hr = MFCreateSourceReaderFromURL(filePathW.c_str(), nullptr, &pReader);
 	assert(SUCCEEDED(hr));
 
-	// PCM にデコードする設定
+	// XAPOFX(Echo / EQ など) は FLOAT32 入力を前提とするため、
+	// 読み込み時点で IEEE Float へデコードしておく
 	Microsoft::WRL::ComPtr<IMFMediaType> pPCMType;
 	hr = MFCreateMediaType(&pPCMType);
 	assert(SUCCEEDED(hr));
@@ -208,7 +230,7 @@ SoundData Audio::SoundLoadFile(const char* filename) {
 	hr = pPCMType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
 	assert(SUCCEEDED(hr));
 
-	hr = pPCMType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);
+	hr = pPCMType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_Float);
 	assert(SUCCEEDED(hr));
 
 	hr = pReader->SetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM, nullptr, pPCMType.Get());
@@ -219,13 +241,15 @@ SoundData Audio::SoundLoadFile(const char* filename) {
 	hr = pReader->GetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM, &pOutType);
 	assert(SUCCEEDED(hr));
 
-	// WAVEFORMATEX を取り出す
+	// WAVEFORMATEX / WAVEFORMATEXTENSIBLE を取り出す
 	WAVEFORMATEX* waveFormat = nullptr;
-	hr = MFCreateWaveFormatExFromMFMediaType(pOutType.Get(), &waveFormat, nullptr);
+	UINT32 waveFormatSize = 0;
+	hr = MFCreateWaveFormatExFromMFMediaType(pOutType.Get(), &waveFormat, &waveFormatSize);
 	assert(SUCCEEDED(hr));
 	// SoundData へ格納
 	SoundData soundData{};
 	soundData.wfex = *waveFormat; // WAVEFORMATEX コピー
+	soundData.waveFormatBlob.assign(reinterpret_cast<const BYTE*>(waveFormat), reinterpret_cast<const BYTE*>(waveFormat) + waveFormatSize);
 	CoTaskMemFree(waveFormat);
 	// 読み込んだ PCM データを格納するバッファ
 	std::vector<BYTE> buffer;
@@ -275,6 +299,7 @@ void Audio::SoundUnload(SoundData* soundData) {
 	StopVoicesForSound(*soundData);
 	soundData->buffer.clear();
 	soundData->wfex = {};
+	soundData->waveFormatBlob.clear();
 	soundData->effects.clear();
 }
 
@@ -291,12 +316,17 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
 	const XAUDIO2_VOICE_SENDS* sendList = mixer_.GetOutputVoiceSends();
+	const WAVEFORMATEX* waveFormat = soundData.GetWaveFormat();
 	if (sendList) {
-		result_ = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex, 0, XAUDIO2_DEFAULT_FREQ_RATIO, nullptr, sendList, nullptr);
+		result_ = xAudio2_->CreateSourceVoice(&pSourceVoice, waveFormat, 0, XAUDIO2_DEFAULT_FREQ_RATIO, nullptr, sendList, nullptr);
 	} else {
-		result_ = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
+		result_ = xAudio2_->CreateSourceVoice(&pSourceVoice, waveFormat);
 	}
 	assert(SUCCEEDED(result_));
+	if (FAILED(result_) || !pSourceVoice) {
+		OutputDebugStringA("SoundPlayWave: CreateSourceVoice failed.\n");
+		return;
+	}
 
 	pSourceVoice->SetVolume(soundData.volume);
 	XAUDIO2_BUFFER buf{};
@@ -318,6 +348,8 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	activeVoice.voice = pSourceVoice;
 	activeVoice.audioData = soundData.buffer.data();
 	activeVoice.isLoop = isLoop;
+	activeVoice.sourceEnded = false;
+	activeVoice.totalSamples = isLoop ? 0 : CalculateTotalSamples(soundData);
 	const bool effectApplied = ApplyEffectsToVoice(pSourceVoice, soundData.effects, activeVoice.effectInstances);
 	assert(effectApplied);
 
@@ -467,10 +499,11 @@ bool Audio::RecreateActiveVoice(ActiveVoice& active, const SoundData& soundData)
 	IXAudio2SourceVoice* oldVoice = active.voice;
 	IXAudio2SourceVoice* newVoice = nullptr;
 	const XAUDIO2_VOICE_SENDS* sendList = mixer_.GetOutputVoiceSends();
+	const WAVEFORMATEX* waveFormat = soundData.GetWaveFormat();
 	if (sendList) {
-		result_ = xAudio2_->CreateSourceVoice(&newVoice, &soundData.wfex, 0, XAUDIO2_DEFAULT_FREQ_RATIO, nullptr, sendList, nullptr);
+		result_ = xAudio2_->CreateSourceVoice(&newVoice, waveFormat, 0, XAUDIO2_DEFAULT_FREQ_RATIO, nullptr, sendList, nullptr);
 	} else {
-		result_ = xAudio2_->CreateSourceVoice(&newVoice, &soundData.wfex);
+		result_ = xAudio2_->CreateSourceVoice(&newVoice, waveFormat);
 	}
 	if (FAILED(result_) || !newVoice) {
 		return false;
@@ -627,7 +660,7 @@ std::vector<Audio::EditorSoundEntry> Audio::GetEditorSoundEntries() const {
 		entry.soundData = soundData;
 		entry.name = soundData->debugName.empty() ? "(unnamed sound)" : soundData->debugName;
 		for (const auto& active : activeVoices_) {
-			if (!active.voice || active.audioData != soundData->buffer.data()) {
+			if (!active.voice || active.audioData != soundData->buffer.data() || active.sourceEnded) {
 				continue;
 			}
 			entry.isPlaying = true;
@@ -676,7 +709,7 @@ bool Audio::IsSoundFinished(const SoundData& soundData) const {
 		return true;
 	}
 	for (const auto& active : activeVoices_) {
-		if (active.voice && active.audioData == targetData) {
+		if (active.voice && active.audioData == targetData && !active.sourceEnded) {
 			return false;
 		}
 	}
