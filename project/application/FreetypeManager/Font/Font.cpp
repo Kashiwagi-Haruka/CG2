@@ -14,7 +14,6 @@ void Font::Initialize(uint32_t Handle) {
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	// 頂点データ
-
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	// ……スプライトの頂点6つ設定……
 	// 頂点は 4つだけにする
