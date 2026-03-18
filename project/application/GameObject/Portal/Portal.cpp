@@ -34,6 +34,7 @@ Portal::Portal()
     ring_ = std::make_unique<Primitive>();
     //ワープ座標
     warpPos_ = std::make_unique<WarpPos>();
+
 }
 
 Portal::~Portal()
@@ -66,6 +67,8 @@ void Portal::Initialize()
     portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
     ring_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
     preRotY_ = { 0.0f };
+
+
 }
 
 void Portal::Update()
@@ -76,7 +79,6 @@ void Portal::Update()
     ring_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, uvRotateZ_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
     UpdatePortalWorldMatrix();
     ring_->Update();
-
     portalCircle_->Update();
     //ワープ地点
     warpPos_->Update();

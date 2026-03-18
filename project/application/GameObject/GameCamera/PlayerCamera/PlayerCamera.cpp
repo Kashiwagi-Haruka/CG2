@@ -20,6 +20,7 @@ PlayerCamera::PlayerCamera()
     //カメラを生成する
     camera_ = std::make_unique<Camera>();
     camera_->SetTransform(cameraTransform_);
+    camera_->SetFovY(0.9f);
     //Rayの設定
     ray_ = { .origin = {0.0f},.diff = {0.0f} };
 
