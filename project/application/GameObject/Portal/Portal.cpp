@@ -71,7 +71,7 @@ void Portal::Update()
 {
     isPlayerHit_ = false;
 
-    uvRotateZ_ += YoshidaMath::kDeltaTime * 2.0f;
+    uvRotateZ_ += YoshidaMath::kDeltaTime;
     ring_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, uvRotateZ_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
     UpdatePortalWorldMatrix();
     ring_->Update();
@@ -83,13 +83,14 @@ void Portal::Update()
 
 void Portal::DrawPortals() {
     if (portalCircle_) {
+        Object3dCommon::GetInstance()->DrawCommonPortal();
         portalCircle_->Draw();
     }
 }
 
 void Portal::DrawRings() {
     //Object3dCommon::GetInstance()->DrawCommonNoCull();
-    ring_->Draw();
+   /* ring_->Draw();*/
 }
 
 
