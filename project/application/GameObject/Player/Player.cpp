@@ -180,38 +180,83 @@ void Player::Move()
         transform_.translate += right * horizontal.x * moveSpeed_;
 
 
-        if (soundTimer_ == 0.0f) {
-            Audio::GetInstance()->SoundPlayWave(footStepSE);
-            Audio::GetInstance()->SetSoundVolume(&footStepSE, (moveSpeed_ == parameters_.kWalkSpeed) ? 0.5f : 0.25f);
-        }
-
-        if (soundTimer_ < 4.0f) {
-            soundTimer_ += moveSpeed_;
-        } else {
-            soundTimer_ = 0.0f;
-        }
-
     }
-
 }
 
-void Player::Gravity()
-{
-    velocity_.y -= YoshidaMath::kDeltaTime * YoshidaMath::kGravity;
-    transform_.translate.y += velocity_.y;
-    velocity_.y = std::clamp(velocity_.y, -1.0f, 1.0f);
+void Player::ResetFootContactState() {
+	leftFootGrounded_ = false;
+	rightFootGrounded_ = false;
 }
 
-void Player::OnCollision(Collider* collider)
-{
+void Player::UpdateFootContact(Collider* collider) {
+	if (!collider) {
+		return;
+	}
 
-    if (collider->GetCollisionAttribute() != kCollisionMat) {
-        //マットじゃなかったら
-        OnCollisionObstacle();
-    }
-    if (collider->GetCollisionAttribute() == kCollisionPortal) {
+	const uint32_t collisionAttribute = collider->GetCollisionAttribute();
+	if (collisionAttribute != kCollisionFloor && collisionAttribute != kCollisionMat) {
+		return;
+	}
 
-    }
+	const bool wasLeftFootGrounded = leftFootGrounded_;
+	const bool wasRightFootGrounded = rightFootGrounded_;
+
+	leftFootGrounded_ = leftFootGrounded_ || CheckFootContact(collider, kLeftFootJointName);
+	rightFootGrounded_ = rightFootGrounded_ || CheckFootContact(collider, kRightFootJointName);
+
+	if ((!wasLeftFootGrounded && leftFootGrounded_) || (!wasRightFootGrounded && rightFootGrounded_)) {
+		PlayFootstepSE();
+	}
+}
+
+bool Player::CheckFootContact(Collider* collider, const char* jointName) const {
+	if (!collider || !skeleton_) {
+		return false;
+	}
+
+	const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex(jointName);
+	if (!jointIndex.has_value()) {
+		return false;
+	}
+
+	skeleton_->SetObjectMatrix(bodyObj_->GetWorldMatrix());
+	const Vector3 footPosition = skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
+
+	const AABB colliderLocalAABB = collider->GetAABB();
+	const Vector3 colliderPosition = collider->GetWorldPosition();
+	const AABB colliderWorldAABB = {
+	    .min = colliderLocalAABB.min + colliderPosition,
+	    .max = colliderLocalAABB.max + colliderPosition,
+	};
+
+	const AABB footAABB = {
+	    .min = {footPosition.x - kFootContactHalfWidth, footPosition.y - kFootContactHeight, footPosition.z - kFootContactHalfWidth},
+	    .max = {footPosition.x + kFootContactHalfWidth, footPosition.y,                      footPosition.z + kFootContactHalfWidth},
+	};
+
+	return YoshidaMath::IsCollision(footAABB, colliderWorldAABB);
+}
+
+void Player::PlayFootstepSE() {
+	Audio::GetInstance()->SoundPlayWave(footStepSE);
+	Audio::GetInstance()->SetSoundVolume(&footStepSE, (moveSpeed_ == parameters_.kWalkSpeed) ? 0.5f : 0.25f);
+}
+
+void Player::Gravity() {
+	velocity_.y -= YoshidaMath::kDeltaTime * YoshidaMath::kGravity;
+	transform_.translate.y += velocity_.y;
+	velocity_.y = std::clamp(velocity_.y, -1.0f, 1.0f);
+}
+
+void Player::OnCollision(Collider* collider) {
+	UpdateFootContact(collider);
+
+	if (collider->GetCollisionAttribute() != kCollisionMat) {
+		// マットじゃなかったら
+		OnCollisionObstacle();
+	}
+	if (collider->GetCollisionAttribute() == kCollisionPortal) {
+	}
 }
 
 Vector3 Player::GetWorldPosition() const
