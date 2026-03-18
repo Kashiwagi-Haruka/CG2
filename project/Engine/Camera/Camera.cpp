@@ -2,6 +2,7 @@
 #include "Function.h"
 
 #include "Engine/Loadfile/JSON/JsonManager.h"
+#include <cmath>
 #ifdef USE_IMGUI
 #include "imgui.h"
 #endif
@@ -13,6 +14,26 @@ Matrix4x4 MakeCameraViewMatrix(const Transform& transform) {
 	const Matrix4x4 inverseRotateX = Function::MakeRotateXMatrix(-transform.rotate.x);
 	const Matrix4x4 inverseRotateZ = Function::MakeRotateZMatrix(-transform.rotate.z);
 	return Function::Multiply(Function::Multiply(Function::Multiply(inverseTranslate, inverseRotateY), inverseRotateX), inverseRotateZ);
+}
+
+Matrix4x4 MakeCameraViewMatrix(const Matrix4x4& worldMatrix) {
+	Matrix4x4 rotationMatrix = Function::MakeIdentity4x4();
+	for (int row = 0; row < 3; ++row) {
+		const float axisLength = std::sqrt(
+		    worldMatrix.m[row][0] * worldMatrix.m[row][0] +
+		    worldMatrix.m[row][1] * worldMatrix.m[row][1] +
+		    worldMatrix.m[row][2] * worldMatrix.m[row][2]);
+		if (axisLength == 0.0f) {
+			continue;
+		}
+		rotationMatrix.m[row][0] = worldMatrix.m[row][0] / axisLength;
+		rotationMatrix.m[row][1] = worldMatrix.m[row][1] / axisLength;
+		rotationMatrix.m[row][2] = worldMatrix.m[row][2] / axisLength;
+	}
+
+	const Matrix4x4 inverseTranslate = Function::MakeTranslateMatrix(-worldMatrix.m[3][0], -worldMatrix.m[3][1], -worldMatrix.m[3][2]);
+	const Matrix4x4 inverseRotate = Function::Transpose(rotationMatrix);
+	return Function::Multiply(inverseTranslate, inverseRotate);
 }
 } // namespace
 
@@ -45,7 +66,7 @@ void Camera::Update() {
 void Camera::UpdateViewProjection(const Matrix4x4& worldMatrix) {
 	// 現在のTransformと投影設定をもとに各行列を更新
 	worldMatrix_ = worldMatrix;
-	viewMatrix_ =  Function::Inverse(worldMatrix);
+	viewMatrix_ =  MakeCameraViewMatrix(worldMatrix);
 	projectionMatrix_ = Function::MakePerspectiveFovMatrix(fovY, aspectRatio, nearZ, farZ);
 	viewProjectionMatrix_ = Function::Multiply(viewMatrix_, projectionMatrix_);
 }
