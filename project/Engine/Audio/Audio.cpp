@@ -15,39 +15,8 @@
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "mfreadwrite.lib")
 
-// EqualizerのFrequencyCenterの最小・最大値を定義
-constexpr float FXEQ_MIN_FRQUENCY_CENTER = 20.0f;    // 20Hz（人間の可聴域下限）
-constexpr float FXEQ_MAX_FRQUENCY_CENTER = 20000.0f; // 20kHz（人間の可聴域上限）
-
 
 namespace {
-float ClampEchoDelay(float delay) { return std::clamp(delay, FXECHO_MIN_DELAY, FXECHO_MAX_DELAY); }
-
-void SanitizeEffectSettings(Audio::MixerEffectSettings& effect) {
-	switch (effect.type) {
-	case Audio::MixerEffectType::Echo:
-		effect.echo.WetDryMix = std::clamp(effect.echo.WetDryMix, 0.0f, 100.0f);
-		effect.echo.Feedback = std::clamp(effect.echo.Feedback, 0.0f, 100.0f);
-		effect.echo.Delay = ClampEchoDelay(effect.echo.Delay);
-		break;
-	case Audio::MixerEffectType::Equalizer:
-		effect.equalizer.FrequencyCenter0 = std::clamp(effect.equalizer.FrequencyCenter0, FXEQ_MIN_FRQUENCY_CENTER, FXEQ_MAX_FRQUENCY_CENTER);
-		effect.equalizer.Gain0 = std::clamp(effect.equalizer.Gain0, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-		effect.equalizer.Bandwidth0 = std::clamp(effect.equalizer.Bandwidth0, FXEQ_MIN_BANDWIDTH, FXEQ_MAX_BANDWIDTH);
-		effect.equalizer.FrequencyCenter1 = std::clamp(effect.equalizer.FrequencyCenter1, FXEQ_MIN_FRQUENCY_CENTER, FXEQ_MAX_FRQUENCY_CENTER);
-		effect.equalizer.Gain1 = std::clamp(effect.equalizer.Gain1, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-		effect.equalizer.Bandwidth1 = std::clamp(effect.equalizer.Bandwidth1, FXEQ_MIN_BANDWIDTH, FXEQ_MAX_BANDWIDTH);
-		effect.equalizer.FrequencyCenter2 = std::clamp(effect.equalizer.FrequencyCenter2, FXEQ_MIN_FRQUENCY_CENTER, FXEQ_MAX_FRQUENCY_CENTER);
-		effect.equalizer.Gain2 = std::clamp(effect.equalizer.Gain2, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-		effect.equalizer.Bandwidth2 = std::clamp(effect.equalizer.Bandwidth2, FXEQ_MIN_BANDWIDTH, FXEQ_MAX_BANDWIDTH);
-		effect.equalizer.FrequencyCenter3 = std::clamp(effect.equalizer.FrequencyCenter3, FXEQ_MIN_FRQUENCY_CENTER, FXEQ_MAX_FRQUENCY_CENTER);
-		effect.equalizer.Gain3 = std::clamp(effect.equalizer.Gain3, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN);
-		effect.equalizer.Bandwidth3 = std::clamp(effect.equalizer.Bandwidth3, FXEQ_MIN_BANDWIDTH, FXEQ_MAX_BANDWIDTH);
-		break;
-	default:
-		break;
-	}
-}
 std::vector<SoundData*>& SoundDataRegistry() {
 	static std::vector<SoundData*> instances;
 	return instances;
@@ -403,20 +372,20 @@ bool Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 		return false;
 	}
 
-	const UINT32 outputChannels = XAUDIO2_DEFAULT_CHANNELS;
+	XAUDIO2_VOICE_DETAILS voiceDetails{};
+	voice->GetVoiceDetails(&voiceDetails);
+	const UINT32 outputChannels = voiceDetails.InputChannels > 0 ? voiceDetails.InputChannels : 1;
 
 	outInstances.clear();
 	std::vector<XAUDIO2_EFFECT_DESCRIPTOR> descriptors;
-	std::vector<MixerEffectSettings> appliedEffects;
+	std::vector<const MixerEffectSettings*> appliedEffects;
 	descriptors.reserve(effects.size());
 	appliedEffects.reserve(effects.size());
 
-	for (const auto& baseEffect : effects) {
-		if (!baseEffect.enabled) {
+	for (const auto& effect : effects) {
+		if (!effect.enabled) {
 			continue;
 		}
-		MixerEffectSettings effect = baseEffect;
-		SanitizeEffectSettings(effect);
 
 		Microsoft::WRL::ComPtr<IUnknown> xapo;
 		HRESULT hr = S_OK;
@@ -444,7 +413,7 @@ bool Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 
 		outInstances.push_back(xapo);
 		descriptors.push_back({xapo.Get(), TRUE, outputChannels});
-		appliedEffects.push_back(effect);
+		appliedEffects.push_back(&effect);
 	}
 
 	if (descriptors.empty()) {
@@ -464,7 +433,7 @@ bool Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 	}
 
 	for (UINT32 effectIndex = 0; effectIndex < appliedEffects.size(); ++effectIndex) {
-		const auto& effect = appliedEffects[effectIndex];
+		const auto& effect = *appliedEffects[effectIndex];
 		switch (effect.type) {
 		case MixerEffectType::Reverb:
 			hr = voice->SetEffectParameters(effectIndex, &effect.reverb, sizeof(effect.reverb));
@@ -489,6 +458,7 @@ bool Audio::ApplyEffectsToVoice(IXAudio2SourceVoice* voice, const std::vector<Mi
 
 	return true;
 }
+
 bool Audio::RecreateActiveVoice(ActiveVoice& active, const SoundData& soundData) {
 	if (!active.voice) {
 		return false;
