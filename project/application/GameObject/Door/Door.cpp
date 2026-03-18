@@ -10,6 +10,9 @@
 SoundData Door::doorLockSE_;
 SoundData Door::doorOpenSE_;
 
+bool Door::isSendOpenMessage_ = false;
+bool Door::isSendLockMessage_ = false;
+
 Door::Door()
 {
     obj_ = std::make_unique<Object3d>();
@@ -29,6 +32,7 @@ Door::Door()
 
     Audio::GetInstance()->SetSoundVolume(&doorLockSE_, 0.25f);
     Audio::GetInstance()->SetSoundVolume(&doorOpenSE_, 0.25f);
+
 
 }
 
@@ -55,6 +59,10 @@ Vector3 Door::GetWorldPosition() const
 
 void Door::Update()
 {
+
+    isSendLockMessage_ = false;
+    isSendOpenMessage_ = false;
+
     worldMat_ = Function::MakeAffineMatrix(obj_->GetScale(), obj_->GetRotate(), obj_->GetTranslate());
     obj_->SetWorldMatrix(worldMat_);
     obj_->Update();
@@ -65,9 +73,9 @@ void Door::Update()
         if (desiredAnimationName == "1Lock") {
             //アイドル状態に戻す
             desiredAnimationName = "0Idle";
-
-        } else  if (desiredAnimationName == "2Open") {
             
+        } else  if (desiredAnimationName == "2Open") {
+
             if (!isOpen_) {
                 isOpen_ = true;
             }
@@ -79,11 +87,11 @@ void Door::Update()
         } else if (desiredAnimationName == "3Close") {
 
             if (isOpen_) {
-                isOpen_ = false;  
+                isOpen_ = false;
                 desiredAnimationName = "0Idle";
-            } 
+            }
         }
-       
+
     }
 
     autoLockSystem_->Update();
@@ -93,6 +101,9 @@ void Door::Initialize()
 {
     obj_->Initialize();
     autoLockSystem_->Initialize();
+
+    isSendLockMessage_ = false;
+    isSendOpenMessage_ = false;
 
     isGetKey_ = false;
     isOpen_ = false;
@@ -127,9 +138,11 @@ void Door::CheckCollision()
             if (isGetKey_) {
                 desiredAnimationName = "2Open";
                 Audio::GetInstance()->SoundPlayWave(doorOpenSE_, false);
+                isSendOpenMessage_ = true;
             } else {
                 desiredAnimationName = "1Lock";
                 Audio::GetInstance()->SoundPlayWave(doorLockSE_, false);
+                isSendLockMessage_ = true;
             }
         }
     }

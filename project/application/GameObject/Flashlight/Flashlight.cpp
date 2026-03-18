@@ -53,7 +53,7 @@ void Flashlight::Initialize()
 {
     isRotateY_ = false;
     obj_->Initialize();
-    transform_.translate = {1.0f,0.1f,1.0f};
+    transform_.translate = {8.0f,0.1f,1.0f};
     transform_.rotate = { 0.0f,0.0f,0.0f };
     transform_.scale = { 1.0f,1.0f,1.0f };
     SetLight();

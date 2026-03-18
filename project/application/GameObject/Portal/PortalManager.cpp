@@ -150,9 +150,10 @@ void PortalManager::DrawWhiteBoard() {
 
 void PortalManager::DrawPortal()
 {
+
     for (auto& portal : portals_) {
-        portal->DrawRings();
-        Object3dCommon::GetInstance()->DrawCommonPortal();
+        //portal->DrawRings();
+
         portal->DrawPortals();
     }
 }

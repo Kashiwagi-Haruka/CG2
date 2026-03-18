@@ -33,7 +33,14 @@ public:
     std::unique_ptr<AutoLockSystem>& GetAutoLockSystem() { return autoLockSystem_; };
     void SetAnimationName(const std::string& name) { desiredAnimationName = name; }
     bool GetIsOpen() { return isOpen_; };
+
+    static bool GetLockMassage() { return isSendLockMessage_; };
+    static bool GetOpenMassage() { return isSendOpenMessage_; };
+    static void SetLockMassage(const bool flag) {  isSendLockMessage_ = flag; };
+    static void SetOpenMassage(const bool flag) {  isSendOpenMessage_ = flag; };
 private:
+    static bool isSendLockMessage_;
+    static bool isSendOpenMessage_;
     static SoundData doorLockSE_;
     static SoundData doorOpenSE_;
     bool isGetKey_ = false;
