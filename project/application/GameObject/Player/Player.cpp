@@ -7,7 +7,61 @@
 #include "GameObject/YoshidaMath/Easing.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
+#include <algorithm>
 #include <imgui.h>
+#include <optional>
+
+namespace {
+struct FootContactState {
+	bool left = false;
+	bool right = false;
+	float leftY = 0.0f;
+	float rightY = 0.0f;
+	float groundY = 0.0f;
+};
+
+float WrapAnimationTime(float time, float duration) {
+	if (duration <= 0.0f) {
+		return 0.0f;
+	}
+
+	while (time < 0.0f) {
+		time += duration;
+	}
+	while (time >= duration) {
+		time -= duration;
+	}
+	return time;
+}
+
+std::optional<FootContactState> SampleFootContactState(
+    const Animation::AnimationData& animation, float sampleTime, const Matrix4x4& objectMatrix, const Model& model, const char* leftJointName = "foot.L", const char* rightJointName = "foot.R") {
+	Skeleton skeleton = Skeleton().Create(model.GetModelData().rootnode);
+	skeleton.ApplyAnimation(animation, WrapAnimationTime(sampleTime, animation.duration));
+	skeleton.Update();
+	skeleton.SetObjectMatrix(objectMatrix);
+
+	const std::optional<int32_t> leftIndex = skeleton.FindJointIndex(leftJointName);
+	const std::optional<int32_t> rightIndex = skeleton.FindJointIndex(rightJointName);
+	if (!leftIndex.has_value() || !rightIndex.has_value()) {
+		return std::nullopt;
+	}
+
+	const std::vector<Joint>& joints = skeleton.GetJoints();
+	const Vector3 leftPosition = skeleton.GetJointWorldPosition(joints[*leftIndex]);
+	const Vector3 rightPosition = skeleton.GetJointWorldPosition(joints[*rightIndex]);
+	const float groundY = std::min(leftPosition.y, rightPosition.y);
+	const float contactThreshold = 0.02f;
+
+	return FootContactState{
+	    .left = std::abs(leftPosition.y - groundY) <= contactThreshold,
+	    .right = std::abs(rightPosition.y - groundY) <= contactThreshold,
+	    .leftY = leftPosition.y,
+	    .rightY = rightPosition.y,
+	    .groundY = groundY,
+	};
+}
+} // namespace
 
 Player::Player() {
     localAABB_ = {
@@ -88,53 +142,78 @@ void Player::Draw()
 
 }
 
-void Player::Debug()
-{
+void Player::Debug() {
 #ifdef USE_IMGUI
-    if (ImGui::Begin("Human")) {
+	if (ImGui::Begin("Human")) {
 
+		if (ImGui::TreeNode("Transform")) {
+			ImGui::DragFloat3("Scale", &transform_.scale.x, 0.1f);
+			ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.1f);
+			ImGui::DragFloat3("Translate", &transform_.translate.x, 0.1f);
+			ImGui::TreePop();
+		}
+		if (!animationClips_.empty()) {
+			std::vector<const char*> animationNames;
+			animationNames.reserve(animationClips_.size());
+			for (const auto& clip : animationClips_) {
+				animationNames.push_back(clip.name.c_str());
+			}
+			int selectedIndex = static_cast<int>(currentAnimationIndex_);
+			if (ImGui::Combo("Animation", &selectedIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
+				currentAnimationIndex_ = static_cast<size_t>(selectedIndex);
+				bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
+				animationTime_ = 0.0f;
+			}
 
-        if (ImGui::TreeNode("Transform")) {
-            ImGui::DragFloat3("Scale", &transform_.scale.x, 0.1f);
-            ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.1f);
-            ImGui::DragFloat3("Translate", &transform_.translate.x, 0.1f);
-            ImGui::TreePop();
-        }
-        if (!animationClips_.empty()) {
-            std::vector<const char*> animationNames;
-            animationNames.reserve(animationClips_.size());
-            for (const auto& clip : animationClips_) {
-                animationNames.push_back(clip.name.c_str());
-            }
-            int selectedIndex = static_cast<int>(currentAnimationIndex_);
-            if (ImGui::Combo("Animation", &selectedIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
-                currentAnimationIndex_ = static_cast<size_t>(selectedIndex);
-                bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
-                animationTime_ = 0.0f;
-            }
-        }
+			if (Model* playerModel = ModelManager::GetInstance()->FindModel("gentleman")) {
+				const Animation::AnimationData& currentAnimation = animationClips_[currentAnimationIndex_];
+				const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+				const float previousTime = WrapAnimationTime(animationTime_ - deltaTime, currentAnimation.duration);
+				const float nextTime = WrapAnimationTime(animationTime_ + deltaTime, currentAnimation.duration);
 
-        if (ImGui::TreeNode("Parameters")) {
-            ImGui::DragFloat("Rotate Speed", &parameters_.kRotateYSpeed, 0.001f, 0.0f, 10.0f);
-            ImGui::DragFloat("Walk Speed", &parameters_.kWalkSpeed, 0.001f, 0.0f, 10.0f);
-            ImGui::DragFloat("Sneak Speed", &parameters_.kSneakSpeed, 0.001f, 0.0f, 10.0f);
+				const std::optional<FootContactState> previousContact = SampleFootContactState(currentAnimation, previousTime, bodyObj_->GetWorldMatrix(), *playerModel);
+				const std::optional<FootContactState> nextContact = SampleFootContactState(currentAnimation, nextTime, bodyObj_->GetWorldMatrix(), *playerModel);
 
-            if (ImGui::Button("Save Player Parameters")) {
-                SaveParameters();
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Load Player Parameters")) {
-                LoadParameters();
-            }
-            if (!parameterStatusMessage_.empty()) {
-                ImGui::Text("%s", parameterStatusMessage_.c_str());
-            }
-            ImGui::TreePop();
-        }
-    }
-    ImGui::End();
+				ImGui::Separator();
+				ImGui::Text("Foot Contact");
+				if (previousContact.has_value()) {
+					ImGui::Text("Prev Frame  L:%s  R:%s", previousContact->left ? "Ground" : "Air", previousContact->right ? "Ground" : "Air");
+					ImGui::TextDisabled("Prev Y  L:%.3f R:%.3f Ground:%.3f", previousContact->leftY, previousContact->rightY, previousContact->groundY);
+				} else {
+					ImGui::TextDisabled("Prev Frame: foot joint not found");
+				}
+
+				if (nextContact.has_value()) {
+					ImGui::Text("Next Frame  L:%s  R:%s", nextContact->left ? "Ground" : "Air", nextContact->right ? "Ground" : "Air");
+					ImGui::TextDisabled("Next Y  L:%.3f R:%.3f Ground:%.3f", nextContact->leftY, nextContact->rightY, nextContact->groundY);
+				} else {
+					ImGui::TextDisabled("Next Frame: foot joint not found");
+				}
+			}
+		}
+
+		if (ImGui::TreeNode("Parameters")) {
+			ImGui::DragFloat("Rotate Speed", &parameters_.kRotateYSpeed, 0.001f, 0.0f, 10.0f);
+			ImGui::DragFloat("Walk Speed", &parameters_.kWalkSpeed, 0.001f, 0.0f, 10.0f);
+			ImGui::DragFloat("Sneak Speed", &parameters_.kSneakSpeed, 0.001f, 0.0f, 10.0f);
+
+			if (ImGui::Button("Save Player Parameters")) {
+				SaveParameters();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Load Player Parameters")) {
+				LoadParameters();
+			}
+			if (!parameterStatusMessage_.empty()) {
+				ImGui::Text("%s", parameterStatusMessage_.c_str());
+			}
+			ImGui::TreePop();
+		}
+	}
+	ImGui::End();
 #endif
 }
+
 
 void Player::Move()
 {
