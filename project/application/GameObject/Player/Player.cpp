@@ -122,6 +122,7 @@ void Player::Initialize() {
 
 void Player::Update()
 {
+	ResetFootContactState();
     //移動処理
     Move();
     //重力処理
@@ -317,8 +318,8 @@ bool Player::CheckFootContact(Collider* collider, const char* jointName) const {
 }
 
 void Player::PlayFootstepSE() {
-	Audio::GetInstance()->SoundPlayWave(footStepSE);
 	Audio::GetInstance()->SetSoundVolume(&footStepSE, (moveSpeed_ == parameters_.kWalkSpeed) ? 0.5f : 0.25f);
+	Audio::GetInstance()->SoundPlayWave(footStepSE);
 }
 
 void Player::Gravity() {
