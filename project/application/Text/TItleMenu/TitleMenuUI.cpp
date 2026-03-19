@@ -161,8 +161,6 @@ void TitleMenuUI::Update()
 
 void TitleMenuUI::Draw()
 {
-    SpriteCommon::GetInstance()->DrawCommonFont();
-
     pressSpaceText_.Draw();
 
     if (isStart_) { return; }

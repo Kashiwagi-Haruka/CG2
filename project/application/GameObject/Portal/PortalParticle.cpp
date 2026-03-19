@@ -12,14 +12,14 @@ PortalParticle::PortalParticle() {
 	ParticleManager::GetInstance()->CreateParticleGroup("portalBall", "Resources/2d/defaultParticle.png");
 
 	emitter_ = std::make_unique<ParticleEmitter>("portalBall");
-	emitter_->SetFrequency(0.008f);
+	emitter_->SetFrequency(0.002f);
 	emitter_->SetCount(100);
-	emitter_->SetLife(1.0f);
+	emitter_->SetLife(5.0f);
 	emitter_->SetAcceleration({0.0f, 0.0f, 0.0f});
 	emitter_->SetAreaMin({-0.5f, -0.5f, -0.5f});
 	emitter_->SetAreaMax({0.5f, 0.5f, 0.5f});
-	emitter_->SetBeforeColor({0.4f, 0.7f, 1.0f, 1.0f});
-	emitter_->SetAfterColor({0.2f, 1.0f, 0.3f, 0.0f});
+	emitter_->SetBeforeColor({1.0f, 0.0f, 0.0f, 1.0f});
+	emitter_->SetAfterColor({1.0f, 1.0f, 0.3f, 0.0f});
 	emitter_->SetEmissionAngle(2.0f * 3.1415926535f);
 
 	const std::string pathGroup = "portalPath" + std::to_string(nextId_++);
@@ -27,12 +27,12 @@ PortalParticle::PortalParticle() {
 	pathEmitter_ = std::make_unique<ParticleEmitter>(pathGroup);
 	pathEmitter_->SetFrequency(0.004f);
 	pathEmitter_->SetCount(100);
-	pathEmitter_->SetLife(1.0f);
-	pathEmitter_->SetAcceleration({0.0f, 0.0f, 0.0f});
+	pathEmitter_->SetLife(5.0f);
+	pathEmitter_->SetAcceleration({0.0f, -YoshidaMath::kGravity, 0.0f});
 	pathEmitter_->SetAreaMin({-0.12f, -0.12f, -0.12f});
 	pathEmitter_->SetAreaMax({0.12f, 0.12f, 0.12f});
 	pathEmitter_->SetBeforeColor({0.4f, 0.7f, 1.0f, 1.0f});
-	pathEmitter_->SetAfterColor({0.2f, 1.0f, 0.3f, 0.0f});
+	pathEmitter_->SetAfterColor({1.0f, 1.0f, 0.3f, 0.0f});
 	pathEmitter_->SetEmissionAngle(2.0f * 3.1415926535f);
 
 	primitive_ = std::make_unique<Primitive>();
@@ -42,7 +42,7 @@ PortalParticle::PortalParticle() {
 	transform_.scale = {0.1f, 0.1f, 0.1f};
 	primitive_->SetScale(transform_.scale);
 
-	particleTransform_.scale = {0.01f, 0.01f, 0.01f};
+	particleTransform_.scale = {0.0075f, 0.0075f, 0.0075f};
 }
 
 void PortalParticle::Initialize() {}
@@ -137,6 +137,7 @@ void PortalParticle::Draw() {
 	if (!isVisible_) {
 		return;
 	}
+
 
 	if (primitive_) {
 		primitive_->Draw();
