@@ -33,6 +33,16 @@ bool PlayerCommand::MoveBackward()
     return  Move(K_MoveBackward, C_MoveBackward);
 }
 
+bool PlayerCommand::MoveForwardTrigger()
+{
+    return MoveTrigger(K_MoveForward, C_MoveForward);
+}
+
+bool PlayerCommand::MoveBackwardTrigger()
+{
+    return MoveTrigger(K_MoveBackward, C_MoveBackward);
+}
+
 bool PlayerCommand::Shot()
 {
     auto* input = Input::GetInstance();
@@ -77,6 +87,12 @@ Vector2 PlayerCommand::Rotate(float rotateSpeed)
     }
 
     return {dPitch,dYaw };
+}
+
+bool PlayerCommand::MoveTrigger(const GameKeyBind key, const GameKeyBind controller)
+{
+    auto* input = Input::GetInstance();
+    return input->TriggerKey(key) || input->TriggerButton(Input::PadButton(controller));
 }
 
 bool PlayerCommand::Move(const GameKeyBind key, const GameKeyBind controller)

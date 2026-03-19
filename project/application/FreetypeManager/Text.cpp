@@ -30,38 +30,6 @@ void Text::SetBlendMode(const BlendMode& blendMode) {
     blendMode_ = blendMode;
 }
 
-void Text::UpdateLayout() {
-
-    std::u32string visibleText = text_.substr(0, visibleCharCount_);
-
-    // まず仮レイアウト（位置は0始まり）を取得
-    //glyphRuns_ = FreeTypeManager::LayoutString(fontHandle_, text_, { 0.0f, 0.0f }, size_.x);
-    glyphRuns_ = FreeTypeManager::LayoutString(fontHandle_, visibleText, { 0.0f, 0.0f }, size_.x);
-    // 中央・右寄せ対応（行ごとにオフセット）
-    std::unordered_map<float, float> lineWidths;
-    for (const auto& run : glyphRuns_) {
-        auto& size = FreeTypeManager::GetGlyphTextures({ fontHandle_, run.glyphIndex }).glyphSize;
-        lineWidths[run.position.y] += size.y;
-    }
-
-    for (auto& run : glyphRuns_) {
-        float offsetX = 0.0f;
-        float lineWidth = lineWidths[run.position.y];
-        switch (align_) {
-        case TextAlign::Center:
-            offsetX = -lineWidth * 0.5f;
-            break;
-        case TextAlign::Right:
-            offsetX = -lineWidth;
-            break;
-        default:
-            break;
-        }
-        run.position.x += position_.x + offsetX;
-        run.position.y += position_.y;
-    }
-}
-
 void Text::StartTyping(float speed)
 {
     typeSpeed_ = speed;
@@ -107,4 +75,41 @@ void Text::Update()
             }
         }
     }
+}
+
+
+void Text::UpdateLayout(const bool isType)
+{
+
+    if (isType) {
+        std::u32string visibleText = text_.substr(0, visibleCharCount_);
+        glyphRuns_ = FreeTypeManager::LayoutString(fontHandle_, visibleText, { 0.0f, 0.0f }, size_.x);
+    } else {
+        glyphRuns_ = FreeTypeManager::LayoutString(fontHandle_, text_, { 0.0f, 0.0f }, size_.x);
+    }
+
+    // 中央・右寄せ対応（行ごとにオフセット）
+    std::unordered_map<float, float> lineWidths;
+    for (const auto& run : glyphRuns_) {
+        auto& size = FreeTypeManager::GetGlyphTextures({ fontHandle_, run.glyphIndex }).glyphSize;
+        lineWidths[run.position.y] += size.y;
+    }
+
+    for (auto& run : glyphRuns_) {
+        float offsetX = 0.0f;
+        float lineWidth = lineWidths[run.position.y];
+        switch (align_) {
+        case TextAlign::Center:
+            offsetX = -lineWidth * 0.5f;
+            break;
+        case TextAlign::Right:
+            offsetX = -lineWidth;
+            break;
+        default:
+            break;
+        }
+        run.position.x += position_.x + offsetX;
+        run.position.y += position_.y;
+    }
+
 }

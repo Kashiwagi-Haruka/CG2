@@ -31,5 +31,6 @@ private:
     std::unique_ptr<Object3d>obj_ = nullptr;
     Transform* mirrorTransform_ = nullptr;
     Vector3 velocity_ = { 0.0f };
+    bool isGrab_ = false;
 };
 

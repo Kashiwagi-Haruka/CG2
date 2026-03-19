@@ -90,7 +90,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>freetype.lib;user32.lib;gdi32.lib;kernel32.lib;shell32.lib;assimp-vc143-md.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib;user32.lib;gdi32.lib;kernel32.lib;shell32.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Generated\outputs\$(Configuration)\freetype\;$(SolutionDir)..\Generated\outputs\$(Configuration)\imgui\;$(Project Dir)externals\assimp\lib\Debug</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>

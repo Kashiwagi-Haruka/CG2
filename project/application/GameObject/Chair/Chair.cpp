@@ -5,6 +5,7 @@
 #include"GameObject/KeyBindConfig.h"
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
+#include"GameObject/Player/Player.h"
 
 PlayerCamera* Chair::playerCamera_ = nullptr;
 
@@ -15,7 +16,7 @@ Chair::Chair()
     obj_->SetModel("chair");
     SetAABB({ .min = {-0.125f,0.0f,-0.125f},.max = {0.125f,0.5f,0.125f} });
     SetCollisionAttribute(kCollisionChair);
-    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair);
+    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionKey);
 }
 
 void Chair::OnCollision(Collider* collider)
@@ -25,7 +26,7 @@ void Chair::OnCollision(Collider* collider)
     }
 
     if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-        Vector3 vel = playerCamera_->GetRay().diff*4.0f;
+        Vector3 vel = playerCamera_->GetRay().diff * 4.0f;
         vel.y = 0.0f;
         const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
         transform_.translate += vel * deltaTime;
@@ -35,7 +36,9 @@ void Chair::OnCollision(Collider* collider)
         velocity_.y = 0.0f;
     }
 
+    if (collider->GetCollisionAttribute() == kCollisionKey) {
 
+    }
 }
 
 Vector3 Chair::GetWorldPosition() const
@@ -45,8 +48,9 @@ Vector3 Chair::GetWorldPosition() const
 
 void Chair::Update()
 {
+
     if (mirrorTransform_ != nullptr) {
-        transform_.translate.x =- mirrorTransform_->translate.x;
+        transform_.translate.x = -mirrorTransform_->translate.x;
         transform_.translate.y = mirrorTransform_->translate.y;
         transform_.translate.z = mirrorTransform_->translate.z;
 
@@ -59,16 +63,26 @@ void Chair::Update()
         transform_.scale.z = mirrorTransform_->scale.z;
     }
 
-
-    if (PlayerCommand::GetInstance()->Interact()) {
-        if (OnCollisionRay()) {
+    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+        if (Player::GetIsGrab() && isGrab_) {
             // カーソルに追従させて持ち上げる処理
-            Vector3 origin = playerCamera_->GetTransform().translate;
-            origin.y -= 0.5f;
-            transform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
-            transform_.translate.y = (std::max)(transform_.translate.y, 0.0f);
+            isGrab_ = false;
+            Player::SetIsGrab(false);
+        } else {
+            if (OnCollisionRay()) {
+                isGrab_ = true;
+                Player::SetIsGrab(true);
+            }
         }
+    }
 
+    if (isGrab_ && Player::GetIsGrab()) {
+        // カーソルに追従させて持ち上げる処理
+        Vector3 origin = playerCamera_->GetTransform().translate;
+        origin.y -= 0.5f;
+        transform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
+        transform_.translate.y = (std::max)(transform_.translate.y, 0.0f);
+        velocity_.y = 0.0f;
     } else {
         const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
         velocity_.y -= YoshidaMath::kGravity * deltaTime;
@@ -86,6 +100,7 @@ void Chair::Update()
 
 void Chair::Initialize()
 {
+    isGrab_ = false;
     obj_->Initialize();
     velocity_ = { 0.0f };
     transform_ = obj_->GetTransform();

@@ -3,13 +3,13 @@
 #include"GameObject/Door/Door.h"
 #include"DirectXCommon.h"
 #include"GameObject/Edamame/EdamameTrivia.h"
+#include"GameObject/Key/Key.h"
 #include <codecvt>
 #include <locale>
 
 TextUIManager::TextUIManager()
 {
-    /// @brief ライブラリの初期化
-    FreeTypeManager::Initialize();
+
 
     fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
     FreeTypeManager::SetPixelSizes(fontHandle_, 24, 24);
@@ -22,7 +22,7 @@ TextUIManager::TextUIManager()
     text_.UpdateLayout();
 
     edamameTrivia_.Initialize(fontHandle_);
-    edamameTrivia_.SetPosition({640,512+64 });
+    edamameTrivia_.SetPosition({ 640,512 + 64 });
     edamameTrivia_.SetColor({ 1, 1, 1, 1 });
     edamameTrivia_.SetAlign(TextAlign::Center);
     edamameTrivia_.SetBlendMode(BlendMode::kBlendModeAlpha);
@@ -32,8 +32,7 @@ TextUIManager::TextUIManager()
 
 TextUIManager::~TextUIManager()
 {
-    /// @brief 終了処理
-    FreeTypeManager::Finalize();
+
 }
 
 void TextUIManager::Initialize()
@@ -53,17 +52,21 @@ void TextUIManager::Update()
         }
     }
 
-    if (Door::GetLockMassage()) {
-        text_.SetString(U"鍵がかかっている。");
-        text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-        isDraw_ = true;
-    }
 
     if (Door::GetOpenMassage()) {
         text_.SetString(U"扉が開いた。");
         text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
         isDraw_ = true;
+    } else if (Key::GetGetKeyMessage()) {
+        text_.SetString(U"鍵を入手した。");
+        text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
+        isDraw_ = true;
+    } else if (Door::GetLockMassage()) {
+        text_.SetString(U"鍵がかかっている。");
+        text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
+        isDraw_ = true;
     }
+
 
     if (EdamameTrivia::GetIsSendStartTriviaMessage()) {
         edamameTrivia_.SetString(EdamameTrivia::GetString());
@@ -78,12 +81,10 @@ void TextUIManager::Draw()
 {
     SpriteCommon::GetInstance()->DrawCommonFont();
     edamameTrivia_.Draw();
-    FreeTypeManager::ResetFontUsage();
 
-    if (!isDraw_) { return; }
-    SpriteCommon::GetInstance()->DrawCommonFont();
-    text_.Draw();
-    FreeTypeManager::ResetFontUsage();
+    if (isDraw_) {
+        text_.Draw();
+    }
 
-   
+    FreeTypeManager::ResetFontUsage();
 }

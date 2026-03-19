@@ -333,6 +333,7 @@
     <ClCompile Include="application\FreetypeManager\Text.cpp" />
     <ClCompile Include="application\FreetypeManager\FreeTypeManager.cpp" />
     <ClCompile Include="application\FreetypeManager\Font\Font.cpp" />
+    <ClCompile Include="application\FreetypeManager\TextUIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -652,6 +653,7 @@
     <ClInclude Include="application\FreetypeManager\FreeTypeManager.h" />
     <ClInclude Include="application\FreetypeManager\Font\Font.h" />
     <ClInclude Include="application\GameObject\Player\PlayerParameters.h" />
+    <ClInclude Include="application\FreetypeManager\TextUIManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

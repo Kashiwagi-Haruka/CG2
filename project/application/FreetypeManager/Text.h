@@ -30,8 +30,9 @@ public:
     void SetSize(const Vector2 size) { size_ = size; }
     void Draw();
     void Update();
-    void UpdateLayout();
+    void UpdateLayout(const bool isType = true);
     void StartTyping(float speed);
+    const Vector2& GetPosition()const { return position_; }
 private:
 
 private:
@@ -45,10 +46,8 @@ private:
     std::vector<Font*> activeFonts_;
     VerticalAlign verticalAlign_ = VerticalAlign::Middle;
     TextAlign align_ = TextAlign::Center;
-    BlendMode blendMode_ = kBlendModeNone;
+    BlendMode blendMode_ = kBlendModeAlpha;
 
-
-    // Text.h に追加
     float typeTimer_ = 0.0f;         // 経過時間
     float typeSpeed_ = 0.05f;        // 1文字表示する間隔（秒）
     size_t visibleCharCount_ = 0;    // 現在表示する文字数

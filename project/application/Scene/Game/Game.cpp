@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "SceneManager.h"
+#include"FreetypeManager/FreeTypeManager.h"
 
 void Game::Initialize() {
 	FrameWork::Initialize();
@@ -9,13 +10,14 @@ void Game::Initialize() {
 
 	sceneFactory_ = std::make_unique<SceneFactory>();
 	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
-	/*SceneManager::GetInstance()->ChangeScene("Title");*/
+	SceneManager::GetInstance()->ChangeScene("Title");
 	/*SceneManager::GetInstance()->ChangeScene("Sample");*/
 	//SceneManager::GetInstance()->ChangeScene("Game");
 	//SceneManager::GetInstance()->ChangeScene("Result");
 	/*SceneManager::GetInstance()->ChangeScene("Tutorial");*/
 	//4か月開発のシーンの作成
-	SceneManager::GetInstance()->ChangeScene("ShadowGame");
+	//SceneManager::GetInstance()->ChangeScene("ShadowGame");
+
 }
 
 void Game::Update() {
@@ -36,6 +38,9 @@ void Game::Draw() {
 }
 
 void Game::Finalize() {
+
+	/// @brief 終了処理
+	FreeTypeManager::Finalize();
 
 	SceneManager::GetInstance()->Finalize();
 	GameBase::GetInstance()->Finalize();

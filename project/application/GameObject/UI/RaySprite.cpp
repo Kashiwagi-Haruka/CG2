@@ -4,6 +4,7 @@
 #include"WinApp.h"
 #include"GameObject/KeyBindConfig.h"
 #include"GameObject/Portal/PortalManager.h"
+#include"GameObject/Player/Player.h"
 
 RaySprite::RaySprite()
 {
@@ -30,7 +31,7 @@ void RaySprite::Update()
 {
 	auto* playerCommand = PlayerCommand::GetInstance();
 
-	if (playerCommand->Interact()) {
+	if (Player::GetIsGrab()) {
 		// インタラクトの処理
 		SetTexture(RaySprite::GRAB);
 	} else if(PortalManager::GetCanMakePortal()){

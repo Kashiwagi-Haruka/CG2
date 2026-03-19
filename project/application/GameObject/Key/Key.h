@@ -26,12 +26,15 @@ public:
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
+    static bool GetGetKeyMessage() { return isSendGetKeyMessage_; }
 private:
     std::unique_ptr<Object3d>obj_ = nullptr;
     PlayerCamera* playerCamera_ = nullptr;
-
-	Transform worldTransform_ = {};
-
-	bool isGrabbed_ = false;
+    Transform worldTransform_ = {};
+    Vector3 velocity_ = { 0.0f };
+    const float mass_ = 4.0f;
+    bool isChairHit_ = false;
+    bool isGetKey_ = false;
+    static bool isSendGetKeyMessage_;
 };
 

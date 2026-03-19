@@ -255,7 +255,7 @@ float FreeTypeManager::GetFontSize(uint32_t handle)
 {
     if (fontFaces_.contains(handle)) {
         auto& ftData = fontFaces_.at(handle);
-        uint32_t pixelWidth = ftData.face->size->metrics.max_advance / 64.0f;
+        float pixelWidth = ftData.face->size->metrics.max_advance / 64.0f;
         return pixelWidth;
     }
 
