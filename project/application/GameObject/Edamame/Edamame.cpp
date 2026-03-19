@@ -107,7 +107,7 @@ void Edamame::Trivia()
         float bgmVol = 0.0f;
         float vol = 0.0f; 
 
-        if (length <= 50.0f) {
+        if (length <= 25.0f) {
             if (length <= 1.0f) {
                 bgmVol = 0.25f;
                 vol = 1.0f;
