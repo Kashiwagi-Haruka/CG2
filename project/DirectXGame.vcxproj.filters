@@ -334,6 +334,7 @@
     <ClCompile Include="application\FreetypeManager\FreeTypeManager.cpp" />
     <ClCompile Include="application\FreetypeManager\Font\Font.cpp" />
     <ClCompile Include="application\FreetypeManager\TextUIManager.cpp" />
+    <ClCompile Include="application\FreetypeManager\TItleMenu\TitleMenuUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -655,6 +656,7 @@
     <ClInclude Include="application\GameObject\Player\PlayerParameters.h" />
     <ClInclude Include="application\FreetypeManager\TextUIManager.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\RandomClass.h" />
+    <ClInclude Include="application\FreetypeManager\TItleMenu\TitleMenuUI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
