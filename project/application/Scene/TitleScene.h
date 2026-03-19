@@ -4,7 +4,8 @@
 #include "SceneTransition/SceneTransition.h"
 #include "Sprite.h"
 #include <memory>
-#include"FreetypeManager/TItleMenu/TitleMenuUI.h"
+#include"Text/TItleMenu/TitleMenuUI.h"
+#include"Text/FirstStory/FirstStory.h"
 
 class GameBase;
 
@@ -16,6 +17,7 @@ private:
     bool isTransitionOut = false;
     std::unique_ptr<SceneTransition> transition = nullptr;
     std::unique_ptr<TitleMenuUI> titleMenuUI_ = nullptr;
+    std::unique_ptr<FirstStory> firstStory_ = nullptr;
 public:
     TitleScene();
     ~TitleScene() override = default;

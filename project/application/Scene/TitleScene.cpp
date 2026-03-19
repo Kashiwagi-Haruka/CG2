@@ -4,7 +4,7 @@
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 #include <imgui.h>
-#include"FreetypeManager/FreeTypeManager.h"
+#include"Text/FreetypeManager/FreeTypeManager.h"
 #include"Function.h"
 
 
@@ -14,14 +14,18 @@ TitleScene::TitleScene() {
     Audio::GetInstance()->SetSoundVolume(&BGMData_, 1.0f);
 
     transition = std::make_unique<SceneTransition>();
+
+    /// @brief 初期化
+    FreeTypeManager::Initialize();
+    Text::LoadSE();
     titleMenuUI_ = std::make_unique<TitleMenuUI>();
+    firstStory_ = std::make_unique<FirstStory>();
 }
 
 void TitleScene::Finalize() {
     Audio::GetInstance()->SoundUnload(&BGMData_);
-
+    Text::UnLoadSE();
 }
-
 
 void TitleScene::Initialize() {
 
@@ -30,18 +34,23 @@ void TitleScene::Initialize() {
     isTransitionOut = false;
     transition->Initialize(false);
     titleMenuUI_->Initialize();
+    firstStory_->Initialize();
 }
 
 void TitleScene::Update() {
+
     if (!isBGMPlaying) {
         Audio::GetInstance()->SoundPlayWave(BGMData_, true);
         isBGMPlaying = true;
     }
 
-
     titleMenuUI_->Update();
 
     if (titleMenuUI_->GetIsStart()) {
+        firstStory_->Update();
+    }
+
+    if (firstStory_->GetIsEnd()) {
         if (!isTransitionOut) {
             transition->Initialize(true);
             isTransitionOut = true;
@@ -57,16 +66,20 @@ void TitleScene::Update() {
             SceneManager::GetInstance()->ChangeScene("ShadowGame");
         }
     }
+
+
+
 }
 void TitleScene::Draw() {
 
     titleMenuUI_->Draw();
-
+    firstStory_->Draw();   
+    FreeTypeManager::ResetFontUsage();
     SpriteCommon::GetInstance()->DrawCommon();
 
-    if (isTransitionIn || isTransitionOut) {
-        transition->Draw();
-    }
+    //if (isTransitionIn || isTransitionOut) {
+    //    transition->Draw();
+    //}
 
 
 }

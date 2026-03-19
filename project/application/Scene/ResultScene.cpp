@@ -4,6 +4,7 @@
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 #include <algorithm>
+#include"ScreenSize/ScreenSize.h"
 
 ResultScene::ResultScene() {
 
@@ -21,7 +22,7 @@ void ResultScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGM_); }
 void ResultScene::Initialize() {
 	isSceneEnd_ = false;
 	sprite_->Initialize(textureHandle_);
-	sprite_->SetScale({ static_cast<float>(WinApp::kClientWidth),static_cast<float>(WinApp::kClientHeight) });
+	sprite_->SetScale({SCREEN_SIZE::WIDTH,SCREEN_SIZE::HEIGHT});
 	sprite_->Update();
 	Input::GetInstance()->SetIsCursorStability(false);
 	Input::GetInstance()->SetIsCursorVisible(true);

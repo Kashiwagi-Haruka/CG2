@@ -20,7 +20,7 @@
 #pragma endregion
 
 #pragma region //UI
-#include"FreetypeManager/TextUIManager.h"
+#include"Text/TextUIManager/TextUIManager.h"
 #pragma endregion
 
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"

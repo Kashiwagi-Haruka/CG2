@@ -3,6 +3,8 @@
 #include "SceneManager.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
+#include"ScreenSize/ScreenSize.h"
+
 GameOverScene::GameOverScene() {
 	transition = std::make_unique<SceneTransition>();
 	BGM_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/BGM/gameOverBGM.mp3");
@@ -17,7 +19,7 @@ void GameOverScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGM_); }
 void GameOverScene::Initialize() {
 	
 	sprite_->Initialize(textureHandle_);
-	sprite_->SetScale({ static_cast<float>(WinApp::kClientWidth),static_cast<float>(WinApp::kClientHeight)  });
+	sprite_->SetScale({SCREEN_SIZE::WIDTH,SCREEN_SIZE::HEIGHT});
 	sprite_->Update();
 	transition->Initialize(false);
 	isTransitionIn = true;

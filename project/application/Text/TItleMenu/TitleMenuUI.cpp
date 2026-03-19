@@ -3,19 +3,8 @@
 #include"GameObject/KeyBindConfig.h"
 #include"DirectXCommon.h"
 #include "Sprite/SpriteCommon.h"
-
-namespace COLOR {
-    constexpr Vector4 RED = { 1.0f,0.0f,0.0f,1.0f };
-    constexpr Vector4 WHITE = { 1.0f,1.0f,1.0f,1.0f };
-}
-
-namespace SCREEN_SIZE {
-    const float WIDTH = static_cast<float>(WinApp::kClientWidth);
-    const float HEIGHT = static_cast<float>(WinApp::kClientHeight);
-    const float HALF_WIDTH = WIDTH * 0.5f;
-    const float HALF_HEIGHT = HEIGHT * 0.5f;
-}
-
+#include"ScreenSize/ScreenSize.h"
+#include"Color/Color.h"
 
 TitleMenuUI::TitleMenuUI()
 {
@@ -23,8 +12,7 @@ TitleMenuUI::TitleMenuUI()
     SEData_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/pushWatch.mp3");
     Audio::GetInstance()->SetSoundVolume(&SEData_, 1.0f);
 
-    /// @brief 初期化
-    FreeTypeManager::Initialize();
+
     //フォントハンドル
     fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
     FreeTypeManager::SetPixelSizes(fontHandle_, 64, 64);
@@ -91,6 +79,18 @@ void TitleMenuUI::Initialize()
 
 void TitleMenuUI::Update()
 {
+
+    fontTheta_ += SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime() * Function::kPi;
+    fontTheta_ = fmodf(fontTheta_, Function::kPi * 2.0f);
+    float fontAlpha = std::sinf(fontTheta_) * 0.5f + 0.5f;
+
+    pressSpaceText_.SetColor({ 1.0f,1.0f,1.0f,fontAlpha });
+    pressSpaceText_.UpdateLayout(false);
+
+    if (isStart_) {
+        return;
+    }
+
     if (PlayerCommand::GetInstance()->Shot()) {
         Audio::GetInstance()->SoundPlayWave(SEData_, false);
         if (isShowMenu_) {
@@ -144,9 +144,7 @@ void TitleMenuUI::Update()
         triangleText_.UpdateLayout(false);
     }
 
-    fontTheta_ += SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime() * Function::kPi;
-    fontTheta_ = fmodf(fontTheta_, Function::kPi * 2.0f);
-    float fontAlpha = std::sinf(fontTheta_) * 0.5f + 0.5f;
+
 
     if (rand() % 60 == 0) {
         Vector2 pos = titleDefaultPos_;
@@ -158,13 +156,17 @@ void TitleMenuUI::Update()
     }
     titleText_.UpdateLayout(false);
 
-    pressSpaceText_.SetColor({ 1.0f,1.0f,1.0f,fontAlpha });
-    pressSpaceText_.UpdateLayout(false);
+
 }
 
 void TitleMenuUI::Draw()
 {
     SpriteCommon::GetInstance()->DrawCommonFont();
+
+    pressSpaceText_.Draw();
+
+    if (isStart_) { return; }
+    //スタートしてないとき
     titleText_.Draw();
 
     if (isShowMenu_) {
@@ -173,8 +175,6 @@ void TitleMenuUI::Draw()
             text.Draw();
         }
     }
-    pressSpaceText_.Draw();
 
-    FreeTypeManager::ResetFontUsage();
 }
 
