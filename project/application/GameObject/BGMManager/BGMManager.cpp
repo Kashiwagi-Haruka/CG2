@@ -1,7 +1,7 @@
 #include "BGMManager.h"
 #include<cassert>
 #include<algorithm>
-
+#include"GameObject/YoshidaMath/Easing.h"
 std::unordered_map<BGMManager::Data, SoundData>BGMManager::BGMs_;
 bool BGMManager::isEdamameSound_ = false;
 void BGMManager::Load()
@@ -22,12 +22,9 @@ void BGMManager::Initialize()
 void BGMManager::Update()
 {
     if (isEdamameSound_) {
-        float vol = 1.0f - BGMs_[EDAMAME].volume;
-        vol = std::clamp(vol, 0.0f, 1.0f);
-        vol *= 0.125f;
-        SetVol(vol, BGM1);
+        SetVol(0.0f, BGM1);
     } else {
-        SetVol(0.125f, BGM1);
+        SetVol(0.25f, BGM1);
     }
 }
 

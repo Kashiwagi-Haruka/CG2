@@ -17,7 +17,7 @@ public:
     static void Initialize();
     static void Update();
     static void SetVol(float vol,const Data& data);
-    static void SoundPlay(const Data& data, const bool loop);
+    static void SoundPlay(const Data& data, const bool loop = false);
     static void UnLoad();
     static bool GetIsEdamameSound() { return isEdamameSound_; };
     static void SetIsEdamameSound(const bool flag) { isEdamameSound_ = flag; }

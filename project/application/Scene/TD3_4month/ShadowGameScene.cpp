@@ -151,7 +151,7 @@ void ShadowGameScene::Update()
         }
     }
 
-    BGMManager::Update();
+
 
     //if (isPause_) {
     //    return;
@@ -206,7 +206,6 @@ void ShadowGameScene::CheckCollision()
     //ホワイトボードとrayの当たり判定作成する
     portalManager_->CheckCollision();
     key_->CheckCollision();
-    edamame_->CheckCollision();
     door_->CheckCollision();
     vendingMac_->CheckCollision();
 

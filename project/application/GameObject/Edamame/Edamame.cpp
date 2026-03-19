@@ -6,6 +6,7 @@
 #include <GameObject/YoshidaMath/CollisionManager/Collider.h>
 #include"Object3d/Object3dCommon.h"
 #include"GameObject/BGMManager/BGMManager.h"
+
 Edamame::Edamame()
 {
     obj_ = std::make_unique<Object3d>();
@@ -41,7 +42,9 @@ void Edamame::Update()
 {
     obj_->SetTransform(worldTransform_);
     obj_->UpdateBillboard();
-
+    CheckCollision();
+    //枝豆知識
+    Trivia();
 }
 
 void Edamame::Draw()
@@ -81,11 +84,9 @@ void Edamame::CheckCollision()
                 BGMManager::SoundPlay(BGMManager::EDAMAME, false);
                 BGMManager::SetIsEdamameSound(true);
             }
-        }     
+        }    
     }
 
-    //枝豆知識
-    Trivia();
 }
 
 bool Edamame::OnCollisionRay()
@@ -104,7 +105,7 @@ void Edamame::Trivia()
         Vector3 distance = Function::Distance(playerCamera_->GetRay().origin, worldTransform_.translate);
         float  length = Function::Length(distance);
         float bgmVol = 0.0f;
-        float vol = 0.0f;
+        float vol = 0.0f; 
 
         if (length <= 50.0f) {
             if (length <= 1.0f) {
@@ -118,7 +119,7 @@ void Edamame::Trivia()
             bgmVol = 0.0f;
             vol = 0.0f;
             //枝豆サウンドを止める
-        /*    BGMManager::SetIsEdamameSound(false);*/
+            BGMManager::SetIsEdamameSound(false);
         }
 
         edamameTrivia_->SetVol(vol);
