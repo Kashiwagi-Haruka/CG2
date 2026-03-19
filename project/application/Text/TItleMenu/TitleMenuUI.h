@@ -1,6 +1,6 @@
 #pragma once
 
-#include"FreetypeManager/Text.h"
+#include"Text/Text.h"
 #include<array>
 #include <memory>
 #include"GameObject/YoshidaMath/RandomClass.h"

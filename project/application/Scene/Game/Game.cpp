@@ -1,6 +1,6 @@
 #include "Game.h"
 #include "SceneManager.h"
-#include"FreetypeManager/FreeTypeManager.h"
+#include"Text/FreetypeManager/FreeTypeManager.h"
 
 void Game::Initialize() {
 	FrameWork::Initialize();

@@ -5,6 +5,7 @@
 #include"GameObject/KeyBindConfig.h"
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/Player/Player.h"
+#include"ScreenSize/ScreenSize.h"
 
 RaySprite::RaySprite()
 {
@@ -22,7 +23,7 @@ void RaySprite::Initialize()
 	sprite_->SetAnchorPoint({ 0.5f,0.5f });
 	sprite_->SetRotation(0.0f);
 	sprite_->SetScale({ 128.0f,128.0f });
-	sprite_->SetPosition({WinApp::kClientWidth*0.5f,WinApp::kClientHeight*0.5f});
+	sprite_->SetPosition({ SCREEN_SIZE::HALF_WIDTH,SCREEN_SIZE::HALF_HEIGHT });
 	sprite_->SetColor({1.0f,1.0f,1.0f,1.0f});
 	sprite_->Update();
 }

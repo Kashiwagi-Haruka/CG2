@@ -159,9 +159,9 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application\FreetypeManager\Font\Font.cpp" />
-    <ClCompile Include="application\FreetypeManager\FreeTypeManager.cpp" />
-    <ClCompile Include="application\FreetypeManager\Text.cpp" />
+    <ClCompile Include="application\Text\FreetypeManager\Font\Font.cpp" />
+    <ClCompile Include="application\Text\FreetypeManager\FreeTypeManager.cpp" />
+    <ClCompile Include="application\Text\Text.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\Collider.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\Easing.cpp" />
@@ -271,8 +271,9 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Wall\Wall.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManager.cpp" />
     <ClCompile Include="application\GameObject\VendingMac\VendingMac.cpp" />
-    <ClCompile Include="application\FreetypeManager\TextUIManager.cpp" />
-    <ClCompile Include="application\FreetypeManager\TItleMenu\TitleMenuUI.cpp" />
+    <ClCompile Include="application\Text\TextUIManager\TextUIManager.cpp" />
+    <ClCompile Include="application\Text\TItleMenu\TitleMenuUI.cpp" />
+    <ClCompile Include="application\Text\FirstStory\FirstStory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -289,9 +290,11 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <None Include="Resources\shader\Sprite\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="application\FreetypeManager\Font\Font.h" />
-    <ClInclude Include="application\FreetypeManager\FreeTypeManager.h" />
-    <ClInclude Include="application\FreetypeManager\Text.h" />
+    <ClInclude Include="application\Color\Color.h" />
+    <ClInclude Include="application\ScreenSize\ScreenSize.h" />
+    <ClInclude Include="application\Text\FreetypeManager\Font\Font.h" />
+    <ClInclude Include="application\Text\FreetypeManager\FreeTypeManager.h" />
+    <ClInclude Include="application\Text\Text.h" />
     <ClInclude Include="application\GameObject\Key\Key.h" />
     <ClInclude Include="application\GameObject\Player\PlayerParameters.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\Collider.h" />
@@ -408,8 +411,9 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Wall\Wall.h" />
     <ClInclude Include="application\GameObject\Wall\WallManager.h" />
     <ClInclude Include="application\GameObject\VendingMac\VendingMac.h" />
-    <ClInclude Include="application\FreetypeManager\TextUIManager.h" />
-    <ClInclude Include="application\FreetypeManager\TItleMenu\TitleMenuUI.h" />
+    <ClInclude Include="application\Text\TextUIManager\TextUIManager.h" />
+    <ClInclude Include="application\Text\TItleMenu\TitleMenuUI.h" />
+    <ClInclude Include="application\Text\FirstStory\FirstStory.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

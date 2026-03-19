@@ -330,11 +330,12 @@
     <ClCompile Include="application\GameObject\Door\Door.cpp" />
     <ClCompile Include="application\GameObject\Door\AutoLockSystem.cpp" />
     <ClCompile Include="application\GameObject\Chair\ChairManager.cpp" />
-    <ClCompile Include="application\FreetypeManager\Text.cpp" />
-    <ClCompile Include="application\FreetypeManager\FreeTypeManager.cpp" />
-    <ClCompile Include="application\FreetypeManager\Font\Font.cpp" />
-    <ClCompile Include="application\FreetypeManager\TextUIManager.cpp" />
-    <ClCompile Include="application\FreetypeManager\TItleMenu\TitleMenuUI.cpp" />
+    <ClCompile Include="application\Text\Text.cpp" />
+    <ClCompile Include="application\Text\FreetypeManager\FreeTypeManager.cpp" />
+    <ClCompile Include="application\Text\FreetypeManager\Font\Font.cpp" />
+    <ClCompile Include="application\Text\TextUIManager\TextUIManager.cpp" />
+    <ClCompile Include="application\Text\TItleMenu\TitleMenuUI.cpp" />
+    <ClCompile Include="application\Text\FirstStory\FirstStory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -650,13 +651,16 @@
     <ClInclude Include="application\GameObject\Door\AutoLockSystem.h" />
     <ClInclude Include="application\GameObject\Chair\ChairManager.h" />
     <ClInclude Include="Engine\Texture\SkinningData.h" />
-    <ClInclude Include="application\FreetypeManager\Text.h" />
-    <ClInclude Include="application\FreetypeManager\FreeTypeManager.h" />
-    <ClInclude Include="application\FreetypeManager\Font\Font.h" />
+    <ClInclude Include="application\Text\Text.h" />
+    <ClInclude Include="application\Text\FreetypeManager\FreeTypeManager.h" />
+    <ClInclude Include="application\Text\FreetypeManager\Font\Font.h" />
     <ClInclude Include="application\GameObject\Player\PlayerParameters.h" />
-    <ClInclude Include="application\FreetypeManager\TextUIManager.h" />
+    <ClInclude Include="application\Text\TextUIManager\TextUIManager.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\RandomClass.h" />
-    <ClInclude Include="application\FreetypeManager\TItleMenu\TitleMenuUI.h" />
+    <ClInclude Include="application\Text\TItleMenu\TitleMenuUI.h" />
+    <ClInclude Include="application\Text\FirstStory\FirstStory.h" />
+    <ClInclude Include="application\ScreenSize\ScreenSize.h" />
+    <ClInclude Include="application\Color\Color.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

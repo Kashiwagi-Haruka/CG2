@@ -4,10 +4,21 @@
 #include"WinApp.h"
 #include"SpriteCommon.h"
 #include"DirectXCommon.h"
+#include"ScreenSize/ScreenSize.h"
 
+SoundData Text::voiceSE_;
+
+void Text::LoadSE()
+{
+    voiceSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/voiceSE.mp3");
+}
+void Text::UnLoadSE()
+{
+    Audio::GetInstance()->SoundUnload(&voiceSE_);
+}
 void Text::Initialize(uint32_t fontHandle) {
     fontHandle_ = fontHandle;
-    size_ = { static_cast<float>(WinApp::kClientWidth),static_cast<float>(WinApp::kClientHeight) };
+    size_ = {SCREEN_SIZE::WIDTH,SCREEN_SIZE::HEIGHT};
 }
 
 void Text::SetString(const std::u32string& text) {
@@ -59,7 +70,7 @@ void Text::Draw() {
 
 }
 
-void Text::Update()
+void Text::Update(const bool isSound)
 {
     if (isTyping_) {
         const float deltaTime = SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
@@ -68,6 +79,9 @@ void Text::Update()
             typeTimer_ -= typeSpeed_;
             if (visibleCharCount_ < text_.size()) {
                 visibleCharCount_++;
+                if (isSound&& visibleCharCount_%2 == 0) {
+                    Audio::GetInstance()->SoundPlayWave(voiceSE_, false);
+                }
                 UpdateLayout(); // レイアウト更新
             } else {
                 isTyping_ = false; // 全部表示し終わったら止める

@@ -3,7 +3,7 @@
 #include <externals/freetype/include/ft2build.h>
 //FT_FREETYPE_H はマクロです。
 #include FT_FREETYPE_H
-#include"application/FreetypeManager/Font/Font.h"
+#include"Text/FreetypeManager/Font/Font.h"
 
 //DirectX
 #include<wrl.h>
