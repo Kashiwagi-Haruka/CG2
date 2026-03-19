@@ -5,6 +5,8 @@
 #include "Sprite.h"
 #include <memory>
 #include"FreetypeManager/Text.h"
+#include"GameObject/YoshidaMath/RandomClass.h"
+
 #include<array>
 class GameBase;
 
@@ -35,11 +37,15 @@ class TitleScene : public BaseScene {
     std::array<Text, MAX_TEXT> menuText_;
     float fontTheta_ = 0.0f;
 
+    std::unique_ptr<RandomClass> random_ = nullptr;
+    Vector2 titleDefaultPos_ = { 0.0f };
 #pragma endregion
 
     bool isShowMenu_ = false;
     bool isSelectButton_ = false;
     uint32_t selectButtonNum_ = 0;
+
+
 public:
     TitleScene();
     ~TitleScene() override = default;

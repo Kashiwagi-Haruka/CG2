@@ -10,6 +10,7 @@
 #include"DirectXCommon.h"
 #include"Function.h"
 
+
 namespace COLOR {
     constexpr Vector4 RED = { 1.0f,0.0f,0.0f,1.0f };
     constexpr Vector4 WHITE = { 1.0f,1.0f,1.0f,1.0f };
@@ -33,6 +34,10 @@ TitleScene::TitleScene() {
     Audio::GetInstance()->SetSoundVolume(&SEData_, 1.0f);
 
     transition = std::make_unique<SceneTransition>();
+
+    random_ = std::make_unique<RandomClass>();
+
+    titleDefaultPos_ = { SCREEN_SIZE::HALF_WIDTH,240 };
 }
 
 void TitleScene::Finalize() {
@@ -50,7 +55,7 @@ void TitleScene::FirstSettingText()
     FreeTypeManager::SetPixelSizes(fontHandle_, 64, 64);
     titleText_.Initialize(fontHandle_);
     titleText_.SetString(U"p-再打刻");
-    titleText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH,240 });
+    titleText_.SetPosition(titleDefaultPos_);
     titleText_.SetColor(COLOR::WHITE);
     titleText_.SetAlign(TextAlign::Center);
     titleText_.SetBlendMode(BlendMode::kBlendModeAlpha);
@@ -64,13 +69,13 @@ void TitleScene::FirstSettingText()
     }
 
     menuText_[START_TEXT].SetString(U"出勤する");
-    menuText_[START_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH+128.0f ,SCREEN_SIZE::HALF_HEIGHT});
+    menuText_[START_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f ,SCREEN_SIZE::HALF_HEIGHT });
 
     menuText_[CONTINUE_TEXT].SetString(U"再打刻する");
-    menuText_[CONTINUE_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 128.0f,SCREEN_SIZE::HALF_HEIGHT + 64.0f });
+    menuText_[CONTINUE_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f,SCREEN_SIZE::HALF_HEIGHT + 64.0f });
 
     menuText_[OPTION_TEXT].SetString(U"オプション");
-    menuText_[OPTION_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 128.0f,SCREEN_SIZE::HALF_HEIGHT + 128.0f });
+    menuText_[OPTION_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f,SCREEN_SIZE::HALF_HEIGHT + 128.0f });
 
     triangleText_.Initialize(menuFontHandle_);
     triangleText_.SetString(U"▶");
@@ -85,7 +90,7 @@ void TitleScene::FirstSettingText()
 
     pressSpaceText_.Initialize(menuFontHandle_);
     pressSpaceText_.SetString(U"スペースor左クリック");
-    pressSpaceText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH,SCREEN_SIZE::HEIGHT-128.0f });
+    pressSpaceText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH,SCREEN_SIZE::HEIGHT - 128.0f });
     pressSpaceText_.SetColor(COLOR::WHITE);
     pressSpaceText_.SetAlign(TextAlign::Center);
     pressSpaceText_.SetBlendMode(BlendMode::kBlendModeAlpha);
@@ -103,6 +108,8 @@ void TitleScene::Initialize() {
     transition->Initialize(false);
     titleText_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
     selectButtonNum_ = 0;
+
+    random_->SetMinMax(-8.0f, 8.0f);
 }
 
 void TitleScene::Update() {
@@ -167,11 +174,19 @@ void TitleScene::Update() {
         triangleText_.UpdateLayout(false);
     }
 
-    titleText_.Update();
-    
-    fontTheta_ += SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime()*Function::kPi;
+    fontTheta_ += SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime() * Function::kPi;
     fontTheta_ = fmodf(fontTheta_, Function::kPi * 2.0f);
-    float fontAlpha = std::sinf(fontTheta_)*0.5f+0.5f;
+    float fontAlpha = std::sinf(fontTheta_) * 0.5f + 0.5f;
+
+    if (rand() % 60 == 0) {
+        Vector2 pos = titleDefaultPos_;
+        pos.x += random_->Get();
+        pos.y += random_->Get();
+        titleText_.SetPosition(pos);
+    } else {
+        titleText_.SetPosition(titleDefaultPos_);
+    }
+    titleText_.UpdateLayout(false);
 
 #ifdef USE_IMGUI
 
@@ -204,7 +219,7 @@ void TitleScene::Draw() {
 
     SpriteCommon::GetInstance()->DrawCommonFont();
     titleText_.Draw();
-  
+
     if (isShowMenu_) {
         triangleText_.Draw();
         for (auto& text : menuText_) {

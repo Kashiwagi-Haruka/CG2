@@ -151,7 +151,7 @@ void ShadowGameScene::Update()
         }
     }
 
-
+    BGMManager::Update();
 
     //if (isPause_) {
     //    return;

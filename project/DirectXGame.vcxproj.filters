@@ -654,6 +654,7 @@
     <ClInclude Include="application\FreetypeManager\Font\Font.h" />
     <ClInclude Include="application\GameObject\Player\PlayerParameters.h" />
     <ClInclude Include="application\FreetypeManager\TextUIManager.h" />
+    <ClInclude Include="application\GameObject\YoshidaMath\RandomClass.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

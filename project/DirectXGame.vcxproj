@@ -300,6 +300,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\KeyBindConfig.h" />
     <ClInclude Include="application\GameObject\Edamame\Edamame.h" />
     <ClInclude Include="application\GameObject\Chair\Chair.h" />
+    <ClInclude Include="application\GameObject\YoshidaMath\RandomClass.h" />
     <ClInclude Include="application\Scene\TD3_4month\CoffeeScene.h" />
     <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
     <ClInclude Include="application\GameObject\Edamame\EdamameTrivia.h" />
