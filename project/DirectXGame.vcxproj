@@ -272,6 +272,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Wall\WallManager.cpp" />
     <ClCompile Include="application\GameObject\VendingMac\VendingMac.cpp" />
     <ClCompile Include="application\FreetypeManager\TextUIManager.cpp" />
+    <ClCompile Include="application\FreetypeManager\TItleMenu\TitleMenuUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -408,6 +409,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Wall\WallManager.h" />
     <ClInclude Include="application\GameObject\VendingMac\VendingMac.h" />
     <ClInclude Include="application\FreetypeManager\TextUIManager.h" />
+    <ClInclude Include="application\FreetypeManager\TItleMenu\TitleMenuUI.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
