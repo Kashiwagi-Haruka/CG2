@@ -26,7 +26,5 @@ private:
     AABB localAABB_ = {};
     PlayerCamera* playerCamera_ = nullptr;
     Transform worldTransform_ = {};
-    SoundData edamameBGM_;
-    bool isPlaySound_ = false;
 };
 

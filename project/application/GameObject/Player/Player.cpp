@@ -64,6 +64,8 @@ std::optional<FootContactState> SampleFootContactState(
 }
 } // namespace
 
+bool Player::isGrab_ = false;
+
 Player::Player() {
     localAABB_ = {
         .min = {-0.25f, 0.0f, -0.25f},
@@ -86,6 +88,7 @@ void Player::SetCamera(Camera* camera) {
 }
 void Player::Initialize() {
 
+    isGrab_ = false;
     // 体の初期化
     bodyObj_->Initialize();
     // 体にモデル挿入
@@ -142,9 +145,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-
     bodyObj_->Draw();
-
 }
 
 void Player::Debug() {
