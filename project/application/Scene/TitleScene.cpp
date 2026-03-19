@@ -6,7 +6,8 @@
 #include <imgui.h>
 #include"Text/FreetypeManager/FreeTypeManager.h"
 #include"Function.h"
-
+#include"Object3d/Object3dCommon.h"
+#include"DirectXCommon.h"
 
 TitleScene::TitleScene() {
 
@@ -38,6 +39,8 @@ void TitleScene::Initialize() {
 }
 
 void TitleScene::Update() {
+
+
 
     if (!isBGMPlaying) {
         Audio::GetInstance()->SoundPlayWave(BGMData_, true);
@@ -71,6 +74,10 @@ void TitleScene::Update() {
 
 }
 void TitleScene::Draw() {
+
+
+    Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(true);
+    Object3dCommon::GetInstance()->SetVignetteStrength(true);
 
     titleMenuUI_->Draw();
     firstStory_->Draw();   

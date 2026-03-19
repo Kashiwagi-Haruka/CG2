@@ -47,7 +47,7 @@ void FirstStory::Update()
 
 void FirstStory::Draw()
 {
-    SpriteCommon::GetInstance()->DrawCommonFont();
+
     text_.Draw();
     //FreeTypeManager::ResetFontUsage();
 }

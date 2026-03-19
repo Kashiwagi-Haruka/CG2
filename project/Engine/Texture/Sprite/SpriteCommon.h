@@ -27,7 +27,7 @@ public:
 	void Finalize();
 	void DrawCommon();
 	void DrawCommonFont();
-
+	void SetBlendMode(const BlendMode& blendMode = BlendMode::kBlendModeAlpha) { blendMode_ = blendMode; }
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 
 	DirectXCommon* GetDxCommon() const { return dxCommon_; };

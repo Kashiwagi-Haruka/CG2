@@ -10,7 +10,7 @@
 TextUIManager::TextUIManager()
 {
 
-
+    FreeTypeManager::Initialize();
     fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
     FreeTypeManager::SetPixelSizes(fontHandle_, 24, 24);
     text_.Initialize(fontHandle_);
@@ -79,7 +79,7 @@ void TextUIManager::Update()
 
 void TextUIManager::Draw()
 {
-    SpriteCommon::GetInstance()->DrawCommonFont();
+
     edamameTrivia_.Draw();
 
     if (isDraw_) {
