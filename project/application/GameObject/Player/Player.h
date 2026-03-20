@@ -68,6 +68,8 @@ private:
 	bool CheckFootContact(Collider* collider, const char* jointName) const;
 	bool IsMovingHorizontally() const;
 	void PlayFootstepSE();
+	void UpdateMovementAnimation(bool isSneaking);
+	size_t FindAnimationIndex(const char* animationName, size_t fallbackIndex) const;
 
 public:
 	void OnCollision(Collider* collider) override;

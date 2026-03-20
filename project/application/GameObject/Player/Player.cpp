@@ -108,9 +108,10 @@ void Player::Initialize() {
     animationClips_ = Animation::LoadAnimationClips("Resources/TD3_3102/3d/gentleman", "gentleman");
 
     if (!animationClips_.empty()) {
-        currentAnimationIndex_ = 0;
-        bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
-    }
+		currentAnimationIndex_ = FindAnimationIndex("Walk", 0);
+		bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
+	}
+
 
     if (Model* walkModel = ModelManager::GetInstance()->FindModel("gentleman")) {
         skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
@@ -322,7 +323,29 @@ bool Player::CheckFootContact(Collider* collider, const char* jointName) const {
 }
 
 bool Player::IsMovingHorizontally() const { return std::abs(velocity_.x) > 0.01f || std::abs(velocity_.z) > 0.01f; }
+size_t Player::FindAnimationIndex(const char* animationName, size_t fallbackIndex) const {
+	const auto found =
+	    std::find_if(animationClips_.begin(), animationClips_.end(), [animationName](const Animation::AnimationData& clip) { return clip.name.find(animationName) != std::string::npos; });
+	if (found == animationClips_.end()) {
+		return std::min(fallbackIndex, animationClips_.empty() ? size_t{0} : animationClips_.size() - 1);
+	}
+	return static_cast<size_t>(std::distance(animationClips_.begin(), found));
+}
 
+void Player::UpdateMovementAnimation(bool isSneaking) {
+	if (animationClips_.empty()) {
+		return;
+	}
+
+	const size_t desiredAnimationIndex = isSneaking ? FindAnimationIndex("SneakWalk", 0) : FindAnimationIndex("Walk", 0);
+	if (currentAnimationIndex_ == desiredAnimationIndex) {
+		return;
+	}
+
+	currentAnimationIndex_ = desiredAnimationIndex;
+	animationTime_ = 0.0f;
+	bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
+}
 void Player::PlayFootstepSE() {
 	if (!IsMovingHorizontally() || soundTimer_ > 0.0f) {
 		return;
@@ -366,11 +389,7 @@ void Player::Animation()
     float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 
     auto* playerCommand = PlayerCommand::GetInstance();
-    if (playerCommand->Sneak()) {
-        //currentAnimationIndex_ = 1;
-    } else {
-        currentAnimationIndex_ = 0;
-    }
+	UpdateMovementAnimation(playerCommand->Sneak() || moveSpeed_ == parameters_.kSneakSpeed);
 
 
     if (skeleton_ && !animationClips_.empty()) {
