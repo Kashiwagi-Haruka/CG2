@@ -389,7 +389,7 @@ void Player::Animation()
     float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 
     auto* playerCommand = PlayerCommand::GetInstance();
-	UpdateMovementAnimation(playerCommand->Sneak() || moveSpeed_ == parameters_.kSneakSpeed);
+	UpdateMovementAnimation(playerCommand->Sneak());
 
 
     if (skeleton_ && !animationClips_.empty()) {
