@@ -25,6 +25,7 @@ public:
     void CheckCollision();
     void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
     static bool IsGetLightMessage() { return isSendGetLightMessage_; }
+    void UpdateSpotLight();
 private:
     bool OnCollisionRay();
 private:
@@ -33,7 +34,6 @@ private:
     std::unique_ptr<Object3d>obj_ = nullptr;
     //SpotLight
     SpotLight spotLight_;
-    bool isRotateY_ = false;
     bool isGetLight_ = false;
     static bool isSendGetLightMessage_;
 };

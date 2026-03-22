@@ -4,7 +4,7 @@
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
 #include"GameObject/Player/Player.h"
-
+#include"GameObject/Player/Player.h"
 bool Flashlight::isSendGetLightMessage_ = false;
 
 Flashlight::Flashlight()
@@ -12,7 +12,7 @@ Flashlight::Flashlight()
     obj_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/light", "light");
     obj_->SetModel("light");
-    SetAABB({ .min = {-0.1f,-0.2f,-0.1f},.max = {0.1f,0.1f,0.1f} });
+    SetAABB({ .min = {-0.1f,-0.1f,-0.1f},.max = {0.1f,0.1f,0.1f} });
     SetCollisionAttribute(kCollisionItem);
     SetCollisionMask(kCollisionPlayer);
 }
@@ -20,7 +20,6 @@ Flashlight::Flashlight()
 void Flashlight::OnCollision(Collider* collider)
 {
     if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-        isRotateY_ = true;
     }
 }
 
@@ -37,30 +36,36 @@ void Flashlight::SetCamera(Camera* camera)
 
 void Flashlight::Update()
 {
-    if (isRotateY_) {
-        transform_.rotate.y += YoshidaMath::kDeltaTime;
-        obj_->SetRotate(transform_.rotate);
-    }
-    isRotateY_ = false;
+    isSendGetLightMessage_ = false;
 
-    obj_->SetTransform(transform_);
+    CheckCollision();
+
+    if (isGetLight_) {
+
+        Matrix4x4 child = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+        child = Function::Multiply(child, playerCamera_->GetCamera()->GetWorldMatrix());
+        obj_->SetWorldMatrix(child);
+
+    } else {
+        //y座標を固定する
+        transform_.translate.y = std::clamp(transform_.translate.y, 0.0f, 2.4f);
+        obj_->SetTransform(transform_);
+    }
+
+
     obj_->Update();
    
-    spotLight_.position = obj_->GetTranslate();
-    spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
-    spotLight_.intensity = 10.0f;
+    UpdateSpotLight();
    
 }
 
 void Flashlight::Initialize()
 {
-
-    isRotateY_ = false;
     isGetLight_ = false;
     isSendGetLightMessage_ = false;
 
     obj_->Initialize();
-    transform_.translate = {8.0f,0.1f,1.0f};
+    transform_.translate = {4.0f,0.1f,1.0f};
     transform_.rotate = { 0.0f,0.0f,0.0f };
     transform_.scale = { 1.0f,1.0f,1.0f };
     SetLight();
@@ -92,30 +97,32 @@ void Flashlight::CheckCollision()
         if (Player::GetIsGrab()) {
             isGetLight_ = false;
             Player::SetIsGrab(false);
+            transform_.translate =  GetWorldPosition();
         } else {
             if (OnCollisionRay()) {
                 isGetLight_ = true;
                 Player::SetIsGrab(true);
                 isSendGetLightMessage_ = true;
+                transform_.translate = { -0.2f,0.0f,0.25f };
+                transform_.rotate = { 0.0f,Function::kPi,0.0f };
+                transform_.scale = { 1.0f,1.0f,1.0f };
             }
 
         }
 
     }
 
-    if (isGetLight_) {
-        // カーソルに追従させて持ち上げる処理
-        Vector3 origin = playerCamera_->GetTransform().translate;
-        transform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
-        transform_.translate.y = (std::max)(transform_.translate.y, 0.0f);
 
-    } 
+}
 
-    //y座標を固定する
-    transform_.translate.y = std::clamp(transform_.translate.y, 0.0f, 2.4f);
+void Flashlight::UpdateSpotLight()
+{
+    spotLight_.position = GetWorldPosition();
+    spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
+    spotLight_.intensity = 10.0f;
 }
 
 bool Flashlight::OnCollisionRay()
 {
-     return playerCamera_->OnCollisionRay(GetAABB(), transform_.translate);
+     return playerCamera_->OnCollisionRay(GetAABB(), GetWorldPosition());
 }

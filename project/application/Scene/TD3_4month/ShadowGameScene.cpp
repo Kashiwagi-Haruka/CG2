@@ -66,7 +66,7 @@ ShadowGameScene::ShadowGameScene()
     chairManager_->SetPlayerCamera(playerCamera_.get());
     vendingMac_->SetPlayerCamera(playerCamera_.get());
     door_->SetPlayerCamera(playerCamera_.get());
-
+    flashlight_->SetPlayerCamera(playerCamera_.get());
 
 }
 
@@ -387,8 +387,7 @@ void ShadowGameScene::UpdateGameObject()
 #pragma region//ゲームオブジェクト
 
 
-     //懐中電灯
-    flashlight_->Update();
+
     spotLights_[1] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
     areaLights_[3] = wallManager_->GetAreaLight();
@@ -405,6 +404,8 @@ void ShadowGameScene::UpdateGameObject()
     player_->Update();
     //携帯打刻機
     timeCardWatch_->Update();
+    //懐中電灯
+    flashlight_->Update();
     //鍵
     key_->Update();
     //枝豆管理
