@@ -345,7 +345,7 @@ void Player::Gravity() {
 void Player::OnCollision(Collider* collider) {
     UpdateFootContact(collider);
 
-    if (collider->GetCollisionAttribute() != kCollisionMat) {
+    if (collider->GetCollisionAttribute() != kCollisionMat&& collider->GetCollisionAttribute() != kCollisionItem) {
         // マットじゃなかったら
         OnCollisionObstacle();
     }
