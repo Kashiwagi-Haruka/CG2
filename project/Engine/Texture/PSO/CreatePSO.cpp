@@ -148,12 +148,10 @@ void CreatePSO::CreateRootSignature() {
 	descriptorRange[8].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange[8].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	if (useSkinning_) {
-		descriptorRange[6].BaseShaderRegister = 0;
-		descriptorRange[6].NumDescriptors = 1;
-		descriptorRange[6].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-		descriptorRange[6].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-	}
+	descriptorRange[9].BaseShaderRegister = 9;
+	descriptorRange[9].NumDescriptors = 1;
+	descriptorRange[9].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[9].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
@@ -215,8 +213,8 @@ void CreatePSO::CreateRootSignature() {
 
 	rootParameters[13].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[13].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[16].DescriptorTable.pDescriptorRanges = &descriptorRange[9];
-	rootParameters[16].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[13].DescriptorTable.pDescriptorRanges = &descriptorRange[6];
+	rootParameters[13].DescriptorTable.NumDescriptorRanges = 1;
 
 	rootParameters[14].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[14].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
@@ -235,7 +233,7 @@ void CreatePSO::CreateRootSignature() {
 		rootParameters[16].DescriptorTable.NumDescriptorRanges = 1;
 	}
 	descriptionRootSignature.pParameters = rootParameters;
-	descriptionRootSignature.NumParameters = useSkinning_ ? 17 : 16;
+	descriptionRootSignature.NumParameters = useSkinning_ ? _countof(rootParameters) : _countof(rootParameters) - 1;
 
 	D3D12_STATIC_SAMPLER_DESC staticSampler[1] = {};
 	staticSampler[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
