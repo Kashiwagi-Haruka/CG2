@@ -87,9 +87,9 @@ void DebugCamera::Update() {
 	transform_.rotate.y += dYaw;
 
 	const Matrix4x4 pivotMat = Function::MakeTranslateMatrix(pivot_);
-	const Matrix4x4 scaleMat = Function::MakeScaleMatrix(scale_);
-	const Matrix4x4 offsetMat = Function::MakeTranslateMatrix(translation_);
-	const Matrix4x4 pivotCameraMatrix = Function::Multiply(Function::Multiply(Function::Multiply(pivotMat, matRot_), scaleMat), offsetMat);
+	const Vector3 zoomedTranslation = translation_ * scale_.x;
+	const Matrix4x4 offsetMat = Function::MakeTranslateMatrix(zoomedTranslation);
+	const Matrix4x4 pivotCameraMatrix = Function::Multiply(Function::Multiply(pivotMat, matRot_), offsetMat);
 
 	transform_.scale = scale_;
 	transform_.translate = {pivotCameraMatrix.m[3][0], pivotCameraMatrix.m[3][1], pivotCameraMatrix.m[3][2]};
