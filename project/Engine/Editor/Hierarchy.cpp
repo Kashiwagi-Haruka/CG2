@@ -7,6 +7,7 @@
 #include "Engine/Audio/Audio.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
+#include "Input.h"
 #include "Object3d/Object3d.h"
 #include "Object3d/Object3dCommon.h"
 #include "Primitive/Primitive.h"
@@ -147,8 +148,61 @@ void Hierarchy::Finalize() {
 	selectionBoxDirty_ = true;
 	editorGridDirty_ = true;
 	loadedSceneName_.clear();
+	isEditorPreviewCameraInitialized_ = false;
+	wasEditorPreviewActiveLastFrame_ = false;
 	ResetForSceneChange();
 }
+bool Hierarchy::IsEditorPreviewActive() const { return HasRegisteredObjects() && !isPlaying_; }
+
+void Hierarchy::UpdateEditorPreview() {
+	if (!IsEditorPreviewActive()) {
+		wasEditorPreviewActiveLastFrame_ = false;
+		return;
+	}
+
+	Object3dCommon* object3dCommon = Object3dCommon::GetInstance();
+	if (!object3dCommon) {
+		wasEditorPreviewActiveLastFrame_ = false;
+		return;
+	}
+
+	Camera* sceneCamera = object3dCommon->GetDefaultCamera();
+	if (!sceneCamera) {
+		wasEditorPreviewActiveLastFrame_ = false;
+		return;
+	}
+
+	if (!isEditorPreviewCameraInitialized_ || !wasEditorPreviewActiveLastFrame_) {
+		editorPreviewCamera_.Initialize();
+		editorPreviewCamera_.SetTransform(sceneCamera->GetTransform());
+		isEditorPreviewCameraInitialized_ = true;
+	}
+
+	Input* input = Input::GetInstance();
+	if (input) {
+		input->SetIsCursorVisible(true);
+		input->SetIsCursorStability(false);
+	}
+
+	editorPreviewCamera_.Update();
+	sceneCamera->SetViewProjectionMatrix(editorPreviewCamera_.GetViewMatrix(), editorPreviewCamera_.GetProjectionMatrix());
+	object3dCommon->SetDefaultCamera(sceneCamera);
+
+	for (Object3d* object : objects_) {
+		if (object) {
+			object->Update();
+		}
+	}
+
+	for (Primitive* primitive : primitives_) {
+		if (primitive) {
+			primitive->Update();
+		}
+	}
+
+	wasEditorPreviewActiveLastFrame_ = true;
+}
+
 std::string Hierarchy::GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const {
 	const SceneManager* sceneManager = SceneManager::GetInstance();
 	if (!sceneManager) {
@@ -179,6 +233,8 @@ void Hierarchy::ResetForSceneChange() {
 	editorLightState_.pointLights.clear();
 	editorLightState_.spotLights.clear();
 	editorLightState_.areaLights.clear();
+	isEditorPreviewCameraInitialized_ = false;
+	wasEditorPreviewActiveLastFrame_ = false;
 	Object3dCommon::GetInstance()->SetEditorLightOverride(false);
 }
 
@@ -986,7 +1042,12 @@ void Hierarchy::DrawGridEditor() {
 	gridSnapSpacing_ = std::max(gridSnapSpacing_, 0.1f);
 	gridHalfLineCount_ = std::max(gridHalfLineCount_, 1);
 }
-void Hierarchy::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
+void Hierarchy::SetPlayMode(bool isPlaying) {
+	isPlaying_ = isPlaying;
+	if (isPlaying_) {
+		wasEditorPreviewActiveLastFrame_ = false;
+	}
+}
 
 void Hierarchy::DrawEditorGridLines() {
 #ifdef USE_IMGUI

@@ -16,6 +16,7 @@
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
 #include "Engine/Audio/Audio.h"
+#include "Engine/Camera/DebugCamera.h"
 
 class Object3d;
 class Primitive;
@@ -31,8 +32,10 @@ public:
 	bool HasRegisteredObjects() const;
 	void DrawObjectEditors();
 	void DrawEditorGridLines();
+	void UpdateEditorPreview();
 	void SetPlayMode(bool isPlaying);
 	bool IsPlayMode() const { return isPlaying_; }
+	bool IsEditorPreviewActive() const;
 	bool LoadObjectEditorsFromJsonIfExists(const std::string& filePath);
 	void Finalize();
 
@@ -111,4 +114,7 @@ private:
 	std::unordered_map<std::string, float> savedAudioVolumes_;
 	std::unordered_map<std::string, bool> savedAudioLoopEnabled_;
 	std::unordered_map<std::string, std::vector<Audio::MixerEffectSettings>> savedAudioEffects_;
+	DebugCamera editorPreviewCamera_{};
+	bool isEditorPreviewCameraInitialized_ = false;
+	bool wasEditorPreviewActiveLastFrame_ = false;
 };

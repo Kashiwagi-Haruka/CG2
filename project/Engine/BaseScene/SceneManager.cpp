@@ -53,7 +53,12 @@ void SceneManager::Update() {
 	}
 
 	if (scene_) {
-		scene_->Update();
+		Hierarchy* hierarchy = Hierarchy::GetInstance();
+		if (hierarchy && hierarchy->IsEditorPreviewActive()) {
+			hierarchy->UpdateEditorPreview();
+		} else {
+			scene_->Update();
+		}
 	}
 }
 
