@@ -105,13 +105,22 @@ private:
 	// 環境マップのSRVインデックス
 	uint32_t environmentMapSrvIndex_ = 0;
 	// シャドウマップのSRVインデックス
-	uint32_t shadowMapSrvIndex_ = 0;
+	uint32_t directionalShadowMapSrvIndex_ = 0;
+	uint32_t pointShadowMapSrvIndex_ = 0;
+	uint32_t spotShadowMapSrvIndex_ = 0;
+	uint32_t areaShadowMapSrvIndex_ = 0;
 	// 現在利用中の環境マップパス
 	std::string environmentMapPath_;
 	// シャドウマップ深度テクスチャ
-	Microsoft::WRL::ComPtr<ID3D12Resource> shadowMapResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalShadowMapResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointShadowMapResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> spotShadowMapResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> areaShadowMapResource_ = nullptr;
 	// シャドウマップ描画用DSVヒープ
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> shadowDsvHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> directionalShadowDsvHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pointShadowDsvHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> spotShadowDsvHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> areaShadowDsvHeap_ = nullptr;
 	// シャドウマップ描画用ビューポート
 	D3D12_VIEWPORT shadowViewport_{};
 	// シャドウマップ描画用シザー矩形
@@ -120,6 +129,10 @@ private:
 	static constexpr uint32_t kShadowMapSize_ = 2048;
 	// シャドウマップパス中かどうかのフラグ
 	bool isShadowMapPassActive_ = false;
+	bool directionalShadowEnabled_ = true;
+	bool pointShadowEnabled_ = false;
+	bool spotShadowEnabled_ = false;
+	bool areaShadowEnabled_ = false;
 	// シャドウ計算用ライト位置
 	Vector3 shadowLightPosition_ = {0.0f, 80.0f, 0.0f};
 	// シャドウ投影用近クリップ距離
@@ -233,7 +246,10 @@ public:
 	// 環境マップSRVインデックス取得
 	uint32_t GetEnvironmentMapSrvIndex() const { return environmentMapSrvIndex_; }
 	// シャドウマップSRVインデックス取得
-	uint32_t GetShadowMapSrvIndex() const { return shadowMapSrvIndex_; }
+	uint32_t GetDirectionalShadowMapSrvIndex() const { return directionalShadowMapSrvIndex_; }
+	uint32_t GetPointShadowMapSrvIndex() const { return pointShadowMapSrvIndex_; }
+	uint32_t GetSpotShadowMapSrvIndex() const { return spotShadowMapSrvIndex_; }
+	uint32_t GetAreaShadowMapSrvIndex() const { return areaShadowMapSrvIndex_; }
 	// シャドウマップパス状態取得
 	bool IsShadowMapPassActive() const { return isShadowMapPassActive_; }
 
@@ -260,6 +276,19 @@ public:
 
 	// ディレクショナルライト視点のViewProjection行列取得
 	Matrix4x4 GetDirectionalLightViewProjectionMatrix() const;
+	Matrix4x4 GetPointLightViewProjectionMatrix() const;
+	Matrix4x4 GetSpotLightViewProjectionMatrix() const;
+	Matrix4x4 GetAreaLightViewProjectionMatrix() const;
+	void SetShadowMapEnabled(bool directional, bool point, bool spot, bool area) {
+		directionalShadowEnabled_ = directional;
+		pointShadowEnabled_ = point;
+		spotShadowEnabled_ = spot;
+		areaShadowEnabled_ = area;
+	}
+	bool IsDirectionalShadowEnabled() const { return directionalShadowEnabled_; }
+	bool IsPointShadowEnabled() const { return pointShadowEnabled_; }
+	bool IsSpotShadowEnabled() const { return spotShadowEnabled_; }
+	bool IsAreaShadowEnabled() const { return areaShadowEnabled_; }
 
 	// 全画面グレースケールの有効化切り替え
 	void SetFullScreenGrayscaleEnabled(bool enable) { fullScreenGrayscaleEnabled_ = enable; }

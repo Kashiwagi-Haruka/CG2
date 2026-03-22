@@ -154,7 +154,10 @@ void Object3d::UpdateCameraMatrices() {
 
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
-	transformationMatrixData_->LightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetDirectionalLightViewProjectionMatrix());
+	transformationMatrixData_->DirectionalLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetDirectionalLightViewProjectionMatrix());
+	transformationMatrixData_->PointLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetPointLightViewProjectionMatrix());
+	transformationMatrixData_->SpotLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetSpotLightViewProjectionMatrix());
+	transformationMatrixData_->AreaLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetAreaLightViewProjectionMatrix());
 	transformationMatrixData_->WorldInverseTranspose = Function::Inverse(worldMatrix);
 	transformResource_->Unmap(0, nullptr);
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));

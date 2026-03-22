@@ -13,7 +13,8 @@ struct AreaLight {
 	float height;
 	float radius;
 	float decay;
-	float padding;
+	int32_t shadowEnabled;
+	float padding[3];
 };
 struct AreaLightCount {
 	uint32_t count;

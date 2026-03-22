@@ -119,7 +119,10 @@ void Model::Draw(const SkinCluster* skinCluster, const ID3D12Resource* materialR
 	// --- Environment Map SRVのDescriptorTableを設定 ---
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(11, Object3dCommon::GetInstance()->GetEnvironmentMapSrvIndex());
 	if (!Object3dCommon::GetInstance()->IsShadowMapPassActive()) {
-		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetShadowMapSrvIndex());
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetDirectionalShadowMapSrvIndex());
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(13, Object3dCommon::GetInstance()->GetPointShadowMapSrvIndex());
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(14, Object3dCommon::GetInstance()->GetSpotShadowMapSrvIndex());
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(15, Object3dCommon::GetInstance()->GetAreaShadowMapSrvIndex());
 	}
 	// --- 描画！（DrawCall）---
 	if (!modelData_.indices.empty()) {

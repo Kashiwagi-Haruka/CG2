@@ -171,7 +171,10 @@ void InstancedObject3d::UpdateCameraMatrices() {
 
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
-	transformationMatrixData_->LightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetDirectionalLightViewProjectionMatrix());
+	transformationMatrixData_->DirectionalLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetDirectionalLightViewProjectionMatrix());
+	transformationMatrixData_->PointLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetPointLightViewProjectionMatrix());
+	transformationMatrixData_->SpotLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetSpotLightViewProjectionMatrix());
+	transformationMatrixData_->AreaLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetAreaLightViewProjectionMatrix());
 	transformationMatrixData_->WorldInverseTranspose = Function::Inverse(worldMatrix);
 	transformResource_->Unmap(0, nullptr);
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
@@ -220,7 +223,10 @@ void InstancedObject3d::Draw() {
 		instanceTransformResources_[i]->Map(0, nullptr, reinterpret_cast<void**>(&instanceMatrixData));
 		instanceMatrixData->WVP = worldViewProjectionMatrix;
 		instanceMatrixData->World = worldMatrix;
-		instanceMatrixData->LightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetDirectionalLightViewProjectionMatrix());
+		instanceMatrixData->DirectionalLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetDirectionalLightViewProjectionMatrix());
+		instanceMatrixData->PointLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetPointLightViewProjectionMatrix());
+		instanceMatrixData->SpotLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetSpotLightViewProjectionMatrix());
+		instanceMatrixData->AreaLightWVP = Function::Multiply(worldMatrix, Object3dCommon::GetInstance()->GetAreaLightViewProjectionMatrix());
 		instanceMatrixData->WorldInverseTranspose = Function::Inverse(worldMatrix);
 		instanceTransformResources_[i]->Unmap(0, nullptr);
 

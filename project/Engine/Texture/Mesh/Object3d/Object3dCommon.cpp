@@ -10,6 +10,40 @@
 #include <cmath>
 #include <cstring>
 
+namespace {
+struct ShadowRenderTarget {
+	Microsoft::WRL::ComPtr<ID3D12Resource>* resource;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>* dsvHeap;
+	uint32_t* srvIndex;
+};
+
+void CreateShadowRenderTarget(DirectXCommon* dxCommon, const D3D12_HEAP_PROPERTIES& heapProps, const D3D12_RESOURCE_DESC& shadowDesc, const D3D12_CLEAR_VALUE& clearValue, ShadowRenderTarget target) {
+	HRESULT hr = dxCommon->GetDevice()->CreateCommittedResource(
+	    &heapProps, D3D12_HEAP_FLAG_NONE, &shadowDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(target.resource->ReleaseAndGetAddressOf()));
+	assert(SUCCEEDED(hr));
+	*target.dsvHeap = dxCommon->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dxCommon->GetDevice()->CreateDepthStencilView(target.resource->Get(), &dsvDesc, (*target.dsvHeap)->GetCPUDescriptorHandleForHeapStart());
+	*target.srvIndex = TextureManager::GetInstance()->GetSrvManager()->Allocate();
+	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforTexture2D(*target.srvIndex, target.resource->Get(), DXGI_FORMAT_R32_FLOAT, 1);
+}
+
+void TransitionShadowResource(DirectXCommon* dxCommon, ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
+	if (!resource || before == after) {
+		return;
+	}
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = resource;
+	barrier.Transition.StateBefore = before;
+	barrier.Transition.StateAfter = after;
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	dxCommon->GetCommandList()->ResourceBarrier(1, &barrier);
+}
+} // namespace
+
 std::unique_ptr<Object3dCommon> Object3dCommon::instance = nullptr;
 
 Object3dCommon::Object3dCommon() {}
@@ -139,18 +173,10 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	clearValue.Format = DXGI_FORMAT_D32_FLOAT;
 	clearValue.DepthStencil.Depth = 1.0f;
 
-	HRESULT shadowHr =
-	    dxCommon_->GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &shadowDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&shadowMapResource_));
-	assert(SUCCEEDED(shadowHr));
-
-	shadowDsvHeap_ = dxCommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
-	D3D12_DEPTH_STENCIL_VIEW_DESC shadowDsvDesc{};
-	shadowDsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	shadowDsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	dxCommon_->GetDevice()->CreateDepthStencilView(shadowMapResource_.Get(), &shadowDsvDesc, shadowDsvHeap_->GetCPUDescriptorHandleForHeapStart());
-
-	shadowMapSrvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
-	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforTexture2D(shadowMapSrvIndex_, shadowMapResource_.Get(), DXGI_FORMAT_R32_FLOAT, 1);
+	CreateShadowRenderTarget(dxCommon_, heapProps, shadowDesc, clearValue, {&directionalShadowMapResource_, &directionalShadowDsvHeap_, &directionalShadowMapSrvIndex_});
+	CreateShadowRenderTarget(dxCommon_, heapProps, shadowDesc, clearValue, {&pointShadowMapResource_, &pointShadowDsvHeap_, &pointShadowMapSrvIndex_});
+	CreateShadowRenderTarget(dxCommon_, heapProps, shadowDesc, clearValue, {&spotShadowMapResource_, &spotShadowDsvHeap_, &spotShadowMapSrvIndex_});
+	CreateShadowRenderTarget(dxCommon_, heapProps, shadowDesc, clearValue, {&areaShadowMapResource_, &areaShadowDsvHeap_, &areaShadowMapSrvIndex_});
 
 	shadowViewport_.TopLeftX = 0.0f;
 	shadowViewport_.TopLeftY = 0.0f;
@@ -186,6 +212,10 @@ void Object3dCommon::DrawSet(){
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, Object3dCommon::GetInstance()->GetPointLightCountResource()->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, Object3dCommon::GetInstance()->GetSpotLightCountResource()->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(7, Object3dCommon::GetInstance()->GetAreaLightCountResource()->GetGPUVirtualAddress());
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, directionalShadowMapSrvIndex_);
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(13, pointShadowMapSrvIndex_);
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(14, spotShadowMapSrvIndex_);
+	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(15, areaShadowMapSrvIndex_);
 }
 void Object3dCommon::DrawCommon() {
 
@@ -296,19 +326,18 @@ void Object3dCommon::DrawCommonShadow() {
 }
 
 void Object3dCommon::BeginShadowMapPass() {
-	if (!shadowMapResource_) {
+	ID3D12Resource* resource = directionalShadowEnabled_ ? directionalShadowMapResource_.Get()
+	                                                     : (pointShadowEnabled_ ? pointShadowMapResource_.Get()
+	                                                                            : (spotShadowEnabled_ ? spotShadowMapResource_.Get() : (areaShadowEnabled_ ? areaShadowMapResource_.Get() : nullptr)));
+	ID3D12DescriptorHeap* dsvHeap =
+	    directionalShadowEnabled_ ? directionalShadowDsvHeap_.Get()
+	                              : (pointShadowEnabled_ ? pointShadowDsvHeap_.Get() : (spotShadowEnabled_ ? spotShadowDsvHeap_.Get() : (areaShadowEnabled_ ? areaShadowDsvHeap_.Get() : nullptr)));
+	if (!resource || !dsvHeap) {
 		return;
 	}
 	isShadowMapPassActive_ = true;
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Transition.pResource = shadowMapResource_.Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = shadowDsvHeap_->GetCPUDescriptorHandleForHeapStart();
+	TransitionShadowResource(dxCommon_, resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
 	dxCommon_->GetCommandList()->OMSetRenderTargets(0, nullptr, false, &dsvHandle);
 	dxCommon_->GetCommandList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	dxCommon_->GetCommandList()->RSSetViewports(1, &shadowViewport_);
@@ -316,18 +345,16 @@ void Object3dCommon::BeginShadowMapPass() {
 }
 
 void Object3dCommon::EndShadowMapPass() {
-	if (!shadowMapResource_) {
+	ID3D12Resource* resource = directionalShadowEnabled_ ? directionalShadowMapResource_.Get()
+	                                                     : (pointShadowEnabled_ ? pointShadowMapResource_.Get()
+	                                                                            : (spotShadowEnabled_ ? spotShadowMapResource_.Get() : (areaShadowEnabled_ ? areaShadowMapResource_.Get() : nullptr)));
+	if (!resource) {
 		return;
 	}
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Transition.pResource = shadowMapResource_.Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
+	TransitionShadowResource(dxCommon_, resource, D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	isShadowMapPassActive_ = false;
 }
+
 void Object3dCommon::SetDirectionalLight(DirectionalLight& light) {
 	*directionalLightData_ = light;
 	directionalLightData_->direction = Function::Normalize(directionalLightData_->direction);
@@ -360,6 +387,93 @@ Matrix4x4 Object3dCommon::GetDirectionalLightViewProjectionMatrix() const {
 	Matrix4x4 lightProjection = Function::MakeOrthographicMatrix(-shadowOrthoHalfWidth_, shadowOrthoHalfHeight_, shadowOrthoHalfWidth_, -shadowOrthoHalfHeight_, shadowCameraNear_, shadowCameraFar_);
 	return Function::Multiply(lightView, lightProjection);
 }
+Matrix4x4 Object3dCommon::GetPointLightViewProjectionMatrix() const {
+	Vector3 lightPosition = pointLightCountData_ && pointLightCountData_->count > 0 ? pointlightData_[0].position : shadowLightPosition_;
+	Vector3 target = {0.0f, 0.0f, 0.0f};
+	Vector3 lightDirection = Function::Normalize(target - lightPosition);
+	if (Function::Length(lightDirection) < 1.0e-5f) {
+		lightDirection = {0.0f, -1.0f, 0.0f};
+	}
+	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
+	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
+	const Vector3 cameraUp = Function::Cross(lightDirection, right);
+	Matrix4x4 view = Function::MakeIdentity4x4();
+	view.m[0][0] = right.x;
+	view.m[1][0] = right.y;
+	view.m[2][0] = right.z;
+	view.m[0][1] = cameraUp.x;
+	view.m[1][1] = cameraUp.y;
+	view.m[2][1] = cameraUp.z;
+	view.m[0][2] = lightDirection.x;
+	view.m[1][2] = lightDirection.y;
+	view.m[2][2] = lightDirection.z;
+	view.m[3][0] = -Function::Dot(lightPosition, right);
+	view.m[3][1] = -Function::Dot(lightPosition, cameraUp);
+	view.m[3][2] = -Function::Dot(lightPosition, lightDirection);
+	Matrix4x4 proj = Function::MakePerspectiveFovMatrix(0.9f, 1.0f, shadowCameraNear_, shadowCameraFar_);
+	return Function::Multiply(view, proj);
+}
+
+Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
+	Vector3 lightPosition = shadowLightPosition_;
+	Vector3 lightDirection = {0.0f, -1.0f, 0.0f};
+	float fov = 0.9f;
+	if (spotLightCountData_ && spotLightCountData_->count > 0) {
+		const SpotLight& light = spotLightData_[0];
+		lightPosition = light.position;
+		lightDirection = Function::Normalize(light.direction);
+		fov = std::max(0.1f, std::acos(std::clamp(light.cosAngle, -1.0f, 1.0f)) * 2.0f);
+	}
+	Vector3 target = lightPosition + lightDirection;
+	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
+	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
+	const Vector3 cameraUp = Function::Cross(lightDirection, right);
+	Matrix4x4 view = Function::MakeIdentity4x4();
+	view.m[0][0] = right.x;
+	view.m[1][0] = right.y;
+	view.m[2][0] = right.z;
+	view.m[0][1] = cameraUp.x;
+	view.m[1][1] = cameraUp.y;
+	view.m[2][1] = cameraUp.z;
+	view.m[0][2] = lightDirection.x;
+	view.m[1][2] = lightDirection.y;
+	view.m[2][2] = lightDirection.z;
+	view.m[3][0] = -Function::Dot(lightPosition, right);
+	view.m[3][1] = -Function::Dot(lightPosition, cameraUp);
+	view.m[3][2] = -Function::Dot(lightPosition, lightDirection);
+	Matrix4x4 proj = Function::MakePerspectiveFovMatrix(fov, 1.0f, shadowCameraNear_, shadowCameraFar_);
+	return Function::Multiply(view, proj);
+}
+
+Matrix4x4 Object3dCommon::GetAreaLightViewProjectionMatrix() const {
+	Vector3 lightPosition = shadowLightPosition_;
+	Vector3 lightDirection = {0.0f, -1.0f, 0.0f};
+	if (areaLightCountData_ && areaLightCountData_->count > 0) {
+		const AreaLight& light = areaLightData_[0];
+		lightPosition = light.position;
+		lightDirection = -Function::Normalize(light.normal);
+	}
+	const Vector3 target = lightPosition + lightDirection;
+	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
+	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
+	const Vector3 cameraUp = Function::Cross(lightDirection, right);
+	Matrix4x4 view = Function::MakeIdentity4x4();
+	view.m[0][0] = right.x;
+	view.m[1][0] = right.y;
+	view.m[2][0] = right.z;
+	view.m[0][1] = cameraUp.x;
+	view.m[1][1] = cameraUp.y;
+	view.m[2][1] = cameraUp.z;
+	view.m[0][2] = lightDirection.x;
+	view.m[1][2] = lightDirection.y;
+	view.m[2][2] = lightDirection.z;
+	view.m[3][0] = -Function::Dot(lightPosition, right);
+	view.m[3][1] = -Function::Dot(lightPosition, cameraUp);
+	view.m[3][2] = -Function::Dot(lightPosition, lightDirection);
+	Matrix4x4 proj = Function::MakeOrthographicMatrix(-shadowOrthoHalfWidth_, shadowOrthoHalfHeight_, shadowOrthoHalfWidth_, -shadowOrthoHalfHeight_, shadowCameraNear_, shadowCameraFar_);
+	return Function::Multiply(view, proj);
+}
+
 void Object3dCommon::SetBlendMode(BlendMode blendMode) {
 	blendMode_ = blendMode;
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get());

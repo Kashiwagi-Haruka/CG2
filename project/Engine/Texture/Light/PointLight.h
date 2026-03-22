@@ -10,7 +10,8 @@ struct PointLight {
 	float intensity;
 	float radius;
 	float decay;
-	float padding[2];
+	int32_t shadowEnabled;
+	float padding;
 };
 struct PointLightCount {
 	uint32_t count;

@@ -100,7 +100,10 @@ void PortalMesh::Update() {
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix_;
-	transformationMatrixData_->LightWVP = Function::Multiply(worldMatrix_, Object3dCommon::GetInstance()->GetDirectionalLightViewProjectionMatrix());
+	transformationMatrixData_->DirectionalLightWVP = Function::Multiply(worldMatrix_, Object3dCommon::GetInstance()->GetDirectionalLightViewProjectionMatrix());
+	transformationMatrixData_->PointLightWVP = Function::Multiply(worldMatrix_, Object3dCommon::GetInstance()->GetPointLightViewProjectionMatrix());
+	transformationMatrixData_->SpotLightWVP = Function::Multiply(worldMatrix_, Object3dCommon::GetInstance()->GetSpotLightViewProjectionMatrix());
+	transformationMatrixData_->AreaLightWVP = Function::Multiply(worldMatrix_, Object3dCommon::GetInstance()->GetAreaLightViewProjectionMatrix());
 	transformationMatrixData_->WorldInverseTranspose = Function::Inverse(worldMatrix_);
 	transformResource_->Unmap(0, nullptr);
 
@@ -137,7 +140,11 @@ void PortalMesh::Draw() {
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(9, Object3dCommon::GetInstance()->GetSpotLightSrvIndex());
 	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(10, Object3dCommon::GetInstance()->GetAreaLightSrvIndex());*/
 	if (!Object3dCommon::GetInstance()->IsShadowMapPassActive()) {
-		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetShadowMapSrvIndex());
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, Object3dCommon::GetInstance()->GetDirectionalShadowMapSrvIndex());
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(13, Object3dCommon::GetInstance()->GetPointShadowMapSrvIndex());
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(14, Object3dCommon::GetInstance()->GetSpotShadowMapSrvIndex());
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(15, Object3dCommon::GetInstance()->GetAreaShadowMapSrvIndex());
+	
 	}
 	Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(indexCount_, 1, 0, 0, 0);
 }

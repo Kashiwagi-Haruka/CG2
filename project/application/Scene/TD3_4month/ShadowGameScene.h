@@ -104,6 +104,11 @@ private:
     std::array<AreaLight, kMaxAreaLights> areaLights_{};
     uint32_t activeAreaLightCount_ = 0;
 #pragma endregion
+	bool useDirectionalShadow_ = true;
+	bool usePointShadow_ = false;
+	bool useSpotShadow_ = false;
+	bool useAreaShadow_ = false;
+
 public:
     //シーンのコンストラクタ
     ShadowGameScene();
