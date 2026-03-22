@@ -19,16 +19,16 @@ private:
 #pragma region // 体やメッシュの情報
     // 体のObj
     std::unique_ptr<Object3d> bodyObj_ = nullptr;
-    // アニメーションクリップ
-    std::vector<Animation::AnimationData> animationClips_{};
-    // 現在のアニメーションインデックス
-    size_t currentAnimationIndex_ = 0;
+    // アニメーション
+    Animation::AnimationData blendedPoseAnimation_{};
     // 骨
     std::unique_ptr<Skeleton> skeleton_{};
     // スキン
     SkinCluster skinCluster_{};
-    // アニメーション時間
-    float animationTime_ = 0.0f;
+    const std::string animationGroupName_ = "Man";
+    const float kAnimationBlendDuration_ = 0.3f;
+    bool animationFinished_ = false;
+    std::string desiredAnimationName = "Idle";
 #pragma endregion
     // 体の座標
     Transform transform_{};
