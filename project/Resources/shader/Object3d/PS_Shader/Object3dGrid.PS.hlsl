@@ -40,7 +40,7 @@ float4 GetGridLineColor(int lineIndex)
     return float4(1.0f, 1.0f, 1.0f, 1.0f); // others: white
 }
 
-PixelShaderOutput main(VertexShaderOutput input)
+PixelShaderOutput main(Object3dVertexShaderOutput input)
 {
     PixelShaderOutput output;
 

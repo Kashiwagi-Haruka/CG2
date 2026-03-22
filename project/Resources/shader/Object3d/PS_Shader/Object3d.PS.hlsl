@@ -175,7 +175,7 @@ float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition)
     return lerp(0.25f, 1.0f, visibility);
 }
 
-PixelShaderOutput main(VertexShaderOutput input)
+PixelShaderOutput main(Object3dVertexShaderOutput input)
 {
     PixelShaderOutput output;
     const float pi = 3.14159265f;

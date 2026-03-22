@@ -19,9 +19,9 @@ struct VertexShaderInput
     float3 normal : NORMAL0;
 };
 
-VertexShaderOutput main(VertexShaderInput input)
+Object3dVertexShaderOutput main(VertexShaderInput input)
 {
-    VertexShaderOutput output;
+    Object3dVertexShaderOutput output;
     output.position = mul(input.position, gTransformationMatrix.WVP);
     output.normal = normalize(mul(input.normal, (float3x3) gTransformationMatrix.WorldInverseTranspose));
     output.texcoord = input.texcoord;
