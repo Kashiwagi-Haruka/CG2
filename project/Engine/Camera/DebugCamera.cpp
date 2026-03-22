@@ -23,7 +23,7 @@ void DebugCamera::Initialize() {
 	nearZ_ = 0.1f;
 	farZ_ = 10000.0f;
 	matRot_ = Function::MakeIdentity4x4();
-	scale_ = transform_.scale;
+	scale_ = {1.0f, 1.0f, 1.0f};
 	translation_ = transform_.translate;
 	Update();
 }
@@ -32,7 +32,7 @@ void DebugCamera::SetTransform(const Transform& transform) {
 	// 受け取った姿勢を基準に、Pivot操作用の内部状態を再初期化
 	transform_ = transform;
 	pivot_ = {0.0f, 0.0f, 0.0f};
-	scale_ = transform.scale;
+	scale_ = {1.0f, 1.0f, 1.0f};
 	translation_ = transform.translate;
 	matRot_ = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, transform.rotate, {0.0f, 0.0f, 0.0f});
 }
