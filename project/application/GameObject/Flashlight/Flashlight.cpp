@@ -3,6 +3,9 @@
 #include"Function.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
+#include"GameObject/Player/Player.h"
+
+bool Flashlight::isSendGetLightMessage_ = false;
 
 Flashlight::Flashlight()
 {
@@ -23,7 +26,7 @@ void Flashlight::OnCollision(Collider* collider)
 
 Vector3 Flashlight::GetWorldPosition() const
 {
-    return obj_->GetTranslate();
+    return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
 }
 
 void Flashlight::SetCamera(Camera* camera)
@@ -51,7 +54,11 @@ void Flashlight::Update()
 
 void Flashlight::Initialize()
 {
+
     isRotateY_ = false;
+    isGetLight_ = false;
+    isSendGetLightMessage_ = false;
+
     obj_->Initialize();
     transform_.translate = {8.0f,0.1f,1.0f};
     transform_.rotate = { 0.0f,0.0f,0.0f };
@@ -75,4 +82,40 @@ void Flashlight::SetLight()
     spotLight_.decay = 2.0f;
     spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
     spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+}
+
+void Flashlight::CheckCollision()
+{
+
+    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+        //keyとrayの当たり判定
+        if (Player::GetIsGrab()) {
+            isGetLight_ = false;
+            Player::SetIsGrab(false);
+        } else {
+            if (OnCollisionRay()) {
+                isGetLight_ = true;
+                Player::SetIsGrab(true);
+                isSendGetLightMessage_ = true;
+            }
+
+        }
+
+    }
+
+    if (isGetLight_) {
+        // カーソルに追従させて持ち上げる処理
+        Vector3 origin = playerCamera_->GetTransform().translate;
+        transform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
+        transform_.translate.y = (std::max)(transform_.translate.y, 0.0f);
+
+    } 
+
+    //y座標を固定する
+    transform_.translate.y = std::clamp(transform_.translate.y, 0.0f, 2.4f);
+}
+
+bool Flashlight::OnCollisionRay()
+{
+     return playerCamera_->OnCollisionRay(GetAABB(), transform_.translate);
 }

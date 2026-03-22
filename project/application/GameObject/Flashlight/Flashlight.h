@@ -3,7 +3,7 @@
 #include"Object3d/Object3d.h"
 #include<memory>
 #include "Light/SpotLight.h" 
-
+#include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
 class Camera;
 
 class Flashlight :
@@ -22,11 +22,19 @@ public:
     void Draw();
     void SetLight();
     SpotLight& GetSpotLight() { return spotLight_; };
+    void CheckCollision();
+    void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
+    static bool IsGetLightMessage() { return isSendGetLightMessage_; }
 private:
+    bool OnCollisionRay();
+private:
+    PlayerCamera* playerCamera_ = nullptr;
     Transform transform_ = {};
     std::unique_ptr<Object3d>obj_ = nullptr;
     //SpotLight
     SpotLight spotLight_;
     bool isRotateY_ = false;
+    bool isGetLight_ = false;
+    static bool isSendGetLightMessage_;
 };
 
