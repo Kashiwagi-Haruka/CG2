@@ -2,24 +2,25 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "Transform.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
 
+#include "Engine/Audio/Audio.h"
+#include "Engine/Camera/DebugCamera.h"
 #include "Inspector.h"
 #include "Light/AreaLight.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
-#include "Engine/Audio/Audio.h"
-#include "Engine/Camera/DebugCamera.h"
 
 class Object3d;
 class Primitive;
+class Camera;
 
 class Hierarchy {
 public:
@@ -55,6 +56,7 @@ private:
 	void DrawSelectionBoxEditor();
 	void DrawAudioEditor();
 	void DrawCameraEditor();
+	void DrawCameraBillboards();
 	void SyncSelectionBoxToTarget();
 	Transform GetSelectedTransform() const;
 	bool IsObjectSelected() const;
@@ -117,4 +119,10 @@ private:
 	DebugCamera editorPreviewCamera_{};
 	bool isEditorPreviewCameraInitialized_ = false;
 	bool wasEditorPreviewActiveLastFrame_ = false;
+	std::vector<Camera*> cameras_;
+	std::unique_ptr<Primitive> cameraBillboardPrimitive_;
+
+public:
+	void RegisterCamera(Camera* camera);
+	void UnregisterCamera(Camera* camera);
 };

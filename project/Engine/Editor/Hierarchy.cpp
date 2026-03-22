@@ -142,6 +142,8 @@ void Hierarchy::Finalize() {
 
 	selectionBoxPrimitive_.reset();
 	editorGridPlane_.reset();
+	cameraBillboardPrimitive_.reset();
+	cameras_.clear();
 
 	selectedObjectIndex_ = 0;
 	selectedIsPrimitive_ = false;
@@ -422,6 +424,25 @@ void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
 			}
 			break;
 		}
+	}
+}
+void Hierarchy::RegisterCamera(Camera* camera) {
+	if (!camera) {
+		return;
+	}
+	if (std::find(cameras_.begin(), cameras_.end(), camera) != cameras_.end()) {
+		return;
+	}
+	cameras_.push_back(camera);
+}
+
+void Hierarchy::UnregisterCamera(Camera* camera) {
+	if (!camera) {
+		return;
+	}
+	auto it = std::remove(cameras_.begin(), cameras_.end(), camera);
+	if (it != cameras_.end()) {
+		cameras_.erase(it, cameras_.end());
 	}
 }
 
@@ -1051,6 +1072,7 @@ void Hierarchy::SetPlayMode(bool isPlaying) {
 
 void Hierarchy::DrawEditorGridLines() {
 #ifdef USE_IMGUI
+	DrawCameraBillboards();
 	if (!showEditorGridLines_) {
 		return;
 	}
@@ -1101,6 +1123,67 @@ void Hierarchy::DrawEditorGridLines() {
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 	selectionBoxPrimitive_->Update();
 	selectionBoxPrimitive_->Draw();
+#endif
+}
+void Hierarchy::DrawCameraBillboards() {
+#ifdef USE_IMGUI
+	if (isPlaying_ || cameras_.empty()) {
+		return;
+	}
+
+	Object3dCommon* object3dCommon = Object3dCommon::GetInstance();
+	if (!object3dCommon) {
+		return;
+	}
+
+	Camera* previewCamera = object3dCommon->GetDefaultCamera();
+	if (!previewCamera) {
+		return;
+	}
+
+	if (!cameraBillboardPrimitive_) {
+		cameraBillboardPrimitive_ = std::make_unique<Primitive>();
+		cameraBillboardPrimitive_->SetEditorRegistrationEnabled(false);
+		cameraBillboardPrimitive_->Initialize(Primitive::Plane, "Resources/Editor/camera.png");
+		cameraBillboardPrimitive_->SetEnableLighting(false);
+	}
+
+	cameraBillboardPrimitive_->SetCamera(previewCamera);
+	cameraBillboardPrimitive_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	cameraBillboardPrimitive_->SetShininess(1.0f);
+	cameraBillboardPrimitive_->SetEnvironmentCoefficient(0.0f);
+
+	Matrix4x4 billboardMatrix = Function::Inverse(previewCamera->GetViewMatrix());
+	billboardMatrix.m[3][0] = 0.0f;
+	billboardMatrix.m[3][1] = 0.0f;
+	billboardMatrix.m[3][2] = 0.0f;
+
+	Object3dCommon::GetInstance()->DrawCommonNoCull();
+	for (Camera* camera : cameras_) {
+		if (!camera || camera == previewCamera) {
+			continue;
+		}
+
+		Matrix4x4 worldMatrix = billboardMatrix;
+		const Vector3 worldTranslate = camera->GetWorldTranslate();
+		const float scale = 0.75f;
+		worldMatrix.m[0][0] *= scale;
+		worldMatrix.m[0][1] *= scale;
+		worldMatrix.m[0][2] *= scale;
+		worldMatrix.m[1][0] *= scale;
+		worldMatrix.m[1][1] *= scale;
+		worldMatrix.m[1][2] *= scale;
+		worldMatrix.m[2][0] *= scale;
+		worldMatrix.m[2][1] *= scale;
+		worldMatrix.m[2][2] *= scale;
+		worldMatrix.m[3][0] = worldTranslate.x;
+		worldMatrix.m[3][1] = worldTranslate.y;
+		worldMatrix.m[3][2] = worldTranslate.z;
+
+		cameraBillboardPrimitive_->SetWorldMatrix(worldMatrix);
+		cameraBillboardPrimitive_->UpdateCameraMatrices();
+		cameraBillboardPrimitive_->Draw();
+	}
 #endif
 }
 void Hierarchy::DrawCameraEditor() {

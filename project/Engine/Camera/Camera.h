@@ -29,6 +29,7 @@ class Camera {
 public:
 	// デフォルト設定でカメラを初期化
 	Camera();
+	~Camera();
 	// transform_ や投影パラメータから行列を再計算
 	void Update();
 	//ワールド行列から行列を作成する
