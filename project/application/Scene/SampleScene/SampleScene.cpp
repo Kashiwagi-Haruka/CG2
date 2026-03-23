@@ -214,7 +214,7 @@ void SampleScene::Initialize() {
 	overlayCameraSprite_->SetRotation(0.0f);
 	overlayCameraSprite_->SetPosition(Vector2(0.0f, 0.0f));
 
-		activePointLightCount_ = 1;
+	activePointLightCount_ = 1;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {-5.0f, 5.0f, 0.0f};
 	pointLights_[0].intensity = 1.0f;
