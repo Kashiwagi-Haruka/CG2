@@ -337,6 +337,8 @@
     <ClCompile Include="application\Text\TItleMenu\TitleMenuUI.cpp" />
     <ClCompile Include="application\Text\FirstStory\FirstStory.cpp" />
     <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
+    <ClCompile Include="application\GameObject\Locker\Locker.cpp" />
+    <ClCompile Include="application\GameObject\Locker\LockerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -663,6 +665,8 @@
     <ClInclude Include="application\ScreenSize\ScreenSize.h" />
     <ClInclude Include="application\Color\Color.h" />
     <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
+    <ClInclude Include="application\GameObject\Locker\Locker.h" />
+    <ClInclude Include="application\GameObject\Locker\LockerManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

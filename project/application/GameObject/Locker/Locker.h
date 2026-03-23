@@ -5,20 +5,18 @@
 #include <RigidBody.h>
 #include <memory>
 #include <Object3d/Object3d.h>
-#include <GameObject/TimeCard/TimeCardWatch.h>
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
 #include <GameObject/YoshidaMath/CollisionManager/Collider.h>
 
-class Key : public YoshidaMath::Collider
+class Locker : public YoshidaMath::Collider
 {
 public:
-    Key();
+    Locker();
     void Initialize();
     void Update();
     void Draw();
-    void SetPlayerCamera(PlayerCamera* camera);
+    static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
     void SetCamera(Camera* camera);
-    void SetModel(const std::string& filePath);
     void CheckCollision();
     bool OnCollisionRay();
     /// @brief 衝突時コールバック関数
@@ -26,16 +24,9 @@ public:
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
-    static bool GetGetKeyMessage() { return isSendGetKeyMessage_; }
-    bool* GetKeyPtr() { return &isGetKey_; };
 private:
+
+    static PlayerCamera* playerCamera_;
     std::unique_ptr<Object3d>obj_ = nullptr;
-    PlayerCamera* playerCamera_ = nullptr;
-    Transform worldTransform_ = {};
-    Vector3 velocity_ = { 0.0f };
-    const float mass_ = 4.0f;
-    bool isChairHit_ = false;
-    bool isGetKey_ = false;
-    static bool isSendGetKeyMessage_;
 };
 

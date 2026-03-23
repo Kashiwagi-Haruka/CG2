@@ -275,6 +275,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Text\TextUIManager\TextUIManager.cpp" />
     <ClCompile Include="application\Text\TItleMenu\TitleMenuUI.cpp" />
     <ClCompile Include="application\Text\FirstStory\FirstStory.cpp" />
+    <ClCompile Include="application\GameObject\Locker\Locker.cpp" />
+    <ClCompile Include="application\GameObject\Locker\LockerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -416,6 +418,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Text\TextUIManager\TextUIManager.h" />
     <ClInclude Include="application\Text\TItleMenu\TitleMenuUI.h" />
     <ClInclude Include="application\Text\FirstStory\FirstStory.h" />
+    <ClInclude Include="application\GameObject\Locker\Locker.h" />
+    <ClInclude Include="application\GameObject\Locker\LockerManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

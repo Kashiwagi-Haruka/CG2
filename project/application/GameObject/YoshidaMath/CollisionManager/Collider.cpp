@@ -165,8 +165,8 @@ AABB YoshidaMath::GetAABBWorldPos(YoshidaMath::Collider* aabb)
 {
     AABB aabbWorld = aabb->GetAABB();
     Vector3 pos = aabb->GetWorldPosition();
-    aabbWorld.min += aabbWorld.min+pos;
-    aabbWorld.max += pos;
+    aabbWorld.min = aabbWorld.min + pos;
+    aabbWorld.max = aabbWorld.max + pos;
     return aabbWorld;
 
 }
