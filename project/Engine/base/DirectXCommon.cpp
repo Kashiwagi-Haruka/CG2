@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include "ParticleManager.h"
 #include "SrvManager/SrvManager.h"
+#include "TextureManager.h"
 #include "StringUtility.h"
 #include <algorithm>
 #include <cassert>
@@ -628,6 +629,7 @@ void DirectXCommon::ExecuteCommandListAndWait() {
 	assert(SUCCEEDED(hr_));
 	hr_ = commandList_->Reset(commandAllocators_[frameIndex_].Get(), nullptr);
 	assert(SUCCEEDED(hr_));
+	TextureManager::GetInstance()->GetSrvManager()->PreDraw();
 }
 void DirectXCommon::DrawSceneTextureToBackBuffer() {
 	D3D12_RESOURCE_BARRIER barriers[2]{};
@@ -734,6 +736,7 @@ void DirectXCommon::SetMainRenderTarget() {
 	float clearColor[] = {0.1f, 0.25f, 0.5f, 1.0f};
 	commandList_->ClearRenderTargetView(sceneRtvHandle_, clearColor, 0, nullptr);
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	TextureManager::GetInstance()->GetSrvManager()->PreDraw();
 }
 
 void DirectXCommon::CrtvTransitionBarrier() {

@@ -8,6 +8,8 @@
 #include "DirectXCommon.h"
 #include<algorithm>
 #include"Camera.h"
+#include "TextureManager.h"
+#include "SrvManager/SrvManager.h"
 
 Camera* Portal::sceneCamera_ = nullptr;
 
@@ -123,6 +125,7 @@ void Portal::TransitionToShaderResource() {
 
 	portalRenderTexture_->TransitionToShaderResource();
 	Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
+	TextureManager::GetInstance()->GetSrvManager()->PreDraw();
 }
 
 void Portal::SetCamera(Camera* camera) {

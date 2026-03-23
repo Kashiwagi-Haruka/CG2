@@ -360,6 +360,7 @@ void Object3dCommon::EndShadowMapPass() {
 	}
 	TransitionShadowResource(dxCommon_, resource, D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	isShadowMapPassActive_ = false;
+	TextureManager::GetInstance()->GetSrvManager()->PreDraw();
 }
 
 void Object3dCommon::SetDirectionalLight(DirectionalLight& light) {
