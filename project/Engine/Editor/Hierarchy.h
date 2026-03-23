@@ -14,10 +14,7 @@
 #include "Engine/Audio/Audio.h"
 #include "Engine/Editor/Camera/EditorCamera.h"
 #include "Inspector/Inspector.h"
-#include "Light/AreaLight.h"
-#include "Light/DirectionalLight.h"
-#include "Light/PointLight.h"
-#include "Light/SpotLight.h"
+#include "Light/EditorLight.h"
 
 class Object3d;
 class Primitive;
@@ -67,18 +64,6 @@ private:
 	void UndoEditorChange();
 	void RedoEditorChange();
 
-	struct EditorLightState {
-		bool overrideSceneLights = false;
-		DirectionalLight directionalLight = {
-		    {1.0f, 1.0f, 1.0f, 1.0f},
-            {0.0f, -1.0f, 0.0f},
-            1.0f, 1, {0.0f, 0.0f, 0.0f}
-        };
-		std::vector<PointLight> pointLights;
-		std::vector<SpotLight> spotLights;
-		std::vector<AreaLight> areaLights;
-	};
-
 	bool SaveObjectEditorsToJson(const std::string& filePath) const;
 	bool LoadObjectEditorsFromJson(const std::string& filePath);
 
@@ -113,7 +98,7 @@ private:
 	float editorGridY_ = 0.0f;
 	bool editorGridDirty_ = true;
 	std::unique_ptr<Primitive> editorGridPlane_;
-	EditorLightState editorLightState_{};
+	EditorLight editorLight_{};
 	std::unordered_map<std::string, float> savedAudioVolumes_;
 	std::unordered_map<std::string, bool> savedAudioLoopEnabled_;
 	std::unordered_map<std::string, std::vector<Audio::MixerEffectSettings>> savedAudioEffects_;
