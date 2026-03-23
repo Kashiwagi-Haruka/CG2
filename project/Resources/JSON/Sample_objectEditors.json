@@ -1,6 +1,134 @@
 {
   "audio": {
-    "sounds": []
+    "sounds": [
+      {
+        "effects": [
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": true,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 0
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 1
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 2
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 3
+          }
+        ],
+        "loopEnabled": false,
+        "name": "Rendez-vous_2.mp3",
+        "volume": 1.0
+      }
+    ]
   },
   "lights": {
     "area": [],
@@ -73,7 +201,7 @@
         ],
         "translate": [
           -3.259999990463257,
-          0.0,
+          2.609999895095825,
           0.0
         ]
       }
@@ -351,226 +479,6 @@
         "translate": [
           -4.059999942779541,
           0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "index": 1,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "portal2",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          0.3499999940395355,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "index": 2,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "portal1",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          -0.18000000715255737,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "index": 3,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "ring2",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          -4.110000133514404,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "index": 4,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "sphere",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          -0.0,
-          -0.0,
           0.0
         ]
       }

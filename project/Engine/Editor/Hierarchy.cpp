@@ -7,6 +7,7 @@
 #include "Engine/Audio/Audio.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
+#include "Input.h"
 #include "Object3d/Object3d.h"
 #include "Object3d/Object3dCommon.h"
 #include "Primitive/Primitive.h"
@@ -129,6 +130,7 @@ Hierarchy* Hierarchy::GetInstance() {
 	return &instance;
 }
 void Hierarchy::Finalize() {
+	playModeInitializedAudioNames_.clear();
 	objects_.clear();
 	objectNames_.clear();
 	editorTransforms_.clear();
@@ -141,14 +143,69 @@ void Hierarchy::Finalize() {
 
 	selectionBoxPrimitive_.reset();
 	editorGridPlane_.reset();
+	cameraBillboardPrimitive_.reset();
+	cameras_.clear();
 
 	selectedObjectIndex_ = 0;
 	selectedIsPrimitive_ = false;
 	selectionBoxDirty_ = true;
 	editorGridDirty_ = true;
 	loadedSceneName_.clear();
+	isEditorPreviewCameraInitialized_ = false;
+	wasEditorPreviewActiveLastFrame_ = false;
 	ResetForSceneChange();
 }
+bool Hierarchy::IsEditorPreviewActive() const { return HasRegisteredObjects() && !isPlaying_; }
+
+void Hierarchy::UpdateEditorPreview() {
+	if (!IsEditorPreviewActive()) {
+		wasEditorPreviewActiveLastFrame_ = false;
+		return;
+	}
+
+	Object3dCommon* object3dCommon = Object3dCommon::GetInstance();
+	if (!object3dCommon) {
+		wasEditorPreviewActiveLastFrame_ = false;
+		return;
+	}
+
+	Camera* sceneCamera = object3dCommon->GetDefaultCamera();
+	if (!sceneCamera) {
+		wasEditorPreviewActiveLastFrame_ = false;
+		return;
+	}
+
+	if (!isEditorPreviewCameraInitialized_ || !wasEditorPreviewActiveLastFrame_) {
+		editorPreviewCamera_.Initialize();
+		editorPreviewCamera_.SetTransform(sceneCamera->GetTransform());
+		isEditorPreviewCameraInitialized_ = true;
+	}
+
+	Input* input = Input::GetInstance();
+	if (input) {
+		input->SetIsCursorVisible(true);
+		input->SetIsCursorStability(false);
+	}
+
+	editorPreviewCamera_.Update();
+	sceneCamera->SetViewProjectionMatrix(editorPreviewCamera_.GetViewMatrix(), editorPreviewCamera_.GetProjectionMatrix());
+	object3dCommon->SetDefaultCamera(sceneCamera);
+
+	for (Object3d* object : objects_) {
+		if (object) {
+			object->Update();
+		}
+	}
+
+	for (Primitive* primitive : primitives_) {
+		if (primitive) {
+			primitive->Update();
+		}
+	}
+
+	wasEditorPreviewActiveLastFrame_ = true;
+}
+
 std::string Hierarchy::GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const {
 	const SceneManager* sceneManager = SceneManager::GetInstance();
 	if (!sceneManager) {
@@ -162,6 +219,7 @@ std::string Hierarchy::GetSceneScopedEditorFilePath(const std::string& defaultFi
 }
 
 void Hierarchy::ResetForSceneChange() {
+	playModeInitializedAudioNames_.clear();
 	hasUnsavedChanges_ = false;
 	saveStatusMessage_.clear();
 	hasLoadedForCurrentScene_ = false;
@@ -179,6 +237,8 @@ void Hierarchy::ResetForSceneChange() {
 	editorLightState_.pointLights.clear();
 	editorLightState_.spotLights.clear();
 	editorLightState_.areaLights.clear();
+	isEditorPreviewCameraInitialized_ = false;
+	wasEditorPreviewActiveLastFrame_ = false;
 	Object3dCommon::GetInstance()->SetEditorLightOverride(false);
 }
 
@@ -366,6 +426,25 @@ void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
 			}
 			break;
 		}
+	}
+}
+void Hierarchy::RegisterCamera(Camera* camera) {
+	if (!camera) {
+		return;
+	}
+	if (std::find(cameras_.begin(), cameras_.end(), camera) != cameras_.end()) {
+		return;
+	}
+	cameras_.push_back(camera);
+}
+
+void Hierarchy::UnregisterCamera(Camera* camera) {
+	if (!camera) {
+		return;
+	}
+	auto it = std::remove(cameras_.begin(), cameras_.end(), camera);
+	if (it != cameras_.end()) {
+		cameras_.erase(it, cameras_.end());
 	}
 }
 
@@ -986,10 +1065,30 @@ void Hierarchy::DrawGridEditor() {
 	gridSnapSpacing_ = std::max(gridSnapSpacing_, 0.1f);
 	gridHalfLineCount_ = std::max(gridHalfLineCount_, 1);
 }
-void Hierarchy::SetPlayMode(bool isPlaying) { isPlaying_ = isPlaying; }
+void Hierarchy::SetPlayMode(bool isPlaying) {
+	const bool wasPlaying = isPlaying_;
+	isPlaying_ = isPlaying;
+	Audio* audio = Audio::GetInstance();
+	if (isPlaying_) {
+		if (audio) {
+			audio->StopAllPreviewSounds();
+			audio->StopAllSceneSounds();
+		}
+		wasEditorPreviewActiveLastFrame_ = false;
+		if (!wasPlaying) {
+			playModeInitializedAudioNames_.clear();
+		}
+	} else if (wasPlaying) {
+		if (audio) {
+			audio->StopAllSceneSounds();
+		}
+		playModeInitializedAudioNames_.clear();
+	}
+}
 
 void Hierarchy::DrawEditorGridLines() {
 #ifdef USE_IMGUI
+	DrawCameraBillboards();
 	if (!showEditorGridLines_) {
 		return;
 	}
@@ -1040,6 +1139,55 @@ void Hierarchy::DrawEditorGridLines() {
 	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 	selectionBoxPrimitive_->Update();
 	selectionBoxPrimitive_->Draw();
+#endif
+}
+void Hierarchy::DrawCameraBillboards() {
+#ifdef USE_IMGUI
+	if (isPlaying_ || cameras_.empty()) {
+		return;
+	}
+
+	Object3dCommon* object3dCommon = Object3dCommon::GetInstance();
+	if (!object3dCommon) {
+		return;
+	}
+
+	Camera* previewCamera = object3dCommon->GetDefaultCamera();
+	if (!previewCamera) {
+		return;
+	}
+
+	if (!cameraBillboardPrimitive_) {
+		cameraBillboardPrimitive_ = std::make_unique<Primitive>();
+		cameraBillboardPrimitive_->SetEditorRegistrationEnabled(false);
+		cameraBillboardPrimitive_->Initialize(Primitive::Plane, "Resources/Editor/camera.png");
+		cameraBillboardPrimitive_->SetEnableLighting(false);
+	}
+
+	cameraBillboardPrimitive_->SetCamera(previewCamera);
+	cameraBillboardPrimitive_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	cameraBillboardPrimitive_->SetShininess(1.0f);
+	cameraBillboardPrimitive_->SetEnvironmentCoefficient(0.0f);
+
+	Matrix4x4 billboardMatrix = Function::Inverse(previewCamera->GetViewMatrix());
+	billboardMatrix.m[3][0] = 0.0f;
+	billboardMatrix.m[3][1] = 0.0f;
+	billboardMatrix.m[3][2] = 0.0f;
+
+	Object3dCommon::GetInstance()->DrawCommonNoCull();
+	for (Camera* camera : cameras_) {
+		if (!camera || camera == previewCamera) {
+			continue;
+		}
+		
+		Matrix4x4 worldMatrix = Function::Multiply(billboardMatrix, Function::MakeAffineMatrix(Vector3(1, 1, 1), Vector3(0, 0, 0), camera->GetTranslate()));
+		;
+		
+
+		cameraBillboardPrimitive_->SetWorldMatrix(worldMatrix);
+		cameraBillboardPrimitive_->UpdateCameraMatrices();
+		cameraBillboardPrimitive_->Draw();
+	}
 #endif
 }
 void Hierarchy::DrawCameraEditor() {
@@ -1175,8 +1323,10 @@ void Hierarchy::DrawAudioEditor() {
 		if (!entry.soundData) {
 			continue;
 		}
+
+		const bool shouldApplySavedState = !isPlaying_ || !playModeInitializedAudioNames_.contains(entry.name);
 		const auto savedIt = savedAudioVolumes_.find(entry.name);
-		if (savedIt != savedAudioVolumes_.end()) {
+		if (shouldApplySavedState && savedIt != savedAudioVolumes_.end()) {
 			audio->SetSoundVolume(entry.soundData, savedIt->second);
 		}
 		bool loopEnabled = false;
@@ -1185,9 +1335,14 @@ void Hierarchy::DrawAudioEditor() {
 			loopEnabled = loopIt->second;
 		}
 		const auto effectsIt = savedAudioEffects_.find(entry.name);
-		if (effectsIt != savedAudioEffects_.end()) {
+		if (shouldApplySavedState && effectsIt != savedAudioEffects_.end()) {
 			audio->SetSoundEffects(entry.soundData, effectsIt->second);
-			savedAudioEffects_.erase(effectsIt);
+			if (!isPlaying_) {
+				savedAudioEffects_.erase(effectsIt);
+			}
+		}
+		if (isPlaying_ && shouldApplySavedState) {
+			playModeInitializedAudioNames_.insert(entry.name);
 		}
 		if (ImGui::TreeNode((entry.name + "##audio_" + std::to_string(i)).c_str())) {
 			float volume = entry.soundData->volume;
@@ -1294,7 +1449,7 @@ void Hierarchy::DrawAudioEditor() {
 				ImGui::TextUnformatted("Stopped");
 			}
 			if (ImGui::Button(("Play from Start##audio_play_" + std::to_string(i)).c_str())) {
-				audio->SoundPlayWaveFromStart(*entry.soundData, loopEnabled);
+				audio->SoundPlayPreviewFromStart(*entry.soundData, loopEnabled);
 			}
 			ImGui::SameLine();
 			if (ImGui::Button(("Stop##audio_stop_" + std::to_string(i)).c_str())) {

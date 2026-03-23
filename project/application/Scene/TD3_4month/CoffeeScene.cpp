@@ -19,7 +19,7 @@ CoffeeScene::CoffeeScene() {
 	}
 	camera_ = std::make_unique<Camera>();
 	debugCamera_ = std::make_unique<DebugCamera>();
-	coffee_ = std::make_unique<Coffee>();
+	coffee_ = std::make_unique<Coffees>();
 	cameraTransform_ = {
 	    .scale = {1.0f, 1.0f, 1.0f },
 	    .rotate = {0.0f, 0.0f, 0.0f },
@@ -66,6 +66,11 @@ void CoffeeScene::Initialize() {
 	roomWalls_[5]->SetRotate({0.0f, std::numbers::pi_v<float> * 0.5f, 0.0f});
 	roomWalls_[5]->SetTranslate({halfWidth, halfHeight, 0.0f});
 
+	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	directionalLight_.direction = {0.0f, 0.5f, 1.0f};
+	directionalLight_.intensity = 1.0f;
+	directionalLight_.shadowEnabled = useDirectionalShadow_ ? 1 : 0;
+
 	coffee_->Initialize();
 }
 
@@ -104,20 +109,33 @@ void CoffeeScene::Update() {
 		wall->SetCamera(camera_.get());
 		wall->Update();
 	}
-	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
-	DirectionalLight directionalLight{};
-	directionalLight.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	directionalLight.direction = {0.0f, 0.5f, 1.0f};
-	directionalLight.intensity = 1.0f;
-	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight);
-	coffee_->Update(camera_.get(), directionalLight.direction);
+	auto* object3dCommon = Object3dCommon::GetInstance();
+	object3dCommon->SetDefaultCamera(camera_.get());
+	directionalLight_.shadowEnabled = useDirectionalShadow_ ? 1 : 0;
+	object3dCommon->SetDirectionalLight(directionalLight_);
+	object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, false, false, false);
+	coffee_->Update(camera_.get(), directionalLight_.direction);
 }
 
 void CoffeeScene::Draw() {
-	Object3dCommon::GetInstance()->DrawCommon();
-	// for (auto& wall : roomWalls_) {
-	//	wall->Draw();
-	// }
+	auto* object3dCommon = Object3dCommon::GetInstance();
+	if (useDirectionalShadow_) {
+		object3dCommon->SetShadowMapEnabled(true, false, false, false);
+		object3dCommon->BeginShadowMapPass();
+		object3dCommon->DrawCommonShadow();
+		for (auto& wall : roomWalls_) {
+			wall->Draw();
+		}
+		coffee_->Draw();
+		object3dCommon->EndShadowMapPass();
+	}
+
+	object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, false, false, false);
+	object3dCommon->SetDefaultCamera(camera_.get());
+	object3dCommon->DrawCommon();
+	for (auto& wall : roomWalls_) {
+		wall->Draw();
+	}
 	coffee_->Draw();
 }
 

@@ -304,7 +304,7 @@ void Audio::SoundUnload(SoundData* soundData) {
 }
 
 // サウンドを再生する(必要ならループ再生)
-void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
+void Audio::SoundPlayWaveInternal(const SoundData& soundData, bool isLoop, ActiveVoice::PlaybackSource playbackSource) {
 	if (!xAudio2_) {
 		OutputDebugStringA("SoundPlayWave: xAudio2 is null!\n");
 		return;
@@ -350,6 +350,7 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	activeVoice.isLoop = isLoop;
 	activeVoice.sourceEnded = false;
 	activeVoice.totalSamples = isLoop ? 0 : CalculateTotalSamples(soundData);
+	activeVoice.playbackSource = playbackSource;
 	const bool effectApplied = ApplyEffectsToVoice(pSourceVoice, soundData.effects, activeVoice.effectInstances);
 	assert(effectApplied);
 
@@ -358,11 +359,17 @@ void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) {
 	activeVoices_.push_back(std::move(activeVoice));
 }
 
+void Audio::SoundPlayWave(const SoundData& soundData, bool isLoop) { SoundPlayWaveInternal(soundData, isLoop, ActiveVoice::PlaybackSource::Scene); }
+
 void Audio::SoundPlayWaveFromStart(const SoundData& soundData, bool isLoop) {
 	StopVoicesForSound(soundData);
 	SoundPlayWave(soundData, isLoop);
 }
 
+void Audio::SoundPlayPreviewFromStart(const SoundData& soundData, bool isLoop) {
+	StopVoicesForSound(soundData);
+	SoundPlayWaveInternal(soundData, isLoop, ActiveVoice::PlaybackSource::EditorPreview);
+}
 void Audio::StopSound(const SoundData& soundData) { StopVoicesForSound(soundData); }
 // 特定サウンドを再生しているボイスだけを停止する
 void Audio::StopVoicesForSound(const SoundData& soundData) {
@@ -727,3 +734,18 @@ void Audio::StopAllVoices() {
 	}
 	activeVoices_.clear();
 }
+void Audio::StopVoicesBySource(ActiveVoice::PlaybackSource playbackSource) {
+	for (auto& active : activeVoices_) {
+		if (!active.voice || active.playbackSource != playbackSource) {
+			continue;
+		}
+		active.voice->Stop();
+		active.voice->DestroyVoice();
+		active.voice = nullptr;
+	}
+	activeVoices_.erase(std::remove_if(activeVoices_.begin(), activeVoices_.end(), [](const ActiveVoice& active) { return active.voice == nullptr; }), activeVoices_.end());
+}
+
+void Audio::StopAllSceneSounds() { StopVoicesBySource(ActiveVoice::PlaybackSource::Scene); }
+
+void Audio::StopAllPreviewSounds() { StopVoicesBySource(ActiveVoice::PlaybackSource::EditorPreview); }

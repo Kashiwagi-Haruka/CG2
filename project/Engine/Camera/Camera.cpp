@@ -1,6 +1,6 @@
 #include "Camera.h"
 #include "Function.h"
-
+#include "Engine/Editor/Hierarchy.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include <cmath>
 #ifdef USE_IMGUI
@@ -52,8 +52,10 @@ Camera::Camera()
 	if (editorId_ == 0) {
 		LoadEditorData();
 	}
+	Hierarchy::GetInstance()->RegisterCamera(this);
 }
 
+Camera::~Camera() { Hierarchy::GetInstance()->UnregisterCamera(this); }
 void Camera::Update() {
 	// 現在のTransformと投影設定をもとに各行列を更新
 	worldMatrix_ = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, transform_.rotate, transform_.translate);

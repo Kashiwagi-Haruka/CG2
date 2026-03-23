@@ -33,7 +33,10 @@ public:
 private:
 	struct alignas(256) TransformationMatrix {
 		Matrix4x4 WVP;
-		Matrix4x4 LightWVP;
+		Matrix4x4 DirectionalLightWVP;
+		Matrix4x4 PointLightWVP;
+		Matrix4x4 SpotLightWVP;
+		Matrix4x4 AreaLightWVP;
 		Matrix4x4 World;
 		Matrix4x4 WorldInverseTranspose;
 	};

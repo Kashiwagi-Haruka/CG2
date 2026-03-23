@@ -83,6 +83,11 @@ private:
 	bool comInitialized_ = false;
 
 	struct ActiveVoice {
+		enum class PlaybackSource {
+			Scene,
+			EditorPreview,
+		};
+
 		// 実際に再生中のソースボイス
 		IXAudio2SourceVoice* voice;
 		// どの SoundData を再生しているか識別するための先頭アドレス
@@ -95,6 +100,8 @@ private:
 		UINT64 totalSamples = 0;
 		// ボイスに適用しているエフェクトインスタンス保持
 		std::vector<Microsoft::WRL::ComPtr<IUnknown>> effectInstances;
+		// どこから再生された音か
+		PlaybackSource playbackSource = PlaybackSource::Scene;
 	};
 
 	// 現在再生中のボイス一覧
@@ -110,6 +117,10 @@ private:
 	bool RecreateActiveVoice(ActiveVoice& active, const SoundData& soundData);
 	// 全ボイスを停止
 	void StopAllVoices();
+	// 指定ソースの全ボイスを停止
+	void StopVoicesBySource(ActiveVoice::PlaybackSource playbackSource);
+	// 内部用の音声再生
+	void SoundPlayWaveInternal(const SoundData& soundData, bool isLoop, ActiveVoice::PlaybackSource playbackSource);
 
 public:
 	// 非ループ音声の終了監視と後始末
@@ -128,8 +139,14 @@ public:
 	void SoundPlayWave(const SoundData& sounddata, bool isLoop = false);
 	// 指定サウンドを停止して先頭から再生(重ね再生しない)
 	void SoundPlayWaveFromStart(const SoundData& soundData, bool isLoop = false);
+	// エディターのお試し再生専用: 指定サウンドを停止して先頭から再生
+	void SoundPlayPreviewFromStart(const SoundData& soundData, bool isLoop = false);
 	// 指定サウンドの再生を停止
 	void StopSound(const SoundData& soundData);
+	// シーン再生由来の音をすべて停止
+	void StopAllSceneSounds();
+	// エディターのお試し再生由来の音をすべて停止
+	void StopAllPreviewSounds();
 	// 音量設定
 	void SetSoundVolume(SoundData* soundData, float volume);
 	// エディター表示用のサウンド情報を取得

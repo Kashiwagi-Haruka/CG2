@@ -319,7 +319,7 @@
     </ClCompile>
     <ClCompile Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.cpp" />
     <ClCompile Include="application\GameSave\GameSave.cpp" />
-    <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
+    <ClCompile Include="application\GameObject\Coffee\Coffees.cpp" />
     <ClCompile Include="application\GameObject\Wall\Wall.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManager.cpp" />
     <ClCompile Include="application\GameObject\Edamame\EdamameTrivia.cpp" />
@@ -336,6 +336,7 @@
     <ClCompile Include="application\Text\TextUIManager\TextUIManager.cpp" />
     <ClCompile Include="application\Text\TItleMenu\TitleMenuUI.cpp" />
     <ClCompile Include="application\Text\FirstStory\FirstStory.cpp" />
+    <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
     <ClCompile Include="application\GameObject\Locker\Locker.cpp" />
     <ClCompile Include="application\GameObject\Locker\LockerManager.cpp" />
   </ItemGroup>
@@ -643,7 +644,7 @@
     <ClInclude Include="application\GameObject\Key\Key.h" />
     <ClInclude Include="Engine\Texture\Mesh\Object3d\InstancedObject3d\InstancedObject3d.h" />
     <ClInclude Include="application\GameSave\GameSave.h" />
-    <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
+    <ClInclude Include="application\GameObject\Coffee\Coffees.h" />
     <ClInclude Include="application\GameObject\Edamame\EdamameTrivia.h" />
     <ClInclude Include="application\GameObject\Coffee\CoffeeTrivia.h" />
     <ClInclude Include="application\GameObject\BGMManager\BGMManager.h" />
@@ -663,6 +664,7 @@
     <ClInclude Include="application\Text\FirstStory\FirstStory.h" />
     <ClInclude Include="application\ScreenSize\ScreenSize.h" />
     <ClInclude Include="application\Color\Color.h" />
+    <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
     <ClInclude Include="application\GameObject\Locker\Locker.h" />
     <ClInclude Include="application\GameObject\Locker\LockerManager.h" />
   </ItemGroup>

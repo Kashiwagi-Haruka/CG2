@@ -4,6 +4,7 @@
 #include "TextureManager.h"
 #include "Object3d/Object3dCommon.h"
 #include <cassert>
+#include <string>
 
 void RenderTexture2D::Initialize(uint32_t width, uint32_t height, DXGI_FORMAT format, const std::array<float, 4>& clearColor) {
 	width_ = width;
@@ -96,7 +97,7 @@ void RenderTexture2D::Initialize(uint32_t width, uint32_t height, DXGI_FORMAT fo
 
 	srvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
 	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforTexture2D(srvIndex_, resource_.Get(), format_, 1);
-
+	TextureManager::GetInstance()->RegisterExternalTexture("RenderTexture2D:" + std::to_string(srvIndex_), resource_.Get(), srvIndex_, format_, width_, height_, 1);
 	currentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	initialized_ = true;
 }

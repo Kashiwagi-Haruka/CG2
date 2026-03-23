@@ -52,17 +52,17 @@ struct PixelShaderOutput
     float4 color : SV_TARGET0;
 };
 
-struct PortalVertexShaderOutput
+struct Object3dPortalVertexShaderOutput
 {
     float4 position : SV_POSITION;
     float2 texcoord : TEXCOORD0;
     float3 normal : NORMAL0;
-    float3 worldPosition : POSITION0;
+    float3 worldPosition : TEXCOORD3;
     float4 shadowPosition : TEXCOORD1;
     float4 textureProjectedPosition : TEXCOORD2;
 };
 
-PixelShaderOutput main(PortalVertexShaderOutput input)
+PixelShaderOutput main(Object3dPortalVertexShaderOutput input)
 {
     PixelShaderOutput output;
 

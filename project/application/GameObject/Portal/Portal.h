@@ -43,6 +43,7 @@ public:
     void DrawRings();
     bool GetIsPlayerHit() { return isPlayerHit_; };
 private:
+	bool ShouldProcessPortal() const;
     void UpdatePortalWorldMatrix();
     void SetRotateFromDirection(const Vector3& forward);
     void UpdateScale();

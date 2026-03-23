@@ -52,7 +52,7 @@ float3 ApplySepia(float3 color)
     sepia.b = dot(color, float3(0.272f, 0.534f, 0.131f));
     return saturate(sepia);
 }
-PixelShaderOutput main(VertexShaderOutput input)
+PixelShaderOutput main(Object3dVertexShaderOutput input)
 {
     PixelShaderOutput output;
 

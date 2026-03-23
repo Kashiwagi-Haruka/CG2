@@ -3,10 +3,13 @@
 #include"application/GameObject/YoshidaMath/YoshidaMath.h"
 #include<cassert>
 #include"GameObject/YoshidaMath/Easing.h"
+#include "Engine/Editor/Hierarchy.h"
 #include "Object3d/Object3dCommon.h"
 #include "DirectXCommon.h"
 #include<algorithm>
 #include"Camera.h"
+#include "TextureManager.h"
+#include "SrvManager/SrvManager.h"
 
 Camera* Portal::sceneCamera_ = nullptr;
 
@@ -71,120 +74,143 @@ void Portal::Initialize()
 
 }
 
-void Portal::Update()
-{
-    isPlayerHit_ = false;
+void Portal::Update() {
+	if (!ShouldProcessPortal()) {
+		return;
+	}
 
-    uvRotateZ_ += YoshidaMath::kDeltaTime;
-    ring_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, uvRotateZ_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
-    UpdatePortalWorldMatrix();
-    ring_->Update();
-    portalCircle_->Update();
-    //ワープ地点
-    warpPos_->Update();
+	isPlayerHit_ = false;
+
+	uvRotateZ_ += YoshidaMath::kDeltaTime;
+	ring_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, uvRotateZ_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
+	UpdatePortalWorldMatrix();
+	ring_->Update();
+	portalCircle_->Update();
+	// ワープ地点
+	warpPos_->Update();
 }
 
 void Portal::DrawPortals() {
-    if (portalCircle_) {
-        Object3dCommon::GetInstance()->DrawCommonPortal();
-        portalCircle_->Draw();
-    }
+	if (!ShouldProcessPortal()) {
+		return;
+	}
+
+	if (portalCircle_) {
+		Object3dCommon::GetInstance()->DrawCommonPortal();
+		portalCircle_->Draw();
+	}
 }
 
 void Portal::DrawRings() {
-    //Object3dCommon::GetInstance()->DrawCommonNoCull();
-    //ring_->Draw();
+	if (!ShouldProcessPortal()) {
+		return;
+	}
+
+	// Object3dCommon::GetInstance()->DrawCommonNoCull();
+	// ring_->Draw();
 }
 
+void Portal::BeginRender() {
+	if (!ShouldProcessPortal()) {
+		return;
+	}
 
-void Portal::BeginRender()
-{
-    portalRenderTexture_->BeginRender();
-
+	portalRenderTexture_->BeginRender();
 }
 
-void Portal::TransitionToShaderResource()
-{
-    portalRenderTexture_->TransitionToShaderResource();
-    Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
+void Portal::TransitionToShaderResource() {
+	if (!ShouldProcessPortal()) {
+		return;
+	}
+
+	portalRenderTexture_->TransitionToShaderResource();
+	Object3dCommon::GetInstance()->GetDxCommon()->ExecuteCommandListAndWait();
+	TextureManager::GetInstance()->GetSrvManager()->PreDraw();
 }
 
-void Portal::SetCamera(Camera* camera)
-{
-    sceneCamera_ = camera;
-    portalCircle_->SetObjectCamera(camera);
+void Portal::SetCamera(Camera* camera) {
+	sceneCamera_ = camera;
+	portalCircle_->SetObjectCamera(camera);
 
-    ring_->SetCamera(camera);
-    ring_->UpdateCameraMatrices();
-    warpPos_->SetCamera(camera);
-
+	ring_->SetCamera(camera);
+	ring_->UpdateCameraMatrices();
+	warpPos_->SetCamera(camera);
 }
 
-void Portal::SetPortalWorldMatrix()
-{
-    SetParentTransformToTransform();
-    Vector3 forward = SetSceneCameraAndParentAndGetForward();
-    //回転を方向別でセットする
+void Portal::SetPortalWorldMatrix() {
+	if (!ShouldProcessPortal()) {
+		return;
+	}
 
-    SetRotateFromDirection(forward);
-    SetTranslate(forward);
-    UpdateWorldMatrix();
+	SetParentTransformToTransform();
+	Vector3 forward = SetSceneCameraAndParentAndGetForward();
+	// 回転を方向別でセットする
+
+	SetRotateFromDirection(forward);
+	SetTranslate(forward);
+	UpdateWorldMatrix();
 }
 
-void Portal::UpdatePortalWorldMatrix()
-{
-    Vector3 forward = SetSceneCameraAndParentAndGetForward();
-    SetTranslate(forward);
-    transform_.rotate.y = preRotY_+ parentTransform->rotate.y;
-    UpdateScale();
-    UpdateWorldMatrix();
+void Portal::UpdatePortalWorldMatrix() {
+	if (!ShouldProcessPortal()) {
+		return;
+	}
+
+	Vector3 forward = SetSceneCameraAndParentAndGetForward();
+	SetTranslate(forward);
+	transform_.rotate.y = preRotY_ + parentTransform->rotate.y;
+	UpdateScale();
+	UpdateWorldMatrix();
 }
 
-void Portal::SetRotateFromDirection(const Vector3& forward)
-{
-    Vector3 direction = YoshidaMath::GetDirectionFromRotateY(parentTransform->rotate.y);
-    float dot = Function::Dot(forward, direction);
+void Portal::SetRotateFromDirection(const Vector3& forward) {
+	Vector3 direction = YoshidaMath::GetDirectionFromRotateY(parentTransform->rotate.y);
+	float dot = Function::Dot(forward, direction);
 
-    if (dot < 0.0f) {
-        //向き合っている
-        //ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
-        preRotY_ = Function::kPi;
-    } else {
-        //ring_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
-        preRotY_ =0.0f;
-    }
-    transform_.rotate.y = preRotY_ + parentTransform->rotate.y;
+	if (dot < 0.0f) {
+		// 向き合っている
+		// ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+		preRotY_ = Function::kPi;
+	} else {
+		// ring_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
+		preRotY_ = 0.0f;
+	}
+	transform_.rotate.y = preRotY_ + parentTransform->rotate.y;
 }
 
-void Portal::UpdateScale()
-{
-    scaleTimer_ += YoshidaMath::kDeltaTime;
-    scaleTimer_ = std::clamp(scaleTimer_, 0.0f, 1.0f);
-    transform_.scale = YoshidaMath::Easing::EaseInOutBack({ 0.0f,0.0f,0.0f }, parentTransform->scale, scaleTimer_);
+void Portal::UpdateScale() {
+	scaleTimer_ += YoshidaMath::kDeltaTime;
+	scaleTimer_ = std::clamp(scaleTimer_, 0.0f, 1.0f);
+	transform_.scale = YoshidaMath::Easing::EaseInOutBack({0.0f, 0.0f, 0.0f}, parentTransform->scale, scaleTimer_);
 }
 
-void Portal::UpdateWorldMatrix()
-{
-    Matrix4x4  worldMatrix = Function::MakeAffineMatrix(transform_.scale*0.9f, transform_.rotate, transform_.translate);
-    Matrix4x4  worldMatrix1 = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, ringTranslate_);
-    portalCircle_->SetWorldMatrix(worldMatrix);
-    ring_->SetWorldMatrix(worldMatrix1);
+void Portal::UpdateWorldMatrix() {
+	Matrix4x4 worldMatrix = Function::MakeAffineMatrix(transform_.scale * 0.9f, transform_.rotate, transform_.translate);
+	Matrix4x4 worldMatrix1 = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, ringTranslate_);
+	portalCircle_->SetWorldMatrix(worldMatrix);
+	ring_->SetWorldMatrix(worldMatrix1);
 }
 
-void Portal::SetTranslate(const Vector3& forward)
-{
-    transform_.translate = parentTransform->translate - forward * 0.0625f;
-    ringTranslate_ = transform_.translate - forward * 0.0625f * 0.125f;
+void Portal::SetTranslate(const Vector3& forward) {
+	transform_.translate = parentTransform->translate - forward * 0.0625f;
+	ringTranslate_ = transform_.translate - forward * 0.0625f * 0.125f;
 }
 
-Vector3 Portal::SetSceneCameraAndParentAndGetForward()
-{
-    assert(sceneCamera_);
-    return YoshidaMath::GetForward(sceneCamera_->GetWorldMatrix());
+Vector3 Portal::SetSceneCameraAndParentAndGetForward() {
+	if (!sceneCamera_) {
+		return {0.0f, 0.0f, 1.0f};
+	}
+	return YoshidaMath::GetForward(sceneCamera_->GetWorldMatrix());
 }
 
-void Portal::SetParentTransformToTransform()
-{
-    assert(parentTransform);
-    transform_ = *parentTransform;
+void Portal::SetParentTransformToTransform() {
+	if (!parentTransform) {
+		return;
+	}
+	transform_ = *parentTransform;
+}
+
+bool Portal::ShouldProcessPortal() const {
+	Hierarchy* hierarchy = Hierarchy::GetInstance();
+	return !hierarchy || hierarchy->IsPlayMode();
 }
