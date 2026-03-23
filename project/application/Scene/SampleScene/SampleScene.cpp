@@ -214,66 +214,7 @@ void SampleScene::Initialize() {
 	overlayCameraSprite_->SetRotation(0.0f);
 	overlayCameraSprite_->SetPosition(Vector2(0.0f, 0.0f));
 
-		activePointLightCount_ = 2;
-	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLights_[0].position = {0.0f, 5.0f, 0.0f};
-	pointLights_[0].intensity = 1.0f;
-	pointLights_[0].radius = 10.0f;
-	pointLights_[0].decay = 1.0f;
-	pointLights_[0].shadowEnabled = 0;
-	pointLights_[1].color = {1.0f, 0.0f, 0.0f, 1.0f};
-	pointLights_[1].position = {5.0f, 5.0f, 5.0f};
-	pointLights_[1].intensity = 1.0f;
-	pointLights_[1].radius = 10.0f;
-	pointLights_[1].decay = 1.0f;
-	pointLights_[1].shadowEnabled = 0;
-
-	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
-	directionalLight_.intensity = 1.0f;
-	directionalLight_.shadowEnabled = 1;
-
-	activeSpotLightCount_ = 2;
-	spotLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	spotLights_[0].position = {2.0f, 1.25f, 0.0f};
-	spotLights_[0].direction = {-1.0f, -1.0f, 0.0f};
-	spotLights_[0].intensity = 4.0f;
-	spotLights_[0].distance = 7.0f;
-	spotLights_[0].decay = 2.0f;
-	spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-	spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
-	spotLights_[0].shadowEnabled = 0;
-
-	spotLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	spotLights_[1].position = {2.0f, 1.25f, 0.0f};
-	spotLights_[1].direction = {-1.0f, -1.0f, 0.0f};
-	spotLights_[1].intensity = 4.0f;
-	spotLights_[1].distance = 7.0f;
-	spotLights_[1].decay = 2.0f;
-	spotLights_[1].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-	spotLights_[1].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
-	spotLights_[1].shadowEnabled = 0;
-
-	activeAreaLightCount_ = 2;
-	areaLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	areaLights_[0].position = {0.0f, 3.0f, 0.0f};
-	areaLights_[0].normal = {1.0f, -1.0f, 0.0f};
-	areaLights_[0].intensity = 4.0f;
-	areaLights_[0].width = 2.0f;
-	areaLights_[0].height = 2.0f;
-	areaLights_[0].radius = 0.1f;
-	areaLights_[0].decay = 2.0f;
-	areaLights_[0].shadowEnabled = 0;
-
-	areaLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	areaLights_[1].position = {-5.0f, 3.0f, 0.0f};
-	areaLights_[1].normal = {1.0f, -1.0f, 0.0f};
-	areaLights_[1].intensity = 4.0f;
-	areaLights_[1].width = 2.0f;
-	areaLights_[1].height = 2.0f;
-	areaLights_[1].radius = 0.1f;
-	areaLights_[1].decay = 2.0f;
-	areaLights_[1].shadowEnabled = 0;
+	
 }
 
 void SampleScene::Update() {
