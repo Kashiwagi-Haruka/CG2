@@ -43,10 +43,22 @@ void Flashlight::Update()
 
     if (isGetLight_) {
 
-        Matrix4x4 child = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-        child = Function::Multiply(child, playerCamera_->GetCamera()->GetWorldMatrix());
-        obj_->SetWorldMatrix(child);
+        transform_.translate = { 0.0f,0.1f,0.0f };
+        transform_.rotate = { 0.0f,Function::kPi * 0.5f,0.0f };
+        transform_.scale = { 1.0f,1.0f,1.0f };
 
+        Matrix4x4  handMat =player_->GetJointMatrix("Hand.L");
+        Matrix4x4 child = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+        child = Function::Multiply(child, handMat);
+        obj_->SetWorldMatrix(child);
+#ifdef USE_IMGUI
+        ImGui::Begin("FlashLight");
+        ImGui::DragFloat3("direction", &spotLight_.direction.x);
+        ImGui::Text("translate %f %f %f", handMat.m[3][0], handMat.m[3][1], handMat.m[3][2]);
+
+        ImGui::End();
+
+#endif
     } else {
         //y座標を固定する
         transform_.translate.y = std::clamp(transform_.translate.y, 0.0f, 2.4f);
@@ -104,9 +116,7 @@ void Flashlight::CheckCollision()
                 isGetLight_ = true;
                 Player::SetIsGrab(true);
                 isSendGetLightMessage_ = true;
-                transform_.translate = { -0.2f,0.0f,0.25f };
-                transform_.rotate = { 0.0f,Function::kPi,0.0f };
-                transform_.scale = { 1.0f,1.0f,1.0f };
+
             }
 
         }
@@ -121,10 +131,7 @@ void Flashlight::UpdateSpotLight()
     spotLight_.position = GetWorldPosition();
     spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
     spotLight_.intensity = 10.0f;
-#ifdef USE_IMGUI
 
-
-#endif
 }
 
 bool Flashlight::OnCollisionRay()

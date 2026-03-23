@@ -23,7 +23,7 @@ void Key::Initialize()
     worldTransform_ = {
         .scale{2.0f, 2.0f, 2.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{-4.0f, 4.0f, -6.5f}
+        .translate{-1.0f, 4.0f, -6.5f}
     };
     velocity_ = { 0.0f };
     obj_->Initialize();
