@@ -169,10 +169,11 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Edamame\Edamame.cpp" />
     <ClCompile Include="application\GameObject\Chair\Chair.cpp" />
     <ClCompile Include="application\Scene\TD3_4month\CoffeeScene.cpp" />
-    <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
+    <ClCompile Include="application\GameObject\Coffee\Coffees.cpp" />
     <ClCompile Include="application\GameObject\Edamame\EdamameTrivia.cpp" />
     <ClCompile Include="application\GameObject\Coffee\CoffeeTrivia.cpp" />
     <ClCompile Include="application\GameObject\BGMManager\BGMManager.cpp" />
+    <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
     <ClCompile Include="Engine\Audio\AudioMixer.cpp" />
     <ClCompile Include="application\GameObject\Door\Door.cpp" />
     <ClCompile Include="application\GameObject\Door\AutoLockSystem.cpp" />
@@ -306,10 +307,11 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Chair\Chair.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\RandomClass.h" />
     <ClInclude Include="application\Scene\TD3_4month\CoffeeScene.h" />
-    <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
+    <ClInclude Include="application\GameObject\Coffee\Coffees.h" />
     <ClInclude Include="application\GameObject\Edamame\EdamameTrivia.h" />
     <ClInclude Include="application\GameObject\Coffee\CoffeeTrivia.h" />
     <ClInclude Include="application\GameObject\BGMManager\BGMManager.h" />
+    <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
     <ClInclude Include="Engine\Audio\AudioMixer.h" />
     <ClInclude Include="application\GameObject\Door\Door.h" />
     <ClInclude Include="application\GameObject\Door\AutoLockSystem.h" />

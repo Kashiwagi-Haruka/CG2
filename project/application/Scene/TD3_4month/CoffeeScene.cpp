@@ -19,7 +19,7 @@ CoffeeScene::CoffeeScene() {
 	}
 	camera_ = std::make_unique<Camera>();
 	debugCamera_ = std::make_unique<DebugCamera>();
-	coffee_ = std::make_unique<Coffee>();
+	coffee_ = std::make_unique<Coffees>();
 	cameraTransform_ = {
 	    .scale = {1.0f, 1.0f, 1.0f },
 	    .rotate = {0.0f, 0.0f, 0.0f },

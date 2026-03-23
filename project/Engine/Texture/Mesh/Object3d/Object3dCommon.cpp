@@ -148,6 +148,11 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 
 	areaLightSrvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
 	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaLight));
+	
+	SetPointLights(nullptr, 0);
+	SetSpotLights(nullptr, 0);
+	SetAreaLights(nullptr, 0);
+
 	editorDirectionalLight_ = *directionalLightData_;
 	editorPointLightCount_ = 0;
 	editorSpotLightCount_ = 0;

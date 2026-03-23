@@ -1,7 +1,7 @@
 {
   "playerParameters": {
     "rotateYSpeed": 0.25,
-    "sneakSpeed": 0.0625,
-    "walkSpeed": 0.125
+    "sneakSpeed": 0.014999999664723873,
+    "walkSpeed": 0.09600000083446503
   }
 }
