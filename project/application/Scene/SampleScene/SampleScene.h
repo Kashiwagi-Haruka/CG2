@@ -44,6 +44,9 @@ class SampleScene : public BaseScene {
 
 	DirectionalLight directionalLight_{};
 	bool directionalShadowEnabled_ = true;
+	bool pointShadowEnabled_ = true;
+	bool spotShadowEnabled_ = true;
+	bool areaShadowEnabled_ = true;
 	std::array<PointLight, kMaxPointLights> pointLights_{};
 	uint32_t activePointLightCount_ = 0;
 	std::array<SpotLight, kMaxSpotLights> spotLights_{};

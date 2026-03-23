@@ -55,6 +55,8 @@ public:
 	void LoadTextureFromMemory(const std::string& key, const uint8_t* data, size_t size);
 	// RGBA8 生データからテクスチャを作成する
 	void LoadTextureFromRGBA8(const std::string& key, uint32_t width, uint32_t height, const uint8_t* data);
+	// TextureManager 外で生成したテクスチャ SRV をメタデータ付きで登録する
+	void RegisterExternalTexture(const std::string& key, ID3D12Resource* resource, uint32_t srvIndex, DXGI_FORMAT format, uint32_t width, uint32_t height, uint32_t mipLevels = 1);
 	// ファイルパスから SRV インデックスを取得する
 	uint32_t GetTextureIndexByfilePath(const std::string& filePath);
 	// ファイルパスから GPU SRV ハンドルを取得する

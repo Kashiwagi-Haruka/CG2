@@ -156,6 +156,29 @@ void TextureManager::LoadTextureFromRGBA8(const std::string& key, uint32_t width
 	std::string log = "Embedded Texture Loaded (RGBA8): " + key + " | SRV Index: " + std::to_string(textureData.srvIndex) + " | GPU Handle: " + std::to_string(textureData.srvHandleGPU.ptr) + "\n";
 	OutputDebugStringA(log.c_str());
 }
+void TextureManager::RegisterExternalTexture(const std::string& key, ID3D12Resource* resource, uint32_t srvIndex, DXGI_FORMAT format, uint32_t width, uint32_t height, uint32_t mipLevels) {
+	if (key.empty()) {
+		return;
+	}
+
+	TextureData& textureData = textureDatas[key];
+	textureData.filePath = key;
+	textureData.resource = resource;
+	textureData.srvIndex = srvIndex;
+	textureData.srvHandleCPU = srvManager_->GetCPUDescriptorHandle(srvIndex);
+	textureData.srvHandleGPU = srvManager_->GetGPUDescriptorHandle(srvIndex);
+
+	textureData.metadata = {};
+	textureData.metadata.width = width;
+	textureData.metadata.height = height;
+	textureData.metadata.depth = 1;
+	textureData.metadata.arraySize = 1;
+	textureData.metadata.mipLevels = mipLevels;
+	textureData.metadata.format = format;
+	textureData.metadata.dimension = DirectX::TEX_DIMENSION_TEXTURE2D;
+	textureData.metadata.miscFlags = 0;
+	textureData.metadata.miscFlags2 = 0;
+}
 // メタデータに基づいてテクスチャリソースを作成する
 Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(DirectX::TexMetadata& metadata) {
 

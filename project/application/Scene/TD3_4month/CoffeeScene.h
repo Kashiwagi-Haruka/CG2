@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "DebugCamera.h"
 #include "GameObject/Coffee/Coffees.h"
+#include "Light/DirectionalLight.h"
 #include "Primitive/Primitive.h"
 #include "Transform.h"
 #include <array>
@@ -17,7 +18,10 @@ private:
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	std::unique_ptr<Coffees> coffee_ = nullptr;
 	Transform cameraTransform_{};
+	DirectionalLight directionalLight_{};
 	bool useDebugCamera_ = false;
+	bool useDirectionalShadow_ = true;
+
 public:
 	CoffeeScene();
 	~CoffeeScene() override = default;
