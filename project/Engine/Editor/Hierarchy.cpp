@@ -1163,22 +1163,10 @@ void Hierarchy::DrawCameraBillboards() {
 		if (!camera || camera == previewCamera) {
 			continue;
 		}
-
-		Matrix4x4 worldMatrix = billboardMatrix;
-		const Vector3 worldTranslate = camera->GetWorldTranslate();
-		const float scale = 0.75f;
-		worldMatrix.m[0][0] *= scale;
-		worldMatrix.m[0][1] *= scale;
-		worldMatrix.m[0][2] *= scale;
-		worldMatrix.m[1][0] *= scale;
-		worldMatrix.m[1][1] *= scale;
-		worldMatrix.m[1][2] *= scale;
-		worldMatrix.m[2][0] *= scale;
-		worldMatrix.m[2][1] *= scale;
-		worldMatrix.m[2][2] *= scale;
-		worldMatrix.m[3][0] = worldTranslate.x;
-		worldMatrix.m[3][1] = worldTranslate.y;
-		worldMatrix.m[3][2] = worldTranslate.z;
+		
+		Matrix4x4 worldMatrix = Function::Multiply(billboardMatrix, Function::MakeAffineMatrix(Vector3(1, 1, 1), Vector3(0, 0, 0), camera->GetTranslate()));
+		;
+		
 
 		cameraBillboardPrimitive_->SetWorldMatrix(worldMatrix);
 		cameraBillboardPrimitive_->UpdateCameraMatrices();

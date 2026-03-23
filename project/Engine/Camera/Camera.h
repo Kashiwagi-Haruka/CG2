@@ -40,7 +40,7 @@ public:
 		worldMatrix_ = worldMatrix;
 	}
 	void DrawEditorInHierarchy();
-
+	void SetScale(const Vector3& scale) { transform_.scale = scale; }
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
 	void SetTransform(const Transform& transform) { transform_ = transform; }
@@ -59,6 +59,7 @@ public:
 	const float GetNearZ() const { return nearZ; }
 	const float GetFarZ() const { return farZ; }
 
+	const Vector3& GetScale() const { return transform_.scale; }
 	const Vector3& GetRotate() const { return transform_.rotate; }
 	const Vector3& GetTranslate() const { return transform_.translate; }
 	Vector3 GetWorldTranslate() const { return {worldMatrix_.m[3][0], worldMatrix_.m[3][1], worldMatrix_.m[3][2]}; }
