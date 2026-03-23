@@ -71,7 +71,7 @@ private:
 		DirectionalLight directionalLight = {
 		    {1.0f, 1.0f, 1.0f, 1.0f},
             {0.0f, -1.0f, 0.0f},
-            1.0f
+            1.0f, 1, {0.0f, 0.0f, 0.0f}
         };
 		std::vector<PointLight> pointLights;
 		std::vector<SpotLight> spotLights;

@@ -153,7 +153,7 @@ private:
 	DirectionalLight editorDirectionalLight_ = {
 	    {1.0f, 1.0f, 1.0f, 1.0f},
         {0.0f, -1.0f, 0.0f},
-        1.0f
+        1.0f, 1, {0.0f, 0.0f, 0.0f}
     };
 	// エディタ指定のポイントライト配列
 	std::array<PointLight, kMaxPointLights> editorPointLights_{};

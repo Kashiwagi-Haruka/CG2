@@ -122,7 +122,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	*directionalLightData_ = {
 	    {1.0f, 1.0f, 1.0f, 1.0f},
         {0.0f, -1.0f, 0.0f},
-        1.0f
+        1.0f, 1, {0.0f, 0.0f, 0.0f}
     };
 	directionalLightResource_->Unmap(0, nullptr);
 	pointLightResource_ = CreateBufferResource(sizeof(PointLight) * kMaxPointLights);
@@ -164,7 +164,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	shadowDesc.Height = kShadowMapSize_;
 	shadowDesc.DepthOrArraySize = 1;
 	shadowDesc.MipLevels = 1;
-	shadowDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	shadowDesc.Format = DXGI_FORMAT_R32_TYPELESS;
 	shadowDesc.SampleDesc.Count = 1;
 	shadowDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	shadowDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
@@ -212,10 +212,12 @@ void Object3dCommon::DrawSet(){
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, Object3dCommon::GetInstance()->GetPointLightCountResource()->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, Object3dCommon::GetInstance()->GetSpotLightCountResource()->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(7, Object3dCommon::GetInstance()->GetAreaLightCountResource()->GetGPUVirtualAddress());
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, directionalShadowMapSrvIndex_);
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(13, pointShadowMapSrvIndex_);
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(14, spotShadowMapSrvIndex_);
-	TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(15, areaShadowMapSrvIndex_);
+	if (!isShadowMapPassActive_) {
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, directionalShadowMapSrvIndex_);
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(13, pointShadowMapSrvIndex_);
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(14, spotShadowMapSrvIndex_);
+		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(15, areaShadowMapSrvIndex_);
+	}
 }
 void Object3dCommon::DrawCommon() {
 

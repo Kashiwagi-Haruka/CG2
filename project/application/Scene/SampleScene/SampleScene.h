@@ -43,6 +43,7 @@ class SampleScene : public BaseScene {
 	bool useDebugCamera_ = false;
 
 	DirectionalLight directionalLight_{};
+	bool directionalShadowEnabled_ = true;
 	std::array<PointLight, kMaxPointLights> pointLights_{};
 	uint32_t activePointLightCount_ = 0;
 	std::array<SpotLight, kMaxSpotLights> spotLights_{};

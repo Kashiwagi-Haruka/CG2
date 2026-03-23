@@ -17,6 +17,8 @@ struct DirectionalLight
     float4 color;
     float3 direction;
     float intensity;
+    int shadowEnabled;
+    float3 padding;
 };
 struct PointLight
 {
@@ -209,8 +211,9 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
         float spotShadowVisibility = ComputeShadowVisibility(gSpotShadowMap, input.spotShadowPosition);
         float areaShadowVisibility = ComputeShadowVisibility(gAreaShadowMap, input.areaShadowPosition);
         
-        float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity * directionalShadow * directionalShadowVisibility;
-        float3 specular = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * directionalShadow * directionalShadowVisibility;
+        float directionalShadowFactor = (gDirectionalLight.shadowEnabled != 0) ? directionalShadowVisibility : 1.0f;
+        float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity * directionalShadow * directionalShadowFactor;
+        float3 specular = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f) * directionalShadow * directionalShadowFactor;
         
 // Point Light
         float3 N = normalize(input.normal);

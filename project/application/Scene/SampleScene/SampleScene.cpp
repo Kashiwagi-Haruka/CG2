@@ -220,15 +220,18 @@ void SampleScene::Initialize() {
 	pointLights_[0].intensity = 1.0f;
 	pointLights_[0].radius = 10.0f;
 	pointLights_[0].decay = 1.0f;
+	pointLights_[0].shadowEnabled = 1;
 	pointLights_[1].color = {1.0f, 0.0f, 0.0f, 1.0f};
 	pointLights_[1].position = {5.0f, 5.0f, 5.0f};
 	pointLights_[1].intensity = 1.0f;
 	pointLights_[1].radius = 10.0f;
 	pointLights_[1].decay = 1.0f;
+	pointLights_[1].shadowEnabled = 1;
 
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
 	directionalLight_.intensity = 1.0f;
+	directionalLight_.shadowEnabled = 1;
 
 	activeSpotLightCount_ = 2;
 	spotLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -239,6 +242,7 @@ void SampleScene::Initialize() {
 	spotLights_[0].decay = 2.0f;
 	spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+	spotLights_[0].shadowEnabled = 1;
 
 	spotLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	spotLights_[1].position = {2.0f, 1.25f, 0.0f};
@@ -248,6 +252,7 @@ void SampleScene::Initialize() {
 	spotLights_[1].decay = 2.0f;
 	spotLights_[1].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLights_[1].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+	spotLights_[1].shadowEnabled = 1;
 
 	activeAreaLightCount_ = 2;
 	areaLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -258,6 +263,7 @@ void SampleScene::Initialize() {
 	areaLights_[0].height = 2.0f;
 	areaLights_[0].radius = 0.1f;
 	areaLights_[0].decay = 2.0f;
+	areaLights_[0].shadowEnabled = 1;
 
 	areaLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	areaLights_[1].position = {-5.0f, 3.0f, 0.0f};
@@ -267,6 +273,7 @@ void SampleScene::Initialize() {
 	areaLights_[1].height = 2.0f;
 	areaLights_[1].radius = 0.1f;
 	areaLights_[1].decay = 2.0f;
+	areaLights_[1].shadowEnabled = 1;
 }
 
 void SampleScene::Update() {
@@ -445,6 +452,43 @@ void SampleScene::Update() {
 		ImGui::Combo("Random Noise Blend", &randomNoiseBlendMode_, noiseBlendModes, IM_ARRAYSIZE(noiseBlendModes));
 	}
 	ImGui::End();
+	if (ImGui::Begin("Sample Lights")) {
+		if (ImGui::TreeNode("Directional")) {
+			ImGui::Checkbox("Shadow##Directional", &directionalShadowEnabled_);
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("Point")) {
+			for (uint32_t i = 0; i < activePointLightCount_; ++i) {
+				bool shadowEnabled = pointLights_[i].shadowEnabled != 0;
+				if (ImGui::Checkbox(("Shadow##Point" + std::to_string(i)).c_str(), &shadowEnabled)) {
+					pointLights_[i].shadowEnabled = shadowEnabled ? 1 : 0;
+				}
+			}
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("Spot")) {
+			for (uint32_t i = 0; i < activeSpotLightCount_; ++i) {
+				bool shadowEnabled = spotLights_[i].shadowEnabled != 0;
+				if (ImGui::Checkbox(("Shadow##Spot" + std::to_string(i)).c_str(), &shadowEnabled)) {
+					spotLights_[i].shadowEnabled = shadowEnabled ? 1 : 0;
+				}
+			}
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("Area")) {
+			for (uint32_t i = 0; i < activeAreaLightCount_; ++i) {
+				bool shadowEnabled = areaLights_[i].shadowEnabled != 0;
+				if (ImGui::Checkbox(("Shadow##Area" + std::to_string(i)).c_str(), &shadowEnabled)) {
+					areaLights_[i].shadowEnabled = shadowEnabled ? 1 : 0;
+				}
+			}
+			ImGui::TreePop();
+		}
+	}
+	ImGui::End();
 	if (ImGui::Begin("Portal")) {
 		ImGui::Text("Portal A object transform");
 		ImGui::DragFloat3("Scale##PortalAScale", &portalATransform_.scale.x, 0.01f, 0.01f, 100.0f);
@@ -474,6 +518,7 @@ void SampleScene::Update() {
 
 
 #endif // USE_IMGUI
+	directionalLight_.shadowEnabled = directionalShadowEnabled_ ? 1 : 0;
 	if (useDebugCamera_) {
 		debugCamera_->Update();
 		camera_->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());

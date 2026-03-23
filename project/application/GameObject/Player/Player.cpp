@@ -97,7 +97,7 @@ void Player::Initialize() {
     transform_ = {
         .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{0.0f, 2.0f, 0.0f}
+        .translate{4.0f, 2.0f, 2.0f}
     };
     // 速度の初期化
     velocity_ = { 0.0f };
