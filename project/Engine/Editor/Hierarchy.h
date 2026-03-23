@@ -12,7 +12,7 @@
 #include "Vector4.h"
 
 #include "Engine/Audio/Audio.h"
-#include "Engine/Camera/DebugCamera.h"
+#include "Engine/Editor/Camera/EditorCamera.h"
 #include "Inspector.h"
 #include "Light/AreaLight.h"
 #include "Light/DirectionalLight.h"
@@ -118,11 +118,7 @@ private:
 	std::unordered_map<std::string, bool> savedAudioLoopEnabled_;
 	std::unordered_map<std::string, std::vector<Audio::MixerEffectSettings>> savedAudioEffects_;
 	std::unordered_set<std::string> playModeInitializedAudioNames_;
-	DebugCamera editorPreviewCamera_{};
-	bool isEditorPreviewCameraInitialized_ = false;
-	bool wasEditorPreviewActiveLastFrame_ = false;
-	std::vector<Camera*> cameras_;
-	std::unique_ptr<Primitive> cameraBillboardPrimitive_;
+	EditorCamera editorCamera_{};
 
 public:
 	void RegisterCamera(Camera* camera);

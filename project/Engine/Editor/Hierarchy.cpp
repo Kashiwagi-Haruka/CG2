@@ -143,68 +143,18 @@ void Hierarchy::Finalize() {
 
 	selectionBoxPrimitive_.reset();
 	editorGridPlane_.reset();
-	cameraBillboardPrimitive_.reset();
-	cameras_.clear();
 
 	selectedObjectIndex_ = 0;
 	selectedIsPrimitive_ = false;
 	selectionBoxDirty_ = true;
 	editorGridDirty_ = true;
 	loadedSceneName_.clear();
-	isEditorPreviewCameraInitialized_ = false;
-	wasEditorPreviewActiveLastFrame_ = false;
+	editorCamera_.Reset();
 	ResetForSceneChange();
 }
 bool Hierarchy::IsEditorPreviewActive() const { return HasRegisteredObjects() && !isPlaying_; }
 
-void Hierarchy::UpdateEditorPreview() {
-	if (!IsEditorPreviewActive()) {
-		wasEditorPreviewActiveLastFrame_ = false;
-		return;
-	}
-
-	Object3dCommon* object3dCommon = Object3dCommon::GetInstance();
-	if (!object3dCommon) {
-		wasEditorPreviewActiveLastFrame_ = false;
-		return;
-	}
-
-	Camera* sceneCamera = object3dCommon->GetDefaultCamera();
-	if (!sceneCamera) {
-		wasEditorPreviewActiveLastFrame_ = false;
-		return;
-	}
-
-	if (!isEditorPreviewCameraInitialized_ || !wasEditorPreviewActiveLastFrame_) {
-		editorPreviewCamera_.Initialize();
-		editorPreviewCamera_.SetTransform(sceneCamera->GetTransform());
-		isEditorPreviewCameraInitialized_ = true;
-	}
-
-	Input* input = Input::GetInstance();
-	if (input) {
-		input->SetIsCursorVisible(true);
-		input->SetIsCursorStability(false);
-	}
-
-	editorPreviewCamera_.Update();
-	sceneCamera->SetViewProjectionMatrix(editorPreviewCamera_.GetViewMatrix(), editorPreviewCamera_.GetProjectionMatrix());
-	object3dCommon->SetDefaultCamera(sceneCamera);
-
-	for (Object3d* object : objects_) {
-		if (object) {
-			object->Update();
-		}
-	}
-
-	for (Primitive* primitive : primitives_) {
-		if (primitive) {
-			primitive->Update();
-		}
-	}
-
-	wasEditorPreviewActiveLastFrame_ = true;
-}
+void Hierarchy::UpdateEditorPreview() { editorCamera_.UpdateEditorPreview(IsEditorPreviewActive(), objects_, primitives_); }
 
 std::string Hierarchy::GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const {
 	const SceneManager* sceneManager = SceneManager::GetInstance();
@@ -237,10 +187,10 @@ void Hierarchy::ResetForSceneChange() {
 	editorLightState_.pointLights.clear();
 	editorLightState_.spotLights.clear();
 	editorLightState_.areaLights.clear();
-	isEditorPreviewCameraInitialized_ = false;
-	wasEditorPreviewActiveLastFrame_ = false;
+	editorCamera_.DeactivatePreview();
 	Object3dCommon::GetInstance()->SetEditorLightOverride(false);
 }
+
 
 void Hierarchy::UndoEditorChange() {
 	if (undoStack_.empty()) {
@@ -428,25 +378,9 @@ void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
 		}
 	}
 }
-void Hierarchy::RegisterCamera(Camera* camera) {
-	if (!camera) {
-		return;
-	}
-	if (std::find(cameras_.begin(), cameras_.end(), camera) != cameras_.end()) {
-		return;
-	}
-	cameras_.push_back(camera);
-}
+void Hierarchy::RegisterCamera(Camera* camera) { editorCamera_.RegisterCamera(camera); }
 
-void Hierarchy::UnregisterCamera(Camera* camera) {
-	if (!camera) {
-		return;
-	}
-	auto it = std::remove(cameras_.begin(), cameras_.end(), camera);
-	if (it != cameras_.end()) {
-		cameras_.erase(it, cameras_.end());
-	}
-}
+void Hierarchy::UnregisterCamera(Camera* camera) { editorCamera_.UnregisterCamera(camera); }
 
 bool Hierarchy::HasRegisteredObjects() const { return !objects_.empty() || !primitives_.empty(); }
 
@@ -1074,7 +1008,7 @@ void Hierarchy::SetPlayMode(bool isPlaying) {
 			audio->StopAllPreviewSounds();
 			audio->StopAllSceneSounds();
 		}
-		wasEditorPreviewActiveLastFrame_ = false;
+		editorCamera_.DeactivatePreview();
 		if (!wasPlaying) {
 			playModeInitializedAudioNames_.clear();
 		}
@@ -1141,70 +1075,8 @@ void Hierarchy::DrawEditorGridLines() {
 	selectionBoxPrimitive_->Draw();
 #endif
 }
-void Hierarchy::DrawCameraBillboards() {
-#ifdef USE_IMGUI
-	if (isPlaying_ || cameras_.empty()) {
-		return;
-	}
-
-	Object3dCommon* object3dCommon = Object3dCommon::GetInstance();
-	if (!object3dCommon) {
-		return;
-	}
-
-	Camera* previewCamera = object3dCommon->GetDefaultCamera();
-	if (!previewCamera) {
-		return;
-	}
-
-	if (!cameraBillboardPrimitive_) {
-		cameraBillboardPrimitive_ = std::make_unique<Primitive>();
-		cameraBillboardPrimitive_->SetEditorRegistrationEnabled(false);
-		cameraBillboardPrimitive_->Initialize(Primitive::Plane, "Resources/Editor/camera.png");
-		cameraBillboardPrimitive_->SetEnableLighting(false);
-	}
-
-	cameraBillboardPrimitive_->SetCamera(previewCamera);
-	cameraBillboardPrimitive_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-	cameraBillboardPrimitive_->SetShininess(1.0f);
-	cameraBillboardPrimitive_->SetEnvironmentCoefficient(0.0f);
-
-	Matrix4x4 billboardMatrix = Function::Inverse(previewCamera->GetViewMatrix());
-	billboardMatrix.m[3][0] = 0.0f;
-	billboardMatrix.m[3][1] = 0.0f;
-	billboardMatrix.m[3][2] = 0.0f;
-
-	Object3dCommon::GetInstance()->DrawCommonNoCull();
-	for (Camera* camera : cameras_) {
-		if (!camera || camera == previewCamera) {
-			continue;
-		}
-		
-		Matrix4x4 worldMatrix = Function::Multiply(billboardMatrix, Function::MakeAffineMatrix(Vector3(1, 1, 1), Vector3(0, 0, 0), camera->GetTranslate()));
-		;
-		
-
-		cameraBillboardPrimitive_->SetWorldMatrix(worldMatrix);
-		cameraBillboardPrimitive_->UpdateCameraMatrices();
-		cameraBillboardPrimitive_->Draw();
-	}
-#endif
-}
-void Hierarchy::DrawCameraEditor() {
-#ifdef USE_IMGUI
-	Object3dCommon* object3dCommon = Object3dCommon::GetInstance();
-	if (!object3dCommon) {
-		ImGui::TextUnformatted("Object3dCommon unavailable");
-		return;
-	}
-	Camera* camera = object3dCommon->GetDefaultCamera();
-	if (!camera) {
-		ImGui::TextUnformatted("No default camera");
-		return;
-	}
-	camera->DrawEditorInHierarchy();
-#endif
-}
+void Hierarchy::DrawCameraBillboards() { editorCamera_.DrawCameraBillboards(isPlaying_); }
+void Hierarchy::DrawCameraEditor() { editorCamera_.DrawCameraEditor(); }
 void Hierarchy::DrawLightEditor() {
 #ifdef USE_IMGUI
 	bool overrideChanged = ImGui::Checkbox("Use Editor Lights", &editorLightState_.overrideSceneLights);
