@@ -61,6 +61,7 @@ void Flashlight::Update()
 #endif
     } else {
         //y座標を固定する
+        transform_.rotate = { 0.0f,0.0f,0.0f };
         transform_.translate.y = std::clamp(transform_.translate.y, 0.0f, 2.4f);
         obj_->SetTransform(transform_);
     }
@@ -129,7 +130,10 @@ void Flashlight::CheckCollision()
 void Flashlight::UpdateSpotLight()
 {
     spotLight_.position = GetWorldPosition();
-    spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
+
+    spotLight_.direction = -YoshidaMath::GetForward(obj_->GetWorldMatrix());
+
+
     spotLight_.intensity = 10.0f;
 
 }
