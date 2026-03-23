@@ -339,6 +339,7 @@
     <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
     <ClCompile Include="application\GameObject\Locker\Locker.cpp" />
     <ClCompile Include="application\GameObject\Locker\LockerManager.cpp" />
+    <ClCompile Include="Engine\Editor\Camera\EditorCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -667,6 +668,7 @@
     <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
     <ClInclude Include="application\GameObject\Locker\Locker.h" />
     <ClInclude Include="application\GameObject\Locker\LockerManager.h" />
+    <ClInclude Include="Engine\Editor\Camera\EditorCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
