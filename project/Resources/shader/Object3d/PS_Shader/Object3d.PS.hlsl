@@ -251,7 +251,8 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
             float3 lightToSurface = spotLight.position - input.worldPosition;
             float3 lightDirection = normalize(lightToSurface);
             float3 spotDirection = normalize(spotLight.direction);
-            float cosAngle = dot(lightDirection, spotDirection);
+            float3 lightForward = -lightDirection;
+            float cosAngle = dot(lightForward, spotDirection);
             float falloffFactor = saturate((cosAngle - spotLight.cosAngle) / (spotLight.cosFalloffStart - spotLight.cosAngle));
             float distanceToLight = length(lightToSurface);
             float attenuationFactor = pow(saturate(1.0f - distanceToLight / spotLight.distance), spotLight.decay);

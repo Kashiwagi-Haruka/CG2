@@ -155,6 +155,18 @@ private:
         {0.0f, -1.0f, 0.0f},
         1.0f, 1, {0.0f, 0.0f, 0.0f}
     };
+	// CPU側キャッシュのポイントライト配列
+	std::array<PointLight, kMaxPointLights> cachedPointLights_{};
+	// CPU側キャッシュのポイントライト有効数
+	uint32_t cachedPointLightCount_ = 0;
+	// CPU側キャッシュのスポットライト配列
+	std::array<SpotLight, kMaxSpotLights> cachedSpotLights_{};
+	// CPU側キャッシュのスポットライト有効数
+	uint32_t cachedSpotLightCount_ = 0;
+	// CPU側キャッシュのエリアライト配列
+	std::array<AreaLight, kMaxAreaLights> cachedAreaLights_{};
+	// CPU側キャッシュのエリアライト有効数
+	uint32_t cachedAreaLightCount_ = 0;
 	// エディタ指定のポイントライト配列
 	std::array<PointLight, kMaxPointLights> editorPointLights_{};
 	// エディタ指定ポイントライト有効数

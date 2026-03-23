@@ -418,8 +418,8 @@ Matrix4x4 Object3dCommon::GetPointLightViewProjectionMatrix() const {
 	Vector3 target = {0.0f, 0.0f, 0.0f};
 	float farPlane = shadowCameraFar_;
 	float fov = 1.6f;
-	if (pointLightCountData_ && pointLightCountData_->count > 0) {
-		const PointLight& light = pointlightData_[0];
+	if (cachedPointLightCount_ > 0) {
+		const PointLight& light = cachedPointLights_[0];
 		lightPosition = light.position;
 		farPlane = std::max(shadowCameraNear_ + 0.1f, light.radius);
 	}
@@ -452,8 +452,8 @@ Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
 	Vector3 lightDirection = {0.0f, -1.0f, 0.0f};
 	float fov = 0.9f;
 	float farPlane = shadowCameraFar_;
-	if (spotLightCountData_ && spotLightCountData_->count > 0) {
-		const SpotLight& light = spotLightData_[0];
+	if (cachedSpotLightCount_ > 0) {
+		const SpotLight& light = cachedSpotLights_[0];
 		lightPosition = light.position;
 		lightDirection = Function::Normalize(light.direction);
 		fov = std::max(0.1f, std::acos(std::clamp(light.cosAngle, -1.0f, 1.0f)) * 2.0f);
@@ -486,8 +486,8 @@ Matrix4x4 Object3dCommon::GetAreaLightViewProjectionMatrix() const {
 	float halfWidth = shadowOrthoHalfWidth_;
 	float halfHeight = shadowOrthoHalfHeight_;
 	float farPlane = shadowCameraFar_;
-	if (areaLightCountData_ && areaLightCountData_->count > 0) {
-		const AreaLight& light = areaLightData_[0];
+	if (cachedAreaLightCount_ > 0) {
+		const AreaLight& light = cachedAreaLights_[0];
 		lightPosition = light.position;
 		lightDirection = -Function::Normalize(light.normal);
 		halfWidth = std::max(0.5f, light.width * 0.5f + light.radius);
@@ -521,6 +521,11 @@ void Object3dCommon::SetBlendMode(BlendMode blendMode) {
 }
 void Object3dCommon::SetPointLights(const PointLight* pointLights, uint32_t count) {
 	uint32_t clampedCount = std::min(count, static_cast<uint32_t>(kMaxPointLights));
+	cachedPointLightCount_ = clampedCount;
+	std::fill(cachedPointLights_.begin(), cachedPointLights_.end(), PointLight{});
+	if (pointLights && clampedCount > 0) {
+		std::copy_n(pointLights, clampedCount, cachedPointLights_.begin());
+	}
 	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointlightData_));
 	std::memset(pointlightData_, 0, sizeof(PointLight) * kMaxPointLights);
 	if (pointLights && clampedCount > 0) {
@@ -534,6 +539,11 @@ void Object3dCommon::SetPointLights(const PointLight* pointLights, uint32_t coun
 }
 void Object3dCommon::SetSpotLights(const SpotLight* spotLights, uint32_t count) {
 	uint32_t clampedCount = std::min(count, static_cast<uint32_t>(kMaxSpotLights));
+	cachedSpotLightCount_ = clampedCount;
+	std::fill(cachedSpotLights_.begin(), cachedSpotLights_.end(), SpotLight{});
+	if (spotLights && clampedCount > 0) {
+		std::copy_n(spotLights, clampedCount, cachedSpotLights_.begin());
+	}
 	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData_));
 	std::memset(spotLightData_, 0, sizeof(SpotLight) * kMaxSpotLights);
 	if (spotLights && clampedCount > 0) {
@@ -547,6 +557,11 @@ void Object3dCommon::SetSpotLights(const SpotLight* spotLights, uint32_t count) 
 }
 void Object3dCommon::SetAreaLights(const AreaLight* areaLights, uint32_t count) {
 	uint32_t clampedCount = std::min(count, static_cast<uint32_t>(kMaxAreaLights));
+	cachedAreaLightCount_ = clampedCount;
+	std::fill(cachedAreaLights_.begin(), cachedAreaLights_.end(), AreaLight{});
+	if (areaLights && clampedCount > 0) {
+		std::copy_n(areaLights, clampedCount, cachedAreaLights_.begin());
+	}
 	areaLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&areaLightData_));
 	std::memset(areaLightData_, 0, sizeof(AreaLight) * kMaxAreaLights);
 	if (areaLights && clampedCount > 0) {
