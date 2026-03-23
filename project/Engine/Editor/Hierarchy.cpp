@@ -130,6 +130,7 @@ Hierarchy* Hierarchy::GetInstance() {
 	return &instance;
 }
 void Hierarchy::Finalize() {
+	playModeInitializedAudioNames_.clear();
 	objects_.clear();
 	objectNames_.clear();
 	editorTransforms_.clear();
@@ -218,6 +219,7 @@ std::string Hierarchy::GetSceneScopedEditorFilePath(const std::string& defaultFi
 }
 
 void Hierarchy::ResetForSceneChange() {
+	playModeInitializedAudioNames_.clear();
 	hasUnsavedChanges_ = false;
 	saveStatusMessage_.clear();
 	hasLoadedForCurrentScene_ = false;
@@ -1064,9 +1066,15 @@ void Hierarchy::DrawGridEditor() {
 	gridHalfLineCount_ = std::max(gridHalfLineCount_, 1);
 }
 void Hierarchy::SetPlayMode(bool isPlaying) {
+	const bool wasPlaying = isPlaying_;
 	isPlaying_ = isPlaying;
 	if (isPlaying_) {
 		wasEditorPreviewActiveLastFrame_ = false;
+		if (!wasPlaying) {
+			playModeInitializedAudioNames_.clear();
+		}
+	} else if (wasPlaying) {
+		playModeInitializedAudioNames_.clear();
 	}
 }
 
@@ -1307,8 +1315,10 @@ void Hierarchy::DrawAudioEditor() {
 		if (!entry.soundData) {
 			continue;
 		}
+
+		const bool shouldApplySavedState = !isPlaying_ || !playModeInitializedAudioNames_.contains(entry.name);
 		const auto savedIt = savedAudioVolumes_.find(entry.name);
-		if (savedIt != savedAudioVolumes_.end()) {
+		if (shouldApplySavedState && savedIt != savedAudioVolumes_.end()) {
 			audio->SetSoundVolume(entry.soundData, savedIt->second);
 		}
 		bool loopEnabled = false;
@@ -1317,9 +1327,14 @@ void Hierarchy::DrawAudioEditor() {
 			loopEnabled = loopIt->second;
 		}
 		const auto effectsIt = savedAudioEffects_.find(entry.name);
-		if (effectsIt != savedAudioEffects_.end()) {
+		if (shouldApplySavedState && effectsIt != savedAudioEffects_.end()) {
 			audio->SetSoundEffects(entry.soundData, effectsIt->second);
-			savedAudioEffects_.erase(effectsIt);
+			if (!isPlaying_) {
+				savedAudioEffects_.erase(effectsIt);
+			}
+		}
+		if (isPlaying_ && shouldApplySavedState) {
+			playModeInitializedAudioNames_.insert(entry.name);
 		}
 		if (ImGui::TreeNode((entry.name + "##audio_" + std::to_string(i)).c_str())) {
 			float volume = entry.soundData->volume;

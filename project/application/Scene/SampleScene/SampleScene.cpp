@@ -217,7 +217,7 @@ void SampleScene::Initialize() {
 		activePointLightCount_ = 1;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {-1.0f, 5.0f, 0.0f};
-	pointLights_[0].intensity = 1.0f;
+	pointLights_[0].intensity = 4.0f;
 	pointLights_[0].radius = 10.0f;
 	pointLights_[0].decay = 1.0f;
 	pointLights_[0].shadowEnabled = 1;
@@ -508,23 +508,14 @@ void SampleScene::Update() {
 
 #endif // USE_IMGUI
 	directionalLight_.shadowEnabled = directionalShadowEnabled_ ? 1 : 0;
-	if (activePointLightCount_ > 0) {
-		pointLights_[0].shadowEnabled = pointShadowEnabled_ ? 1 : 0;
-		for (uint32_t i = 1; i < activePointLightCount_; ++i) {
-			pointLights_[i].shadowEnabled = 0;
-		}
+	for (uint32_t i = 0; i < activePointLightCount_; ++i) {
+		pointLights_[i].shadowEnabled = (pointShadowEnabled_ && i == 0) ? 1 : 0;
 	}
-	if (activeSpotLightCount_ > 0) {
-		spotLights_[0].shadowEnabled = spotShadowEnabled_ ? 1 : 0;
-		for (uint32_t i = 1; i < activeSpotLightCount_; ++i) {
-			spotLights_[i].shadowEnabled = 0;
-		}
+	for (uint32_t i = 0; i < activeSpotLightCount_; ++i) {
+		spotLights_[i].shadowEnabled = (spotShadowEnabled_ && i == 0) ? 1 : 0;
 	}
-	if (activeAreaLightCount_ > 0) {
-		areaLights_[0].shadowEnabled = areaShadowEnabled_ ? 1 : 0;
-		for (uint32_t i = 1; i < activeAreaLightCount_; ++i) {
-			areaLights_[i].shadowEnabled = 0;
-		}
+	for (uint32_t i = 0; i < activeAreaLightCount_; ++i) {
+		areaLights_[i].shadowEnabled = (areaShadowEnabled_ && i == 0) ? 1 : 0;
 	}
 	if (useDebugCamera_) {
 		debugCamera_->Update();

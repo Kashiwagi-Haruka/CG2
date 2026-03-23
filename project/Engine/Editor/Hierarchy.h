@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "Transform.h"
@@ -116,6 +117,7 @@ private:
 	std::unordered_map<std::string, float> savedAudioVolumes_;
 	std::unordered_map<std::string, bool> savedAudioLoopEnabled_;
 	std::unordered_map<std::string, std::vector<Audio::MixerEffectSettings>> savedAudioEffects_;
+	std::unordered_set<std::string> playModeInitializedAudioNames_;
 	DebugCamera editorPreviewCamera_{};
 	bool isEditorPreviewCameraInitialized_ = false;
 	bool wasEditorPreviewActiveLastFrame_ = false;
