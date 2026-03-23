@@ -25,7 +25,7 @@ ShadowGameScene::ShadowGameScene()
     player_ = std::make_unique<Player>();
     //プレイヤー視点のカメラ
     playerCamera_ = std::make_unique<PlayerCamera>();
-    playerCamera_->SetPlayerTransformPtr(&player_->GetTransform());
+    playerCamera_->SetPlayer(player_.get());
     //テスト地面
     testField_ = std::make_unique<TestField>();
     //ホワイトボード管理
@@ -36,6 +36,7 @@ ShadowGameScene::ShadowGameScene()
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     //懐中電灯
     flashlight_ = std::make_unique<Flashlight>();
+    flashlight_->SetPlayer(player_.get());
     // 鍵管理
     key_ = std::make_unique<Key>();
     // 枝豆管理
@@ -91,6 +92,8 @@ void ShadowGameScene::Initialize()
     isTransitionIn_ = true;
     isTransitionOut_ = false;
 
+    //プレイヤーの初期化
+    player_->Initialize();
     playerCamera_->Initialize();
 
     //デバックカメラの設定
@@ -98,8 +101,7 @@ void ShadowGameScene::Initialize()
     debugCamera_->SetTranslation(playerCamera_->GetTransform().translate);
 
     InitializeLights();
-    //プレイヤーの初期化
-    player_->Initialize();
+
     //テスト地面
     testField_->Initialize();
     //ホワイトボード管理
@@ -400,13 +402,14 @@ void ShadowGameScene::UpdateGameObject()
     spotLights_[1] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
 
-    portalManager_->WarpPlayer(player_.get());
-
     if (!useDebugCamera_) {
         playerCamera_->Update();
     }
+
+    portalManager_->WarpPlayer(player_.get());
     //プレイヤー
     player_->Update();
+
     //携帯打刻機
     timeCardWatch_->Update();
     //懐中電灯
