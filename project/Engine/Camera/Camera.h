@@ -19,11 +19,7 @@ class Camera {
 	float nearZ = 0.1f;                   // ニアクリップ距離
 	float farZ = 10000.0f;                // ファークリップ距離
 
-	void LoadEditorData();
-	void SaveEditorData();
-
 	int editorId_ = -1;
-	std::string editorStatusMessage_;
 	static int nextEditorId_;
 
 public:
@@ -32,14 +28,13 @@ public:
 	~Camera();
 	// transform_ や投影パラメータから行列を再計算
 	void Update();
-	//ワールド行列から行列を作成する
+	// ワールド行列から行列を作成する
 	void UpdateViewProjection(const Matrix4x4& worldMatrix);
+	bool LoadEditorData();
+	bool SaveEditorData() const;
 	// 外部で計算済みのビュー・プロジェクション行列を反映
 	void SetViewProjectionMatrix(const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix);
-	void SetWorldMatrix(const Matrix4x4& worldMatrix) {
-		worldMatrix_ = worldMatrix;
-	}
-	void DrawEditorInHierarchy();
+	void SetWorldMatrix(const Matrix4x4& worldMatrix) { worldMatrix_ = worldMatrix; }
 	void SetScale(const Vector3& scale) { transform_.scale = scale; }
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }

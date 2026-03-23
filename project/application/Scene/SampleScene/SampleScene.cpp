@@ -217,7 +217,7 @@ void SampleScene::Initialize() {
 	activePointLightCount_ = 1;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {-5.0f, 5.0f, 0.0f};
-	pointLights_[0].intensity = 1.0f;
+	pointLights_[0].intensity = 0.0f;
 	pointLights_[0].radius = 10.0f;
 	pointLights_[0].decay = 1.0f;
 	pointLights_[0].shadowEnabled = 1;
@@ -236,9 +236,9 @@ void SampleScene::Initialize() {
 
 	activeSpotLightCount_ = 2;
 	spotLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	spotLights_[0].position = {2.0f, 1.25f, 0.0f};
-	spotLights_[0].direction = {-1.0f, -1.0f, 0.0f};
-	spotLights_[0].intensity = 0.0f;
+	spotLights_[0].position = {-1.0f, 5.0f, 0.0f};
+	spotLights_[0].direction = {0.0f, -1.0f, 0.0f};
+	spotLights_[0].intensity = 1.0f;
 	spotLights_[0].distance = 7.0f;
 	spotLights_[0].decay = 2.0f;
 	spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
