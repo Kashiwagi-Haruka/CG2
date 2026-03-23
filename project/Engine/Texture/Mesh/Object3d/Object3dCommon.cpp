@@ -50,6 +50,35 @@ enum ShadowMapPassType : int32_t {
 	kShadowMapPassSpot = 2,
 	kShadowMapPassArea = 3,
 };
+Matrix4x4 MakeLightViewProjection(const Vector3& lightPosition, const Vector3& rawLightDirection, float nearPlane, float farPlane, float fovRadians) {
+	Vector3 lightDirection = Function::Normalize(rawLightDirection);
+	if (Function::Length(lightDirection) < 1.0e-5f) {
+		lightDirection = {0.0f, -1.0f, 0.0f};
+	}
+	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
+	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
+	const Vector3 cameraUp = Function::Cross(lightDirection, right);
+
+	Matrix4x4 view = Function::MakeIdentity4x4();
+	view.m[0][0] = right.x;
+	view.m[1][0] = right.y;
+	view.m[2][0] = right.z;
+	view.m[0][1] = cameraUp.x;
+	view.m[1][1] = cameraUp.y;
+	view.m[2][1] = cameraUp.z;
+	view.m[0][2] = lightDirection.x;
+	view.m[1][2] = lightDirection.y;
+	view.m[2][2] = lightDirection.z;
+	view.m[3][0] = -Function::Dot(lightPosition, right);
+	view.m[3][1] = -Function::Dot(lightPosition, cameraUp);
+	view.m[3][2] = -Function::Dot(lightPosition, lightDirection);
+
+	const float clampedNearPlane = std::max(0.01f, nearPlane);
+	const float clampedFarPlane = std::max(clampedNearPlane + 0.1f, farPlane);
+	const float clampedFov = std::clamp(fovRadians, 0.1f, Function::kPi - 0.1f);
+	Matrix4x4 projection = Function::MakePerspectiveFovMatrix(clampedFov, 1.0f, clampedNearPlane, clampedFarPlane);
+	return Function::Multiply(view, projection);
+}
 }
 std::unique_ptr<Object3dCommon> Object3dCommon::instance = nullptr;
 
@@ -415,36 +444,30 @@ Matrix4x4 Object3dCommon::GetDirectionalLightViewProjectionMatrix() const {
 }
 Matrix4x4 Object3dCommon::GetPointLightViewProjectionMatrix() const {
 	Vector3 lightPosition = shadowLightPosition_;
-	Vector3 target = {0.0f, 0.0f, 0.0f};
+	Vector3 lightDirection = Function::Normalize(-lightPosition);
 	float farPlane = shadowCameraFar_;
-	float fov = 1.6f;
-	if (cachedPointLightCount_ > 0) {
-		const PointLight& light = cachedPointLights_[0];
-		lightPosition = light.position;
-		farPlane = std::max(shadowCameraNear_ + 0.1f, light.radius);
+	float fov = Function::kPi * 0.6f;
+
+	const PointLight* selectedLight = nullptr;
+	for (uint32_t i = 0; i < cachedPointLightCount_; ++i) {
+		if (cachedPointLights_[i].shadowEnabled != 0) {
+			selectedLight = &cachedPointLights_[i];
+			break;
+		}
 	}
-	Vector3 lightDirection = Function::Normalize(target - lightPosition);
-	if (Function::Length(lightDirection) < 1.0e-5f) {
-		lightDirection = {0.0f, -1.0f, 0.0f};
+	if (!selectedLight && cachedPointLightCount_ > 0) {
+		selectedLight = &cachedPointLights_[0];
 	}
-	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
-	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
-	const Vector3 cameraUp = Function::Cross(lightDirection, right);
-	Matrix4x4 view = Function::MakeIdentity4x4();
-	view.m[0][0] = right.x;
-	view.m[1][0] = right.y;
-	view.m[2][0] = right.z;
-	view.m[0][1] = cameraUp.x;
-	view.m[1][1] = cameraUp.y;
-	view.m[2][1] = cameraUp.z;
-	view.m[0][2] = lightDirection.x;
-	view.m[1][2] = lightDirection.y;
-	view.m[2][2] = lightDirection.z;
-	view.m[3][0] = -Function::Dot(lightPosition, right);
-	view.m[3][1] = -Function::Dot(lightPosition, cameraUp);
-	view.m[3][2] = -Function::Dot(lightPosition, lightDirection);
-	Matrix4x4 proj = Function::MakePerspectiveFovMatrix(fov, 1.0f, shadowCameraNear_, farPlane);
-	return Function::Multiply(view, proj);
+	if (selectedLight) {
+		lightPosition = selectedLight->position;
+		farPlane = std::max(shadowCameraNear_ + 0.1f, selectedLight->radius);
+		if (Function::Length(selectedLight->position) > 1.0e-4f) {
+			lightDirection = Function::Normalize(-selectedLight->position);
+		} else {
+			lightDirection = {0.0f, -1.0f, 0.0f};
+		}
+	}
+	return MakeLightViewProjection(lightPosition, lightDirection, shadowCameraNear_, farPlane, fov);
 }
 
 Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
@@ -452,67 +475,51 @@ Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
 	Vector3 lightDirection = {0.0f, -1.0f, 0.0f};
 	float fov = 0.9f;
 	float farPlane = shadowCameraFar_;
-	if (cachedSpotLightCount_ > 0) {
-		const SpotLight& light = cachedSpotLights_[0];
-		lightPosition = light.position;
-		lightDirection = Function::Normalize(light.direction);
-		fov = std::max(0.1f, std::acos(std::clamp(light.cosAngle, -1.0f, 1.0f)) * 2.0f);
-		farPlane = std::max(shadowCameraNear_ + 0.1f, light.distance);
+
+	const SpotLight* selectedLight = nullptr;
+	for (uint32_t i = 0; i < cachedSpotLightCount_; ++i) {
+		if (cachedSpotLights_[i].shadowEnabled != 0) {
+			selectedLight = &cachedSpotLights_[i];
+			break;
+		}
 	}
-	Vector3 target = lightPosition + lightDirection;
-	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
-	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
-	const Vector3 cameraUp = Function::Cross(lightDirection, right);
-	Matrix4x4 view = Function::MakeIdentity4x4();
-	view.m[0][0] = right.x;
-	view.m[1][0] = right.y;
-	view.m[2][0] = right.z;
-	view.m[0][1] = cameraUp.x;
-	view.m[1][1] = cameraUp.y;
-	view.m[2][1] = cameraUp.z;
-	view.m[0][2] = lightDirection.x;
-	view.m[1][2] = lightDirection.y;
-	view.m[2][2] = lightDirection.z;
-	view.m[3][0] = -Function::Dot(lightPosition, right);
-	view.m[3][1] = -Function::Dot(lightPosition, cameraUp);
-	view.m[3][2] = -Function::Dot(lightPosition, lightDirection);
-	Matrix4x4 proj = Function::MakePerspectiveFovMatrix(fov, 1.0f, shadowCameraNear_, farPlane);
-	return Function::Multiply(view, proj);
+	if (!selectedLight && cachedSpotLightCount_ > 0) {
+		selectedLight = &cachedSpotLights_[0];
+	}
+	if (selectedLight) {
+		lightPosition = selectedLight->position;
+		lightDirection = Function::Normalize(selectedLight->direction);
+		const float outerAngle = std::acos(std::clamp(selectedLight->cosAngle, -1.0f, 1.0f));
+		fov = outerAngle * 2.0f + 0.1f;
+		farPlane = std::max(shadowCameraNear_ + 0.1f, selectedLight->distance);
+	}
+	return MakeLightViewProjection(lightPosition, lightDirection, shadowCameraNear_, farPlane, fov);
 }
 
 Matrix4x4 Object3dCommon::GetAreaLightViewProjectionMatrix() const {
 	Vector3 lightPosition = shadowLightPosition_;
 	Vector3 lightDirection = {0.0f, -1.0f, 0.0f};
-	float halfWidth = shadowOrthoHalfWidth_;
-	float halfHeight = shadowOrthoHalfHeight_;
+	float fov = Function::kPi * 0.5f;
 	float farPlane = shadowCameraFar_;
-	if (cachedAreaLightCount_ > 0) {
-		const AreaLight& light = cachedAreaLights_[0];
-		lightPosition = light.position;
-		lightDirection = -Function::Normalize(light.normal);
-		halfWidth = std::max(0.5f, light.width * 0.5f + light.radius);
-		halfHeight = std::max(0.5f, light.height * 0.5f + light.radius);
-		farPlane = std::max({shadowCameraNear_ + 0.1f, light.radius, light.width, light.height});
+
+	const AreaLight* selectedLight = nullptr;
+	for (uint32_t i = 0; i < cachedAreaLightCount_; ++i) {
+		if (cachedAreaLights_[i].shadowEnabled != 0) {
+			selectedLight = &cachedAreaLights_[i];
+			break;
+		}
 	}
-	const Vector3 target = lightPosition + lightDirection;
-	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
-	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
-	const Vector3 cameraUp = Function::Cross(lightDirection, right);
-	Matrix4x4 view = Function::MakeIdentity4x4();
-	view.m[0][0] = right.x;
-	view.m[1][0] = right.y;
-	view.m[2][0] = right.z;
-	view.m[0][1] = cameraUp.x;
-	view.m[1][1] = cameraUp.y;
-	view.m[2][1] = cameraUp.z;
-	view.m[0][2] = lightDirection.x;
-	view.m[1][2] = lightDirection.y;
-	view.m[2][2] = lightDirection.z;
-	view.m[3][0] = -Function::Dot(lightPosition, right);
-	view.m[3][1] = -Function::Dot(lightPosition, cameraUp);
-	view.m[3][2] = -Function::Dot(lightPosition, lightDirection);
-	Matrix4x4 proj = Function::MakeOrthographicMatrix(-halfWidth, halfHeight, halfWidth, -halfHeight, shadowCameraNear_, farPlane);
-	return Function::Multiply(view, proj);
+	if (!selectedLight && cachedAreaLightCount_ > 0) {
+		selectedLight = &cachedAreaLights_[0];
+	}
+	if (selectedLight) {
+		lightPosition = selectedLight->position;
+		lightDirection = -Function::Normalize(selectedLight->normal);
+		const float coverageRadius = std::max(selectedLight->radius, std::max(selectedLight->width, selectedLight->height));
+		fov = std::atan2(std::max(0.5f, coverageRadius), std::max(0.1f, selectedLight->radius)) * 2.0f + 0.1f;
+		farPlane = std::max({shadowCameraNear_ + 0.1f, selectedLight->radius, selectedLight->width, selectedLight->height});
+	}
+	return MakeLightViewProjection(lightPosition, lightDirection, shadowCameraNear_, farPlane, fov);
 }
 
 void Object3dCommon::SetBlendMode(BlendMode blendMode) {

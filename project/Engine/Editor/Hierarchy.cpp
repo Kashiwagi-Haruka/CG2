@@ -1068,12 +1068,20 @@ void Hierarchy::DrawGridEditor() {
 void Hierarchy::SetPlayMode(bool isPlaying) {
 	const bool wasPlaying = isPlaying_;
 	isPlaying_ = isPlaying;
+	Audio* audio = Audio::GetInstance();
 	if (isPlaying_) {
+		if (audio) {
+			audio->StopAllPreviewSounds();
+			audio->StopAllSceneSounds();
+		}
 		wasEditorPreviewActiveLastFrame_ = false;
 		if (!wasPlaying) {
 			playModeInitializedAudioNames_.clear();
 		}
 	} else if (wasPlaying) {
+		if (audio) {
+			audio->StopAllSceneSounds();
+		}
 		playModeInitializedAudioNames_.clear();
 	}
 }
@@ -1441,7 +1449,7 @@ void Hierarchy::DrawAudioEditor() {
 				ImGui::TextUnformatted("Stopped");
 			}
 			if (ImGui::Button(("Play from Start##audio_play_" + std::to_string(i)).c_str())) {
-				audio->SoundPlayWaveFromStart(*entry.soundData, loopEnabled);
+				audio->SoundPlayPreviewFromStart(*entry.soundData, loopEnabled);
 			}
 			ImGui::SameLine();
 			if (ImGui::Button(("Stop##audio_stop_" + std::to_string(i)).c_str())) {

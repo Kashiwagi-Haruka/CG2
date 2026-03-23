@@ -216,8 +216,8 @@ void SampleScene::Initialize() {
 
 		activePointLightCount_ = 1;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLights_[0].position = {-1.0f, 5.0f, 0.0f};
-	pointLights_[0].intensity = 4.0f;
+	pointLights_[0].position = {-5.0f, 5.0f, 0.0f};
+	pointLights_[0].intensity = 1.0f;
 	pointLights_[0].radius = 10.0f;
 	pointLights_[0].decay = 1.0f;
 	pointLights_[0].shadowEnabled = 1;
