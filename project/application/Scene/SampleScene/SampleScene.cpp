@@ -548,6 +548,7 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
 	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
+	Object3dCommon::GetInstance()->SetShadowMapEnabled(directionalShadowEnabled_, false, false, false);
 	Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(fullScreenGrayscaleEnabled_);
 	Object3dCommon::GetInstance()->SetFullScreenSepiaEnabled(fullScreenSepiaEnabled_);
 	Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength_);
@@ -594,13 +595,15 @@ void SampleScene::Update() {
 }
 void SampleScene::Draw() {
 
-	Object3dCommon::GetInstance()->BeginShadowMapPass();
-	Object3dCommon::GetInstance()->DrawCommonShadow();
-	uvBallObj_->Draw();
-	planeGltf_->Draw();
-	fieldObj_->Draw();
-	animatedCubeObj_->Draw();
-	Object3dCommon::GetInstance()->EndShadowMapPass();
+	if (directionalShadowEnabled_) {
+		Object3dCommon::GetInstance()->BeginShadowMapPass();
+		Object3dCommon::GetInstance()->DrawCommonShadow();
+		uvBallObj_->Draw();
+		planeGltf_->Draw();
+		fieldObj_->Draw();
+		animatedCubeObj_->Draw();
+		Object3dCommon::GetInstance()->EndShadowMapPass();
+	}
 
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
 	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);

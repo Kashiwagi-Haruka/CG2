@@ -91,6 +91,7 @@ Coffee::Coffee() { instancedObject_ = std::make_unique<InstancedObject3d>(); }
 void Coffee::Initialize() {
 	ModelManager::GetInstance()->LoadModel(kCoffeeModelDirectory, kCoffeeModelName);
 	instancedObject_->Initialize(kCoffeeModelName);
+	instancedObject_->SetShininess(80.0f);
 	instancedObject_->SetSpawnOrigin({0.0f, 0.0f, 0.0f});
 	renderedInstanceCapacity_ = std::min(kCoffeeInitialVisibleCount, kCoffeeInstanceCount);
 	instancedObject_->SetInstanceCount(renderedInstanceCapacity_);
