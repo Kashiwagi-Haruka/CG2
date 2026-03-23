@@ -24,6 +24,8 @@ namespace {
     constexpr uint64_t kCollisionKey = 0b1 << 9;
     //マット
     constexpr uint64_t kCollisionMat = 0b1 << 10;
+    //ロッカー
+    constexpr uint64_t kCollisionLocker = 0b1 << 11;
     //何の陣営にも属さない
     constexpr uint32_t kCollisionNone = 0b0;
 }

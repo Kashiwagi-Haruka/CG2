@@ -44,12 +44,6 @@ Door::~Door()
 
 void Door::OnCollision(Collider* collider) {
 
-    if (!isGetKey_) {
-        //キーを持っていなかったら
-        if (collider->GetCollisionAttribute() == kCollisionKey) {
-            isGetKey_ = true;
-        }
-    }
 }
 
 Vector3 Door::GetWorldPosition() const
@@ -105,7 +99,7 @@ void Door::Initialize()
     isSendLockMessage_ = false;
     isSendOpenMessage_ = false;
 
-    isGetKey_ = false;
+    isGetKey_ = nullptr;
     isOpen_ = false;
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/door", "door");

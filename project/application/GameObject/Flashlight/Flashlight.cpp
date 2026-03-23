@@ -4,7 +4,8 @@
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
 #include"GameObject/Player/Player.h"
-#include"GameObject/Player/Player.h"
+#include<imgui.h>
+
 bool Flashlight::isSendGetLightMessage_ = false;
 
 Flashlight::Flashlight()
@@ -120,6 +121,10 @@ void Flashlight::UpdateSpotLight()
     spotLight_.position = GetWorldPosition();
     spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
     spotLight_.intensity = 10.0f;
+#ifdef USE_IMGUI
+
+
+#endif
 }
 
 bool Flashlight::OnCollisionRay()
