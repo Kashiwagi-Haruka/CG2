@@ -42,7 +42,8 @@ ShadowGameScene::ShadowGameScene()
     edamame_ = std::make_unique<Edamame>();
     //ドア
     door_ = std::make_unique<Door>();
-
+    //ロッカー
+    lockerManager_ = std::make_unique<LockerManager>();
     //壁管理
     wallManager_ = std::make_unique<WallManager>();
     //壁管理
@@ -57,8 +58,7 @@ ShadowGameScene::ShadowGameScene()
     portalManager_->SetPlayerCamera(playerCamera_.get());
     //Playerの座標のポインタを入れる
     timeCardWatch_->SetTransformPtr(&player_->GetTransform());
-  /*  Object3dCommon::GetInstance()->Initialize();*/
-    //UIManager
+      //UIManager
     textUIManager_ = std::make_unique<TextUIManager>();
 
     key_->SetPlayerCamera(playerCamera_.get());
@@ -67,7 +67,7 @@ ShadowGameScene::ShadowGameScene()
     vendingMac_->SetPlayerCamera(playerCamera_.get());
     door_->SetPlayerCamera(playerCamera_.get());
     flashlight_->SetPlayerCamera(playerCamera_.get());
-
+    lockerManager_->SetPlayerCamera(playerCamera_.get());
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -120,7 +120,8 @@ void ShadowGameScene::Initialize()
     vendingMac_->Initialize();
     //ドア
     door_->Initialize();
-
+    //ロッカー
+    lockerManager_->Initialize();
 
     //カーソルを画面中央に設定する
     auto* input = Input::GetInstance();
@@ -184,7 +185,7 @@ void ShadowGameScene::Draw()
     playerCamera_->DrawRaySprite();
 
     textUIManager_->Draw();
-        
+
     //シーン遷移の描画処理
     DrawSceneTransition();
 }
@@ -205,7 +206,6 @@ void ShadowGameScene::CheckCollision()
 {
     //ホワイトボードとrayの当たり判定作成する
     portalManager_->CheckCollision();
-    key_->CheckCollision();
     door_->CheckCollision();
     vendingMac_->CheckCollision();
 
@@ -245,6 +245,10 @@ void ShadowGameScene::CheckCollision()
 
     if (!door_->GetIsOpen()) {
         collisionManager_->AddCollider(door_.get());
+    }
+
+    for (auto& locker : lockerManager_->GetLockers()) {
+        collisionManager_->AddCollider(locker.get());
     }
 
     collisionManager_->AddCollider(key_.get());
@@ -336,10 +340,11 @@ void ShadowGameScene::UpdateCamera()
 
 void ShadowGameScene::UpdateSceneTransition()
 {
-    if (Input::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut_) {
-        transition_->Initialize(true);
+    if (door_->GetOpenMassage()) {
+        transition_->Initialize(false);
         isTransitionOut_ = true;
     }
+
     if (isTransitionIn_ || isTransitionOut_) {
         transition_->Update();
         if (transition_->IsEnd() && isTransitionIn_) {
@@ -347,7 +352,7 @@ void ShadowGameScene::UpdateSceneTransition()
         }
         if (transition_->IsEnd() && isTransitionOut_) {
             //シーンの切り替え
-     /*       SceneManager::GetInstance()->ChangeScene("Title");*/
+            SceneManager::GetInstance()->ChangeScene("Result");
         }
     }
 }
@@ -422,8 +427,15 @@ void ShadowGameScene::UpdateGameObject()
     vendingMac_->Update();
     //ドア
     door_->Update();
+    //ロッカー
+    lockerManager_->Update();
     //ポータル管理
     portalManager_->Update();
+
+    if (*key_->GetKeyPtr()) {
+        door_->SetIsGetKey(key_->GetKeyPtr());
+    }
+
     ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
 #pragma endregion
 }
@@ -487,6 +499,8 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     vendingMac_->Draw();
     //ドア
     door_->Draw();
+    //ロッカー
+    lockerManager_->Draw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //懐中電灯
@@ -525,6 +539,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     wallManager2_->SetCamera(camera);
     vendingMac_->SetCamera(camera);
     door_->SetCamera(camera);
+    lockerManager_->SetCamera(camera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {

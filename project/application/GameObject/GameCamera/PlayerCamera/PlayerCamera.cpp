@@ -20,7 +20,7 @@ PlayerCamera::PlayerCamera()
     //カメラを生成する
     camera_ = std::make_unique<Camera>();
     camera_->SetTransform(cameraTransform_);
-    camera_->SetFovY(0.9f);
+    camera_->SetFovY(0.44f);
     //Rayの設定
     ray_ = { .origin = {0.0f},.diff = {0.0f} };
 
@@ -68,28 +68,8 @@ void PlayerCamera::Rotate()
 
 void PlayerCamera::SetRay()
 {
-  
     ray_.origin = cameraTransform_.translate;
     ray_.diff = GetForward();
-
-    //// 左下が０、右上が１とした時のマウスポジション
-    //float ndcX = (cameraTransform_.translate.x / WinApp::kClientWidth) * 2.0f - 1.0f;
-    //float ndcY = 1.0f - (cameraTransform_.translate.y / WinApp::kClientHeight) * 2.0f; // Yは上下反転
-
-    //// クリップ空間でZ=0(near)とZ=1(far)の2点を作る
-    //Vector3 nearPoint = { ndcX, ndcY, 0.0f };
-    //Vector3 farPoint = { ndcX, ndcY, 1.0f };
-
-    //// 逆射影行列
-    //Matrix4x4 inverseViewProj = Function::Inverse(camera_->GetViewProjectionMatrix());
-
-    //// ワールド空間に変換
-    //Vector3 nearWorld = Function::TransformVM(nearPoint, inverseViewProj);
-    //Vector3 farWorld = Function::TransformVM(farPoint, inverseViewProj);
-
-    //// マウスレイの始点・方向
-    //ray_.origin = nearWorld;
-    //ray_.diff = Function::Normalize(farWorld- ray_.origin);
 }
 
 void PlayerCamera::DrawRaySprite()
