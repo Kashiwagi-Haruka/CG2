@@ -43,7 +43,14 @@ void TransitionShadowResource(DirectXCommon* dxCommon, ID3D12Resource* resource,
 	dxCommon->GetCommandList()->ResourceBarrier(1, &barrier);
 }
 } // namespace
-
+namespace {
+enum ShadowMapPassType : int32_t {
+	kShadowMapPassDirectional = 0,
+	kShadowMapPassPoint = 1,
+	kShadowMapPassSpot = 2,
+	kShadowMapPassArea = 3,
+};
+}
 std::unique_ptr<Object3dCommon> Object3dCommon::instance = nullptr;
 
 Object3dCommon::Object3dCommon() {}
@@ -149,6 +156,15 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	areaLightSrvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
 	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaLight));
 	
+	shadowMapPassSettingsResource_ = CreateBufferResource(sizeof(ShadowMapPassSettings));
+	assert(shadowMapPassSettingsResource_);
+	shadowMapPassSettingsResource_->Map(0, nullptr, reinterpret_cast<void**>(&shadowMapPassSettingsData_));
+	assert(shadowMapPassSettingsData_);
+	shadowMapPassSettingsData_->shadowType = kShadowMapPassDirectional;
+	std::fill(std::begin(shadowMapPassSettingsData_->padding), std::end(shadowMapPassSettingsData_->padding), 0.0f);
+	shadowMapPassSettingsResource_->Unmap(0, nullptr);
+	shadowMapPassSettingsData_ = nullptr;
+
 	SetPointLights(nullptr, 0);
 	SetSpotLights(nullptr, 0);
 	SetAreaLights(nullptr, 0);
@@ -217,11 +233,13 @@ void Object3dCommon::DrawSet(){
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, Object3dCommon::GetInstance()->GetPointLightCountResource()->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, Object3dCommon::GetInstance()->GetSpotLightCountResource()->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(7, Object3dCommon::GetInstance()->GetAreaLightCountResource()->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(16, Object3dCommon::GetInstance()->GetShadowMapPassSettingsResource()->GetGPUVirtualAddress());
 	if (!isShadowMapPassActive_) {
 		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(12, directionalShadowMapSrvIndex_);
 		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(13, pointShadowMapSrvIndex_);
 		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(14, spotShadowMapSrvIndex_);
 		TextureManager::GetInstance()->GetSrvManager()->SetGraphicsRootDescriptorTable(15, areaShadowMapSrvIndex_);
+
 	}
 }
 void Object3dCommon::DrawCommon() {

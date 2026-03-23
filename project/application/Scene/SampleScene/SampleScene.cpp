@@ -214,7 +214,7 @@ void SampleScene::Initialize() {
 	overlayCameraSprite_->SetRotation(0.0f);
 	overlayCameraSprite_->SetPosition(Vector2(0.0f, 0.0f));
 
-		activePointLightCount_ = 2;
+		activePointLightCount_ = 1;
 	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
 	pointLights_[0].position = {-1.0f, 5.0f, 0.0f};
 	pointLights_[0].intensity = 1.0f;
@@ -222,12 +222,12 @@ void SampleScene::Initialize() {
 	pointLights_[0].decay = 1.0f;
 	pointLights_[0].shadowEnabled = 1;
 
-	pointLights_[1].color = {1.0f, 0.0f, 0.0f, 1.0f};
+	/*pointLights_[1].color = {1.0f, 0.0f, 0.0f, 1.0f};
 	pointLights_[1].position = {5.0f, 5.0f, 5.0f};
 	pointLights_[1].intensity = 0.0f;
 	pointLights_[1].radius = 10.0f;
 	pointLights_[1].decay = 1.0f;
-	pointLights_[1].shadowEnabled = 1;
+	pointLights_[1].shadowEnabled = 1;*/
 
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};

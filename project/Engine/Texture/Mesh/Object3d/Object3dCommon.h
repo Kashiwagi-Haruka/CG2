@@ -233,6 +233,7 @@ public:
 	ID3D12Resource* GetDirectionalLightResource() const { return directionalLightResource_.Get(); }
 	// ポイントライト数CB取得
 	ID3D12Resource* GetPointLightCountResource() const { return pointLightCountResource_.Get(); }
+	ID3D12Resource* GetShadowMapPassSettingsResource() const { return shadowMapPassSettingsResource_.Get(); }
 	// ポイントライトSRVインデックス取得
 	uint32_t GetPointLightSrvIndex() const { return pointLightSrvIndex_; }
 	// スポットライト数CB取得
@@ -241,6 +242,12 @@ public:
 	uint32_t GetSpotLightSrvIndex() const { return spotLightSrvIndex_; }
 	// エリアライト数CB取得
 	ID3D12Resource* GetAreaLightCountResource() const { return areaLightCountResource_.Get(); }
+	struct ShadowMapPassSettings {
+		int32_t shadowType;
+		float padding[3];
+	};
+	ShadowMapPassSettings* shadowMapPassSettingsData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> shadowMapPassSettingsResource_ = nullptr;
 	// エリアライトSRVインデックス取得
 	uint32_t GetAreaLightSrvIndex() const { return areaLightSrvIndex_; }
 	// 環境マップSRVインデックス取得
@@ -284,6 +291,18 @@ public:
 		pointShadowEnabled_ = point;
 		spotShadowEnabled_ = spot;
 		areaShadowEnabled_ = area;
+		shadowMapPassSettingsResource_->Map(0, nullptr, reinterpret_cast<void**>(&shadowMapPassSettingsData_));
+		if (directional) {
+			shadowMapPassSettingsData_->shadowType = 0;
+		} else if (point) {
+			shadowMapPassSettingsData_->shadowType = 1;
+		} else if (spot) {
+			shadowMapPassSettingsData_->shadowType = 2;
+		} else if (area) {
+			shadowMapPassSettingsData_->shadowType = 3;
+		}
+		shadowMapPassSettingsResource_->Unmap(0, nullptr);
+		shadowMapPassSettingsData_ = nullptr;
 	}
 	bool IsDirectionalShadowEnabled() const { return directionalShadowEnabled_; }
 	bool IsPointShadowEnabled() const { return pointShadowEnabled_; }

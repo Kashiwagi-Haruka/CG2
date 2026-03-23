@@ -10,6 +10,12 @@ struct TransformationMatrix
     float4x4 WorldInverseTranspose;
 };
 ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b1);
+struct ShadowMapPassSettings
+{
+    int shadowType;
+    float3 padding;
+};
+ConstantBuffer<ShadowMapPassSettings> gShadowMapPassSettings : register(b8);
 struct VertexShaderInput
 {
     float4 position : POSITION0;
@@ -19,7 +25,22 @@ struct VertexShaderInput
 Object3dVertexShaderOutput main(VertexShaderInput input)
 {
     Object3dVertexShaderOutput output;
-    output.position = mul(input.position, gTransformationMatrix.DirectionalLightWVP);
+    if (gShadowMapPassSettings.shadowType == 1)
+    {
+        output.position = mul(input.position, gTransformationMatrix.PointLightWVP);
+    }
+    else if (gShadowMapPassSettings.shadowType == 2)
+    {
+        output.position = mul(input.position, gTransformationMatrix.SpotLightWVP);
+    }
+    else if (gShadowMapPassSettings.shadowType == 3)
+    {
+        output.position = mul(input.position, gTransformationMatrix.AreaLightWVP);
+    }
+    else
+    {
+        output.position = mul(input.position, gTransformationMatrix.DirectionalLightWVP);
+    }
     output.normal = normalize(mul(input.normal, (float3x3) gTransformationMatrix.WorldInverseTranspose));
     output.texcoord = input.texcoord;
     output.worldPosition = mul(input.position, gTransformationMatrix.World).xyz;

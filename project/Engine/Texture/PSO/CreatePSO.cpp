@@ -101,7 +101,7 @@ void CreatePSO::CreateRootSignature() {
 	// --- RootSignature ---
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	D3D12_ROOT_PARAMETER rootParameters[17] = {};
+	D3D12_ROOT_PARAMETER rootParameters[18] = {};
 	D3D12_DESCRIPTOR_RANGE descriptorRange[10] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
 	descriptorRange[0].NumDescriptors = 1;
@@ -226,11 +226,15 @@ void CreatePSO::CreateRootSignature() {
 	rootParameters[15].DescriptorTable.pDescriptorRanges = &descriptorRange[8];
 	rootParameters[15].DescriptorTable.NumDescriptorRanges = 1;
 
+	rootParameters[16].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[16].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[16].Descriptor.ShaderRegister = 8;
+
 	if (useSkinning_) {
-		rootParameters[16].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		rootParameters[16].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-		rootParameters[16].DescriptorTable.pDescriptorRanges = &descriptorRange[9];
-		rootParameters[16].DescriptorTable.NumDescriptorRanges = 1;
+		rootParameters[17].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters[17].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+		rootParameters[17].DescriptorTable.pDescriptorRanges = &descriptorRange[9];
+		rootParameters[17].DescriptorTable.NumDescriptorRanges = 1;
 	}
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = useSkinning_ ? _countof(rootParameters) : _countof(rootParameters) - 1;
