@@ -1,7 +1,7 @@
 #define NOMINMAX
 #include "Hierarchy.h"
-#include "EditorGrid.h"
-#include "ToolBar.h"
+#include "Grid/EditorGrid.h"
+#include "ToolBar/ToolBar.h"
 #include "Camera.h"
 #include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Audio/Audio.h"
@@ -152,10 +152,19 @@ void Hierarchy::Finalize() {
 	editorCamera_.Reset();
 	ResetForSceneChange();
 }
-bool Hierarchy::IsEditorPreviewActive() const { return HasRegisteredObjects() && !isPlaying_; }
+bool Hierarchy::IsEditorPreviewActive() const {
+#ifdef USE_IMGUI
+	return HasRegisteredObjects() && !isPlaying_;
+#else
+	return false;
+#endif
+}
 
-void Hierarchy::UpdateEditorPreview() { editorCamera_.UpdateEditorPreview(IsEditorPreviewActive(), objects_, primitives_); }
-
+void Hierarchy::UpdateEditorPreview() {
+#ifdef USE_IMGUI
+	editorCamera_.UpdateEditorPreview(IsEditorPreviewActive(), objects_, primitives_);
+#endif
+}
 std::string Hierarchy::GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const {
 	const SceneManager* sceneManager = SceneManager::GetInstance();
 	if (!sceneManager) {
@@ -378,9 +387,21 @@ void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
 		}
 	}
 }
-void Hierarchy::RegisterCamera(Camera* camera) { editorCamera_.RegisterCamera(camera); }
+void Hierarchy::RegisterCamera(Camera* camera) {
+#ifdef USE_IMGUI
+	editorCamera_.RegisterCamera(camera);
+#else
+	(void)camera;
+#endif
+}
 
-void Hierarchy::UnregisterCamera(Camera* camera) { editorCamera_.UnregisterCamera(camera); }
+void Hierarchy::UnregisterCamera(Camera* camera) {
+#ifdef USE_IMGUI
+	editorCamera_.UnregisterCamera(camera);
+#else
+	(void)camera;
+#endif
+}
 
 bool Hierarchy::HasRegisteredObjects() const { return !objects_.empty() || !primitives_.empty(); }
 

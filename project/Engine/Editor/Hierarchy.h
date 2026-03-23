@@ -13,7 +13,7 @@
 
 #include "Engine/Audio/Audio.h"
 #include "Engine/Editor/Camera/EditorCamera.h"
-#include "Inspector.h"
+#include "Inspector/Inspector.h"
 #include "Light/AreaLight.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
