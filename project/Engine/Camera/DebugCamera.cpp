@@ -48,11 +48,10 @@ void DebugCamera::SetRotation(const Vector3& rotation) {
 }
 
 void DebugCamera::Update() {
-	// 左ドラッグ: 回転 / Shift+左ドラッグ: 注視方向基準の移動 / Ctrl+左ドラッグ・ホイール: スケールズーム
+	// 左ドラッグ: 回転 / Shift+左ドラッグ: 平面移動 / Ctrl+左ドラッグ: 向いている方向基準の自由移動 / ホイール: スケールズーム
 	const float rotateSpeed = 0.005f;
 	const float moveSpeed = 0.02f;
 	const float zoomSpeed = 0.01f;
-	const float dragZoomSpeed = 0.002f;
 	constexpr float kMinZoomScale = 0.1f;
 	constexpr float kMaxZoomScale = 4.0f;
 	constexpr float kPitchLimit = 1.54f;
@@ -75,8 +74,10 @@ void DebugCamera::Update() {
 		translation_ += right * (mouseMove.x * moveSpeed);
 		translation_ += forward * (-mouseMove.y * moveSpeed);
 	} else if (isLeftDrag && isCtrl) {
-		const float nextScale = std::clamp(scale_.x - mouseMove.y * dragZoomSpeed, kMinZoomScale, kMaxZoomScale);
-		scale_ = {nextScale, nextScale, nextScale};
+		const Vector3 right = GetRightAxis(matRot_);
+		const Vector3 forward = GetForwardAxis(matRot_);
+		translation_ += right * (mouseMove.x * moveSpeed);
+		translation_ += forward * (-mouseMove.y * moveSpeed);
 	} else if (isLeftDrag) {
 		dYaw = mouseMove.x * rotateSpeed;
 		dPitch = mouseMove.y * rotateSpeed;
