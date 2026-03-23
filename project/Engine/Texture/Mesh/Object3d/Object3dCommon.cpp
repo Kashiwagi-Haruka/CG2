@@ -414,8 +414,15 @@ Matrix4x4 Object3dCommon::GetDirectionalLightViewProjectionMatrix() const {
 	return Function::Multiply(lightView, lightProjection);
 }
 Matrix4x4 Object3dCommon::GetPointLightViewProjectionMatrix() const {
-	Vector3 lightPosition = pointLightCountData_ && pointLightCountData_->count > 0 ? pointlightData_[0].position : shadowLightPosition_;
+	Vector3 lightPosition = shadowLightPosition_;
 	Vector3 target = {0.0f, 0.0f, 0.0f};
+	float farPlane = shadowCameraFar_;
+	float fov = 1.6f;
+	if (pointLightCountData_ && pointLightCountData_->count > 0) {
+		const PointLight& light = pointlightData_[0];
+		lightPosition = light.position;
+		farPlane = std::max(shadowCameraNear_ + 0.1f, light.radius);
+	}
 	Vector3 lightDirection = Function::Normalize(target - lightPosition);
 	if (Function::Length(lightDirection) < 1.0e-5f) {
 		lightDirection = {0.0f, -1.0f, 0.0f};
@@ -436,7 +443,7 @@ Matrix4x4 Object3dCommon::GetPointLightViewProjectionMatrix() const {
 	view.m[3][0] = -Function::Dot(lightPosition, right);
 	view.m[3][1] = -Function::Dot(lightPosition, cameraUp);
 	view.m[3][2] = -Function::Dot(lightPosition, lightDirection);
-	Matrix4x4 proj = Function::MakePerspectiveFovMatrix(0.9f, 1.0f, shadowCameraNear_, shadowCameraFar_);
+	Matrix4x4 proj = Function::MakePerspectiveFovMatrix(fov, 1.0f, shadowCameraNear_, farPlane);
 	return Function::Multiply(view, proj);
 }
 
@@ -444,11 +451,13 @@ Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
 	Vector3 lightPosition = shadowLightPosition_;
 	Vector3 lightDirection = {0.0f, -1.0f, 0.0f};
 	float fov = 0.9f;
+	float farPlane = shadowCameraFar_;
 	if (spotLightCountData_ && spotLightCountData_->count > 0) {
 		const SpotLight& light = spotLightData_[0];
 		lightPosition = light.position;
 		lightDirection = Function::Normalize(light.direction);
 		fov = std::max(0.1f, std::acos(std::clamp(light.cosAngle, -1.0f, 1.0f)) * 2.0f);
+		farPlane = std::max(shadowCameraNear_ + 0.1f, light.distance);
 	}
 	Vector3 target = lightPosition + lightDirection;
 	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
@@ -467,17 +476,23 @@ Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
 	view.m[3][0] = -Function::Dot(lightPosition, right);
 	view.m[3][1] = -Function::Dot(lightPosition, cameraUp);
 	view.m[3][2] = -Function::Dot(lightPosition, lightDirection);
-	Matrix4x4 proj = Function::MakePerspectiveFovMatrix(fov, 1.0f, shadowCameraNear_, shadowCameraFar_);
+	Matrix4x4 proj = Function::MakePerspectiveFovMatrix(fov, 1.0f, shadowCameraNear_, farPlane);
 	return Function::Multiply(view, proj);
 }
 
 Matrix4x4 Object3dCommon::GetAreaLightViewProjectionMatrix() const {
 	Vector3 lightPosition = shadowLightPosition_;
 	Vector3 lightDirection = {0.0f, -1.0f, 0.0f};
+	float halfWidth = shadowOrthoHalfWidth_;
+	float halfHeight = shadowOrthoHalfHeight_;
+	float farPlane = shadowCameraFar_;
 	if (areaLightCountData_ && areaLightCountData_->count > 0) {
 		const AreaLight& light = areaLightData_[0];
 		lightPosition = light.position;
 		lightDirection = -Function::Normalize(light.normal);
+		halfWidth = std::max(0.5f, light.width * 0.5f + light.radius);
+		halfHeight = std::max(0.5f, light.height * 0.5f + light.radius);
+		farPlane = std::max({shadowCameraNear_ + 0.1f, light.radius, light.width, light.height});
 	}
 	const Vector3 target = lightPosition + lightDirection;
 	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
@@ -496,7 +511,7 @@ Matrix4x4 Object3dCommon::GetAreaLightViewProjectionMatrix() const {
 	view.m[3][0] = -Function::Dot(lightPosition, right);
 	view.m[3][1] = -Function::Dot(lightPosition, cameraUp);
 	view.m[3][2] = -Function::Dot(lightPosition, lightDirection);
-	Matrix4x4 proj = Function::MakeOrthographicMatrix(-shadowOrthoHalfWidth_, shadowOrthoHalfHeight_, shadowOrthoHalfWidth_, -shadowOrthoHalfHeight_, shadowCameraNear_, shadowCameraFar_);
+	Matrix4x4 proj = Function::MakeOrthographicMatrix(-halfWidth, halfHeight, halfWidth, -halfHeight, shadowCameraNear_, farPlane);
 	return Function::Multiply(view, proj);
 }
 
