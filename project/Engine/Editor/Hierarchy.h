@@ -2,8 +2,6 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 #include "Transform.h"
@@ -11,7 +9,7 @@
 #include "Vector3.h"
 #include "Vector4.h"
 
-#include "Engine/Audio/Audio.h"
+#include "Engine/Editor/Audio/EditorAudio.h"
 #include "Engine/Editor/Camera/EditorCamera.h"
 #include "Inspector/Inspector.h"
 #include "Light/EditorLight.h"
@@ -52,7 +50,6 @@ private:
 	void DrawGridEditor();
 	void DrawLightEditor();
 	void DrawSelectionBoxEditor();
-	void DrawAudioEditor();
 	void DrawCameraEditor();
 	void DrawCameraBillboards();
 	void SyncSelectionBoxToTarget();
@@ -99,10 +96,7 @@ private:
 	bool editorGridDirty_ = true;
 	std::unique_ptr<Primitive> editorGridPlane_;
 	EditorLight editorLight_{};
-	std::unordered_map<std::string, float> savedAudioVolumes_;
-	std::unordered_map<std::string, bool> savedAudioLoopEnabled_;
-	std::unordered_map<std::string, std::vector<Audio::MixerEffectSettings>> savedAudioEffects_;
-	std::unordered_set<std::string> playModeInitializedAudioNames_;
+	EditorAudio editorAudio_{};
 	EditorCamera editorCamera_{};
 
 public:
