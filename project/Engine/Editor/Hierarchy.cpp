@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Engine/BaseScene/SceneManager.h"
 #include "Engine/Editor/Object3d/EditorObject3d.h"
+#include "Engine/Editor/Primitive/EditorPrimitive.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
 #include "Grid/EditorGrid.h"
@@ -144,17 +145,7 @@ void Hierarchy::ApplyEditorSnapshot(const EditorSnapshot& snapshot) {
 		if (!primitives_[i] || primitives_[i] == selectionBoxPrimitive_.get() || i >= primitiveEditorTransforms_.size() || i >= primitiveEditorMaterials_.size()) {
 			continue;
 		}
-		primitives_[i]->SetTransform(primitiveEditorTransforms_[i]);
-		const InspectorMaterial& material = primitiveEditorMaterials_[i];
-		primitives_[i]->SetColor(material.color);
-		primitives_[i]->SetEnableLighting(material.enableLighting);
-		primitives_[i]->SetShininess(material.shininess);
-		primitives_[i]->SetEnvironmentCoefficient(material.environmentCoefficient);
-		primitives_[i]->SetGrayscaleEnabled(material.grayscaleEnabled);
-		primitives_[i]->SetSepiaEnabled(material.sepiaEnabled);
-		primitives_[i]->SetDistortionStrength(material.distortionStrength);
-		primitives_[i]->SetDistortionFalloff(material.distortionFalloff);
-		primitives_[i]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+		EditorPrimitive::ApplyEditorValues(primitives_[i], primitiveEditorTransforms_[i], primitiveEditorMaterials_[i]);
 	}
 
 	selectionBoxDirty_ = true;
@@ -206,33 +197,14 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive) {
 	if (emptyIt != primitives_.end()) {
 		const size_t index = static_cast<size_t>(std::distance(primitives_.begin(), emptyIt));
 		primitives_[index] = primitive;
-		primitive->SetTransform(primitiveEditorTransforms_[index]);
-		const InspectorMaterial& material = primitiveEditorMaterials_[index];
-		primitive->SetColor(material.color);
-		primitive->SetEnableLighting(material.enableLighting);
-		primitive->SetShininess(material.shininess);
-		primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
-		primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
-		primitive->SetSepiaEnabled(material.sepiaEnabled);
-		primitive->SetDistortionStrength(material.distortionStrength);
-		primitive->SetDistortionFalloff(material.distortionFalloff);
-		primitive->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+		EditorPrimitive::ApplyEditorValues(primitive, primitiveEditorTransforms_[index], primitiveEditorMaterials_[index]);
 		return;
 	}
 	const size_t index = primitives_.size();
 	primitives_.push_back(primitive);
 	primitiveNames_.push_back("Primitive " + std::to_string(index));
 	primitiveEditorTransforms_.push_back(primitive->GetTransform());
-	primitiveEditorMaterials_.push_back({
-	    primitive->GetColor(),
-	    primitive->IsLightingEnabled(),
-	    primitive->GetShininess(),
-	    primitive->GetEnvironmentCoefficient(),
-	    primitive->IsGrayscaleEnabled(),
-	    primitive->IsSepiaEnabled(),
-	    primitive->GetDistortionStrength(),
-	    primitive->GetDistortionFalloff(),
-	});
+	primitiveEditorMaterials_.push_back(EditorPrimitive::CaptureMaterial(primitive));
 }
 
 void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
@@ -509,15 +481,7 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 				}
 			}
 			primitiveEditorMaterials_[index] = material;
-			primitives_[index]->SetColor(material.color);
-			primitives_[index]->SetEnableLighting(material.enableLighting);
-			primitives_[index]->SetShininess(material.shininess);
-			primitives_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
-			primitives_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
-			primitives_[index]->SetSepiaEnabled(material.sepiaEnabled);
-			primitives_[index]->SetDistortionStrength(material.distortionStrength);
-			primitives_[index]->SetDistortionFalloff(material.distortionFalloff);
-			primitives_[index]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+			EditorPrimitive::ApplyEditorValues(primitives_[index], primitiveEditorTransforms_[index], material);
 		}
 	}
 
@@ -717,18 +681,7 @@ void Hierarchy::DrawObjectEditors() {
 			if (!primitive) {
 				continue;
 			}
-			const Transform& transform = primitiveEditorTransforms_[i];
-			const InspectorMaterial& material = primitiveEditorMaterials_[i];
-			primitive->SetTransform(transform);
-			primitive->SetColor(material.color);
-			primitive->SetEnableLighting(material.enableLighting);
-			primitive->SetShininess(material.shininess);
-			primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
-			primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
-			primitive->SetSepiaEnabled(material.sepiaEnabled);
-			primitive->SetDistortionStrength(material.distortionStrength);
-			primitive->SetDistortionFalloff(material.distortionFalloff);
-			primitive->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor));
+			EditorPrimitive::ApplyEditorValues(primitive, primitiveEditorTransforms_[i], primitiveEditorMaterials_[i]);
 		}
 	}
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -862,15 +815,7 @@ void Hierarchy::DrawObjectEditors() {
 						primitive->SetTransform(transform);
 					}
 					if (materialChanged) {
-						primitive->SetColor(material.color);
-						primitive->SetEnableLighting(material.enableLighting);
-						primitive->SetShininess(material.shininess);
-						primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
-						primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
-						primitive->SetSepiaEnabled(material.sepiaEnabled);
-						primitive->SetDistortionStrength(material.distortionStrength);
-						primitive->SetDistortionFalloff(material.distortionFalloff);
-						primitive->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+						EditorPrimitive::ApplyEditorValues(primitive, transform, material);
 					}
 				}
 			} else {
