@@ -2,6 +2,7 @@
 #include "Hierarchy.h"
 #include "Camera.h"
 #include "Engine/BaseScene/SceneManager.h"
+#include "Engine/Editor/Object3d/EditorObject3d.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
 #include "Grid/EditorGrid.h"
@@ -136,17 +137,7 @@ void Hierarchy::ApplyEditorSnapshot(const EditorSnapshot& snapshot) {
 		if (!objects_[i] || i >= editorTransforms_.size() || i >= editorMaterials_.size()) {
 			continue;
 		}
-		objects_[i]->SetTransform(editorTransforms_[i]);
-		const InspectorMaterial& material = editorMaterials_[i];
-		objects_[i]->SetColor(material.color);
-		objects_[i]->SetEnableLighting(material.enableLighting);
-		objects_[i]->SetShininess(material.shininess);
-		objects_[i]->SetEnvironmentCoefficient(material.environmentCoefficient);
-		objects_[i]->SetGrayscaleEnabled(material.grayscaleEnabled);
-		objects_[i]->SetSepiaEnabled(material.sepiaEnabled);
-		objects_[i]->SetDistortionStrength(material.distortionStrength);
-		objects_[i]->SetDistortionFalloff(material.distortionFalloff);
-		objects_[i]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+		EditorObject3d::ApplyEditorValues(objects_[i], editorTransforms_[i], editorMaterials_[i]);
 	}
 
 	for (size_t i = 0; i < primitives_.size(); ++i) {
@@ -179,33 +170,14 @@ void Hierarchy::RegisterObject3d(Object3d* object) {
 	if (emptyIt != objects_.end()) {
 		const size_t index = static_cast<size_t>(std::distance(objects_.begin(), emptyIt));
 		objects_[index] = object;
-		object->SetTransform(editorTransforms_[index]);
-		const InspectorMaterial& material = editorMaterials_[index];
-		object->SetColor(material.color);
-		object->SetEnableLighting(material.enableLighting);
-		object->SetShininess(material.shininess);
-		object->SetEnvironmentCoefficient(material.environmentCoefficient);
-		object->SetGrayscaleEnabled(material.grayscaleEnabled);
-		object->SetSepiaEnabled(material.sepiaEnabled);
-		object->SetDistortionStrength(material.distortionStrength);
-		object->SetDistortionFalloff(material.distortionFalloff);
-		object->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+		EditorObject3d::ApplyEditorValues(object, editorTransforms_[index], editorMaterials_[index]);
 		return;
 	}
 	const size_t index = objects_.size();
 	objects_.push_back(object);
 	objectNames_.push_back("Object " + std::to_string(index));
 	editorTransforms_.push_back(object->GetTransform());
-	editorMaterials_.push_back({
-	    object->GetColor(),
-	    object->IsLightingEnabled(),
-	    object->GetShininess(),
-	    object->GetEnvironmentCoefficient(),
-	    object->IsGrayscaleEnabled(),
-	    object->IsSepiaEnabled(),
-	    object->GetDistortionStrength(),
-	    object->GetDistortionFalloff(),
-	});
+	editorMaterials_.push_back(EditorObject3d::CaptureMaterial(object));
 }
 
 void Hierarchy::UnregisterObject3d(Object3d* object) {
@@ -467,15 +439,7 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 				}
 			}
 			editorMaterials_[index] = material;
-			objects_[index]->SetColor(material.color);
-			objects_[index]->SetEnableLighting(material.enableLighting);
-			objects_[index]->SetShininess(material.shininess);
-			objects_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
-			objects_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
-			objects_[index]->SetSepiaEnabled(material.sepiaEnabled);
-			objects_[index]->SetDistortionStrength(material.distortionStrength);
-			objects_[index]->SetDistortionFalloff(material.distortionFalloff);
-			objects_[index]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+			EditorObject3d::ApplyEditorValues(objects_[index], editorTransforms_[index], material);
 		}
 	}
 
@@ -745,18 +709,7 @@ void Hierarchy::DrawObjectEditors() {
 			if (!object) {
 				continue;
 			}
-			const Transform& transform = editorTransforms_[i];
-			const InspectorMaterial& material = editorMaterials_[i];
-			object->SetTransform(transform);
-			object->SetColor(material.color);
-			object->SetEnableLighting(material.enableLighting);
-			object->SetShininess(material.shininess);
-			object->SetEnvironmentCoefficient(material.environmentCoefficient);
-			object->SetGrayscaleEnabled(material.grayscaleEnabled);
-			object->SetSepiaEnabled(material.sepiaEnabled);
-			object->SetDistortionStrength(material.distortionStrength);
-			object->SetDistortionFalloff(material.distortionFalloff);
-			object->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+			EditorObject3d::ApplyEditorValues(object, editorTransforms_[i], editorMaterials_[i]);
 		}
 
 		for (size_t i = 0; i < primitives_.size(); ++i) {
@@ -932,15 +885,7 @@ void Hierarchy::DrawObjectEditors() {
 						object->SetTransform(transform);
 					}
 					if (materialChanged) {
-						object->SetColor(material.color);
-						object->SetEnableLighting(material.enableLighting);
-						object->SetShininess(material.shininess);
-						object->SetEnvironmentCoefficient(material.environmentCoefficient);
-						object->SetGrayscaleEnabled(material.grayscaleEnabled);
-						object->SetSepiaEnabled(material.sepiaEnabled);
-						object->SetDistortionStrength(material.distortionStrength);
-						object->SetDistortionFalloff(material.distortionFalloff);
-						object->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+						EditorObject3d::ApplyEditorValues(object, transform, material);
 					}
 				}
 			}
