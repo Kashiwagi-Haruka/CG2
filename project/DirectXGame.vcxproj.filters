@@ -339,6 +339,8 @@
     <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
     <ClCompile Include="application\GameObject\Locker\Locker.cpp" />
     <ClCompile Include="application\GameObject\Locker\LockerManager.cpp" />
+    <ClCompile Include="application\GameObject\Desk\Desk.cpp" />
+    <ClCompile Include="application\GameObject\Desk\DeskManager.cpp" />
     <ClCompile Include="Engine\Editor\Camera\EditorCamera.cpp" />
     <ClCompile Include="Engine\Editor\Audio\EditorAudio.cpp" />
     <ClCompile Include="Engine\Editor\Light\EditorLight.cpp" />
@@ -672,6 +674,8 @@
     <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
     <ClInclude Include="application\GameObject\Locker\Locker.h" />
     <ClInclude Include="application\GameObject\Locker\LockerManager.h" />
+    <ClInclude Include="application\GameObject\Desk\Desk.h" />
+    <ClInclude Include="application\GameObject\Desk\DeskManager.h" />
     <ClInclude Include="Engine\Editor\Camera\EditorCamera.h" />
     <ClInclude Include="Engine\Editor\Audio\EditorAudio.h" />
     <ClInclude Include="Engine\Editor\Light\EditorLight.h" />
