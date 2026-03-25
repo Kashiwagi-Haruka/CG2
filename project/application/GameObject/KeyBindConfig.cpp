@@ -3,6 +3,8 @@
 
 
 std::unique_ptr<PlayerCommand> PlayerCommand::instance_ = nullptr;
+bool PlayerCommand::isGrab_ = false;
+bool PlayerCommand::isStand_ = false;
 
 PlayerCommand* PlayerCommand::GetInstance()
 {
@@ -46,7 +48,7 @@ bool PlayerCommand::MoveBackwardTrigger()
 bool PlayerCommand::Shot()
 {
     auto* input = Input::GetInstance();
-    return input->TriggerKey(K_Shot) || input->TriggerButton(Input::PadButton(C_Shot))||input->TriggerMouseButton(Input::MouseButton(M_Shot));
+    return input->TriggerKey(K_Shot) || input->TriggerButton(Input::PadButton(C_Shot)) || input->TriggerMouseButton(Input::MouseButton(M_Shot));
 }
 
 bool PlayerCommand::Sneak()
@@ -65,6 +67,18 @@ bool PlayerCommand::InteractTrigger()
 {
     auto* input = Input::GetInstance();
     return input->TriggerKey(K_Interact) || input->TriggerButton(Input::PadButton(C_Interact));
+}
+
+bool PlayerCommand::MouseWheelUp()
+{
+    auto* input = Input::GetInstance();
+    return(input->GetMouseWheelDelta() < 0.0f);
+}
+
+bool PlayerCommand::MouseWheelDown()
+{
+    auto* input = Input::GetInstance();
+    return(input->GetMouseWheelDelta() > 0.0f);
 }
 
 Vector2 PlayerCommand::Rotate(float rotateSpeed)
@@ -86,7 +100,14 @@ Vector2 PlayerCommand::Rotate(float rotateSpeed)
         dPitch += inputMovePos.y * YoshidaMath::kDeltaTime * rotateSpeed;
     }
 
-    return {dPitch,dYaw };
+    return { dPitch,dYaw };
+}
+
+void PlayerCommand::Initialize()
+{
+    isGrab_ = false;
+    //何かにたっているかどうか
+    isStand_ = false;
 }
 
 bool PlayerCommand::MoveTrigger(const GameKeyBind key, const GameKeyBind controller)

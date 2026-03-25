@@ -19,18 +19,24 @@ public:
     void Update();
     void Initialize();
     void Draw();
-  static  void SetPlayerCamera(PlayerCamera* camera);
+    static void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
     void SetTransform(const Transform& transform) { transform_ = transform; };
     void SetMirrorTransform(Transform* transform) { mirrorTransform_ = transform; };
     Transform& GetTransform() { return transform_; };
+    bool GetIsStand() { return isStand_; }
+    void SetIsStand(const bool isStand) { isStand_ = isStand; }
 private:
+    void SwichCommand();
+    void Mirror();
+    void Grab();
     bool OnCollisionRay();
-   static PlayerCamera* playerCamera_;
+    static PlayerCamera* playerCamera_;
     Transform transform_ = {};
     std::unique_ptr<Object3d>obj_ = nullptr;
     Transform* mirrorTransform_ = nullptr;
     Vector3 velocity_ = { 0.0f };
     bool isGrab_ = false;
+    bool isStand_ = false;
 };
 

@@ -65,7 +65,7 @@ namespace {
     }
 } // namespace
 
-bool Player::isGrab_ = false;
+
 
 Player::Player() {
     localAABB_ = {
@@ -89,8 +89,6 @@ void Player::SetCamera(Camera* camera) {
     bodyObj_->UpdateCameraMatrices();
 }
 void Player::Initialize() {
-
-    isGrab_ = false;
 
     // 座標の初期化
     transform_ = {
@@ -140,6 +138,9 @@ void Player::Update()
     Gravity();
     //アニメーション
     Animation();
+
+    bodyObj_->SetWorldMatrix(Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
+    bodyObj_->Update();
 
     //デバック
     Debug();
@@ -367,6 +368,7 @@ Vector3 Player::GetJointWorldPos(const char* jointName) const
 }
 
 void Player::Gravity() {
+
     velocity_.y -= YoshidaMath::kDeltaTime * YoshidaMath::kGravity;
     transform_.translate.y += velocity_.y;
     velocity_.y = std::clamp(velocity_.y, -1.0f, 1.0f);
@@ -448,10 +450,10 @@ void Player::Animation()
         }
     }
 
-    bodyObj_->SetWorldMatrix(Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
-    bodyObj_->Update();
+
 
 }
+
 void Player::SaveParameters() {
     JsonManager* jsonManager = JsonManager::GetInstance();
 

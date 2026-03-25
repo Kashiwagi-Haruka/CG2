@@ -28,6 +28,7 @@ TextUIManager::TextUIManager()
     edamameTrivia_.SetBlendMode(BlendMode::kBlendModeAlpha);
     edamameTrivia_.UpdateLayout();
 
+    chairMenu_ = std::make_unique<ChairMenu>();
 }
 
 TextUIManager::~TextUIManager()
@@ -39,6 +40,7 @@ void TextUIManager::Initialize()
 {
     isDraw_ = false;
     showTimer_ = showTime_;
+    chairMenu_->Initialize();
 }
 
 void TextUIManager::Update()
@@ -75,6 +77,8 @@ void TextUIManager::Update()
 
     text_.Update();
     edamameTrivia_.Update();
+
+    chairMenu_->Update();
 }
 
 void TextUIManager::Draw()
@@ -85,6 +89,8 @@ void TextUIManager::Draw()
     if (isDraw_) {
         text_.Draw();
     }
+
+    chairMenu_->Draw();
 
     FreeTypeManager::ResetFontUsage();
 }

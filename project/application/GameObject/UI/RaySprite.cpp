@@ -32,7 +32,7 @@ void RaySprite::Update()
 {
 	auto* playerCommand = PlayerCommand::GetInstance();
 
-	if (Player::GetIsGrab()) {
+	if (PlayerCommand::GetIsGrab()) {
 		// インタラクトの処理
 		SetTexture(RaySprite::GRAB);
 	} else if(PortalManager::GetCanMakePortal()){

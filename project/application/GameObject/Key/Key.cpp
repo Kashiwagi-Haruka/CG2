@@ -41,7 +41,7 @@ void Key::Update()
     obj_->SetEnableLighting(false);
     CheckCollision();
 
-    if (isGetKey_ && Player::GetIsGrab()) {
+    if (isGetKey_ && PlayerCommand::GetIsGrab()) {
         // カーソルに追従させて持ち上げる処理
         Vector3 origin = playerCamera_->GetTransform().translate;
         worldTransform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
@@ -100,12 +100,12 @@ void Key::CheckCollision()
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
         if (isGetKey_) {
             isGetKey_ = false;
-            Player::SetIsGrab(false);
+            PlayerCommand::SetIsGrab(false);
         } else {
-            if (OnCollisionRay()&& !Player::GetIsGrab()) {
+            if (OnCollisionRay()&& !PlayerCommand::GetIsGrab()) {
                 isGetKey_ = true;
                 isSendGetKeyMessage_ = true;
-                Player::SetIsGrab(true);
+                PlayerCommand::SetIsGrab(true);
             }
         }
     }
