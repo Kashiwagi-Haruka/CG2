@@ -22,9 +22,7 @@ Desk::Desk()
 
 void Desk::OnCollision(Collider* collider)
 {
-    if (collider->GetCollisionAttribute() == kCollisionPlayer) {
 
-    }
 }
 
 Vector3 Desk::GetWorldPosition() const
@@ -35,7 +33,7 @@ Vector3 Desk::GetWorldPosition() const
 void Desk::Animation()
 {
 
-    bool loopAnimation = false;
+    bool loopAnimation = true;
 
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     AnimationManager::PlaybackResult playbackResult{};
@@ -101,10 +99,7 @@ void Desk::CheckCollision()
 
     if (OnCollisionRay()) {
         //rayの当たり判定
-
-
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
-
             if (!PlayerCommand::GetIsGrab()) {
 
             }

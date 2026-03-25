@@ -178,9 +178,9 @@ void ShadowGameScene::Update()
 
     //オブジェクトの当たり判定
     CheckCollision();
-
     //Text
     textUIManager_->Update();
+
 }
 
 void ShadowGameScene::Draw()

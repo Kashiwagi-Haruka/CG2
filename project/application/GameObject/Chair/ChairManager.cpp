@@ -39,7 +39,7 @@ void ChairManager::Initialize()
 
 
     for (size_t i = 0; i < maxNum_ - 1; i += 2) {
-        Transform transform = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {10.0f,1.0f,(float)i}};
+        Transform transform = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {6.25f+i*1.0f,1.0f,3.5f,}};
         chairs_.at(i)->SetTransform(transform);
         transform.rotate.y += Function::kPi;
         transform.translate.x *= -1.0f;

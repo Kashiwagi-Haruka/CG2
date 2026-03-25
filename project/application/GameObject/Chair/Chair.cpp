@@ -25,19 +25,10 @@ void Chair::OnCollision(Collider* collider)
         return;
     }
 
-    if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-        Vector3 vel = playerCamera_->GetRay().diff * 4.0f;
-        vel.y = 0.0f;
-        const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-        transform_.translate += vel * deltaTime;
-    }
-
-    if (collider->GetCollisionAttribute() == kCollisionFloor) {
+    if (collider->GetCollisionAttribute() == kCollisionFloor||
+        collider->GetCollisionAttribute() == kCollisionKey || 
+        collider->GetCollisionAttribute() == kCollisionPlayer) {
         velocity_.y = 0.0f;
-    }
-
-    if (collider->GetCollisionAttribute() == kCollisionKey) {
-
     }
 }
 
@@ -167,8 +158,6 @@ void Chair::Grab()
 
     transform_.translate.y = std::clamp(transform_.translate.y, 0.0f, 2.4f);
     YoshidaMath::ResolveCollision(transform_.translate, velocity_, GetCollisionInfo());
-
-
 }
 
 bool Chair::OnCollisionRay()

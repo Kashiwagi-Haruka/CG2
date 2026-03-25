@@ -72,7 +72,7 @@ void TextUIManager::Update()
 
     if (EdamameTrivia::GetIsSendStartTriviaMessage()) {
         edamameTrivia_.SetString(EdamameTrivia::GetString());
-        edamameTrivia_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
+        edamameTrivia_.StartTyping(0.1f); // 0.1秒ごとに1文字ずつ表示
     }
 
     text_.Update();
@@ -83,14 +83,15 @@ void TextUIManager::Update()
 
 void TextUIManager::Draw()
 {
-
-    edamameTrivia_.Draw();
-
     if (isDraw_) {
         text_.Draw();
     }
 
-    chairMenu_->Draw();
+    if (ChairMenu::GetIsShowMenu()) {
+        chairMenu_->Draw();
+    } else {
+        edamameTrivia_.Draw();
+    }
 
     FreeTypeManager::ResetFontUsage();
 }
