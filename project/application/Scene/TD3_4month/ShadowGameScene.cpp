@@ -61,7 +61,7 @@ ShadowGameScene::ShadowGameScene()
 
     portalManager_->SetPlayerCamera(playerCamera_.get());
     //Playerの座標のポインタを入れる
-    timeCardWatch_->SetTransformPtr(&player_->GetTransform());
+    timeCardWatch_->SetPlayer(player_.get());
     //UIManager
     textUIManager_ = std::make_unique<TextUIManager>();
 
