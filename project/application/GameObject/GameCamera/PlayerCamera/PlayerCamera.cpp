@@ -81,7 +81,6 @@ bool PlayerCamera::OnCollisionRay(const AABB& localAABB, const Vector3& translat
 
 void PlayerCamera::SetTransform()
 {
-    assert(playerTransform_);
 
     Rotate();
 
