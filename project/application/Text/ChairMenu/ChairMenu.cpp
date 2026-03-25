@@ -7,6 +7,7 @@
 
 bool ChairMenu::isShowMenu_ = false;
 uint32_t ChairMenu::selectButtonNum_ = 0;
+bool ChairMenu::isSelectButton_ = false;
 
 ChairMenu::ChairMenu()
 {
@@ -22,10 +23,10 @@ ChairMenu::ChairMenu()
         text.SetAlign(TextAlign::Left);
     }
 
-    grabText_[0] = U"椅子を離す";
-    grabText_[1] = U"椅子を持つ";
+    grabText_[0] = U"椅子を持つ";
+    grabText_[1] = U"椅子を離す";
 
-    menuText_[GRAB_TEXT].SetString(grabText_[1]);
+    menuText_[GRAB_TEXT].SetString(grabText_[0]);
     menuText_[GRAB_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f ,SCREEN_SIZE::HALF_HEIGHT });
 
     menuText_[STAND_TEXT].SetString(U"椅子に乗る");
@@ -63,7 +64,8 @@ void ChairMenu::Initialize()
 {
     isShowMenu_ = false;
     selectButtonNum_ = 0;
-    menuText_[GRAB_TEXT].SetString(grabText_[1]);
+    isSelectButton_ = false;
+    menuText_[GRAB_TEXT].SetString(grabText_[0]);
 }
 
 void ChairMenu::Update()
@@ -76,22 +78,22 @@ void ChairMenu::Update()
     pressEText_.SetColor({ 1.0f,1.0f,1.0f,fontAlpha });
     pressEText_.UpdateLayout(false);
 
-
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
-        Audio::GetInstance()->SoundPlayWave(SEData_, false);
-        if (!isShowMenu_) {
-            //最初は0番に設定する
-            selectButtonNum_ = 0;
-            for (auto& text : menuText_) {
-                text.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-            }
-        }
-    }
-
     if (isShowMenu_) {
 
+        if (PlayerCommand::GetInstance()->InteractTrigger()) {
+
+            if (!isSelectButton_) {
+                Audio::GetInstance()->SoundPlayWave(SEData_, false);
+                isSelectButton_ = true;
+                //最初は0番に設定する
+                selectButtonNum_ = 0;
+                for (auto& text : menuText_) {
+                    text.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
+                }
+            }
+        }
         //メニューテキストのテキストを設定する
-        menuText_[GRAB_TEXT].SetString(grabText_[!PlayerCommand::GetIsGrab()]);
+        menuText_[GRAB_TEXT].SetString(grabText_[PlayerCommand::GetIsGrab()]);
 
         //メニューが開いた時
         if (PlayerCommand::GetInstance()->MouseWheelDown()) {
