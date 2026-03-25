@@ -86,3 +86,8 @@ void WhiteBoard::ResetCollisionAttribute()
 {
     SetCollisionAttribute(kCollisionFloor);
 }
+
+void WhiteBoard::SetCollisionAttributeNoneAndInitialize()
+{
+    SetCollisionAttribute(kCollisionNone);
+}

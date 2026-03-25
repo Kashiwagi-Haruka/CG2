@@ -27,7 +27,7 @@ void Edamame::Initialize()
     worldTransform_ = {
         .scale{0.5f, 0.5f, 0.5f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{-4.0f, 0.25f, 0.0f}
+        .translate{-4.0f, 0.5f, 0.0f}
     };
 
     obj_->Initialize();
@@ -72,13 +72,6 @@ void Edamame::CheckCollision()
 {
     //keyとrayの当たり判定
     if (OnCollisionRay()) {
-        if (PlayerCommand::GetInstance()->Interact()) {
-            // カーソルに追従させて持ち上げる処理
-            Vector3 origin = playerCamera_->GetTransform().translate;
-            worldTransform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
-            worldTransform_.translate.y = (std::max)(worldTransform_.translate.y, 0.25f);
-        }
-
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (!BGMManager::GetIsEdamameSound()) {
                 BGMManager::SoundPlay(BGMManager::EDAMAME, false);
@@ -100,22 +93,25 @@ void Edamame::Trivia()
 
     if (BGMManager::GetIsEdamameSound()) {
 
-        edamameTrivia_->Update();
-
+        if (OnCollisionRay()) {
+            edamameTrivia_->Update();
+        }
         Vector3 distance = Function::Distance(playerCamera_->GetRay().origin, worldTransform_.translate);
         float  length = Function::Length(distance);
         float bgmVol = 0.0f;
         float vol = 0.0f; 
 
-        if (length <= 25.0f) {
+        if (length <= 20.0f) {
             if (length <= 1.0f) {
                 bgmVol = 0.25f;
                 vol = 1.0f;
+                edamameTrivia_->SetIsDraw(true);
             } else {
                 vol = 1.0f / length;
                 bgmVol = vol * 0.25f;
             }
         } else {
+            edamameTrivia_->SetIsDraw(false);
             bgmVol = 0.0f;
             vol = 0.0f;
             //枝豆サウンドを止める

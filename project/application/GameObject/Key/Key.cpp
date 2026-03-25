@@ -15,7 +15,9 @@ Key::Key()
     // モデルをセット
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/key", "key");
     obj_->SetModel("key");
-
+    SetAABB({ .min = { -0.1f,-0.1f,-0.1f }, .max = { 0.1f,0.1f,0.1f } });
+    SetCollisionAttribute(kCollisionKey);
+    SetCollisionMask(kCollisionChair | kCollisionLocker|kCollisionFloor|kCollisionWall);
 }
 
 void Key::Initialize()
@@ -23,13 +25,11 @@ void Key::Initialize()
     worldTransform_ = {
         .scale{2.0f, 2.0f, 2.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{-1.0f, 4.0f, -6.5f}
+        .translate{-1.0f, 3.0f, -6.5f}
     };
     velocity_ = { 0.0f };
     obj_->Initialize();
-    SetAABB({ .min = { -0.25f,-0.25f,-0.25f }, .max = { 0.25f,0.25f,0.25f } });
-    SetCollisionAttribute(kCollisionKey);
-    SetCollisionMask(kCollisionDoor | kCollisionChair | kCollisionLocker);
+
 
     isChairHit_ = false;
     isSendGetKeyMessage_ = false;

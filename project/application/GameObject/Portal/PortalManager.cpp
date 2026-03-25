@@ -87,7 +87,7 @@ void PortalManager::WarpPlayer(Player* player)
                 Transform transform = *portal->GetWarpPos()->GetParent();
                 transform.translate.y = 0.0f;
                 player->SetTranslate(transform.translate);
-                player->SetRotate(portal->GetWarpPos()->GetTransform().rotate+ transform.rotate);
+                player->SetRotate(portal->GetWarpPos()->GetTransform().rotate + transform.rotate);
 
                 Audio::GetInstance()->SoundPlayWave(warpSE_, false);
                 break;
@@ -216,7 +216,8 @@ void PortalManager::CheckCollision() {
 
                 preWhiteBoards_.push_back(board.get());
 
-                preWhiteBoards_.back()->SetCollisionAttribute(kCollisionNone);
+                //マスクの設定とフラグの初期化
+                preWhiteBoards_.back()->SetCollisionAttributeNoneAndInitialize();
 
                 pendingWhiteBoard_ = preWhiteBoards_.back();
 
@@ -246,16 +247,10 @@ void PortalManager::SpawnPortal(WhiteBoard* board) {
         Portal* existingPortal = portals_.back().get();
         newPortal->GetWarpPos()->SetParent(&existingPortal->GetTransform());
         existingPortal->GetWarpPos()->SetParent(&newPortal->GetTransform());
-        //テクスチャの入れ替え
-        //existingPortal->SetTextureIndex(existingPortal->GetRenderTexture2D()->GetSrvIndex());
-        //newPortal->SetTextureIndex(newPortal->GetRenderTexture2D()->GetSrvIndex());
-
     } else {
         //ポータルがないとき
         newPortal->GetWarpPos()->SetParent(&firstWarpPosTransform_);
     }
-
-
     portals_.push_back(std::move(newPortal));
     Audio::GetInstance()->SoundPlayWave(portalSpawnSE_, false);
 }

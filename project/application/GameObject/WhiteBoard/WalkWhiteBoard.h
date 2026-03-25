@@ -8,26 +8,29 @@ class WalkWhiteBoard :
     public WhiteBoard
 {
 private:
-
     //アニメーションクリップ
     static std::vector<Animation::AnimationData> animationClips_;
     //骨
     std::unique_ptr<Skeleton> skeleton_{};
     //スキン
     SkinCluster skinCluster_{};
-    //現在のアニメーションインデックス
-    size_t currentAnimationIndex_ = 0; 
-    //アニメーション時間
-    float animationTime_ = 0.0f;
+    Animation::AnimationData blendedPoseAnimation_{};
+    const std::string animationGroupName_ = "walkWhiteBoard";
+    const float kAnimationBlendDuration_ = 0.3f;
+    bool animationFinished_ = false;
+    std::string desiredAnimationName = "Idle";
 public:
+    WalkWhiteBoard();
     void OnCollision(Collider* collider)override;
     void SetTargetPosPtr(Vector3* pos) { targetPos_ = pos; };
     static void LoadAnimation(const std::string& directionalPath, const std::string& filePath);
     void Initialize()override;
     void Update()override;
     void Draw()override;
-    void SetAnimationIndex(const size_t& index) { currentAnimationIndex_ = index; }
     void ResetCollisionAttribute()override;
+    void SetIsMove(const bool isMove) { isMove_ = isMove; }
+    void SetCollisionAttributeNoneAndInitialize()override;
+
 private:
     bool isMove_ = false;
   
