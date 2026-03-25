@@ -25,6 +25,8 @@ public:
     static void SetIsShowMenu(const bool isShowMenu) { isShowMenu_ = isShowMenu; }
     static bool GetIsShowMenu() { return isShowMenu_; }
     static uint32_t GetSelectButtonNum() { return selectButtonNum_; }
+    static void SetIsSelectButton(const bool isSelectButton) { isSelectButton_ = isSelectButton; }
+    static bool GetIsSelectButton() { return isSelectButton_; }
 private:
     SoundData SEData_;
 
@@ -40,6 +42,6 @@ private:
 #pragma endregion
     static bool isShowMenu_;
     static uint32_t selectButtonNum_;
-
+    static bool isSelectButton_;
 };
 

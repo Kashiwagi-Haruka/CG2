@@ -50,22 +50,23 @@ void Chair::Update()
 {
     Mirror();
 
-    //インタラクトをトリガーすると
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+    //rayと重なると
+    if (OnCollisionRay()) {
+        //インタラクトをトリガーすると
+        if (PlayerCommand::GetInstance()->InteractTrigger()) {
+            if (ChairMenu::GetIsShowMenu()) {
+                if (ChairMenu::GetIsSelectButton()) {
+                    //数値によって処理を変更する
+                    SwichCommand();
+                    ChairMenu::SetIsSelectButton(false);
+                }
+            } else {
 
-        if (ChairMenu::GetIsShowMenu()) {
-            //数値によって処理を変更する
-            SwichCommand();
-
-        } else {
-            //rayと重なると
-            if (OnCollisionRay()) {
                 //メニューを表示してないとき表示する
                 ChairMenu::SetIsShowMenu(true);
             }
         }
     }
-
     Grab();
 
     obj_->SetTransform(transform_);
@@ -117,16 +118,18 @@ void Chair::SwichCommand()
         if (!PlayerCommand::GetIsStand()) {
             PlayerCommand::SetIsStand(true);
             isStand_ = true;
-            //メニューを閉じる
-            ChairMenu::SetIsShowMenu(false);
         }
 
+        //メニューを閉じる
+        ChairMenu::SetIsShowMenu(false);
         break;
     default:
         //メニューを閉じる
         ChairMenu::SetIsShowMenu(false);
         break;
     }
+
+
 }
 
 void Chair::Mirror()
