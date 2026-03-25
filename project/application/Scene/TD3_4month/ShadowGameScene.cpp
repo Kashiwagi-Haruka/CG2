@@ -53,6 +53,9 @@ ShadowGameScene::ShadowGameScene()
     vendingMac_ = std::make_unique<VendingMac>();
     //椅子
     chairManager_ = std::make_unique<ChairManager>();
+    //机
+    deskManager_ = std::make_unique<DeskManager>();
+    
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 
@@ -69,6 +72,7 @@ ShadowGameScene::ShadowGameScene()
     door_->SetPlayerCamera(playerCamera_.get());
     flashlight_->SetPlayerCamera(playerCamera_.get());
     lockerManager_->SetPlayerCamera(playerCamera_.get());
+    deskManager_->SetPlayerCamera(playerCamera_.get());
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -124,7 +128,8 @@ void ShadowGameScene::Initialize()
     door_->Initialize();
     //ロッカー
     lockerManager_->Initialize();
-
+    //デスク管理
+    deskManager_->Initialize();
     //カーソルを画面中央に設定する
     auto* input = Input::GetInstance();
     input->SetIsCursorVisible(false);
@@ -252,7 +257,9 @@ void ShadowGameScene::CheckCollision()
     for (auto& locker : lockerManager_->GetLockers()) {
         collisionManager_->AddCollider(locker.get());
     }
-
+    for (auto& desk : deskManager_->GetDesks()) {
+        collisionManager_->AddCollider(desk.get());
+    }
     collisionManager_->AddCollider(key_.get());
 
     collisionManager_->CheckAllCollisions();
@@ -432,6 +439,8 @@ void ShadowGameScene::UpdateGameObject()
     door_->Update();
     //ロッカー
     lockerManager_->Update();
+    //机
+    deskManager_->Update();
     //ポータル管理
     portalManager_->Update();
 
@@ -518,6 +527,8 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     door_->Draw();
     //ロッカー
     lockerManager_->Draw();
+    //机
+    deskManager_->Draw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //懐中電灯
@@ -557,6 +568,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     vendingMac_->SetCamera(camera);
     door_->SetCamera(camera);
     lockerManager_->SetCamera(camera);
+    deskManager_->SetCamera(camera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {

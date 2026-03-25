@@ -79,7 +79,7 @@ void Flashlight::Initialize()
     isSendGetLightMessage_ = false;
 
     obj_->Initialize();
-    transform_.translate = {4.0f,0.1f,1.0f};
+    transform_.translate = {4.0f,0.1f,5.0f};
     transform_.rotate = { 0.0f,0.0f,0.0f };
     transform_.scale = { 1.0f,1.0f,1.0f };
     SetLight();
@@ -130,10 +130,7 @@ void Flashlight::CheckCollision()
 void Flashlight::UpdateSpotLight()
 {
     spotLight_.position = GetWorldPosition();
-
     spotLight_.direction = -YoshidaMath::GetForward(obj_->GetWorldMatrix());
-
-
     spotLight_.intensity = 10.0f;
 
 }

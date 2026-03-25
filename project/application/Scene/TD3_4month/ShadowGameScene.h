@@ -18,6 +18,7 @@
 #include"GameObject/VendingMac/VendingMac.h"
 #include"GameObject/Door/Door.h"
 #include"GameObject/Locker/LockerManager.h"
+#include"GameObject/Desk/DeskManager.h"
 #pragma endregion
 
 #pragma region //UI
@@ -89,6 +90,8 @@ private:
     std::unique_ptr<Door> door_ = nullptr;
     //ロッカー管理
     std::unique_ptr<LockerManager> lockerManager_ = nullptr;
+    //デスク管理
+    std::unique_ptr<DeskManager> deskManager_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
