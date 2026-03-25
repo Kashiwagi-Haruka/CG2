@@ -55,14 +55,14 @@ ShadowGameScene::ShadowGameScene()
     chairManager_ = std::make_unique<ChairManager>();
     //机
     deskManager_ = std::make_unique<DeskManager>();
-    
+
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 
     portalManager_->SetPlayerCamera(playerCamera_.get());
     //Playerの座標のポインタを入れる
     timeCardWatch_->SetTransformPtr(&player_->GetTransform());
-      //UIManager
+    //UIManager
     textUIManager_ = std::make_unique<TextUIManager>();
 
     key_->SetPlayerCamera(playerCamera_.get());
@@ -98,6 +98,7 @@ void ShadowGameScene::Initialize()
 
     //プレイヤーの初期化
     player_->Initialize();
+    PlayerCommand::Initialize();
     playerCamera_->Initialize();
 
     //デバックカメラの設定
@@ -448,58 +449,69 @@ void ShadowGameScene::UpdateGameObject()
         door_->SetIsGetKey(key_->GetKeyPtr());
     }
 
+    for (auto& chair : chairManager_->GetChairs()) {
+        if (chair->GetIsStand()) {
+            Vector3 pos = chair->GetWorldPosition();
+            pos.y += 1.0f;
+            player_->SetTranslate(pos);
+            chair->SetIsStand(false);
+            PlayerCommand::SetIsStand(false);
+            break;
+        }
+    }
+
     ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
 #pragma endregion
 }
 void ShadowGameScene::UpdateLight() {
 #pragma region // Lightを組み込む
-	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
-	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
-	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
-	Object3dCommon::GetInstance()->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
+    Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+    Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
+    Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
+    Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
+    Object3dCommon::GetInstance()->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
 #pragma endregion
 
 #ifdef USE_IMGUI
-	if (ImGui::TreeNode("Light")) {
-		ImGui::DragFloat3("Area0Position", &areaLights_[0].position.x, 0.1f);
-		ImGui::DragFloat3("Area1Position", &areaLights_[1].position.x, 0.1f);
-		ImGui::Checkbox("DirectionalShadow", &useDirectionalShadow_);
-		ImGui::Checkbox("PointShadow", &usePointShadow_);
-		ImGui::Checkbox("SpotShadow", &useSpotShadow_);
-		ImGui::Checkbox("AreaShadow", &useAreaShadow_);
-		pointLights_[0].shadowEnabled = usePointShadow_ ? 1 : 0;
-		spotLights_[0].shadowEnabled = useSpotShadow_ ? 1 : 0;
-		areaLights_[0].shadowEnabled = useAreaShadow_ ? 1 : 0;
-		ImGui::TreePop();
-	}
+    if (ImGui::TreeNode("Light")) {
+        ImGui::DragFloat3("Area0Position", &areaLights_[0].position.x, 0.1f);
+        ImGui::DragFloat3("Area1Position", &areaLights_[1].position.x, 0.1f);
+        ImGui::Checkbox("DirectionalShadow", &useDirectionalShadow_);
+        ImGui::Checkbox("PointShadow", &usePointShadow_);
+        ImGui::Checkbox("SpotShadow", &useSpotShadow_);
+        ImGui::Checkbox("AreaShadow", &useAreaShadow_);
+        pointLights_[0].shadowEnabled = usePointShadow_ ? 1 : 0;
+        spotLights_[0].shadowEnabled = useSpotShadow_ ? 1 : 0;
+        areaLights_[0].shadowEnabled = useAreaShadow_ ? 1 : 0;
+        ImGui::TreePop();
+    }
 #endif
 }
 #pragma endregion
 
 #pragma region // private描画処理
 void ShadowGameScene::DrawSceneTransition() {
-	if (isTransitionIn_ || isTransitionOut_) {
-		transition_->Draw();
-	}
+    if (isTransitionIn_ || isTransitionOut_) {
+        transition_->Draw();
+    }
 }
 
 void ShadowGameScene::DrawModel() {
-	//=======================shadowマップの開始↓=======================
-	auto* object3dCommon = Object3dCommon::GetInstance();
-	const bool shadowFlags[4] = {useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_};
-	for (int i = 0; i < 4; ++i) {
-		if (!shadowFlags[i]) {
-			continue;
-		}
-		object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
-		object3dCommon->BeginShadowMapPass();
-		object3dCommon->DrawCommonShadow();
-		DrawGameObject(true, false, false, true);
-		object3dCommon->EndShadowMapPass();
-	}
-	object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
-	//=======================shadowマップの終了↑=======================
+    //=======================shadowマップの開始↓=======================
+    auto* object3dCommon = Object3dCommon::GetInstance();
+    const bool shadowFlags[4] = { useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_ };
+    for (int i = 0; i < 4; ++i) {
+        if (!shadowFlags[i]) {
+            continue;
+        }
+        object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
+        object3dCommon->BeginShadowMapPass();
+        object3dCommon->DrawCommonShadow();
+        DrawGameObject(true, false, false, true);
+        object3dCommon->EndShadowMapPass();
+    }
+    object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
+    //=======================shadowマップの終了↑=======================
 
     for (auto& portal : portalManager_->GetPortals()) {
         portal->BeginRender();

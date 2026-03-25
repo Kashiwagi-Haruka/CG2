@@ -346,6 +346,7 @@
     <ClCompile Include="Engine\Editor\Light\EditorLight.cpp" />
     <ClCompile Include="Engine\Editor\Object3d\EditorObject3d.cpp" />
     <ClCompile Include="Engine\Editor\Primitive\EditorPrimitive.cpp" />
+    <ClCompile Include="application\Text\ChairMenu\ChairMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -681,6 +682,7 @@
     <ClInclude Include="Engine\Editor\Light\EditorLight.h" />
     <ClInclude Include="Engine\Editor\Object3d\EditorObject3d.h" />
     <ClInclude Include="Engine\Editor\Primitive\EditorPrimitive.h" />
+    <ClInclude Include="application\Text\ChairMenu\ChairMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

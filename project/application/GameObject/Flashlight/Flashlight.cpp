@@ -108,14 +108,14 @@ void Flashlight::CheckCollision()
 
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
         //keyとrayの当たり判定
-        if (Player::GetIsGrab()) {
+        if (PlayerCommand::GetIsGrab()) {
             isGetLight_ = false;
-            Player::SetIsGrab(false);
+            PlayerCommand::SetIsGrab(false);
             transform_.translate =  GetWorldPosition();
         } else {
             if (OnCollisionRay()) {
                 isGetLight_ = true;
-                Player::SetIsGrab(true);
+                PlayerCommand::SetIsGrab(true);
                 isSendGetLightMessage_ = true;
 
             }

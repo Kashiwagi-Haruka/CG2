@@ -64,7 +64,7 @@ void Locker::CheckCollision()
 
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
        
-            if (!Player::GetIsGrab()) {
+            if (!PlayerCommand::GetIsGrab()) {
 
             }
         }
