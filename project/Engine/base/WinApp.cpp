@@ -16,6 +16,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 namespace {
 constexpr float kTargetAspectRatio = 16.0f / 9.0f;
 constexpr DWORD kFixedWindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+constexpr int32_t kWindowedClientWidth = 1280;
+constexpr int32_t kWindowedClientHeight = 720;
 bool gIsFullscreen = false;
 RECT gWindowedRect{};
 DWORD gWindowedStyle = 0;
@@ -36,9 +38,10 @@ void ToggleFullscreen(HWND hwnd) {
 		gIsFullscreen = true;
 	} else {
 		SetWindowLongPtr(hwnd, GWL_STYLE, static_cast<LONG_PTR>(gWindowedStyle));
-		SetWindowPos(
-		    hwnd, nullptr, gWindowedRect.left, gWindowedRect.top, gWindowedRect.right - gWindowedRect.left, gWindowedRect.bottom - gWindowedRect.top,
-		    SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOZORDER);
+		RECT windowRect{0, 0, kWindowedClientWidth, kWindowedClientHeight};
+		const DWORD exStyle = static_cast<DWORD>(GetWindowLongPtr(hwnd, GWL_EXSTYLE));
+		AdjustWindowRectEx(&windowRect, gWindowedStyle, false, exStyle);
+		SetWindowPos(hwnd, nullptr, gWindowedRect.left, gWindowedRect.top, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOZORDER);
 		gIsFullscreen = false;
 	}
 }
@@ -131,8 +134,10 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 }
 
 void WinApp::Initialize(const wchar_t* TitleName, int32_t clientWidth, int32_t clientHeight) {
-	kClientWidth = clientWidth;
-	kClientHeight = clientHeight;
+	(void)clientWidth;
+	(void)clientHeight;
+	kClientWidth = kWindowedClientWidth;
+	kClientHeight = kWindowedClientHeight;
 	HRESULT hr = CoInitializeEx(0, COINITBASE_MULTITHREADED);
 #ifdef USE_IMGUI
 	// フルスクリーン時を含む高DPI環境で、ImGuiのマウス座標と描画座標がずれないようにする
@@ -164,7 +169,8 @@ void WinApp::SetClientSize(int32_t clientWidth, int32_t clientHeight) {
 	if (!hwnd_) {
 		return;
 	}
-
+	kClientWidth = clientWidth;
+	kClientHeight = clientHeight;
 	RECT windowRect{0, 0, clientWidth, clientHeight};
 	const DWORD style = static_cast<DWORD>(GetWindowLongPtr(hwnd_, GWL_STYLE));
 	const DWORD exStyle = static_cast<DWORD>(GetWindowLongPtr(hwnd_, GWL_EXSTYLE));
