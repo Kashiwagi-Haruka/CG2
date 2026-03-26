@@ -9,6 +9,8 @@
 #include"GameObject/TimeCard/TimeCard.h"
 #include"GameObject/TimeCard/TimeCardRack.h"
 #include "Light/DirectionalLight.h" 
+#include"GameObject/Wall/Wall.h"
+#include"GameObject/YoshidaMath/RandomClass.h"
 #include"Camera.h"
 class GameBase;
 
@@ -24,10 +26,20 @@ private:
 
     std::unique_ptr<TimeCard> timeCard_ = nullptr;
     std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
-    std::unique_ptr<Camera> camera_ = nullptr;
-    Transform cameraTransform_;
+    std::unique_ptr<Wall> wall_ = nullptr;
+
+    Matrix4x4 identityMat_;
     //DirectionalLight
     DirectionalLight directionalLight_{};
+    //カメラ
+    std::unique_ptr<Camera> camera_ = nullptr;
+    Transform cameraTransform_;
+    Vector3 cameraDefaultPos_ = { 0.0f };
+    Vector3 cameraRandomOffset_ = { 0.0f };
+    float cameraMoveTimer_ = 0.0f;
+    std::unique_ptr<RandomClass> random_ = nullptr;
+private:
+    void CameraUpdate();
 public:
     TitleScene();
     ~TitleScene() override = default;

@@ -8,6 +8,32 @@
 #include"Function.h"
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
+#include"GameObject/YoshidaMath/Easing.h"
+#include"GameBase.h"
+void TitleScene::CameraUpdate()
+{
+   const float deltaTime =  GameBase::GetInstance()->GetDeltaTime();
+   cameraMoveTimer_ += deltaTime;
+   if (cameraMoveTimer_ >= 1.0f) {
+       cameraMoveTimer_ = 0.0f;
+       cameraRandomOffset_.x = random_->Get();
+       cameraRandomOffset_.y = random_->Get();
+   }
+
+    cameraTransform_.translate = YoshidaMath::Easing::Lerp(cameraTransform_.translate,cameraDefaultPos_+cameraRandomOffset_,0.01f);
+
+    //カメラ
+    camera_->SetTransform(cameraTransform_);
+    camera_->Update();
+
+#ifdef USE_IMGUI
+    ImGui::Begin("Camera");
+    ImGui::DragFloat3("scale", &cameraTransform_.scale.x);
+    ImGui::DragFloat3("rotate", &cameraTransform_.rotate.x);
+    ImGui::DragFloat3("translate", &cameraTransform_.translate.x);
+    ImGui::End();
+#endif
+}
 
 TitleScene::TitleScene() {
 
@@ -15,18 +41,22 @@ TitleScene::TitleScene() {
     Audio::GetInstance()->SetSoundVolume(&BGMData_, 1.0f);
     //カメラのインスタンス化
     camera_ = std::make_unique<Camera>();
+    cameraDefaultPos_ = { 0.0f,0.0f,-0.3f };
 
     transition = std::make_unique<SceneTransition>();
+    //ランダム
+    random_ = std::make_unique<RandomClass>();
 
     /// @brief 初期化
     FreeTypeManager::Initialize();
     Text::LoadSE();
     titleMenuUI_ = std::make_unique<TitleMenuUI>();
     firstStory_ = std::make_unique<FirstStory>();
-
+    //ゲームオブジェクト
     timeCard_ = std::make_unique<TimeCard>();
     timeCardRack_ = std::make_unique<TimeCardRack>();
-
+    wall_ = std::make_unique<Wall>();
+    identityMat_ = Function::MakeIdentity4x4();
 }
 
 void TitleScene::Finalize() {
@@ -41,28 +71,38 @@ void TitleScene::Initialize() {
     isTransitionOut = false;
     transition->Initialize(false);
 
+    //ランダム
+    random_->SetMinMax(-0.01f, 0.01f);
 
     titleMenuUI_->Initialize();
     firstStory_->Initialize();
 
+    //カメラ
     cameraTransform_ = {
         .scale = {1.0f,1.0f,1.0f},
         .rotate = {0.0f,0.0f,0.0f},
-        .translate = {0.0f,0.0f,-0.3f}
+        .translate = cameraDefaultPos_
     };
-
+    //カメラ
     camera_->SetTransform(cameraTransform_);
+    cameraRandomOffset_ = { 0.0f };
+    cameraMoveTimer_ = 0.0f;
 
-
+    //ライト
     directionalLight_.color = { 1.0f, 1.0f, 1.0f, 1.0f };
     directionalLight_.direction = { 0.0f, -1.0f, 0.0f };
     directionalLight_.intensity = 1.0f;
-
-
+    //ゲームオブジェクト
     timeCard_->Initialize();
     timeCardRack_->Initialize();
+    wall_->Initialize();
+    wall_->SetParentMatrix(&identityMat_);
+    wall_->SetST({ 14.0f,4.0f,1.0f }, { 0.0f,0.0f,0.75f });
     timeCard_->SetCamera(camera_.get());
     timeCardRack_->SetCamera(camera_.get());
+    wall_->SetCamera(camera_.get());
+
+
 }
 
 void TitleScene::Update() {
@@ -95,22 +135,14 @@ void TitleScene::Update() {
         }
     }
 
-    //カメラ
-    camera_->SetTransform(cameraTransform_);
-    camera_->Update();
+    CameraUpdate();
 
-#ifdef USE_IMGUI
-    ImGui::Begin("Camera");
-    ImGui::DragFloat3("scale", &cameraTransform_.scale.x);
-    ImGui::DragFloat3("rotate", &cameraTransform_.rotate.x);
-    ImGui::DragFloat3("translate", &cameraTransform_.translate.x);
-    ImGui::End();
-#endif
 
     Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
 
     timeCard_->Update();
     timeCardRack_->Update();
+    wall_->Update();
 
 }
 void TitleScene::Draw() {
@@ -123,6 +155,7 @@ void TitleScene::Draw() {
     
     timeCard_->Draw();
     timeCardRack_->Draw();
+    wall_->Draw();
 
     SpriteCommon::GetInstance()->DrawCommonFont();
     titleMenuUI_->Draw();
