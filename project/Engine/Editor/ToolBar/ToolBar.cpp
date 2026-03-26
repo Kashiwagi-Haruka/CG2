@@ -1,6 +1,7 @@
 #include "ToolBar.h"
 
 #ifdef USE_IMGUI
+#include "Engine/Texture/TextureManager.h"
 #include "externals/imgui/imgui.h"
 #endif
 
@@ -44,8 +45,14 @@ ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUn
 	ImGui::SameLine();
 	ImGui::TextUnformatted("Mode");
 	ImGui::SameLine();
+
+	constexpr const char* kPlayIconPath = "Resources/Editor/play.png";
+	constexpr const char* kStopIconPath = "Resources/Editor/stop.png";
+	const ImVec2 iconButtonSize(24.0f, 24.0f);
+
 	if (!isPlaying) {
-		if (ImGui::Button("Play")) {
+		const auto playHandle = TextureManager::GetInstance()->GetSrvHandleGPU(kPlayIconPath);
+		if (ImGui::ImageButton("PlayIconButton", ImTextureRef(reinterpret_cast<void*>(playHandle.ptr)), iconButtonSize)) {
 			result.playRequested = true;
 		}
 		if (hasUnsavedChanges) {
@@ -53,7 +60,8 @@ ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUn
 			ImGui::TextUnformatted("(Unsaved changes)");
 		}
 	} else {
-		if (ImGui::Button("Stop")) {
+		const auto stopHandle = TextureManager::GetInstance()->GetSrvHandleGPU(kStopIconPath);
+		if (ImGui::ImageButton("StopIconButton", ImTextureRef(reinterpret_cast<void*>(stopHandle.ptr)), iconButtonSize)) {
 			result.stopRequested = true;
 		}
 		ImGui::SameLine();
