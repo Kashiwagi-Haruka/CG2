@@ -70,6 +70,7 @@ private:
 	std::vector<EditorSnapshot> redoStack_;
 	EditorSnapshot loadedSnapshot_{};
 	bool hasLoadedSnapshot_ = false;
+	std::string loadedSnapshotFilePath_;
 
 	std::vector<Object3d*> objects_;
 	std::vector<std::string> objectNames_;

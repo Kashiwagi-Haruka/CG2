@@ -87,6 +87,7 @@ void Hierarchy::ResetForSceneChange() {
 	saveStatusMessage_.clear();
 	hasLoadedForCurrentScene_ = false;
 	hasLoadedSnapshot_ = false;
+	loadedSnapshotFilePath_.clear();
 	editorLight_.Reset();
 	undoStack_.clear();
 	redoStack_.clear();
@@ -108,12 +109,19 @@ bool Hierarchy::ResetToLoadedSnapshot() {
 	if (!hasLoadedSnapshot_) {
 		return false;
 	}
-	ApplyEditorSnapshot(loadedSnapshot_);
+	if (!loadedSnapshotFilePath_.empty() && HasObjectEditorJsonFile(loadedSnapshotFilePath_)) {
+		if (!LoadObjectEditorsFromJson(loadedSnapshotFilePath_)) {
+			return false;
+		}
+	} else {
+		ApplyEditorSnapshot(loadedSnapshot_);
+	}
 	undoStack_.clear();
 	redoStack_.clear();
 	hasUnsavedChanges_ = false;
 	return true;
 }
+
 
 void Hierarchy::UndoEditorChange() {
 	if (undoStack_.empty()) {
@@ -501,6 +509,7 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 	editorAudio_.LoadFromJson(root.value("audio", nlohmann::json::object()));
 	loadedSnapshot_ = CreateCurrentSnapshot();
 	hasLoadedSnapshot_ = true;
+	loadedSnapshotFilePath_ = filePath;
 	return true;
 }
 void Hierarchy::DrawSceneSelector() {
