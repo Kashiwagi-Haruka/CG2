@@ -743,12 +743,45 @@ void Hierarchy::DrawObjectEditors() {
 		}
 		if (toolbarResult.playRequested) {
 			if (hasUnsavedChanges_) {
-				saveStatusMessage_ = "Warning: unsaved changes. Save before Play";
+				ImGui::OpenPopup("Unsaved Changes");
 			} else {
 				SceneManager::GetInstance()->RequestReinitializeCurrentScene();
 				SetPlayMode(true);
 				saveStatusMessage_ = "Playing";
 			}
+		}
+
+		if (ImGui::BeginPopupModal("Unsaved Changes", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::TextUnformatted("There are unsaved changes. Do you want to continue playing?");
+			ImGui::Separator();
+
+			if (ImGui::Button("YES", ImVec2(100.0f, 0.0f))) {
+				SceneManager::GetInstance()->RequestReinitializeCurrentScene();
+				SetPlayMode(true);
+				saveStatusMessage_ = "Playing (unsaved changes kept)";
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("NO", ImVec2(100.0f, 0.0f))) {
+				saveStatusMessage_ = "Play canceled";
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Save", ImVec2(100.0f, 0.0f))) {
+				const std::string saveFilePath = GetSceneScopedEditorFilePath("objectEditors.json");
+				const bool saved = SaveObjectEditorsToJson(saveFilePath);
+				if (saved) {
+					hasUnsavedChanges_ = false;
+					SceneManager::GetInstance()->RequestReinitializeCurrentScene();
+					SetPlayMode(true);
+					saveStatusMessage_ = "Saved and Playing: " + saveFilePath;
+					ImGui::CloseCurrentPopup();
+				} else {
+					saveStatusMessage_ = "Save failed: " + saveFilePath;
+				}
+			}
+
+			ImGui::EndPopup();
 		}
 		if (toolbarResult.stopRequested) {
 			SetPlayMode(false);
