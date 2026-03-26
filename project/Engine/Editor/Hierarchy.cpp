@@ -696,8 +696,18 @@ void Hierarchy::DrawObjectEditors() {
 
 	ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, kTopToolbarHeight), ImGuiCond_Always);
-	if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
+	if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
 		ToolBar::Result toolbarResult = ToolBar::Draw(isPlaying_, hasUnsavedChanges_, !undoStack_.empty(), !redoStack_.empty());
+		if (toolbarResult.saveRequested) {
+			if (!isPlaying_) {
+				const std::string saveFilePath = GetSceneScopedEditorFilePath("objectEditors.json");
+				const bool saved = SaveObjectEditorsToJson(saveFilePath);
+				if (saved) {
+					hasUnsavedChanges_ = false;
+				}
+				saveStatusMessage_ = saved ? ("Saved: " + saveFilePath) : ("Save failed: " + saveFilePath);
+			}
+		}
 		if (toolbarResult.undoRequested) {
 			UndoEditorChange();
 			saveStatusMessage_ = "Undo";
@@ -708,7 +718,7 @@ void Hierarchy::DrawObjectEditors() {
 		}
 		if (toolbarResult.playRequested) {
 			if (hasUnsavedChanges_) {
-				saveStatusMessage_ = "Warning: unsaved changes. Save To JSON before Play";
+				saveStatusMessage_ = "Warning: unsaved changes. Save before Play";
 			} else {
 				SceneManager::GetInstance()->RequestReinitializeCurrentScene();
 				SetPlayMode(true);
@@ -742,14 +752,7 @@ void Hierarchy::DrawObjectEditors() {
 		DrawSelectionBoxEditor();
 		ImGui::Separator();
 
-		if (!isPlaying_ && ImGui::Button("Save To JSON")) {
-			const std::string saveFilePath = GetSceneScopedEditorFilePath("objectEditors.json");
-			const bool saved = SaveObjectEditorsToJson(saveFilePath);
-			if (saved) {
-				hasUnsavedChanges_ = false;
-			}
-			saveStatusMessage_ = saved ? ("Saved: " + saveFilePath) : ("Save failed: " + saveFilePath);
-		}
+
 		if (!saveStatusMessage_.empty()) {
 			ImGui::Text("%s", saveStatusMessage_.c_str());
 		}

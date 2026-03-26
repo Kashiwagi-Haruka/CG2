@@ -7,6 +7,13 @@
 ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo) {
 	Result result{};
 #ifdef USE_IMGUI
+	if (ImGui::BeginMenuBar()) {
+		if (!isPlaying && ImGui::MenuItem("Save")) {
+			result.saveRequested = true;
+		}
+		ImGui::EndMenuBar();
+	}
+
 	if (!canUndo) {
 		ImGui::BeginDisabled();
 	}
