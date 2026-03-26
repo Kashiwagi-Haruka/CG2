@@ -11,6 +11,10 @@ public:
     void Initialize();
     void Update();
     void Draw();
+   
+private:
+    void StartText();
+
 private:
     std::unique_ptr<ChairMenu>chairMenu_ = nullptr;
     uint32_t fontHandle_;

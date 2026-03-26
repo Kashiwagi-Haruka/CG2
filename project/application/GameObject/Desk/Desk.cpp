@@ -17,7 +17,7 @@ Desk::Desk()
     obj_->SetModel("desk");
     SetAABB({ .min = {-0.4f,0.0f,-0.3f},.max = {0.4f,0.8f,0.3f} });
     SetCollisionAttribute(kCollisionDesk);
-    SetCollisionMask(kCollisionPlayer | kCollisionKey);
+    SetCollisionMask(kCollisionPlayer | kCollisionKey|kCollisionDesk);
 }
 
 void Desk::OnCollision(Collider* collider)

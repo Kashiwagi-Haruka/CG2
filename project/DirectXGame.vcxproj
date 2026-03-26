@@ -285,6 +285,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Text\FirstStory\FirstStory.cpp" />
     <ClCompile Include="application\GameObject\Locker\Locker.cpp" />
     <ClCompile Include="application\GameObject\Locker\LockerManager.cpp" />
+    <ClCompile Include="application\GameObject\TimeCard\TimeCard.cpp" />
+    <ClCompile Include="application\GameObject\TimeCard\TimeCardRack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -436,6 +438,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Text\FirstStory\FirstStory.h" />
     <ClInclude Include="application\GameObject\Locker\Locker.h" />
     <ClInclude Include="application\GameObject\Locker\LockerManager.h" />
+    <ClInclude Include="application\GameObject\TimeCard\TimeCard.h" />
+    <ClInclude Include="application\GameObject\TimeCard\TimeCardRack.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

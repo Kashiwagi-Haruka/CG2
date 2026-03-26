@@ -110,7 +110,9 @@ void TitleMenuUI::Update()
 
     if (isShowMenu_) {
 
-        if (PlayerCommand::GetInstance()->MoveForwardTrigger()) {
+        auto* playerCommand = PlayerCommand::GetInstance();
+
+        if (playerCommand->MoveForwardTrigger()|| playerCommand->MouseWheelDown()) {
             if (selectButtonNum_ > 0) {
                 Audio::GetInstance()->SoundPlayWave(SEData_, false);
                 selectButtonNum_--;
@@ -118,7 +120,7 @@ void TitleMenuUI::Update()
             menuText_[selectButtonNum_].StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
         }
 
-        if (PlayerCommand::GetInstance()->MoveBackwardTrigger()) {
+        if (playerCommand->MoveBackwardTrigger()|| playerCommand->MouseWheelUp()) {
             if (selectButtonNum_ < menuText_.size() - 1) {
                 Audio::GetInstance()->SoundPlayWave(SEData_, false);
                 selectButtonNum_++;

@@ -15,9 +15,9 @@ Key::Key()
     // モデルをセット
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/key", "key");
     obj_->SetModel("key");
-    SetAABB({ .min = { -0.1f,-0.1f,-0.1f }, .max = { 0.1f,0.1f,0.1f } });
+    SetAABB({ .min = { -0.25f,-0.25f,-0.25f }, .max = { 0.25f,0.25f,0.25f } });
     SetCollisionAttribute(kCollisionKey);
-    SetCollisionMask(kCollisionChair | kCollisionLocker|kCollisionFloor|kCollisionWall);
+    SetCollisionMask(kCollisionChair | kCollisionLocker | kCollisionFloor|kCollisionDesk);
 }
 
 void Key::Initialize()
@@ -25,11 +25,10 @@ void Key::Initialize()
     worldTransform_ = {
         .scale{2.0f, 2.0f, 2.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{-1.0f, 3.0f, -6.5f}
+        .translate{-1.0f, 2.4f, -6.5f}
     };
     velocity_ = { 0.0f };
     obj_->Initialize();
-
 
     isChairHit_ = false;
     isSendGetKeyMessage_ = false;
@@ -51,15 +50,16 @@ void Key::Update()
     } else {
         //重力処理
         const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-        velocity_.y -= YoshidaMath::kGravity * deltaTime * mass_;
+        velocity_.y -= YoshidaMath::kGravity * deltaTime;
         worldTransform_.translate += velocity_ * deltaTime;
     }
 
-    //y座標を固定する
-    worldTransform_.translate.y = std::clamp(worldTransform_.translate.y, 0.0f, 2.4f);
+
     //押し戻し処理
     YoshidaMath::ResolveCollision(worldTransform_.translate, velocity_, GetCollisionInfo());
-   
+    //y座標を固定する
+    worldTransform_.translate.y = std::clamp(worldTransform_.translate.y, 0.0f, 2.4f);
+
     obj_->SetTransform(worldTransform_);
     obj_->Update();
 
@@ -102,7 +102,7 @@ void Key::CheckCollision()
             isGetKey_ = false;
             PlayerCommand::SetIsGrab(false);
         } else {
-            if (OnCollisionRay()&& !PlayerCommand::GetIsGrab()) {
+            if (OnCollisionRay() && !PlayerCommand::GetIsGrab()) {
                 isGetKey_ = true;
                 isSendGetKeyMessage_ = true;
                 PlayerCommand::SetIsGrab(true);
@@ -123,14 +123,10 @@ void Key::OnCollision(Collider* collider)
     if (collider->GetCollisionAttribute() == kCollisionChair) {
         if (!isChairHit_) {
             isChairHit_ = true;
-            velocity_.y = 0.0f;
         }
     }
 
-    if (collider->GetCollisionAttribute() == kCollisionLocker) {
-       velocity_.y = 0.0f;   
-    }
-
+    //velocity_.y = 0.0f;
 }
 
 Vector3 Key::GetWorldPosition() const

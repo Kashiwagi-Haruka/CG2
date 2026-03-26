@@ -644,7 +644,7 @@
               "Feedback": 65.0,
               "WetDryMix": 60.0
             },
-            "enabled": true,
+            "enabled": false,
             "equalizer": {
               "Bandwidth0": 18.0,
               "Bandwidth1": 18.0,
@@ -664,7 +664,7 @@
               "Release": 6
             },
             "reverb": {
-              "WetDryMix": 84.33699798583984
+              "WetDryMix": 65.0
             },
             "type": 0
           },
@@ -672,7 +672,7 @@
             "echo": {
               "Delay": 800.0,
               "Feedback": 65.0,
-              "WetDryMix": 68.43399810791016
+              "WetDryMix": 60.0
             },
             "enabled": false,
             "equalizer": {
@@ -1563,9 +1563,9 @@
           1.0
         ],
         "translate": [
-          10.0,
+          -2.0,
           0.0,
-          10.0
+          2.0
         ]
       }
     },
