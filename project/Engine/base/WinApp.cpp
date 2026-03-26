@@ -45,6 +45,14 @@ void ToggleFullscreen(HWND hwnd) {
 		gIsFullscreen = false;
 	}
 }
+SIZE CalculateMinWindowSizeForClient(HWND hwnd, int32_t minClientWidth, int32_t minClientHeight) {
+	RECT windowRect{0, 0, minClientWidth, minClientHeight};
+	const DWORD style = static_cast<DWORD>(GetWindowLongPtr(hwnd, GWL_STYLE));
+	const DWORD exStyle = static_cast<DWORD>(GetWindowLongPtr(hwnd, GWL_EXSTYLE));
+	AdjustWindowRectEx(&windowRect, style, false, exStyle);
+	return {windowRect.right - windowRect.left, windowRect.bottom - windowRect.top};
+}
+
 void KeepClientAspectRatio16By9(HWND hwnd, WPARAM edge, RECT* rect) {
 	if (!rect) {
 		return;
@@ -120,6 +128,15 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 	case WM_SIZING:
 		KeepClientAspectRatio16By9(hwnd, wparam, reinterpret_cast<RECT*>(lparam));
 		return TRUE;
+	case WM_GETMINMAXINFO: {
+		MINMAXINFO* minMaxInfo = reinterpret_cast<MINMAXINFO*>(lparam);
+		if (minMaxInfo) {
+			const SIZE minWindowSize = CalculateMinWindowSizeForClient(hwnd, kWindowedClientWidth, kWindowedClientHeight);
+			minMaxInfo->ptMinTrackSize.x = minWindowSize.cx;
+			minMaxInfo->ptMinTrackSize.y = minWindowSize.cy;
+		}
+		return 0;
+	}
 	case WM_DEVICECHANGE:
 		if (wparam == DBT_DEVICEARRIVAL || wparam == DBT_DEVICEREMOVECOMPLETE || wparam == DBT_DEVNODES_CHANGED) {
 			// パッド再列挙フラグを立てる
@@ -169,9 +186,11 @@ void WinApp::SetClientSize(int32_t clientWidth, int32_t clientHeight) {
 	if (!hwnd_) {
 		return;
 	}
-	kClientWidth = clientWidth;
-	kClientHeight = clientHeight;
-	RECT windowRect{0, 0, clientWidth, clientHeight};
+	const int32_t clampedClientWidth = std::max(clientWidth, kWindowedClientWidth);
+	const int32_t clampedClientHeight = std::max(clientHeight, kWindowedClientHeight);
+	kClientWidth = clampedClientWidth;
+	kClientHeight = clampedClientHeight;
+	RECT windowRect{0, 0, clampedClientWidth, clampedClientHeight};
 	const DWORD style = static_cast<DWORD>(GetWindowLongPtr(hwnd_, GWL_STYLE));
 	const DWORD exStyle = static_cast<DWORD>(GetWindowLongPtr(hwnd_, GWL_EXSTYLE));
 	AdjustWindowRectEx(&windowRect, style, false, exStyle);
