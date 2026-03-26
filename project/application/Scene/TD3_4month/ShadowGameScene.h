@@ -11,6 +11,8 @@
 #include"GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/TimeCard/TimeCardWatch.h"
+#include"GameObject/TimeCard/TimeCard.h"
+#include"GameObject/TimeCard/TimeCardRack.h"
 #include"GameObject/Flashlight/Flashlight.h"
 #include"GameObject/Key/Key.h"
 #include <GameObject/Chair/ChairManager.h>
@@ -19,6 +21,7 @@
 #include"GameObject/Door/Door.h"
 #include"GameObject/Locker/LockerManager.h"
 #include"GameObject/Desk/DeskManager.h"
+
 #pragma endregion
 
 #pragma region //UI
@@ -92,6 +95,9 @@ private:
     std::unique_ptr<LockerManager> lockerManager_ = nullptr;
     //デスク管理
     std::unique_ptr<DeskManager> deskManager_ = nullptr;
+    //タイムカード
+    std::unique_ptr<TimeCard> timeCard_ = nullptr;
+    std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

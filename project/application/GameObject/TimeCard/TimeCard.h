@@ -11,6 +11,7 @@ public:
     void SetCamera(Camera* camera);
     void Update();
     void Draw();
+    void SetTransform(const Transform& transform) { transform_ = transform; }
 private:
     std::unique_ptr<Object3d> modelObj_ = nullptr;
     Transform transform_;
