@@ -55,7 +55,10 @@ ShadowGameScene::ShadowGameScene()
     chairManager_ = std::make_unique<ChairManager>();
     //机
     deskManager_ = std::make_unique<DeskManager>();
-
+    //打刻機
+    timeCard_ = std::make_unique<TimeCard>();
+    //タイムカードラック
+    timeCardRack_ = std::make_unique<TimeCardRack>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 
@@ -131,6 +134,11 @@ void ShadowGameScene::Initialize()
     lockerManager_->Initialize();
     //デスク管理
     deskManager_->Initialize();
+    //打刻機
+    timeCard_->Initialize();
+    //タイムカードラック
+    timeCardRack_->Initialize();
+
     //カーソルを画面中央に設定する
     auto* input = Input::GetInstance();
     input->SetIsCursorVisible(false);
@@ -444,6 +452,14 @@ void ShadowGameScene::UpdateGameObject()
     deskManager_->Update();
     //ポータル管理
     portalManager_->Update();
+    //打刻機
+    timeCard_->SetTransform({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f}, { 8.0f, 1.0f, -7.0f } });
+    timeCard_->Update();
+    //タイムカードラック
+    timeCardRack_->SetTransform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 7.75f,1.3f,-7.0f } });
+    timeCardRack_->Update();
+
+
 
     if (*key_->GetKeyPtr()) {
         door_->SetIsGetKey(key_->GetKeyPtr());
@@ -551,6 +567,10 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     edamame_->Draw();
     //椅子の描画
     chairManager_->Draw();
+    //打刻機
+    timeCard_->Draw();
+    //タイムカードラック
+    timeCardRack_->Draw();
 
     if (!isShadow) {
         Object3dCommon::GetInstance()->DrawCommonSkinning();
@@ -581,6 +601,8 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     door_->SetCamera(camera);
     lockerManager_->SetCamera(camera);
     deskManager_->SetCamera(camera);
+    timeCard_->SetCamera(camera);
+    timeCardRack_->SetCamera(camera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
