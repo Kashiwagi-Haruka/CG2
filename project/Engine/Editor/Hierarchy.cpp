@@ -729,6 +729,9 @@ void Hierarchy::DrawObjectEditors() {
 				saveStatusMessage_ = saved ? ("Saved: " + saveFilePath) : ("Save failed: " + saveFilePath);
 			}
 		}
+		if (toolbarResult.gridRequested) {
+			showGridWindow_ = !showGridWindow_;
+		}
 		if (toolbarResult.allResetRequested) {
 			const bool reset = ResetToLoadedSnapshot();
 			saveStatusMessage_ = reset ? "AllReset: restored loaded values" : "AllReset failed: no loaded data";
@@ -798,8 +801,6 @@ void Hierarchy::DrawObjectEditors() {
 		ImGui::Separator();
 		ImGui::SeparatorText("Scene Switch");
 		DrawSceneSelector();
-		ImGui::SeparatorText("Grid");
-		DrawGridEditor();
 		ImGui::SeparatorText("Light");
 		DrawLightEditor();
 		ImGui::SeparatorText("Camera");
@@ -846,7 +847,14 @@ void Hierarchy::DrawObjectEditors() {
 		}
 	}
 	ImGui::End();
-
+	if (showGridWindow_) {
+		ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x + leftPanelWidth + 16.0f, contentStartY + 16.0f), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(340.0f, 190.0f), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin("Grid", &showGridWindow_)) {
+			DrawGridEditor();
+		}
+		ImGui::End();
+	}
 	const float inspectorPosX = viewport->WorkPos.x + viewport->WorkSize.x - rightPanelWidth;
 	ImGui::SetNextWindowPos(ImVec2(inspectorPosX, contentStartY), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(rightPanelWidth, availableHeight), ImGuiCond_Always);

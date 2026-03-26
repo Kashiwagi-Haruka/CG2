@@ -99,6 +99,7 @@ private:
 	int gridHalfLineCount_ = 50;
 	float editorGridY_ = 0.0f;
 	bool editorGridDirty_ = true;
+	bool showGridWindow_ = true;
 	std::unique_ptr<Primitive> editorGridPlane_;
 	EditorLight editorLight_{};
 	EditorAudio editorAudio_{};
