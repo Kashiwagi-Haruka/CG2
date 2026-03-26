@@ -18,10 +18,10 @@ ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUn
 			}
 			ImGui::EndMenu();
 		}
+		if (ImGui::MenuItem("Grid")) {
+			result.gridRequested = true;
+		}
 		ImGui::EndMenuBar();
-	}
-	if (ImGui::MenuItem("Grid")) {
-		result.gridRequested = true;
 	}
 	if (!canUndo) {
 		ImGui::BeginDisabled();
