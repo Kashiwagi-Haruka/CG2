@@ -685,7 +685,7 @@ void Hierarchy::DrawObjectEditors() {
 		}
 	}
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
-	const float kTopToolbarHeight = 44.0f;
+	const float kTopToolbarHeight = 56.0f;
 	const float kLeftPanelRatio = 0.22f;
 	const float kRightPanelRatio = 0.24f;
 	const float kPanelMinWidth = 260.0f;
