@@ -10,15 +10,15 @@
 
 TimeCardWatch::TimeCardWatch()
 {
-    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/timeCard", "timeCard");
+    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/timeCardWatch", "timeCardWatch");
     modelObj_ = std::make_unique<Object3d>();
-    modelObj_->SetModel("timeCard");
+    modelObj_->SetModel("timeCardWatch");
 }
 
 void TimeCardWatch::Initialize()
 {
     modelObj_->Initialize();
-    transform_ = { .scale = {2.0f,2.0f,2.0f},.rotate = {Function::kPi*0.5f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
+    transform_ = { .scale = {2.0f,2.0f,2.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.05f,0.0f} };
 }
 
 void TimeCardWatch::SetCamera(Camera* camera)

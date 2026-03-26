@@ -40,14 +40,13 @@ void WalkWhiteBoard::Initialize()
 {
     isMove_ = false;
     obj_->Initialize();
-    transform_ = { .scale = {1.0f,1.0f,1.0f}, .rotate = {0.0f,Function::kPi ,0.0f},.translate = {-2.0f,0.0f,3.0f} };
+    transform_ = { .scale = {1.0f,1.0f,1.0f}, .rotate = {0.0f,Function::kPi ,0.0f},.translate = {-4.0f,0.0f,6.5f} };
     velocity_ = { 0.0f };
 
 #ifdef _DEBUG
     primitive_->Initialize(Primitive::Box);
     primitive_->SetColor({ 1.0f,1.0f,1.0f,0.1f });
 #endif
-
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "Idle", true);
@@ -79,9 +78,6 @@ void WalkWhiteBoard::Update()
     }
 
     Animation();
-
-    //obj_->SetWorldMatrix(Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
-    //obj_->Update();
 
     obj_->SetTransform(transform_);
     obj_->Update();

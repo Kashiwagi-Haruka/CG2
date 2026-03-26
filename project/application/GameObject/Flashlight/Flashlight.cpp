@@ -15,7 +15,7 @@ Flashlight::Flashlight()
     obj_->SetModel("light");
     SetAABB({ .min = {-0.1f,-0.1f,-0.1f},.max = {0.1f,0.1f,0.1f} });
     SetCollisionAttribute(kCollisionItem);
-    SetCollisionMask(kCollisionPlayer);
+    SetCollisionMask(kCollisionPlayer|kCollisionFloor);
 }
 
 void Flashlight::OnCollision(Collider* collider)
@@ -96,8 +96,8 @@ void Flashlight::SetLight()
     spotLight_.color = { 1.0f, 1.0f, 0.5f, 1.0f };
     spotLight_.position = obj_->GetTranslate();
     spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
-    spotLight_.intensity = 10.0f;
-    spotLight_.distance = 7.0f;
+    spotLight_.intensity = 1.0f;
+    spotLight_.distance = 5.0f;
     spotLight_.decay = 2.0f;
     spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
     spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
@@ -109,13 +109,13 @@ void Flashlight::CheckCollision()
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
         //keyとrayの当たり判定
         if (PlayerCommand::GetIsGrab()) {
-            isGetLight_ = false;
+  /*          isGetLight_ = false;
             PlayerCommand::SetIsGrab(false);
-            transform_.translate =  GetWorldPosition();
+            transform_.translate =  GetWorldPosition();*/
         } else {
             if (OnCollisionRay()) {
                 isGetLight_ = true;
-                PlayerCommand::SetIsGrab(true);
+      /*          PlayerCommand::SetIsGrab(true);*/
                 isSendGetLightMessage_ = true;
 
             }

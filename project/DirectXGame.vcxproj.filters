@@ -347,6 +347,8 @@
     <ClCompile Include="Engine\Editor\Object3d\EditorObject3d.cpp" />
     <ClCompile Include="Engine\Editor\Primitive\EditorPrimitive.cpp" />
     <ClCompile Include="application\Text\ChairMenu\ChairMenu.cpp" />
+    <ClCompile Include="application\GameObject\TimeCard\TimeCard.cpp" />
+    <ClCompile Include="application\GameObject\TimeCard\TimeCardRack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -683,6 +685,8 @@
     <ClInclude Include="Engine\Editor\Object3d\EditorObject3d.h" />
     <ClInclude Include="Engine\Editor\Primitive\EditorPrimitive.h" />
     <ClInclude Include="application\Text\ChairMenu\ChairMenu.h" />
+    <ClInclude Include="application\GameObject\TimeCard\TimeCard.h" />
+    <ClInclude Include="application\GameObject\TimeCard\TimeCardRack.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

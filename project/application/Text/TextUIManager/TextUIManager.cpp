@@ -4,6 +4,8 @@
 #include"DirectXCommon.h"
 #include"GameObject/Edamame/EdamameTrivia.h"
 #include"GameObject/Key/Key.h"
+#include"GameObject/Flashlight/Flashlight.h"
+
 #include <codecvt>
 #include <locale>
 
@@ -57,18 +59,17 @@ void TextUIManager::Update()
 
     if (Door::GetOpenMassage()) {
         text_.SetString(U"扉が開いた。");
-        text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-        isDraw_ = true;
+        StartText();
     } else if (Key::GetGetKeyMessage()) {
         text_.SetString(U"鍵を入手した。");
-        text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-        isDraw_ = true;
+        StartText();
     } else if (Door::GetLockMassage()) {
         text_.SetString(U"鍵がかかっている。");
-        text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-        isDraw_ = true;
+        StartText();
+    } else if (Flashlight::IsGetLightMessage()) {
+        text_.SetString(U"懐中電灯を取得した。");
+        StartText();
     }
-
 
     if (EdamameTrivia::GetIsSendStartTriviaMessage()) {
         edamameTrivia_.SetString(EdamameTrivia::GetString());
@@ -94,4 +95,10 @@ void TextUIManager::Draw()
     }
 
     FreeTypeManager::ResetFontUsage();
+}
+
+void TextUIManager::StartText()
+{
+    text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
+    isDraw_ = true;
 }

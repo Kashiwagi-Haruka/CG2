@@ -33,7 +33,6 @@ private:
     PlayerCamera* playerCamera_ = nullptr;
     Transform worldTransform_ = {};
     Vector3 velocity_ = { 0.0f };
-    const float mass_ = 1.0f;
     bool isChairHit_ = false;
     bool isGetKey_ = false;
     static bool isSendGetKeyMessage_;

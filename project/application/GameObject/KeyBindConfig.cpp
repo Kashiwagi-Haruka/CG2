@@ -17,32 +17,32 @@ PlayerCommand* PlayerCommand::GetInstance()
 
 bool PlayerCommand::MoveLeft()
 {
-    return Move(K_MoveLeft, C_MoveLeft);
+    return Move(K_MoveLeft, K_MoveLeftArrow, C_MoveLeft);
 }
 
 bool PlayerCommand::MoveRight()
 {
-    return Move(K_MoveRight, C_MoveRight);
+    return Move(K_MoveRight, K_MoveRightArrow, C_MoveRight);
 }
 
 bool PlayerCommand::MoveForward()
 {
-    return  Move(K_MoveForward, C_MoveForward);
+    return  Move(K_MoveForward, K_MoveForwardArrow,C_MoveForward);
 }
 
 bool PlayerCommand::MoveBackward()
 {
-    return  Move(K_MoveBackward, C_MoveBackward);
+    return  Move(K_MoveBackward, K_MoveBackwardArrow, C_MoveBackward);
 }
 
 bool PlayerCommand::MoveForwardTrigger()
 {
-    return MoveTrigger(K_MoveForward, C_MoveForward);
+    return MoveTrigger(K_MoveForward, K_MoveForwardArrow, C_MoveForward);
 }
 
 bool PlayerCommand::MoveBackwardTrigger()
 {
-    return MoveTrigger(K_MoveBackward, C_MoveBackward);
+    return MoveTrigger(K_MoveBackward, K_MoveBackwardArrow, C_MoveBackward);
 }
 
 bool PlayerCommand::Shot()
@@ -110,14 +110,14 @@ void PlayerCommand::Initialize()
     isStand_ = false;
 }
 
-bool PlayerCommand::MoveTrigger(const GameKeyBind key, const GameKeyBind controller)
+bool PlayerCommand::MoveTrigger(const GameKeyBind key, const GameKeyBind key2, const GameKeyBind controller)
 {
     auto* input = Input::GetInstance();
-    return input->TriggerKey(key) || input->TriggerButton(Input::PadButton(controller));
+    return input->TriggerKey(key) || input->TriggerKey(key2) || input->TriggerButton(Input::PadButton(controller));
 }
 
-bool PlayerCommand::Move(const GameKeyBind key, const GameKeyBind controller)
+bool PlayerCommand::Move(const GameKeyBind key, const GameKeyBind key2, const GameKeyBind controller)
 {
     auto* input = Input::GetInstance();
-    return input->PushKey(key) || input->PushButton(Input::PadButton(controller));
+    return input->PushKey(key) || input->PushKey(key2) || input->PushButton(Input::PadButton(controller));
 }

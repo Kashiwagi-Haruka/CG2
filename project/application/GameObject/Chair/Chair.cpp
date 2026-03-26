@@ -52,12 +52,12 @@ void Chair::Update()
                     ChairMenu::SetIsSelectButton(false);
                 }
             } else {
-
                 //メニューを表示してないとき表示する
                 ChairMenu::SetIsShowMenu(true);
             }
         }
     }
+
     Grab();
 
     obj_->SetTransform(transform_);
