@@ -4,6 +4,7 @@ class ToolBar final {
 public:
 	struct Result final {
 		bool saveRequested = false;
+		bool allResetRequested = false;
 		bool undoRequested = false;
 		bool redoRequested = false;
 		bool playRequested = false;

@@ -86,24 +86,40 @@ void Hierarchy::ResetForSceneChange() {
 	hasUnsavedChanges_ = false;
 	saveStatusMessage_.clear();
 	hasLoadedForCurrentScene_ = false;
+	hasLoadedSnapshot_ = false;
 	editorLight_.Reset();
 	undoStack_.clear();
 	redoStack_.clear();
 	editorCamera_.DeactivatePreview();
 }
 
+Hierarchy::EditorSnapshot Hierarchy::CreateCurrentSnapshot() const {
+	EditorSnapshot snapshot{};
+	snapshot.objectTransforms = editorTransforms_;
+	snapshot.objectMaterials = editorMaterials_;
+	snapshot.objectNames = objectNames_;
+	snapshot.primitiveTransforms = primitiveEditorTransforms_;
+	snapshot.primitiveMaterials = primitiveEditorMaterials_;
+	snapshot.primitiveNames = primitiveNames_;
+	return snapshot;
+}
+
+bool Hierarchy::ResetToLoadedSnapshot() {
+	if (!hasLoadedSnapshot_) {
+		return false;
+	}
+	ApplyEditorSnapshot(loadedSnapshot_);
+	undoStack_.clear();
+	redoStack_.clear();
+	hasUnsavedChanges_ = false;
+	return true;
+}
 
 void Hierarchy::UndoEditorChange() {
 	if (undoStack_.empty()) {
 		return;
 	}
-	EditorSnapshot current{};
-	current.objectTransforms = editorTransforms_;
-	current.objectMaterials = editorMaterials_;
-	current.objectNames = objectNames_;
-	current.primitiveTransforms = primitiveEditorTransforms_;
-	current.primitiveMaterials = primitiveEditorMaterials_;
-	current.primitiveNames = primitiveNames_;
+	EditorSnapshot current = CreateCurrentSnapshot();
 	redoStack_.push_back(std::move(current));
 	ApplyEditorSnapshot(undoStack_.back());
 	undoStack_.pop_back();
@@ -114,13 +130,7 @@ void Hierarchy::RedoEditorChange() {
 	if (redoStack_.empty()) {
 		return;
 	}
-	EditorSnapshot current{};
-	current.objectTransforms = editorTransforms_;
-	current.objectMaterials = editorMaterials_;
-	current.objectNames = objectNames_;
-	current.primitiveTransforms = primitiveEditorTransforms_;
-	current.primitiveMaterials = primitiveEditorMaterials_;
-	current.primitiveNames = primitiveNames_;
+	EditorSnapshot current = CreateCurrentSnapshot();
 	undoStack_.push_back(std::move(current));
 	ApplyEditorSnapshot(redoStack_.back());
 	redoStack_.pop_back();
@@ -489,6 +499,8 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 		editorLight_.LoadFromJson(root["lights"]);
 	}
 	editorAudio_.LoadFromJson(root.value("audio", nlohmann::json::object()));
+	loadedSnapshot_ = CreateCurrentSnapshot();
+	hasLoadedSnapshot_ = true;
 	return true;
 }
 void Hierarchy::DrawSceneSelector() {
@@ -707,6 +719,10 @@ void Hierarchy::DrawObjectEditors() {
 				}
 				saveStatusMessage_ = saved ? ("Saved: " + saveFilePath) : ("Save failed: " + saveFilePath);
 			}
+		}
+		if (toolbarResult.allResetRequested) {
+			const bool reset = ResetToLoadedSnapshot();
+			saveStatusMessage_ = reset ? "AllReset: restored loaded values" : "AllReset failed: no loaded data";
 		}
 		if (toolbarResult.undoRequested) {
 			UndoEditorChange();

@@ -58,6 +58,8 @@ private:
 	std::string GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const;
 	void ResetForSceneChange();
 	void ApplyEditorSnapshot(const EditorSnapshot& snapshot);
+	EditorSnapshot CreateCurrentSnapshot() const;
+	bool ResetToLoadedSnapshot();
 	void UndoEditorChange();
 	void RedoEditorChange();
 
@@ -66,6 +68,8 @@ private:
 
 	std::vector<EditorSnapshot> undoStack_;
 	std::vector<EditorSnapshot> redoStack_;
+	EditorSnapshot loadedSnapshot_{};
+	bool hasLoadedSnapshot_ = false;
 
 	std::vector<Object3d*> objects_;
 	std::vector<std::string> objectNames_;

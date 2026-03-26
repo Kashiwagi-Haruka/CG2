@@ -8,8 +8,14 @@ ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUn
 	Result result{};
 #ifdef USE_IMGUI
 	if (ImGui::BeginMenuBar()) {
-		if (!isPlaying && ImGui::MenuItem("Save")) {
-			result.saveRequested = true;
+		if (ImGui::BeginMenu("File")) {
+			if (!isPlaying && ImGui::MenuItem("Save")) {
+				result.saveRequested = true;
+			}
+			if (!isPlaying && ImGui::MenuItem("AllReset")) {
+				result.allResetRequested = true;
+			}
+			ImGui::EndMenu();
 		}
 		ImGui::EndMenuBar();
 	}
