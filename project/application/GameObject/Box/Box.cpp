@@ -15,18 +15,12 @@ Box::Box()
     obj_->SetModel("box");
     SetAABB({ .min = {-0.25f,-0.125f,-0.25f},.max = {0.25f,0.125f,0.25f} });
     SetCollisionAttribute(kCollisionItem);
-    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionKey | kCollisionWall
-    |kCollisionDesk);
+    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionItem | kCollisionWall);
 }
 
 void Box::OnCollision(Collider* collider)
 {
-    if (collider->GetCollisionAttribute() == kCollisionDesk) {
-        obj_->SetColor(COLOR::RED);
-    } else {
-        obj_->SetColor(COLOR::WHITE);
-    }
-
+    obj_->SetColor(COLOR::RED);
 }
 
 Vector3 Box::GetWorldPosition() const
@@ -60,7 +54,7 @@ void Box::Update()
     }
 
     Grab();
-
+    obj_->SetColor(COLOR::WHITE);
     obj_->SetTransform(transform_);
     obj_->Update();
 
@@ -110,8 +104,9 @@ void Box::Grab()
         transform_.rotate.y = playerCamera_->GetTransform().rotate.y;
     } else {
         const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-        velocity_.y -= YoshidaMath::kGravity * deltaTime*0.5f;
-        transform_.translate += velocity_ * deltaTime;
+        velocity_.y -= YoshidaMath::kGravity * deltaTime * 0.5f;
+        transform_.translate.y += velocity_.y*deltaTime;
+        velocity_.y = std::clamp(velocity_.y, -1.0f, 1.0f);
     }
 
     transform_.translate.y = std::clamp(transform_.translate.y, GetAABB().max.y, 2.4f);
