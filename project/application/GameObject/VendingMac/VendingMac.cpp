@@ -12,7 +12,7 @@ VendingMac::VendingMac()
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/vendingMac", "vendingMac");
     obj_->SetModel("vendingMac");
     SetAABB({ .min = {-0.5f,0.0f,-0.5f},.max = {0.5f,1.83f,0.5f} });
-    SetCollisionAttribute(kCollisionWall);
+    SetCollisionAttribute(kCollisionVendingMac);
     SetCollisionMask(kCollisionPlayer);
 
     areaLight_.color = { 1.0f,234.0f / 255.0f,200.0f / 255.0f,1.0f };

@@ -10,7 +10,7 @@ Wall::Wall()
     Vector3 halfScale = Vector3{ 1.0f,1.0f,1.0f } *0.5f;
     SetAABB({ .min = -halfScale,.max = halfScale });
     SetCollisionAttribute(kCollisionWall);
-    SetCollisionMask(kCollisionPlayer|kCollisionEnemy|kCollisionItem|kCollisionChair);
+    SetCollisionMask(kCollisionPlayer|kCollisionEnemy|kCollisionKey|kCollisionChair);
 }
 
 

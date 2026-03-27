@@ -14,8 +14,8 @@ Locker::Locker()
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Locker", "Locker");
     obj_->SetModel("Locker");
     SetAABB({ .min = {-0.4f,0.0f,-0.4f},.max = {0.4f,2.0f,0.4f} });
-    SetCollisionAttribute(kCollisionWall);
-    SetCollisionMask(kCollisionPlayer| kCollisionItem);
+    SetCollisionAttribute(kCollisionLocker);
+    SetCollisionMask(kCollisionPlayer| kCollisionKey);
 }
 
 void Locker::OnCollision(Collider* collider)
