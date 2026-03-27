@@ -34,7 +34,7 @@ private:
     //カメラの設定
     std::unique_ptr<Camera> camera_ = nullptr;
     //カメラの感度
-    float eyeRotateSpeed_ = 0.3f;
+    float eyeRotateSpeed_ = 0.02f;
     //raySprite
     std::unique_ptr<RaySprite> raySprite_ = nullptr;
     Player* player_ = nullptr;

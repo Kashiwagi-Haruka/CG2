@@ -285,21 +285,21 @@ void ShadowGameScene::InitializeLights()
     spotLights_[1] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
 
-    activePointLightCount_ = 2;
-    pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    pointLights_[0].position = { 7.0f, 0.0f, 0.0f };
-    pointLights_[0].intensity = 1.0f;
-    pointLights_[0].radius = 10.0f;
-    pointLights_[0].decay = 1.0f;
-    pointLights_[1].color = { 1.0f, 0.0f, 0.0f, 1.0f };
-    pointLights_[1].position = { 5.0f, 5.0f, 5.0f };
-    pointLights_[1].intensity = 1.0f;
-    pointLights_[1].radius = 10.0f;
-    pointLights_[1].decay = 1.0f;
+    activePointLightCount_ = 0;
+    //pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    //pointLights_[0].position = { 7.0f, 0.0f, 0.0f };
+    //pointLights_[0].intensity = 1.0f;
+    //pointLights_[0].radius = 10.0f;
+    //pointLights_[0].decay = 1.0f;
+    //pointLights_[1].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+    //pointLights_[1].position = { 5.0f, 5.0f, 5.0f };
+    //pointLights_[1].intensity = 1.0f;
+    //pointLights_[1].radius = 10.0f;
+    //pointLights_[1].decay = 1.0f;
 
-    directionalLight_.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    directionalLight_.color = { 1.0f, 1.0f, 0.75f, 1.0f };
     directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
-    directionalLight_.intensity = 0.1f;
+    directionalLight_.intensity = 0.25f;
 
     activeSpotLightCount_ = 2;
     spotLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -316,19 +316,19 @@ void ShadowGameScene::InitializeLights()
     areaLights_[0].position = { 7.0f, 3.0f, 0.0f };
     areaLights_[0].normal = { 0.0f, 1.0f, 0.0f };
     areaLights_[0].intensity = 10.0f;
-    areaLights_[0].width = 2.0f;
-    areaLights_[0].height = 2.0f;
-    areaLights_[0].radius = 5.0f;
-    areaLights_[0].decay = 2.0f;
+    areaLights_[0].width = 4.0f;
+    areaLights_[0].height = 0.1f;
+    areaLights_[0].radius = 30.0f;
+    areaLights_[0].decay = 0.01f;
 
     areaLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     areaLights_[1].position = { -7.0f, 3.0f, 0.0f };
     areaLights_[1].normal = { 0.0f, 1.0f, 0.0f };
     areaLights_[1].intensity = 10.0f;
-    areaLights_[1].width = 2.0f;
-    areaLights_[1].height = 2.0f;
-    areaLights_[1].radius = 5.0f;
-    areaLights_[1].decay = 2.0f;
+    areaLights_[1].width = 4.0f;
+    areaLights_[1].height = 0.1f;
+    areaLights_[1].radius = 30.0f;
+    areaLights_[1].decay = 0.01f;
 
 }
 #pragma region //private更新処理

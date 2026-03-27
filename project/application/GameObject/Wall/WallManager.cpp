@@ -22,8 +22,8 @@ WallManager::WallManager()
     areaLight_.intensity = 1.0f;
     areaLight_.width = 10.0f;
     areaLight_.height = 4.0f;
-    areaLight_.radius = 10.0f;
-    areaLight_.decay = 4.0f;
+    areaLight_.radius = 40.0f;
+    areaLight_.decay = 0.1f;
 
     plane_ = std::make_unique<Primitive>();
 }
