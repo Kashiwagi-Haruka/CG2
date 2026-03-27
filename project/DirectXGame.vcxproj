@@ -287,6 +287,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Locker\LockerManager.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCard.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCardRack.cpp" />
+    <ClCompile Include="application\Option\Option.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -304,6 +305,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Color\Color.h" />
+    <ClInclude Include="application\Option\OptionData.h" />
     <ClInclude Include="application\ScreenSize\ScreenSize.h" />
     <ClInclude Include="application\Text\FreetypeManager\Font\Font.h" />
     <ClInclude Include="application\Text\FreetypeManager\FreeTypeManager.h" />
@@ -440,6 +442,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Locker\LockerManager.h" />
     <ClInclude Include="application\GameObject\TimeCard\TimeCard.h" />
     <ClInclude Include="application\GameObject\TimeCard\TimeCardRack.h" />
+    <ClInclude Include="application\Option\Option.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
