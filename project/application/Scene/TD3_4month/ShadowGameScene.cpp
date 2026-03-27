@@ -91,7 +91,7 @@ void ShadowGameScene::Initialize()
     //UIManager
     textUIManager_->Initialize();
     BGMManager::Initialize();
-    BGMManager::SoundPlay(BGMManager::BGM1, true);
+
     isPause_ = false;
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;

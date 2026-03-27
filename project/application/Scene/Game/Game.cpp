@@ -10,6 +10,10 @@ void Game::Initialize() {
 
 	sceneFactory_ = std::make_unique<SceneFactory>();
 	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
+	
+	//フリータイプの初期化
+	FreeTypeManager::Initialize();
+
 	SceneManager::GetInstance()->ChangeScene("Title");
 	/*SceneManager::GetInstance()->ChangeScene("Sample");*/
 	//SceneManager::GetInstance()->ChangeScene("Game");
