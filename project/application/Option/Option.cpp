@@ -44,9 +44,7 @@ void Option::Initialize() {
 	}
 }
 void Option::Update() {
-	if (!isShowOption_) {
-		return;
-	}
+
 
 	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
 		for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
@@ -55,9 +53,7 @@ void Option::Update() {
 	}
 }
 void Option::Draw() {
-	if (!isShowOption_) {
-		return;
-	}
+
 	SpriteCommon::GetInstance()->DrawCommonFont();
 	optionTitleText_.Draw();
 	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
