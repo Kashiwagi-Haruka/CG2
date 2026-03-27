@@ -38,5 +38,6 @@ private:
     Vector3 velocity_ = { 0.0f };
     bool isGrab_ = false;
     bool isStand_ = false;
+	bool isPreOnCollisionRay_ = false;
 };
 

@@ -41,6 +41,12 @@ void Chair::Update()
 {
     Mirror();
 
+	// Rayが外れたらメニューを自動で閉じる
+	if (isPreOnCollisionRay_&&!OnCollisionRay() && ChairMenu::GetIsShowMenu()) {
+		ChairMenu::SetIsShowMenu(false);
+		ChairMenu::SetIsSelectButton(false);
+	}
+
     //rayと重なると
     if (OnCollisionRay()) {
         //インタラクトをトリガーすると
@@ -57,6 +63,8 @@ void Chair::Update()
             }
         }
     }
+
+    isPreOnCollisionRay_ = OnCollisionRay();
 
     Grab();
 
