@@ -5,6 +5,7 @@
 #include "WinApp.h"
 #include "application/Color/Color.h"
 #include "Input.h"
+#include "TextureManager.h"
 
 #include <array>
 
@@ -86,9 +87,18 @@ void Menu::Initialize() {
 	GameEndText_.SetPosition({WinApp::kClientWidth / 2.0f, WinApp::kClientHeight / 2.0f + 180.0f});
 	GameEndText_.SetAlign(TextAlign::Center);
 	GameEndText_.UpdateLayout(false);
+
+	const uint32_t overlayTexture = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
+	backgroundOverlaySprite_ = std::make_unique<Sprite>();
+	backgroundOverlaySprite_->Initialize(overlayTexture);
+	backgroundOverlaySprite_->SetPosition({0.0f, 0.0f});
+	backgroundOverlaySprite_->SetScale({static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)});
+	backgroundOverlaySprite_->SetColor({0.0f, 0.0f, 0.0f, 0.5f});
+	backgroundOverlaySprite_->Update();
 }
 
 void Menu::Update() {
+	backgroundOverlaySprite_->Update();
 	auto* input = Input::GetInstance();
 	if (isTrigger_ && currentMenuName_ == "Option") {
 		option_->Update();
@@ -181,6 +191,8 @@ void Menu::CloseOptionAndPrepareResume() {
 }
 
 void Menu::Draw() {
+	SpriteCommon::GetInstance()->DrawCommon();
+	backgroundOverlaySprite_->Draw();
 	SpriteCommon::GetInstance()->DrawCommonFont();
 	if (isTrigger_ && currentMenuName_ == "Option") {
 		option_->Draw();

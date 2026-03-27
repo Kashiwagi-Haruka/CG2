@@ -3,6 +3,7 @@
 #include "Text/Text.h"
 #include <memory>
 #include <string>
+#include "Sprite/Sprite.h"
 class Menu {
 public:
 	enum class Action { kNone, kResumeGame, kSave, kOpenOption, kBackToTitle, kEndGame };
@@ -23,6 +24,7 @@ private:
 	Text TitleText_;
 	Text GameEndText_;
 	uint32_t fontHandle_ = 0;
+	std::unique_ptr<Sprite> backgroundOverlaySprite_{};
 
 public:
 	/// <summary>
