@@ -4,8 +4,22 @@
 #include "Sprite/SpriteCommon.h"
 #include "WinApp.h"
 #include "application/Color/Color.h"
+#include "Input.h"
+
+#include <array>
 
 namespace {
+constexpr std::array<const char*, 5> kMenuOrder = {"Game", "Save", "Option", "Title", "GameEnd"};
+
+size_t FindMenuIndex(const std::string& menuName) {
+	for (size_t i = 0; i < kMenuOrder.size(); ++i) {
+		if (menuName == kMenuOrder[i]) {
+			return i;
+		}
+	}
+	return 0;
+}
+
 std::u32string ToMenuLabel(const std::string& menuName) {
 	if (menuName == "Game") {
 		return U"ゲームに戻る";
@@ -75,6 +89,25 @@ void Menu::Initialize() {
 }
 
 void Menu::Update() {
+	auto* input = Input::GetInstance();
+	const bool moveUp = input->TriggerKey(DIK_W) || input->TriggerKey(DIK_UP);
+	const bool moveDown = input->TriggerKey(DIK_S) || input->TriggerKey(DIK_DOWN);
+	const float mouseWheelDelta = input->GetMouseWheelDelta();
+	const bool wheelUp = mouseWheelDelta > 0.0f;
+	const bool wheelDown = mouseWheelDelta < 0.0f;
+
+	const int moveDirection = (moveDown || wheelDown) ? 1 : (moveUp || wheelUp) ? -1 : 0;
+	if (moveDirection != 0) {
+		const int menuCount = static_cast<int>(kMenuOrder.size());
+		const int currentIndex = static_cast<int>(FindMenuIndex(currentMenuName_));
+		int nextIndex = currentIndex + moveDirection;
+		if (nextIndex < 0) {
+			nextIndex += menuCount;
+		} else if (nextIndex >= menuCount) {
+			nextIndex -= menuCount;
+		}
+		currentMenuName_ = kMenuOrder[static_cast<size_t>(nextIndex)];
+	}
 	auto setDefaultColor = [](Text& text) {
 		text.SetColor(COLOR::WHITE);
 		text.UpdateLayout(false);
