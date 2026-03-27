@@ -90,6 +90,14 @@ void Menu::Initialize() {
 
 void Menu::Update() {
 	auto* input = Input::GetInstance();
+	if (isTrigger_ && currentMenuName_ == "Option") {
+		option_->Update();
+		if (!option_->GetIsShowOption()) {
+			isTrigger_ = false;
+		}
+		return;
+	}
+
 	const bool moveUp = input->TriggerKey(DIK_W) || input->TriggerKey(DIK_UP);
 	const bool moveDown = input->TriggerKey(DIK_S) || input->TriggerKey(DIK_DOWN);
 	const float mouseWheelDelta = input->GetMouseWheelDelta();
@@ -118,6 +126,7 @@ void Menu::Update() {
 		} else if (currentMenuName_ == "Option") {
 			pendingAction_ = Action::kOpenOption;
 			isTrigger_ = true;
+			option_->OpenOption();
 		} else if (currentMenuName_ == "Title") {
 			pendingAction_ = Action::kBackToTitle;
 			isTrigger_ = false;
@@ -151,10 +160,6 @@ void Menu::Update() {
 	} else if (currentMenuName_ == "GameEnd") {
 		GameEndText_.SetColor(COLOR::RED);
 		GameEndText_.UpdateLayout(false);
-	}
-
-	if (isTrigger_ && currentMenuName_ == "Option") {
-		option_->Update();
 	}
 }
 Menu::Action Menu::ConsumePendingAction() {
