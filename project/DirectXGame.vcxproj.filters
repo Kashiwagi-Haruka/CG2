@@ -350,6 +350,8 @@
     <ClCompile Include="application\GameObject\TimeCard\TimeCard.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCardRack.cpp" />
     <ClCompile Include="application\GameObject\SEManager\SEManager.cpp" />
+    <ClCompile Include="application\GameObject\Box\Box.cpp" />
+    <ClCompile Include="application\GameObject\Box\BoxManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -689,6 +691,8 @@
     <ClInclude Include="application\GameObject\TimeCard\TimeCard.h" />
     <ClInclude Include="application\GameObject\TimeCard\TimeCardRack.h" />
     <ClInclude Include="application\GameObject\SEManager\SEManager.h" />
+    <ClInclude Include="application\GameObject\Box\Box.h" />
+    <ClInclude Include="application\GameObject\Box\BoxManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

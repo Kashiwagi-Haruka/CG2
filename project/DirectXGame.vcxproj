@@ -177,6 +177,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Desk\Desk.cpp" />
     <ClCompile Include="application\GameObject\Desk\DeskManager.cpp" />
     <ClCompile Include="application\Text\ChairMenu\ChairMenu.cpp" />
+    <ClCompile Include="application\GameObject\Box\Box.cpp" />
+    <ClCompile Include="application\GameObject\Box\BoxManager.cpp" />
     <ClCompile Include="Engine\Editor\Object3d\EditorObject3d.cpp" />
     <ClCompile Include="Engine\Editor\Primitive\EditorPrimitive.cpp" />
     <ClCompile Include="Engine\Editor\Light\EditorLight.cpp" />
@@ -328,6 +330,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Desk\Desk.h" />
     <ClInclude Include="application\GameObject\Desk\DeskManager.h" />
     <ClInclude Include="application\Text\ChairMenu\ChairMenu.h" />
+    <ClInclude Include="application\GameObject\Box\Box.h" />
+    <ClInclude Include="application\GameObject\Box\BoxManager.h" />
     <ClInclude Include="Engine\Editor\Object3d\EditorObject3d.h" />
     <ClInclude Include="Engine\Editor\Primitive\EditorPrimitive.h" />
     <ClInclude Include="Engine\Editor\Light\EditorLight.h" />
