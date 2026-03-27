@@ -108,6 +108,24 @@ void Menu::Update() {
 		}
 		currentMenuName_ = kMenuOrder[static_cast<size_t>(nextIndex)];
 	}
+	if (input->TriggerKey(DIK_E)) {
+		if (currentMenuName_ == "Game") {
+			pendingAction_ = Action::kResumeGame;
+			isTrigger_ = false;
+		} else if (currentMenuName_ == "Save") {
+			pendingAction_ = Action::kSave;
+			isTrigger_ = false;
+		} else if (currentMenuName_ == "Option") {
+			pendingAction_ = Action::kOpenOption;
+			isTrigger_ = true;
+		} else if (currentMenuName_ == "Title") {
+			pendingAction_ = Action::kBackToTitle;
+			isTrigger_ = false;
+		} else if (currentMenuName_ == "GameEnd") {
+			pendingAction_ = Action::kEndGame;
+			isTrigger_ = false;
+		}
+	}
 	auto setDefaultColor = [](Text& text) {
 		text.SetColor(COLOR::WHITE);
 		text.UpdateLayout(false);
@@ -139,7 +157,11 @@ void Menu::Update() {
 		option_->Update();
 	}
 }
-
+Menu::Action Menu::ConsumePendingAction() {
+	const Action action = pendingAction_;
+	pendingAction_ = Action::kNone;
+	return action;
+}
 void Menu::Draw() {
 	SpriteCommon::GetInstance()->DrawCommonFont();
 	menuText_.Draw();

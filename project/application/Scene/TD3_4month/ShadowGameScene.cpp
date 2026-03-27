@@ -176,7 +176,20 @@ void ShadowGameScene::Update()
 
     if (isPause_) {
 		menu_->Update();
-    }
+		const Menu::Action menuAction = menu_->ConsumePendingAction();
+		if (menuAction == Menu::Action::kResumeGame) {
+			isPause_ = false;
+			input->SetIsCursorVisible(false);
+			input->SetIsCursorStability(true);
+		} else if (menuAction == Menu::Action::kBackToTitle) {
+			isPause_ = false;
+			input->SetIsCursorVisible(false);
+			input->SetIsCursorStability(true);
+			SceneManager::GetInstance()->ChangeScene("Title");
+		} else if (menuAction == Menu::Action::kEndGame) {
+			PostQuitMessage(0);
+		}
+	}
 
     //シーン遷移の更新処理
     UpdateSceneTransition();

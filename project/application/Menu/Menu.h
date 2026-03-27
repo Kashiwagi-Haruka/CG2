@@ -1,14 +1,18 @@
 #pragma once
-#include <string>
 #include "Option/Option.h"
-#include <memory>
 #include "Text/Text.h"
+#include <memory>
+#include <string>
 class Menu {
+public:
+	enum class Action { kNone, kResumeGame, kSave, kOpenOption, kBackToTitle, kEndGame };
 
+private:
 	std::string currentMenuName_ = "Game";
 
 	bool isTrigger_ = false;
 	bool isPreTrigger_ = false;
+	Action pendingAction_ = Action::kNone;
 
 	std::unique_ptr<Option> option_;
 
@@ -20,8 +24,7 @@ class Menu {
 	Text GameEndText_;
 	uint32_t fontHandle_ = 0;
 
-
-	public:
+public:
 	/// <summary>
 	/// "Game"ゲームに戻る,"Save"セーブ,"Option"オプション,"Title"タイトル,"GameEnd"ゲームを終わる
 	/// </summary>
@@ -31,5 +34,5 @@ class Menu {
 	void Initialize();
 	void Update();
 	void Draw();
-
+	Action ConsumePendingAction();
 };
