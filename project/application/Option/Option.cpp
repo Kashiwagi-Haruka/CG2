@@ -80,7 +80,7 @@ void Option::Update() {
 	const bool moveDown = input->TriggerKey(DIK_S) || input->TriggerKey(DIK_DOWN);
 	const bool moveLeft = input->TriggerKey(DIK_A) || input->TriggerKey(DIK_LEFT);
 	const bool moveRight = input->TriggerKey(DIK_D) || input->TriggerKey(DIK_RIGHT);
-	const bool closeOption = input->TriggerKey(DIK_ESCAPE) || input->TriggerKey(DIK_Q);
+	const bool closeOption = input->TriggerKey(DIK_E);
 
 	if (closeOption) {
 		SaveOptionData();
