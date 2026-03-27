@@ -131,7 +131,7 @@ void Flashlight::UpdateSpotLight()
 {
     spotLight_.position = GetWorldPosition();
     spotLight_.direction = -YoshidaMath::GetForward(obj_->GetWorldMatrix());
-    spotLight_.intensity = 10.0f;
+    spotLight_.intensity = 1.0f;
 
 }
 
