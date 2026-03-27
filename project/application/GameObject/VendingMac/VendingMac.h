@@ -28,7 +28,6 @@ public:
     AreaLight& GetAreaLight() { return  areaLight_; }
 private:
     float GetVol(float length, float maxVol);
-    static SoundData noise_;
     bool OnCollisionRay();
     PlayerCamera* playerCamera_ = nullptr;
     std::unique_ptr<Object3d>obj_ = nullptr;

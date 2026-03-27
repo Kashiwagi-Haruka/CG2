@@ -20,8 +20,6 @@ enum class VerticalAlign {
 
 class Text {
 public:
-    static void LoadSE();
-    static void UnLoadSE();
     void Initialize(uint32_t fontHandle);
     void SetString(const std::u32string& text);
     void SetPosition(const Vector2& pos);
@@ -37,7 +35,6 @@ public:
     const Vector2& GetPosition()const { return position_; }
 
 private:
-    static SoundData voiceSE_;
     uint32_t fontHandle_ = 0;
     std::u32string text_;
     Vector2 position_ = { 0.0f, 0.0f };

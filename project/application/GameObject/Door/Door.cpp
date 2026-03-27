@@ -6,9 +6,8 @@
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
 #include"Animation/AnimationManager.h"
+#include"GameObject/SEManager/SEManager.h"
 
-SoundData Door::doorLockSE_;
-SoundData Door::doorOpenSE_;
 
 bool Door::isSendOpenMessage_ = false;
 bool Door::isSendLockMessage_ = false;
@@ -27,19 +26,12 @@ Door::Door()
     worldMat_ = Function::MakeIdentity4x4();
     autoLockSystem_->SetParentMat(&worldMat_);
 
-    doorLockSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/doorLock.mp3");
-    doorOpenSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/doorOpen.mp3");
-
-    Audio::GetInstance()->SetSoundVolume(&doorLockSE_, 0.25f);
-    Audio::GetInstance()->SetSoundVolume(&doorOpenSE_, 0.25f);
-
-
 }
 
 Door::~Door()
 {
-    Audio::GetInstance()->SoundUnload(&doorLockSE_);
-    Audio::GetInstance()->SoundUnload(&doorOpenSE_);
+
+
 }
 
 void Door::OnCollision(Collider* collider) {
@@ -131,11 +123,11 @@ void Door::CheckCollision()
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (isGetKey_) {
                 desiredAnimationName = "2Open";
-                Audio::GetInstance()->SoundPlayWave(doorOpenSE_, false);
+                SEManager::SoundPlay(SEManager::DOOR_OPEN);
                 isSendOpenMessage_ = true;
             } else {
                 desiredAnimationName = "1Lock";
-                Audio::GetInstance()->SoundPlayWave(doorLockSE_, false);
+                SEManager::SoundPlay(SEManager::DOOR_LOCK);
                 isSendLockMessage_ = true;
             }
         }

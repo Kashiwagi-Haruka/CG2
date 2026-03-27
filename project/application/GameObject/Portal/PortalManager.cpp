@@ -8,6 +8,7 @@
 #include"TextureManager.h"
 #include"DirectXCommon.h"
 #include"GameObject/Player/Player.h"
+#include"GameObject/SEManager/SEManager.h"
 
 namespace {
     const constexpr uint32_t kMaxWhiteBoards = 6;
@@ -35,14 +36,7 @@ PortalManager::PortalManager(Vector3* pos) {
     }
 
     portalParticle_ = std::make_unique<PortalParticle>();
-    warpSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/warp0.mp3");
-    Audio::GetInstance()->SetSoundVolume(&warpSE_, 0.25f);
 
-    portalSpawnSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/warp1.mp3");
-    Audio::GetInstance()->SetSoundVolume(&portalSpawnSE_, 0.25f);
-
-    shotSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/shot.mp3");
-    Audio::GetInstance()->SetSoundVolume(&shotSE_, 0.25f);
 }
 
 PortalManager::~PortalManager()
@@ -56,9 +50,6 @@ PortalManager::~PortalManager()
     }
     portals_.clear();
 
-    Audio::GetInstance()->SoundUnload(&warpSE_);
-    Audio::GetInstance()->SoundUnload(&portalSpawnSE_);
-    Audio::GetInstance()->SoundUnload(&shotSE_);
 }
 
 void PortalManager::Initialize() {
@@ -88,8 +79,7 @@ void PortalManager::WarpPlayer(Player* player)
                 transform.translate.y = 0.0f;
                 player->SetTranslate(transform.translate);
                 player->SetRotate(portal->GetWarpPos()->GetTransform().rotate + transform.rotate);
-
-                Audio::GetInstance()->SoundPlayWave(warpSE_, false);
+                SEManager::SoundPlay(SEManager::WARP);
                 break;
             }
         }
@@ -201,7 +191,7 @@ void PortalManager::CheckCollision() {
             if (PlayerCommand::GetInstance()->Shot()) {
 
                 //ショットSE鳴らす
-                Audio::GetInstance()->SoundPlayWave(shotSE_, false);
+                SEManager::SoundPlay(SEManager::SHOT);
 
                 if (preWhiteBoards_.size() >= 2) {
                     //ポータルの生成が2個以上になったら
@@ -252,5 +242,5 @@ void PortalManager::SpawnPortal(WhiteBoard* board) {
         newPortal->GetWarpPos()->SetParent(&firstWarpPosTransform_);
     }
     portals_.push_back(std::move(newPortal));
-    Audio::GetInstance()->SoundPlayWave(portalSpawnSE_, false);
+    SEManager::SoundPlay(SEManager::PORTAL_SPAWN);
 }

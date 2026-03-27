@@ -349,6 +349,7 @@
     <ClCompile Include="application\Text\ChairMenu\ChairMenu.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCard.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCardRack.cpp" />
+    <ClCompile Include="application\GameObject\SEManager\SEManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -687,6 +688,7 @@
     <ClInclude Include="application\Text\ChairMenu\ChairMenu.h" />
     <ClInclude Include="application\GameObject\TimeCard\TimeCard.h" />
     <ClInclude Include="application\GameObject\TimeCard\TimeCardRack.h" />
+    <ClInclude Include="application\GameObject\SEManager\SEManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

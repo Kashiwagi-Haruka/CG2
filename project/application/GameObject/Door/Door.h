@@ -42,8 +42,6 @@ public:
 private:
     static bool isSendLockMessage_;
     static bool isSendOpenMessage_;
-    static SoundData doorLockSE_;
-    static SoundData doorOpenSE_;
     bool* isGetKey_ = nullptr;
     bool isOpen_ = false;
 
