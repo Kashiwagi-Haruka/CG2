@@ -93,7 +93,7 @@ void Menu::Initialize() {
 	backgroundOverlaySprite_->Initialize(overlayTexture);
 	backgroundOverlaySprite_->SetPosition({0.0f, 0.0f});
 	backgroundOverlaySprite_->SetScale({static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight)});
-	backgroundOverlaySprite_->SetColor({0.0f, 0.0f, 0.0f, 0.5f});
+	backgroundOverlaySprite_->SetColor({0.0f, 0.0f, 0.0f, 0.9f});
 	backgroundOverlaySprite_->Update();
 }
 
