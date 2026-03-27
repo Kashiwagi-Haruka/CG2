@@ -2,6 +2,7 @@
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Logger.h"
 #include "TextureManager.h"
+#include "Sprite/SpriteCommon.h"
 namespace {
 const char* kOptionFileName = "optionData.json";
 }
@@ -35,7 +36,7 @@ void Option::Draw() {
 	if (!isShowOption_) {
 		return;
 	}
-
+	SpriteCommon::GetInstance()->DrawCommon();
 	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
 		for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
 			parameterSprite_[parameterIndex][divisionIndex].Draw();

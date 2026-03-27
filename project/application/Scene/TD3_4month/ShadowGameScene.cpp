@@ -67,6 +67,7 @@ ShadowGameScene::ShadowGameScene()
     timeCardWatch_->SetPlayer(player_.get());
     //UIManager
     textUIManager_ = std::make_unique<TextUIManager>();
+	menu_ = std::make_unique<Menu>();
 
     key_->SetPlayerCamera(playerCamera_.get());
     edamame_->SetPlayerCamera(playerCamera_.get());
@@ -89,6 +90,7 @@ void ShadowGameScene::Initialize()
 
     //UIManager
     textUIManager_->Initialize();
+	menu_->Initialize();
     BGMManager::Initialize();
     isPause_ = false;
     noiseTimer_ = kNoiseTimer_;
@@ -162,17 +164,19 @@ void ShadowGameScene::Update()
         if (isPause_) {
             input->SetIsCursorVisible(true);
             input->SetIsCursorStability(false);
+			
         } else {
             input->SetIsCursorVisible(false);
             input->SetIsCursorStability(true);
         }
     }
 
+    
 
 
-    //if (isPause_) {
-    //    return;
-    //}
+    if (isPause_) {
+		menu_->Update();
+    }
 
     //シーン遷移の更新処理
     UpdateSceneTransition();
@@ -539,6 +543,9 @@ void ShadowGameScene::DrawModel() {
 
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
     SetCameraAndDraw(playerCamera_->GetCamera(), true, true, false);
+	if (isPause_) {
+	menu_->Draw();
+    }
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
