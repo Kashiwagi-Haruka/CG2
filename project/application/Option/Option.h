@@ -30,6 +30,8 @@ class Option {
 	std::array<std::array<Sprite, kOptionParameterDivisionNum>, kOptionParameterNum> parameterSprite_;
 
 public:
+	static const OptionData& GetCurrentOptionData() { return currentOptionData_; }
+
 	void OpenOption() { isShowOption_ = true; }
 	void CloseOption() { isShowOption_ = false; }
 	bool GetIsShowOption() const { return isShowOption_; }
@@ -40,4 +42,7 @@ public:
 
 	void SaveOptionData();
 	void LoadOptionData();
+
+private:
+	static OptionData currentOptionData_;
 };

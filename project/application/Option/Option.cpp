@@ -35,7 +35,7 @@ int DivisionFromVolume(float value) {
 	return std::clamp(division, 0, 9);
 }
 } // namespace
-
+OptionData Option::currentOptionData_{};
 void Option::Initialize() {
 	uint32_t textureHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
 	fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
@@ -188,11 +188,14 @@ void Option::SaveOptionData() {
 	if (!jsonManager->SaveJson(kOptionFileName)) {
 		Logger::Log("オプション設定の保存に失敗しました。\n");
 	}
+	currentOptionData_ = optionData_;
 }
+
 void Option::LoadOptionData() {
 	JsonManager* jsonManager = JsonManager::GetInstance();
 	if (!jsonManager->LoadJson(kOptionFileName)) {
 		SaveOptionData();
+		currentOptionData_ = optionData_;
 		return;
 	}
 
@@ -217,4 +220,6 @@ void Option::LoadOptionData() {
 	if (optionJson.contains("VoiceVolume") && optionJson["VoiceVolume"].is_number()) {
 		optionData_.VoiceVolume = optionJson["VoiceVolume"].get<float>();
 	}
+
+	currentOptionData_ = optionData_;
 }
