@@ -5,6 +5,7 @@
 #include "Primitive/Primitive.h"
 #include"Audio.h"
 #include"EdamameTrivia.h"
+#include"Light/SpotLight.h"
 
 class Edamame
 {
@@ -20,11 +21,13 @@ public:
     void CheckCollision();
     bool OnCollisionRay();
     void Trivia();
+    SpotLight& GetSpotLight() { return spotLight_; };
 private:
     std::unique_ptr<EdamameTrivia>edamameTrivia_ = nullptr;
     std::unique_ptr<Object3d>obj_ = nullptr;
     AABB localAABB_ = {};
     PlayerCamera* playerCamera_ = nullptr;
     Transform worldTransform_ = {};
+    SpotLight spotLight_;
 };
 

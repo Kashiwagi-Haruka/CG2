@@ -36,7 +36,7 @@ TitleMenuUI::TitleMenuUI()
     menuText_[CONTINUE_TEXT].SetString(U"再打刻する");
     menuText_[CONTINUE_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f,SCREEN_SIZE::HALF_HEIGHT + 64.0f });
 
-    menuText_[OPTION_TEXT].SetString(U"オプション");
+    menuText_[OPTION_TEXT].SetString(U"設定");
     menuText_[OPTION_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f,SCREEN_SIZE::HALF_HEIGHT + 128.0f });
 
     triangleText_.Initialize(menuFontHandle_);

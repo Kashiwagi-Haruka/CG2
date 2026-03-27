@@ -36,10 +36,20 @@ void Edamame::Initialize()
     //枝豆知識
     edamameTrivia_->Initialize();
 
+    spotLight_.color = { 0.75f, 1.0f, 0.25f, 1.0f };
+    spotLight_.position = worldTransform_.translate;
+    spotLight_.position.y = 2.0f;
+    spotLight_.direction = { 0.0f, -1.0f, 0.0f };
+    spotLight_.intensity = 2.0f;
+    spotLight_.distance = 10.0f;
+    spotLight_.decay = 0.1f;
+    spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
+    spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 }
 
 void Edamame::Update()
 {
+    obj_->SetEnableLighting(false);
     obj_->SetTransform(worldTransform_);
     obj_->UpdateBillboard();
     CheckCollision();
@@ -102,10 +112,13 @@ void Edamame::Trivia()
         float vol = 0.0f; 
 
         if (length <= 20.0f) {
+            
+            edamameTrivia_->SetIsDraw(true);
+
             if (length <= 1.0f) {
                 bgmVol = 0.25f;
                 vol = 1.0f;
-                edamameTrivia_->SetIsDraw(true);
+ 
             } else {
                 vol = 1.0f / length;
                 bgmVol = vol * 0.25f;

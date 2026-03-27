@@ -282,15 +282,16 @@ void ShadowGameScene::InitializeLights()
     //フラッシュライト
     flashlight_->Initialize();
 
+    spotLights_[0] = edamame_->GetSpotLight();
     spotLights_[1] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
 
-    activePointLightCount_ = 0;
-    //pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    //pointLights_[0].position = { 7.0f, 0.0f, 0.0f };
-    //pointLights_[0].intensity = 1.0f;
-    //pointLights_[0].radius = 10.0f;
-    //pointLights_[0].decay = 1.0f;
+    activePointLightCount_ = 1;
+    pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    pointLights_[0].position = { 7.0f, 2.0f, 0.0f };
+    pointLights_[0].intensity = 1.0f;
+    pointLights_[0].radius = 10.0f;
+    pointLights_[0].decay = 1.0f;
     //pointLights_[1].color = { 1.0f, 0.0f, 0.0f, 1.0f };
     //pointLights_[1].position = { 5.0f, 5.0f, 5.0f };
     //pointLights_[1].intensity = 1.0f;
@@ -302,14 +303,7 @@ void ShadowGameScene::InitializeLights()
     directionalLight_.intensity = 0.25f;
 
     activeSpotLightCount_ = 2;
-    spotLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    spotLights_[0].position = { 2.0f, 1.25f, 0.0f };
-    spotLights_[0].direction = { -1.0f, -1.0f, 0.0f };
-    spotLights_[0].intensity = 4.0f;
-    spotLights_[0].distance = 7.0f;
-    spotLights_[0].decay = 2.0f;
-    spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-    spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+
 
     activeAreaLightCount_ = 5;
     areaLights_[0].color = { 1.0f,1.0f, 1.0f, 1.0f };
