@@ -1,16 +1,17 @@
 #define NOMINMAX
 #include "Hierarchy.h"
-#include "Grid/EditorGrid.h"
-#include "ToolBar/ToolBar.h"
 #include "Camera.h"
 #include "Engine/BaseScene/SceneManager.h"
-#include "Engine/Audio/Audio.h"
+#include "Engine/Editor/Object3d/EditorObject3d.h"
+#include "Engine/Editor/Primitive/EditorPrimitive.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
+#include "Grid/EditorGrid.h"
 #include "Input.h"
 #include "Object3d/Object3d.h"
 #include "Object3d/Object3dCommon.h"
 #include "Primitive/Primitive.h"
+#include "ToolBar/ToolBar.h"
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
 #endif
@@ -26,103 +27,6 @@ std::filesystem::path ResolveObjectEditorJsonPath(const std::string& filePath) {
 
 bool HasObjectEditorJsonFile(const std::string& filePath) { return std::filesystem::exists(ResolveObjectEditorJsonPath(filePath)); }
 
-nlohmann::json SerializeAudioEffect(const Audio::MixerEffectSettings& effect) {
-	nlohmann::json effectJson;
-	effectJson["type"] = static_cast<int>(effect.type);
-	effectJson["enabled"] = effect.enabled;
-	effectJson["reverb"] = {
-	    {"WetDryMix", effect.reverb.WetDryMix}
-    };
-	effectJson["echo"] = {
-	    {"WetDryMix", effect.echo.WetDryMix},
-        {"Feedback",  effect.echo.Feedback },
-        {"Delay",     effect.echo.Delay    }
-    };
-	effectJson["equalizer"] = {
-	    {"FrequencyCenter0", effect.equalizer.FrequencyCenter0},
-        {"Gain0",            effect.equalizer.Gain0           },
-        {"Bandwidth0",       effect.equalizer.Bandwidth0      },
-	    {"FrequencyCenter1", effect.equalizer.FrequencyCenter1},
-        {"Gain1",            effect.equalizer.Gain1           },
-        {"Bandwidth1",       effect.equalizer.Bandwidth1      },
-	    {"FrequencyCenter2", effect.equalizer.FrequencyCenter2},
-        {"Gain2",            effect.equalizer.Gain2           },
-        {"Bandwidth2",       effect.equalizer.Bandwidth2      },
-	    {"FrequencyCenter3", effect.equalizer.FrequencyCenter3},
-        {"Gain3",            effect.equalizer.Gain3           },
-        {"Bandwidth3",       effect.equalizer.Bandwidth3      }
-    };
-	effectJson["limiter"] = {
-	    {"Release",  effect.limiter.Release },
-        {"Loudness", effect.limiter.Loudness}
-    };
-	return effectJson;
-}
-
-bool DeserializeAudioEffect(const nlohmann::json& effectJson, Audio::MixerEffectSettings& effect) {
-	if (!effectJson.is_object()) {
-		return false;
-	}
-	if (effectJson.contains("type") && effectJson["type"].is_number_integer()) {
-		const int type = effectJson["type"].get<int>();
-		if (type >= 0 && type <= static_cast<int>(Audio::MixerEffectType::Limiter)) {
-			effect.type = static_cast<Audio::MixerEffectType>(type);
-		}
-	}
-	if (effectJson.contains("enabled") && effectJson["enabled"].is_boolean()) {
-		effect.enabled = effectJson["enabled"].get<bool>();
-	}
-	if (effectJson.contains("reverb") && effectJson["reverb"].is_object()) {
-		const auto& v = effectJson["reverb"];
-		if (v.contains("WetDryMix") && v["WetDryMix"].is_number())
-			effect.reverb.WetDryMix = v["WetDryMix"].get<float>();
-	}
-	if (effectJson.contains("echo") && effectJson["echo"].is_object()) {
-		const auto& v = effectJson["echo"];
-		if (v.contains("WetDryMix") && v["WetDryMix"].is_number())
-			effect.echo.WetDryMix = v["WetDryMix"].get<float>();
-		if (v.contains("Feedback") && v["Feedback"].is_number())
-			effect.echo.Feedback = v["Feedback"].get<float>();
-		if (v.contains("Delay") && v["Delay"].is_number())
-			effect.echo.Delay = v["Delay"].get<float>();
-	}
-	if (effectJson.contains("equalizer") && effectJson["equalizer"].is_object()) {
-		const auto& v = effectJson["equalizer"];
-		if (v.contains("FrequencyCenter0") && v["FrequencyCenter0"].is_number())
-			effect.equalizer.FrequencyCenter0 = v["FrequencyCenter0"].get<float>();
-		if (v.contains("Gain0") && v["Gain0"].is_number())
-			effect.equalizer.Gain0 = v["Gain0"].get<float>();
-		if (v.contains("Bandwidth0") && v["Bandwidth0"].is_number())
-			effect.equalizer.Bandwidth0 = v["Bandwidth0"].get<float>();
-		if (v.contains("FrequencyCenter1") && v["FrequencyCenter1"].is_number())
-			effect.equalizer.FrequencyCenter1 = v["FrequencyCenter1"].get<float>();
-		if (v.contains("Gain1") && v["Gain1"].is_number())
-			effect.equalizer.Gain1 = v["Gain1"].get<float>();
-		if (v.contains("Bandwidth1") && v["Bandwidth1"].is_number())
-			effect.equalizer.Bandwidth1 = v["Bandwidth1"].get<float>();
-		if (v.contains("FrequencyCenter2") && v["FrequencyCenter2"].is_number())
-			effect.equalizer.FrequencyCenter2 = v["FrequencyCenter2"].get<float>();
-		if (v.contains("Gain2") && v["Gain2"].is_number())
-			effect.equalizer.Gain2 = v["Gain2"].get<float>();
-		if (v.contains("Bandwidth2") && v["Bandwidth2"].is_number())
-			effect.equalizer.Bandwidth2 = v["Bandwidth2"].get<float>();
-		if (v.contains("FrequencyCenter3") && v["FrequencyCenter3"].is_number())
-			effect.equalizer.FrequencyCenter3 = v["FrequencyCenter3"].get<float>();
-		if (v.contains("Gain3") && v["Gain3"].is_number())
-			effect.equalizer.Gain3 = v["Gain3"].get<float>();
-		if (v.contains("Bandwidth3") && v["Bandwidth3"].is_number())
-			effect.equalizer.Bandwidth3 = v["Bandwidth3"].get<float>();
-	}
-	if (effectJson.contains("limiter") && effectJson["limiter"].is_object()) {
-		const auto& v = effectJson["limiter"];
-		if (v.contains("Release") && v["Release"].is_number_unsigned())
-			effect.limiter.Release = v["Release"].get<UINT32>();
-		if (v.contains("Loudness") && v["Loudness"].is_number_unsigned())
-			effect.limiter.Loudness = v["Loudness"].get<UINT32>();
-	}
-	return true;
-}
-
 } // namespace
 
 Hierarchy* Hierarchy::GetInstance() {
@@ -130,7 +34,7 @@ Hierarchy* Hierarchy::GetInstance() {
 	return &instance;
 }
 void Hierarchy::Finalize() {
-	playModeInitializedAudioNames_.clear();
+	editorAudio_.Finalize();
 	objects_.clear();
 	objectNames_.clear();
 	editorTransforms_.clear();
@@ -178,26 +82,44 @@ std::string Hierarchy::GetSceneScopedEditorFilePath(const std::string& defaultFi
 }
 
 void Hierarchy::ResetForSceneChange() {
-	playModeInitializedAudioNames_.clear();
+	editorAudio_.ResetForSceneChange();
 	hasUnsavedChanges_ = false;
 	saveStatusMessage_.clear();
 	hasLoadedForCurrentScene_ = false;
-	editorLightState_.overrideSceneLights = false;
+	hasLoadedSnapshot_ = false;
+	loadedSnapshotFilePath_.clear();
+	editorLight_.Reset();
 	undoStack_.clear();
 	redoStack_.clear();
-	savedAudioVolumes_.clear();
-	savedAudioLoopEnabled_.clear();
-	savedAudioEffects_.clear();
-	editorLightState_.directionalLight = {
-	    {1.0f, 1.0f, 1.0f, 1.0f},
-        {0.0f, -1.0f, 0.0f},
-        1.0f
-    };
-	editorLightState_.pointLights.clear();
-	editorLightState_.spotLights.clear();
-	editorLightState_.areaLights.clear();
 	editorCamera_.DeactivatePreview();
-	Object3dCommon::GetInstance()->SetEditorLightOverride(false);
+}
+
+Hierarchy::EditorSnapshot Hierarchy::CreateCurrentSnapshot() const {
+	EditorSnapshot snapshot{};
+	snapshot.objectTransforms = editorTransforms_;
+	snapshot.objectMaterials = editorMaterials_;
+	snapshot.objectNames = objectNames_;
+	snapshot.primitiveTransforms = primitiveEditorTransforms_;
+	snapshot.primitiveMaterials = primitiveEditorMaterials_;
+	snapshot.primitiveNames = primitiveNames_;
+	return snapshot;
+}
+
+bool Hierarchy::ResetToLoadedSnapshot() {
+	if (!hasLoadedSnapshot_) {
+		return false;
+	}
+	if (!loadedSnapshotFilePath_.empty() && HasObjectEditorJsonFile(loadedSnapshotFilePath_)) {
+		if (!LoadObjectEditorsFromJson(loadedSnapshotFilePath_)) {
+			return false;
+		}
+	} else {
+		ApplyEditorSnapshot(loadedSnapshot_);
+	}
+	undoStack_.clear();
+	redoStack_.clear();
+	hasUnsavedChanges_ = false;
+	return true;
 }
 
 
@@ -205,13 +127,7 @@ void Hierarchy::UndoEditorChange() {
 	if (undoStack_.empty()) {
 		return;
 	}
-	EditorSnapshot current{};
-	current.objectTransforms = editorTransforms_;
-	current.objectMaterials = editorMaterials_;
-	current.objectNames = objectNames_;
-	current.primitiveTransforms = primitiveEditorTransforms_;
-	current.primitiveMaterials = primitiveEditorMaterials_;
-	current.primitiveNames = primitiveNames_;
+	EditorSnapshot current = CreateCurrentSnapshot();
 	redoStack_.push_back(std::move(current));
 	ApplyEditorSnapshot(undoStack_.back());
 	undoStack_.pop_back();
@@ -222,13 +138,7 @@ void Hierarchy::RedoEditorChange() {
 	if (redoStack_.empty()) {
 		return;
 	}
-	EditorSnapshot current{};
-	current.objectTransforms = editorTransforms_;
-	current.objectMaterials = editorMaterials_;
-	current.objectNames = objectNames_;
-	current.primitiveTransforms = primitiveEditorTransforms_;
-	current.primitiveMaterials = primitiveEditorMaterials_;
-	current.primitiveNames = primitiveNames_;
+	EditorSnapshot current = CreateCurrentSnapshot();
 	undoStack_.push_back(std::move(current));
 	ApplyEditorSnapshot(redoStack_.back());
 	redoStack_.pop_back();
@@ -246,34 +156,14 @@ void Hierarchy::ApplyEditorSnapshot(const EditorSnapshot& snapshot) {
 		if (!objects_[i] || i >= editorTransforms_.size() || i >= editorMaterials_.size()) {
 			continue;
 		}
-		objects_[i]->SetTransform(editorTransforms_[i]);
-		const InspectorMaterial& material = editorMaterials_[i];
-		objects_[i]->SetColor(material.color);
-		objects_[i]->SetEnableLighting(material.enableLighting);
-		objects_[i]->SetShininess(material.shininess);
-		objects_[i]->SetEnvironmentCoefficient(material.environmentCoefficient);
-		objects_[i]->SetGrayscaleEnabled(material.grayscaleEnabled);
-		objects_[i]->SetSepiaEnabled(material.sepiaEnabled);
-		objects_[i]->SetDistortionStrength(material.distortionStrength);
-		objects_[i]->SetDistortionFalloff(material.distortionFalloff);
-		objects_[i]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+		EditorObject3d::ApplyEditorValues(objects_[i], editorTransforms_[i], editorMaterials_[i]);
 	}
 
 	for (size_t i = 0; i < primitives_.size(); ++i) {
 		if (!primitives_[i] || primitives_[i] == selectionBoxPrimitive_.get() || i >= primitiveEditorTransforms_.size() || i >= primitiveEditorMaterials_.size()) {
 			continue;
 		}
-		primitives_[i]->SetTransform(primitiveEditorTransforms_[i]);
-		const InspectorMaterial& material = primitiveEditorMaterials_[i];
-		primitives_[i]->SetColor(material.color);
-		primitives_[i]->SetEnableLighting(material.enableLighting);
-		primitives_[i]->SetShininess(material.shininess);
-		primitives_[i]->SetEnvironmentCoefficient(material.environmentCoefficient);
-		primitives_[i]->SetGrayscaleEnabled(material.grayscaleEnabled);
-		primitives_[i]->SetSepiaEnabled(material.sepiaEnabled);
-		primitives_[i]->SetDistortionStrength(material.distortionStrength);
-		primitives_[i]->SetDistortionFalloff(material.distortionFalloff);
-		primitives_[i]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+		EditorPrimitive::ApplyEditorValues(primitives_[i], primitiveEditorTransforms_[i], primitiveEditorMaterials_[i]);
 	}
 
 	selectionBoxDirty_ = true;
@@ -289,33 +179,14 @@ void Hierarchy::RegisterObject3d(Object3d* object) {
 	if (emptyIt != objects_.end()) {
 		const size_t index = static_cast<size_t>(std::distance(objects_.begin(), emptyIt));
 		objects_[index] = object;
-		object->SetTransform(editorTransforms_[index]);
-		const InspectorMaterial& material = editorMaterials_[index];
-		object->SetColor(material.color);
-		object->SetEnableLighting(material.enableLighting);
-		object->SetShininess(material.shininess);
-		object->SetEnvironmentCoefficient(material.environmentCoefficient);
-		object->SetGrayscaleEnabled(material.grayscaleEnabled);
-		object->SetSepiaEnabled(material.sepiaEnabled);
-		object->SetDistortionStrength(material.distortionStrength);
-		object->SetDistortionFalloff(material.distortionFalloff);
-		object->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+		EditorObject3d::ApplyEditorValues(object, editorTransforms_[index], editorMaterials_[index]);
 		return;
 	}
 	const size_t index = objects_.size();
 	objects_.push_back(object);
 	objectNames_.push_back("Object " + std::to_string(index));
 	editorTransforms_.push_back(object->GetTransform());
-	editorMaterials_.push_back({
-	    object->GetColor(),
-	    object->IsLightingEnabled(),
-	    object->GetShininess(),
-	    object->GetEnvironmentCoefficient(),
-	    object->IsGrayscaleEnabled(),
-	    object->IsSepiaEnabled(),
-	    object->GetDistortionStrength(),
-	    object->GetDistortionFalloff(),
-	});
+	editorMaterials_.push_back(EditorObject3d::CaptureMaterial(object));
 }
 
 void Hierarchy::UnregisterObject3d(Object3d* object) {
@@ -344,33 +215,14 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive) {
 	if (emptyIt != primitives_.end()) {
 		const size_t index = static_cast<size_t>(std::distance(primitives_.begin(), emptyIt));
 		primitives_[index] = primitive;
-		primitive->SetTransform(primitiveEditorTransforms_[index]);
-		const InspectorMaterial& material = primitiveEditorMaterials_[index];
-		primitive->SetColor(material.color);
-		primitive->SetEnableLighting(material.enableLighting);
-		primitive->SetShininess(material.shininess);
-		primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
-		primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
-		primitive->SetSepiaEnabled(material.sepiaEnabled);
-		primitive->SetDistortionStrength(material.distortionStrength);
-		primitive->SetDistortionFalloff(material.distortionFalloff);
-		primitive->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+		EditorPrimitive::ApplyEditorValues(primitive, primitiveEditorTransforms_[index], primitiveEditorMaterials_[index]);
 		return;
 	}
 	const size_t index = primitives_.size();
 	primitives_.push_back(primitive);
 	primitiveNames_.push_back("Primitive " + std::to_string(index));
 	primitiveEditorTransforms_.push_back(primitive->GetTransform());
-	primitiveEditorMaterials_.push_back({
-	    primitive->GetColor(),
-	    primitive->IsLightingEnabled(),
-	    primitive->GetShininess(),
-	    primitive->GetEnvironmentCoefficient(),
-	    primitive->IsGrayscaleEnabled(),
-	    primitive->IsSepiaEnabled(),
-	    primitive->GetDistortionStrength(),
-	    primitive->GetDistortionFalloff(),
-	});
+	primitiveEditorMaterials_.push_back(EditorPrimitive::CaptureMaterial(primitive));
 }
 
 void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
@@ -428,22 +280,7 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 	nlohmann::json root;
 	root["objects"] = nlohmann::json::array();
 	root["primitives"] = nlohmann::json::array();
-	root["lights"] = {
-	    {"overrideSceneLights", editorLightState_.overrideSceneLights},
-	    {"directional",
-	     {
-	         {"color",
-	          {editorLightState_.directionalLight.color.x, editorLightState_.directionalLight.color.y, editorLightState_.directionalLight.color.z, editorLightState_.directionalLight.color.w}},
-	         {"direction", {editorLightState_.directionalLight.direction.x, editorLightState_.directionalLight.direction.y, editorLightState_.directionalLight.direction.z}},
-	         {"intensity", editorLightState_.directionalLight.intensity},
-	     }	                                                       },
-	    {"point",               nlohmann::json::array()              },
-	    {"spot",                nlohmann::json::array()              },
-	    {"area",                nlohmann::json::array()              },
-	};
-	root["audio"] = {
-	    {"sounds", nlohmann::json::array()}
-    };
+	editorLight_.SaveToJson(root["lights"]);
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		const Object3d* object = objects_[i];
 		if (!object) {
@@ -508,61 +345,8 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 		};
 		root["primitives"].push_back(primitiveJson);
 	}
-	for (const PointLight& point : editorLightState_.pointLights) {
-		root["lights"]["point"].push_back({
-		    {"color",     {point.color.x, point.color.y, point.color.z, point.color.w}},
-		    {"position",  {point.position.x, point.position.y, point.position.z}      },
-		    {"intensity", point.intensity		                                     },
-		    {"radius",    point.radius		                                        },
-		    {"decay",     point.decay		                                         },
-		});
-	}
 
-	for (const SpotLight& spot : editorLightState_.spotLights) {
-		root["lights"]["spot"].push_back({
-		    {"color",           {spot.color.x, spot.color.y, spot.color.z, spot.color.w}},
-		    {"position",        {spot.position.x, spot.position.y, spot.position.z}     },
-		    {"direction",       {spot.direction.x, spot.direction.y, spot.direction.z}  },
-		    {"intensity",       spot.intensity		                                  },
-		    {"distance",        spot.distance		                                   },
-		    {"decay",           spot.decay		                                      },
-		    {"cosAngle",        spot.cosAngle		                                   },
-		    {"cosFalloffStart", spot.cosFalloffStart                                    },
-		});
-	}
-
-	for (const AreaLight& area : editorLightState_.areaLights) {
-		root["lights"]["area"].push_back({
-		    {"color",     {area.color.x, area.color.y, area.color.z, area.color.w}},
-		    {"position",  {area.position.x, area.position.y, area.position.z}     },
-		    {"normal",    {area.normal.x, area.normal.y, area.normal.z}           },
-		    {"intensity", area.intensity		                                  },
-		    {"width",     area.width		                                      },
-		    {"height",    area.height		                                     },
-		    {"radius",    area.radius		                                     },
-		    {"decay",     area.decay		                                      },
-		});
-	}
-	Audio* audio = Audio::GetInstance();
-	if (audio) {
-		for (const auto& entry : audio->GetEditorSoundEntries()) {
-			if (!entry.soundData || entry.name.empty()) {
-				continue;
-			}
-			const auto loopIt = savedAudioLoopEnabled_.find(entry.name);
-			const bool loopEnabled = loopIt != savedAudioLoopEnabled_.end() ? loopIt->second : false;
-			nlohmann::json soundJson = {
-			    {"name",        entry.name             },
-                {"volume",      entry.soundData->volume},
-                {"loopEnabled", loopEnabled            },
-                {"effects",     nlohmann::json::array()}
-            };
-			for (const auto& effect : audio->GetSoundEffects(entry.soundData)) {
-				soundJson["effects"].push_back(SerializeAudioEffect(effect));
-			}
-			root["audio"]["sounds"].push_back(std::move(soundJson));
-		}
-	}
+	editorAudio_.SaveToJson(root["audio"]);
 	JsonManager* jsonManager = JsonManager::GetInstance();
 	jsonManager->SetData(root);
 	return jsonManager->SaveJson(filePath);
@@ -645,15 +429,7 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 				}
 			}
 			editorMaterials_[index] = material;
-			objects_[index]->SetColor(material.color);
-			objects_[index]->SetEnableLighting(material.enableLighting);
-			objects_[index]->SetShininess(material.shininess);
-			objects_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
-			objects_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
-			objects_[index]->SetSepiaEnabled(material.sepiaEnabled);
-			objects_[index]->SetDistortionStrength(material.distortionStrength);
-			objects_[index]->SetDistortionFalloff(material.distortionFalloff);
-			objects_[index]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+			EditorObject3d::ApplyEditorValues(objects_[index], editorTransforms_[index], material);
 		}
 	}
 
@@ -723,246 +499,17 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 				}
 			}
 			primitiveEditorMaterials_[index] = material;
-			primitives_[index]->SetColor(material.color);
-			primitives_[index]->SetEnableLighting(material.enableLighting);
-			primitives_[index]->SetShininess(material.shininess);
-			primitives_[index]->SetEnvironmentCoefficient(material.environmentCoefficient);
-			primitives_[index]->SetGrayscaleEnabled(material.grayscaleEnabled);
-			primitives_[index]->SetSepiaEnabled(material.sepiaEnabled);
-			primitives_[index]->SetDistortionStrength(material.distortionStrength);
-			primitives_[index]->SetDistortionFalloff(material.distortionFalloff);
-			primitives_[index]->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+			EditorPrimitive::ApplyEditorValues(primitives_[index], primitiveEditorTransforms_[index], material);
 		}
 	}
 
 	if (root.contains("lights") && root["lights"].is_object()) {
-		const auto& lightsJson = root["lights"];
-
-		if (lightsJson.contains("overrideSceneLights") && lightsJson["overrideSceneLights"].is_boolean()) {
-			editorLightState_.overrideSceneLights = lightsJson["overrideSceneLights"].get<bool>();
-		}
-
-		if (lightsJson.contains("directional") && lightsJson["directional"].is_object()) {
-			const auto& directionalJson = lightsJson["directional"];
-			if (directionalJson.contains("color") && directionalJson["color"].is_array() && directionalJson["color"].size() == 4) {
-				editorLightState_.directionalLight.color = {
-				    directionalJson["color"][0].get<float>(), directionalJson["color"][1].get<float>(), directionalJson["color"][2].get<float>(), directionalJson["color"][3].get<float>()};
-			}
-			if (directionalJson.contains("direction") && directionalJson["direction"].is_array() && directionalJson["direction"].size() == 3) {
-				editorLightState_.directionalLight.direction = {
-				    directionalJson["direction"][0].get<float>(), directionalJson["direction"][1].get<float>(), directionalJson["direction"][2].get<float>()};
-			}
-			if (directionalJson.contains("intensity") && directionalJson["intensity"].is_number()) {
-				editorLightState_.directionalLight.intensity = directionalJson["intensity"].get<float>();
-			}
-		}
-
-		if (lightsJson.contains("point") && lightsJson["point"].is_array()) {
-			editorLightState_.pointLights.clear();
-			for (const auto& pointJson : lightsJson["point"]) {
-				if (!pointJson.is_object()) {
-					continue;
-				}
-				PointLight point{};
-				if (pointJson.contains("color") && pointJson["color"].is_array() && pointJson["color"].size() == 4) {
-					point.color = {pointJson["color"][0].get<float>(), pointJson["color"][1].get<float>(), pointJson["color"][2].get<float>(), pointJson["color"][3].get<float>()};
-				}
-				if (pointJson.contains("position") && pointJson["position"].is_array() && pointJson["position"].size() == 3) {
-					point.position = {pointJson["position"][0].get<float>(), pointJson["position"][1].get<float>(), pointJson["position"][2].get<float>()};
-				}
-				if (pointJson.contains("intensity") && pointJson["intensity"].is_number()) {
-					point.intensity = pointJson["intensity"].get<float>();
-				}
-				if (pointJson.contains("radius") && pointJson["radius"].is_number()) {
-					point.radius = pointJson["radius"].get<float>();
-				}
-				if (pointJson.contains("decay") && pointJson["decay"].is_number()) {
-					point.decay = pointJson["decay"].get<float>();
-				}
-				editorLightState_.pointLights.push_back(point);
-				if (editorLightState_.pointLights.size() >= kMaxPointLights) {
-					break;
-				}
-			}
-		}
-
-		if (lightsJson.contains("spot") && lightsJson["spot"].is_array()) {
-			editorLightState_.spotLights.clear();
-			for (const auto& spotJson : lightsJson["spot"]) {
-				if (!spotJson.is_object()) {
-					continue;
-				}
-				SpotLight spot{};
-				if (spotJson.contains("color") && spotJson["color"].is_array() && spotJson["color"].size() == 4) {
-					spot.color = {spotJson["color"][0].get<float>(), spotJson["color"][1].get<float>(), spotJson["color"][2].get<float>(), spotJson["color"][3].get<float>()};
-				}
-				if (spotJson.contains("position") && spotJson["position"].is_array() && spotJson["position"].size() == 3) {
-					spot.position = {spotJson["position"][0].get<float>(), spotJson["position"][1].get<float>(), spotJson["position"][2].get<float>()};
-				}
-				if (spotJson.contains("direction") && spotJson["direction"].is_array() && spotJson["direction"].size() == 3) {
-					spot.direction = {spotJson["direction"][0].get<float>(), spotJson["direction"][1].get<float>(), spotJson["direction"][2].get<float>()};
-				}
-				if (spotJson.contains("intensity") && spotJson["intensity"].is_number()) {
-					spot.intensity = spotJson["intensity"].get<float>();
-				}
-				if (spotJson.contains("distance") && spotJson["distance"].is_number()) {
-					spot.distance = spotJson["distance"].get<float>();
-				}
-				if (spotJson.contains("decay") && spotJson["decay"].is_number()) {
-					spot.decay = spotJson["decay"].get<float>();
-				}
-				if (spotJson.contains("cosAngle") && spotJson["cosAngle"].is_number()) {
-					spot.cosAngle = spotJson["cosAngle"].get<float>();
-				}
-				if (spotJson.contains("cosFalloffStart") && spotJson["cosFalloffStart"].is_number()) {
-					spot.cosFalloffStart = spotJson["cosFalloffStart"].get<float>();
-				}
-				editorLightState_.spotLights.push_back(spot);
-				if (editorLightState_.spotLights.size() >= kMaxSpotLights) {
-					break;
-				}
-			}
-		}
-
-		if (lightsJson.contains("area") && lightsJson["area"].is_array()) {
-			editorLightState_.areaLights.clear();
-			for (const auto& areaJson : lightsJson["area"]) {
-				if (!areaJson.is_object()) {
-					continue;
-				}
-				AreaLight area{};
-				if (areaJson.contains("color") && areaJson["color"].is_array() && areaJson["color"].size() == 4) {
-					area.color = {areaJson["color"][0].get<float>(), areaJson["color"][1].get<float>(), areaJson["color"][2].get<float>(), areaJson["color"][3].get<float>()};
-				}
-				if (areaJson.contains("position") && areaJson["position"].is_array() && areaJson["position"].size() == 3) {
-					area.position = {areaJson["position"][0].get<float>(), areaJson["position"][1].get<float>(), areaJson["position"][2].get<float>()};
-				}
-				if (areaJson.contains("normal") && areaJson["normal"].is_array() && areaJson["normal"].size() == 3) {
-					area.normal = {areaJson["normal"][0].get<float>(), areaJson["normal"][1].get<float>(), areaJson["normal"][2].get<float>()};
-				}
-				if (areaJson.contains("intensity") && areaJson["intensity"].is_number()) {
-					area.intensity = areaJson["intensity"].get<float>();
-				}
-				if (areaJson.contains("width") && areaJson["width"].is_number()) {
-					area.width = areaJson["width"].get<float>();
-				}
-				if (areaJson.contains("height") && areaJson["height"].is_number()) {
-					area.height = areaJson["height"].get<float>();
-				}
-				if (areaJson.contains("radius") && areaJson["radius"].is_number()) {
-					area.radius = areaJson["radius"].get<float>();
-				}
-				if (areaJson.contains("decay") && areaJson["decay"].is_number()) {
-					area.decay = areaJson["decay"].get<float>();
-				}
-				editorLightState_.areaLights.push_back(area);
-				if (editorLightState_.areaLights.size() >= kMaxAreaLights) {
-					break;
-				}
-			}
-		}
-
-		Object3dCommon::GetInstance()->SetEditorLightOverride(editorLightState_.overrideSceneLights);
-		Object3dCommon::GetInstance()->SetEditorLights(
-		    editorLightState_.directionalLight, editorLightState_.pointLights.empty() ? nullptr : editorLightState_.pointLights.data(), static_cast<uint32_t>(editorLightState_.pointLights.size()),
-		    editorLightState_.spotLights.empty() ? nullptr : editorLightState_.spotLights.data(), static_cast<uint32_t>(editorLightState_.spotLights.size()),
-		    editorLightState_.areaLights.empty() ? nullptr : editorLightState_.areaLights.data(), static_cast<uint32_t>(editorLightState_.areaLights.size()));
+		editorLight_.LoadFromJson(root["lights"]);
 	}
-	if (root.contains("audio") && root["audio"].is_object()) {
-		const auto& audioJson = root["audio"];
-		if (audioJson.contains("sounds") && audioJson["sounds"].is_array()) {
-			for (const auto& soundJson : audioJson["sounds"]) {
-				if (!soundJson.is_object()) {
-					continue;
-				}
-				if (!soundJson.contains("name") || !soundJson["name"].is_string()) {
-					continue;
-				}
-				if (!soundJson.contains("volume") || !soundJson["volume"].is_number()) {
-					continue;
-				}
-				const std::string name = soundJson["name"].get<std::string>();
-				const float volume = std::clamp(soundJson["volume"].get<float>(), 0.0f, 1.0f);
-				savedAudioVolumes_[name] = volume;
-				if (soundJson.contains("loopEnabled") && soundJson["loopEnabled"].is_boolean()) {
-					savedAudioLoopEnabled_[name] = soundJson["loopEnabled"].get<bool>();
-				}
-			}
-		}
-	}
-	Audio* audio = Audio::GetInstance();
-	if (audio && root.contains("audio") && root["audio"].is_object()) {
-		const auto& audioJson = root["audio"];
-		if (audioJson.contains("effects") && audioJson["effects"].is_array()) {
-			std::vector<Audio::MixerEffectSettings> effects;
-			for (const auto& effectJson : audioJson["effects"]) {
-				if (!effectJson.is_object()) {
-					continue;
-				}
-				Audio::MixerEffectSettings effect{};
-				if (effectJson.contains("type") && effectJson["type"].is_number_integer()) {
-					const int type = effectJson["type"].get<int>();
-					if (type >= 0 && type <= static_cast<int>(Audio::MixerEffectType::Limiter)) {
-						effect.type = static_cast<Audio::MixerEffectType>(type);
-					}
-				}
-				if (effectJson.contains("enabled") && effectJson["enabled"].is_boolean()) {
-					effect.enabled = effectJson["enabled"].get<bool>();
-				}
-				if (effectJson.contains("reverb") && effectJson["reverb"].is_object()) {
-					const auto& v = effectJson["reverb"];
-					if (v.contains("WetDryMix") && v["WetDryMix"].is_number()) {
-						effect.reverb.WetDryMix = v["WetDryMix"].get<float>();
-					}
-				}
-				if (effectJson.contains("echo") && effectJson["echo"].is_object()) {
-					const auto& v = effectJson["echo"];
-					if (v.contains("WetDryMix") && v["WetDryMix"].is_number())
-						effect.echo.WetDryMix = v["WetDryMix"].get<float>();
-					if (v.contains("Feedback") && v["Feedback"].is_number())
-						effect.echo.Feedback = v["Feedback"].get<float>();
-					if (v.contains("Delay") && v["Delay"].is_number())
-						effect.echo.Delay = v["Delay"].get<float>();
-				}
-				if (effectJson.contains("equalizer") && effectJson["equalizer"].is_object()) {
-					const auto& v = effectJson["equalizer"];
-					if (v.contains("FrequencyCenter0") && v["FrequencyCenter0"].is_number())
-						effect.equalizer.FrequencyCenter0 = v["FrequencyCenter0"].get<float>();
-					if (v.contains("Gain0") && v["Gain0"].is_number())
-						effect.equalizer.Gain0 = v["Gain0"].get<float>();
-					if (v.contains("Bandwidth0") && v["Bandwidth0"].is_number())
-						effect.equalizer.Bandwidth0 = v["Bandwidth0"].get<float>();
-					if (v.contains("FrequencyCenter1") && v["FrequencyCenter1"].is_number())
-						effect.equalizer.FrequencyCenter1 = v["FrequencyCenter1"].get<float>();
-					if (v.contains("Gain1") && v["Gain1"].is_number())
-						effect.equalizer.Gain1 = v["Gain1"].get<float>();
-					if (v.contains("Bandwidth1") && v["Bandwidth1"].is_number())
-						effect.equalizer.Bandwidth1 = v["Bandwidth1"].get<float>();
-					if (v.contains("FrequencyCenter2") && v["FrequencyCenter2"].is_number())
-						effect.equalizer.FrequencyCenter2 = v["FrequencyCenter2"].get<float>();
-					if (v.contains("Gain2") && v["Gain2"].is_number())
-						effect.equalizer.Gain2 = v["Gain2"].get<float>();
-					if (v.contains("Bandwidth2") && v["Bandwidth2"].is_number())
-						effect.equalizer.Bandwidth2 = v["Bandwidth2"].get<float>();
-					if (v.contains("FrequencyCenter3") && v["FrequencyCenter3"].is_number())
-						effect.equalizer.FrequencyCenter3 = v["FrequencyCenter3"].get<float>();
-					if (v.contains("Gain3") && v["Gain3"].is_number())
-						effect.equalizer.Gain3 = v["Gain3"].get<float>();
-					if (v.contains("Bandwidth3") && v["Bandwidth3"].is_number())
-						effect.equalizer.Bandwidth3 = v["Bandwidth3"].get<float>();
-				}
-				if (effectJson.contains("limiter") && effectJson["limiter"].is_object()) {
-					const auto& v = effectJson["limiter"];
-					if (v.contains("Release") && v["Release"].is_number())
-						effect.limiter.Release = v["Release"].get<uint32_t>();
-					if (v.contains("Loudness") && v["Loudness"].is_number())
-						effect.limiter.Loudness = v["Loudness"].get<uint32_t>();
-				}
-				effects.push_back(effect);
-			}
-			audio->SetMixerEffects(effects);
-		}
-	}
+	editorAudio_.LoadFromJson(root.value("audio", nlohmann::json::object()));
+	loadedSnapshot_ = CreateCurrentSnapshot();
+	hasLoadedSnapshot_ = true;
+	loadedSnapshotFilePath_ = filePath;
 	return true;
 }
 void Hierarchy::DrawSceneSelector() {
@@ -1023,21 +570,9 @@ void Hierarchy::DrawGridEditor() {
 void Hierarchy::SetPlayMode(bool isPlaying) {
 	const bool wasPlaying = isPlaying_;
 	isPlaying_ = isPlaying;
-	Audio* audio = Audio::GetInstance();
+	editorAudio_.OnPlayModeChanged(isPlaying_, wasPlaying);
 	if (isPlaying_) {
-		if (audio) {
-			audio->StopAllPreviewSounds();
-			audio->StopAllSceneSounds();
-		}
 		editorCamera_.DeactivatePreview();
-		if (!wasPlaying) {
-			playModeInitializedAudioNames_.clear();
-		}
-	} else if (wasPlaying) {
-		if (audio) {
-			audio->StopAllSceneSounds();
-		}
-		playModeInitializedAudioNames_.clear();
 	}
 }
 
@@ -1100,260 +635,11 @@ void Hierarchy::DrawCameraBillboards() { editorCamera_.DrawCameraBillboards(isPl
 void Hierarchy::DrawCameraEditor() { editorCamera_.DrawCameraEditor(); }
 void Hierarchy::DrawLightEditor() {
 #ifdef USE_IMGUI
-	bool overrideChanged = ImGui::Checkbox("Use Editor Lights", &editorLightState_.overrideSceneLights);
-	if (overrideChanged) {
-		Object3dCommon::GetInstance()->SetEditorLightOverride(editorLightState_.overrideSceneLights);
+	if (editorLight_.DrawEditor(isPlaying_)) {
 		hasUnsavedChanges_ = true;
 	}
-
-	bool lightChanged = false;
-	if (ImGui::TreeNode("Directional Light")) {
-		if (!isPlaying_) {
-			lightChanged |= ImGui::ColorEdit4("Dir Color", &editorLightState_.directionalLight.color.x);
-			lightChanged |= ImGui::DragFloat3("Dir Direction", &editorLightState_.directionalLight.direction.x, 0.01f, -1.0f, 1.0f);
-			lightChanged |= ImGui::DragFloat("Dir Intensity", &editorLightState_.directionalLight.intensity, 0.01f, 0.0f, 10.0f);
-		}
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("Point Lights")) {
-		int pointCount = static_cast<int>(editorLightState_.pointLights.size());
-		if (!isPlaying_ && ImGui::SliderInt("Point Count", &pointCount, 0, static_cast<int>(kMaxPointLights))) {
-			editorLightState_.pointLights.resize(static_cast<size_t>(pointCount));
-			lightChanged = true;
-		}
-		for (size_t i = 0; i < editorLightState_.pointLights.size(); ++i) {
-			PointLight& point = editorLightState_.pointLights[i];
-			const std::string label = "Point " + std::to_string(i);
-			if (ImGui::TreeNode((label + "##point").c_str())) {
-				if (!isPlaying_) {
-					lightChanged |= ImGui::ColorEdit4(("Color##point_" + std::to_string(i)).c_str(), &point.color.x);
-					lightChanged |= ImGui::DragFloat3(("Position##point_" + std::to_string(i)).c_str(), &point.position.x, 0.05f);
-					lightChanged |= ImGui::DragFloat(("Intensity##point_" + std::to_string(i)).c_str(), &point.intensity, 0.01f, 0.0f, 10.0f);
-					lightChanged |= ImGui::DragFloat(("Radius##point_" + std::to_string(i)).c_str(), &point.radius, 0.05f, 0.0f, 500.0f);
-					lightChanged |= ImGui::DragFloat(("Decay##point_" + std::to_string(i)).c_str(), &point.decay, 0.01f, 0.0f, 10.0f);
-				}
-				ImGui::TreePop();
-			}
-		}
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("Spot Lights")) {
-		int spotCount = static_cast<int>(editorLightState_.spotLights.size());
-		if (!isPlaying_ && ImGui::SliderInt("Spot Count", &spotCount, 0, static_cast<int>(kMaxSpotLights))) {
-			editorLightState_.spotLights.resize(static_cast<size_t>(spotCount));
-			lightChanged = true;
-		}
-		for (size_t i = 0; i < editorLightState_.spotLights.size(); ++i) {
-			SpotLight& spot = editorLightState_.spotLights[i];
-			if (ImGui::TreeNode(("Spot " + std::to_string(i) + "##spot").c_str())) {
-				if (!isPlaying_) {
-					lightChanged |= ImGui::ColorEdit4(("Color##spot_" + std::to_string(i)).c_str(), &spot.color.x);
-					lightChanged |= ImGui::DragFloat3(("Position##spot_" + std::to_string(i)).c_str(), &spot.position.x, 0.05f);
-					lightChanged |= ImGui::DragFloat3(("Direction##spot_" + std::to_string(i)).c_str(), &spot.direction.x, 0.01f, -1.0f, 1.0f);
-					lightChanged |= ImGui::DragFloat(("Intensity##spot_" + std::to_string(i)).c_str(), &spot.intensity, 0.01f, 0.0f, 10.0f);
-					lightChanged |= ImGui::DragFloat(("Distance##spot_" + std::to_string(i)).c_str(), &spot.distance, 0.05f, 0.0f, 500.0f);
-					lightChanged |= ImGui::DragFloat(("Decay##spot_" + std::to_string(i)).c_str(), &spot.decay, 0.01f, 0.0f, 10.0f);
-					lightChanged |= ImGui::DragFloat(("Cos Angle##spot_" + std::to_string(i)).c_str(), &spot.cosAngle, 0.001f, -1.0f, 1.0f);
-					lightChanged |= ImGui::DragFloat(("Cos Falloff##spot_" + std::to_string(i)).c_str(), &spot.cosFalloffStart, 0.001f, -1.0f, 1.0f);
-				}
-				ImGui::TreePop();
-			}
-		}
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("Area Lights")) {
-		int areaCount = static_cast<int>(editorLightState_.areaLights.size());
-		if (!isPlaying_ && ImGui::SliderInt("Area Count", &areaCount, 0, static_cast<int>(kMaxAreaLights))) {
-			editorLightState_.areaLights.resize(static_cast<size_t>(areaCount));
-			lightChanged = true;
-		}
-		for (size_t i = 0; i < editorLightState_.areaLights.size(); ++i) {
-			AreaLight& area = editorLightState_.areaLights[i];
-			if (ImGui::TreeNode(("Area " + std::to_string(i) + "##area").c_str())) {
-				if (!isPlaying_) {
-					lightChanged |= ImGui::ColorEdit4(("Color##area_" + std::to_string(i)).c_str(), &area.color.x);
-					lightChanged |= ImGui::DragFloat3(("Position##area_" + std::to_string(i)).c_str(), &area.position.x, 0.05f);
-					lightChanged |= ImGui::DragFloat3(("Normal##area_" + std::to_string(i)).c_str(), &area.normal.x, 0.01f, -1.0f, 1.0f);
-					lightChanged |= ImGui::DragFloat(("Intensity##area_" + std::to_string(i)).c_str(), &area.intensity, 0.01f, 0.0f, 10.0f);
-					lightChanged |= ImGui::DragFloat(("Width##area_" + std::to_string(i)).c_str(), &area.width, 0.05f, 0.0f, 500.0f);
-					lightChanged |= ImGui::DragFloat(("Height##area_" + std::to_string(i)).c_str(), &area.height, 0.05f, 0.0f, 500.0f);
-					lightChanged |= ImGui::DragFloat(("Radius##area_" + std::to_string(i)).c_str(), &area.radius, 0.05f, 0.0f, 500.0f);
-					lightChanged |= ImGui::DragFloat(("Decay##area_" + std::to_string(i)).c_str(), &area.decay, 0.01f, 0.0f, 10.0f);
-				}
-				ImGui::TreePop();
-			}
-		}
-		ImGui::TreePop();
-	}
-
-	if (lightChanged || editorLightState_.overrideSceneLights) {
-		hasUnsavedChanges_ = hasUnsavedChanges_ || lightChanged;
-		Object3dCommon::GetInstance()->SetEditorLights(
-		    editorLightState_.directionalLight, editorLightState_.pointLights.empty() ? nullptr : editorLightState_.pointLights.data(), static_cast<uint32_t>(editorLightState_.pointLights.size()),
-		    editorLightState_.spotLights.empty() ? nullptr : editorLightState_.spotLights.data(), static_cast<uint32_t>(editorLightState_.spotLights.size()),
-		    editorLightState_.areaLights.empty() ? nullptr : editorLightState_.areaLights.data(), static_cast<uint32_t>(editorLightState_.areaLights.size()));
-	}
 #endif
 }
-void Hierarchy::DrawAudioEditor() {
-#ifdef USE_IMGUI
-	Audio* audio = Audio::GetInstance();
-	if (!audio) {
-		ImGui::TextUnformatted("Audio system unavailable");
-		return;
-	}
-
-	auto entries = audio->GetEditorSoundEntries();
-	if (entries.empty()) {
-		ImGui::TextUnformatted("No tracked sounds.");
-		return;
-	}
-	for (size_t i = 0; i < entries.size(); ++i) {
-		auto& entry = entries[i];
-		if (!entry.soundData) {
-			continue;
-		}
-
-		const bool shouldApplySavedState = !isPlaying_ || !playModeInitializedAudioNames_.contains(entry.name);
-		const auto savedIt = savedAudioVolumes_.find(entry.name);
-		if (shouldApplySavedState && savedIt != savedAudioVolumes_.end()) {
-			audio->SetSoundVolume(entry.soundData, savedIt->second);
-		}
-		bool loopEnabled = false;
-		const auto loopIt = savedAudioLoopEnabled_.find(entry.name);
-		if (loopIt != savedAudioLoopEnabled_.end()) {
-			loopEnabled = loopIt->second;
-		}
-		const auto effectsIt = savedAudioEffects_.find(entry.name);
-		if (shouldApplySavedState && effectsIt != savedAudioEffects_.end()) {
-			audio->SetSoundEffects(entry.soundData, effectsIt->second);
-			if (!isPlaying_) {
-				savedAudioEffects_.erase(effectsIt);
-			}
-		}
-		if (isPlaying_ && shouldApplySavedState) {
-			playModeInitializedAudioNames_.insert(entry.name);
-		}
-		if (ImGui::TreeNode((entry.name + "##audio_" + std::to_string(i)).c_str())) {
-			float volume = entry.soundData->volume;
-			if (ImGui::SliderFloat(("Volume##audio_volume_" + std::to_string(i)).c_str(), &volume, 0.0f, 1.0f)) {
-				audio->SetSoundVolume(entry.soundData, volume);
-				savedAudioVolumes_[entry.name] = volume;
-				hasUnsavedChanges_ = true;
-			}
-			if (ImGui::Checkbox(("Loop Playback##audio_loop_enabled_" + std::to_string(i)).c_str(), &loopEnabled)) {
-				savedAudioLoopEnabled_[entry.name] = loopEnabled;
-				hasUnsavedChanges_ = true;
-			}
-
-			auto effects = audio->GetSoundEffects(entry.soundData);
-			if (ImGui::TreeNode(("Effects##audio_effects_" + std::to_string(i)).c_str())) {
-				auto findSoundEffect = [&](Audio::MixerEffectType type) {
-					for (const auto& effect : effects) {
-						if (effect.type == type) {
-							return effect;
-						}
-					}
-					Audio::MixerEffectSettings effect{};
-					effect.type = type;
-					effect.enabled = false;
-					return effect;
-				};
-
-				auto reverb = findSoundEffect(Audio::MixerEffectType::Reverb);
-				auto echo = findSoundEffect(Audio::MixerEffectType::Echo);
-				auto equalizer = findSoundEffect(Audio::MixerEffectType::Equalizer);
-				auto limiter = findSoundEffect(Audio::MixerEffectType::Limiter);
-
-				bool changed = false;
-				if (ImGui::Checkbox(("Use Reverb##audio_effect_reverb_" + std::to_string(i)).c_str(), &reverb.enabled)) {
-					audio->SetReverb(entry.soundData, reverb.enabled);
-					changed = true;
-				}
-				if (ImGui::SliderFloat(("Reverb WetDryMix##audio_reverb_wd_" + std::to_string(i)).c_str(), &reverb.reverb.WetDryMix, 0.0f, 100.0f)) {
-					reverb.enabled = true;
-					changed = true;
-				}
-				if (ImGui::Checkbox(("Use Echo##audio_effect_echo_" + std::to_string(i)).c_str(), &echo.enabled)) {
-					audio->SetEcho(entry.soundData, echo.enabled);
-					changed = true;
-				}
-				if (ImGui::SliderFloat(("Echo WetDryMix##audio_echo_wd_" + std::to_string(i)).c_str(), &echo.echo.WetDryMix, 0.0f, 100.0f)) {
-					echo.enabled = true;
-					changed = true;
-				}
-				if (ImGui::SliderFloat(("Echo Feedback##audio_echo_fb_" + std::to_string(i)).c_str(), &echo.echo.Feedback, 0.0f, 100.0f)) {
-					echo.enabled = true;
-					changed = true;
-				}
-				if (ImGui::SliderFloat(("Echo Delay##audio_echo_delay_" + std::to_string(i)).c_str(), &echo.echo.Delay, FXECHO_MIN_DELAY, FXECHO_MAX_DELAY)) {
-					echo.enabled = true;
-					changed = true;
-				}
-				if (ImGui::Checkbox(("Use Equalizer##audio_effect_eq_" + std::to_string(i)).c_str(), &equalizer.enabled)) {
-					audio->SetEqualizer(entry.soundData, equalizer.enabled);
-					changed = true;
-				}
-				if (ImGui::SliderFloat(("EQ Gain0##audio_eq_g0_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain0, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN)) {
-					equalizer.enabled = true;
-					changed = true;
-				}
-				if (ImGui::SliderFloat(("EQ Gain1##audio_eq_g1_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain1, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN)) {
-					equalizer.enabled = true;
-					changed = true;
-				}
-				if (ImGui::SliderFloat(("EQ Gain2##audio_eq_g2_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain2, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN)) {
-					equalizer.enabled = true;
-					changed = true;
-				}
-				if (ImGui::SliderFloat(("EQ Gain3##audio_eq_g3_" + std::to_string(i)).c_str(), &equalizer.equalizer.Gain3, FXEQ_MIN_GAIN, FXEQ_MAX_GAIN)) {
-					equalizer.enabled = true;
-					changed = true;
-				}
-				if (ImGui::Checkbox(("Use Limiter##audio_effect_limiter_" + std::to_string(i)).c_str(), &limiter.enabled)) {
-					audio->SetLimiter(entry.soundData, limiter.enabled);
-					changed = true;
-				}
-				int release = static_cast<int>(limiter.limiter.Release);
-				int loudness = static_cast<int>(limiter.limiter.Loudness);
-				if (ImGui::SliderInt(("Limiter Release##audio_limiter_release_" + std::to_string(i)).c_str(), &release, FXMASTERINGLIMITER_MIN_RELEASE, FXMASTERINGLIMITER_MAX_RELEASE)) {
-					limiter.limiter.Release = static_cast<UINT32>(release);
-					limiter.enabled = true;
-					changed = true;
-				}
-				if (ImGui::SliderInt(("Limiter Loudness##audio_limiter_loudness_" + std::to_string(i)).c_str(), &loudness, FXMASTERINGLIMITER_MIN_LOUDNESS, FXMASTERINGLIMITER_MAX_LOUDNESS)) {
-					limiter.limiter.Loudness = static_cast<UINT32>(loudness);
-					limiter.enabled = true;
-					changed = true;
-				}
-
-				if (changed) {
-					audio->SetSoundEffects(entry.soundData, {reverb, echo, equalizer, limiter});
-					hasUnsavedChanges_ = true;
-				}
-				ImGui::TreePop();
-			}
-			if (entry.isPlaying) {
-				ImGui::Text("Playing (%s)", entry.isLoop ? "Loop" : "One-shot");
-			} else {
-				ImGui::TextUnformatted("Stopped");
-			}
-			if (ImGui::Button(("Play from Start##audio_play_" + std::to_string(i)).c_str())) {
-				audio->SoundPlayPreviewFromStart(*entry.soundData, loopEnabled);
-			}
-			ImGui::SameLine();
-			if (ImGui::Button(("Stop##audio_stop_" + std::to_string(i)).c_str())) {
-				audio->StopSound(*entry.soundData);
-			}
-			ImGui::TreePop();
-		}
-	}
-#endif
-}
-
 
 bool Hierarchy::IsObjectSelected() const {
 	if (selectedIsPrimitive_) {
@@ -1408,18 +694,7 @@ void Hierarchy::DrawObjectEditors() {
 			if (!object) {
 				continue;
 			}
-			const Transform& transform = editorTransforms_[i];
-			const InspectorMaterial& material = editorMaterials_[i];
-			object->SetTransform(transform);
-			object->SetColor(material.color);
-			object->SetEnableLighting(material.enableLighting);
-			object->SetShininess(material.shininess);
-			object->SetEnvironmentCoefficient(material.environmentCoefficient);
-			object->SetGrayscaleEnabled(material.grayscaleEnabled);
-			object->SetSepiaEnabled(material.sepiaEnabled);
-			object->SetDistortionStrength(material.distortionStrength);
-			object->SetDistortionFalloff(material.distortionFalloff);
-			object->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+			EditorObject3d::ApplyEditorValues(object, editorTransforms_[i], editorMaterials_[i]);
 		}
 
 		for (size_t i = 0; i < primitives_.size(); ++i) {
@@ -1427,22 +702,11 @@ void Hierarchy::DrawObjectEditors() {
 			if (!primitive) {
 				continue;
 			}
-			const Transform& transform = primitiveEditorTransforms_[i];
-			const InspectorMaterial& material = primitiveEditorMaterials_[i];
-			primitive->SetTransform(transform);
-			primitive->SetColor(material.color);
-			primitive->SetEnableLighting(material.enableLighting);
-			primitive->SetShininess(material.shininess);
-			primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
-			primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
-			primitive->SetSepiaEnabled(material.sepiaEnabled);
-			primitive->SetDistortionStrength(material.distortionStrength);
-			primitive->SetDistortionFalloff(material.distortionFalloff);
-			primitive->SetUvTransform(Function::MakeAffineMatrix(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor));
+			EditorPrimitive::ApplyEditorValues(primitive, primitiveEditorTransforms_[i], primitiveEditorMaterials_[i]);
 		}
 	}
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
-	const float kTopToolbarHeight = 44.0f;
+	const float kTopToolbarHeight = 80.0f;
 	const float kLeftPanelRatio = 0.22f;
 	const float kRightPanelRatio = 0.24f;
 	const float kPanelMinWidth = 260.0f;
@@ -1453,8 +717,25 @@ void Hierarchy::DrawObjectEditors() {
 
 	ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, kTopToolbarHeight), ImGuiCond_Always);
-	if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
+	if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
 		ToolBar::Result toolbarResult = ToolBar::Draw(isPlaying_, hasUnsavedChanges_, !undoStack_.empty(), !redoStack_.empty());
+		if (toolbarResult.saveRequested) {
+			if (!isPlaying_) {
+				const std::string saveFilePath = GetSceneScopedEditorFilePath("objectEditors.json");
+				const bool saved = SaveObjectEditorsToJson(saveFilePath);
+				if (saved) {
+					hasUnsavedChanges_ = false;
+				}
+				saveStatusMessage_ = saved ? ("Saved: " + saveFilePath) : ("Save failed: " + saveFilePath);
+			}
+		}
+		if (toolbarResult.gridRequested) {
+			showGridWindow_ = !showGridWindow_;
+		}
+		if (toolbarResult.allResetRequested) {
+			const bool reset = ResetToLoadedSnapshot();
+			saveStatusMessage_ = reset ? "AllReset: restored loaded values" : "AllReset failed: no loaded data";
+		}
 		if (toolbarResult.undoRequested) {
 			UndoEditorChange();
 			saveStatusMessage_ = "Undo";
@@ -1465,12 +746,45 @@ void Hierarchy::DrawObjectEditors() {
 		}
 		if (toolbarResult.playRequested) {
 			if (hasUnsavedChanges_) {
-				saveStatusMessage_ = "Warning: unsaved changes. Save To JSON before Play";
+				ImGui::OpenPopup("Unsaved Changes");
 			} else {
 				SceneManager::GetInstance()->RequestReinitializeCurrentScene();
 				SetPlayMode(true);
 				saveStatusMessage_ = "Playing";
 			}
+		}
+
+		if (ImGui::BeginPopupModal("Unsaved Changes", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::TextUnformatted("There are unsaved changes. Do you want to continue playing?");
+			ImGui::Separator();
+
+			if (ImGui::Button("YES", ImVec2(100.0f, 0.0f))) {
+				SceneManager::GetInstance()->RequestReinitializeCurrentScene();
+				SetPlayMode(true);
+				saveStatusMessage_ = "Playing (unsaved changes kept)";
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("NO", ImVec2(100.0f, 0.0f))) {
+				saveStatusMessage_ = "Play canceled";
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Save", ImVec2(100.0f, 0.0f))) {
+				const std::string saveFilePath = GetSceneScopedEditorFilePath("objectEditors.json");
+				const bool saved = SaveObjectEditorsToJson(saveFilePath);
+				if (saved) {
+					hasUnsavedChanges_ = false;
+					SceneManager::GetInstance()->RequestReinitializeCurrentScene();
+					SetPlayMode(true);
+					saveStatusMessage_ = "Saved and Playing: " + saveFilePath;
+					ImGui::CloseCurrentPopup();
+				} else {
+					saveStatusMessage_ = "Save failed: " + saveFilePath;
+				}
+			}
+
+			ImGui::EndPopup();
 		}
 		if (toolbarResult.stopRequested) {
 			SetPlayMode(false);
@@ -1487,26 +801,17 @@ void Hierarchy::DrawObjectEditors() {
 		ImGui::Separator();
 		ImGui::SeparatorText("Scene Switch");
 		DrawSceneSelector();
-		ImGui::SeparatorText("Grid");
-		DrawGridEditor();
 		ImGui::SeparatorText("Light");
 		DrawLightEditor();
 		ImGui::SeparatorText("Camera");
 		DrawCameraEditor();
 		ImGui::SeparatorText("Audio");
-		DrawAudioEditor();
+		editorAudio_.DrawEditor(isPlaying_, hasUnsavedChanges_);
 		ImGui::SeparatorText("Selection");
 		DrawSelectionBoxEditor();
 		ImGui::Separator();
 
-		if (!isPlaying_ && ImGui::Button("Save To JSON")) {
-			const std::string saveFilePath = GetSceneScopedEditorFilePath("objectEditors.json");
-			const bool saved = SaveObjectEditorsToJson(saveFilePath);
-			if (saved) {
-				hasUnsavedChanges_ = false;
-			}
-			saveStatusMessage_ = saved ? ("Saved: " + saveFilePath) : ("Save failed: " + saveFilePath);
-		}
+
 		if (!saveStatusMessage_.empty()) {
 			ImGui::Text("%s", saveStatusMessage_.c_str());
 		}
@@ -1542,7 +847,14 @@ void Hierarchy::DrawObjectEditors() {
 		}
 	}
 	ImGui::End();
-
+	if (showGridWindow_) {
+		ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x + leftPanelWidth + 16.0f, contentStartY + 16.0f), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(340.0f, 190.0f), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin("Grid", &showGridWindow_)) {
+			DrawGridEditor();
+		}
+		ImGui::End();
+	}
 	const float inspectorPosX = viewport->WorkPos.x + viewport->WorkSize.x - rightPanelWidth;
 	ImGui::SetNextWindowPos(ImVec2(inspectorPosX, contentStartY), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(rightPanelWidth, availableHeight), ImGuiCond_Always);
@@ -1572,15 +884,7 @@ void Hierarchy::DrawObjectEditors() {
 						primitive->SetTransform(transform);
 					}
 					if (materialChanged) {
-						primitive->SetColor(material.color);
-						primitive->SetEnableLighting(material.enableLighting);
-						primitive->SetShininess(material.shininess);
-						primitive->SetEnvironmentCoefficient(material.environmentCoefficient);
-						primitive->SetGrayscaleEnabled(material.grayscaleEnabled);
-						primitive->SetSepiaEnabled(material.sepiaEnabled);
-						primitive->SetDistortionStrength(material.distortionStrength);
-						primitive->SetDistortionFalloff(material.distortionFalloff);
-						primitive->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+						EditorPrimitive::ApplyEditorValues(primitive, transform, material);
 					}
 				}
 			} else {
@@ -1595,15 +899,7 @@ void Hierarchy::DrawObjectEditors() {
 						object->SetTransform(transform);
 					}
 					if (materialChanged) {
-						object->SetColor(material.color);
-						object->SetEnableLighting(material.enableLighting);
-						object->SetShininess(material.shininess);
-						object->SetEnvironmentCoefficient(material.environmentCoefficient);
-						object->SetGrayscaleEnabled(material.grayscaleEnabled);
-						object->SetSepiaEnabled(material.sepiaEnabled);
-						object->SetDistortionStrength(material.distortionStrength);
-						object->SetDistortionFalloff(material.distortionFalloff);
-						object->SetUvTransform(material.uvScale, material.uvRotate, material.uvTranslate, material.uvAnchor);
+						EditorObject3d::ApplyEditorValues(object, transform, material);
 					}
 				}
 			}

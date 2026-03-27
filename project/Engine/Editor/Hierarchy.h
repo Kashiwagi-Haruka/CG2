@@ -2,8 +2,6 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 #include "Transform.h"
@@ -11,13 +9,10 @@
 #include "Vector3.h"
 #include "Vector4.h"
 
-#include "Engine/Audio/Audio.h"
+#include "Engine/Editor/Audio/EditorAudio.h"
 #include "Engine/Editor/Camera/EditorCamera.h"
 #include "Inspector/Inspector.h"
-#include "Light/AreaLight.h"
-#include "Light/DirectionalLight.h"
-#include "Light/PointLight.h"
-#include "Light/SpotLight.h"
+#include "Light/EditorLight.h"
 
 class Object3d;
 class Primitive;
@@ -55,7 +50,6 @@ private:
 	void DrawGridEditor();
 	void DrawLightEditor();
 	void DrawSelectionBoxEditor();
-	void DrawAudioEditor();
 	void DrawCameraEditor();
 	void DrawCameraBillboards();
 	void SyncSelectionBoxToTarget();
@@ -64,26 +58,19 @@ private:
 	std::string GetSceneScopedEditorFilePath(const std::string& defaultFilePath) const;
 	void ResetForSceneChange();
 	void ApplyEditorSnapshot(const EditorSnapshot& snapshot);
+	EditorSnapshot CreateCurrentSnapshot() const;
+	bool ResetToLoadedSnapshot();
 	void UndoEditorChange();
 	void RedoEditorChange();
-
-	struct EditorLightState {
-		bool overrideSceneLights = false;
-		DirectionalLight directionalLight = {
-		    {1.0f, 1.0f, 1.0f, 1.0f},
-            {0.0f, -1.0f, 0.0f},
-            1.0f, 1, {0.0f, 0.0f, 0.0f}
-        };
-		std::vector<PointLight> pointLights;
-		std::vector<SpotLight> spotLights;
-		std::vector<AreaLight> areaLights;
-	};
 
 	bool SaveObjectEditorsToJson(const std::string& filePath) const;
 	bool LoadObjectEditorsFromJson(const std::string& filePath);
 
 	std::vector<EditorSnapshot> undoStack_;
 	std::vector<EditorSnapshot> redoStack_;
+	EditorSnapshot loadedSnapshot_{};
+	bool hasLoadedSnapshot_ = false;
+	std::string loadedSnapshotFilePath_;
 
 	std::vector<Object3d*> objects_;
 	std::vector<std::string> objectNames_;
@@ -112,12 +99,10 @@ private:
 	int gridHalfLineCount_ = 50;
 	float editorGridY_ = 0.0f;
 	bool editorGridDirty_ = true;
+	bool showGridWindow_ = true;
 	std::unique_ptr<Primitive> editorGridPlane_;
-	EditorLightState editorLightState_{};
-	std::unordered_map<std::string, float> savedAudioVolumes_;
-	std::unordered_map<std::string, bool> savedAudioLoopEnabled_;
-	std::unordered_map<std::string, std::vector<Audio::MixerEffectSettings>> savedAudioEffects_;
-	std::unordered_set<std::string> playModeInitializedAudioNames_;
+	EditorLight editorLight_{};
+	EditorAudio editorAudio_{};
 	EditorCamera editorCamera_{};
 
 public:

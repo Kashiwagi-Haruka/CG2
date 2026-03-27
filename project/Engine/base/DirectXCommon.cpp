@@ -652,10 +652,13 @@ void DirectXCommon::DrawSceneTextureToBackBuffer() {
 		const float kTopToolbarHeight = 44.0f;
 		const float kLeftPanelRatio = 0.22f;
 		const float kRightPanelRatio = 0.24f;
+		const float kPanelMinWidth = 260.0f;
 		const float kGameAspect = 16.0f / 9.0f;
-		const float availableWidth = viewport_.Width * (1.0f - kLeftPanelRatio - kRightPanelRatio);
+		const float leftPanelWidth = std::max(kPanelMinWidth, viewport_.Width * kLeftPanelRatio);
+		const float rightPanelWidth = std::max(kPanelMinWidth, viewport_.Width * kRightPanelRatio);
+		const float availableWidth = std::max(1.0f, viewport_.Width - leftPanelWidth - rightPanelWidth);
 		const float availableHeight = std::max(1.0f, viewport_.Height - kTopToolbarHeight);
-		const float availableStartX = viewport_.Width * kLeftPanelRatio;
+		const float availableStartX = leftPanelWidth;
 		const float availableStartY = kTopToolbarHeight;
 
 		float gameWidth = availableWidth;

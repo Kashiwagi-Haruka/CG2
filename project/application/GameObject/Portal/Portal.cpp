@@ -211,6 +211,11 @@ void Portal::SetParentTransformToTransform() {
 }
 
 bool Portal::ShouldProcessPortal() const {
+#ifndef USE_IMGUI
+	// エディタUIなしのビルド(Release配布など)では常にゲーム実行中として扱う
+	return true;
+#else
 	Hierarchy* hierarchy = Hierarchy::GetInstance();
 	return !hierarchy || hierarchy->IsPlayMode();
+#endif
 }
