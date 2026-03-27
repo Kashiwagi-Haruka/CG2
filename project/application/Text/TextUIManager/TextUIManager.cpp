@@ -90,7 +90,10 @@ void TextUIManager::Draw()
     if (ChairMenu::GetIsShowMenu()) {
         chairMenu_->Draw();
     } else {
-        edamameTrivia_.Draw();
+        if (EdamameTrivia::GetIsDraw()) {
+            edamameTrivia_.Draw();  
+        }
+     
     }
 
     FreeTypeManager::ResetFontUsage();
