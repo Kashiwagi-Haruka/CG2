@@ -352,6 +352,8 @@
     <ClCompile Include="application\Option\Option.cpp" />
     <ClCompile Include="application\Menu\Menu.cpp" />
     <ClCompile Include="application\GameObject\SEManager\SEManager.cpp" />
+    <ClCompile Include="application\GameObject\Box\Box.cpp" />
+    <ClCompile Include="application\GameObject\Box\BoxManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -694,6 +696,8 @@
     <ClInclude Include="application\Option\OptionData.h" />
     <ClInclude Include="application\Menu\Menu.h" />
     <ClInclude Include="application\GameObject\SEManager\SEManager.h" />
+    <ClInclude Include="application\GameObject\Box\Box.h" />
+    <ClInclude Include="application\GameObject\Box\BoxManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

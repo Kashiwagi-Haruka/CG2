@@ -27,7 +27,7 @@ void Edamame::Initialize()
     worldTransform_ = {
         .scale{0.5f, 0.5f, 0.5f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{-4.0f, 0.5f, 0.0f}
+        .translate{-7.0f, 0.5f, 0.0f}
     };
 
     obj_->Initialize();

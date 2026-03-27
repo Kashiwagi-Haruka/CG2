@@ -9,7 +9,7 @@ TestField::TestField()
     AABB aabb = { .min = {-50.0f,-1.0f,-50.0f},.max = {50.0f,0.0f,50.0f} };
     SetAABB(aabb);
     SetCollisionAttribute(kCollisionFloor);
-    SetCollisionMask(kCollisionPlayer|kCollisionChair|kCollisionKey);
+    SetCollisionMask(kCollisionPlayer|kCollisionChair|kCollisionItem);
 }
 
 void TestField::Initialize()

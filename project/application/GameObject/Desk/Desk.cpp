@@ -16,8 +16,8 @@ Desk::Desk()
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/desk", "desk");
     obj_->SetModel("desk");
     SetAABB({ .min = {-0.4f,0.0f,-0.3f},.max = {0.4f,0.8f,0.3f} });
-    SetCollisionAttribute(kCollisionDesk);
-    SetCollisionMask(kCollisionPlayer | kCollisionKey|kCollisionDesk);
+    SetCollisionAttribute(kCollisionWall);
+    SetCollisionMask(kCollisionPlayer |kCollisionItem|kCollisionChair);
 }
 
 void Desk::OnCollision(Collider* collider)

@@ -21,6 +21,7 @@
 #include"GameObject/Door/Door.h"
 #include"GameObject/Locker/LockerManager.h"
 #include"GameObject/Desk/DeskManager.h"
+#include"GameObject/Box/BoxManager.h"
 #include "Menu/Menu.h"
 
 #pragma endregion
@@ -100,6 +101,8 @@ private:
     //タイムカード
     std::unique_ptr<TimeCard> timeCard_ = nullptr;
     std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
+    //箱
+    std::unique_ptr<BoxManager> boxManager_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

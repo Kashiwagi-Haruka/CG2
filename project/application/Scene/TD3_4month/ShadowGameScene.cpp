@@ -60,6 +60,8 @@ ShadowGameScene::ShadowGameScene()
     timeCard_ = std::make_unique<TimeCard>();
     //タイムカードラック
     timeCardRack_ = std::make_unique<TimeCardRack>();
+    //箱管理
+    boxManager_ = std::make_unique<BoxManager>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 
@@ -78,6 +80,7 @@ ShadowGameScene::ShadowGameScene()
     flashlight_->SetPlayerCamera(playerCamera_.get());
     lockerManager_->SetPlayerCamera(playerCamera_.get());
     deskManager_->SetPlayerCamera(playerCamera_.get());
+    boxManager_->SetPlayerCamera(playerCamera_.get());
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -142,7 +145,8 @@ void ShadowGameScene::Initialize()
     timeCard_->Initialize();
     //タイムカードラック
     timeCardRack_->Initialize();
-
+    //箱管理
+    boxManager_->Initialize();
     //カーソルを画面中央に設定する
     auto* input = Input::GetInstance();
     input->SetIsCursorVisible(false);
@@ -291,6 +295,10 @@ void ShadowGameScene::CheckCollision()
     }
     for (auto& desk : deskManager_->GetDesks()) {
         collisionManager_->AddCollider(desk.get());
+    }
+
+    for (auto& box : boxManager_->GetBoxes()) {
+        collisionManager_->AddCollider(box.get());
     }
     collisionManager_->AddCollider(key_.get());
 
@@ -453,6 +461,8 @@ void ShadowGameScene::UpdateGameObject()
     edamame_->Update();
     //椅子管理
     chairManager_->Update();
+    //箱管理
+    boxManager_->Update();
     //床
     testField_->Update();
     //壁管理
@@ -591,7 +601,8 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     timeCard_->Draw();
     //タイムカードラック
     timeCardRack_->Draw();
-
+    //箱管理
+    boxManager_->Draw();
     if (!isShadow) {
         Object3dCommon::GetInstance()->DrawCommonSkinning();
     }
@@ -623,6 +634,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     deskManager_->SetCamera(camera);
     timeCard_->SetCamera(camera);
     timeCardRack_->SetCamera(camera);
+    boxManager_->SetCamera(camera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
