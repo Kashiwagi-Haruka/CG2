@@ -49,7 +49,6 @@ TitleScene::TitleScene() {
 
     /// @brief 初期化
     FreeTypeManager::Initialize();
-    Text::LoadSE();
     titleMenuUI_ = std::make_unique<TitleMenuUI>();
     firstStory_ = std::make_unique<FirstStory>();
     //ゲームオブジェクト
@@ -61,7 +60,6 @@ TitleScene::TitleScene() {
 
 void TitleScene::Finalize() {
     Audio::GetInstance()->SoundUnload(&BGMData_);
-    Text::UnLoadSE();
 }
 
 void TitleScene::Initialize() {

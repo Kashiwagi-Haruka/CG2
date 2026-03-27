@@ -17,6 +17,7 @@ ShadowGameScene::ShadowGameScene()
     //BGMの管理
     BGMManager::Load();
 
+
     //シーン遷移の設定
     transition_ = std::make_unique<SceneTransition>();
     //デバックカメラ
@@ -90,6 +91,7 @@ void ShadowGameScene::Initialize()
     //UIManager
     textUIManager_->Initialize();
     BGMManager::Initialize();
+    BGMManager::SoundPlay(BGMManager::BGM1, true);
     isPause_ = false;
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;
@@ -208,6 +210,7 @@ void ShadowGameScene::Draw()
 
 void ShadowGameScene::Finalize()
 {
+    BGMManager::UnLoad();
 }
 
 void ShadowGameScene::DebugImGui()

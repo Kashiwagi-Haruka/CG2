@@ -91,7 +91,6 @@ class SampleScene : public BaseScene {
 	float randomNoiseScale_ = 512.0f;
 	int randomNoiseBlendMode_ = 0;
 	float ringUvRotation_ = 0.0f;
-
 	SoundData bgmData_{};
 	bool isBgmPlaying_ = false;
 

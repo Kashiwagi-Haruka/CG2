@@ -3,6 +3,7 @@
 #include "FrameWork.h"
 #include "GameBase.h"
 #include "Scene/SceneFactory/SceneFactory.h"
+#include"GameObject/SEManager/SEManager.h"
 #include <memory>
 class BaseScene;
 class Game : public FrameWork {

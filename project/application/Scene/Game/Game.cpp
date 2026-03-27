@@ -17,7 +17,7 @@ void Game::Initialize() {
 	/*SceneManager::GetInstance()->ChangeScene("Tutorial");*/
 	//4か月開発のシーンの作成
 	//SceneManager::GetInstance()->ChangeScene("ShadowGame");
-
+	SEManager::Load();
 }
 
 void Game::Update() {
@@ -39,6 +39,7 @@ void Game::Draw() {
 
 void Game::Finalize() {
 
+	SEManager::UnLoad();
 	/// @brief 終了処理
 	FreeTypeManager::Finalize();
 

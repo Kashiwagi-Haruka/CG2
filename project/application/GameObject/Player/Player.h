@@ -52,7 +52,6 @@ private:
     static constexpr float kWalkFootstepInterval = 0.40f;
     static constexpr float kSneakFootstepInterval = 0.55f;
 
-    SoundData footStepSE;
     float soundTimer_ = 0.0f;
     bool leftFootGrounded_ = false;
     bool rightFootGrounded_ = false;

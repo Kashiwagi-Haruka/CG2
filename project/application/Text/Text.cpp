@@ -5,17 +5,8 @@
 #include"SpriteCommon.h"
 #include"DirectXCommon.h"
 #include"ScreenSize/ScreenSize.h"
+#include"GameObject/SEManager/SEManager.h"
 
-SoundData Text::voiceSE_;
-
-void Text::LoadSE()
-{
-    voiceSE_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/voiceSE.mp3");
-}
-void Text::UnLoadSE()
-{
-    Audio::GetInstance()->SoundUnload(&voiceSE_);
-}
 void Text::Initialize(uint32_t fontHandle) {
     fontHandle_ = fontHandle;
     size_ = {SCREEN_SIZE::WIDTH,SCREEN_SIZE::HEIGHT};
@@ -82,7 +73,7 @@ void Text::Update(const bool isSound)
             if (visibleCharCount_ < text_.size()) {
                 visibleCharCount_++;
                 if (isSound&& visibleCharCount_%2 == 0) {
-                    Audio::GetInstance()->SoundPlayWave(voiceSE_, false);
+                    SEManager::SoundPlay(SEManager::TYPE);
                 }
                 UpdateLayout(); // レイアウト更新
             } else {

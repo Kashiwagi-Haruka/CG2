@@ -4,6 +4,7 @@
 #include "Sprite/SpriteCommon.h"
 #include"ScreenSize/ScreenSize.h"
 #include"Color/Color.h"
+#include"GameObject/SEManager/SEManager.h"
 
 bool ChairMenu::isShowMenu_ = false;
 uint32_t ChairMenu::selectButtonNum_ = 0;
@@ -11,10 +12,6 @@ bool ChairMenu::isSelectButton_ = false;
 
 ChairMenu::ChairMenu()
 {
-    //SEの初期化
-    SEData_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/pushWatch.mp3");
-    Audio::GetInstance()->SetSoundVolume(&SEData_, 1.0f);
-
     menuFontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
     FreeTypeManager::SetPixelSizes(menuFontHandle_, 32, 32);
     for (auto& text : menuText_) {
@@ -57,7 +54,6 @@ ChairMenu::ChairMenu()
 
 ChairMenu::~ChairMenu()
 {
-    Audio::GetInstance()->SoundUnload(&SEData_);
 }
 
 void ChairMenu::Initialize()
@@ -83,7 +79,7 @@ void ChairMenu::Update()
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
 
             if (!isSelectButton_) {
-                Audio::GetInstance()->SoundPlayWave(SEData_, false);
+                SEManager::SoundPlay(SEManager::PUSH_WATCH);
                 isSelectButton_ = true;
                 //最初は0番に設定する
                 selectButtonNum_ = 0;
@@ -99,7 +95,7 @@ void ChairMenu::Update()
         if (PlayerCommand::GetInstance()->MouseWheelDown()) {
             //ホイールを下にすると
             if (selectButtonNum_ > 0) {
-                Audio::GetInstance()->SoundPlayWave(SEData_, false);
+                SEManager::SoundPlay(SEManager::PUSH_WATCH);
                 if (!PlayerCommand::GetIsGrab()) {
                     //グラブしていないとき
                     selectButtonNum_--;
@@ -111,7 +107,7 @@ void ChairMenu::Update()
         if (PlayerCommand::GetInstance()->MouseWheelUp()) {
             //ホイールを上にすると
             if (selectButtonNum_ < menuText_.size() - 1) {
-                Audio::GetInstance()->SoundPlayWave(SEData_, false);
+                SEManager::SoundPlay(SEManager::PUSH_WATCH);
                 if (!PlayerCommand::GetIsGrab()) {
                     //持っていなかったら
                     selectButtonNum_++;
