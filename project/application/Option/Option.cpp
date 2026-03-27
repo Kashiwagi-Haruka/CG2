@@ -16,7 +16,7 @@ void Option::Initialize() {
 
 	optionTitleText_.Initialize(fontHandle_);
 	optionTitleText_.SetString(U"オプション");
-	optionTitleText_.SetPosition({WinApp::kClientWidth / 2.0f, 80.0f});
+	optionTitleText_.SetPosition({WinApp::kClientWidth / 2.0f, WinApp::kClientHeight / 2.0f - 180.0f});
 	optionTitleText_.SetColor(COLOR::WHITE);
 	optionTitleText_.SetAlign(TextAlign::Center);
 	optionTitleText_.UpdateLayout(false);
