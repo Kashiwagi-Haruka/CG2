@@ -47,8 +47,7 @@ TitleScene::TitleScene() {
     //ランダム
     random_ = std::make_unique<RandomClass>();
 
-    /// @brief 初期化
-    FreeTypeManager::Initialize();
+
     titleMenuUI_ = std::make_unique<TitleMenuUI>();
     firstStory_ = std::make_unique<FirstStory>();
     //ゲームオブジェクト
