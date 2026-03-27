@@ -22,6 +22,7 @@
 #include"GameObject/Locker/LockerManager.h"
 #include"GameObject/Desk/DeskManager.h"
 #include"GameObject/Box/BoxManager.h"
+#include "Menu/Menu.h"
 
 #pragma endregion
 
@@ -49,6 +50,7 @@ private:
 
 #pragma region//UI
     std::unique_ptr<TextUIManager> textUIManager_ = nullptr;
+	std::unique_ptr<Menu> menu_ = nullptr;
 #pragma endregion
 
 #pragma region//カメラの設定
