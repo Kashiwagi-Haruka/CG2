@@ -16,8 +16,8 @@ Key::Key()
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/key", "key");
     obj_->SetModel("key");
     SetAABB({ .min = { -0.25f,-0.25f,-0.25f }, .max = { 0.25f,0.25f,0.25f } });
-    SetCollisionAttribute(kCollisionItem);
-    SetCollisionMask(kCollisionChair | kCollisionWall | kCollisionFloor);
+    SetCollisionAttribute(kCollisionKey);
+    SetCollisionMask(kCollisionChair | kCollisionLocker | kCollisionFloor|kCollisionDesk);
 }
 
 void Key::Initialize()
@@ -46,16 +46,20 @@ void Key::Update()
         worldTransform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
         worldTransform_.translate.y = (std::max)(worldTransform_.translate.y, 0.0f);
         velocity_.y = 0.0f;
-        //y座標を固定する
-        worldTransform_.translate.y = std::clamp(worldTransform_.translate.y, 0.1f, 2.4f);
+
     } else {
         //重力処理
         const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
         velocity_.y -= YoshidaMath::kGravity * deltaTime;
-        worldTransform_.translate.y += velocity_.y * deltaTime;
+        worldTransform_.translate += velocity_ * deltaTime;
     }
+
+
     //押し戻し処理
     YoshidaMath::ResolveCollision(worldTransform_.translate, velocity_, GetCollisionInfo());
+    //y座標を固定する
+    worldTransform_.translate.y = std::clamp(worldTransform_.translate.y, 0.0f, 2.4f);
+
     obj_->SetTransform(worldTransform_);
     obj_->Update();
 
@@ -122,6 +126,7 @@ void Key::OnCollision(Collider* collider)
         }
     }
 
+    //velocity_.y = 0.0f;
 }
 
 Vector3 Key::GetWorldPosition() const

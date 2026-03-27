@@ -16,7 +16,7 @@ Chair::Chair()
     obj_->SetModel("chair");
     SetAABB({ .min = {-0.125f,0.0f,-0.125f},.max = {0.125f,0.5f,0.125f} });
     SetCollisionAttribute(kCollisionChair);
-    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionItem|kCollisionWall);
+    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionKey|kCollisionWall);
 }
 
 void Chair::OnCollision(Collider* collider)
@@ -26,7 +26,7 @@ void Chair::OnCollision(Collider* collider)
     }
 
     if (collider->GetCollisionAttribute() == kCollisionFloor||
-        collider->GetCollisionAttribute() == kCollisionItem || 
+        collider->GetCollisionAttribute() == kCollisionKey || 
         collider->GetCollisionAttribute() == kCollisionPlayer) {
         velocity_.y = 0.0f;
     }
