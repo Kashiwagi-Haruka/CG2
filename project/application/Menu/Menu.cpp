@@ -164,14 +164,14 @@ Menu::Action Menu::ConsumePendingAction() {
 }
 void Menu::Draw() {
 	SpriteCommon::GetInstance()->DrawCommonFont();
+	if (isTrigger_ && currentMenuName_ == "Option") {
+		option_->Draw();
+		return;
+	}
 	menuText_.Draw();
 	GameText_.Draw();
 	SaveText_.Draw();
 	OptionText_.Draw();
 	TitleText_.Draw();
 	GameEndText_.Draw();
-
-	if (isTrigger_ && currentMenuName_ == "Option") {
-		option_->Draw();
-	}
 }

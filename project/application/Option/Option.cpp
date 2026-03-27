@@ -1,23 +1,45 @@
 #include "Option.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Logger.h"
-#include "TextureManager.h"
 #include "Sprite/SpriteCommon.h"
+#include "TextureManager.h"
+#include "WinApp.h"
+#include "application/Color/Color.h"
 namespace {
 const char* kOptionFileName = "optionData.json";
 }
 
-void Option::Initialize() { 
+void Option::Initialize() {
 	uint32_t textureHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
+	fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
+	FreeTypeManager::SetPixelSizes(fontHandle_, 42, 42);
 
-	LoadOptionData(); 
+	optionTitleText_.Initialize(fontHandle_);
+	optionTitleText_.SetString(U"オプション");
+	optionTitleText_.SetPosition({WinApp::kClientWidth / 2.0f, 80.0f});
+	optionTitleText_.SetColor(COLOR::WHITE);
+	optionTitleText_.SetAlign(TextAlign::Center);
+	optionTitleText_.UpdateLayout(false);
+
+	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
+		Text& parameterLabel = optionParameterTexts_[parameterIndex];
+		parameterLabel.Initialize(fontHandle_);
+		parameterLabel.SetString(kParameterLabels_[parameterIndex]);
+		parameterLabel.SetPosition({kOptionLabelPos.x, kOptionLabelPos.y + (kOptionLabelStepY * static_cast<float>(parameterIndex))});
+		parameterLabel.SetColor(COLOR::WHITE);
+		parameterLabel.SetAlign(TextAlign::Left);
+		parameterLabel.UpdateLayout(false);
+	}
+
+	LoadOptionData();
 
 	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
 		for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
-		Sprite& sprite = parameterSprite_[parameterIndex][divisionIndex];
-		sprite.Initialize(textureHandle);
-		sprite.SetScale(kOptionSpriteSize);
-		sprite.SetPosition({kOptionSpriteStartPos.x + (kOptionSpriteStep.x * static_cast<float>(divisionIndex)), kOptionSpriteStartPos.y + (kOptionSpriteStep.y * static_cast<float>(parameterIndex))});
+			Sprite& sprite = parameterSprite_[parameterIndex][divisionIndex];
+			sprite.Initialize(textureHandle);
+			sprite.SetScale(kOptionSpriteSize);
+			sprite.SetPosition(
+			    {kOptionSpriteStartPos.x + (kOptionSpriteStep.x * static_cast<float>(divisionIndex)), kOptionSpriteStartPos.y + (kOptionSpriteStep.y * static_cast<float>(parameterIndex))});
 		}
 	}
 }
@@ -36,6 +58,12 @@ void Option::Draw() {
 	if (!isShowOption_) {
 		return;
 	}
+	SpriteCommon::GetInstance()->DrawCommonFont();
+	optionTitleText_.Draw();
+	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
+		optionParameterTexts_[parameterIndex].Draw();
+	}
+
 	SpriteCommon::GetInstance()->DrawCommon();
 	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
 		for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
