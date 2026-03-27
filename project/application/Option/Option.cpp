@@ -7,18 +7,39 @@ const char* kOptionFileName = "optionData.json";
 }
 
 void Option::Initialize() { 
-	TextureManager::GetInstance()->LoadTextureName("Resources/TD3_3102/2d/white2x2.png");
+	uint32_t textureHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
 
 	LoadOptionData(); 
+
+	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
+		for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
+		Sprite& sprite = parameterSprite_[parameterIndex][divisionIndex];
+		sprite.Initialize(textureHandle);
+		sprite.SetScale(kOptionSpriteSize);
+		sprite.SetPosition({kOptionSpriteStartPos.x + (kOptionSpriteStep.x * static_cast<float>(divisionIndex)), kOptionSpriteStartPos.y + (kOptionSpriteStep.y * static_cast<float>(parameterIndex))});
+		}
+	}
 }
 void Option::Update() {
 	if (!isShowOption_) {
 		return;
 	}
+
+	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
+		for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
+			parameterSprite_[parameterIndex][divisionIndex].Update();
+		}
+	}
 }
 void Option::Draw() {
 	if (!isShowOption_) {
 		return;
+	}
+
+	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
+		for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
+			parameterSprite_[parameterIndex][divisionIndex].Draw();
+		}
 	}
 }
 

@@ -350,6 +350,7 @@
     <ClCompile Include="application\GameObject\TimeCard\TimeCard.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCardRack.cpp" />
     <ClCompile Include="application\Option\Option.cpp" />
+    <ClCompile Include="application\Menu\Menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -690,6 +691,7 @@
     <ClInclude Include="application\GameObject\TimeCard\TimeCardRack.h" />
     <ClInclude Include="application\Option\Option.h" />
     <ClInclude Include="application\Option\OptionData.h" />
+    <ClInclude Include="application\Menu\Menu.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
