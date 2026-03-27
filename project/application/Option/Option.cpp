@@ -14,14 +14,14 @@ const char* kOptionFileName = "optionData.json";
 float Clamp01(float value) { return std::clamp(value, 0.0f, 1.0f); }
 
 float CameraSensitivityFromDivision(int division) {
-	constexpr float kMinCameraSensitivity = 0.5f;
+	constexpr float kMinCameraSensitivity = 0.0f;
 	constexpr float kMaxCameraSensitivity = 2.0f;
 	constexpr float kStep = (kMaxCameraSensitivity - kMinCameraSensitivity) / 9.0f;
 	return kMinCameraSensitivity + (kStep * static_cast<float>(division));
 }
 
 int DivisionFromCameraSensitivity(float value) {
-	constexpr float kMinCameraSensitivity = 0.5f;
+	constexpr float kMinCameraSensitivity = 0.0f;
 	constexpr float kMaxCameraSensitivity = 2.0f;
 	constexpr float kStep = (kMaxCameraSensitivity - kMinCameraSensitivity) / 9.0f;
 	const float clamped = std::clamp(value, kMinCameraSensitivity, kMaxCameraSensitivity);
