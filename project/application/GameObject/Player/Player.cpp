@@ -65,7 +65,7 @@ namespace {
     }
 } // namespace
 
-bool Player::isGrab_ = false;
+
 
 Player::Player() {
     localAABB_ = {
@@ -74,7 +74,7 @@ Player::Player() {
     };
     SetAABB(localAABB_);
     SetCollisionAttribute(kCollisionPlayer);
-    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionVendingMac | kCollisionDoor | kCollisionMat| kCollisionLocker);
+    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionVendingMac | kCollisionDoor | kCollisionMat | kCollisionLocker| kCollisionDesk);
     // 体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
     // モデルの読み込み
@@ -89,8 +89,6 @@ void Player::SetCamera(Camera* camera) {
     bodyObj_->UpdateCameraMatrices();
 }
 void Player::Initialize() {
-
-    isGrab_ = false;
 
     // 座標の初期化
     transform_ = {
@@ -111,7 +109,7 @@ void Player::Initialize() {
     // 体にモデル挿入
     bodyObj_->SetModel("gentleman");
 
-    AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/gentleman","gentleman");
+    AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/gentleman", "gentleman");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "Idle", true);
     if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, "Idle")) {
         bodyObj_->SetAnimation(idleAnimation, true);
@@ -141,6 +139,9 @@ void Player::Update()
     //アニメーション
     Animation();
 
+    bodyObj_->SetWorldMatrix(Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
+    bodyObj_->Update();
+
     //デバック
     Debug();
 }
@@ -161,44 +162,44 @@ void Player::Debug() {
             ImGui::Text("%s", desiredAnimationName);
             ImGui::TreePop();
         }
-   /*     if (!animationClips_.empty()) {
-            std::vector<const char*> animationNames;
-            animationNames.reserve(animationClips_.size());
-            for (const auto& clip : animationClips_) {
-                animationNames.push_back(clip.name.c_str());
-            }
-            int selectedIndex = static_cast<int>(currentAnimationIndex_);
-            if (ImGui::Combo("Animation", &selectedIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
-                currentAnimationIndex_ = static_cast<size_t>(selectedIndex);
-                bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
-                animationTime_ = 0.0f;
-            }
+        /*     if (!animationClips_.empty()) {
+                 std::vector<const char*> animationNames;
+                 animationNames.reserve(animationClips_.size());
+                 for (const auto& clip : animationClips_) {
+                     animationNames.push_back(clip.name.c_str());
+                 }
+                 int selectedIndex = static_cast<int>(currentAnimationIndex_);
+                 if (ImGui::Combo("Animation", &selectedIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
+                     currentAnimationIndex_ = static_cast<size_t>(selectedIndex);
+                     bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
+                     animationTime_ = 0.0f;
+                 }
 
-            if (Model* playerModel = ModelManager::GetInstance()->FindModel("gentleman")) {
-                const Animation::AnimationData& currentAnimation = animationClips_[currentAnimationIndex_];
-                const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+                 if (Model* playerModel = ModelManager::GetInstance()->FindModel("gentleman")) {
+                     const Animation::AnimationData& currentAnimation = animationClips_[currentAnimationIndex_];
+                     const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 
 
-                const std::optional<FootContactState> previousContact = SampleFootContactState(currentAnimation, previousTime, bodyObj_->GetWorldMatrix(), *playerModel);
-                const std::optional<FootContactState> nextContact = SampleFootContactState(currentAnimation, nextTime, bodyObj_->GetWorldMatrix(), *playerModel);
+                     const std::optional<FootContactState> previousContact = SampleFootContactState(currentAnimation, previousTime, bodyObj_->GetWorldMatrix(), *playerModel);
+                     const std::optional<FootContactState> nextContact = SampleFootContactState(currentAnimation, nextTime, bodyObj_->GetWorldMatrix(), *playerModel);
 
-                ImGui::Separator();
-                ImGui::Text("Foot Contact");
-                if (previousContact.has_value()) {
-                    ImGui::Text("Prev Frame  L:%s  R:%s", previousContact->left ? "Ground" : "Air", previousContact->right ? "Ground" : "Air");
-                    ImGui::TextDisabled("Prev Y  L:%.3f R:%.3f Ground:%.3f", previousContact->leftY, previousContact->rightY, previousContact->groundY);
-                } else {
-                    ImGui::TextDisabled("Prev Frame: foot joint not found");
-                }
+                     ImGui::Separator();
+                     ImGui::Text("Foot Contact");
+                     if (previousContact.has_value()) {
+                         ImGui::Text("Prev Frame  L:%s  R:%s", previousContact->left ? "Ground" : "Air", previousContact->right ? "Ground" : "Air");
+                         ImGui::TextDisabled("Prev Y  L:%.3f R:%.3f Ground:%.3f", previousContact->leftY, previousContact->rightY, previousContact->groundY);
+                     } else {
+                         ImGui::TextDisabled("Prev Frame: foot joint not found");
+                     }
 
-                if (nextContact.has_value()) {
-                    ImGui::Text("Next Frame  L:%s  R:%s", nextContact->left ? "Ground" : "Air", nextContact->right ? "Ground" : "Air");
-                    ImGui::TextDisabled("Next Y  L:%.3f R:%.3f Ground:%.3f", nextContact->leftY, nextContact->rightY, nextContact->groundY);
-                } else {
-                    ImGui::TextDisabled("Next Frame: foot joint not found");
-                }
-            }
-        }*/
+                     if (nextContact.has_value()) {
+                         ImGui::Text("Next Frame  L:%s  R:%s", nextContact->left ? "Ground" : "Air", nextContact->right ? "Ground" : "Air");
+                         ImGui::TextDisabled("Next Y  L:%.3f R:%.3f Ground:%.3f", nextContact->leftY, nextContact->rightY, nextContact->groundY);
+                     } else {
+                         ImGui::TextDisabled("Next Frame: foot joint not found");
+                     }
+                 }
+             }*/
 
         if (ImGui::TreeNode("Parameters")) {
             ImGui::DragFloat("Rotate Speed", &parameters_.kRotateYSpeed, 0.001f, 0.0f, 10.0f);
@@ -336,7 +337,38 @@ void Player::PlayFootstepSE() {
     soundTimer_ = isWalking ? kWalkFootstepInterval : kSneakFootstepInterval;
 }
 
+Matrix4x4 Player::GetJointMatrix(const char* jointName) const
+{
+    if (!skeleton_) {
+        return { 0.0f };
+    }
+
+    const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex(jointName);
+    if (!jointIndex.has_value()) {
+        return { 0.0f };
+    }
+
+    skeleton_->SetObjectMatrix(bodyObj_->GetWorldMatrix());
+    return  skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndex]);
+}
+
+Vector3 Player::GetJointWorldPos(const char* jointName) const
+{
+    if (!skeleton_) {
+        return { 0.0f };
+    }
+
+    const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex(jointName);
+    if (!jointIndex.has_value()) {
+        return { 0.0f };
+    }
+
+    skeleton_->SetObjectMatrix(bodyObj_->GetWorldMatrix());
+    return  skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
+}
+
 void Player::Gravity() {
+
     velocity_.y -= YoshidaMath::kDeltaTime * YoshidaMath::kGravity;
     transform_.translate.y += velocity_.y;
     velocity_.y = std::clamp(velocity_.y, -1.0f, 1.0f);
@@ -345,7 +377,7 @@ void Player::Gravity() {
 void Player::OnCollision(Collider* collider) {
     UpdateFootContact(collider);
 
-    if (collider->GetCollisionAttribute() != kCollisionMat&& collider->GetCollisionAttribute() != kCollisionItem) {
+    if (collider->GetCollisionAttribute() != kCollisionMat && collider->GetCollisionAttribute() != kCollisionItem) {
         // マットじゃなかったら
         OnCollisionObstacle();
     }
@@ -418,10 +450,10 @@ void Player::Animation()
         }
     }
 
-    bodyObj_->SetWorldMatrix(Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
-    bodyObj_->Update();
+
 
 }
+
 void Player::SaveParameters() {
     JsonManager* jsonManager = JsonManager::GetInstance();
 

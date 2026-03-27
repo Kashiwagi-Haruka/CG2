@@ -15,7 +15,7 @@ Flashlight::Flashlight()
     obj_->SetModel("light");
     SetAABB({ .min = {-0.1f,-0.1f,-0.1f},.max = {0.1f,0.1f,0.1f} });
     SetCollisionAttribute(kCollisionItem);
-    SetCollisionMask(kCollisionPlayer);
+    SetCollisionMask(kCollisionPlayer|kCollisionFloor);
 }
 
 void Flashlight::OnCollision(Collider* collider)
@@ -43,12 +43,25 @@ void Flashlight::Update()
 
     if (isGetLight_) {
 
-        Matrix4x4 child = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-        child = Function::Multiply(child, playerCamera_->GetCamera()->GetWorldMatrix());
-        obj_->SetWorldMatrix(child);
+        transform_.translate = { 0.0f,0.1f,0.0f };
+        transform_.rotate = { 0.0f,Function::kPi * 0.5f,0.0f };
+        transform_.scale = { 1.0f,1.0f,1.0f };
 
+        Matrix4x4  handMat =player_->GetJointMatrix("Hand.L");
+        Matrix4x4 child = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+        child = Function::Multiply(child, handMat);
+        obj_->SetWorldMatrix(child);
+#ifdef USE_IMGUI
+        ImGui::Begin("FlashLight");
+        ImGui::DragFloat3("direction", &spotLight_.direction.x);
+        ImGui::Text("translate %f %f %f", handMat.m[3][0], handMat.m[3][1], handMat.m[3][2]);
+
+        ImGui::End();
+
+#endif
     } else {
         //y座標を固定する
+        transform_.rotate = { 0.0f,0.0f,0.0f };
         transform_.translate.y = std::clamp(transform_.translate.y, 0.0f, 2.4f);
         obj_->SetTransform(transform_);
     }
@@ -66,7 +79,7 @@ void Flashlight::Initialize()
     isSendGetLightMessage_ = false;
 
     obj_->Initialize();
-    transform_.translate = {4.0f,0.1f,1.0f};
+    transform_.translate = {4.0f,0.1f,5.0f};
     transform_.rotate = { 0.0f,0.0f,0.0f };
     transform_.scale = { 1.0f,1.0f,1.0f };
     SetLight();
@@ -83,8 +96,8 @@ void Flashlight::SetLight()
     spotLight_.color = { 1.0f, 1.0f, 0.5f, 1.0f };
     spotLight_.position = obj_->GetTranslate();
     spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
-    spotLight_.intensity = 10.0f;
-    spotLight_.distance = 7.0f;
+    spotLight_.intensity = 1.0f;
+    spotLight_.distance = 5.0f;
     spotLight_.decay = 2.0f;
     spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
     spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
@@ -95,18 +108,16 @@ void Flashlight::CheckCollision()
 
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
         //keyとrayの当たり判定
-        if (Player::GetIsGrab()) {
-            isGetLight_ = false;
-            Player::SetIsGrab(false);
-            transform_.translate =  GetWorldPosition();
+        if (PlayerCommand::GetIsGrab()) {
+  /*          isGetLight_ = false;
+            PlayerCommand::SetIsGrab(false);
+            transform_.translate =  GetWorldPosition();*/
         } else {
             if (OnCollisionRay()) {
                 isGetLight_ = true;
-                Player::SetIsGrab(true);
+      /*          PlayerCommand::SetIsGrab(true);*/
                 isSendGetLightMessage_ = true;
-                transform_.translate = { -0.2f,0.0f,0.25f };
-                transform_.rotate = { 0.0f,Function::kPi,0.0f };
-                transform_.scale = { 1.0f,1.0f,1.0f };
+
             }
 
         }
@@ -119,12 +130,9 @@ void Flashlight::CheckCollision()
 void Flashlight::UpdateSpotLight()
 {
     spotLight_.position = GetWorldPosition();
-    spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
+    spotLight_.direction = -YoshidaMath::GetForward(obj_->GetWorldMatrix());
     spotLight_.intensity = 10.0f;
-#ifdef USE_IMGUI
 
-
-#endif
 }
 
 bool Flashlight::OnCollisionRay()

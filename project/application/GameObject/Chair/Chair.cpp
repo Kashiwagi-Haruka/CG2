@@ -5,7 +5,7 @@
 #include"GameObject/KeyBindConfig.h"
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
-#include"GameObject/Player/Player.h"
+#include"Text/ChairMenu/ChairMenu.h"
 
 PlayerCamera* Chair::playerCamera_ = nullptr;
 
@@ -25,19 +25,10 @@ void Chair::OnCollision(Collider* collider)
         return;
     }
 
-    if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-        Vector3 vel = playerCamera_->GetRay().diff * 4.0f;
-        vel.y = 0.0f;
-        const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-        transform_.translate += vel * deltaTime;
-    }
-
-    if (collider->GetCollisionAttribute() == kCollisionFloor) {
+    if (collider->GetCollisionAttribute() == kCollisionFloor||
+        collider->GetCollisionAttribute() == kCollisionKey || 
+        collider->GetCollisionAttribute() == kCollisionPlayer) {
         velocity_.y = 0.0f;
-    }
-
-    if (collider->GetCollisionAttribute() == kCollisionKey) {
-
     }
 }
 
@@ -48,7 +39,92 @@ Vector3 Chair::GetWorldPosition() const
 
 void Chair::Update()
 {
+    Mirror();
 
+    //rayと重なると
+    if (OnCollisionRay()) {
+        //インタラクトをトリガーすると
+        if (PlayerCommand::GetInstance()->InteractTrigger()) {
+            if (ChairMenu::GetIsShowMenu()) {
+                if (ChairMenu::GetIsSelectButton()) {
+                    //数値によって処理を変更する
+                    SwichCommand();
+                    ChairMenu::SetIsSelectButton(false);
+                }
+            } else {
+                //メニューを表示してないとき表示する
+                ChairMenu::SetIsShowMenu(true);
+            }
+        }
+    }
+
+    Grab();
+
+    obj_->SetTransform(transform_);
+    obj_->Update();
+
+}
+
+void Chair::Initialize()
+{
+    isStand_ = false;
+    obj_->Initialize();
+    velocity_ = { 0.0f };
+    transform_ = obj_->GetTransform();
+}
+
+void Chair::Draw()
+{
+    obj_->Draw();
+}
+
+void Chair::SwichCommand()
+{
+    switch (ChairMenu::GetSelectButtonNum())
+    {
+    case ChairMenu::GRAB_TEXT:
+        //メニューを表示しているとき
+        if (isGrab_) {
+            //持っていたら離す
+            isGrab_ = false;
+            //プレイヤーの状態をセットする
+            PlayerCommand::SetIsGrab(false);
+            //グラブ終了後メニューを閉じる
+            ChairMenu::SetIsShowMenu(false);
+        } else {
+            if (!PlayerCommand::GetIsGrab()) {
+                if (OnCollisionRay()) {
+                    isGrab_ = true;
+                    //プレイヤーの状態をセットする
+                    PlayerCommand::SetIsGrab(true);
+                }
+
+            }
+        }
+
+
+        break;
+    case ChairMenu::STAND_TEXT:
+
+        if (!PlayerCommand::GetIsStand()) {
+            PlayerCommand::SetIsStand(true);
+            isStand_ = true;
+        }
+
+        //メニューを閉じる
+        ChairMenu::SetIsShowMenu(false);
+        break;
+    default:
+        //メニューを閉じる
+        ChairMenu::SetIsShowMenu(false);
+        break;
+    }
+
+
+}
+
+void Chair::Mirror()
+{
     if (mirrorTransform_ != nullptr) {
         transform_.translate.x = -mirrorTransform_->translate.x;
         transform_.translate.y = mirrorTransform_->translate.y;
@@ -62,21 +138,12 @@ void Chair::Update()
         transform_.scale.y = mirrorTransform_->scale.y;
         transform_.scale.z = mirrorTransform_->scale.z;
     }
+}
 
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
-        if (Player::GetIsGrab() && isGrab_) {
-            // カーソルに追従させて持ち上げる処理
-            isGrab_ = false;
-            Player::SetIsGrab(false);
-        } else {
-            if (OnCollisionRay()) {
-                isGrab_ = true;
-                Player::SetIsGrab(true);
-            }
-        }
-    }
+void Chair::Grab()
+{
 
-    if (isGrab_ && Player::GetIsGrab()) {
+    if (isGrab_ && PlayerCommand::GetIsGrab()) {
         // カーソルに追従させて持ち上げる処理
         Vector3 origin = playerCamera_->GetTransform().translate;
         origin.y -= 0.5f;
@@ -89,29 +156,9 @@ void Chair::Update()
         transform_.translate += velocity_ * deltaTime;
     }
 
-
     transform_.translate.y = std::clamp(transform_.translate.y, 0.0f, 2.4f);
     YoshidaMath::ResolveCollision(transform_.translate, velocity_, GetCollisionInfo());
-
-    obj_->SetTransform(transform_);
-    obj_->Update();
-
 }
-
-void Chair::Initialize()
-{
-    isGrab_ = false;
-    obj_->Initialize();
-    velocity_ = { 0.0f };
-    transform_ = obj_->GetTransform();
-}
-
-void Chair::Draw()
-{
-
-    obj_->Draw();
-}
-
 
 bool Chair::OnCollisionRay()
 {

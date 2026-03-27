@@ -25,7 +25,7 @@ ShadowGameScene::ShadowGameScene()
     player_ = std::make_unique<Player>();
     //プレイヤー視点のカメラ
     playerCamera_ = std::make_unique<PlayerCamera>();
-    playerCamera_->SetPlayerTransformPtr(&player_->GetTransform());
+    playerCamera_->SetPlayer(player_.get());
     //テスト地面
     testField_ = std::make_unique<TestField>();
     //ホワイトボード管理
@@ -36,6 +36,7 @@ ShadowGameScene::ShadowGameScene()
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     //懐中電灯
     flashlight_ = std::make_unique<Flashlight>();
+    flashlight_->SetPlayer(player_.get());
     // 鍵管理
     key_ = std::make_unique<Key>();
     // 枝豆管理
@@ -52,13 +53,19 @@ ShadowGameScene::ShadowGameScene()
     vendingMac_ = std::make_unique<VendingMac>();
     //椅子
     chairManager_ = std::make_unique<ChairManager>();
+    //机
+    deskManager_ = std::make_unique<DeskManager>();
+    //打刻機
+    timeCard_ = std::make_unique<TimeCard>();
+    //タイムカードラック
+    timeCardRack_ = std::make_unique<TimeCardRack>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 
     portalManager_->SetPlayerCamera(playerCamera_.get());
     //Playerの座標のポインタを入れる
-    timeCardWatch_->SetTransformPtr(&player_->GetTransform());
-      //UIManager
+    timeCardWatch_->SetPlayer(player_.get());
+    //UIManager
     textUIManager_ = std::make_unique<TextUIManager>();
 
     key_->SetPlayerCamera(playerCamera_.get());
@@ -68,6 +75,7 @@ ShadowGameScene::ShadowGameScene()
     door_->SetPlayerCamera(playerCamera_.get());
     flashlight_->SetPlayerCamera(playerCamera_.get());
     lockerManager_->SetPlayerCamera(playerCamera_.get());
+    deskManager_->SetPlayerCamera(playerCamera_.get());
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -91,6 +99,9 @@ void ShadowGameScene::Initialize()
     isTransitionIn_ = true;
     isTransitionOut_ = false;
 
+    //プレイヤーの初期化
+    player_->Initialize();
+    PlayerCommand::Initialize();
     playerCamera_->Initialize();
 
     //デバックカメラの設定
@@ -98,8 +109,7 @@ void ShadowGameScene::Initialize()
     debugCamera_->SetTranslation(playerCamera_->GetTransform().translate);
 
     InitializeLights();
-    //プレイヤーの初期化
-    player_->Initialize();
+
     //テスト地面
     testField_->Initialize();
     //ホワイトボード管理
@@ -122,6 +132,12 @@ void ShadowGameScene::Initialize()
     door_->Initialize();
     //ロッカー
     lockerManager_->Initialize();
+    //デスク管理
+    deskManager_->Initialize();
+    //打刻機
+    timeCard_->Initialize();
+    //タイムカードラック
+    timeCardRack_->Initialize();
 
     //カーソルを画面中央に設定する
     auto* input = Input::GetInstance();
@@ -170,9 +186,9 @@ void ShadowGameScene::Update()
 
     //オブジェクトの当たり判定
     CheckCollision();
-
     //Text
     textUIManager_->Update();
+
 }
 
 void ShadowGameScene::Draw()
@@ -250,7 +266,9 @@ void ShadowGameScene::CheckCollision()
     for (auto& locker : lockerManager_->GetLockers()) {
         collisionManager_->AddCollider(locker.get());
     }
-
+    for (auto& desk : deskManager_->GetDesks()) {
+        collisionManager_->AddCollider(desk.get());
+    }
     collisionManager_->AddCollider(key_.get());
 
     collisionManager_->CheckAllCollisions();
@@ -400,13 +418,14 @@ void ShadowGameScene::UpdateGameObject()
     spotLights_[1] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
 
-    portalManager_->WarpPlayer(player_.get());
-
     if (!useDebugCamera_) {
         playerCamera_->Update();
     }
+
+    portalManager_->WarpPlayer(player_.get());
     //プレイヤー
     player_->Update();
+
     //携帯打刻機
     timeCardWatch_->Update();
     //懐中電灯
@@ -429,11 +448,32 @@ void ShadowGameScene::UpdateGameObject()
     door_->Update();
     //ロッカー
     lockerManager_->Update();
+    //机
+    deskManager_->Update();
     //ポータル管理
     portalManager_->Update();
+    //打刻機
+    timeCard_->SetTransform({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f}, { 8.0f, 1.0f, -7.0f } });
+    timeCard_->Update();
+    //タイムカードラック
+    timeCardRack_->SetTransform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 7.75f,1.3f,-7.0f } });
+    timeCardRack_->Update();
+
+
 
     if (*key_->GetKeyPtr()) {
         door_->SetIsGetKey(key_->GetKeyPtr());
+    }
+
+    for (auto& chair : chairManager_->GetChairs()) {
+        if (chair->GetIsStand()) {
+            Vector3 pos = chair->GetWorldPosition();
+            pos.y += 1.0f;
+            player_->SetTranslate(pos);
+            chair->SetIsStand(false);
+            PlayerCommand::SetIsStand(false);
+            break;
+        }
     }
 
     ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
@@ -441,53 +481,53 @@ void ShadowGameScene::UpdateGameObject()
 }
 void ShadowGameScene::UpdateLight() {
 #pragma region // Lightを組み込む
-	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
-	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
-	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
-	Object3dCommon::GetInstance()->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
+    Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+    Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
+    Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
+    Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
+    Object3dCommon::GetInstance()->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
 #pragma endregion
 
 #ifdef USE_IMGUI
-	if (ImGui::TreeNode("Light")) {
-		ImGui::DragFloat3("Area0Position", &areaLights_[0].position.x, 0.1f);
-		ImGui::DragFloat3("Area1Position", &areaLights_[1].position.x, 0.1f);
-		ImGui::Checkbox("DirectionalShadow", &useDirectionalShadow_);
-		ImGui::Checkbox("PointShadow", &usePointShadow_);
-		ImGui::Checkbox("SpotShadow", &useSpotShadow_);
-		ImGui::Checkbox("AreaShadow", &useAreaShadow_);
-		pointLights_[0].shadowEnabled = usePointShadow_ ? 1 : 0;
-		spotLights_[0].shadowEnabled = useSpotShadow_ ? 1 : 0;
-		areaLights_[0].shadowEnabled = useAreaShadow_ ? 1 : 0;
-		ImGui::TreePop();
-	}
+    if (ImGui::TreeNode("Light")) {
+        ImGui::DragFloat3("Area0Position", &areaLights_[0].position.x, 0.1f);
+        ImGui::DragFloat3("Area1Position", &areaLights_[1].position.x, 0.1f);
+        ImGui::Checkbox("DirectionalShadow", &useDirectionalShadow_);
+        ImGui::Checkbox("PointShadow", &usePointShadow_);
+        ImGui::Checkbox("SpotShadow", &useSpotShadow_);
+        ImGui::Checkbox("AreaShadow", &useAreaShadow_);
+        pointLights_[0].shadowEnabled = usePointShadow_ ? 1 : 0;
+        spotLights_[0].shadowEnabled = useSpotShadow_ ? 1 : 0;
+        areaLights_[0].shadowEnabled = useAreaShadow_ ? 1 : 0;
+        ImGui::TreePop();
+    }
 #endif
 }
 #pragma endregion
 
 #pragma region // private描画処理
 void ShadowGameScene::DrawSceneTransition() {
-	if (isTransitionIn_ || isTransitionOut_) {
-		transition_->Draw();
-	}
+    if (isTransitionIn_ || isTransitionOut_) {
+        transition_->Draw();
+    }
 }
 
 void ShadowGameScene::DrawModel() {
-	//=======================shadowマップの開始↓=======================
-	auto* object3dCommon = Object3dCommon::GetInstance();
-	const bool shadowFlags[4] = {useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_};
-	for (int i = 0; i < 4; ++i) {
-		if (!shadowFlags[i]) {
-			continue;
-		}
-		object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
-		object3dCommon->BeginShadowMapPass();
-		object3dCommon->DrawCommonShadow();
-		DrawGameObject(true, false, false, true);
-		object3dCommon->EndShadowMapPass();
-	}
-	object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
-	//=======================shadowマップの終了↑=======================
+    //=======================shadowマップの開始↓=======================
+    auto* object3dCommon = Object3dCommon::GetInstance();
+    const bool shadowFlags[4] = { useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_ };
+    for (int i = 0; i < 4; ++i) {
+        if (!shadowFlags[i]) {
+            continue;
+        }
+        object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
+        object3dCommon->BeginShadowMapPass();
+        object3dCommon->DrawCommonShadow();
+        DrawGameObject(true, false, false, true);
+        object3dCommon->EndShadowMapPass();
+    }
+    object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
+    //=======================shadowマップの終了↑=======================
 
     for (auto& portal : portalManager_->GetPortals()) {
         portal->BeginRender();
@@ -515,6 +555,8 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     door_->Draw();
     //ロッカー
     lockerManager_->Draw();
+    //机
+    deskManager_->Draw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //懐中電灯
@@ -525,6 +567,10 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     edamame_->Draw();
     //椅子の描画
     chairManager_->Draw();
+    //打刻機
+    timeCard_->Draw();
+    //タイムカードラック
+    timeCardRack_->Draw();
 
     if (!isShadow) {
         Object3dCommon::GetInstance()->DrawCommonSkinning();
@@ -554,6 +600,9 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     vendingMac_->SetCamera(camera);
     door_->SetCamera(camera);
     lockerManager_->SetCamera(camera);
+    deskManager_->SetCamera(camera);
+    timeCard_->SetCamera(camera);
+    timeCardRack_->SetCamera(camera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {

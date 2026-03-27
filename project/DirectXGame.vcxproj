@@ -174,6 +174,9 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Coffee\CoffeeTrivia.cpp" />
     <ClCompile Include="application\GameObject\BGMManager\BGMManager.cpp" />
     <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
+    <ClCompile Include="application\GameObject\Desk\Desk.cpp" />
+    <ClCompile Include="application\GameObject\Desk\DeskManager.cpp" />
+    <ClCompile Include="application\Text\ChairMenu\ChairMenu.cpp" />
     <ClCompile Include="Engine\Editor\Object3d\EditorObject3d.cpp" />
     <ClCompile Include="Engine\Editor\Primitive\EditorPrimitive.cpp" />
     <ClCompile Include="Engine\Editor\Light\EditorLight.cpp" />
@@ -282,6 +285,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Text\FirstStory\FirstStory.cpp" />
     <ClCompile Include="application\GameObject\Locker\Locker.cpp" />
     <ClCompile Include="application\GameObject\Locker\LockerManager.cpp" />
+    <ClCompile Include="application\GameObject\TimeCard\TimeCard.cpp" />
+    <ClCompile Include="application\GameObject\TimeCard\TimeCardRack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -319,6 +324,9 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Coffee\CoffeeTrivia.h" />
     <ClInclude Include="application\GameObject\BGMManager\BGMManager.h" />
     <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
+    <ClInclude Include="application\GameObject\Desk\Desk.h" />
+    <ClInclude Include="application\GameObject\Desk\DeskManager.h" />
+    <ClInclude Include="application\Text\ChairMenu\ChairMenu.h" />
     <ClInclude Include="Engine\Editor\Object3d\EditorObject3d.h" />
     <ClInclude Include="Engine\Editor\Primitive\EditorPrimitive.h" />
     <ClInclude Include="Engine\Editor\Light\EditorLight.h" />
@@ -430,6 +438,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Text\FirstStory\FirstStory.h" />
     <ClInclude Include="application\GameObject\Locker\Locker.h" />
     <ClInclude Include="application\GameObject\Locker\LockerManager.h" />
+    <ClInclude Include="application\GameObject\TimeCard\TimeCard.h" />
+    <ClInclude Include="application\GameObject\TimeCard\TimeCardRack.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

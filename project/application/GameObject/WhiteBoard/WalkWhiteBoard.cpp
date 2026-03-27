@@ -4,9 +4,20 @@
 #include "Model/ModelManager.h"
 #include"DirectXCommon.h"
 #include<imgui.h>
+#include"Animation/AnimationManager.h"
+#include"GameBase.h"
 
 //アニメーションクリップ
 std::vector<Animation::AnimationData>WalkWhiteBoard:: animationClips_;
+
+WalkWhiteBoard::WalkWhiteBoard()
+{
+    localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
+    /* SetRadius(1.0f);*/
+    SetAABB(AABB{ .min = {-0.0f,0.5f,-0.5f}, .max = {0.5f,1.5f,0.5f} });
+    SetCollisionAttribute(kCollisionEnemy);
+    SetCollisionMask(kCollisionPlayer);
+}
 
 void WalkWhiteBoard::OnCollision(Collider* collider)
 {
@@ -14,8 +25,8 @@ void WalkWhiteBoard::OnCollision(Collider* collider)
     if (collider->GetCollisionAttribute() == kCollisionPlayer) {
         if (!isMove_) {
             isMove_ = true;
+            desiredAnimationName = "WalkStart";
         }
-    
     }
 }
 
@@ -29,23 +40,18 @@ void WalkWhiteBoard::Initialize()
 {
     isMove_ = false;
     obj_->Initialize();
-    transform_ = { .scale = {1.0f,1.0f,1.0f}, .rotate = {0.0f,Function::kPi ,0.0f},.translate = {-5.0f,0.0f,7.0f} };
+    transform_ = { .scale = {1.0f,1.0f,1.0f}, .rotate = {0.0f,Function::kPi ,0.0f},.translate = {-4.0f,0.0f,6.5f} };
     velocity_ = { 0.0f };
-    localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
-    /* SetRadius(1.0f);*/
-    SetAABB(AABB{ .min = {-0.0f,0.5f,-0.5f}, .max = {0.5f,1.5f,0.5f} });
-    SetCollisionAttribute(kCollisionEnemy);
-    SetCollisionMask(kCollisionPlayer);
 
 #ifdef _DEBUG
     primitive_->Initialize(Primitive::Box);
     primitive_->SetColor({ 1.0f,1.0f,1.0f,0.1f });
 #endif
 
-    animationTime_ = 0.0f;
-    if (!animationClips_.empty()) {
-        SetAnimationIndex(1);
-        obj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
+    AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
+    AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "Idle", true);
+    if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, "Idle")) {
+        obj_->SetAnimation(idleAnimation, true);
     }
 
     if (Model* walkModel = ModelManager::GetInstance()->FindModel("whiteBoard")) {
@@ -55,6 +61,7 @@ void WalkWhiteBoard::Initialize()
             obj_->SetSkinCluster(&skinCluster_);
         }
     }
+
 
 }
 
@@ -66,13 +73,11 @@ void WalkWhiteBoard::Update()
             velocity_ = YoshidaMath::GetToTargetVec(*targetPos_, transform_.translate);
             velocity_ *= YoshidaMath::kDeltaTime;
             transform_.translate.x += velocity_.x;
-            /*       transform_.translate.y += velocity;*/
             transform_.translate.z += velocity_.z;
         }
-
-
-        Animation();
     }
+
+    Animation();
 
     obj_->SetTransform(transform_);
     obj_->Update();
@@ -86,16 +91,12 @@ void WalkWhiteBoard::Update()
 #ifdef _DEBUG
     primitive_->SetTransform(collisionTransform_);
     primitive_->Update();
-
-
 #endif
 #ifdef USE_IMGUI
     ImGui::Begin("WalkWhiteBoard");
     ImGui::Checkbox("isMove", &isMove_);
     ImGui::End();
 #endif
-
-
 }
 
 void WalkWhiteBoard::Draw()
@@ -111,21 +112,48 @@ void WalkWhiteBoard::ResetCollisionAttribute()
     SetCollisionAttribute(kCollisionEnemy);
 }
 
+void WalkWhiteBoard::SetCollisionAttributeNoneAndInitialize()
+{
+    desiredAnimationName = "Idle";
+    SetCollisionAttribute(kCollisionNone);
+    isMove_ = false;
+}
+
 void WalkWhiteBoard::Animation()
 {
-
-    float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-
-    if (skeleton_ && !animationClips_.empty()) {
-        const Animation::AnimationData& currentAnimation = animationClips_[currentAnimationIndex_];
-
-        animationTime_ = Animation::AdvanceTime(currentAnimation, animationTime_, deltaTime, true);
-        skeleton_->ApplyAnimation(currentAnimation, animationTime_);
-        skeleton_->Update();
-        if (!skinCluster_.mappedPalette.empty()) {
-            UpdateSkinCluster(skinCluster_, *skeleton_);
-        }
-        Matrix4x4 humanWorld = obj_->GetWorldMatrix();
-        skeleton_->SetObjectMatrix(humanWorld);
+    bool loopAnimation = false;
+    if (desiredAnimationName == "Idle") {
+        loopAnimation = false;
+    } else if (desiredAnimationName == "WalkStart") {
+        loopAnimation = false;
+    } else if (desiredAnimationName == "Walking") {
+        loopAnimation = true;
     }
+
+
+    const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+    AnimationManager::PlaybackResult playbackResult{};
+    if (AnimationManager::GetInstance()->UpdatePlayback(animationGroupName_, desiredAnimationName, loopAnimation, deltaTime, kAnimationBlendDuration_, blendedPoseAnimation_, playbackResult)) {
+        animationFinished_ = playbackResult.animationFinished;
+        if (playbackResult.changedAnimation && playbackResult.currentAnimation) {
+            obj_->SetAnimation(playbackResult.currentAnimation, loopAnimation);
+        }
+
+        if (skeleton_ && playbackResult.animationToApply) {
+            skeleton_->ApplyAnimation(*playbackResult.animationToApply, playbackResult.animationTime);
+            skeleton_->Update();
+            if (!skinCluster_.mappedPalette.empty()) {
+                UpdateSkinCluster(skinCluster_, *skeleton_);
+            }
+        }
+    }
+
+    if (animationFinished_) {
+    
+        if (desiredAnimationName == "WalkStart") {
+            desiredAnimationName = "Walking";
+        }
+    }
+
+
 }

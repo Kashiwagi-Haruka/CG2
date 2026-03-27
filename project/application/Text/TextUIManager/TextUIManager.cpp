@@ -4,6 +4,8 @@
 #include"DirectXCommon.h"
 #include"GameObject/Edamame/EdamameTrivia.h"
 #include"GameObject/Key/Key.h"
+#include"GameObject/Flashlight/Flashlight.h"
+
 #include <codecvt>
 #include <locale>
 
@@ -28,6 +30,7 @@ TextUIManager::TextUIManager()
     edamameTrivia_.SetBlendMode(BlendMode::kBlendModeAlpha);
     edamameTrivia_.UpdateLayout();
 
+    chairMenu_ = std::make_unique<ChairMenu>();
 }
 
 TextUIManager::~TextUIManager()
@@ -39,6 +42,7 @@ void TextUIManager::Initialize()
 {
     isDraw_ = false;
     showTimer_ = showTime_;
+    chairMenu_->Initialize();
 }
 
 void TextUIManager::Update()
@@ -55,36 +59,46 @@ void TextUIManager::Update()
 
     if (Door::GetOpenMassage()) {
         text_.SetString(U"扉が開いた。");
-        text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-        isDraw_ = true;
+        StartText();
     } else if (Key::GetGetKeyMessage()) {
         text_.SetString(U"鍵を入手した。");
-        text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-        isDraw_ = true;
+        StartText();
     } else if (Door::GetLockMassage()) {
         text_.SetString(U"鍵がかかっている。");
-        text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-        isDraw_ = true;
+        StartText();
+    } else if (Flashlight::IsGetLightMessage()) {
+        text_.SetString(U"懐中電灯を取得した。");
+        StartText();
     }
-
 
     if (EdamameTrivia::GetIsSendStartTriviaMessage()) {
         edamameTrivia_.SetString(EdamameTrivia::GetString());
-        edamameTrivia_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
+        edamameTrivia_.StartTyping(0.1f); // 0.1秒ごとに1文字ずつ表示
     }
 
     text_.Update();
     edamameTrivia_.Update();
+
+    chairMenu_->Update();
 }
 
 void TextUIManager::Draw()
 {
-
-    edamameTrivia_.Draw();
-
     if (isDraw_) {
         text_.Draw();
     }
 
+    if (ChairMenu::GetIsShowMenu()) {
+        chairMenu_->Draw();
+    } else {
+        edamameTrivia_.Draw();
+    }
+
     FreeTypeManager::ResetFontUsage();
+}
+
+void TextUIManager::StartText()
+{
+    text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
+    isDraw_ = true;
 }

@@ -22,6 +22,8 @@ public:
     AABB GetAABB();
     Transform& GetCollisionTransform() { return collisionTransform_; }
     virtual void ResetCollisionAttribute();
+    //衝突マスクをセットするのとイニシャライズ
+    virtual void SetCollisionAttributeNoneAndInitialize();
 protected:
     std::unique_ptr<Object3d>obj_ = nullptr;
 #ifdef _DEBUG

@@ -10,6 +10,12 @@ enum GameKeyBind
     K_MoveRight = DIK_D,
     K_MoveForward = DIK_W,
     K_MoveBackward = DIK_S,
+
+    K_MoveLeftArrow = DIK_LEFT,
+    K_MoveRightArrow = DIK_RIGHT,
+    K_MoveForwardArrow = DIK_UP,
+    K_MoveBackwardArrow = DIK_DOWN,
+
     K_Shot = DIK_SPACE,
     K_Sneak = DIK_LSHIFT,
     K_Interact = DIK_E,
@@ -31,6 +37,10 @@ class PlayerCommand {
 
 private:
     static std::unique_ptr<PlayerCommand> instance_;
+    //何かをつかんでいるかどうか
+    static bool isGrab_;
+    //何かにたっているかどうか
+    static bool isStand_;
 public:
     static PlayerCommand* GetInstance();
     PlayerCommand(const PlayerCommand&) = delete;
@@ -49,10 +59,16 @@ public:
     bool Sneak();
     bool Interact();
     bool InteractTrigger();
+    bool MouseWheelUp();
+    bool MouseWheelDown();
     Vector2 Rotate(float rotateSpeed);
-
+    static bool GetIsGrab() { return isGrab_; };
+    static void SetIsGrab(bool flag) { isGrab_ = flag; }
+    static bool GetIsStand() { return isStand_; };
+    static void SetIsStand(bool flag) { isStand_ = flag; }
+    static void Initialize();
 private:
-    bool MoveTrigger(const GameKeyBind key, const GameKeyBind controller);
-    bool Move(const GameKeyBind key, const GameKeyBind controller);
+    bool MoveTrigger(const GameKeyBind key, const GameKeyBind key2, const GameKeyBind controller);
+    bool Move(const GameKeyBind key, const GameKeyBind key2, const GameKeyBind controller);
     PlayerCommand() = default;
 };

@@ -6,7 +6,7 @@
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include"WinApp.h"
-
+#include"GameObject/Player/Player.h"
 
 PlayerCamera::PlayerCamera()
 {
@@ -14,7 +14,7 @@ PlayerCamera::PlayerCamera()
     cameraTransform_ = {
     .scale{1.0f, 1.0f, 1.0f  },
     .rotate{0.0f, 0.0f, 0.0f  },
-    .translate{0.0f, 5.0f, -10.0f}
+    .translate{0.0f, 0.0f, 0.0f}
     };
 
     //カメラを生成する
@@ -35,22 +35,13 @@ void PlayerCamera::Update()
     SetTransform();
     SetRay();
     camera_->Update();
-
-    // レイの判定&インタラクト
-    auto* playerCommand = PlayerCommand::GetInstance();
-    
-    if (playerCommand->Interact()) {
-    }
-  
     raySprite_->Update();
-    
 }
 
 void PlayerCamera::Rotate()
 {
     Vector2 deltaRotate = PlayerCommand::GetInstance()->Rotate(eyeRotateSpeed_);
-
-    playerTransform_->rotate.y += deltaRotate.y;
+    player_->GetTransform().rotate.y += deltaRotate.y;
     cameraTransform_.rotate.x += deltaRotate.x;
 #ifdef USE_IMGUI
     if (ImGui::TreeNode("Eye")) {
@@ -82,7 +73,7 @@ void PlayerCamera::Initialize()
     raySprite_->Initialize();
 }
 
-bool PlayerCamera::OnCollisionRay(const AABB& localAABB,const Vector3& translate)
+bool PlayerCamera::OnCollisionRay(const AABB& localAABB, const Vector3& translate)
 {
     return YoshidaMath::RayIntersectsAABB(GetRay(), YoshidaMath::GetAABBWorldPos(localAABB, translate), kTMin_, kTMax_);
 }
@@ -90,25 +81,29 @@ bool PlayerCamera::OnCollisionRay(const AABB& localAABB,const Vector3& translate
 
 void PlayerCamera::SetTransform()
 {
-    assert(playerTransform_);
 
     Rotate();
 
-    //Playerからの視点
+
     cameraTransform_.scale = { 1.0f,1.0f,1.0f };
+
     float halfPi = Function::kPi * 0.5f;
     cameraTransform_.rotate.x =
-
         std::clamp(
             cameraTransform_.rotate.x,
             -halfPi,
-            halfPi- halfPi * 0.25f);
+            halfPi - halfPi * 0.25f);
 
-    cameraTransform_.rotate.y = playerTransform_->rotate.y;
+    cameraTransform_.rotate.y = player_->GetTransform().rotate.y;
     cameraTransform_.rotate.z = 0.0f;
 
-    cameraTransform_.translate = playerTransform_->translate;
-    cameraTransform_.translate.y += 1.6f;
+    //Playerの頭
+    cameraTransform_.translate = player_->GetJointWorldPos("Head");
+
+    //if (揺れなし) {
+    //    cameraTransform_.translate = player_->GetTransform().translate;
+    //    cameraTransform_.translate.y += 1.6f;
+    //}
 
     camera_->SetTransform(cameraTransform_);
 

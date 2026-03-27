@@ -4,6 +4,7 @@
 std::array<std::u32string, 8> EdamameTrivia::strings_;
 size_t EdamameTrivia::triviaNum_ = 0;
 bool EdamameTrivia::isSendStartTriviaMessage_ = false;
+ bool EdamameTrivia::isDraw_= false;
 EdamameTrivia::EdamameTrivia()
 {
     //枝豆
@@ -29,33 +30,36 @@ void EdamameTrivia::Initialize()
 {
     triviaNum_ = strings_.size() - 1;
     isSendStartTriviaMessage_ = false;
+    isDraw_ = false;
 }
 
 void EdamameTrivia::Update()
 {
     isSendStartTriviaMessage_ = false;
 
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
-
-        isSendStartTriviaMessage_ = true;
-        std::string  filePath = "Resources/TD3_3102/Audio/Voice/Edamame/" + std::to_string(triviaNum_) + ".mp3";
-        Audio::GetInstance()->SoundUnload(&triviaVoice_);
-
-        if (triviaNum_ < strings_.size() - 1) {
-            triviaNum_++;
-        } else {
-            triviaNum_ = 0;
-        }
-
-        filePath = "Resources/TD3_3102/Audio/Voice/Edamame/" + std::to_string(triviaNum_) + ".mp3";
-        triviaVoice_ = Audio::GetInstance()->SoundLoadFile(filePath.c_str());
-        Audio::GetInstance()->SoundPlayWave(triviaVoice_, false);
+    if (PlayerCommand::GetInstance()->InteractTrigger()|| 
+        Audio::GetInstance()->IsSoundFinished(triviaVoice_)&& triviaNum_ != strings_.size() - 1) {
+        SetSound();
     }
 
 }
 
-void EdamameTrivia::Draw()
+void EdamameTrivia::SetSound()
 {
+
+    isSendStartTriviaMessage_ = true;
+    std::string  filePath = "Resources/TD3_3102/Audio/Voice/Edamame/" + std::to_string(triviaNum_) + ".mp3";
+    Audio::GetInstance()->SoundUnload(&triviaVoice_);
+
+    if (triviaNum_ < strings_.size() - 1) {
+        triviaNum_++;
+    } else {
+        triviaNum_ = 0;
+    }
+
+    filePath = "Resources/TD3_3102/Audio/Voice/Edamame/" + std::to_string(triviaNum_) + ".mp3";
+    triviaVoice_ = Audio::GetInstance()->SoundLoadFile(filePath.c_str());
+    Audio::GetInstance()->SoundPlayWave(triviaVoice_, false);
 }
 
 void EdamameTrivia::SetVol(float vol)

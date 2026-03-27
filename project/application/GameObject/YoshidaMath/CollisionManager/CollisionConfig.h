@@ -26,6 +26,8 @@ namespace {
     constexpr uint64_t kCollisionMat = 0b1 << 10;
     //ロッカー
     constexpr uint64_t kCollisionLocker = 0b1 << 11;
+    //机
+    constexpr uint64_t kCollisionDesk = 0b1 << 12;
     //何の陣営にも属さない
     constexpr uint32_t kCollisionNone = 0b0;
 }

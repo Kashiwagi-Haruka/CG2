@@ -6,34 +6,35 @@
 #include<imgui.h>
 #include"Camera.h"
 #include"Audio.h"
+#include"GameObject/Player/Player.h"
 
 TimeCardWatch::TimeCardWatch()
 {
-    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/timeCard", "timeCard");
+    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/timeCardWatch", "timeCardWatch");
     modelObj_ = std::make_unique<Object3d>();
-    modelObj_->SetModel("timeCard");
+    modelObj_->SetModel("timeCardWatch");
 }
 
 void TimeCardWatch::Initialize()
 {
     modelObj_->Initialize();
-    transform_ = { .scale = {20.0f,20.0f,20.0f},.rotate = {-Function::kPi,0.0f,2.55f},.translate = {1.5f,-1.2f,1.5f} };
+    transform_ = { .scale = {2.0f,2.0f,2.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.05f,0.0f} };
 }
 
 void TimeCardWatch::SetCamera(Camera* camera)
 {
-    //カメラのセット
-    modelObj_->SetCamera(camera);
     camera_ = camera;
     assert(camera_);
+    //カメラのセット
+    modelObj_->SetCamera(camera);
     modelObj_->UpdateCameraMatrices();
 }
 
 void TimeCardWatch::Update()
 {
     Matrix4x4 child = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-    assert(parentTransform_);
-    Matrix4x4 parent = camera_->GetWorldMatrix();
+    assert(player_);
+    Matrix4x4 parent =player_->GetJointMatrix("Hand.R");
     child = Function::Multiply(child, parent);
 
     modelObj_->SetWorldMatrix(child);

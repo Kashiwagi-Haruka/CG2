@@ -12,7 +12,6 @@
 #include <string>
 
 class Camera;
-
 class Player : public YoshidaMath::Collider {
 private:
     static constexpr const char* kParameterFileName = "playerParameters.json";
@@ -39,38 +38,42 @@ private:
     float moveSpeed_ = { 0.0f };
     AABB localAABB_ = { 0.0f };
 
+    // プレイヤーのパラメータ
+    PlayerParameters parameters_{};
+    std::string parameterStatusMessage_{};
 
-    //何かをつかんでいるかどうか
-    static bool isGrab_;
-	// プレイヤーのパラメータ
-	PlayerParameters parameters_{};
-	std::string parameterStatusMessage_{};
+    void SaveParameters();
+    void LoadParameters();
 
-	void SaveParameters();
-	void LoadParameters();
+    static constexpr const char* kLeftFootJointName = "foot.L";
+    static constexpr const char* kRightFootJointName = "foot.R";
+    static constexpr float kFootContactHalfWidth = 0.08f;
+    static constexpr float kFootContactHeight = 0.06f;
+    static constexpr float kWalkFootstepInterval = 0.40f;
+    static constexpr float kSneakFootstepInterval = 0.55f;
 
-	static constexpr const char* kLeftFootJointName = "foot.L";
-	static constexpr const char* kRightFootJointName = "foot.R";
-	static constexpr float kFootContactHalfWidth = 0.08f;
-	static constexpr float kFootContactHeight = 0.06f;
-	static constexpr float kWalkFootstepInterval = 0.40f;
-	static constexpr float kSneakFootstepInterval = 0.55f;
+    SoundData footStepSE;
+    float soundTimer_ = 0.0f;
+    bool leftFootGrounded_ = false;
+    bool rightFootGrounded_ = false;
 
-	SoundData footStepSE;
-	float soundTimer_ = 0.0f;
-	bool leftFootGrounded_ = false;
-	bool rightFootGrounded_ = false;
-
-	void ResetFootContactState();
-	void UpdateFootContact(Collider* collider);
-	bool CheckFootContact(Collider* collider, const char* jointName) const;
-	bool IsMovingHorizontally() const;
-	void PlayFootstepSE();
+    void ResetFootContactState();
+    void UpdateFootContact(Collider* collider);
+    bool CheckFootContact(Collider* collider, const char* jointName) const;
+    bool IsMovingHorizontally() const;
+    void PlayFootstepSE();
+    // 移動
+    void Move();
+    // 重力処理
+    void Gravity();
+    // アニメーション
+    void Animation();
 
 
 public:
-    static bool GetIsGrab() { return isGrab_; };
-    static void SetIsGrab(bool flag) { isGrab_ = flag; }
+    Matrix4x4 GetJointMatrix(const char* jointName)const;
+    Vector3 GetJointWorldPos(const char* jointName)const;
+
     void OnCollision(Collider* collider) override;
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
@@ -80,6 +83,8 @@ public:
     Transform& GetTransform() { return transform_; };
     // 前方のベクトルを取得する
     const Vector3& GetForward() const { return forward_; };
+    // ワールド行列の取得
+    const Matrix4x4& GetWorldMatrix() const { return bodyObj_->GetWorldMatrix(); }
     void SetTranslate(const Vector3& translate) { transform_.translate = translate; };
     void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
     // コンストラクタ
@@ -90,18 +95,8 @@ public:
     void Initialize();
     // 更新処理
     void Update();
-
     // 描画処理
     void Draw();
     // デバック
     void Debug();
-    // 移動
-    void Move();
-    // 重力処理
-    void Gravity();
-
-    // アニメーション
-    void Animation();
-    // ワールド行列の取得
-    const Matrix4x4& GetWorldMatrix() const { return bodyObj_->GetWorldMatrix(); }
 };
