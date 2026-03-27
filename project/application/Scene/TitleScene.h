@@ -17,7 +17,6 @@ class GameBase;
 class TitleScene : public BaseScene {
 private:
     SoundData BGMData_;
-    bool isBGMPlaying;
     bool isTransitionIn = false;
     bool isTransitionOut = false;
     std::unique_ptr<SceneTransition> transition = nullptr;

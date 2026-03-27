@@ -63,7 +63,8 @@ void TitleScene::Finalize() {
 
 void TitleScene::Initialize() {
 
-    isBGMPlaying = false;
+    Audio::GetInstance()->SoundPlayWave(BGMData_, true);
+
     isTransitionIn = true;
     isTransitionOut = false;
     transition->Initialize(false);
@@ -104,10 +105,6 @@ void TitleScene::Initialize() {
 
 void TitleScene::Update() {
 
-    if (!isBGMPlaying) {
-        Audio::GetInstance()->SoundPlayWave(BGMData_, true);
-        isBGMPlaying = true;
-    }
 
     titleMenuUI_->Update();
 
