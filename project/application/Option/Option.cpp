@@ -48,6 +48,13 @@ void Option::Initialize() {
 	optionTitleText_.SetAlign(TextAlign::Center);
 	optionTitleText_.UpdateLayout(false);
 
+	saveHintText_.Initialize(fontHandle_);
+	saveHintText_.SetString(U"Eで保存して戻る");
+	saveHintText_.SetPosition({WinApp::kClientWidth / 2.0f, WinApp::kClientHeight - 30.0f});
+	saveHintText_.SetColor(COLOR::WHITE);
+	saveHintText_.SetAlign(TextAlign::Center);
+	saveHintText_.UpdateLayout(false);
+
 	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
 		Text& parameterLabel = optionParameterTexts_[parameterIndex];
 		parameterLabel.Initialize(fontHandle_);
@@ -161,6 +168,7 @@ void Option::Draw() {
 
 	SpriteCommon::GetInstance()->DrawCommonFont();
 	optionTitleText_.Draw();
+	saveHintText_.Draw();
 	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
 		optionParameterTexts_[parameterIndex].Draw();
 	}

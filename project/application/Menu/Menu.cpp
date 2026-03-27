@@ -88,6 +88,20 @@ void Menu::Initialize() {
 	GameEndText_.SetAlign(TextAlign::Center);
 	GameEndText_.UpdateLayout(false);
 
+		tabBackHintText_.Initialize(fontHandle_);
+	tabBackHintText_.SetString(U"TABで戻る");
+	tabBackHintText_.SetPosition({30.0f, WinApp::kClientHeight - 30.0f});
+	tabBackHintText_.SetColor(COLOR::WHITE);
+	tabBackHintText_.SetAlign(TextAlign::Left);
+	tabBackHintText_.UpdateLayout(false);
+
+	confirmHintText_.Initialize(fontHandle_);
+	confirmHintText_.SetString(U"Eで決定");
+	confirmHintText_.SetPosition({WinApp::kClientWidth - 30.0f, WinApp::kClientHeight - 30.0f});
+	confirmHintText_.SetColor(COLOR::WHITE);
+	confirmHintText_.SetAlign(TextAlign::Right);
+	confirmHintText_.UpdateLayout(false);
+
 	const uint32_t overlayTexture = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
 	backgroundOverlaySprite_ = std::make_unique<Sprite>();
 	backgroundOverlaySprite_->Initialize(overlayTexture);
@@ -204,4 +218,6 @@ void Menu::Draw() {
 	OptionText_.Draw();
 	TitleText_.Draw();
 	GameEndText_.Draw();
-}
+	tabBackHintText_.Draw();
+	confirmHintText_.Draw();
+	}

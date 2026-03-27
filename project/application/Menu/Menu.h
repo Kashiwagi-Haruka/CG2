@@ -1,9 +1,9 @@
 #pragma once
 #include "Option/Option.h"
+#include "Sprite/Sprite.h"
 #include "Text/Text.h"
 #include <memory>
 #include <string>
-#include "Sprite/Sprite.h"
 class Menu {
 public:
 	enum class Action { kNone, kResumeGame, kSave, kOpenOption, kBackToTitle, kEndGame };
@@ -23,6 +23,8 @@ private:
 	Text OptionText_;
 	Text TitleText_;
 	Text GameEndText_;
+	Text tabBackHintText_;
+	Text confirmHintText_;
 	uint32_t fontHandle_ = 0;
 	std::unique_ptr<Sprite> backgroundOverlaySprite_{};
 

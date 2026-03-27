@@ -19,6 +19,7 @@ class Option {
 
 	uint32_t fontHandle_ = 0;
 	Text optionTitleText_;
+	Text saveHintText_;
 	std::array<Text, kOptionParameterNum> optionParameterTexts_;
 	const std::array<std::u32string, kOptionParameterNum> kParameterLabels_ = {
 	    U"カメラの感度設定",

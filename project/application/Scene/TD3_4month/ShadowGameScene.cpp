@@ -193,7 +193,7 @@ void ShadowGameScene::Update()
 			PostQuitMessage(0);
 		}
 	}
-
+	PlayerCommand::SetIsUiInputLocked(isPause_);
     //シーン遷移の更新処理
     UpdateSceneTransition();
     //カメラの更新処理
