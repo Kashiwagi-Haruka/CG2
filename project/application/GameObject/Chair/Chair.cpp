@@ -41,22 +41,30 @@ void Chair::Update()
 {
     Mirror();
 
-    //rayと重なると
-    if (OnCollisionRay()) {
-        //インタラクトをトリガーすると
-        if (PlayerCommand::GetInstance()->InteractTrigger()) {
-            if (ChairMenu::GetIsShowMenu()) {
-                if (ChairMenu::GetIsSelectButton()) {
-                    //数値によって処理を変更する
-                    SwichCommand();
-                    ChairMenu::SetIsSelectButton(false);
-                }
-            } else {
-                //メニューを表示してないとき表示する
-                ChairMenu::SetIsShowMenu(true);
-            }
-        }
-    }
+	// Rayが外れたらメニューを自動で閉じる
+	if (isPreOnCollisionRay_ && !OnCollisionRay() && !isGrab_ && ChairMenu::GetIsShowMenu()) {
+		ChairMenu::SetIsShowMenu(false);
+		ChairMenu::SetIsSelectButton(false);
+	}
+
+	// rayと重なる、または椅子を持っていると
+	if (OnCollisionRay() || isGrab_) {
+		// インタラクトをトリガーすると
+		if (PlayerCommand::GetInstance()->InteractTrigger()) {
+			if (ChairMenu::GetIsShowMenu()) {
+				if (ChairMenu::GetIsSelectButton()) {
+					// 数値によって処理を変更する
+					SwichCommand();
+					ChairMenu::SetIsSelectButton(false);
+				}
+			} else {
+				// メニューを表示してないとき表示する
+				ChairMenu::SetIsShowMenu(true);
+			}
+		}
+	}
+
+    isPreOnCollisionRay_ = OnCollisionRay();
 
     Grab();
 
