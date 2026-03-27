@@ -123,11 +123,6 @@ void Option::Update() {
 		optionData_.VoiceVolume = static_cast<float>(currentDivision) / 9.0f;
 	}
 
-	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
-		optionParameterTexts_[parameterIndex].SetColor(parameterIndex == selectedParameterIndex_ ? COLOR::RED : COLOR::WHITE);
-		optionParameterTexts_[parameterIndex].UpdateLayout(false);
-	}
-
 	const int cameraDivision = DivisionFromCameraSensitivity(optionData_.CameraMoveSpeed.x);
 	const int bgmDivision = DivisionFromVolume(optionData_.BGMVolume);
 	const int seDivision = DivisionFromVolume(optionData_.SEVolume);
@@ -135,8 +130,25 @@ void Option::Update() {
 	const int divisions[kOptionParameterNum] = {cameraDivision, bgmDivision, seDivision, voiceDivision};
 
 	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
+		if (parameterIndex >= 1 && divisions[parameterIndex] == 0) {
+			optionParameterTexts_[parameterIndex].SetString(kParameterLabels_[parameterIndex] + U"×");
+		} else {
+			optionParameterTexts_[parameterIndex].SetString(kParameterLabels_[parameterIndex]);
+		}
+		optionParameterTexts_[parameterIndex].SetColor(parameterIndex == selectedParameterIndex_ ? COLOR::RED : COLOR::WHITE);
+		optionParameterTexts_[parameterIndex].UpdateLayout(false);
+	}
+
+	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
 		for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
-			if (divisionIndex <= divisions[parameterIndex]) {
+			bool isGaugeActive = false;
+			if (parameterIndex == 0) {
+				isGaugeActive = (divisionIndex <= divisions[parameterIndex]);
+			} else {
+				isGaugeActive = (divisionIndex < divisions[parameterIndex]);
+			}
+
+			if (isGaugeActive) {
 				parameterSprite_[parameterIndex][divisionIndex].SetColor(parameterIndex == selectedParameterIndex_ ? COLOR::RED : COLOR::WHITE);
 			} else {
 				parameterSprite_[parameterIndex][divisionIndex].SetColor({0.3f, 0.3f, 0.3f, 1.0f});
