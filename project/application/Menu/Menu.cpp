@@ -167,6 +167,19 @@ Menu::Action Menu::ConsumePendingAction() {
 	pendingAction_ = Action::kNone;
 	return action;
 }
+bool Menu::IsOptionOpen() const { return isTrigger_ && currentMenuName_ == "Option" && option_ && option_->GetIsShowOption(); }
+
+void Menu::CloseOptionAndPrepareResume() {
+	if (!IsOptionOpen()) {
+		return;
+	}
+	option_->SaveOptionData();
+	option_->CloseOption();
+	isTrigger_ = false;
+	currentMenuName_ = "Game";
+	pendingAction_ = Action::kResumeGame;
+}
+
 void Menu::Draw() {
 	SpriteCommon::GetInstance()->DrawCommonFont();
 	if (isTrigger_ && currentMenuName_ == "Option") {

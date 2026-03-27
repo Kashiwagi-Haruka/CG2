@@ -35,4 +35,6 @@ public:
 	void Update();
 	void Draw();
 	Action ConsumePendingAction();
+	bool IsOptionOpen() const;
+	void CloseOptionAndPrepareResume();
 };

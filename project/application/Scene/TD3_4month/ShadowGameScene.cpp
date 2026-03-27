@@ -158,6 +158,9 @@ void ShadowGameScene::Update()
     auto* input = Input::GetInstance();
 
     if (input->TriggerKey(DIK_TAB)) {
+		if (isPause_ && menu_ && menu_->IsOptionOpen()) {
+			menu_->CloseOptionAndPrepareResume();
+		}
         //Tabキーでポーズ
         isPause_ = (isPause_) ? false : true;
 
