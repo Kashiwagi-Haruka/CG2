@@ -17,6 +17,7 @@ ShadowGameScene::ShadowGameScene()
     //BGMの管理
     BGMManager::Load();
 
+
     //シーン遷移の設定
     transition_ = std::make_unique<SceneTransition>();
     //デバックカメラ
@@ -92,6 +93,7 @@ void ShadowGameScene::Initialize()
     textUIManager_->Initialize();
 	menu_->Initialize();
     BGMManager::Initialize();
+
     isPause_ = false;
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;
@@ -228,6 +230,7 @@ void ShadowGameScene::Draw()
 
 void ShadowGameScene::Finalize()
 {
+    BGMManager::UnLoad();
 }
 
 void ShadowGameScene::DebugImGui()
@@ -299,53 +302,47 @@ void ShadowGameScene::InitializeLights()
     //フラッシュライト
     flashlight_->Initialize();
 
+    spotLights_[0] = edamame_->GetSpotLight();
     spotLights_[1] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
 
-    activePointLightCount_ = 2;
+    activePointLightCount_ = 1;
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    pointLights_[0].position = { 7.0f, 0.0f, 0.0f };
+    pointLights_[0].position = { 7.0f, 2.0f, 0.0f };
     pointLights_[0].intensity = 1.0f;
     pointLights_[0].radius = 10.0f;
     pointLights_[0].decay = 1.0f;
-    pointLights_[1].color = { 1.0f, 0.0f, 0.0f, 1.0f };
-    pointLights_[1].position = { 5.0f, 5.0f, 5.0f };
-    pointLights_[1].intensity = 1.0f;
-    pointLights_[1].radius = 10.0f;
-    pointLights_[1].decay = 1.0f;
+    //pointLights_[1].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+    //pointLights_[1].position = { 5.0f, 5.0f, 5.0f };
+    //pointLights_[1].intensity = 1.0f;
+    //pointLights_[1].radius = 10.0f;
+    //pointLights_[1].decay = 1.0f;
 
-    directionalLight_.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    directionalLight_.color = { 1.0f, 1.0f, 0.75f, 1.0f };
     directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
-    directionalLight_.intensity = 0.1f;
+    directionalLight_.intensity = 0.25f;
 
     activeSpotLightCount_ = 2;
-    spotLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    spotLights_[0].position = { 2.0f, 1.25f, 0.0f };
-    spotLights_[0].direction = { -1.0f, -1.0f, 0.0f };
-    spotLights_[0].intensity = 4.0f;
-    spotLights_[0].distance = 7.0f;
-    spotLights_[0].decay = 2.0f;
-    spotLights_[0].cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-    spotLights_[0].cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+
 
     activeAreaLightCount_ = 5;
     areaLights_[0].color = { 1.0f,1.0f, 1.0f, 1.0f };
     areaLights_[0].position = { 7.0f, 3.0f, 0.0f };
     areaLights_[0].normal = { 0.0f, 1.0f, 0.0f };
     areaLights_[0].intensity = 10.0f;
-    areaLights_[0].width = 2.0f;
-    areaLights_[0].height = 2.0f;
-    areaLights_[0].radius = 5.0f;
-    areaLights_[0].decay = 2.0f;
+    areaLights_[0].width = 4.0f;
+    areaLights_[0].height = 0.1f;
+    areaLights_[0].radius = 30.0f;
+    areaLights_[0].decay = 0.01f;
 
     areaLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     areaLights_[1].position = { -7.0f, 3.0f, 0.0f };
     areaLights_[1].normal = { 0.0f, 1.0f, 0.0f };
     areaLights_[1].intensity = 10.0f;
-    areaLights_[1].width = 2.0f;
-    areaLights_[1].height = 2.0f;
-    areaLights_[1].radius = 5.0f;
-    areaLights_[1].decay = 2.0f;
+    areaLights_[1].width = 4.0f;
+    areaLights_[1].height = 0.1f;
+    areaLights_[1].radius = 30.0f;
+    areaLights_[1].decay = 0.01f;
 
 }
 #pragma region //private更新処理

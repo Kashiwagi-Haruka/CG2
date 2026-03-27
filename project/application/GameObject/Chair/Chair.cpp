@@ -16,7 +16,7 @@ Chair::Chair()
     obj_->SetModel("chair");
     SetAABB({ .min = {-0.125f,0.0f,-0.125f},.max = {0.125f,0.5f,0.125f} });
     SetCollisionAttribute(kCollisionChair);
-    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionKey);
+    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionKey|kCollisionWall);
 }
 
 void Chair::OnCollision(Collider* collider)
@@ -154,10 +154,12 @@ void Chair::Grab()
     if (isGrab_ && PlayerCommand::GetIsGrab()) {
         // カーソルに追従させて持ち上げる処理
         Vector3 origin = playerCamera_->GetTransform().translate;
-        origin.y -= 0.5f;
-        transform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
+        origin.y -= 1.5f;
+        transform_.translate = origin + playerCamera_->GetRay().diff*1.5f;
         transform_.translate.y = (std::max)(transform_.translate.y, 0.0f);
         velocity_.y = 0.0f;
+        transform_.rotate.y = playerCamera_->GetTransform().rotate.y;
+
     } else {
         const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
         velocity_.y -= YoshidaMath::kGravity * deltaTime;

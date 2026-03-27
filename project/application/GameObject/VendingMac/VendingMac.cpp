@@ -4,8 +4,7 @@
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
 #include<imgui.h>
-
-SoundData VendingMac::noise_;
+#include"GameObject/SEManager/SEManager.h"
 
 VendingMac::VendingMac()
 {
@@ -24,15 +23,14 @@ VendingMac::VendingMac()
     areaLight_.decay = 1.0f;
     translate_ = { 0.0f,1.3f,0.6f };
 
-    noise_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/noise.mp3");
-    Audio::GetInstance()->SetSoundVolume(&noise_, 0.0f);
+
 
 
 }
 
 VendingMac::~VendingMac()
 {
-    Audio::GetInstance()->SoundUnload(&noise_);
+
 }
 
 void VendingMac::OnCollision(Collider* collider)
@@ -58,14 +56,14 @@ void VendingMac::Update()
     // プレイヤーのカメラ位置から
     Vector3 distance = playerCamera_->GetRay().origin - obj_->GetTranslate();
     float  length = Function::Length(distance);
-    Audio::GetInstance()->SetSoundVolume(&noise_, GetVol(length,0.5f));
+    SEManager::SetVol(GetVol(length, 1.0f),SEManager::NOISE);
 
 }
 
 void VendingMac::Initialize()
 {
     obj_->Initialize();
-    Audio::GetInstance()->SoundPlayWave(noise_, true);
+    SEManager::SoundPlay(SEManager::NOISE, true);
 }
 
 void VendingMac::Draw()

@@ -17,9 +17,6 @@ public:
    void Draw();
    bool GetIsStart() { return isStart_; }
 private:
-
-    SoundData SEData_;
-
 #pragma region //Text
 
     enum MENU {

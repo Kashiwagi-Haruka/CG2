@@ -28,8 +28,6 @@ public:
     static void SetIsSelectButton(const bool isSelectButton) { isSelectButton_ = isSelectButton; }
     static bool GetIsSelectButton() { return isSelectButton_; }
 private:
-    SoundData SEData_;
-
 #pragma region //Text
     uint32_t menuFontHandle_;
 

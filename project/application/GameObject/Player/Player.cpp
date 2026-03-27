@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <imgui.h>
 #include <optional>
+#include"GameObject/SEManager/SEManager.h"
 
 namespace {
     struct FootContactState {
@@ -80,7 +81,7 @@ Player::Player() {
     // モデルの読み込み
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
 
-    footStepSE = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/maou_se_sound_footstep02.mp3");
+
 
 }
 void Player::SetCamera(Camera* camera) {
@@ -334,8 +335,8 @@ void Player::PlayFootstepSE() {
     }
 
     const bool isWalking = moveSpeed_ == parameters_.kWalkSpeed;
-    Audio::GetInstance()->SetSoundVolume(&footStepSE, (moveSpeed_ == parameters_.kWalkSpeed) ? 0.5f : 0.25f);
-    Audio::GetInstance()->SoundPlayWave(footStepSE);
+    SEManager::SetVol((moveSpeed_ == parameters_.kWalkSpeed) ? 0.5f : 0.25f,SEManager::FOOT_STEP);
+    SEManager::SoundPlay(SEManager::FOOT_STEP);
     soundTimer_ = isWalking ? kWalkFootstepInterval : kSneakFootstepInterval;
 }
 

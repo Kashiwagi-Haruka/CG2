@@ -351,6 +351,7 @@
     <ClCompile Include="application\GameObject\TimeCard\TimeCardRack.cpp" />
     <ClCompile Include="application\Option\Option.cpp" />
     <ClCompile Include="application\Menu\Menu.cpp" />
+    <ClCompile Include="application\GameObject\SEManager\SEManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -692,6 +693,7 @@
     <ClInclude Include="application\Option\Option.h" />
     <ClInclude Include="application\Option\OptionData.h" />
     <ClInclude Include="application\Menu\Menu.h" />
+    <ClInclude Include="application\GameObject\SEManager\SEManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

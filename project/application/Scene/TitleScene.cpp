@@ -47,9 +47,7 @@ TitleScene::TitleScene() {
     //ランダム
     random_ = std::make_unique<RandomClass>();
 
-    /// @brief 初期化
-    FreeTypeManager::Initialize();
-    Text::LoadSE();
+
     titleMenuUI_ = std::make_unique<TitleMenuUI>();
     firstStory_ = std::make_unique<FirstStory>();
     //ゲームオブジェクト
@@ -61,12 +59,12 @@ TitleScene::TitleScene() {
 
 void TitleScene::Finalize() {
     Audio::GetInstance()->SoundUnload(&BGMData_);
-    Text::UnLoadSE();
 }
 
 void TitleScene::Initialize() {
 
-    isBGMPlaying = false;
+    Audio::GetInstance()->SoundPlayWave(BGMData_, true);
+
     isTransitionIn = true;
     isTransitionOut = false;
     transition->Initialize(false);
@@ -107,10 +105,6 @@ void TitleScene::Initialize() {
 
 void TitleScene::Update() {
 
-    if (!isBGMPlaying) {
-        Audio::GetInstance()->SoundPlayWave(BGMData_, true);
-        isBGMPlaying = true;
-    }
 
     titleMenuUI_->Update();
 

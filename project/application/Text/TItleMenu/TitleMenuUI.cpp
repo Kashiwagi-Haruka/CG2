@@ -5,14 +5,9 @@
 #include "Sprite/SpriteCommon.h"
 #include"ScreenSize/ScreenSize.h"
 #include"Color/Color.h"
-
+#include"GameObject/SEManager/SEManager.h"
 TitleMenuUI::TitleMenuUI()
 {
-    //SEの初期化
-    SEData_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/pushWatch.mp3");
-    Audio::GetInstance()->SetSoundVolume(&SEData_, 1.0f);
-
-
     //フォントハンドル
     fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
     FreeTypeManager::SetPixelSizes(fontHandle_, 64, 64);
@@ -41,7 +36,7 @@ TitleMenuUI::TitleMenuUI()
     menuText_[CONTINUE_TEXT].SetString(U"再打刻する");
     menuText_[CONTINUE_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f,SCREEN_SIZE::HALF_HEIGHT + 64.0f });
 
-    menuText_[OPTION_TEXT].SetString(U"オプション");
+    menuText_[OPTION_TEXT].SetString(U"設定");
     menuText_[OPTION_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f,SCREEN_SIZE::HALF_HEIGHT + 128.0f });
 
     triangleText_.Initialize(menuFontHandle_);
@@ -65,7 +60,7 @@ TitleMenuUI::TitleMenuUI()
 
 TitleMenuUI::~TitleMenuUI()
 {
-    Audio::GetInstance()->SoundUnload(&SEData_);
+
 }
 
 void TitleMenuUI::Initialize()
@@ -92,7 +87,7 @@ void TitleMenuUI::Update()
     }
 
     if (PlayerCommand::GetInstance()->Shot()) {
-        Audio::GetInstance()->SoundPlayWave(SEData_, false);
+        SEManager::SoundPlay(SEManager::PUSH_WATCH);
         if (isShowMenu_) {
             if (selectButtonNum_ == 0) {
                 if (!isStart_) {
@@ -114,7 +109,7 @@ void TitleMenuUI::Update()
 
         if (playerCommand->MoveForwardTrigger()|| playerCommand->MouseWheelDown()) {
             if (selectButtonNum_ > 0) {
-                Audio::GetInstance()->SoundPlayWave(SEData_, false);
+                SEManager::SoundPlay(SEManager::PUSH_WATCH);
                 selectButtonNum_--;
             }
             menuText_[selectButtonNum_].StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
@@ -122,7 +117,7 @@ void TitleMenuUI::Update()
 
         if (playerCommand->MoveBackwardTrigger()|| playerCommand->MouseWheelUp()) {
             if (selectButtonNum_ < menuText_.size() - 1) {
-                Audio::GetInstance()->SoundPlayWave(SEData_, false);
+                SEManager::SoundPlay(SEManager::PUSH_WATCH);
                 selectButtonNum_++;
             }
             menuText_[selectButtonNum_].StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示

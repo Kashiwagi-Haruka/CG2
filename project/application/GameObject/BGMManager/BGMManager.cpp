@@ -13,7 +13,7 @@ void BGMManager::Load()
 
 void BGMManager::Initialize()
 {
-    SoundPlay(BGM1,true);
+    SoundPlay(BGM1, true);
     SetVol(0.125f, BGM1);
     SetVol(0.1f, EDAMAME);
     isEdamameSound_ = false;

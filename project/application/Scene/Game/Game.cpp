@@ -10,14 +10,18 @@ void Game::Initialize() {
 
 	sceneFactory_ = std::make_unique<SceneFactory>();
 	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
-	SceneManager::GetInstance()->ChangeScene("Title");
+	
+	//フリータイプの初期化
+	FreeTypeManager::Initialize();
+
+	//SceneManager::GetInstance()->ChangeScene("Title");
 	/*SceneManager::GetInstance()->ChangeScene("Sample");*/
 	//SceneManager::GetInstance()->ChangeScene("Game");
 	//SceneManager::GetInstance()->ChangeScene("Result");
 	/*SceneManager::GetInstance()->ChangeScene("Tutorial");*/
 	//4か月開発のシーンの作成
-	//SceneManager::GetInstance()->ChangeScene("ShadowGame");
-
+	SceneManager::GetInstance()->ChangeScene("ShadowGame");
+	SEManager::Load();
 }
 
 void Game::Update() {
@@ -39,6 +43,7 @@ void Game::Draw() {
 
 void Game::Finalize() {
 
+	SEManager::UnLoad();
 	/// @brief 終了処理
 	FreeTypeManager::Finalize();
 

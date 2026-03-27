@@ -55,10 +55,4 @@ private:
 
 	const float kWarpTime_ = 2.0f;
 	float warpCoolTimer_ = kWarpTime_;
-	//音楽
-	SoundData warpSE_;
-	//ポータル生成時
-	SoundData portalSpawnSE_;
-	//打刻機の打刻ショット
-	SoundData shotSE_;
 };
