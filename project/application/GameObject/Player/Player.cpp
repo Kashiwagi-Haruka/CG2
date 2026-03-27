@@ -230,7 +230,9 @@ void Player::Move()
 
     velocity_.x = { 0.0f };
     velocity_.z = { 0.0f };
-
+	if (PlayerCommand::GetIsUiInputLocked()) {
+		return;
+	}
     auto* input = Input::GetInstance();
 
     Vector2 controllerPos = input->GetJoyStickLXY();

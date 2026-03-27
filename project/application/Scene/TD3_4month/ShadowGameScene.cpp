@@ -68,6 +68,7 @@ ShadowGameScene::ShadowGameScene()
     timeCardWatch_->SetPlayer(player_.get());
     //UIManager
     textUIManager_ = std::make_unique<TextUIManager>();
+	menu_ = std::make_unique<Menu>();
 
     key_->SetPlayerCamera(playerCamera_.get());
     edamame_->SetPlayerCamera(playerCamera_.get());
@@ -90,6 +91,7 @@ void ShadowGameScene::Initialize()
 
     //UIManager
     textUIManager_->Initialize();
+	menu_->Initialize();
     BGMManager::Initialize();
 
     isPause_ = false;
@@ -158,24 +160,42 @@ void ShadowGameScene::Update()
     auto* input = Input::GetInstance();
 
     if (input->TriggerKey(DIK_TAB)) {
+		if (isPause_ && menu_ && menu_->IsOptionOpen()) {
+			menu_->CloseOptionAndPrepareResume();
+		}
         //Tabキーでポーズ
         isPause_ = (isPause_) ? false : true;
 
         if (isPause_) {
             input->SetIsCursorVisible(true);
             input->SetIsCursorStability(false);
+			
         } else {
             input->SetIsCursorVisible(false);
             input->SetIsCursorStability(true);
         }
     }
 
+    
 
 
-    //if (isPause_) {
-    //    return;
-    //}
-
+    if (isPause_) {
+		menu_->Update();
+		const Menu::Action menuAction = menu_->ConsumePendingAction();
+		if (menuAction == Menu::Action::kResumeGame) {
+			isPause_ = false;
+			input->SetIsCursorVisible(false);
+			input->SetIsCursorStability(true);
+		} else if (menuAction == Menu::Action::kBackToTitle) {
+			isPause_ = false;
+			input->SetIsCursorVisible(false);
+			input->SetIsCursorStability(true);
+			SceneManager::GetInstance()->ChangeScene("Title");
+		} else if (menuAction == Menu::Action::kEndGame) {
+			PostQuitMessage(0);
+		}
+	}
+	PlayerCommand::SetIsUiInputLocked(isPause_);
     //シーン遷移の更新処理
     UpdateSceneTransition();
     //カメラの更新処理
@@ -536,6 +556,9 @@ void ShadowGameScene::DrawModel() {
 
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
     SetCameraAndDraw(playerCamera_->GetCamera(), true, true, false);
+	if (isPause_) {
+	menu_->Draw();
+    }
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {

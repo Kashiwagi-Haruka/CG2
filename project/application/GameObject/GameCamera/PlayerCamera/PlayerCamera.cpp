@@ -7,53 +7,49 @@
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include"WinApp.h"
 #include"GameObject/Player/Player.h"
+#include "application/Option/Option.h"
 
-PlayerCamera::PlayerCamera()
-{
-    //カメラの設定
-    cameraTransform_ = {
-    .scale{1.0f, 1.0f, 1.0f  },
-    .rotate{0.0f, 0.0f, 0.0f  },
-    .translate{0.0f, 0.0f, 0.0f}
+PlayerCamera::PlayerCamera() {
+	// カメラの設定
+	cameraTransform_ = {
+	    .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f, 0.0f, 0.0f},
+        .translate{0.0f, 0.0f, 0.0f}
     };
 
-    //カメラを生成する
-    camera_ = std::make_unique<Camera>();
-    camera_->SetTransform(cameraTransform_);
-    camera_->SetFovY(0.44f);
-    //Rayの設定
-    ray_ = { .origin = {0.0f},.diff = {0.0f} };
+	// カメラを生成する
+	camera_ = std::make_unique<Camera>();
+	camera_->SetTransform(cameraTransform_);
+	camera_->SetFovY(0.44f);
+	// Rayの設定
+	ray_ = {.origin = {0.0f}, .diff = {0.0f}};
 
-    //raySpriteの設定   
-    raySprite_ = std::make_unique<RaySprite>();
-
-
+	// raySpriteの設定
+	raySprite_ = std::make_unique<RaySprite>();
 }
 
-void PlayerCamera::Update()
-{
-    SetTransform();
-    SetRay();
-    camera_->Update();
-    raySprite_->Update();
+void PlayerCamera::Update() {
+	SetTransform();
+	SetRay();
+	camera_->Update();
+	raySprite_->Update();
 }
 
-void PlayerCamera::Rotate()
-{
-    Vector2 deltaRotate = PlayerCommand::GetInstance()->Rotate(eyeRotateSpeed_);
-    player_->GetTransform().rotate.y += deltaRotate.y;
-    cameraTransform_.rotate.x += deltaRotate.x;
+void PlayerCamera::Rotate() {
+	const Vector2 optionCameraMoveSpeed = Option::GetCurrentOptionData().CameraMoveSpeed;
+	Vector2 deltaRotate = PlayerCommand::GetInstance()->Rotate(eyeRotateSpeed_);
+	player_->GetTransform().rotate.y += deltaRotate.y * optionCameraMoveSpeed.y;
+	cameraTransform_.rotate.x += deltaRotate.x * optionCameraMoveSpeed.x;
 #ifdef USE_IMGUI
-    if (ImGui::TreeNode("Eye")) {
-        ImGui::DragFloat("eyeRotateSpeed", &eyeRotateSpeed_, 0.1f, 0.1f);
-        ImGui::DragFloat("eyeRotateX", &cameraTransform_.rotate.x, 0.1f);
+	if (ImGui::TreeNode("Eye")) {
+		ImGui::DragFloat("eyeRotateSpeed", &eyeRotateSpeed_, 0.1f, 0.1f);
+		ImGui::DragFloat("eyeRotateX", &cameraTransform_.rotate.x, 0.1f);
 
-        ImGui::DragFloat3("origin", &ray_.origin.x, 0.3f);
-        ImGui::DragFloat3("diff", &ray_.diff.x, 0.3f);
+		ImGui::DragFloat3("origin", &ray_.origin.x, 0.3f);
+		ImGui::DragFloat3("diff", &ray_.diff.x, 0.3f);
 
-
-        ImGui::TreePop();
-    }
+		ImGui::TreePop();
+	}
 #endif
 }
 
