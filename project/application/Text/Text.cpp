@@ -44,7 +44,7 @@ void Text::StartTyping(float speed)
 void Text::Draw() {
 
     SpriteCommon::GetInstance()->DrawCommonFont();
-    SpriteCommon::GetInstance()->SetBlendMode(kBlendModeAdd);
+    SpriteCommon::GetInstance()->SetBlendMode(blendMode_);
     activeFonts_.clear();
 
     for (const auto& run : glyphRuns_) {

@@ -228,6 +228,9 @@ void ShadowGameScene::Draw()
 
     textUIManager_->Draw();
 
+    if (isPause_) {
+        menu_->Draw();
+    }
     //シーン遷移の描画処理
     DrawSceneTransition();
 }
@@ -314,17 +317,17 @@ void ShadowGameScene::InitializeLights()
     spotLights_[1] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
 
-    activePointLightCount_ = 1;
+    activePointLightCount_ = 2;
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     pointLights_[0].position = { 7.0f, 2.0f, 0.0f };
     pointLights_[0].intensity = 1.0f;
     pointLights_[0].radius = 10.0f;
     pointLights_[0].decay = 1.0f;
-    //pointLights_[1].color = { 1.0f, 0.0f, 0.0f, 1.0f };
-    //pointLights_[1].position = { 5.0f, 5.0f, 5.0f };
-    //pointLights_[1].intensity = 1.0f;
-    //pointLights_[1].radius = 10.0f;
-    //pointLights_[1].decay = 1.0f;
+    pointLights_[1].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+    pointLights_[1].position = { 5.0f, 5.0f, 5.0f };
+    pointLights_[1].intensity = 1.0f;
+    pointLights_[1].radius = 10.0f;
+    pointLights_[1].decay = 1.0f;
 
     directionalLight_.color = { 1.0f, 1.0f, 0.75f, 1.0f };
     directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
@@ -434,14 +437,12 @@ void ShadowGameScene::UpdateGameObject()
 
 #pragma region//ゲームオブジェクト
 
-
-
+    spotLights_[0] = edamame_->GetSpotLight();
     spotLights_[1] = flashlight_->GetSpotLight();
+ 
     areaLights_[2] = vendingMac_->GetAreaLight();
     areaLights_[3] = wallManager_->GetAreaLight();
     areaLights_[4] = wallManager2_->GetAreaLight();
-    spotLights_[1] = flashlight_->GetSpotLight();
-    areaLights_[2] = vendingMac_->GetAreaLight();
 
     if (!useDebugCamera_) {
         playerCamera_->Update();
@@ -566,9 +567,7 @@ void ShadowGameScene::DrawModel() {
 
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
     SetCameraAndDraw(playerCamera_->GetCamera(), true, true, false);
-	if (isPause_) {
-	menu_->Draw();
-    }
+
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
@@ -603,6 +602,7 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     timeCardRack_->Draw();
     //箱管理
     boxManager_->Draw();
+
     if (!isShadow) {
         Object3dCommon::GetInstance()->DrawCommonSkinning();
     }
