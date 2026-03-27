@@ -205,6 +205,7 @@ void Menu::CloseOptionAndPrepareResume() {
 }
 
 void Menu::Draw() {
+	SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
 	SpriteCommon::GetInstance()->DrawCommon();
 	backgroundOverlaySprite_->Draw();
 	SpriteCommon::GetInstance()->DrawCommonFont();
