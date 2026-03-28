@@ -4,7 +4,6 @@
 #include "Sprite/SpriteCommon.h"
 #include "WinApp.h"
 #include "application/Color/Color.h"
-#include "Input.h"
 #include "TextureManager.h"
 
 #include <array>
@@ -113,7 +112,7 @@ void Menu::Initialize() {
 
 void Menu::Update() {
 	backgroundOverlaySprite_->Update();
-	auto* input = Input::GetInstance();
+	PlayerCommand* playerCommand = PlayerCommand::GetInstance();
 	if (isTrigger_ && currentMenuName_ == "Option") {
 		option_->Update();
 		if (!option_->GetIsShowOption()) {
@@ -122,13 +121,10 @@ void Menu::Update() {
 		return;
 	}
 
-	const bool moveUp = input->TriggerKey(DIK_W) || input->TriggerKey(DIK_UP);
-	const bool moveDown = input->TriggerKey(DIK_S) || input->TriggerKey(DIK_DOWN);
-	const float mouseWheelDelta = input->GetMouseWheelDelta();
-	const bool wheelUp = mouseWheelDelta > 0.0f;
-	const bool wheelDown = mouseWheelDelta < 0.0f;
+	const bool moveUp = playerCommand->UiMoveForwardTrigger() || playerCommand->MouseWheelDown();
+	const bool moveDown = playerCommand->UiMoveBackwardTrigger() || playerCommand->MouseWheelUp();
 
-	const int moveDirection = (moveDown || wheelDown) ? 1 : (moveUp || wheelUp) ? -1 : 0;
+	const int moveDirection = moveDown ? 1 : moveUp ? -1 : 0;
 	if (moveDirection != 0) {
 		const int menuCount = static_cast<int>(kMenuOrder.size());
 		const int currentIndex = static_cast<int>(FindMenuIndex(currentMenuName_));
@@ -140,7 +136,7 @@ void Menu::Update() {
 		}
 		currentMenuName_ = kMenuOrder[static_cast<size_t>(nextIndex)];
 	}
-	if (input->TriggerKey(DIK_E)) {
+	if (playerCommand->UiInteractTrigger()) {
 		if (currentMenuName_ == "Game") {
 			pendingAction_ = Action::kResumeGame;
 			isTrigger_ = false;

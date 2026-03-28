@@ -1,11 +1,11 @@
 #define NOMINMAX
 #include "Option.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
-#include "Input.h"
 #include "Logger.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 #include "WinApp.h"
+#include "application/GameObject/KeyBindConfig.h"
 #include "application/Color/Color.h"
 #include <algorithm>
 namespace {
@@ -82,12 +82,12 @@ void Option::Update() {
 		return;
 	}
 
-	auto* input = Input::GetInstance();
-	const bool moveUp = input->TriggerKey(DIK_W) || input->TriggerKey(DIK_UP);
-	const bool moveDown = input->TriggerKey(DIK_S) || input->TriggerKey(DIK_DOWN);
-	const bool moveLeft = input->TriggerKey(DIK_A) || input->TriggerKey(DIK_LEFT);
-	const bool moveRight = input->TriggerKey(DIK_D) || input->TriggerKey(DIK_RIGHT);
-	const bool closeOption = input->TriggerKey(DIK_E);
+	PlayerCommand* playerCommand = PlayerCommand::GetInstance();
+	const bool moveUp = playerCommand->UiMoveForwardTrigger() || playerCommand->MouseWheelDown();
+	const bool moveDown = playerCommand->UiMoveBackwardTrigger() || playerCommand->MouseWheelUp();
+	const bool moveLeft = playerCommand->UiMoveLeftTrigger();
+	const bool moveRight = playerCommand->UiMoveRightTrigger();
+	const bool closeOption = playerCommand->UiInteractTrigger() || playerCommand->Shot();
 
 	if (closeOption) {
 		SaveOptionData();
