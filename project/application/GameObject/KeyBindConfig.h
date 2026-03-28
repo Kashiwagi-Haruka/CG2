@@ -57,13 +57,18 @@ public:
 
 	bool MoveForwardTrigger();
 	bool MoveBackwardTrigger();
+	bool UiMoveForwardTrigger();
+	bool UiMoveBackwardTrigger();
 
 	bool Shot();
 	bool Sneak();
 	bool Interact();
 	bool InteractTrigger();
+	bool UiInteractTrigger();
 	bool MouseWheelUp();
 	bool MouseWheelDown();
+	bool UiMoveLeft();
+	bool UiMoveRight();
 	Vector2 Rotate(float rotateSpeed);
 	static bool GetIsGrab() { return isGrab_; };
 	static void SetIsGrab(bool flag) { isGrab_ = flag; }

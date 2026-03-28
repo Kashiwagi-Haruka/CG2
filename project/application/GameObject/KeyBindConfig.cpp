@@ -54,7 +54,9 @@ bool PlayerCommand::MoveBackwardTrigger() {
 	}
 	return MoveTrigger(K_MoveBackward, K_MoveBackwardArrow, C_MoveBackward);
 }
+bool PlayerCommand::UiMoveForwardTrigger() { return MoveTrigger(K_MoveForward, K_MoveForwardArrow, C_MoveForward); }
 
+bool PlayerCommand::UiMoveBackwardTrigger() { return MoveTrigger(K_MoveBackward, K_MoveBackwardArrow, C_MoveBackward); }
 bool PlayerCommand::Shot() {
 	auto* input = Input::GetInstance();
 	return input->TriggerKey(K_Shot) || input->TriggerButton(Input::PadButton(C_Shot)) || input->TriggerMouseButton(Input::MouseButton(M_Shot));
@@ -81,6 +83,11 @@ bool PlayerCommand::InteractTrigger() {
 	return input->TriggerKey(K_Interact) || input->TriggerButton(Input::PadButton(C_Interact));
 }
 
+bool PlayerCommand::UiInteractTrigger() {
+	auto* input = Input::GetInstance();
+	return input->TriggerKey(K_Interact) || input->TriggerButton(Input::PadButton(C_Interact));
+}
+
 bool PlayerCommand::MouseWheelUp() {
 	auto* input = Input::GetInstance();
 	return (input->GetMouseWheelDelta() < 0.0f);
@@ -90,6 +97,10 @@ bool PlayerCommand::MouseWheelDown() {
 	auto* input = Input::GetInstance();
 	return (input->GetMouseWheelDelta() > 0.0f);
 }
+
+bool PlayerCommand::UiMoveLeft() { return Move(K_MoveLeft, K_MoveLeftArrow, C_MoveLeft); }
+
+bool PlayerCommand::UiMoveRight() { return Move(K_MoveRight, K_MoveRightArrow, C_MoveRight); }
 
 Vector2 PlayerCommand::Rotate(float rotateSpeed) {
 	auto* input = Input::GetInstance();

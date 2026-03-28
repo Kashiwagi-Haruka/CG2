@@ -121,8 +121,8 @@ void Menu::Update() {
 		return;
 	}
 
-	const bool moveUp = playerCommand->MoveForwardTrigger() || playerCommand->MouseWheelDown();
-	const bool moveDown = playerCommand->MoveBackwardTrigger() || playerCommand->MouseWheelUp();
+	const bool moveUp = playerCommand->UiMoveForwardTrigger() || playerCommand->MouseWheelDown();
+	const bool moveDown = playerCommand->UiMoveBackwardTrigger() || playerCommand->MouseWheelUp();
 
 	const int moveDirection = moveDown ? 1 : moveUp ? -1 : 0;
 	if (moveDirection != 0) {
@@ -136,7 +136,7 @@ void Menu::Update() {
 		}
 		currentMenuName_ = kMenuOrder[static_cast<size_t>(nextIndex)];
 	}
-	if (playerCommand->InteractTrigger()) {
+	if (playerCommand->UiInteractTrigger()) {
 		if (currentMenuName_ == "Game") {
 			pendingAction_ = Action::kResumeGame;
 			isTrigger_ = false;
