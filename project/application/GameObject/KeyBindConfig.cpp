@@ -57,6 +57,10 @@ bool PlayerCommand::MoveBackwardTrigger() {
 bool PlayerCommand::UiMoveForwardTrigger() { return MoveTrigger(K_MoveForward, K_MoveForwardArrow, C_MoveForward); }
 
 bool PlayerCommand::UiMoveBackwardTrigger() { return MoveTrigger(K_MoveBackward, K_MoveBackwardArrow, C_MoveBackward); }
+
+bool PlayerCommand::UiMoveLeftTrigger() { return MoveTrigger(K_MoveLeft, K_MoveLeftArrow, C_MoveLeft); }
+
+bool PlayerCommand::UiMoveRightTrigger() { return MoveTrigger(K_MoveRight, K_MoveRightArrow, C_MoveRight); }
 bool PlayerCommand::Shot() {
 	auto* input = Input::GetInstance();
 	return input->TriggerKey(K_Shot) || input->TriggerButton(Input::PadButton(C_Shot)) || input->TriggerMouseButton(Input::MouseButton(M_Shot));

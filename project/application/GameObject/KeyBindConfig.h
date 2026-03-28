@@ -59,6 +59,8 @@ public:
 	bool MoveBackwardTrigger();
 	bool UiMoveForwardTrigger();
 	bool UiMoveBackwardTrigger();
+	bool UiMoveLeftTrigger();
+	bool UiMoveRightTrigger();
 
 	bool Shot();
 	bool Sneak();

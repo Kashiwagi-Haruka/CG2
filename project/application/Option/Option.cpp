@@ -85,8 +85,8 @@ void Option::Update() {
 	PlayerCommand* playerCommand = PlayerCommand::GetInstance();
 	const bool moveUp = playerCommand->UiMoveForwardTrigger() || playerCommand->MouseWheelDown();
 	const bool moveDown = playerCommand->UiMoveBackwardTrigger() || playerCommand->MouseWheelUp();
-	const bool moveLeft = playerCommand->UiMoveLeft();
-	const bool moveRight = playerCommand->UiMoveRight();
+	const bool moveLeft = playerCommand->UiMoveLeftTrigger();
+	const bool moveRight = playerCommand->UiMoveRightTrigger();
 	const bool closeOption = playerCommand->UiInteractTrigger() || playerCommand->Shot();
 
 	if (closeOption) {
