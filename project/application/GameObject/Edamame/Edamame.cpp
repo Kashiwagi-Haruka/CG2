@@ -15,6 +15,10 @@ Edamame::Edamame()
     obj_->SetModel("edamame_billboard");
     //枝豆知識
     edamameTrivia_ = std::make_unique<EdamameTrivia>();
+    //枝豆モデル
+    edamameModel_ = std::make_unique<EdamameModel>();
+
+
 }
 
 Edamame::~Edamame()
@@ -25,16 +29,22 @@ Edamame::~Edamame()
 void Edamame::Initialize()
 {
     worldTransform_ = {
-        .scale{0.5f, 0.5f, 0.5f},
+        .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
         .translate{-7.0f, 0.5f, 0.0f}
     };
 
     obj_->Initialize();
-    localAABB_ = { .min = { -0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} };
+    localAABB_ = { .min = { -0.25f,-0.25f,-0.25f},.max = {0.25f,0.25f,0.25f} };
 
     //枝豆知識
     edamameTrivia_->Initialize();
+
+    //枝豆モデル
+    edamameModel_->Initialize();
+    //枝豆モデルに座標をセットする
+    edamameModel_->SetTranslate(worldTransform_.translate);
+
 
     spotLight_.color = { 0.75f, 1.0f, 0.25f, 1.0f };
     spotLight_.position = worldTransform_.translate;
@@ -52,6 +62,8 @@ void Edamame::Update()
     obj_->SetEnableLighting(false);
     obj_->SetTransform(worldTransform_);
     obj_->UpdateBillboard();
+    edamameModel_->Update();
+
     CheckCollision();
     //枝豆知識
     Trivia();
@@ -60,6 +72,7 @@ void Edamame::Update()
 void Edamame::Draw()
 {
     obj_->Draw();
+    edamameModel_->Draw();
 }
 
 void Edamame::SetPlayerCamera(PlayerCamera* camera)
@@ -71,11 +84,7 @@ void Edamame::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
     obj_->UpdateCameraMatrices();
-}
-
-void Edamame::SetModel(const std::string& filePath)
-{
-    obj_->SetModel(filePath);
+    edamameModel_->SetCamera(camera);
 }
 
 void Edamame::CheckCollision()
@@ -86,8 +95,11 @@ void Edamame::CheckCollision()
             if (!BGMManager::GetIsEdamameSound()) {
                 BGMManager::SoundPlay(BGMManager::EDAMAME, false);
                 BGMManager::SetIsEdamameSound(true);
+
+                //枝豆モデルのアップデート
+                edamameModel_->SetIsStartMove(true);
             }
-        }    
+        }
     }
 
 }
@@ -105,20 +117,28 @@ void Edamame::Trivia()
 
         if (OnCollisionRay()) {
             edamameTrivia_->Update();
+
+
+            if (edamameTrivia_->GetIsDie()) {
+                //死んだとき 落下開始
+                edamameModel_->SetIsDropStart(true);
+            
+            }
+
         }
         Vector3 distance = Function::Distance(playerCamera_->GetRay().origin, worldTransform_.translate);
         float  length = Function::Length(distance);
         float bgmVol = 0.0f;
-        float vol = 0.0f; 
+        float vol = 0.0f;
 
         if (length <= 20.0f) {
-            
+
             edamameTrivia_->SetIsDraw(true);
 
             if (length <= 1.0f) {
                 bgmVol = 0.25f;
                 vol = 1.0f;
- 
+
             } else {
                 vol = 1.0f / length;
                 bgmVol = vol * 0.25f;

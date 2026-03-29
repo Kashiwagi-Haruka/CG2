@@ -31,15 +31,33 @@ void EdamameTrivia::Initialize()
     triviaNum_ = strings_.size() - 1;
     isSendStartTriviaMessage_ = false;
     isDraw_ = false;
+    isDie_ = false;
+    isEnd_ = false;
 }
 
 void EdamameTrivia::Update()
 {
     isSendStartTriviaMessage_ = false;
+   
+    if (isDie_) {
+        return;
+    }
 
-    if (PlayerCommand::GetInstance()->InteractTrigger()|| 
-        Audio::GetInstance()->IsSoundFinished(triviaVoice_)&& triviaNum_ != strings_.size() - 1) {
+
+    if (isEnd_ && Audio::GetInstance()->IsSoundFinished(triviaVoice_)) {
+        Audio::GetInstance()->SoundUnload(&triviaVoice_);
+        isDie_ = true;
+    }
+
+    if (isEnd_) {
+        return;
+    }
+
+    if (PlayerCommand::GetInstance()->InteractTrigger()|| Audio::GetInstance()->IsSoundFinished(triviaVoice_) && triviaNum_ != strings_.size() - 1) {
         SetSound();
+        if (triviaNum_ == strings_.size() - 1) {
+            isEnd_ = true;
+        }
     }
 
 }

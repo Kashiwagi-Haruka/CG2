@@ -11,7 +11,7 @@
 #include"GameObject/SEManager/SEManager.h"
 
 namespace {
-    const constexpr uint32_t kMaxWhiteBoards = 6;
+    const constexpr uint32_t kMaxWhiteBoards = 5;
 }
 
 bool PortalManager::canMakePortal_ = false;
