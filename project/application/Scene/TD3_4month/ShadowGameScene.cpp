@@ -17,7 +17,6 @@ ShadowGameScene::ShadowGameScene()
     //BGMの管理
     BGMManager::Load();
 
-
     //シーン遷移の設定
     transition_ = std::make_unique<SceneTransition>();
     //デバックカメラ
@@ -35,6 +34,8 @@ ShadowGameScene::ShadowGameScene()
 
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
+    timeCardWatch_->SetPlayer(player_.get());
+
     //懐中電灯
     flashlight_ = std::make_unique<Flashlight>();
     flashlight_->SetPlayer(player_.get());
@@ -62,16 +63,17 @@ ShadowGameScene::ShadowGameScene()
     timeCardRack_ = std::make_unique<TimeCardRack>();
     //箱管理
     boxManager_ = std::make_unique<BoxManager>();
+
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 
-    portalManager_->SetPlayerCamera(playerCamera_.get());
-    //Playerの座標のポインタを入れる
-    timeCardWatch_->SetPlayer(player_.get());
+
+
     //UIManager
     textUIManager_ = std::make_unique<TextUIManager>();
 	menu_ = std::make_unique<Menu>();
 
+    portalManager_->SetPlayerCamera(playerCamera_.get());
     key_->SetPlayerCamera(playerCamera_.get());
     edamame_->SetPlayerCamera(playerCamera_.get());
     chairManager_->SetPlayerCamera(playerCamera_.get());
@@ -304,6 +306,7 @@ void ShadowGameScene::CheckCollision()
         collisionManager_->AddCollider(box.get());
     }
     collisionManager_->AddCollider(key_.get());
+    collisionManager_->AddCollider(edamame_->GetEdamameModel().get());
 
     collisionManager_->CheckAllCollisions();
 }
