@@ -354,6 +354,7 @@
     <ClCompile Include="application\GameObject\SEManager\SEManager.cpp" />
     <ClCompile Include="application\GameObject\Box\Box.cpp" />
     <ClCompile Include="application\GameObject\Box\BoxManager.cpp" />
+    <ClCompile Include="application\GameObject\Elevator\Elevator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -698,6 +699,7 @@
     <ClInclude Include="application\GameObject\SEManager\SEManager.h" />
     <ClInclude Include="application\GameObject\Box\Box.h" />
     <ClInclude Include="application\GameObject\Box\BoxManager.h" />
+    <ClInclude Include="application\GameObject\Elevator\Elevator.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
