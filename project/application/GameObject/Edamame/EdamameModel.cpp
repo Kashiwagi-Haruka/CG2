@@ -137,8 +137,8 @@ void EdamameModel::Update()
     obj_->SetTranslate(translate_);
 
     if (isDrop_) {
-        rotate_.x =  YoshidaMath::Easing::Lerp(rotate_.x,0.0f,0.1f);
-        rotate_.z = YoshidaMath::Easing::Lerp(rotate_.z, 0.0f, 0.1f);
+        rotate_.x =  YoshidaMath::Easing::Lerp(rotate_.x,0.0f,0.01f);
+        rotate_.z = YoshidaMath::Easing::Lerp(rotate_.z, 0.0f, 0.01f);
 
         obj_->Update();
     } else {
