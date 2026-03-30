@@ -7,7 +7,7 @@
 #include"DirectXCommon.h"
 #include"Animation/AnimationManager.h"
 #include"GameObject/SEManager/SEManager.h"
-
+#include"GameObject/Key/Key.h"
 
 bool Door::isSendOpenMessage_ = false;
 bool Door::isSendLockMessage_ = false;
@@ -91,7 +91,6 @@ void Door::Initialize()
     isSendLockMessage_ = false;
     isSendOpenMessage_ = false;
 
-    isGetKey_ = nullptr;
     isOpen_ = false;
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/door", "door");
@@ -121,7 +120,7 @@ void Door::CheckCollision()
     //自販機とrayの当たり判定
     if (OnCollisionRay()) {
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
-            if (isGetKey_) {
+            if (Key::IsGetKey()) {
                 desiredAnimationName = "2Open";
                 SEManager::SoundPlay(SEManager::DOOR_OPEN);
                 isSendOpenMessage_ = true;

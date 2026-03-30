@@ -27,14 +27,14 @@ public:
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
     static bool GetGetKeyMessage() { return isSendGetKeyMessage_; }
-    bool* GetKeyPtr() { return &isGetKey_; };
+    static bool IsGetKey() { return isGetKey_; }
 private:
     std::unique_ptr<Object3d>obj_ = nullptr;
     PlayerCamera* playerCamera_ = nullptr;
     Transform worldTransform_ = {};
     Vector3 velocity_ = { 0.0f };
     bool isChairHit_ = false;
-    bool isGetKey_ = false;
+   static bool isGetKey_;
     static bool isSendGetKeyMessage_;
 };
 

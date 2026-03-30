@@ -449,12 +449,6 @@ void ShadowGameScene::UpdateGameObject()
     timeCardRack_->SetTransform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 7.75f,1.3f,-7.0f } });
     timeCardRack_->Update();
 
-
-
-    if (*key_->GetKeyPtr()) {
-        door_->SetIsGetKey(key_->GetKeyPtr());
-    }
-
     for (auto& chair : chairManager_->GetChairs()) {
         if (chair->GetIsStand()) {
             Vector3 pos = chair->GetWorldPosition();

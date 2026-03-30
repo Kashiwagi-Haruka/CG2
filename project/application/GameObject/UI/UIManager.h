@@ -4,6 +4,9 @@
 #include"Text/TextUIManager/TextUIManager.h"
 #include "Menu/Menu.h"
 #include"GameObject/UI/RaySprite.h"
+#include"GameObject/UI/TabKey.h"
+#include"KeyIcon.h"
+#include"LightIcon.h"
 
 class UIManager
 {
@@ -13,6 +16,10 @@ private:
     std::unique_ptr<Menu> menu_ = nullptr;
     //raySprite
     std::unique_ptr<RaySprite> raySprite_ = nullptr;
+    std::unique_ptr<TabKey>tabKey_ = nullptr;
+
+    std::unique_ptr<KeyIcon> keyIcon_ = nullptr;
+    std::unique_ptr<LightIcon>lightIcon_ = nullptr;
 public:
     static bool GetIsPause() { return isPause_; }
     static void SetIsPause(const bool isPause) { isPause_ = isPause; }

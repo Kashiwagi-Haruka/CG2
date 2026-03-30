@@ -1,6 +1,8 @@
 #include "UIManager.h"
 #include"Input.h"
 #include"SceneManager.h"
+#include"GameObject/Flashlight/Flashlight.h"
+#include"GameObject/Key/Key.h"
 
 bool UIManager::isPause_ = false;
 
@@ -16,6 +18,10 @@ UIManager::UIManager()
     textUIManager_ = std::make_unique<TextUIManager>();
     menu_ = std::make_unique<Menu>();
     raySprite_ = std::make_unique<RaySprite>();
+    tabKey_ = std::make_unique<TabKey>();
+
+   keyIcon_ = std::make_unique<KeyIcon>();
+   lightIcon_ = std::make_unique<LightIcon>();
 }
 
 void UIManager::Initialize()
@@ -25,6 +31,9 @@ void UIManager::Initialize()
     textUIManager_->Initialize();
     menu_->Initialize();
     raySprite_->Initialize();
+    tabKey_->Initialize();
+    keyIcon_->Initialize();
+    lightIcon_->Initialize();
 }
 
 void UIManager::Update()
@@ -62,6 +71,9 @@ void UIManager::Update()
     //Text
     textUIManager_->Update();
     raySprite_->Update();
+    tabKey_->Update();
+    keyIcon_->Update();
+    lightIcon_->Update();
 }
 
 void UIManager::CloseOptionANdPrepareResume()
@@ -94,6 +106,16 @@ void UIManager::Draw()
 
     if (isPause_) {
         menu_->Draw();
+    } else {
+        tabKey_->Draw();
+    }
+
+    if (Flashlight::IsGetLight()) {
+        lightIcon_->Draw();
+    }
+
+    if (Key::IsGetKey()) {
+        keyIcon_->Draw();
     }
 
 }

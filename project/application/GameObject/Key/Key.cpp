@@ -8,6 +8,7 @@
 #include"DirectXCommon.h"
 #include"imgui.h"
 bool Key::isSendGetKeyMessage_ = false;
+bool Key::isGetKey_ = false;
 
 Key::Key()
 {
@@ -17,7 +18,7 @@ Key::Key()
     obj_->SetModel("key");
     SetAABB({ .min = { -0.25f,-0.25f,-0.25f }, .max = { 0.25f,0.25f,0.25f } });
     SetCollisionAttribute(kCollisionKey);
-    SetCollisionMask(kCollisionChair | kCollisionLocker | kCollisionFloor|kCollisionDesk);
+    SetCollisionMask(kCollisionChair | kCollisionLocker | kCollisionFloor | kCollisionDesk);
 }
 
 void Key::Initialize()
@@ -96,20 +97,17 @@ void Key::SetModel(const std::string& filePath)
 
 void Key::CheckCollision()
 {
-
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
-        if (isGetKey_) {
-            isGetKey_ = false;
-            PlayerCommand::SetIsGrab(false);
-        } else {
+
+        if (!isGetKey_) {
             if (OnCollisionRay() && !PlayerCommand::GetIsGrab()) {
                 isGetKey_ = true;
                 isSendGetKeyMessage_ = true;
-                PlayerCommand::SetIsGrab(true);
+
             }
         }
-    }
 
+    }
 }
 
 bool Key::OnCollisionRay()

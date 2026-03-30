@@ -29,7 +29,6 @@ public:
     void CheckCollision();
     void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
-    void SetIsGetKey(bool* flag) { isGetKey_ = flag; };
     std::unique_ptr<AutoLockSystem>& GetAutoLockSystem() { return autoLockSystem_; };
     void SetAnimationName(const std::string& name) { desiredAnimationName = name; }
     bool GetIsOpen() { return isOpen_; };
@@ -38,11 +37,10 @@ public:
     static bool GetOpenMassage() { return isSendOpenMessage_; };
     static void SetLockMassage(const bool flag) {  isSendLockMessage_ = flag; };
     static void SetOpenMassage(const bool flag) {  isSendOpenMessage_ = flag; };
-    void SetIsKeyPtr(bool* flagPtr) { isGetKey_ = flagPtr; }
 private:
     static bool isSendLockMessage_;
     static bool isSendOpenMessage_;
-    bool* isGetKey_ = nullptr;
+
     bool isOpen_ = false;
 
     void Animation();
