@@ -27,20 +27,21 @@ public:
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
+    void SetAnimationGroupName(const std::string& name){ animationGroupName_ = name; }
 private:
     // アニメーション
     void Animation();
 private:
     static PlayerCamera* playerCamera_;
     std::unique_ptr<Object3d>obj_ = nullptr;
-
+    AABB localAABB_;
     // アニメーション
     Animation::AnimationData blendedPoseAnimation_{};
     // 骨
     std::unique_ptr<Skeleton> skeleton_{};
     // スキン
     SkinCluster skinCluster_{};
-    const std::string animationGroupName_ = "Desk";
+     std::string animationGroupName_ = "Desk";
     const float kAnimationBlendDuration_ = 0.3f;
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Open";

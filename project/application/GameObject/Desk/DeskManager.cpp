@@ -4,6 +4,8 @@ DeskManager::DeskManager()
 {
     for (int i = 0; i < kMaxDesks_; ++i) {
         std::unique_ptr<Desk> desk = std::make_unique<Desk>();
+        std::string name = "Desk" + std::to_string(i);
+        desk->SetAnimationGroupName(name);
         desks_.push_back(std::move(desk));
     }
 }

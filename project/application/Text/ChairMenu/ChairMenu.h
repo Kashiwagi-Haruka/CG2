@@ -25,12 +25,10 @@ public:
     static void SetIsShowMenu(const bool isShowMenu) { isShowMenu_ = isShowMenu; }
     static bool GetIsShowMenu() { return isShowMenu_; }
     static uint32_t GetSelectButtonNum() { return selectButtonNum_; }
-    static void SetIsSelectButton(const bool isSelectButton) { isSelectButton_ = isSelectButton; }
-    static bool GetIsSelectButton() { return isSelectButton_; }
 private:
 #pragma region //Text
     uint32_t menuFontHandle_;
-
+    bool isPreGrab_ = false;
     Text triangleText_;
     Text pressEText_;
     std::array<Text, MAX_TEXT> menuText_;
@@ -40,6 +38,7 @@ private:
 #pragma endregion
     static bool isShowMenu_;
     static uint32_t selectButtonNum_;
-    static bool isSelectButton_;
+    bool isShowStart_ = false;
+   
 };
 
