@@ -5,11 +5,10 @@
 #include "Primitive/Primitive.h"
 #include"Audio.h"
 #include"EdamameTrivia.h"
-#include"Light/CommonLight/SpotCommonLight.h"
 #include"EdamameModel.h"
+#include"Light/CommonLight/PointCommonLight.h"
 
-
-
+#include<array>
 class Edamame
 {
 public:
@@ -23,7 +22,7 @@ public:
     void CheckCollision();
     bool OnCollisionRay();
     void Trivia();
-    SpotCommonLight& GetSpotLight() { return spotLight_; };
+    std::array<PointCommonLight, 2>& GetPointLights() { return pointLights_; };
 
     std::unique_ptr<EdamameModel>& GetEdamameModel() {return edamameModel_;}
 private:
@@ -33,6 +32,6 @@ private:
     AABB localAABB_ = {};
     PlayerCamera* playerCamera_ = nullptr;
     Transform worldTransform_ = {};
-    SpotCommonLight spotLight_;
+    std::array<PointCommonLight,2> pointLights_;
 };
 

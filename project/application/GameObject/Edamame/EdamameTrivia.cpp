@@ -4,8 +4,8 @@
 std::array<std::u32string, 8> EdamameTrivia::strings_;
 size_t EdamameTrivia::triviaNum_ = 0;
 bool EdamameTrivia::isSendStartTriviaMessage_ = false;
- bool EdamameTrivia::isDraw_= false;
- bool EdamameTrivia::isDie_ = false;
+bool EdamameTrivia::isDraw_ = false;
+bool EdamameTrivia::isDie_ = false;
 
 EdamameTrivia::EdamameTrivia()
 {
@@ -40,7 +40,7 @@ void EdamameTrivia::Initialize()
 void EdamameTrivia::Update()
 {
     isSendStartTriviaMessage_ = false;
-   
+
     if (isDie_) {
         return;
     }
@@ -55,7 +55,7 @@ void EdamameTrivia::Update()
         return;
     }
 
-    if (PlayerCommand::GetInstance()->InteractTrigger()|| Audio::GetInstance()->IsSoundFinished(triviaVoice_) && triviaNum_ != strings_.size() - 1) {
+    if (PlayerCommand::GetInstance()->InteractTrigger() || Audio::GetInstance()->IsSoundFinished(triviaVoice_) && triviaNum_ != strings_.size() - 1) {
         SetSound();
         if (triviaNum_ == strings_.size() - 1) {
             isEnd_ = true;
