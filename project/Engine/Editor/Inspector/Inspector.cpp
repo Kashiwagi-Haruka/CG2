@@ -6,7 +6,33 @@
 
 #include <algorithm>
 #include <array>
+#ifdef USE_IMGUI
+namespace {
+bool DrawAxisValue(const char* axisLabel, const ImVec4& axisColor, const std::string& id, float& value) {
+	bool changed = false;
+	ImGui::PushStyleColor(ImGuiCol_Text, axisColor);
+	ImGui::TextUnformatted(axisLabel);
+	ImGui::PopStyleColor();
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(80.0f);
+	changed |= ImGui::DragFloat(id.c_str(), &value, 0.01f);
+	return changed;
+}
 
+bool DrawTransformAxisRow(const char* label, const std::string& idSuffix, Vector3& value) {
+	constexpr float kAxisStartX = 100.0f;
+	bool changed = false;
+	ImGui::TextUnformatted(label);
+	ImGui::SameLine(kAxisStartX);
+	changed |= DrawAxisValue("X:", ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "##x_" + idSuffix, value.x);
+	ImGui::SameLine();
+	changed |= DrawAxisValue("Y:", ImVec4(0.3f, 1.0f, 0.3f, 1.0f), "##y_" + idSuffix, value.y);
+	ImGui::SameLine();
+	changed |= DrawAxisValue("Z:", ImVec4(0.3f, 0.5f, 1.0f, 1.0f), "##z_" + idSuffix, value.z);
+	return changed;
+}
+} // namespace
+#endif
 bool Inspector::DrawObjectInspector(
     size_t index, std::string& objectName, Transform& transform, InspectorMaterial& material, bool isPlaying, bool& transformChanged, bool& materialChanged, bool& nameChanged) {
 #ifdef USE_IMGUI
@@ -72,9 +98,9 @@ bool Inspector::DrawPrimitiveInspector(
 bool Inspector::DrawTransformEditor(const std::string& idSuffix, Transform& transform) {
 #ifdef USE_IMGUI
 	bool changed = false;
-	changed |= ImGui::DragFloat3(("Scale##" + idSuffix).c_str(), &transform.scale.x, 0.01f);
-	changed |= ImGui::DragFloat3(("Rotate##" + idSuffix).c_str(), &transform.rotate.x, 0.01f);
-	changed |= ImGui::DragFloat3(("Translate##" + idSuffix).c_str(), &transform.translate.x, 0.01f);
+	changed |= DrawTransformAxisRow("Scale", "scale_" + idSuffix, transform.scale);
+	changed |= DrawTransformAxisRow("Rotate", "rotate_" + idSuffix, transform.rotate);
+	changed |= DrawTransformAxisRow("Translate", "translate_" + idSuffix, transform.translate);
 	return changed;
 #else
 	(void)idSuffix;

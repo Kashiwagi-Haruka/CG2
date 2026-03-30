@@ -124,5 +124,6 @@ public:
 	void SetInstanceCount(size_t count);
 	uint32_t GetInstanceCount() const { return static_cast<uint32_t>(instanceTransforms_.size()); }
 	void SetInstanceScale(size_t index, const Vector3& scale);
+	void SetInstanceRotate(size_t index, const Vector3& rotate);
 	void SetInstanceOffset(size_t index, const Vector3& offset);
 };
