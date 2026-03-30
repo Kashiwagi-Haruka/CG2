@@ -58,7 +58,7 @@ void EdamameModel::Animation()
                 if (desiredAnimationName == "Idle") {
                     //回る
                     desiredAnimationName = "Round";
-                    loopAnimation = false;
+                    loopAnimation = true;
                 } else if (desiredAnimationName == "Round") {
                     //話す
                     desiredAnimationName = "Speak";
@@ -173,5 +173,7 @@ void EdamameModel::Initialize()
 
 void EdamameModel::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommonSkinningToon();
     obj_->Draw();
+    Object3dCommon::GetInstance()->DrawCommon();
 }

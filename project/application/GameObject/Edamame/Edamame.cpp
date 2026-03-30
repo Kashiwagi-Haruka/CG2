@@ -42,19 +42,23 @@ void Edamame::Initialize()
 
     //枝豆モデル
     edamameModel_->Initialize();
-    //枝豆モデルに座標をセットする
-    edamameModel_->SetTranslate(worldTransform_.translate);
 
 
-    spotLight_.color = { 0.75f, 1.0f, 0.25f, 1.0f };
-    spotLight_.position = worldTransform_.translate;
-    spotLight_.position.y = 2.0f;
-    spotLight_.direction = { 0.0f, -1.0f, 0.0f };
-    spotLight_.intensity = 2.0f;
-    spotLight_.distance = 10.0f;
-    spotLight_.decay = 0.1f;
-    spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-    spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+    pointLights_[0].color = { 1.0f, 1.0f, 0.25f, 1.0f };
+    pointLights_[0].position = worldTransform_.translate;
+    pointLights_[0].position.y += 1.0f;
+    pointLights_[0].intensity = 4.0f;
+    pointLights_[0].radius = 4.0f;
+    pointLights_[0].decay = 0.1f;
+    pointLights_[0].shadowEnabled =  false;
+
+    pointLights_[1].color = { 1.0f, 1.0f, 0.25f, 1.0f };
+    pointLights_[1].position = worldTransform_.translate;
+    pointLights_[1].position.y = 0.0f;
+    pointLights_[1].intensity = 4.0f;
+    pointLights_[1].radius = 4.0f;
+    pointLights_[1].decay = 0.1f;
+    pointLights_[1].shadowEnabled = false;
 }
 
 void Edamame::Update()
@@ -62,8 +66,13 @@ void Edamame::Update()
     obj_->SetEnableLighting(false);
     obj_->SetTransform(worldTransform_);
     obj_->UpdateBillboard();
+    Vector3 pos = worldTransform_.translate;
+    pos -= playerCamera_->GetRay().diff * 0.25f;
+    pointLights_[1].position = pos- playerCamera_->GetRay().diff;
+    //スポットライト
+    //枝豆モデルに座標をセットする
+    edamameModel_->SetTranslate(pos);
     edamameModel_->Update();
-
     CheckCollision();
     //枝豆知識
     Trivia();
@@ -122,7 +131,7 @@ void Edamame::Trivia()
             if (edamameTrivia_->GetIsDie()) {
                 //死んだとき 落下開始
                 edamameModel_->SetIsDropStart(true);
-            
+
             }
 
         }
@@ -133,16 +142,16 @@ void Edamame::Trivia()
 
         if (length <= 20.0f) {
 
-   
+
             edamameTrivia_->SetIsDraw(true);
             if (length <= 1.0f) {
                 bgmVol = 0.25f;
                 vol = 1.0f;
-          
+
             } else {
                 vol = 1.0f / length;
                 bgmVol = vol * 0.25f;
- 
+
             }
         } else {
             edamameTrivia_->SetIsDraw(false);
