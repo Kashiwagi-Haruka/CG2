@@ -29,7 +29,9 @@ void EdamameModel::OnCollision(Collider* collider)
             //落下開始してたら
             desiredAnimationName = "Die";
         }
-        speedY_ = 0.0f;
+
+        Vector3 vel = {0.0f,speedY_,0.0f};
+        YoshidaMath::ResolveCollision(translate_, vel, GetCollisionInfo());
     };
 }
 
@@ -121,23 +123,23 @@ void EdamameModel::Update()
         }
     }
 
-    obj_->SetTranslate(translate_);
-    obj_->SetRotate(rotate_);
+
 
     if (isDrop_) {
 
         speedY_ -= YoshidaMath::kGravity * deltaTime;
-        translate_.y += speedY_ * deltaTime;
-        //速度制限
-        speedY_ = std::clamp(speedY_, -1.0f, 1.0f);
+        translate_.y += speedY_;
         //位置制限
         translate_.y = std::clamp(translate_.y, 0.0f, 2.4f);
 
-        rotate_.x =  YoshidaMath::Easing::Lerp(rotate_.x,0.0f,0.001f);
-        rotate_.z = YoshidaMath::Easing::Lerp(rotate_.z, 0.0f, 0.001f);
-
+        rotate_.x =  YoshidaMath::Easing::Lerp(rotate_.x,0.0f,0.05f);
+        rotate_.z = YoshidaMath::Easing::Lerp(rotate_.z, 0.0f, 0.05f);
+        obj_->SetTranslate(translate_);
+        obj_->SetRotate(rotate_);
         obj_->Update();
     } else {
+        obj_->SetTranslate(translate_);
+        obj_->SetRotate(rotate_);
         obj_->UpdateBillboard();
     }
 

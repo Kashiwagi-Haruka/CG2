@@ -36,9 +36,9 @@ PortalParticle::PortalParticle() {
 	pathEmitter_->SetEmissionAngle(2.0f * 3.1415926535f);
 
 	primitive_ = std::make_unique<Primitive>();
-	primitive_->Initialize(Primitive::Sphere);
+	primitive_->Initialize(Primitive::Sphere,"Resources/2d/white2x2.png");
 	primitive_->SetEnableLighting(false);
-	primitive_->SetColor({0.2f, 0.6f, 1.0f, 1.0f});
+	primitive_->SetColor({0.0f, 0.0f, 0.0f, 1.0f});
 	transform_.scale = {0.1f, 0.1f, 0.1f};
 	primitive_->SetScale(transform_.scale);
 
