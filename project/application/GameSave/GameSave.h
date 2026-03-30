@@ -13,15 +13,17 @@ class GameSave {
 		bool isFlipVertically;   // 上下反転しているか
 	};
 	struct ProgressSaveData {
+		std::string currentStageName;
 	};
 	PlayerSaveData playerSaveData_;
 	CameraSaveData cameraSaveData_;
-
+	ProgressSaveData progressSaveData_;
 
 public:
 	
 	void PlayerSave(const Transform& transform);
 	void CameraSave(const Transform& transform, float rotateSpeed, bool isFlipHorizontally, bool isFlipVertically);
+	void ProgressSave(const std::string& currentStageName);
 
 	void Save();
 	void Load();

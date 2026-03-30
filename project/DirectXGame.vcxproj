@@ -293,6 +293,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Option\Option.cpp" />
     <ClCompile Include="application\Menu\Menu.cpp" />
     <ClCompile Include="application\GameObject\SEManager\SEManager.cpp" />
+    <ClCompile Include="application\GameObject\SavePoint\SavePoint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -453,6 +454,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Option\Option.h" />
     <ClInclude Include="application\Menu\Menu.h" />
     <ClInclude Include="application\GameObject\SEManager\SEManager.h" />
+    <ClInclude Include="application\GameObject\SavePoint\SavePoint.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
