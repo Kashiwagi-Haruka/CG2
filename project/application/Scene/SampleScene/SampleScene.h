@@ -42,6 +42,7 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 	bool useDebugCamera_ = false;
 
+
 	DirectionalCommonLight directionalLight_{};
 	bool directionalShadowEnabled_ = true;
 	bool pointShadowEnabled_ = true;
