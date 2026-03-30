@@ -31,6 +31,7 @@ void SEManager::Initialize()
     SetVol(0.0f, NOISE);
 
     SetVol(1.0f, TYPE);
+
 }
 
 void SEManager::Update()
