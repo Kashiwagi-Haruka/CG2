@@ -395,10 +395,10 @@
     <ClInclude Include="Engine\base\DirectXCommon.h">
       <Filter>Engine\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Light\AreaLight.h">
+    <ClInclude Include="Engine\Texture\Light\CommonLight\AreaCommonLight.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Light\DirectionalLight.h">
+    <ClInclude Include="Engine\Texture\Light\CommonLight\DirectionalCommonLight.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="Engine\BaseScene\AbstractSceneFactory.h">
@@ -506,7 +506,7 @@
     <ClInclude Include="Engine\Texture\Particle\ParticleManager.h">
       <Filter>Engine\Texture\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Light\PointLight.h">
+    <ClInclude Include="Engine\Texture\Light\CommonLight\PointCommonLight.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="application\Pause\Pause.h">
@@ -572,7 +572,7 @@
     <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h">
       <Filter>Engine\Texture\PSO</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Texture\Light\SpotLight.h">
+    <ClInclude Include="Engine\Texture\Light\CommonLight\SpotCommonLight.h">
       <Filter>Engine\Light</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Input\Input.h">
@@ -702,6 +702,10 @@
     <ClInclude Include="application\GameObject\Box\BoxManager.h" />
     <ClInclude Include="application\GameObject\Elevator\Elevator.h" />
     <ClInclude Include="application\GameObject\SavePoint\SavePoint.h" />
+    <ClInclude Include="Engine\Texture\Light\SoloLight\SpotLight.h" />
+    <ClInclude Include="Engine\Texture\Light\SoloLight\PointLight.h" />
+    <ClInclude Include="Engine\Texture\Light\SoloLight\DirectionalLight.h" />
+    <ClInclude Include="Engine\Texture\Light\SoloLight\AreaLight.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

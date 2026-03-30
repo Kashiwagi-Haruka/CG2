@@ -19,7 +19,7 @@
 
 #include "BlendMode/BlendModeManager.h"
 #include "Function.h"
-#include "Light/DirectionalLight.h"
+#include "Light/CommonLight/DirectionalCommonLight.h"
 #include "Matrix4x4.h"
 #include "Transform.h"
 #include "Vector2.h"

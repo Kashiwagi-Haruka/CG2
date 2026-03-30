@@ -3,7 +3,7 @@
 #include "Animation/Animation.h"
 #include "CameraForGPU.h"
 #include "Data/VertexData.h"
-#include "Light/DirectionalLight.h"
+#include "Light/CommonLight/DirectionalCommonLight.h"
 #include "Matrix4x4.h"
 #include "Model/Model.h"
 #include "Transform.h"

@@ -56,7 +56,7 @@ bool EditorLight::DrawEditor(bool isPlaying) {
 			lightChanged = true;
 		}
 		for (size_t i = 0; i < state_.pointLights.size(); ++i) {
-			PointLight& point = state_.pointLights[i];
+			PointCommonLight& point = state_.pointLights[i];
 			const std::string label = "Point " + std::to_string(i);
 			if (ImGui::TreeNode((label + "##point").c_str())) {
 				if (!isPlaying) {
@@ -79,7 +79,7 @@ bool EditorLight::DrawEditor(bool isPlaying) {
 			lightChanged = true;
 		}
 		for (size_t i = 0; i < state_.spotLights.size(); ++i) {
-			SpotLight& spot = state_.spotLights[i];
+			SpotCommonLight& spot = state_.spotLights[i];
 			if (ImGui::TreeNode(("Spot " + std::to_string(i) + "##spot").c_str())) {
 				if (!isPlaying) {
 					lightChanged |= ImGui::ColorEdit4(("Color##spot_" + std::to_string(i)).c_str(), &spot.color.x);
@@ -104,7 +104,7 @@ bool EditorLight::DrawEditor(bool isPlaying) {
 			lightChanged = true;
 		}
 		for (size_t i = 0; i < state_.areaLights.size(); ++i) {
-			AreaLight& area = state_.areaLights[i];
+			AreaCommonLight& area = state_.areaLights[i];
 			if (ImGui::TreeNode(("Area " + std::to_string(i) + "##area").c_str())) {
 				if (!isPlaying) {
 					lightChanged |= ImGui::ColorEdit4(("Color##area_" + std::to_string(i)).c_str(), &area.color.x);
@@ -146,7 +146,7 @@ void EditorLight::SaveToJson(nlohmann::json& lightsJson) const {
 	    {"area",                nlohmann::json::array()   },
 	};
 
-	for (const PointLight& point : state_.pointLights) {
+	for (const PointCommonLight& point : state_.pointLights) {
 		lightsJson["point"].push_back({
 		    {"color",     {point.color.x, point.color.y, point.color.z, point.color.w}},
 		    {"position",  {point.position.x, point.position.y, point.position.z}      },
@@ -155,7 +155,7 @@ void EditorLight::SaveToJson(nlohmann::json& lightsJson) const {
 		    {"decay",     point.decay		                                         },
 		});
 	}
-	for (const SpotLight& spot : state_.spotLights) {
+	for (const SpotCommonLight& spot : state_.spotLights) {
 		lightsJson["spot"].push_back({
 		    {"color",           {spot.color.x, spot.color.y, spot.color.z, spot.color.w}},
 		    {"position",        {spot.position.x, spot.position.y, spot.position.z}     },
@@ -167,7 +167,7 @@ void EditorLight::SaveToJson(nlohmann::json& lightsJson) const {
 		    {"cosFalloffStart", spot.cosFalloffStart                                    },
 		});
 	}
-	for (const AreaLight& area : state_.areaLights) {
+	for (const AreaCommonLight& area : state_.areaLights) {
 		lightsJson["area"].push_back({
 		    {"color",     {area.color.x, area.color.y, area.color.z, area.color.w}},
 		    {"position",  {area.position.x, area.position.y, area.position.z}     },
@@ -205,7 +205,7 @@ void EditorLight::LoadFromJson(const nlohmann::json& lightsJson) {
 		for (const auto& pointJson : lightsJson["point"]) {
 			if (!pointJson.is_object())
 				continue;
-			PointLight point{};
+			PointCommonLight point{};
 			if (pointJson.contains("color"))
 				LoadColor(pointJson["color"], point.color);
 			if (pointJson.contains("position"))
@@ -225,7 +225,7 @@ void EditorLight::LoadFromJson(const nlohmann::json& lightsJson) {
 		for (const auto& spotJson : lightsJson["spot"]) {
 			if (!spotJson.is_object())
 				continue;
-			SpotLight spot{};
+			SpotCommonLight spot{};
 			if (spotJson.contains("color"))
 				LoadColor(spotJson["color"], spot.color);
 			if (spotJson.contains("position"))
@@ -251,7 +251,7 @@ void EditorLight::LoadFromJson(const nlohmann::json& lightsJson) {
 		for (const auto& areaJson : lightsJson["area"]) {
 			if (!areaJson.is_object())
 				continue;
-			AreaLight area{};
+			AreaCommonLight area{};
 			if (areaJson.contains("color"))
 				LoadColor(areaJson["color"], area.color);
 			if (areaJson.contains("position"))

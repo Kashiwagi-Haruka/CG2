@@ -33,10 +33,10 @@
 
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 
-#include "Light/DirectionalLight.h" 
-#include "Light/PointLight.h"
-#include "Light/SpotLight.h" 
-#include "Light/AreaLight.h"
+#include "Light/CommonLight/DirectionalCommonLight.h" 
+#include "Light/CommonLight/AreaCommonLight.h"
+#include "Light/CommonLight/SpotCommonLight.h" 
+#include "Light/CommonLight/PointCommonLight.h"
 #include"Audio.h"
 #include <GameObject/Edamame/Edamame.h>
 
@@ -112,15 +112,15 @@ private:
 
 #pragma region// light
     //DirectionalLight
-    DirectionalLight directionalLight_{};
+    DirectionalCommonLight directionalLight_{};
     //PointLight
-    std::array<PointLight, kMaxPointLights> pointLights_{};
+    std::array<PointCommonLight, kMaxPointLights> pointLights_{};
     uint32_t activePointLightCount_ = 0;
     //SpotLight
-    std::array<SpotLight, kMaxSpotLights> spotLights_{};
+    std::array<SpotCommonLight, kMaxSpotLights> spotLights_{};
     uint32_t activeSpotLightCount_ = 0;
     //AreaLight
-    std::array<AreaLight, kMaxAreaLights> areaLights_{};
+    std::array<AreaCommonLight, kMaxAreaLights> areaLights_{};
     uint32_t activeAreaLightCount_ = 0;
 #pragma endregion
 	bool useDirectionalShadow_ = true;
