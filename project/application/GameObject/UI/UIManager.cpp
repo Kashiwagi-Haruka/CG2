@@ -3,6 +3,7 @@
 #include"SceneManager.h"
 #include"GameObject/Flashlight/Flashlight.h"
 #include"GameObject/Key/Key.h"
+#include"application/GameObject/SEManager/SEManager.h"
 
 bool UIManager::isPause_ = false;
 
@@ -50,6 +51,7 @@ void UIManager::Update()
         } else {
             CursorHideAndStop();
         }
+		SEManager::SoundPlay(SEManager::PUSH_WATCH);
     }
 
 

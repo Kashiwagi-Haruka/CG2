@@ -7,6 +7,7 @@
 #include "WinApp.h"
 #include "application/GameObject/KeyBindConfig.h"
 #include "application/Color/Color.h"
+#include "application/GameObject/SEManager/SEManager.h"
 #include <algorithm>
 namespace {
 const char* kOptionFileName = "optionData.json";
@@ -97,8 +98,10 @@ void Option::Update() {
 
 	if (moveUp) {
 		selectedParameterIndex_ = (selectedParameterIndex_ + kOptionParameterNum - 1) % kOptionParameterNum;
+		SEManager::SoundPlay(SEManager::PUSH_WATCH);
 	} else if (moveDown) {
 		selectedParameterIndex_ = (selectedParameterIndex_ + 1) % kOptionParameterNum;
+		SEManager::SoundPlay(SEManager::PUSH_WATCH);
 	}
 
 	int currentDivision = 0;
@@ -113,9 +116,17 @@ void Option::Update() {
 	}
 
 	if (moveLeft) {
-		currentDivision = std::max(0, currentDivision - 1);
+		const int nextDivision = std::max(0, currentDivision - 1);
+		if (nextDivision != currentDivision) {
+			SEManager::SoundPlay(SEManager::PUSH_WATCH);
+		}
+		currentDivision = nextDivision;
 	} else if (moveRight) {
-		currentDivision = std::min(kOptionParameterDivisionNum - 1, currentDivision + 1);
+		const int nextDivision = std::min(kOptionParameterDivisionNum - 1, currentDivision + 1);
+		if (nextDivision != currentDivision) {
+			SEManager::SoundPlay(SEManager::PUSH_WATCH);
+		}
+		currentDivision = nextDivision;
 	}
 
 	if (selectedParameterIndex_ == 0) {

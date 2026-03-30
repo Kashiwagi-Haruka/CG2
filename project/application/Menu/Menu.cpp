@@ -5,7 +5,7 @@
 #include "WinApp.h"
 #include "application/Color/Color.h"
 #include "TextureManager.h"
-
+#include "application/GameObject/SEManager/SEManager.h"
 #include <array>
 
 namespace {
@@ -135,6 +135,7 @@ void Menu::Update() {
 			nextIndex -= menuCount;
 		}
 		currentMenuName_ = kMenuOrder[static_cast<size_t>(nextIndex)];
+		SEManager::SoundPlay(SEManager::PUSH_WATCH);
 	}
 	if (playerCommand->UiInteractTrigger()) {
 		if (currentMenuName_ == "Game") {
