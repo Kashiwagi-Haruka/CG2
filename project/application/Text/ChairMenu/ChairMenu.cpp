@@ -8,7 +8,6 @@
 
 bool ChairMenu::isShowMenu_ = false;
 uint32_t ChairMenu::selectButtonNum_ = 0;
-bool ChairMenu::isSelectButton_ = false;
 
 ChairMenu::ChairMenu()
 {
@@ -60,7 +59,8 @@ void ChairMenu::Initialize()
 {
     isShowMenu_ = false;
     selectButtonNum_ = 0;
-    isSelectButton_ = false;
+    isShowStart_ = false;
+    isPreGrab_ = false;
     menuText_[GRAB_TEXT].SetString(grabText_[0]);
 }
 
@@ -74,22 +74,27 @@ void ChairMenu::Update()
     pressEText_.SetColor({ 1.0f,1.0f,1.0f,fontAlpha });
     pressEText_.UpdateLayout(false);
 
-    if (isShowMenu_) {
 
-        if (PlayerCommand::GetInstance()->InteractTrigger()) {
-
-            if (!isSelectButton_) {
-                SEManager::SoundPlay(SEManager::PUSH_WATCH);
-                isSelectButton_ = true;
-                //最初は0番に設定する
-                selectButtonNum_ = 0;
-                for (auto& text : menuText_) {
-                    text.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-                }
-            }
-        }
+    if (PlayerCommand::GetIsGrab() != isPreGrab_) {
+        isPreGrab_ = PlayerCommand::GetIsGrab();
         //メニューテキストのテキストを設定する
         menuText_[GRAB_TEXT].SetString(grabText_[PlayerCommand::GetIsGrab()]);
+        menuText_[GRAB_TEXT].StartTyping(0.05f);
+    }
+
+    if (isShowMenu_) {
+
+        if (!isShowStart_) {
+            SEManager::SoundPlay(SEManager::PUSH_WATCH);
+            //最初は0番に設定する
+            selectButtonNum_ = 0;
+            for (auto& text : menuText_) {
+                text.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
+            }
+            isShowStart_ = true;
+        }
+
+
 
         //メニューが開いた時
         if (PlayerCommand::GetInstance()->MouseWheelDown()) {
@@ -132,6 +137,8 @@ void ChairMenu::Update()
         }
 
         triangleText_.UpdateLayout(false);
+    }else{
+        isShowStart_ = false;
     }
 
 }

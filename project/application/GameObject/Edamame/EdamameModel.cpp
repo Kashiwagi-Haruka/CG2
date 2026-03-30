@@ -131,7 +131,7 @@ void EdamameModel::Update()
         //速度制限
         speedY_ = std::clamp(speedY_, -1.0f, 1.0f);
         //位置制限
-        translate_.y = std::clamp(translate_.y, GetAABB().max.y, 2.4f);
+        translate_.y = std::clamp(translate_.y, 0.0f, 2.4f);
 
         rotate_.x =  YoshidaMath::Easing::Lerp(rotate_.x,0.0f,0.001f);
         rotate_.z = YoshidaMath::Easing::Lerp(rotate_.z, 0.0f, 0.001f);
