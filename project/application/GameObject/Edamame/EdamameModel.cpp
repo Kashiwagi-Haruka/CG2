@@ -121,12 +121,10 @@ void EdamameModel::Update()
         }
     }
 
-
     obj_->SetTranslate(translate_);
     obj_->SetRotate(rotate_);
 
     if (isDrop_) {
-
 
         speedY_ -= YoshidaMath::kGravity * deltaTime;
         translate_.y += speedY_ * deltaTime;
@@ -141,9 +139,7 @@ void EdamameModel::Update()
         obj_->Update();
     } else {
         obj_->UpdateBillboard();
-
     }
-
 
 }
 
