@@ -5,7 +5,7 @@ class Mission {
 	uint32_t fontHandle_ = 0;
 
 	Text MissionText_;
-	Text keyGetMissionText_;
+	Text KeyGetMissionText_;
 	Text GotoDoorMissionText_;
 
 public:
