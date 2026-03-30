@@ -2,7 +2,6 @@
 #include"Function.h"
 #include"Light/CommonLight/SpotCommonLight.h"
 
-
 TestField::TestField()
 {
     plane_ = std::make_unique<Primitive>();
