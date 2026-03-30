@@ -98,31 +98,19 @@ void EdamameModel::SetCamera(Camera* camera)
 void EdamameModel::Update()
 {
 
-
     if (isDropStart_) {
         if (!isDrop_) {
-            rotate_ = Function::DirectionToRotation(YoshidaMath::GetForward(obj_->GetWorldMatrix()), { 1,0,0 });
-            rotate_.y += Function::kPi;
+            Vector3 rotate = Function::DirectionToRotation(YoshidaMath::GetForward(obj_->GetWorldMatrix()), { 1,0,0 });
+            rotate.y += Function::kPi;
+            rotate_ = rotate;
             isDrop_ = true;
         }
     }
 
     Animation();
 
-
     //重力処理
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
-
-
-    if (isDrop_) {
-
-        speedY_ -= YoshidaMath::kGravity * deltaTime;
-        translate_.y += speedY_ * deltaTime;
-        //速度制限
-        speedY_ = std::clamp(speedY_, -1.0f, 1.0f);
-        //位置制限
-        translate_.y = std::clamp(translate_.y, GetAABB().max.y, 2.4f);
-    }
 
     if (isStart_) {
         if (scaleTimer_ != 1.0f) {
@@ -133,12 +121,22 @@ void EdamameModel::Update()
         }
     }
 
-    obj_->SetRotate(rotate_);
+
     obj_->SetTranslate(translate_);
+    obj_->SetRotate(rotate_);
 
     if (isDrop_) {
-        rotate_.x =  YoshidaMath::Easing::Lerp(rotate_.x,0.0f,0.01f);
-        rotate_.z = YoshidaMath::Easing::Lerp(rotate_.z, 0.0f, 0.01f);
+
+
+        speedY_ -= YoshidaMath::kGravity * deltaTime;
+        translate_.y += speedY_ * deltaTime;
+        //速度制限
+        speedY_ = std::clamp(speedY_, -1.0f, 1.0f);
+        //位置制限
+        translate_.y = std::clamp(translate_.y, GetAABB().max.y, 2.4f);
+
+        rotate_.x =  YoshidaMath::Easing::Lerp(rotate_.x,0.0f,0.001f);
+        rotate_.z = YoshidaMath::Easing::Lerp(rotate_.z, 0.0f, 0.001f);
 
         obj_->Update();
     } else {

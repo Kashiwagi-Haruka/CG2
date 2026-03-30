@@ -5,6 +5,8 @@ std::array<std::u32string, 8> EdamameTrivia::strings_;
 size_t EdamameTrivia::triviaNum_ = 0;
 bool EdamameTrivia::isSendStartTriviaMessage_ = false;
  bool EdamameTrivia::isDraw_= false;
+ bool EdamameTrivia::isDie_ = false;
+
 EdamameTrivia::EdamameTrivia()
 {
     //枝豆
