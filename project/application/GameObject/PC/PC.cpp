@@ -1,4 +1,4 @@
-#include "Desk.h"
+#include "PC.h"
 #include"Model/ModelManager.h"
 #include"Function.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
@@ -9,36 +9,34 @@
 #include "GameBase.h"
 #include"GameObject/SEManager/SEManager.h"
 
-PlayerCamera* Desk::playerCamera_ = nullptr;
+PlayerCamera* PC::playerCamera_ = nullptr;
 
-Desk::Desk()
+PC::PC()
 {
     obj_ = std::make_unique<Object3d>();
-    ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/desk", "desk");
-    obj_->SetModel("desk");
-    SetAABB({ .min = {-0.4f,0.0f,-0.3f},.max = {0.4f,0.8f,0.3f} });
-    SetCollisionAttribute(kCollisionDesk);
-    SetCollisionMask(kCollisionPlayer | kCollisionKey | kCollisionItem);
-    localAABB_ = { .min = {-0.125f,-0.125f,-0.125f},.max = {0.125f,0.125,0.125f} };
+    ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/pc", "pc");
+    obj_->SetModel("pc");
+    SetAABB({ .min = {-0.15f,-0.15f,-0.15f},.max = {0.15f,0.15f,0.15f} });
+    SetCollisionAttribute(kCollisionItem);
+    SetCollisionMask(kCollisionPlayer | kCollisionKey | kCollisionDesk);
 }
 
-void Desk::OnCollision(Collider* collider)
+void PC::OnCollision(Collider* collider)
 {
 
 }
 
-Vector3 Desk::GetWorldPosition() const
+Vector3 PC::GetWorldPosition() const
 {
     return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
 }
 
-void Desk::Animation()
+void PC::Animation()
 {
-
 
     bool loopAnimation = false;
 
-    if (desiredAnimationName == "Close") {
+    if (desiredAnimationName == "Open") {
         if (animationFinished_) {
             desiredAnimationName = "Idle";
         }
@@ -67,38 +65,31 @@ void Desk::Animation()
 
 }
 
-void Desk::SetCamera(Camera* camera)
+void PC::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
     obj_->UpdateCameraMatrices();
 }
 
-void Desk::Update()
+void PC::Update()
 {
 
     CheckCollision();
     Animation();
     obj_->Update();
-
-    if (!isStart_) {
-        isStart_ = true;
-    }
 }
 
-void Desk::Initialize()
+void PC::Initialize()
 {
     obj_->Initialize();
-    
-    isStart_ = false;
-    desiredAnimationName = "Idle";
 
-    AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/desk", "desk");
-    AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, desiredAnimationName, false);
-    if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, desiredAnimationName)) {
+    AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/pc", "pc");
+    AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "Idle", false);
+    if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, "Idle")) {
         obj_->SetAnimation(idleAnimation, false);
     }
 
-    if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("desk")) {
+    if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("pc")) {
         skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
         skinCluster_ = CreateSkinCluster(*skeleton_, *sizukuModel);
         if (!skinCluster_.mappedPalette.empty()) {
@@ -107,30 +98,27 @@ void Desk::Initialize()
     }
 }
 
-void Desk::Draw()
+void PC::Draw()
 {
     obj_->Draw();
 }
 
 
-void Desk::CheckCollision()
+void PC::CheckCollision()
 {
-    if (!isStart_) {
-        return;
-    }
 
     if (OnCollisionRay()) {
         //rayの当たり判定
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (!PlayerCommand::GetIsGrab()) {
-
-    /*                SEManager::SoundPlay(SEManager::CHAIR);*/
+                if (animationFinished_) {
+                    /*                SEManager::SoundPlay(SEManager::CHAIR);*/
                     if (desiredAnimationName == "Idle") {
+                        desiredAnimationName = "Close";
+                    } else if (desiredAnimationName == "Close") {
                         desiredAnimationName = "Open";
-                    } else if (desiredAnimationName == "Open") {
-                        desiredAnimationName = "Idle";
                     }
-                
+                }
 
             }
         }
@@ -139,10 +127,10 @@ void Desk::CheckCollision()
 }
 
 
-bool Desk::OnCollisionRay()
+bool PC::OnCollisionRay()
 {
-    const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex("drawer.002");
+    const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex("monitor");
     skeleton_->SetObjectMatrix(obj_->GetWorldMatrix());
     Vector3 pos = skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
-    return playerCamera_->OnCollisionRay(localAABB_, pos);
+    return playerCamera_->OnCollisionRay(GetAABB(), pos);
 }

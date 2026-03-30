@@ -27,6 +27,8 @@
 #include "GameObject/Elevator/Elevator.h"
 
 #include <GameObject/Edamame/Edamame.h>
+#include"GameObject/PC/PC.h"
+
 #pragma endregion
 
 #include"GameObject/UI/UIManager.h"
@@ -103,6 +105,8 @@ private:
     std::unique_ptr<BoxManager> boxManager_ = nullptr;
 	// エレベーター
 	std::unique_ptr<Elevator> elevator_ = nullptr;
+    //PC
+    std::unique_ptr<PC> pc_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
@@ -167,6 +171,7 @@ private:
     void DrawModel();
     void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer);
     void SetSceneCameraForDraw(Camera* camera);
+    void SetPlayerCamera(PlayerCamera* playerCamera);
     void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer);
 };
 
