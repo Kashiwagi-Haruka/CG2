@@ -7,6 +7,7 @@
 #include<imgui.h>
 
 bool Flashlight::isSendGetLightMessage_ = false;
+ bool Flashlight::isGetLight_ = false;
 
 Flashlight::Flashlight()
 {
@@ -108,11 +109,8 @@ void Flashlight::CheckCollision()
 
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
         //keyとrayの当たり判定
-        if (PlayerCommand::GetIsGrab()) {
-  /*          isGetLight_ = false;
-            PlayerCommand::SetIsGrab(false);
-            transform_.translate =  GetWorldPosition();*/
-        } else {
+
+        if(!PlayerCommand::GetIsGrab()){
             if (OnCollisionRay()) {
                 isGetLight_ = true;
       /*          PlayerCommand::SetIsGrab(true);*/

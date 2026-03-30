@@ -27,6 +27,7 @@ public:
     static bool IsGetLightMessage() { return isSendGetLightMessage_; }
     void UpdateSpotLight();
     void SetPlayer(Player* player) { player_ = player; }
+    static bool IsGetLight() { return isGetLight_; }
 private:
     bool OnCollisionRay();
 private:
@@ -36,7 +37,7 @@ private:
     std::unique_ptr<Object3d>obj_ = nullptr;
     //SpotLight
     SpotLight spotLight_;
-    bool isGetLight_ = false;
+    static bool isGetLight_;
     static bool isSendGetLightMessage_;
 };
 
