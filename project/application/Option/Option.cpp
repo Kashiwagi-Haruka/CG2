@@ -93,6 +93,7 @@ void Option::Update() {
 	if (closeOption) {
 		SaveOptionData();
 		CloseOption();
+		SEManager::SoundPlay(SEManager::PUSH_WATCH);
 		return;
 	}
 
