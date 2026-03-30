@@ -75,7 +75,7 @@ void TextUIManager::Update()
         edamameTrivia_.StartTyping(0.1f); // 0.1秒ごとに1文字ずつ表示
     }
 
-    text_.Update();
+    text_.Update(true);
     edamameTrivia_.Update();
 
     chairMenu_->Update();
@@ -90,7 +90,8 @@ void TextUIManager::Draw()
     if (ChairMenu::GetIsShowMenu()) {
         chairMenu_->Draw();
     } else {
-        if (EdamameTrivia::GetIsDraw()) {
+        if (EdamameTrivia::GetIsDraw()&& !EdamameTrivia::GetIsDie()) {
+            //死んでないとき且つ描画するとき
             edamameTrivia_.Draw();  
         }
      

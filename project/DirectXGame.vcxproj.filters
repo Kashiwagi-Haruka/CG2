@@ -356,6 +356,8 @@
     <ClCompile Include="application\GameObject\Box\BoxManager.cpp" />
     <ClCompile Include="application\GameObject\Elevator\Elevator.cpp" />
     <ClCompile Include="application\GameObject\SavePoint\SavePoint.cpp" />
+    <ClCompile Include="application\GameObject\Edamame\EdamameModel.cpp" />
+    <ClCompile Include="application\GameObject\UI\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -706,6 +708,8 @@
     <ClInclude Include="Engine\Texture\Light\SoloLight\PointLight.h" />
     <ClInclude Include="Engine\Texture\Light\SoloLight\DirectionalLight.h" />
     <ClInclude Include="Engine\Texture\Light\SoloLight\AreaLight.h" />
+    <ClInclude Include="application\GameObject\Edamame\EdamameModel.h" />
+    <ClInclude Include="application\GameObject\UI\UIManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

@@ -180,6 +180,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Box\Box.cpp" />
     <ClCompile Include="application\GameObject\Box\BoxManager.cpp" />
     <ClCompile Include="application\GameObject\Elevator\Elevator.cpp" />
+    <ClCompile Include="application\GameObject\Edamame\EdamameModel.cpp" />
     <ClCompile Include="Engine\Editor\Object3d\EditorObject3d.cpp" />
     <ClCompile Include="Engine\Editor\Primitive\EditorPrimitive.cpp" />
     <ClCompile Include="Engine\Editor\Light\EditorLight.cpp" />
@@ -294,6 +295,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Menu\Menu.cpp" />
     <ClCompile Include="application\GameObject\SEManager\SEManager.cpp" />
     <ClCompile Include="application\GameObject\SavePoint\SavePoint.cpp" />
+    <ClCompile Include="application\GameObject\UI\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -338,6 +340,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Box\Box.h" />
     <ClInclude Include="application\GameObject\Box\BoxManager.h" />
     <ClInclude Include="application\GameObject\Elevator\Elevator.h" />
+    <ClInclude Include="application\GameObject\Edamame\EdamameModel.h" />
     <ClInclude Include="Engine\Editor\Object3d\EditorObject3d.h" />
     <ClInclude Include="Engine\Editor\Primitive\EditorPrimitive.h" />
     <ClInclude Include="Engine\Editor\Light\EditorLight.h" />
@@ -459,6 +462,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Menu\Menu.h" />
     <ClInclude Include="application\GameObject\SEManager\SEManager.h" />
     <ClInclude Include="application\GameObject\SavePoint\SavePoint.h" />
+    <ClInclude Include="application\GameObject\UI\UIManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

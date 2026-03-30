@@ -6,6 +6,9 @@
 #include"Audio.h"
 #include"EdamameTrivia.h"
 #include"Light/CommonLight/SpotCommonLight.h"
+#include"EdamameModel.h"
+
+
 
 class Edamame
 {
@@ -17,12 +20,14 @@ public:
     void Draw();
     void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
-    void SetModel(const std::string& filePath);
     void CheckCollision();
     bool OnCollisionRay();
     void Trivia();
     SpotCommonLight& GetSpotLight() { return spotLight_; };
+
+    std::unique_ptr<EdamameModel>& GetEdamameModel() {return edamameModel_;}
 private:
+    std::unique_ptr<EdamameModel>edamameModel_ = nullptr;
     std::unique_ptr<EdamameTrivia>edamameTrivia_ = nullptr;
     std::unique_ptr<Object3d>obj_ = nullptr;
     AABB localAABB_ = {};

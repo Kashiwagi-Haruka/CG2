@@ -10,9 +10,12 @@ private:
     static size_t triviaNum_;
     static bool isSendStartTriviaMessage_;
     static bool isDraw_;
+   static bool isDie_;
+    bool isEnd_ = true;
 public:
     EdamameTrivia();
     ~EdamameTrivia();
+    static bool GetIsDie() { return isDie_; }
     void Initialize();
     void Update();
     void SetSound();
