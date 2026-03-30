@@ -7,7 +7,7 @@
 #include "Model/ModelManager.h"
 
 namespace {
-    const constexpr uint32_t kMaxWhiteBoards = 5;
+    const constexpr uint32_t kMaxWhiteBoards = 4;
 }
 
 WhiteBoardManager::WhiteBoardManager(Vector3* playerPos) {

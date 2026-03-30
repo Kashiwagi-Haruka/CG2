@@ -28,11 +28,13 @@ ShadowGameScene::ShadowGameScene()
     playerCamera_->SetPlayer(player_.get());
     //テスト地面
     testField_ = std::make_unique<TestField>();
-	// ホワイトボード管理
-	whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
-	// ポータル管理
-	portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
+    // ホワイトボード管理
+    whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
+    // ポータル管理
+    portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
     portalManager_->SetPlayerCamera(playerCamera_.get());
+    //PC
+    pc_ = std::make_unique<PC>();
 
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
@@ -65,24 +67,14 @@ ShadowGameScene::ShadowGameScene()
     timeCardRack_ = std::make_unique<TimeCardRack>();
     //箱管理
     boxManager_ = std::make_unique<BoxManager>();
-	// エレベーター
-	elevator_ = std::make_unique<Elevator>();
+    // エレベーター
+    elevator_ = std::make_unique<Elevator>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
     //UI管理
     uiManager_ = std::make_unique<UIManager>();
-
-
-    portalManager_->SetPlayerCamera(playerCamera_.get());
-    key_->SetPlayerCamera(playerCamera_.get());
-    edamame_->SetPlayerCamera(playerCamera_.get());
-    chairManager_->SetPlayerCamera(playerCamera_.get());
-    vendingMac_->SetPlayerCamera(playerCamera_.get());
-    door_->SetPlayerCamera(playerCamera_.get());
-    flashlight_->SetPlayerCamera(playerCamera_.get());
-    lockerManager_->SetPlayerCamera(playerCamera_.get());
-    deskManager_->SetPlayerCamera(playerCamera_.get());
-    boxManager_->SetPlayerCamera(playerCamera_.get());
+    //PlayerCameraをセットする
+    SetPlayerCamera(playerCamera_.get());
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -121,9 +113,11 @@ void ShadowGameScene::Initialize()
     //テスト地面
     testField_->Initialize();
     //ホワイトボード管理
-	whiteBoardManager_->Initialize();
-	// ポータル管理
+    whiteBoardManager_->Initialize();
+    // ポータル管理
     portalManager_->Initialize();
+    //PC
+    pc_->Initialize();
     //携帯打刻機
     timeCardWatch_->Initialize();
     // 鍵
@@ -150,8 +144,8 @@ void ShadowGameScene::Initialize()
     timeCardRack_->Initialize();
     //箱管理
     boxManager_->Initialize();
-	// エレベーター
-	elevator_->Initialize();
+    // エレベーター
+    elevator_->Initialize();
     //カーソルを画面中央に設定する
     auto* input = Input::GetInstance();
     input->SetIsCursorVisible(false);
@@ -163,25 +157,19 @@ void ShadowGameScene::Initialize()
 
 void ShadowGameScene::Update()
 {
-
     //UI管理
     uiManager_->Update();
-
     PlayerCommand::SetIsUiInputLocked(UIManager::GetIsPause());
     //シーン遷移の更新処理
     UpdateSceneTransition();
     //カメラの更新処理
     UpdateCamera();
-
     //ライトの更新処理
     UpdateLight();
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
-
     //オブジェクトの当たり判定
     CheckCollision();
-
-
 }
 
 void ShadowGameScene::Draw()
@@ -219,9 +207,7 @@ void ShadowGameScene::CheckCollision()
     vendingMac_->CheckCollision();
 
     collisionManager_->ClearColliders();
-
     collisionManager_->AddCollider(player_.get());
-
 
     for (auto& portal : portalManager_->GetPortals()) {
         if (!portal->GetIsPlayerHit()) {
@@ -266,8 +252,10 @@ void ShadowGameScene::CheckCollision()
     for (auto& box : boxManager_->GetBoxes()) {
         collisionManager_->AddCollider(box.get());
     }
+
     collisionManager_->AddCollider(key_.get());
     collisionManager_->AddCollider(edamame_->GetEdamameModel().get());
+    collisionManager_->AddCollider(pc_.get());
 
     collisionManager_->CheckAllCollisions();
 }
@@ -433,7 +421,7 @@ void ShadowGameScene::UpdateGameObject()
     //箱管理
     boxManager_->Update();
     //エレベーター
-	elevator_->Update();
+    elevator_->Update();
     //床
     testField_->Update();
     //壁管理
@@ -448,8 +436,8 @@ void ShadowGameScene::UpdateGameObject()
     lockerManager_->Update();
     //机
     deskManager_->Update();
-	// ホワイトボード管理
-	whiteBoardManager_->Update();
+    // ホワイトボード管理
+    whiteBoardManager_->Update();
     //ポータル管理
     portalManager_->Update();
     //打刻機
@@ -458,6 +446,8 @@ void ShadowGameScene::UpdateGameObject()
     //タイムカードラック
     timeCardRack_->SetTransform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 7.75f,1.3f,-7.0f } });
     timeCardRack_->Update();
+    //PC
+    pc_->Update();
 
     for (auto& chair : chairManager_->GetChairs()) {
         if (chair->GetIsStand()) {
@@ -552,6 +542,8 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     lockerManager_->Draw();
     //机
     deskManager_->Draw();
+    //PC
+    pc_->Draw();
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //懐中電灯
@@ -581,16 +573,17 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     }
 
     // ホワイトボード管理の描画
-	whiteBoardManager_->Draw();
-	// ポータル管理の描画
-	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
+    whiteBoardManager_->Draw();
+    // ポータル管理の描画
+    portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
-	player_->SetCamera(camera);
-	testField_->SetCamera(camera);
-	whiteBoardManager_->SetCamera(camera);
+    player_->SetCamera(camera);
+    testField_->SetCamera(camera);
+    whiteBoardManager_->SetCamera(camera);
     portalManager_->SetCamera(camera);
+    pc_->SetCamera(camera);
     timeCardWatch_->SetCamera(camera);
     flashlight_->SetCamera(camera);
     key_->SetCamera(camera);
@@ -605,7 +598,21 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
     timeCard_->SetCamera(camera);
     timeCardRack_->SetCamera(camera);
     boxManager_->SetCamera(camera);
-	elevator_->SetCamera(camera);
+    elevator_->SetCamera(camera);
+}
+void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera)
+{
+    portalManager_->SetPlayerCamera(playerCamera);
+    key_->SetPlayerCamera(playerCamera);
+    edamame_->SetPlayerCamera(playerCamera);
+    chairManager_->SetPlayerCamera(playerCamera);
+    vendingMac_->SetPlayerCamera(playerCamera);
+    door_->SetPlayerCamera(playerCamera);
+    flashlight_->SetPlayerCamera(playerCamera);
+    lockerManager_->SetPlayerCamera(playerCamera);
+    deskManager_->SetPlayerCamera(playerCamera);
+    boxManager_->SetPlayerCamera(playerCamera);
+    pc_->SetPlayerCamera(playerCamera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
