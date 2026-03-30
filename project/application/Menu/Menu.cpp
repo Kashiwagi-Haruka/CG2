@@ -155,6 +155,7 @@ void Menu::Update() {
 			pendingAction_ = Action::kEndGame;
 			isTrigger_ = false;
 		}
+		SEManager::SoundPlay(SEManager::PUSH_WATCH);
 	}
 	auto setDefaultColor = [](Text& text) {
 		text.SetColor(COLOR::WHITE);
