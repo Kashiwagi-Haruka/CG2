@@ -361,6 +361,7 @@
     <ClCompile Include="application\GameObject\UI\TabKey.cpp" />
     <ClCompile Include="application\GameObject\UI\LightIcon.cpp" />
     <ClCompile Include="application\GameObject\UI\KeyIcon.cpp" />
+    <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoardManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -716,6 +717,7 @@
     <ClInclude Include="application\GameObject\UI\TabKey.h" />
     <ClInclude Include="application\GameObject\UI\LightIcon.h" />
     <ClInclude Include="application\GameObject\UI\KeyIcon.h" />
+    <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoardManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
