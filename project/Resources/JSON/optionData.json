@@ -1,8 +1,8 @@
 {
   "BGMVolume": 1.0,
   "CameraMoveSpeed": {
-    "x": 2.0,
-    "y": 2.0
+    "x": 0.31111112236976624,
+    "y": 0.31111112236976624
   },
   "SEVolume": 1.0,
   "VoiceVolume": 1.0
