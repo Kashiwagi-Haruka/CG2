@@ -133,15 +133,16 @@ void Edamame::Trivia()
 
         if (length <= 20.0f) {
 
+   
             edamameTrivia_->SetIsDraw(true);
-
             if (length <= 1.0f) {
                 bgmVol = 0.25f;
                 vol = 1.0f;
-
+          
             } else {
                 vol = 1.0f / length;
                 bgmVol = vol * 0.25f;
+ 
             }
         } else {
             edamameTrivia_->SetIsDraw(false);
