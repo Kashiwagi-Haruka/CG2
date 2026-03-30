@@ -28,8 +28,10 @@ ShadowGameScene::ShadowGameScene()
     playerCamera_->SetPlayer(player_.get());
     //テスト地面
     testField_ = std::make_unique<TestField>();
-    //ホワイトボード管理
-    portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate);
+	// ホワイトボード管理
+	whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
+	// ポータル管理
+	portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
     portalManager_->SetPlayerCamera(playerCamera_.get());
 
     //携帯打刻機
@@ -119,6 +121,8 @@ void ShadowGameScene::Initialize()
     //テスト地面
     testField_->Initialize();
     //ホワイトボード管理
+	whiteBoardManager_->Initialize();
+	// ポータル管理
     portalManager_->Initialize();
     //携帯打刻機
     timeCardWatch_->Initialize();
@@ -228,7 +232,7 @@ void ShadowGameScene::CheckCollision()
         }
     }
 
-    for (auto& whiteBoard : portalManager_->GetWhiteBoards()) {
+    for (auto& whiteBoard : whiteBoardManager_->GetWhiteBoards()) {
         collisionManager_->AddCollider(whiteBoard.get());
     }
     for (auto& wall : wallManager_->GetWalls()) {
@@ -444,6 +448,8 @@ void ShadowGameScene::UpdateGameObject()
     lockerManager_->Update();
     //机
     deskManager_->Update();
+	// ホワイトボード管理
+	whiteBoardManager_->Update();
     //ポータル管理
     portalManager_->Update();
     //打刻機
@@ -574,14 +580,16 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
         player_->Draw();
     }
 
-    //ポータル管理の描画
-    portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
+    // ホワイトボード管理の描画
+	whiteBoardManager_->Draw();
+	// ポータル管理の描画
+	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 
-void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
-{
-    player_->SetCamera(camera);
-    testField_->SetCamera(camera);
+void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
+	player_->SetCamera(camera);
+	testField_->SetCamera(camera);
+	whiteBoardManager_->SetCamera(camera);
     portalManager_->SetCamera(camera);
     timeCardWatch_->SetCamera(camera);
     flashlight_->SetCamera(camera);

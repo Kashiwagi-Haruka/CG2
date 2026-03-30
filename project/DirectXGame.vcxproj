@@ -299,6 +299,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\UI\TabKey.cpp" />
     <ClCompile Include="application\GameObject\UI\LightIcon.cpp" />
     <ClCompile Include="application\GameObject\UI\KeyIcon.cpp" />
+    <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoardManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -469,6 +470,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\UI\TabKey.h" />
     <ClInclude Include="application\GameObject\UI\LightIcon.h" />
     <ClInclude Include="application\GameObject\UI\KeyIcon.h" />
+    <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoardManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
