@@ -1,16 +1,17 @@
 #pragma once
 #include "GameObject/Portal/Portal.h"
 #include "GameObject/Portal/PortalParticle.h"
-#include "GameObject/WhiteBoard/WhiteBoard.h"
+#include "Transform.h"
 #include "Vector3.h"
-#include"Transform.h"
-#include <array>
-class Player;
 
+class Player;
 class PlayerCamera;
+class WhiteBoard;
+class WhiteBoardManager;
+
 class PortalManager {
 public:
-	PortalManager(Vector3* pos);
+	PortalManager(Vector3* pos, WhiteBoardManager* whiteBoardManager);
 	~PortalManager();
 	void Initialize();
 	void Update();
@@ -20,34 +21,27 @@ public:
 	void SetCamera(Camera* camera);
 	void SetPlayerCamera(PlayerCamera* playerCamera);
 	/// @brief 作成できるポータル地点との当たり判定を作成する
-	/// @param timeCardWatch 携帯打刻機
-	/// @param camera かめら
-	/// @param warpPos ワープ地点の設定をする
 	void CheckCollision();
 	std::vector<std::unique_ptr<Portal>>& GetPortals() { return portals_; };
-	std::vector<std::unique_ptr<WhiteBoard>>& GetWhiteBoards() { return whiteBoards_; }
 
 	static bool GetCanMakePortal() { return canMakePortal_; };
+
 private:
-	bool OnCollisionRay(const AABB& AABB, const Vector3& pos);
-	void UpdateWhiteBoard();
 	void UpdatePortal();
 
-	//ポータルの作成
+	// ポータルの作成
 	void SpawnPortal(WhiteBoard* board);
-	void DrawWhiteBoard();
 	void DrawPortal();
 
 	static bool canMakePortal_;
 
-	std::vector<WhiteBoard*> preWhiteBoards_;
-	std::vector<std::unique_ptr<WhiteBoard>> whiteBoards_;
+	WhiteBoardManager* whiteBoardManager_ = nullptr;
 	WhiteBoard* pendingWhiteBoard_ = nullptr;
 
 	PlayerCamera* playerCamera_ = nullptr;
 	Vector3* playerPos_ = nullptr;
-	//初回のワープ地点
-	Transform firstWarpPosTransform_ = { 0.0f };
+	// 初回のワープ地点
+	Transform firstWarpPosTransform_ = {0.0f};
 
 	bool isPendingPortalSpawn_ = false;
 	std::vector<std::unique_ptr<Portal>> portals_;

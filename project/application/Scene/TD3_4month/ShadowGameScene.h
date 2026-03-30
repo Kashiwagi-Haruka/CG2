@@ -10,6 +10,7 @@
 #include"GameObject/TestField/TestField.h"
 #include"GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include"GameObject/Portal/PortalManager.h"
+#include"GameObject/WhiteBoard/WhiteBoardManager.h"
 #include"GameObject/TimeCard/TimeCardWatch.h"
 #include"GameObject/TimeCard/TimeCard.h"
 #include"GameObject/TimeCard/TimeCardRack.h"
@@ -69,6 +70,8 @@ private:
     std::unique_ptr<Player> player_ = nullptr;
     //TestField
     std::unique_ptr<TestField> testField_ = nullptr;
+	// ホワイトボード管理
+	std::unique_ptr<WhiteBoardManager> whiteBoardManager_ = nullptr;
     //ポータル管理
     std::unique_ptr<PortalManager> portalManager_ = nullptr;
     //携帯打刻機
