@@ -146,12 +146,13 @@ void ChairMenu::Update()
 void ChairMenu::Draw()
 {
     if (isShowMenu_) {
-        pressEText_.Draw();
+  
         triangleText_.Draw();
         menuText_[GRAB_TEXT].Draw();
         if (!PlayerCommand::GetIsGrab()) {
             menuText_[STAND_TEXT].Draw();
             menuText_[CLOSE_TEXT].Draw();
+            pressEText_.Draw();
         }
     }
 }
