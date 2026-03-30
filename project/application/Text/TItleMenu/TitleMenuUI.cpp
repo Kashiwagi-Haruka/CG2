@@ -66,7 +66,6 @@ TitleMenuUI::~TitleMenuUI()
 void TitleMenuUI::Initialize()
 {
     isShowMenu_ = false;
-    isSelectButton_ = false;
     isStart_ = false;
     selectButtonNum_ = 0;
     random_->SetMinMax(-8.0f, 8.0f);

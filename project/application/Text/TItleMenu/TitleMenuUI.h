@@ -40,7 +40,6 @@ private:
 #pragma endregion
 
     bool isShowMenu_ = false;
-    bool isSelectButton_ = false;
     bool isStart_ = false;
     uint32_t selectButtonNum_ = 0;
 };

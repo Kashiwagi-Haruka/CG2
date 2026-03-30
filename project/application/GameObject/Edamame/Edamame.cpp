@@ -126,15 +126,9 @@ void Edamame::Trivia()
 
         if (OnCollisionRay()) {
             edamameTrivia_->Update();
-
-
-            if (edamameTrivia_->GetIsDie()) {
-                //死んだとき 落下開始
-                edamameModel_->SetIsDropStart(true);
-
-            }
-
         }
+
+
         Vector3 distance = Function::Distance(playerCamera_->GetRay().origin, worldTransform_.translate);
         float  length = Function::Length(distance);
         float bgmVol = 0.0f;
@@ -163,5 +157,11 @@ void Edamame::Trivia()
 
         edamameTrivia_->SetVol(vol);
         BGMManager::SetVol(bgmVol, BGMManager::EDAMAME);
+    }
+
+
+    if (edamameTrivia_->GetIsDie()) {
+        //死んだとき 落下開始
+       edamameModel_->SetIsDropStart(true);
     }
 }
