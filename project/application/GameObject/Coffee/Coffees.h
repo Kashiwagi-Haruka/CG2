@@ -17,12 +17,13 @@ private:
 	struct InstanceData {
 		Vector3 position;
 		Vector3 velocity = {0.0f, 0.0f, 0.0f};
-		float yaw = 0.0f;
+		Vector3 rotation = {0.0f, 0.0f, 0.0f};
+		Vector3 angularVelocity = {0.0f, 0.0f, 0.0f};
 		float scale = 1.0f;
 		float radius = 0.25f;
 		float halfHeight = 0.15f;
 		bool isActive = false;
-		float padding[2] = {0.0f, 0.0f};
+		float padding = 0.0f;
 	};
 
 	struct SimulationParams {

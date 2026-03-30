@@ -1,5 +1,6 @@
 #include "TestField.h"
 #include"Function.h"
+#include"Light/CommonLight/SpotCommonLight.h"
 
 TestField::TestField()
 {

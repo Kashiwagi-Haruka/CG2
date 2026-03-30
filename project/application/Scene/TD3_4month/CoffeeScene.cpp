@@ -23,7 +23,7 @@ CoffeeScene::CoffeeScene() {
 	cameraTransform_ = {
 	    .scale = {1.0f, 1.0f, 1.0f },
 	    .rotate = {0.0f, 0.0f, 0.0f },
-	    .translate = {0.0f, 1.5f, -5.0f},
+	    .translate = {0.0f, 1.5f, -35.0f},
 	};
 
 }

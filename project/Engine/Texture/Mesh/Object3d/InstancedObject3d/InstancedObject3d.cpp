@@ -383,7 +383,12 @@ void InstancedObject3d::SetInstanceScale(size_t index, const Vector3& scale) {
 	}
 	instanceTransforms_[index].scale = scale;
 }
-
+void InstancedObject3d::SetInstanceRotate(size_t index, const Vector3& rotate) {
+	if (index >= instanceTransforms_.size()) {
+		return;
+	}
+	instanceTransforms_[index].rotate = rotate;
+}
 void InstancedObject3d::SetInstanceOffset(size_t index, const Vector3& offset) {
 	if (index >= instanceTransforms_.size()) {
 		return;
