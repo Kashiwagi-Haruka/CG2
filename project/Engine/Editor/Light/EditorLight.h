@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Light/AreaLight.h"
-#include "Light/DirectionalLight.h"
-#include "Light/PointLight.h"
-#include "Light/SpotLight.h"
+#include "Light/CommonLight/AreaCommonLight.h"
+#include "Light/CommonLight/DirectionalCommonLight.h"
+#include "Light/CommonLight/PointCommonLight.h"
+#include "Light/CommonLight/SpotCommonLight.h"
 #include <nlohmann/json.hpp>
 
 #include <vector>
@@ -12,14 +12,14 @@ class EditorLight {
 public:
 	struct State {
 		bool overrideSceneLights = false;
-		DirectionalLight directionalLight = {
+		DirectionalCommonLight directionalLight = {
 		    {1.0f, 1.0f, 1.0f, 1.0f},
             {0.0f, -1.0f, 0.0f},
             1.0f, 1, {0.0f, 0.0f, 0.0f}
         };
-		std::vector<PointLight> pointLights;
-		std::vector<SpotLight> spotLights;
-		std::vector<AreaLight> areaLights;
+		std::vector<PointCommonLight> pointLights;
+		std::vector<SpotCommonLight> spotLights;
+		std::vector<AreaCommonLight> areaLights;
 	};
 
 	void Reset();

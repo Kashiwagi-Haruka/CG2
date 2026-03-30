@@ -8,7 +8,7 @@
 #include"Text/FirstStory/FirstStory.h"
 #include"GameObject/TimeCard/TimeCard.h"
 #include"GameObject/TimeCard/TimeCardRack.h"
-#include "Light/DirectionalLight.h" 
+#include "Light/CommonLight/DirectionalCommonLight.h" 
 #include"GameObject/Wall/Wall.h"
 #include"GameObject/YoshidaMath/RandomClass.h"
 #include"Camera.h"
@@ -29,7 +29,7 @@ private:
 
     Matrix4x4 identityMat_;
     //DirectionalLight
-    DirectionalLight directionalLight_{};
+    DirectionalCommonLight directionalLight_{};
     //カメラ
     std::unique_ptr<Camera> camera_ = nullptr;
     Transform cameraTransform_;

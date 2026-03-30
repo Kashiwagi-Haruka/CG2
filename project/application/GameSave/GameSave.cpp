@@ -7,3 +7,5 @@ void GameSave::CameraSave(const Transform& transform, float rotateSpeed, bool is
 }
 void GameSave::PlayerSave(const Transform& transform) {
 	playerSaveData_.transform = transform; }
+void GameSave::ProgressSave(const std::string& currentStageName) {
+	progressSaveData_.currentStageName = currentStageName; }
