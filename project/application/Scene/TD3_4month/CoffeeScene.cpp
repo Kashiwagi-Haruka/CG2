@@ -1,6 +1,6 @@
 #include "CoffeeScene.h"
 #include "Input.h"
-#include "Light/DirectionalLight.h"
+#include "Light/CommonLight/DirectionalCommonLight.h"
 #include "Object3d/Object3dCommon.h"
 #ifdef USE_IMGUI
 #include <imgui.h>

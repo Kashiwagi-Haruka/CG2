@@ -22,6 +22,9 @@
 #include"GameObject/Locker/LockerManager.h"
 #include"GameObject/Desk/DeskManager.h"
 #include"GameObject/Box/BoxManager.h"
+#include "Menu/Menu.h"
+#include "GameObject/Elevator/Elevator.h"
+
 #include <GameObject/Edamame/Edamame.h>
 #pragma endregion
 
@@ -29,10 +32,10 @@
 
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 
-#include "Light/DirectionalLight.h" 
-#include "Light/PointLight.h"
-#include "Light/SpotLight.h" 
-#include "Light/AreaLight.h"
+#include "Light/CommonLight/DirectionalCommonLight.h" 
+#include "Light/CommonLight/AreaCommonLight.h"
+#include "Light/CommonLight/SpotCommonLight.h" 
+#include "Light/CommonLight/PointCommonLight.h"
 #include"Audio.h"
 
 class ShadowGameScene : public BaseScene
@@ -95,21 +98,23 @@ private:
     std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
     //箱
     std::unique_ptr<BoxManager> boxManager_ = nullptr;
+	// エレベーター
+	std::unique_ptr<Elevator> elevator_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
 
 #pragma region// light
     //DirectionalLight
-    DirectionalLight directionalLight_{};
+    DirectionalCommonLight directionalLight_{};
     //PointLight
-    std::array<PointLight, kMaxPointLights> pointLights_{};
+    std::array<PointCommonLight, kMaxPointLights> pointLights_{};
     uint32_t activePointLightCount_ = 0;
     //SpotLight
-    std::array<SpotLight, kMaxSpotLights> spotLights_{};
+    std::array<SpotCommonLight, kMaxSpotLights> spotLights_{};
     uint32_t activeSpotLightCount_ = 0;
     //AreaLight
-    std::array<AreaLight, kMaxAreaLights> areaLights_{};
+    std::array<AreaCommonLight, kMaxAreaLights> areaLights_{};
     uint32_t activeAreaLightCount_ = 0;
 #pragma endregion
 	bool useDirectionalShadow_ = true;

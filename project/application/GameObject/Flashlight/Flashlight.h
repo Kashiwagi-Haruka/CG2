@@ -2,7 +2,7 @@
 #include "GameObject/YoshidaMath/CollisionManager/Collider.h"
 #include"Object3d/Object3d.h"
 #include<memory>
-#include "Light/SpotLight.h" 
+#include "Light/CommonLight/SpotCommonLight.h" 
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
 class Camera;
 class Player;
@@ -21,7 +21,7 @@ public:
     void Initialize();
     void Draw();
     void SetLight();
-    SpotLight& GetSpotLight() { return spotLight_; };
+    SpotCommonLight& GetSpotLight() { return spotLight_; };
     void CheckCollision();
     void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
     static bool IsGetLightMessage() { return isSendGetLightMessage_; }
@@ -35,9 +35,10 @@ private:
     PlayerCamera* playerCamera_ = nullptr;
     Transform transform_ = {};
     std::unique_ptr<Object3d>obj_ = nullptr;
-    //SpotLight
-    SpotLight spotLight_;
     static bool isGetLight_;
+  //SpotLight
+    SpotCommonLight spotLight_;
+
     static bool isSendGetLightMessage_;
 };
 

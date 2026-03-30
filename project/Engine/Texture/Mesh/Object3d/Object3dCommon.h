@@ -1,8 +1,8 @@
 #pragma once
-#include "Light/AreaLight.h"
-#include "Light/DirectionalLight.h"
-#include "Light/PointLight.h"
-#include "Light/SpotLight.h"
+#include "Light/CommonLight/AreaCommonLight.h"
+#include "Light/CommonLight/DirectionalCommonLight.h"
+#include "Light/CommonLight/PointCommonLight.h"
+#include "Light/CommonLight/SpotCommonLight.h"
 #include "Matrix4x4.h"
 #include "PSO/CreatePSO.h"
 #include <Windows.h>
@@ -69,35 +69,35 @@ private:
 	std::unique_ptr<CreatePSO> psoShadow_;
 
 	// Directional Light（共通）
-	DirectionalLight* directionalLightData_ = nullptr;
+	DirectionalCommonLight* directionalLightData_ = nullptr;
 	// ディレクショナルライト定数バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	// ポイントライト配列へのCPU書き込みポインタ
-	PointLight* pointlightData_ = nullptr;
+	PointCommonLight* pointlightData_ = nullptr;
 	// ポイントライト構造化バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_ = nullptr;
 	// ポイントライト数へのCPU書き込みポインタ
-	PointLightCount* pointLightCountData_ = nullptr;
+	PointCommonLightCount* pointLightCountData_ = nullptr;
 	// ポイントライト数の定数バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightCountResource_ = nullptr;
 	// ポイントライト配列のSRVインデックス
 	uint32_t pointLightSrvIndex_ = 0;
 	// スポットライト配列へのCPU書き込みポインタ
-	SpotLight* spotLightData_ = nullptr;
+	SpotCommonLight* spotLightData_ = nullptr;
 	// スポットライト構造化バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_ = nullptr;
 	// スポットライト数へのCPU書き込みポインタ
-	SpotLightCount* spotLightCountData_ = nullptr;
+	SpotCommonLightCount* spotLightCountData_ = nullptr;
 	// スポットライト数の定数バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightCountResource_ = nullptr;
 	// スポットライト配列のSRVインデックス
 	uint32_t spotLightSrvIndex_ = 0;
 	// エリアライト配列へのCPU書き込みポインタ
-	AreaLight* areaLightData_ = nullptr;
+	AreaCommonLight* areaLightData_ = nullptr;
 	// エリアライト構造化バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> areaLightResource_ = nullptr;
 	// エリアライト数へのCPU書き込みポインタ
-	AreaLightCount* areaLightCountData_ = nullptr;
+	AreaCommonLightCount* areaLightCountData_ = nullptr;
 	// エリアライト数の定数バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> areaLightCountResource_ = nullptr;
 	// エリアライト配列のSRVインデックス
@@ -150,33 +150,33 @@ private:
 	// エディタ指定ライトを強制使用するか
 	bool useEditorLights_ = false;
 	// エディタ指定のディレクショナルライト
-	DirectionalLight editorDirectionalLight_ = {
+	DirectionalCommonLight editorDirectionalLight_ = {
 	    {1.0f, 1.0f, 1.0f, 1.0f},
         {0.0f, -1.0f, 0.0f},
         1.0f, 1, {0.0f, 0.0f, 0.0f}
     };
 	// CPU側キャッシュのポイントライト配列
-	std::array<PointLight, kMaxPointLights> cachedPointLights_{};
+	std::array<PointCommonLight, kMaxPointLights> cachedPointLights_{};
 	// CPU側キャッシュのポイントライト有効数
 	uint32_t cachedPointLightCount_ = 0;
 	// CPU側キャッシュのスポットライト配列
-	std::array<SpotLight, kMaxSpotLights> cachedSpotLights_{};
+	std::array<SpotCommonLight, kMaxSpotLights> cachedSpotLights_{};
 	// CPU側キャッシュのスポットライト有効数
 	uint32_t cachedSpotLightCount_ = 0;
 	// CPU側キャッシュのエリアライト配列
-	std::array<AreaLight, kMaxAreaLights> cachedAreaLights_{};
+	std::array<AreaCommonLight, kMaxAreaLights> cachedAreaLights_{};
 	// CPU側キャッシュのエリアライト有効数
 	uint32_t cachedAreaLightCount_ = 0;
 	// エディタ指定のポイントライト配列
-	std::array<PointLight, kMaxPointLights> editorPointLights_{};
+	std::array<PointCommonLight, kMaxPointLights> editorPointLights_{};
 	// エディタ指定ポイントライト有効数
 	uint32_t editorPointLightCount_ = 0;
 	// エディタ指定のスポットライト配列
-	std::array<SpotLight, kMaxSpotLights> editorSpotLights_{};
+	std::array<SpotCommonLight, kMaxSpotLights> editorSpotLights_{};
 	// エディタ指定スポットライト有効数
 	uint32_t editorSpotLightCount_ = 0;
 	// エディタ指定のエリアライト配列
-	std::array<AreaLight, kMaxAreaLights> editorAreaLights_{};
+	std::array<AreaCommonLight, kMaxAreaLights> editorAreaLights_{};
 	// エディタ指定エリアライト有効数
 	uint32_t editorAreaLightCount_ = 0;
 	// ルートシグネチャ・DescriptorHeap共通設定
@@ -278,20 +278,20 @@ public:
 	void SetEnvironmentMapTextureResource(ID3D12Resource* resource, DXGI_FORMAT format);
 
 	// ディレクショナルライト設定
-	void SetDirectionalLight(DirectionalLight& light);
+	void SetDirectionalLight(DirectionalCommonLight& light);
 	// ポイントライト配列設定
-	void SetPointLights(const PointLight* pointLights, uint32_t count);
+	void SetPointLights(const PointCommonLight* pointLights, uint32_t count);
 	// スポットライト配列設定
-	void SetSpotLights(const SpotLight* spotLights, uint32_t count);
+	void SetSpotLights(const SpotCommonLight* spotLights, uint32_t count);
 	// エリアライト配列設定
-	void SetAreaLights(const AreaLight* areaLights, uint32_t count);
+	void SetAreaLights(const AreaCommonLight* areaLights, uint32_t count);
 	// エディタライト上書き有効化
 	void SetEditorLightOverride(bool enabled) { useEditorLights_ = enabled; }
 	// エディタライト上書き有効状態取得
 	bool IsEditorLightOverrideEnabled() const { return useEditorLights_; }
 	// エディタライト一式を設定
 	void SetEditorLights(
-	    const DirectionalLight& directionalLight, const PointLight* pointLights, uint32_t pointCount, const SpotLight* spotLights, uint32_t spotCount, const AreaLight* areaLights, uint32_t areaCount);
+	    const DirectionalCommonLight& directionalLight, const PointCommonLight* pointLights, uint32_t pointCount, const SpotCommonLight* spotLights, uint32_t spotCount, const AreaCommonLight* areaLights, uint32_t areaCount);
 
 	// ディレクショナルライト視点のViewProjection行列取得
 	Matrix4x4 GetDirectionalLightViewProjectionMatrix() const;

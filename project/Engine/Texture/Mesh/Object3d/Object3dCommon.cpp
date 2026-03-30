@@ -150,7 +150,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	psoShadow_->CreateShadow();
 
 	// Directional Light の共通バッファ作成
-	directionalLightResource_ = CreateBufferResource(sizeof(DirectionalLight));
+	directionalLightResource_ = CreateBufferResource(sizeof(DirectionalCommonLight));
 	assert(directionalLightResource_);
 	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
 	assert(directionalLightData_);
@@ -161,29 +161,29 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
         1.0f, 1, {0.0f, 0.0f, 0.0f}
     };
 	directionalLightResource_->Unmap(0, nullptr);
-	pointLightResource_ = CreateBufferResource(sizeof(PointLight) * kMaxPointLights);
+	pointLightResource_ = CreateBufferResource(sizeof(PointCommonLight) * kMaxPointLights);
 	assert(pointLightResource_);
-	pointLightCountResource_ = CreateBufferResource(sizeof(PointLightCount));
+	pointLightCountResource_ = CreateBufferResource(sizeof(PointCommonLightCount));
 	assert(pointLightCountResource_);
 
 	pointLightSrvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
-	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(pointLightSrvIndex_, pointLightResource_.Get(), static_cast<UINT>(kMaxPointLights), sizeof(PointLight));
+	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(pointLightSrvIndex_, pointLightResource_.Get(), static_cast<UINT>(kMaxPointLights), sizeof(PointCommonLight));
 
-	spotLightResource_ = CreateBufferResource(sizeof(SpotLight) * kMaxSpotLights);
+	spotLightResource_ = CreateBufferResource(sizeof(SpotCommonLight) * kMaxSpotLights);
 	assert(spotLightResource_);
-	spotLightCountResource_ = CreateBufferResource(sizeof(SpotLightCount));
+	spotLightCountResource_ = CreateBufferResource(sizeof(SpotCommonLightCount));
 	assert(spotLightCountResource_);
 
 	spotLightSrvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
-	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(spotLightSrvIndex_, spotLightResource_.Get(), static_cast<UINT>(kMaxSpotLights), sizeof(SpotLight));
+	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(spotLightSrvIndex_, spotLightResource_.Get(), static_cast<UINT>(kMaxSpotLights), sizeof(SpotCommonLight));
 
-	areaLightResource_ = CreateBufferResource(sizeof(AreaLight) * kMaxAreaLights);
+	areaLightResource_ = CreateBufferResource(sizeof(AreaCommonLight) * kMaxAreaLights);
 	assert(areaLightResource_);
-	areaLightCountResource_ = CreateBufferResource(sizeof(AreaLightCount));
+	areaLightCountResource_ = CreateBufferResource(sizeof(AreaCommonLightCount));
 	assert(areaLightCountResource_);
 
 	areaLightSrvIndex_ = TextureManager::GetInstance()->GetSrvManager()->Allocate();
-	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaLight));
+	TextureManager::GetInstance()->GetSrvManager()->CreateSRVforStructuredBuffer(areaLightSrvIndex_, areaLightResource_.Get(), static_cast<UINT>(kMaxAreaLights), sizeof(AreaCommonLight));
 	
 	shadowMapPassSettingsResource_ = CreateBufferResource(sizeof(ShadowMapPassSettings));
 	assert(shadowMapPassSettingsResource_);
@@ -202,9 +202,9 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	editorPointLightCount_ = 0;
 	editorSpotLightCount_ = 0;
 	editorAreaLightCount_ = 0;
-	std::fill(editorPointLights_.begin(), editorPointLights_.end(), PointLight{});
-	std::fill(editorSpotLights_.begin(), editorSpotLights_.end(), SpotLight{});
-	std::fill(editorAreaLights_.begin(), editorAreaLights_.end(), AreaLight{});
+	std::fill(editorPointLights_.begin(), editorPointLights_.end(), PointCommonLight{});
+	std::fill(editorSpotLights_.begin(), editorSpotLights_.end(), SpotCommonLight{});
+	std::fill(editorAreaLights_.begin(), editorAreaLights_.end(), AreaCommonLight{});
 	D3D12_HEAP_PROPERTIES heapProps{};
 	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 
@@ -410,7 +410,7 @@ void Object3dCommon::EndShadowMapPass() {
 	TextureManager::GetInstance()->GetSrvManager()->PreDraw();
 }
 
-void Object3dCommon::SetDirectionalLight(DirectionalLight& light) {
+void Object3dCommon::SetDirectionalLight(DirectionalCommonLight& light) {
 	*directionalLightData_ = light;
 	directionalLightData_->direction = Function::Normalize(directionalLightData_->direction);
 }
@@ -448,7 +448,7 @@ Matrix4x4 Object3dCommon::GetPointLightViewProjectionMatrix() const {
 	float farPlane = shadowCameraFar_;
 	float fov = Function::kPi * 0.6f;
 
-	const PointLight* selectedLight = nullptr;
+	const PointCommonLight* selectedLight = nullptr;
 	for (uint32_t i = 0; i < cachedPointLightCount_; ++i) {
 		if (cachedPointLights_[i].shadowEnabled != 0) {
 			selectedLight = &cachedPointLights_[i];
@@ -476,7 +476,7 @@ Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
 	float fov = 0.9f;
 	float farPlane = shadowCameraFar_;
 
-	const SpotLight* selectedLight = nullptr;
+	const SpotCommonLight* selectedLight = nullptr;
 	for (uint32_t i = 0; i < cachedSpotLightCount_; ++i) {
 		if (cachedSpotLights_[i].shadowEnabled != 0) {
 			selectedLight = &cachedSpotLights_[i];
@@ -502,7 +502,7 @@ Matrix4x4 Object3dCommon::GetAreaLightViewProjectionMatrix() const {
 	float fov = Function::kPi * 0.5f;
 	float farPlane = shadowCameraFar_;
 
-	const AreaLight* selectedLight = nullptr;
+	const AreaCommonLight* selectedLight = nullptr;
 	for (uint32_t i = 0; i < cachedAreaLightCount_; ++i) {
 		if (cachedAreaLights_[i].shadowEnabled != 0) {
 			selectedLight = &cachedAreaLights_[i];
@@ -526,17 +526,17 @@ void Object3dCommon::SetBlendMode(BlendMode blendMode) {
 	blendMode_ = blendMode;
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get());
 }
-void Object3dCommon::SetPointLights(const PointLight* pointLights, uint32_t count) {
+void Object3dCommon::SetPointLights(const PointCommonLight* pointLights, uint32_t count) {
 	uint32_t clampedCount = std::min(count, static_cast<uint32_t>(kMaxPointLights));
 	cachedPointLightCount_ = clampedCount;
-	std::fill(cachedPointLights_.begin(), cachedPointLights_.end(), PointLight{});
+	std::fill(cachedPointLights_.begin(), cachedPointLights_.end(), PointCommonLight{});
 	if (pointLights && clampedCount > 0) {
 		std::copy_n(pointLights, clampedCount, cachedPointLights_.begin());
 	}
 	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointlightData_));
-	std::memset(pointlightData_, 0, sizeof(PointLight) * kMaxPointLights);
+	std::memset(pointlightData_, 0, sizeof(PointCommonLight) * kMaxPointLights);
 	if (pointLights && clampedCount > 0) {
-		std::memcpy(pointlightData_, pointLights, sizeof(PointLight) * clampedCount);
+		std::memcpy(pointlightData_, pointLights, sizeof(PointCommonLight) * clampedCount);
 	}
 	pointLightResource_->Unmap(0, nullptr);
 
@@ -544,17 +544,17 @@ void Object3dCommon::SetPointLights(const PointLight* pointLights, uint32_t coun
 	pointLightCountData_->count = clampedCount;
 	pointLightCountResource_->Unmap(0, nullptr);
 }
-void Object3dCommon::SetSpotLights(const SpotLight* spotLights, uint32_t count) {
+void Object3dCommon::SetSpotLights(const SpotCommonLight* spotLights, uint32_t count) {
 	uint32_t clampedCount = std::min(count, static_cast<uint32_t>(kMaxSpotLights));
 	cachedSpotLightCount_ = clampedCount;
-	std::fill(cachedSpotLights_.begin(), cachedSpotLights_.end(), SpotLight{});
+	std::fill(cachedSpotLights_.begin(), cachedSpotLights_.end(), SpotCommonLight{});
 	if (spotLights && clampedCount > 0) {
 		std::copy_n(spotLights, clampedCount, cachedSpotLights_.begin());
 	}
 	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData_));
-	std::memset(spotLightData_, 0, sizeof(SpotLight) * kMaxSpotLights);
+	std::memset(spotLightData_, 0, sizeof(SpotCommonLight) * kMaxSpotLights);
 	if (spotLights && clampedCount > 0) {
-		std::memcpy(spotLightData_, spotLights, sizeof(SpotLight) * clampedCount);
+		std::memcpy(spotLightData_, spotLights, sizeof(SpotCommonLight) * clampedCount);
 	}
 	spotLightResource_->Unmap(0, nullptr);
 
@@ -562,17 +562,17 @@ void Object3dCommon::SetSpotLights(const SpotLight* spotLights, uint32_t count) 
 	spotLightCountData_->count = clampedCount;
 	spotLightCountResource_->Unmap(0, nullptr);
 }
-void Object3dCommon::SetAreaLights(const AreaLight* areaLights, uint32_t count) {
+void Object3dCommon::SetAreaLights(const AreaCommonLight* areaLights, uint32_t count) {
 	uint32_t clampedCount = std::min(count, static_cast<uint32_t>(kMaxAreaLights));
 	cachedAreaLightCount_ = clampedCount;
-	std::fill(cachedAreaLights_.begin(), cachedAreaLights_.end(), AreaLight{});
+	std::fill(cachedAreaLights_.begin(), cachedAreaLights_.end(), AreaCommonLight{});
 	if (areaLights && clampedCount > 0) {
 		std::copy_n(areaLights, clampedCount, cachedAreaLights_.begin());
 	}
 	areaLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&areaLightData_));
-	std::memset(areaLightData_, 0, sizeof(AreaLight) * kMaxAreaLights);
+	std::memset(areaLightData_, 0, sizeof(AreaCommonLight) * kMaxAreaLights);
 	if (areaLights && clampedCount > 0) {
-		std::memcpy(areaLightData_, areaLights, sizeof(AreaLight) * clampedCount);
+		std::memcpy(areaLightData_, areaLights, sizeof(AreaCommonLight) * clampedCount);
 	}
 	areaLightResource_->Unmap(0, nullptr);
 
@@ -581,7 +581,7 @@ void Object3dCommon::SetAreaLights(const AreaLight* areaLights, uint32_t count) 
 	areaLightCountResource_->Unmap(0, nullptr);
 }
 void Object3dCommon::SetEditorLights(
-    const DirectionalLight& directionalLight, const PointLight* pointLights, uint32_t pointCount, const SpotLight* spotLights, uint32_t spotCount, const AreaLight* areaLights, uint32_t areaCount) {
+    const DirectionalCommonLight& directionalLight, const PointCommonLight* pointLights, uint32_t pointCount, const SpotCommonLight* spotLights, uint32_t spotCount, const AreaCommonLight* areaLights, uint32_t areaCount) {
 	editorDirectionalLight_ = directionalLight;
 	editorDirectionalLight_.direction = Function::Normalize(editorDirectionalLight_.direction);
 	if (Function::Length(editorDirectionalLight_.direction) < 1.0e-5f) {
@@ -589,19 +589,19 @@ void Object3dCommon::SetEditorLights(
 	}
 
 	editorPointLightCount_ = std::min(pointCount, static_cast<uint32_t>(kMaxPointLights));
-	std::fill(editorPointLights_.begin(), editorPointLights_.end(), PointLight{});
+	std::fill(editorPointLights_.begin(), editorPointLights_.end(), PointCommonLight{});
 	if (pointLights && editorPointLightCount_ > 0) {
 		std::copy_n(pointLights, editorPointLightCount_, editorPointLights_.begin());
 	}
 
 	editorSpotLightCount_ = std::min(spotCount, static_cast<uint32_t>(kMaxSpotLights));
-	std::fill(editorSpotLights_.begin(), editorSpotLights_.end(), SpotLight{});
+	std::fill(editorSpotLights_.begin(), editorSpotLights_.end(), SpotCommonLight{});
 	if (spotLights && editorSpotLightCount_ > 0) {
 		std::copy_n(spotLights, editorSpotLightCount_, editorSpotLights_.begin());
 	}
 
 	editorAreaLightCount_ = std::min(areaCount, static_cast<uint32_t>(kMaxAreaLights));
-	std::fill(editorAreaLights_.begin(), editorAreaLights_.end(), AreaLight{});
+	std::fill(editorAreaLights_.begin(), editorAreaLights_.end(), AreaCommonLight{});
 	if (areaLights && editorAreaLightCount_ > 0) {
 		std::copy_n(areaLights, editorAreaLightCount_, editorAreaLights_.begin());
 	}
