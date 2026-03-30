@@ -23,6 +23,7 @@
 #include"GameObject/Desk/DeskManager.h"
 #include"GameObject/Box/BoxManager.h"
 #include "Menu/Menu.h"
+#include "GameObject/Elevator/Elevator.h"
 
 #pragma endregion
 
@@ -103,6 +104,8 @@ private:
     std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
     //箱
     std::unique_ptr<BoxManager> boxManager_ = nullptr;
+	// エレベーター
+	std::unique_ptr<Elevator> elevator_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

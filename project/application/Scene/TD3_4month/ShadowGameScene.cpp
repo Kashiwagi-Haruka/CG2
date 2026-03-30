@@ -62,6 +62,8 @@ ShadowGameScene::ShadowGameScene()
     timeCardRack_ = std::make_unique<TimeCardRack>();
     //箱管理
     boxManager_ = std::make_unique<BoxManager>();
+	// エレベーター
+	elevator_ = std::make_unique<Elevator>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
 
@@ -147,6 +149,8 @@ void ShadowGameScene::Initialize()
     timeCardRack_->Initialize();
     //箱管理
     boxManager_->Initialize();
+	// エレベーター
+	elevator_->Initialize();
     //カーソルを画面中央に設定する
     auto* input = Input::GetInstance();
     input->SetIsCursorVisible(false);
@@ -464,6 +468,8 @@ void ShadowGameScene::UpdateGameObject()
     chairManager_->Update();
     //箱管理
     boxManager_->Update();
+    //エレベーター
+	elevator_->Update();
     //床
     testField_->Update();
     //壁管理
@@ -602,6 +608,8 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     timeCardRack_->Draw();
     //箱管理
     boxManager_->Draw();
+    //エレベーター    
+    elevator_->Draw();
 
     if (!isShadow) {
         Object3dCommon::GetInstance()->DrawCommonSkinning();
@@ -635,6 +643,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera)
     timeCard_->SetCamera(camera);
     timeCardRack_->SetCamera(camera);
     boxManager_->SetCamera(camera);
+	elevator_->SetCamera(camera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
