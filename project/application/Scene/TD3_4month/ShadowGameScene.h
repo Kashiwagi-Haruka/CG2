@@ -22,13 +22,10 @@
 #include"GameObject/Locker/LockerManager.h"
 #include"GameObject/Desk/DeskManager.h"
 #include"GameObject/Box/BoxManager.h"
-#include "Menu/Menu.h"
-
+#include <GameObject/Edamame/Edamame.h>
 #pragma endregion
 
-#pragma region //UI
-#include"Text/TextUIManager/TextUIManager.h"
-#pragma endregion
+#include"GameObject/UI/UIManager.h"
 
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 
@@ -37,21 +34,16 @@
 #include "Light/SpotLight.h" 
 #include "Light/AreaLight.h"
 #include"Audio.h"
-#include <GameObject/Edamame/Edamame.h>
 
 class ShadowGameScene : public BaseScene
 {
 private:
 
-    bool isPause_ = false;
     const float kNoiseTimer_ = 0.5f;
     float noiseTimer_ = kNoiseTimer_;
     bool isNoise_ = false;
 
-#pragma region//UI
-    std::unique_ptr<TextUIManager> textUIManager_ = nullptr;
-	std::unique_ptr<Menu> menu_ = nullptr;
-#pragma endregion
+    std::unique_ptr<UIManager> uiManager_ = nullptr;
 
 #pragma region//カメラの設定
 

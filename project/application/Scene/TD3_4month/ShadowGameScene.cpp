@@ -66,12 +66,9 @@ ShadowGameScene::ShadowGameScene()
 
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
+    //UI管理
+    uiManager_ = std::make_unique<UIManager>();
 
-
-
-    //UIManager
-    textUIManager_ = std::make_unique<TextUIManager>();
-	menu_ = std::make_unique<Menu>();
 
     portalManager_->SetPlayerCamera(playerCamera_.get());
     key_->SetPlayerCamera(playerCamera_.get());
@@ -94,12 +91,11 @@ ShadowGameScene::~ShadowGameScene()
 void ShadowGameScene::Initialize()
 {
 
-    //UIManager
-    textUIManager_->Initialize();
-	menu_->Initialize();
+
     BGMManager::Initialize();
 
-    isPause_ = false;
+    uiManager_->Initialize();
+
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;
 
@@ -161,47 +157,10 @@ void ShadowGameScene::Initialize()
 void ShadowGameScene::Update()
 {
 
+    //UI管理
+    uiManager_->Update();
 
-    //カーソルを画面中央に設定する
-    auto* input = Input::GetInstance();
-
-    if (input->TriggerKey(DIK_TAB)) {
-		if (isPause_ && menu_ && menu_->IsOptionOpen()) {
-			menu_->CloseOptionAndPrepareResume();
-		}
-        //Tabキーでポーズ
-        isPause_ = (isPause_) ? false : true;
-
-        if (isPause_) {
-            input->SetIsCursorVisible(true);
-            input->SetIsCursorStability(false);
-			
-        } else {
-            input->SetIsCursorVisible(false);
-            input->SetIsCursorStability(true);
-        }
-    }
-
-    
-
-
-    if (isPause_) {
-		menu_->Update();
-		const Menu::Action menuAction = menu_->ConsumePendingAction();
-		if (menuAction == Menu::Action::kResumeGame) {
-			isPause_ = false;
-			input->SetIsCursorVisible(false);
-			input->SetIsCursorStability(true);
-		} else if (menuAction == Menu::Action::kBackToTitle) {
-			isPause_ = false;
-			input->SetIsCursorVisible(false);
-			input->SetIsCursorStability(true);
-			SceneManager::GetInstance()->ChangeScene("Title");
-		} else if (menuAction == Menu::Action::kEndGame) {
-			PostQuitMessage(0);
-		}
-	}
-	PlayerCommand::SetIsUiInputLocked(isPause_);
+    PlayerCommand::SetIsUiInputLocked(UIManager::GetIsPause());
     //シーン遷移の更新処理
     UpdateSceneTransition();
     //カメラの更新処理
@@ -214,8 +173,7 @@ void ShadowGameScene::Update()
 
     //オブジェクトの当たり判定
     CheckCollision();
-    //Text
-    textUIManager_->Update();
+
 
 }
 
@@ -226,13 +184,9 @@ void ShadowGameScene::Draw()
 
     //スプライト共通
     SpriteCommon::GetInstance()->DrawCommon();
-    playerCamera_->DrawRaySprite();
+    //UI管理を描画する
+    uiManager_->Draw();
 
-    textUIManager_->Draw();
-
-    if (isPause_) {
-        menu_->Draw();
-    }
     //シーン遷移の描画処理
     DrawSceneTransition();
 }
@@ -442,7 +396,7 @@ void ShadowGameScene::UpdateGameObject()
 
     spotLights_[0] = edamame_->GetSpotLight();
     spotLights_[1] = flashlight_->GetSpotLight();
- 
+
     areaLights_[2] = vendingMac_->GetAreaLight();
     areaLights_[3] = wallManager_->GetAreaLight();
     areaLights_[4] = wallManager2_->GetAreaLight();

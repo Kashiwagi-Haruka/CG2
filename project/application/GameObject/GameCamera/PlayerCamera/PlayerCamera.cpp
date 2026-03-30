@@ -21,18 +21,13 @@ PlayerCamera::PlayerCamera() {
 	camera_ = std::make_unique<Camera>();
 	camera_->SetTransform(cameraTransform_);
 	camera_->SetFovY(0.44f);
-	// Rayの設定
-	ray_ = {.origin = {0.0f}, .diff = {0.0f}};
 
-	// raySpriteの設定
-	raySprite_ = std::make_unique<RaySprite>();
 }
 
 void PlayerCamera::Update() {
 	SetTransform();
 	SetRay();
 	camera_->Update();
-	raySprite_->Update();
 }
 
 void PlayerCamera::Rotate() {
@@ -59,14 +54,12 @@ void PlayerCamera::SetRay()
     ray_.diff = GetForward();
 }
 
-void PlayerCamera::DrawRaySprite()
-{
-    raySprite_->Draw();
-}
 
 void PlayerCamera::Initialize()
 {
-    raySprite_->Initialize();
+    camera_->SetTransform(cameraTransform_);
+    // Rayの設定
+    ray_ = { .origin = {0.0f}, .diff = {0.0f} };
 }
 
 bool PlayerCamera::OnCollisionRay(const AABB& localAABB, const Vector3& translate)

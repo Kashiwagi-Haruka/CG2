@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include"Transform.h"
 #include"RigidBody.h"
-#include"GameObject/UI/RaySprite.h"
+
 class Player;
 class PlayerCamera
 {
@@ -17,7 +17,6 @@ public:
     //Rayをセットする
     void SetRay();
     Ray& GetRay() { return ray_; };
-    void DrawRaySprite();
     void Initialize();
     //RayとAABBの当たり判定を共通化しました。
     bool OnCollisionRay(const AABB& localAABB, const Vector3& translate);
@@ -35,8 +34,7 @@ private:
     std::unique_ptr<Camera> camera_ = nullptr;
     //カメラの感度
     float eyeRotateSpeed_ = 0.02f;
-    //raySprite
-    std::unique_ptr<RaySprite> raySprite_ = nullptr;
+
     Player* player_ = nullptr;
 };
 
