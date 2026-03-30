@@ -39,5 +39,6 @@ private:
     bool isGrab_ = false;
     bool isStand_ = false;
 	bool isPreOnCollisionRay_ = false;
+	float chairMoveSeTimer_ = 0.0f;
 };
 
