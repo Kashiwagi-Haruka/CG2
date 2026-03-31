@@ -346,9 +346,18 @@ void ShadowGameScene::UpdateSceneTransition()
             isTransitionIn_ = false;
         }
         if (transition_->IsEnd() && isTransitionOut_) {
-            //シーンの切り替え
-            SceneManager::GetInstance()->ChangeScene("Result");
+           
+            if (door_->GetIsOpen()) {
+                //シーンの切り替え
+                SceneManager::GetInstance()->ChangeScene("Result");
+            } 
+            //else if (coffee_->GetInstanceCount() >= 100) {
+            //    //シーンの切り替え
+            //    SceneManager::GetInstance()->ChangeScene("GameOver");
+            //}
         }
+    
+ 
     }
 }
 

@@ -77,13 +77,18 @@ void VendingMac::CheckCollision()
     //自販機とrayの当たり判定
     if (OnCollisionRay()) {
         if (PlayerCommand::GetInstance()->Interact()) {
-     
+
             if (SEManager::IsSoundFinished(SEManager::VENDING_MAC)) {
                 SEManager::SoundPlay(SEManager::VENDING_MAC);
+            }
+
+            if (rand() % 10 == 2) {
+           
                 if (!isCoffeeEventStart_) {
                     isCoffeeEventStart_ = true;
                 }
             }
+         
           
 
         }
