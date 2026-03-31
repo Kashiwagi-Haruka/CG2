@@ -12,6 +12,9 @@ public:
 	void Update(Camera* camera, const Vector3& lightDirection);
 	void Draw();
 	uint32_t GetInstanceCount() const;
+	void SetSpawnOrigin(const Vector3& spawnOrigin);
+	void SetFloorY(float floorY);
+	void SetSpawnContainment(const Vector3& center, float topY, float radius);
 
 private:
 	struct InstanceData {
@@ -52,4 +55,5 @@ private:
 	uint32_t renderedInstanceCapacity_ = 0;
 	float spawnTimer_ = 0.0f;
 	float nextSpawnInterval_ = 0.0f;
+	Vector3 spawnOrigin_ = {0.0f, 5.0f, 0.0f};
 };

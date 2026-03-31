@@ -14,7 +14,6 @@ constexpr const char* kCoffeesModelDirectory = "Resources/TD3_3102/3d/Coffee";
 constexpr const char* kCoffeesModelName = "Coffee";
 constexpr uint32_t kCoffeesInstanceCount = 1000;
 constexpr uint32_t kCoffeesInitialVisibleCount = 100;
-constexpr Vector3 kCoffeesSpawnOrigin = {0.0f, 5.0f, 0.0f};
 constexpr float kCoffeesMinScale = 0.22f;
 constexpr float kCoffeesScaleStep = 0.0f;
 constexpr float kCoffeesGravity = -15.0f;
@@ -110,7 +109,7 @@ void Coffees::Initialize() {
 		const float scale = kCoffeesMinScale + static_cast<float>(i % 4u) * kCoffeesScaleStep;
 		instancedObject_->SetInstanceScale(i, {scale, scale, scale});
 
-		instances_[i].position = kCoffeesSpawnOrigin;
+		instances_[i].position = spawnOrigin_;
 		instances_[i].scale = scale;
 		instances_[i].radius = 0.12f + scale * 0.22f;
 		instances_[i].halfHeight = 0.18f + scale * 0.35f;
@@ -143,9 +142,9 @@ void Coffees::RunSimulation() {
 
 	const float deltaTime = simulationParams_.deltaTime;
 	const float gravity = simulationParams_.gravity;
-	const float canTopY = simulationParams_.canTopY;
 	const Vector3 canTopCenter = simulationParams_.canTopCenter;
 	const float canTopRadius = simulationParams_.canTopRadius;
+	const float floorY = simulationParams_.floorY;
 	const float separationBias = simulationParams_.separationBias;
 	const float roomMinX = simulationParams_.roomMinX;
 	const float roomMaxX = simulationParams_.roomMaxX;
@@ -163,9 +162,9 @@ void Coffees::RunSimulation() {
 		const float seed = static_cast<float>(spawnIndex) * 1.6180339f;
 		const float angle = seed * 6.2831853f;
 		const float radial = std::fmod(seed * 0.73f, 1.0f) * kCoffeesSpawnAreaRadius;
-		spawnInstance.position.x = kCoffeesSpawnOrigin.x + std::cos(angle) * radial;
-		spawnInstance.position.z = kCoffeesSpawnOrigin.z + std::sin(angle) * radial;
-		spawnInstance.position.y = kCoffeesSpawnOrigin.y;
+		spawnInstance.position.x = spawnOrigin_.x + std::cos(angle) * radial;
+		spawnInstance.position.z = spawnOrigin_.z + std::sin(angle) * radial;
+		spawnInstance.position.y = spawnOrigin_.y;
 		spawnInstance.velocity = {0.0f, 0.0f, 0.0f};
 		spawnInstance.rotation = {0.0f, angle, 0.0f};
 		spawnInstance.angularVelocity = {0.0f, 0.0f, 0.0f};
@@ -196,7 +195,7 @@ void Coffees::RunSimulation() {
 		instance.angularVelocity.y *= kCoffeesAngularDamping;
 		instance.angularVelocity.z *= kCoffeesAngularDamping;
 
-		const float minCenterY = canTopY + instance.halfHeight;
+		const float minCenterY = floorY + instance.halfHeight;
 		const bool isGrounded = instance.position.y <= minCenterY;
 		if (instance.position.y <= minCenterY) {
 			instance.position.y = minCenterY;
@@ -225,23 +224,25 @@ void Coffees::RunSimulation() {
 			instance.rotation.z += (desiredTilt.z - instance.rotation.z) * kCoffeesTiltFollow;
 		}
 
-		const float deltaCenterX = instance.position.x - canTopCenter.x;
-		const float deltaCenterZ = instance.position.z - canTopCenter.z;
-		const float maxCanRadius = std::max(0.0f, canTopRadius - instance.radius);
-		const float distanceSq = deltaCenterX * deltaCenterX + deltaCenterZ * deltaCenterZ;
-		if (distanceSq > maxCanRadius * maxCanRadius && distanceSq > 1e-7f) {
-			const float distance = std::sqrt(distanceSq);
-			const float invDistance = 1.0f / distance;
-			const Vector3 normal = {deltaCenterX * invDistance, 0.0f, deltaCenterZ * invDistance};
-			instance.position.x = canTopCenter.x + normal.x * maxCanRadius;
-			instance.position.z = canTopCenter.z + normal.z * maxCanRadius;
+		if (canTopRadius > 0.0f) {
+			const float deltaCenterX = instance.position.x - canTopCenter.x;
+			const float deltaCenterZ = instance.position.z - canTopCenter.z;
+			const float maxCanRadius = std::max(0.0f, canTopRadius - instance.radius);
+			const float distanceSq = deltaCenterX * deltaCenterX + deltaCenterZ * deltaCenterZ;
+			if (distanceSq > maxCanRadius * maxCanRadius && distanceSq > 1e-7f) {
+				const float distance = std::sqrt(distanceSq);
+				const float invDistance = 1.0f / distance;
+				const Vector3 normal = {deltaCenterX * invDistance, 0.0f, deltaCenterZ * invDistance};
+				instance.position.x = canTopCenter.x + normal.x * maxCanRadius;
+				instance.position.z = canTopCenter.z + normal.z * maxCanRadius;
 
-			const float velocityAlongNormal = instance.velocity.x * normal.x + instance.velocity.z * normal.z;
-			if (velocityAlongNormal > 0.0f) {
-				instance.velocity.x -= (1.0f + kCoffeesCanWallDamping) * velocityAlongNormal * normal.x;
-				instance.velocity.z -= (1.0f + kCoffeesCanWallDamping) * velocityAlongNormal * normal.z;
-				const float tangentialSpin = (instance.velocity.x * -normal.z + instance.velocity.z * normal.x) * 0.15f;
-				instance.angularVelocity.y += tangentialSpin;
+				const float velocityAlongNormal = instance.velocity.x * normal.x + instance.velocity.z * normal.z;
+				if (velocityAlongNormal > 0.0f) {
+					instance.velocity.x -= (1.0f + kCoffeesCanWallDamping) * velocityAlongNormal * normal.x;
+					instance.velocity.z -= (1.0f + kCoffeesCanWallDamping) * velocityAlongNormal * normal.z;
+					const float tangentialSpin = (instance.velocity.x * -normal.z + instance.velocity.z * normal.x) * 0.15f;
+					instance.angularVelocity.y += tangentialSpin;
+				}
 			}
 		}
 
@@ -362,8 +363,9 @@ void Coffees::RunSimulation() {
 		instance.position.y += pendingPush[i].y;
 		instance.position.z = std::clamp(instance.position.z + pendingPush[i].z, roomMinZ, roomMaxZ);
 
-		if (instance.position.y < canTopY) {
-			instance.position.y = canTopY;
+		const float minY = floorY + instance.halfHeight;
+		if (instance.position.y < minY) {
+			instance.position.y = minY;
 			instance.velocity.y = 0.0f;
 		}
 		if (instance.position.x <= roomMinX || instance.position.x >= roomMaxX) {
@@ -374,7 +376,6 @@ void Coffees::RunSimulation() {
 		}
 		instancedObject_->SetInstanceOffset(i, instance.position);
 	}
-
 }
 void Coffees::EnsureInstanceCapacity(uint32_t requiredCount) {
 	if (requiredCount <= renderedInstanceCapacity_) {
@@ -415,3 +416,16 @@ void Coffees::Update(Camera* camera, const Vector3& lightDirection) {
 void Coffees::Draw() { instancedObject_->Draw(); }
 
 uint32_t Coffees::GetInstanceCount() const { return activeInstanceCount_; }
+
+void Coffees::SetSpawnOrigin(const Vector3& spawnOrigin) {
+	spawnOrigin_ = spawnOrigin;
+	simulationParams_.canTopCenter = {spawnOrigin.x, 0.0f, spawnOrigin.z};
+}
+
+void Coffees::SetFloorY(float floorY) { simulationParams_.floorY = floorY; }
+
+void Coffees::SetSpawnContainment(const Vector3& center, float topY, float radius) {
+	simulationParams_.canTopCenter = center;
+	simulationParams_.canTopY = topY;
+	simulationParams_.canTopRadius = radius;
+}

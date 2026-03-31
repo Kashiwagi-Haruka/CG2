@@ -35,7 +35,8 @@ ShadowGameScene::ShadowGameScene()
     portalManager_->SetPlayerCamera(playerCamera_.get());
     //PC
     pc_ = std::make_unique<PC>();
-
+	// コーヒー缶
+	coffees_ = std::make_unique<Coffees>();
     //携帯打刻機
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     timeCardWatch_->SetPlayer(player_.get());
@@ -118,6 +119,10 @@ void ShadowGameScene::Initialize()
     portalManager_->Initialize();
     //PC
     pc_->Initialize();
+	// コーヒー缶
+	coffees_->Initialize();
+	coffees_->SetFloorY(0.0f);
+	coffees_->SetSpawnContainment({0.0f, 0.0f, 0.0f}, 0.0f, 0.0f);
     //携帯打刻機
     timeCardWatch_->Initialize();
     // 鍵
@@ -430,6 +435,9 @@ void ShadowGameScene::UpdateGameObject()
     wallManager2_->Update();
     //自販機
     vendingMac_->Update();
+	const Vector3 vendingPosition = vendingMac_->GetWorldPosition();
+	coffees_->SetSpawnOrigin({vendingPosition.x, vendingPosition.y + 0.9f, vendingPosition.z + 0.45f});
+	coffees_->Update(cameraController_->GetPlayerCamera()->GetCamera(), directionalLight_.direction);
     //ドア
     door_->Update();
     //ロッカー
@@ -536,6 +544,8 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     wallManager2_->Draw();
     //自販機
     vendingMac_->Draw();
+	// コーヒー缶
+	coffees_->Draw();
     //ドア
     door_->Draw();
     //ロッカー

@@ -28,6 +28,7 @@
 
 #include <GameObject/Edamame/Edamame.h>
 #include"GameObject/PC/PC.h"
+#include "GameObject/Coffee/Coffees.h"
 
 #pragma endregion
 
@@ -107,6 +108,8 @@ private:
 	std::unique_ptr<Elevator> elevator_ = nullptr;
     //PC
     std::unique_ptr<PC> pc_ = nullptr;
+	// コーヒー缶
+	std::unique_ptr<Coffees> coffees_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
