@@ -22,7 +22,7 @@ private:
 		Vector3 velocity = {0.0f, 0.0f, 0.0f};
 		Vector3 rotation = {0.0f, 0.0f, 0.0f};
 		Vector3 angularVelocity = {0.0f, 0.0f, 0.0f};
-		float scale = 1.0f;
+		float scale = 0.5f;
 		float radius = 0.25f;
 		float halfHeight = 0.15f;
 		bool isActive = false;
