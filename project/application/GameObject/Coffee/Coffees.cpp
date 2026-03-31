@@ -23,9 +23,12 @@ constexpr float kCoffeesStaticFrictionSpeed = 0.07f;
 constexpr float kCoffeesCollisionDamping = 0.75f;
 constexpr float kCoffeesCollisionTangentialDamping = 0.65f;
 constexpr float kCoffeesSeparationBias = 0.001f;
-constexpr float kCoffeesMinSpawnInterval = 0.001f;
-constexpr float kCoffeesMaxSpawnInterval = 0.005f;
-constexpr float kCoffeesSpawnAreaRadius = 0.35f;
+constexpr float kCoffeesMinSpawnInterval = 0.012f;
+constexpr float kCoffeesMaxSpawnInterval = 0.030f;
+constexpr float kCoffeesSpawnAreaRadius = 0.10f;
+constexpr float kCoffeesLaunchSpeed = 8.5f;
+constexpr float kCoffeesLaunchVerticalSpeed = 1.8f;
+constexpr float kCoffeesLaunchSpread = 1.2f;
 constexpr float kCoffeesSpatialCellSize = 0.7f;
 constexpr float kCoffeesCanTopY = 0.85f;
 constexpr float kCoffeesCanTopRadius = 0.7f;
@@ -168,7 +171,13 @@ void Coffees::RunSimulation() {
 		spawnInstance.position.x = spawnOrigin_.x + std::cos(angle) * radial;
 		spawnInstance.position.z = spawnOrigin_.z + std::sin(angle) * radial;
 		spawnInstance.position.y = spawnOrigin_.y;
-		spawnInstance.velocity = {0.0f, 0.0f, 0.0f};
+		const Vector3 right = {-launchDirection_.z, 0.0f, launchDirection_.x};
+		const float spreadRatio = std::fmod(seed * 0.37f, 1.0f) * 2.0f - 1.0f;
+		spawnInstance.velocity = {
+		    launchDirection_.x * kCoffeesLaunchSpeed + right.x * spreadRatio * kCoffeesLaunchSpread,
+		    kCoffeesLaunchVerticalSpeed + std::abs(spreadRatio) * 0.25f,
+		    launchDirection_.z * kCoffeesLaunchSpeed + right.z * spreadRatio * kCoffeesLaunchSpread,
+		};
 		spawnInstance.rotation = {0.0f, angle, 0.0f};
 		spawnInstance.angularVelocity = {0.0f, 0.0f, 0.0f};
 		spawnInstance.isActive = true;
@@ -466,7 +475,17 @@ void Coffees::SetSpawnOrigin(const Vector3& spawnOrigin) {
 	spawnOrigin_ = spawnOrigin;
 	simulationParams_.canTopCenter = {spawnOrigin.x, 0.0f, spawnOrigin.z};
 }
+void Coffees::SetLaunchDirection(const Vector3& launchDirection) {
+	Vector3 horizontalDirection = {launchDirection.x, 0.0f, launchDirection.z};
+	const float lengthSq = horizontalDirection.x * horizontalDirection.x + horizontalDirection.z * horizontalDirection.z;
+	if (lengthSq <= 1e-6f) {
+		launchDirection_ = {0.0f, 0.0f, 1.0f};
+		return;
+	}
 
+	const float invLength = 1.0f / std::sqrt(lengthSq);
+	launchDirection_ = {horizontalDirection.x * invLength, 0.0f, horizontalDirection.z * invLength};
+}
 void Coffees::SetFloorY(float floorY) { simulationParams_.floorY = floorY; }
 
 void Coffees::SetSpawnContainment(const Vector3& center, float topY, float radius) {

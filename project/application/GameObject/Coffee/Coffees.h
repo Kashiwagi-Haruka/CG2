@@ -13,6 +13,7 @@ public:
 	void Draw();
 	uint32_t GetInstanceCount() const;
 	void SetSpawnOrigin(const Vector3& spawnOrigin);
+	void SetLaunchDirection(const Vector3& launchDirection);
 	void SetFloorY(float floorY);
 	void SetSpawnContainment(const Vector3& center, float topY, float radius);
 	void StartSpill();
@@ -57,5 +58,6 @@ private:
 	float spawnTimer_ = 0.0f;
 	float nextSpawnInterval_ = 0.0f;
 	Vector3 spawnOrigin_ = {0.0f, 5.0f, 0.0f};
+	Vector3 launchDirection_ = {0.0f, 0.0f, 1.0f};
 	bool isSpilling_ = false;
 };

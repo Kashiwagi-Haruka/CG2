@@ -445,6 +445,7 @@ void ShadowGameScene::UpdateGameObject()
 	    vendingPosition.y + 0.9f,
 	    vendingPosition.z + vendingForward.z * 0.45f,
 	});
+	coffees_->SetLaunchDirection(vendingForward);
 	coffees_->Update(playerCamera_->GetCamera(), directionalLight_.direction);
     //ドア
     door_->Update();
