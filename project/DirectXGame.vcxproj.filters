@@ -366,6 +366,7 @@
     <ClCompile Include="application\GameObject\PC\PC.cpp" />
     <ClCompile Include="application\GameObject\Event\GameEvent.cpp" />
     <ClCompile Include="application\GameObject\Event\FirstGameEvent.cpp" />
+    <ClCompile Include="application\GameObject\CameraController\CameraController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -726,6 +727,7 @@
     <ClInclude Include="application\GameObject\PC\PC.h" />
     <ClInclude Include="application\GameObject\Event\GameEvent.h" />
     <ClInclude Include="application\GameObject\Event\FirstGameEvent.h" />
+    <ClInclude Include="application\GameObject\CameraController\CameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
