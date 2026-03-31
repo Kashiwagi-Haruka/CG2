@@ -34,6 +34,9 @@ constexpr float kCoffeesAngularDamping = 0.96f;
 constexpr float kCoffeesRollingFollow = 0.18f;
 constexpr float kCoffeesTiltFollow = 0.08f;
 constexpr float kCoffeesMaxTilt = 1.15f;
+constexpr float kCoffeesWallBounceDamping = 0.75f;
+constexpr float kCoffeesStopSpeed = 0.08f;
+constexpr float kCoffeesStopPushPower = 0.015f;
 
 int64_t HashCell(int32_t x, int32_t y, int32_t z) { return (static_cast<int64_t>(x) << 42) ^ (static_cast<int64_t>(y) << 21) ^ static_cast<int64_t>(z); }
 
@@ -357,25 +360,60 @@ void Coffees::RunSimulation() {
 		}
 	}
 
-	for (size_t i = 0; i < activeInstanceCount_; ++i) {
+		for (size_t i = 0; i < activeInstanceCount_; ++i) {
 		auto& instance = instances_[i];
-		instance.position.x = std::clamp(instance.position.x + pendingPush[i].x, roomMinX, roomMaxX);
+		const float pushPowerSq = pendingPush[i].x * pendingPush[i].x + pendingPush[i].z * pendingPush[i].z;
+
+		instance.position.x += pendingPush[i].x;
 		instance.position.y += pendingPush[i].y;
-		instance.position.z = std::clamp(instance.position.z + pendingPush[i].z, roomMinZ, roomMaxZ);
+		instance.position.z += pendingPush[i].z;
 
 		const float minY = floorY + instance.halfHeight;
 		if (instance.position.y < minY) {
 			instance.position.y = minY;
 			instance.velocity.y = 0.0f;
 		}
-		if (instance.position.x <= roomMinX || instance.position.x >= roomMaxX) {
-			instance.velocity.x *= -kCoffeesCollisionDamping;
+
+		const float minX = roomMinX + instance.radius;
+		const float maxX = roomMaxX - instance.radius;
+		const float minZ = roomMinZ + instance.radius;
+		const float maxZ = roomMaxZ - instance.radius;
+
+		if (instance.position.x < minX) {
+			instance.position.x = minX;
+			if (instance.velocity.x < 0.0f) {
+				instance.velocity.x *= -kCoffeesWallBounceDamping;
+			}
+		} else if (instance.position.x > maxX) {
+			instance.position.x = maxX;
+			if (instance.velocity.x > 0.0f) {
+				instance.velocity.x *= -kCoffeesWallBounceDamping;
+			}
 		}
-		if (instance.position.z <= roomMinZ || instance.position.z >= roomMaxZ) {
-			instance.velocity.z *= -kCoffeesCollisionDamping;
+
+		if (instance.position.z < minZ) {
+			instance.position.z = minZ;
+			if (instance.velocity.z < 0.0f) {
+				instance.velocity.z *= -kCoffeesWallBounceDamping;
+			}
+		} else if (instance.position.z > maxZ) {
+			instance.position.z = maxZ;
+			if (instance.velocity.z > 0.0f) {
+				instance.velocity.z *= -kCoffeesWallBounceDamping;
+			}
 		}
+
+		const float horizontalSpeedSq = instance.velocity.x * instance.velocity.x + instance.velocity.z * instance.velocity.z;
+		const bool isGrounded = instance.position.y <= (minY + 0.0001f);
+			if (isGrounded && horizontalSpeedSq < (kCoffeesStopSpeed * kCoffeesStopSpeed) && pushPowerSq < (kCoffeesStopPushPower * kCoffeesStopPushPower)) {
+			instance.velocity.x = 0.0f;
+			instance.velocity.z = 0.0f;
+			instance.angularVelocity.x = 0.0f;
+			instance.angularVelocity.z = 0.0f;
+			}
 		instancedObject_->SetInstanceOffset(i, instance.position);
-	}
+		}
+
 }
 void Coffees::EnsureInstanceCapacity(uint32_t requiredCount) {
 	if (requiredCount <= renderedInstanceCapacity_) {
