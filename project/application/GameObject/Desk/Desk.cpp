@@ -80,16 +80,13 @@ void Desk::Update()
     Animation();
     obj_->Update();
 
-    if (!isStart_) {
-        isStart_ = true;
-    }
 }
 
 void Desk::Initialize()
 {
     obj_->Initialize();
-    
-    isStart_ = false;
+
+    isRayHit_ = false;
     desiredAnimationName = "Idle";
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/desk", "desk");
@@ -115,11 +112,10 @@ void Desk::Draw()
 
 void Desk::CheckCollision()
 {
-    if (!isStart_) {
-        return;
-    }
 
-    if (OnCollisionRay()) {
+    isRayHit_ = OnCollisionRay();
+
+    if (isRayHit_) {
         //rayの当たり判定
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (!PlayerCommand::GetIsGrab()) {

@@ -1,5 +1,7 @@
 #include "LockerManager.h"
 
+bool LockerManager::isRayHit_ = false;
+
 LockerManager::LockerManager()
 {
     for (int i = 0; i < kMaxLockers_; ++i) {
@@ -10,6 +12,7 @@ LockerManager::LockerManager()
 
 void LockerManager::Initialize()
 {
+    isRayHit_ = false;
     for (auto& locker : lockers_) {
         locker->Initialize();
     }
@@ -19,6 +22,16 @@ void LockerManager::Update()
 {
     for (auto& locker : lockers_) {
         locker->Update();
+    }
+
+    isRayHit_ = false;
+
+    for (auto& locker : lockers_) {
+        if (locker->IsRayHit())
+        {
+            isRayHit_ = true;
+            break;
+        }
     }
 }
 

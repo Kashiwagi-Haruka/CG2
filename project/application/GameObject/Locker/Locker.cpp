@@ -45,7 +45,7 @@ void Locker::Update()
 
 void Locker::Initialize()
 {
-
+    isRayHit_ = false;
     obj_->Initialize();
 }
 
@@ -57,10 +57,9 @@ void Locker::Draw()
 
 void Locker::CheckCollision()
 {
-
-    if (OnCollisionRay()) {
+    isRayHit_ = OnCollisionRay();
+    if (isRayHit_) {
         //rayの当たり判定
-      
 
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
        

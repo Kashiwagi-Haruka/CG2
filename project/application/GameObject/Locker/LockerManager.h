@@ -5,6 +5,7 @@ class LockerManager
 {
 public:
     LockerManager();
+    static bool IsRayHit() { return isRayHit_; }
     void Initialize();
     void Update();
     void Draw();
@@ -14,5 +15,6 @@ public:
 private:
     static constexpr uint32_t kMaxLockers_ = 2;
     std::vector<std::unique_ptr<Locker>>lockers_;
+    static bool isRayHit_;
 };
 

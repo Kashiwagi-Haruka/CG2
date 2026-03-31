@@ -41,13 +41,15 @@ void Chair::Update() {
 
     Mirror();
 
+    isRayHit_ = OnCollisionRay();
+
     // Rayが外れたらメニューを自動で閉じる
-    if (isPreOnCollisionRay_ && !OnCollisionRay() && !isGrab_ && ChairMenu::GetIsShowMenu()) {
+    if (isPreOnCollisionRay_ && !isRayHit_ && !isGrab_ && ChairMenu::GetIsShowMenu()) {
         ChairMenu::SetIsShowMenu(false);
     }
 
     // rayと重なる、または椅子を持っていると
-    if (OnCollisionRay() || isGrab_) {
+    if (isRayHit_ || isGrab_) {
         // インタラクトをトリガーすると
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (ChairMenu::GetIsShowMenu()) {
@@ -70,6 +72,8 @@ void Chair::Update() {
 }
 
 void Chair::Initialize() {
+
+    isRayHit_ = false;
     isStand_ = false;
     obj_->Initialize();
     velocity_ = { 0.0f };
@@ -178,7 +182,7 @@ void Chair::Grab() {
 
 bool Chair::OnCollisionRay()
 {
-    return playerCamera_->OnCollisionRay(GetAABB(), transform_.translate);
+    return  playerCamera_->OnCollisionRay(GetAABB(), transform_.translate);
 }
 
 void Chair::SetPlayerCamera(PlayerCamera* camera)

@@ -5,6 +5,7 @@
 class ChairManager
 {
 public:
+    static bool IsRayHit() { return isRayHit_; }
     ChairManager();
     ~ChairManager();
     void SetCamera(Camera* camera);
@@ -14,6 +15,7 @@ public:
     void SetPlayerCamera(PlayerCamera* camera);
     std::vector<std::unique_ptr<Chair>>& GetChairs() { return chairs_; };
 private:
+    static bool isRayHit_;
     std::vector<std::unique_ptr<Chair>>chairs_;
 };
 

@@ -28,10 +28,12 @@ public:
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
     void SetAnimationGroupName(const std::string& name) { animationGroupName_ = name; }
+    static bool IsRayHit() { return isRayHit_; }
 private:
     // アニメーション
     void Animation();
 private:
+    static bool isRayHit_;
     static PlayerCamera* playerCamera_;
     std::unique_ptr<Object3d>obj_ = nullptr;
     // アニメーション

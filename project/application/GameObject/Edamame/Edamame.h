@@ -14,6 +14,7 @@ class Edamame
 public:
     Edamame();
     ~Edamame();
+    static bool IsRayHit() { return isRayHit_; }
     void Initialize();
     void Update();
     void Draw();
@@ -33,5 +34,6 @@ private:
     PlayerCamera* playerCamera_ = nullptr;
     Transform worldTransform_ = {};
     std::array<PointCommonLight,2> pointLights_;
+    static bool isRayHit_;
 };
 

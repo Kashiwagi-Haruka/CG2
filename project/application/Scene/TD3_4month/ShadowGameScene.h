@@ -165,6 +165,8 @@ private:
     void UpdateCamera();
     //シーン遷移の更新処理
     void UpdateSceneTransition();
+    //ポストエフェクトの更新処理
+    void UpdatePostEffect();
     //ゲームオブジェクトの更新処理
     void UpdateGameObject();
     //ポイントライトの更新処理

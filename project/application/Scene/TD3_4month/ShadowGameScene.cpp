@@ -158,32 +158,39 @@ void ShadowGameScene::Initialize()
     uiManager_->CursorHideAndStop();
     //カメラをセットする
     SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
-
+    
     //最初のイベントをセットする
     currentEvent_ = firstEvent_.get();
+
+    Update();
+
     currentEvent_->StartEvent();
- 
 }
 
 void ShadowGameScene::Update()
 {
-    //UI管理
-    uiManager_->Update();
-    PlayerCommand::SetIsUiInputLocked(UIManager::GetIsPause());
-    //シーン遷移の更新処理
-    UpdateSceneTransition();
+
+    currentEvent_->Update();
     //カメラの更新処理
     UpdateCamera();
-  
     //ライトの更新処理
     UpdateLight();
+    //ポストエフェクトの更新処理
+    UpdatePostEffect();
+
+    if (!currentEvent_->IsRunning()) {
+        //UI管理
+        uiManager_->Update();
+        PlayerCommand::SetIsUiInputLocked(UIManager::GetIsPause());
+        //シーン遷移の更新処理
+        UpdateSceneTransition();
+    }
+
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
-    currentEvent_->Update();
-    
     //オブジェクトの当たり判定
     CheckCollision();
-
+  
 
 }
 
@@ -194,11 +201,13 @@ void ShadowGameScene::Draw()
 
     //スプライト共通
     SpriteCommon::GetInstance()->DrawCommon();
-    //UI管理を描画する
-    uiManager_->Draw();
 
-    //シーン遷移の描画処理
-    DrawSceneTransition();
+    if (!currentEvent_->IsRunning()) {
+        //UI管理を描画する
+        uiManager_->Draw();
+    }
+    ////シーン遷移の描画処理
+    //DrawSceneTransition();
 }
 
 void ShadowGameScene::Finalize()
@@ -285,11 +294,11 @@ void ShadowGameScene::InitializeLights()
 
     activePointLightCount_ = 4;
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    pointLights_[0].position = { 7.0f, 2.0f, 0.0f };
+    pointLights_[0].position = { 7.0f, 5.0f, 0.0f };
     pointLights_[0].intensity = 1.0f;
     pointLights_[0].radius = 10.0f;
     pointLights_[0].decay = 1.0f;
-    pointLights_[1].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+    pointLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     pointLights_[1].position = { 5.0f, 5.0f, 5.0f };
     pointLights_[1].intensity = 1.0f;
     pointLights_[1].radius = 10.0f;
@@ -327,6 +336,7 @@ void ShadowGameScene::InitializeLights()
 #pragma region //private更新処理
 void ShadowGameScene::UpdateCamera()
 {
+
     cameraController_->Update();
 
     Object3dCommon::GetInstance()->SetDefaultCamera(cameraController_->GetPlayerCamera()->GetCamera());
@@ -361,7 +371,7 @@ void ShadowGameScene::UpdateSceneTransition()
     }
 }
 
-void ShadowGameScene::UpdateGameObject()
+void ShadowGameScene::UpdatePostEffect()
 {
     bool vignetteStrength = true;
 
@@ -393,17 +403,10 @@ void ShadowGameScene::UpdateGameObject()
     Object3dCommon::GetInstance()->SetRandomNoiseScale(noiseTimer_);
     Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode);
 
-#pragma region//ゲームオブジェクト
+}
 
-    spotLights_[0] = flashlight_->GetSpotLight();
-
-    pointLights_[2] = edamame_->GetPointLights().at(0);
-    pointLights_[3] = edamame_->GetPointLights().at(1);
-
-    areaLights_[2] = vendingMac_->GetAreaLight();
-    areaLights_[3] = wallManager_->GetAreaLight();
-    areaLights_[4] = wallManager2_->GetAreaLight();
-
+void ShadowGameScene::UpdateGameObject()
+{
     portalManager_->WarpPlayer(player_.get());
     //プレイヤー
     player_->Update();
@@ -465,10 +468,20 @@ void ShadowGameScene::UpdateGameObject()
     }
 
     ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
-#pragma endregion
+
 }
 void ShadowGameScene::UpdateLight() {
 #pragma region // Lightを組み込む
+
+    spotLights_[0] = flashlight_->GetSpotLight();
+
+    pointLights_[2] = edamame_->GetPointLights().at(0);
+    pointLights_[3] = edamame_->GetPointLights().at(1);
+
+    areaLights_[2] = vendingMac_->GetAreaLight();
+    areaLights_[3] = wallManager_->GetAreaLight();
+    areaLights_[4] = wallManager2_->GetAreaLight();
+
     Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
     Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
     Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);

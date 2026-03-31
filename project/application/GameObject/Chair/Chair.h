@@ -26,6 +26,7 @@ public:
     Transform& GetTransform() { return transform_; };
     bool GetIsStand() { return isStand_; }
     void SetIsStand(const bool isStand) { isStand_ = isStand; }
+    bool IsRayHit() { return isRayHit_; }
 private:
     void SwichCommand();
     void Mirror();
@@ -39,6 +40,7 @@ private:
     bool isGrab_ = false;
     bool isStand_ = false;
 	bool isPreOnCollisionRay_ = false;
+    bool isRayHit_ = false;
 	float chairMoveSeTimer_ = 0.0f;
 };
 

@@ -27,7 +27,9 @@ public:
     void SetCamera(Camera* camera);
     AreaCommonLight& GetAreaLight() { return  areaLight_; }
     bool GetIsEventStart() { return isCoffeeEventStart_; }
+   static bool IsRayHit() { return isRayHit_; };
 private:
+    static bool isRayHit_;
     bool isCoffeeEventStart_ = false;
     float GetVol(float length, float maxVol);
     bool OnCollisionRay();

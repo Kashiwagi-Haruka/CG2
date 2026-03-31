@@ -11,7 +11,7 @@
 
 bool Key::isSendGetKeyMessage_ = false;
 bool Key::isGetKey_ = false;
-
+bool Key::isRayHit_ = false;
 Key::Key()
 {
     obj_ = std::make_unique<Object3d>();
@@ -33,6 +33,7 @@ void Key::Initialize()
     };
     velocity_ = { 0.0f };
     obj_->Initialize();
+    isRayHit_ = false;
     isLockerHit_ = false;
     isGetKey_ = false;
     isChairHit_ = false;
@@ -96,11 +97,14 @@ void Key::SetModel(const std::string& filePath)
 
 void Key::CheckCollision()
 {
+    isRayHit_ = false;
+
     if (isGetKey_) {
         return;
     }
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
-        if (OnCollisionRay() && !PlayerCommand::GetIsGrab()) {
+        isRayHit_ = OnCollisionRay();
+        if (isRayHit_ && !PlayerCommand::GetIsGrab()) {
             isGetKey_ = true;
             isSendGetKeyMessage_ = true;
             SEManager::SoundPlay(SEManager::KEY);
@@ -112,7 +116,8 @@ void Key::CheckCollision()
 
 bool Key::OnCollisionRay()
 {
-    return playerCamera_->OnCollisionRay(GetAABB(), worldTransform_.translate);
+   return playerCamera_->OnCollisionRay(GetAABB(), worldTransform_.translate);
+
 }
 
 void Key::OnCollision(Collider* collider)
