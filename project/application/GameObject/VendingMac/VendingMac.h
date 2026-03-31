@@ -24,7 +24,6 @@ public:
     void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
     AreaCommonLight& GetAreaLight() { return  areaLight_; }
-    bool GetIsEventStart() { return isCoffeeEventStart_; }
    static bool IsRayHit() { return isRayHit_; };
   	Vector3 GetForward() const;
   	bool ConsumeInteractRequest();

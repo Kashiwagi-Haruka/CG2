@@ -71,8 +71,6 @@ ShadowGameScene::ShadowGameScene()
     boxManager_ = std::make_unique<BoxManager>();
     // エレベーター
     elevator_ = std::make_unique<Elevator>();
-    //こーひー
-    coffee_ = std::make_unique<Coffees>();
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
     //UI管理
@@ -156,8 +154,6 @@ void ShadowGameScene::Initialize()
     boxManager_->Initialize();
     // エレベーター
     elevator_->Initialize();
-    //コーヒー
-    coffee_->Initialize();
  
 
     //カーソルを画面中央に設定する
@@ -451,7 +447,7 @@ void ShadowGameScene::UpdateGameObject()
 	    vendingPosition.z + vendingForward.z * 0.45f,
 	});
 	coffees_->SetLaunchDirection(vendingForward);
-	coffees_->Update(playerCamera_->GetCamera(), directionalLight_.direction);
+	coffees_->Update(cameraController_->GetPlayerCamera()->GetCamera(), directionalLight_.direction);
     //ドア
     door_->Update();
     //ロッカー
@@ -470,10 +466,6 @@ void ShadowGameScene::UpdateGameObject()
     timeCardRack_->Update();
     //PC
     pc_->Update();
-
-    if (vendingMac_->GetIsEventStart()) {
-        coffee_->Update(cameraController_->GetPlayerCamera()->GetCamera(), directionalLight_.direction);
-    }
 
     for (auto& chair : chairManager_->GetChairs()) {
         if (chair->GetIsStand()) {
@@ -600,8 +592,7 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     boxManager_->Draw();
     //エレベーター    
     elevator_->Draw();
-    //コーヒー
-    coffee_->Draw();
+
     if (!isShadow) {
         Object3dCommon::GetInstance()->DrawCommonSkinning();
     }
