@@ -119,8 +119,8 @@ void Desk::CheckCollision()
         //rayの当たり判定
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (!PlayerCommand::GetIsGrab()) {
-
-    /*                SEManager::SoundPlay(SEManager::CHAIR);*/
+                
+                    SEManager::SoundPlay(SEManager::DESK);
                     if (desiredAnimationName == "Idle") {
                         desiredAnimationName = "Open";
                     } else if (desiredAnimationName == "Open") {

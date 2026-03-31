@@ -42,7 +42,7 @@ void AutoLockSystem::Update()
 void AutoLockSystem::Initialize()
 {
     isPlayerHit_ = false;
-    obj_->Initialize(Primitive::Box);
+    obj_->Initialize(Primitive::Box,"Resources/TD3_3102/2d/floor.png");
 
 }
 

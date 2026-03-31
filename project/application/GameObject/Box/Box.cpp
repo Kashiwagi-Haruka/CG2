@@ -20,11 +20,11 @@ Box::Box()
 
 void Box::OnCollision(Collider* collider)
 {
-    if (collider->GetCollisionAttribute() == kCollisionWall|| collider->GetCollisionAttribute() == kCollisionFloor) {
+  /*  if (collider->GetCollisionAttribute() == kCollisionWall|| collider->GetCollisionAttribute() == kCollisionFloor) {
         obj_->SetColor(COLOR::RED);
     } else {
         obj_->SetColor(COLOR::WHITE);
-    }
+    }*/
 
 }
 
