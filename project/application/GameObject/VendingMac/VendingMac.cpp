@@ -70,7 +70,7 @@ void VendingMac::Draw() { obj_->Draw(); }
 void VendingMac::CheckCollision() {
 	// 自販機とrayの当たり判定
 	if (OnCollisionRay()) {
-		if (PlayerCommand::GetInstance()->Interact()) {
+		if (PlayerCommand::GetInstance()->InteractTrigger()) {
 			interactRequested_ = true;
 		}
 	}
