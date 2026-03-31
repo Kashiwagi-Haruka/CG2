@@ -18,6 +18,8 @@ public:
 	void SetSpawnContainment(const Vector3& center, float topY, float radius);
 	void StartSpill();
 
+		void SetRoomBounds(float minX, float maxX, float minZ, float maxZ);
+
 private:
 	struct InstanceData {
 		Vector3 position;

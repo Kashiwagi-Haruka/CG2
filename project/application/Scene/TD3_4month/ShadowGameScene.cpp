@@ -122,6 +122,7 @@ void ShadowGameScene::Initialize()
 	// コーヒー缶
 	coffees_->Initialize();
 	coffees_->SetFloorY(0.0f);
+	coffees_->SetRoomBounds(-40.0f, 40.0f, -40.0f, 40.0f);
 	coffees_->SetSpawnContainment({0.0f, 0.0f, 0.0f}, 0.0f, 0.0f);
     //携帯打刻機
     timeCardWatch_->Initialize();

@@ -40,6 +40,7 @@ constexpr float kCoffeesMaxTilt = 1.15f;
 constexpr float kCoffeesWallBounceDamping = 0.75f;
 constexpr float kCoffeesStopSpeed = 0.08f;
 constexpr float kCoffeesStopPushPower = 0.015f;
+constexpr float kCoffeesPeerPushPower = 1.75f;
 
 int64_t HashCell(int32_t x, int32_t y, int32_t z) { return (static_cast<int64_t>(x) << 42) ^ (static_cast<int64_t>(y) << 21) ^ static_cast<int64_t>(z); }
 
@@ -135,10 +136,10 @@ void Coffees::Initialize() {
 	simulationParams_.gravity = kCoffeesGravity;
 	simulationParams_.bounceDamping = kCoffeesBounceDamping;
 	simulationParams_.separationBias = kCoffeesSeparationBias;
-	simulationParams_.roomMinX = -100.0f;
-	simulationParams_.roomMaxX = 100.0f;
-	simulationParams_.roomMinZ = -800.0f;
-	simulationParams_.roomMaxZ = 800.0f;
+	simulationParams_.roomMinX = -6.9f;
+	simulationParams_.roomMaxX = 6.9f;
+	simulationParams_.roomMinZ = -6.9f;
+	simulationParams_.roomMaxZ = 6.9f;
 }
 
 void Coffees::RunSimulation() {
@@ -325,7 +326,7 @@ void Coffees::RunSimulation() {
 							const float overlap = minDist - dist;
 							const float scale = (overlap * 0.5f + separationBias) / dist;
 							const Vector3 normal = {deltaX / dist, 0.0f, deltaZ / dist};
-							const Vector3 push = {deltaX * scale, 0.0f, deltaZ * scale};
+							const Vector3 push = {deltaX * scale * kCoffeesPeerPushPower, 0.0f, deltaZ * scale * kCoffeesPeerPushPower};
 							pendingPush[i].x += push.x;
 							pendingPush[i].z += push.z;
 							pendingPush[j].x -= push.x;
@@ -339,7 +340,7 @@ void Coffees::RunSimulation() {
 							const float relativeAlongNormal = relativeVelocity.x * normal.x + relativeVelocity.z * normal.z;
 
 							if (relativeAlongNormal < 0.0f) {
-								const float impulse = -(1.0f + kCoffeesCollisionDamping) * relativeAlongNormal * 0.5f;
+								const float impulse = -(1.0f + kCoffeesCollisionDamping) * relativeAlongNormal * 0.5f * kCoffeesPeerPushPower;
 								const Vector3 impulseVec = {normal.x * impulse, 0.0f, normal.z * impulse};
 								instances_[i].velocity.x += impulseVec.x;
 								instances_[i].velocity.z += impulseVec.z;
@@ -485,6 +486,12 @@ void Coffees::SetLaunchDirection(const Vector3& launchDirection) {
 
 	const float invLength = 1.0f / std::sqrt(lengthSq);
 	launchDirection_ = {horizontalDirection.x * invLength, 0.0f, horizontalDirection.z * invLength};
+}
+void Coffees::SetRoomBounds(float minX, float maxX, float minZ, float maxZ) {
+	simulationParams_.roomMinX = std::min(minX, maxX);
+	simulationParams_.roomMaxX = std::max(minX, maxX);
+	simulationParams_.roomMinZ = std::min(minZ, maxZ);
+	simulationParams_.roomMaxZ = std::max(minZ, maxZ);
 }
 void Coffees::SetFloorY(float floorY) { simulationParams_.floorY = floorY; }
 
