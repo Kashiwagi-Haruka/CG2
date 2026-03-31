@@ -28,6 +28,7 @@
 #include "GameObject/Elevator/Elevator.h"
 #include <GameObject/Edamame/Edamame.h>
 #include"GameObject/PC/PC.h"
+#include"GameObject/Coffee/Coffees.h"
 
 #pragma endregion
 
@@ -56,7 +57,7 @@ private:
     std::unique_ptr<UIManager> uiManager_ = nullptr;
 
 #pragma region//カメラの設定
-   CameraController* cameraController_ = nullptr;
+    CameraController* cameraController_ = nullptr;
 
 #pragma endregion
 
@@ -109,6 +110,8 @@ private:
     std::unique_ptr<Elevator> elevator_ = nullptr;
     //PC
     std::unique_ptr<PC> pc_ = nullptr;
+    //コーヒー
+    std::unique_ptr<Coffees> coffee_ = nullptr;
 #pragma endregion
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;

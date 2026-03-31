@@ -22,10 +22,6 @@ VendingMac::VendingMac()
     areaLight_.radius = 0.8f;
     areaLight_.decay = 1.0f;
     translate_ = { 0.0f,1.3f,0.6f };
-
-
-
-
 }
 
 VendingMac::~VendingMac()
@@ -47,6 +43,8 @@ Vector3 VendingMac::GetWorldPosition() const
 
 void VendingMac::Update()
 {
+    CheckCollision();
+
     obj_->Update();
 
     Matrix4x4 worldMat = Function::Multiply(Function::MakeTranslateMatrix(translate_), obj_->GetWorldMatrix());
@@ -56,12 +54,15 @@ void VendingMac::Update()
     // プレイヤーのカメラ位置から
     Vector3 distance = playerCamera_->GetRay().origin - obj_->GetTranslate();
     float  length = Function::Length(distance);
-    SEManager::SetVol(GetVol(length, 1.0f),SEManager::NOISE);
+    SEManager::SetVol(GetVol(length, 1.0f), SEManager::NOISE);
+
+
 
 }
 
 void VendingMac::Initialize()
 {
+    isCoffeeEventStart_ = false;
     obj_->Initialize();
     SEManager::SoundPlay(SEManager::NOISE, true);
 }
@@ -76,6 +77,14 @@ void VendingMac::CheckCollision()
     //自販機とrayの当たり判定
     if (OnCollisionRay()) {
         if (PlayerCommand::GetInstance()->Interact()) {
+     
+            if (SEManager::IsSoundFinished(SEManager::VENDING_MAC)) {
+                SEManager::SoundPlay(SEManager::VENDING_MAC);
+                if (!isCoffeeEventStart_) {
+                    isCoffeeEventStart_ = true;
+                }
+            }
+          
 
         }
     }
