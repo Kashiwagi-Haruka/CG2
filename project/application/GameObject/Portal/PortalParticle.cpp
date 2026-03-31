@@ -18,7 +18,7 @@ PortalParticle::PortalParticle() {
 	emitter_->SetAcceleration({0.0f, 0.0f, 0.0f});
 	emitter_->SetAreaMin({-0.5f, -0.5f, -0.5f});
 	emitter_->SetAreaMax({0.5f, 0.5f, 0.5f});
-	emitter_->SetBeforeColor({1.0f, 0.0f, 0.0f, 1.0f});
+	emitter_->SetBeforeColor({1.0f, 0.25f, 0.0f, 1.0f});
 	emitter_->SetAfterColor({1.0f, 1.0f, 0.3f, 0.5f});
 	emitter_->SetEmissionAngle(2.0f * 3.1415926535f);
 

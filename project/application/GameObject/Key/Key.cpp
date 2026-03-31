@@ -42,15 +42,6 @@ void Key::Update()
     obj_->SetEnableLighting(false);
     CheckCollision();
 
-    if (isGetKey_ && PlayerCommand::GetIsGrab()) {
-        // カーソルに追従させて持ち上げる処理
-        //Vector3 origin = playerCamera_->GetTransform().translate;
-        //worldTransform_.translate = origin + (Function::Normalize(playerCamera_->GetRay().diff));
-        //worldTransform_.translate.y = (std::max)(worldTransform_.translate.y, 0.0f);
-        //velocity_.y = 0.0f;
-
-    } 
-
     //鍵を持っていないとき
     if (!isGetKey_) {
         //重力処理
@@ -76,6 +67,9 @@ void Key::Update()
 
 void Key::Draw()
 {
+    if (isGetKey_) {
+        return;
+    }
     obj_->Draw();
 }
 
