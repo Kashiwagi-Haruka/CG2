@@ -108,3 +108,4 @@ void VendingMac::SetCamera(Camera* camera)
     obj_->SetCamera(camera);
     obj_->UpdateCameraMatrices();
 }
+Vector3 VendingMac::GetForward() const { return YoshidaMath::GetForward(obj_->GetWorldMatrix()); }

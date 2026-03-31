@@ -8,30 +8,30 @@
 
 class Camera;
 
-class VendingMac :
-    public YoshidaMath::Collider
-{
+class VendingMac : public YoshidaMath::Collider {
 public:
-    VendingMac();
-    ~VendingMac();
-    /// @brief 衝突時コールバック関数
-    void OnCollision(Collider* collider)override;
-    /// @brief ワールド座標を取得する
-    /// @return ワールド座標
-    Vector3 GetWorldPosition() const override;
-    void Update();
-    void Initialize();
-    void Draw();
-    void CheckCollision();
-    void SetPlayerCamera(PlayerCamera* camera);
-    void SetCamera(Camera* camera);
-    AreaCommonLight& GetAreaLight() { return  areaLight_; }
+	VendingMac();
+	~VendingMac();
+	/// @brief 衝突時コールバック関数
+	void OnCollision(Collider* collider) override;
+	/// @brief ワールド座標を取得する
+	/// @return ワールド座標
+	Vector3 GetWorldPosition() const override;
+	void Update();
+	void Initialize();
+	void Draw();
+	void CheckCollision();
+	void SetPlayerCamera(PlayerCamera* camera);
+	void SetCamera(Camera* camera);
+	Vector3 GetForward() const;
+	AreaCommonLight& GetAreaLight() { return areaLight_; }
+
 private:
-    float GetVol(float length, float maxVol);
-    bool OnCollisionRay();
-    PlayerCamera* playerCamera_ = nullptr;
-    std::unique_ptr<Object3d>obj_ = nullptr;
-    AreaCommonLight areaLight_;
-    Vector3 translate_ = { 0.0f };
+	float GetVol(float length, float maxVol);
+	bool OnCollisionRay();
+	PlayerCamera* playerCamera_ = nullptr;
+	std::unique_ptr<Object3d> obj_ = nullptr;
+	AreaCommonLight areaLight_;
+	Vector3 translate_ = {0.0f};
 };
 

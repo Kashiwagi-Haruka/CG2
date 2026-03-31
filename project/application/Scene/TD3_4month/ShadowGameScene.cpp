@@ -436,7 +436,12 @@ void ShadowGameScene::UpdateGameObject()
     //自販機
     vendingMac_->Update();
 	const Vector3 vendingPosition = vendingMac_->GetWorldPosition();
-	coffees_->SetSpawnOrigin({vendingPosition.x, vendingPosition.y + 0.9f, vendingPosition.z + 0.45f});
+	const Vector3 vendingForward = vendingMac_->GetForward();
+	coffees_->SetSpawnOrigin({
+	    vendingPosition.x + vendingForward.x * 0.45f,
+	    vendingPosition.y + 0.9f,
+	    vendingPosition.z + vendingForward.z * 0.45f,
+	});
 	coffees_->Update(playerCamera_->GetCamera(), directionalLight_.direction);
     //ドア
     door_->Update();
