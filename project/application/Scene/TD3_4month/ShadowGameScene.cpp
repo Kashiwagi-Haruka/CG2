@@ -24,7 +24,7 @@ ShadowGameScene::ShadowGameScene()
     //プレイヤーの生成
     player_ = std::make_unique<Player>();
     //カメラコントローラー
-    cameraController_ = std::make_unique<CameraController>();
+    cameraController_ = CameraController::GetInstance();
     cameraController_->SetPlayer(player_.get());
 
     //テスト地面
@@ -148,14 +148,15 @@ void ShadowGameScene::Initialize()
     boxManager_->Initialize();
     // エレベーター
     elevator_->Initialize();
-
     //カーソルを画面中央に設定する
     uiManager_->CursorHideAndStop();
-
-
-
+    //カメラをセットする
     SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
+    //最初のイベントをセットする
+    currentEvent_ = firstEvent_.get();
+    currentEvent_->StartEvent();
+ 
 }
 
 void ShadowGameScene::Update()
@@ -167,12 +168,17 @@ void ShadowGameScene::Update()
     UpdateSceneTransition();
     //カメラの更新処理
     UpdateCamera();
+  
     //ライトの更新処理
     UpdateLight();
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
+    currentEvent_->Update();
+    
     //オブジェクトの当たり判定
     CheckCollision();
+
+
 }
 
 void ShadowGameScene::Draw()
@@ -319,24 +325,7 @@ void ShadowGameScene::UpdateCamera()
     cameraController_->Update();
 
     Object3dCommon::GetInstance()->SetDefaultCamera(cameraController_->GetPlayerCamera()->GetCamera());
-#ifdef USE_IMGUI
-    if (ImGui::Begin("Camera")) {
-        ImGui::Checkbox("Use Debug Camera (F1)", &useDebugCamera_);
-        ImGui::Text("Debug: LMB drag rotate, Shift+LMB drag pan, Wheel zoom");
-        if (ImGui::TreeNode("Transform")) {
 
-            if (!useDebugCamera_) {
-                auto& playerCameraT = player_->GetTransform();
-                ImGui::DragFloat3("Scale", &playerCameraT.scale.x, 0.01f);
-                ImGui::DragFloat3("Rotate", &playerCameraT.rotate.x, 0.01f);
-                ImGui::DragFloat3("Translate", &playerCameraT.translate.x, 0.01f);
-            }
-            ImGui::TreePop();
-        }
-        ImGui::End();
-    }
-
-#endif
 }
 
 void ShadowGameScene::UpdateSceneTransition()
@@ -392,7 +381,7 @@ void ShadowGameScene::UpdateGameObject()
 
 #pragma region//ゲームオブジェクト
 
-    spotLights_[1] = flashlight_->GetSpotLight();
+    spotLights_[0] = flashlight_->GetSpotLight();
 
     pointLights_[2] = edamame_->GetPointLights().at(0);
     pointLights_[3] = edamame_->GetPointLights().at(1);

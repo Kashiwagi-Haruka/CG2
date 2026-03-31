@@ -12,8 +12,7 @@ public:
     void Update();
     Camera* GetCamera() { return camera_.get(); };
     Transform& GetTransform() { return cameraTransform_; }
-    //回転
-    void Rotate();
+
     //Rayをセットする
     void SetRay();
     Ray& GetRay() { return ray_; };
@@ -21,11 +20,13 @@ public:
     //RayとAABBの当たり判定を共通化しました。
     bool OnCollisionRay(const AABB& localAABB, const Vector3& translate);
     void SetPlayer(Player* player) { player_ = player; }
+    void SetHeadTransform();
+    void SetTransform();
 private:
     const float kTMin_ = 0.0f;
     const float kTMax_ = 5.0f;
-
-    void SetTransform();
+    //回転
+    void Rotate();
     Vector3 GetForward();
     Transform cameraTransform_ = {};
     //カメラからのRay
