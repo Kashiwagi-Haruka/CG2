@@ -26,6 +26,7 @@ class SceneTransition {
 
 	SpriteData blockSpriteData_;
 	std::vector<Block> blocks_;
+	std::vector<size_t> blockOrder_;
 	Text errorText_;
 	uint32_t fontHandle_ = 0;
 	bool typeStarted_ = false;
@@ -36,9 +37,8 @@ class SceneTransition {
 	float afterTextWait_ = 0.6f;
 	float spreadDuration_ = 1.0f;
 	float reverseDuration_ = 0.55f;
-	float blockDelayMax_ = 0.45f;
-	float minBlockSize_ = 56.0f;
-	float maxBlockSize_ = 180.0f;
+	float blockDelayMax_ = 0.55f;
+	float blockSize_ = 24.0f;
 
 	bool isIn_ = true;
 	bool isEnd = false;

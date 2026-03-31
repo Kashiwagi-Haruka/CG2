@@ -8,13 +8,15 @@
 #include "TextureManager.h"
 
 #include <algorithm>
+#include <cmath>
+#include <numeric>
 #include <random>
 
 SceneTransition::SceneTransition() {
 	blockSpriteData_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/white2x2.png");
 	blockSpriteData_.sprite = std::make_unique<Sprite>();
 	blockSpriteData_.sprite->Initialize(blockSpriteData_.handle);
-	blockSpriteData_.sprite->SetColor({0,0,0,1});
+	blockSpriteData_.sprite->SetColor({0, 0, 0, 1});
 
 	fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
 	FreeTypeManager::SetPixelSizes(fontHandle_, 96, 96);
@@ -26,7 +28,8 @@ SceneTransition::SceneTransition() {
 	errorText_.SetColor(COLOR::WHITE);
 	errorText_.SetBlendMode(BlendMode::kBlendModeAlpha);
 
-	blocks_.resize(150);
+	blocks_.clear();
+	blockOrder_.clear();
 }
 
 SceneTransition::~SceneTransition() {}
@@ -53,15 +56,29 @@ void SceneTransition::StartSpread(bool reverseStart) {
 
 void SceneTransition::SetupBlocks() {
 	std::mt19937 mt(std::random_device{}());
-	std::uniform_real_distribution<float> xDist(0.0f, SCREEN_SIZE::WIDTH);
-	std::uniform_real_distribution<float> yDist(0.0f, SCREEN_SIZE::HEIGHT);
-	std::uniform_real_distribution<float> delayDist(0.0f, blockDelayMax_);
-	std::uniform_real_distribution<float> sizeDist(minBlockSize_, maxBlockSize_);
 
-	for (auto& block : blocks_) {
-		block.position = {xDist(mt), yDist(mt)};
-		block.delay = delayDist(mt);
-		block.size = sizeDist(mt);
+	const int columns = static_cast<int>(std::ceil(SCREEN_SIZE::WIDTH / blockSize_)) + 2;
+	const int rows = static_cast<int>(std::ceil(SCREEN_SIZE::HEIGHT / blockSize_)) + 2;
+	const size_t blockCount = static_cast<size_t>(columns * rows);
+
+	blocks_.resize(blockCount);
+	blockOrder_.resize(blockCount);
+	std::iota(blockOrder_.begin(), blockOrder_.end(), 0);
+	std::shuffle(blockOrder_.begin(), blockOrder_.end(), mt);
+
+	const float halfBlock = blockSize_ * 0.5f;
+	for (size_t i = 0; i < blockCount; ++i) {
+		const int x = static_cast<int>(i % columns);
+		const int y = static_cast<int>(i / columns);
+		const float positionX = x * blockSize_ - halfBlock;
+		const float positionY = y * blockSize_ - halfBlock;
+
+		Block& block = blocks_[i];
+		block.position = {positionX, positionY};
+		block.size = blockSize_ * 1.2f;
+
+		const float progress = static_cast<float>(blockOrder_[i]) / static_cast<float>(std::max<size_t>(blockCount - 1, 1));
+		block.delay = progress * blockDelayMax_;
 	}
 }
 
@@ -134,6 +151,13 @@ void SceneTransition::Draw() {
 	}
 
 	t = std::clamp(t, 0.0f, 1.0f);
+
+	if (phase_ == Phase::HoldAndType) {
+		blockSpriteData_.sprite->SetScale({SCREEN_SIZE::WIDTH, SCREEN_SIZE::HEIGHT});
+		blockSpriteData_.sprite->SetPosition({0.0f, 0.0f});
+		blockSpriteData_.sprite->Update();
+		blockSpriteData_.sprite->Draw();
+	}
 
 	for (const auto& block : blocks_) {
 		const float appear = std::clamp((t - block.delay) / (1.0f - block.delay + 0.0001f), 0.0f, 1.0f);
