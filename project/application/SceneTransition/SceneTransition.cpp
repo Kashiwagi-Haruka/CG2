@@ -13,7 +13,7 @@
 #include <random>
 
 SceneTransition::SceneTransition() {
-	blockSpriteData_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/white2x2.png");
+	blockSpriteData_.handle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
 	blockSpriteData_.sprite = std::make_unique<Sprite>();
 	blockSpriteData_.sprite->Initialize(blockSpriteData_.handle);
 	blockSpriteData_.sprite->SetColor({0, 0, 0, 1});
@@ -141,6 +141,9 @@ void SceneTransition::UpdateReverse() {
 }
 
 void SceneTransition::Draw() {
+	SpriteCommon::GetInstance()->DrawCommon();
+	SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
+
 	float t = 0.0f;
 	if (phase_ == Phase::Spread) {
 		t = GetPhaseRatio(spreadDuration_);
@@ -152,12 +155,15 @@ void SceneTransition::Draw() {
 
 	t = std::clamp(t, 0.0f, 1.0f);
 
-	if (phase_ == Phase::HoldAndType) {
+	if (t > 0.0f) {
+		blockSpriteData_.sprite->SetColor({0.0f, 0.0f, 0.0f, t});
 		blockSpriteData_.sprite->SetScale({SCREEN_SIZE::WIDTH, SCREEN_SIZE::HEIGHT});
 		blockSpriteData_.sprite->SetPosition({0.0f, 0.0f});
 		blockSpriteData_.sprite->Update();
 		blockSpriteData_.sprite->Draw();
 	}
+
+		blockSpriteData_.sprite->SetColor({0.0f, 0.0f, 0.0f, 1.0f});
 
 	for (const auto& block : blocks_) {
 		const float appear = std::clamp((t - block.delay) / (1.0f - block.delay + 0.0001f), 0.0f, 1.0f);
