@@ -18,7 +18,7 @@ Door::Door()
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/door", "door");
     obj_->SetModel("door");
     SetAABB({ .min = {-0.125f,0.0f,-0.125f},.max = {0.125f,1.9f,0.125f} });
-    SetCollisionAttribute(kCollisionDoor);
+    SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer | kCollisionKey);
 
     autoLockSystem_ = std::make_unique<AutoLockSystem>();

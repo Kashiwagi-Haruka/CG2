@@ -75,14 +75,11 @@ Player::Player() {
     };
     SetAABB(localAABB_);
     SetCollisionAttribute(kCollisionPlayer);
-    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionVendingMac | kCollisionDoor | kCollisionMat | kCollisionLocker| kCollisionDesk);
+    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall  | kCollisionMat);
     // 体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
     // モデルの読み込み
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
-
-
-
 }
 void Player::SetCamera(Camera* camera) {
     // カメラのセット

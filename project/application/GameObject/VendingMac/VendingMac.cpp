@@ -11,8 +11,8 @@ VendingMac::VendingMac()
     obj_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/vendingMac", "vendingMac");
     obj_->SetModel("vendingMac");
-    SetAABB({ .min = {-0.5f,0.0f,-0.5f},.max = {0.5f,1.83f,0.5f} });
-    SetCollisionAttribute(kCollisionVendingMac);
+    SetAABB({ .min = {-0.75f,0.0f,-0.75f},.max = {0.75f,1.83f,0.75f} });
+    SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
 
     areaLight_.color = { 1.0f,234.0f / 255.0f,200.0f / 255.0f,1.0f };

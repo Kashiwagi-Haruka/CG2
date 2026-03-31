@@ -18,7 +18,7 @@ PC::PC()
     obj_->SetModel("pc");
     SetAABB({ .min = {-0.15f,-0.15f,-0.15f},.max = {0.15f,0.15f,0.15f} });
     SetCollisionAttribute(kCollisionItem);
-    SetCollisionMask(kCollisionPlayer | kCollisionKey | kCollisionDesk);
+    SetCollisionMask(kCollisionPlayer | kCollisionKey | kCollisionWall);
 }
 
 void PC::OnCollision(Collider* collider)
