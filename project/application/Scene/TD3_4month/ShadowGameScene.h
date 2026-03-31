@@ -31,7 +31,7 @@
 #include"GameObject/PC/PC.h"
 
 #include "GameObject/Coffee/Coffees.h"
-
+#include "GameObject/UI/DamageOverlay.h"
 
 #pragma endregion
 
@@ -48,29 +48,30 @@
 #include "Light/CommonLight/SpotCommonLight.h" 
 #include "Light/CommonLight/PointCommonLight.h"
 #include"Audio.h"
+#include <string>
 
-class ShadowGameScene : public BaseScene
-{
+class ShadowGameScene : public BaseScene {
 private:
+	const float kNoiseTimer_ = 0.5f;
+	float noiseTimer_ = kNoiseTimer_;
+	bool isNoise_ = false;
 
-    const float kNoiseTimer_ = 0.5f;
-    float noiseTimer_ = kNoiseTimer_;
-    bool isNoise_ = false;
+	std::unique_ptr<UIManager> uiManager_ = nullptr;
 
-    std::unique_ptr<UIManager> uiManager_ = nullptr;
-
-#pragma region//カメラの設定
-    CameraController* cameraController_ = nullptr;
+#pragma region // カメラの設定
+	CameraController* cameraController_ = nullptr;
 
 #pragma endregion
 
-#pragma region//シーン遷移の設定
-    //シーン遷移の設定
-    std::unique_ptr<SceneTransition> transition_ = nullptr;
-    //遷移入り
-    bool isTransitionIn_ = false;
-    //遷移抜け
-    bool isTransitionOut_ = false;
+#pragma region // シーン遷移の設定
+	// シーン遷移の設定
+	std::unique_ptr<SceneTransition> transition_ = nullptr;
+	// 遷移入り
+	bool isTransitionIn_ = false;
+	// 遷移抜け
+	bool isTransitionOut_ = false;
+	// 遷移完了後の次シーン名
+	std::string nextSceneName_;
 #pragma endregion
 
 #pragma region//ゲームオブジェクトの設定
@@ -139,39 +140,47 @@ private:
     bool useSpotShadow_ = false;
     bool useAreaShadow_ = false;
 
+ 	float playerHp_ = 3.0f;
+	static constexpr float kPlayerMaxHp_ = 3.0f;
+	float damageCooldownTimer_ = 0.0f;
+	std::unique_ptr<DamageOverlay> damageOverlay_ = nullptr;
+
 public:
-    //シーンのコンストラクタ
-    ShadowGameScene();
-    //デストラクタ
-    ~ShadowGameScene() override;
-    //初期化処理
-    void Initialize() override;
-    //更新処理
-    void Update() override;
-    //描画処理
-    void Draw() override;
-    //終了処理
-    void Finalize() override;
-    //デバック
-    void DebugImGui();
-    //衝突判定チェック
-    void CheckCollision();
+	// シーンのコンストラクタ
+	ShadowGameScene();
+	// デストラクタ
+	~ShadowGameScene() override;
+	// 初期化処理
+	void Initialize() override;
+	// 更新処理
+	void Update() override;
+	// 描画処理
+	void Draw() override;
+	// 終了処理
+	void Finalize() override;
+	// デバック
+	void DebugImGui();
+	// 衝突判定チェック
+	void CheckCollision();
+
 private:
-    // =======================================
-    // プライベート初期化
-    // =======================================
-    void InitializeLights();
-    // =======================================
-    // プライベート更新処理
-    // =======================================
-    //カメラの更新処理
-    void UpdateCamera();
-    //シーン遷移の更新処理
-    void UpdateSceneTransition();
-    //ポストエフェクトの更新処理
-    void UpdatePostEffect();
-    //ゲームオブジェクトの更新処理
-    void UpdateGameObject();
+	// =======================================
+	// プライベート初期化
+	// =======================================
+	void InitializeLights();
+	// =======================================
+	// プライベート更新処理
+	// =======================================
+	// カメラの更新処理
+	void UpdateCamera();
+	// シーン遷移の更新処理
+	void UpdateSceneTransition();
+	// ポストエフェクトの更新処理
+	void UpdatePostEffect();
+	// ゲームオブジェクトの更新処理
+	void UpdateGameObject();
+	void UpdatePlayerDamage();
+	void ApplyPlayerDamage(float damageAmount);
     //ポイントライトの更新処理
     void UpdateLight();
     // =======================================

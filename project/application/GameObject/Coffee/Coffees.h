@@ -17,8 +17,9 @@ public:
 	void SetFloorY(float floorY);
 	void SetSpawnContainment(const Vector3& center, float topY, float radius);
 	void StartSpill();
+	bool CheckHitPlayer(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const;
 
-		void SetRoomBounds(float minX, float maxX, float minZ, float maxZ);
+	void SetRoomBounds(float minX, float maxX, float minZ, float maxZ);
 
 private:
 	struct InstanceData {

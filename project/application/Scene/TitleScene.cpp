@@ -157,9 +157,9 @@ void TitleScene::Draw() {
     FreeTypeManager::ResetFontUsage();
     SpriteCommon::GetInstance()->DrawCommon();
 
-    //if (isTransitionIn || isTransitionOut) {
-    //    transition->Draw();
-    //}
+    if (isTransitionIn || isTransitionOut) {
+		transition->Draw();
+	}
 
 
 }

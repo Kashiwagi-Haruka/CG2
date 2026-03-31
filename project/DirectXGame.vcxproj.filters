@@ -367,6 +367,7 @@
     <ClCompile Include="application\GameObject\Event\GameEvent.cpp" />
     <ClCompile Include="application\GameObject\Event\FirstGameEvent.cpp" />
     <ClCompile Include="application\GameObject\CameraController\CameraController.cpp" />
+    <ClCompile Include="application\GameObject\UI\DamageOverlay.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManager2.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -729,6 +730,7 @@
     <ClInclude Include="application\GameObject\Event\GameEvent.h" />
     <ClInclude Include="application\GameObject\Event\FirstGameEvent.h" />
     <ClInclude Include="application\GameObject\CameraController\CameraController.h" />
+    <ClInclude Include="application\GameObject\UI\DamageOverlay.h" />
     <ClInclude Include="application\GameObject\Wall\WallManager2.h" />
   </ItemGroup>
   <ItemGroup>

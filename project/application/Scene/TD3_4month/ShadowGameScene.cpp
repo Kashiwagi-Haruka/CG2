@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "ShadowGameScene.h"
 #include "Input.h"
 #include "SceneManager.h"
@@ -6,11 +7,12 @@
 #include"DirectXCommon.h"
 #include<numbers>
 #include"RigidBody.h"
-#include "WinApp.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
+#include <algorithm>
+#include <cmath>
 
 
 ShadowGameScene::ShadowGameScene()
@@ -79,6 +81,8 @@ ShadowGameScene::ShadowGameScene()
     firstEvent_ = std::make_unique<FirstGameEvent>();
     //PlayerCameraをセットする
     SetPlayerCamera(cameraController_->GetPlayerCamera());
+
+	damageOverlay_ = std::make_unique<DamageOverlay>();
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -94,14 +98,18 @@ void ShadowGameScene::Initialize()
     BGMManager::Initialize();
 
     uiManager_->Initialize();
+	damageOverlay_->Initialize();
 
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;
+	playerHp_ = kPlayerMaxHp_;
+	damageCooldownTimer_ = 0.0f;
 
     //シーン遷移の設定
     transition_->Initialize(false);
     isTransitionIn_ = true;
     isTransitionOut_ = false;
+	nextSceneName_.clear();
 
     //プレイヤーの初期化
     player_->Initialize();
@@ -190,6 +198,7 @@ void ShadowGameScene::Update()
 
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
+	UpdatePlayerDamage();
     //オブジェクトの当たり判定
     CheckCollision();
   
@@ -203,13 +212,14 @@ void ShadowGameScene::Draw()
 
     //スプライト共通
     SpriteCommon::GetInstance()->DrawCommon();
-
+	damageOverlay_->Draw();
     if (!currentEvent_->IsRunning()) {
         //UI管理を描画する
         uiManager_->Draw();
     }
-    ////シーン遷移の描画処理
-    //DrawSceneTransition();
+
+    //シーン遷移の描画処理
+    DrawSceneTransition();
 }
 
 void ShadowGameScene::Finalize()
@@ -349,32 +359,25 @@ void ShadowGameScene::UpdateCamera()
 
 }
 
-void ShadowGameScene::UpdateSceneTransition()
-{
-    if (door_->GetOpenMassage()) {
-        transition_->Initialize(false);
-        isTransitionOut_ = true;
-    }
+void ShadowGameScene::UpdateSceneTransition() {
+	if (door_->GetOpenMassage() && !isTransitionOut_) {
+		transition_->Initialize(true);
+		isTransitionOut_ = true;
+		nextSceneName_ = "Result";
+	}
 
-    if (isTransitionIn_ || isTransitionOut_) {
-        transition_->Update();
-        if (transition_->IsEnd() && isTransitionIn_) {
-            isTransitionIn_ = false;
-        }
-        if (transition_->IsEnd() && isTransitionOut_) {
-           
-            if (door_->GetIsOpen()) {
-                //シーンの切り替え
-                SceneManager::GetInstance()->ChangeScene("Result");
-            } 
-            //else if (coffee_->GetInstanceCount() >= 100) {
-            //    //シーンの切り替え
-            //    SceneManager::GetInstance()->ChangeScene("GameOver");
-            //}
-        }
-    
- 
-    }
+	if (isTransitionIn_ || isTransitionOut_) {
+		transition_->Update();
+		if (transition_->IsEnd() && isTransitionIn_) {
+			isTransitionIn_ = false;
+		}
+		if (transition_->IsEnd() && isTransitionOut_) {
+			if (!nextSceneName_.empty()) {
+				// シーンの切り替え
+				SceneManager::GetInstance()->ChangeScene(nextSceneName_);
+			}
+		}
+	}
 }
 
 void ShadowGameScene::UpdatePostEffect()
@@ -480,6 +483,41 @@ void ShadowGameScene::UpdateGameObject()
 
     ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 
+}
+void ShadowGameScene::UpdatePlayerDamage() {
+	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+	damageCooldownTimer_ = std::max(0.0f, damageCooldownTimer_ - deltaTime);
+
+	constexpr float kHpRegenPerSecond = 0.2f;
+	playerHp_ = std::min(kPlayerMaxHp_, playerHp_ + (kHpRegenPerSecond * deltaTime));
+
+	damageOverlay_->Update(deltaTime, playerHp_, kPlayerMaxHp_);
+
+	constexpr float kCoffeeHitSpeedThreshold = 2.0f;
+	constexpr float kPlayerHitRadius = 0.45f;
+	constexpr float kDamageCooldown = 0.7f;
+
+	if (damageCooldownTimer_ <= 0.0f && coffees_->CheckHitPlayer(player_->GetWorldPosition(), kPlayerHitRadius, kCoffeeHitSpeedThreshold)) {
+		ApplyPlayerDamage(1.0f);
+		damageCooldownTimer_ = kDamageCooldown;
+		damageOverlay_->StartDisplay();
+
+		if (playerHp_ <= 0.0f) {
+			if (!isTransitionOut_) {
+				transition_->Initialize(true);
+				isTransitionOut_ = true;
+				nextSceneName_ = "GameOver";
+			}
+			return;
+		}
+	}
+}
+
+void ShadowGameScene::ApplyPlayerDamage(float damageAmount) {
+	playerHp_ = std::max(0.0f, playerHp_ - damageAmount);
+	if (playerHp_ > 1.0f && playerHp_ < kPlayerMaxHp_) {
+		playerHp_ = std::floor(playerHp_);
+	}
 }
 void ShadowGameScene::UpdateLight() {
 #pragma region // Lightを組み込む
