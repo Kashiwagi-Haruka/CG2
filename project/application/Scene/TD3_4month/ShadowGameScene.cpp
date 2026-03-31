@@ -12,6 +12,7 @@
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
 
+
 ShadowGameScene::ShadowGameScene()
 {
     //BGMの管理
@@ -19,20 +20,20 @@ ShadowGameScene::ShadowGameScene()
 
     //シーン遷移の設定
     transition_ = std::make_unique<SceneTransition>();
-    //デバックカメラ
-    debugCamera_ = std::make_unique<DebugCamera>();
+
     //プレイヤーの生成
     player_ = std::make_unique<Player>();
-    //プレイヤー視点のカメラ
-    playerCamera_ = std::make_unique<PlayerCamera>();
-    playerCamera_->SetPlayer(player_.get());
+    //カメラコントローラー
+    cameraController_ = std::make_unique<CameraController>();
+    cameraController_->SetPlayer(player_.get());
+
     //テスト地面
     testField_ = std::make_unique<TestField>();
     // ホワイトボード管理
     whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
     // ポータル管理
     portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
-    portalManager_->SetPlayerCamera(playerCamera_.get());
+
     //PC
     pc_ = std::make_unique<PC>();
 
@@ -73,8 +74,10 @@ ShadowGameScene::ShadowGameScene()
     collisionManager_ = std::make_unique<CollisionManager>();
     //UI管理
     uiManager_ = std::make_unique<UIManager>();
+    //最初のイベント
+    firstEvent_ = std::make_unique<FirstGameEvent>();
     //PlayerCameraをセットする
-    SetPlayerCamera(playerCamera_.get());
+    SetPlayerCamera(cameraController_->GetPlayerCamera());
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -102,11 +105,10 @@ void ShadowGameScene::Initialize()
     //プレイヤーの初期化
     player_->Initialize();
     PlayerCommand::Initialize();
-    playerCamera_->Initialize();
 
-    //デバックカメラの設定
-    debugCamera_->Initialize();
-    debugCamera_->SetTranslation(playerCamera_->GetTransform().translate);
+    //カメラコントローラー
+    cameraController_->Initialize();
+
 
     InitializeLights();
 
@@ -146,12 +148,13 @@ void ShadowGameScene::Initialize()
     boxManager_->Initialize();
     // エレベーター
     elevator_->Initialize();
-    //カーソルを画面中央に設定する
-    auto* input = Input::GetInstance();
-    input->SetIsCursorVisible(false);
-    input->SetIsCursorStability(true);
 
-    SetSceneCameraForDraw(playerCamera_->GetCamera());
+    //カーソルを画面中央に設定する
+    uiManager_->CursorHideAndStop();
+
+
+
+    SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
 }
 
@@ -313,11 +316,9 @@ void ShadowGameScene::InitializeLights()
 #pragma region //private更新処理
 void ShadowGameScene::UpdateCamera()
 {
-    if (useDebugCamera_) {
-        debugCamera_->Update();
-        playerCamera_->GetCamera()->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
-    }
-    Object3dCommon::GetInstance()->SetDefaultCamera(playerCamera_->GetCamera());
+    cameraController_->Update();
+
+    Object3dCommon::GetInstance()->SetDefaultCamera(cameraController_->GetPlayerCamera()->GetCamera());
 #ifdef USE_IMGUI
     if (ImGui::Begin("Camera")) {
         ImGui::Checkbox("Use Debug Camera (F1)", &useDebugCamera_);
@@ -400,10 +401,6 @@ void ShadowGameScene::UpdateGameObject()
     areaLights_[3] = wallManager_->GetAreaLight();
     areaLights_[4] = wallManager2_->GetAreaLight();
 
-    if (!useDebugCamera_) {
-        playerCamera_->Update();
-    }
-
     portalManager_->WarpPlayer(player_.get());
     //プレイヤー
     player_->Update();
@@ -460,7 +457,7 @@ void ShadowGameScene::UpdateGameObject()
         }
     }
 
-    ParticleManager::GetInstance()->Update(playerCamera_->GetCamera());
+    ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 #pragma endregion
 }
 void ShadowGameScene::UpdateLight() {
@@ -522,7 +519,7 @@ void ShadowGameScene::DrawModel() {
     }
 
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-    SetCameraAndDraw(playerCamera_->GetCamera(), true, true, false);
+    SetCameraAndDraw(cameraController_->GetPlayerCamera()->GetCamera(), true, true, false);
 
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer)
@@ -602,6 +599,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
 }
 void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera)
 {
+    portalManager_->SetPlayerCamera(playerCamera);
     portalManager_->SetPlayerCamera(playerCamera);
     key_->SetPlayerCamera(playerCamera);
     edamame_->SetPlayerCamera(playerCamera);

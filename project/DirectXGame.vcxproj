@@ -181,6 +181,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Box\BoxManager.cpp" />
     <ClCompile Include="application\GameObject\Elevator\Elevator.cpp" />
     <ClCompile Include="application\GameObject\Edamame\EdamameModel.cpp" />
+    <ClCompile Include="application\GameObject\CameraController\CameraController.cpp" />
     <ClCompile Include="Engine\Editor\Object3d\EditorObject3d.cpp" />
     <ClCompile Include="Engine\Editor\Primitive\EditorPrimitive.cpp" />
     <ClCompile Include="Engine\Editor\Light\EditorLight.cpp" />
@@ -349,6 +350,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Box\BoxManager.h" />
     <ClInclude Include="application\GameObject\Elevator\Elevator.h" />
     <ClInclude Include="application\GameObject\Edamame\EdamameModel.h" />
+    <ClInclude Include="application\GameObject\CameraController\CameraController.h" />
     <ClInclude Include="Engine\Editor\Object3d\EditorObject3d.h" />
     <ClInclude Include="Engine\Editor\Primitive\EditorPrimitive.h" />
     <ClInclude Include="Engine\Editor\Light\EditorLight.h" />
