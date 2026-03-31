@@ -46,14 +46,14 @@ void Key::Update()
     obj_->SetEnableLighting(false);
     CheckCollision();
 
-    if (isGetKey_|| isLockerHit_|| isChairHit_) {
-        velocity_.y = 0.0f;
-    } else {
-        //重力処理
-        const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-        velocity_.y -= YoshidaMath::kGravity * deltaTime;
-        worldTransform_.translate += velocity_ * deltaTime;
-    }
+    //if (isGetKey_|| isLockerHit_|| isChairHit_) {
+    //    velocity_.y = 0.0f;
+    //} else {
+    //    //重力処理
+    //    const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+    //    velocity_.y -= YoshidaMath::kGravity * deltaTime;
+    //    worldTransform_.translate += velocity_ * deltaTime;
+    //}
 
     //y座標を固定する
     worldTransform_.translate.y = std::clamp(worldTransform_.translate.y, 0.0f, 2.4f);
