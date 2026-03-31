@@ -47,29 +47,30 @@
 #include "Light/CommonLight/SpotCommonLight.h" 
 #include "Light/CommonLight/PointCommonLight.h"
 #include"Audio.h"
+#include <string>
 
-class ShadowGameScene : public BaseScene
-{
+class ShadowGameScene : public BaseScene {
 private:
+	const float kNoiseTimer_ = 0.5f;
+	float noiseTimer_ = kNoiseTimer_;
+	bool isNoise_ = false;
 
-    const float kNoiseTimer_ = 0.5f;
-    float noiseTimer_ = kNoiseTimer_;
-    bool isNoise_ = false;
+	std::unique_ptr<UIManager> uiManager_ = nullptr;
 
-    std::unique_ptr<UIManager> uiManager_ = nullptr;
-
-#pragma region//カメラの設定
-    CameraController* cameraController_ = nullptr;
+#pragma region // カメラの設定
+	CameraController* cameraController_ = nullptr;
 
 #pragma endregion
 
-#pragma region//シーン遷移の設定
-    //シーン遷移の設定
-    std::unique_ptr<SceneTransition> transition_ = nullptr;
-    //遷移入り
-    bool isTransitionIn_ = false;
-    //遷移抜け
-    bool isTransitionOut_ = false;
+#pragma region // シーン遷移の設定
+	// シーン遷移の設定
+	std::unique_ptr<SceneTransition> transition_ = nullptr;
+	// 遷移入り
+	bool isTransitionIn_ = false;
+	// 遷移抜け
+	bool isTransitionOut_ = false;
+	// 遷移完了後の次シーン名
+	std::string nextSceneName_;
 #pragma endregion
 
 #pragma region//ゲームオブジェクトの設定

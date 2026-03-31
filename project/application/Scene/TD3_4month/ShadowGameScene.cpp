@@ -109,6 +109,7 @@ void ShadowGameScene::Initialize()
     transition_->Initialize(false);
     isTransitionIn_ = true;
     isTransitionOut_ = false;
+	nextSceneName_.clear();
 
     //プレイヤーの初期化
     player_->Initialize();
@@ -358,32 +359,25 @@ void ShadowGameScene::UpdateCamera()
 
 }
 
-void ShadowGameScene::UpdateSceneTransition()
-{
-    if (door_->GetOpenMassage()) {
-        transition_->Initialize(false);
-        isTransitionOut_ = true;
-    }
+void ShadowGameScene::UpdateSceneTransition() {
+	if (door_->GetOpenMassage() && !isTransitionOut_) {
+		transition_->Initialize(true);
+		isTransitionOut_ = true;
+		nextSceneName_ = "Result";
+	}
 
-    if (isTransitionIn_ || isTransitionOut_) {
-        transition_->Update();
-        if (transition_->IsEnd() && isTransitionIn_) {
-            isTransitionIn_ = false;
-        }
-        if (transition_->IsEnd() && isTransitionOut_) {
-           
-            if (door_->GetIsOpen()) {
-                //シーンの切り替え
-                SceneManager::GetInstance()->ChangeScene("Result");
-            } 
-            //else if (coffee_->GetInstanceCount() >= 100) {
-            //    //シーンの切り替え
-            //    SceneManager::GetInstance()->ChangeScene("GameOver");
-            //}
-        }
-    
- 
-    }
+	if (isTransitionIn_ || isTransitionOut_) {
+		transition_->Update();
+		if (transition_->IsEnd() && isTransitionIn_) {
+			isTransitionIn_ = false;
+		}
+		if (transition_->IsEnd() && isTransitionOut_) {
+			if (!nextSceneName_.empty()) {
+				// シーンの切り替え
+				SceneManager::GetInstance()->ChangeScene(nextSceneName_);
+			}
+		}
+	}
 }
 
 void ShadowGameScene::UpdatePostEffect()
@@ -509,7 +503,11 @@ void ShadowGameScene::UpdatePlayerDamage() {
 		damageOverlay_->StartDisplay();
 
 		if (playerHp_ <= 0.0f) {
-			SceneManager::GetInstance()->ChangeScene("GameOver");
+			if (!isTransitionOut_) {
+				transition_->Initialize(true);
+				isTransitionOut_ = true;
+				nextSceneName_ = "GameOver";
+			}
 			return;
 		}
 	}
