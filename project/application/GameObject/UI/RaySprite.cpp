@@ -6,6 +6,16 @@
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/Player/Player.h"
 #include"ScreenSize/ScreenSize.h"
+#include"GameObject/Box/BoxManager.h"
+#include"GameObject/Chair/ChairManager.h"
+#include"GameObject/Desk/DeskManager.h"
+#include"GameObject/Door/Door.h"
+#include"GameObject/Edamame/Edamame.h"
+#include"GameObject/Flashlight/Flashlight.h"
+#include"GameObject/Key/Key.h"
+#include"GameObject/Elevator/Elevator.h"
+#include"GameObject/Locker/LockerManager.h"
+#include"GameObject/VendingMac/VendingMac.h"
 
 RaySprite::RaySprite()
 {
@@ -40,13 +50,18 @@ void RaySprite::Update()
 	} else {
 		SetTexture(RaySprite::HAND);
 	}
+
 	sprite_->Update();
 }
 
 void RaySprite::Draw()
 {
 	SpriteCommon::GetInstance()->DrawCommon();
-	sprite_->Draw();
+
+	if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortal()) {
+		sprite_->Draw();
+	}
+	
 }
 
 void RaySprite::SetTexture(const TextureUI num)
@@ -65,4 +80,16 @@ void RaySprite::SetTexture(const TextureUI num)
 	default:
 		break;
 	}
+}
+
+bool RaySprite::IsRayHit()
+{
+	return BoxManager::IsRayHit()||
+	ChairManager::IsRayHit() ||
+	DeskManager::IsRayHit() ||
+	LockerManager::IsRayHit() ||
+	Door::IsRayHit() ||
+	Edamame::IsRayHit() ||
+	Flashlight::IsRayHit() ||
+	Key::IsRayHit()|| VendingMac::IsRayHit();
 }

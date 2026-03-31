@@ -17,6 +17,8 @@ public:
     void Draw();
     void SetTexture(const TextureUI num);
 private:
+    bool IsRayHit();
+private:
     std::unique_ptr<Sprite> sprite_ = nullptr;
     uint32_t grabHandle_ = 0;
     uint32_t handHandle_ = 0;

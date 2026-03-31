@@ -28,6 +28,7 @@ public:
     void UpdateSpotLight();
     void SetPlayer(Player* player) { player_ = player; }
     static bool IsGetLight() { return isGetLight_; }
+    static bool IsRayHit() { return isRayHit_; }
 private:
     bool OnCollisionRay();
 private:
@@ -38,7 +39,7 @@ private:
     static bool isGetLight_;
   //SpotLight
     SpotCommonLight spotLight_;
-
+    static bool isRayHit_;
     static bool isSendGetLightMessage_;
 };
 

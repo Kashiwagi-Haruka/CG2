@@ -7,6 +7,8 @@
 #include"Object3d/Object3dCommon.h"
 #include"GameObject/BGMManager/BGMManager.h"
 
+bool Edamame::isRayHit_ = false;
+
 Edamame::Edamame()
 {
     obj_ = std::make_unique<Object3d>();
@@ -28,6 +30,7 @@ Edamame::~Edamame()
 
 void Edamame::Initialize()
 {
+    isRayHit_ = false;
     worldTransform_ = {
         .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f, 0.0f, 0.0f},
@@ -98,8 +101,9 @@ void Edamame::SetCamera(Camera* camera)
 
 void Edamame::CheckCollision()
 {
+    isRayHit_ = OnCollisionRay();
     //keyとrayの当たり判定
-    if (OnCollisionRay()) {
+    if (isRayHit_) {
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (!BGMManager::GetIsEdamameSound()) {
                 BGMManager::SoundPlay(BGMManager::EDAMAME, false);

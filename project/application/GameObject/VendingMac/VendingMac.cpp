@@ -6,8 +6,12 @@
 #include<imgui.h>
 #include"GameObject/SEManager/SEManager.h"
 
+
+bool VendingMac::isRayHit_ = false;
+
 VendingMac::VendingMac()
 {
+
     obj_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/vendingMac", "vendingMac");
     obj_->SetModel("vendingMac");
@@ -62,6 +66,7 @@ void VendingMac::Update()
 
 void VendingMac::Initialize()
 {
+    isRayHit_ = false;
     isCoffeeEventStart_ = false;
     obj_->Initialize();
     SEManager::SoundPlay(SEManager::NOISE, true);
@@ -74,15 +79,18 @@ void VendingMac::Draw()
 
 void VendingMac::CheckCollision()
 {
+    isRayHit_ = OnCollisionRay();
+
     //自販機とrayの当たり判定
-    if (OnCollisionRay()) {
+    if (isRayHit_) {
+
         if (PlayerCommand::GetInstance()->Interact()) {
 
             if (SEManager::IsSoundFinished(SEManager::VENDING_MAC)) {
                 SEManager::SoundPlay(SEManager::VENDING_MAC);
             }
 
-            if (rand() % 10 == 2) {
+            if (rand() % 10 == 0) {
            
                 if (!isCoffeeEventStart_) {
                     isCoffeeEventStart_ = true;

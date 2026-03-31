@@ -4,6 +4,7 @@
 namespace {
     uint32_t maxNum_ = 2;
 }
+bool BoxManager::isRayHit_ = false;
 
 BoxManager::BoxManager()
 {
@@ -30,6 +31,8 @@ void BoxManager::SetCamera(Camera* camera)
 
 void BoxManager::Initialize()
 {
+    isRayHit_ = false;
+
     for (auto& box : boxes_) {
         box->Initialize();
     }
@@ -50,6 +53,16 @@ void BoxManager::Update()
 {
     for (auto& box : boxes_) {
         box->Update();
+    }
+
+    isRayHit_ = false;
+
+    for (auto& box : boxes_) {
+        if (box->IsRayHit()) {
+            isRayHit_ = true;
+            break;
+        }
+       
     }
 }
 

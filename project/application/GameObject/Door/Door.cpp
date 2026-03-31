@@ -11,7 +11,7 @@
 
 bool Door::isSendOpenMessage_ = false;
 bool Door::isSendLockMessage_ = false;
-
+bool Door::isRayHit_ = false;
 Door::Door()
 {
     obj_ = std::make_unique<Object3d>();
@@ -92,6 +92,7 @@ void Door::Initialize()
     isSendOpenMessage_ = false;
 
     isOpen_ = false;
+    isRayHit_ = false;
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/door", "door");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "0Idle", true);
@@ -117,8 +118,9 @@ void Door::Draw()
 
 void Door::CheckCollision()
 {
+    isRayHit_ = OnCollisionRay();
     //自販機とrayの当たり判定
-    if (OnCollisionRay()) {
+    if (isRayHit_) {
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (Key::IsGetKey()) {
                 desiredAnimationName = "2Open";

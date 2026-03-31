@@ -37,6 +37,8 @@ void Box::Update()
 {
     Mirror();
 
+
+    isRayHit_ = OnCollisionRay();
     // インタラクトをトリガーすると
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
 
@@ -47,7 +49,7 @@ void Box::Update()
             PlayerCommand::SetIsGrab(false);
         } else {
             // rayと重なる
-            if (OnCollisionRay()) {
+            if (isRayHit_) {
                 if (!PlayerCommand::GetIsGrab()) {
                     isGrab_ = true;
                     //プレイヤーの状態をセットする
@@ -67,7 +69,7 @@ void Box::Update()
 
 void Box::Initialize()
 {
-
+    isRayHit_ = false;
     obj_->Initialize();
     velocity_ = { 0.0f };
     transform_ = obj_->GetTransform();
@@ -120,6 +122,7 @@ void Box::Grab()
 bool Box::OnCollisionRay()
 {
     return playerCamera_->OnCollisionRay(GetAABB(), transform_.translate);
+   
 }
 
 void Box::SetPlayerCamera(PlayerCamera* camera)

@@ -2,6 +2,7 @@
 #include"GameBase.h"
 #include"GameObject/KeyBindConfig.h"
 #include"GameObject/CameraController/CameraController.h"
+#include"GameObject/UI/UIManager.h"
 
 void FirstGameEvent::Update()
 {
@@ -52,7 +53,6 @@ void FirstGameEvent::OnStart()
     auto* cameraController = CameraController::GetInstance();
     cameraController->SetEventMode(true);
     cameraController->MoveTo({ 6.0f,1.0f,-6.0f }, { 0.0f,Function::kPi,0.0f }, { 8.0f,1.0f,-6.0f }, { 0.0f,Function::kPi,0.0f }, 5.0f);
-
 }
 
 void FirstGameEvent::OnEnd()
