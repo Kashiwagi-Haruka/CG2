@@ -68,65 +68,61 @@ void VendingMac::Initialize()
 {
     isRayHit_ = false;
     isCoffeeEventStart_ = false;
+  	interactRequested_ = false;
     obj_->Initialize();
     SEManager::SoundPlay(SEManager::NOISE, true);
 }
 
-void VendingMac::Draw()
-{
-    obj_->Draw();
-}
+void VendingMac::Draw() { obj_->Draw(); }
+
 
 void VendingMac::CheckCollision()
 {
     isRayHit_ = OnCollisionRay();
 
-    //自販機とrayの当たり判定
-    if (isRayHit_) {
-
-        if (PlayerCommand::GetInstance()->Interact()) {
-
-            if (SEManager::IsSoundFinished(SEManager::VENDING_MAC)) {
+	if (isRayHit_) {
+		if (PlayerCommand::GetInstance()->InteractTrigger()) {
+			
+                 if (SEManager::IsSoundFinished(SEManager::VENDING_MAC)) {
                 SEManager::SoundPlay(SEManager::VENDING_MAC);
             }
-
+            
+            
             if (rand() % 10 == 0) {
            
-                if (!isCoffeeEventStart_) {
-                    isCoffeeEventStart_ = true;
+                if (!interactRequested_) {
+                    interactRequested_ = true;
                 }
             }
-         
-          
+    
+		}
+	}
 
-        }
-    }
 }
 
-float VendingMac::GetVol(float length, float maxVol)
-{
-    if (length >= 100.0f) {
-        return 0.0f;
-    } else  if (length > 1.0f) {
-        float vol = 1.0f / length;
-        return  vol * maxVol;
-    }
+float VendingMac::GetVol(float length, float maxVol) {
+	if (length >= 100.0f) {
+		return 0.0f;
+	} else if (length > 1.0f) {
+		float vol = 1.0f / length;
+		return vol * maxVol;
+	}
 
-    return maxVol;
+	return maxVol;
 }
 
-bool VendingMac::OnCollisionRay()
-{
-    return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate());
-}
+bool VendingMac::OnCollisionRay() { return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate()); }
 
-void VendingMac::SetPlayerCamera(PlayerCamera* camera)
-{
-    playerCamera_ = camera;
-}
+void VendingMac::SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; }
 
-void VendingMac::SetCamera(Camera* camera)
-{
-    obj_->SetCamera(camera);
-    obj_->UpdateCameraMatrices();
+void VendingMac::SetCamera(Camera* camera) {
+	obj_->SetCamera(camera);
+	obj_->UpdateCameraMatrices();
+}
+Vector3 VendingMac::GetForward() const { return YoshidaMath::GetForward(obj_->GetWorldMatrix()); }
+
+bool VendingMac::ConsumeInteractRequest() {
+	const bool requested = interactRequested_;
+	interactRequested_ = false;
+	return requested;
 }

@@ -8,9 +8,7 @@
 
 class Camera;
 
-class VendingMac :
-    public YoshidaMath::Collider
-{
+class VendingMac : public YoshidaMath::Collider {
 public:
     VendingMac();
     ~VendingMac();
@@ -28,14 +26,15 @@ public:
     AreaCommonLight& GetAreaLight() { return  areaLight_; }
     bool GetIsEventStart() { return isCoffeeEventStart_; }
    static bool IsRayHit() { return isRayHit_; };
+  	Vector3 GetForward() const;
+  	bool ConsumeInteractRequest();
 private:
-    static bool isRayHit_;
-    bool isCoffeeEventStart_ = false;
-    float GetVol(float length, float maxVol);
-    bool OnCollisionRay();
-    PlayerCamera* playerCamera_ = nullptr;
-    std::unique_ptr<Object3d>obj_ = nullptr;
-    AreaCommonLight areaLight_;
-    Vector3 translate_ = { 0.0f };
+	float GetVol(float length, float maxVol);
+	bool OnCollisionRay();
+      static bool isRayHit_;
+	PlayerCamera* playerCamera_ = nullptr;
+	std::unique_ptr<Object3d> obj_ = nullptr;
+	AreaCommonLight areaLight_;
+	Vector3 translate_ = {0.0f};
+	bool interactRequested_ = false;
 };
-

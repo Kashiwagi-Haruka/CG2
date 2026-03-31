@@ -12,6 +12,13 @@ public:
 	void Update(Camera* camera, const Vector3& lightDirection);
 	void Draw();
 	uint32_t GetInstanceCount() const;
+	void SetSpawnOrigin(const Vector3& spawnOrigin);
+	void SetLaunchDirection(const Vector3& launchDirection);
+	void SetFloorY(float floorY);
+	void SetSpawnContainment(const Vector3& center, float topY, float radius);
+	void StartSpill();
+
+		void SetRoomBounds(float minX, float maxX, float minZ, float maxZ);
 
 private:
 	struct InstanceData {
@@ -19,7 +26,7 @@ private:
 		Vector3 velocity = {0.0f, 0.0f, 0.0f};
 		Vector3 rotation = {0.0f, 0.0f, 0.0f};
 		Vector3 angularVelocity = {0.0f, 0.0f, 0.0f};
-		float scale = 1.0f;
+		float scale = 0.5f;
 		float radius = 0.25f;
 		float halfHeight = 0.15f;
 		bool isActive = false;
@@ -52,4 +59,7 @@ private:
 	uint32_t renderedInstanceCapacity_ = 0;
 	float spawnTimer_ = 0.0f;
 	float nextSpawnInterval_ = 0.0f;
+	Vector3 spawnOrigin_ = {0.0f, 5.0f, 0.0f};
+	Vector3 launchDirection_ = {0.0f, 0.0f, 1.0f};
+	bool isSpilling_ = false;
 };
