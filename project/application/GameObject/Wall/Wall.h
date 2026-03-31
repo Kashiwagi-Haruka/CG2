@@ -6,6 +6,7 @@
 
 class Camera;
 
+
 class Wall :
     public YoshidaMath::Collider
 {
@@ -24,6 +25,7 @@ public:
     //親を設定する
     void SetParentMatrix(Matrix4x4* parent) { parentMat_ = parent; }
     void SetST(const Vector3& scale, const Vector3& translate);
+    const Matrix4x4& GetWorldMatrix() const { return primitive_->GetWorldMatrix(); };
 private:
     Matrix4x4* parentMat_ = nullptr;
     std::unique_ptr<Primitive>primitive_ = nullptr;

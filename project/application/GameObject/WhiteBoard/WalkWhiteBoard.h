@@ -30,7 +30,7 @@ public:
     void ResetCollisionAttribute()override;
     void SetIsMove(const bool isMove) { isMove_ = isMove; }
     void SetCollisionAttributeNoneAndInitialize()override;
-
+    const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
 private:
     bool isMove_ = false;
   

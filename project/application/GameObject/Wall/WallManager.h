@@ -11,13 +11,13 @@ class WallManager
 public:
     WallManager();
     ~WallManager();
-    void Initialize();
-    void Update();
-    void Draw();
+    virtual void Initialize();
+    virtual void Update();
+    virtual void Draw();
     void SetCamera(Camera* camera);
     std::vector<std::unique_ptr<Wall>>& GetWalls() { return walls_; };
     AreaCommonLight& GetAreaLight() { return  areaLight_; }
-private:
+protected:
     std::unique_ptr <Primitive>plane_ = nullptr;
     AreaCommonLight areaLight_;
     Matrix4x4 roomMat_= { 0.0f };

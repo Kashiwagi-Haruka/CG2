@@ -31,6 +31,12 @@ struct AABB {
 	Vector3 max;
 };
 
+struct OBB {
+	Vector3 center;      // ワールド座標の中心
+	Vector3 halfSize;    // 半径（scale * 0.5）
+	Vector3 axis[3];     // x,y,z の方向ベクトル（正規化）
+};
+
 namespace RigidBody {
 
 // -----------------------------------------

@@ -29,7 +29,7 @@ private:
     std::list<YoshidaMath::Collider*> colliders_; // コライダーのリスト
 
     void  CheckCollisionPair(YoshidaMath::Collider* a, YoshidaMath::Collider* b);
-
+    void OnCollision(YoshidaMath::Collider* a, YoshidaMath::Collider* b);
     /// @brief コライダー2つの衝突判定と応答
     /// @param colliderA コライダーA
     /// @param colliderB コライダーB
@@ -47,5 +47,14 @@ private:
 /// @param colliderB コライダーB
 /// @param score スコアポインタ
     void CheckCollisionSphereAABBPair(YoshidaMath::Collider* colliderA, YoshidaMath::Collider* colliderB);
+    /// @brief コライダー2つの衝突判定と応答
+/// @param colliderA コライダーA
+/// @param colliderB コライダーB
+/// @param score スコアポインタ
+    void CheckCollisionOBBPair(YoshidaMath::Collider* colliderA, YoshidaMath::Collider* colliderB);
+    /// @param colliderA コライダーA
+/// @param colliderB コライダーB
+/// @param score スコアポインタ
+    void CheckCollisionAABBOBBPair(YoshidaMath::Collider* colliderA, YoshidaMath::Collider* colliderB);
 
 };

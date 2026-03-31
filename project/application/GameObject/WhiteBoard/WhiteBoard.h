@@ -13,7 +13,7 @@ public:
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
     Vector3 GetWorldPosition() const  override;
-
+    const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
     virtual void Initialize();
     virtual void Update();
     virtual void Draw();

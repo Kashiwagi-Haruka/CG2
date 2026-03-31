@@ -29,7 +29,7 @@ public:
 	void SetTextureIndex(uint32_t textureIndex) { textureIndex_ = textureIndex; }
 	void SetObjectCamera(Camera* camera) { objectCamera_ = camera; }
 	void SetTextureCamera(Camera* camera) { textureCamera_ = camera; }
-
+	const Matrix4x4& GetWorldMatrix()const { return worldMatrix_; };
 private:
 	struct alignas(256) TransformationMatrix {
 		Matrix4x4 WVP;

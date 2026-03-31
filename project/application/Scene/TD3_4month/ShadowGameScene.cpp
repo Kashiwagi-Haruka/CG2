@@ -56,7 +56,7 @@ ShadowGameScene::ShadowGameScene()
     //壁管理
     wallManager_ = std::make_unique<WallManager>();
     //壁管理
-    wallManager2_ = std::make_unique<WallManager>();
+    wallManager2_ = std::make_unique<WallManager2>();
     //自販機
     vendingMac_ = std::make_unique<VendingMac>();
     //椅子

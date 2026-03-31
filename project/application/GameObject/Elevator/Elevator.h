@@ -24,5 +24,5 @@ private:
 	float animationTime_ = 0.0f;
 	float animationSpeed_ = 1.2f;
 	float animationAmplitude_ = 0.35f;
-	float baseHeight_ = 0.9f;
+	float baseHeight_ = 2.4f;
 };

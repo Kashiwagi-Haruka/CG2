@@ -29,6 +29,7 @@ public:
     Vector3 GetWorldPosition() const override;
     void SetAnimationGroupName(const std::string& name) { animationGroupName_ = name; }
     static bool IsRayHit() { return isRayHit_; }
+    const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
 private:
     // アニメーション
     void Animation();

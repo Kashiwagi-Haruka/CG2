@@ -83,7 +83,9 @@ public:
     // 前方のベクトルを取得する
     const Vector3& GetForward() const { return forward_; };
     // ワールド行列の取得
-    const Matrix4x4& GetWorldMatrix() const { return bodyObj_->GetWorldMatrix(); }
+   const Matrix4x4& GetWorldMatrix()const override {
+       return bodyObj_->GetWorldMatrix();
+   };
     void SetTranslate(const Vector3& translate) { transform_.translate = translate; };
     void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
     // コンストラクタ

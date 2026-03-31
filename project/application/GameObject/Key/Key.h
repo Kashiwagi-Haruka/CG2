@@ -29,6 +29,7 @@ public:
     static bool GetGetKeyMessage() { return isSendGetKeyMessage_; }
     static bool IsGetKey() { return isGetKey_; }
     static bool IsRayHit() { return isRayHit_; };
+    const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
 private:
    static bool isRayHit_;
     std::unique_ptr<Object3d>obj_ = nullptr;
