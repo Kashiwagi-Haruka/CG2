@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "ShadowGameScene.h"
 #include "Input.h"
 #include "SceneManager.h"
@@ -6,11 +7,11 @@
 #include"DirectXCommon.h"
 #include<numbers>
 #include"RigidBody.h"
-#include "WinApp.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
+#include <algorithm>
 
 
 ShadowGameScene::ShadowGameScene()
@@ -79,6 +80,8 @@ ShadowGameScene::ShadowGameScene()
     firstEvent_ = std::make_unique<FirstGameEvent>();
     //PlayerCameraをセットする
     SetPlayerCamera(cameraController_->GetPlayerCamera());
+
+	damageOverlay_ = std::make_unique<DamageOverlay>();
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -97,6 +100,8 @@ void ShadowGameScene::Initialize()
 
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;
+	playerHp_ = kPlayerMaxHp_;
+	damageCooldownTimer_ = 0.0f;
 
     //シーン遷移の設定
     transition_->Initialize(false);
@@ -190,6 +195,7 @@ void ShadowGameScene::Update()
 
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
+	UpdatePlayerDamage();
     //オブジェクトの当たり判定
     CheckCollision();
   
@@ -203,11 +209,12 @@ void ShadowGameScene::Draw()
 
     //スプライト共通
     SpriteCommon::GetInstance()->DrawCommon();
-
+	damageOverlay_->Draw();
     if (!currentEvent_->IsRunning()) {
         //UI管理を描画する
         uiManager_->Draw();
     }
+
     ////シーン遷移の描画処理
     //DrawSceneTransition();
 }
@@ -480,6 +487,26 @@ void ShadowGameScene::UpdateGameObject()
 
     ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 
+}
+void ShadowGameScene::UpdatePlayerDamage() {
+	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+	damageCooldownTimer_ = std::max(0.0f, damageCooldownTimer_ - deltaTime);
+	damageOverlay_->Update(deltaTime, playerHp_, kPlayerMaxHp_);
+
+	constexpr float kCoffeeHitSpeedThreshold = 2.0f;
+	constexpr float kPlayerHitRadius = 0.45f;
+	constexpr float kDamageCooldown = 0.7f;
+
+	if (damageCooldownTimer_ <= 0.0f && coffees_->CheckHitPlayer(player_->GetWorldPosition(), kPlayerHitRadius, kCoffeeHitSpeedThreshold)) {
+		playerHp_ = std::max(0, playerHp_ - 1);
+		damageCooldownTimer_ = kDamageCooldown;
+		damageOverlay_->StartDisplay();
+
+		if (playerHp_ <= 0) {
+			SceneManager::GetInstance()->ChangeScene("GameOver");
+			return;
+		}
+	}
 }
 void ShadowGameScene::UpdateLight() {
 #pragma region // Lightを組み込む

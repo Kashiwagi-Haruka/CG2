@@ -502,3 +502,38 @@ void Coffees::SetSpawnContainment(const Vector3& center, float topY, float radiu
 }
 
 void Coffees::StartSpill() { isSpilling_ = true; }
+
+bool Coffees::CheckHitPlayer(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const {
+	if (!isSpilling_) {
+		return false;
+	}
+
+	const float minHitSpeedSq = minHitSpeed * minHitSpeed;
+	for (uint32_t i = 0; i < activeInstanceCount_; ++i) {
+		const InstanceData& instance = instances_[i];
+		if (!instance.isActive) {
+			continue;
+		}
+
+		const float speedSq = instance.velocity.x * instance.velocity.x + instance.velocity.y * instance.velocity.y + instance.velocity.z * instance.velocity.z;
+		if (speedSq < minHitSpeedSq) {
+			continue;
+		}
+
+		const float dx = instance.position.x - playerPosition.x;
+		const float dz = instance.position.z - playerPosition.z;
+		const float collisionRadius = instance.radius + playerRadius;
+		if (dx * dx + dz * dz <= collisionRadius * collisionRadius) {
+			const float topA = instance.position.y + instance.halfHeight;
+			const float bottomA = instance.position.y - instance.halfHeight;
+			const float playerHalfHeight = 0.9f;
+			const float topB = playerPosition.y + playerHalfHeight;
+			const float bottomB = playerPosition.y - playerHalfHeight;
+			if (bottomA <= topB && topA >= bottomB) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}

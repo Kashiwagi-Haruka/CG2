@@ -30,7 +30,7 @@
 #include"GameObject/PC/PC.h"
 
 #include "GameObject/Coffee/Coffees.h"
-
+#include "GameObject/UI/DamageOverlay.h"
 
 #pragma endregion
 
@@ -138,6 +138,11 @@ private:
     bool useSpotShadow_ = false;
     bool useAreaShadow_ = false;
 
+        int playerHp_ = 3;
+	static constexpr int kPlayerMaxHp_ = 3;
+	float damageCooldownTimer_ = 0.0f;
+	std::unique_ptr<DamageOverlay> damageOverlay_ = nullptr;
+
 public:
     //シーンのコンストラクタ
     ShadowGameScene();
@@ -171,6 +176,7 @@ private:
     void UpdatePostEffect();
     //ゲームオブジェクトの更新処理
     void UpdateGameObject();
+	void UpdatePlayerDamage();
     //ポイントライトの更新処理
     void UpdateLight();
     // =======================================
