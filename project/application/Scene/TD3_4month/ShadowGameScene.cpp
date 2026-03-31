@@ -217,8 +217,8 @@ void ShadowGameScene::Draw()
         uiManager_->Draw();
     }
 
-    ////シーン遷移の描画処理
-    //DrawSceneTransition();
+    //シーン遷移の描画処理
+    DrawSceneTransition();
 }
 
 void ShadowGameScene::Finalize()
