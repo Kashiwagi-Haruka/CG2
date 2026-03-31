@@ -15,13 +15,12 @@ Box::Box()
     obj_->SetModel("box");
     SetAABB({ .min = {-0.25f,-0.125f,-0.25f},.max = {0.25f,0.125f,0.25f} });
     SetCollisionAttribute(kCollisionItem);
-    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionKey | kCollisionWall
-    |kCollisionDesk);
+    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionKey | kCollisionWall);
 }
 
 void Box::OnCollision(Collider* collider)
 {
-    if (collider->GetCollisionAttribute() == kCollisionDesk) {
+    if (collider->GetCollisionAttribute() == kCollisionWall|| collider->GetCollisionAttribute() == kCollisionFloor) {
         obj_->SetColor(COLOR::RED);
     } else {
         obj_->SetColor(COLOR::WHITE);

@@ -16,6 +16,7 @@ public:
 		CHAIR,
 		TYPE,
 		VENDING_MAC,
+		KEY,
 	};
 
 private:

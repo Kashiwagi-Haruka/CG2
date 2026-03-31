@@ -36,5 +36,6 @@ private:
     bool isChairHit_ = false;
    static bool isGetKey_;
     static bool isSendGetKeyMessage_;
+    bool isLockerHit_ = false;
 };
 

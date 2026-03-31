@@ -7,6 +7,8 @@
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
 #include"imgui.h"
+#include"GameObject/SEManager/SEManager.h"
+
 bool Key::isSendGetKeyMessage_ = false;
 bool Key::isGetKey_ = false;
 
@@ -16,21 +18,22 @@ Key::Key()
     // モデルをセット
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/key", "key");
     obj_->SetModel("key");
-    SetAABB({ .min = { -0.25f,-0.25f,-0.25f }, .max = { 0.25f,0.25f,0.25f } });
+    SetAABB({ .min = { -0.1f,-0.1f,-0.1f }, .max = { 0.1f,0.1f,0.1f } });
     SetCollisionAttribute(kCollisionKey);
-    SetCollisionMask(kCollisionChair | kCollisionLocker | kCollisionFloor | kCollisionDesk);
+    SetCollisionMask(kCollisionChair | kCollisionWall | kCollisionFloor);
 }
 
 void Key::Initialize()
 {
+
     worldTransform_ = {
         .scale{2.0f, 2.0f, 2.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{-1.0f, 2.4f, -6.5f}
+        .translate{-1.0f, 2.0f, -6.5f}
     };
     velocity_ = { 0.0f };
     obj_->Initialize();
-
+    isLockerHit_ = false;
     isGetKey_ = false;
     isChairHit_ = false;
     isSendGetKeyMessage_ = false;
@@ -42,8 +45,9 @@ void Key::Update()
     obj_->SetEnableLighting(false);
     CheckCollision();
 
-    //鍵を持っていないとき
-    if (!isGetKey_) {
+    if (isGetKey_|| isLockerHit_|| isChairHit_) {
+        velocity_.y = 0.0f;
+    } else {
         //重力処理
         const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
         velocity_.y -= YoshidaMath::kGravity * deltaTime;
@@ -92,17 +96,18 @@ void Key::SetModel(const std::string& filePath)
 
 void Key::CheckCollision()
 {
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
-
-        if (!isGetKey_) {
-            if (OnCollisionRay() && !PlayerCommand::GetIsGrab()) {
-                isGetKey_ = true;
-                isSendGetKeyMessage_ = true;
-
-            }
-        }
-
+    if (isGetKey_) {
+        return;
     }
+    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+        if (OnCollisionRay() && !PlayerCommand::GetIsGrab()) {
+            isGetKey_ = true;
+            isSendGetKeyMessage_ = true;
+            SEManager::SoundPlay(SEManager::KEY);
+        }
+    }
+    
+
 }
 
 bool Key::OnCollisionRay()
@@ -113,18 +118,30 @@ bool Key::OnCollisionRay()
 void Key::OnCollision(Collider* collider)
 {
 
-    if (collider->GetCollisionAttribute() == kCollisionChair) {
-        if (!isChairHit_) {
-            isChairHit_ = true;
-        }
-    }
+        isLockerHit_ = false;
 
-    //押し戻し処理
-    YoshidaMath::ResolveCollision(worldTransform_.translate, velocity_, GetCollisionInfo());
+        if (collider->GetCollisionAttribute() == kCollisionWall) {
+            if (!isLockerHit_) {
+                isLockerHit_ = true;
+            }
+        }
+
+        if (collider->GetCollisionAttribute() == kCollisionChair) {
+            if (!isChairHit_) {
+                isChairHit_ = true;
+            }
+        }
+
+        if (collider->GetCollisionAttribute() == kCollisionFloor) {
+
+        }
+    
+
+
+
 }
 
 Vector3 Key::GetWorldPosition() const
 {
-    //親子関係を付けている場合はこれ
-    return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
+    return  worldTransform_.translate;
 }
