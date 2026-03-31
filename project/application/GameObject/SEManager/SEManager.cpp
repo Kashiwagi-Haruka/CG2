@@ -17,6 +17,7 @@ void SEManager::Load() {
 	SEs_[NOISE] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/noise.mp3");
 	SEs_[CHAIR] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/chair.mp3");
 	SEs_[TYPE] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/voiceSE.mp3");
+	SEs_[VENDING_MAC] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/vendingMac.mp3");
 }
 
 void SEManager::Initialize() {
@@ -31,6 +32,7 @@ void SEManager::Initialize() {
 	SetVol(0.5f, CHAIR);
 
 	SetVol(1.0f, TYPE);
+	SetVol(1.0f, VENDING_MAC);
 }
 
 void SEManager::Update() {}
@@ -57,4 +59,12 @@ void SEManager::UnLoad() {
 	Audio::GetInstance()->SoundUnload(&SEs_[NOISE]);
 	Audio::GetInstance()->SoundUnload(&SEs_[CHAIR]);
 	Audio::GetInstance()->SoundUnload(&SEs_[TYPE]);
+	Audio::GetInstance()->SoundUnload(&SEs_[VENDING_MAC]);
+}
+
+bool SEManager::IsSoundFinished(const Data& data)
+{
+	assert(SEs_.contains(data));
+	return Audio::GetInstance()->IsSoundFinished(SEs_[data]);
+
 }

@@ -15,11 +15,11 @@ public:
 		NOISE,
 		CHAIR,
 		TYPE,
+		VENDING_MAC,
 	};
 
 private:
 	static std::unordered_map<SEManager::Data, SoundData> SEs_;
-
 public:
 	static void Load();
 	static void Initialize();
@@ -27,4 +27,5 @@ public:
 	static void SetVol(float vol, const Data& data);
 	static void SoundPlay(const Data& data, const bool loop = false);
 	static void UnLoad();
+	static bool IsSoundFinished(const Data& data);
 };

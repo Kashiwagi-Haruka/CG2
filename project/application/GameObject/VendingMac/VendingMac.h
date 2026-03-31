@@ -26,7 +26,9 @@ public:
     void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
     AreaCommonLight& GetAreaLight() { return  areaLight_; }
+    bool GetIsEventStart() { return isCoffeeEventStart_; }
 private:
+    bool isCoffeeEventStart_ = false;
     float GetVol(float length, float maxVol);
     bool OnCollisionRay();
     PlayerCamera* playerCamera_ = nullptr;
