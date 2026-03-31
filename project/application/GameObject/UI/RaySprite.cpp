@@ -16,7 +16,7 @@
 #include"GameObject/Elevator/Elevator.h"
 #include"GameObject/Locker/LockerManager.h"
 #include"GameObject/VendingMac/VendingMac.h"
-
+#include"GameObject/PC/PC.h"
 RaySprite::RaySprite()
 {
 	handHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/hand.png");
@@ -91,5 +91,5 @@ bool RaySprite::IsRayHit()
 	Door::IsRayHit() ||
 	Edamame::IsRayHit() ||
 	Flashlight::IsRayHit() ||
-	Key::IsRayHit()|| VendingMac::IsRayHit();
+	Key::IsRayHit()|| VendingMac::IsRayHit()||PC::IsRayHit();
 }
