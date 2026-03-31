@@ -138,45 +138,47 @@ private:
     bool useSpotShadow_ = false;
     bool useAreaShadow_ = false;
 
-        int playerHp_ = 3;
-	static constexpr int kPlayerMaxHp_ = 3;
+ 	float playerHp_ = 3.0f;
+	static constexpr float kPlayerMaxHp_ = 3.0f;
 	float damageCooldownTimer_ = 0.0f;
 	std::unique_ptr<DamageOverlay> damageOverlay_ = nullptr;
 
 public:
-    //シーンのコンストラクタ
-    ShadowGameScene();
-    //デストラクタ
-    ~ShadowGameScene() override;
-    //初期化処理
-    void Initialize() override;
-    //更新処理
-    void Update() override;
-    //描画処理
-    void Draw() override;
-    //終了処理
-    void Finalize() override;
-    //デバック
-    void DebugImGui();
-    //衝突判定チェック
-    void CheckCollision();
+	// シーンのコンストラクタ
+	ShadowGameScene();
+	// デストラクタ
+	~ShadowGameScene() override;
+	// 初期化処理
+	void Initialize() override;
+	// 更新処理
+	void Update() override;
+	// 描画処理
+	void Draw() override;
+	// 終了処理
+	void Finalize() override;
+	// デバック
+	void DebugImGui();
+	// 衝突判定チェック
+	void CheckCollision();
+
 private:
-    // =======================================
-    // プライベート初期化
-    // =======================================
-    void InitializeLights();
-    // =======================================
-    // プライベート更新処理
-    // =======================================
-    //カメラの更新処理
-    void UpdateCamera();
-    //シーン遷移の更新処理
-    void UpdateSceneTransition();
-    //ポストエフェクトの更新処理
-    void UpdatePostEffect();
-    //ゲームオブジェクトの更新処理
-    void UpdateGameObject();
+	// =======================================
+	// プライベート初期化
+	// =======================================
+	void InitializeLights();
+	// =======================================
+	// プライベート更新処理
+	// =======================================
+	// カメラの更新処理
+	void UpdateCamera();
+	// シーン遷移の更新処理
+	void UpdateSceneTransition();
+	// ポストエフェクトの更新処理
+	void UpdatePostEffect();
+	// ゲームオブジェクトの更新処理
+	void UpdateGameObject();
 	void UpdatePlayerDamage();
+	void ApplyPlayerDamage(float damageAmount);
     //ポイントライトの更新処理
     void UpdateLight();
     // =======================================

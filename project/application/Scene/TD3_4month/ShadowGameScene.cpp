@@ -12,6 +12,7 @@
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
 #include <algorithm>
+#include <cmath>
 
 
 ShadowGameScene::ShadowGameScene()
@@ -492,6 +493,10 @@ void ShadowGameScene::UpdateGameObject()
 void ShadowGameScene::UpdatePlayerDamage() {
 	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	damageCooldownTimer_ = std::max(0.0f, damageCooldownTimer_ - deltaTime);
+
+	constexpr float kHpRegenPerSecond = 0.2f;
+	playerHp_ = std::min(kPlayerMaxHp_, playerHp_ + (kHpRegenPerSecond * deltaTime));
+
 	damageOverlay_->Update(deltaTime, playerHp_, kPlayerMaxHp_);
 
 	constexpr float kCoffeeHitSpeedThreshold = 2.0f;
@@ -499,14 +504,21 @@ void ShadowGameScene::UpdatePlayerDamage() {
 	constexpr float kDamageCooldown = 0.7f;
 
 	if (damageCooldownTimer_ <= 0.0f && coffees_->CheckHitPlayer(player_->GetWorldPosition(), kPlayerHitRadius, kCoffeeHitSpeedThreshold)) {
-		playerHp_ = std::max(0, playerHp_ - 1);
+		ApplyPlayerDamage(1.0f);
 		damageCooldownTimer_ = kDamageCooldown;
 		damageOverlay_->StartDisplay();
 
-		if (playerHp_ <= 0) {
+		if (playerHp_ <= 0.0f) {
 			SceneManager::GetInstance()->ChangeScene("GameOver");
 			return;
 		}
+	}
+}
+
+void ShadowGameScene::ApplyPlayerDamage(float damageAmount) {
+	playerHp_ = std::max(0.0f, playerHp_ - damageAmount);
+	if (playerHp_ > 1.0f && playerHp_ < kPlayerMaxHp_) {
+		playerHp_ = std::floor(playerHp_);
 	}
 }
 void ShadowGameScene::UpdateLight() {

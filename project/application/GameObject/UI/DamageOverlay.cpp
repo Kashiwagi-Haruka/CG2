@@ -15,15 +15,17 @@ void DamageOverlay::Initialize() {
 	sprite_->SetColor({0.0f, 0.0f, 0.0f, 0.0f});
 	sprite_->Update();
 	displayTimer_ = 0.0f;
+	forceDisplay_ = false;
 	isInitialized_ = true;
 }
 
-void DamageOverlay::Update(float deltaTime, int hp, int maxHp) {
+void DamageOverlay::Update(float deltaTime, float hp, float maxHp) {
 	if (!isInitialized_) {
 		return;
 	}
 	displayTimer_ = std::max(0.0f, displayTimer_ - deltaTime);
-	if (displayTimer_ <= 0.0f) {
+	forceDisplay_ = (hp <= 2.0f);
+	if (displayTimer_ <= 0.0f && !forceDisplay_) {
 		return;
 	}
 	UpdateSpriteColor(hp, maxHp);
@@ -31,7 +33,7 @@ void DamageOverlay::Update(float deltaTime, int hp, int maxHp) {
 }
 
 void DamageOverlay::Draw() const {
-	if (!isInitialized_ || displayTimer_ <= 0.0f) {
+	if (!isInitialized_ || (displayTimer_ <= 0.0f && !forceDisplay_)) {
 		return;
 	}
 	SpriteCommon::GetInstance()->DrawCommon();
@@ -45,12 +47,12 @@ void DamageOverlay::StartDisplay() {
 	displayTimer_ = kDisplayDuration_;
 }
 
-void DamageOverlay::UpdateSpriteColor(int hp, int maxHp) {
-	const float clampedHp = static_cast<float>(std::clamp(hp, 0, maxHp));
+void DamageOverlay::UpdateSpriteColor(float hp, float maxHp) {
+	const float clampedHp = std::clamp(hp, 0.0f, maxHp);
 	Vector4 color = {0.0f, 0.0f, 0.0f, 0.0f};
 
 	if (clampedHp >= 2.0f) {
-		const float t = std::clamp(static_cast<float>(maxHp) - clampedHp, 0.0f, 1.0f);
+		const float t = std::clamp(maxHp - clampedHp, 0.0f, 1.0f);
 		color = {0.0f, 0.0f, 0.0f, t};
 	} else {
 		const float t = std::clamp((2.0f - clampedHp) / 2.0f, 0.0f, 1.0f);
