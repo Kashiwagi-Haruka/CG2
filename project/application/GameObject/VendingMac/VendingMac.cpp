@@ -87,7 +87,7 @@ void VendingMac::CheckCollision()
             }
             
             
-            if (rand() % 10 == 0) {
+            if (rand() % 4 == 0) {
            
                 if (!interactRequested_) {
                     interactRequested_ = true;
