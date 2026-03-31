@@ -31,6 +31,7 @@ void Key::Initialize()
     velocity_ = { 0.0f };
     obj_->Initialize();
 
+    isGetKey_ = false;
     isChairHit_ = false;
     isSendGetKeyMessage_ = false;
 }
