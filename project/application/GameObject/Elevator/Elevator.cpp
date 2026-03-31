@@ -24,9 +24,9 @@ void Elevator::Initialize() {
 	floorBox_->SetColor({0.15f, 0.15f, 0.15f, 1.0f});
 
 	elevatorTransform_ = {
-	    .scale = {7.0f,   7.0f,          7.0f },
-	    .rotate = {0.0f,   Function::kPi, 0.0f },
-	    .translate = {0.0f, baseHeight_,   -40.0f},
+	    .scale = {1.0f,   1.0f,          1.0f },
+	    .rotate = {0.0f, Function::kPi, 0.0f },
+	    .translate = {7.0f, baseHeight_,   -15.0f},
 	};
 
 	floorBoxTransform_ = {
@@ -62,8 +62,8 @@ void Elevator::Update() {
 }
 
 void Elevator::Draw() {
-	//Object3dCommon::GetInstance()->DrawCommonSkinning();
-	//modelObj_->Draw();
+	Object3dCommon::GetInstance()->DrawCommonSkinning();
+	modelObj_->Draw();
 	//Object3dCommon::GetInstance()->DrawCommon();
 	//floorBox_->Draw();
 }

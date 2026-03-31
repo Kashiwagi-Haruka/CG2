@@ -1,16 +1,15 @@
-#include "WallManager.h"
+#include "WallManager2.h"
 #include"Model/ModelManager.h"
 #include"Function.h"
-
 namespace {
-    const int kMaxWall = 4;
+    const int kMaxWall = 7;
 }
 
-WallManager::WallManager()
+WallManager2::WallManager2()
 {
     room1_ = std::make_unique<Object3d>();
-    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/room1", "room1");
-    room1_->SetModel("room1");
+    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/room2", "room2");
+    room1_->SetModel("room2");
     roomMat_ = Function::MakeIdentity4x4();
 
     walls_.clear();
@@ -29,38 +28,24 @@ WallManager::WallManager()
     areaLight_.decay = 0.1f;
 
     plane_ = std::make_unique<Primitive>();
-
 }
 
-WallManager::~WallManager()
-{
-    for (auto& wall : walls_) {
-        if (wall != nullptr) {
-            wall.reset();
-            wall = nullptr;
-        }
-    }
 
-    walls_.clear();
-}
-
-void WallManager::Initialize()
+void WallManager2::Initialize()
 {
     room1_->Initialize();
     plane_->Initialize(Primitive::Plane, "Resources/2d/white2x2.png");
-
 
     // 壁の初期化
     for (auto& wall : walls_) {
         wall->Initialize();
     }
 }
-
-void WallManager::Update()
+void WallManager2::Update()
 {
     plane_->SetEnableLighting(false);
     room1_->Update();
-    roomMat_ = room1_->GetWorldMatrix();
+    //roomMat_ = room1_->GetWorldMatrix();
     Matrix4x4 planeMat = Function::MakeAffineMatrix(plane_->GetTransform().scale, plane_->GetTransform().rotate, plane_->GetTransform().translate);
     Function::Multiply(planeMat, roomMat_);
     plane_->SetWorldMatrix(planeMat);
@@ -69,41 +54,23 @@ void WallManager::Update()
     normal.x *= 1.0f;
     areaLight_.normal = normal;
     areaLight_.position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
-
     areaLight_.height = plane_->GetTransform().scale.y;
+    Vector3 translate = {7.0f,0.0f,0.0f};
 
 
-    walls_[0]->SetST({ 1.0f,4.0f,14.0f }, { 0.0f,2.0f,-7.0f });
-    walls_[1]->SetST({ 1.0f,4.0f,14.0f }, { 0.0f,2.0f,7.0f });
+    walls_[0]->SetST({ 1.0f,4.0f,22.0f }, translate+Vector3{ 7.0f,2.0f,0.0f });
+    walls_[1]->SetST({ 1.0f,4.0f,22.0f }, translate+Vector3{ -7.0f,2.0f,0.0f });
+    //裏側                  
+    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate+Vector3{ 0.0f,2.0f,7.0f });
+                                  
+    walls_[3]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ -3.5f,2.0f,-6.5f });
+    walls_[4]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ 3.5f,2.0f ,-6.5f });
+    walls_[5]->SetST({6.0f, 4.0f,1.0f,}, translate+Vector3{ -4.0f,2.0f, -11.5f });
+    walls_[6]->SetST({6.0f, 4.0f ,1.0f },translate+Vector3 { 4.0f,2.0f, -11.5f });
 
-    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, { 7.0f,2.0f,0.0f });
-    walls_[3]->SetST({ 14.0f,4.0f,1.0f }, { -7.0f,2.0f,0.0f });
 
     for (auto& wall : walls_) {
         wall->Update();
     }
 
-}
-
-void WallManager::Draw()
-{
-    room1_->Draw();
-    plane_->Draw();
-    //for (auto& wall : walls_) {
-    //    wall->Draw();
-    //}
-
-}
-
-void WallManager::SetCamera(Camera* camera)
-{
-
-    room1_->SetCamera(camera);
-    room1_->UpdateCameraMatrices();
-    plane_->SetCamera(camera);
-    plane_->UpdateCameraMatrices();
-
-    //for (auto& wall : walls_) {
-    //    wall->SetCamera(camera);
-    //}
 }

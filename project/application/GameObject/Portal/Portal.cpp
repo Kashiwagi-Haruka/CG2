@@ -34,7 +34,7 @@ Portal::Portal()
     SetCollisionAttribute(kCollisionPortal);
     SetCollisionMask(kCollisionPlayer);
 
-    ring_ = std::make_unique<Primitive>();
+
     //ワープ座標
     warpPos_ = std::make_unique<WarpPos>();
 
@@ -43,7 +43,7 @@ Portal::Portal()
 Portal::~Portal()
 {
     warpPos_.reset();
-    ring_.reset();
+
     portalCircle_.reset();
     portalRenderTexture_.reset();
 
@@ -55,10 +55,7 @@ void Portal::Initialize()
     scaleTimer_ = 0.0f;
     uvRotateZ_ = 0.0f;
     transform_ = { .scale = {0.0f,0.0f,0.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
-    ring_->Initialize(Primitive::Ring, "Resources/TD3_3102/2d/ring.png", 128);
-    //ライティングしない
-    ring_->SetEnableLighting(false);
-    ring_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+
     //ワープ座標
     warpPos_->Initialize();
 
@@ -68,7 +65,6 @@ void Portal::Initialize()
     portalCircle_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
     //テクスチャここで設定するよーん
     portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
-    ring_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
     preRotY_ = { 0.0f };
 
 
@@ -82,9 +78,8 @@ void Portal::Update() {
 	isPlayerHit_ = false;
 
 	uvRotateZ_ += YoshidaMath::kDeltaTime;
-	ring_->SetUvTransform(Vector3(1, 1, 1), Vector3(0, 0, uvRotateZ_), Vector3(0, 0, 0), Vector2(0.5f, 0.5f));
+
 	UpdatePortalWorldMatrix();
-	ring_->Update();
 	portalCircle_->Update();
 	// ワープ地点
 	warpPos_->Update();
@@ -131,9 +126,6 @@ void Portal::TransitionToShaderResource() {
 void Portal::SetCamera(Camera* camera) {
 	sceneCamera_ = camera;
 	portalCircle_->SetObjectCamera(camera);
-
-	ring_->SetCamera(camera);
-	ring_->UpdateCameraMatrices();
 	warpPos_->SetCamera(camera);
 }
 
@@ -188,7 +180,6 @@ void Portal::UpdateWorldMatrix() {
 	Matrix4x4 worldMatrix = Function::MakeAffineMatrix(transform_.scale * 0.9f, transform_.rotate, transform_.translate);
 	Matrix4x4 worldMatrix1 = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, ringTranslate_);
 	portalCircle_->SetWorldMatrix(worldMatrix);
-	ring_->SetWorldMatrix(worldMatrix1);
 }
 
 void Portal::SetTranslate(const Vector3& forward) {

@@ -19,6 +19,7 @@
 #include"GameObject/Key/Key.h"
 #include <GameObject/Chair/ChairManager.h>
 #include"GameObject/Wall/WallManager.h"
+#include"GameObject/Wall/WallManager2.h"
 #include"GameObject/VendingMac/VendingMac.h"
 #include"GameObject/Door/Door.h"
 #include"GameObject/Locker/LockerManager.h"
@@ -95,7 +96,7 @@ private:
     //壁管理
     std::unique_ptr<WallManager> wallManager_ = nullptr;
     //壁管理2こめ
-    std::unique_ptr<WallManager> wallManager2_ = nullptr;
+    std::unique_ptr<WallManager2> wallManager2_ = nullptr;
     //自販機
     std::unique_ptr<VendingMac> vendingMac_ = nullptr;
     //ドア

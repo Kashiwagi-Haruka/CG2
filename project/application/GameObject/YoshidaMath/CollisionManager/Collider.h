@@ -13,7 +13,8 @@ namespace YoshidaMath {
 
     enum ColliderType {
         kSphere,
-        kAABB
+        kAABB,
+        kOBB
     };
 
     struct CollisionInfo {
@@ -29,7 +30,8 @@ namespace YoshidaMath {
     void ResolveCollision(Vector3& pos, Vector3& velocity, const YoshidaMath::CollisionInfo& info);
     //AABBの中心を取得する
     Vector3 GetAABBCenter(const AABB& aabb);
-
+    bool IsCollision(const OBB& a, const OBB& b);
+    bool IsCollision(const AABB& aabb, const OBB& obb);
 }
 
 /// @brief 衝突判定オブジェクト
@@ -42,7 +44,7 @@ namespace YoshidaMath {
         uint32_t collisionMask_ = 0xffffffff;		// 衝突マスク
         float radius_ = 1.0f;	// 衝突半径
         AABB AABB_;
-
+        OBB OBB_;
 
     public:
 
@@ -53,15 +55,16 @@ namespace YoshidaMath {
         /// @brief ワールド座標を取得する
         /// @return ワールド座標
         virtual Vector3 GetWorldPosition() const = 0;
-  
+        virtual const Matrix4x4& GetWorldMatrix() const = 0;
         /// @brief 衝突半径を設定する
         /// @param radius 衝突半径
         void SetRadius(float radius);
-        void SetAABB(const AABB& aabb);
+        void SetAABB(const AABB& aabb,const bool isRound = false);
         /// @brief 衝突半径を取得する
         /// @return 衝突半径
         float GetRadius() const { return radius_; }
         const AABB& GetAABB() const { return AABB_; }
+        OBB& GetOBB() { return OBB_; }
 
         ColliderType GetType() const { return type_; }
 
@@ -86,7 +89,7 @@ namespace YoshidaMath {
             return collisionInfo_;
         }
     };
-
+    void UpdateOBB(YoshidaMath::Collider* obb);
     //AABBのワールド座標を取得する
     AABB GetAABBWorldPos(YoshidaMath::Collider* aabb);
     //Sphereのワールド座標を取得する

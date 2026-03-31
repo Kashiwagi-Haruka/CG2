@@ -25,6 +25,7 @@ public:
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
     bool IsRayHit() { return isRayHit_; }
+    const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
 private:
     bool isRayHit_ = false;
     static PlayerCamera* playerCamera_;

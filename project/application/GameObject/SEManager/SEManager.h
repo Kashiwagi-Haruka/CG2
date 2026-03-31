@@ -17,6 +17,7 @@ public:
 		TYPE,
 		VENDING_MAC,
 		KEY,
+		DESK,
 	};
 
 private:

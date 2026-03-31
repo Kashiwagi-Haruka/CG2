@@ -12,7 +12,7 @@ ResultScene::ResultScene() {
 
 	transition = std::make_unique<SceneTransition>();
 
-	textureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/gameClearImage.png");
+	textureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/kimigayo.png");
 
 	sprite_ = std::make_unique<Sprite>();
 }

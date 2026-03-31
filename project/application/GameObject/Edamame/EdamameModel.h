@@ -32,7 +32,7 @@ public:
     void SetIsDropStart(const bool flag) { isDropStart_ = flag; }
     //カメラの設定
     void SetCamera(Camera* camera);
-
+    const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
 private:
     // アニメーション
     void Animation();
