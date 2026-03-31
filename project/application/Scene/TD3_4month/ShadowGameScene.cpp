@@ -97,6 +97,7 @@ void ShadowGameScene::Initialize()
     BGMManager::Initialize();
 
     uiManager_->Initialize();
+	damageOverlay_->Initialize();
 
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;

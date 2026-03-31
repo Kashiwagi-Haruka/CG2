@@ -15,5 +15,6 @@ private:
 
 	std::unique_ptr<Sprite> sprite_ = nullptr;
 	float displayTimer_ = 0.0f;
+	bool isInitialized_ = false;
 	static constexpr float kDisplayDuration_ = 0.3f;
 };

@@ -1,9 +1,9 @@
 #define NOMINMAX
 #include "DamageOverlay.h"
+#include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
 #include "WinApp.h"
 #include <algorithm>
-#include "Sprite/SpriteCommon.h"
 
 DamageOverlay::DamageOverlay() { sprite_ = std::make_unique<Sprite>(); }
 
@@ -15,9 +15,13 @@ void DamageOverlay::Initialize() {
 	sprite_->SetColor({0.0f, 0.0f, 0.0f, 0.0f});
 	sprite_->Update();
 	displayTimer_ = 0.0f;
+	isInitialized_ = true;
 }
 
 void DamageOverlay::Update(float deltaTime, int hp, int maxHp) {
+	if (!isInitialized_) {
+		return;
+	}
 	displayTimer_ = std::max(0.0f, displayTimer_ - deltaTime);
 	if (displayTimer_ <= 0.0f) {
 		return;
@@ -27,14 +31,19 @@ void DamageOverlay::Update(float deltaTime, int hp, int maxHp) {
 }
 
 void DamageOverlay::Draw() const {
-	if (displayTimer_ <= 0.0f) {
+	if (!isInitialized_ || displayTimer_ <= 0.0f) {
 		return;
 	}
 	SpriteCommon::GetInstance()->DrawCommon();
 	sprite_->Draw();
 }
 
-void DamageOverlay::StartDisplay() { displayTimer_ = kDisplayDuration_; }
+void DamageOverlay::StartDisplay() {
+	if (!isInitialized_) {
+		return;
+	}
+	displayTimer_ = kDisplayDuration_;
+}
 
 void DamageOverlay::UpdateSpriteColor(int hp, int maxHp) {
 	const float clampedHp = static_cast<float>(std::clamp(hp, 0, maxHp));
