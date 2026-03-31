@@ -364,6 +364,8 @@
     <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoardManager.cpp" />
     <ClCompile Include="application\GameObject\UI\Mission.cpp" />
     <ClCompile Include="application\GameObject\PC\PC.cpp" />
+    <ClCompile Include="application\GameObject\Event\GameEvent.cpp" />
+    <ClCompile Include="application\GameObject\Event\FirstGameEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -722,6 +724,8 @@
     <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoardManager.h" />
     <ClInclude Include="application\GameObject\UI\Mission.h" />
     <ClInclude Include="application\GameObject\PC\PC.h" />
+    <ClInclude Include="application\GameObject\Event\GameEvent.h" />
+    <ClInclude Include="application\GameObject\Event\FirstGameEvent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

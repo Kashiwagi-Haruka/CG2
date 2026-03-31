@@ -203,6 +203,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="Engine\Texture\BlendMode\BlendModeManager.cpp" />
     <ClCompile Include="Engine\base\DirectXCommon.cpp" />
     <ClCompile Include="Engine\LeakChecker\D3DResourceLeakChecker.cpp" />
+    <ClCompile Include="application\GameObject\Event\GameEvent.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -302,6 +303,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoardManager.cpp" />
     <ClCompile Include="application\GameObject\UI\Mission.cpp" />
     <ClCompile Include="application\GameObject\PC\PC.cpp" />
+    <ClCompile Include="application\GameObject\Event\FirstGameEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -385,6 +387,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="Engine\Texture\Light\CommonLight\SpotCommonLight.h" />
     <ClInclude Include="Engine\Texture\SkinningData.h" />
     <ClInclude Include="Engine\Texture\Data\SkinningData.h" />
+    <ClInclude Include="application\GameObject\Event\GameEvent.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -475,6 +478,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoardManager.h" />
     <ClInclude Include="application\GameObject\UI\Mission.h" />
     <ClInclude Include="application\GameObject\PC\PC.h" />
+    <ClInclude Include="application\GameObject\Event\FirstGameEvent.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
