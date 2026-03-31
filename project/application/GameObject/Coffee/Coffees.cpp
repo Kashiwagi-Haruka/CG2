@@ -400,10 +400,12 @@ void Coffees::EnsureInstanceCapacity(uint32_t requiredCount) {
 }
 void Coffees::Update(Camera* camera, const Vector3& lightDirection) {
 	simulationParams_.deltaTime = std::max(Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime(), 1.0f / 120.0f);
-	RunSimulation();
+	if (isSpilling_) {
+		RunSimulation();
+	}
 
 	for (uint32_t i = 0; i < renderedInstanceCapacity_; ++i) {
-		if (i < activeInstanceCount_ && instances_[i].isActive && IsVisibleFromCamera(camera, instances_[i].position, instances_[i].radius)) {
+		if (isSpilling_ && i < activeInstanceCount_ && instances_[i].isActive && IsVisibleFromCamera(camera, instances_[i].position, instances_[i].radius)) {
 			instancedObject_->SetInstanceOffset(i, instances_[i].position);
 		} else {
 			instancedObject_->SetInstanceOffset(i, {0.0f, -1000.0f, 0.0f});
@@ -413,7 +415,12 @@ void Coffees::Update(Camera* camera, const Vector3& lightDirection) {
 	instancedObject_->Update(camera, lightDirection);
 }
 
-void Coffees::Draw() { instancedObject_->Draw(); }
+void Coffees::Draw() {
+	if (!isSpilling_) {
+		return;
+	}
+	instancedObject_->Draw();
+}
 
 uint32_t Coffees::GetInstanceCount() const { return activeInstanceCount_; }
 
@@ -429,3 +436,5 @@ void Coffees::SetSpawnContainment(const Vector3& center, float topY, float radiu
 	simulationParams_.canTopY = topY;
 	simulationParams_.canTopRadius = radius;
 }
+
+void Coffees::StartSpill() { isSpilling_ = true; }

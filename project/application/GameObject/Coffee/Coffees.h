@@ -15,6 +15,7 @@ public:
 	void SetSpawnOrigin(const Vector3& spawnOrigin);
 	void SetFloorY(float floorY);
 	void SetSpawnContainment(const Vector3& center, float topY, float radius);
+	void StartSpill();
 
 private:
 	struct InstanceData {
@@ -56,4 +57,5 @@ private:
 	float spawnTimer_ = 0.0f;
 	float nextSpawnInterval_ = 0.0f;
 	Vector3 spawnOrigin_ = {0.0f, 5.0f, 0.0f};
+	bool isSpilling_ = false;
 };

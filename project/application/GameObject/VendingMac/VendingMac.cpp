@@ -60,52 +60,45 @@ void VendingMac::Update()
 
 }
 
-void VendingMac::Initialize()
-{
-    obj_->Initialize();
-    SEManager::SoundPlay(SEManager::NOISE, true);
+void VendingMac::Initialize() {
+	obj_->Initialize();
+	SEManager::SoundPlay(SEManager::NOISE, true);
 }
 
-void VendingMac::Draw()
-{
-    obj_->Draw();
+void VendingMac::Draw() { obj_->Draw(); }
+
+void VendingMac::CheckCollision() {
+	// 自販機とrayの当たり判定
+	if (OnCollisionRay()) {
+		if (PlayerCommand::GetInstance()->Interact()) {
+			interactRequested_ = true;
+		}
+	}
 }
 
-void VendingMac::CheckCollision()
-{
-    //自販機とrayの当たり判定
-    if (OnCollisionRay()) {
-        if (PlayerCommand::GetInstance()->Interact()) {
+float VendingMac::GetVol(float length, float maxVol) {
+	if (length >= 100.0f) {
+		return 0.0f;
+	} else if (length > 1.0f) {
+		float vol = 1.0f / length;
+		return vol * maxVol;
+	}
 
-        }
-    }
+	return maxVol;
 }
 
-float VendingMac::GetVol(float length, float maxVol)
-{
-    if (length >= 100.0f) {
-        return 0.0f;
-    } else  if (length > 1.0f) {
-        float vol = 1.0f / length;
-        return  vol * maxVol;
-    }
+bool VendingMac::OnCollisionRay() { return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate()); }
 
-    return maxVol;
-}
+void VendingMac::SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; }
 
-bool VendingMac::OnCollisionRay()
-{
-    return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate());
-}
-
-void VendingMac::SetPlayerCamera(PlayerCamera* camera)
-{
-    playerCamera_ = camera;
-}
-
-void VendingMac::SetCamera(Camera* camera)
-{
-    obj_->SetCamera(camera);
-    obj_->UpdateCameraMatrices();
+void VendingMac::SetCamera(Camera* camera) {
+	obj_->SetCamera(camera);
+	obj_->UpdateCameraMatrices();
 }
 Vector3 VendingMac::GetForward() const { return YoshidaMath::GetForward(obj_->GetWorldMatrix()); }
+
+bool VendingMac::ConsumeInteractRequest() {
+	const bool requested = interactRequested_;
+	interactRequested_ = false;
+	return requested;
+}

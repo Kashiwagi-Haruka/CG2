@@ -210,6 +210,9 @@ void ShadowGameScene::CheckCollision()
     portalManager_->CheckCollision();
     door_->CheckCollision();
     vendingMac_->CheckCollision();
+	if (vendingMac_->ConsumeInteractRequest()) {
+		coffees_->StartSpill();
+	}
 
     collisionManager_->ClearColliders();
     collisionManager_->AddCollider(player_.get());

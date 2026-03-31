@@ -24,6 +24,7 @@ public:
 	void SetPlayerCamera(PlayerCamera* camera);
 	void SetCamera(Camera* camera);
 	Vector3 GetForward() const;
+	bool ConsumeInteractRequest();
 	AreaCommonLight& GetAreaLight() { return areaLight_; }
 
 private:
@@ -33,5 +34,5 @@ private:
 	std::unique_ptr<Object3d> obj_ = nullptr;
 	AreaCommonLight areaLight_;
 	Vector3 translate_ = {0.0f};
+	bool interactRequested_ = false;
 };
-
