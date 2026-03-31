@@ -56,7 +56,7 @@ private:
     std::unique_ptr<UIManager> uiManager_ = nullptr;
 
 #pragma region//カメラの設定
-    std::unique_ptr<CameraController>cameraController_ = nullptr;
+   CameraController* cameraController_ = nullptr;
 
 #pragma endregion
 
@@ -114,6 +114,7 @@ private:
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
     //最初のイベント
     std::unique_ptr<FirstGameEvent>firstEvent_ = nullptr;
+    GameEvent* currentEvent_ = nullptr;
 #pragma region// light
     //DirectionalLight
     DirectionalCommonLight directionalLight_{};

@@ -8,6 +8,7 @@ protected:
     virtual void OnEnd() = 0;
 public:
     GameEvent() = default;
+    virtual void Update() = 0;
     void StartEvent();
     void EndEvent();
     bool IsRunning() { return isRunning_; };
