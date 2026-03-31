@@ -16,6 +16,7 @@ public:
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
+    const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
     void Update();
     void Initialize();
     void Draw();

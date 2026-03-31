@@ -37,7 +37,7 @@ public:
     //ワープ先を取得する
     WarpPos* GetWarpPos() { return warpPos_.get(); }
     void BeginRender();
-
+    const Matrix4x4& GetWorldMatrix() const { return portalCircle_->GetWorldMatrix(); };
     void TransitionToShaderResource();
     void DrawPortals();
     void DrawRings();
@@ -57,7 +57,6 @@ private:
     float scaleTimer_ = 0.0f;
     static Camera* sceneCamera_;
 
-    std::unique_ptr<Primitive>ring_ = nullptr;
     std::unique_ptr<PortalMesh>portalCircle_ = nullptr;
     Vector3 ringTranslate_ = { 0.0f };
     Transform transform_ = {};

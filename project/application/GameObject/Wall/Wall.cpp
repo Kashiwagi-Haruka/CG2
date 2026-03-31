@@ -6,6 +6,7 @@
 
 Wall::Wall()
 {
+
     primitive_ = std::make_unique<Primitive>();
     Vector3 halfScale = Vector3{ 1.0f,1.0f,1.0f } *0.5f;
     SetAABB({ .min = -halfScale,.max = halfScale });
@@ -34,9 +35,13 @@ void Wall::Update()
     AdjustAABB();
     assert(parentMat_);
     Matrix4x4 worldMat = Function::MakeAffineMatrix(primitive_->GetTransform().scale, primitive_->GetTransform().rotate, primitive_->GetTransform().translate);
-    primitive_->SetWorldMatrix(Function::Multiply(worldMat, *parentMat_));
+    worldMat = Function::Multiply(worldMat, *parentMat_);
+     primitive_->SetWorldMatrix(worldMat);
+    
+
     primitive_->Update();
 }
+
 
 void Wall::Initialize()
 {

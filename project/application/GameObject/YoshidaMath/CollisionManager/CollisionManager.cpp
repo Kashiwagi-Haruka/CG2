@@ -27,8 +27,7 @@ void CollisionManager::CheckCollisionSpherePair(YoshidaMath::Collider* colliderA
 {
     // 衝突判定
     if (YoshidaMath::IsCollision(YoshidaMath::GetSphereWorldPos(colliderA), YoshidaMath::GetSphereWorldPos(colliderB))) {
-        colliderA->OnCollision(colliderB);
-        colliderB->OnCollision(colliderA);
+        OnCollision(colliderA, colliderB);
     }
 }
 
@@ -42,8 +41,7 @@ void CollisionManager::CheckCollisionAABBPair(YoshidaMath::Collider* colliderA, 
 
     // 衝突判定
     if (colliderA->GetCollisionInfo().collided&& colliderB->GetCollisionInfo().collided) {
-        colliderA->OnCollision(colliderB);
-        colliderB->OnCollision(colliderA);
+        OnCollision(colliderA, colliderB);
     }
 }
 
@@ -51,11 +49,27 @@ void CollisionManager::CheckCollisionSphereAABBPair(YoshidaMath::Collider* spher
 {
     // 衝突判定
     if (RigidBody::isCollision(GetAABBWorldPos(aabbC), GetSphereWorldPos(sphereC))) {
-        sphereC->OnCollision(aabbC);
-        aabbC->OnCollision(sphereC);
+        OnCollision(aabbC, sphereC);
     }
 }
 
+void CollisionManager::CheckCollisionOBBPair(YoshidaMath::Collider* colliderA, YoshidaMath::Collider* colliderB)
+{
+    YoshidaMath::UpdateOBB(colliderA);
+    YoshidaMath::UpdateOBB(colliderB);
+    if (YoshidaMath::IsCollision(colliderA->GetOBB(), colliderB->GetOBB())) {
+        OnCollision(colliderA, colliderB);
+    }
+}
+
+void CollisionManager::CheckCollisionAABBOBBPair(YoshidaMath::Collider* colliderA, YoshidaMath::Collider* colliderB)
+{
+    YoshidaMath::UpdateOBB(colliderB);
+
+    if (YoshidaMath::IsCollision(GetAABBWorldPos(colliderA), colliderB->GetOBB())) {
+        OnCollision(colliderA, colliderB);
+    }
+}
 
 void CollisionManager::CheckCollisionPair(YoshidaMath::Collider* a, YoshidaMath::Collider* b) {
     auto typeA = a->GetType();
@@ -69,5 +83,17 @@ void CollisionManager::CheckCollisionPair(YoshidaMath::Collider* a, YoshidaMath:
         CheckCollisionSphereAABBPair(b, a); // 順番に注意！
     } else if (typeA == YoshidaMath::kAABB && typeB == YoshidaMath::kAABB) {
         CheckCollisionAABBPair(a, b);
+    } else if (typeA == YoshidaMath::kOBB, typeB == YoshidaMath::kOBB) {
+        CheckCollisionOBBPair(a, b);
+    } else if (typeA == YoshidaMath::kAABB, typeB == YoshidaMath::kOBB) {
+        CheckCollisionAABBOBBPair(a, b);
+    } else if (typeA == YoshidaMath::kOBB, typeB == YoshidaMath::kAABB) {
+        CheckCollisionAABBOBBPair(b, a);
     }
+}
+
+void CollisionManager::OnCollision(YoshidaMath::Collider* a, YoshidaMath::Collider* b)
+{
+    a->OnCollision(b);
+    b->OnCollision(a);
 }
