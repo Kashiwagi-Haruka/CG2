@@ -67,7 +67,6 @@ void VendingMac::Update()
 void VendingMac::Initialize()
 {
     isRayHit_ = false;
-    isCoffeeEventStart_ = false;
   	interactRequested_ = false;
     obj_->Initialize();
     SEManager::SoundPlay(SEManager::NOISE, true);
