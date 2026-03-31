@@ -16,7 +16,7 @@ WalkWhiteBoard::WalkWhiteBoard()
     /* SetRadius(1.0f);*/
     SetAABB(AABB{ .min = {-0.0f,0.5f,-0.5f}, .max = {0.5f,1.5f,0.5f} });
     SetCollisionAttribute(kCollisionEnemy);
-    SetCollisionMask(kCollisionPlayer);
+    SetCollisionMask(kCollisionPlayer| kCollisionWall);
 }
 
 void WalkWhiteBoard::OnCollision(Collider* collider)
@@ -28,6 +28,8 @@ void WalkWhiteBoard::OnCollision(Collider* collider)
             desiredAnimationName = "WalkStart";
         }
     }
+
+
 }
 
 void WalkWhiteBoard::LoadAnimation(const std::string& directionalPath, const std::string& filePath)

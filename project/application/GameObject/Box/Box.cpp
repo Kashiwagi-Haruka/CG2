@@ -15,13 +15,12 @@ Box::Box()
     obj_->SetModel("box");
     SetAABB({ .min = {-0.25f,-0.125f,-0.25f},.max = {0.25f,0.125f,0.25f} });
     SetCollisionAttribute(kCollisionItem);
-    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionKey | kCollisionWall
-    |kCollisionDesk);
+    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionKey | kCollisionWall);
 }
 
 void Box::OnCollision(Collider* collider)
 {
-    if (collider->GetCollisionAttribute() == kCollisionDesk) {
+    if (collider->GetCollisionAttribute() == kCollisionWall|| collider->GetCollisionAttribute() == kCollisionFloor) {
         obj_->SetColor(COLOR::RED);
     } else {
         obj_->SetColor(COLOR::WHITE);
@@ -38,6 +37,8 @@ void Box::Update()
 {
     Mirror();
 
+
+    isRayHit_ = OnCollisionRay();
     // インタラクトをトリガーすると
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
 
@@ -48,7 +49,7 @@ void Box::Update()
             PlayerCommand::SetIsGrab(false);
         } else {
             // rayと重なる
-            if (OnCollisionRay()) {
+            if (isRayHit_) {
                 if (!PlayerCommand::GetIsGrab()) {
                     isGrab_ = true;
                     //プレイヤーの状態をセットする
@@ -68,7 +69,7 @@ void Box::Update()
 
 void Box::Initialize()
 {
-
+    isRayHit_ = false;
     obj_->Initialize();
     velocity_ = { 0.0f };
     transform_ = obj_->GetTransform();
@@ -121,6 +122,7 @@ void Box::Grab()
 bool Box::OnCollisionRay()
 {
     return playerCamera_->OnCollisionRay(GetAABB(), transform_.translate);
+   
 }
 
 void Box::SetPlayerCamera(PlayerCamera* camera)

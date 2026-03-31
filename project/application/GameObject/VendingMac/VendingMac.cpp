@@ -6,13 +6,17 @@
 #include<imgui.h>
 #include"GameObject/SEManager/SEManager.h"
 
+
+bool VendingMac::isRayHit_ = false;
+
 VendingMac::VendingMac()
 {
+
     obj_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/vendingMac", "vendingMac");
     obj_->SetModel("vendingMac");
-    SetAABB({ .min = {-0.5f,0.0f,-0.5f},.max = {0.5f,1.83f,0.5f} });
-    SetCollisionAttribute(kCollisionVendingMac);
+    SetAABB({ .min = {-0.75f,0.0f,-0.75f},.max = {0.75f,1.83f,0.75f} });
+    SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
 
     areaLight_.color = { 1.0f,234.0f / 255.0f,200.0f / 255.0f,1.0f };
@@ -22,10 +26,6 @@ VendingMac::VendingMac()
     areaLight_.radius = 0.8f;
     areaLight_.decay = 1.0f;
     translate_ = { 0.0f,1.3f,0.6f };
-
-
-
-
 }
 
 VendingMac::~VendingMac()
@@ -47,6 +47,8 @@ Vector3 VendingMac::GetWorldPosition() const
 
 void VendingMac::Update()
 {
+    CheckCollision();
+
     obj_->Update();
 
     Matrix4x4 worldMat = Function::Multiply(Function::MakeTranslateMatrix(translate_), obj_->GetWorldMatrix());
@@ -56,24 +58,46 @@ void VendingMac::Update()
     // プレイヤーのカメラ位置から
     Vector3 distance = playerCamera_->GetRay().origin - obj_->GetTranslate();
     float  length = Function::Length(distance);
-    SEManager::SetVol(GetVol(length, 1.0f),SEManager::NOISE);
+    SEManager::SetVol(GetVol(length, 1.0f), SEManager::NOISE);
+
+
 
 }
 
-void VendingMac::Initialize() {
-	obj_->Initialize();
-	SEManager::SoundPlay(SEManager::NOISE, true);
+void VendingMac::Initialize()
+{
+    isRayHit_ = false;
+    isCoffeeEventStart_ = false;
+  	interactRequested_ = false;
+    obj_->Initialize();
+    SEManager::SoundPlay(SEManager::NOISE, true);
 }
 
 void VendingMac::Draw() { obj_->Draw(); }
 
-void VendingMac::CheckCollision() {
-	// 自販機とrayの当たり判定
-	if (OnCollisionRay()) {
+
+void VendingMac::CheckCollision()
+{
+    isRayHit_ = OnCollisionRay();
+
+	if (isRayHit_) {
 		if (PlayerCommand::GetInstance()->InteractTrigger()) {
-			interactRequested_ = true;
+			
+                 if (SEManager::IsSoundFinished(SEManager::VENDING_MAC)) {
+                SEManager::SoundPlay(SEManager::VENDING_MAC);
+            }
+            
+            
+            if (rand() % 10 == 0) {
+           
+                if (!interactRequested_) {
+                    interactRequested_ = true;
+                }
+            }
+    
 		}
 	}
+
 }
 
 float VendingMac::GetVol(float length, float maxVol) {

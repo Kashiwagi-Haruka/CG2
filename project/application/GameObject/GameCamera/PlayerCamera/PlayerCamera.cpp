@@ -10,23 +10,18 @@
 #include "application/Option/Option.h"
 
 PlayerCamera::PlayerCamera() {
-	// カメラの設定
-	cameraTransform_ = {
-	    .scale{1.0f, 1.0f, 1.0f},
-        .rotate{0.0f, 0.0f, 0.0f},
-        .translate{0.0f, 0.0f, 0.0f}
-    };
 
 	// カメラを生成する
 	camera_ = std::make_unique<Camera>();
-	camera_->SetTransform(cameraTransform_);
-	camera_->SetFovY(0.44f);
 
+	camera_->SetFovY(0.44f);
+    // Rayの設定
+    ray_ = { .origin = {0.0f}, .diff = {0.0f} };
 }
 
 void PlayerCamera::Update() {
-	SetTransform();
 	SetRay();
+    SetHeadTransform();
 	camera_->Update();
 }
 
@@ -57,9 +52,16 @@ void PlayerCamera::SetRay()
 
 void PlayerCamera::Initialize()
 {
-    camera_->SetTransform(cameraTransform_);
-    // Rayの設定
-    ray_ = { .origin = {0.0f}, .diff = {0.0f} };
+    // カメラの設定
+    cameraTransform_ = {
+        .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f, 0.0f, 0.0f},
+        .translate{0.0f, 0.0f, 0.0f}
+    };
+
+    SetHeadTransform();
+    SetTransform();
+    SetRay();
 }
 
 bool PlayerCamera::OnCollisionRay(const AABB& localAABB, const Vector3& translate)
@@ -68,11 +70,10 @@ bool PlayerCamera::OnCollisionRay(const AABB& localAABB, const Vector3& translat
 }
 
 
-void PlayerCamera::SetTransform()
+void PlayerCamera::SetHeadTransform()
 {
 
     Rotate();
-
 
     cameraTransform_.scale = { 1.0f,1.0f,1.0f };
 
@@ -94,8 +95,13 @@ void PlayerCamera::SetTransform()
     //    cameraTransform_.translate.y += 1.6f;
     //}
 
-    camera_->SetTransform(cameraTransform_);
 
+
+}
+
+void PlayerCamera::SetTransform()
+{
+    camera_->SetTransform(cameraTransform_);
 }
 
 Vector3 PlayerCamera::GetForward()

@@ -24,7 +24,9 @@ public:
     void SetTransform(const Transform& transform) { transform_ = transform; };
     void SetMirrorTransform(Transform* transform) { mirrorTransform_ = transform; };
     Transform& GetTransform() { return transform_; };
+    bool IsRayHit() { return isRayHit_; }
 private:
+    bool isRayHit_ = false;
     void Mirror();
     void Grab();
     bool OnCollisionRay();

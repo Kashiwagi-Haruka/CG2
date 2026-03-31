@@ -28,6 +28,7 @@ public:
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
     void SetAnimationGroupName(const std::string& name){ animationGroupName_ = name; }
+    bool IsRayHit() { return isRayHit_; }
 private:
     // アニメーション
     void Animation();
@@ -45,6 +46,7 @@ private:
     const float kAnimationBlendDuration_ = 0.3f;
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Idle";
-    bool isStart_ = false;
+    bool isRayHit_ = false;
+    
 };
 

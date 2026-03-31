@@ -24,8 +24,9 @@ public:
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
+    bool IsRayHit() { return isRayHit_; }
 private:
-
+    bool isRayHit_ = false;
     static PlayerCamera* playerCamera_;
     std::unique_ptr<Object3d>obj_ = nullptr;
 };

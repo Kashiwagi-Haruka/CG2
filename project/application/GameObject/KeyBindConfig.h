@@ -54,7 +54,7 @@ public:
 	bool MoveRight();
 	bool MoveForward();
 	bool MoveBackward();
-
+	bool EvetSkipTrigger();
 	bool MoveForwardTrigger();
 	bool MoveBackwardTrigger();
 	bool UiMoveForwardTrigger();

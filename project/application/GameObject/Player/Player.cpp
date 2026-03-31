@@ -75,14 +75,11 @@ Player::Player() {
     };
     SetAABB(localAABB_);
     SetCollisionAttribute(kCollisionPlayer);
-    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionVendingMac | kCollisionDoor | kCollisionMat | kCollisionLocker| kCollisionDesk);
+    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall  | kCollisionMat);
     // 体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
     // モデルの読み込み
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
-
-
-
 }
 void Player::SetCamera(Camera* camera) {
     // カメラのセット
@@ -95,8 +92,9 @@ void Player::Initialize() {
     transform_ = {
         .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f,Function::kPi, 0.0f},
-        .translate{4.0f, 2.0f, 0.0f}
+        .translate{6.25f, 1.5f, 4.0f}
     };
+
     // 速度の初期化
     velocity_ = { 0.0f };
     forward_ = { 0.0f };
@@ -107,6 +105,8 @@ void Player::Initialize() {
 
     // 体の初期化
     bodyObj_->Initialize();
+    bodyObj_->SetTransform(transform_);
+
     // 体にモデル挿入
     bodyObj_->SetModel("gentleman");
 
@@ -123,6 +123,8 @@ void Player::Initialize() {
             bodyObj_->SetSkinCluster(&skinCluster_);
         }
     }
+    //アニメーション
+    Animation();
     bodyObj_->SetShininess(20.0f);
 
 }
@@ -140,7 +142,7 @@ void Player::Update()
     //アニメーション
     Animation();
 
-    bodyObj_->SetWorldMatrix(Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate));
+    bodyObj_->SetTransform(transform_);
     bodyObj_->Update();
 
     //デバック

@@ -5,6 +5,7 @@ namespace {
     uint32_t maxNum_ = 4;
 }
 
+bool ChairManager::isRayHit_ = false;
 ChairManager::ChairManager()
 {
     for (uint32_t i = 0; i < maxNum_; ++i) {
@@ -32,6 +33,9 @@ void ChairManager::SetCamera(Camera* camera)
 
 void ChairManager::Initialize()
 {
+
+    isRayHit_ = false;
+
     for (auto& chair : chairs_) {
         chair->Initialize();
     }
@@ -54,6 +58,13 @@ void ChairManager::Update()
 {
     for (auto& chair : chairs_) {
         chair->Update();
+    }
+    isRayHit_ = false;
+
+    for (auto& chair : chairs_) {
+        if (chair->IsRayHit()) {
+            isRayHit_ = true;
+        }
     }
 }
 

@@ -13,8 +13,8 @@ Locker::Locker()
     obj_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Locker", "Locker");
     obj_->SetModel("Locker");
-    SetAABB({ .min = {-0.4f,0.0f,-0.4f},.max = {0.4f,2.0f,0.4f} });
-    SetCollisionAttribute(kCollisionLocker);
+    SetAABB({ .min = {-0.5f,0.0f,-0.5f},.max = {0.5f,1.8f,0.5f} });
+    SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer| kCollisionKey);
 }
 
@@ -45,7 +45,7 @@ void Locker::Update()
 
 void Locker::Initialize()
 {
-
+    isRayHit_ = false;
     obj_->Initialize();
 }
 
@@ -57,10 +57,9 @@ void Locker::Draw()
 
 void Locker::CheckCollision()
 {
-
-    if (OnCollisionRay()) {
+    isRayHit_ = OnCollisionRay();
+    if (isRayHit_) {
         //rayの当たり判定
-      
 
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
        

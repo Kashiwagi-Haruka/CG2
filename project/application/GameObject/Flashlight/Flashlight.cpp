@@ -8,7 +8,7 @@
 
 bool Flashlight::isSendGetLightMessage_ = false;
  bool Flashlight::isGetLight_ = false;
-
+bool Flashlight::isRayHit_ = false;
 Flashlight::Flashlight()
 {
     obj_ = std::make_unique<Object3d>();
@@ -78,7 +78,7 @@ void Flashlight::Initialize()
 {
     isGetLight_ = false;
     isSendGetLightMessage_ = false;
-
+    isRayHit_ = false;
     obj_->Initialize();
     transform_.translate = {4.0f,0.1f,5.0f};
     transform_.rotate = { 0.0f,0.0f,0.0f };
@@ -106,12 +106,13 @@ void Flashlight::SetLight()
 
 void Flashlight::CheckCollision()
 {
+    isRayHit_ = OnCollisionRay();
 
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
         //keyとrayの当たり判定
 
         if(!PlayerCommand::GetIsGrab()){
-            if (OnCollisionRay()) {
+            if (isRayHit_) {
                 isGetLight_ = true;
       /*          PlayerCommand::SetIsGrab(true);*/
                 isSendGetLightMessage_ = true;

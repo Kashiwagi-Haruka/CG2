@@ -7,6 +7,7 @@ class BoxManager
 public:
     BoxManager();
     ~BoxManager();
+    static bool IsRayHit() { return isRayHit_; }
     void SetCamera(Camera* camera);
     void Initialize();
     void Update();
@@ -15,5 +16,6 @@ public:
     std::vector<std::unique_ptr<Box>>& GetBoxes() { return boxes_; };
 private:
     std::vector<std::unique_ptr<Box>>boxes_;
+    static bool isRayHit_;
 };
 

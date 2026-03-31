@@ -10,5 +10,5 @@ void GameEvent::EndEvent()
 {
  
     OnEnd();
-    isRunning_ = true;
+    isRunning_ = false;
 }

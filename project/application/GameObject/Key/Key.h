@@ -28,13 +28,16 @@ public:
     Vector3 GetWorldPosition() const override;
     static bool GetGetKeyMessage() { return isSendGetKeyMessage_; }
     static bool IsGetKey() { return isGetKey_; }
+    static bool IsRayHit() { return isRayHit_; };
 private:
+   static bool isRayHit_;
     std::unique_ptr<Object3d>obj_ = nullptr;
     PlayerCamera* playerCamera_ = nullptr;
     Transform worldTransform_ = {};
     Vector3 velocity_ = { 0.0f };
     bool isChairHit_ = false;
-   static bool isGetKey_;
+    static bool isGetKey_;
     static bool isSendGetKeyMessage_;
+    bool isLockerHit_ = false;
 };
 

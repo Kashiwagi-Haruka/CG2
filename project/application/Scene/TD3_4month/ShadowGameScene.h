@@ -4,11 +4,12 @@
 #include <imgui.h>
 #include "SceneTransition/SceneTransition.h"
 
-#include "DebugCamera.h"
+#include"GameObject/CameraController/CameraController.h"
+
 #pragma region //GameObject
 #include"GameObject/Player/Player.h"
 #include"GameObject/TestField/TestField.h"
-#include"GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
+
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/WhiteBoard/WhiteBoardManager.h"
 #include"GameObject/TimeCard/TimeCardWatch.h"
@@ -25,11 +26,16 @@
 #include"GameObject/Box/BoxManager.h"
 #include "Menu/Menu.h"
 #include "GameObject/Elevator/Elevator.h"
-
 #include <GameObject/Edamame/Edamame.h>
 #include"GameObject/PC/PC.h"
+
 #include "GameObject/Coffee/Coffees.h"
 
+
+#pragma endregion
+
+#pragma region//Event
+#include"GameObject/Event/FirstGameEvent.h"
 #pragma endregion
 
 #include"GameObject/UI/UIManager.h"
@@ -53,10 +59,8 @@ private:
     std::unique_ptr<UIManager> uiManager_ = nullptr;
 
 #pragma region//カメラの設定
+    CameraController* cameraController_ = nullptr;
 
-    std::unique_ptr<PlayerCamera> playerCamera_ = nullptr;
-    std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
-    bool useDebugCamera_ = false;
 #pragma endregion
 
 #pragma region//シーン遷移の設定
@@ -73,8 +77,8 @@ private:
     std::unique_ptr<Player> player_ = nullptr;
     //TestField
     std::unique_ptr<TestField> testField_ = nullptr;
-	// ホワイトボード管理
-	std::unique_ptr<WhiteBoardManager> whiteBoardManager_ = nullptr;
+    // ホワイトボード管理
+    std::unique_ptr<WhiteBoardManager> whiteBoardManager_ = nullptr;
     //ポータル管理
     std::unique_ptr<PortalManager> portalManager_ = nullptr;
     //携帯打刻機
@@ -104,16 +108,18 @@ private:
     std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
     //箱
     std::unique_ptr<BoxManager> boxManager_ = nullptr;
-	// エレベーター
-	std::unique_ptr<Elevator> elevator_ = nullptr;
+    // エレベーター
+    std::unique_ptr<Elevator> elevator_ = nullptr;
     //PC
     std::unique_ptr<PC> pc_ = nullptr;
 	// コーヒー缶
 	std::unique_ptr<Coffees> coffees_ = nullptr;
-#pragma endregion
+
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
-
+    //最初のイベント
+    std::unique_ptr<FirstGameEvent>firstEvent_ = nullptr;
+    GameEvent* currentEvent_ = nullptr;
 #pragma region// light
     //DirectionalLight
     DirectionalCommonLight directionalLight_{};
@@ -127,10 +133,10 @@ private:
     std::array<AreaCommonLight, kMaxAreaLights> areaLights_{};
     uint32_t activeAreaLightCount_ = 0;
 #pragma endregion
-	bool useDirectionalShadow_ = true;
-	bool usePointShadow_ = false;
-	bool useSpotShadow_ = false;
-	bool useAreaShadow_ = false;
+    bool useDirectionalShadow_ = true;
+    bool usePointShadow_ = false;
+    bool useSpotShadow_ = false;
+    bool useAreaShadow_ = false;
 
 public:
     //シーンのコンストラクタ
@@ -161,6 +167,8 @@ private:
     void UpdateCamera();
     //シーン遷移の更新処理
     void UpdateSceneTransition();
+    //ポストエフェクトの更新処理
+    void UpdatePostEffect();
     //ゲームオブジェクトの更新処理
     void UpdateGameObject();
     //ポイントライトの更新処理

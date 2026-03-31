@@ -17,7 +17,7 @@ Desk::Desk()
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/desk", "desk");
     obj_->SetModel("desk");
     SetAABB({ .min = {-0.4f,0.0f,-0.3f},.max = {0.4f,0.8f,0.3f} });
-    SetCollisionAttribute(kCollisionDesk);
+    SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer | kCollisionKey | kCollisionItem);
     localAABB_ = { .min = {-0.125f,-0.125f,-0.125f},.max = {0.125f,0.125,0.125f} };
 }
@@ -80,16 +80,13 @@ void Desk::Update()
     Animation();
     obj_->Update();
 
-    if (!isStart_) {
-        isStart_ = true;
-    }
 }
 
 void Desk::Initialize()
 {
     obj_->Initialize();
-    
-    isStart_ = false;
+
+    isRayHit_ = false;
     desiredAnimationName = "Idle";
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/desk", "desk");
@@ -115,11 +112,10 @@ void Desk::Draw()
 
 void Desk::CheckCollision()
 {
-    if (!isStart_) {
-        return;
-    }
 
-    if (OnCollisionRay()) {
+    isRayHit_ = OnCollisionRay();
+
+    if (isRayHit_) {
         //rayの当たり判定
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (!PlayerCommand::GetIsGrab()) {

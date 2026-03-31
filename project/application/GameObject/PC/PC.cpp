@@ -10,6 +10,7 @@
 #include"GameObject/SEManager/SEManager.h"
 
 PlayerCamera* PC::playerCamera_ = nullptr;
+bool PC::isRayHit_ = false;
 
 PC::PC()
 {
@@ -18,7 +19,7 @@ PC::PC()
     obj_->SetModel("pc");
     SetAABB({ .min = {-0.15f,-0.15f,-0.15f},.max = {0.15f,0.15f,0.15f} });
     SetCollisionAttribute(kCollisionItem);
-    SetCollisionMask(kCollisionPlayer | kCollisionKey | kCollisionDesk);
+    SetCollisionMask(kCollisionPlayer | kCollisionKey | kCollisionWall);
 }
 
 void PC::OnCollision(Collider* collider)
@@ -81,6 +82,7 @@ void PC::Update()
 
 void PC::Initialize()
 {
+    isRayHit_  = false;
     obj_->Initialize();
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/pc", "pc");
@@ -106,8 +108,9 @@ void PC::Draw()
 
 void PC::CheckCollision()
 {
+   isRayHit_ = OnCollisionRay();
+    if (isRayHit_) {
 
-    if (OnCollisionRay()) {
         //rayの当たり判定
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (!PlayerCommand::GetIsGrab()) {
