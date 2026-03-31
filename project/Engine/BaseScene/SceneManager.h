@@ -1,6 +1,7 @@
 #pragma once
 #include "AbstractSceneFactory.h"
 #include "BaseScene.h"
+#include "Sprite.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -15,6 +16,18 @@ class SceneManager {
 
 	AbstractSceneFactory* sceneFactory_ = nullptr;
 	bool isSceneReinitializeRequested_ = false;
+
+	enum class TransitionState { None, FadingOut, FadingIn };
+	TransitionState transitionState_ = TransitionState::None;
+	float transitionTimer_ = 0.0f;
+	const float fadeOutDuration_ = 0.35f;
+	const float fadeInDuration_ = 0.35f;
+
+	std::unique_ptr<Sprite> fadeSprite_ = nullptr;
+	uint32_t fadeTextureHandle_ = 0;
+
+	void EnsureFadeSprite();
+	float GetFadeAlpha() const;
 
 public:
 	void SetSceneFactory(AbstractSceneFactory* sceneFactory) { sceneFactory_ = sceneFactory; };
