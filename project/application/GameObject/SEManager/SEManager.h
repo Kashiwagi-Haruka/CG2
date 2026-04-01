@@ -18,10 +18,12 @@ public:
 		VENDING_MAC,
 		KEY,
 		DESK,
+		DAMAGE,
 	};
 
 private:
 	static std::unordered_map<SEManager::Data, SoundData> SEs_;
+
 public:
 	static void Load();
 	static void Initialize();

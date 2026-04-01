@@ -11,6 +11,7 @@
 #include"GameObject/KeyBindConfig.h"
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
+#include "GameObject/SEManager/SEManager.h"
 #include <algorithm>
 #include <cmath>
 
@@ -514,7 +515,11 @@ void ShadowGameScene::UpdatePlayerDamage() {
 }
 
 void ShadowGameScene::ApplyPlayerDamage(float damageAmount) {
+	const float prevHp = playerHp_;
 	playerHp_ = std::max(0.0f, playerHp_ - damageAmount);
+	if (playerHp_ < prevHp) {
+		SEManager::SoundPlay(SEManager::DAMAGE);
+	}
 	if (playerHp_ > 1.0f && playerHp_ < kPlayerMaxHp_) {
 		playerHp_ = std::floor(playerHp_);
 	}
