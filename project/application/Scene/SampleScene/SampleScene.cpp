@@ -691,8 +691,9 @@ void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 	SetSceneCameraForDraw(camera);
 	ParticleManager::GetInstance()->SetCamera(camera);
 	UpdateSceneCameraMatricesForDraw();
-	Object3dCommon::GetInstance()->DrawCommon();
+	Object3dCommon::GetInstance()->DrawCommonOutline();
 	uvBallObj_->Draw();
+	Object3dCommon::GetInstance()->DrawCommon();
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
@@ -708,7 +709,6 @@ void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
-	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 }
 
 void SampleScene::Finalize() {
