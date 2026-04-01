@@ -32,7 +32,7 @@
 
 #include "GameObject/Coffee/Coffees.h"
 #include "GameObject/UI/DamageOverlay.h"
-
+#include "GameObject/Gentleman/Gentleman.h"
 #pragma endregion
 
 #pragma region//Event
@@ -116,7 +116,8 @@ private:
     std::unique_ptr<PC> pc_ = nullptr;
 	// コーヒー缶
 	std::unique_ptr<Coffees> coffees_ = nullptr;
-
+    //セーブポイント紳士
+    std::unique_ptr<Gentleman> gentleman_ = nullptr;
     //衝突管理
     std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
     //最初のイベント

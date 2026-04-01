@@ -307,6 +307,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\PC\PC.cpp" />
     <ClCompile Include="application\GameObject\Event\FirstGameEvent.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManager2.cpp" />
+    <ClCompile Include="application\GameObject\Gentleman\Gentleman.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -485,6 +486,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\PC\PC.h" />
     <ClInclude Include="application\GameObject\Event\FirstGameEvent.h" />
     <ClInclude Include="application\GameObject\Wall\WallManager2.h" />
+    <ClInclude Include="application\GameObject\Gentleman\Gentleman.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
