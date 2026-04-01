@@ -133,6 +133,7 @@ public:
 	void SetRandomNoiseBlendMode(int blendMode);
 	int GetRandomNoiseBlendMode() const { return randomNoiseBlendMode_; }
 	void SetEditorLayoutEnabled(bool enabled) { editorLayoutEnabled_ = enabled; }
+	bool IsEditorLayoutEnabled() const { return editorLayoutEnabled_; }
 	ID3D12Device* GetDevice() { return device_.Get(); };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle() const { return dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(); }
