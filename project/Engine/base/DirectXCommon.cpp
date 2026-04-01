@@ -562,6 +562,7 @@ void DirectXCommon::SetRandomNoiseBlendMode(int blendMode) {
 	}
 }
 void DirectXCommon::PreDraw() {
+	sceneCopiedToBackBufferThisFrame_ = false;
 	randomNoiseTime_ += deltaTime_;
 	if (postEffectParameterMappedData_) {
 		postEffectParameterMappedData_->randomNoiseTime = randomNoiseTime_;
@@ -632,6 +633,9 @@ void DirectXCommon::ExecuteCommandListAndWait() {
 	TextureManager::GetInstance()->GetSrvManager()->PreDraw();
 }
 void DirectXCommon::DrawSceneTextureToBackBuffer() {
+	if (sceneCopiedToBackBufferThisFrame_) {
+		return;
+	}
 	D3D12_RESOURCE_BARRIER barriers[2]{};
 	barriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barriers[0].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -698,7 +702,10 @@ void DirectXCommon::DrawSceneTextureToBackBuffer() {
 	barriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	commandList_->ResourceBarrier(1, &barriers[1]);
+	sceneCopiedToBackBufferThisFrame_ = true;
 }
+
+void DirectXCommon::EnsureSceneTextureCopiedToBackBuffer() { DrawSceneTextureToBackBuffer(); }
 void DirectXCommon::FrameStart() {
 
 	// FrameStart
@@ -732,6 +739,7 @@ void DirectXCommon::DrawCommandList() {
 	// commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 }
 void DirectXCommon::SetMainRenderTarget() {
+	sceneCopiedToBackBufferThisFrame_ = false;
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	commandList_->OMSetRenderTargets(1, &sceneRtvHandle_, false, &dsvHandle);
 	commandList_->RSSetViewports(1, &viewport_);

@@ -81,6 +81,7 @@ class DirectXCommon {
 	float randomNoiseTime_ = 0.0f;
 	int randomNoiseBlendMode_ = 0;
 	bool editorLayoutEnabled_ = false;
+	bool sceneCopiedToBackBufferThisFrame_ = false;
 	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	// RTVを2つ作るのでディスクリプタを2つ用意
@@ -119,6 +120,7 @@ public:
 	void SetMainRenderTarget();
 	void ExecuteCommandListAndWait();
 	void DrawSceneTextureToBackBuffer();
+	void EnsureSceneTextureCopiedToBackBuffer();
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 	void Finalize();
 	float GetDeltaTime() const { return deltaTime_; }
@@ -131,7 +133,6 @@ public:
 	void SetRandomNoiseBlendMode(int blendMode);
 	int GetRandomNoiseBlendMode() const { return randomNoiseBlendMode_; }
 	void SetEditorLayoutEnabled(bool enabled) { editorLayoutEnabled_ = enabled; }
-
 	ID3D12Device* GetDevice() { return device_.Get(); };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle() const { return dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(); }

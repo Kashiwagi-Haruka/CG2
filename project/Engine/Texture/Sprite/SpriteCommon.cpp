@@ -24,13 +24,14 @@ void SpriteCommon::Initialize(DirectXCommon* dxCommon) {
 }
 void SpriteCommon::Finalize() { instance_.reset(); }
 void SpriteCommon::DrawCommon() {
-
+	dxCommon_->EnsureSceneTextureCopiedToBackBuffer();
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(pso_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get()); // 通常
 
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
-void SpriteCommon::DrawCommonFont(){
+void SpriteCommon::DrawCommonFont() {
+	dxCommon_->EnsureSceneTextureCopiedToBackBuffer();
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoFont_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoFont_->GetGraphicsPipelineState(blendMode_).Get()); // 通常
 
