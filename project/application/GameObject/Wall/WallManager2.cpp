@@ -58,15 +58,15 @@ void WallManager2::Update()
     Vector3 translate = {7.0f,0.0f,0.0f};
 
 
-    walls_[0]->SetST({ 1.0f,4.0f,22.0f }, translate+Vector3{ 7.0f,2.0f,0.0f });
-    walls_[1]->SetST({ 1.0f,4.0f,22.0f }, translate+Vector3{ -7.0f,2.0f,0.0f });
+    walls_[0]->SetST({ 1.0f,4.0f,22.0f }, translate+Vector3{ 7.0f,2.0f,-2.0f });
+    walls_[1]->SetST({ 1.0f,4.0f,22.0f }, translate+Vector3{ -7.0f,2.0f,-2.0f });
     //裏側                  
     walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate+Vector3{ 0.0f,2.0f,7.0f });
                                   
-    walls_[3]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ -3.5f,2.0f,-6.5f });
-    walls_[4]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ 3.5f,2.0f ,-6.5f });
-    walls_[5]->SetST({6.0f, 4.0f,1.0f,}, translate+Vector3{ -4.0f,2.0f, -11.5f });
-    walls_[6]->SetST({6.0f, 4.0f ,1.0f },translate+Vector3 { 4.0f,2.0f, -11.5f });
+    walls_[3]->SetST({7.0f, 4.0f,2.0f,}, translate+Vector3{ -3.75f,2.0f,-7.0f });
+    walls_[4]->SetST({7.0f, 4.0f,2.0f,}, translate+Vector3{ 3.75f,2.0f ,-7.0f });
+    walls_[5]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ -3.75f,2.0f, -12.5f });
+    walls_[6]->SetST({7.0f, 4.0f ,1.0f },translate+Vector3 { 3.75f,2.0f, -12.5f });
 
 
     for (auto& wall : walls_) {
