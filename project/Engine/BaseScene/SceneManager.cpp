@@ -100,18 +100,22 @@ void SceneManager::Draw() {
 	if (scene_) {
 		scene_->Draw();
 	}
+}
 
+void SceneManager::DrawOverlay() {
 	const float alpha = GetFadeAlpha();
-	if (alpha > 0.0f) {
-		EnsureFadeSprite();
-		SpriteCommon::GetInstance()->DrawCommon();
-		SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
-		fadeSprite_->SetColor({0.0f, 0.0f, 0.0f, alpha});
-		fadeSprite_->SetScale({SCREEN_SIZE::WIDTH, SCREEN_SIZE::HEIGHT});
-		fadeSprite_->SetPosition({0.0f, 0.0f});
-		fadeSprite_->Update();
-		fadeSprite_->Draw();
+	if (alpha <= 0.0f) {
+		return;
 	}
+
+	EnsureFadeSprite();
+	SpriteCommon::GetInstance()->DrawCommon();
+	SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
+	fadeSprite_->SetColor({0.0f, 0.0f, 0.0f, alpha});
+	fadeSprite_->SetScale({SCREEN_SIZE::WIDTH, SCREEN_SIZE::HEIGHT});
+	fadeSprite_->SetPosition({0.0f, 0.0f});
+	fadeSprite_->Update();
+	fadeSprite_->Draw();
 }
 
 void SceneManager::ChangeScene(const std::string& sceneName) {

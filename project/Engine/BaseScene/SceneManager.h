@@ -35,6 +35,7 @@ public:
 	void RequestReinitializeCurrentScene();
 	void Update();
 	void Draw();
+	void DrawOverlay();
 	void Finalize();
 	const std::string& GetCurrentSceneName() const { return currentSceneName_; }
 	std::vector<std::string> GetSceneNames() const;
