@@ -130,52 +130,13 @@ float ComputeToonShadowMask(float NdotL)
         saturatedNdotL);
 }
 
-
 PixelShaderOutput main(Object3dVertexShaderOutput input)
 {
     PixelShaderOutput output;
-    const float pi = 3.14159265f;
-    float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-
-    float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
-    if (gMaterial.enableLighting != 0)
-    {
-        float3 baseColor = gMaterial.color.rgb * textureColor.rgb;
-        float3 normal = normalize(input.normal);
-        float NdotL = dot(normal, -gDirectionalLight.direction);
-        float toonShadowMask = ComputeToonShadowMask(NdotL);
-
-        float directionalIntensity = min(gDirectionalLight.intensity, kToonLightIntensityMax);
-        float3 litColor = baseColor * gDirectionalLight.color.rgb * directionalIntensity;
-        float3 shadowColor = baseColor * gDirectionalLight.color.rgb * kToonShadowStrength;
-        float3 viewDirection = normalize(input.worldPosition - gCamera.worldPosition);
-        float3 reflectedDirection = reflect(viewDirection, normalize(input.normal));
-        float2 environmentUV = float2(atan2(reflectedDirection.z, reflectedDirection.x) / (2.0f * pi) + 0.5f,
-            asin(reflectedDirection.y) / pi + 0.5f);
-        float3 environmentColor = gEnvironmentTexture.Sample(gSampler, environmentUV).rgb;
-
-        output.color.rgb = lerp(shadowColor, litColor, toonShadowMask);
-        output.color.rgb += environmentColor * gMaterial.environmentCoefficient;
-        output.color.a = gMaterial.color.a * textureColor.a;
-    }
-    else
-    {
-        output.color = gMaterial.color * textureColor;
-    }
-    output.color.rgb = ApplyGrayscale(output.color.rgb);
-    output.color.rgb = ApplySepia(output.color.rgb);
-    if (textureColor.a < 0.5f)
+    output.color = float4(gMaterial.outlineColor.rgb, saturate(gMaterial.outlineColor.a) * gMaterial.color.a);
+    if (output.color.a <= 0.0f || gMaterial.outlineWidth <= 0.0f)
     {
         discard;
     }
-    if (textureColor.a == 0.0f)
-    {
-        discard;
-    }
-    if (output.color.a == 0.0f)
-    {
-        discard;
-    }
-    
     return output;
 }
