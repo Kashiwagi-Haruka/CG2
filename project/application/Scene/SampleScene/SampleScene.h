@@ -96,7 +96,7 @@ class SampleScene : public BaseScene {
 	bool isBgmPlaying_ = false;
 
 		Vector4 uvBallOutlineColor_ = {0.0f, 0.0f, 0.0f, 1.0f};
-	float uvBallOutlineWidth_ = 1.0f;
+	float uvBallOutlineWidth_ = 10.0f;
 
 	void SetSceneCameraForDraw(Camera* camera);
 	void UpdateSceneCameraMatricesForDraw();
