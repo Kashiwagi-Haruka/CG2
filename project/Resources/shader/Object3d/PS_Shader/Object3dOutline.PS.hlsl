@@ -12,6 +12,7 @@ struct Material
     int sepiaEnabled;
     float distortionStrength;
     float distortionFalloff;
+    float2 padding2;
     float4 outlineColor;
     float outlineWidth;
     float3 outlinePadding;
@@ -46,7 +47,8 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float2 uv = transformedUV.xy;
 
-    float3 baseColor = gTexture.Sample(gSampler, uv).rgb * gMaterial.color.rgb;
+    float4 textureColor = gTexture.Sample(gSampler, uv);
+    float3 baseColor = textureColor.rgb * gMaterial.color.rgb;
     float3 normal = normalize(input.normal);
     float3 viewDirection = normalize(gCamera.worldPosition - input.worldPosition);
 
@@ -56,10 +58,10 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
 
     float edge = max(depthEdge, normalEdge);
     edge = saturate(edge + rim * 0.8f);
-    float outline = smoothstep(0.25f, 0.6f, edge);
-    float3 outlined = lerp(baseColor, float3(0.0f, 0.0f, 0.0f), outline);
+    float outline = step(0.35f, edge);
+    float3 outlined = lerp(baseColor, gMaterial.outlineColor.rgb, outline);
 
-    output.color = float4(outlined, gMaterial.color.a);
+    output.color = float4(outlined, textureColor.a * gMaterial.color.a);
     if (output.color.a <= 0.0f)
     {
         discard;

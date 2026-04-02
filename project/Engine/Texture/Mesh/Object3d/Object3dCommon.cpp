@@ -143,8 +143,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 
 	psoOutline_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoOutline_->Create(
-	    D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dOutline.PS.hlsl",
-	    L"Resources/shader/Object3d/VS_Shader/Object3dOutline.VS.hlsl");
+	    D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dOutline.PS.hlsl");
 
 	psoPortal_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoPortal_->Create(

@@ -23,6 +23,7 @@ struct Material
     int sepiaEnabled;
     float distortionStrength;
     float distortionFalloff;
+    float2 padding2;
     float4 outlineColor;
     float outlineWidth;
     float3 outlinePadding;
