@@ -63,6 +63,8 @@ private:
 	std::unique_ptr<CreatePSO> psoSkinningToon_;
 	// ミラー描画用PSO
 	std::unique_ptr<CreatePSO> psoMirror_;
+	// アウトライン描画用PSO
+	std::unique_ptr<CreatePSO> psoOutline_;
 	// ポータル描画用PSO
 	std::unique_ptr<CreatePSO> psoPortal_;
 	// シャドウマップ生成用PSO
@@ -197,6 +199,7 @@ public:
 	void SetDefaultCamera(Camera* camera) { this->defaultCamera = camera; }
 	// 既定カメラ取得
 	Camera* GetDefaultCamera() const { return defaultCamera; };
+#pragma region DrawCommon
 	// 標準描画設定
 	void DrawCommon();
 	// 指定カメラで標準描画設定
@@ -223,12 +226,17 @@ public:
 	void DrawCommonSkinningToon();
 	// ミラー描画設定
 	void DrawCommonMirror();
+	// アウトライン描画設定
+	void DrawCommonOutline();
 	// ポータル描画設定
 	void DrawCommonPortal();
 	// 指定カメラでポータル描画設定
 	void DrawCommonPortal(Camera* camera);
 	// シャドウマップ描画設定
 	void DrawCommonShadow();
+#pragma endregion
+
+
 	// シャドウマップパス開始
 	void BeginShadowMapPass();
 	// シャドウマップパス終了

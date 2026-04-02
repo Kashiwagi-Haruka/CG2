@@ -14,4 +14,8 @@ struct Material {
 	int sepiaEnabled;             // セピア有効フラグ
 	float distortionStrength;     // 歪み強度
 	float distortionFalloff;      // 歪み減衰
+	float padding2[2];            // アライメント調整用
+	Vector4 outlineColor;         // アウトライン色
+	float outlineWidth;           // アウトライン太さ
+	float outlinePadding[3];      // アライメント調整用
 };

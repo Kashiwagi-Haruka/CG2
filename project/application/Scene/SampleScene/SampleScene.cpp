@@ -87,6 +87,9 @@ void SampleScene::Initialize() {
 	uvBallObj_->Initialize();
 	uvBallObj_->SetCamera(camera_.get());
 	uvBallObj_->SetModel("uvBall");
+	uvBallObj_->SetOutlineWidth(uvBallOutlineWidth_);
+	uvBallObj_->SetOutlineColor({1,1,1,1});
+	
 	fieldObj_->Initialize();
 	fieldObj_->SetCamera(camera_.get());
 	fieldObj_->SetModel("terrain");
@@ -297,7 +300,18 @@ void SampleScene::Update() {
 		}
 		ImGui::End();
 	}
-
+	if (ImGui::Begin("UV Ball")) {
+		if (ImGui::TreeNode("Outline")) {
+			if (ImGui::ColorEdit4("Color", &uvBallOutlineColor_.x)) {
+				uvBallObj_->SetOutlineColor(uvBallOutlineColor_);
+			}
+			if (ImGui::DragFloat("Width", &uvBallOutlineWidth_, 0.05f, 0.0f, 20.0f, "%.2f")) {
+				uvBallObj_->SetOutlineWidth(uvBallOutlineWidth_);
+			}
+			ImGui::TreePop();
+		}
+		ImGui::End();
+	}
 	if (ImGui::Begin("Pad Input")) {
 		ImGui::Text("押されているパッドボタン");
 		const std::array<std::pair<Input::PadButton, const char*>, 14> padButtons = {
@@ -673,7 +687,7 @@ void SampleScene::DrawSceneGeometryForPortalTexture(Camera* camera) {
 	UpdateSceneCameraMatricesForDraw();
 
 	Object3dCommon::GetInstance()->DrawCommon();
-	uvBallObj_->Draw();
+	/*uvBallObj_->Draw();*/
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
@@ -691,8 +705,9 @@ void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 	SetSceneCameraForDraw(camera);
 	ParticleManager::GetInstance()->SetCamera(camera);
 	UpdateSceneCameraMatricesForDraw();
-	Object3dCommon::GetInstance()->DrawCommon();
+	Object3dCommon::GetInstance()->DrawCommonOutline();
 	uvBallObj_->Draw();
+	Object3dCommon::GetInstance()->DrawCommon();
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
@@ -708,7 +723,6 @@ void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 
 	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
 	humanObj_->Draw();
-	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 }
 
 void SampleScene::Finalize() {
