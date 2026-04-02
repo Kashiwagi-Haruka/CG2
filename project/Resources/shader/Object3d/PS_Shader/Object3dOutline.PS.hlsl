@@ -294,8 +294,9 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
     float thresholdEnd = saturate(0.6f / max(outlineScale, 0.001f));
     float outline = smoothstep(thresholdStart, thresholdEnd, edge);
 
-    float3 outlined = lerp(baseColor, gMaterial.outlineColor.rgb, outline);
-    output.color = float4(outlined, gMaterial.color.a * textureColor.a * gMaterial.outlineColor.a);
+    float outlineBlend = outline * saturate(gMaterial.outlineColor.a);
+    float3 outlined = lerp(baseColor, gMaterial.outlineColor.rgb, outlineBlend);
+    output.color = float4(outlined, gMaterial.color.a * textureColor.a);
 
     if (output.color.a <= 0.0f)
     {

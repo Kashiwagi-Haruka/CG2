@@ -87,6 +87,8 @@ void SampleScene::Initialize() {
 	uvBallObj_->Initialize();
 	uvBallObj_->SetCamera(camera_.get());
 	uvBallObj_->SetModel("uvBall");
+	uvBallObj_->SetOutlineWidth(2.0f);
+	uvBallObj_->SetOutlineColor({1.0f, 0.0f, 0.0f, 1.0f});
 	
 	fieldObj_->Initialize();
 	fieldObj_->SetCamera(camera_.get());
