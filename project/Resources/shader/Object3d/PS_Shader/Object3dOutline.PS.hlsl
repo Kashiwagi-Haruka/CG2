@@ -56,9 +56,17 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
     float normalEdge = saturate(length(fwidth(normal)) * 2.5f);
     float rim = pow(1.0f - saturate(dot(normal, viewDirection)), 2.0f);
 
+    float outlineWidth = max(gMaterial.outlineWidth, 0.0f);
+    float widthFactor = saturate(outlineWidth / 10.0f);
+
     float edge = max(depthEdge, normalEdge);
-    edge = saturate(edge + rim * 0.8f);
-    float outline = step(0.35f, edge);
+    edge = saturate(edge + rim * lerp(0.45f, 1.25f, widthFactor));
+
+    float threshold = lerp(0.52f, 0.12f, widthFactor);
+    float softness = lerp(0.01f, 0.14f, widthFactor);
+    float aa = max(fwidth(edge), 1.0e-4f);
+    float outline = smoothstep(threshold - (softness + aa), threshold + (softness + aa), edge);
+
     float3 outlined = lerp(baseColor, gMaterial.outlineColor.rgb, outline);
 
     output.color = float4(outlined, textureColor.a * gMaterial.color.a);
