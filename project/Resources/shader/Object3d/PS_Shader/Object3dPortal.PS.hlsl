@@ -12,8 +12,10 @@ struct Material
     int sepiaEnabled;
     float distortionStrength;
     float distortionFalloff;
+    float4 outlineColor;
+    float outlineWidth;
+    float3 outlinePadding;
 };
-
 struct Camera
 {
     float3 worldPosition;

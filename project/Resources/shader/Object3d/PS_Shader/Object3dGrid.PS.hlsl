@@ -12,6 +12,9 @@ struct Material
     int sepiaEnabled;
     float distortionStrength;
     float distortionFalloff;
+    float4 outlineColor;
+    float outlineWidth;
+    float3 outlinePadding;
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);

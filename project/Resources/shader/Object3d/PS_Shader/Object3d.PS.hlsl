@@ -11,6 +11,9 @@ struct Material
     int sepiaEnabled;
     float distortionStrength;
     float distortionFalloff;
+    float4 outlineColor;
+    float outlineWidth;
+    float3 outlinePadding;
 };
 struct DirectionalLight
 {

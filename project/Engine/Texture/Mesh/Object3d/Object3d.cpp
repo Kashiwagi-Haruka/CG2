@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "Object3d/Object3d.h"
 #include "Camera.h"
 #include "DirectXCommon.h"
@@ -28,6 +29,8 @@ void Object3d::Initialize() {
 	SetSepiaEnabled(false);
 	SetDistortionStrength(0.0f);
 	SetDistortionFalloff(1.0f);
+	SetOutlineColor({0.0f, 0.0f, 0.0f, 1.0f});
+	SetOutlineWidth(1.0f);
 	Hierarchy* Hierarchy = Hierarchy::GetInstance();
 	Hierarchy->RegisterObject3d(this);
 }
@@ -234,6 +237,16 @@ void Object3d::SetDistortionFalloff(float falloff) {
 		materialData_->distortionFalloff = falloff;
 	}
 }
+void Object3d::SetOutlineColor(const Vector4& color) {
+	if (materialData_) {
+		materialData_->outlineColor = color;
+	}
+}
+void Object3d::SetOutlineWidth(float width) {
+	if (materialData_) {
+		materialData_->outlineWidth = std::max(0.0f, width);
+	}
+}
 void Object3d::SetUvTransform(const Matrix4x4& uvTransform) {
 	if (materialData_) {
 		materialData_->uvTransform = uvTransform;
@@ -302,6 +315,18 @@ float Object3d::GetDistortionFalloff() const {
 	}
 	return 1.0f;
 }
+Vector4 Object3d::GetOutlineColor() const {
+	if (materialData_) {
+		return materialData_->outlineColor;
+	}
+	return {0.0f, 0.0f, 0.0f, 1.0f};
+}
+float Object3d::GetOutlineWidth() const {
+	if (materialData_) {
+		return materialData_->outlineWidth;
+	}
+	return 1.0f;
+}
 bool Object3d::IsSepiaEnabled() const {
 	if (materialData_) {
 		return materialData_->sepiaEnabled != 0;
@@ -314,4 +339,8 @@ void Object3d::CreateResources() {
 	const size_t alignedMaterialSize = (sizeof(Material) + 0xFF) & ~0xFF;
 	materialResource_ = Object3dCommon::GetInstance()->CreateBufferResource(alignedMaterialSize);
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	if (materialData_) {
+		materialData_->outlineColor = {0.0f, 0.0f, 0.0f, 1.0f};
+		materialData_->outlineWidth = 1.0f;
+	}
 }

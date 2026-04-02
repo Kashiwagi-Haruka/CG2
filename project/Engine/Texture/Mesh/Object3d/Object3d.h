@@ -87,6 +87,8 @@ public:
 	void SetSepiaEnabled(bool enable);
 	void SetDistortionStrength(float strength);
 	void SetDistortionFalloff(float falloff);
+	void SetOutlineColor(const Vector4& color);
+	void SetOutlineWidth(float width);
 	void SetUvTransform(const Matrix4x4& uvTransform);
 	void SetUvTransform(Vector3 scale, Vector3 rotate, Vector3 translate, Vector2 anchor = {0.0f, 0.0f});
 	void SetUvAnchor(Vector2 anchor);
@@ -100,6 +102,8 @@ public:
 	bool IsSepiaEnabled() const;
 	float GetDistortionStrength() const;
 	float GetDistortionFalloff() const;
+	Vector4 GetOutlineColor() const;
+	float GetOutlineWidth() const;
 	Vector2 GetUvAnchor() const { return uvAnchor_; }
 	void SetAnimation(const Animation::AnimationData* animation, bool loop = true) {
 		animation_ = animation;

@@ -87,6 +87,7 @@ void SampleScene::Initialize() {
 	uvBallObj_->Initialize();
 	uvBallObj_->SetCamera(camera_.get());
 	uvBallObj_->SetModel("uvBall");
+	
 	fieldObj_->Initialize();
 	fieldObj_->SetCamera(camera_.get());
 	fieldObj_->SetModel("terrain");
