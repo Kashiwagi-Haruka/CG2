@@ -676,7 +676,7 @@ void SampleScene::DrawSceneGeometryForPortalTexture(Camera* camera) {
 	UpdateSceneCameraMatricesForDraw();
 
 	Object3dCommon::GetInstance()->DrawCommon();
-	uvBallObj_->Draw();
+	/*uvBallObj_->Draw();*/
 	planeGltf_->Draw();
 	fieldObj_->Draw();
 	animatedCubeObj_->Draw();
