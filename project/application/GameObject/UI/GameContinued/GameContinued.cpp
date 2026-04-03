@@ -1,8 +1,10 @@
+#define NOMINMAX
 #include "GameContinued.h"
 #include "DirectXCommon.h"
 #include "GameObject/KeyBindConfig.h"
 #include "SpriteCommon.h"
 #include "TextureManager.h"
+#include "application/Color/Color.h"
 #include <algorithm>
 #include <cmath>
 
@@ -14,6 +16,7 @@ constexpr float kScreenWidth = 1280.0f;
 constexpr float kScreenHeight = 720.0f;
 constexpr float kBlockCenterX = kScreenWidth * 0.5f;
 constexpr float kBlockCenterY = kScreenHeight * 0.5f;
+constexpr float kThumbnailMargin = 12.0f;
 
 float Lerp(float start, float end, float t) { return start + (end - start) * t; }
 
@@ -31,6 +34,7 @@ void GameContinued::Initialize() {
 		screenTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/SaveScreenShot/NoData.png");
 		saveData.GameSceneSprite_ = std::make_unique<Sprite>();
 		saveData.GameSceneSprite_->Initialize(screenTextureHandle_);
+		saveData.GameSceneSprite_->SetAnchorPoint({0.5f, 0.5f});
 		saveData.BlockSprite_ = std::make_unique<Sprite>();
 		saveData.BlockSprite_->Initialize(blockTextureHandle_);
 		saveData.BlockSprite_->SetAnchorPoint({0.5f, 0.5f});
@@ -49,11 +53,21 @@ void GameContinued::Initialize() {
 		blockScales_[i] = {kBlockWidth, kBlockHeight};
 		gameSaveData[i].BlockSprite_->SetColor(blockColors_[i]);
 		gameSaveData[i].BlockSprite_->Update();
+
+		const float thumbnailHeight = std::max(1.0f, kBlockHeight - (kThumbnailMargin * 2.0f));
+		const float thumbnailWidth = thumbnailHeight * (9.0f / 16.0f);
+		const float left = blockPositions_[i].x - (kBlockWidth * 0.5f);
+		gameSaveData[i].GameSceneSprite_->SetPosition({left + kThumbnailMargin + (thumbnailWidth * 0.5f), blockPositions_[i].y});
+		gameSaveData[i].GameSceneSprite_->SetScale({thumbnailWidth, thumbnailHeight});
+		gameSaveData[i].GameSceneSprite_->SetColor(COLOR::WHITE);
+		gameSaveData[i].GameSceneSprite_->Update();
+		text_->SetBlockLayout(i, blockPositions_[i], blockScales_[i]);
 	}
 
 	currentSelectNum_ = 0;
 	isSelected_ = false;
 }
+
 
 void GameContinued::Update() {
 	PlayerCommand* command = PlayerCommand::GetInstance();
@@ -102,6 +116,13 @@ void GameContinued::Update() {
 		gameSaveData[i].BlockSprite_->SetColor(blockColors_[i]);
 		gameSaveData[i].BlockSprite_->SetScale(blockScales_[i]);
 		gameSaveData[i].BlockSprite_->Update();
+		const float thumbnailHeight = std::max(1.0f, blockScales_[i].y - (kThumbnailMargin * 2.0f));
+		const float thumbnailWidth = thumbnailHeight * (9.0f / 16.0f);
+		const float left = blockPositions_[i].x - (blockScales_[i].x * 0.5f);
+		gameSaveData[i].GameSceneSprite_->SetPosition({left + kThumbnailMargin + (thumbnailWidth * 0.5f), blockPositions_[i].y});
+		gameSaveData[i].GameSceneSprite_->SetScale({thumbnailWidth, thumbnailHeight});
+		gameSaveData[i].GameSceneSprite_->Update();
+		text_->SetBlockLayout(i, blockPositions_[i], blockScales_[i]);
 	}
 
 	text_->Update(currentSelectNum_);
@@ -111,7 +132,10 @@ void GameContinued::Draw() {
 	SpriteCommon::GetInstance()->DrawCommon();
 	for (auto& saveData : gameSaveData) {
 		saveData.BlockSprite_->Draw();
+		saveData.GameSceneSprite_->Draw();
 	}
+	SpriteCommon::GetInstance()->DrawCommonFont();
+	text_->Draw();
 }
 
 void GameContinued::SetSaveData(int index, const std::string& name, const std::string& currentStageName, const std::string& saveDateTime) {

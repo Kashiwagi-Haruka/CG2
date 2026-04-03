@@ -19,6 +19,7 @@ public:
 	void Initialize();
 	void Update(int selectIndex);
 	void Draw();
+	void SetBlockLayout(int index, const Vector2& blockCenter, const Vector2& blockScale);
 
 	void SetSaveDataText(const std::string& name, const std::string& currentStageName, const std::string& saveDateTime, int index);
 	void SetCurrentSelectIndex(int index);
