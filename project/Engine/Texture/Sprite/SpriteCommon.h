@@ -1,9 +1,9 @@
 #pragma once
 #include "BlendMode/BlendModeManager.h"
+#include "PSO/SpriteCreatePSO.h"
 #include <Windows.h>
 #include <memory>
 #include <wrl.h>
-#include "PSO/SpriteCreatePSO.h"
 class DirectXCommon;
 
 class SpriteCommon {
@@ -18,6 +18,7 @@ private:
 
 	std::unique_ptr<SpriteCreatePSO> pso_;
 	std::unique_ptr<SpriteCreatePSO> psoFont_;
+	bool isSpriteVisible_ = true;
 
 	HRESULT hr_;
 
@@ -28,6 +29,8 @@ public:
 	void DrawCommon();
 	void DrawCommonFont();
 	void SetBlendMode(const BlendMode& blendMode = BlendMode::kBlendModeAlpha) { blendMode_ = blendMode; }
+	void SetSpriteVisible(bool isVisible) { isSpriteVisible_ = isVisible; }
+	bool IsSpriteVisible() const { return isSpriteVisible_; }
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 
 	DirectXCommon* GetDxCommon() const { return dxCommon_; };

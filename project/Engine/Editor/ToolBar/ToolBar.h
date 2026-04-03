@@ -1,5 +1,3 @@
-#pragma once
-
 class ToolBar final {
 public:
 	struct Result final {
@@ -10,6 +8,7 @@ public:
 		bool redoRequested = false;
 		bool playRequested = false;
 		bool stopRequested = false;
+		bool spriteVisibilityChanged = false;
 	};
 
 	static Result Draw(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo);

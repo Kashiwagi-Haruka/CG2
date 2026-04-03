@@ -9,6 +9,7 @@
 #include "Vector4.h"
 #include "Data/VertexData.h"
 #include "WinApp.h"
+#include <string>
 #include <memory>
 class SrvManager;
 class ImGuiManager;
@@ -41,6 +42,7 @@ public:
 
 	float GetDeltaTime();
 	ID3D12Device* GetD3D12Device();
+	bool SaveCurrentFrameScreenShot(const std::string& filePath);
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
 
 

@@ -136,6 +136,13 @@ public:
 	bool IsEditorLayoutEnabled() const { return editorLayoutEnabled_; }
 	ID3D12Device* GetDevice() { return device_.Get(); };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
+	ID3D12CommandQueue* GetCommandQueueRaw() { return commandQueue_.Get(); }
+	ID3D12Resource* GetCurrentBackBufferResource() {
+		if (backBufferIndex_ >= swapChainResources_.size()) {
+			return nullptr;
+		}
+		return swapChainResources_[backBufferIndex_].Get();
+	}
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilViewHandle() const { return dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(); }
 
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc_; }

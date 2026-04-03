@@ -11,6 +11,7 @@
 #include "Object3d/Object3d.h"
 #include "Object3d/Object3dCommon.h"
 #include "Primitive/Primitive.h"
+#include "Sprite/SpriteCommon.h"
 #include "Engine/Editor/ToolBar/ToolBar.h"
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
@@ -731,6 +732,9 @@ void Hierarchy::DrawObjectEditors() {
 		}
 		if (toolbarResult.gridRequested) {
 			showGridWindow_ = !showGridWindow_;
+		}
+		if (toolbarResult.spriteVisibilityChanged) {
+			saveStatusMessage_ = SpriteCommon::GetInstance()->IsSpriteVisible() ? "View: show all sprites" : "View: hide all sprites";
 		}
 		if (toolbarResult.allResetRequested) {
 			const bool reset = ResetToLoadedSnapshot();

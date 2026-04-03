@@ -74,6 +74,10 @@ void Sprite::Initialize(uint32_t Handle) {
 }
 
 void Sprite::Draw() {
+	const SpriteCommon* spriteCommon = SpriteCommon::GetInstance();
+	if (spriteCommon->GetDxCommon()->IsEditorLayoutEnabled() && !spriteCommon->IsSpriteVisible()) {
+		return;
+	}
 
 	// 頂点バッファビューとインデックスバッファビューをセット（オフセット指定）
 	UINT offset = currentSpriteVertexOffset_;

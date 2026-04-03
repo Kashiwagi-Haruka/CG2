@@ -37,129 +37,134 @@ void TitleScene::CameraUpdate()
 
 TitleScene::TitleScene() {
 
-    BGMData_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/clock.mp3");
-    Audio::GetInstance()->SetSoundVolume(&BGMData_, 1.0f);
-    //カメラのインスタンス化
-    camera_ = std::make_unique<Camera>();
-    cameraDefaultPos_ = { 0.0f,0.0f,-0.3f };
+	BGMData_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/clock.mp3");
+	Audio::GetInstance()->SetSoundVolume(&BGMData_, 1.0f);
+	// カメラのインスタンス化
+	camera_ = std::make_unique<Camera>();
+	cameraDefaultPos_ = {0.0f, 0.0f, -0.3f};
 
-    transition = std::make_unique<SceneTransition>();
-    //ランダム
-    random_ = std::make_unique<RandomClass>();
+	transition = std::make_unique<SceneTransition>();
+	// ランダム
+	random_ = std::make_unique<RandomClass>();
 
-
-    titleMenuUI_ = std::make_unique<TitleMenuUI>();
-    firstStory_ = std::make_unique<FirstStory>();
-    //ゲームオブジェクト
-    timeCard_ = std::make_unique<TimeCard>();
-    timeCardRack_ = std::make_unique<TimeCardRack>();
-    wall_ = std::make_unique<Wall>();
-    identityMat_ = Function::MakeIdentity4x4();
+	titleMenuUI_ = std::make_unique<TitleMenuUI>();
+	firstStory_ = std::make_unique<FirstStory>();
+	gameContinued_ = std::make_unique<GameContinued>();
+	// ゲームオブジェクト
+	timeCard_ = std::make_unique<TimeCard>();
+	timeCardRack_ = std::make_unique<TimeCardRack>();
+	wall_ = std::make_unique<Wall>();
+	identityMat_ = Function::MakeIdentity4x4();
 }
 
-void TitleScene::Finalize() {
-    Audio::GetInstance()->SoundUnload(&BGMData_);
-}
+void TitleScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGMData_); }
 
 void TitleScene::Initialize() {
 
-    Audio::GetInstance()->SoundPlayWave(BGMData_, true);
+	Audio::GetInstance()->SoundPlayWave(BGMData_, true);
 
-    isTransitionIn = true;
-    isTransitionOut = false;
-    transition->Initialize(false);
+	isTransitionIn = true;
+	isTransitionOut = false;
+	transition->Initialize(false);
 
-    //ランダム
-    random_->SetMinMax(-0.01f, 0.01f);
+	// ランダム
+	random_->SetMinMax(-0.01f, 0.01f);
 
-    titleMenuUI_->Initialize();
-    firstStory_->Initialize();
+	titleMenuUI_->Initialize();
+	firstStory_->Initialize();
+	gameContinued_->Initialize();
+	isGameContinuedOpen_ = false;
 
-    //カメラ
-    cameraTransform_ = {
-        .scale = {1.0f,1.0f,1.0f},
-        .rotate = {0.0f,0.0f,0.0f},
-        .translate = cameraDefaultPos_
+	// カメラ
+	cameraTransform_ = {
+	    .scale = {1.0f, 1.0f, 1.0f},
+          .rotate = {0.0f, 0.0f, 0.0f},
+          .translate = cameraDefaultPos_
     };
-    //カメラ
-    camera_->SetTransform(cameraTransform_);
-    cameraRandomOffset_ = { 0.0f };
-    cameraMoveTimer_ = 0.0f;
+	// カメラ
+	camera_->SetTransform(cameraTransform_);
+	cameraRandomOffset_ = {0.0f};
+	cameraMoveTimer_ = 0.0f;
 
-    //ライト
-    directionalLight_.color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    directionalLight_.direction = { 0.0f, -1.0f, 0.0f };
-    directionalLight_.intensity = 1.0f;
-    //ゲームオブジェクト
-    timeCard_->Initialize();
-    timeCardRack_->Initialize();
-    wall_->Initialize();
-    wall_->SetParentMatrix(&identityMat_);
-    wall_->SetST({ 14.0f,4.0f,1.0f }, { 0.0f,0.0f,0.75f });
-    timeCard_->SetCamera(camera_.get());
-    timeCardRack_->SetCamera(camera_.get());
-    wall_->SetCamera(camera_.get());
-
-
+	// ライト
+	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
+	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
+	directionalLight_.intensity = 1.0f;
+	// ゲームオブジェクト
+	timeCard_->Initialize();
+	timeCardRack_->Initialize();
+	wall_->Initialize();
+	wall_->SetParentMatrix(&identityMat_);
+	wall_->SetST({14.0f, 4.0f, 1.0f}, {0.0f, 0.0f, 0.75f});
+	timeCard_->SetCamera(camera_.get());
+	timeCardRack_->SetCamera(camera_.get());
+	wall_->SetCamera(camera_.get());
 }
 
 void TitleScene::Update() {
 
+	if (!isGameContinuedOpen_) {
+		titleMenuUI_->Update();
 
-    titleMenuUI_->Update();
+		if (titleMenuUI_->ConsumeContinueTriggered()) {
+			isGameContinuedOpen_ = true;
+		}
+	} else {
+		gameContinued_->Update();
+	}
 
-    if (titleMenuUI_->GetIsStart()) {
-        firstStory_->Update();
-    }
+	if (titleMenuUI_->GetIsStart()) {
+		firstStory_->Update();
+	}
 
-    if (firstStory_->GetIsEnd()) {
-        if (!isTransitionOut) {
-            transition->Initialize(true);
-            isTransitionOut = true;
-        }
-    }
+	if (firstStory_->GetIsEnd()) {
+		if (!isTransitionOut) {
+			transition->Initialize(true);
+			isTransitionOut = true;
+		}
+	}
 
-    if (isTransitionIn || isTransitionOut) {
-        transition->Update();
-        if (transition->IsEnd() && isTransitionIn) {
-            isTransitionIn = false;
-        }
-        if (transition->IsEnd() && isTransitionOut) {
-            SceneManager::GetInstance()->ChangeScene("ShadowGame");
-        }
-    }
+	if (isTransitionIn || isTransitionOut) {
+		transition->Update();
+		if (transition->IsEnd() && isTransitionIn) {
+			isTransitionIn = false;
+		}
+		if (transition->IsEnd() && isTransitionOut) {
+			SceneManager::GetInstance()->ChangeScene("ShadowGame");
+		}
+	}
 
-    CameraUpdate();
+	CameraUpdate();
 
+	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
 
-    Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-
-    timeCard_->Update();
-    timeCardRack_->Update();
-    wall_->Update();
-
+	timeCard_->Update();
+	timeCardRack_->Update();
+	wall_->Update();
 }
 void TitleScene::Draw() {
 
-    Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(true);
-    Object3dCommon::GetInstance()->SetVignetteStrength(true);
+	Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(true);
+	Object3dCommon::GetInstance()->SetVignetteStrength(true);
 
-    Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
-    Object3dCommon::GetInstance()->DrawCommon();
-    
-    timeCard_->Draw();
-    timeCardRack_->Draw();
-    wall_->Draw();
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
+	Object3dCommon::GetInstance()->DrawCommon();
 
-    SpriteCommon::GetInstance()->DrawCommonFont();
-    titleMenuUI_->Draw();
-    firstStory_->Draw();
-    FreeTypeManager::ResetFontUsage();
-    SpriteCommon::GetInstance()->DrawCommon();
+	timeCard_->Draw();
+	timeCardRack_->Draw();
+	wall_->Draw();
 
-    if (isTransitionIn || isTransitionOut) {
+	SpriteCommon::GetInstance()->DrawCommonFont();
+	if (!isGameContinuedOpen_) {
+		titleMenuUI_->Draw();
+	} else {
+		gameContinued_->Draw();
+	}
+	firstStory_->Draw();
+	FreeTypeManager::ResetFontUsage();
+	SpriteCommon::GetInstance()->DrawCommon();
+
+	if (isTransitionIn || isTransitionOut) {
 		transition->Draw();
 	}
-
-
 }
