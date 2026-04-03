@@ -19,6 +19,7 @@ class GameContinued {
 	std::array<SaveData, saveDataMaxNum_> gameSaveData;
 	std::array<Vector4, saveDataMaxNum_> blockColors_{};
 	std::array<Vector2, saveDataMaxNum_> blockScales_{};
+	std::array<Vector2, saveDataMaxNum_> blockPositions_{};
 	int currentSelectNum_ = 0;
 	bool isSelected_ = false;
 

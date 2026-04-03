@@ -1,8 +1,8 @@
 #include "GameContinued.h"
+#include "DirectXCommon.h"
 #include "GameObject/KeyBindConfig.h"
 #include "SpriteCommon.h"
 #include "TextureManager.h"
-#include "DirectXCommon.h"
 #include <algorithm>
 #include <cmath>
 
@@ -12,6 +12,7 @@ constexpr float kBlockStartY = 120.0f;
 constexpr float kBlockWidth = 1040.0f;
 constexpr float kBlockHeight = 96.0f;
 constexpr float kBlockSpacingY = 110.0f;
+constexpr float kSelectedCenterOffset = (saveDataMaxNum_ - 1) * 0.5f;
 
 float Lerp(float start, float end, float t) { return start + (end - start) * t; }
 
@@ -39,7 +40,8 @@ void GameContinued::Initialize() {
 		SetSaveData(i, "Save " + std::to_string(i + 1), "No Data", "--:--");
 
 		const float y = kBlockStartY + (kBlockSpacingY * static_cast<float>(i));
-		gameSaveData[i].BlockSprite_->SetPosition({kBlockStartX, y});
+		blockPositions_[i] = {kBlockStartX, y};
+		gameSaveData[i].BlockSprite_->SetPosition(blockPositions_[i]);
 		gameSaveData[i].BlockSprite_->SetScale({kBlockWidth, kBlockHeight});
 		blockColors_[i] = {0.3f, 0.3f, 0.3f, 0.86f};
 		blockScales_[i] = {kBlockWidth, kBlockHeight};
@@ -74,18 +76,27 @@ void GameContinued::Update() {
 		const float distance = std::abs(static_cast<float>(i - currentSelectNum_));
 		const float distanceRate = distance / maxDistance;
 		const float easedDistance = distanceRate * distanceRate;
+		const float proximity = 1.0f - distanceRate;
 
-		const float brightness = 0.25f + ((1.0f - easedDistance) * 0.75f);
-		const Vector4 targetColor = {brightness, brightness, brightness, 0.9f};
+		const float targetY = kBlockStartY + (kBlockSpacingY * (static_cast<float>(i) - static_cast<float>(currentSelectNum_) + kSelectedCenterOffset));
+		const Vector2 targetPosition = {kBlockStartX, targetY};
 
-		const float scaleFactor = 0.84f + ((1.0f - easedDistance) * 0.16f);
-		const Vector2 targetScale = {kBlockWidth, kBlockHeight * scaleFactor};
+		const float r = 0.15f + (proximity * 0.80f);
+		const float g = 0.18f + (proximity * 0.57f);
+		const float b = 0.22f + (proximity * 0.25f);
+		const float alpha = 0.78f + (proximity * 0.22f);
+		const Vector4 targetColor = {r, g, b, alpha};
+
+		const float scaleFactor = 0.72f + (std::pow(1.0f - easedDistance, 1.4f) * 0.42f);
+		const Vector2 targetScale = {kBlockWidth * scaleFactor, kBlockHeight * scaleFactor};
 
 		const float deltaTime = SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-		const float transitionRate = std::clamp(deltaTime * 10.0f, 0.0f, 1.0f);
+		const float transitionRate = std::clamp(deltaTime * 8.0f, 0.0f, 1.0f);
+		blockPositions_[i] = Lerp(blockPositions_[i], targetPosition, transitionRate);
 		blockColors_[i] = Lerp(blockColors_[i], targetColor, transitionRate);
 		blockScales_[i] = Lerp(blockScales_[i], targetScale, transitionRate);
 
+		gameSaveData[i].BlockSprite_->SetPosition(blockPositions_[i]);
 		gameSaveData[i].BlockSprite_->SetColor(blockColors_[i]);
 		gameSaveData[i].BlockSprite_->SetScale(blockScales_[i]);
 		gameSaveData[i].BlockSprite_->Update();
