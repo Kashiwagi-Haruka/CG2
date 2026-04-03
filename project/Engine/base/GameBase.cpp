@@ -7,6 +7,7 @@
 #include "Object3d/Object3dCommon.h"
 #include "ParticleManager.h"
 #include "SpriteCommon.h"
+#include "Engine/ScreenShot/ScreenShot.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
 #include <DbgHelp.h>
@@ -124,4 +125,12 @@ ID3D12Device* GameBase::GetD3D12Device() {
 		return nullptr;
 	}
 	return dxCommon_->GetDevice();
+}
+bool GameBase::SaveCurrentFrameScreenShot(const std::string& filePath) {
+	if (!dxCommon_) {
+		return false;
+	}
+
+	dxCommon_->EnsureSceneTextureCopiedToBackBuffer();
+	return ScreenShot::SaveBackBuffer(dxCommon_.get(), filePath);
 }
