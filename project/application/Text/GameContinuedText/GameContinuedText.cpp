@@ -24,9 +24,9 @@ void GameContinuedText::Initialize() {
 		saveDataText.currentStageName_.SetAlign(TextAlign::Left);
 		saveDataText.saveDateTime_.SetAlign(TextAlign::Left);
 
-		saveDataText.Name_.SetColor(COLOR::WHITE);
-		saveDataText.currentStageName_.SetColor(COLOR::WHITE);
-		saveDataText.saveDateTime_.SetColor(COLOR::WHITE);
+		saveDataText.Name_.SetColor(COLOR::BLACK);
+		saveDataText.currentStageName_.SetColor(COLOR::BLACK);
+		saveDataText.saveDateTime_.SetColor(COLOR::BLACK);
 
 		SetBlockLayout(i, {640.0f, 360.0f + (280.0f * static_cast<float>(i))}, {1040.0f, 240.0f});
 
