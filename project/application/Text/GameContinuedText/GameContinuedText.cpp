@@ -29,13 +29,10 @@ void GameContinuedText::Initialize() {
 		gameSaveDataText_[i].currentStageName_.SetColor(COLOR::BLACK);
 		gameSaveDataText_[i].saveDateTime_.SetColor(COLOR::BLACK);
 
-		gameSaveDataText_[i].Name_.SetSize({32.0f, 32.0f});
-		gameSaveDataText_[i].currentStageName_.SetSize({32.0f, 32.0f});
-		gameSaveDataText_[i].saveDateTime_.SetSize({32.0f, 32.0f});
+		gameSaveDataText_[i].Name_.SetSize({200.0f, 200.0f});
+		gameSaveDataText_[i].currentStageName_.SetSize({200.0f, 200.0f});
+		gameSaveDataText_[i].saveDateTime_.SetSize({200.0f, 200.0f});
 
-		gameSaveDataText_[i].Name_.SetString(U"SaveFile");
-		gameSaveDataText_[i].currentStageName_.SetString(U"NoData");
-		gameSaveDataText_[i].saveDateTime_.SetString(U"1111");
 
 
 
@@ -103,13 +100,6 @@ void GameContinuedText::SetCurrentSelectIndex(int index) {
 	}
 
 	currentSelectIndex_ = index;
-
-	for (auto& saveDataText : gameSaveDataText_) {
-		Vector4 color = COLOR::WHITE;
-		saveDataText.Name_.SetColor(color);
-		saveDataText.currentStageName_.SetColor(color);
-		saveDataText.saveDateTime_.SetColor(color);
-	}
 
 	Vector2 cursorPos = gameSaveDataText_[currentSelectIndex_].Name_.GetPosition();
 	cursorPos.x -= kCursorOffsetX;

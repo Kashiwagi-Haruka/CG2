@@ -43,7 +43,7 @@ void GameContinued::Initialize() {
 	text_->Initialize();
 
 	for (int i = 0; i < saveDataMaxNum_; ++i) {
-		SetSaveData(i, "Save " + std::to_string(i + 1), "No Data", "--:--");
+		SetSaveData(i, "SaveFile", "NoData", "--:--");
 
 		const float y = kBlockCenterY + (kBlockSpacingY * static_cast<float>(i));
 		blockPositions_[i] = {kBlockCenterX, y};
