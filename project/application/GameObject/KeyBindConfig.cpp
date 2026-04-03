@@ -47,7 +47,6 @@ bool PlayerCommand::EvetSkipTrigger()
     return
         input->TriggerKey(K_Interact) ||
         input->TriggerButton(Input::PadButton(C_Interact)) ||
-        input->TriggerKey(K_Shot) ||
         input->TriggerButton(Input::PadButton(C_Shot)) ||
         input->TriggerMouseButton(Input::MouseButton(M_Shot));
 }
@@ -74,7 +73,7 @@ bool PlayerCommand::UiMoveLeftTrigger() { return MoveTrigger(K_MoveLeft, K_MoveL
 bool PlayerCommand::UiMoveRightTrigger() { return MoveTrigger(K_MoveRight, K_MoveRightArrow, C_MoveRight); }
 bool PlayerCommand::Shot() {
     auto* input = Input::GetInstance();
-    return input->TriggerKey(K_Shot) || input->TriggerButton(Input::PadButton(C_Shot)) || input->TriggerMouseButton(Input::MouseButton(M_Shot));
+    return input->TriggerButton(Input::PadButton(C_Shot)) || input->TriggerMouseButton(Input::MouseButton(M_Shot));
 }
 
 bool PlayerCommand::Sneak() {

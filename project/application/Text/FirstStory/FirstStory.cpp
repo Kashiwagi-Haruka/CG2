@@ -29,7 +29,7 @@ void FirstStory::Initialize()
 void FirstStory::Update()
 {
 
-    if (PlayerCommand::GetInstance()->Shot()) {
+    if (PlayerCommand::GetInstance()->Shot()||PlayerCommand::GetInstance()->InteractTrigger()) {
         if (shotCount_ < 1) {
             text_.SetString(strings_);
             text_.StartTyping(0.05f);
