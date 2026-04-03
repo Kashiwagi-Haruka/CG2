@@ -4,16 +4,12 @@
 #include <algorithm>
 
 namespace {
-constexpr float kTextLeftPadding = 40.0f;
-constexpr float kTextGapX = 270.0f;
-constexpr float kDateGapX = 560.0f;
 constexpr float kCursorOffsetX = 54.0f;
 } // namespace
-
 void GameContinuedText::Initialize() {
 	// フォントハンドル
 	fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
-	FreeTypeManager::SetPixelSizes(fontHandle_, 64, 64);
+	FreeTypeManager::SetPixelSizes(fontHandle_, 32, 32);
 	for (int i = 0; i < static_cast<int>(gameSaveDataText.size()); ++i) {
 		
 		gameSaveDataText[i].Name_.Initialize(fontHandle_);
@@ -24,13 +20,17 @@ void GameContinuedText::Initialize() {
 		gameSaveDataText[i].currentStageName_.SetAlign(TextAlign::Left);
 		gameSaveDataText[i].saveDateTime_.SetAlign(TextAlign::Left);
 
+		gameSaveDataText[i].Name_.SetBlendMode(BlendMode::kBlendModeMultipy);
+		gameSaveDataText[i].currentStageName_.SetBlendMode(BlendMode::kBlendModeMultipy);
+		gameSaveDataText[i].saveDateTime_.SetBlendMode(BlendMode::kBlendModeMultipy);
+
 		gameSaveDataText[i].Name_.SetColor(COLOR::BLACK);
 		gameSaveDataText[i].currentStageName_.SetColor(COLOR::BLACK);
 		gameSaveDataText[i].saveDateTime_.SetColor(COLOR::BLACK);
 
-		gameSaveDataText[i].Name_.SetSize({64.0f,64.0f});
-		gameSaveDataText[i].currentStageName_.SetSize({64.0f, 64.0f});
-		gameSaveDataText[i].saveDateTime_.SetSize({64.0f, 64.0f});
+		gameSaveDataText[i].Name_.SetSize({32.0f,32.0f});
+		gameSaveDataText[i].currentStageName_.SetSize({32.0f, 32.0f});
+		gameSaveDataText[i].saveDateTime_.SetSize({32.0f, 32.0f});
 
 		gameSaveDataText[i].Name_.SetString(U"SaveFile");
 		gameSaveDataText[i].currentStageName_.SetString(U"NoData");
@@ -71,17 +71,21 @@ void GameContinuedText::SetBlockLayout(int index, const Vector2& blockCenter, co
 	}
 
 	const float left = blockCenter.x - (blockScale.x * 0.5f);
+	const float right = blockCenter.x + (blockScale.x * 0.5f);
 	const float top = blockCenter.y - (blockScale.y * 0.5f);
+
 	const float thumbnailHeight = std::max(1.0f, blockScale.y - 24.0f);
 	const float thumbnailWidth = thumbnailHeight * (9.0f / 16.0f);
-	const float textBaseX = left + 30.0f + thumbnailWidth + kTextLeftPadding;
+	const float textAreaLeft = left + 30.0f + thumbnailWidth + 40.0f;
+	const float textAreaRight = right - 48.0f;
+	const float nameX = std::max(textAreaLeft, textAreaRight - 560.0f);
+	const float stageX = std::max(textAreaLeft, textAreaRight - 340.0f);
+	const float dateX = std::max(textAreaLeft, textAreaRight - 140.0f);
 	const float textY = top + (blockScale.y * 0.5f);
 
-	gameSaveDataText[index].Name_.SetPosition({textBaseX, textY});
-	gameSaveDataText[index].currentStageName_.SetPosition({textBaseX + kTextGapX, textY});
-	gameSaveDataText[index].saveDateTime_.SetPosition({textBaseX + kDateGapX, textY});
-
-
+	gameSaveDataText[index].Name_.SetPosition({nameX, textY});
+	gameSaveDataText[index].currentStageName_.SetPosition({stageX, textY});
+	gameSaveDataText[index].saveDateTime_.SetPosition({dateX, textY});
 }
 void GameContinuedText::SetSaveDataText(const std::string& name, const std::string& currentStageName, const std::string& saveDateTime, int index) {
 	if (index < 0 || index >= saveDataMaxNum_) {
@@ -90,7 +94,6 @@ void GameContinuedText::SetSaveDataText(const std::string& name, const std::stri
 	gameSaveDataText[index].Name_.SetString(std::u32string(name.begin(), name.end()));
 	gameSaveDataText[index].currentStageName_.SetString(std::u32string(currentStageName.begin(), currentStageName.end()));
 	gameSaveDataText[index].saveDateTime_.SetString(std::u32string(saveDateTime.begin(), saveDateTime.end()));
-
 }
 
 void GameContinuedText::SetCurrentSelectIndex(int index) {
@@ -101,7 +104,7 @@ void GameContinuedText::SetCurrentSelectIndex(int index) {
 	currentSelectIndex_ = index;
 
 	for (int i = 0; i < static_cast<int>(gameSaveDataText.size()); ++i) {
-		Vector4 color = (i == currentSelectIndex_) ? COLOR::RED : COLOR::WHITE;
+		Vector4 color = COLOR::WHITE;
 		gameSaveDataText[i].Name_.SetColor(color);
 		gameSaveDataText[i].currentStageName_.SetColor(color);
 		gameSaveDataText[i].saveDateTime_.SetColor(color);
