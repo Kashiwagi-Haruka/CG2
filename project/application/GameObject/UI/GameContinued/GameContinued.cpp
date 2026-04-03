@@ -7,14 +7,13 @@
 #include <cmath>
 
 namespace {
-constexpr float kBlockStartX = 120.0f;
-constexpr float kBlockStartY = 120.0f;
 constexpr float kBlockWidth = 1040.0f;
-constexpr float kBlockHeight = 140.0f;
-constexpr float kBlockSpacingY = 156.0f;
-constexpr float kSelectedCenterOffset = (saveDataMaxNum_ - 1) * 0.5f;
-constexpr float kBlockCenterX = kBlockStartX + (kBlockWidth * 0.5f);
-constexpr float kBlockCenterY = kBlockStartY + (kBlockHeight * 0.5f);
+constexpr float kBlockHeight = 240.0f;
+constexpr float kBlockSpacingY = 280.0f;
+constexpr float kScreenWidth = 1280.0f;
+constexpr float kScreenHeight = 720.0f;
+constexpr float kBlockCenterX = kScreenWidth * 0.5f;
+constexpr float kBlockCenterY = kScreenHeight * 0.5f;
 
 float Lerp(float start, float end, float t) { return start + (end - start) * t; }
 
@@ -81,13 +80,13 @@ void GameContinued::Update() {
 		const float easedDistance = distanceRate * distanceRate;
 		const float proximity = 1.0f - distanceRate;
 
-		const float targetY = kBlockCenterY + (kBlockSpacingY * (static_cast<float>(i) - static_cast<float>(currentSelectNum_) + kSelectedCenterOffset));
+		const float targetY = kBlockCenterY + (kBlockSpacingY * (static_cast<float>(i) - static_cast<float>(currentSelectNum_)));
 		const Vector2 targetPosition = {kBlockCenterX, targetY};
 
-		const float r = 0.15f + (proximity * 0.80f);
-		const float g = 0.18f + (proximity * 0.57f);
-		const float b = 0.22f + (proximity * 0.25f);
-		const float alpha = 0.78f + (proximity * 0.22f);
+		const float r = 0.08f + (proximity * 0.92f);
+		const float g = 0.10f + (proximity * 0.78f);
+		const float b = 0.14f + (proximity * 0.26f);
+		const float alpha = 0.55f + (proximity * 0.45f);
 		const Vector4 targetColor = {r, g, b, alpha};
 
 		const float scaleFactor = 0.72f + (std::pow(1.0f - easedDistance, 1.4f) * 0.42f);
@@ -113,7 +112,6 @@ void GameContinued::Draw() {
 	for (auto& saveData : gameSaveData) {
 		saveData.BlockSprite_->Draw();
 	}
-	text_->Draw();
 }
 
 void GameContinued::SetSaveData(int index, const std::string& name, const std::string& currentStageName, const std::string& saveDateTime) {
