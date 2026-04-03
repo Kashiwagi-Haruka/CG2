@@ -85,7 +85,7 @@ void TitleMenuUI::Update()
         return;
     }
 
-    if (PlayerCommand::GetInstance()->Shot()||PlayerCommand::GetInstance()->InteractTrigger()) {
+    if (PlayerCommand::GetInstance()->Shot()||PlayerCommand::GetInstance()->UiInteractTrigger()) {
         SEManager::SoundPlay(SEManager::PUSH_WATCH);
         if (isShowMenu_) {
             if (selectButtonNum_ == 0) {

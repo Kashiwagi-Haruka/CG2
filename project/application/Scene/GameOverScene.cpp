@@ -44,7 +44,7 @@ void GameOverScene::Update() {
 		Audio::GetInstance()->SoundPlayWave(BGM_, true);
 		isBGMPlaying = true;
 	}
-	if ((PlayerCommand::GetInstance()->Shot()||PlayerCommand::GetInstance()->InteractTrigger()) && !isTransitionOut) {
+	if ((PlayerCommand::GetInstance()->Shot()||PlayerCommand::GetInstance()->UiInteractTrigger()) && !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;
 	}
