@@ -10,9 +10,11 @@ namespace {
 constexpr float kBlockStartX = 120.0f;
 constexpr float kBlockStartY = 120.0f;
 constexpr float kBlockWidth = 1040.0f;
-constexpr float kBlockHeight = 96.0f;
-constexpr float kBlockSpacingY = 110.0f;
+constexpr float kBlockHeight = 140.0f;
+constexpr float kBlockSpacingY = 156.0f;
 constexpr float kSelectedCenterOffset = (saveDataMaxNum_ - 1) * 0.5f;
+constexpr float kBlockCenterX = kBlockStartX + (kBlockWidth * 0.5f);
+constexpr float kBlockCenterY = kBlockStartY + (kBlockHeight * 0.5f);
 
 float Lerp(float start, float end, float t) { return start + (end - start) * t; }
 
@@ -32,6 +34,7 @@ void GameContinued::Initialize() {
 		saveData.GameSceneSprite_->Initialize(screenTextureHandle_);
 		saveData.BlockSprite_ = std::make_unique<Sprite>();
 		saveData.BlockSprite_->Initialize(blockTextureHandle_);
+		saveData.BlockSprite_->SetAnchorPoint({0.5f, 0.5f});
 	}
 	text_ = std::make_unique<GameContinuedText>();
 	text_->Initialize();
@@ -39,8 +42,8 @@ void GameContinued::Initialize() {
 	for (int i = 0; i < saveDataMaxNum_; ++i) {
 		SetSaveData(i, "Save " + std::to_string(i + 1), "No Data", "--:--");
 
-		const float y = kBlockStartY + (kBlockSpacingY * static_cast<float>(i));
-		blockPositions_[i] = {kBlockStartX, y};
+		const float y = kBlockCenterY + (kBlockSpacingY * static_cast<float>(i));
+		blockPositions_[i] = {kBlockCenterX, y};
 		gameSaveData[i].BlockSprite_->SetPosition(blockPositions_[i]);
 		gameSaveData[i].BlockSprite_->SetScale({kBlockWidth, kBlockHeight});
 		blockColors_[i] = {0.3f, 0.3f, 0.3f, 0.86f};
@@ -78,8 +81,8 @@ void GameContinued::Update() {
 		const float easedDistance = distanceRate * distanceRate;
 		const float proximity = 1.0f - distanceRate;
 
-		const float targetY = kBlockStartY + (kBlockSpacingY * (static_cast<float>(i) - static_cast<float>(currentSelectNum_) + kSelectedCenterOffset));
-		const Vector2 targetPosition = {kBlockStartX, targetY};
+		const float targetY = kBlockCenterY + (kBlockSpacingY * (static_cast<float>(i) - static_cast<float>(currentSelectNum_) + kSelectedCenterOffset));
+		const Vector2 targetPosition = {kBlockCenterX, targetY};
 
 		const float r = 0.15f + (proximity * 0.80f);
 		const float g = 0.18f + (proximity * 0.57f);

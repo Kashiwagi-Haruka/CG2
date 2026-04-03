@@ -2,6 +2,7 @@
 
 #ifdef USE_IMGUI
 #include "Engine/Texture/TextureManager.h"
+#include "Sprite/SpriteCommon.h"
 #include "externals/imgui/imgui.h"
 #endif
 
@@ -22,7 +23,11 @@ ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUn
 			result.gridRequested = true;
 		}
 		if (ImGui::BeginMenu("View")) {
-			ImGui::TextDisabled("Coming soon");
+			const bool isSpriteVisible = SpriteCommon::GetInstance()->IsSpriteVisible();
+			if (ImGui::MenuItem("All Sprites", nullptr, isSpriteVisible)) {
+				SpriteCommon::GetInstance()->SetSpriteVisible(!isSpriteVisible);
+				result.spriteVisibilityChanged = true;
+			}
 			ImGui::EndMenu();
 		}
 		ImGui::EndMenuBar();
