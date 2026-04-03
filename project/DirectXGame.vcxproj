@@ -309,6 +309,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Wall\WallManager2.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\Gentleman.cpp" />
     <ClCompile Include="Engine\ScreenShot\ScreenShot.cpp" />
+    <ClCompile Include="application\GameObject\UI\GameContinued\GameContinued.cpp" />
+    <ClCompile Include="application\Text\GameContinuedText\GameContinuedText.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -326,6 +328,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Color\Color.h" />
+    <ClInclude Include="application\GameObject\UI\GameContinued\GameContinuedData.h" />
     <ClInclude Include="application\Option\OptionData.h" />
     <ClInclude Include="application\ScreenSize\ScreenSize.h" />
     <ClInclude Include="application\Text\FreetypeManager\Font\Font.h" />
@@ -489,6 +492,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Wall\WallManager2.h" />
     <ClInclude Include="application\GameObject\Gentleman\Gentleman.h" />
     <ClInclude Include="Engine\ScreenShot\ScreenShot.h" />
+    <ClInclude Include="application\GameObject\UI\GameContinued\GameContinued.h" />
+    <ClInclude Include="application\Text\GameContinuedText\GameContinuedText.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
