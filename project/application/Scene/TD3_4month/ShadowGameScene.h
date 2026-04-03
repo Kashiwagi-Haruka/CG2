@@ -20,12 +20,14 @@
 #include <GameObject/Chair/ChairManager.h>
 #include"GameObject/Wall/WallManager.h"
 #include"GameObject/Wall/WallManager2.h"
+
 #include"GameObject/VendingMac/VendingMac.h"
 #include"GameObject/Door/Door.h"
 #include"GameObject/Locker/LockerManager.h"
 #include"GameObject/Desk/DeskManager.h"
 #include"GameObject/Box/BoxManager.h"
 #include "Menu/Menu.h"
+#include"GameObject/Elevator/ElevatorRoomManager.h"
 #include "GameObject/Elevator/Elevator.h"
 #include <GameObject/Edamame/Edamame.h>
 #include"GameObject/PC/PC.h"
@@ -58,11 +60,8 @@ private:
 
 	std::unique_ptr<UIManager> uiManager_ = nullptr;
 
-#pragma region // カメラの設定
+    // カメラの設定
 	CameraController* cameraController_ = nullptr;
-
-#pragma endregion
-
 #pragma region // シーン遷移の設定
 	// シーン遷移の設定
 	std::unique_ptr<SceneTransition> transition_ = nullptr;
@@ -97,6 +96,9 @@ private:
     std::unique_ptr<WallManager> wallManager_ = nullptr;
     //壁管理2こめ
     std::unique_ptr<WallManager2> wallManager2_ = nullptr;
+    //エレベータ部屋の管理
+    std::unique_ptr<ElevatorRoomManager> elevatorRoomManager_ = nullptr;
+
     //自販機
     std::unique_ptr<VendingMac> vendingMac_ = nullptr;
     //ドア
