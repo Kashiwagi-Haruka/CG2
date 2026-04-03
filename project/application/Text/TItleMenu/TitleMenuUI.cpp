@@ -63,44 +63,45 @@ TitleMenuUI::~TitleMenuUI()
 
 }
 
-void TitleMenuUI::Initialize()
-{
-    isShowMenu_ = false;
-    isStart_ = false;
-    selectButtonNum_ = 0;
-    random_->SetMinMax(-8.0f, 8.0f);
+void TitleMenuUI::Initialize() {
+	isShowMenu_ = false;
+	isStart_ = false;
+	isContinueTriggered_ = false;
+	selectButtonNum_ = 0;
+	random_->SetMinMax(-8.0f, 8.0f);
 }
 
-void TitleMenuUI::Update()
-{
+void TitleMenuUI::Update() {
 
-    fontTheta_ += SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime() * Function::kPi;
-    fontTheta_ = fmodf(fontTheta_, Function::kPi * 2.0f);
-    float fontAlpha = std::sinf(fontTheta_) * 0.5f + 0.5f;
+	fontTheta_ += SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime() * Function::kPi;
+	fontTheta_ = fmodf(fontTheta_, Function::kPi * 2.0f);
+	float fontAlpha = std::sinf(fontTheta_) * 0.5f + 0.5f;
 
-    pressSpaceText_.SetColor({ 1.0f,1.0f,1.0f,fontAlpha });
-    pressSpaceText_.UpdateLayout(false);
+	pressSpaceText_.SetColor({1.0f, 1.0f, 1.0f, fontAlpha});
+	pressSpaceText_.UpdateLayout(false);
 
-    if (isStart_) {
-        return;
-    }
+	if (isStart_) {
+		return;
+	}
 
-    if (PlayerCommand::GetInstance()->Shot()||PlayerCommand::GetInstance()->UiInteractTrigger()) {
-        SEManager::SoundPlay(SEManager::PUSH_WATCH);
-        if (isShowMenu_) {
-            if (selectButtonNum_ == 0) {
-                if (!isStart_) {
-                    isStart_ = true;
-                }
-            }
+	if (PlayerCommand::GetInstance()->Shot() || PlayerCommand::GetInstance()->UiInteractTrigger()) {
+		SEManager::SoundPlay(SEManager::PUSH_WATCH);
+		if (isShowMenu_) {
+			if (selectButtonNum_ == 0) {
+				if (!isStart_) {
+					isStart_ = true;
+				}
+			} else if (selectButtonNum_ == CONTINUE_TEXT) {
+				isContinueTriggered_ = true;
+			}
 
-        } else {
-            isShowMenu_ = true;
-            for (auto& text : menuText_) {
-                text.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-            }
-        }
-    }
+		} else {
+			isShowMenu_ = true;
+			for (auto& text : menuText_) {
+				text.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
+			}
+		}
+	}
 
     if (isShowMenu_) {
 
@@ -154,7 +155,14 @@ void TitleMenuUI::Update()
 
 
 }
+bool TitleMenuUI::ConsumeContinueTriggered() {
+	if (!isContinueTriggered_) {
+		return false;
+	}
 
+	isContinueTriggered_ = false;
+	return true;
+}
 void TitleMenuUI::Draw()
 {
     pressSpaceText_.Draw();
