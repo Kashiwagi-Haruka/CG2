@@ -10,7 +10,7 @@ class GameContinuedText {
 		Text saveDateTime_;
 	};
 
-	std::array<SaveDataText, saveDataMaxNum_> gameSaveDataText;
+	std::array<SaveDataText, saveDataMaxNum_> gameSaveDataText_;
 	Text selectionCursorText_;
 	uint32_t fontHandle_ = 0;
 	int currentSelectIndex_ = 0;
