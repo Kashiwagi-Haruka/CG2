@@ -78,6 +78,9 @@ void GameContinuedText::SetBlockLayout(int index, const Vector2& blockCenter, co
 	gameSaveDataText[index].Name_.SetPosition({textBaseX, textY});
 	gameSaveDataText[index].currentStageName_.SetPosition({textBaseX + kTextGapX, textY});
 	gameSaveDataText[index].saveDateTime_.SetPosition({textBaseX + kDateGapX, textY});
+	gameSaveDataText[index].Name_.UpdateLayout(false);
+	gameSaveDataText[index].currentStageName_.UpdateLayout(false);
+	gameSaveDataText[index].saveDateTime_.UpdateLayout(false);
 }
 void GameContinuedText::SetSaveDataText(const std::string& name, const std::string& currentStageName, const std::string& saveDateTime, int index) {
 	if (index < 0 || index >= saveDataMaxNum_) {
@@ -86,6 +89,9 @@ void GameContinuedText::SetSaveDataText(const std::string& name, const std::stri
 	gameSaveDataText[index].Name_.SetString(std::u32string(name.begin(), name.end()));
 	gameSaveDataText[index].currentStageName_.SetString(std::u32string(currentStageName.begin(), currentStageName.end()));
 	gameSaveDataText[index].saveDateTime_.SetString(std::u32string(saveDateTime.begin(), saveDateTime.end()));
+	gameSaveDataText[index].Name_.UpdateLayout(false);
+	gameSaveDataText[index].currentStageName_.UpdateLayout(false);
+	gameSaveDataText[index].saveDateTime_.UpdateLayout(false);
 }
 
 void GameContinuedText::SetCurrentSelectIndex(int index) {
@@ -105,4 +111,5 @@ void GameContinuedText::SetCurrentSelectIndex(int index) {
 	Vector2 cursorPos = gameSaveDataText[currentSelectIndex_].Name_.GetPosition();
 	cursorPos.x -= kCursorOffsetX;
 	selectionCursorText_.SetPosition(cursorPos);
+	selectionCursorText_.UpdateLayout(false);
 }
