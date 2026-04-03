@@ -27,9 +27,11 @@ Vector3 AutoLockSystem::GetWorldPosition() const
 
 void AutoLockSystem::Update()
 {
+    //前回のフレームを記録
+    isPlayerPreHit_ = isPlayerHit_;
     isPlayerHit_ = false;
     assert(parentMat_);
-    obj_->SetTranslate({ 0.0f,0.0f,-0.75f });
+    obj_->SetTranslate(translate_);
     obj_->SetScale(YoshidaMath::GetAABBScale(GetAABB()));
 
     Transform transform = obj_->GetTransform();
@@ -42,6 +44,7 @@ void AutoLockSystem::Update()
 void AutoLockSystem::Initialize()
 {
     isPlayerHit_ = false;
+    isPlayerPreHit_ = false;
     obj_->Initialize(Primitive::Box,"Resources/TD3_3102/2d/floor.png");
 
 }

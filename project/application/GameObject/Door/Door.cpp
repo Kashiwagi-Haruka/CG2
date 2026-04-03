@@ -22,10 +22,9 @@ Door::Door()
     SetCollisionMask(kCollisionPlayer | kCollisionKey);
 
     autoLockSystem_ = std::make_unique<AutoLockSystem>();
-
     worldMat_ = Function::MakeIdentity4x4();
     autoLockSystem_->SetParentMat(&worldMat_);
-
+    autoLockSystem_->SetTranslate({ 0.0f,0.0f,-0.75f });
 }
 
 Door::~Door()
@@ -66,7 +65,7 @@ void Door::Update()
                 isOpen_ = true;
             }
 
-            if (autoLockSystem_->GetIsPlayerHit()) {
+            if (autoLockSystem_->IsPlayerHit() && !autoLockSystem_->IsPlayerPreHit()) {
                 desiredAnimationName = "3Close";
             }
 
