@@ -28,6 +28,10 @@ void GameContinuedText::Initialize() {
 		saveDataText.currentStageName_.SetColor(COLOR::BLACK);
 		saveDataText.saveDateTime_.SetColor(COLOR::BLACK);
 
+		saveDataText.Name_.SetSize({64.0f,64.0f});
+		saveDataText.currentStageName_.SetSize({64.0f, 64.0f});
+		saveDataText.saveDateTime_.SetSize({64.0f, 64.0f});
+
 		SetBlockLayout(i, {640.0f, 360.0f + (280.0f * static_cast<float>(i))}, {1040.0f, 240.0f});
 
 		SetSaveDataText("Save " + std::to_string(i + 1), "No Data", "--:--", i);
@@ -40,7 +44,15 @@ void GameContinuedText::Initialize() {
 
 	SetCurrentSelectIndex(0);
 }
-void GameContinuedText::Update(int selectIndex) { SetCurrentSelectIndex(selectIndex); }
+void GameContinuedText::Update(int selectIndex) { 
+	SetCurrentSelectIndex(selectIndex); 
+		for (int i = 0; i < static_cast<int>(gameSaveDataText.size()); ++i) {
+		auto& saveDataText = gameSaveDataText[i];
+		saveDataText.Name_.Update();
+		saveDataText.currentStageName_.Update();
+		saveDataText.saveDateTime_.Update();
+	}
+}
 
 void GameContinuedText::Draw() {
 	for (auto& saveDataText : gameSaveDataText) {
