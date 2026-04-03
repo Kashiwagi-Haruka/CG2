@@ -372,6 +372,7 @@
     <ClCompile Include="application\GameObject\UI\DamageOverlay.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManager2.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\Gentleman.cpp" />
+    <ClCompile Include="Engine\ScreenShot\ScreenShot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -736,6 +737,7 @@
     <ClInclude Include="application\GameObject\UI\DamageOverlay.h" />
     <ClInclude Include="application\GameObject\Wall\WallManager2.h" />
     <ClInclude Include="application\GameObject\Gentleman\Gentleman.h" />
+    <ClInclude Include="Engine\ScreenShot\ScreenShot.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

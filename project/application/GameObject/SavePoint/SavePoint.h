@@ -3,12 +3,7 @@
 #include "Primitive/Primitive.h"
 #include "Transform.h"
 class SavePoint {
-
-	std::unique_ptr<Primitive> savePoint_ = nullptr;
 	Transform transform_ = {};
-
-
-
 
 	public:
 
@@ -19,6 +14,6 @@ class SavePoint {
 
 	void Save();
 
-
+	void SetTransform(const Transform& transform) { transform_ = transform; }
 
 };
