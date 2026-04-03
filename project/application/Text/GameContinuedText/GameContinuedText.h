@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObject/UI/GameContinued/GameContinuedData.h"
 #include "Text/Text.h"
-#include <array>
+#include <vector>
 class GameContinuedText {
 
 	struct SaveDataText {

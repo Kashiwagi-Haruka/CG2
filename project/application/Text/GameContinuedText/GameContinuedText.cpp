@@ -10,35 +10,34 @@ void GameContinuedText::Initialize() {
 	// フォントハンドル
 	fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
 	FreeTypeManager::SetPixelSizes(fontHandle_, 32, 32);
-	for (int i = 0; i < static_cast<int>(gameSaveDataText.size()); ++i) {
-		
-		gameSaveDataText[i].Name_.Initialize(fontHandle_);
-		gameSaveDataText[i].currentStageName_.Initialize(fontHandle_);
-		gameSaveDataText[i].saveDateTime_.Initialize(fontHandle_);
+	gameSaveDataText_.resize(saveDataMaxNum_);
+	for (int i = 0; i < static_cast<int>(gameSaveDataText_.size()); ++i) {
 
-		gameSaveDataText[i].Name_.SetAlign(TextAlign::Left);
-		gameSaveDataText[i].currentStageName_.SetAlign(TextAlign::Left);
-		gameSaveDataText[i].saveDateTime_.SetAlign(TextAlign::Left);
+		gameSaveDataText_[i].Name_.Initialize(fontHandle_);
+		gameSaveDataText_[i].currentStageName_.Initialize(fontHandle_);
+		gameSaveDataText_[i].saveDateTime_.Initialize(fontHandle_);
 
-		gameSaveDataText[i].Name_.SetBlendMode(BlendMode::kBlendModeMultipy);
-		gameSaveDataText[i].currentStageName_.SetBlendMode(BlendMode::kBlendModeMultipy);
-		gameSaveDataText[i].saveDateTime_.SetBlendMode(BlendMode::kBlendModeMultipy);
+		gameSaveDataText_[i].Name_.SetAlign(TextAlign::Left);
+		gameSaveDataText_[i].currentStageName_.SetAlign(TextAlign::Left);
+		gameSaveDataText_[i].saveDateTime_.SetAlign(TextAlign::Left);
 
-		gameSaveDataText[i].Name_.SetColor(COLOR::BLACK);
-		gameSaveDataText[i].currentStageName_.SetColor(COLOR::BLACK);
-		gameSaveDataText[i].saveDateTime_.SetColor(COLOR::BLACK);
+		gameSaveDataText_[i].Name_.SetBlendMode(BlendMode::kBlendModeMultipy);
+		gameSaveDataText_[i].currentStageName_.SetBlendMode(BlendMode::kBlendModeMultipy);
+		gameSaveDataText_[i].saveDateTime_.SetBlendMode(BlendMode::kBlendModeMultipy);
 
-		gameSaveDataText[i].Name_.SetSize({32.0f,32.0f});
-		gameSaveDataText[i].currentStageName_.SetSize({32.0f, 32.0f});
-		gameSaveDataText[i].saveDateTime_.SetSize({32.0f, 32.0f});
+		gameSaveDataText_[i].Name_.SetColor(COLOR::BLACK);
+		gameSaveDataText_[i].currentStageName_.SetColor(COLOR::BLACK);
+		gameSaveDataText_[i].saveDateTime_.SetColor(COLOR::BLACK);
 
-		gameSaveDataText[i].Name_.SetString(U"SaveFile");
-		gameSaveDataText[i].currentStageName_.SetString(U"NoData");
-		gameSaveDataText[i].saveDateTime_.SetString(U"1111");
+		gameSaveDataText_[i].Name_.SetSize({32.0f, 32.0f});
+		gameSaveDataText_[i].currentStageName_.SetSize({32.0f, 32.0f});
+		gameSaveDataText_[i].saveDateTime_.SetSize({32.0f, 32.0f});
 
-		gameSaveDataText[i].Name_.UpdateLayout(false);
-		gameSaveDataText[i].currentStageName_.UpdateLayout(false);
-		gameSaveDataText[i].saveDateTime_.UpdateLayout(false);
+		gameSaveDataText_[i].Name_.SetString(U"SaveFile");
+		gameSaveDataText_[i].currentStageName_.SetString(U"NoData");
+		gameSaveDataText_[i].saveDateTime_.SetString(U"1111");
+
+
 
 		SetBlockLayout(i, {640.0f, 360.0f + (280.0f * static_cast<float>(i))}, {1040.0f, 240.0f});
 	}
@@ -50,17 +49,19 @@ void GameContinuedText::Initialize() {
 
 	SetCurrentSelectIndex(0);
 }
-void GameContinuedText::Update(int selectIndex) { 
-	SetCurrentSelectIndex(selectIndex); 
-
-
+void GameContinuedText::Update(int selectIndex) { SetCurrentSelectIndex(selectIndex); 
+	for (auto& saveDataText : gameSaveDataText_) {
+		saveDataText.Name_.UpdateLayout(false);
+		saveDataText.currentStageName_.UpdateLayout(false);
+		saveDataText.saveDateTime_.UpdateLayout(false);
+	}
 }
 
 void GameContinuedText::Draw() {
-	for (int i = 0; i < static_cast<int>(gameSaveDataText.size()); ++i) {
-		gameSaveDataText[i].Name_.Draw();
-		gameSaveDataText[i].currentStageName_.Draw();
-		gameSaveDataText[i].saveDateTime_.Draw();
+	for (auto& saveDataText : gameSaveDataText_) {
+		saveDataText.Name_.Draw();
+		saveDataText.currentStageName_.Draw();
+		saveDataText.saveDateTime_.Draw();
 	}
 	selectionCursorText_.Draw();
 }
@@ -83,17 +84,17 @@ void GameContinuedText::SetBlockLayout(int index, const Vector2& blockCenter, co
 	const float dateX = std::max(textAreaLeft, textAreaRight - 140.0f);
 	const float textY = top + (blockScale.y * 0.5f);
 
-	gameSaveDataText[index].Name_.SetPosition({nameX, textY});
-	gameSaveDataText[index].currentStageName_.SetPosition({stageX, textY});
-	gameSaveDataText[index].saveDateTime_.SetPosition({dateX, textY});
+	gameSaveDataText_[index].Name_.SetPosition({nameX, textY});
+	gameSaveDataText_[index].currentStageName_.SetPosition({stageX, textY});
+	gameSaveDataText_[index].saveDateTime_.SetPosition({dateX, textY});
 }
 void GameContinuedText::SetSaveDataText(const std::string& name, const std::string& currentStageName, const std::string& saveDateTime, int index) {
 	if (index < 0 || index >= saveDataMaxNum_) {
 		return;
 	}
-	gameSaveDataText[index].Name_.SetString(std::u32string(name.begin(), name.end()));
-	gameSaveDataText[index].currentStageName_.SetString(std::u32string(currentStageName.begin(), currentStageName.end()));
-	gameSaveDataText[index].saveDateTime_.SetString(std::u32string(saveDateTime.begin(), saveDateTime.end()));
+	gameSaveDataText_[index].Name_.SetString(std::u32string(name.begin(), name.end()));
+	gameSaveDataText_[index].currentStageName_.SetString(std::u32string(currentStageName.begin(), currentStageName.end()));
+	gameSaveDataText_[index].saveDateTime_.SetString(std::u32string(saveDateTime.begin(), saveDateTime.end()));
 }
 
 void GameContinuedText::SetCurrentSelectIndex(int index) {
@@ -103,14 +104,14 @@ void GameContinuedText::SetCurrentSelectIndex(int index) {
 
 	currentSelectIndex_ = index;
 
-	for (int i = 0; i < static_cast<int>(gameSaveDataText.size()); ++i) {
+	for (auto& saveDataText : gameSaveDataText_) {
 		Vector4 color = COLOR::WHITE;
-		gameSaveDataText[i].Name_.SetColor(color);
-		gameSaveDataText[i].currentStageName_.SetColor(color);
-		gameSaveDataText[i].saveDateTime_.SetColor(color);
+		saveDataText.Name_.SetColor(color);
+		saveDataText.currentStageName_.SetColor(color);
+		saveDataText.saveDateTime_.SetColor(color);
 	}
 
-	Vector2 cursorPos = gameSaveDataText[currentSelectIndex_].Name_.GetPosition();
+	Vector2 cursorPos = gameSaveDataText_[currentSelectIndex_].Name_.GetPosition();
 	cursorPos.x -= kCursorOffsetX;
 	selectionCursorText_.SetPosition(cursorPos);
 	selectionCursorText_.UpdateLayout(false);
