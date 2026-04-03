@@ -47,21 +47,13 @@ void Edamame::Initialize()
     edamameModel_->Initialize();
 
 
-    pointLights_[0].color = { 1.0f, 1.0f, 0.25f, 1.0f };
-    pointLights_[0].position = worldTransform_.translate;
-    pointLights_[0].position.y += 1.0f;
-    pointLights_[0].intensity = 4.0f;
-    pointLights_[0].radius = 4.0f;
-    pointLights_[0].decay = 0.1f;
-    pointLights_[0].shadowEnabled =  false;
-
-    pointLights_[1].color = { 1.0f, 1.0f, 0.25f, 1.0f };
-    pointLights_[1].position = worldTransform_.translate;
-    pointLights_[1].position.y = 0.0f;
-    pointLights_[1].intensity = 4.0f;
-    pointLights_[1].radius = 4.0f;
-    pointLights_[1].decay = 0.1f;
-    pointLights_[1].shadowEnabled = false;
+    pointLight_.color = { 1.0f, 1.0f, 0.25f, 1.0f };
+    pointLight_.position = worldTransform_.translate;
+    pointLight_.position.y += 1.0f;
+    pointLight_.intensity = 4.0f;
+    pointLight_.radius = 4.0f;
+    pointLight_.decay = 1.0f;
+    pointLight_.shadowEnabled =  true;
 }
 
 void Edamame::Update()
@@ -71,7 +63,6 @@ void Edamame::Update()
     obj_->UpdateBillboard();
     Vector3 pos = worldTransform_.translate;
     pos -= playerCamera_->GetRay().diff * 0.25f;
-    pointLights_[1].position = pos- playerCamera_->GetRay().diff;
     //スポットライト
     //枝豆モデルに座標をセットする
     edamameModel_->SetTranslate(pos);

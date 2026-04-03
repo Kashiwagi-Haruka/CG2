@@ -22,9 +22,9 @@ WallManager2::WallManager2()
 
     areaLight_.color = { 1.0f,1.0f,1.0f,1.0f };
     areaLight_.intensity = 1.0f;
-    areaLight_.width = 10.0f;
+    areaLight_.width = 14.0f;
     areaLight_.height = 4.0f;
-    areaLight_.radius = 40.0f;
+    areaLight_.radius = 7.0f;
     areaLight_.decay = 0.1f;
 
     plane_ = std::make_unique<Primitive>();
@@ -54,7 +54,7 @@ void WallManager2::Update()
     normal.x *= 1.0f;
     areaLight_.normal = normal;
     areaLight_.position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
-    areaLight_.height = plane_->GetTransform().scale.y;
+    areaLight_.height = plane_->GetTransform().scale.y*0.5f;
     Vector3 translate = {7.0f,0.0f,0.0f};
 
     walls_[0]->SetST({ 1.0f,4.0f,14.0f }, translate+Vector3{ 7.0f,2.0f,0.0f });

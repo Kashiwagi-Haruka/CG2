@@ -21,13 +21,13 @@ ElevatorRoomManager::ElevatorRoomManager()
         walls_.push_back(std::move(wall));
     }
 
-    areaLight_.color = { 1.0f,1.0f,1.0f,1.0f };
+    areaLight_.color = { 1.0f,1.0f,0.75f,1.0f };
     areaLight_.intensity = 1.0f;
-    areaLight_.width = 10.0f;
-    areaLight_.height = 4.0f;
-    areaLight_.radius = 40.0f;
-    areaLight_.decay = 0.1f;
-    areaLight_.normal = {0.0f,-1.0f,0.0f};
+    areaLight_.width = 2.0f;
+    areaLight_.height = 2.0f;
+    areaLight_.radius = 8.0f;
+    areaLight_.decay = 2.0f;
+    areaLight_.normal = {0.0f,1.0f,0.0f};
 }
 
 ElevatorRoomManager::~ElevatorRoomManager()
@@ -56,8 +56,9 @@ void ElevatorRoomManager::Update()
 {
     room_->Update();
     roomMat_ = room_->GetWorldMatrix();
-
-    areaLight_.position = YoshidaMath::GetWorldPosByMat(room_->GetWorldMatrix());
+    Vector3 translate = YoshidaMath::GetWorldPosByMat(room_->GetWorldMatrix());
+    //translate.y += 4.0f;
+    areaLight_.position = translate;
 
     walls_[0]->SetST({ 1.0f,4.0f,6.0f }, { -7.0f,2.0f,0.0f });
     walls_[1]->SetST({ 1.0f,4.0f,6.0f }, { 7.0f,2.0f,0.0f });

@@ -23,6 +23,12 @@ private:
 	// アニメーション
 	void Animation();
 private:
+
+	// 新しい状態管理
+	bool isPlayerInside_ = false;
+	float insideTimer_ = 0.0f;
+	const float insideOpenDelay_ = 2.0f; // 中に入って2秒で閉まる
+
 	Matrix4x4 worldMat_;
 	static PlayerCamera* playerCamera_;
 	std::unique_ptr<Object3d> modelObj_ = nullptr;
