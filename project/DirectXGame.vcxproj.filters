@@ -142,7 +142,7 @@
     <ClCompile Include="application\GameTimer\GameTimer.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\Hierarchy.cpp">
+    <ClCompile Include="Engine\Editor\Hierarchy\Hierarchy.cpp">
       <Filter>Engine\Editor</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -462,7 +462,7 @@
     <ClInclude Include="application\Scene\GameScene.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\Hierarchy.h">
+    <ClInclude Include="Engine\Editor\Hierarchy\Hierarchy.h">
       <Filter>Engine\Editor</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
