@@ -1,9 +1,11 @@
 #pragma once
-#include <memory>
-#include <array>
-#include "Sprite/Sprite.h"
 #include "GameContinuedData.h"
+#include "Sprite/Sprite.h"
 #include "Text/GameContinuedText/GameContinuedText.h"
+#include <array>
+#include <memory>
+#include <string>
+
 class GameContinued {
 
 	struct SaveData {
@@ -14,16 +16,17 @@ class GameContinued {
 		std::string saveDateTime_;                // セーブデータの保存日時
 	};
 
-	std::array<SaveData,saveDataMaxNum_> gameSaveData;
+	std::array<SaveData, saveDataMaxNum_> gameSaveData;
 	int currentSelectNum_ = 0;
+	bool isSelected_ = false;
 
 	std::unique_ptr<GameContinuedText> text_;
 
-	public:
-
+public:
 	void Initialize();
 	void Update();
 	void Draw();
-
-
+	void SetSaveData(int index, const std::string& name, const std::string& currentStageName, const std::string& saveDateTime);
+	int GetCurrentSelectNum() const { return currentSelectNum_; }
+	bool GetIsSelected() const { return isSelected_; }
 };
