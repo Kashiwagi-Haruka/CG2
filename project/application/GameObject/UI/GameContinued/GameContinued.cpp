@@ -43,7 +43,7 @@ void GameContinued::Initialize() {
 	text_->Initialize();
 
 	for (int i = 0; i < saveDataMaxNum_; ++i) {
-		SetSaveData(i, "Save " + std::to_string(i + 1), "No Data", "--:--");
+		SetSaveData(i, "SaveFile", "NoData", "--:--");
 
 		const float y = kBlockCenterY + (kBlockSpacingY * static_cast<float>(i));
 		blockPositions_[i] = {kBlockCenterX, y};
@@ -55,7 +55,7 @@ void GameContinued::Initialize() {
 		gameSaveData[i].BlockSprite_->Update();
 
 		const float thumbnailHeight = std::max(1.0f, kBlockHeight - (kThumbnailMargin * 2.0f));
-		const float thumbnailWidth = thumbnailHeight * (9.0f / 16.0f);
+		const float thumbnailWidth = thumbnailHeight * (16.0f / 9.0f);
 		const float left = blockPositions_[i].x - (kBlockWidth * 0.5f);
 		gameSaveData[i].GameSceneSprite_->SetPosition({left + kThumbnailMargin + (thumbnailWidth * 0.5f), blockPositions_[i].y});
 		gameSaveData[i].GameSceneSprite_->SetScale({thumbnailWidth, thumbnailHeight});
@@ -97,11 +97,17 @@ void GameContinued::Update() {
 		const float targetY = kBlockCenterY + (kBlockSpacingY * (static_cast<float>(i) - static_cast<float>(currentSelectNum_)));
 		const Vector2 targetPosition = {kBlockCenterX, targetY};
 
-		const float r = 0.08f + (proximity * 0.92f);
-		const float g = 0.10f + (proximity * 0.78f);
-		const float b = 0.14f + (proximity * 0.26f);
-		const float alpha = 0.55f + (proximity * 0.45f);
-		const Vector4 targetColor = {r, g, b, alpha};
+		Vector4 targetColor{};
+		if (i == currentSelectNum_) {
+			targetColor = {0.88f, 0.90f, 0.98f, 0.96f};
+		} else {
+			const float darken = std::pow(proximity, 1.2f);
+			const float r = 0.03f + (darken * 0.10f);
+			const float g = 0.04f + (darken * 0.12f);
+			const float b = 0.06f + (darken * 0.16f);
+			const float alpha = 0.72f + (darken * 0.16f);
+			targetColor = {r, g, b, alpha};
+		}
 
 		const float scaleFactor = 0.72f + (std::pow(1.0f - easedDistance, 1.4f) * 0.42f);
 		const Vector2 targetScale = {kBlockWidth * scaleFactor, kBlockHeight * scaleFactor};
@@ -117,7 +123,7 @@ void GameContinued::Update() {
 		gameSaveData[i].BlockSprite_->SetScale(blockScales_[i]);
 		gameSaveData[i].BlockSprite_->Update();
 		const float thumbnailHeight = std::max(1.0f, blockScales_[i].y - (kThumbnailMargin * 2.0f));
-		const float thumbnailWidth = thumbnailHeight * (9.0f / 16.0f);
+		const float thumbnailWidth = thumbnailHeight * (16.0f / 9.0f);
 		const float left = blockPositions_[i].x - (blockScales_[i].x * 0.5f);
 		gameSaveData[i].GameSceneSprite_->SetPosition({left + kThumbnailMargin + (thumbnailWidth * 0.5f), blockPositions_[i].y});
 		gameSaveData[i].GameSceneSprite_->SetScale({thumbnailWidth, thumbnailHeight});

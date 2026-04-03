@@ -281,6 +281,9 @@ void SampleScene::Initialize() {
 }
 
 void SampleScene::Update() {
+	if (Input::GetInstance()->TriggerKey(DIK_F12)) {
+		GameBase::GetInstance()->SaveCurrentFrameScreenShot("Resources/ScreenShot/Zikken.png");
+	}
 	if (!isBgmPlaying_) {
 		Audio::GetInstance()->SoundPlayWave(bgmData_, true);
 		isBgmPlaying_ = true;

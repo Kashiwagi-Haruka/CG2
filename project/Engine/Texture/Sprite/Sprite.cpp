@@ -59,7 +59,7 @@ void Sprite::Initialize(uint32_t Handle) {
 	Material* matSprite = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&matSprite));
 	matSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 白 or テクスチャの色
-	matSprite->enableLighting = 0;
+	matSprite->enableLighting = false;
 	matSprite->uvTransform = Function::MakeIdentity4x4();
 	material = matSprite;
 	materialResource->Unmap(0, nullptr);
