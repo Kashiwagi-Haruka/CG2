@@ -290,12 +290,13 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
     float softness = lerp(0.01f, 0.14f, widthFactor);
     float aa = max(fwidth(edge), 1.0e-4f);
     float outline = smoothstep(threshold - (softness + aa), threshold + (softness + aa), edge);
-    float outlineBlend = outline * saturate(gMaterial.outlineColor.a);
+    float outlineOpacity = saturate(gMaterial.outlineColor.a);
+    float outlineBlend = outline * outlineOpacity;
 
-    float3 outlined = lerp(litColor, gMaterial.outlineColor.rgb, outline);
+    float3 outlined = lerp(litColor, gMaterial.outlineColor.rgb, outlineBlend);
 
     float baseAlpha = textureColor.a * gMaterial.color.a;
-    float outlineAlpha = lerp(1.0f, saturate(gMaterial.outlineColor.a), outline);
+    float outlineAlpha = lerp(1.0f, outlineOpacity, outline);
     output.color = float4(outlined, baseAlpha * outlineAlpha);
     if (output.color.a <= 0.0f)
     {
