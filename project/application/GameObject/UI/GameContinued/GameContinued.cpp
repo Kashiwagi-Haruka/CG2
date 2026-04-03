@@ -3,9 +3,18 @@
 #include "TextureManager.h"
 
 void GameContinued::Initialize() {
+	int blockTextureHandle_ = 0;
+	int screenTextureHandle_ = 0;
+	blockTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
+	
+
 	for (auto& saveData : gameSaveData) {
+		screenTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/SaveScreenShot/NoData.png");
 		saveData.GameSceneSprite_ = std::make_unique<Sprite>();
+		saveData.GameSceneSprite_->Initialize(screenTextureHandle_);
 		saveData.BlockSprite_ = std::make_unique<Sprite>();
+		saveData.BlockSprite_->Initialize(blockTextureHandle_);
+
 	}
 	text_ = std::make_unique<GameContinuedText>();
 	text_->Initialize();
