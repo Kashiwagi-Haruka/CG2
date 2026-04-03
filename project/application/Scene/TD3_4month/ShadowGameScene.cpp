@@ -323,7 +323,7 @@ void ShadowGameScene::InitializeLights()
 
     areaLights_[2] = vendingMac_->GetAreaLight();
 
-    activePointLightCount_ = 4;
+    activePointLightCount_ = 3;
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     pointLights_[0].position = { 7.0f, 5.0f, 0.0f };
     pointLights_[0].intensity = 1.0f;
@@ -335,8 +335,8 @@ void ShadowGameScene::InitializeLights()
     pointLights_[1].radius = 10.0f;
     pointLights_[1].decay = 1.0f;
 
-    pointLights_[2] = edamame_->GetPointLights().at(0);
-    pointLights_[3] = edamame_->GetPointLights().at(1);
+    pointLights_[2] = edamame_->GetPointLight();
+
 
     directionalLight_.color = { 1.0f, 1.0f, 0.75f, 1.0f };
     directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
@@ -351,8 +351,8 @@ void ShadowGameScene::InitializeLights()
     areaLights_[0].intensity = 10.0f;
     areaLights_[0].width = 4.0f;
     areaLights_[0].height = 0.1f;
-    areaLights_[0].radius = 30.0f;
-    areaLights_[0].decay = 0.01f;
+    areaLights_[0].radius = 4.0f;
+    areaLights_[0].decay = 2.0f;
 
     areaLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     areaLights_[1].position = { -7.0f, 3.0f, 0.0f };
@@ -360,8 +360,8 @@ void ShadowGameScene::InitializeLights()
     areaLights_[1].intensity = 10.0f;
     areaLights_[1].width = 4.0f;
     areaLights_[1].height = 0.1f;
-    areaLights_[1].radius = 30.0f;
-    areaLights_[1].decay = 0.01f;
+    areaLights_[1].radius = 4.0f;
+    areaLights_[1].decay = 2.0f;
 
 }
 #pragma region //private更新処理
@@ -548,8 +548,7 @@ void ShadowGameScene::UpdateLight() {
 
     spotLights_[0] = flashlight_->GetSpotLight();
 
-    pointLights_[2] = edamame_->GetPointLights().at(0);
-    pointLights_[3] = edamame_->GetPointLights().at(1);
+    pointLights_[2] = edamame_->GetPointLight();
 
     areaLights_[2] = vendingMac_->GetAreaLight();
     areaLights_[3] = wallManager_->GetAreaLight();

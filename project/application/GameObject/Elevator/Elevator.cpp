@@ -23,8 +23,9 @@ Elevator::Elevator() {
         autoLockSystems_[i]->SetParentMat(&worldMat_);
     }
 
-    autoLockSystems_[0]->SetTranslate({ 0.0f,0.0f,-1.0f });
-    autoLockSystems_[1]->SetTranslate({ 0.0f,0.0f,-4.0f });
+    autoLockSystems_[0]->SetTranslate({ 0.0f,0.0f,-4.5f });
+    autoLockSystems_[1]->SetAABB({ .min = {-1.5f,0.0f,-1.0f} ,.max = {1.5f,0.02f,2.0f} });
+    autoLockSystems_[1]->SetTranslate({ 0.0f,0.0f,0.0f });
 }
 
 void Elevator::Initialize() {
@@ -32,13 +33,16 @@ void Elevator::Initialize() {
     modelObj_->Initialize();
 
     elevatorTransform_ = {
-        .scale = {1.0f,   1.0f,          1.0f },
+        .scale = {1.0f, 1.0f, 1.0f },
         .rotate = {0.0f, Function::kPi, 0.0f },
         .translate = {7.0f, baseHeight_,   -15.0f},
     };
 
     isRayHit_ = false;
     desiredAnimationName = "Close";
+    // 新しい状態管理
+    isPlayerInside_ = false;
+    insideTimer_ = 0.0f;
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/Elevator", "Elevator");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, desiredAnimationName, false);
@@ -76,14 +80,44 @@ void Elevator::Update() {
     modelObj_->Update();
     worldMat_ = modelObj_->GetWorldMatrix();
 
-    for (auto& sys : autoLockSystems_) {
-        if (sys->IsPlayerHit() && !sys->IsPlayerPreHit()) {
-            if (desiredAnimationName == "Open") {
-                desiredAnimationName = "Close";
-            } else  if (desiredAnimationName == "Close") {
+    bool hitOuter = autoLockSystems_[0]->IsPlayerHit();
+    bool hitInner = autoLockSystems_[1]->IsPlayerHit();
+
+    // 外側マット（入口前）
+    if (hitOuter) {
+        isPlayerInside_ = false;
+        insideTimer_ = 0.0f;
+
+        if (desiredAnimationName == "Close") {
+            desiredAnimationName = "Open"; // 外にいる → 開ける
+        }
+    }
+
+    // 内側マット（エレベーター内部）
+    if (hitInner) {
+        isPlayerInside_ = true;
+        //閉める
+        if (desiredAnimationName == "Open") {
+            desiredAnimationName = "Close";
+        }
+
+    }
+
+    if (isPlayerInside_) {
+        insideTimer_ += GameBase::GetInstance()->GetDeltaTime();
+        if (insideTimer_ > insideOpenDelay_) {
+            if (desiredAnimationName == "Close") {
                 desiredAnimationName = "Open";
             }
-            break;
+        }
+    }
+
+    // 中にいない & 外側マットも踏んでいない → 扉を閉める
+    if (!hitInner && !hitOuter) {
+        insideTimer_ = 0.0f;
+
+        if (desiredAnimationName == "Open") {
+            desiredAnimationName = "Close";
         }
     }
 

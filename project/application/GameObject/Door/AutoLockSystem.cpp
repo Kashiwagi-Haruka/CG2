@@ -7,7 +7,7 @@
 AutoLockSystem::AutoLockSystem()
 {
     obj_ = std::make_unique<Primitive>();
-    SetAABB({ .min = {-0.5f,0.0f,-0.375f},.max = {0.5f,0.02f,0.375f} });
+    SetAABB({ .min = {-1.0f,0.0f,-0.375f},.max = {1.0f,0.02f,0.375f} });
     SetCollisionAttribute(kCollisionMat);
     SetCollisionMask(kCollisionPlayer);
 }

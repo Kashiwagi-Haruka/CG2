@@ -25,6 +25,7 @@ Door::Door()
     worldMat_ = Function::MakeIdentity4x4();
     autoLockSystem_->SetParentMat(&worldMat_);
     autoLockSystem_->SetTranslate({ 0.0f,0.0f,-0.75f });
+    autoLockSystem_->SetAABB({ .min = {-0.5f,0.0f,-0.375f},.max = {0.5f,0.02f,0.375f} });
 }
 
 Door::~Door()
