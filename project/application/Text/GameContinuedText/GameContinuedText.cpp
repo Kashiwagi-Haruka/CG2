@@ -32,9 +32,13 @@ void GameContinuedText::Initialize() {
 		gameSaveDataText[i].currentStageName_.SetSize({64.0f, 64.0f});
 		gameSaveDataText[i].saveDateTime_.SetSize({64.0f, 64.0f});
 
+		gameSaveDataText[i].Name_.SetString(U"SaveFile");
+		gameSaveDataText[i].currentStageName_.SetString(U"NoData");
+		gameSaveDataText[i].saveDateTime_.SetString(U"1111");
 
-
-		SetSaveDataText("Save " + std::to_string(i + 1), "No Data", "--:--", i);
+		gameSaveDataText[i].Name_.UpdateLayout(false);
+		gameSaveDataText[i].currentStageName_.UpdateLayout(false);
+		gameSaveDataText[i].saveDateTime_.UpdateLayout(false);
 
 		SetBlockLayout(i, {640.0f, 360.0f + (280.0f * static_cast<float>(i))}, {1040.0f, 240.0f});
 	}
@@ -48,12 +52,8 @@ void GameContinuedText::Initialize() {
 }
 void GameContinuedText::Update(int selectIndex) { 
 	SetCurrentSelectIndex(selectIndex); 
-		for (int i = 0; i < static_cast<int>(gameSaveDataText.size()); ++i) {
-		auto& saveDataText = gameSaveDataText[i];
-		gameSaveDataText[i].Name_.Update();
-		gameSaveDataText[i].currentStageName_.Update();
-		gameSaveDataText[i].saveDateTime_.Update();
-	}
+
+
 }
 
 void GameContinuedText::Draw() {
@@ -81,9 +81,7 @@ void GameContinuedText::SetBlockLayout(int index, const Vector2& blockCenter, co
 	gameSaveDataText[index].currentStageName_.SetPosition({textBaseX + kTextGapX, textY});
 	gameSaveDataText[index].saveDateTime_.SetPosition({textBaseX + kDateGapX, textY});
 
-	gameSaveDataText[index].Name_.UpdateLayout(false);
-	gameSaveDataText[index].currentStageName_.UpdateLayout(false);
-	gameSaveDataText[index].saveDateTime_.UpdateLayout(false);
+
 }
 void GameContinuedText::SetSaveDataText(const std::string& name, const std::string& currentStageName, const std::string& saveDateTime, int index) {
 	if (index < 0 || index >= saveDataMaxNum_) {
