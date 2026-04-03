@@ -15,26 +15,28 @@ void GameContinuedText::Initialize() {
 	fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
 	FreeTypeManager::SetPixelSizes(fontHandle_, 64, 64);
 	for (int i = 0; i < static_cast<int>(gameSaveDataText.size()); ++i) {
-		auto& saveDataText = gameSaveDataText[i];
-		saveDataText.Name_.Initialize(fontHandle_);
-		saveDataText.currentStageName_.Initialize(fontHandle_);
-		saveDataText.saveDateTime_.Initialize(fontHandle_);
+		
+		gameSaveDataText[i].Name_.Initialize(fontHandle_);
+		gameSaveDataText[i].currentStageName_.Initialize(fontHandle_);
+		gameSaveDataText[i].saveDateTime_.Initialize(fontHandle_);
 
-		saveDataText.Name_.SetAlign(TextAlign::Left);
-		saveDataText.currentStageName_.SetAlign(TextAlign::Left);
-		saveDataText.saveDateTime_.SetAlign(TextAlign::Left);
+		gameSaveDataText[i].Name_.SetAlign(TextAlign::Left);
+		gameSaveDataText[i].currentStageName_.SetAlign(TextAlign::Left);
+		gameSaveDataText[i].saveDateTime_.SetAlign(TextAlign::Left);
 
-		saveDataText.Name_.SetColor(COLOR::BLACK);
-		saveDataText.currentStageName_.SetColor(COLOR::BLACK);
-		saveDataText.saveDateTime_.SetColor(COLOR::BLACK);
+		gameSaveDataText[i].Name_.SetColor(COLOR::BLACK);
+		gameSaveDataText[i].currentStageName_.SetColor(COLOR::BLACK);
+		gameSaveDataText[i].saveDateTime_.SetColor(COLOR::BLACK);
 
-		saveDataText.Name_.SetSize({64.0f,64.0f});
-		saveDataText.currentStageName_.SetSize({64.0f, 64.0f});
-		saveDataText.saveDateTime_.SetSize({64.0f, 64.0f});
+		gameSaveDataText[i].Name_.SetSize({64.0f,64.0f});
+		gameSaveDataText[i].currentStageName_.SetSize({64.0f, 64.0f});
+		gameSaveDataText[i].saveDateTime_.SetSize({64.0f, 64.0f});
 
-		SetBlockLayout(i, {640.0f, 360.0f + (280.0f * static_cast<float>(i))}, {1040.0f, 240.0f});
+
 
 		SetSaveDataText("Save " + std::to_string(i + 1), "No Data", "--:--", i);
+
+		SetBlockLayout(i, {640.0f, 360.0f + (280.0f * static_cast<float>(i))}, {1040.0f, 240.0f});
 	}
 
 	selectionCursorText_.Initialize(fontHandle_);
@@ -48,17 +50,17 @@ void GameContinuedText::Update(int selectIndex) {
 	SetCurrentSelectIndex(selectIndex); 
 		for (int i = 0; i < static_cast<int>(gameSaveDataText.size()); ++i) {
 		auto& saveDataText = gameSaveDataText[i];
-		saveDataText.Name_.Update();
-		saveDataText.currentStageName_.Update();
-		saveDataText.saveDateTime_.Update();
+		gameSaveDataText[i].Name_.Update();
+		gameSaveDataText[i].currentStageName_.Update();
+		gameSaveDataText[i].saveDateTime_.Update();
 	}
 }
 
 void GameContinuedText::Draw() {
-	for (auto& saveDataText : gameSaveDataText) {
-		saveDataText.Name_.Draw();
-		saveDataText.currentStageName_.Draw();
-		saveDataText.saveDateTime_.Draw();
+	for (int i = 0; i < static_cast<int>(gameSaveDataText.size()); ++i) {
+		gameSaveDataText[i].Name_.Draw();
+		gameSaveDataText[i].currentStageName_.Draw();
+		gameSaveDataText[i].saveDateTime_.Draw();
 	}
 	selectionCursorText_.Draw();
 }
@@ -78,6 +80,7 @@ void GameContinuedText::SetBlockLayout(int index, const Vector2& blockCenter, co
 	gameSaveDataText[index].Name_.SetPosition({textBaseX, textY});
 	gameSaveDataText[index].currentStageName_.SetPosition({textBaseX + kTextGapX, textY});
 	gameSaveDataText[index].saveDateTime_.SetPosition({textBaseX + kDateGapX, textY});
+
 	gameSaveDataText[index].Name_.UpdateLayout(false);
 	gameSaveDataText[index].currentStageName_.UpdateLayout(false);
 	gameSaveDataText[index].saveDateTime_.UpdateLayout(false);
@@ -89,9 +92,7 @@ void GameContinuedText::SetSaveDataText(const std::string& name, const std::stri
 	gameSaveDataText[index].Name_.SetString(std::u32string(name.begin(), name.end()));
 	gameSaveDataText[index].currentStageName_.SetString(std::u32string(currentStageName.begin(), currentStageName.end()));
 	gameSaveDataText[index].saveDateTime_.SetString(std::u32string(saveDateTime.begin(), saveDateTime.end()));
-	gameSaveDataText[index].Name_.UpdateLayout(false);
-	gameSaveDataText[index].currentStageName_.UpdateLayout(false);
-	gameSaveDataText[index].saveDateTime_.UpdateLayout(false);
+
 }
 
 void GameContinuedText::SetCurrentSelectIndex(int index) {
