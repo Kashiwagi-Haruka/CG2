@@ -19,77 +19,80 @@
 #include"GameObject/PC/PC.h"
 RaySprite::RaySprite()
 {
-	handHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/hand.png");
-	grabHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/grabHand.png");
-	portalHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/mouseUI.png");
+    handHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/hand.png");
+    grabHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/grabHand.png");
+    portalHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/mouseUI.png");
 
-	sprite_ = std::make_unique<Sprite>();
+    sprite_ = std::make_unique<Sprite>();
 
 }
 
 void RaySprite::Initialize()
 {
-	sprite_->Initialize(handHandle_);
-	sprite_->SetAnchorPoint({ 0.5f,0.5f });
-	sprite_->SetRotation(0.0f);
-	sprite_->SetScale({ 128.0f,128.0f });
-	sprite_->SetPosition({ SCREEN_SIZE::HALF_WIDTH,SCREEN_SIZE::HALF_HEIGHT });
-	sprite_->SetColor({1.0f,1.0f,1.0f,1.0f});
-	sprite_->Update();
+    sprite_->Initialize(handHandle_);
+    sprite_->SetAnchorPoint({ 0.5f,0.5f });
+    sprite_->SetRotation(0.0f);
+    sprite_->SetScale({ 128.0f,128.0f });
+    sprite_->SetPosition({ SCREEN_SIZE::HALF_WIDTH,SCREEN_SIZE::HALF_HEIGHT });
+    sprite_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+    sprite_->Update();
 }
 
 void RaySprite::Update()
 {
-	auto* playerCommand = PlayerCommand::GetInstance();
+    auto* playerCommand = PlayerCommand::GetInstance();
 
-	if (PlayerCommand::GetIsGrab()) {
-		// インタラクトの処理
-		SetTexture(RaySprite::GRAB);
-	} else if(PortalManager::GetCanMakePortal()){
-		SetTexture(RaySprite::PORTAL);
-	} else {
-		SetTexture(RaySprite::HAND);
-	}
+    if (PlayerCommand::GetIsGrab()) {
+        // インタラクトの処理
+        SetTexture(RaySprite::GRAB);
+    } else if (PortalManager::GetCanMakePortal()) {
+        SetTexture(RaySprite::PORTAL);
+    } else {
+        SetTexture(RaySprite::HAND);
+    }
 
-	sprite_->Update();
+    sprite_->Update();
 }
 
 void RaySprite::Draw()
 {
-	SpriteCommon::GetInstance()->DrawCommon();
+    SpriteCommon::GetInstance()->DrawCommon();
 
-	if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortal()) {
-		sprite_->Draw();
-	}
-	
+    if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortal()) {
+        sprite_->Draw();
+    }
+
 }
 
 void RaySprite::SetTexture(const TextureUI num)
 {
-	switch (num)
-	{
-	case TextureUI::PORTAL:
-		sprite_->SetTextureHandle(portalHandle_);
-		break;
-	case TextureUI::HAND:
-		sprite_->SetTextureHandle(handHandle_);
-		break;
-	case TextureUI::GRAB:
-		sprite_->SetTextureHandle(grabHandle_);
-		break;
-	default:
-		break;
-	}
+    switch (num)
+    {
+    case TextureUI::PORTAL:
+        sprite_->SetTextureHandle(portalHandle_);
+        break;
+    case TextureUI::HAND:
+        sprite_->SetTextureHandle(handHandle_);
+        break;
+    case TextureUI::GRAB:
+        sprite_->SetTextureHandle(grabHandle_);
+        break;
+    default:
+        break;
+    }
 }
 
 bool RaySprite::IsRayHit()
 {
-	return BoxManager::IsRayHit()||
-	ChairManager::IsRayHit() ||
-	DeskManager::IsRayHit() ||
-	LockerManager::IsRayHit() ||
-	Door::IsRayHit() ||
-	Edamame::IsRayHit() ||
-	Flashlight::IsRayHit() ||
-	Key::IsRayHit()|| VendingMac::IsRayHit()||PC::IsRayHit();
+    return
+        BoxManager::IsRayHit() ||
+        ChairManager::IsRayHit() ||
+        DeskManager::IsRayHit() ||
+        LockerManager::IsRayHit() ||
+        Door::IsRayHit() ||
+        Edamame::IsRayHit() ||
+        Flashlight::IsRayHit() ||
+        Key::IsRayHit() ||
+        VendingMac::IsRayHit() ||
+        PC::IsRayHit();
 }

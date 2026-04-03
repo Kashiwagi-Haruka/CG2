@@ -3712,7 +3712,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3723,7 +3723,7 @@
         "translate": [
           7.0,
           0.0,
-          -9.25
+          -10.0
         ]
       }
     }
@@ -4866,6 +4866,61 @@
         ]
       },
       "name": "Primitive 20",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "index": 21,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Primitive 21",
       "transform": {
         "rotate": [
           0.0,

@@ -281,29 +281,30 @@ void ShadowGameScene::CheckCollision()
     for (auto& wall : elevatorRoomManager_->GetWalls()) {
         collisionManager_->AddCollider(wall.get());
     }
-
-    collisionManager_->AddCollider(vendingMac_.get());
-    collisionManager_->AddCollider(flashlight_.get());
-    collisionManager_->AddCollider(testField_.get());
+    
     for (auto& chair : chairManager_->GetChairs()) {
         collisionManager_->AddCollider(chair.get());
     }
-
-    collisionManager_->AddCollider(door_->GetAutoLockSystem().get());
-
-    if (!door_->GetIsOpen()) {
-        collisionManager_->AddCollider(door_.get());
-    }
-
     for (auto& locker : lockerManager_->GetLockers()) {
         collisionManager_->AddCollider(locker.get());
     }
     for (auto& desk : deskManager_->GetDesks()) {
         collisionManager_->AddCollider(desk.get());
     }
-
     for (auto& box : boxManager_->GetBoxes()) {
         collisionManager_->AddCollider(box.get());
+    }
+
+    for (auto& system : elevator_->GetAutoLockSys()) {
+        collisionManager_->AddCollider(system.get());
+    }
+
+    collisionManager_->AddCollider(vendingMac_.get());
+    collisionManager_->AddCollider(flashlight_.get());
+    collisionManager_->AddCollider(testField_.get());
+    collisionManager_->AddCollider(door_->GetAutoLockSystem().get());
+    if (!door_->GetIsOpen()) {
+        collisionManager_->AddCollider(door_.get());
     }
 
     collisionManager_->AddCollider(key_.get());
@@ -343,7 +344,7 @@ void ShadowGameScene::InitializeLights()
 
     activeSpotLightCount_ = 1;
 
-    activeAreaLightCount_ = 5;
+    activeAreaLightCount_ = 6;
     areaLights_[0].color = { 1.0f,1.0f, 1.0f, 1.0f };
     areaLights_[0].position = { 7.0f, 3.0f, 0.0f };
     areaLights_[0].normal = { 0.0f, 1.0f, 0.0f };
@@ -711,6 +712,7 @@ void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera)
     boxManager_->SetPlayerCamera(playerCamera);
     pc_->SetPlayerCamera(playerCamera);
     gentleman_->SetPlayerCamera(playerCamera);
+    elevator_->SetPlayerCamera(playerCamera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {

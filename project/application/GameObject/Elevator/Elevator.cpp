@@ -1,69 +1,138 @@
 #include "Elevator.h"
-
 #include "Camera.h"
 #include "Function.h"
 #include "GameObject/YoshidaMath/YoshidaMath.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
+#include"Animation/AnimationManager.h"
+#include"GameObject/SEManager/SEManager.h"
+#include "GameBase.h"
 #include <cmath>
 
+PlayerCamera* Elevator::playerCamera_ = nullptr;
+bool Elevator::isRayHit_ = false;
+
 Elevator::Elevator() {
-	ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/Elevator", "Elevator");
+    ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/Elevator", "Elevator");
+    modelObj_ = std::make_unique<Object3d>();
+    modelObj_->SetModel("Elevator");
+    worldMat_ = Function::MakeIdentity4x4();
 
-	modelObj_ = std::make_unique<Object3d>();
-	modelObj_->SetModel("Elevator");
+    for (int i = 0; i < autoLockSystems_.size(); ++i) {
+        autoLockSystems_[i] = std::make_unique<AutoLockSystem>();
+        autoLockSystems_[i]->SetParentMat(&worldMat_);
+    }
 
-	floorBox_ = std::make_unique<Primitive>();
+    autoLockSystems_[0]->SetTranslate({ 0.0f,0.0f,-1.0f });
+    autoLockSystems_[1]->SetTranslate({ 0.0f,0.0f,-4.0f });
 }
 
 void Elevator::Initialize() {
-	modelObj_->Initialize();
 
-	floorBox_->Initialize(Primitive::PrimitiveName::Box);
-	floorBox_->SetEnableLighting(true);
-	floorBox_->SetColor({0.15f, 0.15f, 0.15f, 1.0f});
+    modelObj_->Initialize();
 
-	elevatorTransform_ = {
-	    .scale = {1.0f,   1.0f,          1.0f },
-	    .rotate = {0.0f, Function::kPi, 0.0f },
-	    .translate = {7.0f, baseHeight_,   -15.0f},
-	};
+    elevatorTransform_ = {
+        .scale = {1.0f,   1.0f,          1.0f },
+        .rotate = {0.0f, Function::kPi, 0.0f },
+        .translate = {7.0f, baseHeight_,   -15.0f},
+    };
 
-	floorBoxTransform_ = {
-	    .scale = {4.2f,	                       0.2f,               4.2f                          },
-	    .rotate = {0.0f,	                       0.0f,               0.0f                          },
-	    .translate = {elevatorTransform_.translate.x, baseHeight_ - 0.8f, elevatorTransform_.translate.z},
-	};
+    isRayHit_ = false;
+    desiredAnimationName = "Close";
 
-	animationTime_ = 0.0f;
+    AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/Elevator", "Elevator");
+    AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, desiredAnimationName, false);
+    if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, desiredAnimationName)) {
+        modelObj_->SetAnimation(idleAnimation, false);
+    }
+
+    if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("Elevator")) {
+        skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
+        skinCluster_ = CreateSkinCluster(*skeleton_, *sizukuModel);
+        if (!skinCluster_.mappedPalette.empty()) {
+            modelObj_->SetSkinCluster(&skinCluster_);
+        }
+    }
+
+
+    for (auto& sys : autoLockSystems_) {
+        sys->Initialize();
+    }
 }
 
 void Elevator::SetCamera(Camera* camera) {
-	modelObj_->SetCamera(camera);
-	modelObj_->UpdateCameraMatrices();
+    modelObj_->SetCamera(camera);
+    modelObj_->UpdateCameraMatrices();
 
-	floorBox_->SetCamera(camera);
-	floorBox_->UpdateCameraMatrices();
+    for (auto& sys : autoLockSystems_) {
+        sys->SetCamera(camera);
+    }
+
 }
 
 void Elevator::Update() {
-	animationTime_ += YoshidaMath::kDeltaTime * animationSpeed_;
-	
 
-	floorBoxTransform_.translate.x = elevatorTransform_.translate.x;
-	floorBoxTransform_.translate.z = elevatorTransform_.translate.z;
-	floorBoxTransform_.translate.y = elevatorTransform_.translate.y - 0.8f;
+    modelObj_->SetTransform(elevatorTransform_);
+    modelObj_->Update();
+    worldMat_ = modelObj_->GetWorldMatrix();
 
-	modelObj_->SetTransform(elevatorTransform_);
-	modelObj_->Update();
+    for (auto& sys : autoLockSystems_) {
+        if (sys->IsPlayerHit() && !sys->IsPlayerPreHit()) {
+            if (desiredAnimationName == "Open") {
+                desiredAnimationName = "Close";
+            } else  if (desiredAnimationName == "Close") {
+                desiredAnimationName = "Open";
+            }
+            break;
+        }
+    }
 
-	floorBox_->SetTransform(floorBoxTransform_);
-	floorBox_->Update();
+
+    Animation();
+
+    for (auto& sys : autoLockSystems_) {
+        sys->Update();
+    }
+
+
 }
 
 void Elevator::Draw() {
-	Object3dCommon::GetInstance()->DrawCommonSkinning();
-	modelObj_->Draw();
-	//Object3dCommon::GetInstance()->DrawCommon();
-	//floorBox_->Draw();
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
+    modelObj_->Draw();
+    Object3dCommon::GetInstance()->DrawCommon();
+
+    for (auto& sys : autoLockSystems_) {
+        sys->Draw();
+    }
+}
+
+void Elevator::Animation()
+{
+
+    bool loopAnimation = false;
+
+    if (desiredAnimationName == "Close") {
+
+    }
+
+    const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+    AnimationManager::PlaybackResult playbackResult{};
+
+    if (AnimationManager::GetInstance()->UpdatePlayback(animationGroupName_, desiredAnimationName, loopAnimation, deltaTime, kAnimationBlendDuration_, blendedPoseAnimation_, playbackResult)) {
+        animationFinished_ = playbackResult.animationFinished;
+
+        if (playbackResult.changedAnimation && playbackResult.currentAnimation) {
+            modelObj_->SetAnimation(playbackResult.currentAnimation, loopAnimation);
+        }
+
+        if (skeleton_ && playbackResult.animationToApply) {
+            skeleton_->ApplyAnimation(*playbackResult.animationToApply, playbackResult.animationTime);
+            skeleton_->Update();
+            if (!skinCluster_.mappedPalette.empty()) {
+                UpdateSkinCluster(skinCluster_, *skeleton_);
+            }
+        }
+    }
+
 }
