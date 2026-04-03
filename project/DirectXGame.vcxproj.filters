@@ -375,6 +375,7 @@
     <ClCompile Include="Engine\ScreenShot\ScreenShot.cpp" />
     <ClCompile Include="application\GameObject\UI\GameContinued\GameContinued.cpp" />
     <ClCompile Include="application\Text\GameContinuedText\GameContinuedText.cpp" />
+    <ClCompile Include="application\GameObject\Elevator\ElevatorRoomManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -743,6 +744,7 @@
     <ClInclude Include="application\GameObject\UI\GameContinued\GameContinued.h" />
     <ClInclude Include="application\Text\GameContinuedText\GameContinuedText.h" />
     <ClInclude Include="application\GameObject\UI\GameContinued\GameContinuedData.h" />
+    <ClInclude Include="application\GameObject\Elevator\ElevatorRoomManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

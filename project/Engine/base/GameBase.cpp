@@ -1,6 +1,6 @@
 #define NOMINMAX
 #include "GameBase.h"
-#include "Engine/Editor/Hierarchy.h"
+#include "Engine/Editor/Hierarchy/Hierarchy.h"
 #include "ImGuiManager.h"
 #include "Input.h"
 #include "Model/ModelManager.h"

@@ -1,6 +1,6 @@
 #define NOMINMAX
 #include "ImGuiManager.h"
-#include "Engine/Editor/Hierarchy.h"
+#include "Engine/Editor/Hierarchy/Hierarchy.h"
 #include <dxgi1_6.h>
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"

@@ -3,7 +3,7 @@
 #include"application/GameObject/YoshidaMath/YoshidaMath.h"
 #include<cassert>
 #include"GameObject/YoshidaMath/Easing.h"
-#include "Engine/Editor/Hierarchy.h"
+#include "Engine/Editor/Hierarchy/Hierarchy.h"
 #include "Object3d/Object3dCommon.h"
 #include "DirectXCommon.h"
 #include<algorithm>
