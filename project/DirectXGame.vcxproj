@@ -183,7 +183,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Edamame\EdamameModel.cpp" />
     <ClCompile Include="application\GameObject\CameraController\CameraController.cpp" />
     <ClCompile Include="application\GameObject\UI\DamageOverlay.cpp" />
-    <ClCompile Include="application\Stage\BaseStage.cpp" />
     <ClCompile Include="application\GameObject\Elevator\ElevatorRoomManager.cpp" />
     <ClCompile Include="Engine\Editor\Object3d\EditorObject3d.cpp" />
     <ClCompile Include="Engine\Editor\Primitive\EditorPrimitive.cpp" />
@@ -310,7 +309,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Event\FirstGameEvent.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManager2.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\Gentleman.cpp" />
-    <ClCompile Include="application\Stage\StageManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -358,7 +356,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Edamame\EdamameModel.h" />
     <ClInclude Include="application\GameObject\CameraController\CameraController.h" />
     <ClInclude Include="application\GameObject\UI\DamageOverlay.h" />
-    <ClInclude Include="application\Stage\BaseStage.h" />
     <ClInclude Include="application\GameObject\Elevator\ElevatorRoomManager.h" />
     <ClInclude Include="Engine\Editor\Object3d\EditorObject3d.h" />
     <ClInclude Include="Engine\Editor\Primitive\EditorPrimitive.h" />
@@ -492,7 +489,6 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Event\FirstGameEvent.h" />
     <ClInclude Include="application\GameObject\Wall\WallManager2.h" />
     <ClInclude Include="application\GameObject\Gentleman\Gentleman.h" />
-    <ClInclude Include="application\Stage\StageManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
