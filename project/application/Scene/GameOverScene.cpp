@@ -5,6 +5,7 @@
 #include "Sprite/SpriteCommon.h"
 #include "Text/FreetypeManager/FreeTypeManager.h"
 #include "TextureManager.h"
+#include "GameObject/KeyBindConfig.h"
 
 GameOverScene::GameOverScene() {
 	transition = std::make_unique<SceneTransition>();
@@ -43,7 +44,7 @@ void GameOverScene::Update() {
 		Audio::GetInstance()->SoundPlayWave(BGM_, true);
 		isBGMPlaying = true;
 	}
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
+	if ((PlayerCommand::GetInstance()->Shot()||PlayerCommand::GetInstance()->UiInteractTrigger()) && !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;
 	}

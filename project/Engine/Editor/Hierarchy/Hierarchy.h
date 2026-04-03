@@ -11,8 +11,8 @@
 
 #include "Engine/Editor/Audio/EditorAudio.h"
 #include "Engine/Editor/Camera/EditorCamera.h"
-#include "Inspector/Inspector.h"
-#include "Light/EditorLight.h"
+#include "Engine/Editor/Inspector/Inspector.h"
+#include "Engine/Editor/Light/EditorLight.h"
 
 class Object3d;
 class Primitive;

@@ -95,8 +95,8 @@ class SampleScene : public BaseScene {
 	SoundData bgmData_{};
 	bool isBgmPlaying_ = false;
 
-		Vector4 uvBallOutlineColor_ = {0.0f, 0.0f, 0.0f, 1.0f};
-	float uvBallOutlineWidth_ = 10.0f;
+		Vector4 uvBallOutlineColor_ = {0.0f, 0.0f, 0.0f, 0.0f};
+	float uvBallOutlineWidth_ = 5.0f;
 
 	void SetSceneCameraForDraw(Camera* camera);
 	void UpdateSceneCameraMatricesForDraw();

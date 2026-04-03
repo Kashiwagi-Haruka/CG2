@@ -16,9 +16,9 @@ enum GameKeyBind
     K_MoveForwardArrow = DIK_UP,
     K_MoveBackwardArrow = DIK_DOWN,
 
-    K_Shot = DIK_SPACE,
     K_Sneak = DIK_LSHIFT,
     K_Interact = DIK_E,
+	K_Interact2 = DIK_SPACE,
 
     // コントローラー
     C_MoveLeft = Input::PadButton::kButtonLeft,

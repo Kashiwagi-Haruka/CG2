@@ -6,12 +6,12 @@
 #include "Engine/Editor/Primitive/EditorPrimitive.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
-#include "Grid/EditorGrid.h"
+#include "Engine/Editor/Grid/EditorGrid.h"
 #include "Input.h"
 #include "Object3d/Object3d.h"
 #include "Object3d/Object3dCommon.h"
 #include "Primitive/Primitive.h"
-#include "ToolBar/ToolBar.h"
+#include "Engine/Editor/ToolBar/ToolBar.h"
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
 #endif
