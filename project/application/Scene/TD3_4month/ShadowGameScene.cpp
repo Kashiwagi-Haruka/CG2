@@ -76,6 +76,9 @@ ShadowGameScene::ShadowGameScene()
     elevator_ = std::make_unique<Elevator>();
     //セーブポイント紳士
     gentleman_ = std::make_unique<Gentleman>();
+    //エレベータールーム
+    elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
+
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
     //UI管理
@@ -169,7 +172,8 @@ void ShadowGameScene::Initialize()
     elevator_->Initialize();
     //セーブポイント紳士
     gentleman_->Initialize();
-
+    //エレベータールーム
+    elevatorRoomManager_->Initialize();
     //カーソルを画面中央に設定する
     uiManager_->CursorHideAndStop();
     //カメラをセットする
@@ -271,6 +275,10 @@ void ShadowGameScene::CheckCollision()
     }
 
     for (auto& wall : wallManager2_->GetWalls()) {
+        collisionManager_->AddCollider(wall.get());
+    }
+
+    for (auto& wall : elevatorRoomManager_->GetWalls()) {
         collisionManager_->AddCollider(wall.get());
     }
 
@@ -446,6 +454,9 @@ void ShadowGameScene::UpdateGameObject()
     wallManager_->Update();
     //壁管理
     wallManager2_->Update();
+    //エレベータールーム管理
+    elevatorRoomManager_->Update();
+
     //自販機
     vendingMac_->Update();
     const Vector3 vendingPosition = vendingMac_->GetWorldPosition();
@@ -542,6 +553,7 @@ void ShadowGameScene::UpdateLight() {
     areaLights_[2] = vendingMac_->GetAreaLight();
     areaLights_[3] = wallManager_->GetAreaLight();
     areaLights_[4] = wallManager2_->GetAreaLight();
+    areaLights_[5] = elevatorRoomManager_->GetAreaLight();
 
     Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
     Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
@@ -605,13 +617,14 @@ void ShadowGameScene::DrawModel() {
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
-
     // テスト地面
     testField_->Draw();
     //壁管理
-    //wallManager_->Draw();
+    wallManager_->Draw();
     //壁管理
     wallManager2_->Draw();
+    //エレベータルーム
+    elevatorRoomManager_->Draw();
     //自販機
     vendingMac_->Draw();
     // コーヒー缶
@@ -673,6 +686,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
     chairManager_->SetCamera(camera);
     wallManager_->SetCamera(camera);
     wallManager2_->SetCamera(camera);
+    elevatorRoomManager_->SetCamera(camera);
     vendingMac_->SetCamera(camera);
     door_->SetCamera(camera);
     lockerManager_->SetCamera(camera);

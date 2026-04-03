@@ -372,6 +372,9 @@
     <ClCompile Include="application\GameObject\UI\DamageOverlay.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManager2.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\Gentleman.cpp" />
+    <ClCompile Include="application\Stage\StageManager.cpp" />
+    <ClCompile Include="application\Stage\BaseStage.cpp" />
+    <ClCompile Include="application\GameObject\Elevator\ElevatorRoomManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -736,6 +739,9 @@
     <ClInclude Include="application\GameObject\UI\DamageOverlay.h" />
     <ClInclude Include="application\GameObject\Wall\WallManager2.h" />
     <ClInclude Include="application\GameObject\Gentleman\Gentleman.h" />
+    <ClInclude Include="application\Stage\StageManager.h" />
+    <ClInclude Include="application\Stage\BaseStage.h" />
+    <ClInclude Include="application\GameObject\Elevator\ElevatorRoomManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
