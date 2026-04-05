@@ -134,6 +134,11 @@ void ShadowGameScene::Initialize()
 
     //プレイヤーの初期化
     player_->Initialize();
+
+    if (!gameSave.GetInitStart()) {
+        player_->SetTransform(gameSave.GetPlayerSaveData().transform);
+    }
+
     PlayerCommand::Initialize();
 
     //カメラコントローラー
@@ -339,7 +344,7 @@ void ShadowGameScene::InitializeLights()
     spotLights_[0] = flashlight_->GetSpotLight();
     areaLights_[2] = vendingMac_->GetAreaLight();
 
-    activePointLightCount_ = 3;
+    activePointLightCount_ = 4;
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     pointLights_[0].position = { 7.0f, 5.0f, 0.0f };
     pointLights_[0].intensity = 1.0f;
@@ -351,7 +356,8 @@ void ShadowGameScene::InitializeLights()
     pointLights_[1].radius = 10.0f;
     pointLights_[1].decay = 1.0f;
 
-    pointLights_[2] = edamame_->GetPointLight();
+    pointLights_[2] = edamame_->GetPointLights().at(0);
+    pointLights_[3] = edamame_->GetPointLights().at(1);
 
     directionalLight_.color = { 1.0f, 1.0f, 0.75f, 1.0f };
     directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
@@ -449,7 +455,6 @@ void ShadowGameScene::UpdateGameObject()
     portalManager_->WarpPlayer(player_.get());
     //プレイヤー
     player_->Update();
-
     //携帯打刻機
     timeCardWatch_->Update();
     //懐中電灯
@@ -572,7 +577,8 @@ void ShadowGameScene::UpdateLight() {
 
     spotLights_[0] = flashlight_->GetSpotLight();
 
-    pointLights_[2] = edamame_->GetPointLight();
+    pointLights_[2] = edamame_->GetPointLights().at(0);
+    pointLights_[3] = edamame_->GetPointLights().at(1);
 
     areaLights_[2] = vendingMac_->GetAreaLight();
     areaLights_[3] = wallManager_->GetAreaLight();
