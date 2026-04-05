@@ -35,6 +35,14 @@ void TitleScene::CameraUpdate()
 #endif
 }
 
+void TitleScene::TransitionStart()
+{
+	if (!isTransitionOut) {
+		transition->Initialize(true);
+		isTransitionOut = true;
+	}
+}
+
 TitleScene::TitleScene() {
 
 	BGMData_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/clock.mp3");
@@ -114,14 +122,14 @@ void TitleScene::Update() {
 	}
 
 	if (titleMenuUI_->GetIsStart()) {
-		firstStory_->Update();
-	}
 
-	if (firstStory_->GetIsEnd()) {
-		if (!isTransitionOut) {
-			transition->Initialize(true);
-			isTransitionOut = true;
+		firstStory_->Update();
+
+		if (firstStory_->GetIsEnd()) {
+			TransitionStart();
 		}
+	} else if (gameContinued_->GetIsSelected()) {
+		TransitionStart();
 	}
 
 	if (isTransitionIn || isTransitionOut) {

@@ -1,9 +1,11 @@
 {
   "BGMVolume": 0.5555555820465088,
   "CameraMoveSpeed": {
-    "x": 0.5222222208976746,
-    "y": 0.5222222208976746
+    "x": 1.1555556058883667,
+    "y": 1.1555556058883667
   },
   "SEVolume": 0.5555555820465088,
-  "VoiceVolume": 0.8888888955116272
+  "VoiceVolume": 0.8888888955116272,
+  "isFlipHorizontally": false,
+  "isFlipVertically": false
 }

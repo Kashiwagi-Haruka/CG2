@@ -230,7 +230,7 @@ bool YoshidaMath::IsCollision(const AABB& aabb, const OBB& obb)
     float AbsR[3][3];
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-            AbsR[i][j] = fabs(Function::Dot(aAxis[i], obb.axis[j])) + 1e-5f;
+            AbsR[i][j] = abs(Function::Dot(aAxis[i], obb.axis[j])) + 1e-5f;
         }
     }
 
@@ -315,7 +315,7 @@ bool YoshidaMath::IsCollision(const OBB& a, const OBB& b)
     // AbsR[i][j] = |R[i][j]| + EPSILON
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
-            AbsR[i][j] = fabs(R[i][j]) + EPSILON;
+            AbsR[i][j] = abs(R[i][j]) + EPSILON;
         }
     }
 

@@ -5,11 +5,12 @@
 #include "SceneTransition/SceneTransition.h"
 
 #include"GameObject/CameraController/CameraController.h"
-
+#pragma region //Save
+#include"GameSave/GameSave.h"
+#pragma endregion
 #pragma region //GameObject
 #include"GameObject/Player/Player.h"
 #include"GameObject/TestField/TestField.h"
-
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/WhiteBoard/WhiteBoardManager.h"
 #include"GameObject/TimeCard/TimeCardWatch.h"
@@ -20,7 +21,6 @@
 #include <GameObject/Chair/ChairManager.h>
 #include"GameObject/Wall/WallManager.h"
 #include"GameObject/Wall/WallManager2.h"
-
 #include"GameObject/VendingMac/VendingMac.h"
 #include"GameObject/Door/Door.h"
 #include"GameObject/Locker/LockerManager.h"
@@ -31,7 +31,6 @@
 #include "GameObject/Elevator/Elevator.h"
 #include <GameObject/Edamame/Edamame.h>
 #include"GameObject/PC/PC.h"
-
 #include "GameObject/Coffee/Coffees.h"
 #include "GameObject/UI/DamageOverlay.h"
 #include "GameObject/Gentleman/Gentleman.h"
@@ -73,6 +72,10 @@ private:
 	std::string nextSceneName_;
 #pragma endregion
 
+#pragma region // セーブ
+    ProgressSaveData progressSaveData_;
+
+#pragma endregion
 #pragma region//ゲームオブジェクトの設定
     //Player
     std::unique_ptr<Player> player_ = nullptr;

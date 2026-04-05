@@ -9,8 +9,11 @@
 #include "GameBase.h"
 #include"GameObject/SEManager/SEManager.h"
 #include<imgui.h>
+#include"GameSave/GameSave.h"
 
 PlayerCamera* Gentleman::playerCamera_ = nullptr;
+Transform* Gentleman::playerTransform_ = nullptr;
+ProgressSaveData* Gentleman::progressSaveData_ = nullptr;
 
 Gentleman::Gentleman()
 {
@@ -74,6 +77,17 @@ void Gentleman::Animation()
         }
     }
 
+}
+
+void Gentleman::Save()
+{
+    auto& save = GameSave::GetInstance();
+    save.CameraSave(playerCamera_->GetParam());
+    save.PlayerSave(*playerTransform_);
+    save.ProgressSave(*progressSaveData_);
+    std::string filename = "Resources/ScreenShot/" + progressSaveData_->currentStageName + ".png";
+    GameBase::GetInstance()->SaveCurrentFrameScreenShot(filename.c_str());
+    save.Save();
 }
 
 void Gentleman::SetCamera(Camera* camera)
@@ -155,9 +169,10 @@ void Gentleman::CheckCollision()
     }
 
     //rayの当たり判定
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+    if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger()) {
         SEManager::SoundPlay(SEManager::TYPE);
         SetAnimationName(animationName);
+        Save();
     }
 
 #ifdef USE_IMGUI

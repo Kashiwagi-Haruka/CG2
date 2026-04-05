@@ -2,32 +2,51 @@
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Transform.h"
 #include <string>
+
+struct PlayerSaveData {
+    Transform transform; // プレイヤーの位置、回転、拡縮
+};
+struct CameraSaveData {
+    Transform transform;     // カメラの位置、回転、拡縮
+    float rotateSpeed;       // カメラの回転速度
+};
+struct ProgressSaveData {
+    bool isGameClear;             // ゲームクリアしているか
+    std::string currentStageName; // 現在のステージ名
+    bool isLightHave;             // ライトを持っているか
+    bool isKeyHave;//キーを持っているか
+};
+
 class GameSave {
-
-	struct PlayerSaveData {
-		Transform transform; // プレイヤーの位置、回転、拡縮
-	};
-	struct CameraSaveData {
-		Transform transform;     // カメラの位置、回転、拡縮
-		float rotateSpeed;       // カメラの回転速度
-		bool isFlipHorizontally; // 左右反転しているか
-		bool isFlipVertically;   // 上下反転しているか
-	};
-	struct ProgressSaveData {
-		bool isGameClear;             // ゲームクリアしているか
-		std::string currentStageName; // 現在のステージ名
-		bool isLightHave;             // ライトを持っているか
-	};
-	PlayerSaveData playerSaveData_{};     // プレイヤーのセーブデータ
-	CameraSaveData cameraSaveData_{};     // カメラのセーブデータ
-	ProgressSaveData progressSaveData_{}; // 進行状況のセーブデータ
-
 public:
-	void PlayerSave(const Transform& transform);                                                                    // プレイヤーのセーブデータを保存する
-	void CameraSave(const Transform& transform, float rotateSpeed, bool isFlipHorizontally, bool isFlipVertically); // カメラのセーブデータを保存する
-	void ProgressSave(bool isClear, const std::string& currentStageName, bool isLightHave);                         // 進行状況のセーブデータを保存する
 
-	void Save();  // セーブデータをファイルに保存する
-	void Load();  // ファイルからセーブデータを読み込む
-	void Reset(); // セーブデータをリセットする
+private:
+    PlayerSaveData playerSaveData_{};     // プレイヤーのセーブデータ
+    CameraSaveData cameraSaveData_{};     // カメラのセーブデータ
+    ProgressSaveData progressSaveData_{}; // 進行状況のセーブデータ
+    bool isInitStart_ = false;
+private:
+    GameSave() {}  // コンストラクタを private にする
+    ~GameSave() {}
+public:
+    // コピー禁止
+    GameSave(const GameSave&) = delete;
+    GameSave& operator=(const GameSave&) = delete;
+
+    static GameSave& GetInstance() {
+        static GameSave instance;  // C++11以降はスレッドセーフ
+        return instance;
+    }
+    void PlayerSave(const Transform& transform);                                                                    // プレイヤーのセーブデータを保存する
+    void CameraSave(const CameraSaveData& saveData); // カメラのセーブデータを保存する
+    void ProgressSave(const ProgressSaveData& progressSaveData); // 進行状況のセーブデータを保存する
+
+    void Save();  // セーブデータをファイルに保存する
+    void Load();  // ファイルからセーブデータを読み込む
+    void Reset(); // セーブデータをリセットする
+    void SetInitStart(const bool flag) { isInitStart_ = flag; }    //最初からスタートするかどうかのフラグをセットする
+    bool GetInitStart() { return isInitStart_; }    //最初からスタートするかどうかのフラグを取得する
+    const PlayerSaveData& GetPlayerSaveData() { return playerSaveData_; };     // プレイヤーのセーブデータ
+    const CameraSaveData& GetCameraSaveData() { return cameraSaveData_; };     // カメラのセーブデータ
+    const ProgressSaveData& GetProgressSaveData() { return progressSaveData_; }; // 進行状況のセーブデータ
 };

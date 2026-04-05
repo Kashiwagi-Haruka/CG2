@@ -14,6 +14,7 @@
 #include "GameObject/SEManager/SEManager.h"
 #include <algorithm>
 #include <cmath>
+#include"GameSave/GameSave.h"
 
 
 ShadowGameScene::ShadowGameScene()
@@ -76,6 +77,8 @@ ShadowGameScene::ShadowGameScene()
     elevator_ = std::make_unique<Elevator>();
     //セーブポイント紳士
     gentleman_ = std::make_unique<Gentleman>();
+    Gentleman::SetPlayerTransform(&player_->GetTransform());
+    Gentleman::SetProgressSaveData(&progressSaveData_);
     //エレベータールーム
     elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
 
@@ -89,8 +92,6 @@ ShadowGameScene::ShadowGameScene()
     SetPlayerCamera(cameraController_->GetPlayerCamera());
 
     damageOverlay_ = std::make_unique<DamageOverlay>();
-
-
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -101,7 +102,19 @@ ShadowGameScene::~ShadowGameScene()
 
 void ShadowGameScene::Initialize()
 {
+    auto& gameSave = GameSave::GetInstance();
+    //一旦ここでロード
+    gameSave.Load();
 
+    if (gameSave.GetInitStart()) {
+        //一旦最初のステージにしておく
+        progressSaveData_.currentStageName = "FirstStage";
+        progressSaveData_.isGameClear = false;
+        progressSaveData_.isKeyHave = false;
+        progressSaveData_.isLightHave = false;
+    } else {
+        progressSaveData_ = gameSave.GetProgressSaveData();
+    }
 
     BGMManager::Initialize();
 
@@ -126,7 +139,9 @@ void ShadowGameScene::Initialize()
     //カメラコントローラー
     cameraController_->Initialize();
 
-
+    //フラッシュライト
+    flashlight_->Initialize();
+    flashlight_->SetGetLight(progressSaveData_.isLightHave);
     InitializeLights();
 
     //テスト地面
@@ -146,6 +161,7 @@ void ShadowGameScene::Initialize()
     timeCardWatch_->Initialize();
     // 鍵
     key_->Initialize();
+    key_->SetGetKey(progressSaveData_.isKeyHave);
     // 枝豆
     edamame_->Initialize();
     //椅子
@@ -184,7 +200,9 @@ void ShadowGameScene::Initialize()
 
     Update();
 
+
     currentEvent_->StartEvent();
+
 }
 
 void ShadowGameScene::Update()
@@ -281,7 +299,7 @@ void ShadowGameScene::CheckCollision()
     for (auto& wall : elevatorRoomManager_->GetWalls()) {
         collisionManager_->AddCollider(wall.get());
     }
-    
+
     for (auto& chair : chairManager_->GetChairs()) {
         collisionManager_->AddCollider(chair.get());
     }
@@ -303,6 +321,7 @@ void ShadowGameScene::CheckCollision()
     collisionManager_->AddCollider(flashlight_.get());
     collisionManager_->AddCollider(testField_.get());
     collisionManager_->AddCollider(door_->GetAutoLockSystem().get());
+
     if (!door_->GetIsOpen()) {
         collisionManager_->AddCollider(door_.get());
     }
@@ -316,11 +335,8 @@ void ShadowGameScene::CheckCollision()
 
 void ShadowGameScene::InitializeLights()
 {
-    //フラッシュライト
-    flashlight_->Initialize();
 
     spotLights_[0] = flashlight_->GetSpotLight();
-
     areaLights_[2] = vendingMac_->GetAreaLight();
 
     activePointLightCount_ = 3;
@@ -336,7 +352,6 @@ void ShadowGameScene::InitializeLights()
     pointLights_[1].decay = 1.0f;
 
     pointLights_[2] = edamame_->GetPointLight();
-
 
     directionalLight_.color = { 1.0f, 1.0f, 0.75f, 1.0f };
     directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
@@ -500,6 +515,15 @@ void ShadowGameScene::UpdateGameObject()
             break;
         }
     }
+
+    if (door_->GetIsOpen()) {
+        //ドアが開いたらクリアにする。
+        progressSaveData_.isGameClear = true;
+    }
+
+    //鍵を取得しているとき
+    progressSaveData_.isKeyHave = key_->IsGetKey();
+    progressSaveData_.isLightHave = flashlight_->IsGetLight();
 
     ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 

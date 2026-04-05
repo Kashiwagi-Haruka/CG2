@@ -3,16 +3,18 @@
 #include "Camera.h"
 #include"Transform.h"
 #include"RigidBody.h"
+#include"GameSave/GameSave.h"
 
 class Player;
 class PlayerCamera
 {
 public:
+
     PlayerCamera();
     void Update();
     Camera* GetCamera() { return camera_.get(); };
-    Transform& GetTransform() { return cameraTransform_; }
-
+    Transform& GetTransform() { return param_.transform; }
+    CameraSaveData& GetParam() { return param_; };
     //Rayをセットする
     void SetRay();
     Ray& GetRay() { return ray_; };
@@ -22,20 +24,21 @@ public:
     void SetPlayer(Player* player) { player_ = player; }
     void SetHeadTransform();
     void SetTransform();
+
 private:
-    const float kTMin_ = 0.0f;
-    const float kTMax_ = 5.0f;
     //回転
     void Rotate();
     Vector3 GetForward();
-    Transform cameraTransform_ = {};
+private:
+    CameraSaveData param_;
+
+    const float kTMin_ = 0.0f;
+    const float kTMax_ = 5.0f;
+
     //カメラからのRay
     Ray ray_;
     //カメラの設定
     std::unique_ptr<Camera> camera_ = nullptr;
-    //カメラの感度
-    float eyeRotateSpeed_ = 0.02f;
-
     Player* player_ = nullptr;
 };
 

@@ -5,9 +5,11 @@
 #include"GameObject/KeyBindConfig.h"
 #include"GameObject/Player/Player.h"
 #include<imgui.h>
+#include"GameSave/GameSave.h"
+
 
 bool Flashlight::isSendGetLightMessage_ = false;
- bool Flashlight::isGetLight_ = false;
+bool Flashlight::isGetLight_ = false;
 bool Flashlight::isRayHit_ = false;
 Flashlight::Flashlight()
 {
@@ -16,7 +18,7 @@ Flashlight::Flashlight()
     obj_->SetModel("light");
     SetAABB({ .min = {-0.1f,-0.1f,-0.1f},.max = {0.1f,0.1f,0.1f} });
     SetCollisionAttribute(kCollisionItem);
-    SetCollisionMask(kCollisionPlayer|kCollisionFloor);
+    SetCollisionMask(kCollisionPlayer | kCollisionFloor);
 }
 
 void Flashlight::OnCollision(Collider* collider)
@@ -48,7 +50,7 @@ void Flashlight::Update()
         transform_.rotate = { 0.0f,Function::kPi * 0.5f,0.0f };
         transform_.scale = { 1.0f,1.0f,1.0f };
 
-        Matrix4x4  handMat =player_->GetJointMatrix("Hand.L");
+        Matrix4x4  handMat = player_->GetJointMatrix("Hand.L");
         Matrix4x4 child = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
         child = Function::Multiply(child, handMat);
         obj_->SetWorldMatrix(child);
@@ -69,9 +71,9 @@ void Flashlight::Update()
 
 
     obj_->Update();
-   
+
     UpdateSpotLight();
-   
+
 }
 
 void Flashlight::Initialize()
@@ -80,7 +82,7 @@ void Flashlight::Initialize()
     isSendGetLightMessage_ = false;
     isRayHit_ = false;
     obj_->Initialize();
-    transform_.translate = {4.0f,0.1f,5.0f};
+    transform_.translate = { 4.0f,0.1f,5.0f };
     transform_.rotate = { 0.0f,0.0f,0.0f };
     transform_.scale = { 1.0f,1.0f,1.0f };
     SetLight();
@@ -88,7 +90,7 @@ void Flashlight::Initialize()
 
 void Flashlight::Draw()
 {
- 
+
     obj_->Draw();
 }
 
@@ -111,10 +113,10 @@ void Flashlight::CheckCollision()
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
         //keyとrayの当たり判定
 
-        if(!PlayerCommand::GetIsGrab()){
+        if (!PlayerCommand::GetIsGrab()) {
             if (isRayHit_) {
                 isGetLight_ = true;
-      /*          PlayerCommand::SetIsGrab(true);*/
+                /*          PlayerCommand::SetIsGrab(true);*/
                 isSendGetLightMessage_ = true;
 
             }
@@ -136,5 +138,5 @@ void Flashlight::UpdateSpotLight()
 
 bool Flashlight::OnCollisionRay()
 {
-     return playerCamera_->OnCollisionRay(GetAABB(), GetWorldPosition());
+    return playerCamera_->OnCollisionRay(GetAABB(), GetWorldPosition());
 }

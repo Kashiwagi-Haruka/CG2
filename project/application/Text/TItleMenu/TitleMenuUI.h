@@ -14,7 +14,7 @@ public:
 	void Initialize();
 	void Update();
 	void Draw();
-	bool GetIsStart() { return isStart_; }
+	bool GetIsStart() { return isInitStart_; }
 	bool ConsumeContinueTriggered();
 
 private:
@@ -41,7 +41,9 @@ private:
 #pragma endregion
 
 	bool isShowMenu_ = false;
-	bool isStart_ = false;
+	//初めからスタート
+	bool isInitStart_ = false;
+	//続きから
 	bool isContinueTriggered_ = false;
-	uint32_t selectButtonNum_ = 0;
+	uint32_t selectButtonNum_ = START_TEXT;
 };

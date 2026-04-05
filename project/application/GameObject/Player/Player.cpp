@@ -13,6 +13,7 @@
 #include <imgui.h>
 #include <optional>
 #include"GameObject/SEManager/SEManager.h"
+#include"GameSave/GameSave.h"
 
 namespace {
     struct FootContactState {
@@ -75,7 +76,7 @@ Player::Player() {
     };
     SetAABB(localAABB_);
     SetCollisionAttribute(kCollisionPlayer);
-    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall  | kCollisionMat);
+    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionMat);
     // 体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
     // モデルの読み込み
@@ -88,12 +89,18 @@ void Player::SetCamera(Camera* camera) {
 }
 void Player::Initialize() {
 
+    auto& gameSave = GameSave::GetInstance();
+
+    if (gameSave.GetInitStart()) { 
     // 座標の初期化
     transform_ = {
         .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f,Function::kPi, 0.0f},
         .translate{6.25f, 1.5f, 4.0f}
     };
+    } else {
+        transform_ = gameSave.GetPlayerSaveData().transform;
+    }
 
     // 速度の初期化
     velocity_ = { 0.0f };
@@ -205,7 +212,6 @@ void Player::Debug() {
              }*/
 
         if (ImGui::TreeNode("Parameters")) {
-            ImGui::DragFloat("Rotate Speed", &parameters_.kRotateYSpeed, 0.001f, 0.0f, 10.0f);
             ImGui::DragFloat("Walk Speed", &parameters_.kWalkSpeed, 0.001f, 0.0f, 10.0f);
             ImGui::DragFloat("Sneak Speed", &parameters_.kSneakSpeed, 0.001f, 0.0f, 10.0f);
 
@@ -232,9 +238,9 @@ void Player::Move()
 
     velocity_.x = { 0.0f };
     velocity_.z = { 0.0f };
-	if (PlayerCommand::GetIsUiInputLocked()) {
-		return;
-	}
+    if (PlayerCommand::GetIsUiInputLocked()) {
+        return;
+    }
     auto* input = Input::GetInstance();
 
     Vector2 controllerPos = input->GetJoyStickLXY();
@@ -337,7 +343,7 @@ void Player::PlayFootstepSE() {
     }
 
     const bool isWalking = moveSpeed_ == parameters_.kWalkSpeed;
-    SEManager::SetVol((moveSpeed_ == parameters_.kWalkSpeed) ? 0.5f : 0.25f,SEManager::FOOT_STEP);
+    SEManager::SetVol((moveSpeed_ == parameters_.kWalkSpeed) ? 0.5f : 0.25f, SEManager::FOOT_STEP);
     SEManager::SoundPlay(SEManager::FOOT_STEP);
     soundTimer_ = isWalking ? kWalkFootstepInterval : kSneakFootstepInterval;
 }
@@ -464,7 +470,6 @@ void Player::SaveParameters() {
 
     nlohmann::json root;
     root["playerParameters"] = {
-        {"rotateYSpeed", parameters_.kRotateYSpeed},
         {"walkSpeed",    parameters_.kWalkSpeed   },
         {"sneakSpeed",   parameters_.kSneakSpeed  },
     };
@@ -490,9 +495,6 @@ void Player::LoadParameters() {
 
     const nlohmann::json& params = root["playerParameters"];
 
-    if (params.contains("rotateYSpeed") && params["rotateYSpeed"].is_number()) {
-        parameters_.kRotateYSpeed = params["rotateYSpeed"].get<float>();
-    }
     if (params.contains("walkSpeed") && params["walkSpeed"].is_number()) {
         parameters_.kWalkSpeed = params["walkSpeed"].get<float>();
     }

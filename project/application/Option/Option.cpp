@@ -199,6 +199,10 @@ void Option::SaveOptionData() {
 	    {"x", optionData_.CameraMoveSpeed.x},
 	    {"y", optionData_.CameraMoveSpeed.y},
 	};
+
+	optionJson["isFlipHorizontally"] = optionData_.isFlipHorizontally;
+	optionJson["isFlipVertically"] = optionData_.isFlipVertically;
+
 	optionJson["BGMVolume"] = optionData_.BGMVolume;
 	optionJson["SEVolume"] = optionData_.SEVolume;
 	optionJson["VoiceVolume"] = optionData_.VoiceVolume;
@@ -229,6 +233,13 @@ void Option::LoadOptionData() {
 		if (cameraMoveSpeed.contains("y") && cameraMoveSpeed["y"].is_number()) {
 			optionData_.CameraMoveSpeed.y = cameraMoveSpeed["y"].get<float>();
 		}
+	}
+
+	if (optionJson.contains("isFlipHorizontally") && optionJson["isFlipHorizontally"].is_number()) {
+		optionData_.isFlipHorizontally = optionJson["isFlipHorizontally"].get<float>();
+	}
+	if (optionJson.contains("isFlipVertically") && optionJson["isFlipVertically"].is_number()) {
+		optionData_.isFlipVertically = optionJson["isFlipVertically"].get<float>();
 	}
 
 	if (optionJson.contains("BGMVolume") && optionJson["BGMVolume"].is_number()) {
