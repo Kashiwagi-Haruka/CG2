@@ -1,0 +1,49 @@
+{
+  "camera": {
+    "isFlipHorizontally": false,
+    "isFlipVertically": false,
+    "rotateSpeed": 0.019999999552965164,
+    "transform": {
+      "rotate": {
+        "x": 0.19083520770072937,
+        "y": 2.092630624771118,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "translate": {
+        "x": 10.044248580932617,
+        "y": 1.5693678855895996,
+        "z": -9.868295669555664
+      }
+    }
+  },
+  "player": {
+    "transform": {
+      "rotate": {
+        "x": 0.0,
+        "y": 2.092630624771118,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "translate": {
+        "x": 10.053900718688965,
+        "y": -0.016333334147930145,
+        "z": -9.874883651733398
+      }
+    }
+  },
+  "progress": {
+    "currentStageName": "FirstStage",
+    "isGameClear": true,
+    "isKeyHave": false,
+    "isLightHave": false
+  }
+}

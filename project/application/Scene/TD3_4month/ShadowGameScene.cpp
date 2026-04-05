@@ -14,6 +14,7 @@
 #include "GameObject/SEManager/SEManager.h"
 #include <algorithm>
 #include <cmath>
+#include"GameSave/GameSave.h"
 
 
 ShadowGameScene::ShadowGameScene()
@@ -76,6 +77,8 @@ ShadowGameScene::ShadowGameScene()
     elevator_ = std::make_unique<Elevator>();
     //セーブポイント紳士
     gentleman_ = std::make_unique<Gentleman>();
+    Gentleman::SetPlayerTransform(&player_->GetTransform());
+    Gentleman::SetProgressSaveData(&progressSaveData_);
     //エレベータールーム
     elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
 
@@ -101,8 +104,12 @@ ShadowGameScene::~ShadowGameScene()
 
 void ShadowGameScene::Initialize()
 {
+    //一旦ここでロード
+    GameSave::GetInstance().Load();
 
-
+    progressSaveData_ = GameSave::GetInstance().GetProgressSaveData();
+    //一旦最初のステージにしておく
+    progressSaveData_.currentStageName = "FirstStage";
     BGMManager::Initialize();
 
     uiManager_->Initialize();
@@ -184,7 +191,9 @@ void ShadowGameScene::Initialize()
 
     Update();
 
+
     currentEvent_->StartEvent();
+
 }
 
 void ShadowGameScene::Update()
@@ -281,7 +290,7 @@ void ShadowGameScene::CheckCollision()
     for (auto& wall : elevatorRoomManager_->GetWalls()) {
         collisionManager_->AddCollider(wall.get());
     }
-    
+
     for (auto& chair : chairManager_->GetChairs()) {
         collisionManager_->AddCollider(chair.get());
     }
@@ -303,6 +312,7 @@ void ShadowGameScene::CheckCollision()
     collisionManager_->AddCollider(flashlight_.get());
     collisionManager_->AddCollider(testField_.get());
     collisionManager_->AddCollider(door_->GetAutoLockSystem().get());
+
     if (!door_->GetIsOpen()) {
         collisionManager_->AddCollider(door_.get());
     }
@@ -500,6 +510,15 @@ void ShadowGameScene::UpdateGameObject()
             break;
         }
     }
+
+    if (door_->GetIsOpen()) {
+        //ドアが開いたらクリアにする。
+        progressSaveData_.isGameClear = true;
+    }
+
+    //鍵を取得しているとき
+    progressSaveData_.isKeyHave = key_->IsGetKey();
+    progressSaveData_.isLightHave = flashlight_->IsGetLight();
 
     ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 

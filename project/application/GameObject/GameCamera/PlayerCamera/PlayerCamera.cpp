@@ -8,56 +8,57 @@
 #include"WinApp.h"
 #include"GameObject/Player/Player.h"
 #include "application/Option/Option.h"
+#include"Option/OptionData.h"
 
 PlayerCamera::PlayerCamera() {
 
-	// カメラを生成する
-	camera_ = std::make_unique<Camera>();
-
-	camera_->SetFovY(0.44f);
+    // カメラを生成する
+    camera_ = std::make_unique<Camera>();
+    camera_->SetFovY(0.44f);
     // Rayの設定
     ray_ = { .origin = {0.0f}, .diff = {0.0f} };
+
 }
 
 void PlayerCamera::Update() {
-	SetRay();
+    SetRay();
     SetHeadTransform();
-	camera_->Update();
+    camera_->Update();
 }
 
 void PlayerCamera::Rotate() {
-	const Vector2 optionCameraMoveSpeed = Option::GetCurrentOptionData().CameraMoveSpeed;
-	Vector2 deltaRotate = PlayerCommand::GetInstance()->Rotate(eyeRotateSpeed_);
-	player_->GetTransform().rotate.y += deltaRotate.y * optionCameraMoveSpeed.y;
-	cameraTransform_.rotate.x += deltaRotate.x * optionCameraMoveSpeed.x;
+    const Vector2 optionCameraMoveSpeed = Option::GetCurrentOptionData().CameraMoveSpeed;
+    Vector2 deltaRotate = PlayerCommand::GetInstance()->Rotate(param_.rotateSpeed);
+    player_->GetTransform().rotate.y += deltaRotate.y * optionCameraMoveSpeed.y;
+    param_.transform.rotate.x += deltaRotate.x * optionCameraMoveSpeed.x;
 #ifdef USE_IMGUI
-	if (ImGui::TreeNode("Eye")) {
-		ImGui::DragFloat("eyeRotateSpeed", &eyeRotateSpeed_, 0.1f, 0.1f);
-		ImGui::DragFloat("eyeRotateX", &cameraTransform_.rotate.x, 0.1f);
+    if (ImGui::TreeNode("Eye")) {
+        ImGui::DragFloat("rotateSpeed", &param_.rotateSpeed, 0.1f, 0.1f);
+        ImGui::DragFloat("eyeRotateX", &param_.transform.rotate.x, 0.1f);
 
-		ImGui::DragFloat3("origin", &ray_.origin.x, 0.3f);
-		ImGui::DragFloat3("diff", &ray_.diff.x, 0.3f);
+        ImGui::DragFloat3("origin", &ray_.origin.x, 0.3f);
+        ImGui::DragFloat3("diff", &ray_.diff.x, 0.3f);
 
-		ImGui::TreePop();
-	}
+        ImGui::TreePop();
+    }
 #endif
 }
 
 void PlayerCamera::SetRay()
 {
-    ray_.origin = cameraTransform_.translate;
+    ray_.origin = param_.transform.translate;
     ray_.diff = GetForward();
 }
 
 
 void PlayerCamera::Initialize()
 {
-    // カメラの設定
-    cameraTransform_ = {
-        .scale{1.0f, 1.0f, 1.0f},
-        .rotate{0.0f, 0.0f, 0.0f},
-        .translate{0.0f, 0.0f, 0.0f}
-    };
+    param_ = GameSave::GetInstance().GetCameraSaveData();
+
+    Transform transform_ = { 0.0f };
+    float rotateSpeedX_ = 0.0f;
+    bool isFlipHorizontally = false;
+    bool isFlipVertically = false;
 
     SetHeadTransform();
     SetTransform();
@@ -74,25 +75,24 @@ void PlayerCamera::SetHeadTransform()
 {
 
     Rotate();
-
-    cameraTransform_.scale = { 1.0f,1.0f,1.0f };
+    param_.transform.scale = { 1.0f,1.0f,1.0f };
 
     float halfPi = Function::kPi * 0.5f;
-    cameraTransform_.rotate.x =
+    param_.transform.rotate.x =
         std::clamp(
-            cameraTransform_.rotate.x,
+            param_.transform.rotate.x,
             -halfPi,
             halfPi - halfPi * 0.25f);
 
-    cameraTransform_.rotate.y = player_->GetTransform().rotate.y;
-    cameraTransform_.rotate.z = 0.0f;
+    param_.transform.rotate.y = player_->GetTransform().rotate.y;
+    param_.transform.rotate.z = 0.0f;
 
     //Playerの頭
-    cameraTransform_.translate = player_->GetJointWorldPos("Head");
+    param_.transform.translate = player_->GetJointWorldPos("Head");
 
     //if (揺れなし) {
-    //    cameraTransform_.translate = player_->GetTransform().translate;
-    //    cameraTransform_.translate.y += 1.6f;
+    //     param_.transform.translate = player_->GetTransform().translate;
+    //     param_.transform.translate.y += 1.6f;
     //}
 
 
@@ -101,10 +101,12 @@ void PlayerCamera::SetHeadTransform()
 
 void PlayerCamera::SetTransform()
 {
-    camera_->SetTransform(cameraTransform_);
+    camera_->SetTransform(param_.transform);
 }
 
 Vector3 PlayerCamera::GetForward()
 {
     return  YoshidaMath::GetForward(camera_->GetWorldMatrix());
 }
+
+

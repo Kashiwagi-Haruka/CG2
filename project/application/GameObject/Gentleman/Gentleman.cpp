@@ -9,8 +9,11 @@
 #include "GameBase.h"
 #include"GameObject/SEManager/SEManager.h"
 #include<imgui.h>
+#include"GameSave/GameSave.h"
 
 PlayerCamera* Gentleman::playerCamera_ = nullptr;
+Transform* Gentleman::playerTransform_ = nullptr;
+ProgressSaveData* Gentleman::progressSaveData_ = nullptr;
 
 Gentleman::Gentleman()
 {
@@ -155,9 +158,14 @@ void Gentleman::CheckCollision()
     }
 
     //rayの当たり判定
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+    if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger()) {
         SEManager::SoundPlay(SEManager::TYPE);
         SetAnimationName(animationName);
+        auto& save = GameSave::GetInstance();
+        save.CameraSave(playerCamera_->GetParam());
+        save.PlayerSave(*playerTransform_);
+        save.ProgressSave(*progressSaveData_);
+        save.Save();
     }
 
 #ifdef USE_IMGUI

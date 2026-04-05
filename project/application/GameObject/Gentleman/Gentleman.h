@@ -10,6 +10,7 @@
 #include "Animation/Animation.h"
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
+#include"GameSave/GameSave.h"
 
 class Gentleman : public YoshidaMath::Collider
 {
@@ -19,6 +20,8 @@ public:
     void Update();
     void Draw();
     static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
+    static void SetPlayerTransform(Transform* transform) {playerTransform_ = transform; };
+    static void SetProgressSaveData(ProgressSaveData* progressSaveData) { progressSaveData_ = progressSaveData; }
     void SetCamera(Camera* camera);
     void CheckCollision();
     bool OnCollisionRay();
@@ -35,6 +38,8 @@ private:
     void Animation();
 private:
     static PlayerCamera* playerCamera_;
+    static Transform* playerTransform_;
+    static ProgressSaveData* progressSaveData_;
     std::unique_ptr<Object3d>obj_ = nullptr;
     AABB localAABB_;
     // アニメーション
@@ -49,5 +54,6 @@ private:
     std::string desiredAnimationName = "Idle";
     bool isRayHit_ = false;
     uint32_t animationNum = 0;
+ 
 };
 

@@ -53,19 +53,14 @@ void JsonToTransform(const nlohmann::json& json, Transform& outTransform) {
 }
 } // namespace
 
-void GameSave::CameraSave(const Transform& transform, float rotateSpeed, bool isFlipHorizontally, bool isFlipVertically) {
-	cameraSaveData_.transform = transform;
-	cameraSaveData_.rotateSpeed = rotateSpeed;
-	cameraSaveData_.isFlipHorizontally = isFlipHorizontally;
-	cameraSaveData_.isFlipVertically = isFlipVertically;
+void GameSave::CameraSave(const CameraSaveData& saveData) {
+	cameraSaveData_ = saveData;
 }
 
 void GameSave::PlayerSave(const Transform& transform) { playerSaveData_.transform = transform; }
 
-void GameSave::ProgressSave(bool isGameClear, const std::string& currentStageName, bool isLightHave) {
-	progressSaveData_.isGameClear = isGameClear;
-	progressSaveData_.currentStageName = currentStageName;
-	progressSaveData_.isLightHave = isLightHave;
+void GameSave::ProgressSave(const ProgressSaveData& progressSaveData) {
+	progressSaveData_ = progressSaveData;
 }
 
 void GameSave::Save() {
@@ -83,6 +78,7 @@ void GameSave::Save() {
 	    {"isGameClear",      progressSaveData_.isGameClear     },
 	    {"currentStageName", progressSaveData_.currentStageName},
 	    {"isLightHave",      progressSaveData_.isLightHave     },
+		   {"isKeyHave",      progressSaveData_.isKeyHave     },
 	};
 
 	JsonManager* jsonManager = JsonManager::GetInstance();
@@ -135,6 +131,9 @@ void GameSave::Load() {
 		}
 		if (progressJson.contains("isLightHave") && progressJson["isLightHave"].is_boolean()) {
 			progressSaveData_.isLightHave = progressJson["isLightHave"].get<bool>();
+		}
+		if (progressJson.contains("isKeyHave") && progressJson["isLightHave"].is_boolean()) {
+			progressSaveData_.isKeyHave = progressJson["isKeyHave"].get<bool>();
 		}
 	}
 }
