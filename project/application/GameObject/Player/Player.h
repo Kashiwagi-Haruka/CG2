@@ -72,7 +72,6 @@ private:
 public:
     Matrix4x4 GetJointMatrix(const char* jointName)const;
     Vector3 GetJointWorldPos(const char* jointName)const;
-
     void OnCollision(Collider* collider) override;
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
@@ -86,8 +85,9 @@ public:
    const Matrix4x4& GetWorldMatrix()const override {
        return bodyObj_->GetWorldMatrix();
    };
-    void SetTranslate(const Vector3& translate) { transform_.translate = translate; };
-    void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
+   void SetTranslate(const Vector3& translate) { transform_.translate = translate; };
+   void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
+    void SetTransform(const Transform& transform) { transform_ = transform; }
     // コンストラクタ
     Player();
     // カメラのセッター

@@ -23,7 +23,7 @@ public:
     void CheckCollision();
     bool OnCollisionRay();
     void Trivia();
-   PointCommonLight& GetPointLight() { return pointLight_; };
+    std::array<PointCommonLight, 2>& GetPointLights() { return pointLights_; };
 
     std::unique_ptr<EdamameModel>& GetEdamameModel() {return edamameModel_;}
 private:
@@ -33,7 +33,7 @@ private:
     AABB localAABB_ = {};
     PlayerCamera* playerCamera_ = nullptr;
     Transform worldTransform_ = {};
-    PointCommonLight pointLight_;
+    std::array<PointCommonLight,2> pointLights_;
     static bool isRayHit_;
 };
 

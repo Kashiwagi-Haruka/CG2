@@ -89,19 +89,13 @@ void Player::SetCamera(Camera* camera) {
 }
 void Player::Initialize() {
 
-    auto& gameSave = GameSave::GetInstance();
-
-    if (gameSave.GetInitStart()) { 
     // 座標の初期化
     transform_ = {
         .scale{1.0f, 1.0f, 1.0f},
         .rotate{0.0f,Function::kPi, 0.0f},
         .translate{6.25f, 1.5f, 4.0f}
     };
-    } else {
-        transform_ = gameSave.GetPlayerSaveData().transform;
-    }
-
+   
     // 速度の初期化
     velocity_ = { 0.0f };
     forward_ = { 0.0f };
