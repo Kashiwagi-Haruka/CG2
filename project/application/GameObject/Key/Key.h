@@ -28,6 +28,7 @@ public:
     Vector3 GetWorldPosition() const override;
     static bool GetGetKeyMessage() { return isSendGetKeyMessage_; }
     static bool IsGetKey() { return isGetKey_; }
+    static void SetGetKey(const bool flag) { isGetKey_ = flag; };
     static bool IsRayHit() { return isRayHit_; };
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
 private:

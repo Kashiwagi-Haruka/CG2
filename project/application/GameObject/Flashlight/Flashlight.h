@@ -30,6 +30,7 @@ public:
     void SetPlayer(Player* player) { player_ = player; }
     static bool IsGetLight() { return isGetLight_; }
     static bool IsRayHit() { return isRayHit_; }
+    static void SetGetLight(const bool flag) { isGetLight_ = flag; }
 private:
     bool OnCollisionRay();
 private:

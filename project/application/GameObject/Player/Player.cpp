@@ -88,8 +88,10 @@ void Player::SetCamera(Camera* camera) {
     bodyObj_->UpdateCameraMatrices();
 }
 void Player::Initialize() {
-    auto& progress = GameSave::GetInstance().GetProgressSaveData();
-    if (!progress.isGameClear && progress.currentStageName == "FirstStage") { {}
+
+    auto& gameSave = GameSave::GetInstance();
+
+    if (gameSave.GetInitStart()) { 
     // 座標の初期化
     transform_ = {
         .scale{1.0f, 1.0f, 1.0f},
@@ -97,7 +99,7 @@ void Player::Initialize() {
         .translate{6.25f, 1.5f, 4.0f}
     };
     } else {
-        transform_ = GameSave::GetInstance().GetPlayerSaveData().transform;
+        transform_ = gameSave.GetPlayerSaveData().transform;
     }
 
     // 速度の初期化

@@ -43,7 +43,7 @@ private:
 
 private:
 	void CameraUpdate();
-
+	void TransitionStart();
 public:
 	TitleScene();
 	~TitleScene() override = default;

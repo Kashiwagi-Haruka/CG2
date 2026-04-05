@@ -71,8 +71,6 @@ void GameSave::Save() {
 	saveJson["camera"] = {
 	    {"transform",          TransformToJson(cameraSaveData_.transform)},
 	    {"rotateSpeed",        cameraSaveData_.rotateSpeed               },
-	    {"isFlipHorizontally", cameraSaveData_.isFlipHorizontally        },
-	    {"isFlipVertically",   cameraSaveData_.isFlipVertically          },
 	};
 	saveJson["progress"] = {
 	    {"isGameClear",      progressSaveData_.isGameClear     },
@@ -112,12 +110,6 @@ void GameSave::Load() {
 		}
 		if (cameraJson.contains("rotateSpeed") && cameraJson["rotateSpeed"].is_number()) {
 			cameraSaveData_.rotateSpeed = cameraJson["rotateSpeed"].get<float>();
-		}
-		if (cameraJson.contains("isFlipHorizontally") && cameraJson["isFlipHorizontally"].is_boolean()) {
-			cameraSaveData_.isFlipHorizontally = cameraJson["isFlipHorizontally"].get<bool>();
-		}
-		if (cameraJson.contains("isFlipVertically") && cameraJson["isFlipVertically"].is_boolean()) {
-			cameraSaveData_.isFlipVertically = cameraJson["isFlipVertically"].get<bool>();
 		}
 	}
 

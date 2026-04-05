@@ -27,8 +27,9 @@ void PlayerCamera::Update() {
 }
 
 void PlayerCamera::Rotate() {
-    const Vector2 optionCameraMoveSpeed = Option::GetCurrentOptionData().CameraMoveSpeed;
-    Vector2 deltaRotate = PlayerCommand::GetInstance()->Rotate(param_.rotateSpeed);
+    auto& optionData = Option::GetCurrentOptionData();
+    const Vector2 optionCameraMoveSpeed = optionData.CameraMoveSpeed;
+    Vector2 deltaRotate = PlayerCommand::GetInstance()->Rotate(param_.rotateSpeed, optionData.isFlipHorizontally, optionData.isFlipVertically);
     player_->GetTransform().rotate.y += deltaRotate.y * optionCameraMoveSpeed.y;
     param_.transform.rotate.x += deltaRotate.x * optionCameraMoveSpeed.x;
 #ifdef USE_IMGUI
@@ -53,13 +54,14 @@ void PlayerCamera::SetRay()
 
 void PlayerCamera::Initialize()
 {
-    param_ = GameSave::GetInstance().GetCameraSaveData();
-
-    Transform transform_ = { 0.0f };
-    float rotateSpeedX_ = 0.0f;
-    bool isFlipHorizontally = false;
-    bool isFlipVertically = false;
-
+    auto& gaveSave = GameSave::GetInstance();
+   
+    if (gaveSave.GetInitStart()) {
+        param_ = gaveSave.GetCameraSaveData();
+    } else {
+        param_.rotateSpeed = 0.02f;
+        param_.transform = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
+    }
     SetHeadTransform();
     SetTransform();
     SetRay();

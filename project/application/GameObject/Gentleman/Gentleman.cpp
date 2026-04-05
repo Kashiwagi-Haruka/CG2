@@ -79,6 +79,17 @@ void Gentleman::Animation()
 
 }
 
+void Gentleman::Save()
+{
+    auto& save = GameSave::GetInstance();
+    save.CameraSave(playerCamera_->GetParam());
+    save.PlayerSave(*playerTransform_);
+    save.ProgressSave(*progressSaveData_);
+    std::string filename = "Resources/ScreenShot/" + progressSaveData_->currentStageName + ".png";
+    GameBase::GetInstance()->SaveCurrentFrameScreenShot(filename.c_str());
+    save.Save();
+}
+
 void Gentleman::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
@@ -161,11 +172,7 @@ void Gentleman::CheckCollision()
     if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger()) {
         SEManager::SoundPlay(SEManager::TYPE);
         SetAnimationName(animationName);
-        auto& save = GameSave::GetInstance();
-        save.CameraSave(playerCamera_->GetParam());
-        save.PlayerSave(*playerTransform_);
-        save.ProgressSave(*progressSaveData_);
-        save.Save();
+        Save();
     }
 
 #ifdef USE_IMGUI

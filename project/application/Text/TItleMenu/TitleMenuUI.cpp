@@ -6,6 +6,8 @@
 #include"ScreenSize/ScreenSize.h"
 #include"Color/Color.h"
 #include"GameObject/SEManager/SEManager.h"
+#include"GameSave/GameSave.h"
+
 TitleMenuUI::TitleMenuUI()
 {
     //フォントハンドル
@@ -65,7 +67,7 @@ TitleMenuUI::~TitleMenuUI()
 
 void TitleMenuUI::Initialize() {
 	isShowMenu_ = false;
-	isStart_ = false;
+	isInitStart_ = false;
 	isContinueTriggered_ = false;
 	selectButtonNum_ = 0;
 	random_->SetMinMax(-8.0f, 8.0f);
@@ -80,20 +82,24 @@ void TitleMenuUI::Update() {
 	pressSpaceText_.SetColor({1.0f, 1.0f, 1.0f, fontAlpha});
 	pressSpaceText_.UpdateLayout(false);
 
-	if (isStart_) {
+	if (isInitStart_) {
 		return;
 	}
 
 	if (PlayerCommand::GetInstance()->Shot() || PlayerCommand::GetInstance()->UiInteractTrigger()) {
 		SEManager::SoundPlay(SEManager::PUSH_WATCH);
 		if (isShowMenu_) {
-			if (selectButtonNum_ == 0) {
-				if (!isStart_) {
-					isStart_ = true;
+			if (selectButtonNum_ == START_TEXT) {
+				if (!isInitStart_) {
+					isInitStart_ = true;
+                    GameSave::GetInstance().SetInitStart(true);
 				}
 			} else if (selectButtonNum_ == CONTINUE_TEXT) {
 				isContinueTriggered_ = true;
-			}
+                GameSave::GetInstance().SetInitStart(false);
+            } else if (selectButtonNum_ == OPTION_TEXT) {
+
+            }
 
 		} else {
 			isShowMenu_ = true;
@@ -167,7 +173,7 @@ void TitleMenuUI::Draw()
 {
     pressSpaceText_.Draw();
 
-    if (isStart_) { return; }
+    if (isInitStart_) { return; }
     //スタートしてないとき
     titleText_.Draw();
 

@@ -92,8 +92,6 @@ ShadowGameScene::ShadowGameScene()
     SetPlayerCamera(cameraController_->GetPlayerCamera());
 
     damageOverlay_ = std::make_unique<DamageOverlay>();
-
-
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -104,12 +102,20 @@ ShadowGameScene::~ShadowGameScene()
 
 void ShadowGameScene::Initialize()
 {
+    auto& gameSave = GameSave::GetInstance();
     //一旦ここでロード
-    GameSave::GetInstance().Load();
+    gameSave.Load();
 
-    progressSaveData_ = GameSave::GetInstance().GetProgressSaveData();
-    //一旦最初のステージにしておく
-    progressSaveData_.currentStageName = "FirstStage";
+    if (gameSave.GetInitStart()) {
+        //一旦最初のステージにしておく
+        progressSaveData_.currentStageName = "FirstStage";
+        progressSaveData_.isGameClear = false;
+        progressSaveData_.isKeyHave = false;
+        progressSaveData_.isLightHave = false;
+    } else {
+        progressSaveData_ = gameSave.GetProgressSaveData();
+    }
+
     BGMManager::Initialize();
 
     uiManager_->Initialize();
@@ -133,7 +139,9 @@ void ShadowGameScene::Initialize()
     //カメラコントローラー
     cameraController_->Initialize();
 
-
+    //フラッシュライト
+    flashlight_->Initialize();
+    flashlight_->SetGetLight(progressSaveData_.isLightHave);
     InitializeLights();
 
     //テスト地面
@@ -153,6 +161,7 @@ void ShadowGameScene::Initialize()
     timeCardWatch_->Initialize();
     // 鍵
     key_->Initialize();
+    key_->SetGetKey(progressSaveData_.isKeyHave);
     // 枝豆
     edamame_->Initialize();
     //椅子
@@ -326,11 +335,8 @@ void ShadowGameScene::CheckCollision()
 
 void ShadowGameScene::InitializeLights()
 {
-    //フラッシュライト
-    flashlight_->Initialize();
 
     spotLights_[0] = flashlight_->GetSpotLight();
-
     areaLights_[2] = vendingMac_->GetAreaLight();
 
     activePointLightCount_ = 3;
@@ -346,7 +352,6 @@ void ShadowGameScene::InitializeLights()
     pointLights_[1].decay = 1.0f;
 
     pointLights_[2] = edamame_->GetPointLight();
-
 
     directionalLight_.color = { 1.0f, 1.0f, 0.75f, 1.0f };
     directionalLight_.direction = { 0.0f, 1.0f, 0.0f };

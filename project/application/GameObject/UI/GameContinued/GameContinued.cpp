@@ -6,6 +6,7 @@
 #include "TextureManager.h"
 #include "application/Color/Color.h"
 #include <algorithm>
+#include"GameObject/SEManager/SEManager.h"
 #include <cmath>
 
 namespace {
@@ -72,18 +73,21 @@ void GameContinued::Initialize() {
 void GameContinued::Update() {
 	PlayerCommand* command = PlayerCommand::GetInstance();
 	if (command->UiMoveForwardTrigger() || command->MouseWheelDown()) {
+		SEManager::SoundPlay(SEManager::PUSH_WATCH);
 		if (currentSelectNum_ > 0) {
 			--currentSelectNum_;
 		}
 	}
 
 	if (command->UiMoveBackwardTrigger() || command->MouseWheelUp()) {
+		SEManager::SoundPlay(SEManager::PUSH_WATCH);
 		if (currentSelectNum_ < saveDataMaxNum_ - 1) {
 			++currentSelectNum_;
 		}
 	}
 
 	if (command->UiInteractTrigger()) {
+		SEManager::SoundPlay(SEManager::PORTAL_SPAWN);
 		isSelected_ = true;
 	}
 

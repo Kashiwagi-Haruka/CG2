@@ -36,6 +36,8 @@ public:
 private:
     // アニメーション
     void Animation();
+    //セーブ
+    void Save();
 private:
     static PlayerCamera* playerCamera_;
     static Transform* playerTransform_;

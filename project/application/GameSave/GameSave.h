@@ -9,8 +9,6 @@ struct PlayerSaveData {
 struct CameraSaveData {
     Transform transform;     // カメラの位置、回転、拡縮
     float rotateSpeed;       // カメラの回転速度
-    bool isFlipHorizontally; // 左右反転しているか
-    bool isFlipVertically;   // 上下反転しているか
 };
 struct ProgressSaveData {
     bool isGameClear;             // ゲームクリアしているか
@@ -26,6 +24,7 @@ private:
     PlayerSaveData playerSaveData_{};     // プレイヤーのセーブデータ
     CameraSaveData cameraSaveData_{};     // カメラのセーブデータ
     ProgressSaveData progressSaveData_{}; // 進行状況のセーブデータ
+    bool isInitStart_ = false;
 private:
     GameSave() {}  // コンストラクタを private にする
     ~GameSave() {}
@@ -45,7 +44,8 @@ public:
     void Save();  // セーブデータをファイルに保存する
     void Load();  // ファイルからセーブデータを読み込む
     void Reset(); // セーブデータをリセットする
-
+    void SetInitStart(const bool flag) { isInitStart_ = flag; }    //最初からスタートするかどうかのフラグをセットする
+    bool GetInitStart() { return isInitStart_; }    //最初からスタートするかどうかのフラグを取得する
     const PlayerSaveData& GetPlayerSaveData() { return playerSaveData_; };     // プレイヤーのセーブデータ
     const CameraSaveData& GetCameraSaveData() { return cameraSaveData_; };     // カメラのセーブデータ
     const ProgressSaveData& GetProgressSaveData() { return progressSaveData_; }; // 進行状況のセーブデータ

@@ -71,7 +71,7 @@ public:
 	bool MouseWheelDown();
 	bool UiMoveLeft();
 	bool UiMoveRight();
-	Vector2 Rotate(float rotateSpeed);
+	Vector2 Rotate(float rotateSpeed, const bool isFlipHorizontally, const bool isFlipVertically);
 	static bool GetIsGrab() { return isGrab_; };
 	static void SetIsGrab(bool flag) { isGrab_ = flag; }
 	static bool GetIsStand() { return isStand_; };
