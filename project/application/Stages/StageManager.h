@@ -1,10 +1,8 @@
 #pragma once
 
 #include "BaseStage.h"
-#include <functional>
 #include <memory>
 #include <string>
-#include <unordered_map>
 
 class StageManager {
 private:
@@ -13,7 +11,7 @@ private:
 	std::string currentStageName_;
 	std::string nextStageName_;
 
-	std::unordered_map<std::string, std::function<std::unique_ptr<BaseStage>()>> stageFactories_;
+	std::unique_ptr<BaseStage> CreateStage(const std::string& stageName) const;
 
 public:
 	void Finalize();
@@ -21,7 +19,6 @@ public:
 	void Draw();
 
 	void ChangeStage(const std::string& stageName);
-	void RegisterStage(const std::string& stageName, std::function<std::unique_ptr<BaseStage>()> factory);
 
 	const std::string& GetCurrentStageName() const { return currentStageName_; }
 };

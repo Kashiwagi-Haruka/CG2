@@ -1,6 +1,16 @@
 #include "StageManager.h"
 
+#include "Stage/MirrorStage.h"
+
 #include <cassert>
+
+std::unique_ptr<BaseStage> StageManager::CreateStage(const std::string& stageName) const {
+	if (stageName == "MirrorStage") {
+		return std::make_unique<MirrorStage>();
+	}
+
+	return nullptr;
+}
 
 void StageManager::Finalize() {
 	if (stage_) {
@@ -43,15 +53,10 @@ void StageManager::Draw() {
 }
 
 void StageManager::ChangeStage(const std::string& stageName) {
-	auto it = stageFactories_.find(stageName);
-	assert(it != stageFactories_.end());
+	auto nextStage = CreateStage(stageName);
+	assert(nextStage != nullptr);
 	assert(nextStage_ == nullptr);
 
-	nextStage_ = it->second();
+	nextStage_ = std::move(nextStage);
 	nextStageName_ = stageName;
-}
-
-void StageManager::RegisterStage(const std::string& stageName, std::function<std::unique_ptr<BaseStage>()> factory) {
-	assert(factory);
-	stageFactories_[stageName] = std::move(factory);
 }
