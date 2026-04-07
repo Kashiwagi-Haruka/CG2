@@ -2,7 +2,7 @@
 #include "Sprite.h"
 #include "Vector2.h"
 #include <memory>
-
+#include<array>
 class RaySprite
 {
 public:
@@ -10,6 +10,8 @@ public:
         PORTAL,
         HAND,
         GRAB,
+        TALK,
+        MAX
     };
     RaySprite();
     void Initialize();
@@ -20,8 +22,7 @@ private:
     bool IsRayHit();
 private:
     std::unique_ptr<Sprite> sprite_ = nullptr;
-    uint32_t grabHandle_ = 0;
-    uint32_t handHandle_ = 0;
-    uint32_t portalHandle_ = 0;
+    std::array<uint32_t, MAX>handle_;
+
 };
 
