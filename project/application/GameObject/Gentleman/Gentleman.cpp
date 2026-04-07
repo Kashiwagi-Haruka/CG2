@@ -86,7 +86,7 @@ void Gentleman::Save(const int slotIndex)
     save.CameraSave(playerCamera_->GetParam());
     save.PlayerSave(*playerTransform_);
     save.ProgressSave(*progressSaveData_);
-    std::string filename = "Resources/TD3_3102/2d/ScreenShot/" + std::to_string(slotIndex) + ".png";
+    std::string filename = "Resources/TD3_3102/2d/SaveScreenShot/" + std::to_string(slotIndex) + ".png";
     GameBase::GetInstance()->SaveCurrentFrameScreenShot(filename.c_str());
     save.Save(slotIndex);
 }
