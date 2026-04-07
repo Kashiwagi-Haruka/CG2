@@ -21,6 +21,7 @@
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
+#include <optional>
 #include <string>
 
 namespace {
@@ -364,15 +365,49 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 		return false;
 	}
 
+	const auto resolveObjectIndex = [this](const nlohmann::json& entry) -> std::optional<size_t> {
+		if (entry.contains("name") && entry["name"].is_string()) {
+			const std::string name = entry["name"].get<std::string>();
+			for (size_t i = 0; i < objectNames_.size(); ++i) {
+				if (i < objects_.size() && objects_[i] && objectNames_[i] == name) {
+					return i;
+				}
+			}
+		}
+		if (entry.contains("index") && entry["index"].is_number_unsigned()) {
+			const size_t index = entry["index"].get<size_t>();
+			if (index < objects_.size() && objects_[index]) {
+				return index;
+			}
+		}
+		return std::nullopt;
+	};
+
+	const auto resolvePrimitiveIndex = [this](const nlohmann::json& entry) -> std::optional<size_t> {
+		if (entry.contains("name") && entry["name"].is_string()) {
+			const std::string name = entry["name"].get<std::string>();
+			for (size_t i = 0; i < primitiveNames_.size(); ++i) {
+				if (i < primitives_.size() && primitives_[i] && primitives_[i] != selectionBoxPrimitive_.get() && primitiveNames_[i] == name) {
+					return i;
+				}
+			}
+		}
+		if (entry.contains("index") && entry["index"].is_number_unsigned()) {
+			const size_t index = entry["index"].get<size_t>();
+			if (index < primitives_.size() && primitives_[index] && primitives_[index] != selectionBoxPrimitive_.get()) {
+				return index;
+			}
+		}
+		return std::nullopt;
+	};
+
 	if (root.contains("objects") && root["objects"].is_array()) {
 		for (const auto& objectJson : root["objects"]) {
-			if (!objectJson.contains("index") || !objectJson["index"].is_number_unsigned()) {
+			const std::optional<size_t> resolvedIndex = resolveObjectIndex(objectJson);
+			if (!resolvedIndex.has_value()) {
 				continue;
 			}
-			const size_t index = objectJson["index"].get<size_t>();
-			if (index >= objects_.size() || !objects_[index]) {
-				continue;
-			}
+			const size_t index = *resolvedIndex;
 			if (objectJson.contains("name") && objectJson["name"].is_string()) {
 				objectNames_[index] = objectJson["name"].get<std::string>();
 			}
