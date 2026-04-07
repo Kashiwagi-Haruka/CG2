@@ -31,7 +31,7 @@ private:
     Vector3 GetForward();
 private:
     CameraSaveData param_;
-
+    const float rotateSpeed_ = 0.02f;       // カメラの回転速度
     const float kTMin_ = 0.0f;
     const float kTMax_ = 5.0f;
 

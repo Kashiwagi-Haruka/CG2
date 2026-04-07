@@ -20,7 +20,7 @@ public:
     void Update();
     void Draw();
     static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
-    static void SetPlayerTransform(Transform* transform) {playerTransform_ = transform; };
+    static void SetPlayerTransform(Transform* transform) { playerTransform_ = transform; };
     static void SetProgressSaveData(ProgressSaveData* progressSaveData) { progressSaveData_ = progressSaveData; }
     void SetCamera(Camera* camera);
     void CheckCollision();
@@ -34,10 +34,11 @@ public:
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
     void SetAnimationName(const std::string& name) { desiredAnimationName = name; };
 private:
+    void SwichCommand();
     // アニメーション
     void Animation();
     //セーブ
-    void Save();
+    void Save(const int slotIndex = 0);
 private:
     static PlayerCamera* playerCamera_;
     static Transform* playerTransform_;
@@ -55,7 +56,7 @@ private:
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Idle";
     bool isRayHit_ = false;
+    bool isPreOnCollisionRay_ = false;
     uint32_t animationNum = 0;
- 
 };
 
