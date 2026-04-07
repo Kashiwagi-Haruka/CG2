@@ -73,8 +73,8 @@ void WallManager::Update()
     areaLight_.height = plane_->GetTransform().scale.y*0.5f;
 
 
-    walls_[0]->SetST({ 1.0f,4.0f,14.0f }, { 0.0f,2.0f,-7.0f });
-    walls_[1]->SetST({ 1.0f,4.0f,14.0f }, { 0.0f,2.0f,7.0f });
+    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, { 0.0f,2.0f,-7.0f });
+    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, { 0.0f,2.0f,7.0f });
 
     walls_[2]->SetST({ 14.0f,4.0f,1.0f }, { 7.0f,2.0f,0.0f });
     walls_[3]->SetST({ 14.0f,4.0f,1.0f }, { -7.0f,2.0f,0.0f });
