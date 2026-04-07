@@ -23,6 +23,8 @@ UIManager::UIManager() {
 	keyIcon_ = std::make_unique<KeyIcon>();
 	lightIcon_ = std::make_unique<LightIcon>();
 	mission_ = std::make_unique<Mission>();
+	chairMenu_ = std::make_unique<ChairMenu>();
+	gentlemanMenu_ = std::make_unique<GentlemanMenu>();
 }
 
 void UIManager::Initialize() {
@@ -36,6 +38,8 @@ void UIManager::Initialize() {
 	keyIcon_->Initialize();
 	lightIcon_->Initialize();
 	mission_->Initialize();
+	chairMenu_->Initialize();
+	gentlemanMenu_->Initialize();
 }
 
 void UIManager::Update() {
@@ -56,7 +60,8 @@ void UIManager::Update() {
 		SEManager::SoundPlay(SEManager::PUSH_WATCH);
 	}
 
-	if (UIManager::GetIsPause()) {
+	if (isPause_) {
+
 		menu_->Update();
 		const Menu::Action menuAction = menu_->ConsumePendingAction();
 		if (menuAction == Menu::Action::kResumeGame) {
@@ -74,12 +79,15 @@ void UIManager::Update() {
 	// Text
 	textUIManager_->Update();
 	raySprite_->Update();
-	tabKey_->Update();
+
+	chairMenu_->Update();
+	gentlemanMenu_->Update();
 
 	if (isPause_) {
 		iDCard_->Update();
 	}
 
+	tabKey_->Update();
 	keyIcon_->Update();
 	lightIcon_->Update();
 	mission_->Update();
@@ -105,6 +113,7 @@ void UIManager::CursorHideAndStop() { // カーソルを画面中央に設定す
 }
 
 void UIManager::Draw() {
+	
 	textUIManager_->Draw();
 
 	raySprite_->Draw();
@@ -117,11 +126,21 @@ void UIManager::Draw() {
 		keyIcon_->Draw();
 	}
 
+	if (ChairMenu::GetIsShowMenu()) {
+		chairMenu_->Draw();
+	}
+
+	if (GentlemanMenu::GetIsShowMenu()) {
+		gentlemanMenu_->Draw();
+	}
 	if (isPause_) {
 		menu_->Draw();
 		iDCard_->Draw();
 	} else {
+		
 		tabKey_->Draw();
+		
+	
 	}
 
 	mission_->Draw();

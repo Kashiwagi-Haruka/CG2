@@ -10,6 +10,7 @@
 #include"GameObject/SEManager/SEManager.h"
 #include<imgui.h>
 #include"GameSave/GameSave.h"
+#include"Text/GentlemanMenu/GentlemanMenu.h"
 
 PlayerCamera* Gentleman::playerCamera_ = nullptr;
 Transform* Gentleman::playerTransform_ = nullptr;
@@ -79,15 +80,15 @@ void Gentleman::Animation()
 
 }
 
-void Gentleman::Save()
+void Gentleman::Save(const int slotIndex)
 {
     auto& save = GameSave::GetInstance();
     save.CameraSave(playerCamera_->GetParam());
     save.PlayerSave(*playerTransform_);
     save.ProgressSave(*progressSaveData_);
-    std::string filename = "Resources/ScreenShot/" + progressSaveData_->currentStageName + ".png";
+    std::string filename = "Resources/TD3_3102/2d/ScreenShot/" + std::to_string(slotIndex) + ".png";
     GameBase::GetInstance()->SaveCurrentFrameScreenShot(filename.c_str());
-    save.Save();
+    save.Save(slotIndex);
 }
 
 void Gentleman::SetCamera(Camera* camera)
@@ -103,6 +104,7 @@ void Gentleman::Update()
     Animation();
     obj_->Update();
 
+
 }
 
 void Gentleman::Initialize()
@@ -111,6 +113,7 @@ void Gentleman::Initialize()
     animationNum = 0;
 
     isRayHit_ = false;
+    isPreOnCollisionRay_ = false;
     desiredAnimationName = "Idle";
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/gentleman", "gentleman");
@@ -139,7 +142,10 @@ void Gentleman::CheckCollision()
 
     isRayHit_ = OnCollisionRay();
 
-
+    // Rayが外れたらメニューを自動で閉じる
+    if (isPreOnCollisionRay_ && !isRayHit_ && GentlemanMenu::GetIsShowMenu()) {
+        GentlemanMenu::SetIsShowMenu(false);
+    }
 
     if (PlayerCommand::GetInstance()->MouseWheelUp()) {
 
@@ -169,11 +175,24 @@ void Gentleman::CheckCollision()
     }
 
     //rayの当たり判定
-    if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger()) {
+    if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger()&&!PlayerCommand::GetIsGrab()) {
+        //トリガーしたとき且つ何も持ってないとき
+
+        if (GentlemanMenu::GetIsShowMenu()) {
+            // 数値によって処理を変更する
+            SwichCommand();
+
+        } else {
+            // メニューを表示してないとき表示する
+            GentlemanMenu::SetIsShowMenu(true);
+        }
+        
         SEManager::SoundPlay(SEManager::TYPE);
         SetAnimationName(animationName);
-        Save();
+   
     }
+
+    isPreOnCollisionRay_ = isRayHit_;
 
 #ifdef USE_IMGUI
     ImGui::Begin("Gentleman");
@@ -191,4 +210,31 @@ bool Gentleman::OnCollisionRay()
     //skeleton_->SetObjectMatrix(obj_->GetWorldMatrix());
     //Vector3 pos = skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
     return playerCamera_->OnCollisionRay(GetAABB(), GetWorldPosition());
+}
+void Gentleman::SwichCommand()
+{
+    switch (GentlemanMenu::GetSelectButtonNum())
+    {
+    case GentlemanMenu::TALK:
+        //メニューを表示しているとき
+
+
+        //グラブ終了後メニューを閉じる
+        //GentlemanMenu::SetIsShowMenu(false);
+
+        break;
+    case GentlemanMenu::SAVE:
+
+        Save();
+        //メニューを閉じる
+        GentlemanMenu::SetIsShowMenu(false);
+        break;
+    default:
+        //メニューを閉じる
+        GentlemanMenu::SetIsShowMenu(false);
+        break;
+    }
+
+
+
 }

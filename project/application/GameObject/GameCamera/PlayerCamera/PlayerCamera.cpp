@@ -29,12 +29,13 @@ void PlayerCamera::Update() {
 void PlayerCamera::Rotate() {
     auto& optionData = Option::GetCurrentOptionData();
     const Vector2 optionCameraMoveSpeed = optionData.CameraMoveSpeed;
-    Vector2 deltaRotate = PlayerCommand::GetInstance()->Rotate(param_.rotateSpeed, optionData.isFlipHorizontally, optionData.isFlipVertically);
+    Vector2 deltaRotate = PlayerCommand::GetInstance()->Rotate(rotateSpeed_, optionData.isFlipHorizontally, optionData.isFlipVertically);
     player_->GetTransform().rotate.y += deltaRotate.y * optionCameraMoveSpeed.y;
     param_.transform.rotate.x += deltaRotate.x * optionCameraMoveSpeed.x;
 #ifdef USE_IMGUI
     if (ImGui::TreeNode("Eye")) {
-        ImGui::DragFloat("rotateSpeed", &param_.rotateSpeed, 0.1f, 0.1f);
+        ImGui::Text("rotateSpeed : %f", rotateSpeed_);
+        ImGui::Text("deltaRotate x: %f,y: %f", deltaRotate.x, deltaRotate.y);
         ImGui::DragFloat("eyeRotateX", &param_.transform.rotate.x, 0.1f);
 
         ImGui::DragFloat3("origin", &ray_.origin.x, 0.3f);
@@ -59,7 +60,6 @@ void PlayerCamera::Initialize()
     if (gaveSave.GetInitStart()) {
         param_ = gaveSave.GetCameraSaveData();
     } else {
-        param_.rotateSpeed = 0.02f;
         param_.transform = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
     }
     SetHeadTransform();

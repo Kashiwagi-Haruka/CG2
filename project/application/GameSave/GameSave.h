@@ -8,7 +8,7 @@ struct PlayerSaveData {
 };
 struct CameraSaveData {
     Transform transform;     // カメラの位置、回転、拡縮
-    float rotateSpeed;       // カメラの回転速度
+
 };
 struct ProgressSaveData {
     bool isGameClear;             // ゲームクリアしているか
@@ -28,6 +28,7 @@ private:
 private:
     GameSave() {}  // コンストラクタを private にする
     ~GameSave() {}
+    std::string GetFileName(const int slotIndex);
 public:
     // コピー禁止
     GameSave(const GameSave&) = delete;
@@ -40,9 +41,9 @@ public:
     void PlayerSave(const Transform& transform);                                                                    // プレイヤーのセーブデータを保存する
     void CameraSave(const CameraSaveData& saveData); // カメラのセーブデータを保存する
     void ProgressSave(const ProgressSaveData& progressSaveData); // 進行状況のセーブデータを保存する
-
-    void Save();  // セーブデータをファイルに保存する
-    void Load();  // ファイルからセーブデータを読み込む
+    // 引数にスロット番号を追加
+    void Save(const int slotIndex = 0);  // セーブデータをファイルに保存する
+    void Load(const int slotIndex = 0);  // ファイルからセーブデータを読み込む
     void Reset(); // セーブデータをリセットする
     void SetInitStart(const bool flag) { isInitStart_ = flag; }    //最初からスタートするかどうかのフラグをセットする
     bool GetInitStart() { return isInitStart_; }    //最初からスタートするかどうかのフラグを取得する

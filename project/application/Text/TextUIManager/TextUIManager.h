@@ -16,7 +16,6 @@ private:
     void StartText();
 
 private:
-    std::unique_ptr<ChairMenu>chairMenu_ = nullptr;
     uint32_t fontHandle_;
     Text text_;
     Text edamameTrivia_;

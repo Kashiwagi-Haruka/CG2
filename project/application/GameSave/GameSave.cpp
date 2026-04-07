@@ -2,7 +2,7 @@
 #include "Engine/Log/Logger.h"
 
 namespace {
-constexpr const char* kGameSaveFileName = "gameSave.json";
+constexpr const char* kGameSaveFileName = "gameSave_";
 
 nlohmann::json Vector3ToJson(const Vector3& vector) {
 	return {
@@ -57,20 +57,25 @@ void GameSave::CameraSave(const CameraSaveData& saveData) {
 	cameraSaveData_ = saveData;
 }
 
+std::string GameSave::GetFileName(const int slotIndex)
+{
+	std::string fileName = kGameSaveFileName + std::to_string(slotIndex) + ".json";
+	return fileName;
+}
+
 void GameSave::PlayerSave(const Transform& transform) { playerSaveData_.transform = transform; }
 
 void GameSave::ProgressSave(const ProgressSaveData& progressSaveData) {
 	progressSaveData_ = progressSaveData;
 }
 
-void GameSave::Save() {
+void GameSave::Save(const int slotIndex) {
 	nlohmann::json saveJson;
 	saveJson["player"] = {
 	    {"transform", TransformToJson(playerSaveData_.transform)},
 	};
 	saveJson["camera"] = {
 	    {"transform",          TransformToJson(cameraSaveData_.transform)},
-	    {"rotateSpeed",        cameraSaveData_.rotateSpeed               },
 	};
 	saveJson["progress"] = {
 	    {"isGameClear",      progressSaveData_.isGameClear     },
@@ -81,14 +86,20 @@ void GameSave::Save() {
 
 	JsonManager* jsonManager = JsonManager::GetInstance();
 	jsonManager->SetData(saveJson);
-	if (!jsonManager->SaveJson(kGameSaveFileName)) {
+
+	std::string fileName = GetFileName(slotIndex);
+
+	if (!jsonManager->SaveJson(fileName)) {
 		Logger::Log("ゲームセーブの保存に失敗しました。\n");
 	}
 }
 
-void GameSave::Load() {
+void GameSave::Load(const int slotIndex) {
 	JsonManager* jsonManager = JsonManager::GetInstance();
-	if (!jsonManager->LoadJson(kGameSaveFileName)) {
+
+	std::string fileName = GetFileName(slotIndex);
+
+	if (!jsonManager->LoadJson(fileName)) {
 		Reset();
 		Save();
 		return;
@@ -108,9 +119,7 @@ void GameSave::Load() {
 		if (cameraJson.contains("transform")) {
 			JsonToTransform(cameraJson["transform"], cameraSaveData_.transform);
 		}
-		if (cameraJson.contains("rotateSpeed") && cameraJson["rotateSpeed"].is_number()) {
-			cameraSaveData_.rotateSpeed = cameraJson["rotateSpeed"].get<float>();
-		}
+
 	}
 
 	if (saveJson.contains("progress") && saveJson["progress"].is_object()) {
