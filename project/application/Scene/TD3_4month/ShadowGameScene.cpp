@@ -89,7 +89,7 @@ ShadowGameScene::ShadowGameScene()
     SetPlayerCamera(cameraController_->GetPlayerCamera());
 
     damageOverlay_ = std::make_unique<DamageOverlay>();
-
+	stageManager_ = std::make_unique<StageManager>();
 
 }
 
@@ -182,6 +182,7 @@ void ShadowGameScene::Initialize()
     //最初のイベントをセットする
     currentEvent_ = firstEvent_.get();
 
+	stageManager_->ChangeStage("MirrorStage");
     Update();
 
     currentEvent_->StartEvent();
@@ -189,7 +190,7 @@ void ShadowGameScene::Initialize()
 
 void ShadowGameScene::Update()
 {
-
+	stageManager_->Update();
     currentEvent_->Update();
     //カメラの更新処理
     UpdateCamera();
@@ -217,6 +218,7 @@ void ShadowGameScene::Update()
 
 void ShadowGameScene::Draw()
 {
+	stageManager_->Draw();
     //ゲームオブジェクトの描画処理
     DrawModel();
 

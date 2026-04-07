@@ -49,6 +49,7 @@
 #include "Light/CommonLight/AreaCommonLight.h"
 #include "Light/CommonLight/SpotCommonLight.h" 
 #include "Light/CommonLight/PointCommonLight.h"
+#include "Stages/StageManager.h"
 #include"Audio.h"
 #include <string>
 
@@ -147,6 +148,8 @@ private:
 	static constexpr float kPlayerMaxHp_ = 3.0f;
 	float damageCooldownTimer_ = 0.0f;
 	std::unique_ptr<DamageOverlay> damageOverlay_ = nullptr;
+	// ステージ管理
+	std::unique_ptr<StageManager> stageManager_ = nullptr;
 
 public:
 	// シーンのコンストラクタ
