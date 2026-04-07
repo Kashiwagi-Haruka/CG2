@@ -18,6 +18,7 @@ UIManager::UIManager() {
 	menu_ = std::make_unique<Menu>();
 	raySprite_ = std::make_unique<RaySprite>();
 	tabKey_ = std::make_unique<TabKey>();
+	iDCard_ = std::make_unique<IDCard>();
 
 	keyIcon_ = std::make_unique<KeyIcon>();
 	lightIcon_ = std::make_unique<LightIcon>();
@@ -31,6 +32,7 @@ void UIManager::Initialize() {
 	menu_->Initialize();
 	raySprite_->Initialize();
 	tabKey_->Initialize();
+	iDCard_->Initialize();
 	keyIcon_->Initialize();
 	lightIcon_->Initialize();
 	mission_->Initialize();
@@ -46,6 +48,8 @@ void UIManager::Update() {
 
 		if (isPause_) {
 			CursorShowAndMove();
+			//IDCardの数値を初期化
+			iDCard_->InitCount();
 		} else {
 			CursorHideAndStop();
 		}
@@ -71,6 +75,11 @@ void UIManager::Update() {
 	textUIManager_->Update();
 	raySprite_->Update();
 	tabKey_->Update();
+
+	if (isPause_) {
+		iDCard_->Update();
+	}
+
 	keyIcon_->Update();
 	lightIcon_->Update();
 	mission_->Update();
@@ -100,18 +109,19 @@ void UIManager::Draw() {
 
 	raySprite_->Draw();
 
-	if (isPause_) {
-		menu_->Draw();
-	} else {
-		tabKey_->Draw();
-	}
-
 	if (Flashlight::IsGetLight()) {
 		lightIcon_->Draw();
 	}
 
 	if (Key::IsGetKey()) {
 		keyIcon_->Draw();
+	}
+
+	if (isPause_) {
+		menu_->Draw();
+		iDCard_->Draw();
+	} else {
+		tabKey_->Draw();
 	}
 
 	mission_->Draw();
