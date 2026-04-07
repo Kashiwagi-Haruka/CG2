@@ -3,6 +3,7 @@
 
 #include "GameObject/UI/RaySprite.h"
 #include "GameObject/UI/TabKey.h"
+#include "GameObject/UI/IDCard.h"
 #include "KeyIcon.h"
 #include "LightIcon.h"
 #include "Menu/Menu.h"
@@ -17,7 +18,7 @@ private:
 	// raySprite
 	std::unique_ptr<RaySprite> raySprite_ = nullptr;
 	std::unique_ptr<TabKey> tabKey_ = nullptr;
-
+	std::unique_ptr<IDCard> iDCard_ = nullptr;
 	std::unique_ptr<KeyIcon> keyIcon_ = nullptr;
 	std::unique_ptr<LightIcon> lightIcon_ = nullptr;
 	std::unique_ptr<Mission> mission_ = nullptr;
