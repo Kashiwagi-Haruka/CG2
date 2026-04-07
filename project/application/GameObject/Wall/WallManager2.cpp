@@ -57,8 +57,8 @@ void WallManager2::Update()
     areaLight_.height = plane_->GetTransform().scale.y*0.5f;
     Vector3 translate = {7.0f,0.0f,0.0f};
 
-    walls_[0]->SetST({ 1.0f,4.0f,14.0f }, translate+Vector3{ 7.0f,2.0f,0.0f });
-    walls_[1]->SetST({ 1.0f,4.0f,14.0f }, translate+Vector3{ -7.0f,2.0f,0.0f });
+    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate+Vector3{ 7.0f,2.0f,0.0f });
+    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate+Vector3{ -7.0f,2.0f,0.0f });
     //裏側                  
     walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate+Vector3{ 0.0f,2.0f,7.0f });
                                   
