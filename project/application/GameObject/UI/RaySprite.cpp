@@ -17,11 +17,13 @@
 #include"GameObject/Locker/LockerManager.h"
 #include"GameObject/VendingMac/VendingMac.h"
 #include"GameObject/PC/PC.h"
+#include"GameObject/GentleMan/GentleMan.h"
 RaySprite::RaySprite()
 {
-    handHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/hand.png");
-    grabHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/grabHand.png");
-    portalHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/mouseUI.png");
+    handle_[HAND] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/hand.png");
+    handle_[GRAB] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/grabHand.png");
+    handle_[PORTAL] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/mouseUI.png");
+    handle_[TALK] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/talk.png");
 
     sprite_ = std::make_unique<Sprite>();
 
@@ -29,7 +31,7 @@ RaySprite::RaySprite()
 
 void RaySprite::Initialize()
 {
-    sprite_->Initialize(handHandle_);
+    sprite_->Initialize(handle_[HAND]);
     sprite_->SetAnchorPoint({ 0.5f,0.5f });
     sprite_->SetRotation(0.0f);
     sprite_->SetScale({ 128.0f,128.0f });
@@ -47,6 +49,8 @@ void RaySprite::Update()
         SetTexture(RaySprite::GRAB);
     } else if (PortalManager::GetCanMakePortal()) {
         SetTexture(RaySprite::PORTAL);
+    } else if(Gentleman::IsRayHit()){
+        SetTexture(RaySprite::TALK);
     } else {
         SetTexture(RaySprite::HAND);
     }
@@ -66,20 +70,7 @@ void RaySprite::Draw()
 
 void RaySprite::SetTexture(const TextureUI num)
 {
-    switch (num)
-    {
-    case TextureUI::PORTAL:
-        sprite_->SetTextureHandle(portalHandle_);
-        break;
-    case TextureUI::HAND:
-        sprite_->SetTextureHandle(handHandle_);
-        break;
-    case TextureUI::GRAB:
-        sprite_->SetTextureHandle(grabHandle_);
-        break;
-    default:
-        break;
-    }
+    sprite_->SetTextureHandle(handle_[num]);
 }
 
 bool RaySprite::IsRayHit()
@@ -94,5 +85,6 @@ bool RaySprite::IsRayHit()
         Flashlight::IsRayHit() ||
         Key::IsRayHit() ||
         VendingMac::IsRayHit() ||
-        PC::IsRayHit();
+        PC::IsRayHit()||
+        Gentleman::IsRayHit();
 }
