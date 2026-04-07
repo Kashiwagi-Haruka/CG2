@@ -291,80 +291,18 @@ void ShadowGameScene::UpdatePostEffect()
 
 }
 
-void ShadowGameScene::UpdateGameObject()
-{
-    portalManager_->WarpPlayer(player_.get());
-    //プレイヤー
-    player_->Update();
+void ShadowGameScene::UpdateGameObject() {
+	// プレイヤー
+	player_->Update();
 
-    //携帯打刻機
-    timeCardWatch_->Update();
-    //懐中電灯
-    flashlight_->Update();
-    //鍵
-    key_->Update();
-    //枝豆管理
-    edamame_->Update();
-    //椅子管理
-    chairManager_->Update();
-    //箱管理
-    boxManager_->Update();
-    //エレベーター
-    elevator_->Update();
-    //床
-    testField_->Update();
-    //壁管理
-    wallManager_->Update();
-    //壁管理
-    wallManager2_->Update();
-    //エレベータールーム管理
-    elevatorRoomManager_->Update();
+	// エレベーター
+	elevator_->Update();
+	// エレベータールーム管理
+	elevatorRoomManager_->Update();
+	// セーブポイント紳士
+	gentleman_->Update();
 
-    //自販機
-    vendingMac_->Update();
-    const Vector3 vendingPosition = vendingMac_->GetWorldPosition();
-    const Vector3 vendingForward = vendingMac_->GetForward();
-    coffees_->SetSpawnOrigin({
-        vendingPosition.x + vendingForward.x * 0.45f,
-        vendingPosition.y + 0.9f,
-        vendingPosition.z + vendingForward.z * 0.45f,
-        });
-    coffees_->SetLaunchDirection(vendingForward);
-    coffees_->Update(cameraController_->GetPlayerCamera()->GetCamera(), directionalLight_.direction);
-    //ドア
-    door_->Update();
-    //ロッカー
-    lockerManager_->Update();
-    //机
-    deskManager_->Update();
-    // ホワイトボード管理
-    whiteBoardManager_->Update();
-    //ポータル管理
-    portalManager_->Update();
-    //打刻機
-    timeCard_->SetTransform({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f}, { 8.0f, 1.0f, -7.0f } });
-    timeCard_->Update();
-    //タイムカードラック
-    timeCardRack_->SetTransform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 7.75f,1.3f,-7.0f } });
-    timeCardRack_->Update();
-    //PC
-    pc_->Update();
-    //セーブポイント紳士
-    gentleman_->Update();
-
-    for (auto& chair : chairManager_->GetChairs()) {
-        if (chair->GetIsStand()) {
-            Vector3 pos = chair->GetWorldPosition();
-            pos.y += 1.0f;
-            player_->SetTranslate(pos);
-            chair->SetIsStand(false);
-            PlayerCommand::SetIsStand(false);
-            break;
-        }
-    }
-
-    ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
-
+	ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 }
 void ShadowGameScene::UpdatePlayerDamage() {
     const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();

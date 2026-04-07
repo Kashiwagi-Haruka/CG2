@@ -96,7 +96,68 @@ void MirrorStage::Initialize() { isStageEnd_ = false;
 	currentEvent_->StartEvent();
 }
 
-void MirrorStage::Update() { currentEvent_->Update(); }
+void MirrorStage::Update() {
+	if (currentEvent_) {
+		currentEvent_->Update();
+	}
+
+	portalManager_->WarpPlayer(player_.get());
+
+	// 携帯打刻機
+	timeCardWatch_->Update();
+	// 懐中電灯
+	flashlight_->Update();
+	// 鍵
+	key_->Update();
+	// 枝豆
+	edamame_->Update();
+	// 椅子
+	chairManager_->Update();
+	// 箱
+	boxManager_->Update();
+	// 床
+	testField_->Update();
+	// 壁
+	wallManager_->Update();
+	wallManager2_->Update();
+	// 自販機
+	vendingMac_->Update();
+	const Vector3 vendingPosition = vendingMac_->GetWorldPosition();
+	const Vector3 vendingForward = vendingMac_->GetForward();
+	coffees_->SetSpawnOrigin({
+	    vendingPosition.x + vendingForward.x * 0.45f,
+	    vendingPosition.y + 0.9f,
+	    vendingPosition.z + vendingForward.z * 0.45f,
+	});
+	coffees_->SetLaunchDirection(vendingForward);
+	coffees_->Update(Object3dCommon::GetInstance()->GetDefaultCamera(), {0.0f, 1.0f, 0.0f});
+	// ドア
+	door_->Update();
+	// ロッカー
+	lockerManager_->Update();
+	// 机
+	deskManager_->Update();
+	// ホワイトボードとポータル
+	whiteBoardManager_->Update();
+	portalManager_->Update();
+	// 打刻機
+	timeCard_->SetTransform({
+	    {1.0f, 1.0f, 1.0f },
+        {0.0f, 0.0f, 0.0f },
+        {8.0f, 1.0f, -7.0f}
+    });
+	timeCard_->Update();
+	timeCardRack_->SetTransform({
+	    {1.0f,  1.0f, 1.0f },
+        {0.0f,  0.0f, 0.0f },
+        {7.75f, 1.3f, -7.0f}
+    });
+	timeCardRack_->Update();
+	// PC
+	pc_->Update();
+
+	CheckCollision();
+}
 
 void MirrorStage::Draw() {}
 
