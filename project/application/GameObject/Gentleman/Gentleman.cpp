@@ -15,6 +15,7 @@
 PlayerCamera* Gentleman::playerCamera_ = nullptr;
 Transform* Gentleman::playerTransform_ = nullptr;
 ProgressSaveData* Gentleman::progressSaveData_ = nullptr;
+bool Gentleman::isRayHit_ = false;
 
 Gentleman::Gentleman()
 {
@@ -24,7 +25,7 @@ Gentleman::Gentleman()
     SetAABB({ .min = {-0.25f, 0.0f, -0.25f}, .max = {0.25f,  1.5f, 0.25f} });
     SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
-    localAABB_ = { .min = {-0.125f,-0.125f,-0.125f},.max = {0.125f,0.125,0.125f} };
+    localAABB_ = { .min = {-0.5f,-0.5f,-0.5f},.max = {0.5f,0.5,0.5f} };
 }
 
 void Gentleman::OnCollision(Collider* collider)
@@ -206,10 +207,10 @@ void Gentleman::CheckCollision()
 
 bool Gentleman::OnCollisionRay()
 {
-    //const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex("drawer.002");
-    //skeleton_->SetObjectMatrix(obj_->GetWorldMatrix());
-    //Vector3 pos = skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
-    return playerCamera_->OnCollisionRay(GetAABB(), GetWorldPosition());
+    const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex("Root_Upper");
+    skeleton_->SetObjectMatrix(obj_->GetWorldMatrix());
+    Vector3 pos = skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
+    return playerCamera_->OnCollisionRay(localAABB_, pos);
 }
 void Gentleman::SwichCommand()
 {

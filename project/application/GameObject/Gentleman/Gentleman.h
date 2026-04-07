@@ -30,7 +30,7 @@ public:
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
-    bool IsRayHit() { return isRayHit_; }
+    static bool IsRayHit() { return isRayHit_; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
     void SetAnimationName(const std::string& name) { desiredAnimationName = name; };
 private:
@@ -55,7 +55,7 @@ private:
     const float kAnimationBlendDuration_ = 0.3f;
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Idle";
-    bool isRayHit_ = false;
+    static bool isRayHit_;
     bool isPreOnCollisionRay_ = false;
     uint32_t animationNum = 0;
 };

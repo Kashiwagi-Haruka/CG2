@@ -17,6 +17,7 @@
 #include"GameObject/Locker/LockerManager.h"
 #include"GameObject/VendingMac/VendingMac.h"
 #include"GameObject/PC/PC.h"
+#include"GameObject/GentleMan/GentleMan.h"
 RaySprite::RaySprite()
 {
     handHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/hand.png");
@@ -58,7 +59,7 @@ void RaySprite::Draw()
 {
     SpriteCommon::GetInstance()->DrawCommon();
 
-    if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortal()) {
+    if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortal()|| Gentleman::IsRayHit()) {
         sprite_->Draw();
     }
 
