@@ -84,6 +84,15 @@ class MirrorStage : public BaseStage {
 	GameEvent* currentEvent_ = nullptr;
 
 	Player* player_ = nullptr;
+	// PointLight
+	std::array<PointCommonLight, kMaxPointLights> pointLights_{};
+	uint32_t activePointLightCount_ = 0;
+	// SpotLight
+	std::array<SpotCommonLight, kMaxSpotLights> spotLights_{};
+	uint32_t activeSpotLightCount_ = 0;
+	// AreaLight
+	std::array<AreaCommonLight, kMaxAreaLights> areaLights_{};
+	uint32_t activeAreaLightCount_ = 0;
 
 public:
 
@@ -103,4 +112,5 @@ public:
 	void DrawModel();
 	void UpdateLight();
 	void UpdatePostEffect();
+	void InitializeLights();
 };

@@ -65,15 +65,7 @@ private:
 #pragma region// light
     //DirectionalLight
     DirectionalCommonLight directionalLight_{};
-    //PointLight
-    std::array<PointCommonLight, kMaxPointLights> pointLights_{};
-    uint32_t activePointLightCount_ = 0;
-    //SpotLight
-    std::array<SpotCommonLight, kMaxSpotLights> spotLights_{};
-    uint32_t activeSpotLightCount_ = 0;
-    //AreaLight
-    std::array<AreaCommonLight, kMaxAreaLights> areaLights_{};
-    uint32_t activeAreaLightCount_ = 0;
+
 #pragma endregion
     bool useDirectionalShadow_ = true;
     bool usePointShadow_ = false;
