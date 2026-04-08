@@ -5,6 +5,7 @@
 #include"GameObject/YoshidaMath/RandomClass.h"
 #include "Audio.h"
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
+#include"GameObject/UI/GameContinued/GameContinued.h"
 
 class GentlemanMenu
 {
@@ -23,13 +24,18 @@ public:
     static uint32_t GetSelectButtonNum() { return selectButtonNum_; }
     static void SetIsSaveMenuShow(const bool isShowSaveMenu) { isShowSaveMenu_ = isShowSaveMenu; }
     static bool GetIsSaveMenuShow() { return isShowSaveMenu_; }
-    static void Save(const int slotIndex);
 
     static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
     static void SetPlayerTransform(Transform* transform) { playerTransform_ = transform; };
     static void SetProgressSaveData(ProgressSaveData* progressSaveData) { progressSaveData_ = progressSaveData; }
 
+    void Save();
+
 private:
+    void UpdateGentleManMenu();
+private:
+    //ゲームコンティニュー
+    std::unique_ptr<GameContinued>gameContinued_ = nullptr;
 
     static PlayerCamera* playerCamera_;
     static Transform* playerTransform_;

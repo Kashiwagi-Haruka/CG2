@@ -207,7 +207,6 @@ void ShadowGameScene::Initialize()
 
     Update();
 
-
     currentEvent_->StartEvent();
 
 }

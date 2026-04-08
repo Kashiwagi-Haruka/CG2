@@ -53,6 +53,8 @@ GentlemanMenu::GentlemanMenu()
     pressEText_.SetColor(COLOR::WHITE);
     pressEText_.SetAlign(TextAlign::Center);
     pressEText_.SetBlendMode(BlendMode::kBlendModeAlpha);
+
+    gameContinued_ = std::make_unique<GameContinued>();
 }
 
 GentlemanMenu::~GentlemanMenu()
@@ -64,6 +66,7 @@ void GentlemanMenu::Initialize()
     isShowMenu_ = false;
     selectButtonNum_ = 0;
     isShowStart_ = false;
+    gameContinued_->Initialize();
 }
 
 void GentlemanMenu::Update()
@@ -128,10 +131,31 @@ void GentlemanMenu::Update()
         isShowStart_ = false;
     }
 
+    UpdateGentleManMenu();
+
+}
+
+void GentlemanMenu::UpdateGentleManMenu()
+{
+    if (isShowSaveMenu_) {
+
+        gameContinued_->Update();
+
+        if (gameContinued_->GetIsSelected()) {
+
+            Save();
+            gameContinued_->SetIsSelected(false);
+            isShowSaveMenu_ = false;
+        }
+    }
 }
 
 void GentlemanMenu::Draw()
 {
+    if (isShowSaveMenu_) {
+        gameContinued_->Draw();
+    }
+
     if (!isShowMenu_) {
         return;
     }
@@ -145,13 +169,30 @@ void GentlemanMenu::Draw()
 
 }
 
-void GentlemanMenu::Save(const int slotIndex)
+void GentlemanMenu::Save()
 {
     auto& save = GameSave::GetInstance();
+
+    //スロットインデックスを取得する
+    int slotIndex = gameContinued_->GetCurrentSelectNum();
+    //現在の時間の文字列
+    auto dataTimeString = save.GetCurrentDateTimeString();
+    //表示するセーブデータのテキストをセットする
+    gameContinued_->SetSaveData(slotIndex, "SaveFile", progressSaveData_->currentStageName.c_str(), dataTimeString.c_str());
+
+    //スクショが入っている画像のアドレスを取得する
+    std::string screenShotFileName = save.GetScreenShotFileName(slotIndex);
+    //スクショを取る
+    GameBase::GetInstance()->SaveCurrentFrameScreenShot(screenShotFileName.c_str());
+
+    //取ったスクショのデータを入れる
+    gameContinued_->LoadAndSetSpriteHandle(slotIndex);
+
     save.CameraSave(playerCamera_->GetParam());
     save.PlayerSave(*playerTransform_);
     save.ProgressSave(*progressSaveData_);
-    std::string filename = "Resources/TD3_3102/2d/SaveScreenShot/" + std::to_string(slotIndex) + ".png";
-    GameBase::GetInstance()->SaveCurrentFrameScreenShot(filename.c_str());
+    save.SetSaveDateTime(dataTimeString);
+
     save.Save(slotIndex);
+
 }

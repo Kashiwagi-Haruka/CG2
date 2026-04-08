@@ -22,10 +22,14 @@ struct ProgressSaveData {
     bool isKeyHave;//キーを持っているか
 };
 
+
+
+
 class GameSave {
 public:
 
 private:
+    std::string saveDateTime_;                // セーブデータの保存日時
     PlayerSaveData playerSaveData_{};     // プレイヤーのセーブデータ
     CameraSaveData cameraSaveData_{};     // カメラのセーブデータ
     ProgressSaveData progressSaveData_{}; // 進行状況のセーブデータ
@@ -33,7 +37,7 @@ private:
 private:
     GameSave() {}  // コンストラクタを private にする
     ~GameSave() {}
-    std::string GetFileName(const int slotIndex);
+
 
 public:
     // コピー禁止
@@ -47,6 +51,8 @@ public:
     void PlayerSave(const Transform& transform);                                                                    // プレイヤーのセーブデータを保存する
     void CameraSave(const CameraSaveData& saveData); // カメラのセーブデータを保存する
     void ProgressSave(const ProgressSaveData& progressSaveData); // 進行状況のセーブデータを保存する
+    //セーブデータをセットする
+    void SetSaveDateTime(const std::string& saveDataTime) { saveDateTime_ = saveDataTime; }
     // 引数にスロット番号を追加
     void Save(const int slotIndex = 0);  // セーブデータをファイルに保存する
     void Load(const int slotIndex = 0);  // ファイルからセーブデータを読み込む
@@ -57,4 +63,6 @@ public:
     const CameraSaveData& GetCameraSaveData() { return cameraSaveData_; };     // カメラのセーブデータ
     const ProgressSaveData& GetProgressSaveData() { return progressSaveData_; }; // 進行状況のセーブデータ
     std::string GetCurrentDateTimeString();
+    std::string GetFileName(const int slotIndex);
+    std::string GetScreenShotFileName(const int slotIndex);
 };

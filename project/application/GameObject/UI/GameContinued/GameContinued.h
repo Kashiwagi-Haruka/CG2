@@ -29,6 +29,7 @@ private:
 	std::unique_ptr<GameContinuedText> text_;
 
 public:
+	void LoadAndSetSpriteHandle(const int index);
 	void Initialize();
 	void Update();
 	void Draw();
