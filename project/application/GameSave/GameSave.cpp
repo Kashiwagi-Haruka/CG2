@@ -63,6 +63,30 @@ std::string GameSave::GetFileName(const int slotIndex)
 	return fileName;
 }
 
+std::string GameSave::GetCurrentDateTimeString()
+{
+	// 1. 現在時刻（システムクロック）を取得
+	auto now = std::chrono::system_clock::now();
+
+	// 2. time_t型に変換
+	std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+
+	// 3. ローカルタイム（構造体）に変換
+	std::tm now_tm;
+#ifdef _WIN32
+	localtime_s(&now_tm, &now_c); // Windows (MSVC) での安全な書き方
+#else
+	now_tm = *std::localtime(&now_c); // 標準的な書き方
+#endif
+
+	// 4. 文字列にフォーマット
+	std::stringstream ss;
+	// "%Y/%m/%d %H:%M:%S" -> 2024/05/2015:30:45
+	ss << std::put_time(&now_tm, "%Y/%m/%d\n%H:%M");
+
+	return ss.str();
+}
+
 void GameSave::PlayerSave(const Transform& transform) { playerSaveData_.transform = transform; }
 
 void GameSave::ProgressSave(const ProgressSaveData& progressSaveData) {
