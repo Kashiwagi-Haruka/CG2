@@ -13,8 +13,6 @@
 #include"Text/GentlemanMenu/GentlemanMenu.h"
 
 PlayerCamera* Gentleman::playerCamera_ = nullptr;
-Transform* Gentleman::playerTransform_ = nullptr;
-ProgressSaveData* Gentleman::progressSaveData_ = nullptr;
 bool Gentleman::isRayHit_ = false;
 
 Gentleman::Gentleman()
@@ -81,16 +79,7 @@ void Gentleman::Animation()
 
 }
 
-void Gentleman::Save(const int slotIndex)
-{
-    auto& save = GameSave::GetInstance();
-    save.CameraSave(playerCamera_->GetParam());
-    save.PlayerSave(*playerTransform_);
-    save.ProgressSave(*progressSaveData_);
-    std::string filename = "Resources/TD3_3102/2d/SaveScreenShot/" + std::to_string(slotIndex) + ".png";
-    GameBase::GetInstance()->SaveCurrentFrameScreenShot(filename.c_str());
-    save.Save(slotIndex);
-}
+
 
 void Gentleman::SetCamera(Camera* camera)
 {
@@ -100,10 +89,10 @@ void Gentleman::SetCamera(Camera* camera)
 
 void Gentleman::Update()
 {
-
     CheckCollision();
     Animation();
     obj_->Update();
+
 
 
 }
@@ -176,21 +165,20 @@ void Gentleman::CheckCollision()
     }
 
     //rayの当たり判定
-    if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger()&&!PlayerCommand::GetIsGrab()) {
+    if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger() && !PlayerCommand::GetIsGrab()) {
         //トリガーしたとき且つ何も持ってないとき
 
         if (GentlemanMenu::GetIsShowMenu()) {
             // 数値によって処理を変更する
             SwichCommand();
-
         } else {
             // メニューを表示してないとき表示する
             GentlemanMenu::SetIsShowMenu(true);
         }
-        
+
         SEManager::SoundPlay(SEManager::TYPE);
         SetAnimationName(animationName);
-   
+
     }
 
     isPreOnCollisionRay_ = isRayHit_;
@@ -226,7 +214,10 @@ void Gentleman::SwichCommand()
         break;
     case GentlemanMenu::SAVE:
 
-        Save();
+        if (!GentlemanMenu::GetIsSaveMenuShow()) {
+            GentlemanMenu::SetIsSaveMenuShow(true);
+        }
+
         //メニューを閉じる
         GentlemanMenu::SetIsShowMenu(false);
         break;

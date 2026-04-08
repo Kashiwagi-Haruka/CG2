@@ -8,6 +8,8 @@
 
 class GameContinued {
 
+private:
+
 	struct SaveData {
 		std::unique_ptr<Sprite> GameSceneSprite_; // ゲームシーンのスクリーンショットを表示するスプライト
 		std::unique_ptr<Sprite> BlockSprite_;     // セーブデータブロックを表示するスプライト
@@ -16,10 +18,11 @@ class GameContinued {
 		std::string saveDateTime_;                // セーブデータの保存日時
 	};
 
-	std::array<SaveData, saveDataMaxNum_> gameSaveData;
+	std::array<SaveData, saveDataMaxNum_> gameSaveData_{};
 	std::array<Vector4, saveDataMaxNum_> blockColors_{};
 	std::array<Vector2, saveDataMaxNum_> blockScales_{};
 	std::array<Vector2, saveDataMaxNum_> blockPositions_{};
+
 	int currentSelectNum_ = 0;
 	bool isSelected_ = false;
 

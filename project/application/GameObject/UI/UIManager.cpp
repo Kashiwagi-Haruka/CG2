@@ -25,6 +25,7 @@ UIManager::UIManager() {
 	mission_ = std::make_unique<Mission>();
 	chairMenu_ = std::make_unique<ChairMenu>();
 	gentlemanMenu_ = std::make_unique<GentlemanMenu>();
+	gameContinued_ = std::make_unique<GameContinued>();
 }
 
 void UIManager::Initialize() {
@@ -40,6 +41,7 @@ void UIManager::Initialize() {
 	mission_->Initialize();
 	chairMenu_->Initialize();
 	gentlemanMenu_->Initialize();
+	gameContinued_->Initialize();
 }
 
 void UIManager::Update() {
@@ -80,11 +82,21 @@ void UIManager::Update() {
 	textUIManager_->Update();
 	raySprite_->Update();
 
-	chairMenu_->Update();
-	gentlemanMenu_->Update();
-
 	if (isPause_) {
 		iDCard_->Update();
+	} else {
+		gentlemanMenu_->Update();
+		chairMenu_->Update();
+
+		if (GentlemanMenu::GetIsSaveMenuShow()) {
+			gameContinued_->Update();
+			if (gameContinued_->GetIsSelected()) {
+				int num = gameContinued_->GetCurrentSelectNum();
+				gameContinued_->SetSaveData(num, "testName", "TestStage", "00:00");
+				GentlemanMenu::SetIsSaveMenuShow(false);
+			}
+
+		}
 	}
 
 	tabKey_->Update();
@@ -131,15 +143,21 @@ void UIManager::Draw() {
 	}
 
 	if (GentlemanMenu::GetIsShowMenu()) {
+		
 		gentlemanMenu_->Draw();
+
 	}
+
+	if (GentlemanMenu::GetIsSaveMenuShow()) {
+		gameContinued_->Draw();
+	}
+
 	if (isPause_) {
 		menu_->Draw();
 		iDCard_->Draw();
 	} else {
 		
 		tabKey_->Draw();
-		
 	
 	}
 
