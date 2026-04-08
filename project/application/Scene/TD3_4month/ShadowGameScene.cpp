@@ -417,42 +417,9 @@ void ShadowGameScene::DrawModel() {
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
-    // テスト地面
-    testField_->Draw();
-    //壁管理
-    wallManager_->Draw();
-    //壁管理
-    wallManager2_->Draw();
     //エレベータルーム
     elevatorRoomManager_->Draw();
-    //自販機
-    vendingMac_->Draw();
-    // コーヒー缶
-    coffees_->Draw();
-    //ドア
-    door_->Draw();
-    //ロッカー
-    lockerManager_->Draw();
-    //机
-    deskManager_->Draw();
-    //PC
-    pc_->Draw();
-    //携帯打刻機の描画処理
-    timeCardWatch_->Draw();
-    //懐中電灯
-    flashlight_->Draw();
-    // 鍵の描画処理
-    key_->Draw();
-    // 枝豆の描画処理
-    edamame_->Draw();
-    //椅子の描画
-    chairManager_->Draw();
-    //打刻機
-    timeCard_->Draw();
-    //タイムカードラック
-    timeCardRack_->Draw();
-    //箱管理
-    boxManager_->Draw();
+
     //エレベーター    
     elevator_->Draw();
     //セーブポイント紳士
@@ -467,49 +434,18 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
         player_->Draw();
     }
 
-    // ホワイトボード管理の描画
-    whiteBoardManager_->Draw();
-    // ポータル管理の描画
-    portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
+
 }
 
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
     player_->SetCamera(camera);
-    testField_->SetCamera(camera);
-    whiteBoardManager_->SetCamera(camera);
-    portalManager_->SetCamera(camera);
-    pc_->SetCamera(camera);
-    timeCardWatch_->SetCamera(camera);
-    flashlight_->SetCamera(camera);
-    key_->SetCamera(camera);
-    edamame_->SetCamera(camera);
-    chairManager_->SetCamera(camera);
-    wallManager_->SetCamera(camera);
-    wallManager2_->SetCamera(camera);
     elevatorRoomManager_->SetCamera(camera);
-    vendingMac_->SetCamera(camera);
-    door_->SetCamera(camera);
-    lockerManager_->SetCamera(camera);
-    deskManager_->SetCamera(camera);
-    timeCard_->SetCamera(camera);
-    timeCardRack_->SetCamera(camera);
-    boxManager_->SetCamera(camera);
+
     elevator_->SetCamera(camera);
     gentleman_->SetCamera(camera);
 }
 void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera)
 {
-    portalManager_->SetPlayerCamera(playerCamera);
-    key_->SetPlayerCamera(playerCamera);
-    edamame_->SetPlayerCamera(playerCamera);
-    chairManager_->SetPlayerCamera(playerCamera);
-    vendingMac_->SetPlayerCamera(playerCamera);
-    door_->SetPlayerCamera(playerCamera);
-    flashlight_->SetPlayerCamera(playerCamera);
-    lockerManager_->SetPlayerCamera(playerCamera);
-    deskManager_->SetPlayerCamera(playerCamera);
-    boxManager_->SetPlayerCamera(playerCamera);
-    pc_->SetPlayerCamera(playerCamera);
     gentleman_->SetPlayerCamera(playerCamera);
     elevator_->SetPlayerCamera(playerCamera);
 }

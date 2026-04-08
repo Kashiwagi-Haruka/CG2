@@ -33,6 +33,8 @@
 #pragma endregion
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 
+class Player;
+
 class MirrorStage : public BaseStage {
 
 	   // TestField
@@ -81,6 +83,8 @@ class MirrorStage : public BaseStage {
 	std::unique_ptr<FirstGameEvent> firstEvent_ = nullptr;
 	GameEvent* currentEvent_ = nullptr;
 
+	Player* player_ = nullptr;
+
 public:
 
 	MirrorStage();
@@ -88,9 +92,15 @@ public:
 	void Update() override;
 	void Draw() override;
 	void Finalize() override;
+	void SetPlayer(Player* player) { player_ = player; }
 
 	private:
 	void CheckCollision();
-
-
+	void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle);
+	void SetPlayerCamera(PlayerCamera* camera);
+	void SetSceneCameraForDraw(Camera* camera);
+	void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle);
+	void DrawModel();
+	void UpdateLight();
+	void UpdatePostEffect();
 };
