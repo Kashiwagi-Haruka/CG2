@@ -89,12 +89,12 @@ void Player::SetCamera(Camera* camera) {
 }
 void Player::Initialize() {
 
-    // 座標の初期化
-    transform_ = {
-        .scale{1.0f, 1.0f, 1.0f},
-        .rotate{0.0f,Function::kPi, 0.0f},
-        .translate{6.25f, 1.5f, 4.0f}
-    };
+    //// 座標の初期化
+    //transform_ = {
+    //    .scale{1.0f, 1.0f, 1.0f},
+    //    .rotate{0.0f,Function::kPi, 0.0f},
+    //    .translate{6.25f, 1.5f, 4.0f}
+    //};
    
     // 速度の初期化
     velocity_ = { 0.0f };

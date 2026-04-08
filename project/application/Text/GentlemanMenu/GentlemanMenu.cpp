@@ -63,10 +63,15 @@ GentlemanMenu::~GentlemanMenu()
 
 void GentlemanMenu::Initialize()
 {
+    gameContinued_->Initialize();
+    isScreenShot_ = false;
+    screenshotTimer_ = 2;
+
     isShowMenu_ = false;
     selectButtonNum_ = 0;
     isShowStart_ = false;
-    gameContinued_->Initialize();
+
+    preGameContinueSelectIndex_ = 0;
 }
 
 void GentlemanMenu::Update()
@@ -137,22 +142,52 @@ void GentlemanMenu::Update()
 
 void GentlemanMenu::UpdateGentleManMenu()
 {
+    if (isScreenShot_) {
+        // --- 1フレーム待機してから撮る ---
+        if (screenshotTimer_ > 0) {
+            screenshotTimer_--;
+
+            if (screenshotTimer_ == 0) {
+                ScreenShot(); // ここで実行される時には、メニューが消えたDrawが1回終わっている
+                isScreenShot_ = false;
+            }
+        }
+    }
+
+
     if (isShowSaveMenu_) {
 
         gameContinued_->Update();
 
         if (gameContinued_->GetIsSelected()) {
+            gameContinued_->SetIsSelected(false);
 
             Save();
-            gameContinued_->SetIsSelected(false);
+            isScreenShot_ = true;
             isShowSaveMenu_ = false;
+            // 3. スクショ予約（2フレーム待てば確実にUIが消えた後の画面を撮れる）
+            screenshotTimer_ = 2;
         }
+
+     
     }
+}
+
+void GentlemanMenu::ScreenShot()
+{
+    auto& save = GameSave::GetInstance();
+    //スクショが入っている画像のアドレスを取得する
+    std::string screenShotFileName = save.GetScreenShotFileName(preGameContinueSelectIndex_);
+    //スクショを取る
+    GameBase::GetInstance()->SaveCurrentFrameScreenShot(screenShotFileName.c_str());
+    //取ったスクショのデータを入れる
+    gameContinued_->LoadAndSetSpriteHandle(preGameContinueSelectIndex_,true);
 }
 
 void GentlemanMenu::Draw()
 {
-    if (isShowSaveMenu_) {
+
+    if (isShowSaveMenu_&&!isScreenShot_) {
         gameContinued_->Draw();
     }
 
@@ -180,13 +215,8 @@ void GentlemanMenu::Save()
     //表示するセーブデータのテキストをセットする
     gameContinued_->SetSaveData(slotIndex, "SaveFile", progressSaveData_->currentStageName.c_str(), dataTimeString.c_str());
 
-    //スクショが入っている画像のアドレスを取得する
-    std::string screenShotFileName = save.GetScreenShotFileName(slotIndex);
-    //スクショを取る
-    GameBase::GetInstance()->SaveCurrentFrameScreenShot(screenShotFileName.c_str());
-
-    //取ったスクショのデータを入れる
-    gameContinued_->LoadAndSetSpriteHandle(slotIndex);
+    //スロットインデックスを入れる
+    preGameContinueSelectIndex_ = slotIndex;
 
     save.CameraSave(playerCamera_->GetParam());
     save.PlayerSave(*playerTransform_);

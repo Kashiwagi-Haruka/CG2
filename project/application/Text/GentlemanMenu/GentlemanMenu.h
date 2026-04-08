@@ -30,9 +30,10 @@ public:
     static void SetProgressSaveData(ProgressSaveData* progressSaveData) { progressSaveData_ = progressSaveData; }
 
     void Save();
-
+    
 private:
     void UpdateGentleManMenu();
+    void ScreenShot();
 private:
     //ゲームコンティニュー
     std::unique_ptr<GameContinued>gameContinued_ = nullptr;
@@ -52,6 +53,8 @@ private:
     static bool isShowSaveMenu_;
     static uint32_t selectButtonNum_;
     bool isShowStart_ = false;
-
+    int screenshotTimer_ = 0; // 0より大きい時にカウントダウンし、0になったら撮る
+    int preGameContinueSelectIndex_ = 0;
+    bool isScreenShot_ = false;
 };
 

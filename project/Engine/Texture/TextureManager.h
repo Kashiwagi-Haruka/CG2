@@ -41,6 +41,9 @@ private:
 	DirectXCommon* dxCommon_ = nullptr;
 	std::unique_ptr<SrvManager> srvManager_;
 
+	//同じファイルネームからリフレッシュして新たにロードする Yoshida追加しました。
+	void RefreshTexture(const std::string& filePath);
+
 public:
 	TextureManager() = default;
 	~TextureManager() = default;
@@ -59,6 +62,10 @@ public:
 	void RegisterExternalTexture(const std::string& key, ID3D12Resource* resource, uint32_t srvIndex, DXGI_FORMAT format, uint32_t width, uint32_t height, uint32_t mipLevels = 1);
 	// ファイルパスから SRV インデックスを取得する
 	uint32_t GetTextureIndexByfilePath(const std::string& filePath);
+	// ファイルパスから SRV インデックスを取得する  Yoshida追加しました。
+	uint32_t GetTextureIndexByfilePathAndRefreshTexture(const std::string& filePath);
+
+
 	// ファイルパスから GPU SRV ハンドルを取得する
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(const std::string& filePath);
 	// ファイルパスから SRV インデックスを取得する

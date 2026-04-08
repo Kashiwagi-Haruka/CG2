@@ -77,6 +77,7 @@ void TextureManager::LoadTextureName(const std::string& filePath) {
 	std::string log = "Texture Loaded: " + filePath + " | SRV Index: " + std::to_string(textureData.srvIndex) + " | GPU Handle: " + std::to_string(textureData.srvHandleGPU.ptr) + "\n";
 	OutputDebugStringA(log.c_str());
 }
+
 // メモリ上の画像データを読み込み、SRV を作成する
 void TextureManager::LoadTextureFromMemory(const std::string& key, const uint8_t* data, size_t size) {
 	if (textureDatas.contains(key)) {
@@ -237,6 +238,16 @@ uint32_t TextureManager::GetTextureIndexByfilePath(const std::string& filePath) 
 	return it->second.srvIndex;
 }
 
+uint32_t TextureManager::GetTextureIndexByfilePathAndRefreshTexture(const std::string& filePath)
+{
+	RefreshTexture(filePath);
+	auto it = textureDatas.find(filePath);
+	assert(it != textureDatas.end());
+
+	return it->second.srvIndex;
+}
+
+
 // ファイルパスから SRV インデックスを取得する
 uint32_t TextureManager::GetsrvIndex(const std::string& filePath) {
 	// 未読み込みなら読み込む
@@ -318,4 +329,56 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t srvIndex) {
 	// SRV マネージャーから直接ハンドルを取得する。
 	assert(srvManager_ != nullptr);
 	return srvManager_->GetGPUDescriptorHandle(srvIndex);
+
+}
+
+void TextureManager::RefreshTexture(const std::string& filePath) {
+	// 1. すでに読み込まれているか確認
+	auto it = textureDatas.find(filePath);
+	if (it == textureDatas.end()) {
+		// まだ読み込まれていない場合は通常のロードを行う
+		LoadTextureName(filePath);
+		return;
+	}
+
+	TextureData& textureData = it->second;
+
+	// 2. 新しい画像を読み込む
+	DirectX::ScratchImage image{};
+	std::wstring filePathW = StringUtility::ConvertString_(filePath);
+	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+	if (FAILED(hr)) {
+		return; // ファイルがまだ書き込まれていない等の場合はスキップ
+	}
+
+	// ミップマップの作成
+	DirectX::ScratchImage mipImages{};
+	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+	assert(SUCCEEDED(hr));
+
+	// 3. 新しいメタデータでリソースを作り直す
+	// (※サイズが変わる可能性があるため、リソース自体は作り直すのが安全です)
+	textureData.metadata = mipImages.GetMetadata();
+	textureData.resource = CreateTextureResource(textureData.metadata);
+
+	// 画像データをアップロード
+	UploadTextureData(textureData.resource.Get(), mipImages);
+
+	// 4. 【重要】既存の srvHandleCPU を使い、新しいリソースで SRV を作成（上書き）
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = textureData.metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
+
+	// 既存のハンドルに対して CreateShaderResourceView を呼ぶことで中身が差し替わる
+	dxCommon_->GetDevice()->CreateShaderResourceView(
+		textureData.resource.Get(),
+		&srvDesc,
+		textureData.srvHandleCPU
+	);
+
+	// デバッグログ
+	std::string log = "[TextureManager] Refreshed: " + filePath + " (Index: " + std::to_string(textureData.srvIndex) + ")\n";
+	OutputDebugStringA(log.c_str());
 }

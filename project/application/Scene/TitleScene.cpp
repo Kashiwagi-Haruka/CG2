@@ -86,9 +86,10 @@ void TitleScene::Initialize() {
 	// カメラ
 	cameraTransform_ = {
 	    .scale = {1.0f, 1.0f, 1.0f},
-          .rotate = {0.0f, 0.0f, 0.0f},
-          .translate = cameraDefaultPos_
+        .rotate = {0.0f, 0.0f, 0.0f},
+        .translate = cameraDefaultPos_
     };
+
 	// カメラ
 	camera_->SetTransform(cameraTransform_);
 	cameraRandomOffset_ = {0.0f};
@@ -127,8 +128,19 @@ void TitleScene::Update() {
 
 		if (firstStory_->GetIsEnd()) {
 			TransitionStart();
+			GameSave::GetInstance().SetInitStart(true);
 		}
 	} else if (gameContinued_->GetIsSelected()) {
+		auto& gameSave = GameSave::GetInstance();
+		int selectNum  = gameContinued_->GetCurrentSelectNum();
+		GameSave::GetInstance().SetSelectSlotIndex(selectNum);
+
+		if (gameSave.IsFileExistsAndLoad(selectNum)) {
+			GameSave::GetInstance().SetInitStart(false);
+		} else {
+			GameSave::GetInstance().SetInitStart(true);
+		}
+
 		TransitionStart();
 	}
 

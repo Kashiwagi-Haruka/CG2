@@ -29,7 +29,8 @@ private:
 	std::unique_ptr<GameContinuedText> text_;
 
 public:
-	void LoadAndSetSpriteHandle(const int index);
+	void LoadAllSlots(); 
+	void LoadAndSetSpriteHandle(const int index, const bool isAllowOverlap);
 	void Initialize();
 	void Update();
 	void Draw();
