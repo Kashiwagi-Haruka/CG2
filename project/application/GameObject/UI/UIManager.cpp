@@ -93,7 +93,9 @@ void UIManager::Update() {
 			if (gameContinued_->GetIsSelected()) {
 				int num = gameContinued_->GetCurrentSelectNum();
 				gameContinued_->SetSaveData(num, "testName", "TestStage", "00:00");
+				GentlemanMenu::Save(num);
 				GentlemanMenu::SetIsSaveMenuShow(false);
+				gameContinued_->SetIsSelected(false);
 			}
 
 		}
