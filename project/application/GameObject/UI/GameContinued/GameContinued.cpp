@@ -31,7 +31,7 @@ void GameContinued::Initialize() {
 	int screenTextureHandle_ = 0;
 	blockTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
 
-	for (auto& saveData : gameSaveData) {
+	for (auto& saveData : gameSaveData_) {
 		screenTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/SaveScreenShot/NoData.png");
 		saveData.GameSceneSprite_ = std::make_unique<Sprite>();
 		saveData.GameSceneSprite_->Initialize(screenTextureHandle_);
@@ -48,20 +48,20 @@ void GameContinued::Initialize() {
 
 		const float y = kBlockCenterY + (kBlockSpacingY * static_cast<float>(i));
 		blockPositions_[i] = {kBlockCenterX, y};
-		gameSaveData[i].BlockSprite_->SetPosition(blockPositions_[i]);
-		gameSaveData[i].BlockSprite_->SetScale({kBlockWidth, kBlockHeight});
+		gameSaveData_[i].BlockSprite_->SetPosition(blockPositions_[i]);
+		gameSaveData_[i].BlockSprite_->SetScale({kBlockWidth, kBlockHeight});
 		blockColors_[i] = {0.3f, 0.3f, 0.3f, 0.86f};
 		blockScales_[i] = {kBlockWidth, kBlockHeight};
-		gameSaveData[i].BlockSprite_->SetColor(blockColors_[i]);
-		gameSaveData[i].BlockSprite_->Update();
+		gameSaveData_[i].BlockSprite_->SetColor(blockColors_[i]);
+		gameSaveData_[i].BlockSprite_->Update();
 
 		const float thumbnailHeight = std::max(1.0f, kBlockHeight - (kThumbnailMargin * 2.0f));
 		const float thumbnailWidth = thumbnailHeight * (16.0f / 9.0f);
 		const float left = blockPositions_[i].x - (kBlockWidth * 0.5f);
-		gameSaveData[i].GameSceneSprite_->SetPosition({left + kThumbnailMargin + (thumbnailWidth * 0.5f), blockPositions_[i].y});
-		gameSaveData[i].GameSceneSprite_->SetScale({thumbnailWidth, thumbnailHeight});
-		gameSaveData[i].GameSceneSprite_->SetColor(COLOR::WHITE);
-		gameSaveData[i].GameSceneSprite_->Update();
+		gameSaveData_[i].GameSceneSprite_->SetPosition({left + kThumbnailMargin + (thumbnailWidth * 0.5f), blockPositions_[i].y});
+		gameSaveData_[i].GameSceneSprite_->SetScale({thumbnailWidth, thumbnailHeight});
+		gameSaveData_[i].GameSceneSprite_->SetColor(COLOR::WHITE);
+		gameSaveData_[i].GameSceneSprite_->Update();
 		text_->SetBlockLayout(i, blockPositions_[i], blockScales_[i]);
 	}
 
@@ -122,16 +122,16 @@ void GameContinued::Update() {
 		blockColors_[i] = Lerp(blockColors_[i], targetColor, transitionRate);
 		blockScales_[i] = Lerp(blockScales_[i], targetScale, transitionRate);
 
-		gameSaveData[i].BlockSprite_->SetPosition(blockPositions_[i]);
-		gameSaveData[i].BlockSprite_->SetColor(blockColors_[i]);
-		gameSaveData[i].BlockSprite_->SetScale(blockScales_[i]);
-		gameSaveData[i].BlockSprite_->Update();
+		gameSaveData_[i].BlockSprite_->SetPosition(blockPositions_[i]);
+		gameSaveData_[i].BlockSprite_->SetColor(blockColors_[i]);
+		gameSaveData_[i].BlockSprite_->SetScale(blockScales_[i]);
+		gameSaveData_[i].BlockSprite_->Update();
 		const float thumbnailHeight = std::max(1.0f, blockScales_[i].y - (kThumbnailMargin * 2.0f));
 		const float thumbnailWidth = thumbnailHeight * (16.0f / 9.0f);
 		const float left = blockPositions_[i].x - (blockScales_[i].x * 0.5f);
-		gameSaveData[i].GameSceneSprite_->SetPosition({left + kThumbnailMargin + (thumbnailWidth * 0.5f), blockPositions_[i].y});
-		gameSaveData[i].GameSceneSprite_->SetScale({thumbnailWidth, thumbnailHeight});
-		gameSaveData[i].GameSceneSprite_->Update();
+		gameSaveData_[i].GameSceneSprite_->SetPosition({left + kThumbnailMargin + (thumbnailWidth * 0.5f), blockPositions_[i].y});
+		gameSaveData_[i].GameSceneSprite_->SetScale({thumbnailWidth, thumbnailHeight});
+		gameSaveData_[i].GameSceneSprite_->Update();
 		text_->SetBlockLayout(i, blockPositions_[i], blockScales_[i]);
 	}
 
@@ -140,7 +140,7 @@ void GameContinued::Update() {
 
 void GameContinued::Draw() {
 	SpriteCommon::GetInstance()->DrawCommon();
-	for (auto& saveData : gameSaveData) {
+	for (auto& saveData : gameSaveData_) {
 		saveData.BlockSprite_->Draw();
 		saveData.GameSceneSprite_->Draw();
 	}
@@ -153,9 +153,9 @@ void GameContinued::SetSaveData(int index, const std::string& name, const std::s
 		return;
 	}
 
-	gameSaveData[index].Name_ = name;
-	gameSaveData[index].currentStageName_ = currentStageName;
-	gameSaveData[index].saveDateTime_ = saveDateTime;
+	gameSaveData_[index].Name_ = name;
+	gameSaveData_[index].currentStageName_ = currentStageName;
+	gameSaveData_[index].saveDateTime_ = saveDateTime;
 
 	if (text_) {
 		text_->SetSaveDataText(name, currentStageName, saveDateTime, index);

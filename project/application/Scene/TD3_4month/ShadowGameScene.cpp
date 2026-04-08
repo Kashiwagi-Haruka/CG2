@@ -77,8 +77,7 @@ ShadowGameScene::ShadowGameScene()
     elevator_ = std::make_unique<Elevator>();
     //セーブポイント紳士
     gentleman_ = std::make_unique<Gentleman>();
-    Gentleman::SetPlayerTransform(&player_->GetTransform());
-    Gentleman::SetProgressSaveData(&progressSaveData_);
+
     //エレベータールーム
     elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
 
@@ -86,6 +85,9 @@ ShadowGameScene::ShadowGameScene()
     collisionManager_ = std::make_unique<CollisionManager>();
     //UI管理
     uiManager_ = std::make_unique<UIManager>();
+    GentlemanMenu::SetPlayerCamera(cameraController_->GetPlayerCamera());
+    GentlemanMenu::SetPlayerTransform(&player_->GetTransform());
+    GentlemanMenu::SetProgressSaveData(&progressSaveData_);
     //最初のイベント
     firstEvent_ = std::make_unique<FirstGameEvent>();
     //PlayerCameraをセットする

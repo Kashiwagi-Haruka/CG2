@@ -5,9 +5,16 @@
 #include"ScreenSize/ScreenSize.h"
 #include"Color/Color.h"
 #include"GameObject/SEManager/SEManager.h"
+#include"GameSave/GameSave.h"
+#include"GameBase.h"
 
- bool GentlemanMenu::isShowMenu_ = false;
- uint32_t GentlemanMenu::selectButtonNum_ = GentlemanMenu::TALK;
+bool GentlemanMenu::isShowMenu_ = false;
+uint32_t GentlemanMenu::selectButtonNum_ = GentlemanMenu::TALK;
+bool GentlemanMenu::isShowSaveMenu_ = false;
+
+PlayerCamera* GentlemanMenu::playerCamera_ = nullptr;
+Transform* GentlemanMenu::playerTransform_ = nullptr;
+ProgressSaveData* GentlemanMenu::progressSaveData_ = nullptr;
 
 GentlemanMenu::GentlemanMenu()
 {
@@ -96,7 +103,6 @@ void GentlemanMenu::Update()
             if (selectButtonNum_ < menuText_.size() - 1) {
                 SEManager::SoundPlay(SEManager::PUSH_WATCH);
                 selectButtonNum_++;
-
             }
             menuText_[selectButtonNum_].StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
         }
@@ -117,6 +123,7 @@ void GentlemanMenu::Update()
         }
 
         triangleText_.UpdateLayout(false);
+
     } else {
         isShowStart_ = false;
     }
@@ -138,3 +145,13 @@ void GentlemanMenu::Draw()
 
 }
 
+void GentlemanMenu::Save(const int slotIndex)
+{
+    auto& save = GameSave::GetInstance();
+    save.CameraSave(playerCamera_->GetParam());
+    save.PlayerSave(*playerTransform_);
+    save.ProgressSave(*progressSaveData_);
+    std::string filename = "Resources/TD3_3102/2d/SaveScreenShot/" + std::to_string(slotIndex) + ".png";
+    GameBase::GetInstance()->SaveCurrentFrameScreenShot(filename.c_str());
+    save.Save(slotIndex);
+}
