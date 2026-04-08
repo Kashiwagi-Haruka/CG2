@@ -74,7 +74,6 @@ private:
 
 #pragma region // セーブ
     ProgressSaveData progressSaveData_;
-
 #pragma endregion
 #pragma region//ゲームオブジェクトの設定
     //Player

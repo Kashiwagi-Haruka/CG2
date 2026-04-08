@@ -8,161 +8,140 @@
 bool UIManager::isPause_ = false;
 
 void UIManager::TogglePause() {
-	// Tabキーでポーズ
-	isPause_ = (isPause_) ? false : true;
+    // Tabキーでポーズ
+    isPause_ = (isPause_) ? false : true;
 }
 
 UIManager::UIManager() {
-	// UIManager
-	textUIManager_ = std::make_unique<TextUIManager>();
-	menu_ = std::make_unique<Menu>();
-	raySprite_ = std::make_unique<RaySprite>();
-	tabKey_ = std::make_unique<TabKey>();
-	iDCard_ = std::make_unique<IDCard>();
+    // UIManager
+    textUIManager_ = std::make_unique<TextUIManager>();
+    menu_ = std::make_unique<Menu>();
+    raySprite_ = std::make_unique<RaySprite>();
+    tabKey_ = std::make_unique<TabKey>();
+    iDCard_ = std::make_unique<IDCard>();
 
-	keyIcon_ = std::make_unique<KeyIcon>();
-	lightIcon_ = std::make_unique<LightIcon>();
-	mission_ = std::make_unique<Mission>();
-	chairMenu_ = std::make_unique<ChairMenu>();
-	gentlemanMenu_ = std::make_unique<GentlemanMenu>();
-	gameContinued_ = std::make_unique<GameContinued>();
+    keyIcon_ = std::make_unique<KeyIcon>();
+    lightIcon_ = std::make_unique<LightIcon>();
+    mission_ = std::make_unique<Mission>();
+    chairMenu_ = std::make_unique<ChairMenu>();
+    gentlemanMenu_ = std::make_unique<GentlemanMenu>();
+
 }
 
 void UIManager::Initialize() {
-	isPause_ = false;
-	// UIManager
-	textUIManager_->Initialize();
-	menu_->Initialize();
-	raySprite_->Initialize();
-	tabKey_->Initialize();
-	iDCard_->Initialize();
-	keyIcon_->Initialize();
-	lightIcon_->Initialize();
-	mission_->Initialize();
-	chairMenu_->Initialize();
-	gentlemanMenu_->Initialize();
-	gameContinued_->Initialize();
+    isPause_ = false;
+    // UIManager
+    textUIManager_->Initialize();
+    menu_->Initialize();
+    raySprite_->Initialize();
+    tabKey_->Initialize();
+    iDCard_->Initialize();
+    keyIcon_->Initialize();
+    lightIcon_->Initialize();
+    mission_->Initialize();
+    chairMenu_->Initialize();
+    gentlemanMenu_->Initialize();
+
 }
 
 void UIManager::Update() {
-	// カーソルを画面中央に設定する
-	auto* input = Input::GetInstance();
+    // カーソルを画面中央に設定する
+    auto* input = Input::GetInstance();
 
-	if (input->TriggerKey(DIK_TAB)) {
+    if (input->TriggerKey(DIK_TAB)) {
 
-		TogglePause();
+        TogglePause();
 
-		if (isPause_) {
-			CursorShowAndMove();
-			//IDCardの数値を初期化
-			iDCard_->InitCount();
-		} else {
-			CursorHideAndStop();
-		}
-		SEManager::SoundPlay(SEManager::PUSH_WATCH);
-	}
+        if (isPause_) {
+            CursorShowAndMove();
+            //IDCardの数値を初期化
+            iDCard_->InitCount();
+        } else {
+            CursorHideAndStop();
+        }
+        SEManager::SoundPlay(SEManager::PUSH_WATCH);
+    }
 
-	if (isPause_) {
+    if (isPause_) {
 
-		menu_->Update();
-		const Menu::Action menuAction = menu_->ConsumePendingAction();
-		if (menuAction == Menu::Action::kResumeGame) {
-			isPause_ = false;
-			CursorHideAndStop();
-		} else if (menuAction == Menu::Action::kBackToTitle) {
-			isPause_ = false;
-			CursorHideAndStop();
-			SceneManager::GetInstance()->ChangeScene("Title");
-		} else if (menuAction == Menu::Action::kEndGame) {
-			PostQuitMessage(0);
-		}
-	}
+        menu_->Update();
+        const Menu::Action menuAction = menu_->ConsumePendingAction();
+        if (menuAction == Menu::Action::kResumeGame) {
+            isPause_ = false;
+            CursorHideAndStop();
+        } else if (menuAction == Menu::Action::kBackToTitle) {
+            isPause_ = false;
+            CursorHideAndStop();
+            SceneManager::GetInstance()->ChangeScene("Title");
+        } else if (menuAction == Menu::Action::kEndGame) {
+            PostQuitMessage(0);
+        }
+    }
 
-	// Text
-	textUIManager_->Update();
-	raySprite_->Update();
+    // Text
+    textUIManager_->Update();
+    raySprite_->Update();
 
-	if (isPause_) {
-		iDCard_->Update();
-	} else {
-		gentlemanMenu_->Update();
-		chairMenu_->Update();
+    if (isPause_) {
+        iDCard_->Update();
+    } else {
+        gentlemanMenu_->Update();
+        chairMenu_->Update();
 
-		if (GentlemanMenu::GetIsSaveMenuShow()) {
-			gameContinued_->Update();
-			if (gameContinued_->GetIsSelected()) {
-				int num = gameContinued_->GetCurrentSelectNum();
-				auto name  = GameSave::GetInstance().GetCurrentDateTimeString();
-				gameContinued_->SetSaveData(num, "SaveFile", "TestStage", name.c_str());
-				GentlemanMenu::Save(num);
-				GentlemanMenu::SetIsSaveMenuShow(false);
-				gameContinued_->SetIsSelected(false);
-			}
+    }
 
-		}
-	}
-
-	tabKey_->Update();
-	keyIcon_->Update();
-	lightIcon_->Update();
-	mission_->Update();
+    tabKey_->Update();
+    keyIcon_->Update();
+    lightIcon_->Update();
+    mission_->Update();
 }
 
 void UIManager::CloseOptionANdPrepareResume() {
-	if (isPause_ && menu_ && menu_->IsOptionOpen()) {
-		menu_->CloseOptionAndPrepareResume();
-	}
+    if (isPause_ && menu_ && menu_->IsOptionOpen()) {
+        menu_->CloseOptionAndPrepareResume();
+    }
 }
 
 void UIManager::CursorShowAndMove() {
-	// カーソルを画面中央に設定する
-	auto* input = Input::GetInstance();
-	input->SetIsCursorVisible(true);
-	input->SetIsCursorStability(false);
+    // カーソルを画面中央に設定する
+    auto* input = Input::GetInstance();
+    input->SetIsCursorVisible(true);
+    input->SetIsCursorStability(false);
 }
 
 void UIManager::CursorHideAndStop() { // カーソルを画面中央に設定する
-	auto* input = Input::GetInstance();
-	input->SetIsCursorVisible(false);
-	input->SetIsCursorStability(true);
+    auto* input = Input::GetInstance();
+    input->SetIsCursorVisible(false);
+    input->SetIsCursorStability(true);
 }
 
 void UIManager::Draw() {
-	
-	textUIManager_->Draw();
 
-	raySprite_->Draw();
+    textUIManager_->Draw();
 
-	if (Flashlight::IsGetLight()) {
-		lightIcon_->Draw();
-	}
+    raySprite_->Draw();
 
-	if (Key::IsGetKey()) {
-		keyIcon_->Draw();
-	}
+    if (Flashlight::IsGetLight()) {
+        lightIcon_->Draw();
+    }
 
-	if (ChairMenu::GetIsShowMenu()) {
-		chairMenu_->Draw();
-	}
+    if (Key::IsGetKey()) {
+        keyIcon_->Draw();
+    }
 
-	if (GentlemanMenu::GetIsShowMenu()) {
-		
-		gentlemanMenu_->Draw();
+    if (ChairMenu::GetIsShowMenu()) {
+        chairMenu_->Draw();
+    }
 
-	}
+    //紳士メニュー
+    gentlemanMenu_->Draw();
 
-	if (GentlemanMenu::GetIsSaveMenuShow()) {
-		gameContinued_->Draw();
-	}
+    if (isPause_) {
+        menu_->Draw();
+        iDCard_->Draw();
+    } else {
+        tabKey_->Draw();
+    }
 
-	if (isPause_) {
-		menu_->Draw();
-		iDCard_->Draw();
-	} else {
-		
-		tabKey_->Draw();
-	
-	}
-
-	mission_->Draw();
+    mission_->Draw();
 }

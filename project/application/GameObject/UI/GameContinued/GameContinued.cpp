@@ -8,6 +8,7 @@
 #include <algorithm>
 #include"GameObject/SEManager/SEManager.h"
 #include <cmath>
+#include"GameSave/GameSave.h"
 
 namespace {
 constexpr float kBlockWidth = 1040.0f;
@@ -25,6 +26,14 @@ Vector2 Lerp(const Vector2& start, const Vector2& end, float t) { return {Lerp(s
 
 Vector4 Lerp(const Vector4& start, const Vector4& end, float t) { return {Lerp(start.x, end.x, t), Lerp(start.y, end.y, t), Lerp(start.z, end.z, t), Lerp(start.w, end.w, t)}; }
 } // namespace
+
+void GameContinued::LoadAndSetSpriteHandle(const int index)
+{
+	auto& sprite = gameSaveData_.at(index).GameSceneSprite_;
+	auto fileName = GameSave::GetInstance().GetScreenShotFileName(index);
+	int screenTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(fileName);
+	sprite->SetTextureHandle(screenTextureHandle_);
+}
 
 void GameContinued::Initialize() {
 	int blockTextureHandle_ = 0;
