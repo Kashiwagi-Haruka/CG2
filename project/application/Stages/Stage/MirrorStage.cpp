@@ -1,6 +1,7 @@
 #include "MirrorStage.h"
 #include "Engine/base/DirectXCommon.h"
 #include <imgui.h>
+#include "GameObject/Player/Player.h"
 MirrorStage::MirrorStage() {
 
  // テスト地面
