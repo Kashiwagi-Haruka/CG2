@@ -29,13 +29,14 @@ class GameSave {
 public:
 
 private:
-    std::string saveDateTime_;                // セーブデータの保存日時
+    std::string saveDateTime_{};                // セーブデータの保存日時
     PlayerSaveData playerSaveData_{};     // プレイヤーのセーブデータ
     CameraSaveData cameraSaveData_{};     // カメラのセーブデータ
-    ProgressSaveData progressSaveData_{}; // 進行状況のセーブデータ
+    ProgressSaveData progressSaveData_; // 進行状況のセーブデータ
     bool isInitStart_ = false;
+    int selectSlotIndex_ = 0;
 private:
-    GameSave() {}  // コンストラクタを private にする
+    GameSave(); // コンストラクタを private にする
     ~GameSave() {}
 
 
@@ -54,15 +55,28 @@ public:
     //セーブデータをセットする
     void SetSaveDateTime(const std::string& saveDataTime) { saveDateTime_ = saveDataTime; }
     // 引数にスロット番号を追加
-    void Save(const int slotIndex = 0);  // セーブデータをファイルに保存する
-    void Load(const int slotIndex = 0);  // ファイルからセーブデータを読み込む
+    void Save(const int slotIndex);  // セーブデータをファイルに保存する
+    void Load(const int slotIndex);  // ファイルからセーブデータを読み込む
+
+
+    void InitData();
+
+
+    void SetSelectSlotIndex(const int selectSlotIndex) { selectSlotIndex_ = selectSlotIndex; }
+    const int GetSelectSlotIndex() { return selectSlotIndex_; }
     void Reset(); // セーブデータをリセットする
     void SetInitStart(const bool flag) { isInitStart_ = flag; }    //最初からスタートするかどうかのフラグをセットする
     bool GetInitStart() { return isInitStart_; }    //最初からスタートするかどうかのフラグを取得する
     const PlayerSaveData& GetPlayerSaveData() { return playerSaveData_; };     // プレイヤーのセーブデータ
     const CameraSaveData& GetCameraSaveData() { return cameraSaveData_; };     // カメラのセーブデータ
     const ProgressSaveData& GetProgressSaveData() { return progressSaveData_; }; // 進行状況のセーブデータ
-    std::string GetCurrentDateTimeString();
-    std::string GetFileName(const int slotIndex);
-    std::string GetScreenShotFileName(const int slotIndex);
+    const std::string GetCurrentDateTimeString();
+    const std::string GetFileName(const int slotIndex);
+    const std::string GetScreenShotFileName(const int slotIndex);
+    const std::string GetSaveDataTime() {return  saveDateTime_; }
+
+
+
+    // ファイルが存在するか確認するヘルパー（オプション）
+    bool IsFileExistsAndLoad(const int slotIndex);
 };

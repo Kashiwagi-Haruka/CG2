@@ -19,7 +19,6 @@ public:
 
 	// ルートオブジェクト内のキー検索
 	const nlohmann::json* Find(const std::string& key) const;
-
 private:
 	JsonManager() = default;
 	nlohmann::json data_;

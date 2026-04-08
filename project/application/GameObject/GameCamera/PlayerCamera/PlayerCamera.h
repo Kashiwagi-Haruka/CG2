@@ -15,6 +15,7 @@ public:
     Camera* GetCamera() { return camera_.get(); };
     Transform& GetTransform() { return param_.transform; }
     CameraSaveData& GetParam() { return param_; };
+    void SetParam(const CameraSaveData& param) { param_ = param; };
     //Rayをセットする
     void SetRay();
     Ray& GetRay() { return ray_; };

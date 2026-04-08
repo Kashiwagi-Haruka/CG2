@@ -104,23 +104,19 @@ ShadowGameScene::~ShadowGameScene()
 
 void ShadowGameScene::Initialize()
 {
+    uiManager_->Initialize();
     auto& gameSave = GameSave::GetInstance();
-    //一旦ここでロード
-    gameSave.Load();
 
     if (gameSave.GetInitStart()) {
-        //一旦最初のステージにしておく
-        progressSaveData_.currentStageName = "FirstStage";
-        progressSaveData_.isGameClear = false;
-        progressSaveData_.isKeyHave = false;
-        progressSaveData_.isLightHave = false;
+        gameSave.InitData();
     } else {
-        progressSaveData_ = gameSave.GetProgressSaveData();
+        //一旦ここでロード
+        gameSave.Load(gameSave.GetSelectSlotIndex());
     }
+    progressSaveData_ = gameSave.GetProgressSaveData();
 
     BGMManager::Initialize();
 
-    uiManager_->Initialize();
     damageOverlay_->Initialize();
 
     noiseTimer_ = kNoiseTimer_;
@@ -136,15 +132,13 @@ void ShadowGameScene::Initialize()
 
     //プレイヤーの初期化
     player_->Initialize();
-
-    if (!gameSave.GetInitStart()) {
-        player_->SetTransform(gameSave.GetPlayerSaveData().transform);
-    }
+    player_->SetTransform(gameSave.GetPlayerSaveData().transform);
 
     PlayerCommand::Initialize();
 
     //カメラコントローラー
     cameraController_->Initialize();
+    cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
 
     //フラッシュライト
     flashlight_->Initialize();
@@ -274,6 +268,7 @@ void ShadowGameScene::CheckCollision()
     //ホワイトボードとrayの当たり判定作成する
     portalManager_->CheckCollision();
     door_->CheckCollision();
+
     //コーヒー排出する
     if (vendingMac_->ConsumeInteractRequest()) {
         coffees_->StartSpill();

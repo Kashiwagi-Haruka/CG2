@@ -6,7 +6,6 @@
 #include"ScreenSize/ScreenSize.h"
 #include"Color/Color.h"
 #include"GameObject/SEManager/SEManager.h"
-#include"GameSave/GameSave.h"
 
 TitleMenuUI::TitleMenuUI()
 {
@@ -92,11 +91,10 @@ void TitleMenuUI::Update() {
 			if (selectButtonNum_ == START_TEXT) {
 				if (!isInitStart_) {
 					isInitStart_ = true;
-                    GameSave::GetInstance().SetInitStart(true);
 				}
 			} else if (selectButtonNum_ == CONTINUE_TEXT) {
 				isContinueTriggered_ = true;
-                GameSave::GetInstance().SetInitStart(false);
+   
             } else if (selectButtonNum_ == OPTION_TEXT) {
 
             }

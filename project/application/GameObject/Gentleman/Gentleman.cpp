@@ -92,9 +92,6 @@ void Gentleman::Update()
     CheckCollision();
     Animation();
     obj_->Update();
-
-
-
 }
 
 void Gentleman::Initialize()

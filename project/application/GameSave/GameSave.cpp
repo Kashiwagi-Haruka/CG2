@@ -1,5 +1,6 @@
 #include "GameSave.h"
 #include "Engine/Log/Logger.h"
+#include"Function.h"
 
 namespace {
     constexpr const char* kGameSaveFileName = "gameSave_";
@@ -53,23 +54,28 @@ namespace {
     }
 } // namespace
 
+GameSave::GameSave() {
+
+    InitData();
+}
+
 void GameSave::CameraSave(const CameraSaveData& saveData) {
     cameraSaveData_ = saveData;
 }
 
-std::string GameSave::GetFileName(const int slotIndex)
+const std::string GameSave::GetFileName(const int slotIndex)
 {
     std::string fileName = kGameSaveFileName + std::to_string(slotIndex) + ".json";
     return fileName;
 }
 
-std::string GameSave::GetScreenShotFileName(const int slotIndex)
+const std::string GameSave::GetScreenShotFileName(const int slotIndex)
 {
     std::string screenShotFileName = "Resources/TD3_3102/2d/SaveScreenShot/" + std::to_string(slotIndex) + ".png";
     return screenShotFileName;
 }
 
-std::string GameSave::GetCurrentDateTimeString()
+const std::string GameSave::GetCurrentDateTimeString()
 {
     // 1. 現在時刻（システムクロック）を取得
     auto now = std::chrono::system_clock::now();
@@ -88,7 +94,7 @@ std::string GameSave::GetCurrentDateTimeString()
     // 4. 文字列にフォーマット
     std::stringstream ss;
     // "%Y/%m/%d %H:%M:%S" -> 2024/05/2015:30:45
-    ss << std::put_time(&now_tm, "%Y/%m/%d\n%H:%M");
+    ss << std::put_time(&now_tm, "%Y/%m/%d\n%H:%M:%S");
 
     return ss.str();
 }
@@ -135,7 +141,7 @@ void GameSave::Load(const int slotIndex) {
 
     if (!jsonManager->LoadJson(fileName)) {
         Reset();
-        Save();
+        Save(slotIndex);
         return;
     }
 
@@ -172,18 +178,50 @@ void GameSave::Load(const int slotIndex) {
         }
     }
 
-    //Jsonファイルからセーブ時間を取得する
+    // Jsonファイルからセーブ時間を取得する (is_string であるべき箇所を修正)
     if (saveJson.contains("saveDateTime") && saveJson["saveDateTime"].is_object()) {
         const nlohmann::json& timeJson = saveJson["saveDateTime"];
-
-        if (timeJson.contains("saveDateTime") && timeJson["saveDateTime"].is_boolean()) {
+        if (timeJson.contains("saveDateTime") && timeJson["saveDateTime"].is_string()) {
             saveDateTime_ = timeJson["saveDateTime"].get<std::string>();
         }
     }
+}
+
+void GameSave::InitData()
+
+{    //一旦最初のステージにしておく
+    progressSaveData_.currentStageName = "FirstStage";
+    progressSaveData_.isGameClear = false;
+    progressSaveData_.isKeyHave = false;
+    progressSaveData_.isLightHave = false;
+
+    // 座標の初期化
+    playerSaveData_.transform = {
+        .scale{1.0f, 1.0f, 1.0f},
+        .rotate{0.0f,Function::kPi, 0.0f},
+        .translate{6.25f, 1.5f, 4.0f}
+    };
+
+    //カメラのセーブデータ
+    cameraSaveData_.transform = {
+        .scale = {1.0f,1.0f,1.0f},
+        .rotate = {0.0f,0.0f,0.0f},
+        .translate = {0.0f,0.0f,0.0f}
+    };
+
+    // セーブデータの保存日時
+    saveDateTime_ = GetCurrentDateTimeString();
 }
 
 void GameSave::Reset() {
     playerSaveData_ = {};
     cameraSaveData_ = {};
     progressSaveData_ = {};
+}
+
+// ファイル存在確認
+bool GameSave::IsFileExistsAndLoad(const int slotIndex) {
+    JsonManager* jsonManager = JsonManager::GetInstance();
+    std::string fileName = GetFileName(slotIndex);
+    return jsonManager->LoadJson(fileName);
 }
