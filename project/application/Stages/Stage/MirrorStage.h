@@ -94,6 +94,13 @@ class MirrorStage : public BaseStage {
 	std::array<AreaCommonLight, kMaxAreaLights> areaLights_{};
 	uint32_t activeAreaLightCount_ = 0;
 
+		const float kNoiseTimer_ = 0.5f;
+	float noiseTimer_ = kNoiseTimer_;
+	bool isNoise_ = false;
+	bool usePointShadow_ = false;
+	bool useSpotShadow_ = false;
+	bool useAreaShadow_ = false;
+
 public:
 
 	MirrorStage();

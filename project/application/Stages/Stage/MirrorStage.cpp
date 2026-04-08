@@ -1,5 +1,6 @@
 #include "MirrorStage.h"
-
+#include "Engine/base/DirectXCommon.h"
+#include <imgui.h>
 MirrorStage::MirrorStage() {
 
  // テスト地面
@@ -51,7 +52,10 @@ MirrorStage::MirrorStage() {
 	firstEvent_ = std::make_unique<FirstGameEvent>();
 }
 
-void MirrorStage::Initialize() { isStageEnd_ = false;
+void MirrorStage::Initialize() { 
+	isStageEnd_ = false;
+	noiseTimer_ = kNoiseTimer_;
+	isNoise_ = false;
 	// テスト地面
 	testField_->Initialize();
 	// ホワイトボード管理
@@ -344,4 +348,60 @@ void MirrorStage::InitializeLights() {
 	areaLights_[1].decay = 2.0f;
 }
 void MirrorStage::UpdateLight() {
+	spotLights_[0] = flashlight_->GetSpotLight();
+
+	pointLights_[2] = edamame_->GetPointLight();
+
+	areaLights_[2] = vendingMac_->GetAreaLight();
+	areaLights_[3] = wallManager_->GetAreaLight();
+	areaLights_[4] = wallManager2_->GetAreaLight();
+
+	areaLights_[5] = elevatorRoomManager_->GetAreaLight();
+	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
+	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
+	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
+	Object3dCommon::GetInstance()->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
+#ifdef USE_IMGUI
+	if (ImGui::TreeNode("Light")) {
+		ImGui::DragFloat3("Area0Position", &areaLights_[0].position.x, 0.1f);
+		ImGui::DragFloat3("Area1Position", &areaLights_[1].position.x, 0.1f);
+		ImGui::Checkbox("PointShadow", &usePointShadow_);
+		ImGui::Checkbox("SpotShadow", &useSpotShadow_);
+		ImGui::Checkbox("AreaShadow", &useAreaShadow_);
+		pointLights_[0].shadowEnabled = usePointShadow_ ? 1 : 0;
+		spotLights_[0].shadowEnabled = useSpotShadow_ ? 1 : 0;
+		areaLights_[0].shadowEnabled = useAreaShadow_ ? 1 : 0;
+		ImGui::TreePop();
+	}
+#endif
+}
+void MirrorStage::UpdatePostEffect() {
+	bool vignetteStrength = true;
+
+	Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(false);
+	Object3dCommon::GetInstance()->SetFullScreenSepiaEnabled(false);
+	Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength);
+	Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength);
+
+	for (auto& portal : portalManager_->GetPortals()) {
+		if (portal->GetIsPlayerHit()) {
+			if (!isNoise_) {
+				isNoise_ = true;
+			}
+		}
+	}
+
+	if (isNoise_) {
+		float randomNoiseScale = 1.0f;
+		noiseTimer_ -= YoshidaMath::kDeltaTime;
+		if (noiseTimer_ <= 0.0f) {
+			isNoise_ = false;
+			noiseTimer_ = kNoiseTimer_;
+		}
+	}
+	BlendMode randomNoiseBlendMode = kBlendModeSub;
+
+	Object3dCommon::GetInstance()->SetRandomNoiseEnabled(isNoise_);
+	Object3dCommon::GetInstance()->SetRandomNoiseScale(noiseTimer_);
+	Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode);
 }

@@ -31,9 +31,7 @@
 
 class ShadowGameScene : public BaseScene {
 private:
-	const float kNoiseTimer_ = 0.5f;
-	float noiseTimer_ = kNoiseTimer_;
-	bool isNoise_ = false;
+
 
 	std::unique_ptr<UIManager> uiManager_ = nullptr;
 
@@ -67,10 +65,7 @@ private:
     DirectionalCommonLight directionalLight_{};
 
 #pragma endregion
-    bool useDirectionalShadow_ = true;
-    bool usePointShadow_ = false;
-    bool useSpotShadow_ = false;
-    bool useAreaShadow_ = false;
+	bool useDirectionalShadow_ = true;
 
  	float playerHp_ = 3.0f;
 	static constexpr float kPlayerMaxHp_ = 3.0f;
