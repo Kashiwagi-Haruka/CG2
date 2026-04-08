@@ -23,7 +23,7 @@ public:
     static uint32_t GetSelectButtonNum() { return selectButtonNum_; }
     static void SetIsSaveMenuShow(const bool isShowSaveMenu) { isShowSaveMenu_ = isShowSaveMenu; }
     static bool GetIsSaveMenuShow() { return isShowSaveMenu_; }
-    void Save(const int slotIndex);
+    static void Save(const int slotIndex);
 
     static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
     static void SetPlayerTransform(Transform* transform) { playerTransform_ = transform; };

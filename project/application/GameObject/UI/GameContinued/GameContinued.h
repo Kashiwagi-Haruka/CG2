@@ -35,4 +35,5 @@ public:
 	void SetSaveData(int index, const std::string& name, const std::string& currentStageName, const std::string& saveDateTime);
 	int GetCurrentSelectNum() const { return currentSelectNum_; }
 	bool GetIsSelected() const { return isSelected_; }
+	void SetIsSelected(const bool isSelected) { isSelected_ = isSelected; }
 };
