@@ -406,5 +406,26 @@ void MirrorStage::UpdatePostEffect() {
 	Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode);
 }
 void MirrorStage::DrawModel() {
+	//=======================shadowマップの開始↓=======================
+	auto* object3dCommon = Object3dCommon::GetInstance();
+	const bool shadowFlags[4] = {useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_};
+	for (int i = 0; i < 4; ++i) {
+		if (!shadowFlags[i]) {
+			continue;
+		}
+		object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
+		object3dCommon->BeginShadowMapPass();
+		object3dCommon->DrawCommonShadow();
+		DrawGameObject(true, false, false);
+		object3dCommon->EndShadowMapPass();
+	}
+	object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
+	//=======================shadowマップの終了↑=======================
 
+	for (auto& portal : portalManager_->GetPortals()) {
+		portal->BeginRender();
+		auto* portalCamera = portal->GetCamera();
+		SetCameraAndDraw(portalCamera, false, false);
+		portal->TransitionToShaderResource();
+	}
 }
