@@ -17,11 +17,11 @@ MirrorStage::MirrorStage() {
 	coffees_ = std::make_unique<Coffees>();
 	// 携帯打刻機
 	timeCardWatch_ = std::make_unique<TimeCardWatch>();
-	timeCardWatch_->SetPlayer(player_.get());
+	timeCardWatch_->SetPlayer(player_);
 
 	// 懐中電灯
 	flashlight_ = std::make_unique<Flashlight>();
-	flashlight_->SetPlayer(player_.get());
+	flashlight_->SetPlayer(player_);
 	// 鍵管理
 	key_ = std::make_unique<Key>();
 	// 枝豆管理
@@ -106,7 +106,7 @@ void MirrorStage::Update() {
 		currentEvent_->Update();
 	}
 
-	portalManager_->WarpPlayer(player_.get());
+	portalManager_->WarpPlayer(player_);
 
 	// 携帯打刻機
 	timeCardWatch_->Update();
