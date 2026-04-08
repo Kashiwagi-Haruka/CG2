@@ -3,6 +3,11 @@
 #include "Transform.h"
 #include <string>
 
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+
 struct PlayerSaveData {
     Transform transform; // プレイヤーの位置、回転、拡縮
 };
@@ -29,6 +34,7 @@ private:
     GameSave() {}  // コンストラクタを private にする
     ~GameSave() {}
     std::string GetFileName(const int slotIndex);
+
 public:
     // コピー禁止
     GameSave(const GameSave&) = delete;
@@ -50,4 +56,5 @@ public:
     const PlayerSaveData& GetPlayerSaveData() { return playerSaveData_; };     // プレイヤーのセーブデータ
     const CameraSaveData& GetCameraSaveData() { return cameraSaveData_; };     // カメラのセーブデータ
     const ProgressSaveData& GetProgressSaveData() { return progressSaveData_; }; // 進行状況のセーブデータ
+    std::string GetCurrentDateTimeString();
 };

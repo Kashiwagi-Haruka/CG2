@@ -92,7 +92,8 @@ void UIManager::Update() {
 			gameContinued_->Update();
 			if (gameContinued_->GetIsSelected()) {
 				int num = gameContinued_->GetCurrentSelectNum();
-				gameContinued_->SetSaveData(num, "testName", "TestStage", "00:00");
+				auto name  = GameSave::GetInstance().GetCurrentDateTimeString();
+				gameContinued_->SetSaveData(num, "SaveFile", "TestStage", name.c_str());
 				GentlemanMenu::Save(num);
 				GentlemanMenu::SetIsSaveMenuShow(false);
 				gameContinued_->SetIsSelected(false);
