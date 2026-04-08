@@ -113,6 +113,7 @@ public:
 	private:
 	void CheckCollision();
 	void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle);
+	void DrawModel();
 	void SetPlayerCamera(PlayerCamera* camera);
 	void SetSceneCameraForDraw(Camera* camera);
 	void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle);

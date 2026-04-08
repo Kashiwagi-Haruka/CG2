@@ -405,3 +405,6 @@ void MirrorStage::UpdatePostEffect() {
 	Object3dCommon::GetInstance()->SetRandomNoiseScale(noiseTimer_);
 	Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode);
 }
+void MirrorStage::DrawModel() {
+
+}
