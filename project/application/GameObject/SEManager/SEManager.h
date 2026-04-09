@@ -31,5 +31,6 @@ public:
 	static void SetVol(float vol, const Data& data);
 	static void SoundPlay(const Data& data, const bool loop = false);
 	static void UnLoad();
+	static void StopSound(const Data& data);
 	static bool IsSoundFinished(const Data& data);
 };
