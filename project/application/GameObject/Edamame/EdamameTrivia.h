@@ -12,6 +12,7 @@ private:
     static bool isDraw_;
    static bool isDie_;
     bool isEnd_ = true;
+    uint32_t count_ = 0;
 public:
     EdamameTrivia();
     ~EdamameTrivia();
