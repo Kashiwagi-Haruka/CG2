@@ -6,7 +6,6 @@
 #include"ScreenSize/ScreenSize.h"
 #include"Color/Color.h"
 #include"GameObject/SEManager/SEManager.h"
-#include"GameSave/GameSave.h"
 
 TitleMenuUI::TitleMenuUI()
 {
@@ -59,12 +58,7 @@ TitleMenuUI::TitleMenuUI()
     pressSpaceText_.SetAlign(TextAlign::Center);
     pressSpaceText_.SetBlendMode(BlendMode::kBlendModeAdd);
 
-    dateText_.Initialize(menuFontHandle_);
-    dateText_.SetString(U"test");
-    dateText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH+64.0f,SCREEN_SIZE::HALF_HEIGHT });
-    dateText_.SetColor(COLOR::WHITE);
-    dateText_.SetAlign(TextAlign::Center);
-    dateText_.SetBlendMode(BlendMode::kBlendModeAdd);
+
    
 }
 
@@ -79,6 +73,7 @@ void TitleMenuUI::Initialize() {
     isContinueTriggered_ = false;
     selectButtonNum_ = 0;
     random_->SetMinMax(-8.0f, 8.0f);
+
 }
 
 void TitleMenuUI::Update() {
@@ -89,10 +84,6 @@ void TitleMenuUI::Update() {
 
     pressSpaceText_.SetColor({ 1.0f, 1.0f, 1.0f, fontAlpha });
     pressSpaceText_.UpdateLayout(false);
-
-    std::string  saveDateTime = GameSave::GetInstance().GetCurrentDateTimeString();
-    dateText_.SetString(std::u32string(saveDateTime.begin(), saveDateTime.end()));
-    dateText_.UpdateLayout(false);
 
     if (isInitStart_) {
         return;
@@ -188,7 +179,7 @@ void TitleMenuUI::Draw()
     if (isInitStart_) { return; }
     //スタートしてないとき
     titleText_.Draw();
-    dateText_.Draw();
+
 
     if (isShowMenu_) {
         triangleText_.Draw();
