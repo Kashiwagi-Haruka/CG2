@@ -16,6 +16,10 @@
 #include"GameSave/GameSave.h"
 
 namespace {
+
+    constexpr float kHpRegenPerSecond = 0.2f;
+    constexpr float kDamageCooldown = 0.7f;
+
     struct FootContactState {
         bool left = false;
         bool right = false;
@@ -95,12 +99,15 @@ void Player::Initialize() {
     //    .rotate{0.0f,Function::kPi, 0.0f},
     //    .translate{6.25f, 1.5f, 4.0f}
     //};
-   
+
     // 速度の初期化
     velocity_ = { 0.0f };
     forward_ = { 0.0f };
     soundTimer_ = 0.0f;
     moveSpeed_ = { 0.0f };
+
+    hp_ = kMaxHp_;
+    damageCooldownTimer_ = 0.0f;
 
     LoadParameters();
 
@@ -224,6 +231,26 @@ void Player::Debug() {
     }
     ImGui::End();
 #endif
+}
+
+void Player::UpdatePlayerDamage(const float deltaTime)
+{
+    damageCooldownTimer_ = std::max(0.0f, damageCooldownTimer_ - deltaTime);
+    hp_ = std::min(kMaxHp_, hp_ + (kHpRegenPerSecond * deltaTime));
+}
+
+void Player::ApplyPlayerDamage(float damageAmount)
+{
+    const float prevHp = hp_;
+    hp_ = std::max(0.0f, hp_ - damageAmount);
+    if (hp_ < prevHp) {
+        SEManager::SoundPlay(SEManager::DAMAGE);
+    }
+    if (hp_ > 1.0f && hp_ < kMaxHp_) {
+        hp_ = std::floor(hp_);
+    }
+
+    damageCooldownTimer_ = kDamageCooldown;
 }
 
 

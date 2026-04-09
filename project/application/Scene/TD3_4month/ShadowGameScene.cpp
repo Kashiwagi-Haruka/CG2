@@ -121,8 +121,7 @@ void ShadowGameScene::Initialize()
 
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;
-    playerHp_ = kPlayerMaxHp_;
-    damageCooldownTimer_ = 0.0f;
+
 
     //シーン遷移の設定
     transition_->Initialize(false);
@@ -530,24 +529,19 @@ void ShadowGameScene::UpdateGameObject()
 
 }
 void ShadowGameScene::UpdatePlayerDamage() {
+
     const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-    damageCooldownTimer_ = std::max(0.0f, damageCooldownTimer_ - deltaTime);
-
-    constexpr float kHpRegenPerSecond = 0.2f;
-    playerHp_ = std::min(kPlayerMaxHp_, playerHp_ + (kHpRegenPerSecond * deltaTime));
-
-    damageOverlay_->Update(deltaTime, playerHp_, kPlayerMaxHp_);
+    player_->UpdatePlayerDamage(deltaTime);
+    damageOverlay_->Update(deltaTime, player_->GetHP(), player_->GetMaxHP());
 
     constexpr float kCoffeeHitSpeedThreshold = 2.0f;
     constexpr float kPlayerHitRadius = 0.45f;
-    constexpr float kDamageCooldown = 0.7f;
 
-    if (damageCooldownTimer_ <= 0.0f && coffees_->CheckHitPlayer(player_->GetWorldPosition(), kPlayerHitRadius, kCoffeeHitSpeedThreshold)) {
-        ApplyPlayerDamage(1.0f);
-        damageCooldownTimer_ = kDamageCooldown;
+    if (player_->GetDamageCoolDownTimer() <= 0.0f && coffees_->CheckHitPlayer(player_->GetWorldPosition(), kPlayerHitRadius, kCoffeeHitSpeedThreshold)) {
+        player_->ApplyPlayerDamage(1.0f);
         damageOverlay_->StartDisplay();
 
-        if (playerHp_ <= 0.0f) {
+        if (player_->IsDie()) {
             if (!isTransitionOut_) {
                 transition_->Initialize(true);
                 isTransitionOut_ = true;
@@ -558,16 +552,6 @@ void ShadowGameScene::UpdatePlayerDamage() {
     }
 }
 
-void ShadowGameScene::ApplyPlayerDamage(float damageAmount) {
-    const float prevHp = playerHp_;
-    playerHp_ = std::max(0.0f, playerHp_ - damageAmount);
-    if (playerHp_ < prevHp) {
-        SEManager::SoundPlay(SEManager::DAMAGE);
-    }
-    if (playerHp_ > 1.0f && playerHp_ < kPlayerMaxHp_) {
-        playerHp_ = std::floor(playerHp_);
-    }
-}
 void ShadowGameScene::UpdateLight() {
 #pragma region // Lightを組み込む
 
