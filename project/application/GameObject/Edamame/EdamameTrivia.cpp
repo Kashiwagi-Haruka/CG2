@@ -31,6 +31,7 @@ EdamameTrivia::~EdamameTrivia()
 void EdamameTrivia::Initialize()
 {
     triviaNum_ = strings_.size() - 1;
+    count_ = 0;
     isSendStartTriviaMessage_ = false;
     isDraw_ = false;
     isDie_ = false;
@@ -45,20 +46,30 @@ void EdamameTrivia::Update()
         return;
     }
 
-
-    if (isEnd_ && Audio::GetInstance()->IsSoundFinished(triviaVoice_)) {
-        Audio::GetInstance()->SoundUnload(&triviaVoice_);
-        isDie_ = true;
-    }
-
     if (isEnd_) {
-        return;
-    }
+        //サウンドが自然に終了した時とインプットした時で分ける
+        if (PlayerCommand::GetInstance()->InteractTrigger()) {
+            count_++;
+        }
 
-    if (PlayerCommand::GetInstance()->InteractTrigger() || Audio::GetInstance()->IsSoundFinished(triviaVoice_) && triviaNum_ != strings_.size() - 1) {
-        SetSound();
-        if (triviaNum_ == strings_.size() - 1) {
-            isEnd_ = true;
+        if (Audio::GetInstance()->IsSoundFinished(triviaVoice_)&&
+            triviaNum_ == strings_.size() - 1) {
+            count_ = 2;
+        }
+
+        if (count_ > 1) {
+            Audio::GetInstance()->SoundUnload(&triviaVoice_);
+            isDie_ = true;
+        }
+    } else {
+
+        if (PlayerCommand::GetInstance()->InteractTrigger() || Audio::GetInstance()->IsSoundFinished(triviaVoice_) && triviaNum_ != strings_.size() - 1) {
+
+            SetSound();
+
+            if (triviaNum_ == strings_.size() - 1) {
+                isEnd_ = true;
+            }
         }
     }
 
