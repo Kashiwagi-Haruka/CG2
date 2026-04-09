@@ -30,6 +30,7 @@ void StageManager::Update() {
 		currentStageName_ = nextStageName_;
 		nextStageName_.clear();
 		stage_->SetStageManager(this);
+		stage_->SetPlayer(player_);
 		stage_->Initialize();
 	}
 
@@ -38,6 +39,7 @@ void StageManager::Update() {
 		currentStageName_ = nextStageName_;
 		nextStageName_.clear();
 		stage_->SetStageManager(this);
+		stage_->SetPlayer(player_);
 		stage_->Initialize();
 	}
 

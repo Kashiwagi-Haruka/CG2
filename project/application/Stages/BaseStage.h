@@ -1,6 +1,7 @@
 #pragma once
 
 class StageManager;
+class Player;
 
 class BaseStage {
 protected:
@@ -16,5 +17,6 @@ public:
 	virtual void Finalize() = 0;
 
 	virtual void SetStageManager(StageManager* stageManager) { stageManager_ = stageManager; }
+	virtual void SetPlayer(Player* player) { (void)player; }
 	virtual bool GetIsStageEnd() const { return isStageEnd_; }
 };

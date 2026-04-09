@@ -75,6 +75,7 @@ void ShadowGameScene::Initialize()
 
     //プレイヤーの初期化
     player_->Initialize();
+	stageManager_->SetPlayer(player_.get());
     PlayerCommand::Initialize();
 
     //カメラコントローラー

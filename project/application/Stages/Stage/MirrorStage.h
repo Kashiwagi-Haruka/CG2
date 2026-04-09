@@ -108,7 +108,7 @@ public:
 	void Update() override;
 	void Draw() override;
 	void Finalize() override;
-	void SetPlayer(Player* player) { player_ = player; }
+	void SetPlayer(Player* player) override;
 
 	private:
 	void CheckCollision();
