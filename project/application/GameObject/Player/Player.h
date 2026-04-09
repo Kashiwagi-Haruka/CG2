@@ -41,6 +41,10 @@ private:
     // プレイヤーのパラメータ
     PlayerParameters parameters_{};
     std::string parameterStatusMessage_{};
+    float hp_ = 3.0f;
+    static constexpr float kMaxHp_ = 3.0f;
+    float damageCooldownTimer_ = 0.0f;
+
 
     void SaveParameters();
     void LoadParameters();
@@ -100,4 +104,10 @@ public:
     void Draw();
     // デバック
     void Debug();
+    const float GetDamageCoolDownTimer() { return damageCooldownTimer_; }
+    const bool IsDie() { return hp_ <= 0.0f; };
+    const float GetHP() { return hp_; };
+    const float GetMaxHP() { return  kMaxHp_; }
+    void UpdatePlayerDamage(const float deltaTime);
+    void ApplyPlayerDamage(float damageAmount);
 };
