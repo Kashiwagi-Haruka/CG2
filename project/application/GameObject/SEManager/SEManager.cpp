@@ -23,6 +23,8 @@ void SEManager::Load() {
 	SEs_[DAMAGE] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/Damage.mp3");
 
 	SEs_[CLOCK] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/clock.mp3");
+	SEs_[CAN] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/cans.mp3");
+	SEs_[BOX] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/box.mp3");
 }
 
 void SEManager::Initialize() {
@@ -42,6 +44,9 @@ void SEManager::Initialize() {
 	SetVol(1.0f, DESK);
 	SetVol(0.25f, DAMAGE);
 	SetVol(0.25f, CLOCK);
+
+	SetVol(0.25f, CAN);
+	SetVol(0.25f, BOX);
 }
 
 void SEManager::Update() {}
