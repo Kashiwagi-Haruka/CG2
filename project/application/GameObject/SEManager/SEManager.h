@@ -20,6 +20,8 @@ public:
 		DESK,
 		DAMAGE,
 		CLOCK,
+		CAN,
+		BOX,
 	};
 
 private:
