@@ -67,9 +67,6 @@ private:
 #pragma endregion
 	bool useDirectionalShadow_ = true;
 
- 	float playerHp_ = 3.0f;
-	static constexpr float kPlayerMaxHp_ = 3.0f;
-	float damageCooldownTimer_ = 0.0f;
 	std::unique_ptr<DamageOverlay> damageOverlay_ = nullptr;
 	// ステージ管理
 	std::unique_ptr<StageManager> stageManager_ = nullptr;
@@ -108,8 +105,7 @@ private:
 	void UpdatePostEffect();
 	// ゲームオブジェクトの更新処理
 	void UpdateGameObject();
-	void UpdatePlayerDamage();
-	void ApplyPlayerDamage(float damageAmount);
+
     //ポイントライトの更新処理
     void UpdateLight();
     // =======================================

@@ -11,10 +11,6 @@
 #include"GameObject/KeyBindConfig.h"
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
-#include "GameObject/SEManager/SEManager.h"
-#include <algorithm>
-#include <cmath>
-
 
 ShadowGameScene::ShadowGameScene()
 {
@@ -62,10 +58,6 @@ void ShadowGameScene::Initialize()
 
     uiManager_->Initialize();
     damageOverlay_->Initialize();
-
-
-    playerHp_ = kPlayerMaxHp_;
-    damageCooldownTimer_ = 0.0f;
 
     //シーン遷移の設定
     transition_->Initialize(false);
@@ -124,7 +116,16 @@ void ShadowGameScene::Update() {
 
 	// ゲームオブジェクトの更新処理
 	UpdateGameObject();
-	UpdatePlayerDamage();
+	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+	damageOverlay_->Update(deltaTime, stageManager_->GetPlayerHp(), stageManager_->GetPlayerMaxHp());
+	if (stageManager_->DidPlayerTakeDamage()) {
+		damageOverlay_->StartDisplay();
+	}
+	if (stageManager_->IsPlayerDead() && !isTransitionOut_) {
+		transition_->Initialize(true);
+		isTransitionOut_ = true;
+		nextSceneName_ = "GameOver";
+	}
 	// オブジェクトの当たり判定
 	CheckCollision();
 }
@@ -215,11 +216,6 @@ void ShadowGameScene::UpdateSceneTransition() {
     }
 }
 
-void ShadowGameScene::UpdatePostEffect()
-{
- 
-}
-
 void ShadowGameScene::UpdateGameObject() {
 	// プレイヤー
 	player_->Update();
@@ -232,45 +228,6 @@ void ShadowGameScene::UpdateGameObject() {
 	gentleman_->Update();
 
 	ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
-}
-void ShadowGameScene::UpdatePlayerDamage() {
-    const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-    damageCooldownTimer_ = std::max(0.0f, damageCooldownTimer_ - deltaTime);
-
-    constexpr float kHpRegenPerSecond = 0.2f;
-    playerHp_ = std::min(kPlayerMaxHp_, playerHp_ + (kHpRegenPerSecond * deltaTime));
-
-    damageOverlay_->Update(deltaTime, playerHp_, kPlayerMaxHp_);
-
-    constexpr float kCoffeeHitSpeedThreshold = 2.0f;
-    constexpr float kPlayerHitRadius = 0.45f;
-    constexpr float kDamageCooldown = 0.7f;
-
-    if (damageCooldownTimer_ <= 0.0f && coffees_->CheckHitPlayer(player_->GetWorldPosition(), kPlayerHitRadius, kCoffeeHitSpeedThreshold)) {
-        ApplyPlayerDamage(1.0f);
-        damageCooldownTimer_ = kDamageCooldown;
-        damageOverlay_->StartDisplay();
-
-        if (playerHp_ <= 0.0f) {
-            if (!isTransitionOut_) {
-                transition_->Initialize(true);
-                isTransitionOut_ = true;
-                nextSceneName_ = "GameOver";
-            }
-            return;
-        }
-    }
-}
-
-void ShadowGameScene::ApplyPlayerDamage(float damageAmount) {
-    const float prevHp = playerHp_;
-    playerHp_ = std::max(0.0f, playerHp_ - damageAmount);
-    if (playerHp_ < prevHp) {
-        SEManager::SoundPlay(SEManager::DAMAGE);
-    }
-    if (playerHp_ > 1.0f && playerHp_ < kPlayerMaxHp_) {
-        playerHp_ = std::floor(playerHp_);
-    }
 }
 void ShadowGameScene::UpdateLight() {
 #pragma region // Lightを組み込む

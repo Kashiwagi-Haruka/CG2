@@ -26,4 +26,8 @@ public:
 	bool IsCurrentEventRunning() const;
 
 	const std::string& GetCurrentStageName() const { return currentStageName_; }
+	float GetPlayerHp() const;
+	float GetPlayerMaxHp() const;
+	bool DidPlayerTakeDamage() const;
+	bool IsPlayerDead() const;
 };

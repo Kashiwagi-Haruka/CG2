@@ -69,3 +69,30 @@ bool StageManager::IsCurrentEventRunning() const {
 
 	return stage_->IsCurrentEventRunning();
 }
+float StageManager::GetPlayerHp() const {
+	if (!stage_) {
+		return 0.0f;
+	}
+	return stage_->GetPlayerHp();
+}
+
+float StageManager::GetPlayerMaxHp() const {
+	if (!stage_) {
+		return 0.0f;
+	}
+	return stage_->GetPlayerMaxHp();
+}
+
+bool StageManager::DidPlayerTakeDamage() const {
+	if (!stage_) {
+		return false;
+	}
+	return stage_->DidPlayerTakeDamage();
+}
+
+bool StageManager::IsPlayerDead() const {
+	if (!stage_) {
+		return false;
+	}
+	return stage_->IsPlayerDead();
+}

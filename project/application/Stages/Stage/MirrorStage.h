@@ -100,9 +100,12 @@ class MirrorStage : public BaseStage {
 	bool usePointShadow_ = false;
 	bool useSpotShadow_ = false;
 	bool useAreaShadow_ = false;
+	float playerHp_ = 3.0f;
+	static constexpr float kPlayerMaxHp_ = 3.0f;
+	float damageCooldownTimer_ = 0.0f;
+	bool didTakeDamage_ = false;
 
 public:
-
 	MirrorStage();
 	void Initialize() override;
 	void Update() override;
@@ -110,8 +113,14 @@ public:
 	void Finalize() override;
 	void SetPlayer(Player* player) override;
 	bool IsCurrentEventRunning() const override;
+	float GetPlayerHp() const override { return playerHp_; }
+	float GetPlayerMaxHp() const override { return kPlayerMaxHp_; }
+	bool DidPlayerTakeDamage() const override { return didTakeDamage_; }
+	bool IsPlayerDead() const override { return playerHp_ <= 0.0f; }
 
-	private:
+private:
+	void UpdatePlayerDamage();
+	void ApplyPlayerDamage(float damageAmount);
 	void CheckCollision();
 	void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle);
 	void DrawModel();

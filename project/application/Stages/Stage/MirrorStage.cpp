@@ -1,7 +1,12 @@
+#define NOMINMAX
 #include "MirrorStage.h"
 #include "Engine/base/DirectXCommon.h"
 #include <imgui.h>
 #include "GameObject/Player/Player.h"
+#include "Object3d/Object3dCommon.h"
+#include "GameObject/SEManager/SEManager.h"
+#include <algorithm>
+#include <cmath>
 MirrorStage::MirrorStage() {
 
  // テスト地面
@@ -53,8 +58,11 @@ MirrorStage::MirrorStage() {
 	firstEvent_ = std::make_unique<FirstGameEvent>();
 }
 
-void MirrorStage::Initialize() { 
+void MirrorStage::Initialize() {
 	isStageEnd_ = false;
+	playerHp_ = kPlayerMaxHp_;
+	damageCooldownTimer_ = 0.0f;
+	didTakeDamage_ = false;
 	noiseTimer_ = kNoiseTimer_;
 	isNoise_ = false;
 	// テスト地面
@@ -102,6 +110,7 @@ void MirrorStage::Initialize() {
 }
 
 void MirrorStage::Update() {
+	didTakeDamage_ = false;
 	if (currentEvent_) {
 		currentEvent_->Update();
 	}
@@ -136,6 +145,7 @@ void MirrorStage::Update() {
 	});
 	coffees_->SetLaunchDirection(vendingForward);
 	coffees_->Update(Object3dCommon::GetInstance()->GetDefaultCamera(), {0.0f, 1.0f, 0.0f});
+	UpdatePlayerDamage();
 	// ドア
 	door_->Update();
 	// ロッカー
@@ -162,6 +172,35 @@ void MirrorStage::Update() {
 	pc_->Update();
 
 	CheckCollision();
+}
+
+void MirrorStage::UpdatePlayerDamage() {
+	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+	damageCooldownTimer_ = std::max(0.0f, damageCooldownTimer_ - deltaTime);
+
+	constexpr float kHpRegenPerSecond = 0.2f;
+	playerHp_ = std::min(kPlayerMaxHp_, playerHp_ + (kHpRegenPerSecond * deltaTime));
+
+	constexpr float kCoffeeHitSpeedThreshold = 2.0f;
+	constexpr float kPlayerHitRadius = 0.45f;
+	constexpr float kDamageCooldown = 0.7f;
+
+	if (damageCooldownTimer_ <= 0.0f && coffees_->CheckHitPlayer(player_->GetWorldPosition(), kPlayerHitRadius, kCoffeeHitSpeedThreshold)) {
+		ApplyPlayerDamage(1.0f);
+		damageCooldownTimer_ = kDamageCooldown;
+	}
+}
+
+void MirrorStage::ApplyPlayerDamage(float damageAmount) {
+	const float prevHp = playerHp_;
+	playerHp_ = std::max(0.0f, playerHp_ - damageAmount);
+	if (playerHp_ < prevHp) {
+		didTakeDamage_ = true;
+		SEManager::SoundPlay(SEManager::DAMAGE);
+	}
+	if (playerHp_ > 1.0f && playerHp_ < kPlayerMaxHp_) {
+		playerHp_ = std::floor(playerHp_);
+	}
 }
 
 void MirrorStage::Draw() {}
