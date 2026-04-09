@@ -465,10 +465,9 @@ void Player::Animation()
 
 
     if (PlayerCommand::GetInstance()->Shot()) {
-
-
-        desiredAnimationName = "ShotWatch";
-
+        if (PortalManager::GetCanMakePortal()) {
+            desiredAnimationName = "ShotWatch";
+        }
     } else {
 
         if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
