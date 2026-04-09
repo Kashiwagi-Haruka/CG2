@@ -60,9 +60,10 @@ void WallManager::Update()
 {
     plane_->SetEnableLighting(false);
     room1_->Update();
+    room1_->SetEnableLighting(true);
     roomMat_ = room1_->GetWorldMatrix();
     Matrix4x4 planeMat = Function::MakeAffineMatrix(plane_->GetTransform().scale, plane_->GetTransform().rotate, plane_->GetTransform().translate);
-    Function::Multiply(planeMat, roomMat_);
+
     plane_->SetWorldMatrix(planeMat);
     plane_->Update();
     Vector3 normal = YoshidaMath::GetForward(plane_->GetWorldMatrix());
@@ -72,12 +73,11 @@ void WallManager::Update()
 
     areaLight_.height = plane_->GetTransform().scale.y*0.5f;
 
+    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, { -7.0f ,0.0f,2.0f });
+    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, { 7.0f  ,0.0f,2.0f});
 
-    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, { 0.0f,2.0f,-7.0f });
-    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, { 0.0f,2.0f,7.0f });
-
-    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, { 7.0f,2.0f,0.0f });
-    walls_[3]->SetST({ 14.0f,4.0f,1.0f }, { -7.0f,2.0f,0.0f });
+    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, {2.0f,0.0f,-7.0f });
+    walls_[3]->SetST({ 14.0f,4.0f,1.0f }, {2.0f,0.0f, 7.0f});
 
     for (auto& wall : walls_) {
         wall->Update();

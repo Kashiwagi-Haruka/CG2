@@ -47,7 +47,6 @@ void WallManager2::Update()
     room1_->Update();
     //roomMat_ = room1_->GetWorldMatrix();
     Matrix4x4 planeMat = Function::MakeAffineMatrix(plane_->GetTransform().scale, plane_->GetTransform().rotate, plane_->GetTransform().translate);
-    Function::Multiply(planeMat, roomMat_);
     plane_->SetWorldMatrix(planeMat);
     plane_->Update();
     Vector3 normal = YoshidaMath::GetForward(plane_->GetWorldMatrix());
