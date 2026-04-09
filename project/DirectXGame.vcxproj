@@ -314,6 +314,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Text\GameContinuedText\GameContinuedText.cpp" />
     <ClCompile Include="application\GameObject\UI\IDCard.cpp" />
     <ClCompile Include="application\Text\GentlemanMenu\GentlemanMenu.cpp" />
+    <ClCompile Include="application\Text\TitleTimeText\TitleTimeText.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -500,6 +501,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Text\GameContinuedText\GameContinuedText.h" />
     <ClInclude Include="application\GameObject\UI\IDCard.h" />
     <ClInclude Include="application\Text\GentlemanMenu\GentlemanMenu.h" />
+    <ClInclude Include="application\Text\TitleTimeText\TitleTimeText.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

@@ -21,6 +21,8 @@ void SEManager::Load() {
 	SEs_[KEY] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/key.mp3");
 	SEs_[DESK] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/desk.mp3");
 	SEs_[DAMAGE] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/Damage.mp3");
+
+	SEs_[CLOCK] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/clock.mp3");
 }
 
 void SEManager::Initialize() {
@@ -39,6 +41,7 @@ void SEManager::Initialize() {
 	SetVol(0.5f, KEY);
 	SetVol(1.0f, DESK);
 	SetVol(0.25f, DAMAGE);
+	SetVol(0.25f, CLOCK);
 }
 
 void SEManager::Update() {}
@@ -55,20 +58,12 @@ void SEManager::SoundPlay(const Data& data, const bool loop) {
 }
 
 void SEManager::UnLoad() {
-	Audio::GetInstance()->SoundUnload(&SEs_[DOOR_LOCK]);
-	Audio::GetInstance()->SoundUnload(&SEs_[DOOR_OPEN]);
 
-	Audio::GetInstance()->SoundUnload(&SEs_[WARP]);
-	Audio::GetInstance()->SoundUnload(&SEs_[PORTAL_SPAWN]);
-	Audio::GetInstance()->SoundUnload(&SEs_[SHOT]);
-	Audio::GetInstance()->SoundUnload(&SEs_[PUSH_WATCH]);
-	Audio::GetInstance()->SoundUnload(&SEs_[NOISE]);
-	Audio::GetInstance()->SoundUnload(&SEs_[CHAIR]);
-	Audio::GetInstance()->SoundUnload(&SEs_[TYPE]);
-	Audio::GetInstance()->SoundUnload(&SEs_[VENDING_MAC]);
-	Audio::GetInstance()->SoundUnload(&SEs_[KEY]);
-	Audio::GetInstance()->SoundUnload(&SEs_[DESK]);
-	Audio::GetInstance()->SoundUnload(&SEs_[DAMAGE]);
+	auto* audio = Audio::GetInstance();
+
+	for (auto& [tag,seData]:SEs_) {
+		audio->SoundUnload(&seData);
+	}
 }
 
 void SEManager::StopSound(const Data& data)

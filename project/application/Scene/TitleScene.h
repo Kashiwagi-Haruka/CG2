@@ -13,16 +13,18 @@
 #include "Text/FirstStory/FirstStory.h"
 #include "Text/TItleMenu/TitleMenuUI.h"
 #include <memory>
+#include"Text/TitleTimeText/TitleTimeText.h"
+
 class GameBase;
 
 class TitleScene : public BaseScene {
 private:
-	SoundData BGMData_;
 	bool isTransitionIn = false;
 	bool isTransitionOut = false;
 	std::unique_ptr<SceneTransition> transition = nullptr;
 	std::unique_ptr<TitleMenuUI> titleMenuUI_ = nullptr;
 	std::unique_ptr<FirstStory> firstStory_ = nullptr;
+	std::unique_ptr<TitleTimeText> titleTimeText_ = nullptr;
 
 	std::unique_ptr<TimeCard> timeCard_ = nullptr;
 	std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;

@@ -45,8 +45,6 @@ void TitleScene::TransitionStart()
 
 TitleScene::TitleScene() {
 
-	BGMData_ = Audio::GetInstance()->SoundLoadFile("Resources/TD3_3102/Audio/SE/clock.mp3");
-	Audio::GetInstance()->SetSoundVolume(&BGMData_, 1.0f);
 	// カメラのインスタンス化
 	camera_ = std::make_unique<Camera>();
 	cameraDefaultPos_ = {0.0f, 0.0f, -0.3f};
@@ -57,6 +55,7 @@ TitleScene::TitleScene() {
 
 	titleMenuUI_ = std::make_unique<TitleMenuUI>();
 	firstStory_ = std::make_unique<FirstStory>();
+	titleTimeText_ = std::make_unique<TitleTimeText>();
 	gameContinued_ = std::make_unique<GameContinued>();
 	// ゲームオブジェクト
 	timeCard_ = std::make_unique<TimeCard>();
@@ -65,11 +64,10 @@ TitleScene::TitleScene() {
 	identityMat_ = Function::MakeIdentity4x4();
 }
 
-void TitleScene::Finalize() { Audio::GetInstance()->SoundUnload(&BGMData_); }
+void TitleScene::Finalize() { }
 
 void TitleScene::Initialize() {
 
-	Audio::GetInstance()->SoundPlayWave(BGMData_, true);
 
 	isTransitionIn = true;
 	isTransitionOut = false;
@@ -81,6 +79,7 @@ void TitleScene::Initialize() {
 	titleMenuUI_->Initialize();
 	firstStory_->Initialize();
 	gameContinued_->Initialize();
+	titleTimeText_->Initialize();
 	isGameContinuedOpen_ = false;
 
 	// カメラ
@@ -111,6 +110,8 @@ void TitleScene::Initialize() {
 }
 
 void TitleScene::Update() {
+
+	titleTimeText_->Update();
 
 	if (!isGameContinuedOpen_) {
 		titleMenuUI_->Update();
@@ -177,9 +178,16 @@ void TitleScene::Draw() {
 	SpriteCommon::GetInstance()->DrawCommonFont();
 	if (!isGameContinuedOpen_) {
 		titleMenuUI_->Draw();
+		
+		if (!titleMenuUI_->GetIsStart()) {
+			titleTimeText_->Draw();
+		}
+	
 	} else {
 		gameContinued_->Draw();
 	}
+
+
 	firstStory_->Draw();
 	FreeTypeManager::ResetFontUsage();
 	SpriteCommon::GetInstance()->DrawCommon();

@@ -33,10 +33,9 @@ private:
 	Text titleText_;
 	Text triangleText_;
 	Text pressSpaceText_;
-	Text dateText_;
+
 	std::array<Text, MAX_TEXT> menuText_;
 	float fontTheta_ = 0.0f;
-
 	std::unique_ptr<RandomClass> random_ = nullptr;
 	Vector2 titleDefaultPos_ = {0.0f};
 #pragma endregion
