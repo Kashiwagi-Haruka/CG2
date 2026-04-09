@@ -71,6 +71,12 @@ void SEManager::UnLoad() {
 	Audio::GetInstance()->SoundUnload(&SEs_[DAMAGE]);
 }
 
+void SEManager::StopSound(const Data& data)
+{
+	assert(SEs_.contains(data));
+	Audio::GetInstance()->StopSound(SEs_[data]);
+}
+
 bool SEManager::IsSoundFinished(const Data& data) {
 	assert(SEs_.contains(data));
 	return Audio::GetInstance()->IsSoundFinished(SEs_[data]);

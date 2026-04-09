@@ -30,7 +30,7 @@ VendingMac::VendingMac()
 
 VendingMac::~VendingMac()
 {
-
+    SEManager::StopSound(SEManager::NOISE);
 }
 
 void VendingMac::OnCollision(Collider* collider)
