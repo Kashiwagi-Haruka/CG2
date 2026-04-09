@@ -60,6 +60,7 @@ void WallManager::Update()
 {
     plane_->SetEnableLighting(false);
     room1_->Update();
+    room1_->SetEnableLighting(true);
     roomMat_ = room1_->GetWorldMatrix();
     Matrix4x4 planeMat = Function::MakeAffineMatrix(plane_->GetTransform().scale, plane_->GetTransform().rotate, plane_->GetTransform().translate);
     Function::Multiply(planeMat, roomMat_);
