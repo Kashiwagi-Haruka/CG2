@@ -65,9 +65,10 @@ void ShadowGameScene::Initialize()
     isTransitionOut_ = false;
     nextSceneName_.clear();
 
-    //プレイヤーの初期化
-    player_->Initialize();
+	// プレイヤーの初期化
+	player_->Initialize();
 	stageManager_->SetPlayer(player_.get());
+	stageManager_->SetElevatorManager(elevatorRoomManager_.get());
     PlayerCommand::Initialize();
 
     //カメラコントローラー

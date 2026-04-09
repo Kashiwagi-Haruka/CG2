@@ -5,12 +5,14 @@
 #include <string>
 
 class Player;
+class ElevatorRoomManager;
 
 class StageManager {
 private:
 	std::unique_ptr<BaseStage> stage_ = nullptr;
 	std::unique_ptr<BaseStage> nextStage_ = nullptr;
 	Player* player_ = nullptr;
+	ElevatorRoomManager* elevatorRoomManager_ = nullptr;
 	std::string currentStageName_;
 	std::string nextStageName_;
 
@@ -22,6 +24,7 @@ public:
 	void Draw();
 
 	void SetPlayer(Player* player) { player_ = player; }
+	void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) { elevatorRoomManager_ = elevatorRoomManager; }
 	void ChangeStage(const std::string& stageName);
 	bool IsCurrentEventRunning() const;
 

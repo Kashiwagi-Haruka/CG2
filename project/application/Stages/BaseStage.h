@@ -2,6 +2,7 @@
 
 class StageManager;
 class Player;
+class ElevatorRoomManager;
 
 class BaseStage {
 protected:
@@ -18,11 +19,11 @@ public:
 
 	virtual void SetStageManager(StageManager* stageManager) { stageManager_ = stageManager; }
 	virtual void SetPlayer(Player* player) { (void)player; }
+	virtual void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) { (void)elevatorRoomManager; }
 	virtual bool GetIsStageEnd() const { return isStageEnd_; }
 	virtual bool IsCurrentEventRunning() const { return false; }
 	virtual float GetPlayerHp() const { return 0.0f; }
 	virtual float GetPlayerMaxHp() const { return 0.0f; }
 	virtual bool DidPlayerTakeDamage() const { return false; }
 	virtual bool IsPlayerDead() const { return false; }
-};
 };

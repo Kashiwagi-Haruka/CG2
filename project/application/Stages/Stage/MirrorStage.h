@@ -85,6 +85,7 @@ class MirrorStage : public BaseStage {
 	GameEvent* currentEvent_ = nullptr;
 
 	Player* player_ = nullptr;
+	ElevatorRoomManager* elevatorRoomManager_ = nullptr;
 	// PointLight
 	std::array<PointCommonLight, kMaxPointLights> pointLights_{};
 	uint32_t activePointLightCount_ = 0;
@@ -95,7 +96,7 @@ class MirrorStage : public BaseStage {
 	std::array<AreaCommonLight, kMaxAreaLights> areaLights_{};
 	uint32_t activeAreaLightCount_ = 0;
 
-		const float kNoiseTimer_ = 0.5f;
+	const float kNoiseTimer_ = 0.5f;
 	float noiseTimer_ = kNoiseTimer_;
 	bool isNoise_ = false;
 	bool usePointShadow_ = false;
@@ -113,6 +114,7 @@ public:
 	void Draw() override;
 	void Finalize() override;
 	void SetPlayer(Player* player) override;
+	void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) override;
 	bool IsCurrentEventRunning() const override;
 	float GetPlayerHp() const override { return playerHp_; }
 	float GetPlayerMaxHp() const override { return kPlayerMaxHp_; }
@@ -124,7 +126,6 @@ private:
 	void ApplyPlayerDamage(float damageAmount);
 	void CheckCollision();
 	void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle);
-	void DrawModel();
 	void SetPlayerCamera(PlayerCamera* camera);
 	void SetSceneCameraForDraw(Camera* camera);
 	void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle);

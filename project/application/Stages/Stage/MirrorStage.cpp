@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include "GameObject/Player/Player.h"
 #include "Object3d/Object3dCommon.h"
+#include "GameObject/Elevator/ElevatorRoomManager.h"
 #include "GameObject/SEManager/SEManager.h"
 #include <algorithm>
 #include <cmath>
@@ -206,6 +207,7 @@ void MirrorStage::ApplyPlayerDamage(float damageAmount) {
 void MirrorStage::Draw() {}
 
 void MirrorStage::Finalize() {}
+void MirrorStage::SetPlayer(Player* player) { player_ = player; }
 bool MirrorStage::IsCurrentEventRunning() const { return currentEvent_ != nullptr && currentEvent_->IsRunning(); }
 void MirrorStage::CheckCollision() {
 	// ホワイトボードとrayの当たり判定作成する
@@ -217,7 +219,6 @@ void MirrorStage::CheckCollision() {
 	}
 
 	collisionManager_->ClearColliders();
-	
 
 	for (auto& portal : portalManager_->GetPortals()) {
 		if (!portal->GetIsPlayerHit()) {
@@ -250,7 +251,11 @@ void MirrorStage::CheckCollision() {
 	for (auto& box : boxManager_->GetBoxes()) {
 		collisionManager_->AddCollider(box.get());
 	}
-
+	if (elevatorRoomManager_) {
+		for (auto& wall : elevatorRoomManager_->GetWalls()) {
+			collisionManager_->AddCollider(wall.get());
+		}
+	}
 
 	collisionManager_->AddCollider(vendingMac_.get());
 	collisionManager_->AddCollider(flashlight_.get());
@@ -267,45 +272,49 @@ void MirrorStage::CheckCollision() {
 void MirrorStage::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle) {
 	// テスト地面
 	testField_->Draw();
-	//壁管理
+	// 壁管理
 	wallManager_->Draw();
-	//壁管理
+	// 壁管理
 	wallManager2_->Draw();
-	//自販機
+	// 自販機
 	vendingMac_->Draw();
 	// コーヒー缶
 	coffees_->Draw();
-	//ドア
+	// ドア
 	door_->Draw();
-	//ロッカー
+	// ロッカー
 	lockerManager_->Draw();
-	//机
+	// 机
 	deskManager_->Draw();
-	//PC
+	// PC
 	pc_->Draw();
-	//携帯打刻機の描画処理
+	// 携帯打刻機の描画処理
 	timeCardWatch_->Draw();
-	//懐中電灯
+	// 懐中電灯
 	flashlight_->Draw();
 	// 鍵の描画処理
 	key_->Draw();
 	// 枝豆の描画処理
 	edamame_->Draw();
-	//椅子の描画
+	// 椅子の描画
 	chairManager_->Draw();
-	//打刻機
+	// 打刻機
 	timeCard_->Draw();
-	//タイムカードラック
+	// タイムカードラック
 	timeCardRack_->Draw();
-	//箱管理
+	// 箱管理
 	boxManager_->Draw();
+	// エレベータールーム
+	if (elevatorRoomManager_) {
+		elevatorRoomManager_->Draw();
+	}
 
 	// ホワイトボード管理の描画
 	whiteBoardManager_->Draw();
 	// ポータル管理の描画
 	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
-void MirrorStage::SetPlayerCamera(PlayerCamera * playerCamera) {
+void MirrorStage::SetPlayerCamera(PlayerCamera* playerCamera) {
 	portalManager_->SetPlayerCamera(playerCamera);
 	key_->SetPlayerCamera(playerCamera);
 	edamame_->SetPlayerCamera(playerCamera);
@@ -316,7 +325,7 @@ void MirrorStage::SetPlayerCamera(PlayerCamera * playerCamera) {
 	lockerManager_->SetPlayerCamera(playerCamera);
 	deskManager_->SetPlayerCamera(playerCamera);
 	boxManager_->SetPlayerCamera(playerCamera);
-	pc_->SetPlayerCamera(playerCamera);	
+	pc_->SetPlayerCamera(playerCamera);
 }
 void MirrorStage::SetSceneCameraForDraw(Camera* camera) {
 	testField_->SetCamera(camera);
@@ -337,6 +346,9 @@ void MirrorStage::SetSceneCameraForDraw(Camera* camera) {
 	timeCard_->SetCamera(camera);
 	timeCardRack_->SetCamera(camera);
 	boxManager_->SetCamera(camera);
+	if (elevatorRoomManager_) {
+		elevatorRoomManager_->SetCamera(camera);
+	}
 }
 void MirrorStage::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle) {
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera);
@@ -387,6 +399,9 @@ void MirrorStage::InitializeLights() {
 	areaLights_[1].radius = 4.0f;
 	areaLights_[1].decay = 2.0f;
 }
+void MirrorStage::SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) {
+	elevatorRoomManager_ = elevatorRoomManager;
+}
 void MirrorStage::UpdateLight() {
 	spotLights_[0] = flashlight_->GetSpotLight();
 
@@ -395,8 +410,9 @@ void MirrorStage::UpdateLight() {
 	areaLights_[2] = vendingMac_->GetAreaLight();
 	areaLights_[3] = wallManager_->GetAreaLight();
 	areaLights_[4] = wallManager2_->GetAreaLight();
-
-	areaLights_[5] = elevatorRoomManager_->GetAreaLight();
+	if (elevatorRoomManager_) {
+		areaLights_[5] = elevatorRoomManager_->GetAreaLight();
+	}
 	Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
 	Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
 	Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
