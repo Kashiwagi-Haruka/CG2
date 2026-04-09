@@ -15,6 +15,7 @@ PlayerCamera::PlayerCamera() {
     // カメラを生成する
     camera_ = std::make_unique<Camera>();
     camera_->SetFovY(0.44f);
+    camera_->SetNearClip(0.2f);
     // Rayの設定
     ray_ = { .origin = {0.0f}, .diff = {0.0f} };
 
@@ -90,8 +91,8 @@ void PlayerCamera::SetHeadTransform()
     param_.transform.rotate.y = player_->GetTransform().rotate.y;
     param_.transform.rotate.z = 0.0f;
 
-    //Playerの頭
-    param_.transform.translate = player_->GetJointWorldPos("Head");
+    //Playerの目
+    param_.transform.translate = player_->GetJointWorldPos("CON.eyes");
 
     //if (揺れなし) {
     //     param_.transform.translate = player_->GetTransform().translate;

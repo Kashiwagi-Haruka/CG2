@@ -6,6 +6,7 @@
 #include "GameObject/WhiteBoard/WalkWhiteBoard.h"
 #include "Model/ModelManager.h"
 
+
 namespace {
     const constexpr uint32_t kMaxWhiteBoards = 4;
 }
@@ -50,6 +51,7 @@ void WhiteBoardManager::Update() {
 }
 
 void WhiteBoardManager::Draw() {
+
     for (auto& board : whiteBoards_) {
         board->Draw();
     }

@@ -9,7 +9,6 @@
 #include "RigidBody.h"
 #include"Audio.h"
 #include <memory>
-#include <string>
 
 class Camera;
 class Player : public YoshidaMath::Collider {
@@ -49,6 +48,7 @@ private:
     void SaveParameters();
     void LoadParameters();
 
+
     static constexpr const char* kLeftFootJointName = "foot.L";
     static constexpr const char* kRightFootJointName = "foot.R";
     static constexpr float kFootContactHalfWidth = 0.08f;
@@ -74,6 +74,7 @@ private:
 
 
 public:
+    SkinCluster& GetSkinCluster() { return skinCluster_; };
     Matrix4x4 GetJointMatrix(const char* jointName)const;
     Vector3 GetJointWorldPos(const char* jointName)const;
     void OnCollision(Collider* collider) override;

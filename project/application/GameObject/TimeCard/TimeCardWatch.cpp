@@ -18,7 +18,7 @@ TimeCardWatch::TimeCardWatch()
 void TimeCardWatch::Initialize()
 {
     modelObj_->Initialize();
-    transform_ = { .scale = {2.0f,2.0f,2.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.05f,0.0f} };
+    transform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.04f,0.0f} };
 }
 
 void TimeCardWatch::SetCamera(Camera* camera)

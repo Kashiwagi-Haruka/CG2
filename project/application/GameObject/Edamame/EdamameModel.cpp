@@ -176,5 +176,4 @@ void EdamameModel::Initialize()
 void EdamameModel::Draw()
 {
     obj_->Draw();
-
 }

@@ -132,9 +132,8 @@ void Elevator::Update() {
 }
 
 void Elevator::Draw() {
-    Object3dCommon::GetInstance()->DrawCommonSkinning();
+
     modelObj_->Draw();
-    Object3dCommon::GetInstance()->DrawCommon();
 
     for (auto& sys : autoLockSystems_) {
         sys->Draw();

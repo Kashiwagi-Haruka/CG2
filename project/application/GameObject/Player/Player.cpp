@@ -14,6 +14,7 @@
 #include <optional>
 #include"GameObject/SEManager/SEManager.h"
 #include"GameSave/GameSave.h"
+#include"GameObject/Portal/PortalManager.h"
 
 namespace {
 
@@ -83,8 +84,10 @@ Player::Player() {
     SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionMat);
     // 体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
+  
     // モデルの読み込み
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
+  
 }
 void Player::SetCamera(Camera* camera) {
     // カメラのセット
@@ -124,6 +127,8 @@ void Player::Initialize() {
         bodyObj_->SetAnimation(idleAnimation, true);
     }
 
+
+
     if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("gentleman")) {
         skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
         skinCluster_ = CreateSkinCluster(*skeleton_, *sizukuModel);
@@ -134,7 +139,6 @@ void Player::Initialize() {
     //アニメーション
     Animation();
     bodyObj_->SetShininess(20.0f);
-
 }
 
 void Player::Update()
@@ -159,7 +163,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-    bodyObj_->Draw();
+    bodyObj_->Draw();  
 }
 
 void Player::Debug() {
@@ -440,6 +444,8 @@ void Player::Animation()
         loopAnimation = true;
     } else if (desiredAnimationName == "SitDown") {
         loopAnimation = false;
+    } else if (desiredAnimationName == "Sit") {
+        loopAnimation = true;
     } else if (desiredAnimationName == "AerialPegeon") {
         loopAnimation = false;
     } else if (desiredAnimationName == "Soft") {
@@ -447,20 +453,43 @@ void Player::Animation()
     } else if (desiredAnimationName == "Round") {
         loopAnimation = false;
     } else if (desiredAnimationName == "Tired") {
-        loopAnimation = true;
+        loopAnimation = false;
     } else if (desiredAnimationName == "Sleep") {
+        loopAnimation = true;
+    } else if (desiredAnimationName == "ShotWatch") {
+        loopAnimation = false;
+    } else if (desiredAnimationName == "HoldWatch") {
         loopAnimation = true;
     }
 
-    if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
 
-        if ((moveSpeed_ == parameters_.kWalkSpeed)) {
-            desiredAnimationName = "Walk";
-        } else if (moveSpeed_ == parameters_.kSneakSpeed) {
-            desiredAnimationName = "Sneak";
-        }
+
+    if (PlayerCommand::GetInstance()->Shot()) {
+
+
+        desiredAnimationName = "ShotWatch";
+
     } else {
-        desiredAnimationName = "Idle";
+
+        if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
+
+            if ((moveSpeed_ == parameters_.kWalkSpeed)) {
+                desiredAnimationName = "Walk";
+            } else if (moveSpeed_ == parameters_.kSneakSpeed) {
+                desiredAnimationName = "Sneak";
+            }
+        } else {
+
+            if (desiredAnimationName == "ShotWatch" && animationFinished_
+                || desiredAnimationName != "ShotWatch") {
+                if (PortalManager::GetCanMakePortal()) {
+                    desiredAnimationName = "HoldWatch";
+                } else {
+                    desiredAnimationName = "Idle";
+                }
+            }
+
+        }
     }
 
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();

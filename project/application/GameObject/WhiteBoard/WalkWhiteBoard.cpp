@@ -104,6 +104,7 @@ void WalkWhiteBoard::Update()
 void WalkWhiteBoard::Draw()
 {
     obj_->Draw();
+
 #ifdef _DEBUG
     primitive_->Draw();
 #endif
