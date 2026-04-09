@@ -109,6 +109,7 @@ public:
 	void Draw() override;
 	void Finalize() override;
 	void SetPlayer(Player* player) override;
+	bool IsCurrentEventRunning() const override;
 
 	private:
 	void CheckCollision();

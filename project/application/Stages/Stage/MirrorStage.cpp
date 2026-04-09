@@ -167,7 +167,7 @@ void MirrorStage::Update() {
 void MirrorStage::Draw() {}
 
 void MirrorStage::Finalize() {}
-
+bool MirrorStage::IsCurrentEventRunning() const { return currentEvent_ != nullptr && currentEvent_->IsRunning(); }
 void MirrorStage::CheckCollision() {
 	// ホワイトボードとrayの当たり判定作成する
 	portalManager_->CheckCollision();

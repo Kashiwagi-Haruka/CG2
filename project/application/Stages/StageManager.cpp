@@ -62,3 +62,10 @@ void StageManager::ChangeStage(const std::string& stageName) {
 	nextStage_ = std::move(nextStage);
 	nextStageName_ = stageName;
 }
+bool StageManager::IsCurrentEventRunning() const {
+	if (!stage_) {
+		return false;
+	}
+
+	return stage_->IsCurrentEventRunning();
+}

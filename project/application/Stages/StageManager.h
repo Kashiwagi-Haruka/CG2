@@ -23,6 +23,7 @@ public:
 
 	void SetPlayer(Player* player) { player_ = player; }
 	void ChangeStage(const std::string& stageName);
+	bool IsCurrentEventRunning() const;
 
 	const std::string& GetCurrentStageName() const { return currentStageName_; }
 };

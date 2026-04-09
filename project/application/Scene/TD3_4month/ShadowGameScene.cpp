@@ -104,50 +104,46 @@ void ShadowGameScene::Initialize()
 
 }
 
-void ShadowGameScene::Update()
-{
+void ShadowGameScene::Update() {
 	stageManager_->Update();
- 
-    //カメラの更新処理
-    UpdateCamera();
-    //ライトの更新処理
-    UpdateLight();
-    //ポストエフェクトの更新処理
-    UpdatePostEffect();
 
-    if (!currentEvent_->IsRunning()) {
-        //UI管理
-        uiManager_->Update();
-        PlayerCommand::SetIsUiInputLocked(UIManager::GetIsPause());
-        //シーン遷移の更新処理
-        UpdateSceneTransition();
-    }
+	// カメラの更新処理
+	UpdateCamera();
+	// ライトの更新処理
+	UpdateLight();
+	// ポストエフェクトの更新処理
+	UpdatePostEffect();
 
-    //ゲームオブジェクトの更新処理
-    UpdateGameObject();
-    UpdatePlayerDamage();
-    //オブジェクトの当たり判定
-    CheckCollision();
+	if (!stageManager_->IsCurrentEventRunning()) {
+		// UI管理
+		uiManager_->Update();
+		PlayerCommand::SetIsUiInputLocked(UIManager::GetIsPause());
+		// シーン遷移の更新処理
+		UpdateSceneTransition();
+	}
 
-
+	// ゲームオブジェクトの更新処理
+	UpdateGameObject();
+	UpdatePlayerDamage();
+	// オブジェクトの当たり判定
+	CheckCollision();
 }
 
-void ShadowGameScene::Draw()
-{
+void ShadowGameScene::Draw() {
 	stageManager_->Draw();
-    //ゲームオブジェクトの描画処理
-    DrawModel();
+	// ゲームオブジェクトの描画処理
+	DrawModel();
 
-    //スプライト共通
-    SpriteCommon::GetInstance()->DrawCommon();
-    damageOverlay_->Draw();
-    if (!currentEvent_->IsRunning()) {
-        //UI管理を描画する
-        uiManager_->Draw();
-    }
+	// スプライト共通
+	SpriteCommon::GetInstance()->DrawCommon();
+	damageOverlay_->Draw();
+	if (!stageManager_->IsCurrentEventRunning()) {
+		// UI管理を描画する
+		uiManager_->Draw();
+	}
 
-    //シーン遷移の描画処理
-    DrawSceneTransition();
+	// シーン遷移の描画処理
+	DrawSceneTransition();
 }
 
 void ShadowGameScene::Finalize()
