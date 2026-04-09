@@ -34,6 +34,7 @@
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 
 class Player;
+class ElevatorRoomManager;
 
 class MirrorStage : public BaseStage {
 
