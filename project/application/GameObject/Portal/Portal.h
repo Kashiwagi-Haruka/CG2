@@ -68,6 +68,6 @@ private:
     std::unique_ptr<WarpPos> warpPos_ = nullptr;
     std::unique_ptr<RenderTexture2D> portalRenderTexture_ = nullptr;
     Transform* parentTransform = nullptr;
-    float canWarpAngleRange_ = -0.707f;// ≒1/√2
+    float canWarpAngleRange_ = -0.5f;
 };
 
