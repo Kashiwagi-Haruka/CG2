@@ -54,6 +54,8 @@ void Gentleman::Animation()
         loopAnimation = true;
     } else if (desiredAnimationName == "Tired") {
         loopAnimation = false;
+    }else if (desiredAnimationName == "Sit") {
+        loopAnimation = true;
     }
 
 
@@ -136,7 +138,7 @@ void Gentleman::CheckCollision()
 
     if (PlayerCommand::GetInstance()->MouseWheelUp()) {
 
-        if (animationNum < 6) {
+        if (animationNum < 7) {
             animationNum++;
         } else {
             animationNum = 0;
@@ -159,6 +161,8 @@ void Gentleman::CheckCollision()
         animationName = "Soft";
     } else if (animationNum == 6) {
         animationName = "Tired";
+    } else if (animationNum == 7) {
+        animationName = "Sit";
     }
 
     //rayの当たり判定

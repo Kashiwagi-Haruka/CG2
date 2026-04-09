@@ -175,6 +175,7 @@ void EdamameModel::Initialize()
 
 void EdamameModel::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommonSkinningToon();
     obj_->Draw();
-
+    Object3dCommon::GetInstance()->DrawCommon();
 }

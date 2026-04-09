@@ -14,6 +14,7 @@
 #include <optional>
 #include"GameObject/SEManager/SEManager.h"
 #include"GameSave/GameSave.h"
+#include"GameObject/Portal/PortalManager.h"
 
 namespace {
 
@@ -440,6 +441,8 @@ void Player::Animation()
         loopAnimation = true;
     } else if (desiredAnimationName == "SitDown") {
         loopAnimation = false;
+    } else if (desiredAnimationName == "Sit") {
+        loopAnimation = true;
     } else if (desiredAnimationName == "AerialPegeon") {
         loopAnimation = false;
     } else if (desiredAnimationName == "Soft") {
@@ -447,20 +450,43 @@ void Player::Animation()
     } else if (desiredAnimationName == "Round") {
         loopAnimation = false;
     } else if (desiredAnimationName == "Tired") {
-        loopAnimation = true;
+        loopAnimation = false;
     } else if (desiredAnimationName == "Sleep") {
+        loopAnimation = true;
+    } else if (desiredAnimationName == "ShotWatch") {
+        loopAnimation = false;
+    } else if (desiredAnimationName == "HoldWatch") {
         loopAnimation = true;
     }
 
-    if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
 
-        if ((moveSpeed_ == parameters_.kWalkSpeed)) {
-            desiredAnimationName = "Walk";
-        } else if (moveSpeed_ == parameters_.kSneakSpeed) {
-            desiredAnimationName = "Sneak";
-        }
+
+    if (PlayerCommand::GetInstance()->Shot()) {
+
+
+            desiredAnimationName = "ShotWatch";
+        
     } else {
-        desiredAnimationName = "Idle";
+
+        if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
+
+            if ((moveSpeed_ == parameters_.kWalkSpeed)) {
+                desiredAnimationName = "Walk";
+            } else if (moveSpeed_ == parameters_.kSneakSpeed) {
+                desiredAnimationName = "Sneak";
+            }
+        } else {
+
+            if (desiredAnimationName == "ShotWatch"&& animationFinished_
+                || desiredAnimationName != "ShotWatch") {
+                if (PortalManager::GetCanMakePortal()) {
+                    desiredAnimationName = "HoldWatch";
+                } else {
+                    desiredAnimationName = "Idle";
+                }
+            }
+
+        }
     }
 
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();

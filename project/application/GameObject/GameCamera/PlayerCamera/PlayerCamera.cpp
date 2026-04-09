@@ -90,8 +90,8 @@ void PlayerCamera::SetHeadTransform()
     param_.transform.rotate.y = player_->GetTransform().rotate.y;
     param_.transform.rotate.z = 0.0f;
 
-    //Playerの頭
-    param_.transform.translate = player_->GetJointWorldPos("Head");
+    //Playerの目
+    param_.transform.translate = player_->GetJointWorldPos("CON.eyes");
 
     //if (揺れなし) {
     //     param_.transform.translate = player_->GetTransform().translate;
