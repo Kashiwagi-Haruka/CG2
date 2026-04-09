@@ -6,6 +6,7 @@
 #include"ScreenSize/ScreenSize.h"
 #include"Color/Color.h"
 #include"GameObject/SEManager/SEManager.h"
+#include"GameSave/GameSave.h"
 
 TitleMenuUI::TitleMenuUI()
 {
@@ -57,6 +58,14 @@ TitleMenuUI::TitleMenuUI()
     pressSpaceText_.SetColor(COLOR::WHITE);
     pressSpaceText_.SetAlign(TextAlign::Center);
     pressSpaceText_.SetBlendMode(BlendMode::kBlendModeAdd);
+
+    dateText_.Initialize(menuFontHandle_);
+    dateText_.SetString(U"test");
+    dateText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH+64.0f,SCREEN_SIZE::HALF_HEIGHT });
+    dateText_.SetColor(COLOR::WHITE);
+    dateText_.SetAlign(TextAlign::Center);
+    dateText_.SetBlendMode(BlendMode::kBlendModeAdd);
+   
 }
 
 TitleMenuUI::~TitleMenuUI()
@@ -65,53 +74,57 @@ TitleMenuUI::~TitleMenuUI()
 }
 
 void TitleMenuUI::Initialize() {
-	isShowMenu_ = false;
-	isInitStart_ = false;
-	isContinueTriggered_ = false;
-	selectButtonNum_ = 0;
-	random_->SetMinMax(-8.0f, 8.0f);
+    isShowMenu_ = false;
+    isInitStart_ = false;
+    isContinueTriggered_ = false;
+    selectButtonNum_ = 0;
+    random_->SetMinMax(-8.0f, 8.0f);
 }
 
 void TitleMenuUI::Update() {
 
-	fontTheta_ += SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime() * Function::kPi;
-	fontTheta_ = fmodf(fontTheta_, Function::kPi * 2.0f);
-	float fontAlpha = std::sinf(fontTheta_) * 0.5f + 0.5f;
+    fontTheta_ += SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime() * Function::kPi;
+    fontTheta_ = fmodf(fontTheta_, Function::kPi * 2.0f);
+    float fontAlpha = std::sinf(fontTheta_) * 0.5f + 0.5f;
 
-	pressSpaceText_.SetColor({1.0f, 1.0f, 1.0f, fontAlpha});
-	pressSpaceText_.UpdateLayout(false);
+    pressSpaceText_.SetColor({ 1.0f, 1.0f, 1.0f, fontAlpha });
+    pressSpaceText_.UpdateLayout(false);
 
-	if (isInitStart_) {
-		return;
-	}
+    std::string  saveDateTime = GameSave::GetInstance().GetCurrentDateTimeString();
+    dateText_.SetString(std::u32string(saveDateTime.begin(), saveDateTime.end()));
+    dateText_.UpdateLayout(false);
 
-	if (PlayerCommand::GetInstance()->Shot() || PlayerCommand::GetInstance()->UiInteractTrigger()) {
-		SEManager::SoundPlay(SEManager::PUSH_WATCH);
-		if (isShowMenu_) {
-			if (selectButtonNum_ == START_TEXT) {
-				if (!isInitStart_) {
-					isInitStart_ = true;
-				}
-			} else if (selectButtonNum_ == CONTINUE_TEXT) {
-				isContinueTriggered_ = true;
-   
+    if (isInitStart_) {
+        return;
+    }
+
+    if (PlayerCommand::GetInstance()->Shot() || PlayerCommand::GetInstance()->UiInteractTrigger()) {
+        SEManager::SoundPlay(SEManager::PUSH_WATCH);
+        if (isShowMenu_) {
+            if (selectButtonNum_ == START_TEXT) {
+                if (!isInitStart_) {
+                    isInitStart_ = true;
+                }
+            } else if (selectButtonNum_ == CONTINUE_TEXT) {
+                isContinueTriggered_ = true;
+
             } else if (selectButtonNum_ == OPTION_TEXT) {
 
             }
 
-		} else {
-			isShowMenu_ = true;
-			for (auto& text : menuText_) {
-				text.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-			}
-		}
-	}
+        } else {
+            isShowMenu_ = true;
+            for (auto& text : menuText_) {
+                text.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
+            }
+        }
+    }
 
     if (isShowMenu_) {
 
         auto* playerCommand = PlayerCommand::GetInstance();
 
-        if (playerCommand->MoveForwardTrigger()|| playerCommand->MouseWheelDown()) {
+        if (playerCommand->MoveForwardTrigger() || playerCommand->MouseWheelDown()) {
             if (selectButtonNum_ > 0) {
                 SEManager::SoundPlay(SEManager::PUSH_WATCH);
                 selectButtonNum_--;
@@ -119,7 +132,7 @@ void TitleMenuUI::Update() {
             menuText_[selectButtonNum_].StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
         }
 
-        if (playerCommand->MoveBackwardTrigger()|| playerCommand->MouseWheelUp()) {
+        if (playerCommand->MoveBackwardTrigger() || playerCommand->MouseWheelUp()) {
             if (selectButtonNum_ < menuText_.size() - 1) {
                 SEManager::SoundPlay(SEManager::PUSH_WATCH);
                 selectButtonNum_++;
@@ -160,20 +173,22 @@ void TitleMenuUI::Update() {
 
 }
 bool TitleMenuUI::ConsumeContinueTriggered() {
-	if (!isContinueTriggered_) {
-		return false;
-	}
+    if (!isContinueTriggered_) {
+        return false;
+    }
 
-	isContinueTriggered_ = false;
-	return true;
+    isContinueTriggered_ = false;
+    return true;
 }
 void TitleMenuUI::Draw()
 {
     pressSpaceText_.Draw();
 
+
     if (isInitStart_) { return; }
     //スタートしてないとき
     titleText_.Draw();
+    dateText_.Draw();
 
     if (isShowMenu_) {
         triangleText_.Draw();

@@ -33,6 +33,7 @@ private:
 	Text titleText_;
 	Text triangleText_;
 	Text pressSpaceText_;
+	Text dateText_;
 	std::array<Text, MAX_TEXT> menuText_;
 	float fontTheta_ = 0.0f;
 
