@@ -122,7 +122,7 @@ void Gentleman::Initialize()
 
 void Gentleman::Draw()
 {
-    obj_->Draw();
+    obj_->Draw();        
 }
 
 

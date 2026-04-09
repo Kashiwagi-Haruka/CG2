@@ -106,6 +106,7 @@ void Desk::Initialize()
 
 void Desk::Draw()
 {
+
     obj_->Draw();
 }
 

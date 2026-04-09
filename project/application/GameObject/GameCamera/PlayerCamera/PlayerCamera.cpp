@@ -15,6 +15,7 @@ PlayerCamera::PlayerCamera() {
     // カメラを生成する
     camera_ = std::make_unique<Camera>();
     camera_->SetFovY(0.44f);
+    camera_->SetNearClip(0.2f);
     // Rayの設定
     ray_ = { .origin = {0.0f}, .diff = {0.0f} };
 

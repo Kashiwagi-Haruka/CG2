@@ -10,6 +10,7 @@
 #pragma endregion
 #pragma region //GameObject
 #include"GameObject/Player/Player.h"
+
 #include"GameObject/TestField/TestField.h"
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/WhiteBoard/WhiteBoardManager.h"
@@ -78,6 +79,7 @@ private:
 #pragma region//ゲームオブジェクトの設定
     //Player
     std::unique_ptr<Player> player_ = nullptr;
+
     //TestField
     std::unique_ptr<TestField> testField_ = nullptr;
     // ホワイトボード管理
@@ -193,9 +195,9 @@ private:
     void DrawSceneTransition();
     //ゲームオブジェクトの描画処理
     void DrawModel();
-    void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer);
+    void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer,bool drawPlayerHead);
     void SetSceneCameraForDraw(Camera* camera);
     void SetPlayerCamera(PlayerCamera* playerCamera);
-    void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer);
+    void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer, bool drawPlayerHead);
 };
 

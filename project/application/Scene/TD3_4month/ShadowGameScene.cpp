@@ -80,7 +80,6 @@ ShadowGameScene::ShadowGameScene()
 
     //エレベータールーム
     elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
-
     //衝突管理
     collisionManager_ = std::make_unique<CollisionManager>();
     //UI管理
@@ -132,6 +131,7 @@ void ShadowGameScene::Initialize()
     //プレイヤーの初期化
     player_->Initialize();
     player_->SetTransform(gameSave.GetPlayerSaveData().transform);
+
 
     PlayerCommand::Initialize();
 
@@ -190,6 +190,7 @@ void ShadowGameScene::Initialize()
     gentleman_->Initialize();
     //エレベータールーム
     elevatorRoomManager_->Initialize();
+
     //カーソルを画面中央に設定する
     uiManager_->CursorHideAndStop();
     //カメラをセットする
@@ -197,6 +198,7 @@ void ShadowGameScene::Initialize()
 
     //最初のイベントをセットする
     currentEvent_ = firstEvent_.get();
+
 
     Update();
 
@@ -208,8 +210,7 @@ void ShadowGameScene::Update()
 {
 
     currentEvent_->Update();
-    //カメラの更新処理
-    UpdateCamera();
+
     //ライトの更新処理
     UpdateLight();
     //ポストエフェクトの更新処理
@@ -225,6 +226,10 @@ void ShadowGameScene::Update()
 
     //ゲームオブジェクトの更新処理
     UpdateGameObject();
+    //カメラの更新処理
+    UpdateCamera();
+    //ポータル管理 カメラの更新後に行う
+    portalManager_->Update();
     UpdatePlayerDamage();
     //オブジェクトの当たり判定
     CheckCollision();
@@ -492,8 +497,7 @@ void ShadowGameScene::UpdateGameObject()
     deskManager_->Update();
     // ホワイトボード管理
     whiteBoardManager_->Update();
-    //ポータル管理
-    portalManager_->Update();
+
     //打刻機
     timeCard_->SetTransform({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f}, { 8.0f, 1.0f, -7.0f } });
     timeCard_->Update();
@@ -607,7 +611,7 @@ void ShadowGameScene::DrawModel() {
         object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
         object3dCommon->BeginShadowMapPass();
         object3dCommon->DrawCommonShadow();
-        DrawGameObject(true, false, false, true);
+        DrawGameObject(true, false, false, true,true);
         object3dCommon->EndShadowMapPass();
     }
     object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
@@ -616,16 +620,16 @@ void ShadowGameScene::DrawModel() {
     for (auto& portal : portalManager_->GetPortals()) {
         portal->BeginRender();
         auto* portalCamera = portal->GetCamera();
-        SetCameraAndDraw(portalCamera, false, false, true);
+        SetCameraAndDraw(portalCamera, false, false, true,true);
         portal->TransitionToShaderResource();
 
     }
 
     Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-    SetCameraAndDraw(cameraController_->GetPlayerCamera()->GetCamera(), true, true, true);
+    SetCameraAndDraw(cameraController_->GetPlayerCamera()->GetCamera(), true, true, true,false);
 
 }
-void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer)
+void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer,bool drawPlayerHead)
 {
     // テスト地面
     testField_->Draw();
@@ -639,22 +643,13 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     vendingMac_->Draw();
     // コーヒー缶
     coffees_->Draw();
-    //ドア
-    door_->Draw();
-    //ロッカー
-    lockerManager_->Draw();
-    //机
-    deskManager_->Draw();
-    //PC
-    pc_->Draw();
+
     //携帯打刻機の描画処理
     timeCardWatch_->Draw();
     //懐中電灯
     flashlight_->Draw();
     // 鍵の描画処理
     key_->Draw();
-    // 枝豆の描画処理
-    edamame_->Draw();
     //椅子の描画
     chairManager_->Draw();
     //打刻機
@@ -663,22 +658,38 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     timeCardRack_->Draw();
     //箱管理
     boxManager_->Draw();
+    //ロッカー
+    lockerManager_->Draw();
+    
+    if (!isShadow) {
+        Object3dCommon::GetInstance()->DrawCommonSkinning();
+    }
+
+    //PC
+    pc_->Draw();
+    //ドア
+    door_->Draw();
+    //机
+    deskManager_->Draw();
+    // 枝豆の描画処理
+    edamame_->Draw();
     //エレベーター    
     elevator_->Draw();
     //セーブポイント紳士
     gentleman_->Draw();
-
-    if (!isShadow) {
-        Object3dCommon::GetInstance()->DrawCommonSkinning();
-    }
 
     if (drawPlayer) {
         // プレイヤーの描画処理
         player_->Draw();
     }
 
+    if (drawPlayerHead) {
+ 
+    }
+
     // ホワイトボード管理の描画
     whiteBoardManager_->Draw();
+
     // ポータル管理の描画
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
@@ -723,11 +734,11 @@ void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera)
     gentleman_->SetPlayerCamera(playerCamera);
     elevator_->SetPlayerCamera(playerCamera);
 }
-void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer)
+void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer,bool drawPlayerHead)
 {
     Object3dCommon::GetInstance()->SetDefaultCamera(camera);
     SetSceneCameraForDraw(camera);
     Object3dCommon::GetInstance()->DrawCommon();
-    DrawGameObject(false, drawPortal, isDrawParticle, drawPlayer);
+    DrawGameObject(false, drawPortal, isDrawParticle, drawPlayer, drawPlayerHead);
 }
 #pragma endregion

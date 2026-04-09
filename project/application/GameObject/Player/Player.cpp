@@ -84,8 +84,10 @@ Player::Player() {
     SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionMat);
     // 体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
+  
     // モデルの読み込み
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
+  
 }
 void Player::SetCamera(Camera* camera) {
     // カメラのセット
@@ -125,6 +127,8 @@ void Player::Initialize() {
         bodyObj_->SetAnimation(idleAnimation, true);
     }
 
+
+
     if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("gentleman")) {
         skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
         skinCluster_ = CreateSkinCluster(*skeleton_, *sizukuModel);
@@ -135,7 +139,6 @@ void Player::Initialize() {
     //アニメーション
     Animation();
     bodyObj_->SetShininess(20.0f);
-
 }
 
 void Player::Update()
@@ -160,7 +163,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-    bodyObj_->Draw();
+    bodyObj_->Draw();  
 }
 
 void Player::Debug() {
@@ -464,8 +467,8 @@ void Player::Animation()
     if (PlayerCommand::GetInstance()->Shot()) {
 
 
-            desiredAnimationName = "ShotWatch";
-        
+        desiredAnimationName = "ShotWatch";
+
     } else {
 
         if (fabs(velocity_.x) > 0.0f || fabs(velocity_.z) > 0.0f) {
@@ -477,7 +480,7 @@ void Player::Animation()
             }
         } else {
 
-            if (desiredAnimationName == "ShotWatch"&& animationFinished_
+            if (desiredAnimationName == "ShotWatch" && animationFinished_
                 || desiredAnimationName != "ShotWatch") {
                 if (PortalManager::GetCanMakePortal()) {
                     desiredAnimationName = "HoldWatch";
