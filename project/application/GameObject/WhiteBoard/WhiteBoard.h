@@ -24,6 +24,8 @@ public:
     virtual void ResetCollisionAttribute();
     //衝突マスクをセットするのとイニシャライズ
     virtual void SetCollisionAttributeNoneAndInitialize();
+    //面が向き合ってるか
+    bool IsFacingSurface(const Matrix4x4& cameraMat);
 protected:
     std::unique_ptr<Object3d>obj_ = nullptr;
 #ifdef _DEBUG
@@ -31,4 +33,6 @@ protected:
 #endif
     AABB localAABB_ = {};
     Transform collisionTransform_ = {};
+private:
+    const float kPortalCreatableAngleRange_ = 0.5f;
 };

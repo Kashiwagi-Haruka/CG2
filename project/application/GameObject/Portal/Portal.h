@@ -28,7 +28,7 @@ public:
     void Initialize();
     void Update();
     void SetCamera(Camera* camera);
-    Transform& GetTransform() {return transform_ ;};
+    Transform& GetTransform() { return transform_; };
     //PortalのSRTをセットする
     void SetParentTransform(Transform* transform) { parentTransform = transform; };
     void SetPortalWorldMatrix();
@@ -42,8 +42,10 @@ public:
     void DrawPortals();
     void DrawRings();
     bool GetIsPlayerHit() { return isPlayerHit_; };
+    bool IsVectorsFace(const Vector3& forward);
+    bool IsVectorFaceCameraAndObj();
 private:
-	bool ShouldProcessPortal() const;
+    bool ShouldProcessPortal() const;
     void UpdatePortalWorldMatrix();
     void SetRotateFromDirection(const Vector3& forward);
     void UpdateScale();
@@ -66,5 +68,6 @@ private:
     std::unique_ptr<WarpPos> warpPos_ = nullptr;
     std::unique_ptr<RenderTexture2D> portalRenderTexture_ = nullptr;
     Transform* parentTransform = nullptr;
+    float canWarpAngleRange_ = -0.707f;// ≒1/√2
 };
 

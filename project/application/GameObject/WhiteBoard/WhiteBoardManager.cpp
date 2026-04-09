@@ -75,6 +75,11 @@ WhiteBoard* WhiteBoardManager::CheckCollision(PlayerCamera* playerCamera) {
             continue;
         }
 
+        //ポータルとカメラが向き合っているかどうか
+        if (!board->IsFacingSurface(playerCamera->GetCamera()->GetWorldMatrix())) {
+            continue;
+        }
+
         if (board->GetCollisionAttribute() == kCollisionNone) {
             continue;
         }
