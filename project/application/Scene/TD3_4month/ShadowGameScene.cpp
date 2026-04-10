@@ -98,14 +98,12 @@ void ShadowGameScene::Initialize()
 }
 
 void ShadowGameScene::Update() {
-	stageManager_->Update();
+
 
 	// カメラの更新処理
 	UpdateCamera();
 	// ライトの更新処理
 	UpdateLight();
-	// ポストエフェクトの更新処理
-	UpdatePostEffect();
 
 	if (!stageManager_->IsCurrentEventRunning()) {
 		// UI管理
@@ -127,8 +125,10 @@ void ShadowGameScene::Update() {
 		isTransitionOut_ = true;
 		nextSceneName_ = "GameOver";
 	}
+	stageManager_->Update();
 	// オブジェクトの当たり判定
 	CheckCollision();
+	
 }
 
 void ShadowGameScene::Draw() {
@@ -174,17 +174,12 @@ void ShadowGameScene::CheckCollision()
     collisionManager_->CheckAllCollisions();
 }
 
-void ShadowGameScene::InitializeLights()
-{
+void ShadowGameScene::InitializeLights() {
 
-
-
-    directionalLight_.color = { 1.0f, 1.0f, 0.75f, 1.0f };
-    directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
-    directionalLight_.intensity = 0.25f;
-
- 
-
+	directionalLight_.color = {1.0f, 1.0f, 0.75f, 1.0f};
+	directionalLight_.direction = {0.0f, 1.0f, 0.0f};
+	directionalLight_.intensity = 0.25f;
+	stageManager_->SetDirectionalShadowEnabled(useDirectionalShadow_);
 }
 #pragma region //private更新処理
 void ShadowGameScene::UpdateCamera()
@@ -233,18 +228,17 @@ void ShadowGameScene::UpdateGameObject() {
 void ShadowGameScene::UpdateLight() {
 #pragma region // Lightを組み込む
 
-
-
-    Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
 
 #pragma endregion
 
 #ifdef USE_IMGUI
-    if (ImGui::TreeNode("DirectionalLight")) {
-        ImGui::Checkbox("DirectionalShadow", &useDirectionalShadow_);
-        ImGui::TreePop();
-    }
+	if (ImGui::TreeNode("DirectionalLight")) {
+		ImGui::Checkbox("DirectionalShadow", &useDirectionalShadow_);
+		ImGui::TreePop();
+	}
 #endif
+	stageManager_->SetDirectionalShadowEnabled(useDirectionalShadow_);
 }
 #pragma endregion
 

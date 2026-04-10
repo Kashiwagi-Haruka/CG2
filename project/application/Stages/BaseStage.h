@@ -8,6 +8,7 @@ class BaseStage {
 protected:
 	StageManager* stageManager_ = nullptr;
 	bool isStageEnd_ = false;
+	bool useDirectionalShadow_ = true;
 
 public:
 	virtual ~BaseStage() = default;
@@ -20,6 +21,7 @@ public:
 	virtual void SetStageManager(StageManager* stageManager) { stageManager_ = stageManager; }
 	virtual void SetPlayer(Player* player) { (void)player; }
 	virtual void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) { (void)elevatorRoomManager; }
+	virtual void SetDirectionalShadowEnabled(bool enabled) { useDirectionalShadow_ = enabled; }
 	virtual bool GetIsStageEnd() const { return isStageEnd_; }
 	virtual bool IsCurrentEventRunning() const { return false; }
 	virtual float GetPlayerHp() const { return 0.0f; }

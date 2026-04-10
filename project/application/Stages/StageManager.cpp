@@ -32,6 +32,7 @@ void StageManager::Update() {
 		stage_->SetStageManager(this);
 		stage_->SetPlayer(player_);
 		stage_->SetElevatorManager(elevatorRoomManager_);
+		stage_->SetDirectionalShadowEnabled(useDirectionalShadow_);
 		stage_->Initialize();
 	}
 
@@ -42,6 +43,7 @@ void StageManager::Update() {
 		stage_->SetStageManager(this);
 		stage_->SetPlayer(player_);
 		stage_->SetElevatorManager(elevatorRoomManager_);
+		stage_->SetDirectionalShadowEnabled(useDirectionalShadow_);
 		stage_->Initialize();
 	}
 
@@ -63,6 +65,16 @@ void StageManager::ChangeStage(const std::string& stageName) {
 
 	nextStage_ = std::move(nextStage);
 	nextStageName_ = stageName;
+}
+
+void StageManager::SetDirectionalShadowEnabled(bool enabled) {
+	useDirectionalShadow_ = enabled;
+	if (stage_) {
+		stage_->SetDirectionalShadowEnabled(enabled);
+	}
+	if (nextStage_) {
+		nextStage_->SetDirectionalShadowEnabled(enabled);
+	}
 }
 bool StageManager::IsCurrentEventRunning() const {
 	if (!stage_) {

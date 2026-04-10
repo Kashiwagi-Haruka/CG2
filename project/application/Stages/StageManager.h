@@ -13,6 +13,7 @@ private:
 	std::unique_ptr<BaseStage> nextStage_ = nullptr;
 	Player* player_ = nullptr;
 	ElevatorRoomManager* elevatorRoomManager_ = nullptr;
+	bool useDirectionalShadow_ = true;
 	std::string currentStageName_;
 	std::string nextStageName_;
 
@@ -25,6 +26,7 @@ public:
 
 	void SetPlayer(Player* player) { player_ = player; }
 	void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) { elevatorRoomManager_ = elevatorRoomManager; }
+	void SetDirectionalShadowEnabled(bool enabled);
 	void ChangeStage(const std::string& stageName);
 	bool IsCurrentEventRunning() const;
 
