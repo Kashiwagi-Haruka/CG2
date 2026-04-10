@@ -106,6 +106,7 @@ void MirrorStage::Initialize() {
 	flashlight_->Initialize();
 	// 箱管理
 	boxManager_->Initialize();
+	InitializeLights();
 	// 最初のイベントをセットする
 	currentEvent_ = firstEvent_.get();
 	currentEvent_->StartEvent();
@@ -500,6 +501,7 @@ void MirrorStage::DrawModel() {
 	}
 	if (mainCamera) {
 		object3dCommon->GetDxCommon()->SetMainRenderTarget();
+		Object3dCommon::GetInstance()->DrawCommon();
 		SetCameraAndDraw(mainCamera, true, true);
 	}
 }
