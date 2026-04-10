@@ -112,7 +112,8 @@ public:
 	MirrorStage();
 	void Initialize() override;
 	void Update() override;
-	void Draw() override;
+	void ShadowMapDraw() override;
+	void MainDraw() override;
 	void Finalize() override;
 	void SetPlayer(Player* player) override;
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
@@ -130,7 +131,6 @@ private:
 	void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle);
 	void SetSceneCameraForDraw(Camera* camera);
 	void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle);
-	void DrawModel();
 	void UpdateLight();
 	void UpdatePostEffect();
 	void InitializeLights();

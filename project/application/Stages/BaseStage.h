@@ -16,7 +16,8 @@ public:
 
 	virtual void Initialize() = 0;
 	virtual void Update() = 0;
-	virtual void Draw() = 0;
+	virtual void ShadowMapDraw() = 0;
+	virtual void MainDraw() = 0;
 	virtual void Finalize() = 0;
 
 	virtual void SetStageManager(StageManager* stageManager) { stageManager_ = stageManager; }

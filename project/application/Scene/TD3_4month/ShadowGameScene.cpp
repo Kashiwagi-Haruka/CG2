@@ -133,7 +133,19 @@ void ShadowGameScene::Update() {
 }
 
 void ShadowGameScene::Draw() {
-	stageManager_->Draw();
+	auto* object3dCommon = Object3dCommon::GetInstance();
+	const bool shadowFlags[4] = {useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_};
+	for (int i = 0; i < 4; ++i) {
+		if (!shadowFlags[i]) {
+			continue;
+		}
+		object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
+		object3dCommon->BeginShadowMapPass();
+		object3dCommon->DrawCommonShadow();
+		stageManager_->ShadowMapDraw();
+		object3dCommon->EndShadowMapPass();
+	}
+	object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
 	// ゲームオブジェクトの描画処理
 	DrawModel();
 
@@ -251,11 +263,9 @@ void ShadowGameScene::DrawSceneTransition() {
 }
 
 void ShadowGameScene::DrawModel() {
- 
-
-    Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-    SetCameraAndDraw(cameraController_->GetPlayerCamera()->GetCamera(), true, true, false);
-
+	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
+	stageManager_->MainDraw();
+	SetCameraAndDraw(cameraController_->GetPlayerCamera()->GetCamera(), true, true, false);
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {

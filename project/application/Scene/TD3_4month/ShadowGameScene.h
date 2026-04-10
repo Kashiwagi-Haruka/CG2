@@ -66,6 +66,9 @@ private:
 
 #pragma endregion
 	bool useDirectionalShadow_ = true;
+	bool usePointShadow_ = false;
+	bool useSpotShadow_ = false;
+	bool useAreaShadow_ = false;
 
 	std::unique_ptr<DamageOverlay> damageOverlay_ = nullptr;
 	// ステージ管理

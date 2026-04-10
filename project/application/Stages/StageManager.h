@@ -24,7 +24,8 @@ private:
 public:
 	void Finalize();
 	void Update();
-	void Draw();
+	void ShadowMapDraw();
+	void MainDraw();
 
 	void SetPlayer(Player* player) { player_ = player; }
 	void SetPlayerCamera(PlayerCamera* playerCamera) { playerCamera_ = playerCamera; }

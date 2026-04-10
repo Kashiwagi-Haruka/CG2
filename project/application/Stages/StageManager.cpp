@@ -54,9 +54,15 @@ void StageManager::Update() {
 	}
 }
 
-void StageManager::Draw() {
+void StageManager::ShadowMapDraw() {
 	if (stage_) {
-		stage_->Draw();
+		stage_->ShadowMapDraw();
+	}
+}
+
+void StageManager::MainDraw() {
+	if (stage_) {
+		stage_->MainDraw();
 	}
 }
 
