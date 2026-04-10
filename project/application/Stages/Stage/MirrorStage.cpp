@@ -205,7 +205,11 @@ void MirrorStage::ApplyPlayerDamage(float damageAmount) {
 	}
 }
 
-void MirrorStage::Draw() {}
+void MirrorStage::Draw() {
+	UpdateLight();
+	UpdatePostEffect();
+	DrawModel();
+}
 
 void MirrorStage::Finalize() {}
 void MirrorStage::SetPlayer(Player* player) {
@@ -473,6 +477,7 @@ void MirrorStage::UpdatePostEffect() {
 void MirrorStage::DrawModel() {
 	//=======================shadowマップの開始↓=======================
 	auto* object3dCommon = Object3dCommon::GetInstance();
+	Camera* mainCamera = object3dCommon->GetDefaultCamera();
 	const bool shadowFlags[4] = {useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_};
 	for (int i = 0; i < 4; ++i) {
 		if (!shadowFlags[i]) {
@@ -492,5 +497,9 @@ void MirrorStage::DrawModel() {
 		auto* portalCamera = portal->GetCamera();
 		SetCameraAndDraw(portalCamera, false, false);
 		portal->TransitionToShaderResource();
+	}
+	if (mainCamera) {
+		object3dCommon->GetDxCommon()->SetMainRenderTarget();
+		SetCameraAndDraw(mainCamera, true, true);
 	}
 }
