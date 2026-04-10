@@ -6,12 +6,14 @@
 
 class Player;
 class ElevatorRoomManager;
+class PlayerCamera;
 
 class StageManager {
 private:
 	std::unique_ptr<BaseStage> stage_ = nullptr;
 	std::unique_ptr<BaseStage> nextStage_ = nullptr;
 	Player* player_ = nullptr;
+	PlayerCamera* playerCamera_ = nullptr;
 	ElevatorRoomManager* elevatorRoomManager_ = nullptr;
 	bool useDirectionalShadow_ = true;
 	std::string currentStageName_;
@@ -25,6 +27,7 @@ public:
 	void Draw();
 
 	void SetPlayer(Player* player) { player_ = player; }
+	void SetPlayerCamera(PlayerCamera* playerCamera) { playerCamera_ = playerCamera; }
 	void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) { elevatorRoomManager_ = elevatorRoomManager; }
 	void SetDirectionalShadowEnabled(bool enabled);
 	void ChangeStage(const std::string& stageName);

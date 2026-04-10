@@ -114,6 +114,7 @@ public:
 	void Draw() override;
 	void Finalize() override;
 	void SetPlayer(Player* player) override;
+	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) override;
 	bool IsCurrentEventRunning() const override;
 	float GetPlayerHp() const override { return playerHp_; }
@@ -126,7 +127,6 @@ private:
 	void ApplyPlayerDamage(float damageAmount);
 	void CheckCollision();
 	void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle);
-	void SetPlayerCamera(PlayerCamera* camera);
 	void SetSceneCameraForDraw(Camera* camera);
 	void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle);
 	void DrawModel();

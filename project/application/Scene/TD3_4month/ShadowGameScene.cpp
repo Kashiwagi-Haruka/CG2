@@ -71,8 +71,9 @@ void ShadowGameScene::Initialize()
 	stageManager_->SetElevatorManager(elevatorRoomManager_.get());
     PlayerCommand::Initialize();
 
-    //カメラコントローラー
-    cameraController_->Initialize();
+	// カメラコントローラー
+	cameraController_->Initialize();
+	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
 
 
     InitializeLights();
