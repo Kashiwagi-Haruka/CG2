@@ -42,7 +42,7 @@ void Flashlight::Update()
 
     CheckCollision();
 
-    if (isGetLight_) {
+        if (isGetLight_ && player_) {
 
         transform_.translate = { 0.0f,0.1f,0.0f };
         transform_.rotate = { 0.0f,Function::kPi * 0.5f,0.0f };
@@ -134,7 +134,9 @@ void Flashlight::UpdateSpotLight()
 
 }
 
-bool Flashlight::OnCollisionRay()
-{
-     return playerCamera_->OnCollisionRay(GetAABB(), GetWorldPosition());
+bool Flashlight::OnCollisionRay() {
+	if (!playerCamera_) {
+		return false;
+	}
+	return playerCamera_->OnCollisionRay(GetAABB(), GetWorldPosition());
 }
