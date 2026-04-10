@@ -207,7 +207,15 @@ void MirrorStage::ApplyPlayerDamage(float damageAmount) {
 void MirrorStage::Draw() {}
 
 void MirrorStage::Finalize() {}
-void MirrorStage::SetPlayer(Player* player) { player_ = player; }
+void MirrorStage::SetPlayer(Player* player) {
+	player_ = player;
+	if (timeCardWatch_) {
+		timeCardWatch_->SetPlayer(player_);
+	}
+	if (flashlight_) {
+		flashlight_->SetPlayer(player_);
+	}
+}
 bool MirrorStage::IsCurrentEventRunning() const { return currentEvent_ != nullptr && currentEvent_->IsRunning(); }
 void MirrorStage::CheckCollision() {
 	// ホワイトボードとrayの当たり判定作成する
