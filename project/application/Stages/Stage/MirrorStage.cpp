@@ -3,6 +3,7 @@
 #include "Engine/base/DirectXCommon.h"
 #include <imgui.h>
 #include "GameObject/Player/Player.h"
+#include "GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include "Object3d/Object3dCommon.h"
 #include "GameObject/Elevator/ElevatorRoomManager.h"
 #include "GameObject/SEManager/SEManager.h"
@@ -329,6 +330,7 @@ void MirrorStage::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawPart
 	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 void MirrorStage::SetPlayerCamera(PlayerCamera* playerCamera) {
+	playerCamera_ = playerCamera;
 	portalManager_->SetPlayerCamera(playerCamera);
 	key_->SetPlayerCamera(playerCamera);
 	edamame_->SetPlayerCamera(playerCamera);
@@ -478,7 +480,7 @@ void MirrorStage::UpdatePostEffect() {
 void MirrorStage::DrawModel() {
 	//=======================shadowマップの開始↓=======================
 	auto* object3dCommon = Object3dCommon::GetInstance();
-	Camera* mainCamera = object3dCommon->GetDefaultCamera();
+	Camera* mainCamera = playerCamera_ ? playerCamera_->GetCamera() : object3dCommon->GetDefaultCamera();
 	const bool shadowFlags[4] = {useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_};
 	for (int i = 0; i < 4; ++i) {
 		if (!shadowFlags[i]) {

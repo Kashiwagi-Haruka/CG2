@@ -106,6 +106,7 @@ class MirrorStage : public BaseStage {
 	static constexpr float kPlayerMaxHp_ = 3.0f;
 	float damageCooldownTimer_ = 0.0f;
 	bool didTakeDamage_ = false;
+	PlayerCamera* playerCamera_ = nullptr;
 
 public:
 	MirrorStage();
