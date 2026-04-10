@@ -90,7 +90,7 @@ void ShadowGameScene::Initialize()
     //カメラをセットする
     SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
-
+    collisionManager_ = std::make_unique<CollisionManager>();
 
 	stageManager_->ChangeStage("MirrorStage");
     Update();
