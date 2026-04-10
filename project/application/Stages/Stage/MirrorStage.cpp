@@ -103,6 +103,7 @@ void MirrorStage::Initialize() {
 	timeCard_->Initialize();
 	// タイムカードラック
 	timeCardRack_->Initialize();
+	flashlight_->Initialize();
 	// 箱管理
 	boxManager_->Initialize();
 	// 最初のイベントをセットする
