@@ -33,6 +33,7 @@ public:
 private:
     bool OnCollisionRay();
 private:
+	bool isInitialized_ = false;
     Player* player_ = nullptr;
     PlayerCamera* playerCamera_ = nullptr;
     Transform transform_ = {};

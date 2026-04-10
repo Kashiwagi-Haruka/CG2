@@ -30,12 +30,12 @@ Vector3 Flashlight::GetWorldPosition() const
     return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
 }
 
-void Flashlight::SetCamera(Camera* camera)
-{
-    obj_->SetCamera(camera);
-    obj_->UpdateCameraMatrices();
+void Flashlight::SetCamera(Camera* camera) {
+	obj_->SetCamera(camera);
+	if (isInitialized_) {
+		obj_->UpdateCameraMatrices();
+	}
 }
-
 void Flashlight::Update()
 {
     isSendGetLightMessage_ = false;
@@ -74,16 +74,16 @@ void Flashlight::Update()
    
 }
 
-void Flashlight::Initialize()
-{
-    isGetLight_ = false;
-    isSendGetLightMessage_ = false;
-    isRayHit_ = false;
-    obj_->Initialize();
-    transform_.translate = {4.0f,0.1f,5.0f};
-    transform_.rotate = { 0.0f,0.0f,0.0f };
-    transform_.scale = { 1.0f,1.0f,1.0f };
-    SetLight();
+void Flashlight::Initialize() {
+	isGetLight_ = false;
+	isSendGetLightMessage_ = false;
+	isRayHit_ = false;
+	obj_->Initialize();
+	isInitialized_ = true;
+	transform_.translate = {4.0f, 0.1f, 5.0f};
+	transform_.rotate = {0.0f, 0.0f, 0.0f};
+	transform_.scale = {1.0f, 1.0f, 1.0f};
+	SetLight();
 }
 
 void Flashlight::Draw()
