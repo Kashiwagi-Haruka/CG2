@@ -117,6 +117,7 @@ public:
 	void Finalize() override;
 	void CheckCollision() override;
 	void SetPlayer(Player* player) override;
+	void SetCollisionManager(CollisionManager* collisionManager) override;
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) override;
 	bool IsCurrentEventRunning() const override;
