@@ -205,11 +205,11 @@ void ShadowGameScene::UpdateCamera()
 }
 
 void ShadowGameScene::UpdateSceneTransition() {
-    if (/*door_->GetOpenMassage() &&! */isTransitionOut_) {
-        transition_->Initialize(true);
-        isTransitionOut_ = true;
-        nextSceneName_ = "Result";
-    }
+    //if (/*door_->GetOpenMassage() &&! */isTransitionOut_) {
+    //    transition_->Initialize(true);
+    //    isTransitionOut_ = true;
+    //    nextSceneName_ = "Result";
+    //}
 
     if (isTransitionIn_ || isTransitionOut_) {
         transition_->Update();
@@ -264,6 +264,7 @@ void ShadowGameScene::DrawSceneTransition() {
 
 void ShadowGameScene::DrawModel() {
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
+	Object3dCommon::GetInstance()->DrawCommon();
 	stageManager_->MainDraw();
 	SetCameraAndDraw(cameraController_->GetPlayerCamera()->GetCamera(), true, true, false);
 }

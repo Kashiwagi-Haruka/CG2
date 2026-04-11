@@ -213,14 +213,13 @@ void MirrorStage::MainDraw() {
 	auto* object3dCommon = Object3dCommon::GetInstance();
 	Camera* mainCamera = playerCamera_ ? playerCamera_->GetCamera() : object3dCommon->GetDefaultCamera();
 
-	for (auto& portal : portalManager_->GetPortals()) {
-		portal->BeginRender();
-		auto* portalCamera = portal->GetCamera();
-		SetCameraAndDraw(portalCamera, false, false);
-		portal->TransitionToShaderResource();
-	}
+	//for (auto& portal : portalManager_->GetPortals()) {
+	//	portal->BeginRender();
+	//	auto* portalCamera = portal->GetCamera();
+	//	SetCameraAndDraw(portalCamera, false, false);
+	//	portal->TransitionToShaderResource();
+	//}
 	if (mainCamera) {
-		object3dCommon->GetDxCommon()->SetMainRenderTarget();
 		Object3dCommon::GetInstance()->DrawCommon();
 		SetCameraAndDraw(mainCamera, true, true);
 	}
