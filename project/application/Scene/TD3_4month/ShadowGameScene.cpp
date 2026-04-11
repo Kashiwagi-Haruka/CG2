@@ -267,7 +267,7 @@ void ShadowGameScene::DrawModel() {
 	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
 	Object3dCommon::GetInstance()->DrawCommon();
 	stageManager_->MainDraw();
-	SetCameraAndDraw(cameraController_->GetPlayerCamera()->GetCamera(), true, true, false);
+	SetCameraAndDraw(cameraController_->GetPlayerCamera()->GetCamera(), true, true, true);
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer)
 {
