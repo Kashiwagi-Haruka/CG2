@@ -115,6 +115,7 @@ public:
 	void ShadowMapDraw() override;
 	void MainDraw() override;
 	void Finalize() override;
+	void CheckCollision() override;
 	void SetPlayer(Player* player) override;
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) override;
@@ -127,7 +128,6 @@ public:
 private:
 	void UpdatePlayerDamage();
 	void ApplyPlayerDamage(float damageAmount);
-	void CheckCollision();
 	void DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle);
 	void SetSceneCameraForDraw(Camera* camera);
 	void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle);

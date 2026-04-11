@@ -19,6 +19,7 @@ public:
 	virtual void ShadowMapDraw() = 0;
 	virtual void MainDraw() = 0;
 	virtual void Finalize() = 0;
+	virtual void CheckCollision() {}
 
 	virtual void SetStageManager(StageManager* stageManager) { stageManager_ = stageManager; }
 	virtual void SetPlayer(Player* player) { (void)player; }

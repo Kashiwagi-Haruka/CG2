@@ -174,18 +174,19 @@ void ShadowGameScene::DebugImGui()
 #endif // USE_IMGUI
 }
 
-void ShadowGameScene::CheckCollision()
-{
+void ShadowGameScene::CheckCollision() {
+	stageManager_->CheckCollision();
 	collisionManager_->AddCollider(player_.get());
-    for (auto& wall : elevatorRoomManager_->GetWalls()) {
-        collisionManager_->AddCollider(wall.get());
-    }
+	for (auto& wall : elevatorRoomManager_->GetWalls()) {
+		collisionManager_->AddCollider(wall.get());
+	}
 	for (auto& system : elevator_->GetAutoLockSys()) {
 		collisionManager_->AddCollider(system.get());
 	}
 
-    collisionManager_->CheckAllCollisions();
+	collisionManager_->CheckAllCollisions();
 }
+
 
 void ShadowGameScene::InitializeLights() {
 

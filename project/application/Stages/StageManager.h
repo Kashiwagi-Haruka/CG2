@@ -24,6 +24,7 @@ private:
 public:
 	void Finalize();
 	void Update();
+	void CheckCollision();
 	void ShadowMapDraw();
 	void MainDraw();
 

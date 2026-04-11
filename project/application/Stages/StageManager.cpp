@@ -65,7 +65,11 @@ void StageManager::MainDraw() {
 		stage_->MainDraw();
 	}
 }
-
+void StageManager::CheckCollision() {
+	if (stage_) {
+		stage_->CheckCollision();
+	}
+}
 void StageManager::ChangeStage(const std::string& stageName) {
 	auto nextStage = CreateStage(stageName);
 	assert(nextStage != nullptr);
