@@ -79,7 +79,7 @@ class MirrorStage : public BaseStage {
 	std::unique_ptr<Coffees> coffees_ = nullptr;
 
 	// 衝突管理
-	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
+	CollisionManager* collisionManager_ = nullptr;
 	// 最初のイベント
 	std::unique_ptr<FirstGameEvent> firstEvent_ = nullptr;
 	GameEvent* currentEvent_ = nullptr;

@@ -33,6 +33,7 @@ void StageManager::Update() {
 		stage_->SetPlayer(player_);
 		stage_->SetPlayerCamera(playerCamera_);
 		stage_->SetElevatorManager(elevatorRoomManager_);
+		stage_->SetCollisionManager(collisionManager_);
 		stage_->SetDirectionalShadowEnabled(useDirectionalShadow_);
 		stage_->Initialize();
 	}
@@ -45,6 +46,7 @@ void StageManager::Update() {
 		stage_->SetPlayer(player_);
 		stage_->SetPlayerCamera(playerCamera_);
 		stage_->SetElevatorManager(elevatorRoomManager_);
+		stage_->SetCollisionManager(collisionManager_);
 		stage_->SetDirectionalShadowEnabled(useDirectionalShadow_);
 		stage_->Initialize();
 	}

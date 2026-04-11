@@ -4,6 +4,7 @@ class StageManager;
 class Player;
 class ElevatorRoomManager;
 class PlayerCamera;
+class CollisionManager;
 
 class BaseStage {
 protected:
@@ -25,6 +26,7 @@ public:
 	virtual void SetPlayer(Player* player) { (void)player; }
 	virtual void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) { (void)elevatorRoomManager; }
 	virtual void SetPlayerCamera(PlayerCamera* playerCamera) { (void)playerCamera; }
+	virtual void SetCollisionManager(CollisionManager* collisionManager) { (void)collisionManager; }
 	virtual void SetDirectionalShadowEnabled(bool enabled) { useDirectionalShadow_ = enabled; }
 	virtual bool GetIsStageEnd() const { return isStageEnd_; }
 	virtual bool IsCurrentEventRunning() const { return false; }

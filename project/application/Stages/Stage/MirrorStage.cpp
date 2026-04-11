@@ -53,8 +53,6 @@ MirrorStage::MirrorStage() {
 	timeCardRack_ = std::make_unique<TimeCardRack>();
 	// 箱管理
 	boxManager_ = std::make_unique<BoxManager>();
-	// 衝突管理
-	collisionManager_ = std::make_unique<CollisionManager>();
 
 	// 最初のイベント
 	firstEvent_ = std::make_unique<FirstGameEvent>();
@@ -233,6 +231,7 @@ void MirrorStage::SetPlayer(Player* player) {
 		flashlight_->SetPlayer(player_);
 	}
 }
+void MirrorStage::SetCollisionManager(CollisionManager* collisionManager) { collisionManager_ = collisionManager; }
 bool MirrorStage::IsCurrentEventRunning() const { return currentEvent_ != nullptr && currentEvent_->IsRunning(); }
 void MirrorStage::CheckCollision() {
 	// ホワイトボードとrayの当たり判定作成する
@@ -243,6 +242,9 @@ void MirrorStage::CheckCollision() {
 		coffees_->StartSpill();
 	}
 
+	if (!collisionManager_) {
+		return;
+	}
 	collisionManager_->ClearColliders();
 
 	for (auto& portal : portalManager_->GetPortals()) {

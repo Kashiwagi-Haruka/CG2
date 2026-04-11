@@ -91,6 +91,7 @@ void ShadowGameScene::Initialize()
     SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
     collisionManager_ = std::make_unique<CollisionManager>();
+	stageManager_->SetCollisionManager(collisionManager_.get());
 
 	stageManager_->ChangeStage("MirrorStage");
     Update();
