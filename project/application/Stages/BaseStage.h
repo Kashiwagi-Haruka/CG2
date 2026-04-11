@@ -24,6 +24,7 @@ public:
 
 	virtual void SetStageManager(StageManager* stageManager) { stageManager_ = stageManager; }
 	virtual void SetPlayer(Player* player) { (void)player; }
+	void SetCollisionManager(CollisionManager* collisionManager) override;
 	virtual void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) { (void)elevatorRoomManager; }
 	virtual void SetPlayerCamera(PlayerCamera* playerCamera) { (void)playerCamera; }
 	virtual void SetCollisionManager(CollisionManager* collisionManager) { (void)collisionManager; }
