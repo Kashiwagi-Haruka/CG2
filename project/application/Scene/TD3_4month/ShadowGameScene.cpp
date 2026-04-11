@@ -197,13 +197,12 @@ void ShadowGameScene::InitializeLights() {
 	stageManager_->SetDirectionalShadowEnabled(useDirectionalShadow_);
 }
 #pragma region //private更新処理
-void ShadowGameScene::UpdateCamera()
-{
+void ShadowGameScene::UpdateCamera() {
 
-    cameraController_->Update();
-
-    Object3dCommon::GetInstance()->SetDefaultCamera(cameraController_->GetPlayerCamera()->GetCamera());
-
+	cameraController_->Update();
+	Camera* sceneCamera = cameraController_->GetPlayerCamera()->GetCamera();
+	SetSceneCameraForDraw(sceneCamera);
+	Object3dCommon::GetInstance()->SetDefaultCamera(sceneCamera);
 }
 
 void ShadowGameScene::UpdateSceneTransition() {

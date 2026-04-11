@@ -112,6 +112,9 @@ void MirrorStage::Initialize() {
 }
 
 void MirrorStage::Update() {
+	if (playerCamera_ && playerCamera_->GetCamera()) {
+		SetSceneCameraForDraw(playerCamera_->GetCamera());
+	}
 	didTakeDamage_ = false;
 	if (currentEvent_) {
 		currentEvent_->Update();
