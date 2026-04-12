@@ -118,6 +118,7 @@ public:
 	void CheckCollision() override;
 	void SetPlayer(Player* player) override;
 	void SetCollisionManager(CollisionManager* collisionManager) override;
+	CollisionManager* GetCollisionManager() const override { return collisionManager_; }
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	void SetElevatorManager(ElevatorRoomManager* elevatorRoomManager) override;
 	bool IsCurrentEventRunning() const override;

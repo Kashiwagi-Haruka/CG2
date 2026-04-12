@@ -28,6 +28,7 @@ public:
 	virtual void SetPlayerCamera(PlayerCamera* playerCamera) { (void)playerCamera; }
 	virtual void SetCollisionManager(CollisionManager* collisionManager) { (void)collisionManager; }
 	virtual void SetDirectionalShadowEnabled(bool enabled) { useDirectionalShadow_ = enabled; }
+	virtual CollisionManager* GetCollisionManager() const { return nullptr; }
 	virtual bool GetIsStageEnd() const { return isStageEnd_; }
 	virtual bool IsCurrentEventRunning() const { return false; }
 	virtual float GetPlayerHp() const { return 0.0f; }

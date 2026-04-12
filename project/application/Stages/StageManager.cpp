@@ -72,6 +72,12 @@ void StageManager::CheckCollision() {
 		stage_->CheckCollision();
 	}
 }
+CollisionManager* StageManager::GetCollisionManager() const {
+	if (stage_ && stage_->GetCollisionManager()) {
+		return stage_->GetCollisionManager();
+	}
+	return collisionManager_;
+}
 void StageManager::ChangeStage(const std::string& stageName) {
 	auto nextStage = CreateStage(stageName);
 	assert(nextStage != nullptr);

@@ -38,6 +38,7 @@ public:
 	bool IsCurrentEventRunning() const;
 
 	const std::string& GetCurrentStageName() const { return currentStageName_; }
+	CollisionManager* GetCollisionManager() const;
 	float GetPlayerHp() const;
 	float GetPlayerMaxHp() const;
 	bool DidPlayerTakeDamage() const;
