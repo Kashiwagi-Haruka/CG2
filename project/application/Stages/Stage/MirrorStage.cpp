@@ -225,6 +225,7 @@ void MirrorStage::CheckCollision() {
 	stageCollisionManager_->AddCollider(key_.get());
 	stageCollisionManager_->AddCollider(edamame_->GetEdamameModel().get());
 	stageCollisionManager_->AddCollider(pc_.get());
+	stageCollisionManager_->CheckAllCollisions();
 }
 
 void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {

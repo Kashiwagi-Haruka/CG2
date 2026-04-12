@@ -208,8 +208,6 @@ void ShadowGameScene::CheckCollision() {
 	}
 	stageManager_->SetCollisionManager(collisionManager_.get());
 	stageManager_->CheckCollision();
-	collisionManager_ = stageManager_->GetCollisionManager();
-	collisionManager_->CheckAllCollisions();
 }
 
 void ShadowGameScene::InitializeLights() {
