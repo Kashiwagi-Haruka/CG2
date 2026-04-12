@@ -170,8 +170,14 @@ void MirrorStage::UpdateLights() {
 	areaLights_[4] = wallManager2_->GetAreaLight();
 }
 void MirrorStage::UpdatePortal() { portalManager_->Update(); }
+void MirrorStage::SetCollisionManager(CollisionManager* collisionManager) {
+	stageCollisionManager_ = collisionManager;
+}
+void MirrorStage::CheckCollision() {
+	if (!stageCollisionManager_) {
+		return;
+	}
 
-void MirrorStage::CheckCollision(CollisionManager* collisionManager) {
 	portalManager_->CheckCollision();
 	door_->CheckCollision();
 
@@ -181,44 +187,44 @@ void MirrorStage::CheckCollision(CollisionManager* collisionManager) {
 
 	for (auto& portal : portalManager_->GetPortals()) {
 		if (!portal->GetIsPlayerHit()) {
-			collisionManager->AddCollider(portal.get());
+			stageCollisionManager_->AddCollider(portal.get());
 		} else {
 			break;
 		}
 	}
 
 	for (auto& whiteBoard : whiteBoardManager_->GetWhiteBoards()) {
-		collisionManager->AddCollider(whiteBoard.get());
+		stageCollisionManager_->AddCollider(whiteBoard.get());
 	}
 	for (auto& wall : wallManager_->GetWalls()) {
-		collisionManager->AddCollider(wall.get());
+		stageCollisionManager_->AddCollider(wall.get());
 	}
 	for (auto& wall : wallManager2_->GetWalls()) {
-		collisionManager->AddCollider(wall.get());
+		stageCollisionManager_->AddCollider(wall.get());
 	}
 	for (auto& chair : chairManager_->GetChairs()) {
-		collisionManager->AddCollider(chair.get());
+		stageCollisionManager_->AddCollider(chair.get());
 	}
 	for (auto& locker : lockerManager_->GetLockers()) {
-		collisionManager->AddCollider(locker.get());
+		stageCollisionManager_->AddCollider(locker.get());
 	}
 	for (auto& desk : deskManager_->GetDesks()) {
-		collisionManager->AddCollider(desk.get());
+		stageCollisionManager_->AddCollider(desk.get());
 	}
 	for (auto& box : boxManager_->GetBoxes()) {
-		collisionManager->AddCollider(box.get());
+		stageCollisionManager_->AddCollider(box.get());
 	}
 
-	collisionManager->AddCollider(vendingMac_.get());
-	collisionManager->AddCollider(flashlight_.get());
-	collisionManager->AddCollider(testField_.get());
-	collisionManager->AddCollider(door_->GetAutoLockSystem().get());
+	stageCollisionManager_->AddCollider(vendingMac_.get());
+	stageCollisionManager_->AddCollider(flashlight_.get());
+	stageCollisionManager_->AddCollider(testField_.get());
+	stageCollisionManager_->AddCollider(door_->GetAutoLockSystem().get());
 	if (!door_->GetIsOpen()) {
-		collisionManager->AddCollider(door_.get());
+		stageCollisionManager_->AddCollider(door_.get());
 	}
-	collisionManager->AddCollider(key_.get());
-	collisionManager->AddCollider(edamame_->GetEdamameModel().get());
-	collisionManager->AddCollider(pc_.get());
+	stageCollisionManager_->AddCollider(key_.get());
+	stageCollisionManager_->AddCollider(edamame_->GetEdamameModel().get());
+	stageCollisionManager_->AddCollider(pc_.get());
 }
 
 void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {

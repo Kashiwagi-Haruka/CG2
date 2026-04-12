@@ -196,10 +196,7 @@ void ShadowGameScene::CheckCollision() {
 	}
 
 	collisionManager_->ClearColliders();
-	stageManager_->CheckCollision(collisionManager_.get());
-	if (stageManager_->GetCollisionManager()) {
-	collisionManager_ = stageManager_->GetCollisionManager();
-	}
+
 	collisionManager_->AddCollider(player_.get());
 
 	for (auto& wall : elevatorRoomManager_->GetWalls()) {
@@ -209,7 +206,9 @@ void ShadowGameScene::CheckCollision() {
 	for (auto& system : elevator_->GetAutoLockSys()) {
 		collisionManager_->AddCollider(system.get());
 	}
-
+	stageManager_->SetCollisionManager(collisionManager_.get());
+	stageManager_->CheckCollision();
+	collisionManager_ = stageManager_->GetCollisionManager();
 	collisionManager_->CheckAllCollisions();
 }
 

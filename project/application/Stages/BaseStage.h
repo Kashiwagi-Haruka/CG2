@@ -16,9 +16,10 @@ public:
 
 	virtual void Initialize() = 0;
 	virtual void SetPlayer(Player* player) = 0;
+	virtual void SetCollisionManager(CollisionManager* collisionManager) = 0;
 	virtual void UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) = 0;
 	virtual void UpdatePortal() = 0;
-	virtual void CheckCollision(CollisionManager* collisionManager) = 0;
+	virtual void CheckCollision() = 0;
 	virtual void DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) = 0;
 	virtual void SetSceneCameraForDraw(Camera* camera) = 0;
 	virtual void SetPlayerCamera(PlayerCamera* playerCamera) = 0;

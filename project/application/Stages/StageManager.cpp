@@ -16,6 +16,11 @@ void StageManager::SetPlayer(Player* player) {
 		stage_->SetPlayer(player_);
 	}
 }
+void StageManager::SetCollisionManager(CollisionManager* collisionManager) {
+	if (stage_) {
+		stage_->SetCollisionManager(collisionManager);
+	}
+}
 void StageManager::InitializeStage() {
 	if (stage_) {
 		stage_->Initialize();
@@ -38,12 +43,11 @@ void StageManager::UpdatePortal() {
 	}
 }
 
-void StageManager::CheckCollision(CollisionManager* collisionManager) {
+void StageManager::CheckCollision() {
 	if (stage_) {
-		stage_->CheckCollision(collisionManager);
+		stage_->CheckCollision();
 	}
 }
-
 void StageManager::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
 	if (stage_) {
 		stage_->DrawModel(isShadow, drawPortal, isDrawParticle);

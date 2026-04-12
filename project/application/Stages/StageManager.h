@@ -22,13 +22,14 @@ public:
 	explicit StageManager(Player* player);
 	void CreateStage(const std::string& sceneName);
 	void SetPlayer(Player* player);
+	void SetCollisionManager(CollisionManager* collisionManager);
 	void InitializeStage();
 	void UpdateLight();
 	void UpdatePlayerDamage();
 	void UpdatePostEffect();
 	void UpdateGameObject(Camera* camera, const Vector3& lightDirection);
 	void UpdatePortal();
-	void CheckCollision(CollisionManager* collisionManager);
+	void CheckCollision();
 	void DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle);
 	void DrawDamageOverlay();
 	void SetSceneCameraForDraw(Camera* camera);
