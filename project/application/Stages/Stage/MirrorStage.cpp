@@ -73,7 +73,11 @@ void MirrorStage::Initialize() {
 	boxManager_->Initialize();
 	InitializeLights();
 }
-
+void MirrorStage::SetPlayer(Player* player) {
+	player_ = player;
+	timeCardWatch_->SetPlayer(player_);
+	flashlight_->SetPlayer(player_);
+}
 void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
 	portalManager_->WarpPlayer(player);
 	timeCardWatch_->Update();

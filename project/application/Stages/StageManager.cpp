@@ -10,7 +10,12 @@ void StageManager::CreateStage(const std::string& sceneName) {
 		stage_.reset();
 	}
 }
-
+void StageManager::SetPlayer(Player* player) {
+	player_ = player;
+	if (stage_) {
+		stage_->SetPlayer(player_);
+	}
+}
 void StageManager::InitializeStage() {
 	if (stage_) {
 		stage_->Initialize();

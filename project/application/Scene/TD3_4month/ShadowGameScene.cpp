@@ -25,6 +25,18 @@ ShadowGameScene::ShadowGameScene() {
 
 	// プレイヤーの生成
 	player_ = std::make_unique<Player>();
+	auto& gameSave = GameSave::GetInstance();
+
+	if (gameSave.GetInitStart()) {
+		gameSave.InitData();
+	} else {
+		// 一旦ここでロード
+		gameSave.Load(gameSave.GetSelectSlotIndex());
+	}
+	progressSaveData_ = gameSave.GetProgressSaveData();
+	// プレイヤーの初期化
+	player_->Initialize();
+	player_->SetTransform(gameSave.GetPlayerSaveData().transform);
 	// カメラコントローラー
 	cameraController_ = CameraController::GetInstance();
 	cameraController_->SetPlayer(player_.get());
@@ -61,15 +73,7 @@ ShadowGameScene::~ShadowGameScene()
 void ShadowGameScene::Initialize()
 {
     uiManager_->Initialize();
-    auto& gameSave = GameSave::GetInstance();
 
-    if (gameSave.GetInitStart()) {
-        gameSave.InitData();
-    } else {
-        //一旦ここでロード
-        gameSave.Load(gameSave.GetSelectSlotIndex());
-    }
-    progressSaveData_ = gameSave.GetProgressSaveData();
 
     BGMManager::Initialize();
 
@@ -85,10 +89,16 @@ void ShadowGameScene::Initialize()
     isTransitionOut_ = false;
     nextSceneName_.clear();
 
-    //プレイヤーの初期化
-    player_->Initialize();
-    player_->SetTransform(gameSave.GetPlayerSaveData().transform);
 
+		auto& gameSave = GameSave::GetInstance();
+
+	if (gameSave.GetInitStart()) {
+		gameSave.InitData();
+	} else {
+		// 一旦ここでロード
+		gameSave.Load(gameSave.GetSelectSlotIndex());
+	}
+	progressSaveData_ = gameSave.GetProgressSaveData();
 
     PlayerCommand::Initialize();
 
@@ -186,9 +196,9 @@ void ShadowGameScene::CheckCollision() {
 	}
 
 	collisionManager_->ClearColliders();
-	collisionManager_->AddCollider(player_.get());
 	stageManager_->CheckCollision(collisionManager_.get());
 	collisionManager_ = stageManager_->GetCollisionManager();
+	collisionManager_->AddCollider(player_.get());
 
 	for (auto& wall : elevatorRoomManager_->GetWalls()) {
 		collisionManager_->AddCollider(wall.get());
@@ -272,6 +282,7 @@ void ShadowGameScene::UpdatePostEffect() {
 
 void ShadowGameScene::UpdateGameObject() {
 	player_->Update();
+	stageManager_->SetPlayer(player_.get());
 	stageManager_->UpdateGameObject(cameraController_->GetPlayerCamera()->GetCamera(), directionalLight_.direction);
 	// エレベーター
 	elevator_->Update();

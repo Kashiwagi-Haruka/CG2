@@ -21,6 +21,7 @@ private:
 public:
 	explicit StageManager(Player* player);
 	void CreateStage(const std::string& sceneName);
+	void SetPlayer(Player* player);
 	void InitializeStage();
 	void UpdateLight();
 	void UpdatePlayerDamage();

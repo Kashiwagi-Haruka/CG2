@@ -15,6 +15,7 @@ public:
 	virtual ~BaseStage() = default;
 
 	virtual void Initialize() = 0;
+	virtual void SetPlayer(Player* player) = 0;
 	virtual void UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) = 0;
 	virtual void UpdatePortal() = 0;
 	virtual void CheckCollision(CollisionManager* collisionManager) = 0;

@@ -67,6 +67,7 @@ public:
 	explicit MirrorStage(Player* player);
 
 	void Initialize() override;
+	void SetPlayer(Player* player) override;
 	void UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) override;
 	void UpdatePortal() override;
 	void CheckCollision(CollisionManager* collisionManager) override;
