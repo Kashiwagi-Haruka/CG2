@@ -379,6 +379,7 @@
     <ClCompile Include="application\GameObject\UI\IDCard.cpp" />
     <ClCompile Include="application\Text\GentlemanMenu\GentlemanMenu.cpp" />
     <ClCompile Include="application\Text\TitleTimeText\TitleTimeText.cpp" />
+    <ClCompile Include="application\Stages\StageManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -751,6 +752,8 @@
     <ClInclude Include="application\GameObject\UI\IDCard.h" />
     <ClInclude Include="application\Text\GentlemanMenu\GentlemanMenu.h" />
     <ClInclude Include="application\Text\TitleTimeText\TitleTimeText.h" />
+    <ClInclude Include="application\Stages\StageManager.h" />
+    <ClInclude Include="application\Stages\BaseStage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
