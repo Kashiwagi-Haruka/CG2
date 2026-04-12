@@ -380,6 +380,7 @@
     <ClCompile Include="application\Text\GentlemanMenu\GentlemanMenu.cpp" />
     <ClCompile Include="application\Text\TitleTimeText\TitleTimeText.cpp" />
     <ClCompile Include="application\Stages\StageManager.cpp" />
+    <ClCompile Include="application\Stages\Stage\MirrorStage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -754,6 +755,7 @@
     <ClInclude Include="application\Text\TitleTimeText\TitleTimeText.h" />
     <ClInclude Include="application\Stages\StageManager.h" />
     <ClInclude Include="application\Stages\BaseStage.h" />
+    <ClInclude Include="application\Stages\Stage\MirrorStage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

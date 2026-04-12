@@ -316,6 +316,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Text\GentlemanMenu\GentlemanMenu.cpp" />
     <ClCompile Include="application\Text\TitleTimeText\TitleTimeText.cpp" />
     <ClCompile Include="application\Stages\StageManager.cpp" />
+    <ClCompile Include="application\Stages\Stage\MirrorStage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -505,6 +506,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Text\GentlemanMenu\GentlemanMenu.h" />
     <ClInclude Include="application\Text\TitleTimeText\TitleTimeText.h" />
     <ClInclude Include="application\Stages\StageManager.h" />
+    <ClInclude Include="application\Stages\Stage\MirrorStage.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

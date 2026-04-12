@@ -31,48 +31,48 @@ ShadowGameScene::ShadowGameScene()
     cameraController_ = CameraController::GetInstance();
     cameraController_->SetPlayer(player_.get());
 
-    //テスト地面
-    testField_ = std::make_unique<TestField>();
-    // ホワイトボード管理
-    whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
-    // ポータル管理
-    portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
+    // テスト地面
+	testField_ = std::make_unique<TestField>();
+	// ホワイトボード管理
+	whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
+	// ポータル管理
+	portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
 
-    //PC
-    pc_ = std::make_unique<PC>();
-    // コーヒー缶
-    coffees_ = std::make_unique<Coffees>();
-    //携帯打刻機
-    timeCardWatch_ = std::make_unique<TimeCardWatch>();
-    timeCardWatch_->SetPlayer(player_.get());
+	// PC
+	pc_ = std::make_unique<PC>();
+	// コーヒー缶
+	coffees_ = std::make_unique<Coffees>();
+	// 携帯打刻機
+	timeCardWatch_ = std::make_unique<TimeCardWatch>();
+	timeCardWatch_->SetPlayer(player_.get());
 
-    //懐中電灯
-    flashlight_ = std::make_unique<Flashlight>();
-    flashlight_->SetPlayer(player_.get());
-    // 鍵管理
-    key_ = std::make_unique<Key>();
-    // 枝豆管理
-    edamame_ = std::make_unique<Edamame>();
-    //ドア
-    door_ = std::make_unique<Door>();
-    //ロッカー
-    lockerManager_ = std::make_unique<LockerManager>();
-    //壁管理
-    wallManager_ = std::make_unique<WallManager>();
-    //壁管理
-    wallManager2_ = std::make_unique<WallManager2>();
-    //自販機
-    vendingMac_ = std::make_unique<VendingMac>();
-    //椅子
-    chairManager_ = std::make_unique<ChairManager>();
-    //机
-    deskManager_ = std::make_unique<DeskManager>();
-    //打刻機
-    timeCard_ = std::make_unique<TimeCard>();
-    //タイムカードラック
-    timeCardRack_ = std::make_unique<TimeCardRack>();
-    //箱管理
-    boxManager_ = std::make_unique<BoxManager>();
+	// 懐中電灯
+	flashlight_ = std::make_unique<Flashlight>();
+	flashlight_->SetPlayer(player_.get());
+	// 鍵管理
+	key_ = std::make_unique<Key>();
+	// 枝豆管理
+	edamame_ = std::make_unique<Edamame>();
+	// ドア
+	door_ = std::make_unique<Door>();
+	// ロッカー
+	lockerManager_ = std::make_unique<LockerManager>();
+	// 壁管理
+	wallManager_ = std::make_unique<WallManager>();
+	// 壁管理
+	wallManager2_ = std::make_unique<WallManager2>();
+	// 自販機
+	vendingMac_ = std::make_unique<VendingMac>();
+	// 椅子
+	chairManager_ = std::make_unique<ChairManager>();
+	// 机
+	deskManager_ = std::make_unique<DeskManager>();
+	// 打刻機
+	timeCard_ = std::make_unique<TimeCard>();
+	// タイムカードラック
+	timeCardRack_ = std::make_unique<TimeCardRack>();
+	// 箱管理
+	boxManager_ = std::make_unique<BoxManager>();
     // エレベーター
     elevator_ = std::make_unique<Elevator>();
     //セーブポイント紳士
