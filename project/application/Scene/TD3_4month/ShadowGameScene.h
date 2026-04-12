@@ -51,6 +51,7 @@
 #include "Light/CommonLight/PointCommonLight.h"
 #include"Audio.h"
 #include <string>
+#include "Stages/StageManager.h"
 
 class ShadowGameScene : public BaseScene {
 private:
@@ -60,8 +61,9 @@ private:
 
 	std::unique_ptr<UIManager> uiManager_ = nullptr;
 
-    // カメラの設定
+	// カメラの設定
 	CameraController* cameraController_ = nullptr;
+	std::unique_ptr<StageManager> stageManager_ = nullptr;
 #pragma region // シーン遷移の設定
 	// シーン遷移の設定
 	std::unique_ptr<SceneTransition> transition_ = nullptr;
