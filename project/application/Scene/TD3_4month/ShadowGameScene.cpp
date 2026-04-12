@@ -16,83 +16,52 @@
 #include <cmath>
 #include"GameSave/GameSave.h"
 
+ShadowGameScene::ShadowGameScene() {
+	// BGMの管理
+	BGMManager::Load();
 
-ShadowGameScene::ShadowGameScene()
-{
-    //BGMの管理
-    BGMManager::Load();
+	// シーン遷移の設定
+	transition_ = std::make_unique<SceneTransition>();
 
-    //シーン遷移の設定
-    transition_ = std::make_unique<SceneTransition>();
+	// プレイヤーの生成
+	player_ = std::make_unique<Player>();
+	auto& gameSave = GameSave::GetInstance();
 
-    //プレイヤーの生成
-    player_ = std::make_unique<Player>();
-    //カメラコントローラー
-    cameraController_ = CameraController::GetInstance();
-    cameraController_->SetPlayer(player_.get());
+	if (gameSave.GetInitStart()) {
+		gameSave.InitData();
+	} else {
+		// 一旦ここでロード
+		gameSave.Load(gameSave.GetSelectSlotIndex());
+	}
+	progressSaveData_ = gameSave.GetProgressSaveData();
+	// プレイヤーの初期化
+	player_->Initialize();
+	player_->SetTransform(gameSave.GetPlayerSaveData().transform);
+	// カメラコントローラー
+	cameraController_ = CameraController::GetInstance();
+	cameraController_->SetPlayer(player_.get());
+	stageManager_ = std::make_unique<StageManager>(player_.get());
+	stageManager_->CreateStage("MirrorStage");
+	// エレベーター
+	elevator_ = std::make_unique<Elevator>();
+	// セーブポイント紳士
+	gentleman_ = std::make_unique<Gentleman>();
 
-    //テスト地面
-    testField_ = std::make_unique<TestField>();
-    // ホワイトボード管理
-    whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
-    // ポータル管理
-    portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
+	// エレベータールーム
+	elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
+	// 衝突管理
+	collisionManager_ = stageManager_->GetCollisionManager();
+	// UI管理
+	uiManager_ = std::make_unique<UIManager>();
+	GentlemanMenu::SetPlayerCamera(cameraController_->GetPlayerCamera());
+	GentlemanMenu::SetPlayerTransform(&player_->GetTransform());
+	GentlemanMenu::SetProgressSaveData(&progressSaveData_);
+	// 最初のイベント
+	firstEvent_ = std::make_unique<FirstGameEvent>();
+	// PlayerCameraをセットする
+	SetPlayerCamera(cameraController_->GetPlayerCamera());
 
-    //PC
-    pc_ = std::make_unique<PC>();
-    // コーヒー缶
-    coffees_ = std::make_unique<Coffees>();
-    //携帯打刻機
-    timeCardWatch_ = std::make_unique<TimeCardWatch>();
-    timeCardWatch_->SetPlayer(player_.get());
-
-    //懐中電灯
-    flashlight_ = std::make_unique<Flashlight>();
-    flashlight_->SetPlayer(player_.get());
-    // 鍵管理
-    key_ = std::make_unique<Key>();
-    // 枝豆管理
-    edamame_ = std::make_unique<Edamame>();
-    //ドア
-    door_ = std::make_unique<Door>();
-    //ロッカー
-    lockerManager_ = std::make_unique<LockerManager>();
-    //壁管理
-    wallManager_ = std::make_unique<WallManager>();
-    //壁管理
-    wallManager2_ = std::make_unique<WallManager2>();
-    //自販機
-    vendingMac_ = std::make_unique<VendingMac>();
-    //椅子
-    chairManager_ = std::make_unique<ChairManager>();
-    //机
-    deskManager_ = std::make_unique<DeskManager>();
-    //打刻機
-    timeCard_ = std::make_unique<TimeCard>();
-    //タイムカードラック
-    timeCardRack_ = std::make_unique<TimeCardRack>();
-    //箱管理
-    boxManager_ = std::make_unique<BoxManager>();
-    // エレベーター
-    elevator_ = std::make_unique<Elevator>();
-    //セーブポイント紳士
-    gentleman_ = std::make_unique<Gentleman>();
-
-    //エレベータールーム
-    elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
-    //衝突管理
-    collisionManager_ = std::make_unique<CollisionManager>();
-    //UI管理
-    uiManager_ = std::make_unique<UIManager>();
-    GentlemanMenu::SetPlayerCamera(cameraController_->GetPlayerCamera());
-    GentlemanMenu::SetPlayerTransform(&player_->GetTransform());
-    GentlemanMenu::SetProgressSaveData(&progressSaveData_);
-    //最初のイベント
-    firstEvent_ = std::make_unique<FirstGameEvent>();
-    //PlayerCameraをセットする
-    SetPlayerCamera(cameraController_->GetPlayerCamera());
-
-    damageOverlay_ = std::make_unique<DamageOverlay>();
+	damageOverlay_ = std::make_unique<DamageOverlay>();
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -104,15 +73,7 @@ ShadowGameScene::~ShadowGameScene()
 void ShadowGameScene::Initialize()
 {
     uiManager_->Initialize();
-    auto& gameSave = GameSave::GetInstance();
 
-    if (gameSave.GetInitStart()) {
-        gameSave.InitData();
-    } else {
-        //一旦ここでロード
-        gameSave.Load(gameSave.GetSelectSlotIndex());
-    }
-    progressSaveData_ = gameSave.GetProgressSaveData();
 
     BGMManager::Initialize();
 
@@ -128,62 +89,26 @@ void ShadowGameScene::Initialize()
     isTransitionOut_ = false;
     nextSceneName_.clear();
 
-    //プレイヤーの初期化
-    player_->Initialize();
-    player_->SetTransform(gameSave.GetPlayerSaveData().transform);
 
+		auto& gameSave = GameSave::GetInstance();
+
+	if (gameSave.GetInitStart()) {
+		gameSave.InitData();
+	} else {
+		// 一旦ここでロード
+		gameSave.Load(gameSave.GetSelectSlotIndex());
+	}
+	progressSaveData_ = gameSave.GetProgressSaveData();
 
     PlayerCommand::Initialize();
-
     //カメラコントローラー
     cameraController_->Initialize();
     cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
 
-    //フラッシュライト
-    flashlight_->Initialize();
-    flashlight_->SetGetLight(progressSaveData_.isLightHave);
+ 
     InitializeLights();
-
-    //テスト地面
-    testField_->Initialize();
-    //ホワイトボード管理
-    whiteBoardManager_->Initialize();
-    // ポータル管理
-    portalManager_->Initialize();
-    //PC
-    pc_->Initialize();
-    // コーヒー缶
-    coffees_->Initialize();
-    coffees_->SetFloorY(0.0f);
-    coffees_->SetRoomBounds(-40.0f, 40.0f, -40.0f, 40.0f);
-    coffees_->SetSpawnContainment({ 0.0f, 0.0f, 0.0f }, 0.0f, 0.0f);
-    //携帯打刻機
-    timeCardWatch_->Initialize();
-    // 鍵
-    key_->Initialize();
-    key_->SetGetKey(progressSaveData_.isKeyHave);
-    // 枝豆
-    edamame_->Initialize();
-    //椅子
-    chairManager_->Initialize();
-    //壁
-    wallManager_->Initialize();
-    //壁
-    wallManager2_->Initialize();
-    //自販機
-    vendingMac_->Initialize();
-    //ドア
-    door_->Initialize();
-    //ロッカー
-    lockerManager_->Initialize();
-    //デスク管理
-    deskManager_->Initialize();
-    //打刻機
-    timeCard_->Initialize();
-    //タイムカードラック
-    timeCardRack_->Initialize();
-    //箱管理
-    boxManager_->Initialize();
+	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
+	stageManager_->InitializeStage();
     // エレベーター
     elevator_->Initialize();
     //セーブポイント紳士
@@ -206,35 +131,32 @@ void ShadowGameScene::Initialize()
 
 }
 
-void ShadowGameScene::Update()
-{
+void ShadowGameScene::Update() {
 
-    currentEvent_->Update();
+	currentEvent_->Update();
 
-    //ライトの更新処理
-    UpdateLight();
-    //ポストエフェクトの更新処理
-    UpdatePostEffect();
+	// ライトの更新処理
+	UpdateLight();
+	// ポストエフェクトの更新処理
+	UpdatePostEffect();
 
-    if (!currentEvent_->IsRunning()) {
-        //UI管理
-        uiManager_->Update();
-        PlayerCommand::SetIsUiInputLocked(UIManager::GetIsPause());
-        //シーン遷移の更新処理
-        UpdateSceneTransition();
-    }
+	if (!currentEvent_->IsRunning()) {
+		// UI管理
+		uiManager_->Update();
+		PlayerCommand::SetIsUiInputLocked(UIManager::GetIsPause());
+		// シーン遷移の更新処理
+		UpdateSceneTransition();
+	}
 
-    //ゲームオブジェクトの更新処理
-    UpdateGameObject();
-    //カメラの更新処理
-    UpdateCamera();
-    //ポータル管理 カメラの更新後に行う
-    portalManager_->Update();
-    UpdatePlayerDamage();
-    //オブジェクトの当たり判定
-    CheckCollision();
-
-
+	// ゲームオブジェクトの更新処理
+	UpdateGameObject();
+	// カメラの更新処理
+	UpdateCamera();
+	// ポータル管理 カメラの更新後に行う
+	stageManager_->UpdatePortal();
+	UpdatePlayerDamage();
+	// オブジェクトの当たり判定
+	CheckCollision();
 }
 
 void ShadowGameScene::Draw()
@@ -267,125 +189,32 @@ void ShadowGameScene::DebugImGui()
 #endif // USE_IMGUI
 }
 
-void ShadowGameScene::CheckCollision()
-{
-    //ホワイトボードとrayの当たり判定作成する
-    portalManager_->CheckCollision();
-    door_->CheckCollision();
+void ShadowGameScene::CheckCollision() {
+	if (!collisionManager_) {
+		return;
+	}
 
-    //コーヒー排出する
-    if (vendingMac_->ConsumeInteractRequest()) {
-        coffees_->StartSpill();
-    }
+	collisionManager_->ClearColliders();
 
-    collisionManager_->ClearColliders();
-    collisionManager_->AddCollider(player_.get());
+	collisionManager_->AddCollider(player_.get());
 
-    for (auto& portal : portalManager_->GetPortals()) {
-        if (!portal->GetIsPlayerHit()) {
-            //プレイヤーがヒットしてないときコライダーリストに追加する
-            collisionManager_->AddCollider(portal.get());
-        } else {
-            break;
-        }
-    }
+	for (auto& wall : elevatorRoomManager_->GetWalls()) {
+		collisionManager_->AddCollider(wall.get());
+	}
 
-    for (auto& whiteBoard : whiteBoardManager_->GetWhiteBoards()) {
-        collisionManager_->AddCollider(whiteBoard.get());
-    }
-    for (auto& wall : wallManager_->GetWalls()) {
-        collisionManager_->AddCollider(wall.get());
-    }
-
-    for (auto& wall : wallManager2_->GetWalls()) {
-        collisionManager_->AddCollider(wall.get());
-    }
-
-    for (auto& wall : elevatorRoomManager_->GetWalls()) {
-        collisionManager_->AddCollider(wall.get());
-    }
-
-    for (auto& chair : chairManager_->GetChairs()) {
-        collisionManager_->AddCollider(chair.get());
-    }
-    for (auto& locker : lockerManager_->GetLockers()) {
-        collisionManager_->AddCollider(locker.get());
-    }
-    for (auto& desk : deskManager_->GetDesks()) {
-        collisionManager_->AddCollider(desk.get());
-    }
-    for (auto& box : boxManager_->GetBoxes()) {
-        collisionManager_->AddCollider(box.get());
-    }
-
-    for (auto& system : elevator_->GetAutoLockSys()) {
-        collisionManager_->AddCollider(system.get());
-    }
-
-    collisionManager_->AddCollider(vendingMac_.get());
-    collisionManager_->AddCollider(flashlight_.get());
-    collisionManager_->AddCollider(testField_.get());
-    collisionManager_->AddCollider(door_->GetAutoLockSystem().get());
-
-    if (!door_->GetIsOpen()) {
-        collisionManager_->AddCollider(door_.get());
-    }
-
-    collisionManager_->AddCollider(key_.get());
-    collisionManager_->AddCollider(edamame_->GetEdamameModel().get());
-    collisionManager_->AddCollider(pc_.get());
-
-    collisionManager_->CheckAllCollisions();
+	for (auto& system : elevator_->GetAutoLockSys()) {
+		collisionManager_->AddCollider(system.get());
+	}
+	stageManager_->SetCollisionManager(collisionManager_.get());
+	stageManager_->CheckCollision();
 }
 
-void ShadowGameScene::InitializeLights()
-{
-
-    spotLights_[0] = flashlight_->GetSpotLight();
-    areaLights_[2] = vendingMac_->GetAreaLight();
-
-    activePointLightCount_ = 4;
-    pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    pointLights_[0].position = { 7.0f, 5.0f, 0.0f };
-    pointLights_[0].intensity = 1.0f;
-    pointLights_[0].radius = 10.0f;
-    pointLights_[0].decay = 1.0f;
-    pointLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    pointLights_[1].position = { 5.0f, 5.0f, 5.0f };
-    pointLights_[1].intensity = 1.0f;
-    pointLights_[1].radius = 10.0f;
-    pointLights_[1].decay = 1.0f;
-
-    pointLights_[2] = edamame_->GetPointLights().at(0);
-    pointLights_[3] = edamame_->GetPointLights().at(1);
-
-    directionalLight_.color = { 1.0f, 1.0f, 0.75f, 1.0f };
-    directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
-    directionalLight_.intensity = 0.25f;
-
-    activeSpotLightCount_ = 1;
-
-    activeAreaLightCount_ = 6;
-    areaLights_[0].color = { 1.0f,1.0f, 1.0f, 1.0f };
-    areaLights_[0].position = { 7.0f, 3.0f, 0.0f };
-    areaLights_[0].normal = { 0.0f, 1.0f, 0.0f };
-    areaLights_[0].intensity = 10.0f;
-    areaLights_[0].width = 4.0f;
-    areaLights_[0].height = 0.1f;
-    areaLights_[0].radius = 4.0f;
-    areaLights_[0].decay = 2.0f;
-
-    areaLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    areaLights_[1].position = { -7.0f, 3.0f, 0.0f };
-    areaLights_[1].normal = { 0.0f, 1.0f, 0.0f };
-    areaLights_[1].intensity = 10.0f;
-    areaLights_[1].width = 4.0f;
-    areaLights_[1].height = 0.1f;
-    areaLights_[1].radius = 4.0f;
-    areaLights_[1].decay = 2.0f;
-
+void ShadowGameScene::InitializeLights() {
+	directionalLight_.color = {1.0f, 1.0f, 0.75f, 1.0f};
+	directionalLight_.direction = {0.0f, 1.0f, 0.0f};
+	directionalLight_.intensity = 0.25f;
 }
-#pragma region //private更新処理
+#pragma region // private更新処理
 void ShadowGameScene::UpdateCamera()
 {
 
@@ -416,183 +245,95 @@ void ShadowGameScene::UpdateSceneTransition() {
     }
 }
 
-void ShadowGameScene::UpdatePostEffect()
-{
-    bool vignetteStrength = true;
+void ShadowGameScene::UpdatePostEffect() {
+	bool vignetteStrength = true;
 
-    Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(false);
-    Object3dCommon::GetInstance()->SetFullScreenSepiaEnabled(false);
-    Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength);
-    Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength);
+	Object3dCommon::GetInstance()->SetFullScreenGrayscaleEnabled(false);
+	Object3dCommon::GetInstance()->SetFullScreenSepiaEnabled(false);
+	Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength);
+	Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength);
 
-    for (auto& portal : portalManager_->GetPortals()) {
-        if (portal->GetIsPlayerHit()) {
-            if (!isNoise_) {
-                isNoise_ = true;
-            }
-        }
-    }
+	if (auto* portalManager = stageManager_->GetPortalManager()) {
+		for (auto& portal : portalManager->GetPortals()) {
+			if (portal->GetIsPlayerHit()) {
+				if (!isNoise_) {
+					isNoise_ = true;
+				}
+			}
+		}
+	}
 
-    if (isNoise_) {
-        float randomNoiseScale = 1.0f;
-        noiseTimer_ -= YoshidaMath::kDeltaTime;
-        if (noiseTimer_ <= 0.0f) {
-            isNoise_ = false;
-            noiseTimer_ = kNoiseTimer_;
-        }
+	if (isNoise_) {
+		float randomNoiseScale = 1.0f;
+		noiseTimer_ -= YoshidaMath::kDeltaTime;
+		if (noiseTimer_ <= 0.0f) {
+			isNoise_ = false;
+			noiseTimer_ = kNoiseTimer_;
+		}
+	}
+	BlendMode randomNoiseBlendMode = kBlendModeSub;
 
-    }
-    BlendMode randomNoiseBlendMode = kBlendModeSub;
-
-    Object3dCommon::GetInstance()->SetRandomNoiseEnabled(isNoise_);
-    Object3dCommon::GetInstance()->SetRandomNoiseScale(noiseTimer_);
-    Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode);
-
+	Object3dCommon::GetInstance()->SetRandomNoiseEnabled(isNoise_);
+	Object3dCommon::GetInstance()->SetRandomNoiseScale(noiseTimer_);
+	Object3dCommon::GetInstance()->SetRandomNoiseBlendMode(randomNoiseBlendMode);
 }
 
-void ShadowGameScene::UpdateGameObject()
-{
-    portalManager_->WarpPlayer(player_.get());
-    //プレイヤー
-    player_->Update();
-    //携帯打刻機
-    timeCardWatch_->Update();
-    //懐中電灯
-    flashlight_->Update();
-    //鍵
-    key_->Update();
-    //枝豆管理
-    edamame_->Update();
-    //椅子管理
-    chairManager_->Update();
-    //箱管理
-    boxManager_->Update();
-    //エレベーター
-    elevator_->Update();
-    //床
-    testField_->Update();
-    //壁管理
-    wallManager_->Update();
-    //壁管理
-    wallManager2_->Update();
-    //エレベータールーム管理
-    elevatorRoomManager_->Update();
+void ShadowGameScene::UpdateGameObject() {
+	player_->Update();
+	stageManager_->SetPlayer(player_.get());
+	stageManager_->UpdateGameObject(cameraController_->GetPlayerCamera()->GetCamera(), directionalLight_.direction);
+	// エレベーター
+	elevator_->Update();
+	// エレベータールーム管理
+	elevatorRoomManager_->Update();
+	// セーブポイント紳士
+	gentleman_->Update();
 
-    //自販機
-    vendingMac_->Update();
-    const Vector3 vendingPosition = vendingMac_->GetWorldPosition();
-    const Vector3 vendingForward = vendingMac_->GetForward();
-    coffees_->SetSpawnOrigin({
-        vendingPosition.x + vendingForward.x * 0.45f,
-        vendingPosition.y + 0.9f,
-        vendingPosition.z + vendingForward.z * 0.45f,
-        });
-    coffees_->SetLaunchDirection(vendingForward);
-    coffees_->Update(cameraController_->GetPlayerCamera()->GetCamera(), directionalLight_.direction);
-    //ドア
-    door_->Update();
-    //ロッカー
-    lockerManager_->Update();
-    //机
-    deskManager_->Update();
-    // ホワイトボード管理
-    whiteBoardManager_->Update();
-
-    //打刻機
-    timeCard_->SetTransform({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f}, { 8.0f, 1.0f, -7.0f } });
-    timeCard_->Update();
-    //タイムカードラック
-    timeCardRack_->SetTransform({ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 7.75f,1.3f,-7.0f } });
-    timeCardRack_->Update();
-    //PC
-    pc_->Update();
-    //セーブポイント紳士
-    gentleman_->Update();
-
-    for (auto& chair : chairManager_->GetChairs()) {
-        if (chair->GetIsStand()) {
-            Vector3 pos = chair->GetWorldPosition();
-            pos.y += 1.0f;
-            player_->SetTranslate(pos);
-            chair->SetIsStand(false);
-            PlayerCommand::SetIsStand(false);
-            break;
-        }
-    }
-
-    if (door_->GetIsOpen()) {
-        //ドアが開いたらクリアにする。
-        progressSaveData_.isGameClear = true;
-    }
-
-    //鍵を取得しているとき
-    progressSaveData_.isKeyHave = key_->IsGetKey();
-    progressSaveData_.isLightHave = flashlight_->IsGetLight();
-
-    ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
-
+	ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 }
 void ShadowGameScene::UpdatePlayerDamage() {
 
-    const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-    player_->UpdatePlayerDamage(deltaTime);
-    damageOverlay_->Update(deltaTime, player_->GetHP(), player_->GetMaxHP());
-
-    constexpr float kCoffeeHitSpeedThreshold = 2.0f;
-    constexpr float kPlayerHitRadius = 0.45f;
-
-    if (player_->GetDamageCoolDownTimer() <= 0.0f && coffees_->CheckHitPlayer(player_->GetWorldPosition(), kPlayerHitRadius, kCoffeeHitSpeedThreshold)) {
-        player_->ApplyPlayerDamage(1.0f);
-        damageOverlay_->StartDisplay();
-
-        if (player_->IsDie()) {
-            if (!isTransitionOut_) {
-                transition_->Initialize(true);
-                isTransitionOut_ = true;
-                nextSceneName_ = "GameOver";
-            }
-            return;
-        }
-    }
+	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+	player_->UpdatePlayerDamage(deltaTime);
+	damageOverlay_->Update(deltaTime, player_->GetHP(), player_->GetMaxHP());
 }
 
 void ShadowGameScene::UpdateLight() {
 #pragma region // Lightを組み込む
-
-    spotLights_[0] = flashlight_->GetSpotLight();
-
-    pointLights_[2] = edamame_->GetPointLights().at(0);
-    pointLights_[3] = edamame_->GetPointLights().at(1);
-
-    areaLights_[2] = vendingMac_->GetAreaLight();
-    areaLights_[3] = wallManager_->GetAreaLight();
-    areaLights_[4] = wallManager2_->GetAreaLight();
-    areaLights_[5] = elevatorRoomManager_->GetAreaLight();
-
-    Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-    Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
-    Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
-    Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
-    Object3dCommon::GetInstance()->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
+	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+	Object3dCommon::GetInstance()->SetPointLights(stageManager_->GetPointLights(), stageManager_->GetActivePointLightCount());
+	Object3dCommon::GetInstance()->SetSpotLights(stageManager_->GetSpotLights(), stageManager_->GetActiveSpotLightCount());
+	Object3dCommon::GetInstance()->SetAreaLights(stageManager_->GetAreaLights(), stageManager_->GetActiveAreaLightCount());
+	Object3dCommon::GetInstance()->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
 #pragma endregion
 
 #ifdef USE_IMGUI
-    if (ImGui::TreeNode("Light")) {
-        ImGui::DragFloat3("Area0Position", &areaLights_[0].position.x, 0.1f);
-        ImGui::DragFloat3("Area1Position", &areaLights_[1].position.x, 0.1f);
-        ImGui::Checkbox("DirectionalShadow", &useDirectionalShadow_);
-        ImGui::Checkbox("PointShadow", &usePointShadow_);
-        ImGui::Checkbox("SpotShadow", &useSpotShadow_);
-        ImGui::Checkbox("AreaShadow", &useAreaShadow_);
-        pointLights_[0].shadowEnabled = usePointShadow_ ? 1 : 0;
-        spotLights_[0].shadowEnabled = useSpotShadow_ ? 1 : 0;
-        areaLights_[0].shadowEnabled = useAreaShadow_ ? 1 : 0;
-        ImGui::TreePop();
-    }
+	if (ImGui::TreeNode("Light")) {
+		AreaCommonLight* areaLights = stageManager_->GetAreaLights();
+		PointCommonLight* pointLights = stageManager_->GetPointLights();
+		SpotCommonLight* spotLights = stageManager_->GetSpotLights();
+		if (areaLights != nullptr) {
+			ImGui::DragFloat3("Area0Position", &areaLights[0].position.x, 0.1f);
+			ImGui::DragFloat3("Area1Position", &areaLights[1].position.x, 0.1f);
+		}
+		ImGui::Checkbox("DirectionalShadow", &useDirectionalShadow_);
+		ImGui::Checkbox("PointShadow", &usePointShadow_);
+		ImGui::Checkbox("SpotShadow", &useSpotShadow_);
+		ImGui::Checkbox("AreaShadow", &useAreaShadow_);
+		if (pointLights != nullptr) {
+			pointLights[0].shadowEnabled = usePointShadow_ ? 1 : 0;
+		}
+		if (spotLights != nullptr) {
+			spotLights[0].shadowEnabled = useSpotShadow_ ? 1 : 0;
+		}
+		if (areaLights != nullptr) {
+			areaLights[0].shadowEnabled = useAreaShadow_ ? 1 : 0;
+		}
+		ImGui::TreePop();
+	}
 #endif
 }
 #pragma endregion
-
 #pragma region // private描画処理
 void ShadowGameScene::DrawSceneTransition() {
     if (isTransitionIn_ || isTransitionOut_) {
@@ -601,144 +342,73 @@ void ShadowGameScene::DrawSceneTransition() {
 }
 
 void ShadowGameScene::DrawModel() {
-    //=======================shadowマップの開始↓=======================
-    auto* object3dCommon = Object3dCommon::GetInstance();
-    const bool shadowFlags[4] = { useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_ };
-    for (int i = 0; i < 4; ++i) {
-        if (!shadowFlags[i]) {
-            continue;
-        }
-        object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
-        object3dCommon->BeginShadowMapPass();
-        object3dCommon->DrawCommonShadow();
-        DrawGameObject(true, false, false, true,true);
-        object3dCommon->EndShadowMapPass();
-    }
-    object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
-    //=======================shadowマップの終了↑=======================
+	//=======================shadowマップの開始↓=======================
+	auto* object3dCommon = Object3dCommon::GetInstance();
+	const bool shadowFlags[4] = {useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_};
+	for (int i = 0; i < 4; ++i) {
+		if (!shadowFlags[i]) {
+			continue;
+		}
+		object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
+		object3dCommon->BeginShadowMapPass();
+		object3dCommon->DrawCommonShadow();
+		DrawGameObject(true, false, false, true, true);
+		object3dCommon->EndShadowMapPass();
+	}
+	object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
+	//=======================shadowマップの終了↑=======================
 
-    for (auto& portal : portalManager_->GetPortals()) {
-        portal->BeginRender();
-        auto* portalCamera = portal->GetCamera();
-        SetCameraAndDraw(portalCamera, false, false, true,true);
-        portal->TransitionToShaderResource();
+	if (auto* portalManager = stageManager_->GetPortalManager()) {
+		for (auto& portal : portalManager->GetPortals()) {
+			portal->BeginRender();
+			auto* portalCamera = portal->GetCamera();
+			SetCameraAndDraw(portalCamera, false, false, true, true);
+			portal->TransitionToShaderResource();
+		}
+	}
 
-    }
-
-    Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
-    SetCameraAndDraw(cameraController_->GetPlayerCamera()->GetCamera(), true, true, true,false);
-
+	Object3dCommon::GetInstance()->GetDxCommon()->SetMainRenderTarget();
+	SetCameraAndDraw(cameraController_->GetPlayerCamera()->GetCamera(), true, true, true, false);
 }
-void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer,bool drawPlayerHead)
-{
-    // テスト地面
-    testField_->Draw();
-    //壁管理
-    wallManager_->Draw();
-    //壁管理
-    wallManager2_->Draw();
-    //エレベータルーム
-    elevatorRoomManager_->Draw();
-    //自販機
-    vendingMac_->Draw();
-    // コーヒー缶
-    coffees_->Draw();
+void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer, bool drawPlayerHead) {
+	// エレベータルーム
+	elevatorRoomManager_->Draw();
+	stageManager_->DrawModel(isShadow, drawPortal, isDrawParticle);
 
-    //携帯打刻機の描画処理
-    timeCardWatch_->Draw();
-    //懐中電灯
-    flashlight_->Draw();
-    // 鍵の描画処理
-    key_->Draw();
-    //椅子の描画
-    chairManager_->Draw();
-    //打刻機
-    timeCard_->Draw();
-    //タイムカードラック
-    timeCardRack_->Draw();
-    //箱管理
-    boxManager_->Draw();
-    //ロッカー
-    lockerManager_->Draw();
-    
-    if (!isShadow) {
-        Object3dCommon::GetInstance()->DrawCommonSkinning();
-    }
+	if (!isShadow) {
+		Object3dCommon::GetInstance()->DrawCommonSkinning();
+	}
 
-    //PC
-    pc_->Draw();
-    //ドア
-    door_->Draw();
-    //机
-    deskManager_->Draw();
-    // 枝豆の描画処理
-    edamame_->Draw();
-    //エレベーター    
-    elevator_->Draw();
-    //セーブポイント紳士
-    gentleman_->Draw();
+	// エレベーター
+	elevator_->Draw();
+	// セーブポイント紳士
+	gentleman_->Draw();
 
-    if (drawPlayer) {
-        // プレイヤーの描画処理
-        player_->Draw();
-    }
+	if (drawPlayer) {
+		// プレイヤーの描画処理
+		player_->Draw();
+	}
 
-    if (drawPlayerHead) {
- 
-    }
-
-    // ホワイトボード管理の描画
-    whiteBoardManager_->Draw();
-
-    // ポータル管理の描画
-    portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
+	if (drawPlayerHead) {
+	}
 }
 
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
-    player_->SetCamera(camera);
-    testField_->SetCamera(camera);
-    whiteBoardManager_->SetCamera(camera);
-    portalManager_->SetCamera(camera);
-    pc_->SetCamera(camera);
-    timeCardWatch_->SetCamera(camera);
-    flashlight_->SetCamera(camera);
-    key_->SetCamera(camera);
-    edamame_->SetCamera(camera);
-    chairManager_->SetCamera(camera);
-    wallManager_->SetCamera(camera);
-    wallManager2_->SetCamera(camera);
-    elevatorRoomManager_->SetCamera(camera);
-    vendingMac_->SetCamera(camera);
-    door_->SetCamera(camera);
-    lockerManager_->SetCamera(camera);
-    deskManager_->SetCamera(camera);
-    timeCard_->SetCamera(camera);
-    timeCardRack_->SetCamera(camera);
-    boxManager_->SetCamera(camera);
-    elevator_->SetCamera(camera);
-    gentleman_->SetCamera(camera);
+	player_->SetCamera(camera);
+	stageManager_->SetSceneCameraForDraw(camera);
+	elevatorRoomManager_->SetCamera(camera);
+	elevator_->SetCamera(camera);
+	gentleman_->SetCamera(camera);
 }
-void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera)
-{
-    portalManager_->SetPlayerCamera(playerCamera);
-    key_->SetPlayerCamera(playerCamera);
-    edamame_->SetPlayerCamera(playerCamera);
-    chairManager_->SetPlayerCamera(playerCamera);
-    vendingMac_->SetPlayerCamera(playerCamera);
-    door_->SetPlayerCamera(playerCamera);
-    flashlight_->SetPlayerCamera(playerCamera);
-    lockerManager_->SetPlayerCamera(playerCamera);
-    deskManager_->SetPlayerCamera(playerCamera);
-    boxManager_->SetPlayerCamera(playerCamera);
-    pc_->SetPlayerCamera(playerCamera);
-    gentleman_->SetPlayerCamera(playerCamera);
-    elevator_->SetPlayerCamera(playerCamera);
+void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera) {
+	stageManager_->SetPlayerCamera(playerCamera);
+	gentleman_->SetPlayerCamera(playerCamera);
+	elevator_->SetPlayerCamera(playerCamera);
 }
-void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer,bool drawPlayerHead)
-{
-    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
-    SetSceneCameraForDraw(camera);
-    Object3dCommon::GetInstance()->DrawCommon();
-    DrawGameObject(false, drawPortal, isDrawParticle, drawPlayer, drawPlayerHead);
+void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer, bool drawPlayerHead) {
+	Object3dCommon::GetInstance()->SetDefaultCamera(camera);
+	SetSceneCameraForDraw(camera);
+	Object3dCommon::GetInstance()->DrawCommon();
+	DrawGameObject(false, drawPortal, isDrawParticle, drawPlayer, drawPlayerHead);
 }
 #pragma endregion

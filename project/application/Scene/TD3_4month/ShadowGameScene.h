@@ -46,11 +46,10 @@
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 
 #include "Light/CommonLight/DirectionalCommonLight.h" 
-#include "Light/CommonLight/AreaCommonLight.h"
-#include "Light/CommonLight/SpotCommonLight.h" 
-#include "Light/CommonLight/PointCommonLight.h"
+
 #include"Audio.h"
 #include <string>
+#include "Stages/StageManager.h"
 
 class ShadowGameScene : public BaseScene {
 private:
@@ -60,8 +59,9 @@ private:
 
 	std::unique_ptr<UIManager> uiManager_ = nullptr;
 
-    // カメラの設定
+	// カメラの設定
 	CameraController* cameraController_ = nullptr;
+	std::unique_ptr<StageManager> stageManager_ = nullptr;
 #pragma region // シーン遷移の設定
 	// シーン遷移の設定
 	std::unique_ptr<SceneTransition> transition_ = nullptr;
@@ -132,15 +132,7 @@ private:
 #pragma region// light
     //DirectionalLight
     DirectionalCommonLight directionalLight_{};
-    //PointLight
-    std::array<PointCommonLight, kMaxPointLights> pointLights_{};
-    uint32_t activePointLightCount_ = 0;
-    //SpotLight
-    std::array<SpotCommonLight, kMaxSpotLights> spotLights_{};
-    uint32_t activeSpotLightCount_ = 0;
-    //AreaLight
-    std::array<AreaCommonLight, kMaxAreaLights> areaLights_{};
-    uint32_t activeAreaLightCount_ = 0;
+
 #pragma endregion
     bool useDirectionalShadow_ = true;
     bool usePointShadow_ = false;
