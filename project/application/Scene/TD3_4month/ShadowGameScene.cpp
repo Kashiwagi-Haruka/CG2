@@ -101,7 +101,6 @@ void ShadowGameScene::Initialize()
 	progressSaveData_ = gameSave.GetProgressSaveData();
 
     PlayerCommand::Initialize();
-
     //カメラコントローラー
     cameraController_->Initialize();
     cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
