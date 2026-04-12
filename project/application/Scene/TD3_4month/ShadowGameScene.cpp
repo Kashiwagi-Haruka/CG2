@@ -176,22 +176,23 @@ void ShadowGameScene::DebugImGui()
 }
 
 void ShadowGameScene::CheckCollision() {
+	stageManager_->SetCollisionManager(collisionManager_.get());
 	stageManager_->CheckCollision();
 	CollisionManager* currentCollisionManager = stageManager_->GetCollisionManager();
 	if (!currentCollisionManager) {
 		return;
 	}
 	// `collisionManager_ = stageManager_->GetCollisionManager();` と同義の処理
-	CollisionManager& collisionManager = *currentCollisionManager;
+	CollisionManager* collisionManager = currentCollisionManager;
 
-	collisionManager.AddCollider(player_.get());
+	collisionManager->AddCollider(player_.get());
 	for (auto& wall : elevatorRoomManager_->GetWalls()) {
-		collisionManager.AddCollider(wall.get());
+		collisionManager->AddCollider(wall.get());
 	}
 	for (auto& system : elevator_->GetAutoLockSys()) {
-		collisionManager.AddCollider(system.get());
+		collisionManager->AddCollider(system.get());
 	}
-	collisionManager.CheckAllCollisions();
+	collisionManager->CheckAllCollisions();
 }
 
 
