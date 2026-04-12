@@ -1,7 +1,7 @@
 #pragma once
-
+#include <memory>
+#include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 class Camera;
-class CollisionManager;
 class Player;
 class PlayerCamera;
 class PortalManager;
@@ -19,4 +19,5 @@ public:
 	virtual void SetSceneCameraForDraw(Camera* camera) = 0;
 	virtual void SetPlayerCamera(PlayerCamera* playerCamera) = 0;
 	virtual PortalManager* GetPortalManager() = 0;
+	virtual std::unique_ptr<CollisionManager> GetCollisionManager() = 0;
 };

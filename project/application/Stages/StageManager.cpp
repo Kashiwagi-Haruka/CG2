@@ -65,3 +65,9 @@ PortalManager* StageManager::GetPortalManager() {
 	}
 	return stage_->GetPortalManager();
 }
+std::unique_ptr<CollisionManager> StageManager::GetCollisionManager() {
+	if (!stage_) {
+		return {};
+	}
+	return stage_->GetCollisionManager();
+}

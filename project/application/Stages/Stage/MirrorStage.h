@@ -22,6 +22,7 @@ class VendingMac;
 class WallManager;
 class WallManager2;
 class WhiteBoardManager;
+class CollisionManager;
 
 class MirrorStage : public BaseStage {
 private:
@@ -30,6 +31,7 @@ private:
 	std::unique_ptr<TestField> testField_ = nullptr;
 	std::unique_ptr<WhiteBoardManager> whiteBoardManager_ = nullptr;
 	std::unique_ptr<PortalManager> portalManager_ = nullptr;
+	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
 	std::unique_ptr<PC> pc_ = nullptr;
 	std::unique_ptr<Coffees> coffees_ = nullptr;
 	std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
@@ -58,4 +60,5 @@ public:
 	void SetSceneCameraForDraw(Camera* camera) override;
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	PortalManager* GetPortalManager() override;
+	std::unique_ptr<CollisionManager> GetCollisionManager() override;
 };

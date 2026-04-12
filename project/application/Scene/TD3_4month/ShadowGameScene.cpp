@@ -38,7 +38,7 @@ ShadowGameScene::ShadowGameScene() {
 	// エレベータールーム
 	elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
 	// 衝突管理
-	collisionManager_ = std::make_unique<CollisionManager>();
+	collisionManager_ = stageManager_->GetCollisionManager();
 	// UI管理
 	uiManager_ = std::make_unique<UIManager>();
 	GentlemanMenu::SetPlayerCamera(cameraController_->GetPlayerCamera());
@@ -180,9 +180,14 @@ void ShadowGameScene::DebugImGui()
 }
 
 void ShadowGameScene::CheckCollision() {
+	if (!collisionManager_) {
+		return;
+	}
+
 	collisionManager_->ClearColliders();
 	collisionManager_->AddCollider(player_.get());
 	stageManager_->CheckCollision(collisionManager_.get());
+	collisionManager_ = stageManager_->GetCollisionManager();
 
 	for (auto& wall : elevatorRoomManager_->GetWalls()) {
 		collisionManager_->AddCollider(wall.get());

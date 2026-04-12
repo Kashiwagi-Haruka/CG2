@@ -20,11 +20,13 @@
 #include "GameObject/Wall/WallManager2.h"
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
+#include <utility>
 
 MirrorStage::MirrorStage(Player* player) : player_(player) {
 	testField_ = std::make_unique<TestField>();
 	whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
 	portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
+	collisionManager_ = std::make_unique<CollisionManager>();
 
 	pc_ = std::make_unique<PC>();
 	coffees_ = std::make_unique<Coffees>();
@@ -221,3 +223,5 @@ void MirrorStage::SetPlayerCamera(PlayerCamera* playerCamera) {
 }
 
 PortalManager* MirrorStage::GetPortalManager() { return portalManager_.get(); }
+
+std::unique_ptr<CollisionManager> MirrorStage::GetCollisionManager() { return std::move(collisionManager_); }
