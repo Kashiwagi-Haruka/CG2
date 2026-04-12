@@ -30,4 +30,5 @@ public:
 	void SetSceneCameraForDraw(Camera* camera);
 	void SetPlayerCamera(PlayerCamera* playerCamera);
 	PortalManager* GetPortalManager();
+	std::unique_ptr<CollisionManager> GetCollisionManager();
 };
