@@ -12,36 +12,37 @@
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
 
-ShadowGameScene::ShadowGameScene()
-{
-    //BGMの管理
-    BGMManager::Load();
+ShadowGameScene::ShadowGameScene() {
+	// BGMの管理
+	BGMManager::Load();
 
-    //シーン遷移の設定
-    transition_ = std::make_unique<SceneTransition>();
+	// シーン遷移の設定
+	transition_ = std::make_unique<SceneTransition>();
 
-    //プレイヤーの生成
-    player_ = std::make_unique<Player>();
-    //カメラコントローラー
-    cameraController_ = CameraController::GetInstance();
-    cameraController_->SetPlayer(player_.get());
+	// プレイヤーの生成
+	player_ = std::make_unique<Player>();
+	// カメラコントローラー
+	cameraController_ = CameraController::GetInstance();
+	cameraController_->SetPlayer(player_.get());
 
-   
-    // エレベーター
-    elevator_ = std::make_unique<Elevator>();
-    //セーブポイント紳士
-    gentleman_ = std::make_unique<Gentleman>();
-    //エレベータールーム
-    elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
-
-	// UI管理
-	uiManager_ = std::make_unique<UIManager>();
-    //PlayerCameraをセットする
-    SetPlayerCamera(cameraController_->GetPlayerCamera());
-
-    damageOverlay_ = std::make_unique<DamageOverlay>();
+	// ステージ管理
 	stageManager_ = std::make_unique<StageManager>();
 
+	// エレベーター
+	elevator_ = std::make_unique<Elevator>();
+	// セーブポイント紳士
+	gentleman_ = std::make_unique<Gentleman>();
+	// エレベータールーム
+	elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
+
+	// 衝突管理
+	collisionManager_ = std::make_unique<CollisionManager>();
+	// UI管理
+	uiManager_ = std::make_unique<UIManager>();
+	// PlayerCameraをセットする
+	SetPlayerCamera(cameraController_->GetPlayerCamera());
+
+	damageOverlay_ = std::make_unique<DamageOverlay>();
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -50,53 +51,46 @@ ShadowGameScene::~ShadowGameScene()
     BGMManager::UnLoad();
 }
 
-void ShadowGameScene::Initialize()
-{
+void ShadowGameScene::Initialize() {
 
+	BGMManager::Initialize();
 
-    BGMManager::Initialize();
+	uiManager_->Initialize();
+	damageOverlay_->Initialize();
 
-    uiManager_->Initialize();
-    damageOverlay_->Initialize();
-
-    //シーン遷移の設定
-    transition_->Initialize(false);
-    isTransitionIn_ = true;
-    isTransitionOut_ = false;
-    nextSceneName_.clear();
+	// シーン遷移の設定
+	transition_->Initialize(false);
+	isTransitionIn_ = true;
+	isTransitionOut_ = false;
+	nextSceneName_.clear();
 
 	// プレイヤーの初期化
 	player_->Initialize();
 	stageManager_->SetPlayer(player_.get());
 	stageManager_->SetElevatorManager(elevatorRoomManager_.get());
-    PlayerCommand::Initialize();
+	PlayerCommand::Initialize();
 
 	// カメラコントローラー
 	cameraController_->Initialize();
 	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
 
+	InitializeLights();
 
-    InitializeLights();
+	// エレベーター
+	elevator_->Initialize();
+	// セーブポイント紳士
+	gentleman_->Initialize();
+	// エレベータールーム
+	elevatorRoomManager_->Initialize();
+	// カーソルを画面中央に設定する
+	uiManager_->CursorHideAndStop();
+	// カメラをセットする
+	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
-
-    // エレベーター
-    elevator_->Initialize();
-    //セーブポイント紳士
-    gentleman_->Initialize();
-    //エレベータールーム
-    elevatorRoomManager_->Initialize();
-    //カーソルを画面中央に設定する
-    uiManager_->CursorHideAndStop();
-    //カメラをセットする
-    SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
-
-    collisionManager_ = std::make_unique<CollisionManager>();
 	stageManager_->SetCollisionManager(collisionManager_.get());
 
 	stageManager_->ChangeStage("MirrorStage");
-    Update();
-
-
+	Update();
 }
 
 void ShadowGameScene::Update() {
