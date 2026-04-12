@@ -11,8 +11,7 @@
 #include <cmath>
 MirrorStage::MirrorStage() {
 	// objectJson の並びに合わせて生成順を調整
-	// ドア
-	door_ = std::make_unique<Door>();
+
 	// 懐中電灯
 	flashlight_ = std::make_unique<Flashlight>();
 	flashlight_->SetPlayer(player_);
@@ -30,6 +29,8 @@ MirrorStage::MirrorStage() {
 	wallManager2_ = std::make_unique<WallManager2>();
 	// 自販機
 	vendingMac_ = std::make_unique<VendingMac>();
+	// ドア
+	door_ = std::make_unique<Door>();
 	// ロッカー
 	lockerManager_ = std::make_unique<LockerManager>();
 	// 机
