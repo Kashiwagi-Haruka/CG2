@@ -27,6 +27,8 @@ ShadowGameScene::ShadowGameScene() {
 
 	// ステージ管理
 	stageManager_ = std::make_unique<StageManager>();
+	stageManager_->SetPlayer(player_.get());
+	stageManager_->ChangeStage("MirrorStage");
 
 	// エレベーター
 	elevator_ = std::make_unique<Elevator>();
@@ -45,10 +47,9 @@ ShadowGameScene::ShadowGameScene() {
 	damageOverlay_ = std::make_unique<DamageOverlay>();
 }
 
-ShadowGameScene::~ShadowGameScene()
-{
-    //BGMの管理
-    BGMManager::UnLoad();
+ShadowGameScene::~ShadowGameScene() {
+	// BGMの管理
+	BGMManager::UnLoad();
 }
 
 void ShadowGameScene::Initialize() {
@@ -68,6 +69,7 @@ void ShadowGameScene::Initialize() {
 	player_->Initialize();
 	stageManager_->SetPlayer(player_.get());
 	stageManager_->SetElevatorManager(elevatorRoomManager_.get());
+	stageManager_->SetCollisionManager(collisionManager_.get());
 	PlayerCommand::Initialize();
 
 	// カメラコントローラー
@@ -87,9 +89,6 @@ void ShadowGameScene::Initialize() {
 	// カメラをセットする
 	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
-	stageManager_->SetCollisionManager(collisionManager_.get());
-
-	stageManager_->ChangeStage("MirrorStage");
 	Update();
 }
 
