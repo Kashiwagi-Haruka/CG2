@@ -248,7 +248,6 @@ void MirrorStage::CheckCollision() {
 	if (!collisionManager_) {
 		return;
 	}
-	collisionManager_->ClearColliders();
 
 	for (auto& portal : portalManager_->GetPortals()) {
 		if (!portal->GetIsPlayerHit()) {
@@ -281,11 +280,6 @@ void MirrorStage::CheckCollision() {
 	for (auto& box : boxManager_->GetBoxes()) {
 		collisionManager_->AddCollider(box.get());
 	}
-	if (elevatorRoomManager_) {
-		for (auto& wall : elevatorRoomManager_->GetWalls()) {
-			collisionManager_->AddCollider(wall.get());
-		}
-	}
 
 	collisionManager_->AddCollider(vendingMac_.get());
 	collisionManager_->AddCollider(flashlight_.get());
@@ -298,6 +292,7 @@ void MirrorStage::CheckCollision() {
 	collisionManager_->AddCollider(key_.get());
 	collisionManager_->AddCollider(edamame_->GetEdamameModel().get());
 	collisionManager_->AddCollider(pc_.get());
+	collisionManager_->CheckAllCollisions();
 }
 void MirrorStage::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle) {
 	// テスト地面
