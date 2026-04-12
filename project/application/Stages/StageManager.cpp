@@ -71,3 +71,44 @@ std::unique_ptr<CollisionManager> StageManager::GetCollisionManager() {
 	}
 	return stage_->GetCollisionManager();
 }
+PointCommonLight* StageManager::GetPointLights() {
+	if (!stage_) {
+		return nullptr;
+	}
+	return stage_->GetPointLights();
+}
+
+uint32_t StageManager::GetActivePointLightCount() const {
+	if (!stage_) {
+		return 0;
+	}
+	return stage_->GetActivePointLightCount();
+}
+
+SpotCommonLight* StageManager::GetSpotLights() {
+	if (!stage_) {
+		return nullptr;
+	}
+	return stage_->GetSpotLights();
+}
+
+uint32_t StageManager::GetActiveSpotLightCount() const {
+	if (!stage_) {
+		return 0;
+	}
+	return stage_->GetActiveSpotLightCount();
+}
+
+AreaCommonLight* StageManager::GetAreaLights() {
+	if (!stage_) {
+		return nullptr;
+	}
+	return stage_->GetAreaLights();
+}
+
+uint32_t StageManager::GetActiveAreaLightCount() const {
+	if (!stage_) {
+		return 0;
+	}
+	return stage_->GetActiveAreaLightCount();
+}

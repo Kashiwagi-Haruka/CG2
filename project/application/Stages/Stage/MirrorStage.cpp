@@ -71,6 +71,7 @@ void MirrorStage::Initialize() {
 	timeCard_->Initialize();
 	timeCardRack_->Initialize();
 	boxManager_->Initialize();
+	InitializeLights();
 }
 
 void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
@@ -111,8 +112,59 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
     });
 	timeCardRack_->Update();
 	pc_->Update();
+	UpdateLights();
 }
 
+void MirrorStage::InitializeLights() {
+	activePointLightCount_ = 4;
+	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	pointLights_[0].position = {7.0f, 5.0f, 0.0f};
+	pointLights_[0].intensity = 1.0f;
+	pointLights_[0].radius = 10.0f;
+	pointLights_[0].decay = 1.0f;
+	pointLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	pointLights_[1].position = {5.0f, 5.0f, 5.0f};
+	pointLights_[1].intensity = 1.0f;
+	pointLights_[1].radius = 10.0f;
+	pointLights_[1].decay = 1.0f;
+	pointLights_[2] = edamame_->GetPointLights().at(0);
+	pointLights_[3] = edamame_->GetPointLights().at(1);
+
+	activeSpotLightCount_ = 1;
+	spotLights_[0] = flashlight_->GetSpotLight();
+
+	activeAreaLightCount_ = 5;
+	areaLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	areaLights_[0].position = {7.0f, 3.0f, 0.0f};
+	areaLights_[0].normal = {0.0f, 1.0f, 0.0f};
+	areaLights_[0].intensity = 10.0f;
+	areaLights_[0].width = 4.0f;
+	areaLights_[0].height = 0.1f;
+	areaLights_[0].radius = 4.0f;
+	areaLights_[0].decay = 2.0f;
+
+	areaLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	areaLights_[1].position = {-7.0f, 3.0f, 0.0f};
+	areaLights_[1].normal = {0.0f, 1.0f, 0.0f};
+	areaLights_[1].intensity = 10.0f;
+	areaLights_[1].width = 4.0f;
+	areaLights_[1].height = 0.1f;
+	areaLights_[1].radius = 4.0f;
+	areaLights_[1].decay = 2.0f;
+
+	areaLights_[2] = vendingMac_->GetAreaLight();
+	areaLights_[3] = wallManager_->GetAreaLight();
+	areaLights_[4] = wallManager2_->GetAreaLight();
+}
+
+void MirrorStage::UpdateLights() {
+	spotLights_[0] = flashlight_->GetSpotLight();
+	pointLights_[2] = edamame_->GetPointLights().at(0);
+	pointLights_[3] = edamame_->GetPointLights().at(1);
+	areaLights_[2] = vendingMac_->GetAreaLight();
+	areaLights_[3] = wallManager_->GetAreaLight();
+	areaLights_[4] = wallManager2_->GetAreaLight();
+}
 void MirrorStage::UpdatePortal() { portalManager_->Update(); }
 
 void MirrorStage::CheckCollision(CollisionManager* collisionManager) {
@@ -225,3 +277,15 @@ void MirrorStage::SetPlayerCamera(PlayerCamera* playerCamera) {
 PortalManager* MirrorStage::GetPortalManager() { return portalManager_.get(); }
 
 std::unique_ptr<CollisionManager> MirrorStage::GetCollisionManager() { return std::move(collisionManager_); }
+
+PointCommonLight* MirrorStage::GetPointLights() { return pointLights_.data(); }
+
+uint32_t MirrorStage::GetActivePointLightCount() const { return activePointLightCount_; }
+
+SpotCommonLight* MirrorStage::GetSpotLights() { return spotLights_.data(); }
+
+uint32_t MirrorStage::GetActiveSpotLightCount() const { return activeSpotLightCount_; }
+
+AreaCommonLight* MirrorStage::GetAreaLights() { return areaLights_.data(); }
+
+uint32_t MirrorStage::GetActiveAreaLightCount() const { return activeAreaLightCount_; }

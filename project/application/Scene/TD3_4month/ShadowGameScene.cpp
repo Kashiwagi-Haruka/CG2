@@ -98,6 +98,7 @@ void ShadowGameScene::Initialize()
 
  
     InitializeLights();
+	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
 	stageManager_->InitializeStage();
     // エレベーター
     elevator_->Initialize();
@@ -200,54 +201,12 @@ void ShadowGameScene::CheckCollision() {
 	collisionManager_->CheckAllCollisions();
 }
 
-void ShadowGameScene::InitializeLights()
-{
-
-    spotLights_[0] = flashlight_->GetSpotLight();
-    areaLights_[2] = vendingMac_->GetAreaLight();
-
-    activePointLightCount_ = 4;
-    pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    pointLights_[0].position = { 7.0f, 5.0f, 0.0f };
-    pointLights_[0].intensity = 1.0f;
-    pointLights_[0].radius = 10.0f;
-    pointLights_[0].decay = 1.0f;
-    pointLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    pointLights_[1].position = { 5.0f, 5.0f, 5.0f };
-    pointLights_[1].intensity = 1.0f;
-    pointLights_[1].radius = 10.0f;
-    pointLights_[1].decay = 1.0f;
-
-    pointLights_[2] = edamame_->GetPointLights().at(0);
-    pointLights_[3] = edamame_->GetPointLights().at(1);
-
-    directionalLight_.color = { 1.0f, 1.0f, 0.75f, 1.0f };
-    directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
-    directionalLight_.intensity = 0.25f;
-
-    activeSpotLightCount_ = 1;
-
-    activeAreaLightCount_ = 6;
-    areaLights_[0].color = { 1.0f,1.0f, 1.0f, 1.0f };
-    areaLights_[0].position = { 7.0f, 3.0f, 0.0f };
-    areaLights_[0].normal = { 0.0f, 1.0f, 0.0f };
-    areaLights_[0].intensity = 10.0f;
-    areaLights_[0].width = 4.0f;
-    areaLights_[0].height = 0.1f;
-    areaLights_[0].radius = 4.0f;
-    areaLights_[0].decay = 2.0f;
-
-    areaLights_[1].color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    areaLights_[1].position = { -7.0f, 3.0f, 0.0f };
-    areaLights_[1].normal = { 0.0f, 1.0f, 0.0f };
-    areaLights_[1].intensity = 10.0f;
-    areaLights_[1].width = 4.0f;
-    areaLights_[1].height = 0.1f;
-    areaLights_[1].radius = 4.0f;
-    areaLights_[1].decay = 2.0f;
-
+void ShadowGameScene::InitializeLights() {
+	directionalLight_.color = {1.0f, 1.0f, 0.75f, 1.0f};
+	directionalLight_.direction = {0.0f, 1.0f, 0.0f};
+	directionalLight_.intensity = 0.25f;
 }
-#pragma region //private更新処理
+#pragma region // private更新処理
 void ShadowGameScene::UpdateCamera()
 {
 
@@ -332,41 +291,40 @@ void ShadowGameScene::UpdatePlayerDamage() {
 
 void ShadowGameScene::UpdateLight() {
 #pragma region // Lightを組み込む
-
-    spotLights_[0] = flashlight_->GetSpotLight();
-
-    pointLights_[2] = edamame_->GetPointLights().at(0);
-    pointLights_[3] = edamame_->GetPointLights().at(1);
-
-    areaLights_[2] = vendingMac_->GetAreaLight();
-    areaLights_[3] = wallManager_->GetAreaLight();
-    areaLights_[4] = wallManager2_->GetAreaLight();
-    areaLights_[5] = elevatorRoomManager_->GetAreaLight();
-
-    Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-    Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activePointLightCount_);
-    Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeSpotLightCount_);
-    Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeAreaLightCount_);
-    Object3dCommon::GetInstance()->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
+	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+	Object3dCommon::GetInstance()->SetPointLights(stageManager_->GetPointLights(), stageManager_->GetActivePointLightCount());
+	Object3dCommon::GetInstance()->SetSpotLights(stageManager_->GetSpotLights(), stageManager_->GetActiveSpotLightCount());
+	Object3dCommon::GetInstance()->SetAreaLights(stageManager_->GetAreaLights(), stageManager_->GetActiveAreaLightCount());
+	Object3dCommon::GetInstance()->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
 #pragma endregion
 
 #ifdef USE_IMGUI
-    if (ImGui::TreeNode("Light")) {
-        ImGui::DragFloat3("Area0Position", &areaLights_[0].position.x, 0.1f);
-        ImGui::DragFloat3("Area1Position", &areaLights_[1].position.x, 0.1f);
-        ImGui::Checkbox("DirectionalShadow", &useDirectionalShadow_);
-        ImGui::Checkbox("PointShadow", &usePointShadow_);
-        ImGui::Checkbox("SpotShadow", &useSpotShadow_);
-        ImGui::Checkbox("AreaShadow", &useAreaShadow_);
-        pointLights_[0].shadowEnabled = usePointShadow_ ? 1 : 0;
-        spotLights_[0].shadowEnabled = useSpotShadow_ ? 1 : 0;
-        areaLights_[0].shadowEnabled = useAreaShadow_ ? 1 : 0;
-        ImGui::TreePop();
-    }
+	if (ImGui::TreeNode("Light")) {
+		AreaCommonLight* areaLights = stageManager_->GetAreaLights();
+		PointCommonLight* pointLights = stageManager_->GetPointLights();
+		SpotCommonLight* spotLights = stageManager_->GetSpotLights();
+		if (areaLights != nullptr) {
+			ImGui::DragFloat3("Area0Position", &areaLights[0].position.x, 0.1f);
+			ImGui::DragFloat3("Area1Position", &areaLights[1].position.x, 0.1f);
+		}
+		ImGui::Checkbox("DirectionalShadow", &useDirectionalShadow_);
+		ImGui::Checkbox("PointShadow", &usePointShadow_);
+		ImGui::Checkbox("SpotShadow", &useSpotShadow_);
+		ImGui::Checkbox("AreaShadow", &useAreaShadow_);
+		if (pointLights != nullptr) {
+			pointLights[0].shadowEnabled = usePointShadow_ ? 1 : 0;
+		}
+		if (spotLights != nullptr) {
+			spotLights[0].shadowEnabled = useSpotShadow_ ? 1 : 0;
+		}
+		if (areaLights != nullptr) {
+			areaLights[0].shadowEnabled = useAreaShadow_ ? 1 : 0;
+		}
+		ImGui::TreePop();
+	}
 #endif
 }
 #pragma endregion
-
 #pragma region // private描画処理
 void ShadowGameScene::DrawSceneTransition() {
     if (isTransitionIn_ || isTransitionOut_) {
