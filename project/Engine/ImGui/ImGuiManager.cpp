@@ -24,6 +24,10 @@ void ImGuiManager::Initialize([[maybe_unused]] WinApp* winApp, [[maybe_unused]] 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.Colors[ImGuiCol_FrameBg] = ImVec4(0.02f, 0.02f, 0.02f, 1.0f);
+	style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.10f, 0.10f, 0.10f, 1.0f);
+	style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.20f, 0.20f, 0.20f, 1.0f);
 	ImGuiIO& io = ImGui::GetIO();
 
 	// エディター用フォントを全体に適用（日本語グリフを含む）
