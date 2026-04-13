@@ -4,6 +4,8 @@
 #include <imgui.h>
 
 void EditorAsset::EditorDraw() {
+#ifdef USE_IMGUI
+
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
 	const float kTopToolbarHeight = 45.0f;
 	const float kLeftPanelRatio = 0.22f;
@@ -107,4 +109,5 @@ void EditorAsset::EditorDraw() {
 		ImGui::PopStyleColor(4);
 	}
 	ImGui::End();
+#endif // USE_IMGUI
 }
