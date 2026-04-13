@@ -21,6 +21,8 @@ void EditorManager::DrawObjectEditors() {
 	}
 }
 
+void EditorManager::DrawAssetWindow() { editorAsset_.EditorDraw(); }
+
 void EditorManager::DrawEditorGridLines() {
 	if (hierarchy_) {
 		hierarchy_->DrawEditorGridLines();
