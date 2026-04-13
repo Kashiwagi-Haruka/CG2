@@ -1,6 +1,7 @@
 #include "Game.h"
+#include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include "SceneManager.h"
-#include"Text/FreetypeManager/FreeTypeManager.h"
+#include "Text/FreetypeManager/FreeTypeManager.h"
 
 void Game::Initialize() {
 	FrameWork::Initialize();
@@ -10,17 +11,17 @@ void Game::Initialize() {
 
 	sceneFactory_ = std::make_unique<SceneFactory>();
 	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
-	
-	//フリータイプの初期化
+
+	// フリータイプの初期化
 	FreeTypeManager::Initialize();
 
 	SceneManager::GetInstance()->ChangeScene("Title");
 	/*SceneManager::GetInstance()->ChangeScene("Sample");*/
-	//SceneManager::GetInstance()->ChangeScene("Game");
-	//SceneManager::GetInstance()->ChangeScene("Result");
+	// SceneManager::GetInstance()->ChangeScene("Game");
+	// SceneManager::GetInstance()->ChangeScene("Result");
 	/*SceneManager::GetInstance()->ChangeScene("Tutorial");*/
-	//4か月開発のシーンの作成
-	//SceneManager::GetInstance()->ChangeScene("ShadowGame");
+	// 4か月開発のシーンの作成
+	// SceneManager::GetInstance()->ChangeScene("ShadowGame");
 	SEManager::Load();
 }
 
@@ -28,7 +29,11 @@ void Game::Update() {
 	FrameWork::Update();
 	GameBase::GetInstance()->BeginFlame();
 
-	SceneManager::GetInstance()->Update();
+	Hierarchy* hierarchy = Hierarchy::GetInstance();
+	const bool shouldPauseSceneUpdate = hierarchy && hierarchy->IsPlayMode() && hierarchy->IsPaused();
+	if (!shouldPauseSceneUpdate) {
+		SceneManager::GetInstance()->Update();
+	}
 	if (!GameBase::GetInstance()->ProcessMessage()) {
 		endRequest_ = true;
 	}

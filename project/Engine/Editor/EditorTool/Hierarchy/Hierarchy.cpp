@@ -552,8 +552,12 @@ void Hierarchy::DrawSceneSelector() {
 void Hierarchy::SetPlayMode(bool isPlaying) {
 	const bool wasPlaying = isPlaying_;
 	isPlaying_ = isPlaying;
+	if (!isPlaying_) {
+		isPaused_ = false;
+	}
 	editorAudio_.OnPlayModeChanged(isPlaying_, wasPlaying);
 	if (isPlaying_) {
+		isPaused_ = false;
 		editorCamera_.DeactivatePreview();
 	}
 }
@@ -665,7 +669,7 @@ void Hierarchy::DrawObjectEditors() {
 	ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, kTopToolbarHeight), ImGuiCond_Always);
 	if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
-		ToolBar::Result toolbarResult = ToolBar::Draw(isPlaying_, hasUnsavedChanges_, !undoStack_.empty(), !redoStack_.empty(), showGridWindow_, gridSettings_);
+		ToolBar::Result toolbarResult = ToolBar::Draw(isPlaying_, isPaused_, hasUnsavedChanges_, !undoStack_.empty(), !redoStack_.empty(), showGridWindow_, gridSettings_);
 		if (toolbarResult.saveRequested) {
 			if (!isPlaying_) {
 				const std::string saveFilePath = GetSceneScopedEditorFilePath("objectEditors.json");
@@ -690,6 +694,14 @@ void Hierarchy::DrawObjectEditors() {
 		if (toolbarResult.redoRequested) {
 			RedoEditorChange();
 			saveStatusMessage_ = "Redo";
+		}
+		if (toolbarResult.pauseRequested && isPlaying_) {
+			isPaused_ = true;
+			saveStatusMessage_ = "Paused";
+		}
+		if (toolbarResult.resumeRequested && isPlaying_) {
+			isPaused_ = false;
+			saveStatusMessage_ = "Playing";
 		}
 		if (toolbarResult.playRequested) {
 			if (hasUnsavedChanges_) {

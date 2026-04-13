@@ -33,6 +33,7 @@ public:
 	void UpdateEditorPreview();
 	void SetPlayMode(bool isPlaying);
 	bool IsPlayMode() const { return isPlaying_; }
+	bool IsPaused() const { return isPaused_; }
 	bool IsEditorPreviewActive() const;
 	bool LoadObjectEditorsFromJsonIfExists(const std::string& filePath);
 	void Finalize();
@@ -91,6 +92,7 @@ private:
 
 	bool hasUnsavedChanges_ = false;
 	bool isPlaying_ = false;
+	bool isPaused_ = false;
 	std::string loadedSceneName_;
 	bool hasLoadedForCurrentScene_ = false;
 	EditorGrid::Settings gridSettings_{};
