@@ -6,7 +6,7 @@
 #include "externals/imgui/imgui.h"
 #endif
 
-ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo, bool isGridWindowShown) {
+ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo, bool& showGridMenu, EditorGrid::Settings& gridSettings) {
 	Result result{};
 #ifdef USE_IMGUI
 	if (ImGui::BeginMenuBar()) {
@@ -20,8 +20,13 @@ ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUn
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("View")) {
-			if (ImGui::MenuItem("Grid", nullptr, isGridWindowShown)) {
-				result.gridRequested = true;
+			ImGui::MenuItem("Grid", nullptr, &showGridMenu);
+			if (showGridMenu) {
+				ImGui::Separator();
+				if (ImGui::BeginMenu("Grid Settings")) {
+					EditorGrid::DrawSettingsEditor(gridSettings);
+					ImGui::EndMenu();
+				}
 			}
 			const bool isSpriteVisible = SpriteCommon::GetInstance()->IsSpriteVisible();
 			if (ImGui::MenuItem("All Sprites", nullptr, isSpriteVisible)) {
@@ -84,6 +89,8 @@ ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUn
 	(void)canUndo;
 	(void)canRedo;
 	(void)isGridWindowShown;
+	(void)showGridMenu;
+	(void)gridSettings;
 #endif
 	return result;
 }

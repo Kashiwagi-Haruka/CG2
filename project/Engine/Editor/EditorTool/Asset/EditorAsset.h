@@ -1,6 +1,8 @@
 #pragma once
 class EditorAsset {
 
+	public:
+
 	void AudioRegister();
 	void CameraRegister();
 	void SpriteRegister();
@@ -8,4 +10,5 @@ class EditorAsset {
 	void Object3dRegister();
 	void MaterialRegister();
 
+	void EditorDraw();
 };
