@@ -383,6 +383,7 @@
     <ClCompile Include="application\Stages\Stage\MirrorStage.cpp" />
     <ClCompile Include="application\Stages\Stage\LightStage.cpp" />
     <ClCompile Include="Engine\Editor\SaveTemplate\SaveTemplate.cpp" />
+    <ClCompile Include="Engine\Editor\EditorManager\EditorManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -760,6 +761,7 @@
     <ClInclude Include="application\Stages\Stage\MirrorStage.h" />
     <ClInclude Include="application\Stages\Stage\LightStage.h" />
     <ClInclude Include="Engine\Editor\SaveTemplate\SaveTemplate.h" />
+    <ClInclude Include="Engine\Editor\EditorManager\EditorManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

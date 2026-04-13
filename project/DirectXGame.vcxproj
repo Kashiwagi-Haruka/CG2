@@ -184,6 +184,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\CameraController\CameraController.cpp" />
     <ClCompile Include="application\GameObject\UI\DamageOverlay.cpp" />
     <ClCompile Include="application\GameObject\Elevator\ElevatorRoomManager.cpp" />
+    <ClCompile Include="Engine\Editor\EditorManager\EditorManager.cpp" />
     <ClCompile Include="Engine\Editor\Object3d\EditorObject3d.cpp" />
     <ClCompile Include="Engine\Editor\Primitive\EditorPrimitive.cpp" />
     <ClCompile Include="Engine\Editor\Light\EditorLight.cpp" />
@@ -369,6 +370,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\CameraController\CameraController.h" />
     <ClInclude Include="application\GameObject\UI\DamageOverlay.h" />
     <ClInclude Include="application\GameObject\Elevator\ElevatorRoomManager.h" />
+    <ClInclude Include="Engine\Editor\EditorManager\EditorManager.h" />
     <ClInclude Include="Engine\Editor\Object3d\EditorObject3d.h" />
     <ClInclude Include="Engine\Editor\Primitive\EditorPrimitive.h" />
     <ClInclude Include="Engine\Editor\Light\EditorLight.h" />
