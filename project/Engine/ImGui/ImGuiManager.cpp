@@ -114,6 +114,9 @@ void ImGuiManager::Begin() {
 	prevEditorLayoutEnabled_ = isEditorLayoutEnabled;
 #endif
 	editorManager->DrawObjectEditors();
+	if (editorManager->HasRegisteredObjects()) {
+		editorManager->DrawAssetWindow();
+	}
 }
 
 void ImGuiManager::End() {

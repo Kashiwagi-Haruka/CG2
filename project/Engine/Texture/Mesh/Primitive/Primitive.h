@@ -77,6 +77,7 @@ private:
 	Matrix4x4 portalCameraWorld0_{};
 	Matrix4x4 portalCameraWorld1_{};
 	bool usePortalProjection_ = false;
+	std::string editorId_;
 
 public:
 	~Primitive();
@@ -139,6 +140,8 @@ public:
 	void SetSecondaryTextureIndex(uint32_t textureIndex);
 	void ClearSecondaryTextureIndex();
 	void SetEditorRegistrationEnabled(bool enable) { editorRegistrationEnabled_ = enable; }
+	void SetEditorId(const std::string& id) { editorId_ = id; }
+	const std::string& GetEditorId() const { return editorId_; }
 	// ポータル投影 UV 用の 2 つのカメラ ViewProjection を設定
 	void SetPortalProjectionMatrices(const Matrix4x4& textureViewProjection0, const Matrix4x4& textureViewProjection1, const Matrix4x4& portalCameraWorld0, const Matrix4x4& portalCameraWorld1);
 	void SetPortalProjectionEnabled(bool enabled);
