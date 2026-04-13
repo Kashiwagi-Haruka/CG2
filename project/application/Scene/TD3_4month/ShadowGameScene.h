@@ -142,6 +142,8 @@ private:
 
 	std::unique_ptr<DamageOverlay> damageOverlay_ = nullptr;
 
+    std::string currentStageName_ = "MirrorStage";
+
 public:
 	// シーンのコンストラクタ
 	ShadowGameScene();
@@ -191,5 +193,6 @@ private:
     void SetSceneCameraForDraw(Camera* camera);
     void SetPlayerCamera(PlayerCamera* playerCamera);
     void SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer, bool drawPlayerHead);
+	void ChangeStage(const std::string& stageName);
 };
 

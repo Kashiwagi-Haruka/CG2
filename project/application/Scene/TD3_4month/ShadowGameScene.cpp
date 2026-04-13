@@ -41,7 +41,7 @@ ShadowGameScene::ShadowGameScene() {
 	cameraController_ = CameraController::GetInstance();
 	cameraController_->SetPlayer(player_.get());
 	stageManager_ = std::make_unique<StageManager>(player_.get());
-	stageManager_->CreateStage("MirrorStage");
+	stageManager_->CreateStage(currentStageName_);
 	// エレベーター
 	elevator_ = std::make_unique<Elevator>();
 	// セーブポイント紳士
@@ -132,7 +132,9 @@ void ShadowGameScene::Initialize()
 }
 
 void ShadowGameScene::Update() {
-
+#ifdef USE_IMGUI
+	DebugImGui();
+#endif
 	currentEvent_->Update();
 
 	// ライトの更新処理
@@ -181,12 +183,28 @@ void ShadowGameScene::Finalize()
     BGMManager::UnLoad();
 }
 
-void ShadowGameScene::DebugImGui()
-{
+void ShadowGameScene::DebugImGui() {
 #ifdef USE_IMGUI
-    ImGui::Begin("shadowGameScene");
-    ImGui::End();
+	ImGui::Begin("shadowGameScene");
+	static constexpr const char* kStageNames[] = {"MirrorStage", "LightStage"};
+	int stageIndex = (currentStageName_ == "LightStage") ? 1 : 0;
+	if (ImGui::Combo("Stage", &stageIndex, kStageNames, IM_ARRAYSIZE(kStageNames))) {
+		ChangeStage(kStageNames[stageIndex]);
+	}
+	ImGui::End();
 #endif // USE_IMGUI
+}
+
+void ShadowGameScene::ChangeStage(const std::string& stageName) {
+	if (stageName == currentStageName_) {
+		return;
+	}
+	currentStageName_ = stageName;
+	stageManager_->CreateStage(currentStageName_);
+	collisionManager_ = stageManager_->GetCollisionManager();
+	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
+	stageManager_->InitializeStage();
+	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 }
 
 void ShadowGameScene::CheckCollision() {
