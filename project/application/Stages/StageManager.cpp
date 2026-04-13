@@ -1,13 +1,18 @@
-#include "StageManager.h"
+#include "Stage/LightStage.h"
 #include "Stage/MirrorStage.h"
+#include "StageManager.h"
 
 StageManager::StageManager(Player* player) : player_(player) {}
 
 void StageManager::CreateStage(const std::string& sceneName) {
+	if (stage_) {
+		stage_.reset();
+	}
+
 	if (sceneName == "MirrorStage") {
 		stage_ = std::make_unique<MirrorStage>(player_);
-	} else {
-		stage_.reset();
+	} else if (sceneName == "LightStage") {
+		stage_ = std::make_unique<LightStage>(player_);
 	}
 }
 void StageManager::SetPlayer(Player* player) {
