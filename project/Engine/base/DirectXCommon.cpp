@@ -675,7 +675,7 @@ void DirectXCommon::DrawSceneTextureToBackBuffer() {
 		gameViewport.Width = std::max(1.0f, gameWidth);
 		gameViewport.Height = std::max(1.0f, gameHeight);
 		gameViewport.TopLeftX = availableStartX + (availableWidth - gameViewport.Width) * 0.5f;
-		gameViewport.TopLeftY = availableStartY + (availableHeight - gameViewport.Height) * 0.5f;
+		gameViewport.TopLeftY = availableStartY;
 		gameScissor.left = static_cast<LONG>(gameViewport.TopLeftX);
 		gameScissor.top = static_cast<LONG>(gameViewport.TopLeftY);
 		gameScissor.right = gameScissor.left + static_cast<LONG>(gameViewport.Width);
