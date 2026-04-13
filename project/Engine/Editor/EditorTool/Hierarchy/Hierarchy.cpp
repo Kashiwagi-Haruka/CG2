@@ -665,7 +665,7 @@ void Hierarchy::DrawObjectEditors() {
 	ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, kTopToolbarHeight), ImGuiCond_Always);
 	if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
-		ToolBar::Result toolbarResult = ToolBar::Draw(isPlaying_, hasUnsavedChanges_, !undoStack_.empty(), !redoStack_.empty());
+		ToolBar::Result toolbarResult = ToolBar::Draw(isPlaying_, hasUnsavedChanges_, !undoStack_.empty(), !redoStack_.empty(), showGridWindow_, gridSettings_);
 		if (toolbarResult.saveRequested) {
 			if (!isPlaying_) {
 				const std::string saveFilePath = GetSceneScopedEditorFilePath("objectEditors.json");
@@ -675,9 +675,6 @@ void Hierarchy::DrawObjectEditors() {
 				}
 				saveStatusMessage_ = saved ? ("Saved: " + saveFilePath) : ("Save failed: " + saveFilePath);
 			}
-		}
-		if (toolbarResult.gridRequested) {
-			showGridWindow_ = !showGridWindow_;
 		}
 		if (toolbarResult.spriteVisibilityChanged) {
 			saveStatusMessage_ = SpriteCommon::GetInstance()->IsSpriteVisible() ? "View: show all sprites" : "View: hide all sprites";
@@ -797,14 +794,6 @@ void Hierarchy::DrawObjectEditors() {
 		}
 	}
 	ImGui::End();
-	if (showGridWindow_) {
-		ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x + leftPanelWidth + 16.0f, contentStartY + 16.0f), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(340.0f, 190.0f), ImGuiCond_FirstUseEver);
-		if (ImGui::Begin("Grid", &showGridWindow_)) {
-			EditorGrid::DrawSettingsEditor(gridSettings_);
-		}
-		ImGui::End();
-	}
 	const float inspectorPosX = viewport->WorkPos.x + viewport->WorkSize.x - rightPanelWidth;
 	ImGui::SetNextWindowPos(ImVec2(inspectorPosX, contentStartY), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(rightPanelWidth, availableHeight), ImGuiCond_Always);

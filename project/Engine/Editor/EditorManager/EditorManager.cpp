@@ -29,7 +29,9 @@ void EditorManager::DrawEditorGridLines() {
 
 bool EditorManager::HasRegisteredObjects() const { return hierarchy_ && hierarchy_->HasRegisteredObjects(); }
 
-ToolBar::Result EditorManager::DrawToolBar(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo) const { return ToolBar::Draw(isPlaying, hasUnsavedChanges, canUndo, canRedo); }
+ToolBar::Result EditorManager::DrawToolBar(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo, bool& showGridMenu, EditorGrid::Settings& gridSettings) const {
+	return ToolBar::Draw(isPlaying, hasUnsavedChanges, canUndo, canRedo, showGridMenu, gridSettings);
+}
 
 std::vector<EditorGridLine> EditorManager::CreateGridLines(int halfLineCount, float spacing, float lineWidth) const { return EditorGrid::CreateLines(halfLineCount, spacing, lineWidth); }
 

@@ -16,7 +16,7 @@ public:
 	void DrawObjectEditors();
 	void DrawEditorGridLines();
 	bool HasRegisteredObjects() const;
-	ToolBar::Result DrawToolBar(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo) const;
+	ToolBar::Result DrawToolBar(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo, bool& showGridMenu, EditorGrid::Settings& gridSettings) const;
 	std::vector<EditorGridLine> CreateGridLines(int halfLineCount = 50, float spacing = 1.0f, float lineWidth = 1.0f) const;
 	bool DrawObjectInspector(
 	    size_t index, std::string& objectName, Transform& transform, InspectorMaterial& material, bool isPlaying, bool& transformChanged, bool& materialChanged, bool& nameChanged) const;
