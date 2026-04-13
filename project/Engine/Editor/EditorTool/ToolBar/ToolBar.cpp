@@ -6,7 +6,7 @@
 #include "externals/imgui/imgui.h"
 #endif
 
-ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo) {
+ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo, bool isGridWindowShown) {
 	Result result{};
 #ifdef USE_IMGUI
 	if (ImGui::BeginMenuBar()) {
@@ -19,10 +19,10 @@ ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUn
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::MenuItem("Grid")) {
-			result.gridRequested = true;
-		}
 		if (ImGui::BeginMenu("View")) {
+			if (ImGui::MenuItem("Grid", nullptr, isGridWindowShown)) {
+				result.gridRequested = true;
+			}
 			const bool isSpriteVisible = SpriteCommon::GetInstance()->IsSpriteVisible();
 			if (ImGui::MenuItem("All Sprites", nullptr, isSpriteVisible)) {
 				SpriteCommon::GetInstance()->SetSpriteVisible(!isSpriteVisible);
@@ -83,6 +83,7 @@ ToolBar::Result ToolBar::Draw(bool isPlaying, bool hasUnsavedChanges, bool canUn
 	(void)hasUnsavedChanges;
 	(void)canUndo;
 	(void)canRedo;
+	(void)isGridWindowShown;
 #endif
 	return result;
 }

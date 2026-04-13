@@ -13,5 +13,5 @@ public:
 		bool spriteVisibilityChanged = false;
 	};
 
-	static Result Draw(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo);
+	static Result Draw(bool isPlaying, bool hasUnsavedChanges, bool canUndo, bool canRedo, bool isGridWindowShown);
 };
