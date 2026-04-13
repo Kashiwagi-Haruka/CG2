@@ -2,17 +2,17 @@
 #include "Hierarchy.h"
 #include "Camera.h"
 #include "Engine/BaseScene/SceneManager.h"
-#include "Engine/Editor/Object3d/EditorObject3d.h"
-#include "Engine/Editor/Primitive/EditorPrimitive.h"
+#include "Engine/Editor/EditorData/Object3d/EditorObject3d.h"
+#include "Engine/Editor/EditorData/Primitive/EditorPrimitive.h"
+#include "Engine/Editor/EditorTool/Grid/EditorGrid.h"
+#include "Engine/Editor/EditorTool/ToolBar/ToolBar.h"
 #include "Engine/Loadfile/JSON/JsonManager.h"
 #include "Function.h"
-#include "Engine/Editor/Grid/EditorGrid.h"
 #include "Input.h"
 #include "Object3d/Object3d.h"
 #include "Object3d/Object3dCommon.h"
 #include "Primitive/Primitive.h"
 #include "Sprite/SpriteCommon.h"
-#include "Engine/Editor/ToolBar/ToolBar.h"
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
 #endif
@@ -52,7 +52,7 @@ void Hierarchy::Finalize() {
 	selectedObjectIndex_ = 0;
 	selectedIsPrimitive_ = false;
 	selectionBoxDirty_ = true;
-	editorGridDirty_ = true;
+	gridSettings_.dirty = true;
 	loadedSceneName_.clear();
 	editorCamera_.Reset();
 	ResetForSceneChange();
@@ -548,26 +548,7 @@ void Hierarchy::DrawSceneSelector() {
 #endif
 }
 
-void Hierarchy::DrawGridEditor() {
-#ifdef USE_IMGUI
-	ImGui::Checkbox("Enable Grid Snap", &enableGridSnap_);
-	if (ImGui::DragFloat("Grid Snap Spacing", &gridSnapSpacing_, 0.05f, 0.1f, 100.0f, "%.2f")) {
-		editorGridDirty_ = true;
-	}
-	if (ImGui::Checkbox("Draw Editor Grid Lines", &showEditorGridLines_)) {
-		editorGridDirty_ = true;
-	}
-	if (ImGui::DragInt("Grid Half Line Count", &gridHalfLineCount_, 1.0f, 1, 200)) {
-		editorGridDirty_ = true;
-	}
-	if (ImGui::DragFloat("Grid Y", &editorGridY_, 0.01f, -100.0f, 100.0f, "%.2f")) {
-		editorGridDirty_ = true;
-	}
-#endif
 
-	gridSnapSpacing_ = std::max(gridSnapSpacing_, 0.1f);
-	gridHalfLineCount_ = std::max(gridHalfLineCount_, 1);
-}
 void Hierarchy::SetPlayMode(bool isPlaying) {
 	const bool wasPlaying = isPlaying_;
 	isPlaying_ = isPlaying;
@@ -580,42 +561,7 @@ void Hierarchy::SetPlayMode(bool isPlaying) {
 void Hierarchy::DrawEditorGridLines() {
 #ifdef USE_IMGUI
 	DrawCameraBillboards();
-	if (!showEditorGridLines_) {
-		return;
-	}
-
-	if (editorGridDirty_ || !editorGridPlane_) {
-		if (!editorGridPlane_) {
-			editorGridPlane_ = std::make_unique<Primitive>();
-			editorGridPlane_->SetEditorRegistrationEnabled(false);
-			editorGridPlane_->Initialize(Primitive::Plane);
-			editorGridPlane_->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
-			editorGridPlane_->SetEnableLighting(false);
-		}
-
-		const float extent = static_cast<float>(gridHalfLineCount_) * gridSnapSpacing_;
-		Transform gridTransform{};
-		gridTransform.scale = {extent * 2.0f, extent * 2.0f, 1.0f};
-		gridTransform.rotate = {Function::kPi * 0.5f, 0.0f, 0.0f};
-		gridTransform.translate = {0.0f, editorGridY_, 0.0f};
-		editorGridPlane_->SetTransform(gridTransform);
-		editorGridPlane_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-		editorGridPlane_->SetDistortionFalloff(gridSnapSpacing_);                        // spacing
-		editorGridPlane_->SetDistortionStrength(static_cast<float>(gridHalfLineCount_)); // half line count
-		editorGridPlane_->SetEnvironmentCoefficient(gridSnapSpacing_ * 0.025f);          // line width in world unit
-		editorGridDirty_ = false;
-	}
-
-	if (!editorGridPlane_) {
-		return;
-	}
-
-	// シーン切り替え後にカメラが再生成されるため、毎フレーム最新のカメラを参照する
-	editorGridPlane_->SetCamera(Object3dCommon::GetInstance()->GetDefaultCamera());
-
-	Object3dCommon::GetInstance()->DrawCommonEditorGrid();
-	editorGridPlane_->Update();
-	editorGridPlane_->Draw();
+	EditorGrid::DrawEditorGridLines(gridSettings_, editorGridPlane_);
 	if (!showSelectionBox_ || !IsObjectSelected()) {
 		return;
 	}
@@ -855,7 +801,7 @@ void Hierarchy::DrawObjectEditors() {
 		ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x + leftPanelWidth + 16.0f, contentStartY + 16.0f), ImGuiCond_FirstUseEver);
 		ImGui::SetNextWindowSize(ImVec2(340.0f, 190.0f), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin("Grid", &showGridWindow_)) {
-			DrawGridEditor();
+			EditorGrid::DrawSettingsEditor(gridSettings_);
 		}
 		ImGui::End();
 	}

@@ -1,6 +1,6 @@
 #define NOMINMAX
 #include "GameBase.h"
-#include "Engine/Editor/Hierarchy/Hierarchy.h"
+#include "Engine/Editor/EditorManager/EditorManager.h"
 #include "ImGuiManager.h"
 #include "Input.h"
 #include "Model/ModelManager.h"
@@ -41,7 +41,7 @@ void GameBase::Finalize() {
 
 	ParticleManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
-	Hierarchy::GetInstance()->Finalize();
+	EditorManager::GetInstance()->Finalize();
 	SpriteCommon::GetInstance()->Finalize();
 	Object3dCommon::GetInstance()->Finalize();
 
@@ -112,7 +112,7 @@ void GameBase::BeginFlame() {
 
 // --- フレーム終了: ImGui 描画 → Present → フェンス同期まで ---
 void GameBase::EndFlame() {
-	Hierarchy::GetInstance()->DrawEditorGridLines();
+	EditorManager::GetInstance()->DrawEditorGridLines();
 	imguiM_->End();
 	dxCommon_->DrawSceneTextureToBackBuffer();
 	imguiM_->Draw(dxCommon_.get());

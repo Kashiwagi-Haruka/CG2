@@ -184,16 +184,18 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\CameraController\CameraController.cpp" />
     <ClCompile Include="application\GameObject\UI\DamageOverlay.cpp" />
     <ClCompile Include="application\GameObject\Elevator\ElevatorRoomManager.cpp" />
-    <ClCompile Include="Engine\Editor\Object3d\EditorObject3d.cpp" />
-    <ClCompile Include="Engine\Editor\Primitive\EditorPrimitive.cpp" />
-    <ClCompile Include="Engine\Editor\Light\EditorLight.cpp" />
-    <ClCompile Include="Engine\Editor\Audio\EditorAudio.cpp" />
-    <ClCompile Include="Engine\Editor\Camera\EditorCamera.cpp" />
+    <ClCompile Include="Engine\Editor\EditorTool\Asset\EditorAsset.cpp" />
+    <ClCompile Include="Engine\Editor\EditorManager\EditorManager.cpp" />
+    <ClCompile Include="Engine\Editor\EditorData\Object3d\EditorObject3d.cpp" />
+    <ClCompile Include="Engine\Editor\EditorData\Primitive\EditorPrimitive.cpp" />
+    <ClCompile Include="Engine\Editor\EditorData\Light\EditorLight.cpp" />
+    <ClCompile Include="Engine\Editor\EditorData\Audio\EditorAudio.cpp" />
+    <ClCompile Include="Engine\Editor\EditorData\Camera\EditorCamera.cpp" />
     <ClCompile Include="Engine\Audio\AudioMixer.cpp" />
     <ClCompile Include="application\GameObject\Door\Door.cpp" />
     <ClCompile Include="application\GameObject\Door\AutoLockSystem.cpp" />
     <ClCompile Include="application\GameObject\Chair\ChairManager.cpp" />
-    <ClCompile Include="Engine\Editor\Grid\EditorGrid.cpp" />
+    <ClCompile Include="Engine\Editor\EditorTool\Grid\EditorGrid.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp" />
     <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp" />
@@ -265,7 +267,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\Player\Player.cpp" />
     <ClCompile Include="application\GameObject\YoshidaMath\YoshidaMath.cpp" />
     <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp" />
-    <ClCompile Include="Engine\Editor\Hierarchy\Hierarchy.cpp" />
+    <ClCompile Include="Engine\Editor\EditorTool\Hierarchy\Hierarchy.cpp" />
     <ClCompile Include="application\GameObject\TestField\TestField.cpp" />
     <ClCompile Include="application\GameObject\Portal\Portal.cpp" />
     <ClCompile Include="application\GameObject\WarpPos\WarpPos.cpp" />
@@ -274,8 +276,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\GameObject\TimeCard\TimeCardWatch.cpp" />
     <ClCompile Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.cpp" />
     <ClCompile Include="Engine\Texture\PSO\SpriteCreatePSO.cpp" />
-    <ClCompile Include="Engine\Editor\Inspector\Inspector.cpp" />
-    <ClCompile Include="Engine\Editor\ToolBar\ToolBar.cpp" />
+    <ClCompile Include="Engine\Editor\EditorTool\Inspector\Inspector.cpp" />
+    <ClCompile Include="Engine\Editor\EditorTool\ToolBar\ToolBar.cpp" />
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Portal\PortalMesh.cpp" />
     <ClCompile Include="application\GameObject\WhiteBoard\WalkWhiteBoard.cpp" />
@@ -318,6 +320,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClCompile Include="application\Stages\StageManager.cpp" />
     <ClCompile Include="application\Stages\Stage\MirrorStage.cpp" />
     <ClCompile Include="application\Stages\Stage\LightStage.cpp" />
+    <ClCompile Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -368,16 +371,18 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\CameraController\CameraController.h" />
     <ClInclude Include="application\GameObject\UI\DamageOverlay.h" />
     <ClInclude Include="application\GameObject\Elevator\ElevatorRoomManager.h" />
-    <ClInclude Include="Engine\Editor\Object3d\EditorObject3d.h" />
-    <ClInclude Include="Engine\Editor\Primitive\EditorPrimitive.h" />
-    <ClInclude Include="Engine\Editor\Light\EditorLight.h" />
-    <ClInclude Include="Engine\Editor\Audio\EditorAudio.h" />
-    <ClInclude Include="Engine\Editor\Camera\EditorCamera.h" />
+    <ClInclude Include="Engine\Editor\EditorTool\Asset\EditorAsset.h" />
+    <ClInclude Include="Engine\Editor\EditorManager\EditorManager.h" />
+    <ClInclude Include="Engine\Editor\EditorData\Object3d\EditorObject3d.h" />
+    <ClInclude Include="Engine\Editor\EditorData\Primitive\EditorPrimitive.h" />
+    <ClInclude Include="Engine\Editor\EditorData\Light\EditorLight.h" />
+    <ClInclude Include="Engine\Editor\EditorData\Audio\EditorAudio.h" />
+    <ClInclude Include="Engine\Editor\EditorData\Camera\EditorCamera.h" />
     <ClInclude Include="Engine\Audio\AudioMixer.h" />
     <ClInclude Include="application\GameObject\Door\Door.h" />
     <ClInclude Include="application\GameObject\Door\AutoLockSystem.h" />
     <ClInclude Include="application\GameObject\Chair\ChairManager.h" />
-    <ClInclude Include="Engine\Editor\Grid\EditorGrid.h" />
+    <ClInclude Include="Engine\Editor\EditorTool\Grid\EditorGrid.h" />
     <ClInclude Include="Engine\Texture\Data\Material.h" />
     <ClInclude Include="Engine\Texture\Light\SoloLight\AreaLight.h" />
     <ClInclude Include="Engine\Texture\Light\SoloLight\DirectionalLight.h" />
@@ -457,7 +462,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\Player\Player.h" />
     <ClInclude Include="application\GameObject\YoshidaMath\YoshidaMath.h" />
     <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h" />
-    <ClInclude Include="Engine\Editor\Hierarchy\Hierarchy.h" />
+    <ClInclude Include="Engine\Editor\EditorTool\Hierarchy\Hierarchy.h" />
     <ClInclude Include="application\GameObject\TestField\TestField.h" />
     <ClInclude Include="application\GameObject\Portal\Portal.h" />
     <ClInclude Include="application\GameObject\WarpPos\WarpPos.h" />
@@ -466,8 +471,8 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\GameObject\TimeCard\TimeCardWatch.h" />
     <ClInclude Include="application\GameObject\GameCamera\PlayerCamera\PlayerCamera.h" />
     <ClInclude Include="Engine\Texture\PSO\SpriteCreatePSO.h" />
-    <ClInclude Include="Engine\Editor\Inspector\Inspector.h" />
-    <ClInclude Include="Engine\Editor\ToolBar\ToolBar.h" />
+    <ClInclude Include="Engine\Editor\EditorTool\Inspector\Inspector.h" />
+    <ClInclude Include="Engine\Editor\EditorTool\ToolBar\ToolBar.h" />
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
     <ClInclude Include="Engine\Texture\Mesh\Portal\PortalMesh.h" />
     <ClInclude Include="application\GameObject\WhiteBoard\WalkWhiteBoard.h" />
@@ -509,6 +514,7 @@ copy "$(WindowsSdkDir)\bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)\
     <ClInclude Include="application\Stages\StageManager.h" />
     <ClInclude Include="application\Stages\Stage\MirrorStage.h" />
     <ClInclude Include="application\Stages\Stage\LightStage.h" />
+    <ClInclude Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
