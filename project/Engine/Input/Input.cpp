@@ -3,6 +3,9 @@
 #include <cassert>
 #include <algorithm>
 #include <cmath>
+#ifdef USE_IMGUI
+#include "imgui.h"
+#endif
 
 
 #pragma comment(lib, "dinput8.lib")
@@ -67,6 +70,45 @@ void GetCombinedTriggerValues(const DIJOYSTATE& state, int leftButtonIndex, int 
 	}
 }
 float NormalizeXInputTrigger(BYTE triggerValue) { return Clamp01(static_cast<float>(triggerValue) / 255.0f); }
+bool IsForegroundWindow(const WinApp* winApp) {
+	if (!winApp) {
+		return false;
+	}
+	return GetForegroundWindow() == winApp->GetHwnd();
+}
+
+bool IsMouseInClientArea(const WinApp* winApp, LONG mouseX, LONG mouseY) {
+	if (!winApp) {
+		return false;
+	}
+	RECT clientRect{};
+	if (!GetClientRect(winApp->GetHwnd(), &clientRect)) {
+		return false;
+	}
+	return mouseX >= clientRect.left && mouseX < clientRect.right && mouseY >= clientRect.top && mouseY < clientRect.bottom;
+}
+
+bool IsImGuiCapturingMouse() {
+#ifdef USE_IMGUI
+	if (ImGui::GetCurrentContext() == nullptr) {
+		return false;
+	}
+	return ImGui::GetIO().WantCaptureMouse;
+#else
+	return false;
+#endif
+}
+
+bool IsImGuiCapturingKeyboard() {
+#ifdef USE_IMGUI
+	if (ImGui::GetCurrentContext() == nullptr) {
+		return false;
+	}
+	return ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantTextInput;
+#else
+	return false;
+#endif
+}
 } // namespace
 
 Input* Input::GetInstance() {
@@ -216,6 +258,9 @@ void Input::Update() {
 }
 
 bool Input::PushKey(BYTE keyNumber) {
+	if (!IsForegroundWindow(winApp_) || IsImGuiCapturingKeyboard()) {
+		return false;
+	}
 
 	if (key[keyNumber]) {
 
@@ -226,6 +271,9 @@ bool Input::PushKey(BYTE keyNumber) {
 }
 
 bool Input::TriggerKey(BYTE keyNumber) {
+	if (!IsForegroundWindow(winApp_) || IsImGuiCapturingKeyboard()) {
+		return false;
+	}
 
 	if (key[keyNumber] && !preKey[keyNumber]) {
 
@@ -236,6 +284,9 @@ bool Input::TriggerKey(BYTE keyNumber) {
 }
 
 bool Input::ReleaseKey(BYTE keyNumber) {
+	if (!IsForegroundWindow(winApp_) || IsImGuiCapturingKeyboard()) {
+		return false;
+	}
 
 	if (!key[keyNumber] && preKey[keyNumber]) {
 
@@ -450,12 +501,23 @@ float Input::GetMouseX() const { return static_cast<float>(mouseX_); }
 float Input::GetMouseY() const { return static_cast<float>(mouseY_); }
 
 Vector2 Input::GetMouseMove() const {
+	if (!IsForegroundWindow(winApp_) || !IsMouseInClientArea(winApp_, mouseX_, mouseY_) || IsImGuiCapturingMouse()) {
+		return Vector2();
+	}
 	// DIMOUSESTATE2 の lX, lY は相対移動量
 	return Vector2(static_cast<float>(mouseState_.lX), static_cast<float>(mouseState_.lY));
 }
-float Input::GetMouseWheelDelta() const { return static_cast<float>(mouseState_.lZ); }
+float Input::GetMouseWheelDelta() const {
+	if (!IsForegroundWindow(winApp_) || !IsMouseInClientArea(winApp_, mouseX_, mouseY_) || IsImGuiCapturingMouse()) {
+		return 0.0f;
+	}
+	return static_cast<float>(mouseState_.lZ);
+}
 
 bool Input::PushMouseButton(MouseButton button) const {
+	if (!IsForegroundWindow(winApp_) || !IsMouseInClientArea(winApp_, mouseX_, mouseY_) || IsImGuiCapturingMouse()) {
+		return false;
+	}
 	int index = static_cast<int>(button);
 	if (index < 0 || index >= static_cast<int>(MouseButton::kMaxButtons)) {
 		return false;
@@ -464,6 +526,9 @@ bool Input::PushMouseButton(MouseButton button) const {
 }
 
 bool Input::TriggerMouseButton(MouseButton button) const {
+	if (!IsForegroundWindow(winApp_) || !IsMouseInClientArea(winApp_, mouseX_, mouseY_) || IsImGuiCapturingMouse()) {
+		return false;
+	}
 	int index = static_cast<int>(button);
 	if (index < 0 || index >= static_cast<int>(MouseButton::kMaxButtons)) {
 		return false;
@@ -473,6 +538,9 @@ bool Input::TriggerMouseButton(MouseButton button) const {
 	return (now && !prev);
 }
 bool Input::ReleaseMouseButton(MouseButton button) const {
+	if (!IsForegroundWindow(winApp_) || !IsMouseInClientArea(winApp_, mouseX_, mouseY_) || IsImGuiCapturingMouse()) {
+		return false;
+	}
 	int index = static_cast<int>(button);
 	if (index < 0 || index >= static_cast<int>(MouseButton::kMaxButtons)) {
 		return false;
