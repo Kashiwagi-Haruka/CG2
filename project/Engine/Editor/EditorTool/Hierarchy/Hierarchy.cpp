@@ -22,6 +22,9 @@
 #include <cstdint>
 #include <filesystem>
 #include <string>
+#include <limits>
+#include <string>
+#include <unordered_map>
 
 namespace {
 std::filesystem::path ResolveObjectEditorJsonPath(const std::string& filePath) { return std::filesystem::path("Resources") / "JSON" / std::filesystem::path(filePath).filename(); }
@@ -292,6 +295,7 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 		nlohmann::json objectJson;
 		objectJson["index"] = i;
 		objectJson["name"] = objectNames_[i];
+		objectJson["editorId"] = object->GetEditorId();
 		objectJson["transform"] = {
 		    {"scale",     {transform.scale.x, transform.scale.y, transform.scale.z}            },
 		    {"rotate",    {transform.rotate.x, transform.rotate.y, transform.rotate.z}         },
@@ -314,17 +318,17 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 		root["objects"].push_back(objectJson);
 	}
 
-
 	for (size_t i = 0; i < primitives_.size(); ++i) {
 		const Primitive* primitive = primitives_[i];
 		if (!primitive || primitive == selectionBoxPrimitive_.get()) {
 			continue;
 		}
 		const Transform& transform = primitiveEditorTransforms_[i];
-		const InspectorMaterial& material = editorMaterials_[i];
+		const InspectorMaterial& material = primitiveEditorMaterials_[i];
 		nlohmann::json primitiveJson;
 		primitiveJson["index"] = i;
 		primitiveJson["name"] = primitiveNames_[i];
+		primitiveJson["editorId"] = primitive->GetEditorId();
 		primitiveJson["transform"] = {
 		    {"scale",     {transform.scale.x, transform.scale.y, transform.scale.z}            },
 		    {"rotate",    {transform.rotate.x, transform.rotate.y, transform.rotate.z}         },
@@ -364,12 +368,33 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 		return false;
 	}
 
+	std::unordered_map<std::string, size_t> objectIdToIndex;
+	for (size_t i = 0; i < objects_.size(); ++i) {
+		if (!objects_[i]) {
+			continue;
+		}
+		const std::string& editorId = objects_[i]->GetEditorId();
+		if (!editorId.empty()) {
+			objectIdToIndex.emplace(editorId, i);
+		}
+	}
+
 	if (root.contains("objects") && root["objects"].is_array()) {
 		for (const auto& objectJson : root["objects"]) {
-			if (!objectJson.contains("index") || !objectJson["index"].is_number_unsigned()) {
-				continue;
+			size_t index = std::numeric_limits<size_t>::max();
+			if (objectJson.contains("editorId") && objectJson["editorId"].is_string()) {
+				const std::string editorId = objectJson["editorId"].get<std::string>();
+				const auto idIt = objectIdToIndex.find(editorId);
+				if (idIt != objectIdToIndex.end()) {
+					index = idIt->second;
+				}
 			}
-			const size_t index = objectJson["index"].get<size_t>();
+			if (index == std::numeric_limits<size_t>::max()) {
+				if (!objectJson.contains("index") || !objectJson["index"].is_number_unsigned()) {
+					continue;
+				}
+				index = objectJson["index"].get<size_t>();
+			}
 			if (index >= objects_.size() || !objects_[index]) {
 				continue;
 			}
@@ -434,12 +459,33 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 		}
 	}
 
+	std::unordered_map<std::string, size_t> primitiveIdToIndex;
+	for (size_t i = 0; i < primitives_.size(); ++i) {
+		if (!primitives_[i] || primitives_[i] == selectionBoxPrimitive_.get()) {
+			continue;
+		}
+		const std::string& editorId = primitives_[i]->GetEditorId();
+		if (!editorId.empty()) {
+			primitiveIdToIndex.emplace(editorId, i);
+		}
+	}
+
 	if (root.contains("primitives") && root["primitives"].is_array()) {
 		for (const auto& primitiveJson : root["primitives"]) {
-			if (!primitiveJson.contains("index") || !primitiveJson["index"].is_number_unsigned()) {
-				continue;
+			size_t index = std::numeric_limits<size_t>::max();
+			if (primitiveJson.contains("editorId") && primitiveJson["editorId"].is_string()) {
+				const std::string editorId = primitiveJson["editorId"].get<std::string>();
+				const auto idIt = primitiveIdToIndex.find(editorId);
+				if (idIt != primitiveIdToIndex.end()) {
+					index = idIt->second;
+				}
 			}
-			const size_t index = primitiveJson["index"].get<size_t>();
+			if (index == std::numeric_limits<size_t>::max()) {
+				if (!primitiveJson.contains("index") || !primitiveJson["index"].is_number_unsigned()) {
+					continue;
+				}
+				index = primitiveJson["index"].get<size_t>();
+			}
 			if (index >= primitives_.size() || !primitives_[index] || primitives_[index] == selectionBoxPrimitive_.get()) {
 				continue;
 			}

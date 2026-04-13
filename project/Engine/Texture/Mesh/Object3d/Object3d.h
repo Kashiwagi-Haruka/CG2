@@ -56,6 +56,7 @@ class Object3d {
 	Vector3 uvRotate_ = {0.0f, 0.0f, 0.0f};
 	Vector3 uvTranslate_ = {0.0f, 0.0f, 0.0f};
 	Vector2 uvAnchor_ = {0.0f, 0.0f};
+	std::string editorId_;
 
 public:
 	~Object3d();
@@ -116,5 +117,7 @@ public:
 	Vector3 GetRotate() { return transform_.rotate; }
 	Vector3 GetScale() { return transform_.scale; }
 	Transform GetTransform() const { return transform_; }
+	void SetEditorId(const std::string& id) { editorId_ = id; }
+	const std::string& GetEditorId() const { return editorId_; }
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix; }
 };
