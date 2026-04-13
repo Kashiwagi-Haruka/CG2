@@ -127,7 +127,7 @@ void MirrorStage::InitializeLights() {
 	pointLights_[0].radius = 10.0f;
 	pointLights_[0].decay = 1.0f;
 	pointLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLights_[1].position = {5.0f, 5.0f, 5.0f};
+	pointLights_[1].position = {-7.0f, 5.0f, 0.0f};
 	pointLights_[1].intensity = 1.0f;
 	pointLights_[1].radius = 10.0f;
 	pointLights_[1].decay = 1.0f;
