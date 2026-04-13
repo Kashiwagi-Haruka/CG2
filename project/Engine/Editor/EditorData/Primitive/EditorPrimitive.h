@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Editor/Inspector/Inspector.h"
+#include "Engine/Editor/EditorTool/Inspector/Inspector.h"
 #include "Transform.h"
 
 class Primitive;

@@ -9,11 +9,11 @@
 #include "Vector3.h"
 #include "Vector4.h"
 
-#include "Engine/Editor/Audio/EditorAudio.h"
-#include "Engine/Editor/Camera/EditorCamera.h"
-#include "Engine/Editor/Grid/EditorGrid.h"
-#include "Engine/Editor/Inspector/Inspector.h"
-#include "Engine/Editor/Light/EditorLight.h"
+#include "Engine/Editor/EditorData/Audio/EditorAudio.h"
+#include "Engine/Editor/EditorData/Camera/EditorCamera.h"
+#include "Engine/Editor/EditorTool/Grid/EditorGrid.h"
+#include "Engine/Editor/EditorTool/Inspector/Inspector.h"
+#include "Engine/Editor/EditorData/Light/EditorLight.h"
 
 class Object3d;
 class Primitive;

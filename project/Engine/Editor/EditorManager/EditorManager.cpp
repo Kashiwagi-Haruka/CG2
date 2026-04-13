@@ -1,6 +1,6 @@
 #include "EditorManager.h"
 
-#include "Engine/Editor/Hierarchy/Hierarchy.h"
+#include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 
 EditorManager* EditorManager::GetInstance() {
 	static EditorManager instance;

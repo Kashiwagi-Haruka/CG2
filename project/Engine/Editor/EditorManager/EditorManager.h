@@ -3,10 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "Engine/Editor/Grid/EditorGrid.h"
-#include "Engine/Editor/Inspector/Inspector.h"
-#include "Engine/Editor/ToolBar/ToolBar.h"
-
+#include "Engine/Editor/EditorTool/Grid/EditorGrid.h"
+#include "Engine/Editor/EditorTool/Inspector/Inspector.h"
+#include "Engine/Editor/EditorTool/ToolBar/ToolBar.h"
 class Hierarchy;
 
 class EditorManager {

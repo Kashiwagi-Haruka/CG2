@@ -34,4 +34,3 @@ public:
 private:
 	static Vector4 GetLineColor(int index);
 };
-project / Engine / Editor / Hierarchy / Hierarchy.cpp project / Engine / Editor / Hierarchy / Hierarchy.cpp

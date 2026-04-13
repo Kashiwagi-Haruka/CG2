@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "EditorGrid.h"
 
 #include "Function.h"
