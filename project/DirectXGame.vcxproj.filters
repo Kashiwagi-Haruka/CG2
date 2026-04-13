@@ -112,7 +112,7 @@
     <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp">
       <Filter>Engine\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\Grid\EditorGrid.cpp">
+    <ClCompile Include="Engine\Editor\EditorTool\Grid\EditorGrid.cpp">
       <Filter>Engine\Editor</Filter>
     </ClCompile>
     <ClCompile Include="Engine\BaseScene\FrameWork.cpp">
@@ -142,7 +142,7 @@
     <ClCompile Include="application\GameTimer\GameTimer.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\Hierarchy\Hierarchy.cpp">
+    <ClCompile Include="Engine\Editor\EditorTool\Hierarchy\Hierarchy.cpp">
       <Filter>Engine\Editor</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -175,7 +175,7 @@
     <ClCompile Include="Engine\Log\Logger.cpp">
       <Filter>Engine\Logger</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\Inspector\Inspector.cpp">
+    <ClCompile Include="Engine\Editor\EditorTool\Inspector\Inspector.cpp">
       <Filter>Engine\Editor</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Loadfile\JSON\JsonManager.cpp">
@@ -295,7 +295,7 @@
     <ClCompile Include="Engine\base\WinApp.cpp">
       <Filter>Engine\Base</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Editor\ToolBar\ToolBar.cpp">
+    <ClCompile Include="Engine\Editor\EditorTool\ToolBar\ToolBar.cpp">
       <Filter>Engine\Editor</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp">
@@ -343,11 +343,11 @@
     <ClCompile Include="application\GameObject\Locker\LockerManager.cpp" />
     <ClCompile Include="application\GameObject\Desk\Desk.cpp" />
     <ClCompile Include="application\GameObject\Desk\DeskManager.cpp" />
-    <ClCompile Include="Engine\Editor\Camera\EditorCamera.cpp" />
-    <ClCompile Include="Engine\Editor\Audio\EditorAudio.cpp" />
-    <ClCompile Include="Engine\Editor\Light\EditorLight.cpp" />
-    <ClCompile Include="Engine\Editor\Object3d\EditorObject3d.cpp" />
-    <ClCompile Include="Engine\Editor\Primitive\EditorPrimitive.cpp" />
+    <ClCompile Include="Engine\Editor\EditorData\Camera\EditorCamera.cpp" />
+    <ClCompile Include="Engine\Editor\EditorData\Audio\EditorAudio.cpp" />
+    <ClCompile Include="Engine\Editor\EditorData\Light\EditorLight.cpp" />
+    <ClCompile Include="Engine\Editor\EditorData\Object3d\EditorObject3d.cpp" />
+    <ClCompile Include="Engine\Editor\EditorData\Primitive\EditorPrimitive.cpp" />
     <ClCompile Include="application\Text\ChairMenu\ChairMenu.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCard.cpp" />
     <ClCompile Include="application\GameObject\TimeCard\TimeCardRack.cpp" />
@@ -382,8 +382,9 @@
     <ClCompile Include="application\Stages\StageManager.cpp" />
     <ClCompile Include="application\Stages\Stage\MirrorStage.cpp" />
     <ClCompile Include="application\Stages\Stage\LightStage.cpp" />
-    <ClCompile Include="Engine\Editor\SaveTemplate\SaveTemplate.cpp" />
+    <ClCompile Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.cpp" />
     <ClCompile Include="Engine\Editor\EditorManager\EditorManager.cpp" />
+    <ClCompile Include="Engine\Editor\EditorTool\Asset\EditorAsset.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -444,7 +445,7 @@
     <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h">
       <Filter>Engine\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\Grid\EditorGrid.h">
+    <ClInclude Include="Engine\Editor\EditorTool\Grid\EditorGrid.h">
       <Filter>Engine\Editor</Filter>
     </ClInclude>
     <ClInclude Include="Engine\BaseScene\FrameWork.h">
@@ -474,7 +475,7 @@
     <ClInclude Include="application\Scene\GameScene.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\Hierarchy\Hierarchy.h">
+    <ClInclude Include="Engine\Editor\EditorTool\Hierarchy\Hierarchy.h">
       <Filter>Engine\Editor</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -507,7 +508,7 @@
     <ClInclude Include="Engine\Log\Logger.h">
       <Filter>Engine\Logger</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\Inspector\Inspector.h">
+    <ClInclude Include="Engine\Editor\EditorTool\Inspector\Inspector.h">
       <Filter>Engine\Editor</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Loadfile\JSON\JsonManager.h">
@@ -639,7 +640,7 @@
     <ClInclude Include="Engine\base\WinApp.h">
       <Filter>Engine\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Editor\ToolBar\ToolBar.h">
+    <ClInclude Include="Engine\Editor\EditorTool\ToolBar\ToolBar.h">
       <Filter>Engine\Editor</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Math\Vector4.h">
@@ -714,11 +715,11 @@
     <ClInclude Include="application\GameObject\Locker\LockerManager.h" />
     <ClInclude Include="application\GameObject\Desk\Desk.h" />
     <ClInclude Include="application\GameObject\Desk\DeskManager.h" />
-    <ClInclude Include="Engine\Editor\Camera\EditorCamera.h" />
-    <ClInclude Include="Engine\Editor\Audio\EditorAudio.h" />
-    <ClInclude Include="Engine\Editor\Light\EditorLight.h" />
-    <ClInclude Include="Engine\Editor\Object3d\EditorObject3d.h" />
-    <ClInclude Include="Engine\Editor\Primitive\EditorPrimitive.h" />
+    <ClInclude Include="Engine\Editor\EditorData\Camera\EditorCamera.h" />
+    <ClInclude Include="Engine\Editor\EditorData\Audio\EditorAudio.h" />
+    <ClInclude Include="Engine\Editor\EditorData\Light\EditorLight.h" />
+    <ClInclude Include="Engine\Editor\EditorData\Object3d\EditorObject3d.h" />
+    <ClInclude Include="Engine\Editor\EditorData\Primitive\EditorPrimitive.h" />
     <ClInclude Include="application\Text\ChairMenu\ChairMenu.h" />
     <ClInclude Include="application\GameObject\TimeCard\TimeCard.h" />
     <ClInclude Include="application\GameObject\TimeCard\TimeCardRack.h" />
@@ -760,8 +761,9 @@
     <ClInclude Include="application\Stages\BaseStage.h" />
     <ClInclude Include="application\Stages\Stage\MirrorStage.h" />
     <ClInclude Include="application\Stages\Stage\LightStage.h" />
-    <ClInclude Include="Engine\Editor\SaveTemplate\SaveTemplate.h" />
+    <ClInclude Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.h" />
     <ClInclude Include="Engine\Editor\EditorManager\EditorManager.h" />
+    <ClInclude Include="Engine\Editor\EditorTool\Asset\EditorAsset.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

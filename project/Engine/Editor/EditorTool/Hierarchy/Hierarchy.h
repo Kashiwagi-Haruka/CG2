@@ -11,6 +11,7 @@
 
 #include "Engine/Editor/Audio/EditorAudio.h"
 #include "Engine/Editor/Camera/EditorCamera.h"
+#include "Engine/Editor/Grid/EditorGrid.h"
 #include "Engine/Editor/Inspector/Inspector.h"
 #include "Engine/Editor/Light/EditorLight.h"
 
@@ -47,7 +48,6 @@ private:
 	};
 
 	void DrawSceneSelector();
-	void DrawGridEditor();
 	void DrawLightEditor();
 	void DrawSelectionBoxEditor();
 	void DrawCameraEditor();
@@ -93,12 +93,7 @@ private:
 	bool isPlaying_ = false;
 	std::string loadedSceneName_;
 	bool hasLoadedForCurrentScene_ = false;
-	bool enableGridSnap_ = true;
-	float gridSnapSpacing_ = 1.0f;
-	bool showEditorGridLines_ = true;
-	int gridHalfLineCount_ = 50;
-	float editorGridY_ = 0.0f;
-	bool editorGridDirty_ = true;
+	EditorGrid::Settings gridSettings_{};
 	bool showGridWindow_ = true;
 	std::unique_ptr<Primitive> editorGridPlane_;
 	EditorLight editorLight_{};

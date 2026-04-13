@@ -1,3 +1,5 @@
+#pragma once
+
 class ToolBar final {
 public:
 	struct Result final {
