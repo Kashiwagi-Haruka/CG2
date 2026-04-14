@@ -45,7 +45,6 @@ Object3dVertexShaderOutput main(VertexShaderInput input)
 
     float3 normal = normalize(input.normal);
     float4 inflatedPosition = input.position;
-    inflatedPosition.xyz += normal * max(gMaterial.outlineWidth, 0.0f) * 0.05f;
 
     output.position = mul(inflatedPosition, gTransformationMatrix.WVP);
     output.normal = normalize(mul(normal, (float3x3) gTransformationMatrix.WorldInverseTranspose));
