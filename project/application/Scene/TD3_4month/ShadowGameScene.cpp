@@ -40,6 +40,9 @@ ShadowGameScene::ShadowGameScene() {
 	// カメラコントローラー
 	cameraController_ = CameraController::GetInstance();
 	cameraController_->SetPlayer(player_.get());
+	
+	lightManager_ = std::make_unique<Yoshida::LightManager>();
+	
 	stageManager_ = std::make_unique<StageManager>(player_.get());
 	stageManager_->CreateStage(currentStageName_);
 	// エレベーター
@@ -82,15 +85,13 @@ void ShadowGameScene::Initialize()
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;
 
-
     //シーン遷移の設定
     transition_->Initialize(false);
     isTransitionIn_ = true;
     isTransitionOut_ = false;
     nextSceneName_.clear();
 
-
-		auto& gameSave = GameSave::GetInstance();
+	auto& gameSave = GameSave::GetInstance();
 
 	if (gameSave.GetInitStart()) {
 		gameSave.InitData();
@@ -105,10 +106,14 @@ void ShadowGameScene::Initialize()
     cameraController_->Initialize();
     cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
 
- 
-    InitializeLights();
+	lightManager_->Initialize();
+
+
 	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
+	stageManager_->SetLightManager(lightManager_.get());
 	stageManager_->InitializeStage();
+
+
     // エレベーター
     elevator_->Initialize();
     //セーブポイント紳士
@@ -123,6 +128,7 @@ void ShadowGameScene::Initialize()
 
     //最初のイベントをセットする
     currentEvent_ = firstEvent_.get();
+
 
 
     Update();
@@ -149,6 +155,7 @@ void ShadowGameScene::Update() {
 		// シーン遷移の更新処理
 		UpdateSceneTransition();
 	}
+
 
 	// ゲームオブジェクトの更新処理
 	UpdateGameObject();
@@ -227,11 +234,7 @@ void ShadowGameScene::CheckCollision() {
 	stageManager_->CheckCollision();
 }
 
-void ShadowGameScene::InitializeLights() {
-	directionalLight_.color = {1.0f, 1.0f, 0.75f, 1.0f};
-	directionalLight_.direction = {0.0f, 1.0f, 0.0f};
-	directionalLight_.intensity = 0.25f;
-}
+
 #pragma region // private更新処理
 void ShadowGameScene::UpdateCamera()
 {
@@ -299,7 +302,7 @@ void ShadowGameScene::UpdatePostEffect() {
 void ShadowGameScene::UpdateGameObject() {
 	player_->Update();
 	stageManager_->SetPlayer(player_.get());
-	stageManager_->UpdateGameObject(cameraController_->GetPlayerCamera()->GetCamera(), directionalLight_.direction);
+	stageManager_->UpdateGameObject(cameraController_->GetPlayerCamera()->GetCamera(),lightManager_->GetDirectionalLight().direction);
 	// エレベーター
 	elevator_->Update();
 	// エレベータールーム管理
@@ -317,39 +320,7 @@ void ShadowGameScene::UpdatePlayerDamage() {
 }
 
 void ShadowGameScene::UpdateLight() {
-#pragma region // Lightを組み込む
-	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
-	Object3dCommon::GetInstance()->SetPointLights(stageManager_->GetPointLights(), stageManager_->GetActivePointLightCount());
-	Object3dCommon::GetInstance()->SetSpotLights(stageManager_->GetSpotLights(), stageManager_->GetActiveSpotLightCount());
-	Object3dCommon::GetInstance()->SetAreaLights(stageManager_->GetAreaLights(), stageManager_->GetActiveAreaLightCount());
-	Object3dCommon::GetInstance()->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
-#pragma endregion
-
-#ifdef USE_IMGUI
-	if (ImGui::TreeNode("Light")) {
-		AreaCommonLight* areaLights = stageManager_->GetAreaLights();
-		PointCommonLight* pointLights = stageManager_->GetPointLights();
-		SpotCommonLight* spotLights = stageManager_->GetSpotLights();
-		if (areaLights != nullptr) {
-			ImGui::DragFloat3("Area0Position", &areaLights[0].position.x, 0.1f);
-			ImGui::DragFloat3("Area1Position", &areaLights[1].position.x, 0.1f);
-		}
-		ImGui::Checkbox("DirectionalShadow", &useDirectionalShadow_);
-		ImGui::Checkbox("PointShadow", &usePointShadow_);
-		ImGui::Checkbox("SpotShadow", &useSpotShadow_);
-		ImGui::Checkbox("AreaShadow", &useAreaShadow_);
-		if (pointLights != nullptr) {
-			pointLights[0].shadowEnabled = usePointShadow_ ? 1 : 0;
-		}
-		if (spotLights != nullptr) {
-			spotLights[0].shadowEnabled = useSpotShadow_ ? 1 : 0;
-		}
-		if (areaLights != nullptr) {
-			areaLights[0].shadowEnabled = useAreaShadow_ ? 1 : 0;
-		}
-		ImGui::TreePop();
-	}
-#endif
+	lightManager_->Update();
 }
 #pragma endregion
 #pragma region // private描画処理
@@ -362,7 +333,8 @@ void ShadowGameScene::DrawSceneTransition() {
 void ShadowGameScene::DrawModel() {
 	//=======================shadowマップの開始↓=======================
 	auto* object3dCommon = Object3dCommon::GetInstance();
-	const bool shadowFlags[4] = {useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_};
+	auto flag = lightManager_->GetShadowFlags();
+	const bool shadowFlags[4] = { flag[0], flag[1], flag[2], flag [2]};
 	for (int i = 0; i < 4; ++i) {
 		if (!shadowFlags[i]) {
 			continue;
@@ -373,7 +345,7 @@ void ShadowGameScene::DrawModel() {
 		DrawGameObject(true, false, false, true, true);
 		object3dCommon->EndShadowMapPass();
 	}
-	object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, usePointShadow_, useSpotShadow_, useAreaShadow_);
+	object3dCommon->SetShadowMapEnabled(flag[0], flag[1], flag[2], flag[2]);
 	//=======================shadowマップの終了↑=======================
 
 	if (auto* portalManager = stageManager_->GetPortalManager()) {

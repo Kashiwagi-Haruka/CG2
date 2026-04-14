@@ -385,6 +385,7 @@
     <ClCompile Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.cpp" />
     <ClCompile Include="Engine\Editor\EditorManager\EditorManager.cpp" />
     <ClCompile Include="Engine\Editor\EditorTool\Asset\EditorAsset.cpp" />
+    <ClCompile Include="application\GameObject\LightManager\LightManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -764,6 +765,7 @@
     <ClInclude Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.h" />
     <ClInclude Include="Engine\Editor\EditorManager\EditorManager.h" />
     <ClInclude Include="Engine\Editor\EditorTool\Asset\EditorAsset.h" />
+    <ClInclude Include="application\GameObject\LightManager\LightManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

@@ -1,9 +1,6 @@
 #pragma once
-#include "Light/CommonLight/AreaCommonLight.h"
-#include "Light/CommonLight/PointCommonLight.h"
-#include "Light/CommonLight/SpotCommonLight.h"
+
 #include "Stages/BaseStage.h"
-#include <array>
 #include <memory>
 
 class BoxManager;
@@ -31,7 +28,7 @@ class CollisionManager;
 class MirrorStage : public BaseStage {
 private:
 	Player* player_ = nullptr;
-
+	Yoshida::LightManager* lightManager_ = nullptr;
 	std::unique_ptr<TestField> testField_ = nullptr;
 	std::unique_ptr<WhiteBoardManager> whiteBoardManager_ = nullptr;
 	std::unique_ptr<PortalManager> portalManager_ = nullptr;
@@ -54,13 +51,6 @@ private:
 	std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
 	std::unique_ptr<BoxManager> boxManager_ = nullptr;
 
-	std::array<PointCommonLight, kMaxPointLights> pointLights_{};
-	uint32_t activePointLightCount_ = 0;
-	std::array<SpotCommonLight, kMaxSpotLights> spotLights_{};
-	uint32_t activeSpotLightCount_ = 0;
-	std::array<AreaCommonLight, kMaxAreaLights> areaLights_{};
-	uint32_t activeAreaLightCount_ = 0;
-
 	void InitializeLights();
 	void UpdateLights();
 
@@ -78,10 +68,5 @@ public:
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	PortalManager* GetPortalManager() override;
 	std::unique_ptr<CollisionManager> GetCollisionManager() override;
-	PointCommonLight* GetPointLights() override;
-	uint32_t GetActivePointLightCount() const override;
-	SpotCommonLight* GetSpotLights() override;
-	uint32_t GetActiveSpotLightCount() const override;
-	AreaCommonLight* GetAreaLights() override;
-	uint32_t GetActiveAreaLightCount() const override;
+	 void SetLightManager(Yoshida::LightManager* lightManager)override;
 };

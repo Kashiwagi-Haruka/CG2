@@ -16,13 +16,11 @@ public:
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	PortalManager* GetPortalManager() override;
 	std::unique_ptr<CollisionManager> GetCollisionManager() override;
-	PointCommonLight* GetPointLights() override;
-	uint32_t GetActivePointLightCount() const override;
-	SpotCommonLight* GetSpotLights() override;
-	uint32_t GetActiveSpotLightCount() const override;
-	AreaCommonLight* GetAreaLights() override;
-	uint32_t GetActiveAreaLightCount() const override;
+	void SetLightManager(Yoshida::LightManager* lightManager) {
+		lightManager_ = lightManager;
+	};
 
 private:
 	Player* player_ = nullptr;
+	Yoshida::LightManager* lightManager_ = nullptr;
 };

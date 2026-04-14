@@ -1,0 +1,44 @@
+
+========================================
+D3D12 Leak Check Report (20260414_153051)
+========================================
+
+[Function Trace to application files]
+1. Engine/LeakChecker/D3DResourceLeakChecker.cpp : D3DResourceLeakChecker::LeakChecker
+2. application/Scene/Game/Game.cpp : Game::Finalize
+3. application/main.cpp : WinMain (application entry point)
+
+Related headers:
+- Engine/LeakChecker/D3DResourceLeakChecker.h
+- application/Scene/Game/Game.h
+
+[RefCount Summary]
+Live object related message count: 1
+
+[Remaining RefCount / Live Objects]
+1. ID3D12Device is null. Refcount could not be sampled.
+
+[Error details]
+No DXGI error/corruption messages were reported.
+
+========================================
+D3D12 Leak Check Report (20260414_153108)
+========================================
+
+[Function Trace to application files]
+1. Engine/LeakChecker/D3DResourceLeakChecker.cpp : D3DResourceLeakChecker::LeakChecker
+2. application/Scene/Game/Game.cpp : Game::Finalize
+3. application/main.cpp : WinMain (application entry point)
+
+Related headers:
+- Engine/LeakChecker/D3DResourceLeakChecker.h
+- application/Scene/Game/Game.h
+
+[RefCount Summary]
+Live object related message count: 1
+
+[Remaining RefCount / Live Objects]
+1. ID3D12Device is null. Refcount could not be sampled.
+
+[Error details]
+No DXGI error/corruption messages were reported.

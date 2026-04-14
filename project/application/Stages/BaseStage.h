@@ -1,8 +1,6 @@
 #pragma once
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
-#include "Light/CommonLight/AreaCommonLight.h"
-#include "Light/CommonLight/PointCommonLight.h"
-#include "Light/CommonLight/SpotCommonLight.h"
+#include"GameObject/LightManager/LightManager.h"
 #include <memory>
 class Camera;
 class Player;
@@ -25,10 +23,5 @@ public:
 	virtual void SetPlayerCamera(PlayerCamera* playerCamera) = 0;
 	virtual PortalManager* GetPortalManager() = 0;
 	virtual std::unique_ptr<CollisionManager> GetCollisionManager() = 0;
-	virtual PointCommonLight* GetPointLights() = 0;
-	virtual uint32_t GetActivePointLightCount() const = 0;
-	virtual SpotCommonLight* GetSpotLights() = 0;
-	virtual uint32_t GetActiveSpotLightCount() const = 0;
-	virtual AreaCommonLight* GetAreaLights() = 0;
-	virtual uint32_t GetActiveAreaLightCount() const = 0;
+	virtual void SetLightManager(Yoshida::LightManager* lightManager) = 0;
 };
