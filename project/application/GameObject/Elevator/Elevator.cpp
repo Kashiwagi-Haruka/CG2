@@ -62,16 +62,20 @@ void Elevator::Initialize() {
     for (auto& sys : autoLockSystems_) {
         sys->Initialize();
     }
+
+	poster_.SetParentMat(&worldMat_);
+	poster_.Initialize();
 }
 
 void Elevator::SetCamera(Camera* camera) {
-    modelObj_->SetCamera(camera);
-    modelObj_->UpdateCameraMatrices();
+	modelObj_->SetCamera(camera);
+	modelObj_->UpdateCameraMatrices();
 
-    for (auto& sys : autoLockSystems_) {
-        sys->SetCamera(camera);
-    }
+	for (auto& sys : autoLockSystems_) {
+		sys->SetCamera(camera);
+	}
 
+	poster_.SetCamera(camera);
 }
 
 void Elevator::Update() {
@@ -127,17 +131,18 @@ void Elevator::Update() {
     for (auto& sys : autoLockSystems_) {
         sys->Update();
     }
-
-
+	poster_.Update();
 }
 
 void Elevator::Draw() {
 
-    modelObj_->Draw();
+	modelObj_->Draw();
 
-    for (auto& sys : autoLockSystems_) {
-        sys->Draw();
-    }
+	for (auto& sys : autoLockSystems_) {
+		sys->Draw();
+	}
+
+	poster_.Draw();
 }
 
 void Elevator::Animation()
