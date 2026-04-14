@@ -24,15 +24,3 @@ void LightStage::SetPlayerCamera([[maybe_unused]] PlayerCamera* playerCamera) {}
 PortalManager* LightStage::GetPortalManager() { return nullptr; }
 
 std::unique_ptr<CollisionManager> LightStage::GetCollisionManager() { return std::make_unique<CollisionManager>(); }
-
-PointCommonLight* LightStage::GetPointLights() { return nullptr; }
-
-uint32_t LightStage::GetActivePointLightCount() const { return 0; }
-
-SpotCommonLight* LightStage::GetSpotLights() { return nullptr; }
-
-uint32_t LightStage::GetActiveSpotLightCount() const { return 0; }
-
-AreaCommonLight* LightStage::GetAreaLights() { return nullptr; }
-
-uint32_t LightStage::GetActiveAreaLightCount() const { return 0; }

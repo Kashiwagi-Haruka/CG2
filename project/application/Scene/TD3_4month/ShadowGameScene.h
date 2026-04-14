@@ -42,10 +42,7 @@
 #pragma endregion
 
 #include"GameObject/UI/UIManager.h"
-
 #include"GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
-
-#include "Light/CommonLight/DirectionalCommonLight.h" 
 
 #include"Audio.h"
 #include <string>
@@ -130,14 +127,9 @@ private:
     std::unique_ptr<FirstGameEvent>firstEvent_ = nullptr;
     GameEvent* currentEvent_ = nullptr;
 #pragma region// light
-    //DirectionalLight
-    DirectionalCommonLight directionalLight_{};
-
+    std::unique_ptr<Yoshida::LightManager>lightManager_ = nullptr;
 #pragma endregion
-    bool useDirectionalShadow_ = true;
-    bool usePointShadow_ = false;
-    bool useSpotShadow_ = false;
-    bool useAreaShadow_ = false;
+
 
 
 	std::unique_ptr<DamageOverlay> damageOverlay_ = nullptr;
@@ -164,10 +156,6 @@ public:
 
 private:
 	// =======================================
-	// プライベート初期化
-	// =======================================
-	void InitializeLights();
-	// =======================================
 	// プライベート更新処理
 	// =======================================
 	// カメラの更新処理
@@ -179,7 +167,6 @@ private:
 	// ゲームオブジェクトの更新処理
 	void UpdateGameObject();
 	void UpdatePlayerDamage();
-	void ApplyPlayerDamage(float damageAmount);
     //ポイントライトの更新処理
     void UpdateLight();
     // =======================================

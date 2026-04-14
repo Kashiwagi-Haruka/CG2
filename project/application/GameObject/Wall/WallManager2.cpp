@@ -20,13 +20,24 @@ WallManager2::WallManager2()
         walls_.push_back(std::move(wall));
     }
 
-    areaLight_.color = { 1.0f,1.0f,1.0f,1.0f };
-    areaLight_.intensity = 0.1f;
-    areaLight_.width = 14.0f;
-    areaLight_.height = 4.0f;
-    areaLight_.radius = 10.0f;
-    areaLight_.decay = 2.0f;
-    
+    //天井
+    areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    areaLights_[0].position = { 7.0f, 3.0f, 0.0f };
+    areaLights_[0].normal = { 0.0f, 1.0f, 0.0f };
+    areaLights_[0].intensity = 10.0f;
+    areaLights_[0].width = 4.0f;
+    areaLights_[0].height = 0.1f;
+    areaLights_[0].radius = 4.0f;
+    areaLights_[0].decay = 2.0f;
+
+    //窓
+    areaLights_[1].color = { 1.0f,1.0f,1.0f,1.0f };
+    areaLights_[1].intensity = 0.1f;
+    areaLights_[1].width = 14.0f;
+    areaLights_[1].height = 4.0f;
+    areaLights_[1].radius = 10.0f;
+    areaLights_[1].decay = 2.0f;
+
     plane_ = std::make_unique<Primitive>();
 }
 
@@ -51,9 +62,9 @@ void WallManager2::Update()
     plane_->Update();
     Vector3 normal = YoshidaMath::GetForward(plane_->GetWorldMatrix());
     normal.x *= 1.0f;
-    areaLight_.normal = normal;
-    areaLight_.position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
-    areaLight_.height = plane_->GetTransform().scale.y*0.5f;
+    areaLights_[1].normal = normal;
+    areaLights_[1].position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
+    areaLights_[1].height = plane_->GetTransform().scale.y*0.5f;
     Vector3 translate = {7.0f,0.0f,0.0f};
 
     walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate+Vector3{ 7.0f,2.0f,0.0f });

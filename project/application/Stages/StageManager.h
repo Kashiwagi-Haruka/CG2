@@ -1,8 +1,6 @@
 #pragma once
 #include "BaseStage.h"
-#include "Light/CommonLight/AreaCommonLight.h"
-#include "Light/CommonLight/PointCommonLight.h"
-#include "Light/CommonLight/SpotCommonLight.h"
+#include"GameObject/LightManager/LightManager.h"
 #include <memory>
 #include <string>
 
@@ -36,10 +34,5 @@ public:
 	void SetPlayerCamera(PlayerCamera* playerCamera);
 	PortalManager* GetPortalManager();
 	std::unique_ptr<CollisionManager> GetCollisionManager();
-	PointCommonLight* GetPointLights();
-	uint32_t GetActivePointLightCount() const;
-	SpotCommonLight* GetSpotLights();
-	uint32_t GetActiveSpotLightCount() const;
-	AreaCommonLight* GetAreaLights();
-	uint32_t GetActiveAreaLightCount() const;
+	void SetLightManager(Yoshida::LightManager*lightManager);
 };

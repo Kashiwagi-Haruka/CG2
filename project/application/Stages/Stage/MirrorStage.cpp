@@ -49,6 +49,7 @@ MirrorStage::MirrorStage(Player* player) : player_(player) {
 }
 
 void MirrorStage::Initialize() {
+
 	testField_->Initialize();
 	whiteBoardManager_->Initialize();
 	portalManager_->Initialize();
@@ -120,54 +121,52 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 }
 
 void MirrorStage::InitializeLights() {
-	activePointLightCount_ = 4;
-	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLights_[0].position = {7.0f, 5.0f, 0.0f};
-	pointLights_[0].intensity = 1.0f;
-	pointLights_[0].radius = 10.0f;
-	pointLights_[0].decay = 1.0f;
-	pointLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLights_[1].position = {-7.0f, 5.0f, 0.0f};
-	pointLights_[1].intensity = 1.0f;
-	pointLights_[1].radius = 10.0f;
-	pointLights_[1].decay = 1.0f;
-	pointLights_[2] = edamame_->GetPointLights().at(0);
-	pointLights_[3] = edamame_->GetPointLights().at(1);
+	assert(lightManager_);
+	lightManager_->ClearLights();
+	lightManager_->Initialize();
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 2);
 
-	activeSpotLightCount_ = 1;
-	spotLights_[0] = flashlight_->GetSpotLight();
+	lightManager_->SetPointLight(edamame_->GetPointLights().at(0),0);
+	lightManager_->SetPointLight(edamame_->GetPointLights().at(1),1);
 
-	activeAreaLightCount_ = 5;
-	areaLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	areaLights_[0].position = {7.0f, 3.0f, 0.0f};
-	areaLights_[0].normal = {0.0f, 1.0f, 0.0f};
-	areaLights_[0].intensity = 10.0f;
-	areaLights_[0].width = 4.0f;
-	areaLights_[0].height = 0.1f;
-	areaLights_[0].radius = 4.0f;
-	areaLights_[0].decay = 2.0f;
+	//activePointLightCount_ = 4;
+	//pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	//pointLights_[0].position = {7.0f, 5.0f, 0.0f};
+	//pointLights_[0].intensity = 1.0f;
+	//pointLights_[0].radius = 10.0f;
+	//pointLights_[0].decay = 1.0f;
+	//pointLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	//pointLights_[1].position = {-7.0f, 5.0f, 0.0f};
+	//pointLights_[1].intensity = 1.0f;
+	//pointLights_[1].radius = 10.0f;
+	//pointLights_[1].decay = 1.0f;
 
-	areaLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	areaLights_[1].position = {-7.0f, 3.0f, 0.0f};
-	areaLights_[1].normal = {0.0f, 1.0f, 0.0f};
-	areaLights_[1].intensity = 10.0f;
-	areaLights_[1].width = 4.0f;
-	areaLights_[1].height = 0.1f;
-	areaLights_[1].radius = 4.0f;
-	areaLights_[1].decay = 2.0f;
+	lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
+	lightManager_->SetSpotLight(flashlight_->GetSpotLight(),0);
 
-	areaLights_[2] = vendingMac_->GetAreaLight();
-	areaLights_[3] = wallManager_->GetAreaLight();
-	areaLights_[4] = wallManager2_->GetAreaLight();
+	lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 5);
+	lightManager_->SetAreaLight(vendingMac_->GetAreaLight(),0);
+
+	lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0),1);
+	lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1),2);
+	lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0),3);
+	lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1),4);
+
 }
 
 void MirrorStage::UpdateLights() {
-	spotLights_[0] = flashlight_->GetSpotLight();
-	pointLights_[2] = edamame_->GetPointLights().at(0);
-	pointLights_[3] = edamame_->GetPointLights().at(1);
-	areaLights_[2] = vendingMac_->GetAreaLight();
-	areaLights_[3] = wallManager_->GetAreaLight();
-	areaLights_[4] = wallManager2_->GetAreaLight();
+
+	//lightManager_->Update();
+
+	lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
+
+	//spotLights_[0] = flashlight_->GetSpotLight();
+	//pointLights_[2] = edamame_->GetPointLights().at(0);
+	//pointLights_[3] = edamame_->GetPointLights().at(1);
+	//areaLights_[2] = vendingMac_->GetAreaLight();
+	//areaLights_[3] = wallManager_->GetAreaLight();
+	//areaLights_[4] = wallManager2_->GetAreaLight();
+
 }
 void MirrorStage::UpdatePortal() { portalManager_->Update(); }
 void MirrorStage::SetCollisionManager(CollisionManager* collisionManager) {
@@ -289,14 +288,6 @@ PortalManager* MirrorStage::GetPortalManager() { return portalManager_.get(); }
 
 std::unique_ptr<CollisionManager> MirrorStage::GetCollisionManager() { return std::move(collisionManager_); }
 
-PointCommonLight* MirrorStage::GetPointLights() { return pointLights_.data(); }
-
-uint32_t MirrorStage::GetActivePointLightCount() const { return activePointLightCount_; }
-
-SpotCommonLight* MirrorStage::GetSpotLights() { return spotLights_.data(); }
-
-uint32_t MirrorStage::GetActiveSpotLightCount() const { return activeSpotLightCount_; }
-
-AreaCommonLight* MirrorStage::GetAreaLights() { return areaLights_.data(); }
-
-uint32_t MirrorStage::GetActiveAreaLightCount() const { return activeAreaLightCount_; }
+void MirrorStage::SetLightManager(Yoshida::LightManager* lightManager)
+{  lightManager_ = lightManager; 
+}
