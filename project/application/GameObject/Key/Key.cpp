@@ -1,14 +1,10 @@
 #include "Key.h"
-#include <GameObject/YoshidaMath/YoshidaMath.h>
 #include <Model/ModelManager.h>
 #include <GameObject/KeyBindConfig.h>
-#include <Function.h>
-#include"GameObject/Player/Player.h"
 #include"Object3d/Object3dCommon.h"
-#include"DirectXCommon.h"
 #include"imgui.h"
 #include"GameObject/SEManager/SEManager.h"
-
+#include"GameSave/GameSave.h"
 bool Key::isSendGetKeyMessage_ = false;
 bool Key::isGetKey_ = false;
 bool Key::isRayHit_ = false;
@@ -41,7 +37,16 @@ void Key::Initialize()
     obj_->Initialize();
     isRayHit_ = false;
     isLockerHit_ = false;
-    isGetKey_ = false;
+
+    auto& gameSave  = GameSave::GetInstance();
+
+    if (!gameSave.GetInitStart()) {
+        isGetKey_ = gameSave.GetProgressSaveData().isKeyHave;
+    } else {
+        isGetKey_ = false;
+    }
+
+
     isChairHit_ = false;
     isSendGetKeyMessage_ = false;
 }

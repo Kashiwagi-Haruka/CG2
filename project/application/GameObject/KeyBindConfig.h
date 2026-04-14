@@ -19,6 +19,7 @@ enum GameKeyBind
     K_Sneak = DIK_LSHIFT,
     K_Interact = DIK_E,
 	K_Interact2 = DIK_SPACE,
+	
 
     // コントローラー
     C_MoveLeft = Input::PadButton::kButtonLeft,
@@ -31,6 +32,7 @@ enum GameKeyBind
 
     //マウス
     M_Shot = Input::MouseButton::kLeft,
+	M_Light = Input::MouseButton::kRight,
 };
 
 class PlayerCommand {
@@ -61,7 +63,7 @@ public:
 	bool UiMoveBackwardTrigger();
 	bool UiMoveLeftTrigger();
 	bool UiMoveRightTrigger();
-
+	bool SwitchLight();
 	bool Shot();
 	bool Sneak();
 	bool Interact();

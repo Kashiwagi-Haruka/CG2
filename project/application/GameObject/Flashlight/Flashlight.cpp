@@ -5,8 +5,7 @@
 #include"GameObject/KeyBindConfig.h"
 #include"GameObject/Player/Player.h"
 #include<imgui.h>
-#include"GameSave/GameSave.h"
-
+#include"GameObject/SEManager/SEManager.h"
 
 bool Flashlight::isSendGetLightMessage_ = false;
 bool Flashlight::isGetLight_ = false;
@@ -19,6 +18,14 @@ Flashlight::Flashlight()
     SetAABB({ .min = {-0.1f,-0.1f,-0.1f},.max = {0.1f,0.1f,0.1f} });
     SetCollisionAttribute(kCollisionItem);
     SetCollisionMask(kCollisionPlayer | kCollisionFloor);
+    spotLight_.color = { 1.0f, 1.0f, 0.5f, 1.0f };
+    spotLight_.position = obj_->GetTranslate();
+    spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
+    spotLight_.intensity = 2.0f;
+    spotLight_.distance = 10.0f;
+    spotLight_.decay = 2.0f;
+    spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
+    spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
 }
 
 void Flashlight::OnCollision(Collider* collider)
@@ -62,6 +69,9 @@ void Flashlight::Update()
         ImGui::End();
 
 #endif
+
+ 
+
     } else {
         //y座標を固定する
         transform_.rotate = { 0.0f,0.0f,0.0f };
@@ -78,7 +88,16 @@ void Flashlight::Update()
 
 void Flashlight::Initialize()
 {
-    isGetLight_ = false;
+    auto& gameSave = GameSave::GetInstance();
+
+    if (!gameSave.GetInitStart()) {
+        isGetLight_ = gameSave.GetProgressSaveData().isLightHave;
+    } else {
+        isGetLight_ = false;
+    }
+
+    isLightOn_ = true;
+
     isSendGetLightMessage_ = false;
     isRayHit_ = false;
     obj_->Initialize();
@@ -132,7 +151,20 @@ void Flashlight::UpdateSpotLight()
 {
     spotLight_.position = GetWorldPosition();
     spotLight_.direction = -YoshidaMath::GetForward(obj_->GetWorldMatrix());
-    spotLight_.intensity = 1.0f;
+  
+    if (!isGetLight_) {
+        return;
+    }
+
+    if (PlayerCommand::GetInstance()->SwitchLight()) {
+        isLightOn_ = !isLightOn_;
+        SEManager::SoundPlay(SEManager::PUSH_WATCH);
+        if (isLightOn_) {
+            spotLight_.intensity = 2.0f;
+        } else {
+            spotLight_.intensity = 0.0f;
+        }
+    }
 
 }
 

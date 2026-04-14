@@ -43,5 +43,6 @@ private:
     SpotCommonLight spotLight_;
     static bool isRayHit_;
     static bool isSendGetLightMessage_;
+    bool isLightOn_ = false;
 };
 
