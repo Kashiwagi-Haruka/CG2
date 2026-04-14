@@ -387,6 +387,7 @@
     <ClCompile Include="Engine\Editor\EditorManager\EditorManager.cpp" />
     <ClCompile Include="Engine\Editor\EditorTool\Asset\EditorAsset.cpp" />
     <ClCompile Include="application\GameObject\LightManager\LightManager.cpp" />
+    <ClCompile Include="application\GameObject\Poster\Poster.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -767,6 +768,7 @@
     <ClInclude Include="Engine\Editor\EditorManager\EditorManager.h" />
     <ClInclude Include="Engine\Editor\EditorTool\Asset\EditorAsset.h" />
     <ClInclude Include="application\GameObject\LightManager\LightManager.h" />
+    <ClInclude Include="application\GameObject\Poster\Poster.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
