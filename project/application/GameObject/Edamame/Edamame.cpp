@@ -7,7 +7,10 @@
 #include"Object3d/Object3dCommon.h"
 #include"GameObject/BGMManager/BGMManager.h"
 
-bool Edamame::isRayHit_ = false;
+namespace {
+const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
+const float kRayHitOutlineWidth = 5.0f;
+} // namespace
 
 Edamame::Edamame()
 {
@@ -58,6 +61,8 @@ void Edamame::Initialize()
     pointLights_[1] = pointLights_[0];
     pointLights_[1].position = worldTransform_.translate;
     pointLights_[1].position.y -= 0.5f;
+	obj_->SetOutlineColor(kRayHitOutlineColor);
+	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
 
 void Edamame::Update()
@@ -78,6 +83,11 @@ void Edamame::Update()
 
 void Edamame::Draw()
 {
+	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommonOutline();
+	} else {
+		Object3dCommon::GetInstance()->DrawCommon();
+    }
     obj_->Draw();
     edamameModel_->Draw();
 }
@@ -94,24 +104,25 @@ void Edamame::SetCamera(Camera* camera)
     edamameModel_->SetCamera(camera);
 }
 
-void Edamame::CheckCollision()
-{
-    isRayHit_ = OnCollisionRay();
-    //keyとrayの当たり判定
-    if (isRayHit_) {
-        if (PlayerCommand::GetInstance()->InteractTrigger()) {
-            if (!BGMManager::GetIsEdamameSound()) {
-                BGMManager::SoundPlay(BGMManager::EDAMAME, false);
-                BGMManager::SetIsEdamameSound(true);
+void Edamame::CheckCollision() {
+	isRayHit_ = OnCollisionRay();
+	if (isRayHit_) {
 
-                //枝豆モデルのアップデート
-                edamameModel_->SetIsStartMove(true);
-            }
-        }
-    }
+	}
 
+	// keyとrayの当たり判定
+	if (isRayHit_) {
+		if (PlayerCommand::GetInstance()->InteractTrigger()) {
+			if (!BGMManager::GetIsEdamameSound()) {
+				BGMManager::SoundPlay(BGMManager::EDAMAME, false);
+				BGMManager::SetIsEdamameSound(true);
+
+				// 枝豆モデルのアップデート
+				edamameModel_->SetIsStartMove(true);
+			}
+		}
+	}
 }
-
 bool Edamame::OnCollisionRay()
 {
     return playerCamera_->OnCollisionRay(localAABB_, worldTransform_.translate);

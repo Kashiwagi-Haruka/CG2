@@ -12,6 +12,12 @@
 bool Key::isSendGetKeyMessage_ = false;
 bool Key::isGetKey_ = false;
 bool Key::isRayHit_ = false;
+namespace {
+const Vector4 kDefaultOutlineColor = {0.0f, 0.0f, 0.0f, 0.0f};
+const float kDefaultOutlineWidth = 0.0f;
+const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
+const float kRayHitOutlineWidth = 5.0f;
+} // namespace
 Key::Key()
 {
     obj_ = std::make_unique<Object3d>();
@@ -95,23 +101,30 @@ void Key::SetModel(const std::string& filePath)
     obj_->SetModel(filePath);
 }
 
-void Key::CheckCollision()
-{
-    isRayHit_ = false;
+void Key::CheckCollision() {
+	if (isGetKey_) {
+		obj_->SetOutlineColor(kDefaultOutlineColor);
+		obj_->SetOutlineWidth(kDefaultOutlineWidth);
+		isRayHit_ = false;
+		return;
+	}
 
-    if (isGetKey_) {
-        return;
-    }
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
-        isRayHit_ = OnCollisionRay();
-        if (isRayHit_ && !PlayerCommand::GetIsGrab()) {
-            isGetKey_ = true;
-            isSendGetKeyMessage_ = true;
-            SEManager::SoundPlay(SEManager::KEY);
-        }
-    }
-    
+	isRayHit_ = OnCollisionRay();
+	if (isRayHit_) {
+		obj_->SetOutlineColor(kRayHitOutlineColor);
+		obj_->SetOutlineWidth(kRayHitOutlineWidth);
+	} else {
+		obj_->SetOutlineColor(kDefaultOutlineColor);
+		obj_->SetOutlineWidth(kDefaultOutlineWidth);
+	}
 
+	if (PlayerCommand::GetInstance()->InteractTrigger()) {
+		if (isRayHit_ && !PlayerCommand::GetIsGrab()) {
+			isGetKey_ = true;
+			isSendGetKeyMessage_ = true;
+			SEManager::SoundPlay(SEManager::KEY);
+		}
+	}
 }
 
 bool Key::OnCollisionRay()

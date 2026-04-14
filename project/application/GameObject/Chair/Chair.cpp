@@ -11,37 +11,43 @@
 
 PlayerCamera* Chair::playerCamera_ = nullptr;
 
+namespace {
+const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
+const float kRayHitOutlineWidth = 5.0f;
+} // namespace
+
 Chair::Chair() {
-    obj_ = std::make_unique<Object3d>();
-    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/chair", "chair");
-    obj_->SetModel("chair");
-    SetAABB({
-        .min = {-0.125f, 0.0f, -0.125f},
+	obj_ = std::make_unique<Object3d>();
+	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/chair", "chair");
+	obj_->SetModel("chair");
+	SetAABB({
+	    .min = {-0.125f, 0.0f, -0.125f},
           .max = {0.125f,  0.5f, 0.125f }
-        });
-    SetCollisionAttribute(kCollisionChair);
-    SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionKey | kCollisionWall);
+    });
+	SetCollisionAttribute(kCollisionChair);
+	SetCollisionMask(kCollisionPlayer | kCollisionFloor | kCollisionChair | kCollisionKey | kCollisionWall);
 }
 
 void Chair::OnCollision(Collider* collider) {
-    if (collider == this) {
-        return;
-    }
+	if (collider == this) {
+		return;
+	}
 
-    if (collider->GetCollisionAttribute() == kCollisionFloor || collider->GetCollisionAttribute() == kCollisionKey || collider->GetCollisionAttribute() == kCollisionPlayer) {
-        velocity_.y = 0.0f;
-    }
+	if (collider->GetCollisionAttribute() == kCollisionFloor || collider->GetCollisionAttribute() == kCollisionKey || collider->GetCollisionAttribute() == kCollisionPlayer) {
+		velocity_.y = 0.0f;
+	}
 }
 
 Vector3 Chair::GetWorldPosition() const { return obj_->GetTranslate(); }
 
 void Chair::Update() {
-    const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-    chairMoveSeTimer_ = std::max(0.0f, chairMoveSeTimer_ - deltaTime);
+	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+	chairMoveSeTimer_ = std::max(0.0f, chairMoveSeTimer_ - deltaTime);
 
-    Mirror();
+	Mirror();
 
-    isRayHit_ = OnCollisionRay();
+	isRayHit_ = OnCollisionRay();
+
 
     // Rayが外れたらメニューを自動で閉じる
     if (isPreOnCollisionRay_ && !isRayHit_ && !isGrab_ && ChairMenu::GetIsShowMenu()) {
@@ -79,10 +85,17 @@ void Chair::Initialize() {
     velocity_ = { 0.0f };
     transform_ = obj_->GetTransform();
     chairMoveSeTimer_ = 0.0f;
+	obj_->SetOutlineColor(kRayHitOutlineColor);
+	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
 
 void Chair::Draw()
 {
+	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommonOutline();
+	} else {
+		Object3dCommon::GetInstance()->DrawCommon();
+    }
     obj_->Draw();
 }
 
