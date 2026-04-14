@@ -11,7 +11,10 @@
 
 PlayerCamera* PC::playerCamera_ = nullptr;
 bool PC::isRayHit_ = false;
-
+namespace {
+const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
+const float kRayHitOutlineWidth = 2.0f;
+} // namespace
 PC::PC()
 {
     obj_ = std::make_unique<Object3d>();
@@ -80,31 +83,35 @@ void PC::Update()
     obj_->Update();
 }
 
-void PC::Initialize()
-{
-    isRayHit_  = false;
-    obj_->Initialize();
+void PC::Initialize() {
+	isRayHit_ = false;
+	obj_->Initialize();
+	obj_->SetOutlineColor(kRayHitOutlineColor);
+	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 
-    AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/pc", "pc");
-    AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "Idle", false);
-    if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, "Idle")) {
-        obj_->SetAnimation(idleAnimation, false);
-    }
+	AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/pc", "pc");
+	AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "Idle", false);
+	if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, "Idle")) {
+		obj_->SetAnimation(idleAnimation, false);
+	}
 
-    if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("pc")) {
-        skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
-        skinCluster_ = CreateSkinCluster(*skeleton_, *sizukuModel);
-        if (!skinCluster_.mappedPalette.empty()) {
-            obj_->SetSkinCluster(&skinCluster_);
-        }
-    }
+	if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("pc")) {
+		skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
+		skinCluster_ = CreateSkinCluster(*skeleton_, *sizukuModel);
+		if (!skinCluster_.mappedPalette.empty()) {
+			obj_->SetSkinCluster(&skinCluster_);
+		}
+	}
 }
 
-void PC::Draw()
-{
-    obj_->Draw();
+void PC::Draw() {
+	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommonSkinningOutline();
+	} else {
+		Object3dCommon::GetInstance()->DrawCommonSkinning();
+	}
+	obj_->Draw();
 }
-
 
 void PC::CheckCollision()
 {

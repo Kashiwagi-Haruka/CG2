@@ -7,7 +7,10 @@
 #include"DirectXCommon.h"
 #include"application/Color/Color.h"
 PlayerCamera* Box::playerCamera_ = nullptr;
-
+namespace {
+const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
+const float kRayHitOutlineWidth = 1.0f;
+} // namespace
 Box::Box()
 {
     obj_ = std::make_unique<Object3d>();
@@ -33,54 +36,54 @@ Vector3 Box::GetWorldPosition() const
     return obj_->GetTranslate();
 }
 
-void Box::Update()
-{
-    Mirror();
+void Box::Update() {
+	Mirror();
 
+	const bool isRayHitBeforeMove = OnCollisionRay();
+	// インタラクトをトリガーすると
+	if (PlayerCommand::GetInstance()->InteractTrigger()) {
 
-    isRayHit_ = OnCollisionRay();
-    // インタラクトをトリガーすると
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+		if (isGrab_) {
+			// 持っていたら離す
+			isGrab_ = false;
+			// プレイヤーの状態をセットする
+			PlayerCommand::SetIsGrab(false);
+		} else {
+			// rayと重なる
+			if (isRayHitBeforeMove) {
+				if (!PlayerCommand::GetIsGrab()) {
+					isGrab_ = true;
+					// プレイヤーの状態をセットする
+					PlayerCommand::SetIsGrab(true);
+				}
+			}
+		}
+	}
 
-        if (isGrab_) {
-            //持っていたら離す
-            isGrab_ = false;
-            //プレイヤーの状態をセットする
-            PlayerCommand::SetIsGrab(false);
-        } else {
-            // rayと重なる
-            if (isRayHit_) {
-                if (!PlayerCommand::GetIsGrab()) {
-                    isGrab_ = true;
-                    //プレイヤーの状態をセットする
-                    PlayerCommand::SetIsGrab(true);
-                }
-            }
+	Grab();
+	isRayHit_ = OnCollisionRay();
 
-        }
-    }
-
-    Grab();
-
-    obj_->SetTransform(transform_);
-    obj_->Update();
-
+	obj_->SetTransform(transform_);
+	obj_->Update();
 }
 
-void Box::Initialize()
-{
-    isRayHit_ = false;
-    obj_->Initialize();
-    velocity_ = { 0.0f };
-    transform_ = obj_->GetTransform();
+void Box::Initialize() {
+	isRayHit_ = false;
+	obj_->Initialize();
+	velocity_ = {0.0f};
+	transform_ = obj_->GetTransform();
+	obj_->SetOutlineColor(kRayHitOutlineColor);
+	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
 
-void Box::Draw()
-{
-    obj_->Draw();
+void Box::Draw() {
+	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommonOutline();
+	} else {
+		Object3dCommon::GetInstance()->DrawCommon();
+	}
+	obj_->Draw();
 }
-
-
 
 void Box::Mirror()
 {

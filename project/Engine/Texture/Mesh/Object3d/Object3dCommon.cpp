@@ -135,6 +135,11 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 
 	psoSkinningToon_ = std::make_unique<CreatePSO>(dxCommon_, true);
 	psoSkinningToon_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dToon.PS.hlsl");
+	
+	psoSkinningOutline_ = std::make_unique<CreatePSO>(dxCommon_, true);
+	psoSkinningOutline_->Create(
+	    D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dOutline.PS.hlsl",
+	    L"Resources/shader/Object3d/VS_Shader/SkinningObject3dOutline.VS.hlsl");
 
 	SetEnvironmentMapTexture("Resources/3d/skydome.png");
 
@@ -351,6 +356,13 @@ void Object3dCommon::DrawCommonSkinningToon() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinningToon_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinningToon_->GetGraphicsPipelineState(blendMode_).Get());
+	DrawSet();
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::DrawCommonSkinningOutline() {
+
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinningOutline_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoSkinningOutline_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

@@ -69,6 +69,8 @@ private:
 	std::unique_ptr<CreatePSO> psoPortal_;
 	// シャドウマップ生成用PSO
 	std::unique_ptr<CreatePSO> psoShadow_;
+	// スキニングアウトライン描画用PSO
+	std::unique_ptr<CreatePSO> psoSkinningOutline_;
 
 	// Directional Light（共通）
 	DirectionalCommonLight* directionalLightData_ = nullptr;
@@ -224,6 +226,8 @@ public:
 	void DrawCommonSkinning();
 	// スキニング＋トゥーン描画設定
 	void DrawCommonSkinningToon();
+	// スキニングアウトライン描画設定
+	void DrawCommonSkinningOutline();
 	// ミラー描画設定
 	void DrawCommonMirror();
 	// アウトライン描画設定

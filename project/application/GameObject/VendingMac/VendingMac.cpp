@@ -5,10 +5,13 @@
 #include"GameObject/KeyBindConfig.h"
 #include<imgui.h>
 #include"GameObject/SEManager/SEManager.h"
-
+#include"Object3d/Object3dCommon.h"
 
 bool VendingMac::isRayHit_ = false;
-
+namespace {
+const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
+const float kRayHitOutlineWidth = 26.0f;
+} // namespace
 VendingMac::VendingMac()
 {
 
@@ -70,9 +73,18 @@ void VendingMac::Initialize()
   	interactRequested_ = false;
     obj_->Initialize();
     SEManager::SoundPlay(SEManager::NOISE, true);
+	obj_->SetOutlineColor(kRayHitOutlineColor);
+	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
 
-void VendingMac::Draw() { obj_->Draw(); }
+void VendingMac::Draw() { 
+    if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommonOutline();
+	} else {
+		Object3dCommon::GetInstance()->DrawCommon();
+    }
+    obj_->Draw(); 
+}
 
 
 void VendingMac::CheckCollision()

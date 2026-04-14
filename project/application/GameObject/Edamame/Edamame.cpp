@@ -7,8 +7,8 @@
 #include"Object3d/Object3dCommon.h"
 #include"GameObject/BGMManager/BGMManager.h"
 
-bool Edamame::isRayHit_ = false;
 
+bool Edamame::isRayHit_ = false;
 Edamame::Edamame()
 {
     obj_ = std::make_unique<Object3d>();
@@ -58,6 +58,7 @@ void Edamame::Initialize()
     pointLights_[1] = pointLights_[0];
     pointLights_[1].position = worldTransform_.translate;
     pointLights_[1].position.y -= 0.5f;
+
 }
 
 void Edamame::Update()
@@ -94,24 +95,22 @@ void Edamame::SetCamera(Camera* camera)
     edamameModel_->SetCamera(camera);
 }
 
-void Edamame::CheckCollision()
-{
-    isRayHit_ = OnCollisionRay();
-    //keyとrayの当たり判定
-    if (isRayHit_) {
-        if (PlayerCommand::GetInstance()->InteractTrigger()) {
-            if (!BGMManager::GetIsEdamameSound()) {
-                BGMManager::SoundPlay(BGMManager::EDAMAME, false);
-                BGMManager::SetIsEdamameSound(true);
+void Edamame::CheckCollision() {
+	isRayHit_ = OnCollisionRay();
+	edamameModel_->SetRayHit(isRayHit_);
+	// keyとrayの当たり判定
+	if (isRayHit_) {
+		if (PlayerCommand::GetInstance()->InteractTrigger()) {
+			if (!BGMManager::GetIsEdamameSound()) {
+				BGMManager::SoundPlay(BGMManager::EDAMAME, false);
+				BGMManager::SetIsEdamameSound(true);
 
-                //枝豆モデルのアップデート
-                edamameModel_->SetIsStartMove(true);
-            }
-        }
-    }
-
+				// 枝豆モデルのアップデート
+				edamameModel_->SetIsStartMove(true);
+			}
+		}
+	}
 }
-
 bool Edamame::OnCollisionRay()
 {
     return playerCamera_->OnCollisionRay(localAABB_, worldTransform_.translate);
