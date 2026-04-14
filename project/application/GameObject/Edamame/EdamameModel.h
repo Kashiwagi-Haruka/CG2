@@ -32,6 +32,8 @@ public:
     void SetIsDropStart(const bool flag) { isDropStart_ = flag; }
     //カメラの設定
     void SetCamera(Camera* camera);
+	// Rayヒット状態
+	void SetRayHit(bool isRayHit) { isRayHit_ = isRayHit; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
 private:
     // アニメーション
@@ -53,6 +55,7 @@ private:
     std::unique_ptr<Skeleton> skeleton_{};
     // スキン
     SkinCluster skinCluster_{};
+	bool isRayHit_ = false;
     const std::string animationGroupName_ = "Edamame";
     const float kAnimationBlendDuration_ = 0.3f;
     bool animationFinished_ = false;

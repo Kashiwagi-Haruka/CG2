@@ -176,9 +176,15 @@ void EdamameModel::Initialize()
             obj_->SetSkinCluster(&skinCluster_);
         }
     }
+	obj_->SetOutlineColor(kRayHitOutlineColor);
+	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
 
-void EdamameModel::Draw()
-{
-    obj_->Draw();
+void EdamameModel::Draw() {
+	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommonSkinningOutline();
+	} else {
+		Object3dCommon::GetInstance()->DrawCommonSkinning();
+	}
+	obj_->Draw();
 }

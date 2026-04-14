@@ -97,10 +97,7 @@ void Edamame::SetCamera(Camera* camera)
 
 void Edamame::CheckCollision() {
 	isRayHit_ = OnCollisionRay();
-	if (isRayHit_) {
-
-	}
-
+	edamameModel_->SetRayHit(isRayHit_);
 	// keyとrayの当たり判定
 	if (isRayHit_) {
 		if (PlayerCommand::GetInstance()->InteractTrigger()) {
