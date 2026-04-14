@@ -36,38 +36,35 @@ Vector3 Box::GetWorldPosition() const
     return obj_->GetTranslate();
 }
 
-void Box::Update()
-{
-    Mirror();
+void Box::Update() {
+	Mirror();
 
+	const bool isRayHitBeforeMove = OnCollisionRay();
+	// インタラクトをトリガーすると
+	if (PlayerCommand::GetInstance()->InteractTrigger()) {
 
-    isRayHit_ = OnCollisionRay();
-    // インタラクトをトリガーすると
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+		if (isGrab_) {
+			// 持っていたら離す
+			isGrab_ = false;
+			// プレイヤーの状態をセットする
+			PlayerCommand::SetIsGrab(false);
+		} else {
+			// rayと重なる
+			if (isRayHitBeforeMove) {
+				if (!PlayerCommand::GetIsGrab()) {
+					isGrab_ = true;
+					// プレイヤーの状態をセットする
+					PlayerCommand::SetIsGrab(true);
+				}
+			}
+		}
+	}
 
-        if (isGrab_) {
-            //持っていたら離す
-            isGrab_ = false;
-            //プレイヤーの状態をセットする
-            PlayerCommand::SetIsGrab(false);
-        } else {
-            // rayと重なる
-            if (isRayHit_) {
-                if (!PlayerCommand::GetIsGrab()) {
-                    isGrab_ = true;
-                    //プレイヤーの状態をセットする
-                    PlayerCommand::SetIsGrab(true);
-                }
-            }
+	Grab();
+	isRayHit_ = OnCollisionRay();
 
-        }
-    }
-
-    Grab();
-
-    obj_->SetTransform(transform_);
-    obj_->Update();
-
+	obj_->SetTransform(transform_);
+	obj_->Update();
 }
 
 void Box::Initialize() {
