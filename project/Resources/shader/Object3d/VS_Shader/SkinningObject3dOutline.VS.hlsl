@@ -44,16 +44,15 @@ Object3dVertexShaderOutput main(VertexShaderInput input)
     Object3dVertexShaderOutput output;
 
     float3 normal = normalize(input.normal);
-    float4 inflatedPosition = input.position;
-    inflatedPosition.xyz += normal * max(gMaterial.outlineWidth, 0.0f) * 0.05f;
+    const float4 outlinedPosition = input.position;
 
-    output.position = mul(inflatedPosition, gTransformationMatrix.WVP);
+    output.position = mul(outlinedPosition, gTransformationMatrix.WVP);
     output.normal = normalize(mul(normal, (float3x3) gTransformationMatrix.WorldInverseTranspose));
     output.texcoord = input.texcoord;
-    output.worldPosition = mul(inflatedPosition, gTransformationMatrix.World).xyz;
-    output.directionalShadowPosition = mul(inflatedPosition, gTransformationMatrix.DirectionalLightWVP);
-    output.pointShadowPosition = mul(inflatedPosition, gTransformationMatrix.PointLightWVP);
-    output.spotShadowPosition = mul(inflatedPosition, gTransformationMatrix.SpotLightWVP);
-    output.areaShadowPosition = mul(inflatedPosition, gTransformationMatrix.AreaLightWVP);
+    output.worldPosition = mul(outlinedPosition, gTransformationMatrix.World).xyz;
+    output.directionalShadowPosition = mul(outlinedPosition, gTransformationMatrix.DirectionalLightWVP);
+    output.pointShadowPosition = mul(outlinedPosition, gTransformationMatrix.PointLightWVP);
+    output.spotShadowPosition = mul(outlinedPosition, gTransformationMatrix.SpotLightWVP);
+    output.areaShadowPosition = mul(outlinedPosition, gTransformationMatrix.AreaLightWVP);
     return output;
 }
