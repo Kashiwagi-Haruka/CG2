@@ -70,6 +70,11 @@ bool PlayerCommand::UiMoveBackwardTrigger() { return MoveTrigger(K_MoveBackward,
 bool PlayerCommand::UiMoveLeftTrigger() { return MoveTrigger(K_MoveLeft, K_MoveLeftArrow, C_MoveLeft); }
 
 bool PlayerCommand::UiMoveRightTrigger() { return MoveTrigger(K_MoveRight, K_MoveRightArrow, C_MoveRight); }
+bool PlayerCommand::SwitchLight()
+{
+    auto* input = Input::GetInstance();
+    return  input->TriggerMouseButton(Input::MouseButton(M_Light));
+}
 bool PlayerCommand::Shot() {
     auto* input = Input::GetInstance();
     return input->TriggerButton(Input::PadButton(C_Shot)) || input->TriggerMouseButton(Input::MouseButton(M_Shot));
