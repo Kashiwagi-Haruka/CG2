@@ -13,10 +13,8 @@ bool Key::isSendGetKeyMessage_ = false;
 bool Key::isGetKey_ = false;
 bool Key::isRayHit_ = false;
 namespace {
-const Vector4 kDefaultOutlineColor = {0.0f, 0.0f, 0.0f, 0.0f};
-const float kDefaultOutlineWidth = 0.0f;
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 5.0f;
+const float kRayHitOutlineWidth = 2.0f;
 } // namespace
 Key::Key()
 {
@@ -24,6 +22,8 @@ Key::Key()
     // モデルをセット
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/key", "key");
     obj_->SetModel("key");
+	obj_->SetOutlineColor(kRayHitOutlineColor);
+	obj_->SetOutlineWidth(kRayHitOutlineWidth);
     SetAABB({ .min = { -0.1f,-0.1f,-0.1f }, .max = { 0.1f,0.1f,0.1f } });
     SetCollisionAttribute(kCollisionKey);
     SetCollisionMask(kCollisionChair | kCollisionWall | kCollisionFloor);
@@ -81,6 +81,11 @@ void Key::Draw()
     if (isGetKey_) {
         return;
     }
+	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommonOutline();
+	} else {
+		Object3dCommon::GetInstance()->DrawCommon();
+    }
     obj_->Draw();
 }
 
@@ -103,20 +108,11 @@ void Key::SetModel(const std::string& filePath)
 
 void Key::CheckCollision() {
 	if (isGetKey_) {
-		obj_->SetOutlineColor(kDefaultOutlineColor);
-		obj_->SetOutlineWidth(kDefaultOutlineWidth);
 		isRayHit_ = false;
 		return;
 	}
 
 	isRayHit_ = OnCollisionRay();
-	if (isRayHit_) {
-		obj_->SetOutlineColor(kRayHitOutlineColor);
-		obj_->SetOutlineWidth(kRayHitOutlineWidth);
-	} else {
-		obj_->SetOutlineColor(kDefaultOutlineColor);
-		obj_->SetOutlineWidth(kDefaultOutlineWidth);
-	}
 
 	if (PlayerCommand::GetInstance()->InteractTrigger()) {
 		if (isRayHit_ && !PlayerCommand::GetIsGrab()) {

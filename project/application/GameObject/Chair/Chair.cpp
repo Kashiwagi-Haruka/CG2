@@ -13,7 +13,7 @@ PlayerCamera* Chair::playerCamera_ = nullptr;
 
 namespace {
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 5.0f;
+const float kRayHitOutlineWidth = 2.0f;
 } // namespace
 
 Chair::Chair() {

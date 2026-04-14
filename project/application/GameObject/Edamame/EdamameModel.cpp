@@ -10,7 +10,10 @@
 #include"GameObject/YoshidaMath/Easing.h"
 
 #include<algorithm>
-
+namespace {
+const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
+const float kRayHitOutlineWidth = 2.0f;
+} // namespace
 EdamameModel::EdamameModel()
 {
     obj_ = std::make_unique<Object3d>();
@@ -19,6 +22,8 @@ EdamameModel::EdamameModel()
     SetAABB({ .min = {-0.1f,-0.1f,-0.1f},.max = {0.1f,0.1f,0.1f} });
     SetCollisionAttribute(kCollisionItem);
     SetCollisionMask(kCollisionPlayer | kCollisionFloor);
+	obj_->SetOutlineColor(kRayHitOutlineColor);
+	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
 
 

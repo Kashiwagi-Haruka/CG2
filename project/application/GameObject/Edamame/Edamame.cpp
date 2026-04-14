@@ -7,11 +7,8 @@
 #include"Object3d/Object3dCommon.h"
 #include"GameObject/BGMManager/BGMManager.h"
 
-namespace {
-const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 5.0f;
-} // namespace
 
+bool Edamame::isRayHit_ = false;
 Edamame::Edamame()
 {
     obj_ = std::make_unique<Object3d>();
@@ -61,8 +58,7 @@ void Edamame::Initialize()
     pointLights_[1] = pointLights_[0];
     pointLights_[1].position = worldTransform_.translate;
     pointLights_[1].position.y -= 0.5f;
-	obj_->SetOutlineColor(kRayHitOutlineColor);
-	obj_->SetOutlineWidth(kRayHitOutlineWidth);
+
 }
 
 void Edamame::Update()
@@ -83,11 +79,6 @@ void Edamame::Update()
 
 void Edamame::Draw()
 {
-	if (isRayHit_) {
-		Object3dCommon::GetInstance()->DrawCommonOutline();
-	} else {
-		Object3dCommon::GetInstance()->DrawCommon();
-    }
     obj_->Draw();
     edamameModel_->Draw();
 }

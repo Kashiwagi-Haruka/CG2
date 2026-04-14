@@ -10,7 +10,7 @@
 bool VendingMac::isRayHit_ = false;
 namespace {
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 5.0f;
+const float kRayHitOutlineWidth = 26.0f;
 } // namespace
 VendingMac::VendingMac()
 {
