@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <cstdint>
 #include <d3d12.h>
+#include <string>
 #include <wrl.h>
 class WinApp {
 
@@ -11,8 +12,11 @@ private:
 	HWND hwnd_;
 	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController_ = nullptr;
 	const wchar_t* TitleName_ = L"CG2";
+	HICON largeIcon_ = nullptr;
+	HICON smallIcon_ = nullptr;
 
 	bool IsPad_ = false;
+
 public:
 	static int32_t kClientWidth;
 	static int32_t kClientHeight;
@@ -20,6 +24,7 @@ public:
 public:
 	// 初期化
 	void Initialize(const wchar_t* TitleName, int32_t clientWidth, int32_t clientHeight);
+	bool SetWindowIconFromFile(const std::wstring& iconPath);
 	void SetClientSize(int32_t clientWidth, int32_t clientHeight);
 	// 更新
 	void Update();

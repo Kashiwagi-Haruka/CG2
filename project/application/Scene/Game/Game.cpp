@@ -6,7 +6,7 @@
 void Game::Initialize() {
 	FrameWork::Initialize();
 	GameBase::GetInstance()->Initialize(L"3102_p-再打刻", 1280, 720);
-
+	GameBase::GetInstance()->SetWindowIconFromFile(L"Resources/TD3_3102/2D/favicon.ico");
 	SetUnhandledExceptionFilter(GameBase::GetInstance()->ExportDump);
 
 	sceneFactory_ = std::make_unique<SceneFactory>();

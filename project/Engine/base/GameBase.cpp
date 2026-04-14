@@ -75,6 +75,12 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 	Object3dCommon::GetInstance()->Initialize(dxCommon_.get());
 	SpriteCommon::GetInstance()->Initialize(dxCommon_.get());
 }
+bool GameBase::SetWindowIconFromFile(const std::wstring& iconPath) {
+	if (!winApp_) {
+		return false;
+	}
+	return winApp_->SetWindowIconFromFile(iconPath);
+}
 
 bool GameBase::ProcessMessage() { return winApp_->ProcessMessage(); }
 

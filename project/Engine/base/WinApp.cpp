@@ -182,6 +182,38 @@ void WinApp::Initialize(const wchar_t* TitleName, int32_t clientWidth, int32_t c
 
 	timeBeginPeriod(1); // タイマーの精度を1msに設定
 }
+bool WinApp::SetWindowIconFromFile(const std::wstring& iconPath) {
+	if (!hwnd_ || iconPath.empty()) {
+		return false;
+	}
+
+	HICON loadedLargeIcon = reinterpret_cast<HICON>(LoadImageW(nullptr, iconPath.c_str(), IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_LOADFROMFILE));
+	HICON loadedSmallIcon = reinterpret_cast<HICON>(LoadImageW(nullptr, iconPath.c_str(), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE));
+	if (!loadedLargeIcon || !loadedSmallIcon) {
+		if (loadedLargeIcon) {
+			DestroyIcon(loadedLargeIcon);
+		}
+		if (loadedSmallIcon) {
+			DestroyIcon(loadedSmallIcon);
+		}
+		return false;
+	}
+
+	if (largeIcon_) {
+		DestroyIcon(largeIcon_);
+		largeIcon_ = nullptr;
+	}
+	if (smallIcon_) {
+		DestroyIcon(smallIcon_);
+		smallIcon_ = nullptr;
+	}
+
+	largeIcon_ = loadedLargeIcon;
+	smallIcon_ = loadedSmallIcon;
+	SendMessageW(hwnd_, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(largeIcon_));
+	SendMessageW(hwnd_, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(smallIcon_));
+	return true;
+}
 void WinApp::SetClientSize(int32_t clientWidth, int32_t clientHeight) {
 	if (!hwnd_) {
 		return;
@@ -200,6 +232,14 @@ void WinApp::SetClientSize(int32_t clientWidth, int32_t clientHeight) {
 void WinApp::Update() {}
 
 void WinApp::Finalize() {
+	if (largeIcon_) {
+		DestroyIcon(largeIcon_);
+		largeIcon_ = nullptr;
+	}
+	if (smallIcon_) {
+		DestroyIcon(smallIcon_);
+		smallIcon_ = nullptr;
+	}
 	CloseWindow(hwnd_);
 	/*CoUninitialize(); */
 }
