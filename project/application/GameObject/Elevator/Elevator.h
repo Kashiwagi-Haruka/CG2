@@ -1,16 +1,17 @@
 #pragma once
-#include "Object3d/Object3d.h"
-#include "Primitive/Primitive.h"
-#include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
 #include "Animation/Animation.h"
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
+#include "GameObject/Door/AutoLockSystem.h"
+#include "GameObject/Poster/Poster.h"
+#include "Object3d/Object3d.h"
+#include "Primitive/Primitive.h"
+#include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
+#include <array>
 #include <memory>
-#include<array>
-#include"GameObject/Door/AutoLockSystem.h"
 class Camera;
 
-class Elevator{
+class Elevator {
 public:
 	Elevator();
 	void Initialize();
@@ -19,11 +20,12 @@ public:
 	void Draw();
 	void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
 	std::array<std::unique_ptr<AutoLockSystem>, 2>& GetAutoLockSys() { return autoLockSystems_; };
+
 private:
 	// アニメーション
 	void Animation();
-private:
 
+private:
 	// 新しい状態管理
 	bool isPlayerInside_ = false;
 	float insideTimer_ = 0.0f;
@@ -39,7 +41,7 @@ private:
 	std::unique_ptr<Skeleton> skeleton_{};
 	// スキン
 	SkinCluster skinCluster_{};
-	
+
 	std::string animationGroupName_ = "Elevator";
 	const float kAnimationBlendDuration_ = 1.0f;
 	bool animationFinished_ = false;
@@ -48,7 +50,8 @@ private:
 
 	float baseHeight_ = 0.0f;
 
-	//オートロック
-	std::array<std::unique_ptr<AutoLockSystem>,2>autoLockSystems_;
+	// オートロック
+	std::array<std::unique_ptr<AutoLockSystem>, 2> autoLockSystems_;
 
+	Poster poster_;
 };

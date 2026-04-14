@@ -27,13 +27,13 @@ private:
 
 	HRESULT hr_;
 
-
 public:
 	static GameBase* GetInstance();
 
 	void Finalize();
 
 	void Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t WindowHeight);
+	bool SetWindowIconFromFile(const std::wstring& iconPath);
 
 	void BeginFlame(); // フレームの開始処理(commandListリセットなど)
 	void EndFlame();   // フレームの終了処理(Present、フェンス待ちなど)
@@ -44,6 +44,4 @@ public:
 	ID3D12Device* GetD3D12Device();
 	bool SaveCurrentFrameScreenShot(const std::string& filePath);
 	static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception);
-
-
 };
