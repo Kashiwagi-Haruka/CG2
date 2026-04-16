@@ -1,0 +1,49 @@
+{
+  "camera": {
+    "transform": {
+      "rotate": {
+        "x": 0.15167763829231262,
+        "y": 10.055197715759277,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "translate": {
+        "x": 13.210075378417969,
+        "y": 1.6108787059783936,
+        "z": -9.32902717590332
+      }
+    }
+  },
+  "player": {
+    "transform": {
+      "rotate": {
+        "x": 0.0,
+        "y": 10.055197715759277,
+        "z": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "translate": {
+        "x": 13.258830070495605,
+        "y": -0.009999999776482582,
+        "z": -9.259012222290039
+      }
+    }
+  },
+  "progress": {
+    "currentStageName": "FirstStage",
+    "isGameClear": true,
+    "isKeyHave": true,
+    "isLightHave": true
+  },
+  "saveDateTime": {
+    "saveDateTime": "2026/04/16\n16:34:13"
+  }
+}

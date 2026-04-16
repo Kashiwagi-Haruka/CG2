@@ -4,7 +4,7 @@
 #include "Function.h"
 
 #include <cassert>
-
+#include <numbers>
 Poster::Poster() {
 	for (auto& poster : posters_) {
 		poster = std::make_unique<Primitive>();
@@ -12,14 +12,14 @@ Poster::Poster() {
 
 	localTransforms_[0] = {
 	    .scale = {0.9f,   1.2f,                 1.0f },
-	    .rotate = {0.0f,  0.0f, 0.0f },
-	    .translate = {-1.47f, 1.35f,                0.55f},
+	    .rotate = {0.0f,  std::numbers::pi_v<float>*-0.5f, 0.0f },
+	    .translate = {-1.41f, 1.35f,                0.55f},
 	};
 
 	localTransforms_[1] = {
 	    .scale = {0.9f,  1.2f,                  1.0f },
-	    .rotate = {0.0f,  0.0f, 0.0f },
-	    .translate = {1.47f, 1.35f,                 0.55f},
+	    .rotate = {0.0f,  std::numbers::pi_v<float>*0.5f, 0.0f },
+	    .translate = {1.41f, 1.35f,                 0.55f},
 	};
 }
 
