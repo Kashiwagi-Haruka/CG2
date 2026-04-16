@@ -291,3 +291,10 @@ std::unique_ptr<CollisionManager> MirrorStage::GetCollisionManager() { return st
 void MirrorStage::SetLightManager(Yoshida::LightManager* lightManager)
 {  lightManager_ = lightManager; 
 }
+bool MirrorStage::CheckHitPlayerByStageHazard(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const {
+	if (!coffees_) {
+		return false;
+	}
+
+	return coffees_->CheckHitPlayer(playerPosition, playerRadius, minHitSpeed);
+}

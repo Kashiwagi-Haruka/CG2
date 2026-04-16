@@ -85,7 +85,13 @@ std::unique_ptr<CollisionManager> StageManager::GetCollisionManager() {
 	}
 	return stage_->GetCollisionManager();
 }
+bool StageManager::CheckHitPlayerByStageHazard(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const {
+	if (!stage_) {
+		return false;
+	}
 
+	return stage_->CheckHitPlayerByStageHazard(playerPosition, playerRadius, minHitSpeed);
+}
 void StageManager::SetLightManager(Yoshida::LightManager* lightManager)
 {
 	if (stage_) {

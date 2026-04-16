@@ -313,10 +313,22 @@ void ShadowGameScene::UpdateGameObject() {
 	ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 }
 void ShadowGameScene::UpdatePlayerDamage() {
+	static constexpr float kCoffeeDamageAmount = 1.0f;
+	static constexpr float kCoffeeHitRadius = 0.45f;
+	static constexpr float kCoffeeHitMinSpeed = 1.75f;
 
 	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	player_->UpdatePlayerDamage(deltaTime);
+	if (player_->GetDamageCoolDownTimer() <= 0.0f) {
+		const bool isHitByStageHazard = stageManager_->CheckHitPlayerByStageHazard(player_->GetTransform().translate, kCoffeeHitRadius, kCoffeeHitMinSpeed);
+		if (isHitByStageHazard) {
+			player_->ApplyPlayerDamage(kCoffeeDamageAmount);
+		}
+	}
 	damageOverlay_->Update(deltaTime, player_->GetHP(), player_->GetMaxHP());
+	if (player_->GetHP() <= 0) {
+		SceneManager::GetInstance()->ChangeScene("GameOver");
+	}
 }
 
 void ShadowGameScene::UpdateLight() {
