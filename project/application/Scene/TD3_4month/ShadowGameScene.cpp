@@ -166,6 +166,12 @@ void ShadowGameScene::Update() {
 	UpdatePlayerDamage();
 	// オブジェクトの当たり判定
 	CheckCollision();
+	if (transition_->IsEnd() && isTransitionOut_) {
+		if (!nextSceneName_.empty()) {
+			// シーンの切り替え
+			SceneManager::GetInstance()->ChangeScene(nextSceneName_);
+		}
+	}
 }
 
 void ShadowGameScene::Draw()
@@ -327,7 +333,11 @@ void ShadowGameScene::UpdatePlayerDamage() {
 	}
 	damageOverlay_->Update(deltaTime, player_->GetHP(), player_->GetMaxHP());
 	if (player_->GetHP() <= 0) {
-		SceneManager::GetInstance()->ChangeScene("GameOver");
+		if (!isTransitionOut_) {
+			transition_->Initialize(true);
+			isTransitionOut_ = true;
+			nextSceneName_ = "GameOver";
+		}
 	}
 }
 
