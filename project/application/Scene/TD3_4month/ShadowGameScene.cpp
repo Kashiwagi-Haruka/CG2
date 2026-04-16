@@ -152,9 +152,10 @@ void ShadowGameScene::Update() {
 		// UI管理
 		uiManager_->Update();
 		PlayerCommand::SetIsUiInputLocked(UIManager::GetIsPause());
-		// シーン遷移の更新処理
-		UpdateSceneTransition();
+
 	}
+	// シーン遷移の更新処理
+	UpdateSceneTransition();
 
 
 	// ゲームオブジェクトの更新処理
@@ -252,7 +253,7 @@ void ShadowGameScene::UpdateCamera()
 }
 
 void ShadowGameScene::UpdateSceneTransition() {
-    if (/*door_->GetOpenMassage() &&! */isTransitionOut_) {
+	if (!currentEvent_->IsRunning() && Door::GetOpenMassage() && !isTransitionOut_) {
         transition_->Initialize(true);
         isTransitionOut_ = true;
         nextSceneName_ = "Result";
