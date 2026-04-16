@@ -320,6 +320,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.cpp" />
     <ClCompile Include="application\GameObject\LightManager\LightManager.cpp" />
     <ClCompile Include="application\GameObject\Poster\Poster.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Inventory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -338,6 +339,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="application\Color\Color.h" />
     <ClInclude Include="application\GameObject\UI\GameContinued\GameContinuedData.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemBase.h" />
     <ClInclude Include="application\Option\OptionData.h" />
     <ClInclude Include="application\ScreenSize\ScreenSize.h" />
     <ClInclude Include="application\Stages\BaseStage.h" />
@@ -516,6 +518,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.h" />
     <ClInclude Include="application\GameObject\LightManager\LightManager.h" />
     <ClInclude Include="application\GameObject\Poster\Poster.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Inventory.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

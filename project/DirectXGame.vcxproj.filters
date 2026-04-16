@@ -388,6 +388,7 @@
     <ClCompile Include="application\GameObject\LightManager\LightManager.cpp" />
     <ClCompile Include="application\GameObject\Poster\Poster.cpp" />
     <ClCompile Include="application\GameObject\VendingMac\Drink\Drink.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Inventory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -769,6 +770,8 @@
     <ClInclude Include="application\GameObject\LightManager\LightManager.h" />
     <ClInclude Include="application\GameObject\Poster\Poster.h" />
     <ClInclude Include="application\GameObject\VendingMac\Drink\Drink.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemBase.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Inventory.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

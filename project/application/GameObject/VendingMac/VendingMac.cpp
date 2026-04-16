@@ -6,11 +6,13 @@
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #include <imgui.h>
+#include <random>
 
 bool VendingMac::isRayHit_ = false;
 namespace {
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
 const float kRayHitOutlineWidth = 26.0f;
+constexpr double kCoffeeSpillProbability = 0.15;
 } // namespace
 VendingMac::VendingMac() {
 
@@ -79,23 +81,22 @@ void VendingMac::Draw() {
 	obj_->Draw();
 	drink_->Draw();
 }
-
 void VendingMac::CheckCollision() {
 	isRayHit_ = OnCollisionRay();
 
 	if (isRayHit_) {
 		if (PlayerCommand::GetInstance()->InteractTrigger()) {
+			static std::mt19937 randomEngine{std::random_device{}()};
+			static std::bernoulli_distribution coffeeSpillDistribution{kCoffeeSpillProbability};
 
 			if (SEManager::IsSoundFinished(SEManager::VENDING_MAC)) {
 				SEManager::SoundPlay(SEManager::VENDING_MAC);
 			}
 
-			if (!interactRequested_) {
+			if (coffeeSpillDistribution(randomEngine)) {
 				interactRequested_ = true;
-			}
-
-			if (drink_->ChangeDrink()) {
-				interactRequested_ = true;
+			} else {
+				(void)drink_->ChangeDrink();
 			}
 		}
 	}
