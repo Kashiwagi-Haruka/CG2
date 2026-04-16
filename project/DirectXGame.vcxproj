@@ -287,6 +287,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\Wall\Wall.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManager.cpp" />
     <ClCompile Include="application\GameObject\VendingMac\VendingMac.cpp" />
+    <ClCompile Include="application\GameObject\VendingMac\VendingDrinkEmitter.cpp" />
     <ClCompile Include="application\Text\TextUIManager\TextUIManager.cpp" />
     <ClCompile Include="application\Text\TItleMenu\TitleMenuUI.cpp" />
     <ClCompile Include="application\Text\FirstStory\FirstStory.cpp" />
@@ -483,6 +484,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\Wall\Wall.h" />
     <ClInclude Include="application\GameObject\Wall\WallManager.h" />
     <ClInclude Include="application\GameObject\VendingMac\VendingMac.h" />
+    <ClInclude Include="application\GameObject\VendingMac\VendingDrinkEmitter.h" />
     <ClInclude Include="application\Text\TextUIManager\TextUIManager.h" />
     <ClInclude Include="application\Text\TItleMenu\TitleMenuUI.h" />
     <ClInclude Include="application\Text\FirstStory\FirstStory.h" />
