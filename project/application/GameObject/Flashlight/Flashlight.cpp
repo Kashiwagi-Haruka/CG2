@@ -119,7 +119,7 @@ void Flashlight::SetLight()
     spotLight_.position = obj_->GetTranslate();
     spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
     spotLight_.intensity = 2.0f;
-    spotLight_.distance = 10.0f;
+    spotLight_.distance = 15.0f;
     spotLight_.decay = 2.0f;
     spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
     spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);

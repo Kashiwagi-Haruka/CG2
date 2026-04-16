@@ -11,7 +11,7 @@ PlayerCamera* Locker::playerCamera_ = nullptr;
 Locker::Locker()
 {
     obj_ = std::make_unique<Object3d>();
-    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Locker", "Locker");
+    ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/Locker", "Locker");
     obj_->SetModel("Locker");
     SetAABB({ .min = {-0.5f,0.0f,-0.5f},.max = {0.5f,1.8f,0.5f} });
     SetCollisionAttribute(kCollisionWall);
