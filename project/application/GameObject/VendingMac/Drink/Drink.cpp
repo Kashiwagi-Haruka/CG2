@@ -3,11 +3,15 @@
 #include "Function.h"
 #include "Object3d/Object3dCommon.h"
 #include <Model/ModelManager.h>
+#include <random>
 
 namespace {
 constexpr int kMaxDrinkCount = 10;
 const Vector3 kDrinkPositionOffset = {0.0f, 0.9f, 0.45f};
 const Vector3 kDrinkScale = {1.0f, 1.0f, 1.0f};
+constexpr float kDrinkSpeed = 0.12f;
+constexpr float kMoveOffset = 0.6f;
+constexpr float kGroundY = 0.0f;
 } // namespace
 
 Drink::Drink() {
@@ -16,25 +20,12 @@ Drink::Drink() {
 	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Drink/energyDrink", "energyDrink");
 	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Drink/Severed_Head", "Severed_Head");
 	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/coffee", "coffee");
-
-	waterObj_ = std::make_unique<Object3d>();
-	teaObj_ = std::make_unique<Object3d>();
-	energyDrinkObj_ = std::make_unique<Object3d>();
-	severedHeadObj_ = std::make_unique<Object3d>();
-	coffeeObj_ = std::make_unique<Object3d>();
 }
 
 void Drink::Initialize() {
-	waterObj_->SetModel("water");
-	waterObj_->Initialize();
-	teaObj_->SetModel("tea");
-	teaObj_->Initialize();
-	energyDrinkObj_->SetModel("energyDrink");
-	energyDrinkObj_->Initialize();
-	severedHeadObj_->SetModel("Severed_Head");
-	severedHeadObj_->Initialize();
-	coffeeObj_->SetModel("coffee");
-	coffeeObj_->Initialize();
+	spawnedDrinks_.clear();
+	drinkCount_ = 0;
+	currentDrinkName_ = WATER;
 }
 
 bool Drink::ChangeDrink() {
@@ -43,50 +34,91 @@ bool Drink::ChangeDrink() {
 		drinkCount_ = kMaxDrinkCount;
 		return true;
 	}
+
+	SpawnDrink(currentDrinkName_);
 	currentDrinkName_ = static_cast<DrinkName>((static_cast<int>(currentDrinkName_) + 1) % kMaxDrinkNameCount);
 	return false;
 }
 
-Object3d* Drink::GetCurrentDrinkObject() {
-	switch (currentDrinkName_) {
+std::unique_ptr<Object3d> Drink::CreateDrinkObject(DrinkName type) const {
+	auto obj = std::make_unique<Object3d>();
+	switch (type) {
 	case Drink::WATER:
-		return waterObj_.get();
+		obj->SetModel("water");
+		break;
 	case Drink::TEA:
-		return teaObj_.get();
+		obj->SetModel("tea");
+		break;
 	case Drink::COFFEE:
-		return coffeeObj_.get();
+		obj->SetModel("coffee");
+		break;
 	case Drink::ENERGY:
-		return energyDrinkObj_.get();
+		obj->SetModel("energyDrink");
+		break;
 	case Drink::SeveredHead:
-		return severedHeadObj_.get();
+		obj->SetModel("Severed_Head");
+		break;
 	default:
-		return nullptr;
+		obj->SetModel("water");
+		break;
 	}
+	obj->Initialize();
+	obj->SetScale(kDrinkScale);
+	if (camera_) {
+		obj->SetCamera(camera_);
+	}
+	return obj;
+}
+
+void Drink::SpawnDrink(DrinkName type) {
+	static std::mt19937 randomEngine{std::random_device{}()};
+	static std::uniform_real_distribution<float> random01(0.4f, 1.6f);
+	static std::uniform_real_distribution<float> randomSign(-1.0f, 1.0f);
+
+	SpawnedDrink spawned{};
+	spawned.type = type;
+	spawned.object = CreateDrinkObject(type);
+	spawned.object->SetTranslate(vendingMacPosition_ + kDrinkPositionOffset);
+
+	const Vector3 randomVector = {randomSign(randomEngine), random01(randomEngine), randomSign(randomEngine)};
+	spawned.moveVector = randomVector * (kMoveOffset * kDrinkSpeed);
+	spawned.isGrounded = false;
+	spawnedDrinks_.push_back(std::move(spawned));
 }
 
 void Drink::Update() {
-	Object3d* currentDrink = GetCurrentDrinkObject();
-	if (!currentDrink) {
-		return;
-	}
+	for (auto& spawnedDrink : spawnedDrinks_) {
+		if (!spawnedDrink.object) {
+			continue;
+		}
 
-	currentDrink->SetTranslate(vendingMacPosition_ + kDrinkPositionOffset);
-	currentDrink->SetScale(kDrinkScale);
-	currentDrink->Update();
+		if (!spawnedDrink.isGrounded) {
+			Vector3 translate = spawnedDrink.object->GetTranslate();
+			translate += spawnedDrink.moveVector;
+			if (translate.y <= kGroundY) {
+				translate.y = kGroundY;
+				spawnedDrink.isGrounded = true;
+			}
+			spawnedDrink.object->SetTranslate(translate);
+		}
+		spawnedDrink.object->Update();
+	}
 }
 
 void Drink::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
-	Object3d* currentDrink = GetCurrentDrinkObject();
-	if (currentDrink) {
-		currentDrink->Draw();
+	for (const auto& spawnedDrink : spawnedDrinks_) {
+		if (spawnedDrink.object) {
+			spawnedDrink.object->Draw();
+		}
 	}
 }
 
 void Drink::SetCamera(Camera* camera) {
-	waterObj_->SetCamera(camera);
-	teaObj_->SetCamera(camera);
-	coffeeObj_->SetCamera(camera);
-	energyDrinkObj_->SetCamera(camera);
-	severedHeadObj_->SetCamera(camera);
+	camera_ = camera;
+	for (auto& spawnedDrink : spawnedDrinks_) {
+		if (spawnedDrink.object) {
+			spawnedDrink.object->SetCamera(camera);
+		}
+	}
 }
