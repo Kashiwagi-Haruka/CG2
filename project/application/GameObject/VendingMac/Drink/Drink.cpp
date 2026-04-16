@@ -1,6 +1,7 @@
 #include "Drink.h"
 #include <Model/ModelManager.h>
 #include "Object3d/Object3dCommon.h"
+#include "Function.h"
 namespace {
 const int kMaxDrinkCount = 10;
 const Vector3 kDrinkPositionOffset = {0.0f, 1.3f, 0.6f};

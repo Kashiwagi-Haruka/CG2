@@ -56,7 +56,7 @@ void MirrorStage::Initialize() {
 	pc_->Initialize();
 	coffees_->Initialize();
 	coffees_->SetFloorY(0.0f);
-	coffees_->SetRoomBounds(-40.0f, 40.0f, -40.0f, 40.0f);
+	coffees_->SetRoomBounds(-7.0f, 14.0f, -7.0f, 7.0f);
 	coffees_->SetSpawnContainment({0.0f, 0.0f, 0.0f}, 0.0f, 0.0f);
 	timeCardWatch_->Initialize();
 	flashlight_->Initialize();

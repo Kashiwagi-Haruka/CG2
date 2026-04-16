@@ -8,6 +8,7 @@ class Camera;
 class Coffees {
 public:
 	Coffees();
+	~Coffees();
 	void Initialize();
 	void Update(Camera* camera, const Vector3& lightDirection);
 	void Draw();
