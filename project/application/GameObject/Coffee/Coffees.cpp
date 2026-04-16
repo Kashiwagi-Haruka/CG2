@@ -99,7 +99,9 @@ namespace {
 } // namespace
 
 Coffees::Coffees() { instancedObject_ = std::make_unique<InstancedObject3d>(); }
+Coffees::~Coffees(){
 
+}
 void Coffees::Initialize() {
     ModelManager::GetInstance()->LoadModel(kCoffeesModelDirectory, kCoffeesModelName);
     instancedObject_->Initialize(kCoffeesModelName);

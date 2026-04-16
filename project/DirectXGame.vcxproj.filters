@@ -339,7 +339,6 @@
     <ClCompile Include="application\Text\TextUIManager\TextUIManager.cpp" />
     <ClCompile Include="application\Text\TItleMenu\TitleMenuUI.cpp" />
     <ClCompile Include="application\Text\FirstStory\FirstStory.cpp" />
-    <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
     <ClCompile Include="application\GameObject\Locker\Locker.cpp" />
     <ClCompile Include="application\GameObject\Locker\LockerManager.cpp" />
     <ClCompile Include="application\GameObject\Desk\Desk.cpp" />
@@ -388,6 +387,8 @@
     <ClCompile Include="Engine\Editor\EditorTool\Asset\EditorAsset.cpp" />
     <ClCompile Include="application\GameObject\LightManager\LightManager.cpp" />
     <ClCompile Include="application\GameObject\Poster\Poster.cpp" />
+    <ClCompile Include="application\GameObject\VendingMac\Drink\Drink.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Inventory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -713,7 +714,6 @@
     <ClInclude Include="application\Text\FirstStory\FirstStory.h" />
     <ClInclude Include="application\ScreenSize\ScreenSize.h" />
     <ClInclude Include="application\Color\Color.h" />
-    <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
     <ClInclude Include="application\GameObject\Locker\Locker.h" />
     <ClInclude Include="application\GameObject\Locker\LockerManager.h" />
     <ClInclude Include="application\GameObject\Desk\Desk.h" />
@@ -769,6 +769,9 @@
     <ClInclude Include="Engine\Editor\EditorTool\Asset\EditorAsset.h" />
     <ClInclude Include="application\GameObject\LightManager\LightManager.h" />
     <ClInclude Include="application\GameObject\Poster\Poster.h" />
+    <ClInclude Include="application\GameObject\VendingMac\Drink\Drink.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemBase.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Inventory.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

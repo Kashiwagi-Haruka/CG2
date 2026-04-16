@@ -152,9 +152,10 @@ void ShadowGameScene::Update() {
 		// UI管理
 		uiManager_->Update();
 		PlayerCommand::SetIsUiInputLocked(UIManager::GetIsPause());
-		// シーン遷移の更新処理
-		UpdateSceneTransition();
+
 	}
+	// シーン遷移の更新処理
+	UpdateSceneTransition();
 
 
 	// ゲームオブジェクトの更新処理
@@ -166,6 +167,12 @@ void ShadowGameScene::Update() {
 	UpdatePlayerDamage();
 	// オブジェクトの当たり判定
 	CheckCollision();
+	if (transition_->IsEnd() && isTransitionOut_) {
+		if (!nextSceneName_.empty()) {
+			// シーンの切り替え
+			SceneManager::GetInstance()->ChangeScene(nextSceneName_);
+		}
+	}
 }
 
 void ShadowGameScene::Draw()
@@ -246,7 +253,7 @@ void ShadowGameScene::UpdateCamera()
 }
 
 void ShadowGameScene::UpdateSceneTransition() {
-    if (/*door_->GetOpenMassage() &&! */isTransitionOut_) {
+	if (!currentEvent_->IsRunning() && Door::GetOpenMassage() && !isTransitionOut_) {
         transition_->Initialize(true);
         isTransitionOut_ = true;
         nextSceneName_ = "Result";
@@ -313,10 +320,26 @@ void ShadowGameScene::UpdateGameObject() {
 	ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 }
 void ShadowGameScene::UpdatePlayerDamage() {
+	static constexpr float kCoffeeDamageAmount = 1.0f;
+	static constexpr float kCoffeeHitRadius = 0.45f;
+	static constexpr float kCoffeeHitMinSpeed = 1.75f;
 
 	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	player_->UpdatePlayerDamage(deltaTime);
+	if (player_->GetDamageCoolDownTimer() <= 0.0f) {
+		const bool isHitByStageHazard = stageManager_->CheckHitPlayerByStageHazard(player_->GetTransform().translate, kCoffeeHitRadius, kCoffeeHitMinSpeed);
+		if (isHitByStageHazard) {
+			player_->ApplyPlayerDamage(kCoffeeDamageAmount);
+		}
+	}
 	damageOverlay_->Update(deltaTime, player_->GetHP(), player_->GetMaxHP());
+	if (player_->GetHP() <= 0) {
+		if (!isTransitionOut_) {
+			transition_->Initialize(true);
+			isTransitionOut_ = true;
+			nextSceneName_ = "GameOver";
+		}
+	}
 }
 
 void ShadowGameScene::UpdateLight() {

@@ -170,7 +170,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\Edamame\EdamameTrivia.cpp" />
     <ClCompile Include="application\GameObject\Coffee\CoffeeTrivia.cpp" />
     <ClCompile Include="application\GameObject\BGMManager\BGMManager.cpp" />
-    <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
     <ClCompile Include="application\GameObject\Desk\Desk.cpp" />
     <ClCompile Include="application\GameObject\Desk\DeskManager.cpp" />
     <ClCompile Include="application\Text\ChairMenu\ChairMenu.cpp" />
@@ -181,6 +180,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\CameraController\CameraController.cpp" />
     <ClCompile Include="application\GameObject\UI\DamageOverlay.cpp" />
     <ClCompile Include="application\GameObject\Elevator\ElevatorRoomManager.cpp" />
+    <ClCompile Include="application\GameObject\VendingMac\Drink\Drink.cpp" />
     <ClCompile Include="Engine\Editor\EditorTool\Asset\EditorAsset.cpp" />
     <ClCompile Include="Engine\Editor\EditorManager\EditorManager.cpp" />
     <ClCompile Include="Engine\Editor\EditorData\Object3d\EditorObject3d.cpp" />
@@ -320,6 +320,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.cpp" />
     <ClCompile Include="application\GameObject\LightManager\LightManager.cpp" />
     <ClCompile Include="application\GameObject\Poster\Poster.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Inventory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -338,6 +339,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="application\Color\Color.h" />
     <ClInclude Include="application\GameObject\UI\GameContinued\GameContinuedData.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemBase.h" />
     <ClInclude Include="application\Option\OptionData.h" />
     <ClInclude Include="application\ScreenSize\ScreenSize.h" />
     <ClInclude Include="application\Stages\BaseStage.h" />
@@ -359,7 +361,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\Edamame\EdamameTrivia.h" />
     <ClInclude Include="application\GameObject\Coffee\CoffeeTrivia.h" />
     <ClInclude Include="application\GameObject\BGMManager\BGMManager.h" />
-    <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
     <ClInclude Include="application\GameObject\Desk\Desk.h" />
     <ClInclude Include="application\GameObject\Desk\DeskManager.h" />
     <ClInclude Include="application\Text\ChairMenu\ChairMenu.h" />
@@ -370,6 +371,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\CameraController\CameraController.h" />
     <ClInclude Include="application\GameObject\UI\DamageOverlay.h" />
     <ClInclude Include="application\GameObject\Elevator\ElevatorRoomManager.h" />
+    <ClInclude Include="application\GameObject\VendingMac\Drink\Drink.h" />
     <ClInclude Include="Engine\Editor\EditorTool\Asset\EditorAsset.h" />
     <ClInclude Include="Engine\Editor\EditorManager\EditorManager.h" />
     <ClInclude Include="Engine\Editor\EditorData\Object3d\EditorObject3d.h" />
@@ -516,6 +518,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.h" />
     <ClInclude Include="application\GameObject\LightManager\LightManager.h" />
     <ClInclude Include="application\GameObject\Poster\Poster.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Inventory.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

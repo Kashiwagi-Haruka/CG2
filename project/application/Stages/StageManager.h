@@ -34,5 +34,6 @@ public:
 	void SetPlayerCamera(PlayerCamera* playerCamera);
 	PortalManager* GetPortalManager();
 	std::unique_ptr<CollisionManager> GetCollisionManager();
-	void SetLightManager(Yoshida::LightManager*lightManager);
+	bool CheckHitPlayerByStageHazard(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const;
+	void SetLightManager(Yoshida::LightManager* lightManager);
 };
