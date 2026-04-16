@@ -72,15 +72,15 @@ std::unique_ptr<Object3d> Drink::CreateDrinkObject(DrinkName type) const {
 
 void Drink::SpawnDrink(DrinkName type) {
 	static std::mt19937 randomEngine{std::random_device{}()};
-	static std::uniform_real_distribution<float> random01(0.4f, 1.6f);
-	static std::uniform_real_distribution<float> randomSign(-1.0f, 1.0f);
+	static std::uniform_real_distribution<float> randomDirection(-0.6f, 0.6f);
+	constexpr float kFixedYDirection = 1.0f;
 
 	SpawnedDrink spawned{};
 	spawned.type = type;
 	spawned.object = CreateDrinkObject(type);
 	spawned.object->SetTranslate(vendingMacPosition_ + kDrinkPositionOffset);
 
-	const Vector3 randomVector = {randomSign(randomEngine), random01(randomEngine), randomSign(randomEngine)};
+	const Vector3 randomVector = {randomDirection(randomEngine), kFixedYDirection, randomDirection(randomEngine)};
 	spawned.moveVector = randomVector * (kMoveOffset * kDrinkSpeed);
 	spawned.isGrounded = false;
 	spawnedDrinks_.push_back(std::move(spawned));
