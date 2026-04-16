@@ -73,7 +73,7 @@ std::unique_ptr<Object3d> Drink::CreateDrinkObject(DrinkName type) const {
 void Drink::SpawnDrink(DrinkName type) {
 	static std::mt19937 randomEngine{std::random_device{}()};
 	static std::uniform_real_distribution<float> randomDirection(-0.6f, 0.6f);
-	constexpr float kFixedYDirection = 1.0f;
+	constexpr float kFixedYDirection = -1.0f;
 
 	SpawnedDrink spawned{};
 	spawned.type = type;
