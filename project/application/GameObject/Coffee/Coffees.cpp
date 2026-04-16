@@ -162,9 +162,7 @@ void Coffees::RunSimulation() {
     const float roomMinZ = simulationParams_.roomMinZ;
     const float roomMaxZ = simulationParams_.roomMaxZ;
 
-    spawnTimer_ += deltaTime;
-    while (spawnTimer_ >= nextSpawnInterval_ && activeInstanceCount_ < static_cast<uint32_t>(instances_.size())) {
-        spawnTimer_ -= nextSpawnInterval_;
+    auto spawnOne = [&]() {
         const uint32_t spawnIndex = activeInstanceCount_;
         const float t = static_cast<float>(spawnIndex) / static_cast<float>(instances_.size() - 1u);
         nextSpawnInterval_ = kCoffeesMaxSpawnInterval + (kCoffeesMinSpawnInterval - kCoffeesMaxSpawnInterval) * t;
@@ -190,6 +188,12 @@ void Coffees::RunSimulation() {
         EnsureInstanceCapacity(activeInstanceCount_);
         instancedObject_->SetInstanceRotate(spawnIndex, spawnInstance.rotation);
         instancedObject_->SetInstanceOffset(spawnIndex, spawnInstance.position);
+    };
+
+    spawnTimer_ += deltaTime;
+    while (spawnTimer_ >= nextSpawnInterval_ && activeInstanceCount_ < static_cast<uint32_t>(instances_.size())) {
+        spawnTimer_ -= nextSpawnInterval_;
+        spawnOne();
     }
 
     static std::vector<Vector3> pendingPush;
@@ -517,7 +521,9 @@ void Coffees::SetSpawnContainment(const Vector3& center, float topY, float radiu
     simulationParams_.canTopRadius = radius;
 }
 
-void Coffees::StartSpill() { isSpilling_ = true; }
+void Coffees::StartSpill() {
+    isSpilling_ = true;
+}
 
 bool Coffees::CheckHitPlayer(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const {
     if (!isSpilling_) {

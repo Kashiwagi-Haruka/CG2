@@ -5,11 +5,20 @@
 #include<memory>
 #include "Light/CommonLight/AreaCommonLight.h"
 #include"Audio.h"
+#include "GameObject/VendingMac/VendingDrinkEmitter.h"
 
 class Camera;
 
 class VendingMac : public YoshidaMath::Collider {
 public:
+    enum class DispenseResult {
+        Water,
+        Tea,
+        EnergyDrink,
+        Coffee,
+        CoffeeMany,
+    };
+
     VendingMac();
     ~VendingMac();
     /// @brief 衝突時コールバック関数
@@ -27,7 +36,7 @@ public:
     AreaCommonLight& GetAreaLight() { return  areaLight_; }
    static bool IsRayHit() { return isRayHit_; };
   	Vector3 GetForward() const;
-  	bool ConsumeInteractRequest();
+	bool ConsumeDispenseResult(DispenseResult& result);
 private:
 	float GetVol(float length, float maxVol);
 	bool OnCollisionRay();
@@ -36,5 +45,8 @@ private:
 	std::unique_ptr<Object3d> obj_ = nullptr;
 	AreaCommonLight areaLight_;
 	Vector3 translate_ = {0.0f};
-	bool interactRequested_ = false;
+	DispenseResult pendingResult_ = DispenseResult::Water;
+	bool hasPendingResult_ = false;
+	int pressesWithoutCoffeeMany_ = 0;
+	std::unique_ptr<VendingDrinkEmitter> drinkEmitter_ = nullptr;
 };

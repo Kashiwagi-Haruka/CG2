@@ -6,6 +6,8 @@
 #include<imgui.h>
 #include"GameObject/SEManager/SEManager.h"
 #include"Object3d/Object3dCommon.h"
+#include <algorithm>
+#include <random>
 
 bool VendingMac::isRayHit_ = false;
 namespace {
@@ -16,6 +18,7 @@ VendingMac::VendingMac()
 {
 
     obj_ = std::make_unique<Object3d>();
+    drinkEmitter_ = std::make_unique<VendingDrinkEmitter>();
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/vendingMac", "vendingMac");
     obj_->SetModel("vendingMac");
     SetAABB({ .min = {-0.75f,0.0f,-0.75f},.max = {0.75f,1.83f,0.75f} });
@@ -63,6 +66,15 @@ void VendingMac::Update()
     float  length = Function::Length(distance);
     SEManager::SetVol(GetVol(length, 1.0f), SEManager::NOISE);
 
+    const Vector3 vendingPosition = obj_->GetTranslate();
+    const Vector3 vendingForward = YoshidaMath::GetForward(obj_->GetWorldMatrix());
+    drinkEmitter_->SetSpawn({
+        vendingPosition.x + vendingForward.x * 0.45f,
+        vendingPosition.y + 0.9f,
+        vendingPosition.z + vendingForward.z * 0.45f,
+    }, vendingForward);
+    const float deltaTime = std::max(Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime(), 1.0f / 120.0f);
+    drinkEmitter_->Update(deltaTime);
 
 
 }
@@ -70,8 +82,10 @@ void VendingMac::Update()
 void VendingMac::Initialize()
 {
     isRayHit_ = false;
-  	interactRequested_ = false;
+	hasPendingResult_ = false;
+	pressesWithoutCoffeeMany_ = 0;
     obj_->Initialize();
+    drinkEmitter_->Initialize();
     SEManager::SoundPlay(SEManager::NOISE, true);
 	obj_->SetOutlineColor(kRayHitOutlineColor);
 	obj_->SetOutlineWidth(kRayHitOutlineWidth);
@@ -84,11 +98,16 @@ void VendingMac::Draw() {
 		Object3dCommon::GetInstance()->DrawCommon();
     }
     obj_->Draw(); 
+    drinkEmitter_->Draw();
 }
 
 
 void VendingMac::CheckCollision()
 {
+	static std::random_device rd;
+	static std::mt19937 engine(rd());
+	static std::uniform_int_distribution<int> distribution(0, 4);
+
     isRayHit_ = OnCollisionRay();
 
 	if (isRayHit_) {
@@ -98,14 +117,24 @@ void VendingMac::CheckCollision()
                 SEManager::SoundPlay(SEManager::VENDING_MAC);
             }
             
-            
-            if (rand() % 4 == 0) {
-           
-                if (!interactRequested_) {
-                    interactRequested_ = true;
-                }
-            }
-    
+			DispenseResult result = DispenseResult::Water;
+			if (pressesWithoutCoffeeMany_ >= 9) {
+				result = DispenseResult::CoffeeMany;
+			} else {
+				result = static_cast<DispenseResult>(distribution(engine));
+			}
+
+			if (result == DispenseResult::CoffeeMany) {
+				pressesWithoutCoffeeMany_ = 0;
+			} else {
+				++pressesWithoutCoffeeMany_;
+			}
+
+			pendingResult_ = result;
+			hasPendingResult_ = true;
+			if (result != DispenseResult::CoffeeMany) {
+				drinkEmitter_->SpawnSingle();
+			}
 		}
 	}
 
@@ -129,11 +158,16 @@ void VendingMac::SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera;
 void VendingMac::SetCamera(Camera* camera) {
 	obj_->SetCamera(camera);
 	obj_->UpdateCameraMatrices();
+    drinkEmitter_->SetCamera(camera);
 }
 Vector3 VendingMac::GetForward() const { return YoshidaMath::GetForward(obj_->GetWorldMatrix()); }
 
-bool VendingMac::ConsumeInteractRequest() {
-	const bool requested = interactRequested_;
-	interactRequested_ = false;
-	return requested;
+bool VendingMac::ConsumeDispenseResult(DispenseResult& result) {
+	if (!hasPendingResult_) {
+		return false;
+	}
+
+	result = pendingResult_;
+	hasPendingResult_ = false;
+	return true;
 }

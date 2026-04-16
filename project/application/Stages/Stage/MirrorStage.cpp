@@ -22,6 +22,12 @@
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include <utility>
 
+namespace {
+constexpr float kCoffeeCanPlayerHitRadius = 0.45f;
+constexpr float kCoffeeCanMinDamageSpeed = 2.0f;
+constexpr float kCoffeeCanDamageAmount = 6.0f;
+}
+
 MirrorStage::MirrorStage(Player* player) : player_(player) {
 	testField_ = std::make_unique<TestField>();
 	whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
@@ -100,6 +106,10 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 	});
 	coffees_->SetLaunchDirection(vendingForward);
 	coffees_->Update(camera, lightDirection);
+	if (player && player->GetDamageCoolDownTimer() <= 0.0f &&
+		coffees_->CheckHitPlayer(player->GetTransform().translate, kCoffeeCanPlayerHitRadius, kCoffeeCanMinDamageSpeed)) {
+		player->ApplyPlayerDamage(kCoffeeCanDamageAmount);
+	}
 	door_->Update();
 	lockerManager_->Update();
 	deskManager_->Update();
@@ -180,8 +190,11 @@ void MirrorStage::CheckCollision() {
 	portalManager_->CheckCollision();
 	door_->CheckCollision();
 
-	if (vendingMac_->ConsumeInteractRequest()) {
-		coffees_->StartSpill();
+	VendingMac::DispenseResult dispenseResult;
+	if (vendingMac_->ConsumeDispenseResult(dispenseResult)) {
+		if (dispenseResult == VendingMac::DispenseResult::CoffeeMany) {
+			coffees_->StartSpill();
+		}
 	}
 
 	for (auto& portal : portalManager_->GetPortals()) {
