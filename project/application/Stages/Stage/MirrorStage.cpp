@@ -124,22 +124,27 @@ void MirrorStage::InitializeLights() {
 	assert(lightManager_);
 	lightManager_->ClearLights();
 	lightManager_->Initialize();
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 2);
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 4);
 
 	lightManager_->SetPointLight(edamame_->GetPointLights().at(0),0);
 	lightManager_->SetPointLight(edamame_->GetPointLights().at(1),1);
 
 	//activePointLightCount_ = 4;
-	//pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	//pointLights_[0].position = {7.0f, 5.0f, 0.0f};
-	//pointLights_[0].intensity = 1.0f;
-	//pointLights_[0].radius = 10.0f;
-	//pointLights_[0].decay = 1.0f;
-	//pointLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
-	//pointLights_[1].position = {-7.0f, 5.0f, 0.0f};
-	//pointLights_[1].intensity = 1.0f;
-	//pointLights_[1].radius = 10.0f;
-	//pointLights_[1].decay = 1.0f;
+	PointCommonLight pointLights_[2];
+	pointLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	pointLights_[0].position = {7.0f, 5.0f, 0.0f};
+	pointLights_[0].intensity = 1.0f;
+	pointLights_[0].radius = 10.0f;
+	pointLights_[0].decay = 1.0f;
+
+	pointLights_[1].color = {1.0f, 1.0f, 1.0f, 1.0f};
+	pointLights_[1].position = {-7.0f, 5.0f, 0.0f};
+	pointLights_[1].intensity = 1.0f;
+	pointLights_[1].radius = 10.0f;
+	pointLights_[1].decay = 1.0f;
+	lightManager_->SetPointLight(pointLights_[0], 2);
+	lightManager_->SetPointLight(pointLights_[1], 3);
+
 
 	lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
 	lightManager_->SetSpotLight(flashlight_->GetSpotLight(),0);

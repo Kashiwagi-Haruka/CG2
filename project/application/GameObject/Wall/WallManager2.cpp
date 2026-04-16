@@ -45,7 +45,7 @@ WallManager2::WallManager2()
 void WallManager2::Initialize()
 {
     room1_->Initialize();
-    plane_->Initialize(Primitive::Plane, "Resources/2d/white2x2.png");
+    plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/out.jpg");
 
     // 壁の初期化
     for (auto& wall : walls_) {
