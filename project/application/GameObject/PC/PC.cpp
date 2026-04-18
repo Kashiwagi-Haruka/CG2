@@ -107,10 +107,12 @@ void PC::Initialize() {
 void PC::Draw() {
 	if (isRayHit_) {
 		Object3dCommon::GetInstance()->DrawCommonSkinningOutline();
+		obj_->Draw();
+		Object3dCommon::GetInstance()->EndOutlineDraw();
 	} else {
 		Object3dCommon::GetInstance()->DrawCommonSkinning();
+		obj_->Draw();
 	}
-	obj_->Draw();
 }
 
 void PC::CheckCollision()

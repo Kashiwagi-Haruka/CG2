@@ -182,9 +182,11 @@ void EdamameModel::Initialize()
 
 void EdamameModel::Draw() {
 	if (isRayHit_) {
-		Object3dCommon::GetInstance()->DrawCommonSkinningOutline();
+		Object3dCommon::GetInstance()->DrawCommonSkinningToonOutline();
+		obj_->Draw();
+		Object3dCommon::GetInstance()->EndOutlineDraw();
 	} else {
 		Object3dCommon::GetInstance()->DrawCommonSkinning();
+		obj_->Draw();
 	}
-	obj_->Draw();
 }

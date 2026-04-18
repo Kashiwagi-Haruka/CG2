@@ -81,19 +81,19 @@ void Key::Update()
 #endif
 }
 
-void Key::Draw()
-{
-    if (isGetKey_) {
-        return;
-    }
+void Key::Draw() {
+	if (isGetKey_) {
+		return;
+	}
 	if (isRayHit_) {
 		Object3dCommon::GetInstance()->DrawCommonOutline();
+		obj_->Draw();
+		Object3dCommon::GetInstance()->EndOutlineDraw();
 	} else {
 		Object3dCommon::GetInstance()->DrawCommon();
-    }
-    obj_->Draw();
+		obj_->Draw();
+	}
 }
-
 void Key::SetPlayerCamera(PlayerCamera* camera)
 {
     playerCamera_ = camera;

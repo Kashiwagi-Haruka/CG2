@@ -89,14 +89,15 @@ void Chair::Initialize() {
 	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
 
-void Chair::Draw()
-{
+void Chair::Draw() {
 	if (isRayHit_) {
 		Object3dCommon::GetInstance()->DrawCommonOutline();
+		obj_->Draw();
+		Object3dCommon::GetInstance()->EndOutlineDraw();
 	} else {
 		Object3dCommon::GetInstance()->DrawCommon();
-    }
-    obj_->Draw();
+		obj_->Draw();
+	}
 }
 
 void Chair::SwichCommand()
