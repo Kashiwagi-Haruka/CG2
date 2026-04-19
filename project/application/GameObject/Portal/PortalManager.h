@@ -14,6 +14,7 @@ public:
 	PortalManager(Vector3* pos, WhiteBoardManager* whiteBoardManager);
 	~PortalManager();
 	void Initialize();
+    void SpawnFirstPortal();
 	void Update();
 	void WarpPlayer(Player* player);
 	void Draw(bool isShadow, bool drawPortal, bool drawParticle);

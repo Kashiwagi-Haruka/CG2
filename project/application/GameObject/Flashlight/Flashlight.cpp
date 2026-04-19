@@ -118,7 +118,7 @@ void Flashlight::SetLight()
     spotLight_.color = { 1.0f, 1.0f, 0.5f, 1.0f };
     spotLight_.position = obj_->GetTranslate();
     spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
-    spotLight_.intensity = 2.0f;
+    spotLight_.intensity = 1.0f;
     spotLight_.distance = 15.0f;
     spotLight_.decay = 2.0f;
     spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
@@ -160,7 +160,7 @@ void Flashlight::UpdateSpotLight()
         isLightOn_ = !isLightOn_;
         SEManager::SoundPlay(SEManager::PUSH_WATCH);
         if (isLightOn_) {
-            spotLight_.intensity = 2.0f;
+            spotLight_.intensity = 1.0f;
         } else {
             spotLight_.intensity = 0.0f;
         }

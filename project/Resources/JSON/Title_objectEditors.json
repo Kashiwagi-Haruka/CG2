@@ -2196,7 +2196,7 @@
         "distortionFalloff": 1.0,
         "distortionStrength": 0.0,
         "enableLighting": true,
-        "environmentCoefficient": 0.0,
+        "environmentCoefficient": 0.18000000715255737,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
         "shininess": 40.0,

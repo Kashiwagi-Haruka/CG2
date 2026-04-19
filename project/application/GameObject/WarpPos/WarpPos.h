@@ -18,11 +18,16 @@ public:
     Camera* GetWarpPosCamera() { return camera_.get(); };
     void SetParent(Transform* transform) { parentTransform_ = transform; }
     Transform* GetParent() { return parentTransform_; }
+    void SetPlayerCamera(Camera* camera) { playerCamera_ = camera; }
+    void SetIsLookPortal(bool isLook) { isLookPortal_ = isLook; }
+
 private:
+    bool isLookPortal_ = false;
     std::unique_ptr<Object3d> object3d_ = nullptr;
     std::unique_ptr<Camera> camera_ = nullptr;
     Transform* parentTransform_;
     Transform transform_ = {};
+    Camera* playerCamera_;
     float sinTheta_ = 0.0f;
 
 };

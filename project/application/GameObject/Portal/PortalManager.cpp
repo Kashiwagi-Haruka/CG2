@@ -16,14 +16,15 @@ PortalManager::PortalManager(Vector3* pos, WhiteBoardManager* whiteBoardManager)
 
     firstWarpPosTransform_ = {
         .scale = {1.0f,  1.0f, 1.0f},
-          .rotate = {0.0f,  0.0f, 0.0f},
-          .translate = {-2.0f, 1.5f, 0.0f}
+          .rotate = {0.0f, 0.0f, 0.0f},
+          .translate = {-4.0f, 1.5f, 5.5f}
     };
 
     portalParticle_ = std::make_unique<PortalParticle>();
 }
 
 PortalManager::~PortalManager() {
+
     for (auto& portal : portals_) {
         portal.reset();
     }
@@ -33,17 +34,24 @@ PortalManager::~PortalManager() {
 void PortalManager::Initialize() {
 
     canMakePortal_ = false;
-
     warpCoolTimer_ = kWarpTime_;
     portals_.clear();
     portalParticle_->Initialize();
+
+
+}
+
+void PortalManager::SpawnFirstPortal()
+{
+
+    SpawnPortal(pendingWhiteBoard_);
 }
 
 void PortalManager::WarpPlayer(Player* player) {
 
     for (auto& portal : portals_) {
         //プレイヤーがヒットしているとき且つポータルと向き合っているとき
-        if (portal->GetIsPlayerHit() && portal->IsVectorFaceCameraAndObj()) {
+        if (portal->GetIsPlayerCanWarp()) {
             if (warpCoolTimer_ == kWarpTime_) {
                 warpCoolTimer_ = 0.0f;
 
@@ -63,6 +71,8 @@ void PortalManager::UpdatePortal() {
     warpCoolTimer_ += YoshidaMath::kDeltaTime;
     warpCoolTimer_ = std::clamp(warpCoolTimer_, 0.0f, kWarpTime_);
 
+
+
     if (isPendingPortalSpawn_ && portalParticle_) {
         portalParticle_->Update();
         if (portalParticle_->IsFinished() && pendingWhiteBoard_) {
@@ -78,6 +88,7 @@ void PortalManager::UpdatePortal() {
 }
 
 void PortalManager::SetCamera(Camera* camera) {
+
     if (portalParticle_) {
         portalParticle_->SetCamera(camera);
     }
@@ -109,7 +120,10 @@ void PortalManager::Draw(bool isShadow, bool drawPortal, bool drawParticle) {
 
 void PortalManager::SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; }
 
-void PortalManager::Update() { UpdatePortal(); }
+void PortalManager::Update() {
+
+    UpdatePortal();
+}
 
 void PortalManager::CheckCollision() {
 
@@ -149,6 +163,7 @@ void PortalManager::SpawnPortal(WhiteBoard* board) {
     newPortal->Initialize();
     // カメラをセットする
     newPortal->SetCamera(playerCamera_->GetCamera());
+    newPortal->SetPlayerCamera(playerCamera_->GetCamera());
     newPortal->SetParentTransform(&board->GetCollisionTransform());
     newPortal->SetPortalWorldMatrix();
 
