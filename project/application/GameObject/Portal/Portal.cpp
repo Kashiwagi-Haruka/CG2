@@ -15,9 +15,12 @@ Camera* Portal::sceneCamera_ = nullptr;
 
 void Portal::OnCollision(Collider* collider)
 {
-    if (!isPlayerHit_) {
+    if (!isPlayerCanWarp_) {
         if (collider->GetCollisionAttribute() == kCollisionPlayer) {
-            isPlayerHit_ = true;
+            if (IsVectorFaceCameraAndObj()) {
+                isPlayerCanWarp_ = true;
+            }
+
         }
     }
 }
@@ -29,12 +32,10 @@ Vector3 Portal::GetWorldPosition() const
 
 Portal::Portal()
 {
-    sphere_ = { .center = {transform_.translate},.radius = 0.0625f * 0.25f };
+    sphere_ = { .center = {transform_.translate},.radius = 0.0625f*0.25f };
     SetRadius(sphere_.radius);
     SetCollisionAttribute(kCollisionPortal);
     SetCollisionMask(kCollisionPlayer);
-
-
     //ワープ座標
     warpPos_ = std::make_unique<WarpPos>();
 
@@ -51,7 +52,7 @@ Portal::~Portal()
 
 void Portal::Initialize()
 {
-    isPlayerHit_ = false;
+    isPlayerCanWarp_ = false;
     scaleTimer_ = 0.0f;
     uvRotateZ_ = 0.0f;
     transform_ = { .scale = {0.0f,0.0f,0.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
@@ -75,12 +76,14 @@ void Portal::Update() {
         return;
     }
 
-    isPlayerHit_ = false;
+    isPlayerCanWarp_ = false;
 
     uvRotateZ_ += YoshidaMath::kDeltaTime;
 
     UpdatePortalWorldMatrix();
     portalCircle_->Update();
+
+    warpPos_->SetIsLookPortal(IsVectorFaceCameraAndObj());
     // ワープ地点
     warpPos_->Update();
 }
@@ -118,7 +121,7 @@ bool Portal::IsVectorFaceCameraAndObj()
 {
     Vector3 forward = SetSceneCameraAndParentAndGetForward();
     //ポータルの本体の向きを取得する ローカル回転分ずらす
-    Vector3 direction = YoshidaMath::GetDirectionFromRotateY(Function::kPi+transform_.rotate.y);
+    Vector3 direction = YoshidaMath::GetDirectionFromRotateY(Function::kPi + transform_.rotate.y);
     float dot = Function::Dot(forward, direction);
     return (dot < canWarpAngleRange_);
 }
@@ -177,10 +180,8 @@ void Portal::SetRotateFromDirection(const Vector3& forward) {
 
     if (IsVectorsFace(forward)) {
         // 向き合っている
-        // ring_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
         preRotY_ = Function::kPi;
     } else {
-        // ring_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
         preRotY_ = 0.0f;
     }
 
@@ -190,17 +191,21 @@ void Portal::SetRotateFromDirection(const Vector3& forward) {
 void Portal::UpdateScale() {
     scaleTimer_ += YoshidaMath::kDeltaTime;
     scaleTimer_ = std::clamp(scaleTimer_, 0.0f, 1.0f);
-    transform_.scale = YoshidaMath::Easing::EaseInOutBack({ 0.0f, 0.0f, 0.0f }, parentTransform->scale, scaleTimer_);
+    Vector3 scale{ 1.6f,0.9f,1.0f };
+    scale.x *= parentTransform->scale.x;
+    scale.y *= parentTransform->scale.x;
+    scale.z *= parentTransform->scale.x;
+    transform_.scale = YoshidaMath::Easing::EaseInOutBack({ 0.0f, 0.0f, 0.0f }, scale, scaleTimer_);
 }
 
 void Portal::UpdateWorldMatrix() {
     Matrix4x4 worldMatrix = Function::MakeAffineMatrix(transform_.scale * 0.9f, transform_.rotate, transform_.translate);
-    Matrix4x4 worldMatrix1 = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, ringTranslate_);
     portalCircle_->SetWorldMatrix(worldMatrix);
 }
 
 void Portal::SetTranslate(const Vector3& forward) {
     transform_.translate = parentTransform->translate - forward * 0.0625f;
+    transform_.translate.y += 0.0625f;
     ringTranslate_ = transform_.translate - forward * 0.0625f * 0.125f;
 }
 

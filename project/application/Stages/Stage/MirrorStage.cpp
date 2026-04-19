@@ -73,6 +73,8 @@ void MirrorStage::Initialize() {
 	timeCardRack_->Initialize();
 	boxManager_->Initialize();
 	InitializeLights();
+
+
 }
 void MirrorStage::SetPlayer(Player* player) {
 	player_ = player;
@@ -190,7 +192,7 @@ void MirrorStage::CheckCollision() {
 	}
 
 	for (auto& portal : portalManager_->GetPortals()) {
-		if (!portal->GetIsPlayerHit()) {
+		if (!portal->GetIsPlayerCanWarp()) {
 			stageCollisionManager_->AddCollider(portal.get());
 		} else {
 			break;

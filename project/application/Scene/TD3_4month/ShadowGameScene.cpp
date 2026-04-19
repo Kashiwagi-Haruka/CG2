@@ -283,7 +283,7 @@ void ShadowGameScene::UpdatePostEffect() {
 
 	if (auto* portalManager = stageManager_->GetPortalManager()) {
 		for (auto& portal : portalManager->GetPortals()) {
-			if (portal->GetIsPlayerHit()) {
+			if (portal->GetIsPlayerCanWarp()) {
 				if (!isNoise_) {
 					isNoise_ = true;
 				}
