@@ -8,6 +8,7 @@
 #include "ParticleManager.h"
 #include "SpriteCommon.h"
 #include "Engine/ScreenShot/ScreenShot.h"
+#include "Text/FreeTypeManager/FreetypeManager.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
 #include <DbgHelp.h>
@@ -30,6 +31,8 @@ GameBase* GameBase::GetInstance() {
 	return instance.get();
 }
 void GameBase::Finalize() {
+
+	FreeTypeManager::Finalize();
 
 	if (imguiM_) {
 		imguiM_->Finalize();
@@ -74,6 +77,8 @@ void GameBase::Initialize(const wchar_t* TitleName, int32_t WindowWidth, int32_t
 
 	Object3dCommon::GetInstance()->Initialize(dxCommon_.get());
 	SpriteCommon::GetInstance()->Initialize(dxCommon_.get());
+
+	FreeTypeManager::Initialize();
 }
 bool GameBase::SetWindowIconFromFile(const std::wstring& iconPath) {
 	if (!winApp_) {
@@ -123,6 +128,7 @@ void GameBase::EndFlame() {
 	dxCommon_->DrawSceneTextureToBackBuffer();
 	imguiM_->Draw(dxCommon_.get());
 	dxCommon_->PostDraw();
+	FreeTypeManager::ResetFontUsage();
 }
 
 float GameBase::GetDeltaTime() { return dxCommon_->GetDeltaTime(); }
