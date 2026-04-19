@@ -12,7 +12,7 @@
 #include<algorithm>
 namespace {
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 2.0f;
+const float kRayHitOutlineWidth = 10.0f;
 } // namespace
 EdamameModel::EdamameModel()
 {
@@ -182,11 +182,12 @@ void EdamameModel::Initialize()
 
 void EdamameModel::Draw() {
 	if (isRayHit_) {
+
+		Object3dCommon::GetInstance()->DrawCommonSkinning();
+		obj_->Draw();
 		Object3dCommon::GetInstance()->DrawCommonSkinningOutline();
 		obj_->Draw();
 		Object3dCommon::GetInstance()->EndOutlineDraw();
-		Object3dCommon::GetInstance()->DrawCommonSkinning();
-		obj_->Draw();
 
 	} else {
 		Object3dCommon::GetInstance()->DrawCommonSkinning();
