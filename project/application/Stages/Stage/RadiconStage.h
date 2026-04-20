@@ -1,7 +1,7 @@
 #pragma once
 #include "Stages/BaseStage.h"
 #include <memory>
-
+#include "GameObject/Radicon/Radicon.h"
 class RadiconStage : public BaseStage {
 public:
 	explicit RadiconStage(Player* player);
@@ -23,4 +23,6 @@ public:
 private:
 	Player* player_ = nullptr;
 	Yoshida::LightManager* lightManager_ = nullptr;
+
+	std::unique_ptr<Radicon> radicon_;
 };
