@@ -9,7 +9,7 @@
 PlayerCamera* Box::playerCamera_ = nullptr;
 namespace {
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 1.0f;
+const float kRayHitOutlineWidth = 10.0f;
 } // namespace
 Box::Box()
 {
@@ -78,6 +78,8 @@ void Box::Initialize() {
 
 void Box::Draw() {
 	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommon();
+		obj_->Draw();
 		Object3dCommon::GetInstance()->DrawCommonOutline();
 		obj_->Draw();
 		Object3dCommon::GetInstance()->EndOutlineDraw();

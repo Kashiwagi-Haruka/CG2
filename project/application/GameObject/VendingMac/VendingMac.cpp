@@ -11,7 +11,7 @@
 bool VendingMac::isRayHit_ = false;
 namespace {
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 26.0f;
+const float kRayHitOutlineWidth = 10.0f;
 constexpr double kCoffeeSpillProbability = 0.15;
 } // namespace
 VendingMac::VendingMac() {
@@ -74,6 +74,8 @@ void VendingMac::Initialize() {
 
 void VendingMac::Draw() {
 	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommon();
+		obj_->Draw();
 		Object3dCommon::GetInstance()->DrawCommonOutline();
 		obj_->Draw();
 		Object3dCommon::GetInstance()->EndOutlineDraw();

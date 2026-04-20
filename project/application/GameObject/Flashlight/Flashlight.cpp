@@ -6,6 +6,7 @@
 #include"GameObject/Player/Player.h"
 #include<imgui.h>
 #include"GameObject/SEManager/SEManager.h"
+#include "Engine/Texture/Mesh/Object3d/Object3dCommon.h"
 
 bool Flashlight::isSendGetLightMessage_ = false;
 bool Flashlight::isGetLight_ = false;
@@ -105,12 +106,18 @@ void Flashlight::Initialize()
     transform_.rotate = { 0.0f,0.0f,0.0f };
     transform_.scale = { 1.0f,1.0f,1.0f };
     SetLight();
+	obj_->SetOutlineColor({1.0f, 1.0f, 0.0f, 1.0f});
+	obj_->SetOutlineWidth(10.0f);
 }
 
-void Flashlight::Draw()
-{
-
+void Flashlight::Draw() {
+	Object3dCommon::GetInstance()->DrawCommon();   
     obj_->Draw();
+	if (isRayHit_) {
+	Object3dCommon::GetInstance()->DrawCommonOutline();
+	obj_->Draw();
+	Object3dCommon::GetInstance()->EndOutlineDraw();
+    }
 }
 
 void Flashlight::SetLight()

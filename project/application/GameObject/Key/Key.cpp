@@ -10,7 +10,7 @@ bool Key::isGetKey_ = false;
 bool Key::isRayHit_ = false;
 namespace {
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 2.0f;
+const float kRayHitOutlineWidth = 10.0f;
 } // namespace
 Key::Key()
 {
@@ -86,6 +86,8 @@ void Key::Draw() {
 		return;
 	}
 	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommon();
+		obj_->Draw();
 		Object3dCommon::GetInstance()->DrawCommonOutline();
 		obj_->Draw();
 		Object3dCommon::GetInstance()->EndOutlineDraw();
