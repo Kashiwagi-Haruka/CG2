@@ -23,8 +23,6 @@ void RadiconStage::SetPlayerCamera([[maybe_unused]] PlayerCamera* playerCamera) 
 
 PortalManager* RadiconStage::GetPortalManager() { return nullptr; }
 
-std::unique_ptr<CollisionManager> RadiconStage::GetCollisionManager() { return std::make_unique<CollisionManager>(); }
-
 void RadiconStage::SetLightManager(Yoshida::LightManager* lightManager) { lightManager_ = lightManager; }
 
 bool RadiconStage::CheckHitPlayerByStageHazard([[maybe_unused]] const Vector3& playerPosition, [[maybe_unused]] float playerRadius, [[maybe_unused]] float minHitSpeed) const { return false; }
