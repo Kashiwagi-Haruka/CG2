@@ -13,7 +13,7 @@ constexpr int kMaxDrinkCount = 10;
 const Vector3 kDrinkPositionOffset = {0.0f, 0.9f, 0.45f};
 const Vector3 kDrinkScale = {1.0f, 1.0f, 1.0f};
 constexpr float kDrinkForwardSpeed = 0.9f;
-constexpr float kInitialUpwardSpeed = 0.08f;
+constexpr float kInitialUpwardSpeed = 0.2f;
 constexpr float kGroundY = 0.12f;
 const AABB kDrinkRayAABB = {
     .min = {-0.12f, -0.12f, -0.12f},
@@ -110,7 +110,7 @@ void Drink::Update() {
 
 		Vector3 translate = spawnedDrink.object->GetTranslate();
 		if (!spawnedDrink.isGrounded) {
-			spawnedDrink.velocity.y -= YoshidaMath::kGravity * deltaTime;
+			spawnedDrink.velocity.y -= YoshidaMath::kGravity*4.0f * deltaTime;
 			translate += spawnedDrink.velocity * deltaTime;
 			if (translate.y <= kGroundY) {
 				translate.y = kGroundY;

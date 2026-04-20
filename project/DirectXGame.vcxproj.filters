@@ -363,8 +363,8 @@
     <ClCompile Include="application\GameObject\Edamame\EdamameModel.cpp" />
     <ClCompile Include="application\GameObject\UI\UIManager.cpp" />
     <ClCompile Include="application\GameObject\UI\TabKey.cpp" />
-    <ClCompile Include="application\GameObject\UI\LightIcon.cpp" />
-    <ClCompile Include="application\GameObject\UI\KeyIcon.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Item\Light\LightIcon.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Item\Key\KeyIcon.cpp" />
     <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoardManager.cpp" />
     <ClCompile Include="application\GameObject\UI\Mission.cpp" />
     <ClCompile Include="application\GameObject\PC\PC.cpp" />
@@ -744,8 +744,8 @@
     <ClInclude Include="application\GameObject\Edamame\EdamameModel.h" />
     <ClInclude Include="application\GameObject\UI\UIManager.h" />
     <ClInclude Include="application\GameObject\UI\TabKey.h" />
-    <ClInclude Include="application\GameObject\UI\LightIcon.h" />
-    <ClInclude Include="application\GameObject\UI\KeyIcon.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\Light\LightIcon.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\Key\KeyIcon.h" />
     <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoardManager.h" />
     <ClInclude Include="application\GameObject\UI\Mission.h" />
     <ClInclude Include="application\GameObject\PC\PC.h" />
