@@ -57,8 +57,10 @@ class DirectXCommon {
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> sceneColorResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> sceneOutlineResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> sceneSrvDescriptorHeap_ = nullptr;
 	D3D12_CPU_DESCRIPTOR_HANDLE sceneRtvHandle_{};
+	D3D12_CPU_DESCRIPTOR_HANDLE sceneOutlineRtvHandle_{};
 	D3D12_CPU_DESCRIPTOR_HANDLE sceneSrvHandleCPU_{};
 	D3D12_GPU_DESCRIPTOR_HANDLE sceneSrvHandleGPU_{};
 
@@ -82,6 +84,7 @@ class DirectXCommon {
 	int randomNoiseBlendMode_ = 0;
 	bool editorLayoutEnabled_ = false;
 	bool sceneCopiedToBackBufferThisFrame_ = false;
+	bool inOutlineRenderTarget_ = false;
 	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	// RTVを2つ作るのでディスクリプタを2つ用意
@@ -134,6 +137,8 @@ public:
 	int GetRandomNoiseBlendMode() const { return randomNoiseBlendMode_; }
 	void SetEditorLayoutEnabled(bool enabled) { editorLayoutEnabled_ = enabled; }
 	bool IsEditorLayoutEnabled() const { return editorLayoutEnabled_; }
+	void BeginOutlineRenderTarget();
+	void EndOutlineRenderTarget();
 	ID3D12Device* GetDevice() { return device_.Get(); };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
 	ID3D12CommandQueue* GetCommandQueueRaw() { return commandQueue_.Get(); }

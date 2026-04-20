@@ -1,4 +1,5 @@
 #include "../Object3d.hlsli"
+
 struct Material
 {
     float4 color;
@@ -11,6 +12,7 @@ struct Material
     int sepiaEnabled;
     float distortionStrength;
     float distortionFalloff;
+    float2 padding2;
     float4 outlineColor;
     float outlineWidth;
     float3 outlinePadding;
@@ -83,6 +85,7 @@ struct Camera
     int fullscreenSepiaEnabled;
     float2 padding2;
 };
+
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b3);
 ConstantBuffer<Camera> gCamera : register(b4);
@@ -95,6 +98,7 @@ StructuredBuffer<AreaLight> gAreaLights : register(t3);
 Texture2D<float4> gTexture : register(t0);
 Texture2D<float4> gEnvironmentTexture : register(t4);
 SamplerState gSampler : register(s0);
+
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
@@ -105,28 +109,6 @@ static const float kToonShadowSoftness = 0.04f;
 static const float kToonShadowStrength = 0.35f;
 static const float kToonLightIntensityMax = 1.00f;
 
-float3 ApplyGrayscale(float3 color)
-{
-    if (gMaterial.grayscaleEnabled == 0 && gCamera.fullscreenGrayscaleEnabled == 0)
-    {
-        return color;
-    }
-    float y = dot(color, float3(0.2125f, 0.7154f, 0.0721f));
-    return float3(y, y, y);
-}
-float3 ApplySepia(float3 color)
-{
-    if (gMaterial.sepiaEnabled == 0 && gCamera.fullscreenSepiaEnabled == 0)
-    {
-        return color;
-    }
-
-    float3 sepia;
-    sepia.r = dot(color, float3(0.393f, 0.769f, 0.189f));
-    sepia.g = dot(color, float3(0.349f, 0.686f, 0.168f));
-    sepia.b = dot(color, float3(0.272f, 0.534f, 0.131f));
-    return saturate(sepia);
-}
 float ComputeToonShadowMask(float NdotL)
 {
     float saturatedNdotL = saturate(NdotL);
@@ -148,6 +130,8 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
     {
         discard;
     }
+
+    float3 finalColor = gMaterial.color.rgb * textureColor.rgb;
 
     if (gMaterial.enableLighting != 0)
     {
@@ -207,20 +191,16 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
             asin(reflectedDirection.y) / pi + 0.5f);
         float3 environmentColor = gEnvironmentTexture.Sample(gSampler, environmentUV).rgb;
 
-        float3 baseColor = gMaterial.color.rgb * textureColor.rgb;
-        float3 litColor = baseColor * shadeIntensity;
+        float3 litColor = finalColor * shadeIntensity;
         litColor += environmentColor * gMaterial.environmentCoefficient;
-
-        output.color.rgb = litColor;
-        output.color.a = gMaterial.color.a * textureColor.a;
-    }
-    else
-    {
-        output.color = gMaterial.color * textureColor;
+        finalColor = litColor;
     }
 
-    output.color.rgb = ApplyGrayscale(output.color.rgb);
-    output.color.rgb = ApplySepia(output.color.rgb);
+    float3 viewDirection = normalize(gCamera.worldPosition - input.worldPosition);
+    float viewDot = abs(dot(normalize(input.normal), viewDirection));
+    float edgeMask = saturate((1.0f - viewDot - 0.2f) / 0.3f);
 
+    output.color.rgb = lerp(finalColor, gMaterial.outlineColor.rgb, edgeMask * gMaterial.outlineColor.a);
+    output.color.a = gMaterial.color.a * textureColor.a;
     return output;
 }

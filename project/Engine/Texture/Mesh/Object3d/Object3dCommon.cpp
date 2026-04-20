@@ -141,6 +141,11 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	    D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dOutline.PS.hlsl",
 	    L"Resources/shader/Object3d/VS_Shader/SkinningObject3dOutline.VS.hlsl");
 
+	psoSkinningToonOutline_ = std::make_unique<CreatePSO>(dxCommon_, true);
+	psoSkinningToonOutline_->Create(
+	    D3D12_CULL_MODE_FRONT, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/SkinningObject3dToonOutline.PS.hlsl",
+	    L"Resources/shader/Object3d/VS_Shader/SkinningObject3dToonOutline.VS.hlsl");
+
 	SetEnvironmentMapTexture("Resources/3d/skydome.png");
 
 	psoMirror_ = std::make_unique<CreatePSO>(dxCommon_);
@@ -360,9 +365,16 @@ void Object3dCommon::DrawCommonSkinningToon() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonSkinningOutline() {
-
+	dxCommon_->BeginOutlineRenderTarget();
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinningOutline_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinningOutline_->GetGraphicsPipelineState(blendMode_).Get());
+	DrawSet();
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::DrawCommonSkinningToonOutline() {
+	dxCommon_->BeginOutlineRenderTarget();
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinningToonOutline_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoSkinningToonOutline_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
@@ -374,12 +386,13 @@ void Object3dCommon::DrawCommonMirror() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonOutline() {
-
+	dxCommon_->BeginOutlineRenderTarget();
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoOutline_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoOutline_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
+void Object3dCommon::EndOutlineDraw() { dxCommon_->EndOutlineRenderTarget(); }
 void Object3dCommon::DrawCommonPortal() {
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoPortal_->GetRootSignature().Get());

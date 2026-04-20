@@ -11,7 +11,7 @@
 bool VendingMac::isRayHit_ = false;
 namespace {
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 26.0f;
+const float kRayHitOutlineWidth = 10.0f;
 constexpr double kCoffeeSpillProbability = 0.15;
 } // namespace
 VendingMac::VendingMac() {
@@ -50,6 +50,7 @@ void VendingMac::Update() {
 
 	obj_->Update();
 	drink_->SetVendingMacPosition(obj_->GetTranslate());
+	drink_->SetVendingMacForward(GetForward());
 	drink_->Update();
 
 	Matrix4x4 worldMat = Function::Multiply(Function::MakeTranslateMatrix(translate_), obj_->GetWorldMatrix());
@@ -74,11 +75,15 @@ void VendingMac::Initialize() {
 
 void VendingMac::Draw() {
 	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommon();
+		obj_->Draw();
 		Object3dCommon::GetInstance()->DrawCommonOutline();
+		obj_->Draw();
+		Object3dCommon::GetInstance()->EndOutlineDraw();
 	} else {
 		Object3dCommon::GetInstance()->DrawCommon();
+		obj_->Draw();
 	}
-	obj_->Draw();
 	drink_->Draw();
 }
 void VendingMac::CheckCollision() {
@@ -115,7 +120,10 @@ float VendingMac::GetVol(float length, float maxVol) {
 
 bool VendingMac::OnCollisionRay() { return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate()); }
 
-void VendingMac::SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; }
+void VendingMac::SetPlayerCamera(PlayerCamera* camera) {
+	playerCamera_ = camera;
+	drink_->SetPlayerCamera(camera);
+}
 
 void VendingMac::SetCamera(Camera* camera) {
 	obj_->SetCamera(camera);
