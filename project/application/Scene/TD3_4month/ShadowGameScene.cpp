@@ -11,6 +11,7 @@
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
 #include"GameSave/GameSave.h"
+#include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 
 ShadowGameScene::ShadowGameScene() {
 	// BGMの管理
@@ -62,6 +63,7 @@ ShadowGameScene::ShadowGameScene() {
 	SetPlayerCamera(cameraController_->GetPlayerCamera());
 
 	damageOverlay_ = std::make_unique<DamageOverlay>();
+	Hierarchy::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
 }
 
 ShadowGameScene::~ShadowGameScene()
