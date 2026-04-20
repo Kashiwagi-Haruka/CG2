@@ -146,7 +146,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	    D3D12_CULL_MODE_FRONT, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/SkinningObject3dToonOutline.PS.hlsl",
 	    L"Resources/shader/Object3d/VS_Shader/SkinningObject3dToonOutline.VS.hlsl");
 
-	SetEnvironmentMapTexture("Resources/3d/skydome.png");
+	SetEnvironmentMapTexture("Resources/TD3_3102/2d/out.jpg");
 
 	psoMirror_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoMirror_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dMirror.PS.hlsl");
