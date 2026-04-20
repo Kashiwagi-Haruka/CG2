@@ -258,11 +258,6 @@ void ShadowGameScene::UpdateCamera()
 }
 
 void ShadowGameScene::UpdateSceneTransition() {
-	if (!currentEvent_->IsRunning() && Door::GetOpenMassage() && !isTransitionOut_) {
-        transition_->Initialize(true);
-        isTransitionOut_ = true;
-        nextSceneName_ = "Result";
-    }
 
     if (isTransitionIn_ || isTransitionOut_) {
         transition_->Update();
