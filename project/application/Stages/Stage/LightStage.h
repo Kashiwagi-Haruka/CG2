@@ -15,7 +15,7 @@ public:
 	void SetSceneCameraForDraw(Camera* camera) override;
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	PortalManager* GetPortalManager() override;
-	std::unique_ptr<CollisionManager> GetCollisionManager() override;
+
 	void SetLightManager(Yoshida::LightManager* lightManager) {
 		lightManager_ = lightManager;
 	};

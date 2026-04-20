@@ -23,4 +23,3 @@ void LightStage::SetPlayerCamera([[maybe_unused]] PlayerCamera* playerCamera) {}
 
 PortalManager* LightStage::GetPortalManager() { return nullptr; }
 
-std::unique_ptr<CollisionManager> LightStage::GetCollisionManager() { return std::make_unique<CollisionManager>(); }

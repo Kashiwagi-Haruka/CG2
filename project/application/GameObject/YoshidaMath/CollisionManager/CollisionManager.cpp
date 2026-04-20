@@ -83,11 +83,11 @@ void CollisionManager::CheckCollisionPair(YoshidaMath::Collider* a, YoshidaMath:
         CheckCollisionSphereAABBPair(b, a); // 順番に注意！
     } else if (typeA == YoshidaMath::kAABB && typeB == YoshidaMath::kAABB) {
         CheckCollisionAABBPair(a, b);
-    } else if (typeA == YoshidaMath::kOBB, typeB == YoshidaMath::kOBB) {
+    } else if (typeA == YoshidaMath::kOBB&& typeB == YoshidaMath::kOBB) {
         CheckCollisionOBBPair(a, b);
-    } else if (typeA == YoshidaMath::kAABB, typeB == YoshidaMath::kOBB) {
+    } else if (typeA == YoshidaMath::kAABB&& typeB == YoshidaMath::kOBB) {
         CheckCollisionAABBOBBPair(a, b);
-    } else if (typeA == YoshidaMath::kOBB, typeB == YoshidaMath::kAABB) {
+    } else if (typeA == YoshidaMath::kOBB&&typeB == YoshidaMath::kAABB) {
         CheckCollisionAABBOBBPair(b, a);
     }
 }

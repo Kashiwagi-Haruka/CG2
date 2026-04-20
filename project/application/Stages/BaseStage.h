@@ -22,6 +22,5 @@ public:
 	virtual void SetSceneCameraForDraw(Camera* camera) = 0;
 	virtual void SetPlayerCamera(PlayerCamera* playerCamera) = 0;
 	virtual PortalManager* GetPortalManager() = 0;
-	virtual std::unique_ptr<CollisionManager> GetCollisionManager() = 0;
 	virtual void SetLightManager(Yoshida::LightManager* lightManager) = 0;
 };
