@@ -13,7 +13,7 @@ PlayerCamera* Chair::playerCamera_ = nullptr;
 
 namespace {
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 2.0f;
+const float kRayHitOutlineWidth = 10.0f;
 } // namespace
 
 Chair::Chair() {
@@ -89,14 +89,17 @@ void Chair::Initialize() {
 	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
 
-void Chair::Draw()
-{
+void Chair::Draw() {
 	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommon();
+		obj_->Draw();
 		Object3dCommon::GetInstance()->DrawCommonOutline();
+		obj_->Draw();
+		Object3dCommon::GetInstance()->EndOutlineDraw();
 	} else {
 		Object3dCommon::GetInstance()->DrawCommon();
-    }
-    obj_->Draw();
+		obj_->Draw();
+	}
 }
 
 void Chair::SwichCommand()

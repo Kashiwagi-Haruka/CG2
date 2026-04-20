@@ -56,7 +56,7 @@ void MirrorStage::Initialize() {
 	pc_->Initialize();
 	coffees_->Initialize();
 	coffees_->SetFloorY(0.0f);
-	coffees_->SetRoomBounds(-40.0f, 40.0f, -40.0f, 40.0f);
+	coffees_->SetRoomBounds(-7.0f, 14.0f, -7.0f, 7.0f);
 	coffees_->SetSpawnContainment({0.0f, 0.0f, 0.0f}, 0.0f, 0.0f);
 	timeCardWatch_->Initialize();
 	flashlight_->Initialize();
@@ -295,4 +295,11 @@ PortalManager* MirrorStage::GetPortalManager() { return portalManager_.get(); }
 
 void MirrorStage::SetLightManager(Yoshida::LightManager* lightManager)
 {  lightManager_ = lightManager; 
+}
+bool MirrorStage::CheckHitPlayerByStageHazard(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const {
+	if (!coffees_) {
+		return false;
+	}
+
+	return coffees_->CheckHitPlayer(playerPosition, playerRadius, minHitSpeed);
 }

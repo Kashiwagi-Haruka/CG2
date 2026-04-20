@@ -10,7 +10,7 @@ bool Key::isGetKey_ = false;
 bool Key::isRayHit_ = false;
 namespace {
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 2.0f;
+const float kRayHitOutlineWidth = 10.0f;
 } // namespace
 Key::Key()
 {
@@ -81,19 +81,21 @@ void Key::Update()
 #endif
 }
 
-void Key::Draw()
-{
-    if (isGetKey_) {
-        return;
-    }
+void Key::Draw() {
+	if (isGetKey_) {
+		return;
+	}
 	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommon();
+		obj_->Draw();
 		Object3dCommon::GetInstance()->DrawCommonOutline();
+		obj_->Draw();
+		Object3dCommon::GetInstance()->EndOutlineDraw();
 	} else {
 		Object3dCommon::GetInstance()->DrawCommon();
-    }
-    obj_->Draw();
+		obj_->Draw();
+	}
 }
-
 void Key::SetPlayerCamera(PlayerCamera* camera)
 {
     playerCamera_ = camera;

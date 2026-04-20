@@ -1,9 +1,10 @@
 #pragma once
 #include "Stages/BaseStage.h"
+#include <memory>
 
-class LightStage : public BaseStage {
+class RadiconStage : public BaseStage {
 public:
-	explicit LightStage(Player* player);
+	explicit RadiconStage(Player* player);
 
 	void Initialize() override;
 	void SetPlayer(Player* player) override;
@@ -15,10 +16,9 @@ public:
 	void SetSceneCameraForDraw(Camera* camera) override;
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	PortalManager* GetPortalManager() override;
-
+	std::unique_ptr<CollisionManager> GetCollisionManager() override;
+	void SetLightManager(Yoshida::LightManager* lightManager) override;
 	bool CheckHitPlayerByStageHazard(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const override;
-	void SetLightManager(Yoshida::LightManager* lightManager) { lightManager_ = lightManager; };
-
 
 private:
 	Player* player_ = nullptr;

@@ -71,6 +71,8 @@
     <FxCompile Include="Resources\shader\Object3d\PS_Shader\Object3dOutline.PS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\VS_Shader\Object3dOutline.VS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\VS_Shader\SkinningObject3dOutline.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\SkinningObject3dToonOutline.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\VS_Shader\SkinningObject3dToonOutline.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
@@ -339,7 +341,6 @@
     <ClCompile Include="application\Text\TextUIManager\TextUIManager.cpp" />
     <ClCompile Include="application\Text\TItleMenu\TitleMenuUI.cpp" />
     <ClCompile Include="application\Text\FirstStory\FirstStory.cpp" />
-    <ClCompile Include="application\GameObject\Coffee\Coffee.cpp" />
     <ClCompile Include="application\GameObject\Locker\Locker.cpp" />
     <ClCompile Include="application\GameObject\Locker\LockerManager.cpp" />
     <ClCompile Include="application\GameObject\Desk\Desk.cpp" />
@@ -362,8 +363,8 @@
     <ClCompile Include="application\GameObject\Edamame\EdamameModel.cpp" />
     <ClCompile Include="application\GameObject\UI\UIManager.cpp" />
     <ClCompile Include="application\GameObject\UI\TabKey.cpp" />
-    <ClCompile Include="application\GameObject\UI\LightIcon.cpp" />
-    <ClCompile Include="application\GameObject\UI\KeyIcon.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Item\Light\LightIcon.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Item\Key\KeyIcon.cpp" />
     <ClCompile Include="application\GameObject\WhiteBoard\WhiteBoardManager.cpp" />
     <ClCompile Include="application\GameObject\UI\Mission.cpp" />
     <ClCompile Include="application\GameObject\PC\PC.cpp" />
@@ -389,6 +390,11 @@
     <ClCompile Include="application\GameObject\LightManager\LightManager.cpp" />
     <ClCompile Include="application\GameObject\Poster\Poster.cpp" />
     <ClCompile Include="application\Stages\Stage\TutorialStage\TutorialStage.cpp" />
+    <ClCompile Include="application\GameObject\VendingMac\Drink\Drink.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Inventory.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.cpp" />
+    <ClCompile Include="application\Stages\Stage\RadiconStage.cpp" />
+    <ClCompile Include="application\GameObject\Radicon\Radicon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -714,7 +720,6 @@
     <ClInclude Include="application\Text\FirstStory\FirstStory.h" />
     <ClInclude Include="application\ScreenSize\ScreenSize.h" />
     <ClInclude Include="application\Color\Color.h" />
-    <ClInclude Include="application\GameObject\Coffee\Coffee.h" />
     <ClInclude Include="application\GameObject\Locker\Locker.h" />
     <ClInclude Include="application\GameObject\Locker\LockerManager.h" />
     <ClInclude Include="application\GameObject\Desk\Desk.h" />
@@ -742,8 +747,8 @@
     <ClInclude Include="application\GameObject\Edamame\EdamameModel.h" />
     <ClInclude Include="application\GameObject\UI\UIManager.h" />
     <ClInclude Include="application\GameObject\UI\TabKey.h" />
-    <ClInclude Include="application\GameObject\UI\LightIcon.h" />
-    <ClInclude Include="application\GameObject\UI\KeyIcon.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\Light\LightIcon.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\Key\KeyIcon.h" />
     <ClInclude Include="application\GameObject\WhiteBoard\WhiteBoardManager.h" />
     <ClInclude Include="application\GameObject\UI\Mission.h" />
     <ClInclude Include="application\GameObject\PC\PC.h" />
@@ -771,6 +776,12 @@
     <ClInclude Include="application\GameObject\LightManager\LightManager.h" />
     <ClInclude Include="application\GameObject\Poster\Poster.h" />
     <ClInclude Include="application\Stages\Stage\TutorialStage\TutorialStage.h" />
+    <ClInclude Include="application\GameObject\VendingMac\Drink\Drink.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemBase.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Inventory.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.h" />
+    <ClInclude Include="application\Stages\Stage\RadiconStage.h" />
+    <ClInclude Include="application\GameObject\Radicon\Radicon.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

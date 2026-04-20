@@ -66,4 +66,5 @@ public:
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	PortalManager* GetPortalManager() override;
 	 void SetLightManager(Yoshida::LightManager* lightManager)override;
+	bool CheckHitPlayerByStageHazard(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const override;
 };

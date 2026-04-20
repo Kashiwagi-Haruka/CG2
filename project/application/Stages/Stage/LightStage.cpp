@@ -23,3 +23,5 @@ void LightStage::SetPlayerCamera([[maybe_unused]] PlayerCamera* playerCamera) {}
 
 PortalManager* LightStage::GetPortalManager() { return nullptr; }
 
+bool LightStage::CheckHitPlayerByStageHazard([[maybe_unused]] const Vector3& playerPosition, [[maybe_unused]] float playerRadius, [[maybe_unused]] float minHitSpeed) const { return false; }
+
