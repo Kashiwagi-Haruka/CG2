@@ -44,6 +44,9 @@ void Elevator::Initialize() {
     isPlayerInside_ = false;
     insideTimer_ = 0.0f;
 
+    isSceneTransition_ = false;
+    isSceneTranstionStart_ = false;
+
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/Elevator", "Elevator");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, desiredAnimationName, false);
     if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, desiredAnimationName)) {
@@ -63,19 +66,19 @@ void Elevator::Initialize() {
         sys->Initialize();
     }
 
-	poster_.SetParentMat(&worldMat_);
-	poster_.Initialize();
+    poster_.SetParentMat(&worldMat_);
+    poster_.Initialize();
 }
 
 void Elevator::SetCamera(Camera* camera) {
-	modelObj_->SetCamera(camera);
-	modelObj_->UpdateCameraMatrices();
+    modelObj_->SetCamera(camera);
+    modelObj_->UpdateCameraMatrices();
 
-	for (auto& sys : autoLockSystems_) {
-		sys->SetCamera(camera);
-	}
+    for (auto& sys : autoLockSystems_) {
+        sys->SetCamera(camera);
+    }
 
-	poster_.SetCamera(camera);
+    poster_.SetCamera(camera);
 }
 
 void Elevator::Update() {
@@ -104,10 +107,31 @@ void Elevator::Update() {
         if (desiredAnimationName == "Open") {
             desiredAnimationName = "Close";
         }
-
     }
 
+    isSceneTranstionStart_ = false;
+
     if (isPlayerInside_) {
+
+        if (animationFinished_) {
+
+            if (desiredAnimationName == "Close") {
+
+                if (!isSceneTransition_) {
+                    isSceneTransition_ = true;
+                    isSceneTranstionStart_ = true;
+                }
+
+
+            } else if (desiredAnimationName == "Open") {
+
+                isSceneTransition_ = false;
+
+            }
+        }
+
+
+
         insideTimer_ += GameBase::GetInstance()->GetDeltaTime();
         if (insideTimer_ > insideOpenDelay_) {
             if (desiredAnimationName == "Close") {
@@ -131,18 +155,18 @@ void Elevator::Update() {
     for (auto& sys : autoLockSystems_) {
         sys->Update();
     }
-	poster_.Update();
+    poster_.Update();
 }
 
 void Elevator::Draw() {
 
-	modelObj_->Draw();
+    modelObj_->Draw();
 
-	for (auto& sys : autoLockSystems_) {
-		sys->Draw();
-	}
+    for (auto& sys : autoLockSystems_) {
+        sys->Draw();
+    }
 
-	poster_.Draw();
+    poster_.Draw();
 }
 
 void Elevator::Animation()

@@ -389,6 +389,7 @@
     <ClCompile Include="Engine\Editor\EditorTool\Asset\EditorAsset.cpp" />
     <ClCompile Include="application\GameObject\LightManager\LightManager.cpp" />
     <ClCompile Include="application\GameObject\Poster\Poster.cpp" />
+    <ClCompile Include="application\Stages\Stage\TutorialStage\TutorialStage.cpp" />
     <ClCompile Include="application\GameObject\VendingMac\Drink\Drink.cpp" />
     <ClCompile Include="application\GameObject\UI\Inventory\Inventory.cpp" />
     <ClCompile Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.cpp" />
@@ -774,6 +775,7 @@
     <ClInclude Include="Engine\Editor\EditorTool\Asset\EditorAsset.h" />
     <ClInclude Include="application\GameObject\LightManager\LightManager.h" />
     <ClInclude Include="application\GameObject\Poster\Poster.h" />
+    <ClInclude Include="application\Stages\Stage\TutorialStage\TutorialStage.h" />
     <ClInclude Include="application\GameObject\VendingMac\Drink\Drink.h" />
     <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemBase.h" />
     <ClInclude Include="application\GameObject\UI\Inventory\Inventory.h" />

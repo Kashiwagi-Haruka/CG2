@@ -32,7 +32,6 @@ private:
 	std::unique_ptr<TestField> testField_ = nullptr;
 	std::unique_ptr<WhiteBoardManager> whiteBoardManager_ = nullptr;
 	std::unique_ptr<PortalManager> portalManager_ = nullptr;
-	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
 	CollisionManager* stageCollisionManager_ = nullptr;
 	std::unique_ptr<PC> pc_ = nullptr;
 	std::unique_ptr<Coffees> coffees_ = nullptr;
@@ -56,7 +55,6 @@ private:
 
 public:
 	explicit MirrorStage(Player* player);
-
 	void Initialize() override;
 	void SetPlayer(Player* player) override;
 	void SetCollisionManager(CollisionManager* collisionManager) override;
@@ -67,7 +65,6 @@ public:
 	void SetSceneCameraForDraw(Camera* camera) override;
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	PortalManager* GetPortalManager() override;
-	std::unique_ptr<CollisionManager> GetCollisionManager() override;
 	 void SetLightManager(Yoshida::LightManager* lightManager)override;
 	bool CheckHitPlayerByStageHazard(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const override;
 };

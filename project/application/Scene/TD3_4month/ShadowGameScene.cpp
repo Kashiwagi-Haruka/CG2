@@ -5,15 +5,11 @@
 #include "Sprite/SpriteCommon.h"
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
-#include<numbers>
-#include"RigidBody.h"
+
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
-#include "GameObject/SEManager/SEManager.h"
-#include <algorithm>
-#include <cmath>
 #include"GameSave/GameSave.h"
 
 ShadowGameScene::ShadowGameScene() {
@@ -53,7 +49,8 @@ ShadowGameScene::ShadowGameScene() {
 	// エレベータールーム
 	elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
 	// 衝突管理
-	collisionManager_ = stageManager_->GetCollisionManager();
+	collisionManager_ = std::make_unique<CollisionManager>();
+	stageManager_->SetCollisionManager(collisionManager_.get());
 	// UI管理
 	uiManager_ = std::make_unique<UIManager>();
 	GentlemanMenu::SetPlayerCamera(cameraController_->GetPlayerCamera());
@@ -141,12 +138,15 @@ void ShadowGameScene::Update() {
 #ifdef USE_IMGUI
 	DebugImGui();
 #endif
+	StageTransition();
 	currentEvent_->Update();
 
 	// ライトの更新処理
 	UpdateLight();
 	// ポストエフェクトの更新処理
 	UpdatePostEffect();
+
+
 
 	if (!currentEvent_->IsRunning()) {
 		// UI管理
@@ -165,6 +165,9 @@ void ShadowGameScene::Update() {
 	// ポータル管理 カメラの更新後に行う
 	stageManager_->UpdatePortal();
 	UpdatePlayerDamage();
+	
+
+
 	// オブジェクトの当たり判定
 	CheckCollision();
 	if (transition_->IsEnd() && isTransitionOut_) {
@@ -200,8 +203,8 @@ void ShadowGameScene::Finalize()
 void ShadowGameScene::DebugImGui() {
 #ifdef USE_IMGUI
 	ImGui::Begin("shadowGameScene");
-	static constexpr const char* kStageNames[] = {"MirrorStage", "LightStage"};
-	int stageIndex = (currentStageName_ == "LightStage") ? 1 : 0;
+	static constexpr const char* kStageNames[] = {"MirrorStage", "LightStage", "TutorialStage"};
+	int stageIndex = (currentStageName_ == "LightStage") ? 1 : (currentStageName_ == "TutorialStage") ? 2 : 0;
 	if (ImGui::Combo("Stage", &stageIndex, kStageNames, IM_ARRAYSIZE(kStageNames))) {
 		ChangeStage(kStageNames[stageIndex]);
 	}
@@ -215,8 +218,10 @@ void ShadowGameScene::ChangeStage(const std::string& stageName) {
 	}
 	currentStageName_ = stageName;
 	stageManager_->CreateStage(currentStageName_);
-	collisionManager_ = stageManager_->GetCollisionManager();
 	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
+	stageManager_->SetLightManager(lightManager_.get());
+    stageManager_->SetPlayer(player_.get());
+    stageManager_->SetCollisionManager(collisionManager_.get());
 	stageManager_->InitializeStage();
 	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 }
@@ -312,6 +317,7 @@ void ShadowGameScene::UpdateGameObject() {
 	stageManager_->UpdateGameObject(cameraController_->GetPlayerCamera()->GetCamera(),lightManager_->GetDirectionalLight().direction);
 	// エレベーター
 	elevator_->Update();
+
 	// エレベータールーム管理
 	elevatorRoomManager_->Update();
 	// セーブポイント紳士
@@ -344,6 +350,18 @@ void ShadowGameScene::UpdatePlayerDamage() {
 
 void ShadowGameScene::UpdateLight() {
 	lightManager_->Update();
+}
+void ShadowGameScene::StageTransition()
+{
+	//ステージの切り替え
+	if (elevator_->IsSceneTransitionStart()) {
+
+		if (currentStageName_ == "MirrorStage") {
+			ChangeStage("TutorialStage");
+		} else if (currentStageName_ == "TutorialStage") {
+			ChangeStage("LightStage");
+		}
+	}
 }
 #pragma endregion
 #pragma region // private描画処理

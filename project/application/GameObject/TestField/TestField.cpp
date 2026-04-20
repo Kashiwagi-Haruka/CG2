@@ -1,14 +1,14 @@
 #include "TestField.h"
 #include"Function.h"
 #include"Light/CommonLight/SpotCommonLight.h"
-
+#include"imgui.h"
 TestField::TestField()
 {
     box_ = std::make_unique<Primitive>();
     AABB aabb = { .min = {-50.0f,-1.0f,-50.0f},.max = {50.0f,0.0f,50.0f} };
     SetAABB(aabb);
     SetCollisionAttribute(kCollisionFloor);
-    SetCollisionMask(kCollisionPlayer|kCollisionChair|kCollisionKey|kCollisionItem);
+    SetCollisionMask(kCollisionPlayer | kCollisionChair | kCollisionKey | kCollisionItem);
 }
 
 void TestField::Initialize()
@@ -23,8 +23,19 @@ void TestField::Update()
 {
     box_->SetEnableLighting(true);
     box_->SetTransform(transform_);
-    box_->SetUvTransform({ 50.0f,50.0f,50.0f }, {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f});
+    box_->SetUvTransform({ 50.0f,50.0f,50.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f });
     box_->Update();
+
+#ifdef USE_IMGUI
+    ImGui::Begin("TestField");
+    if (ImGui::TreeNode("TestField")) {
+        ImGui::DragFloat3("translate", &transform_.translate.x, 0.1f);
+        ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.1f);
+        ImGui::DragFloat3("scale", &transform_.scale.x, 0.1f);
+        ImGui::TreePop();
+    }
+    ImGui::End();
+#endif
 }
 
 void TestField::Draw()

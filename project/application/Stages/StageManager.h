@@ -33,7 +33,8 @@ public:
 	void SetSceneCameraForDraw(Camera* camera);
 	void SetPlayerCamera(PlayerCamera* playerCamera);
 	PortalManager* GetPortalManager();
-	std::unique_ptr<CollisionManager> GetCollisionManager();
+
 	bool CheckHitPlayerByStageHazard(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const;
 	void SetLightManager(Yoshida::LightManager* lightManager);
+
 };

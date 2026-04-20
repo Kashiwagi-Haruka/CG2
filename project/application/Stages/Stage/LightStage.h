@@ -15,9 +15,10 @@ public:
 	void SetSceneCameraForDraw(Camera* camera) override;
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	PortalManager* GetPortalManager() override;
-	std::unique_ptr<CollisionManager> GetCollisionManager() override;
+
 	bool CheckHitPlayerByStageHazard(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const override;
 	void SetLightManager(Yoshida::LightManager* lightManager) { lightManager_ = lightManager; };
+
 
 private:
 	Player* player_ = nullptr;

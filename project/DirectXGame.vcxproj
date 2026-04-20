@@ -320,6 +320,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.cpp" />
     <ClCompile Include="application\GameObject\LightManager\LightManager.cpp" />
     <ClCompile Include="application\GameObject\Poster\Poster.cpp" />
+    <ClCompile Include="application\Stages\Stage\TutorialStage\TutorialStage.cpp" />
     <ClCompile Include="application\GameObject\UI\Inventory\Inventory.cpp" />
     <ClCompile Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.cpp" />
     <ClCompile Include="application\Stages\Stage\RadiconStage.cpp" />
@@ -521,6 +522,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.h" />
     <ClInclude Include="application\GameObject\LightManager\LightManager.h" />
     <ClInclude Include="application\GameObject\Poster\Poster.h" />
+    <ClInclude Include="application\Stages\Stage\TutorialStage\TutorialStage.h" />
     <ClInclude Include="application\GameObject\UI\Inventory\Inventory.h" />
     <ClInclude Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.h" />
     <ClInclude Include="application\Stages\Stage\RadiconStage.h" />

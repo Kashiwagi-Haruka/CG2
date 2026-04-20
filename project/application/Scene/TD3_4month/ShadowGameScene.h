@@ -153,7 +153,7 @@ public:
 	void DebugImGui();
 	// 衝突判定チェック
 	void CheckCollision();
-
+   
 private:
 	// =======================================
 	// プライベート更新処理
@@ -169,6 +169,8 @@ private:
 	void UpdatePlayerDamage();
     //ポイントライトの更新処理
     void UpdateLight();
+    //ステージ遷移の更新処理
+    void StageTransition();
     // =======================================
     // プライベート描画処理
     // =======================================

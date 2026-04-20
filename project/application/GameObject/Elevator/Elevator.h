@@ -20,7 +20,7 @@ public:
 	void Draw();
 	void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
 	std::array<std::unique_ptr<AutoLockSystem>, 2>& GetAutoLockSys() { return autoLockSystems_; };
-
+	bool IsSceneTransitionStart() const { return isSceneTranstionStart_; }
 private:
 	// アニメーション
 	void Animation();
@@ -54,4 +54,7 @@ private:
 	std::array<std::unique_ptr<AutoLockSystem>, 2> autoLockSystems_;
 
 	Poster poster_;
+	bool isSceneTranstionStart_ = false;
+
+	bool isSceneTransition_ = false;
 };

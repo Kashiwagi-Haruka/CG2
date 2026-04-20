@@ -23,5 +23,5 @@ void LightStage::SetPlayerCamera([[maybe_unused]] PlayerCamera* playerCamera) {}
 
 PortalManager* LightStage::GetPortalManager() { return nullptr; }
 
-std::unique_ptr<CollisionManager> LightStage::GetCollisionManager() { return std::make_unique<CollisionManager>(); }
 bool LightStage::CheckHitPlayerByStageHazard([[maybe_unused]] const Vector3& playerPosition, [[maybe_unused]] float playerRadius, [[maybe_unused]] float minHitSpeed) const { return false; }
+
