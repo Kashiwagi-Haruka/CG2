@@ -32,7 +32,15 @@ Vector3 DirectionToRotation(const Vector3& direction, const Vector3& forwardAxis
 
 	return {pitch, -yaw, roll};
 }
+// オイラー角（rotate）から前方向ベクトルを生成する
+Vector3 MakeForwardFromRotate(const Vector3& rotate) {
+	Matrix4x4 rotateX = MakeRotateXMatrix(rotate.x);
+	Matrix4x4 rotateY = MakeRotateYMatrix(rotate.y);
+	Matrix4x4 rotateZ = MakeRotateZMatrix(rotate.z);
+	Matrix4x4 rotateXYZ = Multiply(rotateZ, Multiply(rotateX, rotateY));
 
+	return Normalize({rotateXYZ.m[2][0], rotateXYZ.m[2][1], rotateXYZ.m[2][2]});
+}
 // Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
 //	Matrix4x4 result{};
 //	float f = 1.0f / std::tanf(fovY * 0.5f);

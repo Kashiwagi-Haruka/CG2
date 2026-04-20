@@ -5,7 +5,7 @@ class Camera;
 class Radicon {
 
 	std::unique_ptr<Object3d> obj_;
-	
+	Transform transform_;
 	Vector3 velocity_;
 	float speed_;
 

@@ -1,13 +1,21 @@
 #include "RadiconStage.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
+#include "GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 
-RadiconStage::RadiconStage(Player* player) : player_(player) {}
+RadiconStage::RadiconStage(Player* player) : player_(player) {
+	radicon_ = std::make_unique<Radicon>();
+}
 
-void RadiconStage::Initialize() {}
+void RadiconStage::Initialize() { 
+	radicon_->Initialize();
+}
 
 void RadiconStage::SetPlayer(Player* player) { player_ = player; }
 
-void RadiconStage::SetCollisionManager([[maybe_unused]] CollisionManager* collisionManager) {}
+void RadiconStage::SetCollisionManager([[maybe_unused]] CollisionManager* collisionManager) {
+
+
+}
 
 void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unused]] const Vector3& lightDirection, [[maybe_unused]] Player* player) {}
 
@@ -19,7 +27,7 @@ void RadiconStage::DrawModel([[maybe_unused]] bool isShadow, [[maybe_unused]] bo
 
 void RadiconStage::SetSceneCameraForDraw([[maybe_unused]] Camera* camera) {}
 
-void RadiconStage::SetPlayerCamera([[maybe_unused]] PlayerCamera* playerCamera) {}
+void RadiconStage::SetPlayerCamera([[maybe_unused]] PlayerCamera* playerCamera) { radicon_->SetCamera(playerCamera->GetCamera()); }
 
 PortalManager* RadiconStage::GetPortalManager() { return nullptr; }
 
