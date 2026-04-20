@@ -10,10 +10,7 @@ void Game::Initialize() {
 	SetUnhandledExceptionFilter(GameBase::GetInstance()->ExportDump);
 
 	sceneFactory_ = std::make_unique<SceneFactory>();
-	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
-
-	// フリータイプの初期化
-	FreeTypeManager::Initialize();
+	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());	
 
 	SceneManager::GetInstance()->ChangeScene("Title");
 	/*SceneManager::GetInstance()->ChangeScene("Sample");*/
@@ -49,8 +46,6 @@ void Game::Draw() {
 void Game::Finalize() {
 
 	SEManager::UnLoad();
-	/// @brief 終了処理
-	FreeTypeManager::Finalize();
 
 	SceneManager::GetInstance()->Finalize();
 	GameBase::GetInstance()->Finalize();
