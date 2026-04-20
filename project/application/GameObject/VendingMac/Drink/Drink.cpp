@@ -1,18 +1,28 @@
 #include "Drink.h"
 #include "Camera.h"
+#include "DirectXCommon.h"
 #include "Function.h"
+#include "GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
+#include "GameObject/YoshidaMath/YoshidaMath.h"
 #include "Object3d/Object3dCommon.h"
+#include "RigidBody.h"
 #include <Model/ModelManager.h>
-#include <random>
 
 namespace {
 constexpr int kMaxDrinkCount = 10;
 const Vector3 kDrinkPositionOffset = {0.0f, 0.9f, 0.45f};
 const Vector3 kDrinkScale = {1.0f, 1.0f, 1.0f};
-constexpr float kDrinkSpeed = 0.12f;
-constexpr float kMoveOffset = 0.6f;
-constexpr float kGroundY = 0.0f;
+constexpr float kDrinkForwardSpeed = 0.9f;
+constexpr float kInitialUpwardSpeed = 0.08f;
+constexpr float kGroundY = 0.12f;
+const AABB kDrinkRayAABB = {
+    .min = {-0.12f, -0.12f, -0.12f},
+      .max = {0.12f,  0.12f,  0.12f }
+};
+const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
+constexpr float kRayHitOutlineWidth = 10.0f;
 } // namespace
+
 
 Drink::Drink() {
 	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Drink/water", "water");
@@ -67,49 +77,67 @@ std::unique_ptr<Object3d> Drink::CreateDrinkObject(DrinkName type) const {
 	if (camera_) {
 		obj->SetCamera(camera_);
 	}
+	obj->SetOutlineColor(kRayHitOutlineColor);
+	obj->SetOutlineWidth(kRayHitOutlineWidth);
 	return obj;
 }
 
 void Drink::SpawnDrink(DrinkName type) {
-	static std::mt19937 randomEngine{std::random_device{}()};
-	static std::uniform_real_distribution<float> randomDirection(-0.6f, 0.6f);
-	constexpr float kFixedYDirection = 1.0f;
-
 	SpawnedDrink spawned{};
 	spawned.type = type;
 	spawned.object = CreateDrinkObject(type);
 	spawned.object->SetTranslate(vendingMacPosition_ + kDrinkPositionOffset);
 
-	const Vector3 randomVector = {randomDirection(randomEngine), kFixedYDirection, randomDirection(randomEngine)};
-	spawned.moveVector = randomVector * (kMoveOffset * kDrinkSpeed);
+	Vector3 forward = vendingMacForward_;
+	forward.y = 0.0f;
+	if (Function::Length(forward) <= 0.0001f) {
+		forward = {0.0f, 0.0f, 1.0f};
+	}
+	forward = Function::Normalize(forward);
+	spawned.velocity = forward * kDrinkForwardSpeed;
+	spawned.velocity.y = kInitialUpwardSpeed;
 	spawned.isGrounded = false;
+	spawned.isRayHit = false;
 	spawnedDrinks_.push_back(std::move(spawned));
 }
 
 void Drink::Update() {
+	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	for (auto& spawnedDrink : spawnedDrinks_) {
 		if (!spawnedDrink.object) {
 			continue;
 		}
 
+		Vector3 translate = spawnedDrink.object->GetTranslate();
 		if (!spawnedDrink.isGrounded) {
-			Vector3 translate = spawnedDrink.object->GetTranslate();
-			translate += spawnedDrink.moveVector;
+			spawnedDrink.velocity.y -= YoshidaMath::kGravity * deltaTime;
+			translate += spawnedDrink.velocity * deltaTime;
 			if (translate.y <= kGroundY) {
 				translate.y = kGroundY;
 				spawnedDrink.isGrounded = true;
+				spawnedDrink.velocity = {0.0f, 0.0f, 0.0f};
 			}
 			spawnedDrink.object->SetTranslate(translate);
 		}
+
+		spawnedDrink.isRayHit = playerCamera_ ? playerCamera_->OnCollisionRay(kDrinkRayAABB, translate) : false;
 		spawnedDrink.object->Update();
 	}
 }
 
 void Drink::Draw() {
-	Object3dCommon::GetInstance()->DrawCommon();
 	for (const auto& spawnedDrink : spawnedDrinks_) {
 		if (spawnedDrink.object) {
-			spawnedDrink.object->Draw();
+			if (spawnedDrink.isRayHit) {
+				Object3dCommon::GetInstance()->DrawCommon();
+				spawnedDrink.object->Draw();
+				Object3dCommon::GetInstance()->DrawCommonOutline();
+				spawnedDrink.object->Draw();
+				Object3dCommon::GetInstance()->EndOutlineDraw();
+			} else {
+				Object3dCommon::GetInstance()->DrawCommon();
+				spawnedDrink.object->Draw();
+			}
 		}
 	}
 }

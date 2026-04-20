@@ -50,6 +50,7 @@ void VendingMac::Update() {
 
 	obj_->Update();
 	drink_->SetVendingMacPosition(obj_->GetTranslate());
+	drink_->SetVendingMacForward(GetForward());
 	drink_->Update();
 
 	Matrix4x4 worldMat = Function::Multiply(Function::MakeTranslateMatrix(translate_), obj_->GetWorldMatrix());
@@ -119,7 +120,10 @@ float VendingMac::GetVol(float length, float maxVol) {
 
 bool VendingMac::OnCollisionRay() { return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate()); }
 
-void VendingMac::SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; }
+void VendingMac::SetPlayerCamera(PlayerCamera* camera) {
+	playerCamera_ = camera;
+	drink_->SetPlayerCamera(camera);
+}
 
 void VendingMac::SetCamera(Camera* camera) {
 	obj_->SetCamera(camera);
