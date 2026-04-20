@@ -57,6 +57,8 @@ class Object3d {
 	Vector3 uvTranslate_ = {0.0f, 0.0f, 0.0f};
 	Vector2 uvAnchor_ = {0.0f, 0.0f};
 	std::string editorId_;
+	bool editorRegistrationEnabled_ = false;
+	bool isEditorRegistered_ = false;
 
 public:
 	~Object3d();
@@ -119,5 +121,9 @@ public:
 	Transform GetTransform() const { return transform_; }
 	void SetEditorId(const std::string& id) { editorId_ = id; }
 	const std::string& GetEditorId() const { return editorId_; }
+	void SetEditorRegistrationEnabled(bool enable) { editorRegistrationEnabled_ = enable; }
+	void RegisterToEditor();
+	void RegisterToEditor(const std::string& saveFileName, const std::string& registrationName);
+	void UnregisterFromEditor();
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix; }
 };

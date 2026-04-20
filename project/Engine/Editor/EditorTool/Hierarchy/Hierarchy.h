@@ -24,8 +24,10 @@ public:
 	static Hierarchy* GetInstance();
 
 	void RegisterObject3d(Object3d* object);
+	void RegisterObject3d(Object3d* object, const std::string& saveFileName, const std::string& registrationName);
 	void UnregisterObject3d(Object3d* object);
 	void RegisterPrimitive(Primitive* primitive);
+	void RegisterPrimitive(Primitive* primitive, const std::string& saveFileName, const std::string& registrationName);
 	void UnregisterPrimitive(Primitive* primitive);
 	bool HasRegisteredObjects() const;
 	void DrawObjectEditors();
@@ -101,6 +103,10 @@ private:
 	EditorLight editorLight_{};
 	EditorAudio editorAudio_{};
 	EditorCamera editorCamera_{};
+	std::string editorDataFileName_ = "objectEditors.json";
+	std::string pendingRegistrationName_;
+	std::string pendingRegistrationId_;
+	bool editorDataLoadedManually_ = false;
 
 public:
 	void RegisterCamera(Camera* camera);

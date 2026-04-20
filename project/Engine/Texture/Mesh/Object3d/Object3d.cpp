@@ -2,8 +2,8 @@
 #include "Object3d/Object3d.h"
 #include "Camera.h"
 #include "DirectXCommon.h"
-#include "Function.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
+#include "Function.h"
 #include "Model/Model.h"
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
@@ -12,7 +12,7 @@
 #include <cassert>
 #include <cmath>
 
-Object3d::~Object3d() { Hierarchy::GetInstance()->UnregisterObject3d(this); }
+Object3d::~Object3d() { UnregisterFromEditor(); }
 
 void Object3d::Initialize() {
 
@@ -31,8 +31,32 @@ void Object3d::Initialize() {
 	SetDistortionFalloff(1.0f);
 	SetOutlineColor({0.0f, 0.0f, 0.0f, 1.0f});
 	SetOutlineWidth(1.0f);
-	Hierarchy* Hierarchy = Hierarchy::GetInstance();
-	Hierarchy->RegisterObject3d(this);
+	if (editorRegistrationEnabled_) {
+		RegisterToEditor();
+	}
+}
+void Object3d::RegisterToEditor() {
+	if (isEditorRegistered_) {
+		return;
+	}
+	Hierarchy::GetInstance()->RegisterObject3d(this);
+	isEditorRegistered_ = true;
+}
+
+void Object3d::RegisterToEditor(const std::string& saveFileName, const std::string& registrationName) {
+	if (isEditorRegistered_) {
+		return;
+	}
+	Hierarchy::GetInstance()->RegisterObject3d(this, saveFileName, registrationName);
+	isEditorRegistered_ = true;
+}
+
+void Object3d::UnregisterFromEditor() {
+	if (!isEditorRegistered_) {
+		return;
+	}
+	Hierarchy::GetInstance()->UnregisterObject3d(this);
+	isEditorRegistered_ = false;
 }
 namespace {
 bool IsIdentityMatrix(const Matrix4x4& matrix) {
