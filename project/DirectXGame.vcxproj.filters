@@ -392,6 +392,7 @@
     <ClCompile Include="application\GameObject\VendingMac\Drink\Drink.cpp" />
     <ClCompile Include="application\GameObject\UI\Inventory\Inventory.cpp" />
     <ClCompile Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.cpp" />
+    <ClCompile Include="application\Stages\Stage\RadiconStage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -776,6 +777,7 @@
     <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemBase.h" />
     <ClInclude Include="application\GameObject\UI\Inventory\Inventory.h" />
     <ClInclude Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.h" />
+    <ClInclude Include="application\Stages\Stage\RadiconStage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
