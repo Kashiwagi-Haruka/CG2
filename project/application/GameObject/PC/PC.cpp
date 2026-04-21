@@ -86,6 +86,7 @@ void PC::Update()
 void PC::Initialize() {
 	isRayHit_ = false;
 	obj_->Initialize();
+	obj_->RegisterEditor("PC");
 	obj_->SetOutlineColor(kRayHitOutlineColor);
 	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 

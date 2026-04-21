@@ -67,6 +67,7 @@ void VendingMac::Initialize() {
 	isRayHit_ = false;
 	interactRequested_ = false;
 	obj_->Initialize();
+	obj_->RegisterEditor("VendingMac");
 	drink_->Initialize();
 	SEManager::SoundPlay(SEManager::NOISE, true);
 	obj_->SetOutlineColor(kRayHitOutlineColor);
