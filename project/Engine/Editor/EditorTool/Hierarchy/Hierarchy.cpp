@@ -737,6 +737,26 @@ void Hierarchy::DrawSceneSelector() {
 		}
 		ImGui::EndCombo();
 	}
+	RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
+	if (!registeredEditorDataFiles_.empty()) {
+		if (selectedEditorDataFileIndex_ >= registeredEditorDataFiles_.size()) {
+			selectedEditorDataFileIndex_ = 0;
+		}
+		const std::string& selectedFile = registeredEditorDataFiles_[selectedEditorDataFileIndex_];
+		if (ImGui::BeginCombo("Save File Name", selectedFile.c_str())) {
+			for (size_t i = 0; i < registeredEditorDataFiles_.size(); ++i) {
+				const bool isSelected = (i == selectedEditorDataFileIndex_);
+				if (ImGui::Selectable(registeredEditorDataFiles_[i].c_str(), isSelected)) {
+					selectedEditorDataFileIndex_ = i;
+					editorDataFileName_ = registeredEditorDataFiles_[i];
+				}
+				if (isSelected) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+	}
 #else
 	SceneManager* sceneManager = SceneManager::GetInstance();
 	if (!sceneManager) {
