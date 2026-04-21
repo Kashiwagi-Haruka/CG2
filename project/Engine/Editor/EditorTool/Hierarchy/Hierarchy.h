@@ -29,7 +29,7 @@ public:
 	void RegisterPrimitive(Primitive* primitive);
 	void RegisterPrimitive(Primitive* primitive, const std::string& saveFileName, const std::string& registrationName);
 	void BeginRegisterFile(const std::string& saveFileName);
-	void AddRegisterObject(const std::string& registrationName);
+	void AddRegisterObject(Object3d* object, const std::string& registrationName);
 	void EndRegisterFile();
 	void UnregisterPrimitive(Primitive* primitive);
 	bool HasRegisteredObjects() const;
@@ -112,8 +112,7 @@ private:
 	bool editorDataLoadedManually_ = false;
 	bool isRegisterFileScopeActive_ = false;
 	std::string registerFileScopeName_;
-	std::vector<std::string> registerObjectQueue_;
-	size_t registerObjectQueueIndex_ = 0;
+	std::unordered_map<const Object3d*, std::string> registerObjectBindings_;
 
 public:
 	void RegisterCamera(Camera* camera);

@@ -181,6 +181,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\UI\DamageOverlay.cpp" />
     <ClCompile Include="application\GameObject\Elevator\ElevatorRoomManager.cpp" />
     <ClCompile Include="application\GameObject\VendingMac\Drink\Drink.cpp" />
+    <ClCompile Include="application\GameObject\Enemy\Enemy.cpp" />
     <ClCompile Include="Engine\Editor\EditorTool\Asset\EditorAsset.cpp" />
     <ClCompile Include="Engine\Editor\EditorManager\EditorManager.cpp" />
     <ClCompile Include="Engine\Editor\EditorData\Object3d\EditorObject3d.cpp" />
@@ -376,6 +377,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\UI\DamageOverlay.h" />
     <ClInclude Include="application\GameObject\Elevator\ElevatorRoomManager.h" />
     <ClInclude Include="application\GameObject\VendingMac\Drink\Drink.h" />
+    <ClInclude Include="application\GameObject\Enemy\Enemy.h" />
     <ClInclude Include="Engine\Editor\EditorTool\Asset\EditorAsset.h" />
     <ClInclude Include="Engine\Editor\EditorManager\EditorManager.h" />
     <ClInclude Include="Engine\Editor\EditorData\Object3d\EditorObject3d.h" />

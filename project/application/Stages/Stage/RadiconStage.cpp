@@ -17,9 +17,11 @@ void RadiconStage::SetCollisionManager([[maybe_unused]] CollisionManager* collis
 
 }
 
-void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unused]] const Vector3& lightDirection, [[maybe_unused]] Player* player) {}
+void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unused]] const Vector3& lightDirection, [[maybe_unused]] Player* player) { 
+	radicon_->Update(); 
+}
 
-void RadiconStage::UpdatePortal() {}
+void RadiconStage::UpdatePortal() {/*記載なし*/}
 
 void RadiconStage::CheckCollision() {}
 

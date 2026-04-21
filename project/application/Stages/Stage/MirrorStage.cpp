@@ -52,25 +52,7 @@ MirrorStage::MirrorStage(Player* player) : player_(player) {
 void MirrorStage::Initialize() {
 	Hierarchy* hierarchy = Hierarchy::GetInstance();
 	hierarchy->BeginRegisterFile("MirrorStage_objectEditors.json");
-	hierarchy->AddRegisterObject("TestField");
-	hierarchy->AddRegisterObject("WhiteBoards");
-	hierarchy->AddRegisterObject("Portals");
-	hierarchy->AddRegisterObject("PC");
-	hierarchy->AddRegisterObject("Coffees");
-	hierarchy->AddRegisterObject("TimeCardWatch");
-	hierarchy->AddRegisterObject("Flashlight");
-	hierarchy->AddRegisterObject("Key");
-	hierarchy->AddRegisterObject("Edamame");
-	hierarchy->AddRegisterObject("Chairs");
-	hierarchy->AddRegisterObject("Walls");
-	hierarchy->AddRegisterObject("Walls2");
-	hierarchy->AddRegisterObject("VendingMachine");
-	hierarchy->AddRegisterObject("Door");
-	hierarchy->AddRegisterObject("Lockers");
-	hierarchy->AddRegisterObject("Desks");
-	hierarchy->AddRegisterObject("TimeCard");
-	hierarchy->AddRegisterObject("TimeCardRack");
-	hierarchy->AddRegisterObject("Boxes");
+
 	testField_->Initialize();
 	whiteBoardManager_->Initialize();
 	portalManager_->Initialize();

@@ -76,11 +76,7 @@ void ShadowGameScene::Initialize()
 {
 	Hierarchy* hierarchy = Hierarchy::GetInstance();
 	hierarchy->BeginRegisterFile("ShadowGameScene_objectEditors.json");
-	hierarchy->AddRegisterObject("Player");
-	hierarchy->AddRegisterObject("Stage");
-	hierarchy->AddRegisterObject("Elevator");
-	hierarchy->AddRegisterObject("Gentleman");
-	hierarchy->AddRegisterObject("ElevatorRoom");
+
     uiManager_->Initialize();
 
 
