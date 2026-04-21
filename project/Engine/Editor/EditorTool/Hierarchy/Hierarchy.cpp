@@ -737,26 +737,7 @@ void Hierarchy::DrawSceneSelector() {
 		}
 		ImGui::EndCombo();
 	}
-	RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
-	if (!registeredEditorDataFiles_.empty()) {
-		if (selectedEditorDataFileIndex_ >= registeredEditorDataFiles_.size()) {
-			selectedEditorDataFileIndex_ = 0;
-		}
-		const std::string& selectedFile = registeredEditorDataFiles_[selectedEditorDataFileIndex_];
-		if (ImGui::BeginCombo("Save File Name", selectedFile.c_str())) {
-			for (size_t i = 0; i < registeredEditorDataFiles_.size(); ++i) {
-				const bool isSelected = (i == selectedEditorDataFileIndex_);
-				if (ImGui::Selectable(registeredEditorDataFiles_[i].c_str(), isSelected)) {
-					selectedEditorDataFileIndex_ = i;
-					editorDataFileName_ = registeredEditorDataFiles_[i];
-				}
-				if (isSelected) {
-					ImGui::SetItemDefaultFocus();
-				}
-			}
-			ImGui::EndCombo();
-		}
-	}
+
 #else
 	SceneManager* sceneManager = SceneManager::GetInstance();
 	if (!sceneManager) {
@@ -967,30 +948,29 @@ void Hierarchy::DrawObjectEditors() {
 	}
 	ImGui::End();
 
-	const float contentStartY = viewport->WorkPos.y + kTopToolbarHeight;
+		const float contentStartY = viewport->WorkPos.y + kTopToolbarHeight;
 	ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, contentStartY), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(leftPanelWidth, availableHeight), ImGuiCond_Always);
 	if (ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar)) {
 		ImGui::Text("Manual Object Editor");
 		ImGui::Separator();
 		ImGui::SeparatorText("Editor Data Registration");
-		std::array<char, 256> fileNameBuffer{};
-		std::snprintf(fileNameBuffer.data(), fileNameBuffer.size(), "%s", editorDataFileName_.c_str());
-		if (ImGui::InputText("Save File Name", fileNameBuffer.data(), fileNameBuffer.size())) {
-			editorDataFileName_ = fileNameBuffer.data();
-			RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
-		}
+		RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
 		if (!registeredEditorDataFiles_.empty()) {
 			if (selectedEditorDataFileIndex_ >= registeredEditorDataFiles_.size()) {
 				selectedEditorDataFileIndex_ = 0;
 			}
 			const std::string& selectedFile = registeredEditorDataFiles_[selectedEditorDataFileIndex_];
-			if (ImGui::BeginCombo("Register Files", selectedFile.c_str())) {
+			if (ImGui::BeginCombo("Save File Name", selectedFile.c_str())) {
 				for (size_t i = 0; i < registeredEditorDataFiles_.size(); ++i) {
 					const bool isSelected = (i == selectedEditorDataFileIndex_);
 					if (ImGui::Selectable(registeredEditorDataFiles_[i].c_str(), isSelected)) {
 						selectedEditorDataFileIndex_ = i;
 						editorDataFileName_ = registeredEditorDataFiles_[i];
+						const bool loaded = LoadObjectEditorsFromJson(editorDataFileName_);
+						editorDataLoadedManually_ = loaded;
+						hasUnsavedChanges_ = loaded ? false : hasUnsavedChanges_;
+						saveStatusMessage_ = loaded ? ("Loaded: " + editorDataFileName_) : ("Load failed: " + editorDataFileName_);
 					}
 					if (isSelected) {
 						ImGui::SetItemDefaultFocus();
@@ -998,9 +978,8 @@ void Hierarchy::DrawObjectEditors() {
 				}
 				ImGui::EndCombo();
 			}
-		}
-		if (editorDataFileName_.find(".json") == std::string::npos) {
-			ImGui::TextUnformatted("Hint: json extension is recommended.");
+		} else {
+			ImGui::TextUnformatted("No registered editor data files.");
 		}
 		if (ImGui::Button("Load Editor Data")) {
 			const std::string loadFilePath = editorDataFileName_.empty() ? "objectEditors.json" : editorDataFileName_;

@@ -327,6 +327,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.cpp" />
     <ClCompile Include="application\Stages\Stage\RadiconStage.cpp" />
     <ClCompile Include="application\GameObject\Radicon\Radicon.cpp" />
+    <ClCompile Include="application\GameObject\OperationChangeBox\OperationChangeBox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -531,6 +532,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.h" />
     <ClInclude Include="application\Stages\Stage\RadiconStage.h" />
     <ClInclude Include="application\GameObject\Radicon\Radicon.h" />
+    <ClInclude Include="application\GameObject\OperationChangeBox\OperationChangeBox.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

@@ -1,13 +1,16 @@
 #include "RadiconStage.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include "GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
+#include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 
 RadiconStage::RadiconStage(Player* player) : player_(player) {
 	radicon_ = std::make_unique<Radicon>();
 }
 
 void RadiconStage::Initialize() { 
+	Hierarchy::GetInstance()->BeginRegisterFile("RadiconStage_objectEditors.json");
 	radicon_->Initialize();
+	Hierarchy::GetInstance()->EndRegisterFile();
 }
 
 void RadiconStage::SetPlayer(Player* player) { player_ = player; }
