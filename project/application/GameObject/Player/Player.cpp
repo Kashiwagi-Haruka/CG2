@@ -116,6 +116,7 @@ void Player::Initialize() {
 
     // 体の初期化
     bodyObj_->Initialize();
+    bodyObj_->RegisterEditor("Player");
     bodyObj_->SetTransform(transform_);
 
     // 体にモデル挿入

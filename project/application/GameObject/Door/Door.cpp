@@ -86,6 +86,7 @@ void Door::Update()
 void Door::Initialize()
 {
     obj_->Initialize();
+    obj_->RegisterEditor("Door");
     autoLockSystem_->Initialize();
 
     isSendLockMessage_ = false;

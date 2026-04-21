@@ -35,6 +35,7 @@ void Key::Initialize()
     };
     velocity_ = { 0.0f };
     obj_->Initialize();
+    obj_->RegisterEditor("Key");
     isRayHit_ = false;
     isLockerHit_ = false;
 
