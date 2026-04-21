@@ -32,7 +32,34 @@ namespace {
 std::filesystem::path ResolveObjectEditorJsonPath(const std::string& filePath) { return std::filesystem::path("Resources") / "JSON" / std::filesystem::path(filePath).filename(); }
 
 bool HasObjectEditorJsonFile(const std::string& filePath) { return std::filesystem::exists(ResolveObjectEditorJsonPath(filePath)); }
+void RegisterEditorDataFileName(std::vector<std::string>& fileNames, const std::string& fileName, size_t& selectedIndex) {
+	if (fileName.empty()) {
+		return;
+	}
+	const auto it = std::find(fileNames.begin(), fileNames.end(), fileName);
+	if (it != fileNames.end()) {
+		selectedIndex = static_cast<size_t>(std::distance(fileNames.begin(), it));
+		return;
+	}
+	fileNames.push_back(fileName);
+	selectedIndex = fileNames.size() - 1;
+}
 
+std::vector<std::string> BuildDisplayNamesWithDuplicateSuffix(const std::vector<std::string>& names, const std::string& fallbackPrefix) {
+	std::unordered_map<std::string, size_t> duplicateCounts;
+	std::vector<std::string> displayNames;
+	displayNames.reserve(names.size());
+	for (size_t i = 0; i < names.size(); ++i) {
+		const std::string baseName = names[i].empty() ? (fallbackPrefix + " " + std::to_string(i)) : names[i];
+		const size_t count = ++duplicateCounts[baseName];
+		if (count <= 1) {
+			displayNames.push_back(baseName);
+		} else {
+			displayNames.push_back(baseName + std::to_string(count));
+		}
+	}
+	return displayNames;
+}
 } // namespace
 
 Hierarchy* Hierarchy::GetInstance() {
@@ -99,6 +126,9 @@ void Hierarchy::ResetForSceneChange() {
 	redoStack_.clear();
 	editorCamera_.DeactivatePreview();
 	editorDataLoadedManually_ = false;
+	registeredEditorDataFiles_.clear();
+	selectedEditorDataFileIndex_ = 0;
+	RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
 	pendingRegistrationName_.clear();
 	pendingRegistrationId_.clear();
 	EndRegisterFile();
@@ -208,6 +238,7 @@ void Hierarchy::RegisterObject3d(Object3d* object, const std::string& saveFileNa
 		}
 		if (!scopedSaveFileName.empty()) {
 			editorDataFileName_ = scopedSaveFileName;
+			RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
 		}
 		EditorObject3d::ApplyEditorValues(object, editorTransforms_[index], editorMaterials_[index]);
 		return;
@@ -217,6 +248,7 @@ void Hierarchy::RegisterObject3d(Object3d* object, const std::string& saveFileNa
 	objectNames_.push_back(scopedRegistrationName.empty() ? ("Object " + std::to_string(index)) : scopedRegistrationName);
 	if (!scopedSaveFileName.empty()) {
 		editorDataFileName_ = scopedSaveFileName;
+		RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
 	}
 	editorTransforms_.push_back(object->GetTransform());
 	editorMaterials_.push_back(EditorObject3d::CaptureMaterial(object));
@@ -266,6 +298,7 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive, const std::string& saveF
 		}
 		if (!scopedSaveFileName.empty()) {
 			editorDataFileName_ = scopedSaveFileName;
+			RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
 		}
 		EditorPrimitive::ApplyEditorValues(primitive, primitiveEditorTransforms_[index], primitiveEditorMaterials_[index]);
 		return;
@@ -275,6 +308,7 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive, const std::string& saveF
 	primitiveNames_.push_back(scopedRegistrationName.empty() ? ("Primitive " + std::to_string(index)) : scopedRegistrationName);
 	if (!scopedSaveFileName.empty()) {
 		editorDataFileName_ = scopedSaveFileName;
+		RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
 	}
 	primitiveEditorTransforms_.push_back(primitive->GetTransform());
 	primitiveEditorMaterials_.push_back(EditorPrimitive::CaptureMaterial(primitive));
@@ -285,6 +319,7 @@ void Hierarchy::BeginRegisterFile(const std::string& saveFileName) {
 	registerObjectBindings_.clear();
 	registerPrimitiveBindings_.clear();
 	editorDataFileName_ = registerFileScopeName_;
+	RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
 }
 
 void Hierarchy::AddRegisterObject(Object3d* object, const std::string& registrationName) {
@@ -923,6 +958,26 @@ void Hierarchy::DrawObjectEditors() {
 		std::snprintf(fileNameBuffer.data(), fileNameBuffer.size(), "%s", editorDataFileName_.c_str());
 		if (ImGui::InputText("Save File Name", fileNameBuffer.data(), fileNameBuffer.size())) {
 			editorDataFileName_ = fileNameBuffer.data();
+			RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
+		}
+		if (!registeredEditorDataFiles_.empty()) {
+			if (selectedEditorDataFileIndex_ >= registeredEditorDataFiles_.size()) {
+				selectedEditorDataFileIndex_ = 0;
+			}
+			const std::string& selectedFile = registeredEditorDataFiles_[selectedEditorDataFileIndex_];
+			if (ImGui::BeginCombo("Register Files", selectedFile.c_str())) {
+				for (size_t i = 0; i < registeredEditorDataFiles_.size(); ++i) {
+					const bool isSelected = (i == selectedEditorDataFileIndex_);
+					if (ImGui::Selectable(registeredEditorDataFiles_[i].c_str(), isSelected)) {
+						selectedEditorDataFileIndex_ = i;
+						editorDataFileName_ = registeredEditorDataFiles_[i];
+					}
+					if (isSelected) {
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+				ImGui::EndCombo();
+			}
 		}
 		if (editorDataFileName_.find(".json") == std::string::npos) {
 			ImGui::TextUnformatted("Hint: json extension is recommended.");
@@ -997,12 +1052,13 @@ void Hierarchy::DrawObjectEditors() {
 		}
 
 		ImGui::SeparatorText("Object3d");
+		const std::vector<std::string> objectDisplayNames = BuildDisplayNamesWithDuplicateSuffix(objectNames_, "Object");
 		for (size_t i = 0; i < objects_.size(); ++i) {
 			Object3d* object = objects_[i];
 			if (!object) {
 				continue;
 			}
-			std::string displayName = objectNames_[i].empty() ? ("Object " + std::to_string(i)) : objectNames_[i];
+			std::string displayName = objectDisplayNames[i];
 			const bool selected = (!selectedIsPrimitive_ && selectedObjectIndex_ == i);
 			if (ImGui::Selectable((displayName + "##object_select_" + std::to_string(i)).c_str(), selected)) {
 				selectedObjectIndex_ = i;
@@ -1012,12 +1068,13 @@ void Hierarchy::DrawObjectEditors() {
 		}
 
 		ImGui::SeparatorText("Primitive");
+		const std::vector<std::string> primitiveDisplayNames = BuildDisplayNamesWithDuplicateSuffix(primitiveNames_, "Primitive");
 		for (size_t i = 0; i < primitives_.size(); ++i) {
 			Primitive* primitive = primitives_[i];
 			if (!primitive) {
 				continue;
 			}
-			std::string displayName = primitiveNames_[i].empty() ? ("Primitive " + std::to_string(i)) : primitiveNames_[i];
+			std::string displayName = primitiveDisplayNames[i];
 			const bool selected = (selectedIsPrimitive_ && selectedObjectIndex_ == i);
 			if (ImGui::Selectable((displayName + "##primitive_select_" + std::to_string(i)).c_str(), selected)) {
 				selectedObjectIndex_ = i;

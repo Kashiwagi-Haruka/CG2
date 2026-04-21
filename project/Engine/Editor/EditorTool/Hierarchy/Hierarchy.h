@@ -108,6 +108,8 @@ private:
 	EditorAudio editorAudio_{};
 	EditorCamera editorCamera_{};
 	std::string editorDataFileName_ = "objectEditors.json";
+	std::vector<std::string> registeredEditorDataFiles_{};
+	size_t selectedEditorDataFileIndex_ = 0;
 	std::string pendingRegistrationName_;
 	std::string pendingRegistrationId_;
 	bool editorDataLoadedManually_ = false;
