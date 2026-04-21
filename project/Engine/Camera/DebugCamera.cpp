@@ -19,23 +19,7 @@ Matrix4x4 MakeCameraViewMatrix(const Transform& transform) {
 Vector3 GetRightAxis(const Matrix4x4& rotationMatrix) { return Function::Normalize({rotationMatrix.m[0][0], rotationMatrix.m[0][1], rotationMatrix.m[0][2]}); }
 
 Vector3 GetForwardAxis(const Matrix4x4& rotationMatrix) { return Function::Normalize({rotationMatrix.m[2][0], rotationMatrix.m[2][1], rotationMatrix.m[2][2]}); }
-
-void ZoomPivotOffsetDistance(Vector3& translation, float zoomDelta) {
-	constexpr float kMinDistance = 0.5f;
-	constexpr float kMaxDistance = 500.0f;
-	if (zoomDelta == 0.0f) {
-		return;
-	}
-
-	float currentDistance = std::sqrtf(Function::LengthSquared(translation));
-	if (currentDistance <= 0.0001f) {
-		translation = {0.0f, 0.0f, -1.0f};
-		currentDistance = 1.0f;
-	}
-
-	const float nextDistance = std::clamp(currentDistance + zoomDelta, kMinDistance, kMaxDistance);
-	translation = Function::Normalize(translation) * nextDistance;
-}
+Vector3 GetUpAxis(const Matrix4x4& rotationMatrix) { return Function::Normalize({rotationMatrix.m[1][0], rotationMatrix.m[1][1], rotationMatrix.m[1][2]}); }
 } // namespace
 
 void DebugCamera::Initialize() {
@@ -66,45 +50,50 @@ void DebugCamera::SetRotation(const Vector3& rotation) {
 }
 
 void DebugCamera::Update() {
-	// 左ドラッグ: 向いている方向基準の自由移動 / Ctrl+左ドラッグ: 距離ズーム / Shift+左ドラッグ: 平面移動 / ホイール: 距離ズーム
-	const float moveSpeed = 0.02f;
-	const float dragZoomSpeed = 0.08f;
-	const float wheelZoomSpeed = 0.02f;
+	// 左ドラッグ: 回転 / Shift+左ドラッグ: ローカル軸移動(XYZ)
+	const float rotateSpeed = 0.004f;
+	const float moveSpeed = 0.03f;
+	const float wheelMoveSpeed = 0.2f;
+	const float kPitchLimit = 1.54f;
 
 	Input* input = Input::GetInstance();
 	const Vector2 mouseMove = input->GetMouseMove();
 	const bool isLeftDrag = input->PushMouseButton(Input::MouseButton::kLeft);
 	const bool isShift = input->PushKey(DIK_LSHIFT) || input->PushKey(DIK_RSHIFT);
 	const bool isCtrl = input->PushKey(DIK_LCONTROL) || input->PushKey(DIK_RCONTROL);
+	matRot_ = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, transform_.rotate, {0.0f, 0.0f, 0.0f});
 
-	float zoomDelta = 0.0f;
 	if (isLeftDrag && isShift) {
+		// Shift+左ドラッグ: 画面X=右軸、画面Y=上軸で移動。Ctrl併用時は前後移動に切り替え。
 		const Vector3 right = GetRightAxis(matRot_);
-		Vector3 forward = GetForwardAxis(matRot_);
-		forward.y = 0.0f;
-		if (Function::LengthSquared(forward) > 0.0f) {
-			forward = Function::Normalize(forward);
-		}
-		translation_ += right * (mouseMove.x * moveSpeed);
-		translation_ += forward * (-mouseMove.y * moveSpeed);
-	} else if (isLeftDrag && isCtrl) {
-		zoomDelta += mouseMove.y * dragZoomSpeed;
-	} else if (isLeftDrag) {
-		const Vector3 right = GetRightAxis(matRot_);
+		const Vector3 up = GetUpAxis(matRot_);
 		const Vector3 forward = GetForwardAxis(matRot_);
 		translation_ += right * (mouseMove.x * moveSpeed);
-		translation_ += forward * (-mouseMove.y * moveSpeed);
+		if (isCtrl) {
+			translation_ += forward * (-mouseMove.y * moveSpeed);
+		} else {
+			translation_ += up * (-mouseMove.y * moveSpeed);
+		}
+	} else if (isLeftDrag) {
+		// 左ドラッグ: 視点の向きを変更
+		transform_.rotate.y += mouseMove.x * rotateSpeed;
+		transform_.rotate.x += mouseMove.y * rotateSpeed;
+		transform_.rotate.x = std::clamp(transform_.rotate.x, -kPitchLimit, kPitchLimit);
+		matRot_ = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, transform_.rotate, {0.0f, 0.0f, 0.0f});
 	}
 
+	// ホイール: 前後移動
 	const float wheelDelta = input->GetMouseWheelDelta();
 	if (wheelDelta != 0.0f) {
-		zoomDelta += -wheelDelta * wheelZoomSpeed;
+		const Vector3 forward = GetForwardAxis(matRot_);
+		translation_ += forward * (wheelDelta * wheelMoveSpeed);
 	}
 
-	ZoomPivotOffsetDistance(translation_, zoomDelta);
+	const Vector3 forward = GetForwardAxis(matRot_);
+	pivot_ = translation_ + (forward * pivotForwardOffset_);
 
 	transform_.scale = scale_;
-	transform_.translate = translation_ + pivot_;
+	transform_.translate = translation_;
 	worldMatrix_ = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	viewMatrix_ = MakeCameraViewMatrix(transform_);
 	projectionMatrix_ = Function::MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearZ_, farZ_);
