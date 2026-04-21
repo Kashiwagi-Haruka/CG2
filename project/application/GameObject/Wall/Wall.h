@@ -21,13 +21,14 @@ public:
     void Initialize();
     void Draw();
     void SetCamera(Camera* camera);
+    void RegisterEditor(const std::string& registrationName);
     void AdjustAABB();
     //親を設定する
     void SetParentMatrix(Matrix4x4* parent) { parentMat_ = parent; }
     void SetST(const Vector3& scale, const Vector3& translate);
     const Matrix4x4& GetWorldMatrix() const { return primitive_->GetWorldMatrix(); };
+    Primitive* GetPrimitive() const { return primitive_.get(); }
 private:
     Matrix4x4* parentMat_ = nullptr;
     std::unique_ptr<Primitive>primitive_ = nullptr;
 };
-

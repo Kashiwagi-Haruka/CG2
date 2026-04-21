@@ -143,6 +143,7 @@ public:
 	void SetEditorId(const std::string& id) { editorId_ = id; }
 	const std::string& GetEditorId() const { return editorId_; }
 	void RegisterEditor(const std::string& registrationName);
+	static void RegisterEditors(const std::vector<Primitive*>& primitives, const std::string& registrationNamePrefix);
 	void RegisterToEditor();
 	void RegisterToEditor(const std::string& saveFileName, const std::string& registrationName);
 	void UnregisterFromEditor();

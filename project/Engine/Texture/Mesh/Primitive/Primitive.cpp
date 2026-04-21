@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <string>
 
 namespace {
 constexpr uint32_t kDefaultSlices = 32;
@@ -620,6 +621,14 @@ void Primitive::RegisterEditor(const std::string& registrationName) {
 		Hierarchy::GetInstance()->AddRegisterPrimitive(this, registrationName);
 	}
 	RegisterToEditor();
+}
+void Primitive::RegisterEditors(const std::vector<Primitive*>& primitives, const std::string& registrationNamePrefix) {
+	for (size_t i = 0; i < primitives.size(); ++i) {
+		if (!primitives[i]) {
+			continue;
+		}
+		primitives[i]->RegisterEditor(registrationNamePrefix + std::to_string(i));
+	}
 }
 void Primitive::RegisterToEditor() {
 	if (isEditorRegistered_) {
