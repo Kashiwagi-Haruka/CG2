@@ -24,6 +24,8 @@ Elevator::Elevator() {
     }
 
     autoLockSystems_[0]->SetTranslate({ 0.0f,0.0f,-4.5f });
+    autoLockSystems_[0]->SetAABB({ .min = {-1.5f,0.0f,-0.5f} ,.max = {1.5f,0.02f,0.5f} });
+
     autoLockSystems_[1]->SetAABB({ .min = {-1.5f,0.0f,-1.0f} ,.max = {1.5f,0.02f,2.0f} });
     autoLockSystems_[1]->SetTranslate({ 0.0f,0.0f,0.0f });
 }
@@ -115,45 +117,66 @@ void Elevator::Draw() {
     poster_.Draw();
 }
 
-void Elevator::CheckCollision()
-{
-    //当たり判定を取得しておく
-    bool hitOuter = autoLockSystems_[0]->IsPlayerHit();
-    bool hitInner = autoLockSystems_[1]->IsPlayerHit();
+void Elevator::Close() {
+    //開いているとき閉める
+    if (desiredAnimationName == "Open") {
+        SEManager::SoundPlay(SEManager::ELEVATOR_OPEN);
+        desiredAnimationName = "Close";
+    }
+}
 
-    // 外側マット（入口前）
-    if (hitOuter) {
-        //プレイヤーは外側にいる
+void Elevator::Open() {
+    //しまっているとき開く
+    if (desiredAnimationName == "Close") {
+        SEManager::SoundPlay(SEManager::ELEVATOR_OPEN);
+        desiredAnimationName = "Open"; // 外にいる → 開ける
+    }
+}
+
+void Elevator::CheckCollision() {
+
+
+    Vector3 distance = Function::Distance(playerCamera_->GetTransform().translate, modelObj_->GetTranslate());
+    float length = Function::Length(distance);
+    // 距離が長いとき
+    if (length >= 10.0f) {
+        insideTimer_ = 0.0f;
         isPlayerInside_ = false;
-        //内側にいるフラグをリセット
-        insideTimer_ = 0.0f;
-
-        //しまっているとき開く
-        if (desiredAnimationName == "Close") {
-            SEManager::SoundPlay(SEManager::ELEVATOR_OPEN);
-            desiredAnimationName = "Open"; // 外にいる → 開ける
-        }
-    }
-
-    // 内側マット（エレベーター内部）
-    if (hitInner) {
-        //プレイヤーは内側にいる
-        isPlayerInside_ = true;
-
-        //開いているとき閉める
         if (desiredAnimationName == "Open") {
             desiredAnimationName = "Close";
         }
-    }
+    } else {
 
-    // 中にいない & 外側マットも踏んでいない → 扉を閉める
-    if (!hitInner && !hitOuter) {
-        insideTimer_ = 0.0f;
+        //当たり判定を取得しておく
+        bool hitOuter = autoLockSystems_[0]->IsPlayerHit();
+        bool hitInner = autoLockSystems_[1]->IsPlayerHit();
 
-        if (desiredAnimationName == "Open") {
-            desiredAnimationName = "Close";
+        // 外側マット（入口前）
+        if (hitOuter) {
+            //プレイヤーは外側にいる
+            isPlayerInside_ = false;
+            //内側にいるフラグをリセット
+            insideTimer_ = 0.0f;
+
+            if (!autoLockSystems_[0]->IsPlayerPreHit()) {
+                Open();
+            }
         }
+
+        // 内側マット（エレベーター内部）
+        if (hitInner) {
+            //プレイヤーは内側にいる
+            isPlayerInside_ = true;
+
+            if (!autoLockSystems_[1]->IsPlayerPreHit()) {
+                Close();
+            }
+
+        
+        }
+
     }
+
 }
 
 void Elevator::Animation()

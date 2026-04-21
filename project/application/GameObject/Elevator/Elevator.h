@@ -28,6 +28,8 @@ private:
 	void Animation();
 	//内側にいる時
 	void Inside();
+	void Open();
+	void Close();
 private:
 	// 新しい状態管理
 	bool isPlayerInside_ = false;
