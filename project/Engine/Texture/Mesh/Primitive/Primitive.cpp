@@ -613,9 +613,13 @@ void Primitive::Initialize(PrimitiveName name, const std::string& texturePath, u
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 
 	isUseSetWorld = false;
-	if (editorRegistrationEnabled_) {
-		RegisterToEditor();
+}
+void Primitive::RegisterEditor(const std::string& registrationName) {
+	editorRegistrationEnabled_ = true;
+	if (!registrationName.empty()) {
+		Hierarchy::GetInstance()->AddRegisterPrimitive(this, registrationName);
 	}
+	RegisterToEditor();
 }
 void Primitive::RegisterToEditor() {
 	if (isEditorRegistered_) {

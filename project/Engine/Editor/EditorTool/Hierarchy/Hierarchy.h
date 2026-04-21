@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include <unordered_map>
 #include "Transform.h"
 #include "Vector2.h"
 #include "Vector3.h"
@@ -30,6 +30,7 @@ public:
 	void RegisterPrimitive(Primitive* primitive, const std::string& saveFileName, const std::string& registrationName);
 	void BeginRegisterFile(const std::string& saveFileName);
 	void AddRegisterObject(Object3d* object, const std::string& registrationName);
+	void AddRegisterPrimitive(Primitive* primitive, const std::string& registrationName);
 	void EndRegisterFile();
 	void UnregisterPrimitive(Primitive* primitive);
 	bool HasRegisteredObjects() const;
@@ -113,6 +114,7 @@ private:
 	bool isRegisterFileScopeActive_ = false;
 	std::string registerFileScopeName_;
 	std::unordered_map<const Object3d*, std::string> registerObjectBindings_;
+	std::unordered_map<const Primitive*, std::string> registerPrimitiveBindings_;
 
 public:
 	void RegisterCamera(Camera* camera);

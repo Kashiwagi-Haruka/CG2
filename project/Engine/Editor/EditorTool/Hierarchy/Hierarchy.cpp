@@ -245,6 +245,10 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive, const std::string& saveF
 	}
 	std::string scopedSaveFileName = saveFileName;
 	std::string scopedRegistrationName = registrationName;
+	const auto bindingIt = registerPrimitiveBindings_.find(primitive);
+	if (bindingIt != registerPrimitiveBindings_.end()) {
+		scopedRegistrationName = bindingIt->second;
+	}
 	if (isRegisterFileScopeActive_) {
 		if (scopedSaveFileName.empty()) {
 			scopedSaveFileName = registerFileScopeName_;
@@ -275,11 +279,11 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive, const std::string& saveF
 	primitiveEditorTransforms_.push_back(primitive->GetTransform());
 	primitiveEditorMaterials_.push_back(EditorPrimitive::CaptureMaterial(primitive));
 }
-
 void Hierarchy::BeginRegisterFile(const std::string& saveFileName) {
 	registerFileScopeName_ = saveFileName.empty() ? "objectEditors.json" : saveFileName;
 	isRegisterFileScopeActive_ = true;
 	registerObjectBindings_.clear();
+	registerPrimitiveBindings_.clear();
 	editorDataFileName_ = registerFileScopeName_;
 }
 
@@ -299,10 +303,27 @@ void Hierarchy::AddRegisterObject(Object3d* object, const std::string& registrat
 	}
 }
 
+void Hierarchy::AddRegisterPrimitive(Primitive* primitive, const std::string& registrationName) {
+	if (!primitive || registrationName.empty()) {
+		return;
+	}
+	registerPrimitiveBindings_[primitive] = registrationName;
+	const auto it = std::find(primitives_.begin(), primitives_.end(), primitive);
+	if (it == primitives_.end()) {
+		return;
+	}
+	const size_t index = static_cast<size_t>(std::distance(primitives_.begin(), it));
+	if (index < primitiveNames_.size()) {
+		primitiveNames_[index] = registrationName;
+		hasUnsavedChanges_ = true;
+	}
+}
+
 void Hierarchy::EndRegisterFile() {
 	isRegisterFileScopeActive_ = false;
 	registerFileScopeName_.clear();
 	registerObjectBindings_.clear();
+	registerPrimitiveBindings_.clear();
 }
 void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
 	if (!primitive) {
