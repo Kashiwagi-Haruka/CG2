@@ -168,8 +168,9 @@ void MirrorStage::UpdateLights() {
 	lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
 	//spotLights_[0] = flashlight_->GetSpotLight();
-	//pointLights_[2] = edamame_->GetPointLights().at(0);
-	//pointLights_[3] = edamame_->GetPointLights().at(1);
+
+	lightManager_->SetPointLight(edamame_->GetPointLights().at(0), 0);
+	lightManager_->SetPointLight(edamame_->GetPointLights().at(1), 1);
 	//areaLights_[2] = vendingMac_->GetAreaLight();
 	//areaLights_[3] = wallManager_->GetAreaLight();
 	//areaLights_[4] = wallManager2_->GetAreaLight();
