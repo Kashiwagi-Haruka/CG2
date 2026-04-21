@@ -15,6 +15,7 @@ void TestField::Initialize()
 {
     transform_ = { .scale = {28.0f,0.01f,50.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,-0.01f,0.0f} };
     box_->Initialize(Primitive::Box, "Resources/TD3_3102/2d/floor.png");
+    box_->RegisterEditor("TestField");
     box_->SetTransform(transform_);
     box_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 }

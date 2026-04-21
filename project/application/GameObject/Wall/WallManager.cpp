@@ -59,6 +59,7 @@ void WallManager::Initialize()
 {
     room1_->Initialize();
     plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/out.jpg");
+    plane_->RegisterEditor("WallWindowPlane");
 
 
     // 壁の初期化

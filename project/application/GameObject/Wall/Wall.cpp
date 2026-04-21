@@ -46,6 +46,7 @@ void Wall::Update()
 void Wall::Initialize()
 {
     primitive_->Initialize(Primitive::Box, "Resources/TD3_3102/2d/wall.png");
+    primitive_->RegisterEditor("Wall");
 }
 
 void Wall::Draw()
