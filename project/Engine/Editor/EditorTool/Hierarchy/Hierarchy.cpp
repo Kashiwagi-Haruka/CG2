@@ -70,11 +70,13 @@ void Hierarchy::Finalize() {
 	editorAudio_.Finalize();
 	objects_.clear();
 	objectNames_.clear();
+	objectEditorDataFiles_.clear();
 	editorTransforms_.clear();
 	editorMaterials_.clear();
 
 	primitives_.clear();
 	primitiveNames_.clear();
+	primitiveEditorDataFiles_.clear();
 	primitiveEditorTransforms_.clear();
 	primitiveEditorMaterials_.clear();
 
@@ -226,6 +228,9 @@ void Hierarchy::RegisterObject3d(Object3d* object, const std::string& saveFileNa
 			scopedSaveFileName = registerFileScopeName_;
 		}
 	}
+	if (scopedSaveFileName.empty()) {
+		scopedSaveFileName = editorDataFileName_.empty() ? "objectEditors.json" : editorDataFileName_;
+	}
 	if (std::find(objects_.begin(), objects_.end(), object) != objects_.end()) {
 		return;
 	}
@@ -236,6 +241,10 @@ void Hierarchy::RegisterObject3d(Object3d* object, const std::string& saveFileNa
 		if (!scopedRegistrationName.empty()) {
 			objectNames_[index] = scopedRegistrationName;
 		}
+		if (index >= objectEditorDataFiles_.size()) {
+			objectEditorDataFiles_.resize(index + 1, editorDataFileName_.empty() ? "objectEditors.json" : editorDataFileName_);
+		}
+		objectEditorDataFiles_[index] = scopedSaveFileName;
 		if (!scopedSaveFileName.empty()) {
 			editorDataFileName_ = scopedSaveFileName;
 			RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
@@ -246,6 +255,7 @@ void Hierarchy::RegisterObject3d(Object3d* object, const std::string& saveFileNa
 	const size_t index = objects_.size();
 	objects_.push_back(object);
 	objectNames_.push_back(scopedRegistrationName.empty() ? ("Object " + std::to_string(index)) : scopedRegistrationName);
+	objectEditorDataFiles_.push_back(scopedSaveFileName);
 	if (!scopedSaveFileName.empty()) {
 		editorDataFileName_ = scopedSaveFileName;
 		RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
@@ -286,6 +296,9 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive, const std::string& saveF
 			scopedSaveFileName = registerFileScopeName_;
 		}
 	}
+	if (scopedSaveFileName.empty()) {
+		scopedSaveFileName = editorDataFileName_.empty() ? "objectEditors.json" : editorDataFileName_;
+	}
 	if (std::find(primitives_.begin(), primitives_.end(), primitive) != primitives_.end()) {
 		return;
 	}
@@ -296,6 +309,10 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive, const std::string& saveF
 		if (!scopedRegistrationName.empty()) {
 			primitiveNames_[index] = scopedRegistrationName;
 		}
+		if (index >= primitiveEditorDataFiles_.size()) {
+			primitiveEditorDataFiles_.resize(index + 1, editorDataFileName_.empty() ? "objectEditors.json" : editorDataFileName_);
+		}
+		primitiveEditorDataFiles_[index] = scopedSaveFileName;
 		if (!scopedSaveFileName.empty()) {
 			editorDataFileName_ = scopedSaveFileName;
 			RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
@@ -306,6 +323,7 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive, const std::string& saveF
 	const size_t index = primitives_.size();
 	primitives_.push_back(primitive);
 	primitiveNames_.push_back(scopedRegistrationName.empty() ? ("Primitive " + std::to_string(index)) : scopedRegistrationName);
+	primitiveEditorDataFiles_.push_back(scopedSaveFileName);
 	if (!scopedSaveFileName.empty()) {
 		editorDataFileName_ = scopedSaveFileName;
 		RegisterEditorDataFileName(registeredEditorDataFiles_, editorDataFileName_, selectedEditorDataFileIndex_);
@@ -334,6 +352,12 @@ void Hierarchy::AddRegisterObject(Object3d* object, const std::string& registrat
 	const size_t index = static_cast<size_t>(std::distance(objects_.begin(), it));
 	if (index < objectNames_.size()) {
 		objectNames_[index] = registrationName;
+		if (index >= objectEditorDataFiles_.size()) {
+			objectEditorDataFiles_.resize(index + 1, editorDataFileName_.empty() ? "objectEditors.json" : editorDataFileName_);
+		}
+		if (!registerFileScopeName_.empty()) {
+			objectEditorDataFiles_[index] = registerFileScopeName_;
+		}
 		hasUnsavedChanges_ = true;
 	}
 }
@@ -350,6 +374,12 @@ void Hierarchy::AddRegisterPrimitive(Primitive* primitive, const std::string& re
 	const size_t index = static_cast<size_t>(std::distance(primitives_.begin(), it));
 	if (index < primitiveNames_.size()) {
 		primitiveNames_[index] = registrationName;
+		if (index >= primitiveEditorDataFiles_.size()) {
+			primitiveEditorDataFiles_.resize(index + 1, editorDataFileName_.empty() ? "objectEditors.json" : editorDataFileName_);
+		}
+		if (!registerFileScopeName_.empty()) {
+			primitiveEditorDataFiles_[index] = registerFileScopeName_;
+		}
 		hasUnsavedChanges_ = true;
 	}
 }
@@ -413,12 +443,16 @@ bool Hierarchy::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
 
 bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 	nlohmann::json root;
+	const std::string targetFileName = std::filesystem::path(filePath).filename().string();
 	root["objects"] = nlohmann::json::array();
 	root["primitives"] = nlohmann::json::array();
 	editorLight_.SaveToJson(root["lights"]);
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		const Object3d* object = objects_[i];
 		if (!object) {
+			continue;
+		}
+		if (i >= objectEditorDataFiles_.size() || std::filesystem::path(objectEditorDataFiles_[i]).filename().string() != targetFileName) {
 			continue;
 		}
 		const Transform& transform = editorTransforms_[i];
@@ -452,6 +486,9 @@ bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
 	for (size_t i = 0; i < primitives_.size(); ++i) {
 		const Primitive* primitive = primitives_[i];
 		if (!primitive || primitive == selectionBoxPrimitive_.get()) {
+			continue;
+		}
+		if (i >= primitiveEditorDataFiles_.size() || std::filesystem::path(primitiveEditorDataFiles_[i]).filename().string() != targetFileName) {
 			continue;
 		}
 		const Transform& transform = primitiveEditorTransforms_[i];
@@ -498,11 +535,15 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 	if (!root.is_object()) {
 		return false;
 	}
+	const std::string targetFileName = std::filesystem::path(filePath).filename().string();
 
 	std::unordered_map<std::string, size_t> objectIdToIndex;
 	std::unordered_map<std::string, size_t> objectNameToIndex;
 	for (size_t i = 0; i < objects_.size(); ++i) {
 		if (!objects_[i]) {
+			continue;
+		}
+		if (i >= objectEditorDataFiles_.size() || std::filesystem::path(objectEditorDataFiles_[i]).filename().string() != targetFileName) {
 			continue;
 		}
 		if (i < objectNames_.size() && !objectNames_[i].empty()) {
@@ -513,7 +554,6 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 			objectIdToIndex.emplace(editorId, i);
 		}
 	}
-
 	if (root.contains("objects") && root["objects"].is_array()) {
 		for (const auto& objectJson : root["objects"]) {
 			size_t index = std::numeric_limits<size_t>::max();
@@ -600,10 +640,13 @@ bool Hierarchy::LoadObjectEditorsFromJson(const std::string& filePath) {
 		}
 	}
 
-	std::unordered_map<std::string, size_t> primitiveIdToIndex;
+std::unordered_map<std::string, size_t> primitiveIdToIndex;
 	std::unordered_map<std::string, size_t> primitiveNameToIndex;
 	for (size_t i = 0; i < primitives_.size(); ++i) {
 		if (!primitives_[i] || primitives_[i] == selectionBoxPrimitive_.get()) {
+			continue;
+		}
+		if (i >= primitiveEditorDataFiles_.size() || std::filesystem::path(primitiveEditorDataFiles_[i]).filename().string() != targetFileName) {
 			continue;
 		}
 		if (i < primitiveNames_.size() && !primitiveNames_[i].empty()) {
@@ -842,12 +885,18 @@ void Hierarchy::DrawObjectEditors() {
 			if (!object) {
 				continue;
 			}
+			if (i >= objectEditorDataFiles_.size() || std::filesystem::path(objectEditorDataFiles_[i]).filename().string() != std::filesystem::path(editorDataFileName_).filename().string()) {
+				continue;
+			}
 			EditorObject3d::ApplyEditorValues(object, editorTransforms_[i], editorMaterials_[i]);
 		}
 
 		for (size_t i = 0; i < primitives_.size(); ++i) {
 			Primitive* primitive = primitives_[i];
 			if (!primitive) {
+				continue;
+			}
+			if (i >= primitiveEditorDataFiles_.size() || std::filesystem::path(primitiveEditorDataFiles_[i]).filename().string() != std::filesystem::path(editorDataFileName_).filename().string()) {
 				continue;
 			}
 			EditorPrimitive::ApplyEditorValues(primitive, primitiveEditorTransforms_[i], primitiveEditorMaterials_[i]);
@@ -971,6 +1020,9 @@ void Hierarchy::DrawObjectEditors() {
 						editorDataLoadedManually_ = loaded;
 						hasUnsavedChanges_ = loaded ? false : hasUnsavedChanges_;
 						saveStatusMessage_ = loaded ? ("Loaded: " + editorDataFileName_) : ("Load failed: " + editorDataFileName_);
+						selectedObjectIndex_ = 0;
+						selectedIsPrimitive_ = false;
+						selectionBoxDirty_ = true;
 					}
 					if (isSelected) {
 						ImGui::SetItemDefaultFocus();
@@ -1046,7 +1098,7 @@ void Hierarchy::DrawObjectEditors() {
 		ImGui::Separator();
 
 
-		if (!saveStatusMessage_.empty()) {
+			if (!saveStatusMessage_.empty()) {
 			ImGui::Text("%s", saveStatusMessage_.c_str());
 		}
 
@@ -1055,6 +1107,9 @@ void Hierarchy::DrawObjectEditors() {
 		for (size_t i = 0; i < objects_.size(); ++i) {
 			Object3d* object = objects_[i];
 			if (!object) {
+				continue;
+			}
+			if (i >= objectEditorDataFiles_.size() || std::filesystem::path(objectEditorDataFiles_[i]).filename().string() != std::filesystem::path(editorDataFileName_).filename().string()) {
 				continue;
 			}
 			std::string displayName = objectDisplayNames[i];
@@ -1071,6 +1126,9 @@ void Hierarchy::DrawObjectEditors() {
 		for (size_t i = 0; i < primitives_.size(); ++i) {
 			Primitive* primitive = primitives_[i];
 			if (!primitive) {
+				continue;
+			}
+			if (i >= primitiveEditorDataFiles_.size() || std::filesystem::path(primitiveEditorDataFiles_[i]).filename().string() != std::filesystem::path(editorDataFileName_).filename().string()) {
 				continue;
 			}
 			std::string displayName = primitiveDisplayNames[i];

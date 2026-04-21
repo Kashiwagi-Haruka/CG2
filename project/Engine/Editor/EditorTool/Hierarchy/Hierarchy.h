@@ -81,11 +81,13 @@ private:
 
 	std::vector<Object3d*> objects_;
 	std::vector<std::string> objectNames_;
+	std::vector<std::string> objectEditorDataFiles_;
 	std::vector<Transform> editorTransforms_;
 	std::vector<InspectorMaterial> editorMaterials_;
 
 	std::vector<Primitive*> primitives_;
 	std::vector<std::string> primitiveNames_;
+	std::vector<std::string> primitiveEditorDataFiles_;
 	std::vector<Transform> primitiveEditorTransforms_;
 	std::vector<InspectorMaterial> primitiveEditorMaterials_;
 	std::string saveStatusMessage_;

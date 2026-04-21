@@ -109,19 +109,19 @@ void ShadowGameScene::Initialize()
     cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
 
 	lightManager_->Initialize();
-
-
+	// エレベーター
+	elevator_->Initialize();
+	// セーブポイント紳士
+	gentleman_->Initialize();
+	// エレベータールーム
+	elevatorRoomManager_->Initialize();
+	hierarchy->EndRegisterFile();
 	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
 	stageManager_->SetLightManager(lightManager_.get());
 	stageManager_->InitializeStage();
 
 
-    // エレベーター
-    elevator_->Initialize();
-    //セーブポイント紳士
-    gentleman_->Initialize();
-    //エレベータールーム
-    elevatorRoomManager_->Initialize();
+
 
     //カーソルを画面中央に設定する
     uiManager_->CursorHideAndStop();
@@ -131,7 +131,7 @@ void ShadowGameScene::Initialize()
     //最初のイベントをセットする
     currentEvent_ = firstEvent_.get();
 
-		hierarchy->EndRegisterFile();
+
 
     Update();
 
