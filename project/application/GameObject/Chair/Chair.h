@@ -22,9 +22,11 @@ public:
     void Draw();
     static void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
+    void RegisterEditor(const std::string& registrationName);
     void SetTransform(const Transform& transform) { transform_ = transform; };
     void SetMirrorTransform(Transform* transform) { mirrorTransform_ = transform; };
     Transform& GetTransform() { return transform_; };
+    Object3d* GetObject3d() const { return obj_.get(); }
     bool GetIsStand() { return isStand_; }
     void SetIsStand(const bool isStand) { isStand_ = isStand; }
     bool IsRayHit() { return isRayHit_; }
@@ -44,4 +46,3 @@ private:
     bool isRayHit_ = false;
 	float chairMoveSeTimer_ = 0.0f;
 };
-

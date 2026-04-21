@@ -13,6 +13,7 @@
 #include <d3d12.h>
 #include <memory>
 #include <string>
+#include <vector>
 #include <wrl.h>
 class Camera;
 struct SkinCluster;
@@ -123,6 +124,7 @@ public:
 	const std::string& GetEditorId() const { return editorId_; }
 	void SetEditorRegistrationEnabled(bool enable) { editorRegistrationEnabled_ = enable; }
 	void RegisterEditor(const std::string& registrationName);
+	static void RegisterEditors(const std::vector<Object3d*>& objects, const std::string& registrationNamePrefix);
 	void RegisterToEditor();
 	void RegisterToEditor(const std::string& saveFileName, const std::string& registrationName);
 	void UnregisterFromEditor();

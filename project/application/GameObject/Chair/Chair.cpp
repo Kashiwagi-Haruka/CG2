@@ -82,13 +82,14 @@ void Chair::Initialize() {
     isRayHit_ = false;
     isStand_ = false;
     obj_->Initialize();
-	obj_->RegisterEditor("Chair");
     velocity_ = { 0.0f };
     transform_ = obj_->GetTransform();
     chairMoveSeTimer_ = 0.0f;
 	obj_->SetOutlineColor(kRayHitOutlineColor);
 	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
+
+void Chair::RegisterEditor(const std::string& registrationName) { obj_->RegisterEditor(registrationName); }
 
 void Chair::Draw() {
 	if (isRayHit_) {

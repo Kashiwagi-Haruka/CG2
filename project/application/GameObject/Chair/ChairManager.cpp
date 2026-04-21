@@ -39,6 +39,12 @@ void ChairManager::Initialize()
     for (auto& chair : chairs_) {
         chair->Initialize();
     }
+    std::vector<Object3d*> chairObjects;
+    chairObjects.reserve(chairs_.size());
+    for (const auto& chair : chairs_) {
+        chairObjects.push_back(chair->GetObject3d());
+    }
+    Object3d::RegisterEditors(chairObjects, "Chair");
 
 
 

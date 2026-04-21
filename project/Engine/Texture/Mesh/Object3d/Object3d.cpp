@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <string>
 
 Object3d::~Object3d() { UnregisterFromEditor(); }
 
@@ -45,6 +46,14 @@ void Object3d::RegisterEditor(const std::string& registrationName) {
 		Hierarchy::GetInstance()->AddRegisterObject(this, registrationName);
 	}
 	RegisterToEditor();
+}
+void Object3d::RegisterEditors(const std::vector<Object3d*>& objects, const std::string& registrationNamePrefix) {
+	for (size_t i = 0; i < objects.size(); ++i) {
+		if (!objects[i]) {
+			continue;
+		}
+		objects[i]->RegisterEditor(registrationNamePrefix + std::to_string(i));
+	}
 }
 void Object3d::RegisterToEditor(const std::string& saveFileName, const std::string& registrationName) {
 	if (isEditorRegistered_) {
