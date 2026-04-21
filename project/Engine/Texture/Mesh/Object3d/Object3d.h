@@ -122,6 +122,7 @@ public:
 	void SetEditorId(const std::string& id) { editorId_ = id; }
 	const std::string& GetEditorId() const { return editorId_; }
 	void SetEditorRegistrationEnabled(bool enable) { editorRegistrationEnabled_ = enable; }
+	void RegisterEditor(const std::string& registrationName);
 	void RegisterToEditor();
 	void RegisterToEditor(const std::string& saveFileName, const std::string& registrationName);
 	void UnregisterFromEditor();

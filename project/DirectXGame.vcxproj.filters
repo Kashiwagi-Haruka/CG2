@@ -396,6 +396,7 @@
     <ClCompile Include="application\Stages\Stage\RadiconStage.cpp" />
     <ClCompile Include="application\GameObject\Radicon\Radicon.cpp" />
     <ClCompile Include="application\GameObject\Enemy\Enemy.cpp" />
+    <ClCompile Include="BurningObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -784,6 +785,7 @@
     <ClInclude Include="application\Stages\Stage\RadiconStage.h" />
     <ClInclude Include="application\GameObject\Radicon\Radicon.h" />
     <ClInclude Include="application\GameObject\Enemy\Enemy.h" />
+    <ClInclude Include="BurningObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

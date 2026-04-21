@@ -42,7 +42,13 @@ void Object3d::RegisterToEditor() {
 	Hierarchy::GetInstance()->RegisterObject3d(this);
 	isEditorRegistered_ = true;
 }
-
+void Object3d::RegisterEditor(const std::string& registrationName) {
+	editorRegistrationEnabled_ = true;
+	if (!registrationName.empty()) {
+		Hierarchy::GetInstance()->AddRegisterObject(this, registrationName);
+	}
+	RegisterToEditor();
+}
 void Object3d::RegisterToEditor(const std::string& saveFileName, const std::string& registrationName) {
 	if (isEditorRegistered_) {
 		return;
