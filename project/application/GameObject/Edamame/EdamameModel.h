@@ -25,7 +25,7 @@ public:
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
     //トランスフォームの設定
-    void SetTranslate(const Vector3& translate) { translate_ = translate; };
+    void SetTranslate(const Vector3& translate) {transform_.translate = translate; };
     //始まる
     void SetIsStartMove(const bool flag) { isStart_ = flag; }
     //落下開始
@@ -35,6 +35,7 @@ public:
 	// Rayヒット状態
 	void SetRayHit(bool isRayHit) { isRayHit_ = isRayHit; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
+    void SetPlayerCameraTranslate(Vector3* playerCameraRotate) { playerCameraTranlate_ = playerCameraRotate; }
 private:
     // アニメーション
     void Animation();
@@ -46,8 +47,7 @@ private:
     bool isDrop_ = false;
     float speedY_ = 0.0f;
     float scaleTimer_ = 0.0f;
-    Vector3 translate_ = { 0.0f };
-    Vector3 rotate_ = { 0.0f };
+    Transform transform_;
     std::unique_ptr<Object3d>obj_ = nullptr;
     // アニメーション
     Animation::AnimationData blendedPoseAnimation_{};
@@ -60,5 +60,6 @@ private:
     const float kAnimationBlendDuration_ = 0.3f;
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Speak";
+    Vector3* playerCameraTranlate_ = nullptr;
 };
 
