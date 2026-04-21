@@ -166,9 +166,6 @@ void ShadowGameScene::Update() {
 	// ポータル管理 カメラの更新後に行う
 	stageManager_->UpdatePortal();
 	UpdatePlayerDamage();
-	
-
-
 	// オブジェクトの当たり判定
 	CheckCollision();
 	if (transition_->IsEnd() && isTransitionOut_) {
@@ -355,6 +352,13 @@ void ShadowGameScene::UpdateLight() {
 }
 void ShadowGameScene::StageTransition()
 {
+	if (Key::IsGetKey() && Door::GetOpenMassage()) {
+		
+		if (!progressSaveData_.isGameClear) {
+			progressSaveData_.isGameClear = true;
+		}
+	}
+
 	//ステージの切り替え
 	if (elevator_->IsSceneTransitionStart()&& progressSaveData_.isGameClear) {
 

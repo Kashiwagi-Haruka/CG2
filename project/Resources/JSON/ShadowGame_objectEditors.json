@@ -2728,7 +2728,7 @@
           0.0
         ]
       },
-      "name": "d",
+      "name": "whiteBoard0",
       "transform": {
         "rotate": [
           0.0,
@@ -2784,7 +2784,7 @@
           0.0
         ]
       },
-      "name": "FlashLight",
+      "name": "whiteBoard1",
       "transform": {
         "rotate": [
           0.0,
@@ -2840,7 +2840,7 @@
           0.0
         ]
       },
-      "name": "whiteBoard1",
+      "name": "whiteBoard2",
       "transform": {
         "rotate": [
           0.0,
@@ -2896,7 +2896,7 @@
           0.0
         ]
       },
-      "name": "whiteBoard2",
+      "name": "whiteBoard3",
       "transform": {
         "rotate": [
           0.0,
@@ -2952,7 +2952,7 @@
           0.0
         ]
       },
-      "name": "whiteBoard3",
+      "name": "whiteBoard4",
       "transform": {
         "rotate": [
           0.0,
@@ -3008,7 +3008,7 @@
           0.0
         ]
       },
-      "name": "whiteBoard4",
+      "name": "whiteBoard5",
       "transform": {
         "rotate": [
           0.0,
@@ -3064,7 +3064,7 @@
           0.0
         ]
       },
-      "name": "whiteBoard5",
+      "name": "PC",
       "transform": {
         "rotate": [
           0.0,
@@ -3077,9 +3077,9 @@
           1.0
         ],
         "translate": [
-          5.0,
-          0.0,
-          -8.0
+          6.25,
+          0.800000011920929,
+          3.0
         ]
       }
     },
@@ -3120,7 +3120,7 @@
           0.0
         ]
       },
-      "name": "pc",
+      "name": "timeCardWatch",
       "transform": {
         "rotate": [
           0.0,
@@ -3133,8 +3133,8 @@
           1.0
         ],
         "translate": [
-          6.25,
-          0.800000011920929,
+          0.0,
+          0.0,
           3.0
         ]
       }
@@ -3176,7 +3176,7 @@
           0.0
         ]
       },
-      "name": "whiteBoard7",
+      "name": "FlashLight",
       "transform": {
         "rotate": [
           0.0,
@@ -3232,7 +3232,7 @@
           0.0
         ]
       },
-      "name": "Object 9",
+      "name": "object9",
       "transform": {
         "rotate": [
           0.0,
@@ -3288,7 +3288,7 @@
           0.0
         ]
       },
-      "name": "Object 10",
+      "name": "EdamameBillBoard",
       "transform": {
         "rotate": [
           0.0,
@@ -3344,7 +3344,7 @@
           0.0
         ]
       },
-      "name": "Object 11",
+      "name": "EdamameModel",
       "transform": {
         "rotate": [
           0.0,
@@ -4296,7 +4296,7 @@
           0.0
         ]
       },
-      "name": "Object 28",
+      "name": "Floor",
       "transform": {
         "rotate": [
           0.0,
@@ -4520,7 +4520,7 @@
           0.0
         ]
       },
-      "name": "Object 32",
+      "name": "elevator",
       "transform": {
         "rotate": [
           0.0,
