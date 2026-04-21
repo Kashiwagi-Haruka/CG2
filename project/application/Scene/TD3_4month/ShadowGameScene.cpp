@@ -109,12 +109,13 @@ void ShadowGameScene::Initialize()
     cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
 
 	lightManager_->Initialize();
-	// エレベーター
-	elevator_->Initialize();
+
 	// セーブポイント紳士
 	gentleman_->Initialize();
 	// エレベータールーム
 	elevatorRoomManager_->Initialize();
+	// エレベーター
+	elevator_->Initialize();
 	hierarchy->EndRegisterFile();
 	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
 	stageManager_->SetLightManager(lightManager_.get());

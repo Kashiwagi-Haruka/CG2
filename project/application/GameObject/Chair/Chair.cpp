@@ -82,6 +82,7 @@ void Chair::Initialize() {
     isRayHit_ = false;
     isStand_ = false;
     obj_->Initialize();
+	obj_->RegisterEditor("Chair");
     velocity_ = { 0.0f };
     transform_ = obj_->GetTransform();
     chairMoveSeTimer_ = 0.0f;

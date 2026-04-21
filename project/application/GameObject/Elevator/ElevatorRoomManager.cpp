@@ -45,6 +45,7 @@ ElevatorRoomManager::~ElevatorRoomManager()
 void ElevatorRoomManager::Initialize()
 {
     room_->Initialize();
+	room_->RegisterEditor("room");
 
     // 壁の初期化
     for (auto& wall : walls_) {

@@ -47,6 +47,7 @@ void Locker::Initialize()
 {
     isRayHit_ = false;
     obj_->Initialize();
+	obj_->RegisterEditor("Locker");
 }
 
 void Locker::Draw()
