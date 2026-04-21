@@ -31,9 +31,6 @@ void Object3d::Initialize() {
 	SetDistortionFalloff(1.0f);
 	SetOutlineColor({0.0f, 0.0f, 0.0f, 1.0f});
 	SetOutlineWidth(1.0f);
-	if (editorRegistrationEnabled_) {
-		RegisterToEditor();
-	}
 }
 void Object3d::RegisterToEditor() {
 	if (isEditorRegistered_) {
