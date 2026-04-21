@@ -85,7 +85,7 @@ void Desk::Update()
 void Desk::Initialize()
 {
     obj_->Initialize();
-
+	obj_->RegisterEditor("Desk");
     isRayHit_ = false;
     desiredAnimationName = "Idle";
 
