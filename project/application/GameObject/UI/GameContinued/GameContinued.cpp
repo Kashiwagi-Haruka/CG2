@@ -34,7 +34,7 @@ void GameContinued::LoadAllSlots()
     auto& gameSave = GameSave::GetInstance();
     for (int i = 0; i < saveDataMaxNum_; ++i) {
         if (gameSave.IsFileExistsAndLoad(i)) {
-            gameSave.Load(i);
+            gameSave.LoadFromIndex(i);
             auto progressSaveData = gameSave.GetProgressSaveData();
             auto saveDataTime = gameSave.GetSaveDataTime();
             LoadAndSetSpriteHandle(i, false);

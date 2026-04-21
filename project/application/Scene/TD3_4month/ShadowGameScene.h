@@ -129,13 +129,7 @@ private:
 #pragma region// light
     std::unique_ptr<Yoshida::LightManager>lightManager_ = nullptr;
 #pragma endregion
-
-
-
 	std::unique_ptr<DamageOverlay> damageOverlay_ = nullptr;
-
-    std::string currentStageName_ = "MirrorStage";
-
 public:
 	// シーンのコンストラクタ
 	ShadowGameScene();

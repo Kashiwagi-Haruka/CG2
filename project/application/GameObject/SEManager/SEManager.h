@@ -22,6 +22,8 @@ public:
 		CLOCK,
 		CAN,
 		BOX,
+        ELEVATOR_OPEN,
+		ELEVATOR_BELL,
 	};
 
 private:

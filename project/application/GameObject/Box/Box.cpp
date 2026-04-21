@@ -6,6 +6,7 @@
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
 #include"application/Color/Color.h"
+#include"GameObject/SEManager/SEManager.h"
 PlayerCamera* Box::playerCamera_ = nullptr;
 namespace {
 const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
@@ -48,6 +49,8 @@ void Box::Update() {
 			isGrab_ = false;
 			// プレイヤーの状態をセットする
 			PlayerCommand::SetIsGrab(false);
+            //音を鳴らす
+            SEManager::SoundPlay(SEManager::BOX);
 		} else {
 			// rayと重なる
 			if (isRayHitBeforeMove) {
@@ -55,9 +58,13 @@ void Box::Update() {
 					isGrab_ = true;
 					// プレイヤーの状態をセットする
 					PlayerCommand::SetIsGrab(true);
+                    //音を鳴らす
+                    SEManager::SoundPlay(SEManager::BOX);
 				}
 			}
 		}
+
+   
 	}
 
 	Grab();

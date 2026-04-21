@@ -56,11 +56,9 @@ public:
     void SetSaveDateTime(const std::string& saveDataTime) { saveDateTime_ = saveDataTime; }
     // 引数にスロット番号を追加
     void Save(const int slotIndex);  // セーブデータをファイルに保存する
-    void Load(const int slotIndex);  // ファイルからセーブデータを読み込む
-
-
-    void InitData();
-
+    void LoadFromIndex(const int slotIndex);  // ファイルからセーブデータを読み込む
+    void Load(const std::string& fileName);
+    void LoadFirstStage();
 
     void SetSelectSlotIndex(const int selectSlotIndex) { selectSlotIndex_ = selectSlotIndex; }
     const int GetSelectSlotIndex() { return selectSlotIndex_; }

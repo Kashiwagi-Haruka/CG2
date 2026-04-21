@@ -22,14 +22,17 @@ public:
 	std::array<std::unique_ptr<AutoLockSystem>, 2>& GetAutoLockSys() { return autoLockSystems_; };
 	bool IsSceneTransitionStart() const { return isSceneTranstionStart_; }
 private:
+    // 当たり判定
+    void CheckCollision();
 	// アニメーション
 	void Animation();
-
+	//内側にいる時
+	void Inside();
 private:
 	// 新しい状態管理
 	bool isPlayerInside_ = false;
 	float insideTimer_ = 0.0f;
-	const float insideOpenDelay_ = 2.0f; // 中に入って2秒で閉まる
+	const float insideOpenDelay_ = 2.0f; // 中に入って2秒
 
 	Matrix4x4 worldMat_;
 	static PlayerCamera* playerCamera_;
