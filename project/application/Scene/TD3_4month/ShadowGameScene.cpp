@@ -74,6 +74,13 @@ ShadowGameScene::~ShadowGameScene()
 
 void ShadowGameScene::Initialize()
 {
+	Hierarchy* hierarchy = Hierarchy::GetInstance();
+	hierarchy->BeginRegisterFile("ShadowGameScene_objectEditors.json");
+	hierarchy->AddRegisterObject("Player");
+	hierarchy->AddRegisterObject("Stage");
+	hierarchy->AddRegisterObject("Elevator");
+	hierarchy->AddRegisterObject("Gentleman");
+	hierarchy->AddRegisterObject("ElevatorRoom");
     uiManager_->Initialize();
 
 
@@ -128,7 +135,7 @@ void ShadowGameScene::Initialize()
     //最初のイベントをセットする
     currentEvent_ = firstEvent_.get();
 
-
+		hierarchy->EndRegisterFile();
 
     Update();
 

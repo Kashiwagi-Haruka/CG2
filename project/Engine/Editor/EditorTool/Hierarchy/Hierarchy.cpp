@@ -101,7 +101,9 @@ void Hierarchy::ResetForSceneChange() {
 	editorDataLoadedManually_ = false;
 	pendingRegistrationName_.clear();
 	pendingRegistrationId_.clear();
+	EndRegisterFile();
 }
+
 
 Hierarchy::EditorSnapshot Hierarchy::CreateCurrentSnapshot() const {
 	EditorSnapshot snapshot{};
@@ -183,6 +185,16 @@ void Hierarchy::RegisterObject3d(Object3d* object, const std::string& saveFileNa
 	if (!object) {
 		return;
 	}
+	std::string scopedSaveFileName = saveFileName;
+	std::string scopedRegistrationName = registrationName;
+	if (isRegisterFileScopeActive_) {
+		if (scopedSaveFileName.empty()) {
+			scopedSaveFileName = registerFileScopeName_;
+		}
+		if (scopedRegistrationName.empty() && registerObjectQueueIndex_ < registerObjectQueue_.size()) {
+			scopedRegistrationName = registerObjectQueue_[registerObjectQueueIndex_++];
+		}
+	}
 	if (std::find(objects_.begin(), objects_.end(), object) != objects_.end()) {
 		return;
 	}
@@ -190,20 +202,20 @@ void Hierarchy::RegisterObject3d(Object3d* object, const std::string& saveFileNa
 	if (emptyIt != objects_.end()) {
 		const size_t index = static_cast<size_t>(std::distance(objects_.begin(), emptyIt));
 		objects_[index] = object;
-		if (!registrationName.empty()) {
-			objectNames_[index] = registrationName;
+		if (!scopedRegistrationName.empty()) {
+			objectNames_[index] = scopedRegistrationName;
 		}
-		if (!saveFileName.empty()) {
-			editorDataFileName_ = saveFileName;
+		if (!scopedSaveFileName.empty()) {
+			editorDataFileName_ = scopedSaveFileName;
 		}
 		EditorObject3d::ApplyEditorValues(object, editorTransforms_[index], editorMaterials_[index]);
 		return;
 	}
 	const size_t index = objects_.size();
 	objects_.push_back(object);
-	objectNames_.push_back(registrationName.empty() ? ("Object " + std::to_string(index)) : registrationName);
-	if (!saveFileName.empty()) {
-		editorDataFileName_ = saveFileName;
+	objectNames_.push_back(scopedRegistrationName.empty() ? ("Object " + std::to_string(index)) : scopedRegistrationName);
+	if (!scopedSaveFileName.empty()) {
+		editorDataFileName_ = scopedSaveFileName;
 	}
 	editorTransforms_.push_back(object->GetTransform());
 	editorMaterials_.push_back(EditorObject3d::CaptureMaterial(object));
@@ -230,6 +242,16 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive, const std::string& saveF
 	if (!primitive) {
 		return;
 	}
+	std::string scopedSaveFileName = saveFileName;
+	std::string scopedRegistrationName = registrationName;
+	if (isRegisterFileScopeActive_) {
+		if (scopedSaveFileName.empty()) {
+			scopedSaveFileName = registerFileScopeName_;
+		}
+		if (scopedRegistrationName.empty() && registerObjectQueueIndex_ < registerObjectQueue_.size()) {
+			scopedRegistrationName = registerObjectQueue_[registerObjectQueueIndex_++];
+		}
+	}
 	if (std::find(primitives_.begin(), primitives_.end(), primitive) != primitives_.end()) {
 		return;
 	}
@@ -237,23 +259,45 @@ void Hierarchy::RegisterPrimitive(Primitive* primitive, const std::string& saveF
 	if (emptyIt != primitives_.end()) {
 		const size_t index = static_cast<size_t>(std::distance(primitives_.begin(), emptyIt));
 		primitives_[index] = primitive;
-		if (!registrationName.empty()) {
-			primitiveNames_[index] = registrationName;
+		if (!scopedRegistrationName.empty()) {
+			primitiveNames_[index] = scopedRegistrationName;
 		}
-		if (!saveFileName.empty()) {
-			editorDataFileName_ = saveFileName;
+		if (!scopedSaveFileName.empty()) {
+			editorDataFileName_ = scopedSaveFileName;
 		}
 		EditorPrimitive::ApplyEditorValues(primitive, primitiveEditorTransforms_[index], primitiveEditorMaterials_[index]);
 		return;
 	}
 	const size_t index = primitives_.size();
 	primitives_.push_back(primitive);
-	primitiveNames_.push_back(registrationName.empty() ? ("Primitive " + std::to_string(index)) : registrationName);
-	if (!saveFileName.empty()) {
-		editorDataFileName_ = saveFileName;
+	primitiveNames_.push_back(scopedRegistrationName.empty() ? ("Primitive " + std::to_string(index)) : scopedRegistrationName);
+	if (!scopedSaveFileName.empty()) {
+		editorDataFileName_ = scopedSaveFileName;
 	}
 	primitiveEditorTransforms_.push_back(primitive->GetTransform());
 	primitiveEditorMaterials_.push_back(EditorPrimitive::CaptureMaterial(primitive));
+}
+
+void Hierarchy::BeginRegisterFile(const std::string& saveFileName) {
+	registerFileScopeName_ = saveFileName.empty() ? "objectEditors.json" : saveFileName;
+	isRegisterFileScopeActive_ = true;
+	registerObjectQueue_.clear();
+	registerObjectQueueIndex_ = 0;
+	editorDataFileName_ = registerFileScopeName_;
+}
+
+void Hierarchy::AddRegisterObject(const std::string& registrationName) {
+	if (!isRegisterFileScopeActive_ || registrationName.empty()) {
+		return;
+	}
+	registerObjectQueue_.push_back(registrationName);
+}
+
+void Hierarchy::EndRegisterFile() {
+	isRegisterFileScopeActive_ = false;
+	registerFileScopeName_.clear();
+	registerObjectQueue_.clear();
+	registerObjectQueueIndex_ = 0;
 }
 void Hierarchy::UnregisterPrimitive(Primitive* primitive) {
 	if (!primitive) {
