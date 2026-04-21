@@ -52,6 +52,12 @@ void WallManager2::Initialize()
     for (auto& wall : walls_) {
         wall->Initialize();
     }
+    std::vector<Primitive*> wallPrimitives;
+    wallPrimitives.reserve(walls_.size());
+    for (const auto& wall : walls_) {
+        wallPrimitives.push_back(wall->GetPrimitive());
+    }
+    Primitive::RegisterEditors(wallPrimitives, "Wall2");
 }
 void WallManager2::Update()
 {
