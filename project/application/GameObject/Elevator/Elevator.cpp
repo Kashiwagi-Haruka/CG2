@@ -85,76 +85,22 @@ void Elevator::Update() {
 
     modelObj_->SetTransform(elevatorTransform_);
     modelObj_->Update();
+
     worldMat_ = modelObj_->GetWorldMatrix();
 
-    bool hitOuter = autoLockSystems_[0]->IsPlayerHit();
-    bool hitInner = autoLockSystems_[1]->IsPlayerHit();
-
-    // 外側マット（入口前）
-    if (hitOuter) {
-        isPlayerInside_ = false;
-        insideTimer_ = 0.0f;
-
-        if (desiredAnimationName == "Close") {
-            desiredAnimationName = "Open"; // 外にいる → 開ける
-        }
-    }
-
-    // 内側マット（エレベーター内部）
-    if (hitInner) {
-        isPlayerInside_ = true;
-        //閉める
-        if (desiredAnimationName == "Open") {
-            desiredAnimationName = "Close";
-        }
-    }
-
+    //常にシーンの切り替わる瞬間をリセットする
     isSceneTranstionStart_ = false;
 
-    if (isPlayerInside_) {
+    CheckCollision();
 
-        if (animationFinished_) {
-
-            if (desiredAnimationName == "Close") {
-
-                if (!isSceneTransition_) {
-                    isSceneTransition_ = true;
-                    isSceneTranstionStart_ = true;
-                }
-
-
-            } else if (desiredAnimationName == "Open") {
-
-                isSceneTransition_ = false;
-
-            }
-        }
-
-
-
-        insideTimer_ += GameBase::GetInstance()->GetDeltaTime();
-        if (insideTimer_ > insideOpenDelay_) {
-            if (desiredAnimationName == "Close") {
-                desiredAnimationName = "Open";
-            }
-        }
-    }
-
-    // 中にいない & 外側マットも踏んでいない → 扉を閉める
-    if (!hitInner && !hitOuter) {
-        insideTimer_ = 0.0f;
-
-        if (desiredAnimationName == "Open") {
-            desiredAnimationName = "Close";
-        }
-    }
-
+    Inside();
 
     Animation();
 
     for (auto& sys : autoLockSystems_) {
         sys->Update();
     }
+    //エレベーター内のポスターの更新
     poster_.Update();
 }
 
@@ -169,15 +115,51 @@ void Elevator::Draw() {
     poster_.Draw();
 }
 
+void Elevator::CheckCollision()
+{
+    //当たり判定を取得しておく
+    bool hitOuter = autoLockSystems_[0]->IsPlayerHit();
+    bool hitInner = autoLockSystems_[1]->IsPlayerHit();
+
+    // 外側マット（入口前）
+    if (hitOuter) {
+        //プレイヤーは外側にいる
+        isPlayerInside_ = false;
+        //内側にいるフラグをリセット
+        insideTimer_ = 0.0f;
+
+        //しまっているとき開く
+        if (desiredAnimationName == "Close") {
+            SEManager::SoundPlay(SEManager::ELEVATOR_OPEN);
+            desiredAnimationName = "Open"; // 外にいる → 開ける
+        }
+    }
+
+    // 内側マット（エレベーター内部）
+    if (hitInner) {
+        //プレイヤーは内側にいる
+        isPlayerInside_ = true;
+
+        //開いているとき閉める
+        if (desiredAnimationName == "Open") {
+            desiredAnimationName = "Close";
+        }
+    }
+
+    // 中にいない & 外側マットも踏んでいない → 扉を閉める
+    if (!hitInner && !hitOuter) {
+        insideTimer_ = 0.0f;
+
+        if (desiredAnimationName == "Open") {
+            desiredAnimationName = "Close";
+        }
+    }
+}
+
 void Elevator::Animation()
 {
 
     bool loopAnimation = false;
-
-    if (desiredAnimationName == "Close") {
-
-    }
-
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     AnimationManager::PlaybackResult playbackResult{};
 
@@ -193,6 +175,43 @@ void Elevator::Animation()
             skeleton_->Update();
             if (!skinCluster_.mappedPalette.empty()) {
                 UpdateSkinCluster(skinCluster_, *skeleton_);
+            }
+        }
+    }
+
+}
+
+void Elevator::Inside() {
+
+    //プレイヤーが内側にいる時の処理
+    if (!isPlayerInside_) {
+        return;
+    }
+
+    if (insideTimer_ < insideOpenDelay_) {
+        //タイマーを回す
+        insideTimer_ += GameBase::GetInstance()->GetDeltaTime();
+        insideTimer_ = std::clamp(insideTimer_, 0.0f, insideOpenDelay_);
+        if (insideTimer_ == insideOpenDelay_) {
+            //タイマーが一定時間になった時開ける
+            if (desiredAnimationName == "Close") {
+                SEManager::SoundPlay(SEManager::ELEVATOR_OPEN);
+                SEManager::SoundPlay(SEManager::ELEVATOR_BELL);
+                desiredAnimationName = "Open";
+                isSceneTransition_ = false;
+            }
+        }
+    }
+
+    //アニメーションの終了を感知した時
+    if (animationFinished_) {
+
+        if (desiredAnimationName == "Close") {
+            //しまっていたとき
+            if (!isSceneTransition_) {
+                //シーンの切り替わる瞬間を取得する
+                isSceneTransition_ = true;
+                isSceneTranstionStart_ = true;
             }
         }
     }

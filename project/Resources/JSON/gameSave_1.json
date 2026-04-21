@@ -37,12 +37,12 @@
       }
     }
   },
-  "progress": {
-    "currentStageName": "FirstStage",
-    "isGameClear": true,
-    "isKeyHave": true,
-    "isLightHave": true
-  },
+    "progress": {
+        "currentStageName": "MirrorStage",
+        "isGameClear": true,
+        "isKeyHave": true,
+        "isLightHave": true
+    },
   "saveDateTime": {
     "saveDateTime": "2026/04/16\n16:34:13"
   }
