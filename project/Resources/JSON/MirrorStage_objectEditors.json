@@ -2439,230 +2439,6 @@
   "objects": [
     {
       "editorId": "",
-      "index": 0,
-      "material": {
-        "color": [
-          0.9098039269447327,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "whiteBoard0",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          5.96999979019165,
-          0.0,
-          2.5299999713897705
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 1,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "whiteBoard1",
-      "transform": {
-        "rotate": [
-          0.0,
-          -1.5,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          1.5,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 2,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 0.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "whiteBoard2",
-      "transform": {
-        "rotate": [
-          0.0,
-          1.5,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          -10.0,
-          0.0,
-          -2.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 3,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "whiteBoard3",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          5.0,
-          0.0,
-          6.5
-        ]
-      }
-    },
-    {
-      "editorId": "",
       "index": 4,
       "material": {
         "color": [
@@ -2698,11 +2474,11 @@
           0.0
         ]
       },
-      "name": "whiteBoard4",
+      "name": "WhiteBoard",
       "transform": {
         "rotate": [
           0.0,
-          1.0,
+          0.0,
           0.0
         ],
         "scale": [
@@ -2711,9 +2487,9 @@
           1.0
         ],
         "translate": [
-          -10.0,
-          10.0,
-          2.0
+          0.0,
+          0.0,
+          0.0
         ]
       }
     },
@@ -2754,11 +2530,11 @@
           0.0
         ]
       },
-      "name": "whiteBoard5",
+      "name": "WhiteBoard",
       "transform": {
         "rotate": [
           0.0,
-          1.0,
+          0.0,
           0.0
         ],
         "scale": [
@@ -2767,15 +2543,127 @@
           1.0
         ],
         "translate": [
-          3.0,
           0.0,
-          -11.0
+          0.0,
+          0.0
         ]
       }
     },
     {
       "editorId": "",
       "index": 6,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "WhiteBoard",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 7,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "WhiteBoard",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 8,
       "material": {
         "color": [
           1.0,
@@ -2831,118 +2719,6 @@
     },
     {
       "editorId": "",
-      "index": 7,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "timeCardWatch",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          0.0,
-          0.0,
-          3.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 8,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "FlashLight",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.550000011920929,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          10.0,
-          0.0,
-          -13.319999694824219
-        ]
-      }
-    },
-    {
-      "editorId": "",
       "index": 9,
       "material": {
         "color": [
@@ -2978,7 +2754,7 @@
           0.0
         ]
       },
-      "name": "object9",
+      "name": "TimeCardWatch",
       "transform": {
         "rotate": [
           0.0,
@@ -2992,8 +2768,8 @@
         ],
         "translate": [
           0.0,
-          0.5899999737739563,
-          7.949999809265137
+          0.0,
+          0.0
         ]
       }
     },
@@ -3034,7 +2810,7 @@
           0.0
         ]
       },
-      "name": "EdamameBillBoard",
+      "name": "Flashlight",
       "transform": {
         "rotate": [
           0.0,
@@ -3048,8 +2824,8 @@
         ],
         "translate": [
           0.0,
-          1.2899999618530273,
-          7.920000076293945
+          0.0,
+          0.0
         ]
       }
     },
@@ -3090,7 +2866,7 @@
           0.0
         ]
       },
-      "name": "EdamameModel",
+      "name": "Key",
       "transform": {
         "rotate": [
           0.0,
@@ -3105,7 +2881,7 @@
         "translate": [
           0.0,
           0.0,
-          8.0
+          0.0
         ]
       }
     },
@@ -3119,7 +2895,7 @@
           1.0,
           1.0
         ],
-        "distortionFalloff": 0.0,
+        "distortionFalloff": 1.0,
         "distortionStrength": 0.0,
         "enableLighting": true,
         "environmentCoefficient": 0.0,
@@ -3146,7 +2922,7 @@
           0.0
         ]
       },
-      "name": "chair1",
+      "name": "Edamame",
       "transform": {
         "rotate": [
           0.0,
@@ -3161,7 +2937,7 @@
         "translate": [
           0.0,
           0.0,
-          8.0
+          0.0
         ]
       }
     },
@@ -3202,7 +2978,7 @@
           0.0
         ]
       },
-      "name": "chair2",
+      "name": "Chair0",
       "transform": {
         "rotate": [
           0.0,
@@ -3217,7 +2993,7 @@
         "translate": [
           0.0,
           0.0,
-          10.0
+          0.0
         ]
       }
     },
@@ -3258,11 +3034,11 @@
           0.0
         ]
       },
-      "name": "chair3",
+      "name": "Chair1",
       "transform": {
         "rotate": [
           0.0,
-          3.140000104904175,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3273,7 +3049,7 @@
         "translate": [
           0.0,
           0.0,
-          12.579999923706055
+          0.0
         ]
       }
     },
@@ -3314,7 +3090,7 @@
           0.0
         ]
       },
-      "name": "chair4",
+      "name": "Chair2",
       "transform": {
         "rotate": [
           0.0,
@@ -3329,7 +3105,7 @@
         "translate": [
           0.0,
           0.0,
-          6.21999979019165
+          0.0
         ]
       }
     },
@@ -3346,7 +3122,7 @@
         "distortionFalloff": 1.0,
         "distortionStrength": 0.0,
         "enableLighting": true,
-        "environmentCoefficient": 0.10000000149011612,
+        "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
         "shininess": 40.0,
@@ -3370,7 +3146,7 @@
           0.0
         ]
       },
-      "name": "room",
+      "name": "Chair3",
       "transform": {
         "rotate": [
           0.0,
@@ -3383,7 +3159,7 @@
           1.0
         ],
         "translate": [
-          -7.0,
+          0.0,
           0.0,
           0.0
         ]
@@ -3402,7 +3178,7 @@
         "distortionFalloff": 1.0,
         "distortionStrength": 0.0,
         "enableLighting": true,
-        "environmentCoefficient": 0.10000000149011612,
+        "environmentCoefficient": 0.0,
         "grayscaleEnabled": false,
         "sepiaEnabled": false,
         "shininess": 40.0,
@@ -3426,7 +3202,7 @@
           0.0
         ]
       },
-      "name": "room0",
+      "name": "VendingMac",
       "transform": {
         "rotate": [
           0.0,
@@ -3439,7 +3215,7 @@
           1.0
         ],
         "translate": [
-          7.0,
+          0.0,
           0.0,
           0.0
         ]
@@ -3482,7 +3258,7 @@
           0.0
         ]
       },
-      "name": "mac",
+      "name": "Door",
       "transform": {
         "rotate": [
           0.0,
@@ -3495,9 +3271,9 @@
           1.0
         ],
         "translate": [
-          11.649999618530273,
+          6.909999847412109,
           0.0,
-          -6.5
+          -6.519999980926514
         ]
       }
     },
@@ -3538,7 +3314,7 @@
           0.0
         ]
       },
-      "name": "door1",
+      "name": "Locker",
       "transform": {
         "rotate": [
           0.0,
@@ -3551,9 +3327,9 @@
           1.0
         ],
         "translate": [
-          7.0,
           0.0,
-          -7.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -3594,7 +3370,7 @@
           0.0
         ]
       },
-      "name": "locker1",
+      "name": "Locker",
       "transform": {
         "rotate": [
           0.0,
@@ -3607,9 +3383,9 @@
           1.0
         ],
         "translate": [
-          -1.0,
           0.0,
-          -6.5
+          0.0,
+          0.0
         ]
       }
     },
@@ -3650,7 +3426,7 @@
           0.0
         ]
       },
-      "name": "locker2",
+      "name": "Desk",
       "transform": {
         "rotate": [
           0.0,
@@ -3663,9 +3439,9 @@
           1.0
         ],
         "translate": [
-          1.0,
           0.0,
-          -6.5
+          0.0,
+          0.0
         ]
       }
     },
@@ -3674,7 +3450,7 @@
       "index": 22,
       "material": {
         "color": [
-          0.9843137264251709,
+          1.0,
           1.0,
           1.0,
           1.0
@@ -3706,11 +3482,11 @@
           0.0
         ]
       },
-      "name": "desk1",
+      "name": "Desk",
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3719,9 +3495,9 @@
           1.0
         ],
         "translate": [
-          8.0,
           0.0,
-          2.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -3762,11 +3538,11 @@
           0.0
         ]
       },
-      "name": "desk2",
+      "name": "Desk",
       "transform": {
         "rotate": [
           0.0,
-          3.1419999599456787,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3775,9 +3551,9 @@
           1.0
         ],
         "translate": [
-          6.0,
           0.0,
-          2.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -3818,11 +3594,11 @@
           0.0
         ]
       },
-      "name": "desk3",
+      "name": "Desk",
       "transform": {
         "rotate": [
           0.0,
-          3.1419999599456787,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3831,9 +3607,9 @@
           1.0
         ],
         "translate": [
-          4.0,
           0.0,
-          2.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -3874,7 +3650,7 @@
           0.0
         ]
       },
-      "name": "desk4",
+      "name": "Desk",
       "transform": {
         "rotate": [
           0.0,
@@ -3887,9 +3663,9 @@
           1.0
         ],
         "translate": [
-          8.0,
           0.0,
-          3.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -3930,7 +3706,7 @@
           0.0
         ]
       },
-      "name": "desk5",
+      "name": "Desk",
       "transform": {
         "rotate": [
           0.0,
@@ -3943,9 +3719,9 @@
           1.0
         ],
         "translate": [
-          6.0,
           0.0,
-          3.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -3986,7 +3762,7 @@
           0.0
         ]
       },
-      "name": "desk6",
+      "name": "TimeCard",
       "transform": {
         "rotate": [
           0.0,
@@ -3999,9 +3775,9 @@
           1.0
         ],
         "translate": [
-          4.0,
           0.0,
-          3.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -4042,11 +3818,11 @@
           0.0
         ]
       },
-      "name": "Floor",
+      "name": "TimeCardRack",
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -4098,7 +3874,7 @@
           0.0
         ]
       },
-      "name": "Object 29",
+      "name": "Box",
       "transform": {
         "rotate": [
           0.0,
@@ -4154,7 +3930,7 @@
           0.0
         ]
       },
-      "name": "Object 30",
+      "name": "Box",
       "transform": {
         "rotate": [
           0.0,
@@ -4170,230 +3946,6 @@
           0.0,
           0.0,
           0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 31,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "Object 31",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 32,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "elevator",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 33,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "gentleman",
-      "transform": {
-        "rotate": [
-          0.0,
-          1.5700000524520874,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          12.0,
-          0.0,
-          -11.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 34,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.10000000149011612,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "ElevatorRoom",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          7.079999923706055,
-          0.0,
-          -10.050000190734863
         ]
       }
     }
@@ -4401,7 +3953,7 @@
   "primitives": [
     {
       "editorId": "",
-      "index": 6,
+      "index": 0,
       "material": {
         "color": [
           1.0,
@@ -4457,7 +4009,7 @@
     },
     {
       "editorId": "",
-      "index": 7,
+      "index": 1,
       "material": {
         "color": [
           1.0,
@@ -4505,7 +4057,7 @@
           1.0
         ],
         "translate": [
-          2.0799999237060547,
+          1.559999942779541,
           1.2599999904632568,
           0.0
         ]
@@ -4513,7 +4065,7 @@
     },
     {
       "editorId": "",
-      "index": 8,
+      "index": 2,
       "material": {
         "color": [
           1.0,
@@ -4548,7 +4100,7 @@
           0.0
         ]
       },
-      "name": "Wall",
+      "name": "Wall0",
       "transform": {
         "rotate": [
           0.0,
@@ -4561,15 +4113,15 @@
           1.0
         ],
         "translate": [
+          -6.409999847412109,
           0.0,
-          0.9700000286102295,
           0.0
         ]
       }
     },
     {
       "editorId": "",
-      "index": 9,
+      "index": 3,
       "material": {
         "color": [
           1.0,
@@ -4604,7 +4156,7 @@
           0.0
         ]
       },
-      "name": "Wall",
+      "name": "Wall1",
       "transform": {
         "rotate": [
           0.0,
@@ -4625,7 +4177,7 @@
     },
     {
       "editorId": "",
-      "index": 10,
+      "index": 4,
       "material": {
         "color": [
           1.0,
@@ -4660,7 +4212,7 @@
           0.0
         ]
       },
-      "name": "Wall",
+      "name": "Wall2",
       "transform": {
         "rotate": [
           0.0,
@@ -4681,7 +4233,7 @@
     },
     {
       "editorId": "",
-      "index": 11,
+      "index": 5,
       "material": {
         "color": [
           1.0,
@@ -4716,7 +4268,7 @@
           0.0
         ]
       },
-      "name": "Wall",
+      "name": "Wall3",
       "transform": {
         "rotate": [
           0.0,
@@ -4729,7 +4281,7 @@
           1.0
         ],
         "translate": [
-          0.0,
+          5.0,
           0.0,
           0.0
         ]
@@ -4737,7 +4289,7 @@
     },
     {
       "editorId": "",
-      "index": 12,
+      "index": 6,
       "material": {
         "color": [
           1.0,
@@ -4793,7 +4345,7 @@
     },
     {
       "editorId": "",
-      "index": 13,
+      "index": 7,
       "material": {
         "color": [
           1.0,
@@ -4828,7 +4380,7 @@
           0.0
         ]
       },
-      "name": "Wall",
+      "name": "Wall20",
       "transform": {
         "rotate": [
           0.0,
@@ -4849,7 +4401,7 @@
     },
     {
       "editorId": "",
-      "index": 14,
+      "index": 8,
       "material": {
         "color": [
           1.0,
@@ -4884,7 +4436,7 @@
           0.0
         ]
       },
-      "name": "Wall",
+      "name": "Wall21",
       "transform": {
         "rotate": [
           0.0,
@@ -4905,7 +4457,7 @@
     },
     {
       "editorId": "",
-      "index": 15,
+      "index": 9,
       "material": {
         "color": [
           1.0,
@@ -4940,7 +4492,7 @@
           0.0
         ]
       },
-      "name": "Wall",
+      "name": "Wall22",
       "transform": {
         "rotate": [
           0.0,
@@ -4961,7 +4513,7 @@
     },
     {
       "editorId": "",
-      "index": 16,
+      "index": 10,
       "material": {
         "color": [
           1.0,
@@ -4996,7 +4548,7 @@
           0.0
         ]
       },
-      "name": "Wall",
+      "name": "Wall23",
       "transform": {
         "rotate": [
           0.0,
@@ -5017,7 +4569,7 @@
     },
     {
       "editorId": "",
-      "index": 17,
+      "index": 11,
       "material": {
         "color": [
           1.0,
@@ -5052,7 +4604,7 @@
           0.0
         ]
       },
-      "name": "Wall",
+      "name": "Wall24",
       "transform": {
         "rotate": [
           0.0,
