@@ -6,7 +6,7 @@
 #include <string>
 class Menu {
 public:
-	enum class Action { kNone, kResumeGame, kSave, kOpenOption, kBackToTitle, kEndGame };
+	enum class Action { kNone, kResumeGame, kCredit, kOpenOption, kBackToTitle, kEndGame };
 
 private:
 	std::string currentMenuName_ = "Game";
@@ -19,7 +19,7 @@ private:
 
 	Text menuText_;
 	Text GameText_;
-	Text SaveText_;
+	Text CreditText_;
 	Text OptionText_;
 	Text TitleText_;
 	Text GameEndText_;

@@ -4,6 +4,7 @@
 #include"GameBase.h"
 #include <random> 
 
+
 // ★ 追加：簡単な乱数生成用の便利関数
 namespace {
     float GetRandomFloat(float min, float max) {
@@ -19,10 +20,12 @@ void DocumentParticle::SetEmitArea(const Vector3& areaMin, const Vector3& areaMa
 }
 DocumentParticle::DocumentParticle()
 {
+
     instancedObject_ = std::make_unique<InstancedObject3d>();
 }
 
 void DocumentParticle::Initialize() {
+
     // 1. 書類の3Dモデルを読み込む (モデルパスは適宜変更してください)
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/document", "document");
     instancedObject_->Initialize("document");
@@ -96,6 +99,10 @@ void DocumentParticle::SetTexture()
 }
 
 void DocumentParticle::Update(Camera* camera, const Vector3& lightDirection) {
+  
+    // C++
+    if (!instancedObject_) return;
+    
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
 
     // 1. 時間による自動発生処理

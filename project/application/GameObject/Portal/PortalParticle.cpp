@@ -22,7 +22,7 @@ PortalParticle::PortalParticle() {
 	emitter_->SetAfterColor({1.0f, 1.0f, 0.3f, 0.5f});
 	emitter_->SetEmissionAngle(2.0f * 3.1415926535f);
 
-	const std::string pathGroup = "portalPath" + std::to_string(nextId_++);
+	const std::string pathGroup = "portalPath";
 	ParticleManager::GetInstance()->CreateParticleGroup(pathGroup, "Resources/2d/defaultParticle.png");
 	pathEmitter_ = std::make_unique<ParticleEmitter>(pathGroup);
 	pathEmitter_->SetFrequency(0.004f);

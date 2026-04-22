@@ -40,7 +40,7 @@ private:
 	std::vector<DocumentData> instances_{};
 	uint32_t activeInstanceCount_ = 0;
 	// 最大発生数
-	static constexpr uint32_t kMaxInstanceCount = 1000;
+	static constexpr uint32_t kMaxInstanceCount = 100;
 
 	// --- 時間発生用のメンバ変数 ---
 	bool isEmitting_ = false;       // 発生中かどうか
