@@ -7,6 +7,10 @@
 #include <Object3d/Object3d.h>
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
 #include <GameObject/YoshidaMath/CollisionManager/Collider.h>
+#include "Animation/Animation.h"
+#include "Animation/Skeleton.h"
+#include "Animation/SkinCluster.h"
+
 
 class Locker : public YoshidaMath::Collider
 {
@@ -26,9 +30,26 @@ public:
     Vector3 GetWorldPosition() const override;
     bool IsRayHit() { return isRayHit_; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
+    void SetAnimationGroupName(const std::string& name) { animationGroupName_ = name; }
+    bool GetIsOpen() { return isOpen_; }
 private:
+    void Animation();
+private:
+    bool isOpen_ = false;
     bool isRayHit_ = false;
     static PlayerCamera* playerCamera_;
     std::unique_ptr<Object3d>obj_ = nullptr;
+
+    // アニメーション
+    Animation::AnimationData blendedPoseAnimation_{};
+    // 骨
+    std::unique_ptr<Skeleton> skeleton_{};
+    // スキン
+    SkinCluster skinCluster_{};
+    std::string animationGroupName_ = "Locker";
+    const float kAnimationBlendDuration_ = 0.5f;
+    bool animationFinished_ = false;
+    std::string desiredAnimationName = "Idle";
+
 };
 
