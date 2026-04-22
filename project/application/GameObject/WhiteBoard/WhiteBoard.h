@@ -4,6 +4,7 @@
 #include"RigidBody.h"
 #include"Primitive/Primitive.h"
 #include"GameObject/YoshidaMath/CollisionManager/Collider.h"
+#include <string>
 
 class WhiteBoard  : public YoshidaMath::Collider
 {
@@ -19,6 +20,7 @@ public:
     virtual void Draw();
     void SetCamera(Camera* camera);
     void SetModel(const std::string& filePath);
+    void SetEditorRegistrationName(const std::string& name) { editorRegistrationName_ = name; }
     AABB GetAABB();
     Transform& GetCollisionTransform() { return collisionTransform_; }
     virtual void ResetCollisionAttribute();
@@ -35,4 +37,5 @@ protected:
     Transform collisionTransform_ = {};
 private:
     const float kPortalCreatableAngleRange_ = 0.5f;
+    std::string editorRegistrationName_ = "WhiteBoard";
 };

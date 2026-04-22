@@ -5,6 +5,7 @@
 #include "GameObject/SEManager/SEManager.h"
 #include "GameObject/WhiteBoard/WalkWhiteBoard.h"
 #include "Model/ModelManager.h"
+#include <string>
 
 
 namespace {
@@ -19,12 +20,14 @@ WhiteBoardManager::WhiteBoardManager(Vector3* playerPos) {
     std::unique_ptr<WalkWhiteBoard> walkWhite = std::make_unique<WalkWhiteBoard>();
     WalkWhiteBoard::LoadAnimation("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
     walkWhite->SetModel("whiteBoard");
+    walkWhite->SetEditorRegistrationName("WalkWhiteBoard");
     walkWhite->SetTargetPosPtr(playerPos_);
     whiteBoards_.push_back(std::move(walkWhite));
 
     for (int i = 0; i < kMaxWhiteBoards; ++i) {
         std::unique_ptr<WhiteBoard> white = std::make_unique<WhiteBoard>();
         white->SetModel("whiteBoard");
+        white->SetEditorRegistrationName("WhiteBoard" + std::to_string(i));
         whiteBoards_.push_back(std::move(white));
     }
 }
