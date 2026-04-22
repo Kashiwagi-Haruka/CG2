@@ -13,6 +13,7 @@
 #include "GameObject/Wall/WallManager2.h"
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
+#include"GameObject/DocumentParticle/DocumentParticle.h"
 
 void TutorialStage::InitializeLights()
 {
@@ -57,6 +58,8 @@ TutorialStage::TutorialStage(Player* player)
 	wallManager2_ = std::make_unique<WallManager2>();
 	timeCard_ = std::make_unique<TimeCard>();
 	timeCardRack_ = std::make_unique<TimeCardRack>();
+
+	documentParticle_ = std::make_unique<DocumentParticle>();
 }
 
 void TutorialStage::Initialize()
@@ -72,6 +75,11 @@ void TutorialStage::Initialize()
 	timeCardRack_->Initialize();
 
 	InitializeLights();
+	documentParticle_->Initialize();
+	documentParticle_->SetEmitArea({ -1.0f, 0.0f, -1.0f }, { 1.0f, 0.0f, 1.0f });
+	// 基準点を上空(Y = 10.0f)に設定し、0.2秒ごとに2枚ずつ降らせる
+	documentParticle_->StartEmit({ 0.0f, 4.0f, 0.0f }, 0.2f, 2);
+
 }
 
 void TutorialStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
@@ -96,6 +104,7 @@ void TutorialStage::UpdateGameObject(Camera* camera, const Vector3& lightDirecti
 		{7.75f, 1.3f, -7.0f}
 		});
 	timeCardRack_->Update();
+	documentParticle_->Update(camera,lightDirection);
 }
 
 void TutorialStage::UpdatePortal()
@@ -153,6 +162,7 @@ void TutorialStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
 	door_->Draw();
 	whiteBoardManager_->Draw();
 	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
+	documentParticle_->Draw();
 }
 void TutorialStage::SetSceneCameraForDraw(Camera* camera) {
 	testField_->SetCamera(camera);
