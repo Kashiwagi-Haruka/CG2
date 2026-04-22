@@ -8,7 +8,7 @@ WarpPos::WarpPos()
 {
     camera_ = std::make_unique<Camera>();
     object3d_ = std::make_unique<Object3d>();
-    transform_ = { .scale = {0.1f,0.1f,0.1f},.rotate = { 0.0f,Function::kPi,0.0f},.translate = { 0.0f,0.0f,0.0f} };
+    transform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = { 0.0f,Function::kPi,0.0f},.translate = { 0.0f,0.0f,0.0f} };
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/camera", "camera");
     object3d_->SetModel("camera");
     //object3d_->SetTransform(transform_);
