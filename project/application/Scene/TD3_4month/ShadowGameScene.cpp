@@ -63,7 +63,6 @@ ShadowGameScene::ShadowGameScene() {
 	SetPlayerCamera(cameraController_->GetPlayerCamera());
 
 	damageOverlay_ = std::make_unique<DamageOverlay>();
-	Hierarchy::GetInstance()->LoadObjectEditorsFromJsonIfExists("objectEditors.json");
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -116,6 +115,7 @@ void ShadowGameScene::Initialize()
 	elevatorRoomManager_->Initialize();
 	// エレベーター
 	elevator_->Initialize();
+	hierarchy->LoadObjectEditorsFromJsonIfExists("ShadowGameScene_objectEditors.json");
 	hierarchy->EndRegisterFile();
 	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
 	stageManager_->SetLightManager(lightManager_.get());
