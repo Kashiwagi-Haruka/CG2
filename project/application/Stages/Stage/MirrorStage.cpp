@@ -76,6 +76,7 @@ void MirrorStage::Initialize() {
 	timeCardRack_->Initialize();
 	boxManager_->Initialize();
 	InitializeLights();
+	hierarchy->LoadObjectEditorsFromJsonIfExists("MirrorStage_objectEditors.json");
 	hierarchy->EndRegisterFile();
 
 }

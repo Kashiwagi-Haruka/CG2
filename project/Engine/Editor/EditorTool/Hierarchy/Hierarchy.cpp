@@ -431,14 +431,22 @@ bool Hierarchy::LoadObjectEditorsFromJsonIfExists(const std::string& filePath) {
 	}
 
 	const std::string scopedFilePath = GetSceneScopedEditorFilePath(filePath);
-	if (!HasObjectEditorJsonFile(scopedFilePath)) {
+	std::string resolvedFilePath;
+	if (HasObjectEditorJsonFile(scopedFilePath)) {
+		resolvedFilePath = scopedFilePath;
+	} else if (HasObjectEditorJsonFile(filePath)) {
+		resolvedFilePath = filePath;
+	} else {
 		return false;
 	}
-	if (hasLoadedForCurrentScene_) {
+
+	if (hasLoadedForCurrentScene_ && loadedSnapshotFilePath_ == resolvedFilePath) {
 		return true;
 	}
-	hasLoadedForCurrentScene_ = LoadObjectEditorsFromJson(scopedFilePath);
-	return hasLoadedForCurrentScene_;
+
+	const bool isLoaded = LoadObjectEditorsFromJson(resolvedFilePath);
+	hasLoadedForCurrentScene_ = hasLoadedForCurrentScene_ || isLoaded;
+	return isLoaded;
 }
 
 bool Hierarchy::SaveObjectEditorsToJson(const std::string& filePath) const {
