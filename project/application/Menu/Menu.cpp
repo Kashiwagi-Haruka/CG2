@@ -9,7 +9,7 @@
 #include <array>
 
 namespace {
-constexpr std::array<const char*, 5> kMenuOrder = {"Game", "Save", "Option", "Title", "GameEnd"};
+constexpr std::array<const char*, 5> kMenuOrder = {"Game", "Credit", "Option", "Title", "GameEnd"};
 
 size_t FindMenuIndex(const std::string& menuName) {
 	for (size_t i = 0; i < kMenuOrder.size(); ++i) {
@@ -24,8 +24,8 @@ std::u32string ToMenuLabel(const std::string& menuName) {
 	if (menuName == "Game") {
 		return U"ゲームに戻る";
 	}
-	if (menuName == "Save") {
-		return U"セーブ";
+	if (menuName == "Credit") {
+		return U"クレジット";
 	}
 	if (menuName == "Option") {
 		return U"オプション";
@@ -63,11 +63,11 @@ void Menu::Initialize() {
 	GameText_.SetAlign(TextAlign::Center);
 	GameText_.UpdateLayout(false);
 
-	SaveText_.Initialize(fontHandle_);
-	SaveText_.SetString(ToMenuLabel("Save"));
-	SaveText_.SetPosition({WinApp::kClientWidth / 2.0f, WinApp::kClientHeight / 2.0f});
-	SaveText_.SetAlign(TextAlign::Center);
-	SaveText_.UpdateLayout(false);
+	CreditText_.Initialize(fontHandle_);
+	CreditText_.SetString(ToMenuLabel("Credit"));
+	CreditText_.SetPosition({WinApp::kClientWidth / 2.0f, WinApp::kClientHeight / 2.0f});
+	CreditText_.SetAlign(TextAlign::Center);
+	CreditText_.UpdateLayout(false);
 
 	OptionText_.Initialize(fontHandle_);
 	OptionText_.SetString(ToMenuLabel("Option"));
@@ -87,7 +87,7 @@ void Menu::Initialize() {
 	GameEndText_.SetAlign(TextAlign::Center);
 	GameEndText_.UpdateLayout(false);
 
-		tabBackHintText_.Initialize(fontHandle_);
+	tabBackHintText_.Initialize(fontHandle_);
 	tabBackHintText_.SetString(U"TABで戻る");
 	tabBackHintText_.SetPosition({30.0f, WinApp::kClientHeight - 30.0f});
 	tabBackHintText_.SetColor(COLOR::WHITE);
@@ -141,8 +141,8 @@ void Menu::Update() {
 		if (currentMenuName_ == "Game") {
 			pendingAction_ = Action::kResumeGame;
 			isTrigger_ = false;
-		} else if (currentMenuName_ == "Save") {
-			pendingAction_ = Action::kSave;
+		} else if (currentMenuName_ == "Credit") {
+			pendingAction_ = Action::kCredit;
 			isTrigger_ = false;
 		} else if (currentMenuName_ == "Option") {
 			pendingAction_ = Action::kOpenOption;
@@ -162,7 +162,7 @@ void Menu::Update() {
 		text.UpdateLayout(false);
 	};
 	setDefaultColor(GameText_);
-	setDefaultColor(SaveText_);
+	setDefaultColor(CreditText_);
 	setDefaultColor(OptionText_);
 	setDefaultColor(TitleText_);
 	setDefaultColor(GameEndText_);
@@ -170,9 +170,9 @@ void Menu::Update() {
 	if (currentMenuName_ == "Game") {
 		GameText_.SetColor(COLOR::RED);
 		GameText_.UpdateLayout(false);
-	} else if (currentMenuName_ == "Save") {
-		SaveText_.SetColor(COLOR::RED);
-		SaveText_.UpdateLayout(false);
+	} else if (currentMenuName_ == "Credit") {
+		CreditText_.SetColor(COLOR::RED);
+		CreditText_.UpdateLayout(false);
 	} else if (currentMenuName_ == "Option") {
 		OptionText_.SetColor(COLOR::RED);
 		OptionText_.UpdateLayout(false);
@@ -213,7 +213,7 @@ void Menu::Draw() {
 	}
 	menuText_.Draw();
 	GameText_.Draw();
-	SaveText_.Draw();
+	CreditText_.Draw();
 	OptionText_.Draw();
 	TitleText_.Draw();
 	GameEndText_.Draw();

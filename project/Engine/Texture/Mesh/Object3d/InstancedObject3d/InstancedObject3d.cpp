@@ -6,7 +6,7 @@
 #include "Model/ModelManager.h"
 #include "Object3d/InstancedObject3d/InstancedObject3d.h"
 #include "Object3d/Object3dCommon.h"
-#include "TextureManager.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>

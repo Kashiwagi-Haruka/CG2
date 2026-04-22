@@ -48,6 +48,8 @@ void TutorialStage::InitializeLights()
 
 TutorialStage::TutorialStage(Player* player)
 {
+	player_ = player;
+
 	testField_ = std::make_unique<TestField>();
 	whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
 	portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
@@ -156,13 +158,14 @@ void TutorialStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
 	testField_->Draw();
 	wallManager_->Draw();
 	wallManager2_->Draw();
+	documentParticle_->Draw();
 	key_->Draw();
 	timeCard_->Draw();
 	timeCardRack_->Draw();
 	door_->Draw();
 	whiteBoardManager_->Draw();
 	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
-	documentParticle_->Draw();
+	
 }
 void TutorialStage::SetSceneCameraForDraw(Camera* camera) {
 	testField_->SetCamera(camera);

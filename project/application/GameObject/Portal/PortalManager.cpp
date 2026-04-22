@@ -35,6 +35,11 @@ void PortalManager::Initialize() {
 
     canMakePortal_ = false;
     warpCoolTimer_ = kWarpTime_;
+    
+    for (auto& portal : portals_) {
+        portal.reset();
+    }
+
     portals_.clear();
     portalParticle_->Initialize();
 
