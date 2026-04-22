@@ -53,7 +53,7 @@ void DebugCamera::Update() {
 	// 左ドラッグ: 回転 / Shift+左ドラッグ: ローカル軸移動(XYZ)
 	const float rotateSpeed = 0.004f;
 	const float moveSpeed = 0.03f;
-	const float wheelMoveSpeed = 0.2f;
+	const float wheelMoveSpeed = 0.02f;
 	const float kPitchLimit = 1.54f;
 
 	Input* input = Input::GetInstance();
