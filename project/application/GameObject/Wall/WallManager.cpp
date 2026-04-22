@@ -58,6 +58,7 @@ WallManager::~WallManager()
 void WallManager::Initialize()
 {
     room1_->Initialize();
+    room1_->RegisterEditor("room1");
     plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/out.jpg");
     plane_->RegisterEditor("WallWindowPlane");
 
