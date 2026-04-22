@@ -24,6 +24,7 @@ public:
 		BOX,
         ELEVATOR_OPEN,
 		ELEVATOR_BELL,
+		PAPER,
 	};
 
 private:
