@@ -71,11 +71,12 @@ void WallManager::Initialize()
     for (const auto& wall : walls_) {
         wallPrimitives.push_back(wall->GetPrimitive());
     }
-    Primitive::RegisterEditors(wallPrimitives, "Wall");
+    /*Primitive::RegisterEditors(wallPrimitives, "Wall");*/
 }
 
 void WallManager::Update()
 {
+    
     plane_->SetEnableLighting(false);
     room1_->Update();
     room1_->SetEnableLighting(true);

@@ -57,7 +57,7 @@ void WallManager2::Initialize()
     for (const auto& wall : walls_) {
         wallPrimitives.push_back(wall->GetPrimitive());
     }
-    Primitive::RegisterEditors(wallPrimitives, "Wall2");
+    /*Primitive::RegisterEditors(wallPrimitives, "Wall2:");*/
 }
 void WallManager2::Update()
 {
