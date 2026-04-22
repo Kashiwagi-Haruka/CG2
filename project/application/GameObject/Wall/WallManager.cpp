@@ -71,13 +71,19 @@ void WallManager::Initialize()
     for (const auto& wall : walls_) {
         wallPrimitives.push_back(wall->GetPrimitive());
     }
+
+    const float offsetX = 100.0f;
+    const float offsetZ = 100.0f;
+    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, { -7.0f + offsetX ,0.0f,2.0f + offsetZ });
+    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, { 7.0f + offsetX  ,0.0f,2.0f + offsetZ });
+    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, { 2.0f + offsetZ,0.0f,-7.0f + offsetX });
+    walls_[3]->SetST({ 14.0f,4.0f,1.0f }, { 2.0f + offsetZ,0.0f, 7.0f + offsetX });
+
     /*Primitive::RegisterEditors(wallPrimitives, "Wall");*/
 }
 
 void WallManager::Update()
 {
-	float offsetX = 100.0f;
-	float offsetZ = 100.0f;
     plane_->SetEnableLighting(false);
     room1_->Update();
     room1_->SetEnableLighting(true);
@@ -93,11 +99,6 @@ void WallManager::Update()
 
     areaLights_[1].height = plane_->GetTransform().scale.y * 0.5f;
 
-    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, { -7.0f+offsetX ,0.0f,2.0f+offsetZ });
-    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, { 7.0f+offsetX  ,0.0f,2.0f+offsetZ});
-
-    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, {2.0f+offsetZ,0.0f,-7.0f+offsetX });
-    walls_[3]->SetST({ 14.0f,4.0f,1.0f }, {2.0f+offsetZ,0.0f, 7.0f+offsetX });
     for (auto& wall : walls_) {
         wall->Update();
     }

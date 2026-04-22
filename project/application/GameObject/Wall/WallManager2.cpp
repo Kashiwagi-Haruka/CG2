@@ -57,12 +57,20 @@ void WallManager2::Initialize()
     for (const auto& wall : walls_) {
         wallPrimitives.push_back(wall->GetPrimitive());
     }
+
+    const float offsetX = 100.0f;
+    const float offsetZ = 7.0f;
+    Vector3 translate = { 7.0f,0.0f,0.0f };
+    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ 7.0f + offsetX,2.0f,0.0f + offsetZ });
+    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ -7.0f + offsetX,2.0f,0.0f + offsetZ });
+    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate + Vector3{ 0.0f + offsetX,2.0f,7.0f + offsetZ });
+    walls_[3]->SetST({ 7.0f, 4.0f,1.0f, }, translate + Vector3{ -3.75f + offsetX,2.0f,-6.5f + offsetZ });
+    walls_[4]->SetST({ 7.0f, 4.0f,1.0f, }, translate + Vector3{ 3.75f + offsetX,2.0f ,-6.5f + offsetZ });
+
     /*Primitive::RegisterEditors(wallPrimitives, "Wall2:");*/
 }
 void WallManager2::Update()
 {
-	float offsetX = 100.0f;
-	float offsetZ = 7.0f;
     plane_->SetEnableLighting(false);
     room1_->Update();
     //roomMat_ = room1_->GetWorldMatrix();
@@ -74,16 +82,6 @@ void WallManager2::Update()
     areaLights_[1].normal = normal;
     areaLights_[1].position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
     areaLights_[1].height = plane_->GetTransform().scale.y*0.5f;
-    Vector3 translate = {7.0f,0.0f,0.0f};
-
-    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate+Vector3{ 7.0f+offsetX,2.0f,0.0f+offsetZ });
-    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate+Vector3{ -7.0f+offsetX,2.0f,0.0f+offsetZ});
-    //裏側                  
-    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate+Vector3{ 0.0f+offsetX,2.0f,7.0f+offsetZ });
-                                  
-    walls_[3]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ -3.75f+offsetX,2.0f,-6.5f+offsetZ });
-    walls_[4]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ 3.75f+offsetX,2.0f ,-6.5f+offsetZ });
-   
     for (auto& wall : walls_) {
         wall->Update();
     }
