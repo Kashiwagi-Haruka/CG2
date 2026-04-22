@@ -10,7 +10,7 @@ class TimeCard;
 class TimeCardRack;
 class TimeCardWatch;
 class DocumentManager;
-
+class FileManager;
 class TutorialStage :
     public BaseStage
 {
@@ -30,6 +30,7 @@ class TutorialStage :
     std::unique_ptr<WallManager> wallManager_ = nullptr;
     std::unique_ptr<WallManager2> wallManager2_ = nullptr;
     std::unique_ptr<DocumentManager>documentManager_ = nullptr;
+    std::unique_ptr<FileManager>fileManager_ = nullptr;
 private:
     void InitializeLights();
 public:
