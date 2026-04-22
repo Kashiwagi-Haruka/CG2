@@ -245,6 +245,10 @@ void ShadowGameScene::CheckCollision() {
 	for (auto& system : elevator_->GetAutoLockSys()) {
 		collisionManager_->AddCollider(system.get());
 	}
+	for (auto& wall : elevator_->GetWalls()) {
+		collisionManager_->AddCollider(wall.get());
+	}
+
 	stageManager_->SetCollisionManager(collisionManager_.get());
 	stageManager_->CheckCollision();
 }

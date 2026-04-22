@@ -12,6 +12,10 @@
 PlayerCamera* Elevator::playerCamera_ = nullptr;
 bool Elevator::isRayHit_ = false;
 
+namespace {
+    const int kMaxWall = 3;
+}
+
 Elevator::Elevator() {
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/Elevator", "Elevator");
     modelObj_ = std::make_unique<Object3d>();
@@ -28,6 +32,27 @@ Elevator::Elevator() {
 
     autoLockSystems_[1]->SetAABB({ .min = {-1.5f,0.0f,-1.0f} ,.max = {1.5f,0.02f,2.0f} });
     autoLockSystems_[1]->SetTranslate({ 0.0f,0.0f,0.0f });
+
+
+
+    for (int i = 0; i < kMaxWall; ++i) {
+        std::unique_ptr<Wall> wall = std::make_unique<Wall>();
+        wall->SetParentMatrix(&worldMat_);
+        walls_.push_back(std::move(wall));
+    }
+
+}
+
+Elevator::~Elevator()
+{
+    for (auto& wall : walls_) {
+        if (wall != nullptr) {
+            wall.reset();
+            wall = nullptr;
+        }
+    }
+
+    walls_.clear();
 }
 
 void Elevator::Initialize() {
@@ -70,6 +95,11 @@ void Elevator::Initialize() {
 
     poster_.SetParentMat(&worldMat_);
     poster_.Initialize();
+
+    // 壁の初期化
+    for (auto& wall : walls_) {
+        wall->Initialize();
+    }
 }
 
 void Elevator::SetCamera(Camera* camera) {
@@ -81,6 +111,10 @@ void Elevator::SetCamera(Camera* camera) {
     }
 
     poster_.SetCamera(camera);
+
+    for (auto& wall : walls_) {
+        wall->SetCamera(camera);
+    }
 }
 
 void Elevator::Update() {
@@ -104,6 +138,14 @@ void Elevator::Update() {
     }
     //エレベーター内のポスターの更新
     poster_.Update();
+
+    walls_[0]->SetST({ 2.0f,4.0f,4.0f }, { -2.0f ,0.0f,0.0f });
+    walls_[1]->SetST({ 2.0f,4.0f,4.0f }, { 2.0f  ,0.0f,0.0f });
+    walls_[2]->SetST({ 4.0f,4.0f,2.0f }, { 0.0f,0.0f, 2.0f });
+
+    for (auto& wall : walls_) {
+        wall->Update();
+    }
 }
 
 void Elevator::Draw() {
@@ -112,6 +154,10 @@ void Elevator::Draw() {
 
     for (auto& sys : autoLockSystems_) {
         sys->Draw();
+    }
+
+    for (auto& wall : walls_) {
+        wall->Draw();
     }
 
     poster_.Draw();
@@ -172,7 +218,7 @@ void Elevator::CheckCollision() {
                 Close();
             }
 
-        
+
         }
 
     }
