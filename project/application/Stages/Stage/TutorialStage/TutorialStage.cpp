@@ -14,6 +14,7 @@
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include"GameObject/DocumentManager/DocumentManager.h"
+#include"GameObject/File/FileManager.h"
 
 void TutorialStage::InitializeLights()
 {
@@ -61,6 +62,8 @@ TutorialStage::TutorialStage(Player* player)
     timeCard_ = std::make_unique<TimeCard>();
     timeCardRack_ = std::make_unique<TimeCardRack>();
     documentManager_ = std::make_unique<DocumentManager>();
+
+    fileManager_ = std::make_unique<FileManager>();
 }
 
 void TutorialStage::Initialize()
@@ -77,7 +80,7 @@ void TutorialStage::Initialize()
 
     InitializeLights();
     documentManager_->Initialize();
-
+    fileManager_->Initialize();
 }
 
 void TutorialStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
@@ -103,6 +106,7 @@ void TutorialStage::UpdateGameObject(Camera* camera, const Vector3& lightDirecti
         });
     timeCardRack_->Update();
     documentManager_->Update(camera, lightDirection);
+    fileManager_->Update();
 }
 
 void TutorialStage::UpdatePortal()
@@ -163,6 +167,7 @@ void TutorialStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
     door_->Draw();
     whiteBoardManager_->Draw();
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
+    fileManager_->Draw();
 
 }
 void TutorialStage::SetSceneCameraForDraw(Camera* camera) {
@@ -176,6 +181,7 @@ void TutorialStage::SetSceneCameraForDraw(Camera* camera) {
     timeCard_->SetCamera(camera);
     timeCardRack_->SetCamera(camera);
     documentManager_->SetCamera(camera);
+    fileManager_->SetCamera(camera);
 }
 
 void TutorialStage::SetPlayerCamera(PlayerCamera* playerCamera) {
