@@ -9,6 +9,7 @@ class Camera;
 class DocumentParticle {
 public:
 	DocumentParticle();
+	~DocumentParticle() = default;
 	void Initialize();
 	void Update(Camera* camera, const Vector3& lightDirection);
 	void Draw();
