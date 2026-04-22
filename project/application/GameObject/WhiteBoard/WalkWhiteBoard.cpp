@@ -42,6 +42,7 @@ void WalkWhiteBoard::Initialize()
 {
     isMove_ = false;
     obj_->Initialize();
+	obj_->RegisterEditor("WalkWhiteBoard");
     transform_ = { .scale = {1.0f,1.0f,1.0f}, .rotate = {0.0f,Function::kPi ,0.0f},.translate = {-4.0f,0.0f,6.5f} };
     velocity_ = { 0.0f };
 

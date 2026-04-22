@@ -2474,7 +2474,7 @@
           0.0
         ]
       },
-      "name": "WhiteBoard",
+      "name": "WalkWhiteBoard",
       "transform": {
         "rotate": [
           0.0,
@@ -2487,9 +2487,9 @@
           1.0
         ],
         "translate": [
-          6.019999980926514,
+          -5.739999771118164,
           0.0,
-          6.71999979019165
+          6.880000114440918
         ]
       }
     },
@@ -2543,9 +2543,9 @@
           1.0
         ],
         "translate": [
-          -6.599999904632568,
+          -2.819999933242798,
           0.0,
-          6.630000114440918
+          6.420000076293945
         ]
       }
     },
@@ -2590,7 +2590,7 @@
       "transform": {
         "rotate": [
           0.0,
-          1.5707999467849731,
+          0.0,
           0.0
         ],
         "scale": [
@@ -2599,9 +2599,9 @@
           1.0
         ],
         "translate": [
-          -0.5099999904632568,
+          2.630000114440918,
           0.0,
-          0.4699999988079071
+          0.0
         ]
       }
     },
@@ -2646,7 +2646,7 @@
       "transform": {
         "rotate": [
           0.0,
-          1.5707999467849731,
+          0.0,
           0.0
         ],
         "scale": [
@@ -2655,15 +2655,71 @@
           1.0
         ],
         "translate": [
-          1.2400000095367432,
           0.0,
-          0.4000000059604645
+          0.0,
+          0.0
         ]
       }
     },
     {
       "editorId": "",
       "index": 8,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "WhiteBoard",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 9,
       "material": {
         "color": [
           1.0,
@@ -2719,7 +2775,7 @@
     },
     {
       "editorId": "",
-      "index": 9,
+      "index": 10,
       "material": {
         "color": [
           1.0,
@@ -2775,7 +2831,7 @@
     },
     {
       "editorId": "",
-      "index": 10,
+      "index": 11,
       "material": {
         "color": [
           1.0,
@@ -2831,7 +2887,7 @@
     },
     {
       "editorId": "",
-      "index": 11,
+      "index": 12,
       "material": {
         "color": [
           1.0,
@@ -2887,7 +2943,7 @@
     },
     {
       "editorId": "",
-      "index": 12,
+      "index": 13,
       "material": {
         "color": [
           1.0,
@@ -2943,7 +2999,7 @@
     },
     {
       "editorId": "",
-      "index": 13,
+      "index": 14,
       "material": {
         "color": [
           1.0,
@@ -2999,7 +3055,7 @@
     },
     {
       "editorId": "",
-      "index": 14,
+      "index": 15,
       "material": {
         "color": [
           1.0,
@@ -3055,7 +3111,7 @@
     },
     {
       "editorId": "",
-      "index": 15,
+      "index": 16,
       "material": {
         "color": [
           1.0,
@@ -3111,7 +3167,7 @@
     },
     {
       "editorId": "",
-      "index": 16,
+      "index": 17,
       "material": {
         "color": [
           1.0,
@@ -3167,7 +3223,7 @@
     },
     {
       "editorId": "",
-      "index": 17,
+      "index": 18,
       "material": {
         "color": [
           1.0,
@@ -3223,7 +3279,7 @@
     },
     {
       "editorId": "",
-      "index": 18,
+      "index": 19,
       "material": {
         "color": [
           1.0,
@@ -3279,7 +3335,7 @@
     },
     {
       "editorId": "",
-      "index": 19,
+      "index": 20,
       "material": {
         "color": [
           1.0,
@@ -3335,7 +3391,7 @@
     },
     {
       "editorId": "",
-      "index": 20,
+      "index": 21,
       "material": {
         "color": [
           1.0,
@@ -3391,62 +3447,6 @@
     },
     {
       "editorId": "",
-      "index": 21,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "Locker",
-      "transform": {
-        "rotate": [
-          0.0,
-          3.1415927410125732,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          -12.380000114440918,
-          0.0,
-          7.190000057220459
-        ]
-      }
-    },
-    {
-      "editorId": "",
       "index": 22,
       "material": {
         "color": [
@@ -3486,7 +3486,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3495,9 +3495,9 @@
           1.0
         ],
         "translate": [
-          12.850000381469727,
+          -12.449999809265137,
           0.0,
-          6.960000038146973
+          7.139999866485596
         ]
       }
     },
@@ -3538,11 +3538,11 @@
           0.0
         ]
       },
-      "name": "Desk",
+      "name": "Locker",
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3551,9 +3551,9 @@
           1.0
         ],
         "translate": [
-          8.0,
           0.0,
-          2.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -3598,7 +3598,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3607,7 +3607,7 @@
           1.0
         ],
         "translate": [
-          6.0,
+          8.0,
           0.0,
           2.0
         ]
@@ -3654,7 +3654,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3663,9 +3663,9 @@
           1.0
         ],
         "translate": [
-          4.0,
           0.0,
-          2.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -3710,7 +3710,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3719,9 +3719,9 @@
           1.0
         ],
         "translate": [
-          8.0,
           0.0,
-          3.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -3766,7 +3766,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3775,9 +3775,9 @@
           1.0
         ],
         "translate": [
-          6.0,
           0.0,
-          3.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -3822,7 +3822,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3831,9 +3831,9 @@
           1.0
         ],
         "translate": [
-          4.0,
           0.0,
-          3.0
+          0.0,
+          0.0
         ]
       }
     },
@@ -3874,7 +3874,7 @@
           0.0
         ]
       },
-      "name": "TimeCard",
+      "name": "Desk",
       "transform": {
         "rotate": [
           0.0,
@@ -3930,7 +3930,7 @@
           0.0
         ]
       },
-      "name": "TimeCardRack",
+      "name": "TimeCard",
       "transform": {
         "rotate": [
           0.0,
@@ -3986,7 +3986,7 @@
           0.0
         ]
       },
-      "name": "Box",
+      "name": "TimeCardRack",
       "transform": {
         "rotate": [
           0.0,
@@ -3999,7 +3999,7 @@
           1.0
         ],
         "translate": [
-          5.619999885559082,
+          0.0,
           0.0,
           0.0
         ]
@@ -4055,7 +4055,63 @@
           1.0
         ],
         "translate": [
-          -6.559999942779541,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 33,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Box",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          0.0,
           0.0,
           0.0
         ]
