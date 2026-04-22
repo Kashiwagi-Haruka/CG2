@@ -29,7 +29,7 @@ Drink::Drink() {
 	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Drink/tea", "tea");
 	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Drink/energyDrink", "energyDrink");
 	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Drink/Severed_Head", "Severed_Head");
-	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/coffee", "coffee");
+	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Drink/coffeeCan", "coffeeCan");
 }
 
 void Drink::Initialize() {
@@ -60,7 +60,7 @@ std::unique_ptr<Object3d> Drink::CreateDrinkObject(DrinkName type) const {
 		obj->SetModel("tea");
 		break;
 	case Drink::COFFEE:
-		obj->SetModel("coffee");
+		obj->SetModel("coffeeCan");
 		break;
 	case Drink::ENERGY:
 		obj->SetModel("energyDrink");
