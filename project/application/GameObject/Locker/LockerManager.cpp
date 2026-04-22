@@ -6,6 +6,8 @@ LockerManager::LockerManager()
 {
     for (int i = 0; i < kMaxLockers_; ++i) {
         std::unique_ptr<Locker> locker = std::make_unique<Locker>();
+        std::string name = "Locker" + std::to_string(i);
+        locker->SetAnimationGroupName(name);
         lockers_.push_back(std::move(locker));
     }
 }
