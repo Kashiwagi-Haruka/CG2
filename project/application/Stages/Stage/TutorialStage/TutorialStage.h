@@ -9,6 +9,7 @@ class WhiteBoardManager;
 class TimeCard;
 class TimeCardRack;
 class TimeCardWatch;
+class DocumentParticle;
 
 class TutorialStage :
     public BaseStage
@@ -28,7 +29,7 @@ class TutorialStage :
 
     std::unique_ptr<WallManager> wallManager_ = nullptr;
     std::unique_ptr<WallManager2> wallManager2_ = nullptr;
-
+    std::unique_ptr<DocumentParticle>  documentParticle_ = nullptr;
 private:
     void InitializeLights();
 public:
