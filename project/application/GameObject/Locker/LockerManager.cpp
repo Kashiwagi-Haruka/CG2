@@ -1,13 +1,14 @@
 #include "LockerManager.h"
+#include <string>
 
 bool LockerManager::isRayHit_ = false;
 
-LockerManager::LockerManager()
-{
-    for (int i = 0; i < kMaxLockers_; ++i) {
-        std::unique_ptr<Locker> locker = std::make_unique<Locker>();
-        lockers_.push_back(std::move(locker));
-    }
+LockerManager::LockerManager() {
+	for (int i = 0; i < kMaxLockers_; ++i) {
+		std::unique_ptr<Locker> locker = std::make_unique<Locker>();
+		locker->SetEditorRegistrationName("Locker" + std::to_string(i));
+		lockers_.push_back(std::move(locker));
+	}
 }
 
 void LockerManager::Initialize()
