@@ -61,6 +61,8 @@ void WallManager2::Initialize()
 }
 void WallManager2::Update()
 {
+	float offsetX = 100.0f;
+	float offsetZ = 7.0f;
     plane_->SetEnableLighting(false);
     room1_->Update();
     //roomMat_ = room1_->GetWorldMatrix();
@@ -74,13 +76,13 @@ void WallManager2::Update()
     areaLights_[1].height = plane_->GetTransform().scale.y*0.5f;
     Vector3 translate = {7.0f,0.0f,0.0f};
 
-    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate+Vector3{ 7.0f,2.0f,0.0f });
-    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate+Vector3{ -7.0f,2.0f,0.0f });
+    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate+Vector3{ 7.0f+offsetX,2.0f,0.0f+offsetZ });
+    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate+Vector3{ -7.0f+offsetX,2.0f,0.0f+offsetZ});
     //裏側                  
-    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate+Vector3{ 0.0f,2.0f,7.0f });
+    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate+Vector3{ 0.0f+offsetX,2.0f,7.0f+offsetZ });
                                   
-    walls_[3]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ -3.75f,2.0f,-6.5f });
-    walls_[4]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ 3.75f,2.0f ,-6.5f });
+    walls_[3]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ -3.75f+offsetX,2.0f,-6.5f+offsetZ });
+    walls_[4]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ 3.75f+offsetX,2.0f ,-6.5f+offsetZ });
    
     for (auto& wall : walls_) {
         wall->Update();
