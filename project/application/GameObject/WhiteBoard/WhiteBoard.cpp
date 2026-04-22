@@ -23,7 +23,7 @@ Vector3 WhiteBoard::GetWorldPosition() const
 void WhiteBoard::Initialize()
 {
     obj_->Initialize();
-	obj_->RegisterEditor("WhiteBoard");
+	obj_->RegisterEditor(editorRegistrationName_);
     obj_->SetRotate({ 0.0f,Function::kPi,0.0f });
 #ifdef _DEBUG
     primitive_->Initialize(Primitive::Box);
