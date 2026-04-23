@@ -11,9 +11,9 @@ void DocumentManager::Initialize()
     documentParticle_->Initialize();
     documentParticle_->SetEmitArea({ -1.0f, 0.0f, -1.0f }, { 1.0f, 0.0f, 1.0f });
     // 基準点を上空(Y = 10.0f)に設定し、0.2秒ごとに2枚ずつ降らせる
-    documentParticle_->StartEmit({ 4.0f, 4.0f, 0.0f }, 0.2f, 2);
+    documentParticle_->StartEmit({ -4.0f, 4.0f, 0.0f }, 0.2f, 2);
     document_->Initialize();
-    document_->SetTransform({ { 1.0f,1.0f,1.0f }, { 0.0f,1.0f,0.0f }, {4.0f,0.03f,0.0f} });
+    document_->SetTransform({ { 1.0f,1.0f,1.0f }, { 0.0f,1.0f,0.0f }, {-4.0f,0.03f,0.0f} });
 }
 
 void DocumentManager::Draw()

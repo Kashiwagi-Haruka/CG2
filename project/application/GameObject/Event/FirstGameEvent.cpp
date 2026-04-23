@@ -52,7 +52,7 @@ void FirstGameEvent::OnStart()
     triggerCount_ = 0;
     auto* cameraController = CameraController::GetInstance();
     cameraController->SetEventMode(true);
-    cameraController->MoveTo({ 6.0f,1.0f,-6.0f }, { 0.0f,Function::kPi,0.0f }, { 8.0f,1.0f,-6.0f }, { 0.0f,Function::kPi,0.0f }, 5.0f);
+    cameraController->MoveTo({ 6.0f,1.0f,-5.0f }, { 0.0f,Function::kPi,0.0f }, { 8.0f,1.0f,-5.0f }, { 0.0f,Function::kPi,0.0f }, 5.0f);
 }
 
 void FirstGameEvent::OnEnd()
