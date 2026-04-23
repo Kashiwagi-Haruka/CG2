@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <string>
 
 namespace {
 constexpr uint32_t kDefaultSlices = 32;
@@ -501,7 +502,7 @@ MeshData BuildMeshByPrimitiveName(Primitive::PrimitiveName primitiveName, uint32
 	}
 }
 } // namespace
-Primitive::~Primitive() { Hierarchy::GetInstance()->UnregisterPrimitive(this); }
+Primitive::~Primitive() { UnregisterFromEditor(); }
 // 既定テクスチャでプリミティブを初期化
 void Primitive::Initialize(PrimitiveName name) { Initialize(name, kDefaultSlices); }
 // 指定分割数で既定テクスチャ初期化
@@ -557,8 +558,7 @@ void Primitive::Initialize(PrimitiveName name, uint32_t slices) {
 
 	isUseSetWorld = false;
 	if (editorRegistrationEnabled_) {
-		Hierarchy::GetInstance()->RegisterPrimitive(this);
-		
+		RegisterToEditor();
 	}
 }
 // 指定テクスチャでプリミティブを初期化
@@ -614,10 +614,44 @@ void Primitive::Initialize(PrimitiveName name, const std::string& texturePath, u
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 
 	isUseSetWorld = false;
-	if (editorRegistrationEnabled_) {
-		Hierarchy::GetInstance()->RegisterPrimitive(this);
-
+}
+void Primitive::RegisterEditor(const std::string& registrationName) {
+	editorRegistrationEnabled_ = true;
+	if (!registrationName.empty()) {
+		Hierarchy::GetInstance()->AddRegisterPrimitive(this, registrationName);
 	}
+	RegisterToEditor();
+}
+void Primitive::RegisterEditors(const std::vector<Primitive*>& primitives, const std::string& registrationNamePrefix) {
+	for (size_t i = 0; i < primitives.size(); ++i) {
+		if (!primitives[i]) {
+			continue;
+		}
+		primitives[i]->RegisterEditor(registrationNamePrefix + std::to_string(i));
+	}
+}
+void Primitive::RegisterToEditor() {
+	if (isEditorRegistered_) {
+		return;
+	}
+	Hierarchy::GetInstance()->RegisterPrimitive(this);
+	isEditorRegistered_ = true;
+}
+
+void Primitive::RegisterToEditor(const std::string& saveFileName, const std::string& registrationName) {
+	if (isEditorRegistered_) {
+		return;
+	}
+	Hierarchy::GetInstance()->RegisterPrimitive(this, saveFileName, registrationName);
+	isEditorRegistered_ = true;
+}
+
+void Primitive::UnregisterFromEditor() {
+	if (!isEditorRegistered_) {
+		return;
+	}
+	Hierarchy::GetInstance()->UnregisterPrimitive(this);
+	isEditorRegistered_ = false;
 }
 // 座標変換やマテリアル定数を更新
 void Primitive::Update() {

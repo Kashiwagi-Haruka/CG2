@@ -99,6 +99,7 @@ void Gentleman::Update()
 void Gentleman::Initialize()
 {
     obj_->Initialize();
+	obj_->RegisterEditor("gentleman");
     animationNum = 0;
 
     isRayHit_ = false;

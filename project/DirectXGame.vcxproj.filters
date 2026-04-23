@@ -395,6 +395,9 @@
     <ClCompile Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.cpp" />
     <ClCompile Include="application\Stages\Stage\RadiconStage.cpp" />
     <ClCompile Include="application\GameObject\Radicon\Radicon.cpp" />
+    <ClCompile Include="application\GameObject\Enemy\Enemy.cpp" />
+    <ClCompile Include="application\GameObject\BurningObject\BurningObject.cpp" />
+    <ClCompile Include="application\GameObject\OperationChangeBox\OperationChangeBox.cpp" />
     <ClCompile Include="application\GameObject\DocumentManager\DocumentParticle\DocumentParticle.cpp" />
     <ClCompile Include="application\GameObject\File\FileObject.cpp" />
     <ClCompile Include="application\GameObject\DocumentManager\Document\Document.cpp" />
@@ -787,6 +790,9 @@
     <ClInclude Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.h" />
     <ClInclude Include="application\Stages\Stage\RadiconStage.h" />
     <ClInclude Include="application\GameObject\Radicon\Radicon.h" />
+    <ClInclude Include="application\GameObject\Enemy\Enemy.h" />
+    <ClInclude Include="application\GameObject\BurningObject\BurningObject.h" />
+    <ClInclude Include="application\GameObject\OperationChangeBox\OperationChangeBox.h" />
     <ClInclude Include="application\GameObject\DocumentManager\DocumentParticle\DocumentParticle.h" />
     <ClInclude Include="application\GameObject\File\FileObject.h" />
     <ClInclude Include="application\GameObject\DocumentManager\Document\Document.h" />

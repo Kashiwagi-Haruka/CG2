@@ -58,13 +58,29 @@ WallManager::~WallManager()
 void WallManager::Initialize()
 {
     room1_->Initialize();
+    room1_->RegisterEditor("room1");
     plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/out.jpg");
+    plane_->RegisterEditor("WallWindowPlane");
 
 
     // 壁の初期化
     for (auto& wall : walls_) {
         wall->Initialize();
     }
+    std::vector<Primitive*> wallPrimitives;
+    wallPrimitives.reserve(walls_.size());
+    for (const auto& wall : walls_) {
+        wallPrimitives.push_back(wall->GetPrimitive());
+    }
+
+    const float offsetX = 0.0f;
+    const float offsetZ = 0.0f;
+    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, { -7.0f + offsetX ,0.0f,2.0f + offsetZ });
+    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, { 7.0f + offsetX  ,0.0f,2.0f + offsetZ });
+    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, { 2.0f + offsetZ,0.0f,-7.0f + offsetX });
+    walls_[3]->SetST({ 14.0f,4.0f,1.0f }, { 2.0f + offsetZ,0.0f, 7.0f + offsetX });
+
+    /*Primitive::RegisterEditors(wallPrimitives, "Wall");*/
 }
 
 void WallManager::Update()
@@ -83,12 +99,6 @@ void WallManager::Update()
     areaLights_[1].position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
 
     areaLights_[1].height = plane_->GetTransform().scale.y * 0.5f;
-
-    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, { -7.0f ,0.0f,2.0f });
-    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, { 7.0f  ,0.0f,2.0f});
-
-    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, {2.0f,0.0f,-7.0f });
-    walls_[3]->SetST({ 14.0f,4.0f,1.0f }, {2.0f,0.0f, 7.0f});
 
     for (auto& wall : walls_) {
         wall->Update();

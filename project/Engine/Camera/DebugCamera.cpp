@@ -5,6 +5,7 @@
 #include "Input.h"
 #include "WinApp.h"
 #include <algorithm>
+#include <cmath>
 
 namespace {
 Matrix4x4 MakeCameraViewMatrix(const Transform& transform) {
@@ -18,6 +19,7 @@ Matrix4x4 MakeCameraViewMatrix(const Transform& transform) {
 Vector3 GetRightAxis(const Matrix4x4& rotationMatrix) { return Function::Normalize({rotationMatrix.m[0][0], rotationMatrix.m[0][1], rotationMatrix.m[0][2]}); }
 
 Vector3 GetForwardAxis(const Matrix4x4& rotationMatrix) { return Function::Normalize({rotationMatrix.m[2][0], rotationMatrix.m[2][1], rotationMatrix.m[2][2]}); }
+Vector3 GetUpAxis(const Matrix4x4& rotationMatrix) { return Function::Normalize({rotationMatrix.m[1][0], rotationMatrix.m[1][1], rotationMatrix.m[1][2]}); }
 } // namespace
 
 void DebugCamera::Initialize() {
@@ -48,61 +50,52 @@ void DebugCamera::SetRotation(const Vector3& rotation) {
 }
 
 void DebugCamera::Update() {
-	// 左ドラッグ: 回転 / Shift+左ドラッグ: 平面移動 / Ctrl+左ドラッグ: 向いている方向基準の自由移動 / ホイール: スケールズーム
-	const float rotateSpeed = 0.005f;
-	const float moveSpeed = 0.02f;
-	const float zoomSpeed = 0.01f;
-	constexpr float kMinZoomScale = 0.1f;
-	constexpr float kMaxZoomScale = 4.0f;
-	constexpr float kPitchLimit = 1.54f;
+	// 左ドラッグ: 回転 / Shift+左ドラッグ: ローカル軸移動(XYZ)
+	const float rotateSpeed = 0.004f;
+	const float moveSpeed = 0.03f;
+	const float wheelMoveSpeed = 0.02f;
+	const float kPitchLimit = 1.54f;
 
 	Input* input = Input::GetInstance();
 	const Vector2 mouseMove = input->GetMouseMove();
 	const bool isLeftDrag = input->PushMouseButton(Input::MouseButton::kLeft);
 	const bool isShift = input->PushKey(DIK_LSHIFT) || input->PushKey(DIK_RSHIFT);
 	const bool isCtrl = input->PushKey(DIK_LCONTROL) || input->PushKey(DIK_RCONTROL);
+	matRot_ = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, transform_.rotate, {0.0f, 0.0f, 0.0f});
 
-	float dPitch = 0.0f;
-	float dYaw = 0.0f;
 	if (isLeftDrag && isShift) {
+		// Shift+左ドラッグ: 画面X=右軸、画面Y=上軸で移動。Ctrl併用時は前後移動に切り替え。
 		const Vector3 right = GetRightAxis(matRot_);
-		Vector3 forward = GetForwardAxis(matRot_);
-		forward.y = 0.0f;
-		if (Function::LengthSquared(forward) > 0.0f) {
-			forward = Function::Normalize(forward);
-		}
-		translation_ += right * (mouseMove.x * moveSpeed);
-		translation_ += forward * (-mouseMove.y * moveSpeed);
-	} else if (isLeftDrag && isCtrl) {
-		const Vector3 right = GetRightAxis(matRot_);
+		const Vector3 up = GetUpAxis(matRot_);
 		const Vector3 forward = GetForwardAxis(matRot_);
 		translation_ += right * (mouseMove.x * moveSpeed);
-		translation_ += forward * (-mouseMove.y * moveSpeed);
+		if (isCtrl) {
+			translation_ += forward * (-mouseMove.y * moveSpeed);
+		} else {
+			translation_ += up * (-mouseMove.y * moveSpeed);
+		}
 	} else if (isLeftDrag) {
-		dYaw = mouseMove.x * rotateSpeed;
-		dPitch = mouseMove.y * rotateSpeed;
+		// 左ドラッグ: 視点の向きを変更
+		transform_.rotate.y += mouseMove.x * rotateSpeed;
+		transform_.rotate.x += mouseMove.y * rotateSpeed;
+		transform_.rotate.x = std::clamp(transform_.rotate.x, -kPitchLimit, kPitchLimit);
+		matRot_ = Function::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, transform_.rotate, {0.0f, 0.0f, 0.0f});
 	}
 
+	// ホイール: 前後移動
 	const float wheelDelta = input->GetMouseWheelDelta();
 	if (wheelDelta != 0.0f) {
-		const float nextScale = std::clamp(scale_.x - wheelDelta * zoomSpeed, kMinZoomScale, kMaxZoomScale);
-		scale_ = {nextScale, nextScale, nextScale};
+		const Vector3 forward = GetForwardAxis(matRot_);
+		translation_ += forward * (wheelDelta * wheelMoveSpeed);
 	}
 
-	const float nextPitch = std::clamp(transform_.rotate.x + dPitch, -kPitchLimit, kPitchLimit);
-	dPitch = nextPitch - transform_.rotate.x;
-
-	Matrix4x4 matRotDelta = Function::MakeIdentity4x4();
-	matRotDelta = Function::Multiply(matRotDelta, Function::MakeRotateXMatrix(dPitch));
-	matRotDelta = Function::Multiply(matRotDelta, Function::MakeRotateYMatrix(dYaw));
-	matRot_ = Function::Multiply(matRotDelta, matRot_);
-	transform_.rotate.x = nextPitch;
-	transform_.rotate.y += dYaw;
+	const Vector3 forward = GetForwardAxis(matRot_);
+	pivot_ = translation_ + (forward * pivotForwardOffset_);
 
 	transform_.scale = scale_;
-	transform_.translate = translation_ + pivot_;
+	transform_.translate = translation_;
 	worldMatrix_ = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	viewMatrix_ = MakeCameraViewMatrix(transform_);
-	projectionMatrix_ = Function::MakePerspectiveFovMatrix(fovY_ / transform_.scale.x, aspectRatio_, nearZ_, farZ_);
+	projectionMatrix_ = Function::MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearZ_, farZ_);
 	viewProjectionMatrix_ = Function::Multiply(viewMatrix_, projectionMatrix_);
 }

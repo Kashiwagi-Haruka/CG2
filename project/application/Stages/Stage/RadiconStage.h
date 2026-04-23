@@ -2,6 +2,10 @@
 #include "Stages/BaseStage.h"
 #include <memory>
 #include "GameObject/Radicon/Radicon.h"
+#include "GameObject/Enemy/Enemy.h"
+#include "GameObject/BurningObject/BurningObject.h"
+#include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
+#include "GameObject/TestField/TestField.h"
 class RadiconStage : public BaseStage {
 public:
 	explicit RadiconStage(Player* player);
@@ -24,4 +28,7 @@ private:
 	Yoshida::LightManager* lightManager_ = nullptr;
 
 	std::unique_ptr<Radicon> radicon_;
+	std::unique_ptr<Enemy> enemy_;
+	std::unique_ptr<BurningObject> burningObject_;
+	std::unique_ptr<TestField> testField_;
 };

@@ -12,14 +12,14 @@
 #include "Animation/SkinCluster.h"
 
 
-class Locker : public YoshidaMath::Collider
-{
+class Locker : public YoshidaMath::Collider {
 public:
     Locker();
     void Initialize();
     void Update();
     void Draw();
     static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
+  	void SetEditorRegistrationName(const std::string& name) { editorRegistrationName_ = name; }
     void SetCamera(Camera* camera);
     void CheckCollision();
     bool OnCollisionRay();
@@ -50,6 +50,5 @@ private:
     const float kAnimationBlendDuration_ = 0.5f;
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Idle";
-
+	std::string editorRegistrationName_ = "Locker";
 };
-

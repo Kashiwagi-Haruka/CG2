@@ -102,6 +102,7 @@ void Flashlight::Initialize()
     isSendGetLightMessage_ = false;
     isRayHit_ = false;
     obj_->Initialize();
+    obj_->RegisterEditor("Flashlight");
     transform_.translate = { 4.0f,0.1f,5.0f };
     transform_.rotate = { 0.0f,0.0f,0.0f };
     transform_.scale = { 1.0f,1.0f,1.0f };

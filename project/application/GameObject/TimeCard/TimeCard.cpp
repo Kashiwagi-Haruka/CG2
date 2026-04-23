@@ -17,6 +17,7 @@ TimeCard::TimeCard()
 void TimeCard::Initialize()
 {
     modelObj_->Initialize();
+    modelObj_->RegisterEditor("TimeCard");
     transform_ = {
      .scale = {1.0f,1.0f,1.0f},
      .rotate = {0.0f,Function::kPi,0.0f},

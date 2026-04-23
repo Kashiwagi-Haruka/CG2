@@ -77,6 +77,7 @@ void Box::Update() {
 void Box::Initialize() {
 	isRayHit_ = false;
 	obj_->Initialize();
+	obj_->RegisterEditor("Box");
 	velocity_ = {0.0f};
 	transform_ = obj_->GetTransform();
 	obj_->SetOutlineColor(kRayHitOutlineColor);

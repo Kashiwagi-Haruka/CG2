@@ -89,6 +89,8 @@ void Chair::Initialize() {
 	obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
 
+void Chair::RegisterEditor(const std::string& registrationName) { obj_->RegisterEditor(registrationName); }
+
 void Chair::Draw() {
 	if (isRayHit_) {
 		Object3dCommon::GetInstance()->DrawCommon();

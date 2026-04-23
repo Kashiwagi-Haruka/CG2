@@ -83,7 +83,7 @@ void Locker::Initialize()
 {
     isRayHit_ = false;
     obj_->Initialize();
-
+	obj_->RegisterEditor(editorRegistrationName_);
     desiredAnimationName = "Idle";
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/Locker", "Locker");

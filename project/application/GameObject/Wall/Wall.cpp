@@ -48,6 +48,8 @@ void Wall::Initialize()
     primitive_->Initialize(Primitive::Box, "Resources/TD3_3102/2d/wall.png");
 }
 
+void Wall::RegisterEditor(const std::string& registrationName) { primitive_->RegisterEditor(registrationName); }
+
 void Wall::Draw()
 {
     primitive_->Draw();

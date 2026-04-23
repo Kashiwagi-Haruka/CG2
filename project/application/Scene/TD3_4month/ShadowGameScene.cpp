@@ -11,6 +11,7 @@
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
 #include"GameSave/GameSave.h"
+#include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 
 ShadowGameScene::ShadowGameScene() {
 	// BGMの管理
@@ -73,6 +74,9 @@ ShadowGameScene::~ShadowGameScene()
 
 void ShadowGameScene::Initialize()
 {
+	Hierarchy* hierarchy = Hierarchy::GetInstance();
+	hierarchy->BeginRegisterFile("ShadowGameScene_objectEditors.json");
+
     uiManager_->Initialize();
 
 
@@ -106,18 +110,20 @@ void ShadowGameScene::Initialize()
 
 	lightManager_->Initialize();
 
-
+	// セーブポイント紳士
+	gentleman_->Initialize();
+	// エレベータールーム
+	elevatorRoomManager_->Initialize();
+	// エレベーター
+	elevator_->Initialize();
+	hierarchy->LoadObjectEditorsFromJsonIfExists("ShadowGameScene_objectEditors.json");
+	hierarchy->EndRegisterFile();
 	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
 	stageManager_->SetLightManager(lightManager_.get());
 	stageManager_->InitializeStage();
 
 
-    // エレベーター
-    elevator_->Initialize();
-    //セーブポイント紳士
-    gentleman_->Initialize();
-    //エレベータールーム
-    elevatorRoomManager_->Initialize();
+
 
     //カーソルを画面中央に設定する
     uiManager_->CursorHideAndStop();

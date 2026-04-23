@@ -18,6 +18,7 @@ TimeCardWatch::TimeCardWatch()
 void TimeCardWatch::Initialize()
 {
     modelObj_->Initialize();
+    modelObj_->RegisterEditor("TimeCardWatch");
     transform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.04f,0.0f} };
 }
 

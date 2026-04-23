@@ -21,8 +21,9 @@ class DebugCamera {
 	float nearZ_ = 0.1f;
 	float farZ_ = 10000.0f;
 
-	// Pivot 操作系（従来挙動を維持）
+	// Pivot 操作系
 	Vector3 pivot_ = {0.0f, 0.0f, 0.0f};
+	float pivotForwardOffset_ = 15.0f;
 	Matrix4x4 matRot_{};
 	Vector3 scale_ = {1.0f, 1.0f, 1.0f};
 	Vector3 translation_ = {50.0f, 50.0f, -30.0f};
@@ -30,7 +31,7 @@ class DebugCamera {
 public:
 	// 画面サイズに応じた投影設定と内部状態を初期化
 	void Initialize();
-	// マウス入力に応じて回転・パン・ズームを更新
+	// マウス入力に応じて回転・移動を更新
 	void Update();
 
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
@@ -43,9 +44,11 @@ public:
 	void SetTransform(const Transform& transform);
 	// 回転のみ差し替え、内部回転行列を再構築
 	void SetRotation(const Vector3& rotation);
-	// 注視点（Pivot）を明示的に設定
+	// Pivot（注視点）を明示的に設定
 	void SetPivot(const Vector3& pivot) { pivot_ = pivot; }
-	// Pivot空間でのカメラオフセットを設定
+	// Pivot前方オフセット距離を設定
+	void SetPivotForwardOffset(float offset) { pivotForwardOffset_ = offset; }
+	// デバッグカメラのワールド座標を設定
 	void SetTranslation(const Vector3& translation) {
 		translation_ = translation;
 		transform_.translate = translation;

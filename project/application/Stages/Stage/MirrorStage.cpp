@@ -20,6 +20,7 @@
 #include "GameObject/Wall/WallManager2.h"
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
+#include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include <utility>
 
 MirrorStage::MirrorStage(Player* player) : player_(player) {
@@ -49,6 +50,8 @@ MirrorStage::MirrorStage(Player* player) : player_(player) {
 }
 
 void MirrorStage::Initialize() {
+	Hierarchy* hierarchy = Hierarchy::GetInstance();
+	hierarchy->BeginRegisterFile("MirrorStage_objectEditors.json");
 
 	testField_->Initialize();
 	whiteBoardManager_->Initialize();
@@ -73,7 +76,8 @@ void MirrorStage::Initialize() {
 	timeCardRack_->Initialize();
 	boxManager_->Initialize();
 	InitializeLights();
-
+	hierarchy->LoadObjectEditorsFromJsonIfExists("MirrorStage_objectEditors.json");
+	hierarchy->EndRegisterFile();
 
 }
 void MirrorStage::SetPlayer(Player* player) {

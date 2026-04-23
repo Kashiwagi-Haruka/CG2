@@ -1,13 +1,16 @@
 #include "RadiconStage.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include "GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
+#include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 
 RadiconStage::RadiconStage(Player* player) : player_(player) {
 	radicon_ = std::make_unique<Radicon>();
 }
 
 void RadiconStage::Initialize() { 
+	Hierarchy::GetInstance()->BeginRegisterFile("RadiconStage_objectEditors.json");
 	radicon_->Initialize();
+	Hierarchy::GetInstance()->EndRegisterFile();
 }
 
 void RadiconStage::SetPlayer(Player* player) { player_ = player; }
@@ -17,9 +20,11 @@ void RadiconStage::SetCollisionManager([[maybe_unused]] CollisionManager* collis
 
 }
 
-void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unused]] const Vector3& lightDirection, [[maybe_unused]] Player* player) {}
+void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unused]] const Vector3& lightDirection, [[maybe_unused]] Player* player) { 
+	radicon_->Update(); 
+}
 
-void RadiconStage::UpdatePortal() {}
+void RadiconStage::UpdatePortal() {/*記載なし*/}
 
 void RadiconStage::CheckCollision() {}
 

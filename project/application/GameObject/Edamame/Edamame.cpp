@@ -38,6 +38,7 @@ void Edamame::Initialize()
     };
 
     obj_->Initialize();
+    obj_->RegisterEditor("Edamame");
     localAABB_ = { .min = { -0.25f,-0.25f,-0.25f},.max = {0.25f,0.25f,0.25f} };
 
     //枝豆知識

@@ -58,6 +58,7 @@ Elevator::~Elevator()
 void Elevator::Initialize() {
 
     modelObj_->Initialize();
+	modelObj_->RegisterEditor("EV");
 
     elevatorTransform_ = {
         .scale = {1.0f, 1.0f, 1.0f },

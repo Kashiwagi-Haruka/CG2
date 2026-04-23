@@ -45,12 +45,30 @@ WallManager2::WallManager2()
 void WallManager2::Initialize()
 {
     room1_->Initialize();
+    room1_->RegisterEditor("room2");
     plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/out.jpg");
+    plane_->RegisterEditor("Wall2WindowPlane");
 
     // 壁の初期化
     for (auto& wall : walls_) {
         wall->Initialize();
     }
+    std::vector<Primitive*> wallPrimitives;
+    wallPrimitives.reserve(walls_.size());
+    for (const auto& wall : walls_) {
+        wallPrimitives.push_back(wall->GetPrimitive());
+    }
+
+    const float offsetX = 0.0f;
+    const float offsetZ = 0.0f;
+    Vector3 translate = { 7.0f,0.0f,1.0f };
+    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ 7.0f + offsetX,2.0f,0.0f + offsetZ });
+    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ -7.0f + offsetX,2.0f,0.0f + offsetZ });
+    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate + Vector3{ 0.0f + offsetX,2.0f,7.0f + offsetZ });
+    walls_[3]->SetST({ 7.0f, 4.0f,1.0f, }, translate + Vector3{ -3.75f + offsetX,2.0f,-6.5f + offsetZ });
+    walls_[4]->SetST({ 7.0f, 4.0f,1.0f, }, translate + Vector3{ 3.75f + offsetX,2.0f ,-6.5f + offsetZ });
+
+    /*Primitive::RegisterEditors(wallPrimitives, "Wall2:");*/
 }
 void WallManager2::Update()
 {
@@ -65,16 +83,6 @@ void WallManager2::Update()
     areaLights_[1].normal = normal;
     areaLights_[1].position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
     areaLights_[1].height = plane_->GetTransform().scale.y*0.5f;
-    Vector3 translate = {7.0f,0.0f,0.0f};
-
-    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate+Vector3{ 7.0f,2.0f,0.0f });
-    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate+Vector3{ -7.0f,2.0f,0.0f });
-    //裏側                  
-    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate+Vector3{ 0.0f,2.0f,7.0f });
-                                  
-    walls_[3]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ -3.75f,2.0f,-6.5f });
-    walls_[4]->SetST({7.0f, 4.0f,1.0f,}, translate+Vector3{ 3.75f,2.0f ,-6.5f });
-   
     for (auto& wall : walls_) {
         wall->Update();
     }
