@@ -279,6 +279,17 @@ void ShadowGameScene::UpdateCamera()
 
 void ShadowGameScene::UpdateSceneTransition() {
 
+
+	if (Key::IsGetKey()) {
+
+
+		if (progressSaveData_.currentStageName == "TutorialStage") {
+				isTransitionIn_ = true;
+				nextSceneName_ = "Result";
+			
+		}
+	}
+
     if (isTransitionIn_ || isTransitionOut_) {
         transition_->Update();
         if (transition_->IsEnd() && isTransitionIn_) {
@@ -374,18 +385,20 @@ void ShadowGameScene::StageTransition()
 		if (!progressSaveData_.isGameClear) {
 			progressSaveData_.isGameClear = true;
 		}
+
+	
 	}
+
+
 
 	//ステージの切り替え
 	if (elevator_->IsSceneTransitionStart()&& progressSaveData_.isGameClear) {
 
 		if (progressSaveData_.currentStageName == "MirrorStage") {
 			ChangeStage("TutorialStage");
-		} else if (progressSaveData_.currentStageName == "TutorialStage") {
-			ChangeStage("LightStage");
-		}
-
-		progressSaveData_.isGameClear = false;
+			progressSaveData_.isGameClear = false;
+		} 
+	
 	}
 }
 #pragma endregion
