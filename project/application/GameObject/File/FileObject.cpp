@@ -1,7 +1,7 @@
 #include "FileObject.h"
 #include"Model/ModelManager.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
-#include "Object3d/Object3dCommon.h"
+
 
 FileObject::FileObject()
 {
@@ -11,10 +11,6 @@ FileObject::FileObject()
     SetAABB({ .min = {-0.5f,0.0f,-0.5f},.max = {0.5f,0.3f,0.5f} });
     SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
-
-    transform_.scale = { 1.0f,1.0f,1.0f };
-    transform_.rotate = { 0.0f,0.0f,0.0f };
-    transform_.translate = { 0.0f,0.2f,0.0f };
 }
 
 void FileObject::OnCollision(Collider* collider)
@@ -37,19 +33,18 @@ void FileObject::SetCamera(Camera* camera)
 
 void FileObject::Update()
 {
-
-    obj_->SetTransform(transform_);
     obj_->Update();
 }
 
 void FileObject::Initialize()
 {
     obj_->Initialize();
+    obj_->RegisterEditor(editorRegistrationName_);
 }
 
 void FileObject::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommon();
+
     obj_->Draw();
 
 }

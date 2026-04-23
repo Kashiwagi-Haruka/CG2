@@ -32,8 +32,6 @@ void Key::Initialize()
     obj_->Initialize();
     obj_->RegisterEditor("Key");
    
-    worldTransform_ = obj_->GetTransform();
-    
     isRayHit_ = false;
     isLockerHit_ = false;
 
@@ -56,26 +54,11 @@ void Key::Update()
     obj_->SetEnableLighting(false);
     CheckCollision();
 
-
-    //if (isGetKey_|| isLockerHit_|| isChairHit_) {
-    //    velocity_.y = 0.0f;
-    //} else {
-    //    //重力処理
-    //    const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-    //    velocity_.y -= YoshidaMath::kGravity * deltaTime;
-    //    worldTransform_.translate += velocity_ * deltaTime;
-    //}
-
-    //y座標を固定する
-    worldTransform_.translate.y = std::clamp(worldTransform_.translate.y, 0.0f, 2.4f);
-
-    obj_->SetTransform(worldTransform_);
     obj_->Update();
 
 #ifdef USE_IMGUI
     ImGui::Begin("Key");
     ImGui::DragFloat3("vel", &velocity_.x);
-    ImGui::DragFloat3("translate", &worldTransform_.translate.x);
     ImGui::Checkbox("isGetKey", &isGetKey_);
     ImGui::End();
 #endif
@@ -132,7 +115,7 @@ void Key::CheckCollision() {
 
 bool Key::OnCollisionRay()
 {
-   return playerCamera_->OnCollisionRay(GetAABB(), worldTransform_.translate);
+   return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate());
 
 }
 
@@ -164,5 +147,5 @@ void Key::OnCollision(Collider* collider)
 
 Vector3 Key::GetWorldPosition() const
 {
-    return  worldTransform_.translate;
+    return obj_->GetTranslate();
 }

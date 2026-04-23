@@ -19,9 +19,9 @@ public:
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
-    void SetTransform(const Transform& transform) { transform_ = transform; }
+    void SetEditorRegistrationName(const std::string& name) { editorRegistrationName_ = name; }
 private:
     std::unique_ptr<Object3d>obj_ = nullptr;
-    Transform transform_;
+    std::string editorRegistrationName_ = "FileObject";
 };
 
