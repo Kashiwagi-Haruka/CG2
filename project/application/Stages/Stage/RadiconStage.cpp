@@ -26,7 +26,7 @@ void RadiconStage::Initialize() {
 
 	for (auto& primitive : roomPrimitives_) {
 		primitive = std::make_unique<Primitive>();
-		primitive->Initialize(Primitive::Box, "Resources/TD3_3102/2d/white.png");
+		primitive->Initialize(Primitive::Box, "Resources/TD3_3102/2d/white2x2.png");
 		primitive->SetEnableLighting(true);
 		primitive->SetColor({0.9f, 0.9f, 0.95f, 1.0f});
 	}

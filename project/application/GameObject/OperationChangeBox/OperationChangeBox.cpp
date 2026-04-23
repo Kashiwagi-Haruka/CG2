@@ -11,7 +11,7 @@ constexpr Vector4 kDefaultColor = {0.75f, 0.9f, 1.0f, 1.0f};
 
 void OperationChangeBox::Initialize() {
     box_ = std::make_unique<Primitive>();
-    box_->Initialize(Primitive::Box, "Resources/TD3_3102/2d/white.png");
+    box_->Initialize(Primitive::Box, "Resources/TD3_3102/2d/white2x2.png");
     transform_ = {
         .scale = {0.9f, 0.75f, 0.9f},
         .rotate = {0.0f, Function::kPi, 0.0f},
