@@ -14,6 +14,7 @@
 #include "Text/TItleMenu/TitleMenuUI.h"
 #include <memory>
 #include"Text/TitleTimeText/TitleTimeText.h"
+#include"GameObject/LightManager/LightManager.h"
 
 class GameBase;
 
@@ -33,8 +34,6 @@ private:
 	bool isGameContinuedOpen_ = false;
 
 	Matrix4x4 identityMat_;
-	// DirectionalLight
-	DirectionalCommonLight directionalLight_{};
 	// カメラ
 	std::unique_ptr<Camera> camera_ = nullptr;
 	Transform cameraTransform_;
@@ -42,7 +41,7 @@ private:
 	Vector3 cameraRandomOffset_ = {0.0f};
 	float cameraMoveTimer_ = 0.0f;
 	std::unique_ptr<RandomClass> random_ = nullptr;
-
+	std::unique_ptr<Yoshida::LightManager>lightManager_ = nullptr;
 private:
 	void CameraUpdate();
 	void TransitionStart();
