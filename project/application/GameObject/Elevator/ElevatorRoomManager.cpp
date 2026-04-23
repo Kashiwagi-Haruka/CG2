@@ -15,11 +15,11 @@ ElevatorRoomManager::ElevatorRoomManager()
 
     walls_.clear();
 
-    //for (int i = 0; i < kMaxWall; ++i) {
-    //    std::unique_ptr<Wall> wall = std::make_unique<Wall>();
-    //    wall->SetParentMatrix(&roomMat_);
-    //    walls_.push_back(std::move(wall));
-    //}
+    for (int i = 0; i < kMaxWall; ++i) {
+        std::unique_ptr<Wall> wall = std::make_unique<Wall>();
+        wall->SetParentMatrix(&roomMat_);
+        walls_.push_back(std::move(wall));
+    }
 
     areaLight_.color = { 1.0f,1.0f,0.75f,1.0f };
     areaLight_.intensity = 1.0f;
@@ -47,10 +47,10 @@ void ElevatorRoomManager::Initialize()
     room_->Initialize();
 	room_->RegisterEditor("room");
 
-    //// 壁の初期化
-    //for (auto& wall : walls_) {
-    //    wall->Initialize();
-    //}
+    // 壁の初期化
+    for (auto& wall : walls_) {
+        wall->Initialize();
+    }
     //std::vector<Primitive*> wallPrimitives;
     //wallPrimitives.reserve(walls_.size());
     //for (const auto& wall : walls_) {
@@ -67,18 +67,18 @@ void ElevatorRoomManager::Update()
     //translate.y += 4.0f;
     areaLight_.position = translate;
 
-    //walls_[0]->SetST({ 1.0f,4.0f,6.0f }, { -15.0f,2.0f,0.0f });
-    //walls_[1]->SetST({ 1.0f,4.0f,6.0f }, { 7.0f,2.0f,0.0f });
+    walls_[0]->SetST({ 1.0f,4.0f,6.0f }, { -7.0f,2.0f,0.0f });
+    walls_[1]->SetST({ 1.0f,4.0f,6.0f }, { 7.0f,2.0f,0.0f });
 
-    //walls_[2]->SetST({ 7.0f, 4.0f,1.0f, }, { -3.75f,2.0f,3.0f });
-    //walls_[3]->SetST({ 7.0f, 4.0f,1.0f, }, { 3.75f,2.0f ,3.0f });
+    walls_[2]->SetST({ 7.0f, 4.0f,1.0f, }, { -3.75f,2.0f,3.0f });
+    walls_[3]->SetST({ 7.0f, 4.0f,1.0f, }, { 3.75f,2.0f ,3.0f });
 
-    //walls_[4]->SetST({ 7.0f, 4.0f,1.0f, },{ -3.75f,2.0f, -2.0f });
-    //walls_[5]->SetST({ 7.0f, 4.0f,1.0f },{ 3.75f,2.0f, -2.0f });
+    walls_[4]->SetST({ 7.0f, 4.0f,1.0f, },{ -4.25f,2.0f, -2.0f });
+    walls_[5]->SetST({ 7.0f, 4.0f,1.0f },{ 4.25f,2.0f, -2.0f });
 
-    //for (auto& wall : walls_) {
-    //    wall->Update();
-    //}
+    for (auto& wall : walls_) {
+        wall->Update();
+    }
 
 }
 
@@ -97,7 +97,7 @@ void ElevatorRoomManager::SetCamera(Camera* camera)
     room_->SetCamera(camera);
     room_->UpdateCameraMatrices();
 
-    //for (auto& wall : walls_) { 
-    //    wall->SetCamera(camera);
-    //}
+  /*  for (auto& wall : walls_) { 
+        wall->SetCamera(camera);
+    }*/
 }

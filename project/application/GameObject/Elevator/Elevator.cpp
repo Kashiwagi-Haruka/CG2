@@ -113,9 +113,9 @@ void Elevator::SetCamera(Camera* camera) {
 
     poster_.SetCamera(camera);
 
-    for (auto& wall : walls_) {
-        wall->SetCamera(camera);
-    }
+    //for (auto& wall : walls_) {
+    //    wall->SetCamera(camera);
+    //}
 }
 
 void Elevator::Update() {
@@ -157,9 +157,9 @@ void Elevator::Draw() {
         sys->Draw();
     }
 
-    for (auto& wall : walls_) {
-        wall->Draw();
-    }
+    //for (auto& wall : walls_) {
+    //    wall->Draw();
+    //}
 
     poster_.Draw();
 }

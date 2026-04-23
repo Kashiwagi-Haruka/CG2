@@ -15,6 +15,7 @@
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include"GameObject/DocumentManager/DocumentManager.h"
 #include"GameObject/File/FileManager.h"
+#include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 
 void TutorialStage::InitializeLights()
 {
@@ -80,6 +81,10 @@ TutorialStage::TutorialStage(Player* player)
 void TutorialStage::Initialize()
 {
 
+    Hierarchy* hierarchy = Hierarchy::GetInstance();
+    hierarchy->BeginRegisterFile("TutorialStage_objectEditors.json");
+
+
     InitializeLights();
 
     testField_->Initialize();
@@ -94,6 +99,9 @@ void TutorialStage::Initialize()
 
     documentManager_->Initialize();
     fileManager_->Initialize();
+
+    hierarchy->LoadObjectEditorsFromJsonIfExists("TutorialStage_objectEditors.json");
+    hierarchy->EndRegisterFile();
 }
 
 void TutorialStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
