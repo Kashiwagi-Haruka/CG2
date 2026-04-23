@@ -27,20 +27,13 @@ Key::Key()
 
 void Key::Initialize()
 {
-
-    worldTransform_ = {
-        .scale{2.0f, 2.0f, 2.0f},
-        .rotate{0.0f, 0.0f, 0.0f},
-        .translate{-1.0f, 2.0f, -6.0f}
-    };
-
-
-    //worldTransform_ = obj_->GetTransform();
-
-
+    
     velocity_ = { 0.0f };
     obj_->Initialize();
     obj_->RegisterEditor("Key");
+   
+    worldTransform_ = obj_->GetTransform();
+    
     isRayHit_ = false;
     isLockerHit_ = false;
 
