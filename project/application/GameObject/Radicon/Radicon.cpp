@@ -15,9 +15,14 @@ void Radicon::Initialize() {
 	};
 	speed_ = 0.06f;
 	obj_->SetTransform(transform_);
+	obj_->SetCamera(camera_);
 }
 void Radicon::SetCamera(Camera* camera) {
-	obj_->SetCamera(camera); }
+	camera_ = camera;
+	if (obj_) {
+		obj_->SetCamera(camera);
+	}
+}
 void Radicon::Update(bool isOperationMode) {
 	velocity_ = {0.0f, 0.0f, 0.0f};
 	if (isOperationMode) {
