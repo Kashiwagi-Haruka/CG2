@@ -59,9 +59,9 @@ void WallManager2::Initialize()
         wallPrimitives.push_back(wall->GetPrimitive());
     }
 
-    const float offsetX = 100.0f;
-    const float offsetZ = 7.0f;
-    Vector3 translate = { 7.0f,0.0f,0.0f };
+    const float offsetX = 0.0f;
+    const float offsetZ = 0.0f;
+    Vector3 translate = { 7.0f,0.0f,1.0f };
     walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ 7.0f + offsetX,2.0f,0.0f + offsetZ });
     walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ -7.0f + offsetX,2.0f,0.0f + offsetZ });
     walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate + Vector3{ 0.0f + offsetX,2.0f,7.0f + offsetZ });

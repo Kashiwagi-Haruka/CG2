@@ -73,8 +73,8 @@ void WallManager::Initialize()
         wallPrimitives.push_back(wall->GetPrimitive());
     }
 
-    const float offsetX = 100.0f;
-    const float offsetZ = 100.0f;
+    const float offsetX = 0.0f;
+    const float offsetZ = 0.0f;
     walls_[0]->SetST({ 2.0f,4.0f,14.0f }, { -7.0f + offsetX ,0.0f,2.0f + offsetZ });
     walls_[1]->SetST({ 2.0f,4.0f,14.0f }, { 7.0f + offsetX  ,0.0f,2.0f + offsetZ });
     walls_[2]->SetST({ 14.0f,4.0f,1.0f }, { 2.0f + offsetZ,0.0f,-7.0f + offsetX });
