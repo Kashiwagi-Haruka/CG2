@@ -6,6 +6,10 @@
 #include "GameObject/BurningObject/BurningObject.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include "GameObject/TestField/TestField.h"
+#include "GameObject/OperationChangeBox/OperationChangeBox.h"
+#include <array>
+
+class Primitive;
 class RadiconStage : public BaseStage {
 public:
 	explicit RadiconStage(Player* player);
@@ -31,4 +35,10 @@ private:
 	std::unique_ptr<Enemy> enemy_;
 	std::unique_ptr<BurningObject> burningObject_;
 	std::unique_ptr<TestField> testField_;
+	std::unique_ptr<OperationChangeBox> operationChangeBox_;
+	std::array<std::unique_ptr<Primitive>, 5> roomPrimitives_{};
+
+	PlayerCamera* playerCamera_ = nullptr;
+	bool isOperationMode_ = false;
+	Vector3 lockedPlayerPosition_{};
 };

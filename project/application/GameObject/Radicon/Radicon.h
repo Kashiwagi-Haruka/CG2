@@ -13,8 +13,10 @@ class Radicon {
 
 	void Initialize();
 	void SetCamera(Camera* camera);
-	void Update();
+	void Update(bool isOperationMode);
 	void Draw();
+	void SetTransform(const Transform& transform) { transform_ = transform; }
+	const Transform& GetTransform() const { return transform_; }
 	
 
 };
