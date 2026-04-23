@@ -2,8 +2,8 @@
   "camera": {
     "transform": {
       "rotate": {
-        "x": 0.15167763829231262,
-        "y": 10.055197715759277,
+        "x": 0.7742205858230591,
+        "y": 8.654606819152832,
         "z": 0.0
       },
       "scale": {
@@ -12,9 +12,9 @@
         "z": 1.0
       },
       "translate": {
-        "x": 13.210075378417969,
-        "y": 1.6108787059783936,
-        "z": -9.32902717590332
+        "x": 12.153892517089844,
+        "y": 1.6159073114395142,
+        "z": -9.875096321105957
       }
     }
   },
@@ -22,7 +22,7 @@
     "transform": {
       "rotate": {
         "x": 0.0,
-        "y": 10.055197715759277,
+        "y": 8.654606819152832,
         "z": 0.0
       },
       "scale": {
@@ -31,19 +31,19 @@
         "z": 1.0
       },
       "translate": {
-        "x": 13.258830070495605,
+        "x": 12.11080265045166,
         "y": -0.009999999776482582,
-        "z": -9.259012222290039
+        "z": -9.826021194458008
       }
     }
   },
-    "progress": {
-        "currentStageName": "MirrorStage",
-        "isGameClear": true,
-        "isKeyHave": true,
-        "isLightHave": true
-    },
+  "progress": {
+    "currentStageName": "MirrorStage",
+    "isGameClear": true,
+    "isKeyHave": false,
+    "isLightHave": false
+  },
   "saveDateTime": {
-    "saveDateTime": "2026/04/16\n16:34:13"
+    "saveDateTime": "2026/04/23\n17:14:44"
   }
 }
