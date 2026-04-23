@@ -25,6 +25,9 @@ public:
     void SetPlayer(Player* player) { player_ = player; }
     void SetHeadTransform();
     void SetTransform();
+    void EnableFixedTransform(const Transform& transform);
+    void DisableFixedTransform();
+    bool IsFixedTransformEnabled() const { return isFixedTransformEnabled_; }
 
 private:
     //回転
@@ -41,5 +44,6 @@ private:
     //カメラの設定
     std::unique_ptr<Camera> camera_ = nullptr;
     Player* player_ = nullptr;
+    bool isFixedTransformEnabled_ = false;
+    Transform fixedTransform_{};
 };
-

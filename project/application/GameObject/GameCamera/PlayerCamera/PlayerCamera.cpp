@@ -22,8 +22,8 @@ PlayerCamera::PlayerCamera() {
 }
 
 void PlayerCamera::Update() {
-    SetRay();
     SetHeadTransform();
+    SetRay();
     camera_->Update();
 }
 
@@ -77,6 +77,11 @@ bool PlayerCamera::OnCollisionRay(const AABB& localAABB, const Vector3& translat
 
 void PlayerCamera::SetHeadTransform()
 {
+    if (isFixedTransformEnabled_) {
+        param_.transform = fixedTransform_;
+        camera_->SetTransform(param_.transform);
+        return;
+    }
 
     Rotate();
     param_.transform.scale = { 1.0f,1.0f,1.0f };
@@ -108,9 +113,17 @@ void PlayerCamera::SetTransform()
     camera_->SetTransform(param_.transform);
 }
 
+void PlayerCamera::EnableFixedTransform(const Transform& transform) {
+    isFixedTransformEnabled_ = true;
+    fixedTransform_ = transform;
+    param_.transform = fixedTransform_;
+    camera_->SetTransform(param_.transform);
+}
+
+void PlayerCamera::DisableFixedTransform() { isFixedTransformEnabled_ = false; }
+
 Vector3 PlayerCamera::GetForward()
 {
     return  YoshidaMath::GetForward(camera_->GetWorldMatrix());
 }
-
 

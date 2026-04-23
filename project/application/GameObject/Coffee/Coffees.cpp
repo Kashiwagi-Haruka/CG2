@@ -99,8 +99,14 @@ namespace {
 } // namespace
 
 Coffees::Coffees() { instancedObject_ = std::make_unique<InstancedObject3d>(); }
-Coffees::~Coffees(){
-
+Coffees::~Coffees() {
+	instancedObject_.reset();
+	instances_.clear();
+	activeInstanceCount_ = 0;
+	renderedInstanceCapacity_ = 0;
+	spawnTimer_ = 0.0f;
+	nextSpawnInterval_ = 0.0f;
+	isSpilling_ = false;
 }
 void Coffees::Initialize() {
     ModelManager::GetInstance()->LoadModel(kCoffeesModelDirectory, kCoffeesModelName);
