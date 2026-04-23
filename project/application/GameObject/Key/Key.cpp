@@ -31,8 +31,13 @@ void Key::Initialize()
     worldTransform_ = {
         .scale{2.0f, 2.0f, 2.0f},
         .rotate{0.0f, 0.0f, 0.0f},
-        .translate{-1.0f, 2.0f, -6.5f}
+        .translate{-1.0f, 2.0f, -6.0f}
     };
+
+
+    //worldTransform_ = obj_->GetTransform();
+
+
     velocity_ = { 0.0f };
     obj_->Initialize();
     obj_->RegisterEditor("Key");
@@ -57,6 +62,7 @@ void Key::Update()
     isSendGetKeyMessage_ = false;
     obj_->SetEnableLighting(false);
     CheckCollision();
+
 
     //if (isGetKey_|| isLockerHit_|| isChairHit_) {
     //    velocity_.y = 0.0f;

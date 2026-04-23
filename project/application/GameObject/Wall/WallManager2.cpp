@@ -61,12 +61,12 @@ void WallManager2::Initialize()
 
     const float offsetX = 0.0f;
     const float offsetZ = 0.0f;
-    Vector3 translate = { 7.0f,0.0f,1.0f };
-    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ 7.0f + offsetX,2.0f,0.0f + offsetZ });
-    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ -7.0f + offsetX,2.0f,0.0f + offsetZ });
-    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate + Vector3{ 0.0f + offsetX,2.0f,7.0f + offsetZ });
-    walls_[3]->SetST({ 7.0f, 4.0f,1.0f, }, translate + Vector3{ -3.75f + offsetX,2.0f,-6.5f + offsetZ });
-    walls_[4]->SetST({ 7.0f, 4.0f,1.0f, }, translate + Vector3{ 3.75f + offsetX,2.0f ,-6.5f + offsetZ });
+    Vector3 translate = { 7.0f,0.0f,0.0f };
+    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ 7.0f + offsetX,0.0f,0.0f + offsetZ });
+    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ -7.0f + offsetX,0.0f,0.0f + offsetZ });
+    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate + Vector3{ 0.0f + offsetX,0.0f,7.0f + offsetZ });
+    walls_[3]->SetST({ 7.0f, 4.0f,1.0f, }, translate + Vector3{ -3.75f + offsetX,0.0f,-6.5f + offsetZ });
+    walls_[4]->SetST({ 7.0f, 4.0f,1.0f, }, translate + Vector3{ 3.75f + offsetX,0.0f ,-6.5f + offsetZ });
 
     /*Primitive::RegisterEditors(wallPrimitives, "Wall2:");*/
 }
