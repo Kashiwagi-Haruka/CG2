@@ -35,15 +35,26 @@ void TutorialStage::InitializeLights()
     pointLights_[1].intensity = 1.0f;
     pointLights_[1].radius = 10.0f;
     pointLights_[1].decay = 1.0f;
-    lightManager_->SetPointLight(pointLights_[0], 2);
-    lightManager_->SetPointLight(pointLights_[1], 3);
+    lightManager_->SetPointLight(pointLights_[0], 0);
+    lightManager_->SetPointLight(pointLights_[1], 1);
 
     lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 4);
 
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 1);
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 2);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 3);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 4);
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 0);
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 2);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 3);
+
+}
+
+void TutorialStage::UpdateLights()
+{
+
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 0);
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 2);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 3);
+
 
 }
 
@@ -68,6 +79,9 @@ TutorialStage::TutorialStage(Player* player)
 
 void TutorialStage::Initialize()
 {
+
+    InitializeLights();
+
     testField_->Initialize();
     whiteBoardManager_->Initialize();
     portalManager_->Initialize();
@@ -78,7 +92,6 @@ void TutorialStage::Initialize()
     timeCard_->Initialize();
     timeCardRack_->Initialize();
 
-    InitializeLights();
     documentManager_->Initialize();
     fileManager_->Initialize();
 }
@@ -107,6 +120,9 @@ void TutorialStage::UpdateGameObject(Camera* camera, const Vector3& lightDirecti
     timeCardRack_->Update();
     documentManager_->Update(camera, lightDirection);
     fileManager_->Update();
+
+    UpdateLights();
+
 }
 
 void TutorialStage::UpdatePortal()

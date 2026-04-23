@@ -10,6 +10,8 @@
 #include"DirectXCommon.h"
 #include"GameObject/YoshidaMath/Easing.h"
 #include"GameBase.h"
+
+
 void TitleScene::CameraUpdate()
 {
    const float deltaTime =  GameBase::GetInstance()->GetDeltaTime();
@@ -62,6 +64,8 @@ TitleScene::TitleScene() {
 	timeCardRack_ = std::make_unique<TimeCardRack>();
 	wall_ = std::make_unique<Wall>();
 	identityMat_ = Function::MakeIdentity4x4();
+
+	lightManager_ = std::make_unique<Yoshida::LightManager>();
 }
 
 void TitleScene::Finalize() { }
@@ -94,10 +98,9 @@ void TitleScene::Initialize() {
 	cameraRandomOffset_ = {0.0f};
 	cameraMoveTimer_ = 0.0f;
 
-	// ライト
-	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
-	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
-	directionalLight_.intensity = 1.0f;
+	lightManager_->ClearLights();
+	lightManager_->Initialize();
+
 	// ゲームオブジェクト
 	timeCard_->Initialize();
 	timeCardRack_->Initialize();
@@ -157,7 +160,7 @@ void TitleScene::Update() {
 
 	CameraUpdate();
 
-	Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+	lightManager_->Update();
 
 	timeCard_->Update();
 	timeCardRack_->Update();

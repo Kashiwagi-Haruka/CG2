@@ -33,6 +33,7 @@ class TutorialStage :
     std::unique_ptr<FileManager>fileManager_ = nullptr;
 private:
     void InitializeLights();
+    void UpdateLights();
 public:
     explicit TutorialStage(Player* player);
     void Initialize() override;
