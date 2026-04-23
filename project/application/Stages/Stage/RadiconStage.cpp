@@ -4,6 +4,7 @@
 #include "GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include "Primitive/Primitive.h"
+#include "GameObject/Player/Player.h"
 #include <cmath>
 
 RadiconStage::RadiconStage(Player* player) : player_(player) {

@@ -10,6 +10,7 @@
 #include <array>
 
 class Primitive;
+class Player;
 class RadiconStage : public BaseStage {
 public:
 	explicit RadiconStage(Player* player);
