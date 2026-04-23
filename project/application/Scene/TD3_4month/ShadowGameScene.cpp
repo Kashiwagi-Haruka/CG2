@@ -281,12 +281,11 @@ void ShadowGameScene::UpdateSceneTransition() {
 
 
 	if (Key::IsGetKey()) {
-
-
-		if (progressSaveData_.currentStageName == "TutorialStage") {
-				isTransitionIn_ = true;
-				nextSceneName_ = "Result";
-			
+		if (progressSaveData_.currentStageName == "TutorialStage" && !isTransitionOut_) {
+			transition_->Initialize(true);
+			isTransitionIn_ = false;
+			isTransitionOut_ = true;
+			nextSceneName_ = "Result";
 		}
 	}
 
