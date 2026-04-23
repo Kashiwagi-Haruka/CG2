@@ -189,9 +189,11 @@ void TutorialStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
     timeCard_->Draw();
     timeCardRack_->Draw();
     door_->Draw();
-    whiteBoardManager_->Draw();
-    portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
     fileManager_->Draw();
+    whiteBoardManager_->Draw();
+
+    portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
+    
 
 }
 void TutorialStage::SetSceneCameraForDraw(Camera* camera) {
