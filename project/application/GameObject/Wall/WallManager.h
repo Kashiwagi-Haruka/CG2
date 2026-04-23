@@ -3,7 +3,6 @@
 #include<vector>
 #include"Object3d/Object3d.h"
 #include"Light/CommonLight/AreaCommonLight.h"
-#include"Light/CommonLight/PointCommonLight.h"
 #include"Primitive/Primitive.h"
 
 #include<array>

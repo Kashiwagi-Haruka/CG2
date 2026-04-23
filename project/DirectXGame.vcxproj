@@ -183,6 +183,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\VendingMac\Drink\Drink.cpp" />
     <ClCompile Include="application\GameObject\Enemy\Enemy.cpp" />
     <ClCompile Include="application\GameObject\BurningObject\BurningObject.cpp" />
+    <ClCompile Include="application\GameObject\DocumentManager\DocumentParticle\DocumentParticle.cpp" />
+    <ClCompile Include="application\GameObject\DocumentManager\Document\Document.cpp" />
+    <ClCompile Include="application\GameObject\DocumentManager\DocumentManager.cpp" />
     <ClCompile Include="Engine\Editor\EditorTool\Asset\EditorAsset.cpp" />
     <ClCompile Include="Engine\Editor\EditorManager\EditorManager.cpp" />
     <ClCompile Include="Engine\Editor\EditorData\Object3d\EditorObject3d.cpp" />
@@ -328,6 +331,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Stages\Stage\RadiconStage.cpp" />
     <ClCompile Include="application\GameObject\Radicon\Radicon.cpp" />
     <ClCompile Include="application\GameObject\OperationChangeBox\OperationChangeBox.cpp" />
+    <ClCompile Include="application\GameObject\File\FileObject.cpp" />
+    <ClCompile Include="application\GameObject\File\FileManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -381,6 +386,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\VendingMac\Drink\Drink.h" />
     <ClInclude Include="application\GameObject\Enemy\Enemy.h" />
     <ClInclude Include="application\GameObject\BurningObject\BurningObject.h" />
+    <ClInclude Include="application\GameObject\DocumentManager\DocumentParticle\DocumentParticle.h" />
+    <ClInclude Include="application\GameObject\DocumentManager\Document\Document.h" />
+    <ClInclude Include="application\GameObject\DocumentManager\DocumentManager.h" />
     <ClInclude Include="Engine\Editor\EditorTool\Asset\EditorAsset.h" />
     <ClInclude Include="Engine\Editor\EditorManager\EditorManager.h" />
     <ClInclude Include="Engine\Editor\EditorData\Object3d\EditorObject3d.h" />
@@ -533,6 +541,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Stages\Stage\RadiconStage.h" />
     <ClInclude Include="application\GameObject\Radicon\Radicon.h" />
     <ClInclude Include="application\GameObject\OperationChangeBox\OperationChangeBox.h" />
+    <ClInclude Include="application\GameObject\File\FileObject.h" />
+    <ClInclude Include="application\GameObject\File\FileManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

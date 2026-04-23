@@ -25,11 +25,12 @@ ShadowGameScene::ShadowGameScene() {
 	auto& gameSave = GameSave::GetInstance();
 
 	if (gameSave.GetInitStart()) {
-		gameSave.InitData();
+		gameSave.LoadFirstStage();
 	} else {
 		// 一旦ここでロード
-		gameSave.Load(gameSave.GetSelectSlotIndex());
+		gameSave.LoadFromIndex(gameSave.GetSelectSlotIndex());
 	}
+
 	progressSaveData_ = gameSave.GetProgressSaveData();
 	// プレイヤーの初期化
 	player_->Initialize();
@@ -41,7 +42,7 @@ ShadowGameScene::ShadowGameScene() {
 	lightManager_ = std::make_unique<Yoshida::LightManager>();
 	
 	stageManager_ = std::make_unique<StageManager>(player_.get());
-	stageManager_->CreateStage(currentStageName_);
+	stageManager_->CreateStage(progressSaveData_.currentStageName);
 	// エレベーター
 	elevator_ = std::make_unique<Elevator>();
 	// セーブポイント紳士
@@ -95,10 +96,10 @@ void ShadowGameScene::Initialize()
 	auto& gameSave = GameSave::GetInstance();
 
 	if (gameSave.GetInitStart()) {
-		gameSave.InitData();
+		gameSave.LoadFirstStage();
 	} else {
 		// 一旦ここでロード
-		gameSave.Load(gameSave.GetSelectSlotIndex());
+		gameSave.LoadFromIndex(gameSave.GetSelectSlotIndex());
 	}
 	progressSaveData_ = gameSave.GetProgressSaveData();
 
@@ -171,9 +172,6 @@ void ShadowGameScene::Update() {
 	// ポータル管理 カメラの更新後に行う
 	stageManager_->UpdatePortal();
 	UpdatePlayerDamage();
-	
-
-
 	// オブジェクトの当たり判定
 	CheckCollision();
 	if (transition_->IsEnd() && isTransitionOut_) {
@@ -210,20 +208,25 @@ void ShadowGameScene::DebugImGui() {
 #ifdef USE_IMGUI
 	ImGui::Begin("shadowGameScene");
 	static constexpr const char* kStageNames[] = {"MirrorStage", "LightStage", "TutorialStage"};
-	int stageIndex = (currentStageName_ == "LightStage") ? 1 : (currentStageName_ == "TutorialStage") ? 2 : 0;
+	int stageIndex = (progressSaveData_.currentStageName == "LightStage") ? 1 : (progressSaveData_.currentStageName == "TutorialStage") ? 2 : 0;
 	if (ImGui::Combo("Stage", &stageIndex, kStageNames, IM_ARRAYSIZE(kStageNames))) {
 		ChangeStage(kStageNames[stageIndex]);
 	}
+
+	ImGui::Checkbox("isGameClear", &progressSaveData_.isGameClear);
+	ImGui::Checkbox("isKeyHave", &progressSaveData_.isKeyHave);
+	ImGui::Checkbox("isLightHave", &progressSaveData_.isLightHave);
+
 	ImGui::End();
 #endif // USE_IMGUI
 }
 
 void ShadowGameScene::ChangeStage(const std::string& stageName) {
-	if (stageName == currentStageName_) {
+	if (stageName == progressSaveData_.currentStageName) {
 		return;
 	}
-	currentStageName_ = stageName;
-	stageManager_->CreateStage(currentStageName_);
+	progressSaveData_.currentStageName = stageName;
+	stageManager_->CreateStage(progressSaveData_.currentStageName);
 	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
 	stageManager_->SetLightManager(lightManager_.get());
     stageManager_->SetPlayer(player_.get());
@@ -248,6 +251,10 @@ void ShadowGameScene::CheckCollision() {
 	for (auto& system : elevator_->GetAutoLockSys()) {
 		collisionManager_->AddCollider(system.get());
 	}
+	for (auto& wall : elevator_->GetWalls()) {
+		collisionManager_->AddCollider(wall.get());
+	}
+
 	stageManager_->SetCollisionManager(collisionManager_.get());
 	stageManager_->CheckCollision();
 }
@@ -276,6 +283,7 @@ void ShadowGameScene::UpdateSceneTransition() {
                 SceneManager::GetInstance()->ChangeScene(nextSceneName_);
             }
         }
+
     }
 }
 
@@ -354,14 +362,23 @@ void ShadowGameScene::UpdateLight() {
 }
 void ShadowGameScene::StageTransition()
 {
-	//ステージの切り替え
-	if (elevator_->IsSceneTransitionStart()) {
+	if (Key::IsGetKey() && Door::GetOpenMassage()) {
+		
+		if (!progressSaveData_.isGameClear) {
+			progressSaveData_.isGameClear = true;
+		}
+	}
 
-		if (currentStageName_ == "MirrorStage") {
+	//ステージの切り替え
+	if (elevator_->IsSceneTransitionStart()&& progressSaveData_.isGameClear) {
+
+		if (progressSaveData_.currentStageName == "MirrorStage") {
 			ChangeStage("TutorialStage");
-		} else if (currentStageName_ == "TutorialStage") {
+		} else if (progressSaveData_.currentStageName == "TutorialStage") {
 			ChangeStage("LightStage");
 		}
+
+		progressSaveData_.isGameClear = false;
 	}
 }
 #pragma endregion

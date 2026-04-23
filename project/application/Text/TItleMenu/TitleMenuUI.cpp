@@ -17,7 +17,7 @@ TitleMenuUI::TitleMenuUI()
     titleDefaultPos_ = { SCREEN_SIZE::HALF_WIDTH,240 };
 
     titleText_.Initialize(fontHandle_);
-    titleText_.SetString(U"p-再打刻");
+    titleText_.SetString(U"パラ-再打刻");
     titleText_.SetPosition(titleDefaultPos_);
     titleText_.SetColor(COLOR::WHITE);
     titleText_.SetAlign(TextAlign::Center);

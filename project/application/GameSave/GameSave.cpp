@@ -55,8 +55,7 @@ namespace {
 } // namespace
 
 GameSave::GameSave() {
-
-    InitData();
+    LoadFirstStage();
 }
 
 void GameSave::CameraSave(const CameraSaveData& saveData) {
@@ -134,16 +133,24 @@ void GameSave::Save(const int slotIndex) {
     }
 }
 
-void GameSave::Load(const int slotIndex) {
+void GameSave::LoadFromIndex(const int slotIndex) {
+    std::string fileName = GetFileName(slotIndex);
+   
     JsonManager* jsonManager = JsonManager::GetInstance();
 
-    std::string fileName = GetFileName(slotIndex);
-
-    if (!jsonManager->LoadJson(fileName)) {
+    if (jsonManager->LoadJson(fileName)) {
+     
+        Load(fileName);
+    } else {
         Reset();
         Save(slotIndex);
         return;
     }
+}
+
+void GameSave::Load(const std::string& fileName)
+{
+    JsonManager* jsonManager = JsonManager::GetInstance();
 
     const nlohmann::json& saveJson = jsonManager->GetData();
 
@@ -187,30 +194,19 @@ void GameSave::Load(const int slotIndex) {
     }
 }
 
-void GameSave::InitData()
+void GameSave::LoadFirstStage()
+{
+    std::string fileName = "gameInitData.json";
+    JsonManager* jsonManager = JsonManager::GetInstance();
 
-{    //一旦最初のステージにしておく
-    progressSaveData_.currentStageName = "FirstStage";
-    progressSaveData_.isGameClear = false;
-    progressSaveData_.isKeyHave = false;
-    progressSaveData_.isLightHave = false;
-
-    // 座標の初期化
-    playerSaveData_.transform = {
-        .scale{1.0f, 1.0f, 1.0f},
-        .rotate{0.0f,Function::kPi, 0.0f},
-        .translate{6.25f, 1.5f, 4.0f}
-    };
-
-    //カメラのセーブデータ
-    cameraSaveData_.transform = {
-        .scale = {1.0f,1.0f,1.0f},
-        .rotate = {0.0f,0.0f,0.0f},
-        .translate = {0.0f,0.0f,0.0f}
-    };
-
-    // セーブデータの保存日時
-    saveDateTime_ = GetCurrentDateTimeString();
+    if (jsonManager->LoadJson(fileName)) {
+        Load(fileName);
+        // セーブデータの保存日時
+        saveDateTime_ = GetCurrentDateTimeString();
+    } else {
+        Reset();
+        return;
+    }
 }
 
 void GameSave::Reset() {

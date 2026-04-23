@@ -7,6 +7,8 @@
 #include "Object3d/Object3d.h"
 #include "Primitive/Primitive.h"
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
+#include"GameObject/Wall/Wall.h"
+
 #include <array>
 #include <memory>
 class Camera;
@@ -14,6 +16,7 @@ class Camera;
 class Elevator {
 public:
 	Elevator();
+	~Elevator();
 	void Initialize();
 	void SetCamera(Camera* camera);
 	void Update();
@@ -21,15 +24,21 @@ public:
 	void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
 	std::array<std::unique_ptr<AutoLockSystem>, 2>& GetAutoLockSys() { return autoLockSystems_; };
 	bool IsSceneTransitionStart() const { return isSceneTranstionStart_; }
+	std::vector<std::unique_ptr<Wall>>& GetWalls() { return walls_; };
 private:
+    // 当たり判定
+    void CheckCollision();
 	// アニメーション
 	void Animation();
-
+	//内側にいる時
+	void Inside();
+	void Open();
+	void Close();
 private:
 	// 新しい状態管理
 	bool isPlayerInside_ = false;
 	float insideTimer_ = 0.0f;
-	const float insideOpenDelay_ = 2.0f; // 中に入って2秒で閉まる
+	const float insideOpenDelay_ = 2.0f; // 中に入って2秒
 
 	Matrix4x4 worldMat_;
 	static PlayerCamera* playerCamera_;
@@ -52,6 +61,8 @@ private:
 
 	// オートロック
 	std::array<std::unique_ptr<AutoLockSystem>, 2> autoLockSystems_;
+
+	std::vector<std::unique_ptr<Wall>>walls_;
 
 	Poster poster_;
 	bool isSceneTranstionStart_ = false;

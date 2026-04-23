@@ -398,6 +398,11 @@
     <ClCompile Include="application\GameObject\Enemy\Enemy.cpp" />
     <ClCompile Include="application\GameObject\BurningObject\BurningObject.cpp" />
     <ClCompile Include="application\GameObject\OperationChangeBox\OperationChangeBox.cpp" />
+    <ClCompile Include="application\GameObject\DocumentManager\DocumentParticle\DocumentParticle.cpp" />
+    <ClCompile Include="application\GameObject\File\FileObject.cpp" />
+    <ClCompile Include="application\GameObject\DocumentManager\Document\Document.cpp" />
+    <ClCompile Include="application\GameObject\DocumentManager\DocumentManager.cpp" />
+    <ClCompile Include="application\GameObject\File\FileManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -788,6 +793,11 @@
     <ClInclude Include="application\GameObject\Enemy\Enemy.h" />
     <ClInclude Include="application\GameObject\BurningObject\BurningObject.h" />
     <ClInclude Include="application\GameObject\OperationChangeBox\OperationChangeBox.h" />
+    <ClInclude Include="application\GameObject\DocumentManager\DocumentParticle\DocumentParticle.h" />
+    <ClInclude Include="application\GameObject\File\FileObject.h" />
+    <ClInclude Include="application\GameObject\DocumentManager\Document\Document.h" />
+    <ClInclude Include="application\GameObject\DocumentManager\DocumentManager.h" />
+    <ClInclude Include="application\GameObject\File\FileManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

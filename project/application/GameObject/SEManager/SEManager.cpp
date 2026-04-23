@@ -25,6 +25,9 @@ void SEManager::Load() {
 	SEs_[CLOCK] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/clock.mp3");
 	SEs_[CAN] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/cans.mp3");
 	SEs_[BOX] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/box.mp3");
+	SEs_[ELEVATOR_OPEN] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/elevatorOpen.mp3");
+	SEs_[ELEVATOR_BELL] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/elevatorBell.mp3");
+	SEs_[PAPER] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/maou_se_sound_paper01.mp3");
 }
 
 void SEManager::Initialize() {

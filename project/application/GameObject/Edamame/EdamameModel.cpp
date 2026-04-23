@@ -2,8 +2,6 @@
 #include"Model/ModelManager.h"
 #include"Function.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
-#include"GameObject/KeyBindConfig.h"
-#include"GameObject/Player/Player.h"
 #include"Object3d/Object3dCommon.h"
 #include"Animation/AnimationManager.h"
 #include "GameBase.h"
@@ -11,8 +9,8 @@
 
 #include<algorithm>
 namespace {
-const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 10.0f;
+    const Vector4 kRayHitOutlineColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+    const float kRayHitOutlineWidth = 10.0f;
 } // namespace
 EdamameModel::EdamameModel()
 {
@@ -22,8 +20,10 @@ EdamameModel::EdamameModel()
     SetAABB({ .min = {-0.1f,-0.1f,-0.1f},.max = {0.1f,0.1f,0.1f} });
     SetCollisionAttribute(kCollisionItem);
     SetCollisionMask(kCollisionPlayer | kCollisionFloor);
-	obj_->SetOutlineColor(kRayHitOutlineColor);
-	obj_->SetOutlineWidth(kRayHitOutlineWidth);
+    obj_->SetOutlineColor(kRayHitOutlineColor);
+    obj_->SetOutlineWidth(kRayHitOutlineWidth);
+
+
 }
 
 
@@ -35,8 +35,8 @@ void EdamameModel::OnCollision(Collider* collider)
             desiredAnimationName = "Die";
         }
 
-        Vector3 vel = {0.0f,speedY_,0.0f};
-        YoshidaMath::ResolveCollision(translate_, vel, GetCollisionInfo());
+        Vector3 vel = { 0.0f,speedY_,0.0f };
+        YoshidaMath::ResolveCollision(transform_.translate, vel, GetCollisionInfo());
     };
 }
 
@@ -109,7 +109,7 @@ void EdamameModel::Update()
         if (!isDrop_) {
             Vector3 rotate = Function::DirectionToRotation(YoshidaMath::GetForward(obj_->GetWorldMatrix()), { 1,0,0 });
             rotate.y += Function::kPi;
-            rotate_ = rotate;
+            transform_.rotate = rotate;
             isDrop_ = true;
         }
     }
@@ -124,7 +124,7 @@ void EdamameModel::Update()
             scaleTimer_ += deltaTime;
             scaleTimer_ = std::clamp(scaleTimer_, 0.0f, 1.0f);
             float scale = YoshidaMath::Easing::EaseInOutBack(1.0f, 10.0f, scaleTimer_);
-            obj_->SetScale({ scale,scale,scale });
+            transform_.scale = { scale,scale,scale };
         }
     }
 
@@ -133,20 +133,24 @@ void EdamameModel::Update()
     if (isDrop_) {
 
         speedY_ -= YoshidaMath::kGravity * deltaTime;
-        translate_.y += speedY_;
+        transform_.translate.y += speedY_;
         //位置制限
-        translate_.y = std::clamp(translate_.y, 0.0f, 2.4f);
+        transform_.translate.y = std::clamp(transform_.translate.y, 0.0f, 2.4f);
 
-        rotate_.x =  YoshidaMath::Easing::Lerp(rotate_.x,0.0f,0.05f);
-        rotate_.z = YoshidaMath::Easing::Lerp(rotate_.z, 0.0f, 0.05f);
-        obj_->SetTranslate(translate_);
-        obj_->SetRotate(rotate_);
+        transform_.rotate.x = YoshidaMath::Easing::Lerp(transform_.rotate.x, 0.0f, 0.05f);
+        transform_.rotate.z = YoshidaMath::Easing::Lerp(transform_.rotate.z, 0.0f, 0.05f);
+        obj_->SetTransform(transform_);
         obj_->Update();
     } else {
-        obj_->SetTranslate(translate_);
-        obj_->SetRotate(rotate_);
+
+        obj_->SetTransform(transform_);
+ 
         obj_->UpdateBillboard();
+
     }
+
+
+
 
 }
 
@@ -156,12 +160,14 @@ void EdamameModel::Initialize()
     //落下開始
     isDropStart_ = false;
     isDrop_ = false;
-    translate_ = { 0.0f };
     scaleTimer_ = 0.0f;
 
+    transform_.scale = { 1.0f,1.0f,1.0f };
+    transform_.rotate = { 0.0f, Function::kPi, 0.0f };
+    transform_.translate = { 0.0f,0.0f,0.0f };
+    
     obj_->Initialize();
-
-    rotate_ = { 0.0f,Function::kPi,0.0f };
+    obj_->SetTransform(transform_);
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/edamame", "edamame");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "Idle", true);
@@ -176,21 +182,21 @@ void EdamameModel::Initialize()
             obj_->SetSkinCluster(&skinCluster_);
         }
     }
-	obj_->SetOutlineColor(kRayHitOutlineColor);
-	obj_->SetOutlineWidth(kRayHitOutlineWidth);
+    obj_->SetOutlineColor(kRayHitOutlineColor);
+    obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
 
 void EdamameModel::Draw() {
-	if (isRayHit_) {
+    if (isRayHit_) {
 
-		Object3dCommon::GetInstance()->DrawCommonSkinning();
-		obj_->Draw();
-		Object3dCommon::GetInstance()->DrawCommonSkinningOutline();
-		obj_->Draw();
-		Object3dCommon::GetInstance()->EndOutlineDraw();
+        Object3dCommon::GetInstance()->DrawCommonSkinning();
+        obj_->Draw();
+        Object3dCommon::GetInstance()->DrawCommonSkinningOutline();
+        obj_->Draw();
+        Object3dCommon::GetInstance()->EndOutlineDraw();
 
-	} else {
-		Object3dCommon::GetInstance()->DrawCommonSkinning();
-		obj_->Draw();
-	}
+    } else {
+        Object3dCommon::GetInstance()->DrawCommonSkinning();
+        obj_->Draw();
+    }
 }
