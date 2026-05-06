@@ -24,6 +24,7 @@ class WallManager;
 class WallManager2;
 class WhiteBoardManager;
 class CollisionManager;
+class SkyBox;
 
 class MirrorStage : public BaseStage {
 private:
@@ -49,6 +50,7 @@ private:
 	std::unique_ptr<TimeCard> timeCard_ = nullptr;
 	std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
 	std::unique_ptr<BoxManager> boxManager_ = nullptr;
+	std::unique_ptr<SkyBox> skyBox_ = nullptr;
 
 	void InitializeLights();
 	void UpdateLights();
@@ -65,6 +67,6 @@ public:
 	void SetSceneCameraForDraw(Camera* camera) override;
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	PortalManager* GetPortalManager() override;
-	 void SetLightManager(Yoshida::LightManager* lightManager)override;
+	void SetLightManager(Yoshida::LightManager* lightManager) override;
 	bool CheckHitPlayerByStageHazard(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const override;
 };
