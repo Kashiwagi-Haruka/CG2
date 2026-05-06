@@ -21,7 +21,6 @@
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
-#include "Engine/Texture/Mesh/SkyBox/SkyBox.h"
 #include <utility>
 
 MirrorStage::MirrorStage(Player* player) : player_(player) {
@@ -48,7 +47,6 @@ MirrorStage::MirrorStage(Player* player) : player_(player) {
 	timeCard_ = std::make_unique<TimeCard>();
 	timeCardRack_ = std::make_unique<TimeCardRack>();
 	boxManager_ = std::make_unique<BoxManager>();
-	skyBox_ = std::make_unique<SkyBox>();
 }
 
 void MirrorStage::Initialize() {
@@ -77,7 +75,6 @@ void MirrorStage::Initialize() {
 	timeCard_->Initialize();
 	timeCardRack_->Initialize();
 	boxManager_->Initialize();
-	skyBox_->Initialize();
 	InitializeLights();
 	hierarchy->LoadObjectEditorsFromJsonIfExists("MirrorStage_objectEditors.json");
 	hierarchy->EndRegisterFile();
@@ -126,7 +123,6 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
     });
 	timeCardRack_->Update();
 	pc_->Update();
-	skyBox_->Update();
 	UpdateLights();
 }
 
@@ -263,7 +259,6 @@ void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 	edamame_->Draw();
 	whiteBoardManager_->Draw();
 	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
-	skyBox_->Draw();
 }
 
 void MirrorStage::SetSceneCameraForDraw(Camera* camera) {
@@ -285,7 +280,6 @@ void MirrorStage::SetSceneCameraForDraw(Camera* camera) {
 	timeCard_->SetCamera(camera);
 	timeCardRack_->SetCamera(camera);
 	boxManager_->SetCamera(camera);
-	skyBox_->SetCamera(camera);
 }
 
 void MirrorStage::SetPlayerCamera(PlayerCamera* playerCamera) {

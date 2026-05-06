@@ -1,6 +1,6 @@
 #include "CreatePSO.h"
 #include "DirectXCommon.h"
-#include "Engine/Logger/Logger.h"
+#include "Logger.h"
 #include <array>
 #include <cassert>
 

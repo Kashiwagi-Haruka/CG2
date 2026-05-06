@@ -1,6 +1,6 @@
 #define NOMINMAX
 #include "DirectXCommon.h"
-#include "Engine/Logger/Logger.h"
+#include "Logger.h"
 #include "ParticleManager.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
