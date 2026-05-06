@@ -2,7 +2,7 @@
 #include "Object3d/Object3dCommon.h"
 #include "DirectXCommon.h"
 #include "Function.h"
-#include "Logger.h"
+#include "Engine/Logger/Logger.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
 #include <algorithm>
@@ -146,7 +146,16 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	    D3D12_CULL_MODE_FRONT, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/SkinningObject3dToonOutline.PS.hlsl",
 	    L"Resources/shader/Object3d/VS_Shader/SkinningObject3dToonOutline.VS.hlsl");
 
-	SetEnvironmentMapTexture("Resources/TD3_3102/2d/wall.png");
+	psoMaterialColorSkinning_ = std::make_unique<CreatePSO>(dxCommon_,true);
+	psoMaterialColorSkinning_->Create(
+		D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/MaterialColorOnlyObject3d.PS.hlsl",
+	    L"Resources/shader/Object3d/VS_Shader/SkinningObject3d.VS.hlsl");
+
+		psoSkybox_ = std::make_unique<CreatePSO>(dxCommon_);
+	psoSkybox_->Create(
+	        D3D12_CULL_MODE_FRONT, false, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Skybox/Skybox.PS.hlsl", L"Resources/shader/Skybox/Skybox.VS.hlsl");
+
+	SetEnvironmentMapTexture("Resources/3d/skydome.png");
 
 	psoMirror_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoMirror_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dMirror.PS.hlsl");
@@ -411,6 +420,18 @@ void Object3dCommon::DrawCommonPortal(Camera* camera) {
 void Object3dCommon::DrawCommonShadow() {
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoShadow_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoShadow_->GetGraphicsPipelineState(blendMode_).Get());
+	DrawSet();
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+void Object3dCommon::DrawCommonMaterialColorOnlySkinning() { 
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoMaterialColorSkinning_->GetRootSignature().Get()); 
+	dxCommon_->GetCommandList()->SetPipelineState(psoMaterialColorSkinning_->GetGraphicsPipelineState(blendMode_).Get()); 
+	DrawSet(); 
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); 
+}
+void Object3dCommon::DrawCommonSkybox() {
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkybox_->GetRootSignature().Get());
+	dxCommon_->GetCommandList()->SetPipelineState(psoSkybox_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
