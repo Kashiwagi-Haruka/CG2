@@ -78,8 +78,6 @@ void ShadowGameScene::Initialize()
 	hierarchy->BeginRegisterFile("ShadowGameScene_objectEditors.json");
 
     uiManager_->Initialize();
-
-
     BGMManager::Initialize();
 
     damageOverlay_->Initialize();
@@ -192,7 +190,9 @@ void ShadowGameScene::Draw()
 
     //スプライト共通
     SpriteCommon::GetInstance()->DrawCommon();
-    damageOverlay_->Draw();
+	//ステージマネージャーでスプライトを描画
+	stageManager_->DrawSprite();
+	damageOverlay_->Draw();
     if (!currentEvent_->IsRunning()) {
         //UI管理を描画する
         uiManager_->Draw();

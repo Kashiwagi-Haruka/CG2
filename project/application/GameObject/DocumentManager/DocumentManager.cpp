@@ -4,6 +4,7 @@ DocumentManager::DocumentManager()
 {
     documentParticle_ = std::make_unique<DocumentParticle>();
     document_ = std::make_unique<Document>();
+    documentSprite_ = std::make_unique<DocumentSprite>();
 }
 
 void DocumentManager::Initialize()
@@ -14,6 +15,8 @@ void DocumentManager::Initialize()
     documentParticle_->StartEmit({ -4.0f, 4.0f, 0.0f }, 0.2f, 2);
     document_->Initialize();
     document_->SetTransform({ { 1.0f,1.0f,1.0f }, { 0.0f,1.0f,0.0f }, {-4.0f,0.03f,0.0f} });
+    //スプライト
+    documentSprite_->Initialize();
 }
 
 void DocumentManager::Draw()
@@ -23,9 +26,20 @@ void DocumentManager::Draw()
     document_->Draw();
 }
 
+void DocumentManager::DrawSprite()
+{
+    if (document_->GetDocumentLook()) {
+        documentSprite_->Draw();
+    }
+}
+
 void DocumentManager::Update(Camera* camera, const Vector3& lightDirection)
 {
 
     documentParticle_->Update(camera, lightDirection);
     document_->Update();
+
+    if (document_->GetDocumentLook()) {
+        documentSprite_->Update();
+    }
 }

@@ -30,6 +30,7 @@ public:
 	void CheckCollision();
 	void DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle);
 	void DrawDamageOverlay();
+	void DrawSprite();
 	void SetSceneCameraForDraw(Camera* camera);
 	void SetPlayerCamera(PlayerCamera* playerCamera);
 	PortalManager* GetPortalManager();

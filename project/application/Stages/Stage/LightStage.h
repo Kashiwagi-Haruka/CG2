@@ -12,6 +12,7 @@ public:
 	void UpdatePortal() override;
 	void CheckCollision() override;
 	void DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) override;
+	void DrawSprite()override;
 	void SetSceneCameraForDraw(Camera* camera) override;
 	void SetPlayerCamera(PlayerCamera* playerCamera) override;
 	PortalManager* GetPortalManager() override;

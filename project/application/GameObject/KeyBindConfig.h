@@ -71,6 +71,7 @@ public:
 	bool UiInteractTrigger();
 	bool MouseWheelUp();
 	bool MouseWheelDown();
+	const float GetMouseWheelDelta();
 	bool UiMoveLeft();
 	bool UiMoveRight();
 	Vector2 Rotate(float rotateSpeed, const bool isFlipHorizontally, const bool isFlipVertically);
