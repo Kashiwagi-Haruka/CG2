@@ -34,6 +34,36 @@ Vector3 Document::GetWorldPosition() const
     return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
 }
 
+void Document::OnTriggerLookStart()
+{
+    if (isDocumentLook_) {
+        return;
+    }
+
+    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+
+        if (!PlayerCommand::GetIsGrab()) {
+            SEManager::SoundPlay(SEManager::PAPER);
+            //書類を見る
+            isDocumentLook_ = true;
+        }
+    }
+}
+
+void Document::OnTriggerLookStop()
+{
+    if (!isDocumentLook_) {
+        //書類を見ていないとき
+        return;
+    }
+
+    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+        SEManager::SoundPlay(SEManager::PAPER);
+        //書類を見る
+        isDocumentLook_ = false;
+    }
+}
+
 void Document::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
@@ -52,6 +82,7 @@ void Document::Update()
 void Document::Initialize()
 {
     isRayHit_ = false;
+    isDocumentLook_ = false;
     obj_->Initialize();
 }
 
@@ -66,14 +97,12 @@ void Document::Draw()
 void Document::CheckCollision()
 {
     isRayHit_ = OnCollisionRay();
+
+    OnTriggerLookStop();
+
+   //Rayがヒットしていたら
     if (isRayHit_) {
-        //rayの当たり判定
-        if (PlayerCommand::GetInstance()->InteractTrigger()) {
-            if (!PlayerCommand::GetIsGrab()) {
-                //書類を見れる
-                SEManager::SoundPlay(SEManager::PAPER);
-            }
-        }
+        OnTriggerLookStart();
     }
 
 }

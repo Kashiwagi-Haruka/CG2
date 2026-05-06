@@ -261,6 +261,10 @@ void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 
+void MirrorStage::DrawSprite()
+{
+}
+
 void MirrorStage::SetSceneCameraForDraw(Camera* camera) {
 	testField_->SetCamera(camera);
 	whiteBoardManager_->SetCamera(camera);

@@ -67,6 +67,13 @@ void StageManager::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle
 
 void StageManager::DrawDamageOverlay() {}
 
+void StageManager::DrawSprite()
+{
+    if (stage_) {
+        stage_->DrawSprite();
+    }
+}
+
 void StageManager::SetSceneCameraForDraw(Camera* camera) {
     if (stage_) {
         stage_->SetSceneCameraForDraw(camera);
@@ -86,11 +93,11 @@ PortalManager* StageManager::GetPortalManager() {
     return stage_->GetPortalManager();
 }
 bool StageManager::CheckHitPlayerByStageHazard(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const {
-	if (!stage_) {
-		return false;
-	}
+    if (!stage_) {
+        return false;
+    }
 
-	return stage_->CheckHitPlayerByStageHazard(playerPosition, playerRadius, minHitSpeed);
+    return stage_->CheckHitPlayerByStageHazard(playerPosition, playerRadius, minHitSpeed);
 }
 void StageManager::SetLightManager(Yoshida::LightManager* lightManager)
 {

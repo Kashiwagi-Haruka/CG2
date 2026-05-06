@@ -403,6 +403,7 @@
     <ClCompile Include="application\GameObject\DocumentManager\Document\Document.cpp" />
     <ClCompile Include="application\GameObject\DocumentManager\DocumentManager.cpp" />
     <ClCompile Include="application\GameObject\File\FileManager.cpp" />
+    <ClCompile Include="application\GameObject\DocumentManager\DocumentSprite\DocumentSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -798,6 +799,7 @@
     <ClInclude Include="application\GameObject\DocumentManager\Document\Document.h" />
     <ClInclude Include="application\GameObject\DocumentManager\DocumentManager.h" />
     <ClInclude Include="application\GameObject\File\FileManager.h" />
+    <ClInclude Include="application\GameObject\DocumentManager\DocumentSprite\DocumentSprite.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

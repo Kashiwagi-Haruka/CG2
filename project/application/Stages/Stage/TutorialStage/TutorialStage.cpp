@@ -196,6 +196,11 @@ void TutorialStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
     
 
 }
+void TutorialStage::DrawSprite()
+{
+    documentManager_->DrawSprite();
+
+}
 void TutorialStage::SetSceneCameraForDraw(Camera* camera) {
     testField_->SetCamera(camera);
     whiteBoardManager_->SetCamera(camera);
