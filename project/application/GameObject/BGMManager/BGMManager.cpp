@@ -2,6 +2,7 @@
 #include<cassert>
 #include<algorithm>
 #include"GameObject/YoshidaMath/Easing.h"
+#include"Option/Option.h"
 std::unordered_map<BGMManager::Data, SoundData>BGMManager::BGMs_;
 bool BGMManager::isEdamameSound_ = false;
 void BGMManager::Load()
@@ -14,8 +15,9 @@ void BGMManager::Load()
 void BGMManager::Initialize()
 {
     SoundPlay(BGM1, true);
-    SetVol(0.125f, BGM1);
-    SetVol(0.1f, EDAMAME);
+    auto& bgmVol = Option::GetCurrentOptionData().BGMVolume;
+    SetVol(bgmVol, BGM1);
+    SetVol(bgmVol, EDAMAME);
     isEdamameSound_ = false;
 }
 
@@ -24,7 +26,8 @@ void BGMManager::Update()
     if (isEdamameSound_) {
         SetVol(0.0f, BGM1);
     } else {
-        SetVol(0.25f, BGM1);
+        auto& bgmVol = Option::GetCurrentOptionData().BGMVolume;
+        SetVol(bgmVol, BGM1);
     }
 }
 
@@ -43,6 +46,7 @@ void BGMManager::SoundPlay(const Data& data,const bool loop)
 
 void BGMManager::UnLoad()
 {
-    Audio::GetInstance()->SoundUnload(&BGMs_[BGM1]);
-    Audio::GetInstance()->SoundUnload(&BGMs_[EDAMAME]);
+    for (auto& [tag, data] : BGMs_) {
+        Audio::GetInstance()->SoundUnload(&data);
+    }
 }

@@ -2,6 +2,7 @@
 #include "GameObject/YoshidaMath/Easing.h"
 #include <algorithm>
 #include <cassert>
+#include"Option/Option.h"
 std::unordered_map<SEManager::Data, SoundData> SEManager::SEs_;
 
 void SEManager::Load() {
@@ -31,25 +32,25 @@ void SEManager::Load() {
 }
 
 void SEManager::Initialize() {
-	SetVol(0.25f, DOOR_LOCK);
-	SetVol(0.25f, DOOR_OPEN);
+	//SetVol(0.25f, DOOR_LOCK);
+	//SetVol(0.25f, DOOR_OPEN);
 
-	SetVol(0.25f, WARP);
-	SetVol(0.25f, PORTAL_SPAWN);
-	SetVol(0.25f, SHOT);
-	SetVol(1.0f, PUSH_WATCH);
-	SetVol(0.0f, NOISE);
-	SetVol(0.5f, CHAIR);
+	//SetVol(0.25f, WARP);
+	//SetVol(0.25f, PORTAL_SPAWN);
+	//SetVol(0.25f, SHOT);
+	//SetVol(1.0f, PUSH_WATCH);
+	//SetVol(0.0f, NOISE);
+	//SetVol(0.5f, CHAIR);
 
-	SetVol(1.0f, TYPE);
-	SetVol(1.0f, VENDING_MAC);
-	SetVol(0.5f, KEY);
-	SetVol(1.0f, DESK);
-	SetVol(0.25f, DAMAGE);
-	SetVol(0.25f, CLOCK);
+	//SetVol(1.0f, TYPE);
+	//SetVol(1.0f, VENDING_MAC);
+	//SetVol(0.5f, KEY);
+	//SetVol(1.0f, DESK);
+	//SetVol(0.25f, DAMAGE);
+	//SetVol(0.25f, CLOCK);
 
-	SetVol(0.25f, CAN);
-	SetVol(0.25f, BOX);
+	//SetVol(0.25f, CAN);
+	//SetVol(0.25f, BOX);
 }
 
 void SEManager::Update() {}
@@ -62,6 +63,8 @@ void SEManager::SetVol(float vol, const Data& data) {
 
 void SEManager::SoundPlay(const Data& data, const bool loop) {
 	assert(SEs_.contains(data));
+	auto& seVol = Option::GetCurrentOptionData().SEVolume;
+	SetVol(seVol, data);
 	Audio::GetInstance()->SoundPlayWave(SEs_[data], loop);
 }
 

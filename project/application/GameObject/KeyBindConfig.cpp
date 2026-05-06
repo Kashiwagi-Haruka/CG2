@@ -138,7 +138,7 @@ Vector2 PlayerCommand::Rotate(float rotateSpeed,const bool isFlipHorizontally,co
         dPitch += inputMovePos.y * YoshidaMath::kDeltaTime * rotateSpeed;
     }
 
-    return { isFlipHorizontally?-dPitch:dPitch, isFlipVertically?-dYaw:dYaw };
+    return {  isFlipVertically ? -dPitch : dPitch,isFlipHorizontally ? -dYaw : dYaw };
 }
 
 void PlayerCommand::Initialize() {

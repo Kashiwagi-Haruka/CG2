@@ -14,7 +14,6 @@ PlayerCamera::PlayerCamera() {
 
     // カメラを生成する
     camera_ = std::make_unique<Camera>();
-    camera_->SetFovY(0.44f);
     camera_->SetNearClip(0.2f);
     // Rayの設定
     ray_ = { .origin = {0.0f}, .diff = {0.0f} };
@@ -24,6 +23,8 @@ PlayerCamera::PlayerCamera() {
 void PlayerCamera::Update() {
     SetHeadTransform();
     SetRay();
+    const float fovY = Option::GetCurrentOptionData().fieldOfView * Function::kPi / 180.0f;
+    camera_->SetFovY(fovY);
     camera_->Update();
 }
 
@@ -33,6 +34,7 @@ void PlayerCamera::Rotate() {
     Vector2 deltaRotate = PlayerCommand::GetInstance()->Rotate(rotateSpeed_, optionData.isFlipHorizontally, optionData.isFlipVertically);
     player_->GetTransform().rotate.y += deltaRotate.y * optionCameraMoveSpeed.y;
     param_.transform.rotate.x += deltaRotate.x * optionCameraMoveSpeed.x;
+
 #ifdef USE_IMGUI
     if (ImGui::TreeNode("Eye")) {
         ImGui::Text("rotateSpeed : %f", rotateSpeed_);
@@ -63,6 +65,9 @@ void PlayerCamera::Initialize()
     } else {
         param_.transform = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
     }
+    
+    const float fovY = Option::GetCurrentOptionData().fieldOfView * Function::kPi / 180.0f;
+    camera_->SetFovY(fovY);
 
     SetHeadTransform();
     SetTransform();

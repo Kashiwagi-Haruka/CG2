@@ -1,5 +1,6 @@
 #include "EdamameTrivia.h"
 #include"GameObject/KeyBindConfig.h"
+#include"Option/Option.h"
 
 std::array<std::u32string, 8> EdamameTrivia::strings_;
 size_t EdamameTrivia::triviaNum_ = 0;
@@ -10,9 +11,7 @@ bool EdamameTrivia::isDie_ = false;
 EdamameTrivia::EdamameTrivia()
 {
     //枝豆
-
-    Audio::GetInstance()->SetSoundVolume(&triviaVoice_, 1.0f);
-
+    SetVol(Option::GetCurrentOptionData().VoiceVolume);
     strings_[0] = U"アセトアルデヒド,C2H4O";
     strings_[1] = U"この物質はエタノールの酸化中間代謝物として\n肝臓で生成され酢酸を経て\n最終的に水と二酸化炭素に分解されます。";
     strings_[2] = U"DNAやたんぱく質と結合しやすい性質を持ち、\n発癌など種々のアルコール性臓器障害の\n発生に関与すると考えられています。";
