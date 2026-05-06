@@ -3,7 +3,7 @@
 #include<cmath>
 #include"Function.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
-
+#include"Option/Option.h"
 WarpPos::WarpPos()
 {
     camera_ = std::make_unique<Camera>();
@@ -30,7 +30,8 @@ void WarpPos::Initialize()
 
     object3d_->Initialize();
     sinTheta_ = 0.0f;
-    camera_->SetFovY(0.44f);
+    const float fovY = Option::GetCurrentOptionData().fieldOfView*Function::kPi/180.0f;
+    camera_->SetFovY(fovY);
     camera_->SetNearClip(0.2f);
 }
 
@@ -55,6 +56,8 @@ void WarpPos::Update()
     }
 
     object3d_->SetWorldMatrix(child);
+    const float fovY = Option::GetCurrentOptionData().fieldOfView * Function::kPi / 180.0f;
+    camera_->SetFovY(fovY);
     camera_->UpdateViewProjection(child);
     object3d_->Update();
 }

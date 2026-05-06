@@ -6,7 +6,7 @@
 #include <GameObject/YoshidaMath/CollisionManager/Collider.h>
 #include"Object3d/Object3dCommon.h"
 #include"GameObject/BGMManager/BGMManager.h"
-
+#include"Option/Option.h"
 
 bool Edamame::isRayHit_ = false;
 Edamame::Edamame()
@@ -155,7 +155,8 @@ void Edamame::Trivia()
             //枝豆サウンドを止める
             BGMManager::SetIsEdamameSound(false);
         }
-
+        //Option分かける
+        vol *= Option::GetCurrentOptionData().VoiceVolume;
         edamameTrivia_->SetVol(vol);
         BGMManager::SetVol(bgmVol, BGMManager::EDAMAME);
     }

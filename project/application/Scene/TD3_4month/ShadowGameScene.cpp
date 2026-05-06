@@ -145,6 +145,9 @@ void ShadowGameScene::Update() {
 #ifdef USE_IMGUI
 	DebugImGui();
 #endif
+	//BGMの更新処理
+	BGMManager::Update();
+
 	StageTransition();
 	currentEvent_->Update();
 

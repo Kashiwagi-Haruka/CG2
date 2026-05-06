@@ -25,6 +25,7 @@ public:
         ELEVATOR_OPEN,
 		ELEVATOR_BELL,
 		PAPER,
+		MAX_SE,
 	};
 
 private:

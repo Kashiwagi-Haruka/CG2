@@ -13,8 +13,8 @@ class Camera {
 	Matrix4x4 viewMatrix_;
 	Matrix4x4 projectionMatrix_;
 	Matrix4x4 viewProjectionMatrix_;
-
-	float fovY = 0.45f;                   // 視野角（縦方向）
+	//視野角の計算を変更
+	float fovY = 45.0f * 3.141592654f / 180.0f;// 視野角（縦方向）
 	float aspectRatio = 1280.0f / 720.0f; // アスペクト比
 	float nearZ = 0.1f;                   // ニアクリップ距離
 	float farZ = 10000.0f;                // ファークリップ距離
