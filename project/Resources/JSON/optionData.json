@@ -7,6 +7,6 @@
   "SEVolume": 0.8888888955116272,
   "VoiceVolume": 1.0,
   "fieldOfView": 51.66666793823242,
-  "isFlipHorizontally": true,
+  "isFlipHorizontally": false,
   "isFlipVertically": false
 }
