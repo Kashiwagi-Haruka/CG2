@@ -415,20 +415,8 @@ void ShadowGameScene::DrawSceneTransition() {
 void ShadowGameScene::DrawModel() {
 	//=======================shadowマップの開始↓=======================
 	auto* object3dCommon = Object3dCommon::GetInstance();
-	auto flag = lightManager_->GetShadowFlags();
-	const bool shadowFlags[4] = { flag[0], flag[1], flag[2], flag [2]};
-	for (int i = 0; i < 4; ++i) {
-		if (!shadowFlags[i]) {
-			continue;
-		}
-		object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
-		object3dCommon->BeginShadowMapPass();
-		object3dCommon->DrawCommonShadow();
-		DrawGameObject(true, false, false, true, true);
-		object3dCommon->EndShadowMapPass();
-	}
-	object3dCommon->SetShadowMapEnabled(flag[0], flag[1], flag[2], flag[2]);
-	//=======================shadowマップの終了↑=======================
+	// レイトレースシャドウに移行したため、シャドウマップパスは無効化
+	object3dCommon->SetShadowMapEnabled(false, false, false, false);
 
 	if (auto* portalManager = stageManager_->GetPortalManager()) {
 		for (auto& portal : portalManager->GetPortals()) {
