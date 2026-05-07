@@ -187,6 +187,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\DocumentManager\Document\Document.cpp" />
     <ClCompile Include="application\GameObject\DocumentManager\DocumentManager.cpp" />
     <ClCompile Include="application\GameObject\DocumentManager\DocumentSprite\DocumentSprite.cpp" />
+    <ClCompile Include="application\Text\Credit\Credit.cpp" />
     <ClCompile Include="Engine\Editor\EditorTool\Asset\EditorAsset.cpp" />
     <ClCompile Include="Engine\Editor\EditorManager\EditorManager.cpp" />
     <ClCompile Include="Engine\Editor\EditorData\Object3d\EditorObject3d.cpp" />
@@ -394,6 +395,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\DocumentManager\Document\Document.h" />
     <ClInclude Include="application\GameObject\DocumentManager\DocumentManager.h" />
     <ClInclude Include="application\GameObject\DocumentManager\DocumentSprite\DocumentSprite.h" />
+    <ClInclude Include="application\Text\Credit\Credit.h" />
     <ClInclude Include="Engine\Editor\EditorTool\Asset\EditorAsset.h" />
     <ClInclude Include="Engine\Editor\EditorManager\EditorManager.h" />
     <ClInclude Include="Engine\Editor\EditorData\Object3d\EditorObject3d.h" />
