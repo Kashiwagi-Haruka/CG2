@@ -73,6 +73,9 @@
     <FxCompile Include="Resources\shader\Object3d\VS_Shader\SkinningObject3dOutline.VS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\PS_Shader\SkinningObject3dToonOutline.PS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\VS_Shader\SkinningObject3dToonOutline.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Skybox\Skybox.VS.hlsl" />
+    <FxCompile Include="Resources\shader\Skybox\Skybox.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\PS_Shader\MaterialColorOnlyObject3d.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
@@ -813,6 +816,7 @@
     <None Include="Resources\shader\Sprite\Sprite.hlsli">
       <Filter>Resources</Filter>
     </None>
+    <None Include="Resources\shader\Skybox\Skybox.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

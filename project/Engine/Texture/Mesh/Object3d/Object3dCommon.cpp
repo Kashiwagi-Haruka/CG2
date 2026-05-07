@@ -2,7 +2,7 @@
 #include "Object3d/Object3dCommon.h"
 #include "DirectXCommon.h"
 #include "Function.h"
-#include "Engine/Logger/Logger.h"
+#include "Engine/Log/Logger.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
 #include <algorithm>
@@ -155,7 +155,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	psoSkybox_->Create(
 	        D3D12_CULL_MODE_FRONT, false, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Skybox/Skybox.PS.hlsl", L"Resources/shader/Skybox/Skybox.VS.hlsl");
 
-	SetEnvironmentMapTexture("Resources/3d/skydome.png");
+	SetEnvironmentMapTexture("Resources/TD3_3102/2d/out.jpg");
 
 	psoMirror_ = std::make_unique<CreatePSO>(dxCommon_);
 	psoMirror_->Create(D3D12_CULL_MODE_BACK, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dMirror.PS.hlsl");
