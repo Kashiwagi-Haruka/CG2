@@ -335,6 +335,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\OperationChangeBox\OperationChangeBox.cpp" />
     <ClCompile Include="application\GameObject\File\FileObject.cpp" />
     <ClCompile Include="application\GameObject\File\FileManager.cpp" />
+    <ClCompile Include="Engine\Loadfile\TXT\TxtManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -548,6 +549,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\OperationChangeBox\OperationChangeBox.h" />
     <ClInclude Include="application\GameObject\File\FileObject.h" />
     <ClInclude Include="application\GameObject\File\FileManager.h" />
+    <ClInclude Include="Engine\Loadfile\TXT\TxtManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
