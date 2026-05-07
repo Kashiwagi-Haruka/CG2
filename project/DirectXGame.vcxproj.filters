@@ -408,6 +408,7 @@
     <ClCompile Include="application\GameObject\File\FileManager.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\SkyBox\SkyBox.cpp" />
     <ClCompile Include="application\GameObject\DocumentManager\DocumentSprite\DocumentSprite.cpp" />
+    <ClCompile Include="application\Stages\Stage\GentleManStage\GentleManStage.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManagerRoofFoor.cpp" />
     <ClCompile Include="Engine\Loadfile\TXT\TxtManager.cpp" />
     <ClCompile Include="application\Text\Credit\Credit.cpp" />
@@ -808,6 +809,7 @@
     <ClInclude Include="application\GameObject\File\FileManager.h" />
     <ClInclude Include="Engine\Texture\Mesh\SkyBox\SkyBox.h" />
     <ClInclude Include="application\GameObject\DocumentManager\DocumentSprite\DocumentSprite.h" />
+    <ClInclude Include="application\Stages\Stage\GentleManStage\GentleManStage.h" />
     <ClInclude Include="application\GameObject\Wall\WallManagerRoofFoor.h" />
     <ClInclude Include="Engine\Loadfile\TXT\TxtManager.h" />
     <ClInclude Include="application\Text\Credit\Credit.h" />

@@ -3,6 +3,7 @@
 #include "Stage/RadiconStage.h"
 #include "StageManager.h"
 #include"Stage/TutorialStage/TutorialStage.h"
+#include"Stage/GentleManStage/GentleManStage.h"
 
 StageManager::StageManager(Player* player) : player_(player) {}
 
@@ -19,6 +20,8 @@ void StageManager::CreateStage(const std::string& sceneName) {
         stage_ = std::make_unique<TutorialStage>(player_);
     } else if (sceneName == "RadiconStage") {
         stage_ = std::make_unique<RadiconStage>(player_);
+    } else if (sceneName == "GentleManStage") {
+        stage_ = std::make_unique<GentleManStage>(player_);
     }
 }
 void StageManager::SetPlayer(Player* player) {
