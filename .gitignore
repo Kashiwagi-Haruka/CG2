@@ -329,3 +329,4 @@ FodyWeavers.xsd
 *.pdb
 **/Log/
 *.log
+/project/Resources/JSON/objectEditors.json
