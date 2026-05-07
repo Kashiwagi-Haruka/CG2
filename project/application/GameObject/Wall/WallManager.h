@@ -18,7 +18,7 @@ public:
     std::vector<std::unique_ptr<Wall>>& GetWalls() { return walls_; };
     std::array<AreaCommonLight,2>& GetAreaLights() { return  areaLights_; }
 protected:
-    std::unique_ptr <Primitive>plane_ = nullptr;
+    /*std::unique_ptr <Primitive>plane_ = nullptr;*/
     std::array<AreaCommonLight,2> areaLights_;
     Matrix4x4 roomMat_= { 0.0f };
     std::vector<std::unique_ptr<Wall>>walls_;

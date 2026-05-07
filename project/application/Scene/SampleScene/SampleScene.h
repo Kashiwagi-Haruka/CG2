@@ -27,9 +27,7 @@ class SampleScene : public BaseScene {
 
 	std::unique_ptr<Object3d> uvBallObj_ = nullptr;
 	std::unique_ptr<Object3d> fieldObj_ = nullptr;
-	std::unique_ptr<Object3d> planeGltf_ = nullptr;
-	std::unique_ptr<Object3d> animatedCubeObj_ = nullptr;
-	std::unique_ptr<Object3d> humanObj_ = nullptr;
+	
 	std::unique_ptr<Primitive> spherePrimitive_ = nullptr;
 	std::unique_ptr<PortalMesh> portalMeshA_ = nullptr;
 	std::unique_ptr<PortalMesh> portalMeshB_ = nullptr;
@@ -70,13 +68,6 @@ class SampleScene : public BaseScene {
 	/*Transform portalObjectCameraTransform_{};*/
 	Transform particleTransform_{};
 	std::unique_ptr<ParticleEmitter> sampleParticleEmitter_ = nullptr;
-
-	Animation::AnimationData animatedCubeAnimation_{};
-	std::vector<Animation::AnimationData> humanAnimationClips_{};
-	size_t currentHumanAnimationIndex_ = 0;
-	std::unique_ptr<Skeleton> humanSkeleton_{};
-	SkinCluster humanSkinCluster_{};
-	float humanAnimationTime_ = 0.0f;
 
 	Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	bool enableLighting = true;
