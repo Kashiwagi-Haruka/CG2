@@ -197,7 +197,8 @@ void Gentleman::CheckCollision()
 
 bool Gentleman::OnCollisionRay()
 {
-    const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex("Root_Upper");
+    //舌のコントロールボーン
+    const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex("CON.tongue.002");
     skeleton_->SetObjectMatrix(obj_->GetWorldMatrix());
     Vector3 pos = skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
     return playerCamera_->OnCollisionRay(localAABB_, pos);

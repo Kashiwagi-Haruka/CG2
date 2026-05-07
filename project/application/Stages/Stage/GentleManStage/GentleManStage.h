@@ -7,6 +7,8 @@ class WallManagerRoofFoor;
 class WhiteBoardManager;
 class TimeCardWatch;
 class DocumentManager;
+class GiantGentleMan;
+
 
 class GentleManStage :
     public BaseStage
@@ -19,7 +21,7 @@ class GentleManStage :
     CollisionManager* stageCollisionManager_ = nullptr;
     std::unique_ptr<WallManagerRoofFoor> wallManagerRoofFoor_ = nullptr;
     std::unique_ptr<DocumentManager>documentManager_ = nullptr;
-
+    std::unique_ptr<GiantGentleMan>giantGentleMan_ = nullptr;
 private:
     void InitializeLights();
     void UpdateLights();
