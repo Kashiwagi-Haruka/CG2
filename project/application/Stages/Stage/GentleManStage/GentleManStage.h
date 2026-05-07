@@ -1,6 +1,6 @@
 #pragma once
 #include"../../BaseStage.h"
-class TestField;
+
 class Door;
 class Key;
 class WallManagerRoofFoor;
@@ -13,8 +13,6 @@ class GentleManStage :
 {
     Player* player_ = nullptr;
     Yoshida::LightManager* lightManager_ = nullptr;
-    std::unique_ptr<TestField> testField_ = nullptr;
-
     std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
     std::unique_ptr<WhiteBoardManager>  whiteBoardManager_ = nullptr;
     std::unique_ptr<PortalManager> portalManager_ = nullptr;

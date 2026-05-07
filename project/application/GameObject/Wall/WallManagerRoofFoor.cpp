@@ -3,7 +3,7 @@
 #include"Function.h"
 
 namespace {
-    const int kMaxWall = 3;
+    const int kMaxWall = 4;
 }
 WallManagerRoofFoor::WallManagerRoofFoor()
 {
@@ -24,7 +24,7 @@ WallManagerRoofFoor::WallManagerRoofFoor()
 
 void WallManagerRoofFoor::Update()
 {
-
+    room1_->Update();
     for (auto& wall : walls_) {
         wall->Update();
     }
@@ -50,7 +50,9 @@ void WallManagerRoofFoor::Initialize()
     const float offsetX = 0.0f;
     const float offsetZ = 0.0f;
     Vector3 translate = { 7.0f,0.0f,0.0f };
+
     walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ 7.0f + offsetX,0.0f,0.0f + offsetZ });
     walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ -7.0f + offsetX,0.0f,0.0f + offsetZ });
     walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate + Vector3{ 0.0f + offsetX,0.0f,7.0f + offsetZ });
+    walls_[3]->SetST({ 14.0f,0.01f,30.0f }, translate+ Vector3{ 0.0f + offsetX,0.0f,-7.0f});
 }
