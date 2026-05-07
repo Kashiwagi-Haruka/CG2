@@ -39,7 +39,7 @@ WallManager::WallManager()
     areaLights_[1].radius = 10.0f;
     areaLights_[1].decay = 2.0f;
 
-    plane_ = std::make_unique<Primitive>();
+    /*plane_ = std::make_unique<Primitive>();*/
 
 }
 
@@ -59,8 +59,8 @@ void WallManager::Initialize()
 {
     room1_->Initialize();
     room1_->RegisterEditor("room1");
-    plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/out.jpg");
-    plane_->RegisterEditor("WallWindowPlane");
+    //plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/out.jpg");
+    //plane_->RegisterEditor("WallWindowPlane");
 
 
     // 壁の初期化
@@ -85,20 +85,20 @@ void WallManager::Initialize()
 
 void WallManager::Update()
 {
-    plane_->SetEnableLighting(false);
+    //plane_->SetEnableLighting(false);
     room1_->Update();
     room1_->SetEnableLighting(true);
     roomMat_ = room1_->GetWorldMatrix();
-    Matrix4x4 planeMat = Function::MakeAffineMatrix(plane_->GetTransform().scale, plane_->GetTransform().rotate, plane_->GetTransform().translate);
+    //Matrix4x4 planeMat = Function::MakeAffineMatrix(plane_->GetTransform().scale, plane_->GetTransform().rotate, plane_->GetTransform().translate);
 
-    plane_->SetWorldMatrix(planeMat);
-    plane_->Update();
-    Vector3 normal = YoshidaMath::GetForward(plane_->GetWorldMatrix());
-    normal.x *= 1.0f;
-    areaLights_[1].normal = normal;
-    areaLights_[1].position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
+    //plane_->SetWorldMatrix(planeMat);
+    //plane_->Update();
+    //Vector3 normal = YoshidaMath::GetForward(plane_->GetWorldMatrix());
+    //normal.x *= 1.0f;
+    //areaLights_[1].normal = normal;
+    //areaLights_[1].position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
 
-    areaLights_[1].height = plane_->GetTransform().scale.y * 0.5f;
+    /*areaLights_[1].height = plane_->GetTransform().scale.y * 0.5f;*/
 
     for (auto& wall : walls_) {
         wall->Update();
@@ -109,7 +109,7 @@ void WallManager::Update()
 void WallManager::Draw()
 {
     room1_->Draw();
-    plane_->Draw();
+    /*plane_->Draw();*/
     //for (auto& wall : walls_) {
     //    wall->Draw();
     //}
@@ -121,8 +121,8 @@ void WallManager::SetCamera(Camera* camera)
 
     room1_->SetCamera(camera);
     room1_->UpdateCameraMatrices();
-    plane_->SetCamera(camera);
-    plane_->UpdateCameraMatrices();
+    /*plane_->SetCamera(camera);
+    plane_->UpdateCameraMatrices();*/
 
     //for (auto& wall : walls_) {
     //    wall->SetCamera(camera);
