@@ -8,7 +8,7 @@
 #include "GameObject/Portal/PortalManager.h"
 #include "GameObject/TestField/TestField.h"
 
-#include "GameObject/Wall/WallManager.h"
+#include "GameObject/Wall/wallManagerRoofFoor.h"
 
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
@@ -39,16 +39,16 @@ void GentleManStage::InitializeLights()
 
     lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 4);
 
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManagerRoofFoor_->GetAreaLights().at(0), 0);
+    lightManager_->SetAreaLight(wallManagerRoofFoor_->GetAreaLights().at(1), 1);
 
 }
 
 void GentleManStage::UpdateLights()
 {
 
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManagerRoofFoor_->GetAreaLights().at(0), 0);
+    lightManager_->SetAreaLight(wallManagerRoofFoor_->GetAreaLights().at(1), 1);
 
 }
 
@@ -59,7 +59,7 @@ GentleManStage::GentleManStage(Player* player)
     testField_ = std::make_unique<TestField>();
     whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
     portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
-    wallManager_ = std::make_unique<WallManager>();
+    wallManagerRoofFoor_ = std::make_unique<WallManagerRoofFoor>();
     documentManager_ = std::make_unique<DocumentManager>();
 
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
@@ -78,7 +78,7 @@ void GentleManStage::Initialize()
     whiteBoardManager_->Initialize();
     portalManager_->Initialize();
 
-    wallManager_->Initialize();
+    wallManagerRoofFoor_->Initialize();
     timeCardWatch_->Initialize();
     documentManager_->Initialize();
 
@@ -89,7 +89,7 @@ void GentleManStage::Initialize()
 void GentleManStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
     portalManager_->WarpPlayer(player);
     testField_->Update();
-    wallManager_->Update();
+    wallManagerRoofFoor_->Update();
     whiteBoardManager_->Update();
     documentManager_->Update(camera, lightDirection);
     UpdateLights();
@@ -118,7 +118,7 @@ void GentleManStage::CheckCollision() {
     for (auto& whiteBoard : whiteBoardManager_->GetWhiteBoards()) {
         stageCollisionManager_->AddCollider(whiteBoard.get());
     }
-    for (auto& wall : wallManager_->GetWalls()) {
+    for (auto& wall : wallManagerRoofFoor_->GetWalls()) {
         stageCollisionManager_->AddCollider(wall.get());
     }
 
@@ -137,7 +137,7 @@ void GentleManStage::SetCollisionManager(CollisionManager* collisionManager)
 }
 void GentleManStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
     testField_->Draw();
-    wallManager_->Draw();
+    wallManagerRoofFoor_->Draw();
 
     //ここで書類パーティクルを描画させる
     documentManager_->Draw();
@@ -154,7 +154,7 @@ void GentleManStage::SetSceneCameraForDraw(Camera* camera) {
     testField_->SetCamera(camera);
     whiteBoardManager_->SetCamera(camera);
     portalManager_->SetCamera(camera);
-    wallManager_->SetCamera(camera);
+    wallManagerRoofFoor_->SetCamera(camera);
     documentManager_->SetCamera(camera);
     timeCardWatch_->SetCamera(camera);
 }

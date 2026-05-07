@@ -15,7 +15,11 @@ WallManagerRoofFoor::WallManagerRoofFoor()
 
     //エリアライトの設定をしよう
     //areaLights_
-
+    for (int i = 0; i < kMaxWall; ++i) {
+        std::unique_ptr<Wall> wall = std::make_unique<Wall>();
+        wall->SetParentMatrix(&roomMat_);
+        walls_.push_back(std::move(wall));
+    }
 }
 
 void WallManagerRoofFoor::Update()
