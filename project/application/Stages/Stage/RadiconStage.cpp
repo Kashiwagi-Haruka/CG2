@@ -77,7 +77,14 @@ void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unu
 
 void RadiconStage::UpdatePortal() {/*記載なし*/}
 
-void RadiconStage::CheckCollision() {}
+void RadiconStage::CheckCollision() {
+
+	stageCollisionManager_->AddCollider(testField_.get());
+	/*stageCollisionManager_->AddCollider(radicon_.get());*/
+	stageCollisionManager_->CheckAllCollisions();
+
+
+}
 
 void RadiconStage::DrawModel([[maybe_unused]] bool isShadow, [[maybe_unused]] bool drawPortal, [[maybe_unused]] bool isDrawParticle) {
 	testField_->Draw();

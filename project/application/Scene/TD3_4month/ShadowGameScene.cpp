@@ -64,6 +64,7 @@ ShadowGameScene::ShadowGameScene() {
 	SetPlayerCamera(cameraController_->GetPlayerCamera());
 
 	damageOverlay_ = std::make_unique<DamageOverlay>();
+	skyBox_ = std::make_unique<SkyBox>();
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -81,6 +82,9 @@ void ShadowGameScene::Initialize()
     BGMManager::Initialize();
 
     damageOverlay_->Initialize();
+	skyBox_->Initialize();
+	skyBox_->SetDDSTexture("Resources/SkyBox/forest.dds");
+	skyBox_->SetCamera(cameraController_->GetPlayerCamera()->GetCamera());
 
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;
@@ -414,20 +418,8 @@ void ShadowGameScene::DrawSceneTransition() {
 void ShadowGameScene::DrawModel() {
 	//=======================shadowマップの開始↓=======================
 	auto* object3dCommon = Object3dCommon::GetInstance();
-	auto flag = lightManager_->GetShadowFlags();
-	const bool shadowFlags[4] = { flag[0], flag[1], flag[2], flag [2]};
-	for (int i = 0; i < 4; ++i) {
-		if (!shadowFlags[i]) {
-			continue;
-		}
-		object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
-		object3dCommon->BeginShadowMapPass();
-		object3dCommon->DrawCommonShadow();
-		DrawGameObject(true, false, false, true, true);
-		object3dCommon->EndShadowMapPass();
-	}
-	object3dCommon->SetShadowMapEnabled(flag[0], flag[1], flag[2], flag[2]);
-	//=======================shadowマップの終了↑=======================
+	// レイトレースシャドウに移行したため、シャドウマップパスは無効化
+	object3dCommon->SetShadowMapEnabled(false, false, false, false);
 
 	if (auto* portalManager = stageManager_->GetPortalManager()) {
 		for (auto& portal : portalManager->GetPortals()) {
@@ -465,6 +457,7 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
 }
 
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
+	skyBox_->SetCamera(camera);
 	player_->SetCamera(camera);
 	stageManager_->SetSceneCameraForDraw(camera);
 	elevatorRoomManager_->SetCamera(camera);
@@ -479,7 +472,11 @@ void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera) {
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer, bool drawPlayerHead) {
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera);
 	SetSceneCameraForDraw(camera);
-	Object3dCommon::GetInstance()->DrawCommon();
+	auto* object3dCommon = Object3dCommon::GetInstance();
+	object3dCommon->DrawCommonSkybox();
+	skyBox_->Update();
+	skyBox_->Draw();
+	object3dCommon->DrawCommon();
 	DrawGameObject(false, drawPortal, isDrawParticle, drawPlayer, drawPlayerHead);
 }
 #pragma endregion

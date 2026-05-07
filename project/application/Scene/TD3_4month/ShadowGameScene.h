@@ -47,6 +47,7 @@
 #include"Audio.h"
 #include <string>
 #include "Stages/StageManager.h"
+#include "SkyBox/SkyBox.h"
 
 class ShadowGameScene : public BaseScene {
 private:
@@ -130,6 +131,8 @@ private:
     std::unique_ptr<Yoshida::LightManager>lightManager_ = nullptr;
 #pragma endregion
 	std::unique_ptr<DamageOverlay> damageOverlay_ = nullptr;
+	std::unique_ptr<SkyBox> skyBox_ = nullptr;
+
 public:
 	// シーンのコンストラクタ
 	ShadowGameScene();

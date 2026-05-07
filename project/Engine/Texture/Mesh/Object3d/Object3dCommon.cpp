@@ -143,7 +143,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 
 	psoSkinningToonOutline_ = std::make_unique<CreatePSO>(dxCommon_, true);
 	psoSkinningToonOutline_->Create(
-	    D3D12_CULL_MODE_FRONT, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/SkinningObject3dToonOutline.PS.hlsl",
+	    D3D12_CULL_MODE_FRONT, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dOutline.PS.hlsl",
 	    L"Resources/shader/Object3d/VS_Shader/SkinningObject3dToonOutline.VS.hlsl");
 
 	psoMaterialColorSkinning_ = std::make_unique<CreatePSO>(dxCommon_,true);
@@ -437,12 +437,46 @@ void Object3dCommon::DrawCommonSkybox() {
 }
 
 void Object3dCommon::BeginShadowMapPass() {
-	ID3D12Resource* resource = directionalShadowEnabled_ ? directionalShadowMapResource_.Get()
-	                                                     : (pointShadowEnabled_ ? pointShadowMapResource_.Get()
-	                                                                            : (spotShadowEnabled_ ? spotShadowMapResource_.Get() : (areaShadowEnabled_ ? areaShadowMapResource_.Get() : nullptr)));
-	ID3D12DescriptorHeap* dsvHeap =
-	    directionalShadowEnabled_ ? directionalShadowDsvHeap_.Get()
-	                              : (pointShadowEnabled_ ? pointShadowDsvHeap_.Get() : (spotShadowEnabled_ ? spotShadowDsvHeap_.Get() : (areaShadowEnabled_ ? areaShadowDsvHeap_.Get() : nullptr)));
+	int32_t passType = kShadowMapPassDirectional;
+	if (shadowMapPassSettingsResource_) {
+		shadowMapPassSettingsResource_->Map(0, nullptr, reinterpret_cast<void**>(&shadowMapPassSettingsData_));
+		if (shadowMapPassSettingsData_) {
+			passType = shadowMapPassSettingsData_->shadowType;
+		}
+		shadowMapPassSettingsResource_->Unmap(0, nullptr);
+		shadowMapPassSettingsData_ = nullptr;
+	}
+
+	ID3D12Resource* resource = nullptr;
+	ID3D12DescriptorHeap* dsvHeap = nullptr;
+	switch (passType) {
+	case kShadowMapPassDirectional:
+		if (directionalShadowEnabled_) {
+			resource = directionalShadowMapResource_.Get();
+			dsvHeap = directionalShadowDsvHeap_.Get();
+		}
+		break;
+	case kShadowMapPassPoint:
+		if (pointShadowEnabled_) {
+			resource = pointShadowMapResource_.Get();
+			dsvHeap = pointShadowDsvHeap_.Get();
+		}
+		break;
+	case kShadowMapPassSpot:
+		if (spotShadowEnabled_) {
+			resource = spotShadowMapResource_.Get();
+			dsvHeap = spotShadowDsvHeap_.Get();
+		}
+		break;
+	case kShadowMapPassArea:
+		if (areaShadowEnabled_) {
+			resource = areaShadowMapResource_.Get();
+			dsvHeap = areaShadowDsvHeap_.Get();
+		}
+		break;
+	default:
+		break;
+	}
 	if (!resource || !dsvHeap) {
 		return;
 	}
@@ -456,9 +490,40 @@ void Object3dCommon::BeginShadowMapPass() {
 }
 
 void Object3dCommon::EndShadowMapPass() {
-	ID3D12Resource* resource = directionalShadowEnabled_ ? directionalShadowMapResource_.Get()
-	                                                     : (pointShadowEnabled_ ? pointShadowMapResource_.Get()
-	                                                                            : (spotShadowEnabled_ ? spotShadowMapResource_.Get() : (areaShadowEnabled_ ? areaShadowMapResource_.Get() : nullptr)));
+	int32_t passType = kShadowMapPassDirectional;
+	if (shadowMapPassSettingsResource_) {
+		shadowMapPassSettingsResource_->Map(0, nullptr, reinterpret_cast<void**>(&shadowMapPassSettingsData_));
+		if (shadowMapPassSettingsData_) {
+			passType = shadowMapPassSettingsData_->shadowType;
+		}
+		shadowMapPassSettingsResource_->Unmap(0, nullptr);
+		shadowMapPassSettingsData_ = nullptr;
+	}
+	ID3D12Resource* resource = nullptr;
+	switch (passType) {
+	case kShadowMapPassDirectional:
+		if (directionalShadowEnabled_) {
+			resource = directionalShadowMapResource_.Get();
+		}
+		break;
+	case kShadowMapPassPoint:
+		if (pointShadowEnabled_) {
+			resource = pointShadowMapResource_.Get();
+		}
+		break;
+	case kShadowMapPassSpot:
+		if (spotShadowEnabled_) {
+			resource = spotShadowMapResource_.Get();
+		}
+		break;
+	case kShadowMapPassArea:
+		if (areaShadowEnabled_) {
+			resource = areaShadowMapResource_.Get();
+		}
+		break;
+	default:
+		break;
+	}
 	if (!resource) {
 		return;
 	}
