@@ -70,8 +70,9 @@ void ElevatorRoomManager::Update()
     walls_[0]->SetST({ 1.0f,4.0f,6.0f }, { -7.0f,2.0f,0.0f });
     walls_[1]->SetST({ 1.0f,4.0f,6.0f }, { 7.0f,2.0f,0.0f });
 
-    walls_[2]->SetST({ 7.0f, 4.0f,1.0f, }, { -3.75f,2.0f,3.0f });
-    walls_[3]->SetST({ 7.0f, 4.0f,1.0f, }, { 3.75f,2.0f ,3.0f });
+    //部屋と部屋の通路の壁
+    walls_[2]->SetST({ 2.5f, 4.0f,1.0f, }, { -6.0f ,2.0f,3.0f });
+    walls_[3]->SetST({ 11.5f, 4.0f,1.0f, }, { 1.5f ,2.0f,3.0f  });
 
     walls_[4]->SetST({ 7.0f, 4.0f,1.0f, },{ -4.25f,2.0f, -2.0f });
     walls_[5]->SetST({ 7.0f, 4.0f,1.0f },{ 4.25f,2.0f, -2.0f });

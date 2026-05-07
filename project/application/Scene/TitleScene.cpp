@@ -11,7 +11,6 @@
 #include"GameObject/YoshidaMath/Easing.h"
 #include"GameBase.h"
 
-
 void TitleScene::CameraUpdate()
 {
    const float deltaTime =  GameBase::GetInstance()->GetDeltaTime();
@@ -74,6 +73,7 @@ void TitleScene::Finalize() { }
 void TitleScene::Initialize() {
 
 
+
 	isTransitionIn = true;
 	isTransitionOut = false;
 	transition->Initialize(false);
@@ -113,6 +113,7 @@ void TitleScene::Initialize() {
 	timeCard_->SetCamera(camera_.get());
 	timeCardRack_->SetCamera(camera_.get());
 	wall_->SetCamera(camera_.get());
+
 }
 
 void TitleScene::Update() {
@@ -179,7 +180,9 @@ void TitleScene::Update() {
 
 	lightManager_->Update();
 
+	timeCard_->SetTranslate({.scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,Function::kPi,0.0f},.translate = {0.0f,0.0f,0.0f}});
 	timeCard_->Update();
+	timeCardRack_->SetTranslate({ .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,Function::kPi,0.0f},.translate = {-0.3f,0.0f,0.0f} });
 	timeCardRack_->Update();
 	wall_->Update();
 }

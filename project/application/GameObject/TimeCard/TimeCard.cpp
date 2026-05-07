@@ -18,11 +18,6 @@ void TimeCard::Initialize()
 {
     modelObj_->Initialize();
     modelObj_->RegisterEditor("TimeCard");
-    transform_ = {
-     .scale = {1.0f,1.0f,1.0f},
-     .rotate = {0.0f,Function::kPi,0.0f},
-     .translate = {0.0f,0.0f,0.0f}
-    };
 }
 
 void TimeCard::SetCamera(Camera* camera)
@@ -34,7 +29,6 @@ void TimeCard::SetCamera(Camera* camera)
 
 void TimeCard::Update()
 {
-    modelObj_->SetTransform(transform_);
     modelObj_->Update();
 }
 

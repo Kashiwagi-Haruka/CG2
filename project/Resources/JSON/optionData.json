@@ -4,9 +4,9 @@
     "x": 1.1555556058883667,
     "y": 1.1555556058883667
   },
-  "SEVolume": 0.8888888955116272,
+  "SEVolume": 1.0,
   "VoiceVolume": 1.0,
-  "fieldOfView": 51.66666793823242,
+  "fieldOfView": 50.0,
   "isFlipHorizontally": false,
   "isFlipVertically": false
 }

@@ -114,17 +114,7 @@ void TutorialStage::UpdateGameObject(Camera* camera, const Vector3& lightDirecti
 
     door_->Update();
     whiteBoardManager_->Update();
-    timeCard_->SetTransform({
-        {1.0f, 1.0f, 1.0f },
-        {0.0f, 0.0f, 0.0f },
-        {8.0f, 1.0f, -7.0f}
-        });
     timeCard_->Update();
-    timeCardRack_->SetTransform({
-        {1.0f,  1.0f, 1.0f },
-        {0.0f,  0.0f, 0.0f },
-        {7.75f, 1.3f, -7.0f}
-        });
     timeCardRack_->Update();
     documentManager_->Update(camera, lightDirection);
     fileManager_->Update();

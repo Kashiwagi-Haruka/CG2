@@ -110,17 +110,17 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 	lockerManager_->Update();
 	deskManager_->Update();
 	whiteBoardManager_->Update();
-	timeCard_->SetTransform({
+	/*timeCard_->SetTransform({
 	    {1.0f, 1.0f, 1.0f },
         {0.0f, 0.0f, 0.0f },
         {8.0f, 1.0f, -7.0f}
-    });
+    });*/
 	timeCard_->Update();
-	timeCardRack_->SetTransform({
-	    {1.0f,  1.0f, 1.0f },
-        {0.0f,  0.0f, 0.0f },
-        {7.75f, 1.3f, -7.0f}
-    });
+	//timeCardRack_->SetTransform({
+	//    {1.0f,  1.0f, 1.0f },
+ //       {0.0f,  0.0f, 0.0f },
+ //       {7.75f, 1.3f, -7.0f}
+ //   });
 	timeCardRack_->Update();
 	pc_->Update();
 	UpdateLights();
