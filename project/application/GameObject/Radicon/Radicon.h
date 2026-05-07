@@ -3,7 +3,7 @@
 #include "Engine/Texture/Mesh/Object3d/Object3d.h"
 #include"GameObject/YoshidaMath/CollisionManager/Collider.h"
 class Camera;
-class Radicon:public YoshidaMath::Collider {
+class Radicon{
 
 	std::unique_ptr<Object3d> obj_;
 	Camera* camera_ = nullptr;

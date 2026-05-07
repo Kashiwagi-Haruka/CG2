@@ -143,7 +143,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 
 	psoSkinningToonOutline_ = std::make_unique<CreatePSO>(dxCommon_, true);
 	psoSkinningToonOutline_->Create(
-	    D3D12_CULL_MODE_FRONT, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/SkinningObject3dToonOutline.PS.hlsl",
+	    D3D12_CULL_MODE_FRONT, true, D3D12_FILL_MODE_SOLID, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, L"Resources/shader/Object3d/PS_Shader/Object3dOutline.PS.hlsl",
 	    L"Resources/shader/Object3d/VS_Shader/SkinningObject3dToonOutline.VS.hlsl");
 
 	psoMaterialColorSkinning_ = std::make_unique<CreatePSO>(dxCommon_,true);
