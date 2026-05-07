@@ -101,6 +101,8 @@ void Menu::Initialize() {
 	confirmHintText_.SetAlign(TextAlign::Right);
 	confirmHintText_.UpdateLayout(false);
 
+	credit_.Initialize(fontHandle_);
+
 	const uint32_t overlayTexture = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
 	backgroundOverlaySprite_ = std::make_unique<Sprite>();
 	backgroundOverlaySprite_->Initialize(overlayTexture);
@@ -113,6 +115,14 @@ void Menu::Initialize() {
 void Menu::Update() {
 	backgroundOverlaySprite_->Update();
 	PlayerCommand* playerCommand = PlayerCommand::GetInstance();
+	if (isCreditOpen_) {
+		if (playerCommand->UiInteractTrigger() || playerCommand->Shot()) {
+			isCreditOpen_ = false;
+			SEManager::SoundPlay(SEManager::PUSH_WATCH);
+		}
+		return;
+	}
+
 	if (isTrigger_ && currentMenuName_ == "Option") {
 		option_->Update();
 		if (!option_->GetIsShowOption()) {
@@ -142,8 +152,7 @@ void Menu::Update() {
 			pendingAction_ = Action::kResumeGame;
 			isTrigger_ = false;
 		} else if (currentMenuName_ == "Credit") {
-			pendingAction_ = Action::kCredit;
-			isTrigger_ = false;
+			isCreditOpen_ = true;
 		} else if (currentMenuName_ == "Option") {
 			pendingAction_ = Action::kOpenOption;
 			isTrigger_ = true;
@@ -211,6 +220,11 @@ void Menu::Draw() {
 		option_->Draw();
 		return;
 	}
+	if (isCreditOpen_) {
+		credit_.Draw();
+		tabBackHintText_.Draw();
+		return;
+	}
 	menuText_.Draw();
 	GameText_.Draw();
 	CreditText_.Draw();
@@ -219,4 +233,4 @@ void Menu::Draw() {
 	GameEndText_.Draw();
 	tabBackHintText_.Draw();
 	confirmHintText_.Draw();
-	}
+}
