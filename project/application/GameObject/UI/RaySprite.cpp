@@ -19,7 +19,7 @@
 #include"GameObject/PC/PC.h"
 #include"GameObject/GentleMan/GentleMan.h"
 #include"GameObject/DocumentManager/Document/Document.h"
-
+#include"GameObject/GentleMan/GiantGentleMan.h"
 RaySprite::RaySprite()
 {
     handle_[HAND] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/hand.png");
@@ -89,5 +89,6 @@ bool RaySprite::IsRayHit()
         VendingMac::IsRayHit() ||
         PC::IsRayHit()||
         Gentleman::IsRayHit()||
-        Document::IsRayHit();
+        Document::IsRayHit()||
+        GiantGentleMan::IsRayHit();
 }

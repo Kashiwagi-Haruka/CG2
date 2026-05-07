@@ -3062,9 +3062,9 @@
           1.0
         ],
         "translate": [
-          7.0,
+          2.5,
           0.0,
-          -7.050000190734863
+          -7.0
         ]
       }
     },
@@ -3118,9 +3118,9 @@
           1.0
         ],
         "translate": [
-          0.0,
-          0.0,
-          0.0
+          3.5,
+          1.0,
+          -7.0
         ]
       }
     },
@@ -3165,7 +3165,7 @@
       "transform": {
         "rotate": [
           0.0,
-          3.1415927410125732,
+          0.0,
           0.0
         ],
         "scale": [
@@ -3174,9 +3174,9 @@
           1.0
         ],
         "translate": [
-          -2.5399999618530273,
-          0.0,
-          3.25
+          3.75,
+          1.2000000476837158,
+          -7.0
         ]
       }
     },
@@ -4018,118 +4018,6 @@
         "translate": [
           0.0,
           0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 1,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "WallWindowPlane",
-      "transform": {
-        "rotate": [
-          0.0,
-          1.5707999467849731,
-          0.0
-        ],
-        "scale": [
-          14.329999923706055,
-          4.21999979019165,
-          1.0
-        ],
-        "translate": [
-          14.0,
-          2.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 2,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "Wall2WindowPlane",
-      "transform": {
-        "rotate": [
-          0.0,
-          -1.5707999467849731,
-          0.0
-        ],
-        "scale": [
-          16.75,
-          4.170000076293945,
-          1.0
-        ],
-        "translate": [
-          -14.0,
-          2.0,
           0.0
         ]
       }

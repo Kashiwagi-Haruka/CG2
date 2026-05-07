@@ -18,11 +18,6 @@ void TimeCardRack::Initialize()
 {
     modelObj_->Initialize();
     modelObj_->RegisterEditor("TimeCardRack");
-    transform_ = {
-    .scale = {1.0f,1.0f,1.0f},
-    .rotate = {0.0f,Function::kPi,0.0f},
-    .translate = {0.3f,0.2f,0.0f}
-    };
 }
 
 void TimeCardRack::SetCamera(Camera* camera)
@@ -34,7 +29,6 @@ void TimeCardRack::SetCamera(Camera* camera)
 
 void TimeCardRack::Update()
 {
-    modelObj_->SetTransform(transform_);
     modelObj_->Update();
 }
 
