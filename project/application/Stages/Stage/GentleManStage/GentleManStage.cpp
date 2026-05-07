@@ -6,7 +6,7 @@
 #include "GameObject/Key/Key.h"
 #include "GameObject/Player/Player.h"
 #include "GameObject/Portal/PortalManager.h"
-#include "GameObject/TestField/TestField.h"
+#include "GameObject/GentleMan/GiantGentleMan.h"
 
 #include "GameObject/Wall/wallManagerRoofFoor.h"
 
@@ -63,6 +63,9 @@ GentleManStage::GentleManStage(Player* player)
 
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     timeCardWatch_->SetPlayer(player_);
+
+    giantGentleMan_ = std::make_unique<GiantGentleMan>();
+
 }
 
 void GentleManStage::Initialize()
@@ -78,6 +81,7 @@ void GentleManStage::Initialize()
     wallManagerRoofFoor_->Initialize();
     timeCardWatch_->Initialize();
     documentManager_->Initialize();
+    giantGentleMan_->Initialize();
 
     hierarchy->LoadObjectEditorsFromJsonIfExists("GentleManStage_objectEditors.json");
     hierarchy->EndRegisterFile();
@@ -87,7 +91,9 @@ void GentleManStage::UpdateGameObject(Camera* camera, const Vector3& lightDirect
     portalManager_->WarpPlayer(player);
     wallManagerRoofFoor_->Update();
     whiteBoardManager_->Update();
+    giantGentleMan_->Update();
     documentManager_->Update(camera, lightDirection);
+
     UpdateLights();
 }
 
@@ -118,6 +124,7 @@ void GentleManStage::CheckCollision() {
         stageCollisionManager_->AddCollider(wall.get());
     }
 
+    stageCollisionManager_->AddCollider(giantGentleMan_.get());
 
     stageCollisionManager_->CheckAllCollisions();
 }
@@ -138,6 +145,7 @@ void GentleManStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawPartic
     documentManager_->Draw();
     timeCardWatch_->Draw();
     whiteBoardManager_->Draw();
+    giantGentleMan_->Draw();
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 void GentleManStage::DrawSprite()
@@ -152,11 +160,13 @@ void GentleManStage::SetSceneCameraForDraw(Camera* camera) {
     wallManagerRoofFoor_->SetCamera(camera);
     documentManager_->SetCamera(camera);
     timeCardWatch_->SetCamera(camera);
+    giantGentleMan_->SetCamera(camera);
 }
 
 void GentleManStage::SetPlayerCamera(PlayerCamera* playerCamera) {
     portalManager_->SetPlayerCamera(playerCamera);
     documentManager_->SetPlayerCamera(playerCamera);
+    giantGentleMan_->SetPlayerCamera(playerCamera);
 }
 PortalManager* GentleManStage::GetPortalManager() { return portalManager_.get(); }
 
