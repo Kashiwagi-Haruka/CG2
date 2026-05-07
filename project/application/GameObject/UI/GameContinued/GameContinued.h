@@ -2,6 +2,7 @@
 #include "GameContinuedData.h"
 #include "Sprite/Sprite.h"
 #include "Text/GameContinuedText/GameContinuedText.h"
+#include "Text/Text.h"
 #include <array>
 #include <memory>
 #include <string>
@@ -9,7 +10,6 @@
 class GameContinued {
 
 private:
-
 	struct SaveData {
 		std::unique_ptr<Sprite> GameSceneSprite_; // ゲームシーンのスクリーンショットを表示するスプライト
 		std::unique_ptr<Sprite> BlockSprite_;     // セーブデータブロックを表示するスプライト
@@ -25,11 +25,14 @@ private:
 
 	int currentSelectNum_ = 0;
 	bool isSelected_ = false;
+	bool isBackTriggered_ = false;
+	uint32_t backHintFontHandle_ = 0;
+	Text backHintText_;
 
 	std::unique_ptr<GameContinuedText> text_;
 
 public:
-	void LoadAllSlots(); 
+	void LoadAllSlots();
 	void LoadAndSetSpriteHandle(const int index, const bool isAllowOverlap);
 	void Initialize();
 	void Update();
@@ -37,5 +40,6 @@ public:
 	void SetSaveData(int index, const std::string& name, const std::string& currentStageName, const std::string& saveDateTime);
 	int GetCurrentSelectNum() const { return currentSelectNum_; }
 	bool GetIsSelected() const { return isSelected_; }
+	bool ConsumeBackTriggered();
 	void SetIsSelected(const bool isSelected) { isSelected_ = isSelected; }
 };
