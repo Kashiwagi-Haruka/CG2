@@ -54,7 +54,7 @@ void WhiteBoardManager::Update() {
 }
 
 void WhiteBoardManager::Draw() {
-	Object3dCommon::GetInstance()->DrawCommonSkinning();
+	
     for (auto& board : whiteBoards_) {
         board->Draw();
     }
