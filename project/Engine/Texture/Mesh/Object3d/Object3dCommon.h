@@ -73,6 +73,10 @@ private:
 	std::unique_ptr<CreatePSO> psoSkinningOutline_;
 	// スキニング＋トゥーンアウトライン描画用PSO
 	std::unique_ptr<CreatePSO> psoSkinningToonOutline_;
+	// マテリアルカラーのみ描画用PSO
+	std::unique_ptr<CreatePSO> psoMaterialColorSkinning_;
+	// スカイボックス描画用PSO
+	std::unique_ptr<CreatePSO> psoSkybox_;
 
 	// Directional Light（共通）
 	DirectionalCommonLight* directionalLightData_ = nullptr;
@@ -244,6 +248,10 @@ public:
 	void DrawCommonPortal(Camera* camera);
 	// シャドウマップ描画設定
 	void DrawCommonShadow();
+	// マテリアルカラーのみ描画設定
+	void DrawCommonMaterialColorOnlySkinning();
+	// スカイボックス描画設定
+	void DrawCommonSkybox();
 #pragma endregion
 
 
