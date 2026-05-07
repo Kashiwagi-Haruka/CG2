@@ -79,8 +79,9 @@ void RadiconStage::UpdatePortal() {/*記載なし*/}
 
 void RadiconStage::CheckCollision() {
 
-	
-
+	stageCollisionManager_->AddCollider(testField_.get());
+	stageCollisionManager_->AddCollider(radicon_.get());
+	stageCollisionManager_->CheckAllCollisions();
 
 
 }
