@@ -82,6 +82,7 @@ void SampleScene::Initialize() {
 	uvBallObj_->SetModel("uvBall");
 	uvBallObj_->SetOutlineWidth(uvBallOutlineWidth_);
 	uvBallObj_->SetOutlineColor(uvBallOutlineColor_);
+	uvBallObj_->SetTranslate({0, 4, -1});
 	
 	fieldObj_->Initialize();
 	fieldObj_->SetCamera(camera_.get());
@@ -199,7 +200,7 @@ void SampleScene::Initialize() {
 
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
-	directionalLight_.intensity = 0.0f;
+	directionalLight_.intensity = 1.0f;
 	directionalLight_.shadowEnabled = 1;
 
 	activeSpotLightCount_ = 2;
@@ -468,16 +469,6 @@ void SampleScene::Update() {
 
 
 #endif // USE_IMGUI
-	directionalLight_.shadowEnabled = directionalShadowEnabled_ ? 1 : 0;
-	for (uint32_t i = 0; i < activePointLightCount_; ++i) {
-		pointLights_[i].shadowEnabled = (pointShadowEnabled_ && i == 0) ? 1 : 0;
-	}
-	for (uint32_t i = 0; i < activeSpotLightCount_; ++i) {
-		spotLights_[i].shadowEnabled = (spotShadowEnabled_ && i == 0) ? 1 : 0;
-	}
-	for (uint32_t i = 0; i < activeAreaLightCount_; ++i) {
-		areaLights_[i].shadowEnabled = (areaShadowEnabled_ && i == 0) ? 1 : 0;
-	}
 	if (useDebugCamera_) {
 		debugCamera_->Update();
 		camera_->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
@@ -540,7 +531,7 @@ void SampleScene::Update() {
 }
 void SampleScene::Draw() {
 	auto* object3dCommon = Object3dCommon::GetInstance();
-	// レイトレースシャドウに移行したため、シャドウマップパスは実行しない
+	// レイトレースシャドウに移行したため
 	object3dCommon->SetShadowMapEnabled(false, false, false, false);
 
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
@@ -569,11 +560,11 @@ void SampleScene::Draw() {
 	portalMeshB_->Update();
 
 	DrawSceneGeometry(camera_.get(), true);
-	SpriteCommon::GetInstance()->DrawCommon();
-	uvSprite->Draw();
-	if (overlayCameraSprite_) {
-		/*overlayCameraSprite_->Draw();*/
-	}
+	//SpriteCommon::GetInstance()->DrawCommon();
+	//uvSprite->Draw();
+	//if (overlayCameraSprite_) {
+	//	/*overlayCameraSprite_->Draw();*/
+	//}
 }
 
 void SampleScene::SetSceneCameraForDraw(Camera* camera) {
@@ -607,17 +598,13 @@ void SampleScene::DrawSceneGeometryForPortalTexture(Camera* camera) {
 	if (sampleParticleEmitter_) {
 		sampleParticleEmitter_->Draw();
 	}
-
-
-	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 }
 
 void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 	SetSceneCameraForDraw(camera);
 	ParticleManager::GetInstance()->SetCamera(camera);
 	UpdateSceneCameraMatricesForDraw();
-	Object3dCommon::GetInstance()->DrawCommonOutline();
-	uvBallObj_->Draw();
+	
 	Object3dCommon::GetInstance()->DrawCommon();
 	uvBallObj_->Draw();
 	fieldObj_->Draw();
