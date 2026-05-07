@@ -4,7 +4,7 @@
 
 LightIcon::LightIcon()
 {
-    handle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/flashLightIcon.png");
+    handle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/Icons/flashLightIcon.png");
     sprite_ = std::make_unique<Sprite>();
 }
 

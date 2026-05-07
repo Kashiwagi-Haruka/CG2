@@ -4,7 +4,7 @@
 
 KeyIcon::KeyIcon()
 {
-    handle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/keyIcon.png");
+    handle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/Icons/keyIcon.png");
     sprite_ = std::make_unique<Sprite>();
 }
 
