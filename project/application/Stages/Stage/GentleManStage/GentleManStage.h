@@ -3,7 +3,7 @@
 class TestField;
 class Door;
 class Key;
-class WallManager;
+class WallManagerRoofFoor;
 class WhiteBoardManager;
 class TimeCardWatch;
 class DocumentManager;
@@ -19,7 +19,7 @@ class GentleManStage :
     std::unique_ptr<WhiteBoardManager>  whiteBoardManager_ = nullptr;
     std::unique_ptr<PortalManager> portalManager_ = nullptr;
     CollisionManager* stageCollisionManager_ = nullptr;
-    std::unique_ptr<WallManager> wallManager_ = nullptr;
+    std::unique_ptr<WallManagerRoofFoor> wallManagerRoofFoor_ = nullptr;
     std::unique_ptr<DocumentManager>documentManager_ = nullptr;
 
 private:
