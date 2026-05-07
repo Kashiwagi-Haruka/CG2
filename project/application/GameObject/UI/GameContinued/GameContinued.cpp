@@ -9,6 +9,7 @@
 #include"GameObject/SEManager/SEManager.h"
 #include <cmath>
 #include"GameSave/GameSave.h"
+#include "Input.h"
 
 namespace {
     constexpr float kBlockWidth = 1040.0f;
@@ -100,6 +101,16 @@ void GameContinued::Initialize() {
 
     currentSelectNum_ = 0;
     isSelected_ = false;
+	isBackTriggered_ = false;
+
+	backHintFontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
+	FreeTypeManager::SetPixelSizes(backHintFontHandle_, 48, 48);
+	backHintText_.Initialize(backHintFontHandle_);
+	backHintText_.SetString(U"TABで戻る");
+	backHintText_.SetAlign(TextAlign::Left);
+	backHintText_.SetPosition({40.0f, 60.0f});
+	backHintText_.SetColor(COLOR::WHITE);
+	backHintText_.UpdateLayout(false);
 }
 
 
@@ -123,7 +134,9 @@ void GameContinued::Update() {
         SEManager::SoundPlay(SEManager::PORTAL_SPAWN);
         isSelected_ = true;
     }
-
+	if (Input::GetInstance()->TriggerKey(DIK_TAB)) {
+		isBackTriggered_ = true;
+	}
     for (int i = 0; i < saveDataMaxNum_; ++i) {
         const float maxDistance = static_cast<float>(saveDataMaxNum_ - 1);
         const float distance = std::abs(static_cast<float>(i - currentSelectNum_));
@@ -172,13 +185,22 @@ void GameContinued::Update() {
 }
 
 void GameContinued::Draw() {
-    SpriteCommon::GetInstance()->DrawCommon();
-    for (auto& saveData : gameSaveData_) {
-        saveData.BlockSprite_->Draw();
-        saveData.GameSceneSprite_->Draw();
-    }
-    SpriteCommon::GetInstance()->DrawCommonFont();
-    text_->Draw();
+	SpriteCommon::GetInstance()->DrawCommon();
+	for (auto& saveData : gameSaveData_) {
+		saveData.BlockSprite_->Draw();
+		saveData.GameSceneSprite_->Draw();
+	}
+	SpriteCommon::GetInstance()->DrawCommonFont();
+	text_->Draw();
+	backHintText_.Draw();
+}
+
+bool GameContinued::ConsumeBackTriggered() {
+	if (!isBackTriggered_) {
+		return false;
+	}
+	isBackTriggered_ = false;
+	return true;
 }
 
 void GameContinued::SetSaveData(int index, const std::string& name, const std::string& currentStageName, const std::string& saveDateTime) {

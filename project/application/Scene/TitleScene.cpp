@@ -138,6 +138,9 @@ void TitleScene::Update() {
 		}
 	} else {
 		gameContinued_->Update();
+		if (gameContinued_->ConsumeBackTriggered()) {
+			isGameContinuedOpen_ = false;
+		}
 	}
 
 	if (titleMenuUI_->GetIsStart()) {
