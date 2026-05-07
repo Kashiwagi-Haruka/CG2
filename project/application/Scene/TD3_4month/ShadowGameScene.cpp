@@ -64,6 +64,7 @@ ShadowGameScene::ShadowGameScene() {
 	SetPlayerCamera(cameraController_->GetPlayerCamera());
 
 	damageOverlay_ = std::make_unique<DamageOverlay>();
+
 	skyBox_ = std::make_unique<SkyBox>();
 }
 
