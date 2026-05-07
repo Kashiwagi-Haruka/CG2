@@ -56,7 +56,6 @@ GentleManStage::GentleManStage(Player* player)
 {
     player_ = player;
 
-    testField_ = std::make_unique<TestField>();
     whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
     portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
     wallManagerRoofFoor_ = std::make_unique<WallManagerRoofFoor>();
@@ -73,8 +72,6 @@ void GentleManStage::Initialize()
     hierarchy->BeginRegisterFile("GentleManStage_objectEditors.json");
 
     InitializeLights();
-
-    testField_->Initialize();
     whiteBoardManager_->Initialize();
     portalManager_->Initialize();
 
@@ -88,7 +85,6 @@ void GentleManStage::Initialize()
 
 void GentleManStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
     portalManager_->WarpPlayer(player);
-    testField_->Update();
     wallManagerRoofFoor_->Update();
     whiteBoardManager_->Update();
     documentManager_->Update(camera, lightDirection);
@@ -122,7 +118,6 @@ void GentleManStage::CheckCollision() {
         stageCollisionManager_->AddCollider(wall.get());
     }
 
-    stageCollisionManager_->AddCollider(testField_.get());
 
     stageCollisionManager_->CheckAllCollisions();
 }
@@ -136,7 +131,7 @@ void GentleManStage::SetCollisionManager(CollisionManager* collisionManager)
     stageCollisionManager_ = collisionManager;
 }
 void GentleManStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
-    testField_->Draw();
+
     wallManagerRoofFoor_->Draw();
 
     //ここで書類パーティクルを描画させる
@@ -151,7 +146,7 @@ void GentleManStage::DrawSprite()
 
 }
 void GentleManStage::SetSceneCameraForDraw(Camera* camera) {
-    testField_->SetCamera(camera);
+
     whiteBoardManager_->SetCamera(camera);
     portalManager_->SetCamera(camera);
     wallManagerRoofFoor_->SetCamera(camera);

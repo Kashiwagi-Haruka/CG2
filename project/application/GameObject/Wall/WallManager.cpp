@@ -109,7 +109,7 @@ void WallManager::Update()
 void WallManager::Draw()
 {
     room1_->Draw();
-    /*plane_->Draw();*/
+
     //for (auto& wall : walls_) {
     //    wall->Draw();
     //}
@@ -121,8 +121,6 @@ void WallManager::SetCamera(Camera* camera)
 
     room1_->SetCamera(camera);
     room1_->UpdateCameraMatrices();
-    /*plane_->SetCamera(camera);
-    plane_->UpdateCameraMatrices();*/
 
     //for (auto& wall : walls_) {
     //    wall->SetCamera(camera);
