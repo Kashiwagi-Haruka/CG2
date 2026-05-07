@@ -1,5 +1,5 @@
 #include "DeskManager.h"
-
+#include "Mesh/Object3d/Object3dCommon.h"
 bool DeskManager::isRayHit_ = false;
 
 DeskManager::DeskManager()
@@ -40,6 +40,7 @@ void DeskManager::Update()
 
 void DeskManager::Draw()
 {
+	Object3dCommon::GetInstance()->DrawCommonSkinning();
     for (auto& desk : desks_) {
         desk->Draw();
     }

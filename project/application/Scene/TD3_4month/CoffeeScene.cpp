@@ -119,18 +119,8 @@ void CoffeeScene::Update() {
 
 void CoffeeScene::Draw() {
 	auto* object3dCommon = Object3dCommon::GetInstance();
-	if (useDirectionalShadow_) {
-		object3dCommon->SetShadowMapEnabled(true, false, false, false);
-		object3dCommon->BeginShadowMapPass();
-		object3dCommon->DrawCommonShadow();
-		for (auto& wall : roomWalls_) {
-			wall->Draw();
-		}
-		coffee_->Draw();
-		object3dCommon->EndShadowMapPass();
-	}
-
-	object3dCommon->SetShadowMapEnabled(useDirectionalShadow_, false, false, false);
+	// レイトレースシャドウに移行したため、シャドウマップパスは実行しない
+	object3dCommon->SetShadowMapEnabled(false, false, false, false);
 	object3dCommon->SetDefaultCamera(camera_.get());
 	object3dCommon->DrawCommon();
 	for (auto& wall : roomWalls_) {

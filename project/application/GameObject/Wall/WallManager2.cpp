@@ -38,7 +38,7 @@ WallManager2::WallManager2()
     areaLights_[1].radius = 10.0f;
     areaLights_[1].decay = 2.0f;
 
-    plane_ = std::make_unique<Primitive>();
+    /*plane_ = std::make_unique<Primitive>();*/
 }
 
 
@@ -46,8 +46,8 @@ void WallManager2::Initialize()
 {
     room1_->Initialize();
     room1_->RegisterEditor("room2");
-    plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/out.jpg");
-    plane_->RegisterEditor("Wall2WindowPlane");
+    /*plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/out.jpg");
+    plane_->RegisterEditor("Wall2WindowPlane");*/
 
     // 壁の初期化
     for (auto& wall : walls_) {
@@ -72,17 +72,17 @@ void WallManager2::Initialize()
 }
 void WallManager2::Update()
 {
-    plane_->SetEnableLighting(false);
+    /*plane_->SetEnableLighting(false);*/
     room1_->Update();
     //roomMat_ = room1_->GetWorldMatrix();
-    Matrix4x4 planeMat = Function::MakeAffineMatrix(plane_->GetTransform().scale, plane_->GetTransform().rotate, plane_->GetTransform().translate);
+    /*Matrix4x4 planeMat = Function::MakeAffineMatrix(plane_->GetTransform().scale, plane_->GetTransform().rotate, plane_->GetTransform().translate);
     plane_->SetWorldMatrix(planeMat);
     plane_->Update();
     Vector3 normal = YoshidaMath::GetForward(plane_->GetWorldMatrix());
     normal.x *= 1.0f;
     areaLights_[1].normal = normal;
     areaLights_[1].position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
-    areaLights_[1].height = plane_->GetTransform().scale.y*0.5f;
+    areaLights_[1].height = plane_->GetTransform().scale.y*0.5f;*/
     for (auto& wall : walls_) {
         wall->Update();
     }

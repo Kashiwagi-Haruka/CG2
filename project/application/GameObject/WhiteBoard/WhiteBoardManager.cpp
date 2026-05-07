@@ -1,5 +1,5 @@
 #include "WhiteBoardManager.h"
-
+#include "Mesh/Object3d/Object3dCommon.h"
 #include "GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include "GameObject/KeyBindConfig.h"
 #include "GameObject/SEManager/SEManager.h"
@@ -54,7 +54,7 @@ void WhiteBoardManager::Update() {
 }
 
 void WhiteBoardManager::Draw() {
-
+	
     for (auto& board : whiteBoards_) {
         board->Draw();
     }

@@ -50,9 +50,6 @@ SampleScene::SampleScene() {
 
 	uvBallObj_ = std::make_unique<Object3d>();
 	fieldObj_ = std::make_unique<Object3d>();
-	planeGltf_ = std::make_unique<Object3d>();
-	animatedCubeObj_ = std::make_unique<Object3d>();
-	humanObj_ = std::make_unique<Object3d>();
 	spherePrimitive_ = std::make_unique<Primitive>();
 	portalMeshA_ = std::make_unique<PortalMesh>();
 	portalMeshB_ = std::make_unique<PortalMesh>();
@@ -71,10 +68,6 @@ SampleScene::SampleScene() {
 
 	ModelManager::GetInstance()->LoadModel("Resources/3d", "uvBall");
 	ModelManager::GetInstance()->LoadModel("Resources/3d", "terrain");
-	ModelManager::GetInstance()->LoadGltfModel("Resources/3d", "planeG");
-	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/AnimatedCube", "AnimatedCube");
-	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "walk");
-	ModelManager::GetInstance()->LoadGltfModel("Resources/3d/human", "sneakWalk");
 	ParticleManager::GetInstance()->CreateParticleGroup("sample", "Resources/2d/defaultParticle.png");
 	bgmData_ = Audio::GetInstance()->SoundLoadFile("Resources/audio/BGM/Rendez-vous_2.mp3");
 	Audio::GetInstance()->SetSoundVolume(&bgmData_, 1.0f);
@@ -89,19 +82,11 @@ void SampleScene::Initialize() {
 	uvBallObj_->SetModel("uvBall");
 	uvBallObj_->SetOutlineWidth(uvBallOutlineWidth_);
 	uvBallObj_->SetOutlineColor(uvBallOutlineColor_);
+	uvBallObj_->SetTranslate({0, 4, -1});
 	
 	fieldObj_->Initialize();
 	fieldObj_->SetCamera(camera_.get());
 	fieldObj_->SetModel("terrain");
-	planeGltf_->Initialize();
-	planeGltf_->SetCamera(camera_.get());
-	planeGltf_->SetModel("planeG");
-	animatedCubeObj_->Initialize();
-	animatedCubeObj_->SetCamera(camera_.get());
-	animatedCubeObj_->SetModel("AnimatedCube");
-	humanObj_->Initialize();
-	humanObj_->SetCamera(camera_.get());
-	humanObj_->SetModel("walk");
 
 	spherePrimitive_->Initialize(Primitive::Sphere, 32);
 	spherePrimitive_->SetCamera(camera_.get());
@@ -185,25 +170,6 @@ void SampleScene::Initialize() {
 	sampleParticleEmitter_->SetAcceleration({0.0f, 0.0f, 0.0f});
 	sampleParticleEmitter_->SetAreaMin({-0.5f, -0.5f, -0.5f});
 	sampleParticleEmitter_->SetAreaMax({0.5f, 0.5f, 0.5f});
-	planeGltf_->SetTransform(planeGTransform_);
-	animatedCubeAnimation_ = Animation::LoadAnimationData("Resources/3d/AnimatedCube", "AnimatedCube");
-	animatedCubeObj_->SetAnimation(&animatedCubeAnimation_, true);
-	animatedCubeObj_->SetTransform(animatedCubeTransform_);
-	humanAnimationClips_ = Animation::LoadAnimationClips("Resources/3d/human", "walk");
-	std::vector<Animation::AnimationData> sneakClips = Animation::LoadAnimationClips("Resources/3d/human", "sneakWalk");
-	humanAnimationClips_.insert(humanAnimationClips_.end(), sneakClips.begin(), sneakClips.end());
-	if (!humanAnimationClips_.empty()) {
-		currentHumanAnimationIndex_ = 0;
-		humanObj_->SetAnimation(&humanAnimationClips_[currentHumanAnimationIndex_], true);
-	}
-	humanObj_->SetTransform(humanTransform_);
-	if (Model* walkModel = ModelManager::GetInstance()->FindModel("walk")) {
-		humanSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(walkModel->GetModelData().rootnode));
-		humanSkinCluster_ = CreateSkinCluster(*humanSkeleton_, *walkModel);
-		if (!humanSkinCluster_.mappedPalette.empty()) {
-			humanObj_->SetSkinCluster(&humanSkinCluster_);
-		}
-	}
 
 	uvSprite = std::make_unique<Sprite>();
 	uvSprite->Initialize(TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/2d/uvChecker.png"));
@@ -234,7 +200,7 @@ void SampleScene::Initialize() {
 
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
-	directionalLight_.intensity = 0.0f;
+	directionalLight_.intensity = 1.0f;
 	directionalLight_.shadowEnabled = 1;
 
 	activeSpotLightCount_ = 2;
@@ -384,28 +350,7 @@ void SampleScene::Update() {
 		ImGui::Text("RT: %.3f", input->GetRightTrigger());
 	}
 	ImGui::End();
-	if (ImGui::Begin("Human")) {
-		if (ImGui::TreeNode("Transform")) {
-			ImGui::DragFloat3("Scale", &humanTransform_.scale.x, 0.1f);
-			ImGui::DragFloat3("Rotate", &humanTransform_.rotate.x, 0.1f);
-			ImGui::DragFloat3("Translate", &humanTransform_.translate.x, 0.1f);
-			ImGui::TreePop();
-		}
-		if (!humanAnimationClips_.empty()) {
-			std::vector<const char*> animationNames;
-			animationNames.reserve(humanAnimationClips_.size());
-			for (const auto& clip : humanAnimationClips_) {
-				animationNames.push_back(clip.name.c_str());
-			}
-			int selectedIndex = static_cast<int>(currentHumanAnimationIndex_);
-			if (ImGui::Combo("Animation", &selectedIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
-				currentHumanAnimationIndex_ = static_cast<size_t>(selectedIndex);
-				humanObj_->SetAnimation(&humanAnimationClips_[currentHumanAnimationIndex_], true);
-				humanAnimationTime_ = 0.0f;
-			}
-		}
-	}
-	ImGui::End();
+
 	if (ImGui::Begin("Particle Editor")) {
 		ImGui::Text("Sample Particle Emitter");
 		if (ImGui::TreeNode("Emitter Transform")) {
@@ -524,16 +469,6 @@ void SampleScene::Update() {
 
 
 #endif // USE_IMGUI
-	directionalLight_.shadowEnabled = directionalShadowEnabled_ ? 1 : 0;
-	for (uint32_t i = 0; i < activePointLightCount_; ++i) {
-		pointLights_[i].shadowEnabled = (pointShadowEnabled_ && i == 0) ? 1 : 0;
-	}
-	for (uint32_t i = 0; i < activeSpotLightCount_; ++i) {
-		spotLights_[i].shadowEnabled = (spotShadowEnabled_ && i == 0) ? 1 : 0;
-	}
-	for (uint32_t i = 0; i < activeAreaLightCount_; ++i) {
-		areaLights_[i].shadowEnabled = (areaShadowEnabled_ && i == 0) ? 1 : 0;
-	}
 	if (useDebugCamera_) {
 		debugCamera_->Update();
 		camera_->SetViewProjectionMatrix(debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix());
@@ -582,9 +517,6 @@ void SampleScene::Update() {
 	spherePrimitive_->Update();
 	uvBallObj_->Update();
 	fieldObj_->Update();
-	planeGltf_->Update();
-	animatedCubeObj_->Update();
-	humanObj_->Update();
 	ringUvRotation_ -= 0.05f;
 
 	uvSprite->Update();
@@ -595,37 +527,12 @@ void SampleScene::Update() {
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 
 	float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-	if (humanSkeleton_ && !humanAnimationClips_.empty()) {
-		const Animation::AnimationData& currentAnimation = humanAnimationClips_[currentHumanAnimationIndex_];
-		humanAnimationTime_ = Animation::AdvanceTime(currentAnimation, humanAnimationTime_, deltaTime, true);
-		humanSkeleton_->ApplyAnimation(currentAnimation, humanAnimationTime_);
-		humanSkeleton_->Update();
-		if (!humanSkinCluster_.mappedPalette.empty()) {
-			UpdateSkinCluster(humanSkinCluster_, *humanSkeleton_);
-		}
-		Matrix4x4 humanWorld = humanObj_->GetWorldMatrix();
-		humanSkeleton_->SetObjectMatrix(humanWorld);
-	}
+
 }
 void SampleScene::Draw() {
 	auto* object3dCommon = Object3dCommon::GetInstance();
-	const bool shadowFlags[4] = {directionalShadowEnabled_, pointShadowEnabled_, spotShadowEnabled_, areaShadowEnabled_};
-	for (int i = 0; i < 4; ++i) {
-		if (!shadowFlags[i]) {
-			continue;
-		}
-		object3dCommon->SetShadowMapEnabled(i == 0, i == 1, i == 2, i == 3);
-		object3dCommon->BeginShadowMapPass();
-		object3dCommon->DrawCommonShadow();
-		uvBallObj_->Draw();
-		planeGltf_->Draw();
-		fieldObj_->Draw();
-		animatedCubeObj_->Draw();
-		humanObj_->Draw();
-		spherePrimitive_->Draw();
-		object3dCommon->EndShadowMapPass();
-	}
-	object3dCommon->SetShadowMapEnabled(directionalShadowEnabled_, pointShadowEnabled_, spotShadowEnabled_, areaShadowEnabled_);
+	// レイトレースシャドウに移行したため
+	object3dCommon->SetShadowMapEnabled(false, false, false, false);
 
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
 	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
@@ -653,28 +560,24 @@ void SampleScene::Draw() {
 	portalMeshB_->Update();
 
 	DrawSceneGeometry(camera_.get(), true);
-	SpriteCommon::GetInstance()->DrawCommon();
-	uvSprite->Draw();
-	if (overlayCameraSprite_) {
-		/*overlayCameraSprite_->Draw();*/
-	}
+	//SpriteCommon::GetInstance()->DrawCommon();
+	//uvSprite->Draw();
+	//if (overlayCameraSprite_) {
+	//	/*overlayCameraSprite_->Draw();*/
+	//}
 }
 
 void SampleScene::SetSceneCameraForDraw(Camera* camera) {
 	uvBallObj_->SetCamera(camera);
 	fieldObj_->SetCamera(camera);
-	planeGltf_->SetCamera(camera);
-	animatedCubeObj_->SetCamera(camera);
-	humanObj_->SetCamera(camera);
+
 	spherePrimitive_->SetCamera(camera);
 }
 
 void SampleScene::UpdateSceneCameraMatricesForDraw() {
 	uvBallObj_->UpdateCameraMatrices();
 	fieldObj_->UpdateCameraMatrices();
-	planeGltf_->UpdateCameraMatrices();
-	animatedCubeObj_->UpdateCameraMatrices();
-	humanObj_->UpdateCameraMatrices();
+
 	spherePrimitive_->UpdateCameraMatrices();
 }
 
@@ -682,38 +585,29 @@ void SampleScene::DrawSceneGeometryForPortalTexture(Camera* camera) {
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera);
 	uvBallObj_->SetCamera(camera);
 	fieldObj_->SetCamera(camera);
-	planeGltf_->SetCamera(camera);
-	animatedCubeObj_->SetCamera(camera);
-	humanObj_->SetCamera(camera);
 	spherePrimitive_->SetCamera(camera);
 	ParticleManager::GetInstance()->SetCamera(camera);
 	UpdateSceneCameraMatricesForDraw();
 
 	Object3dCommon::GetInstance()->DrawCommon();
-	/*uvBallObj_->Draw();*/
-	planeGltf_->Draw();
+	uvBallObj_->Draw();
+
 	fieldObj_->Draw();
-	animatedCubeObj_->Draw();
+
 	spherePrimitive_->Draw();
 	if (sampleParticleEmitter_) {
 		sampleParticleEmitter_->Draw();
 	}
-
-	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
-	humanObj_->Draw();
-	Object3dCommon::GetInstance()->DrawCommonWireframeNoDepth();
 }
 
 void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 	SetSceneCameraForDraw(camera);
 	ParticleManager::GetInstance()->SetCamera(camera);
 	UpdateSceneCameraMatricesForDraw();
-	Object3dCommon::GetInstance()->DrawCommonOutline();
-	uvBallObj_->Draw();
+	
 	Object3dCommon::GetInstance()->DrawCommon();
-	planeGltf_->Draw();
+	uvBallObj_->Draw();
 	fieldObj_->Draw();
-	animatedCubeObj_->Draw();
 	spherePrimitive_->Draw();
 	if (sampleParticleEmitter_) {
 		sampleParticleEmitter_->Draw();
@@ -724,8 +618,6 @@ void SampleScene::DrawSceneGeometry(Camera* camera, bool drawPortals) {
 		portalMeshB_->Draw();
 	}
 
-	Object3dCommon::GetInstance()->DrawCommonSkinningToon();
-	humanObj_->Draw();
 }
 
 void SampleScene::Finalize() {

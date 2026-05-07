@@ -2,19 +2,20 @@
 #include "Audio.h"
 #include "BaseScene.h"
 #include "Camera.h"
+#include "GameObject/LightManager/LightManager.h"
 #include "GameObject/TimeCard/TimeCard.h"
 #include "GameObject/TimeCard/TimeCardRack.h"
 #include "GameObject/UI/GameContinued/GameContinued.h"
 #include "GameObject/Wall/Wall.h"
 #include "GameObject/YoshidaMath/RandomClass.h"
 #include "Light/CommonLight/DirectionalCommonLight.h"
+#include "Option/Option.h"
 #include "SceneTransition/SceneTransition.h"
 #include "Sprite.h"
 #include "Text/FirstStory/FirstStory.h"
 #include "Text/TItleMenu/TitleMenuUI.h"
+#include "Text/TitleTimeText/TitleTimeText.h"
 #include <memory>
-#include"Text/TitleTimeText/TitleTimeText.h"
-#include"GameObject/LightManager/LightManager.h"
 
 class GameBase;
 
@@ -31,7 +32,9 @@ private:
 	std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
 	std::unique_ptr<Wall> wall_ = nullptr;
 	std::unique_ptr<GameContinued> gameContinued_ = nullptr;
+	std::unique_ptr<Option> option_ = nullptr;
 	bool isGameContinuedOpen_ = false;
+	bool isOptionOpen_ = false;
 
 	Matrix4x4 identityMat_;
 	// カメラ
@@ -41,10 +44,12 @@ private:
 	Vector3 cameraRandomOffset_ = {0.0f};
 	float cameraMoveTimer_ = 0.0f;
 	std::unique_ptr<RandomClass> random_ = nullptr;
-	std::unique_ptr<Yoshida::LightManager>lightManager_ = nullptr;
+	std::unique_ptr<Yoshida::LightManager> lightManager_ = nullptr;
+
 private:
 	void CameraUpdate();
 	void TransitionStart();
+
 public:
 	TitleScene();
 	~TitleScene() override = default;

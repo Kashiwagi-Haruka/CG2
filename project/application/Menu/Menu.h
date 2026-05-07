@@ -2,6 +2,7 @@
 #include "Option/Option.h"
 #include "Sprite/Sprite.h"
 #include "Text/Text.h"
+#include "application/Text/Credit/Credit.h"
 #include <memory>
 #include <string>
 class Menu {
@@ -25,8 +26,10 @@ private:
 	Text GameEndText_;
 	Text tabBackHintText_;
 	Text confirmHintText_;
+	Credit credit_;
 	uint32_t fontHandle_ = 0;
 	std::unique_ptr<Sprite> backgroundOverlaySprite_{};
+	bool isCreditOpen_ = false;
 
 public:
 	/// <summary>
