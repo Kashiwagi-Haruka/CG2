@@ -21,7 +21,6 @@ public:
 	bool ChangeDrink();
 	void SetVendingMacPosition(const Vector3& position) { vendingMacPosition_ = position; }
 	void SetVendingMacForward(const Vector3& forward) { vendingMacForward_ = forward; }
-
 private:
 	struct SpawnedDrink {
 		DrinkName type = WATER;
@@ -29,6 +28,8 @@ private:
 		Vector3 velocity = {0.0f, 0.0f, 0.0f};
 		bool isGrounded = false;
 		bool isRayHit = false;
+		// 拾われたフラグ
+		bool isPickedUp = false;
 	};
 
 	void SpawnDrink(DrinkName type);

@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "SceneManager.h"
 #include "application/GameObject/SEManager/SEManager.h"
+#include"Inventory/Inventory.h"
 
 bool UIManager::isPause_ = false;
 
@@ -25,7 +26,7 @@ UIManager::UIManager() {
     mission_ = std::make_unique<Mission>();
     chairMenu_ = std::make_unique<ChairMenu>();
     gentlemanMenu_ = std::make_unique<GentlemanMenu>();
-
+ 
 }
 
 void UIManager::Initialize() {
@@ -41,6 +42,7 @@ void UIManager::Initialize() {
     mission_->Initialize();
     chairMenu_->Initialize();
     gentlemanMenu_->Initialize();
+    Inventory::GetInstance()->Initialize();
 
 }
 
@@ -90,6 +92,7 @@ void UIManager::Update() {
 
     }
 
+    Inventory::GetInstance()->Update();
     tabKey_->Update();
     keyIcon_->Update();
     lightIcon_->Update();
@@ -120,6 +123,8 @@ void UIManager::Draw() {
     textUIManager_->Draw();
 
     raySprite_->Draw();
+
+    Inventory::GetInstance()->Draw();
 
     if (Flashlight::IsGetLight()) {
         lightIcon_->Draw();

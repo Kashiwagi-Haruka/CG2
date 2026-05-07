@@ -7,7 +7,10 @@
 #include "Object3d/Object3dCommon.h"
 #include "RigidBody.h"
 #include <Model/ModelManager.h>
-
+#include"GameObject/KeyBindConfig.h"
+#include"GameObject/SEManager/SEManager.h"
+#include"GameObject/UI/Inventory/Inventory.h"
+#include"GameObject/UI/Inventory/item/Drink/itemDrink.h"
 namespace {
 constexpr int kMaxDrinkCount = 10;
 const Vector3 kDrinkPositionOffset = {0.0f, 0.9f, 0.45f};
@@ -49,6 +52,7 @@ bool Drink::ChangeDrink() {
 	currentDrinkName_ = static_cast<DrinkName>((static_cast<int>(currentDrinkName_) + 1) % kMaxDrinkNameCount);
 	return false;
 }
+
 
 std::unique_ptr<Object3d> Drink::CreateDrinkObject(DrinkName type) const {
 	auto obj = std::make_unique<Object3d>();
@@ -102,6 +106,12 @@ void Drink::SpawnDrink(DrinkName type) {
 }
 
 void Drink::Update() {
+
+
+
+
+
+
 	const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	for (auto& spawnedDrink : spawnedDrinks_) {
 		if (!spawnedDrink.object) {
@@ -122,7 +132,32 @@ void Drink::Update() {
 
 		spawnedDrink.isRayHit = playerCamera_ ? playerCamera_->OnCollisionRay(kDrinkRayAABB, translate) : false;
 		spawnedDrink.object->Update();
+
+
+		if (spawnedDrink.isRayHit) {
+			if (PlayerCommand::GetInstance()->InteractTrigger()) {
+
+				// ① ドリンクの種類から、アイテムデータ（ItemDrink）を作成
+				auto newItem = std::make_shared<ItemDrink>(spawnedDrink.type);
+
+				// ② インベントリへの追加を試みる
+				if (Inventory::GetInstance()->AddItem(newItem)) {
+					// 追加に成功したら、3Dオブジェクト側を消去するためのフラグを立てる
+					SEManager::SoundPlay(SEManager::CAN);
+					spawnedDrink.isPickedUp = true;
+				} else {
+					// インベントリがいっぱいで拾えない時の処理（警告音を鳴らすなど）
+				
+				}
+			}
+		}
 	}
+
+	// ④ ループが終わった後に、isPickedUp が true になっているものを配列から一括で削除する
+	std::erase_if(spawnedDrinks_, [](const SpawnedDrink& drink) {
+			return drink.isPickedUp;
+		});
+
 }
 
 void Drink::Draw() {
