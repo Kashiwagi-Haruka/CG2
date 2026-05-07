@@ -200,6 +200,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\EditorTool\Grid\EditorGrid.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\AnimationManager.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\Animation\Animation.cpp" />
+    <ClCompile Include="Engine\Texture\Mesh\SkyBox\SkyBox.cpp" />
     <ClCompile Include="Engine\Texture\PSO\CreatePSO.cpp" />
     <ClCompile Include="Engine\Loadfile\CSV\CSVManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
@@ -412,6 +413,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Texture\Data\Color.h" />
     <ClInclude Include="Engine\Texture\Mesh\Animation\Animation.h" />
     <ClInclude Include="Engine\Texture\Light\CommonLight\AreaCommonLight.h" />
+    <ClInclude Include="Engine\Texture\Mesh\SkyBox\SkyBox.h" />
     <ClInclude Include="Engine\Texture\PSO\CreatePSO.h" />
     <ClInclude Include="Engine\BaseScene\AbstractSceneFactory.h" />
     <ClInclude Include="Engine\BaseScene\BaseScene.h" />

@@ -64,6 +64,7 @@ ShadowGameScene::ShadowGameScene() {
 	SetPlayerCamera(cameraController_->GetPlayerCamera());
 
 	damageOverlay_ = std::make_unique<DamageOverlay>();
+	skyBox_ = std::make_unique<SkyBox>();
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -83,6 +84,8 @@ void ShadowGameScene::Initialize()
     BGMManager::Initialize();
 
     damageOverlay_->Initialize();
+	skyBox_->Initialize();
+	skyBox_->SetCamera(cameraController_->GetPlayerCamera()->GetCamera());
 
     noiseTimer_ = kNoiseTimer_;
     isNoise_ = false;
@@ -462,6 +465,7 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
 }
 
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
+	skyBox_->SetCamera(camera);
 	player_->SetCamera(camera);
 	stageManager_->SetSceneCameraForDraw(camera);
 	elevatorRoomManager_->SetCamera(camera);
@@ -476,7 +480,11 @@ void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera) {
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer, bool drawPlayerHead) {
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera);
 	SetSceneCameraForDraw(camera);
-	Object3dCommon::GetInstance()->DrawCommon();
+	auto* object3dCommon = Object3dCommon::GetInstance();
+	object3dCommon->DrawCommonSkybox();
+	skyBox_->Update();
+	skyBox_->Draw();
+	object3dCommon->DrawCommon();
 	DrawGameObject(false, drawPortal, isDrawParticle, drawPlayer, drawPlayerHead);
 }
 #pragma endregion
