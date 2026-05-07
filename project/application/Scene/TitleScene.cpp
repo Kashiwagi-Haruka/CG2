@@ -59,6 +59,7 @@ TitleScene::TitleScene() {
 	firstStory_ = std::make_unique<FirstStory>();
 	titleTimeText_ = std::make_unique<TitleTimeText>();
 	gameContinued_ = std::make_unique<GameContinued>();
+	option_ = std::make_unique<Option>();
 	// ゲームオブジェクト
 	timeCard_ = std::make_unique<TimeCard>();
 	timeCardRack_ = std::make_unique<TimeCardRack>();
@@ -83,8 +84,10 @@ void TitleScene::Initialize() {
 	titleMenuUI_->Initialize();
 	firstStory_->Initialize();
 	gameContinued_->Initialize();
+	option_->Initialize();
 	titleTimeText_->Initialize();
 	isGameContinuedOpen_ = false;
+	isOptionOpen_ = false;
 
 	// カメラ
 	cameraTransform_ = {
@@ -117,10 +120,21 @@ void TitleScene::Update() {
 	titleTimeText_->Update();
 
 	if (!isGameContinuedOpen_) {
-		titleMenuUI_->Update();
+		if (!isOptionOpen_) {
+			titleMenuUI_->Update();
+		} else {
+			option_->Update();
+			if (!option_->GetIsShowOption()) {
+				isOptionOpen_ = false;
+			}
+		}
 
 		if (titleMenuUI_->ConsumeContinueTriggered()) {
 			isGameContinuedOpen_ = true;
+		}
+		if (titleMenuUI_->ConsumeOptionTriggered()) {
+			isOptionOpen_ = true;
+			option_->OpenOption();
 		}
 	} else {
 		gameContinued_->Update();
@@ -180,16 +194,19 @@ void TitleScene::Draw() {
 
 	SpriteCommon::GetInstance()->DrawCommonFont();
 	if (!isGameContinuedOpen_) {
-		titleMenuUI_->Draw();
-		
-		if (!titleMenuUI_->GetIsStart()) {
-			titleTimeText_->Draw();
+		if (isOptionOpen_) {
+			option_->Draw();
+		} else {
+			titleMenuUI_->Draw();
+			if (!titleMenuUI_->GetIsStart()) {
+				titleTimeText_->Draw();
+			}
 		}
-	
+		
+
 	} else {
 		gameContinued_->Draw();
 	}
-
 
 	firstStory_->Draw();
 	FreeTypeManager::ResetFontUsage();

@@ -71,6 +71,7 @@ void TitleMenuUI::Initialize() {
     isShowMenu_ = false;
     isInitStart_ = false;
     isContinueTriggered_ = false;
+	isOptionTriggered_ = false;
     selectButtonNum_ = 0;
     random_->SetMinMax(-8.0f, 8.0f);
 
@@ -100,7 +101,7 @@ void TitleMenuUI::Update() {
                 isContinueTriggered_ = true;
 
             } else if (selectButtonNum_ == OPTION_TEXT) {
-
+				isOptionTriggered_ = true;
             }
 
         } else {
@@ -170,6 +171,14 @@ bool TitleMenuUI::ConsumeContinueTriggered() {
 
     isContinueTriggered_ = false;
     return true;
+}
+bool TitleMenuUI::ConsumeOptionTriggered() {
+	if (!isOptionTriggered_) {
+		return false;
+	}
+
+	isOptionTriggered_ = false;
+	return true;
 }
 void TitleMenuUI::Draw()
 {
