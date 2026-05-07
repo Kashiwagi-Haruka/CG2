@@ -116,6 +116,11 @@ bool PlayerCommand::MouseWheelDown() {
     return (input->GetMouseWheelDelta() > 0.0f);
 }
 
+const float PlayerCommand::GetMouseWheelDelta()
+{
+    return Input::GetInstance()->GetMouseWheelDelta();
+}
+
 bool PlayerCommand::UiMoveLeft() { return Move(K_MoveLeft, K_MoveLeftArrow, C_MoveLeft); }
 
 bool PlayerCommand::UiMoveRight() { return Move(K_MoveRight, K_MoveRightArrow, C_MoveRight); }
@@ -138,7 +143,7 @@ Vector2 PlayerCommand::Rotate(float rotateSpeed,const bool isFlipHorizontally,co
         dPitch += inputMovePos.y * YoshidaMath::kDeltaTime * rotateSpeed;
     }
 
-    return { isFlipHorizontally?-dPitch:dPitch, isFlipVertically?-dYaw:dYaw };
+    return {  isFlipVertically ? -dPitch : dPitch,isFlipHorizontally ? -dYaw : dYaw };
 }
 
 void PlayerCommand::Initialize() {

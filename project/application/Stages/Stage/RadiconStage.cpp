@@ -95,6 +95,10 @@ void RadiconStage::DrawModel([[maybe_unused]] bool isShadow, [[maybe_unused]] bo
 	radicon_->Draw();
 }
 
+void RadiconStage::DrawSprite()
+{
+}
+
 void RadiconStage::SetSceneCameraForDraw([[maybe_unused]] Camera* camera) {
 	testField_->SetCamera(camera);
 	radicon_->SetCamera(camera);

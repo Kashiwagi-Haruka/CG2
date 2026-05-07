@@ -104,6 +104,9 @@ public:
 	bool GetIsFlipY() { return isFripY_; };
 	void SetIsFlipY(const bool isFlipY);
 	void AdjustTextureSize();
+	const Vector2 GetScale() { return { transform_.scale.x,transform_.scale.y }; }
+	const Vector2 GetTranslate() { return { transform_.translate.x,transform_.translate.y }; }
+
 	const Vector2& GetAnchorPoint() const { return anchorPoint; };
 	void SetAnchorPoint(const Vector2 anchorPoint) {
 		this->anchorPoint;

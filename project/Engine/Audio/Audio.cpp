@@ -120,6 +120,9 @@ void SoundData::RegisterInstance() { SoundDataRegistry().push_back(this); }
 
 void SoundData::UnregisterInstance() {
 	auto& instances = SoundDataRegistry();
+	if (instances.empty()) {
+		return;
+	}
 	instances.erase(std::remove(instances.begin(), instances.end(), this), instances.end());
 }
 

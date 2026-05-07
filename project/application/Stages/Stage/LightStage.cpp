@@ -16,7 +16,10 @@ void LightStage::UpdatePortal() {}
 void LightStage::CheckCollision() {}
 
 void LightStage::DrawModel([[maybe_unused]] bool isShadow, [[maybe_unused]] bool drawPortal, [[maybe_unused]] bool isDrawParticle) {}
+void LightStage::DrawSprite()
+{
 
+}
 void LightStage::SetSceneCameraForDraw([[maybe_unused]] Camera* camera) {}
 
 void LightStage::SetPlayerCamera([[maybe_unused]] PlayerCamera* playerCamera) {}

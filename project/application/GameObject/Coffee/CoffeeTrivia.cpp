@@ -1,11 +1,11 @@
 #include "CoffeeTrivia.h"
 #include"GameObject/KeyBindConfig.h"
+#include"Option/Option.h"
 
 CoffeeTrivia::CoffeeTrivia()
 {
-    //コーヒー
-    Audio::GetInstance()->SetSoundVolume(&triviaVoice_, 1.0f);
 
+    SetVol(Option::GetCurrentOptionData().VoiceVolume);
     strings_[0] = "カフェインは、脳を刺激して頭痛や眠気を和らげ、腎臓に作用して尿量を増やし、心臓を刺激して心拍数を上げる働きがあります。";
     strings_[1] = "例えばコーヒー1杯、150mLには約90mgのカフェインが含まれています。";
     strings_[2] = "しかし、短時間に5g以上摂取すると重症化し、特に脳と心臓に深刻な影響が出ます。";
@@ -52,6 +52,5 @@ void CoffeeTrivia::Draw()
 
 void CoffeeTrivia::SetVol(float vol)
 {
-
     Audio::GetInstance()->SetSoundVolume(&triviaVoice_, vol);
 }

@@ -407,6 +407,7 @@
     <ClCompile Include="application\GameObject\DocumentManager\DocumentManager.cpp" />
     <ClCompile Include="application\GameObject\File\FileManager.cpp" />
     <ClCompile Include="Engine\Texture\Mesh\SkyBox\SkyBox.cpp" />
+    <ClCompile Include="application\GameObject\DocumentManager\DocumentSprite\DocumentSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -803,6 +804,7 @@
     <ClInclude Include="application\GameObject\DocumentManager\DocumentManager.h" />
     <ClInclude Include="application\GameObject\File\FileManager.h" />
     <ClInclude Include="Engine\Texture\Mesh\SkyBox\SkyBox.h" />
+    <ClInclude Include="application\GameObject\DocumentManager\DocumentSprite\DocumentSprite.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
