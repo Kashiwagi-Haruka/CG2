@@ -85,6 +85,7 @@ void ShadowGameScene::Initialize()
 
     damageOverlay_->Initialize();
 	skyBox_->Initialize();
+	skyBox_->SetDDSTexture("Resources/SkyBox/forest.dds");
 	skyBox_->SetCamera(cameraController_->GetPlayerCamera()->GetCamera());
 
     noiseTimer_ = kNoiseTimer_;
