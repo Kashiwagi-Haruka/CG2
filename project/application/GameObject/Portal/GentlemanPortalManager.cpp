@@ -107,16 +107,9 @@ void GentlemanPortalManager::SpawnPortal()
     newPortal->SetPortalWorldMatrix();
 
     if (portals_.empty()) {
-
         // ポータルがないとき
         newPortal->GetWarpPos()->SetParent(&firstWarpPosTransform_);
-    } else {
-        //// すでにポータルがある場合、お互いをつなぐ
-          //Portal* existingPortal = portals_.back().get();
-          //newPortal->GetWarpPos()->SetParent(&existingPortal->GetTransform());
-          //existingPortal->GetWarpPos()->SetParent(&newPortal->GetTransform());
-
-    }
+    } 
     portals_.push_back(std::move(newPortal));
     SEManager::SoundPlay(SEManager::PORTAL_SPAWN);
 }
@@ -169,11 +162,6 @@ void GentlemanPortalManager::CheckCollision() {
     }
 
     if (giantGentleman_->IsMakePortal()) {
-
-        //if (portals_.size() >= 2) {
-        //    // ポータルの生成が2個以上になったら
-        //    portals_.erase(portals_.begin());
-        //}
 
         isPendingPortalSpawn_ = true;
 
