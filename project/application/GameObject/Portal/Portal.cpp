@@ -193,8 +193,8 @@ void Portal::UpdateScale() {
     scaleTimer_ = std::clamp(scaleTimer_, 0.0f, 1.0f);
     Vector3 scale{ 1.6f,0.9f,1.0f };
     scale.x *= parentTransform->scale.x;
-    scale.y *= parentTransform->scale.x;
-    scale.z *= parentTransform->scale.x;
+    scale.y *= parentTransform->scale.y;
+    scale.z *= parentTransform->scale.z;
     transform_.scale = YoshidaMath::Easing::EaseInOutBack({ 0.0f, 0.0f, 0.0f }, scale, scaleTimer_);
 }
 

@@ -20,6 +20,8 @@
 #include"GameObject/GentleMan/GentleMan.h"
 #include"GameObject/DocumentManager/Document/Document.h"
 #include"GameObject/GentleMan/GiantGentleMan.h"
+#include"GameObject/Portal/GentlemanPortalManager.h"
+
 RaySprite::RaySprite()
 {
     handle_[HAND] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/hand.png");
@@ -49,7 +51,7 @@ void RaySprite::Update()
     if (PlayerCommand::GetIsGrab()) {
         // インタラクトの処理
         SetTexture(RaySprite::GRAB);
-    } else if (PortalManager::GetCanMakePortal()|| GiantGentleMan::IsRayHit()) {
+    } else if (PortalManager::GetCanMakePortal()|| GentlemanPortalManager::GetCanMakePortal()) {
         SetTexture(RaySprite::PORTAL);
     } else if(Gentleman::IsRayHit()){
         SetTexture(RaySprite::TALK);
@@ -64,7 +66,7 @@ void RaySprite::Draw()
 {
     SpriteCommon::GetInstance()->DrawCommon();
 
-    if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortal()) {
+    if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortal()|| GentlemanPortalManager::GetCanMakePortal()) {
         sprite_->Draw();
     }
 
@@ -89,6 +91,6 @@ bool RaySprite::IsRayHit()
         VendingMac::IsRayHit() ||
         PC::IsRayHit()||
         Gentleman::IsRayHit()||
-        Document::IsRayHit()||
-        GiantGentleMan::IsRayHit();
+        Document::IsRayHit()
+        ;
 }

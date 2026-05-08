@@ -65,8 +65,8 @@ TutorialStage::TutorialStage(Player* player)
 
     testField_ = std::make_unique<TestField>();
     whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
-    portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
-
+    portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate);
+    portalManager_->SetWhiteBoardManager(whiteBoardManager_.get());
     key_ = std::make_unique<Key>();
     door_ = std::make_unique<Door>();
     wallManager_ = std::make_unique<WallManager>();
