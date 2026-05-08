@@ -40,5 +40,6 @@ private:
     static bool isGetKey_;
     static bool isSendGetKeyMessage_;
     bool isLockerHit_ = false;
+    Vector3 translate_ = {0.0f};
 };
 

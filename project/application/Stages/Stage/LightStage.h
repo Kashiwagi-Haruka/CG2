@@ -1,6 +1,8 @@
 #pragma once
 #include "Stages/BaseStage.h"
 
+class Flashlight;
+
 class LightStage : public BaseStage {
 public:
 	explicit LightStage(Player* player);
@@ -24,4 +26,6 @@ public:
 private:
 	Player* player_ = nullptr;
 	Yoshida::LightManager* lightManager_ = nullptr;
+	std::unique_ptr<Flashlight> flashlight_ = nullptr;
+	CollisionManager* stageCollisionManager_ = nullptr;
 };

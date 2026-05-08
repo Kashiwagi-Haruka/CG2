@@ -7,10 +7,14 @@
 #include "GameObject/Player/Player.h"
 #include <cmath>
 
+
 RadiconStage::RadiconStage(Player* player) : player_(player) {
 	radicon_ = std::make_unique<Radicon>();
 	testField_ = std::make_unique<TestField>();
 	operationChangeBox_ = std::make_unique<OperationChangeBox>();
+	//懐中電灯の作成
+	flashlight_ = std::make_unique<Flashlight>();
+	flashlight_->SetPlayer(player_);
 }
 
 void RadiconStage::Initialize() { 
@@ -37,14 +41,25 @@ void RadiconStage::Initialize() {
 	roomPrimitives_[3]->SetTransform({.scale = {0.2f, 4.0f, 12.0f}, .rotate = {0.0f}, .translate = {-6.0f, 2.0f, 0.0f}});
 	roomPrimitives_[4]->SetTransform({.scale = {0.2f, 4.0f, 12.0f}, .rotate = {0.0f}, .translate = {6.0f, 2.0f, 0.0f}});
 
+
+	//懐中電灯の初期化
+	flashlight_->Initialize();
+
+	//ライトの設定
+	lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
+	lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
+
 	Hierarchy::GetInstance()->EndRegisterFile();
 }
 
-void RadiconStage::SetPlayer(Player* player) { player_ = player; }
+void RadiconStage::SetPlayer(Player* player) { player_ = player;    
+
+flashlight_->SetPlayer(player_);
+}
 
 void RadiconStage::SetCollisionManager([[maybe_unused]] CollisionManager* collisionManager) {
 
-
+	stageCollisionManager_ = collisionManager;
 }
 
 void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unused]] const Vector3& lightDirection, [[maybe_unused]] Player* player) { 
@@ -73,6 +88,13 @@ void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unu
 	for (auto& primitive : roomPrimitives_) {
 		primitive->Update();
 	}
+
+
+	//懐中電灯の更新
+	flashlight_->Update();
+
+	//ライトの更新
+	lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 }
 
 void RadiconStage::UpdatePortal() {/*記載なし*/}
@@ -81,6 +103,9 @@ void RadiconStage::CheckCollision() {
 
 	stageCollisionManager_->AddCollider(testField_.get());
 	/*stageCollisionManager_->AddCollider(radicon_.get());*/
+	//念のため懐中電灯入れておく
+	stageCollisionManager_->AddCollider(flashlight_.get());
+
 	stageCollisionManager_->CheckAllCollisions();
 
 
@@ -93,6 +118,7 @@ void RadiconStage::DrawModel([[maybe_unused]] bool isShadow, [[maybe_unused]] bo
 	}
 	operationChangeBox_->Draw();
 	radicon_->Draw();
+	flashlight_->Draw();
 }
 
 void RadiconStage::DrawSprite()
@@ -107,12 +133,14 @@ void RadiconStage::SetSceneCameraForDraw([[maybe_unused]] Camera* camera) {
 		primitive->SetCamera(camera);
 		primitive->UpdateCameraMatrices();
 	}
+	flashlight_->SetCamera(camera);
 }
 
 void RadiconStage::SetPlayerCamera([[maybe_unused]] PlayerCamera* playerCamera) {
 	playerCamera_ = playerCamera;
 	radicon_->SetCamera(playerCamera->GetCamera());
 	operationChangeBox_->SetPlayerCamera(playerCamera);
+	flashlight_->SetPlayerCamera(playerCamera);
 }
 
 PortalManager* RadiconStage::GetPortalManager() { return nullptr; }

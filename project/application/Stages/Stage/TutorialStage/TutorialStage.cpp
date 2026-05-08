@@ -16,6 +16,7 @@
 #include"GameObject/DocumentManager/DocumentManager.h"
 #include"GameObject/File/FileManager.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
+#include "GameObject/Flashlight/Flashlight.h"
 
 void TutorialStage::InitializeLights()
 {
@@ -39,6 +40,11 @@ void TutorialStage::InitializeLights()
     lightManager_->SetPointLight(pointLights_[0], 0);
     lightManager_->SetPointLight(pointLights_[1], 1);
 
+
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
+    lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
+
+
     lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 4);
 
     lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 0);
@@ -56,7 +62,7 @@ void TutorialStage::UpdateLights()
     lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 2);
     lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 3);
 
-
+    lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 }
 
 TutorialStage::TutorialStage(Player* player)
@@ -76,6 +82,8 @@ TutorialStage::TutorialStage(Player* player)
     documentManager_ = std::make_unique<DocumentManager>();
 
     fileManager_ = std::make_unique<FileManager>();
+    flashlight_ = std::make_unique<Flashlight>();
+    flashlight_->SetPlayer(player_);
 }
 
 void TutorialStage::Initialize()
@@ -86,6 +94,8 @@ void TutorialStage::Initialize()
 
 
     InitializeLights();
+    
+    flashlight_->Initialize();
 
     testField_->Initialize();
     whiteBoardManager_->Initialize();
@@ -118,6 +128,7 @@ void TutorialStage::UpdateGameObject(Camera* camera, const Vector3& lightDirecti
     timeCardRack_->Update();
     documentManager_->Update(camera, lightDirection);
     fileManager_->Update();
+    flashlight_->Update();
 
     UpdateLights();
 
@@ -160,6 +171,9 @@ void TutorialStage::CheckCollision() {
     if (!door_->GetIsOpen()) {
         stageCollisionManager_->AddCollider(door_.get());
     }
+
+    stageCollisionManager_->AddCollider(flashlight_.get());
+
     stageCollisionManager_->AddCollider(key_.get());
     stageCollisionManager_->CheckAllCollisions();
 }
@@ -167,6 +181,7 @@ void TutorialStage::CheckCollision() {
 void TutorialStage::SetPlayer(Player* player)
 {
     player_ = player;
+    flashlight_->SetPlayer(player_);
 }
 void TutorialStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
     testField_->Draw();
@@ -175,6 +190,7 @@ void TutorialStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
     //ここで書類パーティクルを描画させる
     documentManager_->Draw();
 
+    flashlight_->Draw();
     key_->Draw();
     timeCard_->Draw();
     timeCardRack_->Draw();
@@ -203,6 +219,7 @@ void TutorialStage::SetSceneCameraForDraw(Camera* camera) {
     timeCardRack_->SetCamera(camera);
     documentManager_->SetCamera(camera);
     fileManager_->SetCamera(camera);
+    flashlight_->SetCamera(camera);
 }
 
 void TutorialStage::SetPlayerCamera(PlayerCamera* playerCamera) {
@@ -210,6 +227,7 @@ void TutorialStage::SetPlayerCamera(PlayerCamera* playerCamera) {
     key_->SetPlayerCamera(playerCamera);
     door_->SetPlayerCamera(playerCamera);
     documentManager_->SetPlayerCamera(playerCamera);
+    flashlight_->SetPlayerCamera(playerCamera);
 }
 PortalManager* TutorialStage::GetPortalManager() { return portalManager_.get(); }
 

@@ -11,6 +11,7 @@
 bool Flashlight::isSendGetLightMessage_ = false;
 bool Flashlight::isGetLight_ = false;
 bool Flashlight::isRayHit_ = false;
+ProgressSaveData* Flashlight::progressSaveData_ = nullptr;
 Flashlight::Flashlight()
 {
     obj_ = std::make_unique<Object3d>();
@@ -52,6 +53,19 @@ void Flashlight::Update()
 
     CheckCollision();
 
+
+
+#ifdef USE_IMGUI
+    ImGui::Begin("FlashLight");
+    ImGui::DragFloat3("direction", &spotLight_.direction.x);
+    ImGui::Checkbox("isGet", &isGetLight_);
+    //ImGui::Text("translate %f %f %f", handMat.m[3][0], handMat.m[3][1], handMat.m[3][2]);
+    ImGui::End();
+
+#endif
+
+
+
     if (isGetLight_) {
 
         transform_.translate = { 0.0f,0.1f,0.0f };
@@ -62,16 +76,6 @@ void Flashlight::Update()
         Matrix4x4 child = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
         child = Function::Multiply(child, handMat);
         obj_->SetWorldMatrix(child);
-#ifdef USE_IMGUI
-        ImGui::Begin("FlashLight");
-        ImGui::DragFloat3("direction", &spotLight_.direction.x);
-        ImGui::Text("translate %f %f %f", handMat.m[3][0], handMat.m[3][1], handMat.m[3][2]);
-
-        ImGui::End();
-
-#endif
-
- 
 
     } else {
         //y座標を固定する
@@ -89,14 +93,9 @@ void Flashlight::Update()
 
 void Flashlight::Initialize()
 {
-    auto& gameSave = GameSave::GetInstance();
+    assert(progressSaveData_);
 
-    if (!gameSave.GetInitStart()) {
-        isGetLight_ = gameSave.GetProgressSaveData().isLightHave;
-    } else {
-        isGetLight_ = false;
-    }
-
+    isGetLight_ = progressSaveData_->isLightHave;
     isLightOn_ = true;
 
     isSendGetLightMessage_ = false;
@@ -145,7 +144,9 @@ void Flashlight::CheckCollision()
                 isGetLight_ = true;
                 /*          PlayerCommand::SetIsGrab(true);*/
                 isSendGetLightMessage_ = true;
-
+                assert(progressSaveData_);
+                //記録する
+                progressSaveData_->isLightHave = isGetLight_;
             }
 
         }

@@ -41,7 +41,6 @@ void TestField::Update()
 
 void TestField::Draw()
 {
-
     box_->Draw();
 }
 
