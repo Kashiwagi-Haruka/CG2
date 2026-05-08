@@ -2,6 +2,10 @@
 #include "Collider.h"
 #include"Function.h"
 #include "Object3d/Object3dCommon.h"
+#include<algorithm>
+#include<cmath>
+
+
 YoshidaMath::Collider::Collider()
 {
     collisionInfo_.collided = false;
@@ -83,6 +87,65 @@ bool YoshidaMath::RayIntersectsAABB(const Ray& ray, const AABB& box, float tMin,
     return true;
 }
 
+
+
+
+YoshidaMath::CollisionInfo YoshidaMath::GetCollisionInfo(const Sphere& sphere, const AABB& AABB) {
+
+
+    CollisionInfo result;
+    // 最近接点をAABB内から計算（クランプ）
+    Vector3 closestPoint;
+
+    closestPoint.x = std::clamp(sphere.center.x,AABB.min.x, AABB.max.x);
+    closestPoint.y = std::clamp(sphere.center.y,AABB.min.y, AABB.max.y);
+    closestPoint.z = std::clamp(sphere.center.z,AABB.min.z, AABB.max.z);
+
+    // 最近接点と球の中心の距離の2乗を計算
+    Vector3 difference = sphere.center - closestPoint;
+    float distanceSquared = Function::Dot(difference, difference);
+
+    result.collided = distanceSquared <= (sphere.radius * sphere.radius);
+
+    // 球の半径の2乗と比較
+    if (!result.collided) {
+        return result;
+    } 
+
+    result.collided = true;
+
+    // 2. 球の中心がAABBの外側にある場合（表面での接触）
+    if (distanceSquared > 1e-6f) {
+        float distance = std::sqrt(distanceSquared);
+        result.normal = difference / distance; // 正規化（AABBからSphereへ向かうベクトル）
+        result.penetration = sphere.radius - distance;
+        return result;
+    }
+    
+    // 3. 球の中心がAABBの完全に内側にある場合（深くめり込んだ場合）
+    // 各面への距離を計算
+    float distX_min = sphere.center.x - AABB.min.x;
+    float distX_max = AABB.max.x - sphere.center.x;
+    float distY_min = sphere.center.y - AABB.min.y;
+    float distY_max = AABB.max.y - sphere.center.y;
+    float distZ_min = sphere.center.z - AABB.min.z;
+    float distZ_max = AABB.max.z - sphere.center.z;
+
+    // 最も近い面を探す
+    float minDist = distX_min;
+    Vector3 normal = Vector3(-1, 0, 0); // Xマイナス面
+
+    if (distX_max < minDist) { minDist = distX_max; normal = Vector3(1, 0, 0); }
+    if (distY_min < minDist) { minDist = distY_min; normal = Vector3(0, -1, 0); }
+    if (distY_max < minDist) { minDist = distY_max; normal = Vector3(0, 1, 0); }
+    if (distZ_min < minDist) { minDist = distZ_min; normal = Vector3(0, 0, -1); }
+    if (distZ_max < minDist) { minDist = distZ_max; normal = Vector3(0, 0, 1); }
+
+    result.normal = normal;
+    result.penetration = sphere.radius + minDist;
+
+    return result;
+}
 
 YoshidaMath::CollisionInfo YoshidaMath::GetCollisionInfo(const AABB& a, const AABB& b) {
 
@@ -280,6 +343,25 @@ bool YoshidaMath::IsCollision(const AABB& aabb, const OBB& obb)
     }
 
     return true;
+}
+
+void YoshidaMath::SetResult(CollisionInfo& info, const Vector3& centerA, const Vector3& centerB, float overlapX, float overlapY, float overlapZ)
+{   
+    
+    //最小のオーバーラップ軸を分離する
+    if (overlapX <= overlapY && overlapX <= overlapZ) {
+
+        info.penetration = overlapX;
+        info.normal = (centerA.x < centerB.x) ? Vector3(-1.0f, 0.0f, 0.0f) : Vector3(1.0f, 0.0f, 0.0f);
+
+    } else if (overlapY <= overlapZ) {
+        info.penetration = overlapY;
+        info.normal = (centerA.y < centerB.y) ? Vector3(0.0f, -1.0f, 0.0f) : Vector3(0.0f, 1.0f, 0.0f);
+    } else {
+        info.penetration = overlapZ;
+        info.normal = (centerA.z < centerB.z) ? Vector3(0.0f, 0.0f, -1.0f) : Vector3(0.0f, 0.0f, 1.0f);
+    }
+
 }
 
 

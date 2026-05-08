@@ -30,6 +30,11 @@ void Box::OnCollision(Collider* collider)
         obj_->SetColor(COLOR::WHITE);
     }*/
 
+    if (collider->GetCollisionAttribute() == kCollisionFloor) {
+
+        velocity_.y = 0.0f;
+    }
+
 }
 
 Vector3 Box::GetWorldPosition() const

@@ -11,7 +11,7 @@
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
 #include"GiantGentlemanHead.h"
-#include"GiantGentlemanHand.h"
+#include"GiantGentlemanCollider.h"
 #include<unordered_map>
 class GiantGentleMan 
 {
@@ -31,7 +31,7 @@ public:
     //面が向き合ってるか
     bool IsFacingSurface(const Matrix4x4& cameraMat);
     GiantGentlemanHead* GetGiantGentlemanHead() { return head_.get(); }
-    std::unordered_map<std::string,std::unique_ptr<GiantGentlemanHand>>& GetGiantGentlemanHand() { return hands_; }
+    std::unordered_map<std::string,std::unique_ptr<GitantGettlemanCollider>>& GetGiantGentlemanHand() { return colliders_; }
 
 private:
     void CheckCollision();
@@ -43,7 +43,7 @@ private:
 
 
     std::unique_ptr<GiantGentlemanHead>head_ = nullptr;
-    std::unordered_map<std::string, std::unique_ptr<GiantGentlemanHand>>hands_;
+    std::unordered_map<std::string, std::unique_ptr<GitantGettlemanCollider>>colliders_;
 
     static PlayerCamera* playerCamera_;
     std::unique_ptr<Object3d>obj_ = nullptr;

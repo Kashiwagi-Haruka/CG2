@@ -25,14 +25,17 @@ namespace YoshidaMath {
     //rayとAABBの衝突を取得する
     bool RayIntersectsAABB(const Ray& ray, const AABB& box, float tMin, float tMax);
     //衝突情報を取得する
-    CollisionInfo GetCollisionInfo(const AABB& a, const AABB& b);
+    CollisionInfo GetCollisionInfo(const AABB& a, const AABB&);
+    //球とAABBの情報を取得する
+    CollisionInfo GetCollisionInfo(const Sphere& sphere, const AABB& AABB);
     //衝突情報をもとに座標のめり込みを考える
     void ResolveCollision(Vector3& pos, Vector3& velocity, const YoshidaMath::CollisionInfo& info);
     //AABBの中心を取得する
     Vector3 GetAABBCenter(const AABB& aabb);
     bool IsCollision(const OBB& a, const OBB& b);
     bool IsCollision(const AABB& aabb, const OBB& obb);
-}
+    void SetResult(CollisionInfo& info, const Vector3& centerA, const Vector3& centerB, float overlapX, float overlapY, float overlapZ);
+}                                                                                    
 
 /// @brief 衝突判定オブジェクト
 namespace YoshidaMath {
