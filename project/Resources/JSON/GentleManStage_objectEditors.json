@@ -2601,286 +2601,6 @@
           0.0
         ]
       },
-      "name": "WalkWhiteBoard",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          -5.739999771118164,
-          0.0,
-          6.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 5,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "WhiteBoard0",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          5.659999847412109,
-          0.0,
-          6.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 6,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "WhiteBoard1",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          -1.8200000524520874,
-          0.0,
-          6.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 7,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "WhiteBoard2",
-      "transform": {
-        "rotate": [
-          0.0,
-          1.5709999799728394,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          2.0,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 8,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "WhiteBoard3",
-      "transform": {
-        "rotate": [
-          0.0,
-          -1.5709999799728394,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "translate": [
-          -2.0,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 9,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
       "name": "roofTop",
       "transform": {
         "rotate": [
@@ -2902,7 +2622,7 @@
     },
     {
       "editorId": "",
-      "index": 10,
+      "index": 5,
       "material": {
         "color": [
           1.0,
@@ -2958,7 +2678,7 @@
     },
     {
       "editorId": "",
-      "index": 11,
+      "index": 6,
       "material": {
         "color": [
           1.0,
@@ -3009,6 +2729,62 @@
           7.0,
           -26.729999542236328,
           10.380000114440918
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 7,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Flashlight",
+      "transform": {
+        "rotate": [
+          -1.5709999799728394,
+          -0.28999999165534973,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          8.149999618530273,
+          3.9800000190734863,
+          1.3600000143051147
         ]
       }
     }
