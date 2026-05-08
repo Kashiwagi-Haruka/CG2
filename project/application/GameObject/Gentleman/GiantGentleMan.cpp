@@ -9,8 +9,6 @@
 #include"GameSave/GameSave.h"
 
 PlayerCamera* GiantGentleMan::playerCamera_ = nullptr;
-bool GiantGentleMan::isRayHit_ = false;
-
 
 GiantGentleMan::GiantGentleMan()
 {
@@ -34,8 +32,14 @@ void GiantGentleMan::Initialize()
     obj_->Initialize();
     obj_->RegisterEditor("giantGentleMan");
 
-    isRayHit_ = false;
+    collisionTransform_.scale = { 2.0f/1.6f,2.0f/0.9f,1.0f };
+    
+    collisionTransform_.rotate = { 0.0f,Function::kPi*0.5f,0.0f };
+    collisionTransform_.translate = { 0.0f };
 
+    isRayHit_ = false;
+    canMakePortal_ = false;
+    isMakePortal_ = false;
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/gentleman", "gentleman");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, desiredAnimationName, false);
     if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, desiredAnimationName)) {
@@ -73,6 +77,16 @@ void GiantGentleMan::Update()
     for (auto& [name, hand] : colliders_) {
         hand->Update();
     }
+
+#ifdef USE_IMGUI
+    ImGui::Begin("GiantGentleMan");
+    ImGui::Text("CurrantAnimation : %s", desiredAnimationName.c_str());
+    ImGui::DragFloat3("collisionRotate", &collisionTransform_.rotate.x);
+    ImGui::DragFloat3("collisionScale", &collisionTransform_.scale.x);
+    ImGui::DragFloat3("collisionTranslate", &collisionTransform_.translate.x);
+    ImGui::End();
+
+#endif
 }
 
 void GiantGentleMan::Draw()
@@ -82,6 +96,10 @@ void GiantGentleMan::Draw()
     //for (auto& [name, hand] : colliders_) {
     //    hand->Draw();
     //}
+}
+void GiantGentleMan::SetPlayerPos(Vector3* playerPos)
+{
+    playerPos_ = playerPos;
 }
 void GiantGentleMan::SetCamera(Camera* camera)
 {
@@ -96,28 +114,14 @@ void GiantGentleMan::SetCamera(Camera* camera)
 bool GiantGentleMan::IsFacingSurface(const Matrix4x4& cameraMat)
 {
     Vector3 forward = YoshidaMath::GetForward(cameraMat);
-    Vector3 direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
+
+    const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex("CON.tongue.002");
+    Matrix4x4 mat = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndex]);
+    Vector3 direction = YoshidaMath::GetForward(mat);
     float dot = Function::Dot(forward, direction);
 
     //return(fabs(dot) >= kPortalCreatableAngleRange_);
-    return(dot <= -kPortalCreatableAngleRange_);
-}
-void GiantGentleMan::CheckCollision()
-{
-    isRayHit_ = OnCollisionRay();
-    //rayの当たり判定
-    if (isRayHit_ && PlayerCommand::GetInstance()->Shot()) {
-        //トリガーしたとき且つ何も持ってないとき
-        SEManager::SoundPlay(SEManager::TYPE);
-    }
-
-
-#ifdef USE_IMGUI
-    ImGui::Begin("GiantGentleMan");
-    ImGui::Text("CurrantAnimation : %s", desiredAnimationName.c_str());
-    ImGui::End();
-
-#endif
+    return(dot >= -kPortalCreatableAngleRange_);
 }
 
 bool GiantGentleMan::OnCollisionRay()
@@ -125,10 +129,46 @@ bool GiantGentleMan::OnCollisionRay()
     //舌のコントロールボーン
     const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex("CON.tongue.002");
     skeleton_->SetObjectMatrix(obj_->GetWorldMatrix());
-    Vector3 pos = skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
-    return playerCamera_->OnCollisionRay(localAABB_, pos);
+    collisionTransform_.translate = skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
+    return playerCamera_->OnCollisionRay(localAABB_, collisionTransform_.translate);
 }
 
+void GiantGentleMan::CheckCollision() {
+
+    isRayHit_ = OnCollisionRay();
+    //rayの当たり判定
+
+    canMakePortal_ = false;
+
+    if (isMakePortal_) {
+        //既に作成済みだったらポータルを作成しない
+        return;
+    }
+
+    if (!playerCamera_) {
+        return;
+    }
+
+    if (!isRayHit_) {
+        return;
+    }
+
+    //ポータルとカメラが向き合っているかどうか
+    if (!IsFacingSurface(playerCamera_->GetCamera()->GetWorldMatrix())) {
+        return;
+    }
+
+    canMakePortal_ = true;
+
+    if (!PlayerCommand::GetInstance()->Shot()) {
+        return;
+    }
+
+    // ショットSE鳴らす
+    SEManager::SoundPlay(SEManager::SHOT);
+    //ポータルを作成する
+    isMakePortal_ = true;
+}
 
 void GiantGentleMan::Animation()
 {

@@ -416,6 +416,7 @@
     <ClCompile Include="application\GameObject\Gentleman\GentleManManager.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GiantGentlemanHead.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GiantGentlemanCollider.cpp" />
+    <ClCompile Include="application\GameObject\Portal\GentlemanPortalManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -821,6 +822,7 @@
     <ClInclude Include="application\GameObject\Gentleman\GentleManManager.h" />
     <ClInclude Include="application\GameObject\Gentleman\GiantGentlemanHead.h" />
     <ClInclude Include="application\GameObject\Gentleman\GiantGentlemanCollider.h" />
+    <ClInclude Include="application\GameObject\Portal\GentlemanPortalManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

@@ -5,15 +5,15 @@
 
 #include "GameObject/Key/Key.h"
 #include "GameObject/Player/Player.h"
-#include "GameObject/Portal/PortalManager.h"
+#include "GameObject/Portal/GentlemanPortalManager.h"
 #include "GameObject/Gentleman/GiantGentleMan.h"
 
 #include "GameObject/Wall/wallManagerRoofFoor.h"
 
-#include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include"GameObject/DocumentManager/DocumentManager.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
+#include"Function.h"
 
 void GentleManStage::InitializeLights()
 {
@@ -56,16 +56,18 @@ GentleManStage::GentleManStage(Player* player)
 {
     player_ = player;
 
-    whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
-    portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate, whiteBoardManager_.get());
+    //巨大紳士
+    giantGentleMan_ = std::make_unique<GiantGentleMan>();
+    giantGentleMan_->SetPlayerPos(&player_->GetTransform().translate);
+
+    portalManager_ = std::make_unique<GentlemanPortalManager>(&player_->GetTransform().translate);
+    portalManager_->SetGentleMan(giantGentleMan_.get());
     wallManagerRoofFoor_ = std::make_unique<WallManagerRoofFoor>();
     documentManager_ = std::make_unique<DocumentManager>();
 
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     timeCardWatch_->SetPlayer(player_);
 
-    //巨大紳士
-    giantGentleMan_ = std::make_unique<GiantGentleMan>();
 
 }
 
@@ -76,7 +78,6 @@ void GentleManStage::Initialize()
     hierarchy->BeginRegisterFile("GentleManStage_objectEditors.json");
 
     InitializeLights();
-    whiteBoardManager_->Initialize();
     portalManager_->Initialize();
 
     wallManagerRoofFoor_->Initialize();
@@ -91,7 +92,6 @@ void GentleManStage::Initialize()
 void GentleManStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
     portalManager_->WarpPlayer(player);
     wallManagerRoofFoor_->Update();
-    whiteBoardManager_->Update();
     giantGentleMan_->Update();
     documentManager_->Update(camera, lightDirection);
 
@@ -117,17 +117,13 @@ void GentleManStage::CheckCollision() {
             break;
         }
     }
-
-    for (auto& whiteBoard : whiteBoardManager_->GetWhiteBoards()) {
-        stageCollisionManager_->AddCollider(whiteBoard.get());
-    }
     for (auto& wall : wallManagerRoofFoor_->GetWalls()) {
         stageCollisionManager_->AddCollider(wall.get());
     }
 
     stageCollisionManager_->AddCollider(giantGentleMan_->GetGiantGentlemanHead());
 
-    for (auto& [name,hand] : giantGentleMan_->GetGiantGentlemanHand()) {
+    for (auto& [name, hand] : giantGentleMan_->GetGiantGentlemanHand()) {
         stageCollisionManager_->AddCollider(hand.get());
     }
     stageCollisionManager_->CheckAllCollisions();
@@ -148,7 +144,6 @@ void GentleManStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawPartic
     //ここで書類パーティクルを描画させる
     documentManager_->Draw();
     timeCardWatch_->Draw();
-    whiteBoardManager_->Draw();
     giantGentleMan_->Draw();
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
@@ -159,13 +154,12 @@ void GentleManStage::DrawSprite()
 }
 void GentleManStage::SetSceneCameraForDraw(Camera* camera) {
 
-    whiteBoardManager_->SetCamera(camera);
     portalManager_->SetCamera(camera);
     wallManagerRoofFoor_->SetCamera(camera);
     documentManager_->SetCamera(camera);
     timeCardWatch_->SetCamera(camera);
     giantGentleMan_->SetCamera(camera);
-    
+
 }
 
 void GentleManStage::SetPlayerCamera(PlayerCamera* playerCamera) {

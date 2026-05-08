@@ -9,11 +9,10 @@
 
 bool PortalManager::canMakePortal_ = false;
 
-PortalManager::PortalManager(Vector3* pos, WhiteBoardManager* whiteBoardManager) {
+PortalManager::PortalManager(Vector3* pos) {
 
     playerPos_ = pos;
-    whiteBoardManager_ = whiteBoardManager;
-
+  
     firstWarpPosTransform_ = {
         .scale = {1.0f,  1.0f, 1.0f},
           .rotate = {0.0f, 0.0f, 0.0f},
@@ -29,6 +28,12 @@ PortalManager::~PortalManager() {
         portal.reset();
     }
     portals_.clear();
+}
+
+void PortalManager::SetWhiteBoardManager(WhiteBoardManager* whiteBoardManager)
+{
+    whiteBoardManager_ = whiteBoardManager;
+
 }
 
 void PortalManager::Initialize() {
@@ -75,8 +80,6 @@ void PortalManager::UpdatePortal() {
 
     warpCoolTimer_ += YoshidaMath::kDeltaTime;
     warpCoolTimer_ = std::clamp(warpCoolTimer_, 0.0f, kWarpTime_);
-
-
 
     if (isPendingPortalSpawn_ && portalParticle_) {
         portalParticle_->Update();
