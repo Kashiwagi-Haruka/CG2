@@ -1,5 +1,7 @@
 #include "ChairManager.h"
 #include"Function.h"
+#include"GameObject/Player/Player.h"
+#include"GameObject/KeyBindConfig.h"
 
 namespace {
     uint32_t maxNum_ = 4;
@@ -70,6 +72,21 @@ void ChairManager::Update()
     for (auto& chair : chairs_) {
         if (chair->IsRayHit()) {
             isRayHit_ = true;
+        }
+    }
+}
+
+void ChairManager::StandChair(Player* player)
+{
+
+    for (auto& chair : chairs_) {
+        if (chair->GetIsStand()) {
+            Vector3 pos = chair->GetWorldPosition();
+            pos.y += 1.0f;
+            player->SetTranslate(pos);
+            chair->SetIsStand(false);
+            PlayerCommand::SetIsStand(false);
+            break;
         }
     }
 }

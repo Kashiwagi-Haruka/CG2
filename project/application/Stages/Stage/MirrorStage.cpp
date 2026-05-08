@@ -92,6 +92,7 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 	key_->Update();
 	edamame_->Update();
 	chairManager_->Update();
+	chairManager_->StandChair(player);
 	boxManager_->Update();
 	testField_->Update();
 	wallManager_->Update();
