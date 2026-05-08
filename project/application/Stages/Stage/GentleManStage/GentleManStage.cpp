@@ -125,7 +125,11 @@ void GentleManStage::CheckCollision() {
         stageCollisionManager_->AddCollider(wall.get());
     }
 
-    stageCollisionManager_->AddCollider(giantGentleMan_.get());
+    stageCollisionManager_->AddCollider(giantGentleMan_->GetGiantGentlemanHead());
+
+    for (auto& [name,hand] : giantGentleMan_->GetGiantGentlemanHand()) {
+        stageCollisionManager_->AddCollider(hand.get());
+    }
     stageCollisionManager_->CheckAllCollisions();
 }
 

@@ -20,7 +20,7 @@ Gentleman::Gentleman()
     obj_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
     obj_->SetModel("gentleman");
-    SetAABB({ .min = {-0.25f, 0.0f, -0.25f}, .max = {0.25f,  1.5f, 0.25f} });
+    SetAABB({ .min = {-0.5f, 0.0f, -0.5f}, .max = {0.5f,  1.5f, 0.5f} });
     SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
     localAABB_ = { .min = {-0.5f,-0.5f,-0.5f},.max = {0.5f,0.5,0.5f} };

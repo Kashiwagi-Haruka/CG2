@@ -123,6 +123,11 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon) {
 }
 
 void ParticleManager::CreateParticleGroup(const std::string& name, const std::string& textureFilePath) {
+
+	if (particleGroups.contains(name)) {
+		//もうすでにあったらリターンしてみる
+		return;
+	}
 	assert(particleGroups.find(name) == particleGroups.end() && "ParticleGroup name already exists!");
 	ParticleGroup newGroup{};
 	newGroup.textureFilePath = textureFilePath;

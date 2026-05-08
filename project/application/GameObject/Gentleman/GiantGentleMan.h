@@ -10,18 +10,16 @@
 #include "Animation/Animation.h"
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
-
-class GiantGentleMan : public YoshidaMath::Collider
+#include"GiantGentlemanHead.h"
+#include"GiantGentlemanHand.h"
+#include<unordered_map>
+class GiantGentleMan 
 {
 public:
-    GiantGentleMan();
-    /// @brief 衝突時コールバック関数
-    void OnCollision(Collider* collider)override;
-    /// @brief ワールド座標を取得する
-    /// @return ワールド座標
-    Vector3 GetWorldPosition() const override;
-    const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
 
+public:
+
+    GiantGentleMan();
     void Initialize();
     void Update();
     void Draw();
@@ -32,12 +30,21 @@ public:
     static bool IsRayHit() { return isRayHit_; }
     //面が向き合ってるか
     bool IsFacingSurface(const Matrix4x4& cameraMat);
+    GiantGentlemanHead* GetGiantGentlemanHead() { return head_.get(); }
+    std::unordered_map<std::string,std::unique_ptr<GiantGentlemanHand>>& GetGiantGentlemanHand() { return hands_; }
+
 private:
     void CheckCollision();
     bool OnCollisionRay();
     // アニメーション
     void Animation();
 private:
+
+
+
+    std::unique_ptr<GiantGentlemanHead>head_ = nullptr;
+    std::unordered_map<std::string, std::unique_ptr<GiantGentlemanHand>>hands_;
+
     static PlayerCamera* playerCamera_;
     std::unique_ptr<Object3d>obj_ = nullptr;
     AABB localAABB_;

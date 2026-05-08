@@ -414,6 +414,8 @@
     <ClCompile Include="application\Text\Credit\Credit.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GiantGentleMan.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GentleManManager.cpp" />
+    <ClCompile Include="application\GameObject\Gentleman\GiantGentlemanHead.cpp" />
+    <ClCompile Include="application\GameObject\Gentleman\GiantGentlemanHand.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -817,6 +819,8 @@
     <ClInclude Include="application\Text\Credit\Credit.h" />
     <ClInclude Include="application\GameObject\Gentleman\GiantGentleMan.h" />
     <ClInclude Include="application\GameObject\Gentleman\GentleManManager.h" />
+    <ClInclude Include="application\GameObject\Gentleman\GiantGentlemanHead.h" />
+    <ClInclude Include="application\GameObject\Gentleman\GiantGentlemanHand.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
