@@ -78,8 +78,8 @@ void Flashlight::Update()
         obj_->SetWorldMatrix(child);
 
     } else {
+        transform_ =  obj_->GetTransform();
         //y座標を固定する
-        transform_.rotate = { 0.0f,0.0f,0.0f };
         transform_.translate.y = std::clamp(transform_.translate.y, 0.0f, 2.4f);
         obj_->SetTransform(transform_);
     }
@@ -102,9 +102,6 @@ void Flashlight::Initialize()
     isRayHit_ = false;
     obj_->Initialize();
     obj_->RegisterEditor("Flashlight");
-    transform_.translate = { 4.0f,0.1f,5.0f };
-    transform_.rotate = { 0.0f,0.0f,0.0f };
-    transform_.scale = { 1.0f,1.0f,1.0f };
     SetLight();
 	obj_->SetOutlineColor({1.0f, 1.0f, 0.0f, 1.0f});
 	obj_->SetOutlineWidth(10.0f);
