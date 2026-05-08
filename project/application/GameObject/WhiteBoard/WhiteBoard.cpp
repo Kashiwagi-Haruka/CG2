@@ -24,7 +24,7 @@ void WhiteBoard::Initialize()
 {
     obj_->Initialize();
 	obj_->RegisterEditor(editorRegistrationName_);
-    obj_->SetRotate({ 0.0f,Function::kPi,0.0f });
+    //obj_->SetRotate({ 0.0f,Function::kPi,0.0f });
 #ifdef _DEBUG
     primitive_->Initialize(Primitive::Box);
     primitive_->SetColor({ 1.0f,1.0f,1.0f,0.1f });
@@ -33,7 +33,7 @@ void WhiteBoard::Initialize()
 
     /* SetRadius(1.0f);*/
     SetAABB(AABB{ .min = {-0.5f,0.0f,-0.5f}, .max = {0.5f,1.5f,0.5f} });
-    SetCollisionAttribute(kCollisionFloor);
+    SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
 }
 
@@ -85,7 +85,7 @@ AABB WhiteBoard::GetAABB()
 
 void WhiteBoard::ResetCollisionAttribute()
 {
-    SetCollisionAttribute(kCollisionFloor);
+    SetCollisionAttribute(kCollisionWall);
 }
 
 void WhiteBoard::SetCollisionAttributeNoneAndInitialize()

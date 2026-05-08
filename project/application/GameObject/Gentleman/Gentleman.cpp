@@ -137,34 +137,34 @@ void Gentleman::CheckCollision()
         GentlemanMenu::SetIsShowMenu(false);
     }
 
-    if (PlayerCommand::GetInstance()->MouseWheelUp()) {
+    //if (PlayerCommand::GetInstance()->MouseWheelUp()) {
 
-        if (animationNum < 7) {
-            animationNum++;
-        } else {
-            animationNum = 0;
-        }
-    }
+    //    if (animationNum < 7) {
+    //        animationNum++;
+    //    } else {
+    //        animationNum = 0;
+    //    }
+    //}
 
-    std::string animationName = "Idle";
+    //std::string animationName = "Idle";
 
-    if (animationNum == 0) {
-        animationName = "Idle";
-    } else if (animationNum == 1) {
-        animationName = "AerialPigeon";
-    } else if (animationNum == 2) {
-        animationName = "Round";
-    } else if (animationNum == 3) {
-        animationName = "SitDown";
-    } else if (animationNum == 4) {
-        animationName = "Sleep";
-    } else if (animationNum == 5) {
-        animationName = "Soft";
-    } else if (animationNum == 6) {
-        animationName = "Tired";
-    } else if (animationNum == 7) {
-        animationName = "Sit";
-    }
+    //if (animationNum == 0) {
+    //    animationName = "Idle";
+    //} else if (animationNum == 1) {
+    //    animationName = "AerialPigeon";
+    //} else if (animationNum == 2) {
+    //    animationName = "Round";
+    //} else if (animationNum == 3) {
+    //    animationName = "SitDown";
+    //} else if (animationNum == 4) {
+    //    animationName = "Sleep";
+    //} else if (animationNum == 5) {
+    //    animationName = "Soft";
+    //} else if (animationNum == 6) {
+    //    animationName = "Tired";
+    //} else if (animationNum == 7) {
+    //    animationName = "Sit";
+    //}
 
     //rayの当たり判定
     if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger() && !PlayerCommand::GetIsGrab()) {
@@ -179,7 +179,7 @@ void Gentleman::CheckCollision()
         }
 
         SEManager::SoundPlay(SEManager::TYPE);
-        SetAnimationName(animationName);
+   /*     SetAnimationName(animationName);*/
 
     }
 

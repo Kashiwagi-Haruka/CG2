@@ -15,18 +15,23 @@ class GiantGentleMan : public YoshidaMath::Collider
 {
 public:
     GiantGentleMan();
-    void Initialize();
-    void Update();
-    void Draw();
-    static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
-    void SetCamera(Camera* camera);
     /// @brief 衝突時コールバック関数
     void OnCollision(Collider* collider)override;
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
     Vector3 GetWorldPosition() const override;
-    static bool IsRayHit() { return isRayHit_; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
+
+    void Initialize();
+    void Update();
+    void Draw();
+
+    static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
+    void SetCamera(Camera* camera);
+
+    static bool IsRayHit() { return isRayHit_; }
+    //面が向き合ってるか
+    bool IsFacingSurface(const Matrix4x4& cameraMat);
 private:
     void CheckCollision();
     bool OnCollisionRay();
@@ -47,5 +52,7 @@ private:
     bool animationFinished_ = false;
     const std::string desiredAnimationName = "SleepStand";
     static bool isRayHit_;
+    //ポータルが出来る範囲
+    const float kPortalCreatableAngleRange_ = 0.5f;
 };
 

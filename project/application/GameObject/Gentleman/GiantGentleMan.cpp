@@ -61,6 +61,15 @@ void GiantGentleMan::SetCamera(Camera* camera)
     obj_->SetCamera(camera);
     obj_->UpdateCameraMatrices();
 }
+bool GiantGentleMan::IsFacingSurface(const Matrix4x4& cameraMat)
+{
+    Vector3 forward = YoshidaMath::GetForward(cameraMat);
+    Vector3 direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
+    float dot = Function::Dot(forward, direction);
+
+    //return(fabs(dot) >= kPortalCreatableAngleRange_);
+    return(dot <= -kPortalCreatableAngleRange_);
+}
 void GiantGentleMan::CheckCollision()
 {
     isRayHit_ = OnCollisionRay();
