@@ -5,12 +5,14 @@
 #include"imgui.h"
 #include"GameObject/SEManager/SEManager.h"
 #include"GameSave/GameSave.h"
+#include"GameBase.h"
+
 bool Key::isSendGetKeyMessage_ = false;
 bool Key::isGetKey_ = false;
 bool Key::isRayHit_ = false;
 namespace {
-const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 10.0f;
+    const Vector4 kRayHitOutlineColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+    const float kRayHitOutlineWidth = 10.0f;
 } // namespace
 Key::Key()
 {
@@ -18,8 +20,8 @@ Key::Key()
     // モデルをセット
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/key", "key");
     obj_->SetModel("key");
-	obj_->SetOutlineColor(kRayHitOutlineColor);
-	obj_->SetOutlineWidth(kRayHitOutlineWidth);
+    obj_->SetOutlineColor(kRayHitOutlineColor);
+    obj_->SetOutlineWidth(kRayHitOutlineWidth);
     SetAABB({ .min = { -0.1f,-0.1f,-0.1f }, .max = { 0.1f,0.1f,0.1f } });
     SetCollisionAttribute(kCollisionKey);
     SetCollisionMask(kCollisionChair | kCollisionWall | kCollisionFloor);
@@ -27,15 +29,15 @@ Key::Key()
 
 void Key::Initialize()
 {
-    
+
     velocity_ = { 0.0f };
     obj_->Initialize();
     obj_->RegisterEditor("Key");
-   
+
     isRayHit_ = false;
     isLockerHit_ = false;
 
-    auto& gameSave  = GameSave::GetInstance();
+    auto& gameSave = GameSave::GetInstance();
 
     if (!gameSave.GetInitStart()) {
         isGetKey_ = gameSave.GetProgressSaveData().isKeyHave;
@@ -46,6 +48,8 @@ void Key::Initialize()
 
     isChairHit_ = false;
     isSendGetKeyMessage_ = false;
+
+    translate_ = { 0.0f };
 }
 
 void Key::Update()
@@ -54,30 +58,47 @@ void Key::Update()
     obj_->SetEnableLighting(false);
     CheckCollision();
 
+    if (isGetKey_) {
+        velocity_.y = 0.0f;
+    }
+
+    if (!isGetKey_) {
+        //重力処理をしてみる
+        const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+        velocity_.y -= YoshidaMath::kGravity * deltaTime;
+        translate_ = obj_->GetTransform().translate;
+        translate_ += velocity_ * deltaTime;
+        translate_.y = std::clamp(translate_.y, GetAABB().max.y, 2.4f);
+
+        obj_->SetTranslate(translate_);
+    }
+
     obj_->Update();
 
 #ifdef USE_IMGUI
     ImGui::Begin("Key");
     ImGui::DragFloat3("vel", &velocity_.x);
+    ImGui::Text("transformY %f", obj_->GetTransform().translate.y);
     ImGui::Checkbox("isGetKey", &isGetKey_);
+    ImGui::Checkbox("isLockerHit_", &isLockerHit_);
     ImGui::End();
 #endif
 }
 
 void Key::Draw() {
-	if (isGetKey_) {
-		return;
-	}
-	if (isRayHit_) {
-		Object3dCommon::GetInstance()->DrawCommon();
-		obj_->Draw();
-		Object3dCommon::GetInstance()->DrawCommonOutline();
-		obj_->Draw();
-		Object3dCommon::GetInstance()->EndOutlineDraw();
-	} else {
-		Object3dCommon::GetInstance()->DrawCommon();
-		obj_->Draw();
-	}
+    if (isGetKey_) {
+        return;
+    }
+    if (isRayHit_) {
+        Object3dCommon::GetInstance()->DrawCommon();
+        obj_->Draw();
+        Object3dCommon::GetInstance()->DrawCommonOutline();
+        obj_->Draw();
+        Object3dCommon::GetInstance()->EndOutlineDraw();
+    } else {
+        Object3dCommon::GetInstance()->DrawCommon();
+        obj_->Draw();
+    }
 }
 void Key::SetPlayerCamera(PlayerCamera* camera)
 {
@@ -97,52 +118,54 @@ void Key::SetModel(const std::string& filePath)
 }
 
 void Key::CheckCollision() {
-	if (isGetKey_) {
-		isRayHit_ = false;
-		return;
-	}
+    if (isGetKey_) {
+        isRayHit_ = false;
+        return;
+    }
 
-	isRayHit_ = OnCollisionRay();
+    isRayHit_ = OnCollisionRay();
 
-	if (PlayerCommand::GetInstance()->InteractTrigger()) {
-		if (isRayHit_ && !PlayerCommand::GetIsGrab()) {
-			isGetKey_ = true;
-			isSendGetKeyMessage_ = true;
-			SEManager::SoundPlay(SEManager::KEY);
-		}
-	}
+    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+        if (isRayHit_ && !PlayerCommand::GetIsGrab()) {
+            isGetKey_ = true;
+            isSendGetKeyMessage_ = true;
+            SEManager::SoundPlay(SEManager::KEY);
+        }
+    }
 }
 
 bool Key::OnCollisionRay()
 {
-   return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate());
+    return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate());
 
 }
 
 void Key::OnCollision(Collider* collider)
 {
 
-        isLockerHit_ = false;
+    isLockerHit_ = false;
 
-        if (collider->GetCollisionAttribute() == kCollisionWall) {
-            if (!isLockerHit_) {
-                isLockerHit_ = true;
-            }
+    if (collider->GetCollisionAttribute() == kCollisionWall) {
+        if (!isLockerHit_) {
+            isLockerHit_ = true;
+        }
+    }
+
+    if (collider->GetCollisionAttribute() == kCollisionChair) {
+        if (!isChairHit_) {
+            isChairHit_ = true;
         }
 
-        if (collider->GetCollisionAttribute() == kCollisionChair) {
-            if (!isChairHit_) {
-                isChairHit_ = true;
-            }
-        }
+    }
 
-        if (collider->GetCollisionAttribute() == kCollisionFloor) {
+    if (collider->GetCollisionAttribute() == kCollisionFloor) {
+    /*    velocity_.y = 0.0f;*/
+    }
 
-        }
-    
+    ////重力落下しない
+    //velocity_.y = 0.0f;
 
-
-
+    YoshidaMath::ResolveCollision(translate_, velocity_, GetCollisionInfo());
 }
 
 Vector3 Key::GetWorldPosition() const
