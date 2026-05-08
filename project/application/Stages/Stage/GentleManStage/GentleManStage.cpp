@@ -14,6 +14,7 @@
 #include"GameObject/DocumentManager/DocumentManager.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include"Function.h"
+#include "GameObject/Flashlight/Flashlight.h"
 
 void GentleManStage::InitializeLights()
 {
@@ -37,6 +38,11 @@ void GentleManStage::InitializeLights()
     lightManager_->SetPointLight(pointLights_[0], 0);
     lightManager_->SetPointLight(pointLights_[1], 1);
 
+
+
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
+    lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
+
     lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 4);
 
     lightManager_->SetAreaLight(wallManagerRoofFoor_->GetAreaLights().at(0), 0);
@@ -46,6 +52,8 @@ void GentleManStage::InitializeLights()
 
 void GentleManStage::UpdateLights()
 {
+
+    lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
     lightManager_->SetAreaLight(wallManagerRoofFoor_->GetAreaLights().at(0), 0);
     lightManager_->SetAreaLight(wallManagerRoofFoor_->GetAreaLights().at(1), 1);
@@ -67,8 +75,9 @@ GentleManStage::GentleManStage(Player* player)
 
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     timeCardWatch_->SetPlayer(player_);
-
-
+    //懐中電灯の作成
+    flashlight_ = std::make_unique<Flashlight>();
+    flashlight_->SetPlayer(player_);
 }
 
 void GentleManStage::Initialize()
@@ -84,6 +93,8 @@ void GentleManStage::Initialize()
     timeCardWatch_->Initialize();
     documentManager_->Initialize();
     giantGentleMan_->Initialize();
+    //懐中電灯の初期化
+    flashlight_->Initialize();
 
     hierarchy->LoadObjectEditorsFromJsonIfExists("GentleManStage_objectEditors.json");
     hierarchy->EndRegisterFile();
@@ -94,7 +105,8 @@ void GentleManStage::UpdateGameObject(Camera* camera, const Vector3& lightDirect
     wallManagerRoofFoor_->Update();
     giantGentleMan_->Update();
     documentManager_->Update(camera, lightDirection);
-
+    //懐中電灯の更新
+    flashlight_->Update();
     UpdateLights();
 }
 
@@ -126,12 +138,16 @@ void GentleManStage::CheckCollision() {
     for (auto& [name, hand] : giantGentleMan_->GetGiantGentlemanHand()) {
         stageCollisionManager_->AddCollider(hand.get());
     }
+
+    stageCollisionManager_->AddCollider(flashlight_.get());
+
     stageCollisionManager_->CheckAllCollisions();
 }
 
 void GentleManStage::SetPlayer(Player* player)
 {
     player_ = player;
+    flashlight_->SetPlayer(player_);
 }
 void GentleManStage::SetCollisionManager(CollisionManager* collisionManager)
 {
@@ -145,6 +161,8 @@ void GentleManStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawPartic
     documentManager_->Draw();
     timeCardWatch_->Draw();
     giantGentleMan_->Draw();
+    flashlight_->Draw();
+
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 void GentleManStage::DrawSprite()
@@ -159,13 +177,14 @@ void GentleManStage::SetSceneCameraForDraw(Camera* camera) {
     documentManager_->SetCamera(camera);
     timeCardWatch_->SetCamera(camera);
     giantGentleMan_->SetCamera(camera);
-
+    flashlight_->SetCamera(camera);
 }
 
 void GentleManStage::SetPlayerCamera(PlayerCamera* playerCamera) {
     portalManager_->SetPlayerCamera(playerCamera);
     documentManager_->SetPlayerCamera(playerCamera);
     giantGentleMan_->SetPlayerCamera(playerCamera);
+    flashlight_->SetPlayerCamera(playerCamera);
 }
 PortalManager* GentleManStage::GetPortalManager() { return portalManager_.get(); }
 

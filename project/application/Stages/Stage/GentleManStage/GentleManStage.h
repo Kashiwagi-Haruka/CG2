@@ -10,7 +10,7 @@ class DocumentManager;
 class GentlemanPortalManager;
 class GiantGentleMan;
 
-
+class Flashlight;
 
 class GentleManStage :
     public BaseStage
@@ -23,6 +23,11 @@ class GentleManStage :
     std::unique_ptr<WallManagerRoofFoor> wallManagerRoofFoor_ = nullptr;
     std::unique_ptr<DocumentManager>documentManager_ = nullptr;
     std::unique_ptr<GiantGentleMan>giantGentleMan_ = nullptr;
+
+
+    std::unique_ptr<Flashlight> flashlight_ = nullptr;
+
+
 private:
     void InitializeLights();
     void UpdateLights();

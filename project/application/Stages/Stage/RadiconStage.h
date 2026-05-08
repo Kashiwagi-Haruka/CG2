@@ -8,6 +8,7 @@
 #include "GameObject/TestField/TestField.h"
 #include "GameObject/OperationChangeBox/OperationChangeBox.h"
 #include <array>
+#include "GameObject/Flashlight/Flashlight.h"
 
 class Primitive;
 class Player;
@@ -40,6 +41,8 @@ private:
 	std::unique_ptr<TestField> testField_;
 	std::unique_ptr<OperationChangeBox> operationChangeBox_;
 	std::array<std::unique_ptr<Primitive>, 5> roomPrimitives_{};
+
+	std::unique_ptr<Flashlight> flashlight_ = nullptr;
 
 	PlayerCamera* playerCamera_ = nullptr;
 	bool isOperationMode_ = false;

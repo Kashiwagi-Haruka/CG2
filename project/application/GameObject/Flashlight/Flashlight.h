@@ -19,6 +19,7 @@ public:
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
     void SetCamera(Camera* camera);
     void Update();
+    static void SetProgressSaveDataPtr(ProgressSaveData* progressSaveData) { progressSaveData_ = progressSaveData; };
     void Initialize();
     void Draw();
     void SetLight();
@@ -34,6 +35,7 @@ public:
 private:
     bool OnCollisionRay();
 private:
+    static ProgressSaveData* progressSaveData_;
     Player* player_ = nullptr;
     PlayerCamera* playerCamera_ = nullptr;
     Transform transform_ = {};

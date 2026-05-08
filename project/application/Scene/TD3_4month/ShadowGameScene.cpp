@@ -110,6 +110,8 @@ void ShadowGameScene::Initialize()
     cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
 
 	lightManager_->Initialize();
+	//懐中電灯共通のプログレスセーブデータのポインタを格納
+	Flashlight::SetProgressSaveDataPtr(&progressSaveData_);
 	//紳士管理
 	gentleManManager_->Initialize();
 

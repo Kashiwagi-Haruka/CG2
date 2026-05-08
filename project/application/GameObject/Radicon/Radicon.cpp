@@ -16,6 +16,7 @@ void Radicon::Initialize() {
 	speed_ = 0.06f;
 	obj_->SetTransform(transform_);
 	obj_->SetCamera(camera_);
+	obj_->Initialize();
 }
 void Radicon::SetCamera(Camera* camera) {
 	camera_ = camera;
