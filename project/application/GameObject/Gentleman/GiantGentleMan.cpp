@@ -17,10 +17,14 @@ GiantGentleMan::GiantGentleMan()
     obj_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
     obj_->SetModel("gentleman");
-    SetAABB({ .min = {-0.25f, 0.0f, -0.25f}, .max = {0.25f,  1.5f, 0.25f} });
-    SetCollisionAttribute(kCollisionWall);
-    SetCollisionMask(kCollisionPlayer);
     localAABB_ = { .min = {-0.5f,-0.5f,-0.5f},.max = {0.5f,0.5,0.5f} };
+
+    head_ = std::make_unique<GiantGentlemanHead>();
+
+    hands_["GentlemanLeftHand"] = std::make_unique<GiantGentlemanHand>();
+    hands_["GentlemanRightHand"] = std::make_unique<GiantGentlemanHand>();
+
+
 }
 
 void GiantGentleMan::Initialize()
@@ -43,6 +47,13 @@ void GiantGentleMan::Initialize()
             obj_->SetSkinCluster(&skinCluster_);
         }
     }
+
+    head_->Initialize();
+
+    for (auto& [name, hand] : hands_) {
+        hand->RegisterEditor(name);
+        hand->Initialize();
+    }
 }
 
 void GiantGentleMan::Update()
@@ -50,16 +61,29 @@ void GiantGentleMan::Update()
     CheckCollision();
     Animation();
     obj_->Update();
+    head_->Update();
+    for (auto& [name, hand] : hands_) {
+        hand->Update();
+    }
 }
 
 void GiantGentleMan::Draw()
 {
     obj_->Draw();
+    head_->Draw();
+    for (auto& [name, hand] : hands_) {
+        hand->Draw();
+    }
 }
 void GiantGentleMan::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
     obj_->UpdateCameraMatrices();
+
+    head_->SetCamera(camera);
+    for (auto& [name, hand] : hands_) {
+        hand->SetCamera(camera);
+    }
 }
 bool GiantGentleMan::IsFacingSurface(const Matrix4x4& cameraMat)
 {
@@ -97,14 +121,6 @@ bool GiantGentleMan::OnCollisionRay()
     return playerCamera_->OnCollisionRay(localAABB_, pos);
 }
 
-void GiantGentleMan::OnCollision(Collider* collider)
-{
-}
-
-Vector3 GiantGentleMan::GetWorldPosition() const
-{
-    return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
-}
 
 void GiantGentleMan::Animation()
 {
