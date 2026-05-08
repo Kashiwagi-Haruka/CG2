@@ -45,9 +45,10 @@ ShadowGameScene::ShadowGameScene() {
 	stageManager_->CreateStage(progressSaveData_.currentStageName);
 	// エレベーター
 	elevator_ = std::make_unique<Elevator>();
-	// セーブポイント紳士
-	gentleman_ = std::make_unique<Gentleman>();
-
+	//紳士管理
+	gentleManManager_ = std::make_unique<GentleManManager>();
+	gentleManManager_->SetPlayer(player_.get());
+	gentleManManager_->SetProgressSaveData(&progressSaveData_);
 	// エレベータールーム
 	elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
 	// 衝突管理
@@ -55,9 +56,7 @@ ShadowGameScene::ShadowGameScene() {
 	stageManager_->SetCollisionManager(collisionManager_.get());
 	// UI管理
 	uiManager_ = std::make_unique<UIManager>();
-	GentlemanMenu::SetPlayerCamera(cameraController_->GetPlayerCamera());
-	GentlemanMenu::SetPlayerTransform(&player_->GetTransform());
-	GentlemanMenu::SetProgressSaveData(&progressSaveData_);
+
 	// 最初のイベント
 	firstEvent_ = std::make_unique<FirstGameEvent>();
 	// PlayerCameraをセットする
@@ -111,9 +110,9 @@ void ShadowGameScene::Initialize()
     cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
 
 	lightManager_->Initialize();
+	//紳士管理
+	gentleManManager_->Initialize();
 
-	// セーブポイント紳士
-	gentleman_->Initialize();
 	// エレベータールーム
 	elevatorRoomManager_->Initialize();
 	// エレベーター
@@ -271,6 +270,9 @@ void ShadowGameScene::CheckCollision() {
 		collisionManager_->AddCollider(wall.get());
 	}
 
+
+	collisionManager_->AddCollider(gentleManManager_->GetGentleman());
+
 	stageManager_->SetCollisionManager(collisionManager_.get());
 	stageManager_->CheckCollision();
 }
@@ -352,12 +354,10 @@ void ShadowGameScene::UpdateGameObject() {
 	stageManager_->UpdateGameObject(cameraController_->GetPlayerCamera()->GetCamera(),lightManager_->GetDirectionalLight().direction);
 	// エレベーター
 	elevator_->Update();
-
 	// エレベータールーム管理
 	elevatorRoomManager_->Update();
-	// セーブポイント紳士
-	gentleman_->Update();
-
+	//紳士管理
+	gentleManManager_->Update();
 	ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 }
 void ShadowGameScene::UpdatePlayerDamage() {
@@ -446,8 +446,7 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
 
 	// エレベーター
 	elevator_->Draw();
-	// セーブポイント紳士
-	gentleman_->Draw();
+	gentleManManager_->Draw();
 
 	if (drawPlayer) {
 		// プレイヤーの描画処理
@@ -464,11 +463,12 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
 	stageManager_->SetSceneCameraForDraw(camera);
 	elevatorRoomManager_->SetCamera(camera);
 	elevator_->SetCamera(camera);
-	gentleman_->SetCamera(camera);
+	gentleManManager_->SetCamera(camera);
 }
 void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera) {
 	stageManager_->SetPlayerCamera(playerCamera);
-	gentleman_->SetPlayerCamera(playerCamera);
+
+	gentleManManager_->SetPlayerCamera(playerCamera);
 	elevator_->SetPlayerCamera(playerCamera);
 }
 void ShadowGameScene::SetCameraAndDraw(Camera* camera, bool drawPortal, bool isDrawParticle, bool drawPlayer, bool drawPlayerHead) {

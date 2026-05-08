@@ -6,7 +6,7 @@
 #include "GameObject/Key/Key.h"
 #include "GameObject/Player/Player.h"
 #include "GameObject/Portal/PortalManager.h"
-#include "GameObject/GentleMan/GiantGentleMan.h"
+#include "GameObject/Gentleman/GiantGentleMan.h"
 
 #include "GameObject/Wall/wallManagerRoofFoor.h"
 
@@ -64,6 +64,7 @@ GentleManStage::GentleManStage(Player* player)
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     timeCardWatch_->SetPlayer(player_);
 
+    //巨大紳士
     giantGentleMan_ = std::make_unique<GiantGentleMan>();
 
 }
@@ -125,7 +126,6 @@ void GentleManStage::CheckCollision() {
     }
 
     stageCollisionManager_->AddCollider(giantGentleMan_.get());
-
     stageCollisionManager_->CheckAllCollisions();
 }
 
@@ -161,6 +161,7 @@ void GentleManStage::SetSceneCameraForDraw(Camera* camera) {
     documentManager_->SetCamera(camera);
     timeCardWatch_->SetCamera(camera);
     giantGentleMan_->SetCamera(camera);
+    
 }
 
 void GentleManStage::SetPlayerCamera(PlayerCamera* playerCamera) {

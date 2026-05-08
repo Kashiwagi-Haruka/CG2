@@ -49,7 +49,7 @@ void RaySprite::Update()
     if (PlayerCommand::GetIsGrab()) {
         // インタラクトの処理
         SetTexture(RaySprite::GRAB);
-    } else if (PortalManager::GetCanMakePortal()) {
+    } else if (PortalManager::GetCanMakePortal()|| GiantGentleMan::IsRayHit()) {
         SetTexture(RaySprite::PORTAL);
     } else if(Gentleman::IsRayHit()){
         SetTexture(RaySprite::TALK);

@@ -413,6 +413,7 @@
     <ClCompile Include="Engine\Loadfile\TXT\TxtManager.cpp" />
     <ClCompile Include="application\Text\Credit\Credit.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GiantGentleMan.cpp" />
+    <ClCompile Include="application\GameObject\Gentleman\GentleManManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -815,6 +816,7 @@
     <ClInclude Include="Engine\Loadfile\TXT\TxtManager.h" />
     <ClInclude Include="application\Text\Credit\Credit.h" />
     <ClInclude Include="application\GameObject\Gentleman\GiantGentleMan.h" />
+    <ClInclude Include="application\GameObject\Gentleman\GentleManManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
