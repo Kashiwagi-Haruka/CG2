@@ -5,6 +5,13 @@
 using namespace YoshidaMath;
 
 void CollisionManager::CheckAllCollisions() {
+
+
+    //全ての衝突判定を初期化する
+    for (auto& colliders : colliders_) {
+        colliders->GetCollisionInfo().collided = false;
+    }
+
     // リスト内のペアを総当たり
     std::list<YoshidaMath::Collider*>::iterator itrA = colliders_.begin();
     for (; itrA != colliders_.end(); ++itrA) {
@@ -37,7 +44,7 @@ void CollisionManager::CheckCollisionAABBPair(YoshidaMath::Collider* colliderA, 
     AABB worldPosB = GetAABBWorldPos(colliderB);
 
     colliderA->SetCollisionInfo(GetCollisionInfo(worldPosA, worldPosB));
-    colliderB->SetCollisionInfo(GetCollisionInfo(worldPosA, worldPosB));
+    colliderB->SetCollisionInfo(GetCollisionInfo(worldPosB, worldPosA));
 
     // 衝突判定
     if (colliderA->GetCollisionInfo().collided&& colliderB->GetCollisionInfo().collided) {
@@ -47,10 +54,35 @@ void CollisionManager::CheckCollisionAABBPair(YoshidaMath::Collider* colliderA, 
 
 void CollisionManager::CheckCollisionSphereAABBPair(YoshidaMath::Collider* sphereC, YoshidaMath:: Collider* aabbC)
 {
+
+    Sphere worldSphereC = GetSphereWorldPos(sphereC);
+    AABB worldAABBC = GetAABBWorldPos(aabbC);
+
+    CollisionInfo info = GetCollisionInfo(worldSphereC, worldAABBC);
+
+    //// 衝突判定
+    //if (sphereC->GetCollisionInfo().collided && aabbC->GetCollisionInfo().collided) {
+    //    OnCollision(aabbC, sphereC);
+    //}
+
     // 衝突判定
-    if (RigidBody::isCollision(GetAABBWorldPos(aabbC), GetSphereWorldPos(sphereC))) {
+    if (info.collided) {
+        // Sphere側にはそのままセット
+  
+        sphereC->SetCollisionInfo(info);
+        // AABB側には法線を逆向きにしてセット
+        YoshidaMath::CollisionInfo aabbInfo = info;
+        aabbInfo.normal = { -info.normal.x, -info.normal.y, -info.normal.z };
+        aabbC->SetCollisionInfo(aabbInfo);
+
         OnCollision(aabbC, sphereC);
     }
+
+
+    //// 衝突判定
+    //if (RigidBody::isCollision(GetAABBWorldPos(aabbC), GetSphereWorldPos(sphereC))) {
+    //
+    //}
 }
 
 void CollisionManager::CheckCollisionOBBPair(YoshidaMath::Collider* colliderA, YoshidaMath::Collider* colliderB)

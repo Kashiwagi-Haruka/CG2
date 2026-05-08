@@ -21,10 +21,12 @@ GiantGentleMan::GiantGentleMan()
 
     head_ = std::make_unique<GiantGentlemanHead>();
 
-    hands_["GentlemanLeftHand"] = std::make_unique<GiantGentlemanHand>();
-    hands_["GentlemanRightHand"] = std::make_unique<GiantGentlemanHand>();
-
-
+    colliders_["GentlemanLeftHand"] = std::make_unique<GitantGettlemanCollider>();
+    colliders_["GentlemanRightHand"] = std::make_unique<GitantGettlemanCollider>();
+    colliders_["GentlemanShoulder.L"] = std::make_unique<GitantGettlemanCollider>();
+    colliders_["GentlemanShoulder.R"] = std::make_unique<GitantGettlemanCollider>();
+    colliders_["GentlemanLeftArm"] = std::make_unique<GitantGettlemanCollider>();
+    colliders_["GentlemanRightArm"] = std::make_unique<GitantGettlemanCollider>();
 }
 
 void GiantGentleMan::Initialize()
@@ -50,10 +52,16 @@ void GiantGentleMan::Initialize()
 
     head_->Initialize();
 
-    for (auto& [name, hand] : hands_) {
+    for (auto& [name, hand] : colliders_) {
         hand->RegisterEditor(name);
-        hand->Initialize();
     }
+
+    colliders_["GentlemanLeftHand"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["GentlemanRightHand"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["GentlemanShoulder.L"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["GentlemanShoulder.R"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["GentlemanLeftArm"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["GentlemanRightArm"]->Initialize(YoshidaMath::ColliderType::kAABB);
 }
 
 void GiantGentleMan::Update()
@@ -62,7 +70,7 @@ void GiantGentleMan::Update()
     Animation();
     obj_->Update();
     head_->Update();
-    for (auto& [name, hand] : hands_) {
+    for (auto& [name, hand] : colliders_) {
         hand->Update();
     }
 }
@@ -70,10 +78,10 @@ void GiantGentleMan::Update()
 void GiantGentleMan::Draw()
 {
     obj_->Draw();
-    head_->Draw();
-    for (auto& [name, hand] : hands_) {
-        hand->Draw();
-    }
+    //head_->Draw();
+    //for (auto& [name, hand] : colliders_) {
+    //    hand->Draw();
+    //}
 }
 void GiantGentleMan::SetCamera(Camera* camera)
 {
@@ -81,7 +89,7 @@ void GiantGentleMan::SetCamera(Camera* camera)
     obj_->UpdateCameraMatrices();
 
     head_->SetCamera(camera);
-    for (auto& [name, hand] : hands_) {
+    for (auto& [name, hand] : colliders_) {
         hand->SetCamera(camera);
     }
 }

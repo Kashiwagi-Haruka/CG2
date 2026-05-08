@@ -342,7 +342,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\Gentleman\GiantGentleMan.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GentleManManager.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GiantGentlemanHead.cpp" />
-    <ClCompile Include="application\GameObject\Gentleman\GiantGentlemanHand.cpp" />
+    <ClCompile Include="application\GameObject\Gentleman\GiantGentlemanCollider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -563,7 +563,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\Gentleman\GiantGentleMan.h" />
     <ClInclude Include="application\GameObject\Gentleman\GentleManManager.h" />
     <ClInclude Include="application\GameObject\Gentleman\GiantGentlemanHead.h" />
-    <ClInclude Include="application\GameObject\Gentleman\GiantGentlemanHand.h" />
+    <ClInclude Include="application\GameObject\Gentleman\GiantGentlemanCollider.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
