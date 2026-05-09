@@ -39,7 +39,8 @@ public:
 	void EndFlame();   // フレームの終了処理(Present、フェンス待ちなど)
 
 	bool ProcessMessage();
-
+	//現在のフレームを取得する
+	uint64_t GetFrameCount() { return dxCommon_->GetFrameCount(); };
 	float GetDeltaTime();
 	ID3D12Device* GetD3D12Device();
 	bool SaveCurrentFrameScreenShot(const std::string& filePath);
