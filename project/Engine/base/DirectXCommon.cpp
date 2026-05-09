@@ -86,6 +86,10 @@ void DirectXCommon::UpdateFixFPS() {
 	now = std::chrono::steady_clock::now();
 	deltaTime_ = std::chrono::duration<float>(now - reference_).count();
 	reference_ = now;
+
+	// --- ここでフレーム数を加算 ---
+	frameCount_++;
+
 }
 #pragma endregion
 

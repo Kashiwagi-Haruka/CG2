@@ -65,6 +65,7 @@ struct FTTextureData {
     //文字のサイズ
     Vector2 glyphSize;
     float bearingY = 0.0f;
+    uint64_t lastUsedFrame = 0; // 追加：いつ使われたかを記録
 };
 
 class FreeTypeManager {
@@ -144,6 +145,7 @@ public:
     static const FTTextureData& GetGlyphTextures(const GlyphKey& key);
     static float GetFontDescender(uint32_t handle);
     static float GetFontSize(uint32_t handle);
+
 private:
     /// @brief FreeTypeのResource生成
     /// @param bitmap bitmapを入れる
@@ -165,5 +167,11 @@ private:
     static std::unordered_map<GlyphKey, FTTextureData> glyphTextures_;
     //文字ごとのFontを格納する
     static std::unordered_map<GlyphKey, std::vector<std::unique_ptr<Font>>> fontPool_;
+
+
+    // 最大確保枚数（例：256文字分まで）
+    static const size_t MAX_FONT_GLYPHS = 256;
+    // 空いている（再利用可能な）SRVインデックスのプール
+    static std::vector<uint32_t> srvPool_;
 
 };

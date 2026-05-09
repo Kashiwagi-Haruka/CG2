@@ -8,6 +8,7 @@
 #include"Object3d/Object3dCommon.h"
 #include"TextureManager.h"
 #include<d3dx12.h>
+#include"GameBase.h"
 
 using namespace std;
 
@@ -229,13 +230,17 @@ const FTTextureData& FreeTypeManager::GetGlyphTextures(const GlyphKey& key) {
         // なければ生成
         CreateGlyphTexture(key.handle, key.glyphIndex);
     }
-
-
     auto it = glyphTextures_.find(key);
+    
+    //ゲーム基盤から現在のフレーム数を記録
+    //型について: uint64_t を使用していれば、60FPSで動作させ続けても、数値が溢れる（オーバーフローする）まで約98億年かかるため、実用上全く問題ありません。
+    it->second.lastUsedFrame = GameBase::GetInstance()->GetFrameCount();
+
     if (it == glyphTextures_.end()) {
 
         //DebugLog("Glyph texture not found for key: " + std::to_string(key.handle) + ", " + std::to_string(key.glyphIndex) + "\n");
         assert(false); // or return a default value if you prefer
+
     }
     return it->second;
 }
@@ -262,7 +267,6 @@ float FreeTypeManager::GetFontSize(uint32_t handle)
     return 0.0f;
 
 }
-
 
 void FreeTypeManager::ReleaseResource(FTResource& resource)
 {
@@ -373,6 +377,39 @@ void FreeTypeManager::CreateGlyphTexture(uint32_t faceHandle, FT_UInt glyphIndex
     //glyphTextures_に含まれていたらreturn
     if (glyphTextures_.contains(key)) return;
 
+
+    uint32_t targetSrvIndex = 0;
+
+    // --- 上限チェックとリソースの再利用 ---
+    if (glyphTextures_.size() >= MAX_FONT_GLYPHS) {
+    
+        // 1. 一番古い（lastUsedFrameが最小の）グリフを探す
+        auto oldestIt = glyphTextures_.begin();
+        uint64_t minFrame = UINT64_MAX;
+
+        for (auto it = glyphTextures_.begin(); it != glyphTextures_.end(); ++it) {
+            if (it->second.lastUsedFrame < minFrame) {
+                minFrame = it->second.lastUsedFrame;
+                oldestIt = it;
+            }
+        }
+
+
+        // 2. 最古のリソースを解放
+        targetSrvIndex = oldestIt->second.srvIndex; // SRVインデックスを控えておく
+        ReleaseResource(oldestIt->second.ftResource); // GPUリソースのみ解放
+
+        // 3. fontPool_ からも対応するスプライトを削除（整合性を保つため）
+        fontPool_.erase(oldestIt->first);
+
+        // 4. 管理マップから削除
+        glyphTextures_.erase(oldestIt);
+
+    }else {
+    // 上限に達していない場合は新規にアロケート
+    targetSrvIndex = TextureManager::GetInstance()->GetSrvManager()->Allocate();
+    }
+
     auto& ftData = fontFaces_.at(faceHandle);
     FT_Face& face = ftData.face;
 
@@ -390,9 +427,11 @@ void FreeTypeManager::CreateGlyphTexture(uint32_t faceHandle, FT_UInt glyphIndex
 
     FTTextureData texData;
     texData.ftResource = CreateResourceFromFTBitmap(bitmap);
+    // 決定したインデックスを使用
+    texData.srvIndex = targetSrvIndex;
+
+    // SRVの作成（既存のインデックスに上書き）
     auto* srvManager = TextureManager::GetInstance()->GetSrvManager();
-    texData.srvIndex = srvManager->Allocate();
-    //Texture::AddTextureHandleByIndex(texData.srvIndex);
     texData.srvHandleCPU = srvManager->GetCPUDescriptorHandle(texData.srvIndex);
     texData.srvHandleGPU = srvManager->GetGPUDescriptorHandle(texData.srvIndex);
     srvManager->CreateSRVforTexture2D(texData.srvIndex, texData.ftResource.resource.Get(), DXGI_FORMAT_R8_UNORM, 1);
@@ -517,13 +556,18 @@ std::vector<GlyphRun> FreeTypeManager::LayoutString(uint32_t handle, const std::
 
     for (char32_t ch : text) {
 
-        if (ch == U'\n') {
+        if (ch == U'\n' || ch == U'\r') {
             penX = startPos.x;
             penY += face->size->metrics.height / 64.0f;
             prevGlyph = 0;
             continue;
         }
 
+        if (ch == U'　') {
+            //日本語入力の時
+            penX += face->glyph->advance.x / 32.0f;
+            continue;
+        }
 
         if (ch == U'\t' || ch == U' ') {
             penX+=face->glyph->advance.x / 64.0f;
@@ -568,6 +612,7 @@ Font* FreeTypeManager::GetOrCreateFont(const GlyphKey& key)
         // 改行や無効な文字はスキップ
         return nullptr;
     }
+
 
     auto& pool = fontPool_[key];
     if (!glyphTextures_.contains(key)) {

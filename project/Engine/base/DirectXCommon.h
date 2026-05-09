@@ -112,12 +112,14 @@ class DirectXCommon {
 	float deltaTime_ = 1.0f / 60.0f;
 	WinApp* winApp_ = nullptr;
 	std::chrono::steady_clock::time_point reference_;
-
+	// 通算フレーム数を記録します
+	uint64_t frameCount_ = 0;
 public:
 	void initialize(WinApp* winApp);
 	void InitializeFixFPS();
-
 	void UpdateFixFPS();
+	// 現在のフレーム数を取得
+	uint64_t GetFrameCount() const { return frameCount_; }
 	void PreDraw();
 	void PostDraw();
 	void SetMainRenderTarget();

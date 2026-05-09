@@ -2,12 +2,14 @@
 
 #include "Engine/Loadfile/TXT/TxtManager.h"
 #include "application/Color/Color.h"
+#include"ScreenSize/ScreenSize.h"
 
 void Credit::Initialize(uint32_t fontHandle) {
 	creditBodyText_.Initialize(fontHandle);
-	creditBodyText_.SetPosition({40.0f, 80.0f});
+	creditBodyText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH,256
+		});
 	creditBodyText_.SetColor(COLOR::WHITE);
-	creditBodyText_.SetAlign(TextAlign::Left);
+	creditBodyText_.SetAlign(TextAlign::Center);
 
 	try {
 		creditBodyText_.SetString(TxtManager::GetInstance()->LoadTxtAsU32String("Resources/TXT/Credit.txt"));
