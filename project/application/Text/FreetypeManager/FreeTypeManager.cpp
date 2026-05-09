@@ -464,6 +464,8 @@ FT_UInt FreeTypeManager::GetGlyphID(uint32_t faceHandle, uint32_t unicode, uint3
     if (result == 0) {
         //0が帰ってきたらフォールバックする
 
+
+
         FT_UInt glyphIndex = FT_Get_Char_Index(face, unicode);
 
         if (glyphIndex == 0) {
@@ -521,6 +523,13 @@ std::vector<GlyphRun> FreeTypeManager::LayoutString(uint32_t handle, const std::
             prevGlyph = 0;
             continue;
         }
+
+
+        if (ch == U'\t' || ch == U' ') {
+            penX+=face->glyph->advance.x / 64.0f;
+            continue;
+        }
+
 
         FT_UInt glyphIndex = GetGlyphID(handle, ch, 0);
         if (glyphIndex == 0) continue;
