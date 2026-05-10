@@ -67,7 +67,7 @@ void Toilet::SetCamera(Camera* camera)
 
 void Toilet::Update()
 {
-    isOpen_ = false;
+ 
     CheckCollision();
     obj_->Update();
     Animation();
@@ -110,8 +110,7 @@ void Toilet::CheckCollision()
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
 
             if (!PlayerCommand::GetIsGrab()) {
-                // SEが専用のものがあれば変更してください (例: TOILET_OPEN等)
-                SEManager::SoundPlay(SEManager::DOOR_OPEN);
+                SEManager::SoundPlay(SEManager::TOILET);
                 isOpen_ = !isOpen_;
                 if (isOpen_) {
                     desiredAnimationName = "Open";
