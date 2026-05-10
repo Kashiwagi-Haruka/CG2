@@ -156,6 +156,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\GameObject\Toilet\ToiletManager.cpp" />
     <ClCompile Include="application\Text\FreetypeManager\Font\Font.cpp" />
     <ClCompile Include="application\Text\FreetypeManager\FreeTypeManager.cpp" />
     <ClCompile Include="application\Text\Text.cpp" />
@@ -346,6 +347,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\Portal\GentlemanPortalManager.cpp" />
     <ClCompile Include="application\Stages\Stage\RestroomStage\RestroomStage.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManagerRestRoom.cpp" />
+    <ClCompile Include="application\GameObject\Toilet\Toilet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -364,6 +366,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Color\Color.h" />
+    <ClInclude Include="application\GameObject\Toilet\ToiletManager.h" />
     <ClInclude Include="application\GameObject\UI\GameContinued\GameContinuedData.h" />
     <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemBase.h" />
     <ClInclude Include="application\Option\OptionData.h" />
@@ -570,6 +573,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\Portal\GentlemanPortalManager.h" />
     <ClInclude Include="application\Stages\Stage\RestroomStage\RestroomStage.h" />
     <ClInclude Include="application\GameObject\Wall\WallManagerRestRoom.h" />
+    <ClInclude Include="application\GameObject\Toilet\Toilet.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
