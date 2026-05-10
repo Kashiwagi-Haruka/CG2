@@ -215,7 +215,7 @@ void ShadowGameScene::Finalize()
 void ShadowGameScene::DebugImGui() {
 #ifdef USE_IMGUI
 	ImGui::Begin("shadowGameScene");
-	static constexpr const char* kStageNames[] = {"MirrorStage", "LightStage", "TutorialStage", "RadiconStage","GentleManStage"};
+	static constexpr const char* kStageNames[] = {"MirrorStage", "LightStage", "TutorialStage", "RadiconStage","GentleManStage","RestroomStage"};
 	int stageIndex = 0;
 	if (progressSaveData_.currentStageName == "LightStage") {
 		stageIndex = 1;
@@ -225,7 +225,10 @@ void ShadowGameScene::DebugImGui() {
 		stageIndex = 3;
 	} else if (progressSaveData_.currentStageName == "GentleManStage") {
 		stageIndex = 4;
+	} else if (progressSaveData_.currentStageName == "RestroomStage") {
+		stageIndex = 5;
 	}
+
 	if (ImGui::Combo("Stage", &stageIndex, kStageNames, IM_ARRAYSIZE(kStageNames))) {
 		ChangeStage(kStageNames[stageIndex]);
 	}

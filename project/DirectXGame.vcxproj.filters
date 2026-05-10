@@ -415,8 +415,10 @@
     <ClCompile Include="application\GameObject\Gentleman\GiantGentleMan.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GentleManManager.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GiantGentlemanHead.cpp" />
-    <ClCompile Include="application\GameObject\Gentleman\GiantGentlemanCollider.cpp" />
+    <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\ObjectCollider.cpp" />
     <ClCompile Include="application\GameObject\Portal\GentlemanPortalManager.cpp" />
+    <ClCompile Include="application\Stages\Stage\RestroomStage\RestroomStage.cpp" />
+    <ClCompile Include="application\GameObject\Wall\WallManagerRestRoom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -821,8 +823,10 @@
     <ClInclude Include="application\GameObject\Gentleman\GiantGentleMan.h" />
     <ClInclude Include="application\GameObject\Gentleman\GentleManManager.h" />
     <ClInclude Include="application\GameObject\Gentleman\GiantGentlemanHead.h" />
-    <ClInclude Include="application\GameObject\Gentleman\GiantGentlemanCollider.h" />
+    <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\ObjectCollider.h" />
     <ClInclude Include="application\GameObject\Portal\GentlemanPortalManager.h" />
+    <ClInclude Include="application\Stages\Stage\RestroomStage\RestroomStage.h" />
+    <ClInclude Include="application\GameObject\Wall\WallManagerRestRoom.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

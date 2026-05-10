@@ -342,8 +342,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\Gentleman\GiantGentleMan.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GentleManManager.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GiantGentlemanHead.cpp" />
-    <ClCompile Include="application\GameObject\Gentleman\GiantGentlemanCollider.cpp" />
+    <ClCompile Include="application\GameObject\YoshidaMath\CollisionManager\ObjectCollider.cpp" />
     <ClCompile Include="application\GameObject\Portal\GentlemanPortalManager.cpp" />
+    <ClCompile Include="application\Stages\Stage\RestroomStage\RestroomStage.cpp" />
+    <ClCompile Include="application\GameObject\Wall\WallManagerRestRoom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -564,8 +566,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\Gentleman\GiantGentleMan.h" />
     <ClInclude Include="application\GameObject\Gentleman\GentleManManager.h" />
     <ClInclude Include="application\GameObject\Gentleman\GiantGentlemanHead.h" />
-    <ClInclude Include="application\GameObject\Gentleman\GiantGentlemanCollider.h" />
+    <ClInclude Include="application\GameObject\YoshidaMath\CollisionManager\ObjectCollider.h" />
     <ClInclude Include="application\GameObject\Portal\GentlemanPortalManager.h" />
+    <ClInclude Include="application\Stages\Stage\RestroomStage\RestroomStage.h" />
+    <ClInclude Include="application\GameObject\Wall\WallManagerRestRoom.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

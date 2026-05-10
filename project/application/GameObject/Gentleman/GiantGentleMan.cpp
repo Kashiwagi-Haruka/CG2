@@ -19,12 +19,12 @@ GiantGentleMan::GiantGentleMan()
 
     head_ = std::make_unique<GiantGentlemanHead>();
 
-    colliders_["GentlemanLeftHand"] = std::make_unique<GitantGettlemanCollider>();
-    colliders_["GentlemanRightHand"] = std::make_unique<GitantGettlemanCollider>();
-    colliders_["GentlemanShoulder.L"] = std::make_unique<GitantGettlemanCollider>();
-    colliders_["GentlemanShoulder.R"] = std::make_unique<GitantGettlemanCollider>();
-    colliders_["GentlemanLeftArm"] = std::make_unique<GitantGettlemanCollider>();
-    colliders_["GentlemanRightArm"] = std::make_unique<GitantGettlemanCollider>();
+    colliders_["GentlemanLeftHand"] = std::make_unique<ObjectCollider>();
+    colliders_["GentlemanRightHand"] = std::make_unique<ObjectCollider>();
+    colliders_["GentlemanShoulder.L"] = std::make_unique<ObjectCollider>();
+    colliders_["GentlemanShoulder.R"] = std::make_unique<ObjectCollider>();
+    colliders_["GentlemanLeftArm"] = std::make_unique<ObjectCollider>();
+    colliders_["GentlemanRightArm"] = std::make_unique<ObjectCollider>();
 }
 
 void GiantGentleMan::Initialize()
