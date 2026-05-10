@@ -10,6 +10,7 @@ class DocumentManager;
 class PortalManager;
 class WhiteBoardManager;
 class Flashlight;
+class ToiletManager;
 
 class RestroomStage :
     public BaseStage
@@ -23,7 +24,7 @@ class RestroomStage :
     std::unique_ptr<Flashlight> flashlight_ = nullptr;
 
     std::unique_ptr<WhiteBoardManager>  whiteBoardManager_ = nullptr;
-
+    std::unique_ptr<ToiletManager>  toiletManager_ = nullptr;
     std::unique_ptr<Key> key_ = nullptr;
     std::unique_ptr<Door> door_ = nullptr;
 

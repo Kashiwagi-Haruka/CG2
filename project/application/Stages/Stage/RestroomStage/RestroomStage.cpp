@@ -14,6 +14,7 @@
 #include"Function.h"
 #include "GameObject/Flashlight/Flashlight.h"
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
+#include"GameObject/Toilet/ToiletManager.h"
 
 void RestroomStage::InitializeLights()
 {
@@ -66,7 +67,7 @@ RestroomStage::RestroomStage(Player* player)
 
     whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
     portalManager_ = std::make_unique<GentlemanPortalManager>(&player_->GetTransform().translate);
-   
+
     portalManager_->SetWhiteBoardManager(whiteBoardManager_.get());
     wallManagerRestRoom_ = std::make_unique<WallManagerRestRoom>();
 
@@ -78,6 +79,8 @@ RestroomStage::RestroomStage(Player* player)
     //懐中電灯の作成
     flashlight_ = std::make_unique<Flashlight>();
     flashlight_->SetPlayer(player_);
+
+    toiletManager_ = std::make_unique<ToiletManager>();
 }
 
 void RestroomStage::Initialize()
@@ -95,21 +98,22 @@ void RestroomStage::Initialize()
     flashlight_->Initialize();
     key_->Initialize();
     door_->Initialize();
+    toiletManager_->Initialize();
 
     hierarchy->LoadObjectEditorsFromJsonIfExists("RestroomStage_objectEditors.json");
     hierarchy->EndRegisterFile();
 }
 
 void RestroomStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
-    
+
     portalManager_->WarpPlayer(player);
     wallManagerRestRoom_->Update();
-    
+
     whiteBoardManager_->Update();
 
     key_->Update();
     door_->Update();
-
+    toiletManager_->Update();
     //懐中電灯の更新
     flashlight_->Update();
     UpdateLights();
@@ -141,11 +145,16 @@ void RestroomStage::CheckCollision() {
         stageCollisionManager_->AddCollider(whiteBoard.get());
     }
 
-    for (auto& wall : wallManagerRestRoom_->GetWalls()) {
+    //for (auto& wall : wallManagerRestRoom_->GetWalls()) {
+    //    stageCollisionManager_->AddCollider(wall.get());
+    //}
+    for (auto& [name, wall] : wallManagerRestRoom_->GetColliders()) {
         stageCollisionManager_->AddCollider(wall.get());
     }
-    for (auto& [name,wall]:wallManagerRestRoom_->GetColliders()) {
-        stageCollisionManager_->AddCollider(wall.get());
+
+    //便器
+    for (auto& toilet : toiletManager_->GetToilets()) {
+        stageCollisionManager_->AddCollider(toilet.get());
     }
 
     stageCollisionManager_->AddCollider(door_->GetAutoLockSystem().get());
@@ -171,12 +180,12 @@ void RestroomStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
 
     wallManagerRestRoom_->Draw();
     key_->Draw();
-    timeCardWatch_->Draw();   
+    timeCardWatch_->Draw();
     door_->Draw();
     whiteBoardManager_->Draw();
     flashlight_->Draw();
 
-
+    toiletManager_->Draw();
 
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
@@ -195,6 +204,7 @@ void RestroomStage::SetSceneCameraForDraw(Camera* camera) {
     whiteBoardManager_->SetCamera(camera);
     key_->SetCamera(camera);
     door_->SetCamera(camera);
+    toiletManager_->SetCamera(camera);
 }
 
 void RestroomStage::SetPlayerCamera(PlayerCamera* playerCamera) {
@@ -202,6 +212,7 @@ void RestroomStage::SetPlayerCamera(PlayerCamera* playerCamera) {
     flashlight_->SetPlayerCamera(playerCamera);
     key_->SetPlayerCamera(playerCamera);
     door_->SetPlayerCamera(playerCamera);
+    toiletManager_->SetPlayerCamera(playerCamera);
 }
 PortalManager* RestroomStage::GetPortalManager() { return portalManager_.get(); }
 
