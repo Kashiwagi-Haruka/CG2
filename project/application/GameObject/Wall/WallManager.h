@@ -14,7 +14,7 @@ public:
     virtual void Initialize();
     virtual void Update();
     virtual void Draw();
-    void SetCamera(Camera* camera);
+    virtual void SetCamera(Camera* camera);
     std::vector<std::unique_ptr<Wall>>& GetWalls() { return walls_; };
     std::array<AreaCommonLight,2>& GetAreaLights() { return  areaLights_; }
 protected:

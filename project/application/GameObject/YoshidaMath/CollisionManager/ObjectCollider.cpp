@@ -1,21 +1,21 @@
-#include "GiantGentlemanCollider.h"
+#include "ObjectCollider.h"
 
-GitantGettlemanCollider::GitantGettlemanCollider()
+ObjectCollider::ObjectCollider()
 {
     primitive_ = std::make_unique<Primitive>();
 }
 
-void GitantGettlemanCollider::OnCollision(Collider* collider)
+void ObjectCollider::OnCollision(Collider* collider)
 {
 }
 
-Vector3 GitantGettlemanCollider::GetWorldPosition() const
+Vector3 ObjectCollider::GetWorldPosition() const
 {
     return YoshidaMath::GetWorldPosByMat(primitive_->GetWorldMatrix());
 }
 
 
-void GitantGettlemanCollider::Update()
+void ObjectCollider::Update()
 {
     Vector3 scale = primitive_->GetTransform().scale;
     
@@ -36,11 +36,11 @@ void GitantGettlemanCollider::Update()
 
 }
 
-void GitantGettlemanCollider::Draw()
+void ObjectCollider::Draw()
 {
     primitive_->Draw();
 }
-void GitantGettlemanCollider::SetCamera(Camera* camera)
+void ObjectCollider::SetCamera(Camera* camera)
 {
 
     primitive_->SetCamera(camera);
@@ -48,7 +48,7 @@ void GitantGettlemanCollider::SetCamera(Camera* camera)
 
 }
 
-void GitantGettlemanCollider::Initialize(const YoshidaMath::ColliderType& type)
+void ObjectCollider::Initialize(const YoshidaMath::ColliderType& type)
 {
     SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);

@@ -2,10 +2,10 @@
 #include"GameObject/YoshidaMath/CollisionManager/Collider.h"
 #include"Primitive/Primitive.h"
 #include<memory>
-class GitantGettlemanCollider : public YoshidaMath::Collider
+class ObjectCollider : public YoshidaMath::Collider
 {
 public:
-    GitantGettlemanCollider();
+    ObjectCollider();
     void OnCollision(Collider* collider)override;
     /// @brief ワールド座標を取得する
     /// @return ワールド座標
