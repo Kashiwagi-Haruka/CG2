@@ -50,7 +50,7 @@ void UIManager::Update() {
     // カーソルを画面中央に設定する
     auto* input = Input::GetInstance();
 
-    if (input->TriggerKey(DIK_TAB)) {
+    if (!GentlemanMenu::GetIsSaveMenuShow() && input->TriggerKey(DIK_TAB)) {
 
         TogglePause();
 

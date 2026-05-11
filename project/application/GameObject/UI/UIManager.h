@@ -32,6 +32,7 @@ private:
 public:
   
     static bool GetIsPause() { return isPause_; }
+	static bool IsUiOperationBlocked() { return isPause_ || GentlemanMenu::GetIsSaveMenuShow(); }
     static void SetIsPause(const bool isPause) { isPause_ = isPause; }
     static void TogglePause();
     UIManager();
