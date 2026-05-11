@@ -165,5 +165,9 @@ void Edamame::Trivia()
     if (edamameTrivia_->GetIsDie()) {
         //死んだとき 落下開始
         edamameModel_->SetIsDropStart(true);
+		// 枝豆BGMを停止
+		BGMManager::StopSound(BGMManager::EDAMAME);
+		BGMManager::SetVol(0.0f, BGMManager::EDAMAME);
+		BGMManager::SetIsEdamameSound(false);
     }
 }
