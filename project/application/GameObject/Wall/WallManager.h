@@ -17,6 +17,9 @@ public:
     virtual void SetCamera(Camera* camera);
     std::vector<std::unique_ptr<Wall>>& GetWalls() { return walls_; };
     std::array<AreaCommonLight,2>& GetAreaLights() { return  areaLights_; }
+    std::unique_ptr<Object3d>& GetRoom() {
+        return room1_;
+    };
 protected:
     /*std::unique_ptr <Primitive>plane_ = nullptr;*/
     std::array<AreaCommonLight,2> areaLights_;
