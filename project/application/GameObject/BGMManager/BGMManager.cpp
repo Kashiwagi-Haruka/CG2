@@ -43,7 +43,10 @@ void BGMManager::SoundPlay(const Data& data,const bool loop)
     assert(BGMs_.contains(data));
     Audio::GetInstance()->SoundPlayWave(BGMs_[data], loop);
 }
-
+void BGMManager::StopSound(const Data& data) {
+	assert(BGMs_.contains(data));
+	Audio::GetInstance()->StopSound(BGMs_[data]);
+}
 void BGMManager::UnLoad()
 {
     for (auto& [tag, data] : BGMs_) {
