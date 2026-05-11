@@ -5,6 +5,7 @@
 #include "TextureManager.h"
 #include <algorithm>
 #include"ScreenSize/ScreenSize.h"
+#include "GameObject/KeyBindConfig.h"
 
 ResultScene::ResultScene() {
 
