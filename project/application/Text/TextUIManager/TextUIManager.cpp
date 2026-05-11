@@ -102,8 +102,14 @@ void TextUIManager::Draw() {
 	FreeTypeManager::ResetFontUsage();
 }
 
-void TextUIManager::StartText()
-{
-    text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
-    isDraw_ = true;
+void TextUIManager::ShowKeyLostAtStageStartMessage() {
+	text_.SetString(U"カギをなくした。");
+	StartText(5.0f);
+}
+
+void TextUIManager::StartText(float showTime) {
+	showTime_ = showTime;
+	showTimer_ = showTime_;
+	text_.StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
+	isDraw_ = true;
 }

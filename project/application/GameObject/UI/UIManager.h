@@ -42,4 +42,5 @@ public:
     void CursorShowAndMove();
     void CursorHideAndStop();
     void Draw();
+	void ShowKeyLostAtStageStartMessage();
 };

@@ -149,4 +149,6 @@ void UIManager::Draw() {
     }
 
     mission_->Draw();
+
 }
+void UIManager::ShowKeyLostAtStageStartMessage() { textUIManager_->ShowKeyLostAtStageStartMessage(); }
