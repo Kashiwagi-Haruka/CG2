@@ -33,6 +33,8 @@ void Key::Initialize()
     velocity_ = { 0.0f };
     obj_->Initialize();
     obj_->RegisterEditor("Key");
+    obj_->SetOutlineColor(kRayHitOutlineColor);
+    obj_->SetOutlineWidth(kRayHitOutlineWidth);
 
     isRayHit_ = false;
     isLockerHit_ = false;
