@@ -5,6 +5,7 @@
 #include "TextureManager.h"
 #include <algorithm>
 #include"ScreenSize/ScreenSize.h"
+#include "GameObject/KeyBindConfig.h"
 
 ResultScene::ResultScene() {
 
@@ -32,11 +33,12 @@ void ResultScene::Initialize() {
 	isBGMPlaying = false;
 }
 void ResultScene::Update() {
+	PlayerCommand* playerCommand = PlayerCommand::GetInstance();
 	if (!isBGMPlaying) {
 		Audio::GetInstance()->SoundPlayWave(BGM_, true);
 		isBGMPlaying = true;
 	}
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE) && !isTransitionOut) {
+	if ((playerCommand->InteractTrigger() || playerCommand->Shot())&& !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;
 	}
