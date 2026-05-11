@@ -141,7 +141,7 @@ void ShadowGameScene::Initialize()
     Update();
 
     currentEvent_->StartEvent();
-
+	uiManager_->ShowKeyLostAtStageStartMessage();
 }
 
 void ShadowGameScene::Update() {
@@ -249,10 +249,12 @@ void ShadowGameScene::ChangeStage(const std::string& stageName) {
 	stageManager_->CreateStage(progressSaveData_.currentStageName);
 	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
 	stageManager_->SetLightManager(lightManager_.get());
-    stageManager_->SetPlayer(player_.get());
-    stageManager_->SetCollisionManager(collisionManager_.get());
+	stageManager_->SetPlayer(player_.get());
+	stageManager_->SetCollisionManager(collisionManager_.get());
 	stageManager_->InitializeStage();
 	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
+
+	uiManager_->ShowKeyLostAtStageStartMessage();
 }
 
 void ShadowGameScene::CheckCollision() {
