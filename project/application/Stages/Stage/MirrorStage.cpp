@@ -68,6 +68,8 @@ void MirrorStage::Initialize() {
 	chairManager_->Initialize();
 	wallManager_->Initialize();
 	wallManager2_->Initialize();
+
+
 	vendingMac_->Initialize();
 	door_->Initialize();
 	lockerManager_->Initialize();
@@ -76,6 +78,10 @@ void MirrorStage::Initialize() {
 	timeCardRack_->Initialize();
 	boxManager_->Initialize();
 	InitializeLights();
+
+
+
+
 	hierarchy->LoadObjectEditorsFromJsonIfExists("MirrorStage_objectEditors.json");
 	hierarchy->EndRegisterFile();
 
@@ -111,19 +117,11 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 	lockerManager_->Update();
 	deskManager_->Update();
 	whiteBoardManager_->Update();
-	/*timeCard_->SetTransform({
-	    {1.0f, 1.0f, 1.0f },
-        {0.0f, 0.0f, 0.0f },
-        {8.0f, 1.0f, -7.0f}
-    });*/
 	timeCard_->Update();
-	//timeCardRack_->SetTransform({
-	//    {1.0f,  1.0f, 1.0f },
- //       {0.0f,  0.0f, 0.0f },
- //       {7.75f, 1.3f, -7.0f}
- //   });
 	timeCardRack_->Update();
 	pc_->Update();
+
+
 	UpdateLights();
 }
 
@@ -186,6 +184,23 @@ void MirrorStage::SetCollisionManager(CollisionManager* collisionManager) {
 	stageCollisionManager_ = collisionManager;
 }
 void MirrorStage::CheckCollision() {
+
+
+	// ==================//ポータルと部屋の当たり判定を取るために当たり判定を入れる=================================
+	// 部屋1のAABB (WallManager.cpp の壁の配置から推測)
+	portalManager_->ClearRoomAABBs();
+
+	AABB room1AABB = {
+	.min = {-7.5f, -1.0f, -7.5f},
+	.max = { 7.5f,  6.0f,  7.5f}
+	};
+
+	portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(room1AABB, wallManager_->GetRoom()->GetTranslate()));
+	// 部屋2のAABB (WallManager2.cpp の壁の配置に合わせて数値を調整してください)
+	portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(room1AABB, wallManager2_->GetRoom()->GetTranslate()));
+
+	// ===================================================
+
 	if (!stageCollisionManager_) {
 		return;
 	}
@@ -238,6 +253,10 @@ void MirrorStage::CheckCollision() {
 	stageCollisionManager_->AddCollider(edamame_->GetEdamameModel().get());
 	stageCollisionManager_->AddCollider(pc_.get());
 	stageCollisionManager_->CheckAllCollisions();
+
+
+
+
 }
 
 void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
