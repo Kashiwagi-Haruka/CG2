@@ -126,8 +126,10 @@ void Edamame::Trivia()
     if (BGMManager::GetIsEdamameSound()) {
 
         if (OnCollisionRay()) {
-            edamameTrivia_->Update();
-        }
+			edamameTrivia_->Update();
+		} else {
+			edamameTrivia_->UpdateVoiceFinishedState();
+		}
 
 
         Vector3 distance = Function::Distance(playerCamera_->GetRay().origin, worldTransform_.translate);

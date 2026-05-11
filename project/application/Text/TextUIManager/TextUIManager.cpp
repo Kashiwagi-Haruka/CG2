@@ -75,7 +75,7 @@ void TextUIManager::Update() {
 
 	if (isEdamameRayHit) {
 		edamameTriviaAlpha_ = 1.0f;
-	} else if (wasEdamameRayHit_ || edamameTriviaAlpha_ > 0.0f) {
+	} else if ((wasEdamameRayHit_ || edamameTriviaAlpha_ > 0.0f) && EdamameTrivia::GetIsCurrentVoiceFinished()) {
 		const float fadeStep = deltaTime / kEdamameFadeDuration_;
 		edamameTriviaAlpha_ = std::max(0.0f, edamameTriviaAlpha_ - fadeStep);
 	}

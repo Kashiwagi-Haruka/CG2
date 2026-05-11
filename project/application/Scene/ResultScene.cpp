@@ -38,7 +38,7 @@ void ResultScene::Update() {
 		Audio::GetInstance()->SoundPlayWave(BGM_, true);
 		isBGMPlaying = true;
 	}
-	if (playerCommand->InteractTrigger() && playerCommand->Shot() && !isTransitionOut) {
+	if ((playerCommand->InteractTrigger() || playerCommand->Shot())&& !isTransitionOut) {
 		transition->Initialize(true);
 		isTransitionOut = true;
 	}
