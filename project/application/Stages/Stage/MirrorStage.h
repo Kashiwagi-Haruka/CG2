@@ -24,6 +24,7 @@ class WallManager;
 class WallManager2;
 class WhiteBoardManager;
 class CollisionManager;
+class HintSheetManager;
 
 class MirrorStage : public BaseStage {
 private:
@@ -49,6 +50,7 @@ private:
 	std::unique_ptr<TimeCard> timeCard_ = nullptr;
 	std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
 	std::unique_ptr<BoxManager> boxManager_ = nullptr;
+	std::unique_ptr<HintSheetManager> hintSheetManager_ = nullptr;
 
 	void InitializeLights();
 	void UpdateLights();
