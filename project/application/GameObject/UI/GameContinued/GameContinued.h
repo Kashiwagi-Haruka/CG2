@@ -23,7 +23,17 @@ private:
 	std::array<Vector2, saveDataMaxNum_> blockScales_{};
 	std::array<Vector2, saveDataMaxNum_> blockPositions_{};
 
+	std::unique_ptr<Sprite> selectSpriteLeft_ = nullptr;
+	std::unique_ptr<Sprite> selectSpriteRight_ = nullptr;
+	std::unique_ptr<Sprite> selectHintSprite_ = nullptr;
+
+	Text selectConfirmText_;
+	Text selectCancelText_;
+	Text selectHintText_;
+
 	int currentSelectNum_ = 0;
+	bool isSaveConfirmed_ = false;
+	bool isSaveChecked_ = false;
 	bool isSelected_ = false;
 	bool isBackTriggered_ = false;
 	uint32_t backHintFontHandle_ = 0;
