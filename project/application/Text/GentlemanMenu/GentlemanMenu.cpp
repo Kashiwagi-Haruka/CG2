@@ -158,7 +158,10 @@ void GentlemanMenu::UpdateGentleManMenu()
     if (isShowSaveMenu_) {
 
         gameContinued_->Update();
-
+		if (gameContinued_->ConsumeBackTriggered()) {
+			isShowSaveMenu_ = false;
+			return;
+		}
         if (gameContinued_->GetIsSelected()) {
             gameContinued_->SetIsSelected(false);
 

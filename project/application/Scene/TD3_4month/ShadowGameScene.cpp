@@ -164,7 +164,7 @@ void ShadowGameScene::Update() {
 	if (!currentEvent_->IsRunning()) {
 		// UI管理
 		uiManager_->Update();
-		PlayerCommand::SetIsUiInputLocked(UIManager::GetIsPause());
+		PlayerCommand::SetIsUiInputLocked(UIManager::IsUiOperationBlocked());
 
 	}
 	// シーン遷移の更新処理
