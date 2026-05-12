@@ -26,6 +26,7 @@ class Inventory {
 	std::array<Text, kMaxItemCount> countTexts_;
 	Text useItemText_;
 	int useItemTextTimer_ = 0;
+	bool usedItemThisFrame_ = false;
 
 public:
 	// シングルトン化
@@ -41,4 +42,5 @@ public:
 	// ▼ 追加：アイテムをインベントリに入れる処理
 	bool AddItem(std::shared_ptr<ItemBase> item);
 	bool ConsumeSelectedItem();
+	bool ConsumeItemUseEvent();
 };

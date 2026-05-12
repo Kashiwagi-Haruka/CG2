@@ -41,7 +41,7 @@ void Inventory::Initialize() {
 
 	useItemText_.Initialize(fontHandle_);
 	useItemText_.SetString(U"アイテムを使った");
-	useItemText_.SetPosition({256.0f, 180.0f});
+	useItemText_.SetPosition({256.0f, 220.0f});
 	useItemText_.SetColor({1, 1, 1, 1});
 	useItemText_.SetAlign(TextAlign::Left);
 	useItemText_.SetBlendMode(BlendMode::kBlendModeAlpha);
@@ -154,6 +154,8 @@ bool Inventory::ConsumeSelectedItem() {
 	}
 
 	itemCounts_[selectedIndex_]--;
+
+	usedItemThisFrame_ = true;
 	if (itemCounts_[selectedIndex_] > 0) {
 		std::string string = "x" + std::to_string(itemCounts_[selectedIndex_]);
 		countTexts_[selectedIndex_].SetString(std::u32string(string.begin(), string.end()));
@@ -186,4 +188,10 @@ bool Inventory::ConsumeSelectedItem() {
 	}
 
 	return true;
+}
+
+bool Inventory::ConsumeItemUseEvent() {
+	const bool used = usedItemThisFrame_;
+	usedItemThisFrame_ = false;
+	return used;
 }

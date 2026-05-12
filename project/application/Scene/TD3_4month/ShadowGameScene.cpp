@@ -12,6 +12,7 @@
 #include"GameObject/BGMManager/BGMManager.h"
 #include"GameSave/GameSave.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
+#include "GameObject/UI/Inventory/Inventory.h"
 
 ShadowGameScene::ShadowGameScene() {
 	// BGMの管理
@@ -148,7 +149,7 @@ void ShadowGameScene::Update() {
 #ifdef USE_IMGUI
 	DebugImGui();
 #endif
-	//BGMの更新処理
+	// BGMの更新処理
 	BGMManager::Update();
 
 	StageTransition();
@@ -159,17 +160,16 @@ void ShadowGameScene::Update() {
 	// ポストエフェクトの更新処理
 	UpdatePostEffect();
 
-
-
 	if (!currentEvent_->IsRunning()) {
 		// UI管理
 		uiManager_->Update();
+		if (Inventory::GetInstance()->ConsumeItemUseEvent()) {
+			player_->SetHP(player_->GetMaxHP());
+		}
 		PlayerCommand::SetIsUiInputLocked(UIManager::IsUiOperationBlocked());
-
 	}
 	// シーン遷移の更新処理
 	UpdateSceneTransition();
-
 
 	// ゲームオブジェクトの更新処理
 	UpdateGameObject();
