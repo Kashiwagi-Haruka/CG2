@@ -82,9 +82,9 @@ void ElevatorRoomManager::Draw()
 {
     room_->Draw();
 
-    for (auto& [name, collider] : colliders_) {
-        collider->Draw();
-    }
+    //for (auto& [name, collider] : colliders_) {
+    //    collider->Draw();
+    //}
 }
 
 void ElevatorRoomManager::SetCamera(Camera* camera)
@@ -92,7 +92,7 @@ void ElevatorRoomManager::SetCamera(Camera* camera)
     room_->SetCamera(camera);
     room_->UpdateCameraMatrices();
 
-    for (auto& [name, collider] : colliders_) {
-        collider->SetCamera(camera);
-    }
+    //for (auto& [name, collider] : colliders_) {
+    //    collider->SetCamera(camera);
+    //}
 }
