@@ -35,7 +35,7 @@ void Inventory::Initialize() {
 	selectedSlotSprite_ = std::make_unique<Sprite>();
 	uint32_t selectedHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
 	selectedSlotSprite_->Initialize(selectedHandle);
-	selectedSlotSprite_->SetScale({kItemSlotSize + 20.0f, kItemSlotSize + 20.0f});
+	selectedSlotSprite_->SetScale({kItemSlotSize, kItemSlotSize});
 	selectedSlotSprite_->SetColor({1.0f, 1.0f, 0.0f, 0.65f});
 	selectedSlotSprite_->SetPosition(itemSlots_[0]->GetTranslate());
 
@@ -54,13 +54,13 @@ void Inventory::Update() {
 	}
 
 	if (isMenuSelecting_) {
-		if (playerCommand->UiMoveLeftTrigger()) {
+		if (playerCommand->UiMoveLeftTrigger() || playerCommand->MouseWheelDown()) {
 			selectedIndex_--;
 			if (selectedIndex_ < 0) {
 				selectedIndex_ = currentItemCount_ - 1;
 			}
 		}
-		if (playerCommand->UiMoveRightTrigger()) {
+		if (playerCommand->UiMoveRightTrigger() || playerCommand->MouseWheelUp()) {
 			selectedIndex_++;
 			if (selectedIndex_ >= currentItemCount_) {
 				selectedIndex_ = 0;
@@ -89,14 +89,14 @@ void Inventory::Update() {
 void Inventory::Draw() {
 
 	SpriteCommon::GetInstance()->DrawCommon();
-
+	if (isMenuSelecting_ && currentItemCount_ > 0 && selectedSlotSprite_) {
+		selectedSlotSprite_->Draw();
+	}
 	for (auto& slot : itemSlots_) {
 		slot->Draw();
 	}
 
-	if (isMenuSelecting_ && currentItemCount_ > 0 && selectedSlotSprite_) {
-		selectedSlotSprite_->Draw();
-	}
+
 
 	// ▼ 変更：インデックスを使って回すように変更（座標計算などでiが必要になるため）
 	for (int i = 0; i < kMaxItemCount; ++i) {
