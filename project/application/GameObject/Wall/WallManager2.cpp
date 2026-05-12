@@ -1,9 +1,6 @@
 #include "WallManager2.h"
 #include"Model/ModelManager.h"
 #include"Function.h"
-namespace {
-    const int kMaxWall = 5;
-}
 
 WallManager2::WallManager2()
 {
@@ -11,14 +8,6 @@ WallManager2::WallManager2()
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/room2", "room2");
     room1_->SetModel("room2");
     roomMat_ = Function::MakeIdentity4x4();
-
-    walls_.clear();
-
-    for (int i = 0; i < kMaxWall; ++i) {
-        std::unique_ptr<Wall> wall = std::make_unique<Wall>();
-        wall->SetParentMatrix(&roomMat_);
-        walls_.push_back(std::move(wall));
-    }
 
     //天井
     areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -38,7 +27,6 @@ WallManager2::WallManager2()
     areaLights_[1].radius = 10.0f;
     areaLights_[1].decay = 2.0f;
 
-    /*plane_ = std::make_unique<Primitive>();*/
 }
 
 
@@ -46,44 +34,34 @@ void WallManager2::Initialize()
 {
     room1_->Initialize();
     room1_->RegisterEditor("room2");
-    /*plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/out.jpg");
-    plane_->RegisterEditor("Wall2WindowPlane");*/
 
-    // 壁の初期化
-    for (auto& wall : walls_) {
-        wall->Initialize();
+    colliders_.clear();
+    colliders_["LeftWall2"] = std::make_unique<ObjectCollider>();
+    colliders_["RightWall2"] = std::make_unique<ObjectCollider>();
+    colliders_["BackWall2"] = std::make_unique<ObjectCollider>();
+
+    colliders_["LeftWall2"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["RightWall2"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["BackWall2"]->Initialize(YoshidaMath::ColliderType::kAABB);
+
+    for (auto& [name, collider] : colliders_) {
+        collider->RegisterEditor(name);
     }
-    std::vector<Primitive*> wallPrimitives;
-    wallPrimitives.reserve(walls_.size());
-    for (const auto& wall : walls_) {
-        wallPrimitives.push_back(wall->GetPrimitive());
-    }
 
+    //Vector3 translate = { 7.0f,0.0f,0.0f };
+    //walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ 7.0f ,0.0f,0.0f });
+    //walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ -7.0f ,0.0f,0.0f });
+    //walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate + Vector3{ 0.0f ,0.0f,7.0f });
+    //walls_[3]->SetST({ 2.5f, 4.0f,1.0f, }, translate + Vector3{ -6.0f ,0.0f,-6.5f });
+    //walls_[4]->SetST({ 11.5f, 4.0f,1.0f, }, translate + Vector3{ 1.5f ,0.0f ,-6.5f });
 
-    Vector3 translate = { 7.0f,0.0f,0.0f };
-    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ 7.0f ,0.0f,0.0f });
-    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, translate + Vector3{ -7.0f ,0.0f,0.0f });
-    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, translate + Vector3{ 0.0f ,0.0f,7.0f });
-    walls_[3]->SetST({ 2.5f, 4.0f,1.0f, }, translate + Vector3{ -6.0f ,0.0f,-6.5f });
-    walls_[4]->SetST({ 11.5f, 4.0f,1.0f, }, translate + Vector3{ 1.5f ,0.0f ,-6.5f });
-
-    /*Primitive::RegisterEditors(wallPrimitives, "Wall2:");*/
 }
 void WallManager2::Update()
 {
-    /*plane_->SetEnableLighting(false);*/
     room1_->Update();
-    //roomMat_ = room1_->GetWorldMatrix();
-    /*Matrix4x4 planeMat = Function::MakeAffineMatrix(plane_->GetTransform().scale, plane_->GetTransform().rotate, plane_->GetTransform().translate);
-    plane_->SetWorldMatrix(planeMat);
-    plane_->Update();
-    Vector3 normal = YoshidaMath::GetForward(plane_->GetWorldMatrix());
-    normal.x *= 1.0f;
-    areaLights_[1].normal = normal;
-    areaLights_[1].position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
-    areaLights_[1].height = plane_->GetTransform().scale.y*0.5f;*/
-    for (auto& wall : walls_) {
-        wall->Update();
+
+    for (auto& [name, collider] : colliders_) {
+        collider->Update();
     }
 
 }

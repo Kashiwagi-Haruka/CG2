@@ -2,10 +2,6 @@
 #include"Model/ModelManager.h"
 #include"Function.h"
 
-namespace {
-    const int kMaxWall = 4;
-}
-
 WallManager::WallManager()
 {
     room1_ = std::make_unique<Object3d>();
@@ -13,13 +9,9 @@ WallManager::WallManager()
     room1_->SetModel("room1");
     roomMat_ = Function::MakeIdentity4x4();
 
-    walls_.clear();
 
-    for (int i = 0; i < kMaxWall; ++i) {
-        std::unique_ptr<Wall> wall = std::make_unique<Wall>();
-        wall->SetParentMatrix(&roomMat_);
-        walls_.push_back(std::move(wall));
-    }
+
+
 
     //天井の照明
     areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -45,63 +37,49 @@ WallManager::WallManager()
 
 WallManager::~WallManager()
 {
-    for (auto& wall : walls_) {
-        if (wall != nullptr) {
-            wall.reset();
-            wall = nullptr;
-        }
-    }
 
-    walls_.clear();
 }
 
 void WallManager::Initialize()
 {
     room1_->Initialize();
     room1_->RegisterEditor("room1");
-    //plane_->Initialize(Primitive::Plane, "Resources/TD3_3102/2d/out.jpg");
-    //plane_->RegisterEditor("WallWindowPlane");
+
+    colliders_.clear();
+
+    colliders_["FrontWall"] = std::make_unique<ObjectCollider>();
+    colliders_["LeftWall"] = std::make_unique<ObjectCollider>();
+    colliders_["RightWall"] = std::make_unique<ObjectCollider>();
+    colliders_["BackWall"] = std::make_unique<ObjectCollider>();
+
+    colliders_["FrontWall"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["LeftWall"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["RightWall"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["BackWall"]->Initialize(YoshidaMath::ColliderType::kAABB);
 
 
-    // 壁の初期化
-    for (auto& wall : walls_) {
-        wall->Initialize();
+    for (auto& [name, collider] : colliders_) {
+        collider->RegisterEditor(name);
     }
-    std::vector<Primitive*> wallPrimitives;
-    wallPrimitives.reserve(walls_.size());
-    for (const auto& wall : walls_) {
-        wallPrimitives.push_back(wall->GetPrimitive());
-    }
+
+    //walls_[0]->SetST({ 2.0f,4.0f,14.0f }, { -7.0f  ,0.0f,0.0f });
+    //walls_[1]->SetST({ 2.0f,4.0f,14.0f }, { 7.0f   ,0.0f,0.0f });
+
+    //walls_[2]->SetST({ 14.0f,4.0f,1.0f }, { 0.0f ,0.0f,-7.0f });
+    //walls_[3]->SetST({ 14.0f,4.0f,1.0f }, { 0.0f ,0.0f, 7.0f });
+    
 
 
-    walls_[0]->SetST({ 2.0f,4.0f,14.0f }, { -7.0f  ,0.0f,0.0f });
-    walls_[1]->SetST({ 2.0f,4.0f,14.0f }, { 7.0f   ,0.0f,0.0f });
-
-    walls_[2]->SetST({ 14.0f,4.0f,1.0f }, { 0.0f ,0.0f,-7.0f });
-    walls_[3]->SetST({ 14.0f,4.0f,1.0f }, { 0.0f ,0.0f, 7.0f });
-
-    /*Primitive::RegisterEditors(wallPrimitives, "Wall");*/
 }
 
 void WallManager::Update()
 {
-    //plane_->SetEnableLighting(false);
     room1_->Update();
     room1_->SetEnableLighting(true);
     roomMat_ = room1_->GetWorldMatrix();
-    //Matrix4x4 planeMat = Function::MakeAffineMatrix(plane_->GetTransform().scale, plane_->GetTransform().rotate, plane_->GetTransform().translate);
 
-    //plane_->SetWorldMatrix(planeMat);
-    //plane_->Update();
-    //Vector3 normal = YoshidaMath::GetForward(plane_->GetWorldMatrix());
-    //normal.x *= 1.0f;
-    //areaLights_[1].normal = normal;
-    //areaLights_[1].position = YoshidaMath::GetWorldPosByMat(plane_->GetWorldMatrix()) - normal * 2.0f;
-
-    /*areaLights_[1].height = plane_->GetTransform().scale.y * 0.5f;*/
-
-    for (auto& wall : walls_) {
-        wall->Update();
+    for (auto& [name, collider] : colliders_) {
+        collider->Update();
     }
 
 }
@@ -110,19 +88,17 @@ void WallManager::Draw()
 {
     room1_->Draw();
 
-    //for (auto& wall : walls_) {
-    //    wall->Draw();
-    //}
-
+    for (auto& [name, collider] : colliders_) {
+        collider->Draw();
+    }
 }
 
 void WallManager::SetCamera(Camera* camera)
 {
-
     room1_->SetCamera(camera);
     room1_->UpdateCameraMatrices();
 
-    //for (auto& wall : walls_) {
-    //    wall->SetCamera(camera);
-    //}
+    for (auto& [name, collider] : colliders_) {
+        collider->SetCamera(camera);
+    }
 }
