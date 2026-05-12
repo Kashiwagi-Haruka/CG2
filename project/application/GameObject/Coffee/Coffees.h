@@ -22,6 +22,9 @@ public:
 	bool CheckHitPlayer(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const;
 
 	void SetRoomBounds(float minX, float maxX, float minZ, float maxZ);
+	void SetRenderDistanceFromPlayer(float distance);
+	void SetContainmentAroundBase(const Vector3& center, float radius);
+	void SetPlayerPosition(const Vector3& playerPosition);
 
 private:
 	struct InstanceData {
@@ -49,6 +52,8 @@ private:
 		float gravity = -1.0f;
 		float bounceDamping = 0.8f;
 		float separationBias = 0.001f;
+		Vector3 baseContainmentCenter = {0.0f, 0.0f, 0.0f};
+		float baseContainmentRadius = 0.0f;
 	};
 
 	void RunSimulation();
@@ -65,4 +70,6 @@ private:
 	Vector3 spawnOrigin_ = {0.0f, 5.0f, 0.0f};
 	Vector3 launchDirection_ = {0.0f, 0.0f, 1.0f};
 	bool isSpilling_ = false;
+	Vector3 playerPosition_ = {0.0f, 0.0f, 0.0f};
+	float renderDistanceFromPlayer_ = 20.0f;
 };
