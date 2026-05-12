@@ -9,6 +9,7 @@
 #include "RigidBody.h"
 #include"Audio.h"
 #include <memory>
+#include <algorithm>
 
 class Camera;
 class Player : public YoshidaMath::Collider {
@@ -111,4 +112,5 @@ public:
     const float GetMaxHP() { return  kMaxHp_; }
     void UpdatePlayerDamage(const float deltaTime);
     void ApplyPlayerDamage(float damageAmount);
+	void SetHP(float hp) { hp_ = std::clamp(hp, 0.0f, kMaxHp_); }
 };

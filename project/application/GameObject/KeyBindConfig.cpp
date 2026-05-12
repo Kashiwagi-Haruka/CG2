@@ -70,6 +70,7 @@ bool PlayerCommand::UiMoveBackwardTrigger() { return MoveTrigger(K_MoveBackward,
 bool PlayerCommand::UiMoveLeftTrigger() { return MoveTrigger(K_MoveLeft, K_MoveLeftArrow, C_MoveLeft); }
 
 bool PlayerCommand::UiMoveRightTrigger() { return MoveTrigger(K_MoveRight, K_MoveRightArrow, C_MoveRight); }
+
 bool PlayerCommand::SwitchLight()
 {
     auto* input = Input::GetInstance();
@@ -92,7 +93,14 @@ bool PlayerCommand::Interact() {
     auto* input = Input::GetInstance();
     return input->PushKey(K_Interact)||input->PushKey(K_Interact2) || input->PushButton(Input::PadButton(C_Interact));
 }
-
+bool PlayerCommand::MenuCommandTrigger() {
+	auto* input = Input::GetInstance();
+	return input->TriggerKey(K_Interact2);
+}
+bool PlayerCommand::ItemUseTrigger() {
+	auto* input = Input::GetInstance();
+	return input->TriggerKey(K_Interact) || input->TriggerButton(Input::PadButton(C_Interact));
+}
 bool PlayerCommand::InteractTrigger() {
     if (isUiInputLocked_) {
         return false;

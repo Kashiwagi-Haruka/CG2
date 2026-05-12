@@ -59,10 +59,12 @@ public:
 	bool EvetSkipTrigger();
 	bool MoveForwardTrigger();
 	bool MoveBackwardTrigger();
+	bool MenuCommandTrigger();
 	bool UiMoveForwardTrigger();
 	bool UiMoveBackwardTrigger();
 	bool UiMoveLeftTrigger();
 	bool UiMoveRightTrigger();
+	bool ItemUseTrigger();
 	bool SwitchLight();
 	bool Shot();
 	bool Sneak();
