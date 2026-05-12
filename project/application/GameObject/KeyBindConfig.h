@@ -59,6 +59,7 @@ public:
 	bool EvetSkipTrigger();
 	bool MoveForwardTrigger();
 	bool MoveBackwardTrigger();
+	bool MenuCommandTrigger();
 	bool UiMoveForwardTrigger();
 	bool UiMoveBackwardTrigger();
 	bool UiMoveLeftTrigger();
