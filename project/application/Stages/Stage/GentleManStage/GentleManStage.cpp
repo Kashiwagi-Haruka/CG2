@@ -91,7 +91,7 @@ void GentleManStage::Initialize()
 
     wallManagerRoofFoor_->Initialize();
     timeCardWatch_->Initialize();
-    documentManager_->Initialize();
+    documentManager_->Initialize("document1");
     giantGentleMan_->Initialize();
     //懐中電灯の初期化
     flashlight_->Initialize();

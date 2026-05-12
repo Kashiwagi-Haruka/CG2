@@ -11,6 +11,7 @@ class PortalManager;
 class WhiteBoardManager;
 class Flashlight;
 class ToiletManager;
+class DocumentManager;
 
 class RestroomStage :
     public BaseStage
@@ -27,6 +28,7 @@ class RestroomStage :
     std::unique_ptr<ToiletManager>  toiletManager_ = nullptr;
     std::unique_ptr<Key> key_ = nullptr;
     std::unique_ptr<Door> door_ = nullptr;
+    std::unique_ptr<DocumentManager>documentManager_ = nullptr;
 
 private:
     void InitializeLights();
