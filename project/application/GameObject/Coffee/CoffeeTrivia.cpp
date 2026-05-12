@@ -1,6 +1,7 @@
 #include "CoffeeTrivia.h"
 #include"GameObject/KeyBindConfig.h"
 #include"Option/Option.h"
+#include "Model/ModelManager.h"
 
 CoffeeTrivia::CoffeeTrivia()
 {
@@ -13,6 +14,7 @@ CoffeeTrivia::CoffeeTrivia()
     strings_[4] = "心臓では重症になると心拍数が140回/分を超えて血圧が低下し、危険な不整脈から心停止に至ることがあります。";
     strings_[5] = "そのため、カフェインは短時間に大量摂取せず、適量を間隔をあけて摂ることが重要です。";
 
+    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Coffee_billboard", "CoffeeBillboard");
 }
 
 CoffeeTrivia::~CoffeeTrivia()
@@ -23,6 +25,9 @@ CoffeeTrivia::~CoffeeTrivia()
 void CoffeeTrivia::Initialize()
 {
     triviaNum_ = strings_.size() - 1;
+	triviaObj_ = std::make_unique<Object3d>();
+	triviaObj_->Initialize();
+	triviaObj_->SetModel("CoffeeBillboard");
 }
 
 void CoffeeTrivia::Update()
