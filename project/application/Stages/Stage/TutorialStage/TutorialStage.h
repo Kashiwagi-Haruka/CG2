@@ -9,7 +9,7 @@ class WhiteBoardManager;
 class TimeCard;
 class TimeCardRack;
 class TimeCardWatch;
-class DocumentManager;
+class DocumentManagerParticle;
 class FileManager;
 class Flashlight;
 
@@ -31,7 +31,7 @@ class TutorialStage :
 
     std::unique_ptr<WallManager> wallManager_ = nullptr;
     std::unique_ptr<WallManager2> wallManager2_ = nullptr;
-    std::unique_ptr<DocumentManager>documentManager_ = nullptr;
+    std::unique_ptr<DocumentManagerParticle>documentManager_ = nullptr;
     std::unique_ptr<FileManager>fileManager_ = nullptr;
 
     std::unique_ptr<Flashlight> flashlight_ = nullptr;

@@ -15,6 +15,7 @@
 #include "GameObject/Flashlight/Flashlight.h"
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include"GameObject/Toilet/ToiletManager.h"
+#include"GameObject/DocumentManager/DocumentManager.h"
 
 void RestroomStage::InitializeLights()
 {
@@ -81,6 +82,8 @@ RestroomStage::RestroomStage(Player* player)
     flashlight_->SetPlayer(player_);
 
     toiletManager_ = std::make_unique<ToiletManager>();
+
+    documentManager_ = std::make_unique<DocumentManager>();
 }
 
 void RestroomStage::Initialize()
@@ -99,6 +102,7 @@ void RestroomStage::Initialize()
     key_->Initialize();
     door_->Initialize();
     toiletManager_->Initialize();
+    documentManager_->Initialize("document_isomer");
 
     hierarchy->LoadObjectEditorsFromJsonIfExists("RestroomStage_objectEditors.json");
     hierarchy->EndRegisterFile();
@@ -114,8 +118,10 @@ void RestroomStage::UpdateGameObject(Camera* camera, const Vector3& lightDirecti
     key_->Update();
     door_->Update();
     toiletManager_->Update();
+    documentManager_->Update(camera, lightDirection);
     //懐中電灯の更新
     flashlight_->Update();
+
     UpdateLights();
 }
 
@@ -186,13 +192,15 @@ void RestroomStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
     flashlight_->Draw();
 
     toiletManager_->Draw();
+    //ここで書類パーティクルを描画させる
+    documentManager_->Draw();
 
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 void RestroomStage::DrawSprite()
 {
-
+    documentManager_->DrawSprite();
 
 }
 void RestroomStage::SetSceneCameraForDraw(Camera* camera) {
@@ -204,7 +212,8 @@ void RestroomStage::SetSceneCameraForDraw(Camera* camera) {
     whiteBoardManager_->SetCamera(camera);
     key_->SetCamera(camera);
     door_->SetCamera(camera);
-    toiletManager_->SetCamera(camera);
+    toiletManager_->SetCamera(camera);    
+    documentManager_->SetCamera(camera);
 }
 
 void RestroomStage::SetPlayerCamera(PlayerCamera* playerCamera) {
@@ -213,6 +222,7 @@ void RestroomStage::SetPlayerCamera(PlayerCamera* playerCamera) {
     key_->SetPlayerCamera(playerCamera);
     door_->SetPlayerCamera(playerCamera);
     toiletManager_->SetPlayerCamera(playerCamera);
+    documentManager_->SetPlayerCamera(playerCamera);
 }
 PortalManager* RestroomStage::GetPortalManager() { return portalManager_.get(); }
 

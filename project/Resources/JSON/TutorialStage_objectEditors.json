@@ -2540,6 +2540,133 @@
         "loopEnabled": false,
         "name": "maou_se_sound_paper01.mp3",
         "volume": 1.0
+      },
+      {
+        "effects": [
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 0
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 1
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 2
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 3
+          }
+        ],
+        "loopEnabled": false,
+        "name": "toilet.mp3",
+        "volume": 1.0
       }
     ]
   },
@@ -3273,6 +3400,62 @@
           0.0
         ]
       },
+      "name": "document0",
+      "transform": {
+        "rotate": [
+          0.0,
+          1.2319999933242798,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          -4.710000038146973,
+          0.029999999329447746,
+          2.140000104904175
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 17,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
       "name": "FileObject0",
       "transform": {
         "rotate": [
@@ -3294,7 +3477,7 @@
     },
     {
       "editorId": "",
-      "index": 17,
+      "index": 18,
       "material": {
         "color": [
           1.0,
@@ -3350,7 +3533,7 @@
     },
     {
       "editorId": "",
-      "index": 18,
+      "index": 19,
       "material": {
         "color": [
           1.0,
@@ -3406,7 +3589,7 @@
     },
     {
       "editorId": "",
-      "index": 19,
+      "index": 20,
       "material": {
         "color": [
           1.0,
@@ -3462,7 +3645,7 @@
     },
     {
       "editorId": "",
-      "index": 20,
+      "index": 21,
       "material": {
         "color": [
           1.0,
@@ -3518,7 +3701,7 @@
     },
     {
       "editorId": "",
-      "index": 21,
+      "index": 22,
       "material": {
         "color": [
           1.0,
@@ -3574,7 +3757,7 @@
     },
     {
       "editorId": "",
-      "index": 22,
+      "index": 23,
       "material": {
         "color": [
           1.0,
@@ -3630,7 +3813,7 @@
     },
     {
       "editorId": "",
-      "index": 23,
+      "index": 24,
       "material": {
         "color": [
           1.0,
@@ -3686,7 +3869,7 @@
     },
     {
       "editorId": "",
-      "index": 24,
+      "index": 25,
       "material": {
         "color": [
           1.0,
@@ -3742,7 +3925,7 @@
     },
     {
       "editorId": "",
-      "index": 25,
+      "index": 26,
       "material": {
         "color": [
           1.0,
@@ -3798,7 +3981,7 @@
     },
     {
       "editorId": "",
-      "index": 26,
+      "index": 27,
       "material": {
         "color": [
           1.0,
@@ -3854,7 +4037,7 @@
     },
     {
       "editorId": "",
-      "index": 27,
+      "index": 28,
       "material": {
         "color": [
           1.0,
@@ -3910,7 +4093,7 @@
     },
     {
       "editorId": "",
-      "index": 28,
+      "index": 29,
       "material": {
         "color": [
           1.0,
@@ -3966,7 +4149,7 @@
     },
     {
       "editorId": "",
-      "index": 29,
+      "index": 30,
       "material": {
         "color": [
           1.0,

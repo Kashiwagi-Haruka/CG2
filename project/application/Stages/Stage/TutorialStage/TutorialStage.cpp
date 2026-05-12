@@ -79,7 +79,7 @@ TutorialStage::TutorialStage(Player* player)
     wallManager2_ = std::make_unique<WallManager2>();
     timeCard_ = std::make_unique<TimeCard>();
     timeCardRack_ = std::make_unique<TimeCardRack>();
-    documentManager_ = std::make_unique<DocumentManager>();
+    documentManager_ = std::make_unique<DocumentManagerParticle>();
 
     fileManager_ = std::make_unique<FileManager>();
     flashlight_ = std::make_unique<Flashlight>();
@@ -107,7 +107,7 @@ void TutorialStage::Initialize()
     timeCard_->Initialize();
     timeCardRack_->Initialize();
 
-    documentManager_->Initialize();
+    documentManager_->Initialize("document0");
     fileManager_->Initialize();
 
     hierarchy->LoadObjectEditorsFromJsonIfExists("TutorialStage_objectEditors.json");

@@ -11,9 +11,8 @@
 class Document : public YoshidaMath::Collider
 {
 public:
-
     Document();
-    void Initialize();
+    void Initialize(const std::string name);
     void Update();
     void Draw();
     static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
@@ -27,17 +26,13 @@ public:
     Vector3 GetWorldPosition() const override;
     static bool IsRayHit() { return isRayHit_; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
-    void SetTransform(const Transform& transform) { transform_ = transform; }
     bool GetDocumentLook() { return isDocumentLook_; }
+    Vector3* GetTranslate() { return &pos_; };
 private:
-    void OnTriggerLookStart();
-    void OnTriggerLookStop();
-private:
-
     bool isDocumentLook_ = false;
     static  bool isRayHit_;
     static PlayerCamera* playerCamera_;
     std::unique_ptr<Object3d>obj_ = nullptr;
-    Transform transform_;
+    Vector3 pos_;
 };
 
