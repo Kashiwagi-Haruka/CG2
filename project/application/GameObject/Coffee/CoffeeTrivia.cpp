@@ -33,9 +33,11 @@ void CoffeeTrivia::Initialize() {
 	triviaObj_ = std::make_unique<Object3d>();
 	triviaObj_->Initialize();
 	triviaObj_->SetModel("CoffeeBillboard");
+	triviaObj_->SetOutlineColor({1.0f, 1.0f, 0.0f, 1.0f});
+	triviaObj_->SetOutlineWidth(10.0f);
 	localAABB_ = {
-	    .min = {-0.25f, -0.25f, -0.25f},
-          .max = {0.25f,  0.25f,  0.25f }
+	    .min = {-1.00f, -0.10f, -1.00f},
+          .max = {1.00f,  1.10f,  1.00f }
     };
 	isActive_ = false;
 	isLanded_ = false;
@@ -66,6 +68,9 @@ void CoffeeTrivia::Update() {
 	if (isLanded_ && playerCamera_) {
 		isRayHit_ = playerCamera_->OnCollisionRay(localAABB_, position);
 	}
+	if (isRayHit_) {
+		triviaObj_->UpdateBillboard();	
+	}
 
 	if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger()) {
 
@@ -88,15 +93,13 @@ void CoffeeTrivia::Draw() {
 	if (!isActive_) {
 		return;
 	}
+	Object3dCommon::GetInstance()->DrawCommon();
+	triviaObj_->Draw();
 	if (isRayHit_) {
-		Object3dCommon::GetInstance()->DrawCommon();
-		triviaObj_->Draw();
 		Object3dCommon::GetInstance()->DrawCommonOutline();
 		triviaObj_->Draw();
 		Object3dCommon::GetInstance()->EndOutlineDraw();
-	} else {
-		triviaObj_->Draw();
-	}
+	} 
 }
 
 void CoffeeTrivia::SetVol(float vol) { Audio::GetInstance()->SetSoundVolume(&triviaVoice_, vol); }
