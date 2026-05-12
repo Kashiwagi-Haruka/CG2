@@ -10,8 +10,10 @@ class Camera;
 class CoffeeTrivia {
 private:
 	SoundData triviaVoice_;
-	std::array<std::string, 6> strings_;
-	size_t triviaNum_ = 0;
+	static std::array<std::u32string, 6> strings_;
+	static bool isSendStartTriviaMessage_;
+	static bool isCurrentVoiceFinished_;
+	static size_t triviaNum_;
 	std::unique_ptr<Object3d> triviaObj_;
 	Vector3 velocity_ = {0.0f, 0.0f, 0.0f};
 	Vector3 spawnForward_ = {0.0f, 0.0f, 1.0f};
@@ -32,4 +34,7 @@ public:
 	void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; }
 	void Spawn(const Vector3& origin, const Vector3& forward);
 	static bool IsRayHit() { return isRayHit_; }
+	static bool GetIsSendStartTriviaMessage() { return isSendStartTriviaMessage_; }
+	static bool GetIsCurrentVoiceFinished() { return isCurrentVoiceFinished_; }
+	static std::u32string& GetString() { return strings_[triviaNum_]; }
 };

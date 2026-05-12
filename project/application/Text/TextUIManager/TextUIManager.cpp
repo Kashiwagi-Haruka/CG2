@@ -2,6 +2,7 @@
 #include "TextUIManager.h"
 #include "DirectXCommon.h"
 #include "GameObject/Door/Door.h"
+#include "GameObject/Coffee/CoffeeTrivia.h"
 #include "GameObject/Edamame/Edamame.h"
 #include "GameObject/Edamame/EdamameTrivia.h"
 #include "GameObject/Flashlight/Flashlight.h"
@@ -70,16 +71,23 @@ void TextUIManager::Update() {
 		edamameTrivia_.StartTyping(0.1f); // 0.1秒ごとに1文字ずつ表示
 	}
 
+	if (CoffeeTrivia::GetIsSendStartTriviaMessage()) {
+		edamameTrivia_.SetString(CoffeeTrivia::GetString());
+		edamameTrivia_.StartTyping(0.1f); // 0.1秒ごとに1文字ずつ表示
+	}
+
 	const float deltaTime = SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	const bool isEdamameRayHit = Edamame::IsRayHit();
+	const bool isCoffeeRayHit = CoffeeTrivia::IsRayHit();
+	const bool isTriviaRayHit = isEdamameRayHit || isCoffeeRayHit;
 
-	if (isEdamameRayHit) {
+	if (isTriviaRayHit) {
 		edamameTriviaAlpha_ = 1.0f;
-	} else if ((wasEdamameRayHit_ || edamameTriviaAlpha_ > 0.0f) && EdamameTrivia::GetIsCurrentVoiceFinished()) {
+	} else if ((wasEdamameRayHit_ || edamameTriviaAlpha_ > 0.0f) && EdamameTrivia::GetIsCurrentVoiceFinished() && CoffeeTrivia::GetIsCurrentVoiceFinished()) {
 		const float fadeStep = deltaTime / kEdamameFadeDuration_;
 		edamameTriviaAlpha_ = std::max(0.0f, edamameTriviaAlpha_ - fadeStep);
 	}
-	wasEdamameRayHit_ = isEdamameRayHit;
+	wasEdamameRayHit_ = isTriviaRayHit;
 
 	edamameTrivia_.SetColor({1.0f, 1.0f, 1.0f, edamameTriviaAlpha_});
 
@@ -98,8 +106,6 @@ void TextUIManager::Draw() {
 			edamameTrivia_.Draw();
 		}
 	}
-
-	FreeTypeManager::ResetFontUsage();
 }
 
 void TextUIManager::ShowKeyLostAtStageStartMessage() {
