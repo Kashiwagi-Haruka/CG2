@@ -2,6 +2,12 @@
 #include"GameObject/KeyBindConfig.h"
 #include"Option/Option.h"
 #include "Model/ModelManager.h"
+#include "Camera.h"
+#include "Function.h"
+#include "GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
+#include "Object3d/Object3dCommon.h"
+
+bool CoffeeTrivia::isRayHit_ = false;
 
 CoffeeTrivia::CoffeeTrivia()
 {
@@ -22,40 +28,95 @@ CoffeeTrivia::~CoffeeTrivia()
     Audio::GetInstance()->SoundUnload(&triviaVoice_);
 }
 
-void CoffeeTrivia::Initialize()
-{
-    triviaNum_ = strings_.size() - 1;
+void CoffeeTrivia::Initialize() {
+	triviaNum_ = strings_.size() - 1;
 	triviaObj_ = std::make_unique<Object3d>();
 	triviaObj_->Initialize();
 	triviaObj_->SetModel("CoffeeBillboard");
+	localAABB_ = {
+	    .min = {-0.25f, -0.25f, -0.25f},
+          .max = {0.25f,  0.25f,  0.25f }
+    };
+	isActive_ = false;
+	isLanded_ = false;
+	isRayHit_ = false;
 }
 
-void CoffeeTrivia::Update()
-{
+void CoffeeTrivia::Update() {
+	if (!isActive_) {
+		isRayHit_ = false;
+		return;
+	}
 
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+	Vector3 position = triviaObj_->GetTranslate();
+	if (!isLanded_) {
+		velocity_.y -= 0.02f;
+		position += velocity_;
+		if (position.y <= 0.5f) {
+			position.y = 0.5f;
+			velocity_ = {0.0f, 0.0f, 0.0f};
+			isLanded_ = true;
+		}
+	}
 
-        std::string  filePath = "Resources/TD3_3102/Audio/Voice/Coffee/" + std::to_string(triviaNum_) + ".mp3";
-        Audio::GetInstance()->SoundUnload(&triviaVoice_);
+	triviaObj_->SetTranslate(position);
+	triviaObj_->UpdateBillboard();
 
-        if (triviaNum_ < strings_.size() - 1) {
-            triviaNum_++;
-        } else {
-            triviaNum_ = 0;
-        }
+	isRayHit_ = false;
+	if (isLanded_ && playerCamera_) {
+		isRayHit_ = playerCamera_->OnCollisionRay(localAABB_, position);
+	}
 
-        filePath = "Resources/TD3_3102/Audio/Voice/Edamame/" + std::to_string(triviaNum_) + ".mp3";
-        triviaVoice_ = Audio::GetInstance()->SoundLoadFile(filePath.c_str());
-        Audio::GetInstance()->SoundPlayWave(triviaVoice_, false);
-    }
+	if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger()) {
 
+		std::string filePath = "Resources/TD3_3102/Audio/Voice/Coffee/" + std::to_string(triviaNum_) + ".mp3";
+		Audio::GetInstance()->SoundUnload(&triviaVoice_);
+
+		if (triviaNum_ < strings_.size() - 1) {
+			triviaNum_++;
+		} else {
+			triviaNum_ = 0;
+		}
+
+		filePath = "Resources/TD3_3102/Audio/Voice/Coffee/" + std::to_string(triviaNum_) + ".mp3";
+		triviaVoice_ = Audio::GetInstance()->SoundLoadFile(filePath.c_str());
+		Audio::GetInstance()->SoundPlayWave(triviaVoice_, false);
+	}
 }
 
-void CoffeeTrivia::Draw()
-{
+void CoffeeTrivia::Draw() {
+	if (!isActive_) {
+		return;
+	}
+	if (isRayHit_) {
+		Object3dCommon::GetInstance()->DrawCommon();
+		triviaObj_->Draw();
+		Object3dCommon::GetInstance()->DrawCommonOutline();
+		triviaObj_->Draw();
+		Object3dCommon::GetInstance()->EndOutlineDraw();
+	} else {
+		triviaObj_->Draw();
+	}
 }
 
-void CoffeeTrivia::SetVol(float vol)
-{
-    Audio::GetInstance()->SetSoundVolume(&triviaVoice_, vol);
+void CoffeeTrivia::SetVol(float vol) { Audio::GetInstance()->SetSoundVolume(&triviaVoice_, vol); }
+
+void CoffeeTrivia::SetCamera(Camera* camera) {
+	if (!triviaObj_) {
+		return;
+	}
+	triviaObj_->SetCamera(camera);
+	triviaObj_->UpdateCameraMatrices();
+}
+
+void CoffeeTrivia::Spawn(const Vector3& origin, const Vector3& forward) {
+	if (!triviaObj_) {
+		return;
+	}
+	spawnForward_ = forward;
+	triviaObj_->SetTranslate(origin);
+	velocity_ = {forward.x * 0.06f, 0.12f, forward.z * 0.06f};
+	isActive_ = true;
+	isLanded_ = false;
+	isRayHit_ = false;
 }

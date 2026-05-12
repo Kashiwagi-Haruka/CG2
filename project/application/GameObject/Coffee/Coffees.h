@@ -11,6 +11,7 @@ public:
 	~Coffees();
 	void Initialize();
 	void Update(Camera* camera, const Vector3& lightDirection);
+	void SetCamera(Camera* camera);
 	void Draw();
 	uint32_t GetInstanceCount() const;
 	void SetSpawnOrigin(const Vector3& spawnOrigin);

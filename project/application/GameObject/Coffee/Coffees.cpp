@@ -561,3 +561,4 @@ bool Coffees::CheckHitPlayer(const Vector3& playerPosition, float playerRadius, 
 
     return false;
 }
+void Coffees::SetCamera(Camera* camera) { instancedObject_->SetCamera(camera); }

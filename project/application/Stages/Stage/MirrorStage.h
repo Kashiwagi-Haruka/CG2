@@ -6,6 +6,7 @@
 class BoxManager;
 class ChairManager;
 class Coffees;
+class CoffeeTrivia;
 class DeskManager;
 class Door;
 class Edamame;
@@ -35,6 +36,7 @@ private:
 	CollisionManager* stageCollisionManager_ = nullptr;
 	std::unique_ptr<PC> pc_ = nullptr;
 	std::unique_ptr<Coffees> coffees_ = nullptr;
+	std::unique_ptr<CoffeeTrivia> coffeeTrivia_ = nullptr;
 	std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
 	std::unique_ptr<Flashlight> flashlight_ = nullptr;
 	std::unique_ptr<Key> key_ = nullptr;
