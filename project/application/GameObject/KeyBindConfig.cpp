@@ -97,6 +97,10 @@ bool PlayerCommand::MenuCommandTrigger() {
 	auto* input = Input::GetInstance();
 	return input->TriggerKey(K_Interact2);
 }
+bool PlayerCommand::ItemUseTrigger() {
+	auto* input = Input::GetInstance();
+	return input->TriggerKey(K_Interact) || input->TriggerButton(Input::PadButton(C_Interact));
+}
 bool PlayerCommand::InteractTrigger() {
     if (isUiInputLocked_) {
         return false;

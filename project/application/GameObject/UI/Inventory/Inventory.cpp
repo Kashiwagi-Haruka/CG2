@@ -66,7 +66,7 @@ void Inventory::Update() {
 				selectedIndex_ = 0;
 			}
 		}
-		if (playerCommand->InteractTrigger()) {
+		if (playerCommand->ItemUseTrigger()) {
 			if (ConsumeSelectedItem()) {
 				useItemTextTimer_ = 120;
 			}

@@ -64,6 +64,7 @@ public:
 	bool UiMoveBackwardTrigger();
 	bool UiMoveLeftTrigger();
 	bool UiMoveRightTrigger();
+	bool ItemUseTrigger();
 	bool SwitchLight();
 	bool Shot();
 	bool Sneak();
