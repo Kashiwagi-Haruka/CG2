@@ -76,8 +76,8 @@ namespace {
 
 Player::Player() {
     localAABB_ = {
-        .min = {-0.25f, 0.0f, -0.25f},
-          .max = {0.25f,  1.5f, 0.25f }
+        .min = {-0.5f, 0.0f, -0.5f},
+          .max = {0.5f,  1.5f, 0.5f }
     };
     SetAABB(localAABB_);
     SetCollisionAttribute(kCollisionPlayer);

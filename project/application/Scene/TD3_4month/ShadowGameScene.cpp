@@ -264,7 +264,7 @@ void ShadowGameScene::CheckCollision() {
 
 	collisionManager_->AddCollider(player_.get());
 
-	for (auto& wall : elevatorRoomManager_->GetWalls()) {
+	for (auto&[name, wall]:elevatorRoomManager_->GetColliders()) {
 		collisionManager_->AddCollider(wall.get());
 	}
 

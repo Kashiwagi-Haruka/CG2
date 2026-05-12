@@ -129,7 +129,7 @@ void GentleManStage::CheckCollision() {
             break;
         }
     }
-    for (auto& wall : wallManagerRoofFoor_->GetWalls()) {
+    for (auto& [name,wall]:wallManagerRoofFoor_->GetColliders()) {
         stageCollisionManager_->AddCollider(wall.get());
     }
 

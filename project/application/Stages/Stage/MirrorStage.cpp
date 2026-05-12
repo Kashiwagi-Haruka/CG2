@@ -227,10 +227,10 @@ void MirrorStage::CheckCollision() {
 	for (auto& whiteBoard : whiteBoardManager_->GetWhiteBoards()) {
 		stageCollisionManager_->AddCollider(whiteBoard.get());
 	}
-	for (auto& wall : wallManager_->GetWalls()) {
+	for (auto& [name,wall]:wallManager_->GetColliders()) {
 		stageCollisionManager_->AddCollider(wall.get());
 	}
-	for (auto& wall : wallManager2_->GetWalls()) {
+	for (auto& [name, wall] : wallManager2_->GetColliders()) {
 		stageCollisionManager_->AddCollider(wall.get());
 	}
 	for (auto& chair : chairManager_->GetChairs()) {
