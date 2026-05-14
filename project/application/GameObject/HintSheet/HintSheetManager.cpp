@@ -70,3 +70,9 @@ void HintSheetManager::SetCamera(Camera* camera) {
 void HintSheetManager::SetPlayerCamera(PlayerCamera* playerCamera) {
     HintSheet::SetPlayerCamera(playerCamera);
 }
+
+void HintSheetManager::SetParentMatrix(const uint32_t index, Matrix4x4* parentMatrix)
+{
+    assert(index < hintSheets_.size());
+    hintSheets_.at(index)->SetParentMatrix(parentMatrix);
+}

@@ -33,7 +33,7 @@ public:
 
     /// @brief 全ヒントシートのリストを取得
     std::vector<std::unique_ptr<HintSheet>>& GetHintSheets() { return hintSheets_; }
-
+    void SetParentMatrix(const uint32_t index,Matrix4x4* parentMatrix);
 private:
     std::unique_ptr<Sprite>sprite_ = nullptr;
     std::vector<std::unique_ptr<HintSheet>> hintSheets_;

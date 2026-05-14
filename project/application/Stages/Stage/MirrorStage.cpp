@@ -81,6 +81,9 @@ void MirrorStage::Initialize() {
 
 	hintSheetManager_->Initialize();
 	hintSheetManager_->AddHintSheet("Resources/TXT/Hint/Hint0.txt");
+
+	hintSheetManager_->SetParentMatrix(0, deskManager_->GetDrawerMatrix(2));
+
 	InitializeLights();
 
 	hierarchy->LoadObjectEditorsFromJsonIfExists("MirrorStage_objectEditors.json");

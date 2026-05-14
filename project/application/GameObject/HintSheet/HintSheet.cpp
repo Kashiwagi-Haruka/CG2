@@ -59,7 +59,7 @@ void HintSheet::Initialize(uint32_t fontHandle, const std::string& textFilePath)
     obj_->RegisterEditor(std::filesystem::path(textFilePath).stem().string());
 }
 
-void HintSheet::SetMatrix(Matrix4x4* parentMatrix)
+void HintSheet::SetParentMatrix(Matrix4x4* parentMatrix)
 {
     assert(parentMatrix);
     parentMatrix_ = parentMatrix;
