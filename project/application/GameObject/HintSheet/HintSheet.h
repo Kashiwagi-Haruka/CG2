@@ -16,7 +16,7 @@ public:
     /// @param fontHandle Text描画用のフォントハンドル
     /// @param textFilePath 読み込むテキストファイルのパス (例: "Resources/TXT/Hint.txt")
     void Initialize(uint32_t fontHandle, const std::string& textFilePath);
-    void SetMatrix(Matrix4x4* parentMatrix);
+    void SetParentMatrix(Matrix4x4* parentMatrix);
     void Update();
 
     /// @brief 3Dモデルの描画
