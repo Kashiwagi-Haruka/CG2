@@ -5,6 +5,7 @@ std::unique_ptr<PlayerCommand> PlayerCommand::instance_ = nullptr;
 bool PlayerCommand::isGrab_ = false;
 bool PlayerCommand::isStand_ = false;
 bool PlayerCommand::isUiInputLocked_ = false;
+bool PlayerCommand::isLook_ = false;
 
 PlayerCommand* PlayerCommand::GetInstance() {
     if (instance_ == nullptr) {

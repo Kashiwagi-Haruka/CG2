@@ -120,6 +120,7 @@ void TutorialStage::Initialize()
     severedHand_->Initialize();
     severedHand_->SetParentMatrix(deskManager_->GetDrawerMatrix(0));
 
+
     hierarchy->LoadObjectEditorsFromJsonIfExists("TutorialStage_objectEditors.json");
     hierarchy->EndRegisterFile();
 }
