@@ -12,6 +12,8 @@ class TimeCardWatch;
 class DocumentManagerParticle;
 class FileManager;
 class Flashlight;
+class SeveredHand;
+class DeskManager;
 
 class TutorialStage :
     public BaseStage
@@ -35,6 +37,9 @@ class TutorialStage :
     std::unique_ptr<FileManager>fileManager_ = nullptr;
 
     std::unique_ptr<Flashlight> flashlight_ = nullptr;
+    std::unique_ptr<DeskManager> deskManager_ = nullptr;
+
+    std::unique_ptr<SeveredHand> severedHand_ = nullptr;
 
 private:
     void InitializeLights();

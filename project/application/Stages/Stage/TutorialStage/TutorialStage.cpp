@@ -17,6 +17,9 @@
 #include"GameObject/File/FileManager.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include "GameObject/Flashlight/Flashlight.h"
+#include "GameObject/Desk/DeskManager.h"
+#include"GameObject/SeveredHand/SeveredHand.h"
+
 
 void TutorialStage::InitializeLights()
 {
@@ -84,6 +87,10 @@ TutorialStage::TutorialStage(Player* player)
     fileManager_ = std::make_unique<FileManager>();
     flashlight_ = std::make_unique<Flashlight>();
     flashlight_->SetPlayer(player_);
+
+    deskManager_ = std::make_unique<DeskManager>(3);
+    severedHand_ = std::make_unique<SeveredHand>();
+
 }
 
 void TutorialStage::Initialize()
@@ -109,6 +116,9 @@ void TutorialStage::Initialize()
 
     documentManager_->Initialize("document0");
     fileManager_->Initialize();
+    deskManager_->Initialize();
+    severedHand_->Initialize();
+    severedHand_->SetParentMatrix(deskManager_->GetDrawerMatrix(0));
 
     hierarchy->LoadObjectEditorsFromJsonIfExists("TutorialStage_objectEditors.json");
     hierarchy->EndRegisterFile();
@@ -129,6 +139,8 @@ void TutorialStage::UpdateGameObject(Camera* camera, const Vector3& lightDirecti
     documentManager_->Update(camera, lightDirection);
     fileManager_->Update();
     flashlight_->Update();
+    deskManager_->Update();
+    severedHand_->Update();
 
     UpdateLights();
 
@@ -174,14 +186,19 @@ void TutorialStage::CheckCollision() {
     for (auto& whiteBoard : whiteBoardManager_->GetWhiteBoards()) {
         stageCollisionManager_->AddCollider(whiteBoard.get());
     }
-    for (auto& [name,wall] : wallManager_->GetColliders()) {
+    for (auto& [name, wall] : wallManager_->GetColliders()) {
         stageCollisionManager_->AddCollider(wall.get());
     }
-    for (auto&[name, wall]:wallManager2_->GetColliders()) {
+    for (auto& [name, wall] : wallManager2_->GetColliders()) {
         stageCollisionManager_->AddCollider(wall.get());
     }
 
+    for (auto& desk : deskManager_->GetDesks()) {
+        stageCollisionManager_->AddCollider(desk.get());
+    }
+
     stageCollisionManager_->AddCollider(testField_.get());
+    stageCollisionManager_->AddCollider(severedHand_.get());
 
     stageCollisionManager_->AddCollider(door_->GetAutoLockSystem().get());
     if (!door_->GetIsOpen()) {
@@ -212,6 +229,9 @@ void TutorialStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
     timeCardRack_->Draw();
     door_->Draw();
     fileManager_->Draw();
+    deskManager_->Draw();
+    severedHand_->Draw();
+
     whiteBoardManager_->Draw();
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
@@ -236,6 +256,8 @@ void TutorialStage::SetSceneCameraForDraw(Camera* camera) {
     documentManager_->SetCamera(camera);
     fileManager_->SetCamera(camera);
     flashlight_->SetCamera(camera);
+    deskManager_->SetCamera(camera);
+    severedHand_->SetCamera(camera);
 }
 
 void TutorialStage::SetPlayerCamera(PlayerCamera* playerCamera) {
@@ -244,6 +266,8 @@ void TutorialStage::SetPlayerCamera(PlayerCamera* playerCamera) {
     door_->SetPlayerCamera(playerCamera);
     documentManager_->SetPlayerCamera(playerCamera);
     flashlight_->SetPlayerCamera(playerCamera);
+    deskManager_->SetPlayerCamera(playerCamera);
+    severedHand_->SetPlayerCamera(playerCamera);
 }
 PortalManager* TutorialStage::GetPortalManager() { return portalManager_.get(); }
 
