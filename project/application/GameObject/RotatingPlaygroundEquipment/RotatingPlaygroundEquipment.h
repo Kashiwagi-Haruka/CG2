@@ -15,6 +15,11 @@ class RotatingPlaygroundEquipment {
 	float spinAnimationTime_ = 0.0f;
 	bool spinLoopAnimation_ = true;
 	std::vector<std::unique_ptr<Object3d>> gentlemanObj_;
+	std::vector<std::unique_ptr<Skeleton>> gentlemanSkeletons_;
+	std::vector<SkinCluster> gentlemanSkinClusters_;
+	const Animation::AnimationData* gentlemanRoundAnimation_ = nullptr;
+	float gentlemanAnimationTime_ = 0.0f;
+	bool gentlemanLoopAnimation_ = true;
 	Transform spinTransform_;
 	std::vector<Transform> gentlemanTransform_;
 	float gentlemanOrbitAngle_ = 0.0f;

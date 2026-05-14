@@ -40,19 +40,33 @@ void RotatingPlaygroundEquipment::Initialize() {
 		spinAnimation_ = spinAnimation;
 		spinObj_->SetAnimation(spinAnimation_, spinLoopAnimation_);
 	}
+	gentlemanRoundAnimation_ = AnimationManager::GetInstance()->FindAnimation(kGentlemanAnimationGroup, "Round");
 
 	constexpr size_t kGentlemanCount = 4;
 	gentlemanObj_.resize(kGentlemanCount);
+	gentlemanSkeletons_.resize(kGentlemanCount);
+	gentlemanSkinClusters_.resize(kGentlemanCount);
 	gentlemanTransform_.resize(kGentlemanCount);
+	Model* gentlemanModel = ModelManager::GetInstance()->FindModel("gentleman");
 	for (size_t i = 0; i < kGentlemanCount; ++i) {
 		auto& gentleman = gentlemanObj_[i];
 		gentleman = std::make_unique<Object3d>();
 		gentleman->Initialize();
 		gentleman->SetModel("gentleman");
+		if (gentlemanModel) {
+			gentlemanSkeletons_[i] = std::make_unique<Skeleton>(Skeleton().Create(gentlemanModel->GetModelData().rootnode));
+			gentlemanSkinClusters_[i] = CreateSkinCluster(*gentlemanSkeletons_[i], *gentlemanModel);
+			if (!gentlemanSkinClusters_[i].mappedPalette.empty()) {
+				gentleman->SetSkinCluster(&gentlemanSkinClusters_[i]);
+			}
+		}
+		if (gentlemanRoundAnimation_) {
+			gentleman->SetAnimation(gentlemanRoundAnimation_, gentlemanLoopAnimation_);
+		}
 
 		auto& transform = gentlemanTransform_[i];
 		transform.scale = {1.0f, 1.0f, 1.0f};
-		transform.rotate = {0.0f, std::numbers::pi_v<float>/2.0f, 0.0f};
+		transform.rotate = {0.0f, std::numbers::pi_v<float> / 2.0f, 0.0f};
 		transform.translate = spinTransform_.translate;
 		gentleman->SetTransform(transform);
 	}
@@ -74,11 +88,20 @@ void RotatingPlaygroundEquipment::Update() {
 	gentlemanOrbitAngle_ += gentlemanOrbitSpeed_;
 	constexpr float kPi = std::numbers::pi_v<float>;
 	const float angleStep = (2.0f * kPi) / static_cast<float>(gentlemanObj_.size());
+	const float deltaTime = 1.0f / 60.0f;
+	gentlemanAnimationTime_ = gentlemanRoundAnimation_ ? Animation::AdvanceTime(*gentlemanRoundAnimation_, gentlemanAnimationTime_, deltaTime, gentlemanLoopAnimation_) : 0.0f;
 	for (size_t i = 0; i < gentlemanObj_.size(); ++i) {
+		if (gentlemanSkeletons_[i] && gentlemanRoundAnimation_) {
+			gentlemanSkeletons_[i]->ApplyAnimation(*gentlemanRoundAnimation_, gentlemanAnimationTime_);
+			gentlemanSkeletons_[i]->Update();
+			if (!gentlemanSkinClusters_[i].mappedPalette.empty()) {
+				UpdateSkinCluster(gentlemanSkinClusters_[i], *gentlemanSkeletons_[i]);
+			}
+		}
 		const float angle = gentlemanOrbitAngle_ + (angleStep * static_cast<float>(i));
 		auto& transform = gentlemanTransform_[i];
 		transform.translate = {
-		    spinTransform_.translate.x + std::cosf(angle) * gentlemanOrbitRadius_, spinTransform_.translate.y, spinTransform_.translate.z + std::sinf(angle) * gentlemanOrbitRadius_};
+		    spinTransform_.translate.x + std::cosf(angle) * gentlemanOrbitRadius_, spinTransform_.translate.y+1.0f, spinTransform_.translate.z + std::sinf(angle) * gentlemanOrbitRadius_};
 		transform.rotate.y = -angle + kPi;
 		gentlemanObj_[i]->SetTransform(transform);
 		gentlemanObj_[i]->Update();
