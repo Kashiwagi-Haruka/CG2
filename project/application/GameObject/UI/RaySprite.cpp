@@ -11,6 +11,7 @@
 #include"GameObject/Desk/DeskManager.h"
 #include"GameObject/Door/Door.h"
 #include"GameObject/Edamame/Edamame.h"
+#include"GameObject/Coffee/CoffeeTrivia.h"
 #include"GameObject/Flashlight/Flashlight.h"
 #include"GameObject/Key/Key.h"
 #include"GameObject/Elevator/Elevator.h"
@@ -77,20 +78,18 @@ void RaySprite::SetTexture(const TextureUI num)
     sprite_->SetTextureHandle(handle_[num]);
 }
 
-bool RaySprite::IsRayHit()
-{
-    return
-        BoxManager::IsRayHit() ||
-        ChairManager::IsRayHit() ||
-        DeskManager::IsRayHit() ||
-        LockerManager::IsRayHit() ||
-        Door::IsRayHit() ||
-        Edamame::IsRayHit() ||
-        Flashlight::IsRayHit() ||
-        Key::IsRayHit() ||
-        VendingMac::IsRayHit() ||
-        PC::IsRayHit()||
-        Gentleman::IsRayHit()||
-        Document::IsRayHit()
-        ;
+bool RaySprite::IsRayHit() {
+	return BoxManager::IsRayHit() || 
+        ChairManager::IsRayHit() || 
+        DeskManager::IsRayHit() || 
+        LockerManager::IsRayHit() || 
+        Door::IsRayHit() || 
+        Edamame::IsRayHit() || 
+        CoffeeTrivia::IsRayHit() ||
+	    Flashlight::IsRayHit() || 
+        Key::IsRayHit() || 
+        VendingMac::IsRayHit() || 
+        PC::IsRayHit() || 
+        Gentleman::IsRayHit() || 
+        Document::IsRayHit();
 }

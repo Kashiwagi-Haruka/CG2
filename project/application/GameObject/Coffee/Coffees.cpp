@@ -13,7 +13,7 @@
 namespace {
     constexpr const char* kCoffeesModelDirectory = "Resources/TD3_3102/3d/Coffee";
     constexpr const char* kCoffeesModelName = "Coffee";
-    constexpr uint32_t kCoffeesInstanceCount = 1000;
+    constexpr uint32_t kCoffeesInstanceCount = 800;
     constexpr uint32_t kCoffeesInitialVisibleCount = 100;
     constexpr float kCoffeesMinScale = 0.22f;
     constexpr float kCoffeesScaleStep = 0.0f;
@@ -42,6 +42,7 @@ namespace {
     constexpr float kCoffeesStopSpeed = 0.08f;
     constexpr float kCoffeesStopPushPower = 0.015f;
     constexpr float kCoffeesPeerPushPower = 1.75f;
+    constexpr float kCoffeesDefaultRenderDistance = 18.0f;
 
     int64_t HashCell(int32_t x, int32_t y, int32_t z) { return (static_cast<int64_t>(x) << 42) ^ (static_cast<int64_t>(y) << 21) ^ static_cast<int64_t>(z); }
 
@@ -145,10 +146,13 @@ void Coffees::Initialize() {
     simulationParams_.gravity = kCoffeesGravity;
     simulationParams_.bounceDamping = kCoffeesBounceDamping;
     simulationParams_.separationBias = kCoffeesSeparationBias;
-    simulationParams_.roomMinX = -6.9f;
-    simulationParams_.roomMaxX = 6.9f;
-    simulationParams_.roomMinZ = -6.9f;
-    simulationParams_.roomMaxZ = 6.9f;
+    simulationParams_.roomMinX = -4.9f;
+    simulationParams_.roomMaxX = 4.9f;
+    simulationParams_.roomMinZ = -4.9f;
+    simulationParams_.roomMaxZ = 4.9f;
+	simulationParams_.baseContainmentCenter = {5, 0.0f, 5};
+	simulationParams_.baseContainmentRadius = 0.0f;
+	renderDistanceFromPlayer_ = kCoffeesDefaultRenderDistance;
 }
 
 void Coffees::RunSimulation() {
@@ -437,17 +441,35 @@ void Coffees::RunSimulation() {
             }
         }
 
-        const float horizontalSpeedSq = instance.velocity.x * instance.velocity.x + instance.velocity.z * instance.velocity.z;
-        const bool isGrounded = instance.position.y <= (minY + 0.0001f);
-        if (isGrounded && horizontalSpeedSq < (kCoffeesStopSpeed * kCoffeesStopSpeed) && pushPowerSq < (kCoffeesStopPushPower * kCoffeesStopPushPower)) {
-            instance.velocity.x = 0.0f;
-            instance.velocity.z = 0.0f;
-            instance.angularVelocity.x = 0.0f;
-            instance.angularVelocity.z = 0.0f;
-        }
-        instancedObject_->SetInstanceOffset(i, instance.position);
-    }
+        if (simulationParams_.baseContainmentRadius > 0.0f) {
+			const float maxContainmentRadius = std::max(0.0f, simulationParams_.baseContainmentRadius - instance.radius);
+			const float offsetX = instance.position.x - simulationParams_.baseContainmentCenter.x;
+			const float offsetZ = instance.position.z - simulationParams_.baseContainmentCenter.z;
+			const float distSq = offsetX * offsetX + offsetZ * offsetZ;
+			if (distSq > maxContainmentRadius * maxContainmentRadius && distSq > 1e-7f) {
+				const float dist = std::sqrt(distSq);
+				const float invDist = 1.0f / dist;
+				const Vector3 normal = {offsetX * invDist, 0.0f, offsetZ * invDist};
+				instance.position.x = simulationParams_.baseContainmentCenter.x + normal.x * maxContainmentRadius;
+				instance.position.z = simulationParams_.baseContainmentCenter.z + normal.z * maxContainmentRadius;
+				const float velocityAlongNormal = instance.velocity.x * normal.x + instance.velocity.z * normal.z;
+				if (velocityAlongNormal > 0.0f) {
+					instance.velocity.x -= (1.0f + kCoffeesWallBounceDamping) * velocityAlongNormal * normal.x;
+					instance.velocity.z -= (1.0f + kCoffeesWallBounceDamping) * velocityAlongNormal * normal.z;
+				}
+			}
+		}
 
+		const float horizontalSpeedSq = instance.velocity.x * instance.velocity.x + instance.velocity.z * instance.velocity.z;
+		const bool isGrounded = instance.position.y <= (minY + 0.0001f);
+		if (isGrounded && horizontalSpeedSq < (kCoffeesStopSpeed * kCoffeesStopSpeed) && pushPowerSq < (kCoffeesStopPushPower * kCoffeesStopPushPower)) {
+			instance.velocity.x = 0.0f;
+			instance.velocity.z = 0.0f;
+			instance.angularVelocity.x = 0.0f;
+			instance.angularVelocity.z = 0.0f;
+		}
+		instancedObject_->SetInstanceOffset(i, instance.position);
+	}
 }
 void Coffees::EnsureInstanceCapacity(uint32_t requiredCount) {
     if (requiredCount <= renderedInstanceCapacity_) {
@@ -471,20 +493,28 @@ void Coffees::EnsureInstanceCapacity(uint32_t requiredCount) {
     }
 }
 void Coffees::Update(Camera* camera, const Vector3& lightDirection) {
-    simulationParams_.deltaTime = std::max(Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime(), 1.0f / 120.0f);
-    if (isSpilling_) {
-        RunSimulation();
-    }
+	simulationParams_.deltaTime = std::max(Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime(), 1.0f / 120.0f);
+	if (isSpilling_) {
+		RunSimulation();
+	}
 
-    for (uint32_t i = 0; i < renderedInstanceCapacity_; ++i) {
-        if (isSpilling_ && i < activeInstanceCount_ && instances_[i].isActive && IsVisibleFromCamera(camera, instances_[i].position, instances_[i].radius)) {
-            instancedObject_->SetInstanceOffset(i, instances_[i].position);
-        } else {
-            instancedObject_->SetInstanceOffset(i, { 0.0f, -1000.0f, 0.0f });
-        }
-    }
+	for (uint32_t i = 0; i < renderedInstanceCapacity_; ++i) {
+		if (isSpilling_ && i < activeInstanceCount_ && instances_[i].isActive) {
+			const float dx = instances_[i].position.x - playerPosition_.x;
+			const float dz = instances_[i].position.z - playerPosition_.z;
+			const float distanceSqFromPlayer = dx * dx + dz * dz;
+			const bool isNearPlayer = distanceSqFromPlayer <= (renderDistanceFromPlayer_ * renderDistanceFromPlayer_);
+			if (isNearPlayer && IsVisibleFromCamera(camera, instances_[i].position, instances_[i].radius)) {
+				instancedObject_->SetInstanceOffset(i, instances_[i].position);
+			} else {
+				instancedObject_->SetInstanceOffset(i, {0.0f, -1000.0f, 0.0f});
+			}
+		} else {
+			instancedObject_->SetInstanceOffset(i, {0.0f, -1000.0f, 0.0f});
+		}
+	}
 
-    instancedObject_->Update(camera, lightDirection);
+	instancedObject_->Update(camera, lightDirection);
 }
 
 void Coffees::Draw() {
@@ -518,7 +548,14 @@ void Coffees::SetRoomBounds(float minX, float maxX, float minZ, float maxZ) {
     simulationParams_.roomMaxZ = std::max(minZ, maxZ);
 }
 void Coffees::SetFloorY(float floorY) { simulationParams_.floorY = floorY; }
+void Coffees::SetRenderDistanceFromPlayer(float distance) { renderDistanceFromPlayer_ = std::max(0.0f, distance); }
 
+void Coffees::SetContainmentAroundBase(const Vector3& center, float radius) {
+	simulationParams_.baseContainmentCenter = {center.x, 0.0f, center.z};
+	simulationParams_.baseContainmentRadius = std::max(0.0f, radius);
+}
+
+void Coffees::SetPlayerPosition(const Vector3& playerPosition) { playerPosition_ = playerPosition; }
 void Coffees::SetSpawnContainment(const Vector3& center, float topY, float radius) {
     simulationParams_.canTopCenter = center;
     simulationParams_.canTopY = topY;
@@ -561,3 +598,4 @@ bool Coffees::CheckHitPlayer(const Vector3& playerPosition, float playerRadius, 
 
     return false;
 }
+void Coffees::SetCamera(Camera* camera) { instancedObject_->SetCamera(camera); }

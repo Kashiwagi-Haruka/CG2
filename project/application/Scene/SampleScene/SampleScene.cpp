@@ -47,7 +47,7 @@ Transform MakePortalAnchoredTextureCameraTransform(const Transform& portalTransf
 }
 } // namespace
 SampleScene::SampleScene() {
-
+	rotatingPlaygroundEquipment_ = std::make_unique<RotatingPlaygroundEquipment>();
 	uvBallObj_ = std::make_unique<Object3d>();
 	fieldObj_ = std::make_unique<Object3d>();
 	spherePrimitive_ = std::make_unique<Primitive>();
@@ -75,6 +75,10 @@ SampleScene::SampleScene() {
 }
 void SampleScene::Initialize() {
 	isBgmPlaying_ = false;
+
+	rotatingPlaygroundEquipment_->Initialize();
+	rotatingPlaygroundEquipment_->SetCamera(camera_.get());
+
 	debugCamera_->Initialize();
 	debugCamera_->SetTranslation(cameraTransform_.translate);
 	uvBallObj_->Initialize();
@@ -517,6 +521,7 @@ void SampleScene::Update() {
 	spherePrimitive_->Update();
 	uvBallObj_->Update();
 	fieldObj_->Update();
+	rotatingPlaygroundEquipment_->Update();
 	ringUvRotation_ -= 0.05f;
 
 	uvSprite->Update();
@@ -539,6 +544,7 @@ void SampleScene::Draw() {
 	portalTextureCameraA_->Update();
 	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
 	portalTextureCameraB_->Update();
+
 
 	portalRenderTextureA_.BeginRender();
 	assert(Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList() != nullptr);
@@ -565,6 +571,7 @@ void SampleScene::Draw() {
 	//if (overlayCameraSprite_) {
 	//	/*overlayCameraSprite_->Draw();*/
 	//}
+	rotatingPlaygroundEquipment_->Draw();
 }
 
 void SampleScene::SetSceneCameraForDraw(Camera* camera) {

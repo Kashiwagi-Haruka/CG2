@@ -2,6 +2,7 @@
 #include "GameObject/Box/BoxManager.h"
 #include "GameObject/Chair/ChairManager.h"
 #include "GameObject/Coffee/Coffees.h"
+#include "GameObject/Coffee/CoffeeTrivia.h"
 #include "GameObject/Desk/DeskManager.h"
 #include "GameObject/Door/Door.h"
 #include "GameObject/Edamame/Edamame.h"
@@ -32,6 +33,7 @@ MirrorStage::MirrorStage(Player* player) : player_(player) {
 
 	pc_ = std::make_unique<PC>();
 	coffees_ = std::make_unique<Coffees>();
+	coffeeTrivia_ = std::make_unique<CoffeeTrivia>();
 	timeCardWatch_ = std::make_unique<TimeCardWatch>();
 	timeCardWatch_->SetPlayer(player_);
 	flashlight_ = std::make_unique<Flashlight>();
@@ -60,6 +62,7 @@ void MirrorStage::Initialize() {
 	portalManager_->Initialize();
 	pc_->Initialize();
 	coffees_->Initialize();
+	coffeeTrivia_->Initialize();
 	coffees_->SetFloorY(0.0f);
 	coffees_->SetRoomBounds(-7.0f, 14.0f, -7.0f, 7.0f);
 	coffees_->SetSpawnContainment({0.0f, 0.0f, 0.0f}, 0.0f, 0.0f);
@@ -88,7 +91,6 @@ void MirrorStage::Initialize() {
 
 	hierarchy->LoadObjectEditorsFromJsonIfExists("MirrorStage_objectEditors.json");
 	hierarchy->EndRegisterFile();
-
 }
 void MirrorStage::SetPlayer(Player* player) {
 	player_ = player;
@@ -117,6 +119,7 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 	});
 	coffees_->SetLaunchDirection(vendingForward);
 	coffees_->Update(camera, lightDirection);
+	coffeeTrivia_->Update();
 	door_->Update();
 	lockerManager_->Update();
 	deskManager_->Update();
@@ -214,6 +217,8 @@ void MirrorStage::CheckCollision() {
 
 	if (vendingMac_->ConsumeInteractRequest()) {
 		coffees_->StartSpill();
+		const Vector3 vendingPosition = vendingMac_->GetWorldPosition();
+		coffeeTrivia_->Spawn({vendingPosition.x, vendingPosition.y + 0.9f, vendingPosition.z}, vendingMac_->GetForward());
 	}
 
 	for (auto& portal : portalManager_->GetPortals()) {
@@ -274,6 +279,7 @@ void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 	wallManager2_->Draw();
 	vendingMac_->Draw();
 	coffees_->Draw();
+	coffeeTrivia_->Draw();
 	timeCardWatch_->Draw();
 	flashlight_->Draw();
 	key_->Draw();
@@ -309,6 +315,8 @@ void MirrorStage::SetSceneCameraForDraw(Camera* camera) {
 	wallManager_->SetCamera(camera);
 	wallManager2_->SetCamera(camera);
 	vendingMac_->SetCamera(camera);
+	coffees_->SetCamera(camera);
+	coffeeTrivia_->SetCamera(camera);
 	door_->SetCamera(camera);
 	lockerManager_->SetCamera(camera);
 	deskManager_->SetCamera(camera);
@@ -324,6 +332,7 @@ void MirrorStage::SetPlayerCamera(PlayerCamera* playerCamera) {
 	edamame_->SetPlayerCamera(playerCamera);
 	chairManager_->SetPlayerCamera(playerCamera);
 	vendingMac_->SetPlayerCamera(playerCamera);
+	coffeeTrivia_->SetPlayerCamera(playerCamera);
 	door_->SetPlayerCamera(playerCamera);
 	flashlight_->SetPlayerCamera(playerCamera);
 	lockerManager_->SetPlayerCamera(playerCamera);
