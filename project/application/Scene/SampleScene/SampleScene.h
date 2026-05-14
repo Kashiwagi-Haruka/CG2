@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include "GameObject/RotatingPlaygroundEquipment/RotatingPlaygroundEquipment.h"
 class SampleScene : public BaseScene {
 
 	std::unique_ptr<Sprite> uvSprite = nullptr;
@@ -29,6 +30,7 @@ class SampleScene : public BaseScene {
 	std::unique_ptr<Object3d> fieldObj_ = nullptr;
 	
 	std::unique_ptr<Primitive> spherePrimitive_ = nullptr;
+	std::unique_ptr<RotatingPlaygroundEquipment> rotatingPlaygroundEquipment_ = nullptr;
 	std::unique_ptr<PortalMesh> portalMeshA_ = nullptr;
 	std::unique_ptr<PortalMesh> portalMeshB_ = nullptr;
 	RenderTexture2D portalRenderTextureA_{};
