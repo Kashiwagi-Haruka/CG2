@@ -9,6 +9,11 @@ class Camera;
 class RotatingPlaygroundEquipment {
 
 	std::unique_ptr<Object3d> spinObj_;
+	std::unique_ptr<Skeleton> spinSkeleton_;
+	SkinCluster spinSkinCluster_;
+	const Animation::AnimationData* spinAnimation_ = nullptr;
+	float spinAnimationTime_ = 0.0f;
+	bool spinLoopAnimation_ = true;
 	std::vector<std::unique_ptr<Object3d>> gentlemanObj_;
 	std::vector<std::unique_ptr<Skeleton>> gentlemanSkeleton_;
 	std::vector<SkinCluster> gentlemanSkinCluster_;

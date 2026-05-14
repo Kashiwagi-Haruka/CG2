@@ -2,6 +2,7 @@
 #include "Engine/Texture/Mesh/Animation/AnimationManager.h"
 #include "Engine/Texture/Mesh/Model/ModelManager.h"
 #include "Engine/Texture/Mesh/Object3d/Object3dCommon.h"
+#include "Engine/base/DirectXCommon.h"
 #include <cmath>
 
 namespace {
@@ -21,14 +22,23 @@ void RotatingPlaygroundEquipment::Initialize() {
 	AnimationManager::GetInstance()->LoadAnimationGroup(kSpinAnimationGroup, "Resources/TD3_3102/3d/RotatingPlaygroundEquipment", "RotatingPlaygroundEquipment");
 	AnimationManager::GetInstance()->LoadAnimationGroup(kGentlemanAnimationGroup, "Resources/TD3_3102/3d/gentleman", "gentleman");
 	spinObj_->SetModel("RotatingPlaygroundEquipment");
+	if (Model* spinModel = ModelManager::GetInstance()->FindModel("RotatingPlaygroundEquipment")) {
+		spinSkeleton_ = std::make_unique<Skeleton>(Skeleton().Create(spinModel->GetModelData().rootnode));
+		spinSkinCluster_ = CreateSkinCluster(*spinSkeleton_, *spinModel);
+		if (!spinSkinCluster_.mappedPalette.empty()) {
+			spinObj_->SetSkinCluster(&spinSkinCluster_);
+		}
+	}
 	spinTransform_.scale = {0.1f, 0.1f, 0.1f};
 	spinTransform_.rotate = {0.0f, 0.0f, 0.0f};
 	spinTransform_.translate = {0.0f, 0.0f, 0.0f};
 	spinObj_->SetTransform(spinTransform_);
 	if (const Animation::AnimationData* spinAnimation = AnimationManager::GetInstance()->FindAnimation(kSpinAnimationGroup, "spin")) {
-		spinObj_->SetAnimation(spinAnimation, true);
+		spinAnimation_ = spinAnimation;
+		spinObj_->SetAnimation(spinAnimation_, spinLoopAnimation_);
 	} else if (const Animation::AnimationData* spinAnimation = AnimationManager::GetInstance()->FindAnimation(kSpinAnimationGroup, "Spin")) {
-		spinObj_->SetAnimation(spinAnimation, true);
+		spinAnimation_ = spinAnimation;
+		spinObj_->SetAnimation(spinAnimation_, spinLoopAnimation_);
 	}
 
 	constexpr size_t kGentlemanCount = 4;
@@ -62,7 +72,15 @@ void RotatingPlaygroundEquipment::Initialize() {
 }
 
 void RotatingPlaygroundEquipment::Update() {
-	spinTransform_.rotate.y += 0.01f;
+	if (spinSkeleton_ && spinAnimation_) {
+		const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+		spinAnimationTime_ = Animation::AdvanceTime(*spinAnimation_, spinAnimationTime_, deltaTime, spinLoopAnimation_);
+		spinSkeleton_->ApplyAnimation(*spinAnimation_, spinAnimationTime_);
+		spinSkeleton_->Update();
+		if (!spinSkinCluster_.mappedPalette.empty()) {
+			UpdateSkinCluster(spinSkinCluster_, *spinSkeleton_);
+		}
+	}
 	spinObj_->SetTransform(spinTransform_);
 	spinObj_->Update();
 
@@ -88,7 +106,6 @@ void RotatingPlaygroundEquipment::Draw() {
 		gentleman->Draw();
 	}
 }
-
 
 void RotatingPlaygroundEquipment::SetCamera(Camera* camera) {
 	camera_ = camera;
