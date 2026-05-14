@@ -113,9 +113,9 @@ void Elevator::SetCamera(Camera* camera) {
 
     poster_.SetCamera(camera);
 
-    for (auto& [name, collider] : colliders_) {
-        collider->SetCamera(camera);
-    }
+    //for (auto& [name, collider] : colliders_) {
+    //    collider->SetCamera(camera);
+    //}
 
 }
 
@@ -161,9 +161,9 @@ void Elevator::Draw() {
         sys->Draw();
     }
 
-    for (auto& [name, collider] : colliders_) {
-        collider->Draw();
-    }
+    //for (auto& [name, collider] : colliders_) {
+    //    collider->Draw();
+    //}
 
     poster_.Draw();
 }
