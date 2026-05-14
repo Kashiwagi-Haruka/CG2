@@ -30,6 +30,7 @@ public:
     void SetAnimationGroupName(const std::string& name){ animationGroupName_ = name; }
     bool IsRayHit() { return isRayHit_; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
+    Matrix4x4* GetDeskDrawerMatrix();
 private:
     // アニメーション
     void Animation();
@@ -48,6 +49,6 @@ private:
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Idle";
     bool isRayHit_ = false;
-    
+    Matrix4x4 drawerMatrix_;
 };
 

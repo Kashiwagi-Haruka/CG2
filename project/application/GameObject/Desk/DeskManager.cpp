@@ -2,9 +2,9 @@
 #include "Mesh/Object3d/Object3dCommon.h"
 bool DeskManager::isRayHit_ = false;
 
-DeskManager::DeskManager()
+DeskManager::DeskManager(const uint32_t deskCount)
 {
-    for (int i = 0; i < kMaxDesks_; ++i) {
+    for (uint32_t i = 0; i < deskCount; ++i) {
         std::unique_ptr<Desk> desk = std::make_unique<Desk>();
         std::string name = "Desk" + std::to_string(i);
         desk->SetAnimationGroupName(name);
@@ -40,7 +40,7 @@ void DeskManager::Update()
 
 void DeskManager::Draw()
 {
-	Object3dCommon::GetInstance()->DrawCommonSkinning();
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
     for (auto& desk : desks_) {
         desk->Draw();
     }
@@ -56,4 +56,10 @@ void DeskManager::SetCamera(Camera* camera)
 void DeskManager::SetPlayerCamera(PlayerCamera* playerCamera)
 {
     Desk::SetPlayerCamera(playerCamera);
+}
+
+Matrix4x4* DeskManager::GetDrawerMatrix(const uint32_t deskNum)
+{
+    assert(deskNum < desks_.size());
+    return desks_[deskNum]->GetDeskDrawerMatrix();
 }

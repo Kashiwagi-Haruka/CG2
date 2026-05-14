@@ -350,6 +350,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\Toilet\Toilet.cpp" />
     <ClCompile Include="application\GameObject\HintSheet\HintSheet.cpp" />
     <ClCompile Include="application\GameObject\HintSheet\HintSheetManager.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Item\ItemSeveredHand\ItemSeveredHand.cpp" />
+    <ClCompile Include="application\GameObject\SeveredHand\SeveredHand.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -578,6 +580,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\Toilet\Toilet.h" />
     <ClInclude Include="application\GameObject\HintSheet\HintSheet.h" />
     <ClInclude Include="application\GameObject\HintSheet\HintSheetManager.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemSeveredHand\ItemSeveredHand.h" />
+    <ClInclude Include="application\GameObject\SeveredHand\SeveredHand.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
