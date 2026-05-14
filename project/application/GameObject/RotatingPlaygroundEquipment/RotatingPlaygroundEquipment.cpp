@@ -73,7 +73,7 @@ void RotatingPlaygroundEquipment::Initialize() {
 
 void RotatingPlaygroundEquipment::Update() {
 	if (spinSkeleton_ && spinAnimation_) {
-		const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
+		const float deltaTime = 1.0f / 60.0f; // Assuming a fixed frame rate of 60 FPS
 		spinAnimationTime_ = Animation::AdvanceTime(*spinAnimation_, spinAnimationTime_, deltaTime, spinLoopAnimation_);
 		spinSkeleton_->ApplyAnimation(*spinAnimation_, spinAnimationTime_);
 		spinSkeleton_->Update();
