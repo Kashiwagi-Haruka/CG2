@@ -545,6 +545,7 @@ void SampleScene::Draw() {
 	portalTextureCameraB_->SetTransform(portalTextureCameraBTransform_);
 	portalTextureCameraB_->Update();
 
+
 	portalRenderTextureA_.BeginRender();
 	assert(Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList() != nullptr);
 	Object3dCommon::GetInstance()->SetDefaultCamera(portalTextureCameraB_.get());
