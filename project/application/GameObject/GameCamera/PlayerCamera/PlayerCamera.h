@@ -4,6 +4,7 @@
 #include"Transform.h"
 #include"RigidBody.h"
 #include"GameSave/GameSave.h"
+#include "Light/CommonLight/PointCommonLight.h"
 
 class Player;
 class PlayerCamera
@@ -28,7 +29,7 @@ public:
     void EnableFixedTransform(const Transform& transform);
     void DisableFixedTransform();
     bool IsFixedTransformEnabled() const { return isFixedTransformEnabled_; }
-
+    PointCommonLight& GetPointLight() { return pointLight_; }
 private:
     //回転
     void Rotate();
@@ -36,7 +37,7 @@ private:
 private:
     CameraSaveData param_;
     const float rotateSpeed_ = 0.02f;       // カメラの回転速度
-
+    PointCommonLight pointLight_;
     //カメラからのRay
     Ray ray_;
     //カメラの設定
