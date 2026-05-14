@@ -19,7 +19,7 @@
 #include"GameObject/VendingMac/VendingMac.h"
 #include"GameObject/PC/PC.h"
 #include"GameObject/GentleMan/GentleMan.h"
-#include"GameObject/DocumentManager/Document/Document.h"
+#include"GameObject/DocumentManager/DocumentManager.h"
 #include"GameObject/GentleMan/GiantGentleMan.h"
 #include"GameObject/Portal/GentlemanPortalManager.h"
 
@@ -65,6 +65,11 @@ void RaySprite::Update()
 
 void RaySprite::Draw()
 {
+    if (DocumentManager::IsLooking()||DocumentManagerParticle::IsLooking()) {
+        //何かを見ていたらRaySpriteを描画しない
+        return;
+    }
+
     SpriteCommon::GetInstance()->DrawCommon();
 
     if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortal()|| GentlemanPortalManager::GetCanMakePortal()) {
@@ -91,5 +96,6 @@ bool RaySprite::IsRayHit() {
         VendingMac::IsRayHit() || 
         PC::IsRayHit() || 
         Gentleman::IsRayHit() || 
-        Document::IsRayHit();
+        DocumentManager::IsRayHit()||
+        DocumentManagerParticle::IsRayHit();
 }

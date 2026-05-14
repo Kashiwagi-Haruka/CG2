@@ -9,7 +9,6 @@
 #include"Function.h"
 #include"Object3d/Object3dCommon.h"
 
-PlayerCamera* HintSheet::playerCamera_ = nullptr;
 namespace {
     const Vector4 kRayHitOutlineColor = { 1.0f, 1.0f, 0.0f, 1.0f };
     const float kRayHitOutlineWidth = 10.0f;
@@ -59,16 +58,9 @@ void HintSheet::Initialize(uint32_t fontHandle, const std::string& textFilePath)
     obj_->RegisterEditor(std::filesystem::path(textFilePath).stem().string());
 }
 
-void HintSheet::SetParentMatrix(Matrix4x4* parentMatrix)
-{
-    assert(parentMatrix);
-    parentMatrix_ = parentMatrix;
-
-}
-
 void HintSheet::Update()
 {
-    InteractUpdate();
+    CheckCollision();
 
     obj_->SetEnableLighting(false);
     Transform transform = obj_->GetTransform();
@@ -85,40 +77,49 @@ void HintSheet::Update()
 
 }
 
-void HintSheet::InteractUpdate()
+
+void HintSheet::DrawUI()
 {
+    // 見ている状態の時だけテキストを描画する
+    if (isLooking_) {
+        hintText_.Draw();
+    }
+}
 
+void HintSheet::OnCollision(Collider* collider)
+{
+    // プレイヤーが触れた際の処理が必要なら追加
+}
+
+void HintSheet::CheckCollision()
+{
     isRayHit_ = playerCamera_->OnCollisionRay(GetAABB(), YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix()));
-    // トリガーが押された時の処理
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+    // トリガーが押された時の処理  物を持っていない状態を前提とする場合
+    if (PlayerCommand::GetInstance()->InteractTrigger() && !PlayerCommand::GetIsGrab()) {
 
-        // 物を持っていない状態を前提とする場合
-        if (!PlayerCommand::GetIsGrab()) {
+        if (isRayHit_) {
+            //開いたアニメーションが終わった時やポインタがないとき
+            if (isOpenAnimationEndPtr_ && *isOpenAnimationEndPtr_ || !isOpenAnimationEndPtr_) {
 
-            if (isRayHit_) {
-                //開いたアニメーションが終わった時やポインタがないとき
-                if (isOpenAnimationEndPtr_ && *isOpenAnimationEndPtr_ || !isOpenAnimationEndPtr_) {
-                    
-                    SEManager::SoundPlay(SEManager::PAPER);
+                SEManager::SoundPlay(SEManager::PAPER);
 
-                    if (isLooking_) {
-                        // すでにヒントを見ているなら「閉じる」
-                        isLooking_ = false;
-                        PlayerCommand::SetIsLook(false);
+                if (isLooking_) {
+                    // すでにヒントを見ているなら「閉じる」
+                    isLooking_ = false;
+                    PlayerCommand::SetIsLook(false);
 
-                    } else {
-                        //何も見ていないとき
-                        if (!PlayerCommand::GetIsLook()) {
-                            // ヒントを見ていない ＆ レイが当たっているなら「見る」
-                            isLooking_ = true;
-              
-                            PlayerCommand::SetIsLook(true);
-                        }
+                } else {
+                    //何も見ていないとき
+                    if (!PlayerCommand::GetIsLook()) {
+                        // ヒントを見ていない ＆ レイが当たっているなら「見る」
+                        isLooking_ = true;
+
+                        PlayerCommand::SetIsLook(true);
                     }
                 }
-             
-
             }
+
+
         }
     }
 
@@ -129,42 +130,3 @@ void HintSheet::InteractUpdate()
     }
 }
 
-void HintSheet::Draw()
-{
-
-
-    if (isRayHit_) {
-        Object3dCommon::GetInstance()->DrawCommon();
-        obj_->Draw();
-        Object3dCommon::GetInstance()->DrawCommonOutline();
-        obj_->Draw();
-        Object3dCommon::GetInstance()->EndOutlineDraw();
-    } else {
-        Object3dCommon::GetInstance()->DrawCommon();
-        obj_->Draw();
-    }
-}
-
-void HintSheet::DrawUI()
-{
-    // 見ている状態の時だけテキストを描画する
-    if (isLooking_) {
-        hintText_.Draw();
-    }
-}
-
-void HintSheet::SetCamera(Camera* camera)
-{
-    obj_->SetCamera(camera);
-    obj_->UpdateCameraMatrices();
-}
-
-void HintSheet::OnCollision(Collider* collider)
-{
-    // プレイヤーが触れた際の処理が必要なら追加
-}
-
-Vector3 HintSheet::GetWorldPosition() const
-{
-    return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
-}

@@ -14,7 +14,11 @@ class DocumentManager
 protected:
     std::unique_ptr<Document>  document_ = nullptr;
     std::unique_ptr<DocumentSprite>  documentSprite_ = nullptr;
+    static bool isRayHit_;
+    static bool isLooking_;
 public:
+    static bool IsRayHit() { return isRayHit_; };
+    static bool IsLooking() { return isLooking_; };
     DocumentManager();
     virtual void Initialize(const std::string name);
     virtual void Draw();

@@ -427,6 +427,7 @@
     <ClCompile Include="application\GameObject\HintSheet\HintSheetManager.cpp" />
     <ClCompile Include="application\GameObject\UI\Inventory\Item\ItemSeveredHand\ItemSeveredHand.cpp" />
     <ClCompile Include="application\GameObject\SeveredHand\SeveredHand.cpp" />
+    <ClCompile Include="application\GameObject\ReadableObject\ReadableObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -842,6 +843,7 @@
     <ClInclude Include="application\GameObject\HintSheet\HintSheetManager.h" />
     <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemSeveredHand\ItemSeveredHand.h" />
     <ClInclude Include="application\GameObject\SeveredHand\SeveredHand.h" />
+    <ClInclude Include="application\GameObject\ReadableObject\ReadableObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
