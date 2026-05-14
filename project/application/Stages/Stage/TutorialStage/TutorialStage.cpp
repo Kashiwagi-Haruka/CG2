@@ -119,8 +119,8 @@ void TutorialStage::Initialize()
     deskManager_->Initialize();
     severedHand_->Initialize();
     severedHand_->SetParentMatrix(deskManager_->GetDrawerMatrix(0));
-
-
+    severedHand_->SetOpenAnimationEndPtr(deskManager_->GetDesks().at(0)->IsEndOpenAnimation());
+    deskManager_->GetDesks().at(0)->RegisterReadableObject(severedHand_.get());
     hierarchy->LoadObjectEditorsFromJsonIfExists("TutorialStage_objectEditors.json");
     hierarchy->EndRegisterFile();
 }
