@@ -3,6 +3,7 @@
 #include "Engine/Texture/Mesh/Model/ModelManager.h"
 #include "Engine/Texture/Mesh/Object3d/Object3dCommon.h"
 #include "Engine/base/DirectXCommon.h"
+#include "Engine/Math/Function.h"
 #include <cmath>
 #include <numbers>
 namespace {
@@ -85,6 +86,20 @@ void RotatingPlaygroundEquipment::Update() {
 	spinObj_->SetTransform(spinTransform_);
 	spinObj_->Update();
 
+	Vector3 orbitOrigin = spinTransform_.translate;
+	float orbitBaseAngle = 0.0f;
+	if (spinSkeleton_) {
+		const Matrix4x4 spinObjectMatrix = Function::MakeAffineMatrix(spinTransform_.scale, spinTransform_.rotate, spinTransform_.translate);
+		spinSkeleton_->SetObjectMatrix(spinObjectMatrix);
+		const auto& spinJoints = spinSkeleton_->GetJoints();
+		if (!spinJoints.empty()) {
+			const Joint& orbitJoint = spinJoints.front();
+			orbitOrigin = spinSkeleton_->GetJointWorldPosition(orbitJoint);
+			const Matrix4x4 orbitJointWorldMatrix = spinSkeleton_->GetJointWorldMatrix(orbitJoint);
+			orbitBaseAngle = std::atan2(orbitJointWorldMatrix.m[0][2], orbitJointWorldMatrix.m[0][0]);
+		}
+	}
+
 	gentlemanOrbitAngle_ += gentlemanOrbitSpeed_;
 	constexpr float kPi = std::numbers::pi_v<float>;
 	const float angleStep = (2.0f * kPi) / static_cast<float>(gentlemanObj_.size());
@@ -98,10 +113,10 @@ void RotatingPlaygroundEquipment::Update() {
 				UpdateSkinCluster(gentlemanSkinClusters_[i], *gentlemanSkeletons_[i]);
 			}
 		}
-		const float angle = gentlemanOrbitAngle_ + (angleStep * static_cast<float>(i));
+		const float angle = orbitBaseAngle + gentlemanOrbitAngle_ + (angleStep * static_cast<float>(i));
 		auto& transform = gentlemanTransform_[i];
 		transform.translate = {
-		    spinTransform_.translate.x + std::cosf(angle) * gentlemanOrbitRadius_, spinTransform_.translate.y+1.0f, spinTransform_.translate.z + std::sinf(angle) * gentlemanOrbitRadius_};
+		    orbitOrigin.x + std::cosf(angle) * gentlemanOrbitRadius_, orbitOrigin.y , orbitOrigin.z + std::sinf(angle) * gentlemanOrbitRadius_};
 		transform.rotate.y = -angle + kPi;
 		gentlemanObj_[i]->SetTransform(transform);
 		gentlemanObj_[i]->Update();
