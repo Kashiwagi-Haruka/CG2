@@ -13,12 +13,12 @@ void Game::Initialize() {
 	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());	
 
 	/*SceneManager::GetInstance()->ChangeScene("Title");*/
-	SceneManager::GetInstance()->ChangeScene("Sample");
+	//SceneManager::GetInstance()->ChangeScene("Sample");
 	// SceneManager::GetInstance()->ChangeScene("Game");
 	// SceneManager::GetInstance()->ChangeScene("Result");
 	/*SceneManager::GetInstance()->ChangeScene("Tutorial");*/
 	// 4か月開発のシーンの作成
-	// SceneManager::GetInstance()->ChangeScene("ShadowGame");
+	 SceneManager::GetInstance()->ChangeScene("ShadowGame");
 	SEManager::Load();
 }
 
