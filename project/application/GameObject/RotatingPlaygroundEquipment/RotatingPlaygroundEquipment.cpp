@@ -51,7 +51,7 @@ void RotatingPlaygroundEquipment::Initialize() {
 		}
 
 		auto& transform = gentlemanTransform_[i];
-		transform.scale = {10.0f, 10.0f, 10.0f};
+		transform.scale = {1.0f, 1.0f, 1.0f};
 		transform.rotate = {0.0f, 0.0f, 0.0f};
 		transform.translate = spinTransform_.translate;
 		gentleman->SetTransform(transform);
@@ -81,12 +81,14 @@ void RotatingPlaygroundEquipment::Update() {
 }
 
 void RotatingPlaygroundEquipment::Draw() {
-	Object3dCommon::GetInstance()->DrawCommonSkinning();
+	Object3dCommon::GetInstance()->DrawCommon();
 	spinObj_->Draw();
+	Object3dCommon::GetInstance()->DrawCommonSkinning();
 	for (auto& gentleman : gentlemanObj_) {
 		gentleman->Draw();
 	}
 }
+
 
 void RotatingPlaygroundEquipment::SetCamera(Camera* camera) {
 	camera_ = camera;

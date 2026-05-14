@@ -159,7 +159,7 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":2043,
+			"count":2007,
 			"max":[
 				13.535670280456543,
 				12.081945419311523,
@@ -175,37 +175,37 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":2043,
+			"count":2007,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":2043,
+			"count":2007,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5126,
-			"count":2043,
+			"count":2007,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":4,
 			"componentType":5121,
-			"count":2043,
+			"count":2007,
 			"type":"VEC4"
 		},
 		{
 			"bufferView":5,
 			"componentType":5126,
-			"count":2043,
+			"count":2007,
 			"type":"VEC4"
 		},
 		{
 			"bufferView":6,
 			"componentType":5123,
-			"count":8880,
+			"count":8646,
 			"type":"SCALAR"
 		},
 		{
@@ -260,75 +260,75 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":24516,
+			"byteLength":24084,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":24516,
-			"byteOffset":24516,
+			"byteLength":24084,
+			"byteOffset":24084,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":16344,
-			"byteOffset":49032,
+			"byteLength":16056,
+			"byteOffset":48168,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":16344,
-			"byteOffset":65376,
+			"byteLength":16056,
+			"byteOffset":64224,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":8172,
-			"byteOffset":81720,
+			"byteLength":8028,
+			"byteOffset":80280,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":32688,
-			"byteOffset":89892,
+			"byteLength":32112,
+			"byteOffset":88308,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":17760,
-			"byteOffset":122580,
+			"byteLength":17292,
+			"byteOffset":120420,
 			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":128,
-			"byteOffset":140340
+			"byteOffset":137712
 		},
 		{
 			"buffer":0,
 			"byteLength":8,
-			"byteOffset":140468
+			"byteOffset":137840
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":140476
+			"byteOffset":137848
 		},
 		{
 			"buffer":0,
 			"byteLength":160,
-			"byteOffset":140500
+			"byteOffset":137872
 		},
 		{
 			"buffer":0,
 			"byteLength":640,
-			"byteOffset":140660
+			"byteOffset":138032
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":141300
+			"byteOffset":138672
 		}
 	],
 	"samplers":[
@@ -339,7 +339,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":141324,
+			"byteLength":138696,
 			"uri":"RotatingPlaygroundEquipment.bin"
 		}
 	]
