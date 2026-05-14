@@ -34,14 +34,24 @@ void RotatingPlaygroundEquipment::Initialize() {
 	constexpr size_t kGentlemanCount = 4;
 	gentlemanObj_.resize(kGentlemanCount);
 	gentlemanTransform_.resize(kGentlemanCount);
+	gentlemanSkeleton_.resize(kGentlemanCount);
+	gentlemanSkinCluster_.resize(kGentlemanCount);
+	Model* gentlemanModel = ModelManager::GetInstance()->FindModel("gentleman");
 	for (size_t i = 0; i < kGentlemanCount; ++i) {
 		auto& gentleman = gentlemanObj_[i];
 		gentleman = std::make_unique<Object3d>();
 		gentleman->Initialize();
 		gentleman->SetModel("gentleman");
+		if (gentlemanModel) {
+			gentlemanSkeleton_[i] = std::make_unique<Skeleton>(Skeleton().Create(gentlemanModel->GetModelData().rootnode));
+			gentlemanSkinCluster_[i] = CreateSkinCluster(*gentlemanSkeleton_[i], *gentlemanModel);
+			if (!gentlemanSkinCluster_[i].mappedPalette.empty()) {
+				gentleman->SetSkinCluster(&gentlemanSkinCluster_[i]);
+			}
+		}
 
 		auto& transform = gentlemanTransform_[i];
-		transform.scale = {1.0f, 1.0f, 1.0f};
+		transform.scale = {10.0f, 10.0f, 10.0f};
 		transform.rotate = {0.0f, 0.0f, 0.0f};
 		transform.translate = spinTransform_.translate;
 		gentleman->SetTransform(transform);

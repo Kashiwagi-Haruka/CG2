@@ -1,4 +1,6 @@
 #pragma once
+#include "Engine/Texture/Mesh/Animation/Skeleton.h"
+#include "Engine/Texture/Mesh/Animation/SkinCluster.h"
 #include "Engine/Texture/Mesh/Object3d/Object3d.h"
 #include "transform.h"
 #include <memory>
@@ -8,6 +10,8 @@ class RotatingPlaygroundEquipment {
 
 	std::unique_ptr<Object3d> spinObj_;
 	std::vector<std::unique_ptr<Object3d>> gentlemanObj_;
+	std::vector<std::unique_ptr<Skeleton>> gentlemanSkeleton_;
+	std::vector<SkinCluster> gentlemanSkinCluster_;
 	Transform spinTransform_;
 	std::vector<Transform> gentlemanTransform_;
 	float gentlemanOrbitAngle_ = 0.0f;
