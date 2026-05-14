@@ -3,6 +3,9 @@
 #include "Engine/Texture/Mesh/Object3d/Object3dCommon.h"
 #include <cmath>
 
+RotatingPlaygroundEquipment::RotatingPlaygroundEquipment() = default;
+RotatingPlaygroundEquipment::~RotatingPlaygroundEquipment() = default;
+
 void RotatingPlaygroundEquipment::Initialize() {
 	spinObj_ = std::make_unique<Object3d>();
 	spinObj_->Initialize();
