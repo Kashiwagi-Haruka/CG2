@@ -22,7 +22,6 @@ protected:
     std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>colliders_;
 
     AreaCommonLight areaLight_;
-    Matrix4x4 roomMat_ = { 0.0f };
 
     std::unique_ptr<Object3d>room_ = nullptr;
 };

@@ -46,7 +46,6 @@ private:
 	Matrix4x4 worldMat_;
 	static PlayerCamera* playerCamera_;
 	std::unique_ptr<Object3d> modelObj_ = nullptr;
-	Transform elevatorTransform_{};
 	// アニメーション
 	Animation::AnimationData blendedPoseAnimation_{};
 	// 骨
