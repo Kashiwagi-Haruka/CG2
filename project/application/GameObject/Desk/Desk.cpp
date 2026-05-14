@@ -8,6 +8,7 @@
 #include"Animation/AnimationManager.h"
 #include "GameBase.h"
 #include"GameObject/SEManager/SEManager.h"
+#include"GameObject/HintSheet/HintSheet.h"
 
 PlayerCamera* Desk::playerCamera_ = nullptr;
 
@@ -43,10 +44,9 @@ void Desk::Animation()
 
     bool loopAnimation = false;
 
-    if (desiredAnimationName == "Close") {
-        if (animationFinished_) {
-            desiredAnimationName = "Idle";
-        }
+    if (desiredAnimationName == "Close" && animationFinished_) {
+
+        desiredAnimationName = "Idle";
     }
 
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
@@ -80,7 +80,7 @@ void Desk::SetCamera(Camera* camera)
 
 void Desk::Update()
 {
-
+    isEndOpenAnimation_ = animationFinished_ && desiredAnimationName == "Open";
     CheckCollision();
     Animation();
     obj_->Update();
@@ -90,10 +90,12 @@ void Desk::Update()
     skeleton_->SetObjectMatrix(obj_->GetWorldMatrix());
     drawerMatrix_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndex]);
 
+
 }
 
 void Desk::Initialize()
 {
+    hintSheets_.clear();
     obj_->Initialize();
     obj_->RegisterEditor(animationGroupName_);
     isRayHit_ = false;
@@ -126,16 +128,37 @@ void Desk::CheckCollision()
 
     isRayHit_ = OnCollisionRay();
 
+
+    bool isHintSheetPrioritized = false;
+
+
+    for (HintSheet* sheet : hintSheets_) {
+        // その書類の親マトリックスが、このDeskの引き出しマトリックスと一致しているか（親として設定されているか）確認
+        if (sheet->GetParentMatrix() == &drawerMatrix_) {
+            // 書類にRayが当たっている、または見ている最中なら優先フラグを立てる
+            if (sheet->GetIsRayHit() || sheet->GetIsLooking()) {
+                isHintSheetPrioritized = true;
+                break;
+            }
+        }
+    }
+
+
+
     if (isRayHit_) {
         //rayの当たり判定
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
+            //何も持っていない且つ何も見ていないとき
             if (!PlayerCommand::GetIsGrab()) {
 
-                SEManager::SoundPlay(SEManager::DESK);
-                if (desiredAnimationName == "Idle") {
+                if (desiredAnimationName == "Idle" || desiredAnimationName == "Close") {
                     desiredAnimationName = "Open";
-                } else if (desiredAnimationName == "Open") {
-                    desiredAnimationName = "Idle";
+                    SEManager::SoundPlay(SEManager::DESK);
+                } else {
+                    if (!isHintSheetPrioritized) {
+                        SEManager::SoundPlay(SEManager::DESK);
+                        desiredAnimationName = "Close";
+                    }
                 }
 
 

@@ -76,3 +76,9 @@ void HintSheetManager::SetParentMatrix(const uint32_t index, Matrix4x4* parentMa
     assert(index < hintSheets_.size());
     hintSheets_.at(index)->SetParentMatrix(parentMatrix);
 }
+
+void HintSheetManager::SetParentIsOpenEnd(const uint32_t index, bool* isOpenEnd)
+{
+    assert(index < hintSheets_.size());
+    hintSheets_.at(index)->SetOpenAnimationEndPtr(isOpenEnd);
+}

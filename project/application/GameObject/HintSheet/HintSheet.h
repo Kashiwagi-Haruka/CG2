@@ -17,6 +17,7 @@ public:
     /// @param textFilePath 読み込むテキストファイルのパス (例: "Resources/TXT/Hint.txt")
     void Initialize(uint32_t fontHandle, const std::string& textFilePath);
     void SetParentMatrix(Matrix4x4* parentMatrix);
+    void SetOpenAnimationEndPtr(bool* flag) { isOpenAnimationEndPtr_ = flag; };
     void Update();
 
     /// @brief 3Dモデルの描画
@@ -39,11 +40,13 @@ public:
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
 
     bool GetIsLooking() const { return isLooking_; }
-
+    bool GetIsRayHit() const { return isRayHit_; } // 追加: Rayが当たっているか取得
+    Matrix4x4* GetParentMatrix() const { return parentMatrix_; } // 追加: 親マトリックスを取得
 private:
     void InteractUpdate();
 
 private:
+    bool* isOpenAnimationEndPtr_ = nullptr;
     bool isLooking_ = false;       // ヒントを見ている状態か
     bool isRayHit_ = false;        // プレイヤーの視線(レイ)が当たっているか
     static PlayerCamera* playerCamera_;

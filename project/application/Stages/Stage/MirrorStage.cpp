@@ -83,7 +83,8 @@ void MirrorStage::Initialize() {
 	hintSheetManager_->AddHintSheet("Resources/TXT/Hint/Hint0.txt");
 
 	hintSheetManager_->SetParentMatrix(0, deskManager_->GetDrawerMatrix(2));
-
+	hintSheetManager_->SetParentIsOpenEnd(0, deskManager_->GetDesks().at(2)->IsEndOpenAnimation());
+	deskManager_->GetDesks().at(2)->RegisterHintSheet(hintSheetManager_->GetHintSheets().at(0).get());
 	InitializeLights();
 
 	hierarchy->LoadObjectEditorsFromJsonIfExists("MirrorStage_objectEditors.json");

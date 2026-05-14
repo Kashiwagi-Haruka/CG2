@@ -10,11 +10,18 @@
 #include "Animation/Animation.h"
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
+#include <vector>
 
+class HintSheet; // 追加: 前方宣言
 class Desk : public YoshidaMath::Collider
 {
 public:
     Desk();
+    // ヒントシートを登録する関数
+    void RegisterHintSheet(HintSheet* hintSheet) {
+        hintSheets_.push_back(hintSheet);
+    }
+
     void Initialize();
     void Update();
     void Draw();
@@ -31,10 +38,15 @@ public:
     bool IsRayHit() { return isRayHit_; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
     Matrix4x4* GetDeskDrawerMatrix();
+    bool* IsEndOpenAnimation() {
+      
+        return &isEndOpenAnimation_;
+    }
 private:
     // アニメーション
     void Animation();
 private:
+    std::vector<HintSheet*> hintSheets_; // Deskに属するHintSheetのリスト
     static PlayerCamera* playerCamera_;
     std::unique_ptr<Object3d>obj_ = nullptr;
     AABB localAABB_;
@@ -49,6 +61,7 @@ private:
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Idle";
     bool isRayHit_ = false;
-    Matrix4x4 drawerMatrix_;
+    bool isEndOpenAnimation_ = false;
+    Matrix4x4 drawerMatrix_ = { 0.0f };
 };
 

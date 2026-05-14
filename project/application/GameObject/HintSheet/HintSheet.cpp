@@ -22,7 +22,7 @@ HintSheet::HintSheet()
     obj_->SetModel("document");
 
     // 当たり判定のサイズ
-    SetAABB({ .min = {-0.25f, 0.0f, -0.25f}, .max = {0.25f, 0.03f, 0.25f} });
+    SetAABB({ .min = {-0.0625f, 0.0f, -0.0625f}, .max = {0.0625f, 0.03f, 0.0625f} });
     SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
 
@@ -94,16 +94,30 @@ void HintSheet::InteractUpdate()
 
         // 物を持っていない状態を前提とする場合
         if (!PlayerCommand::GetIsGrab()) {
+
             if (isRayHit_) {
-                if (isLooking_) {
-                    // すでにヒントを見ているなら「閉じる」
-                    isLooking_ = false;
+                //開いたアニメーションが終わった時やポインタがないとき
+                if (isOpenAnimationEndPtr_ && *isOpenAnimationEndPtr_ || !isOpenAnimationEndPtr_) {
+                    
                     SEManager::SoundPlay(SEManager::PAPER);
-                } else {
-                    // ヒントを見ていない ＆ レイが当たっているなら「見る」
-                    isLooking_ = true;
-                    SEManager::SoundPlay(SEManager::PAPER);
+
+                    if (isLooking_) {
+                        // すでにヒントを見ているなら「閉じる」
+                        isLooking_ = false;
+                        PlayerCommand::SetIsLook(false);
+
+                    } else {
+                        //何も見ていないとき
+                        if (!PlayerCommand::GetIsLook()) {
+                            // ヒントを見ていない ＆ レイが当たっているなら「見る」
+                            isLooking_ = true;
+              
+                            PlayerCommand::SetIsLook(true);
+                        }
+                    }
                 }
+             
+
             }
         }
     }
@@ -111,6 +125,7 @@ void HintSheet::InteractUpdate()
     if (!isRayHit_) {
         //外れたら強制的に終了する
         isLooking_ = false;
+        PlayerCommand::SetIsLook(false);
     }
 }
 
