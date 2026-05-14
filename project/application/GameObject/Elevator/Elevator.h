@@ -8,7 +8,7 @@
 #include "Primitive/Primitive.h"
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
 #include"GameObject/Wall/Wall.h"
-
+#include"GameObject/YoshidaMath/CollisionManager/ObjectCollider.h"
 #include <array>
 #include <memory>
 class Camera;
@@ -23,8 +23,8 @@ public:
 	void Draw();
 	void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
 	std::array<std::unique_ptr<AutoLockSystem>, 2>& GetAutoLockSys() { return autoLockSystems_; };
-	bool IsSceneTransitionStart() const { return isSceneTranstionStart_; }
-	std::vector<std::unique_ptr<Wall>>& GetWalls() { return walls_; };
+	bool IsSceneTransitionStart() const { return isSceneTransitionStart_; }
+	std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>& GetColliders() { return colliders_; }
 private:
     // 当たり判定
     void CheckCollision();
@@ -35,6 +35,9 @@ private:
 	void Open();
 	void Close();
 private:
+
+	std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>colliders_;
+
 	// 新しい状態管理
 	bool isPlayerInside_ = false;
 	float insideTimer_ = 0.0f;
@@ -51,6 +54,9 @@ private:
 	// スキン
 	SkinCluster skinCluster_{};
 
+	Matrix4x4 doorMatrixLeft_;
+	Matrix4x4 doorMatrixRight_;
+
 	std::string animationGroupName_ = "Elevator";
 	const float kAnimationBlendDuration_ = 1.0f;
 	bool animationFinished_ = false;
@@ -62,10 +68,8 @@ private:
 	// オートロック
 	std::array<std::unique_ptr<AutoLockSystem>, 2> autoLockSystems_;
 
-	std::vector<std::unique_ptr<Wall>>walls_;
-
 	Poster poster_;
-	bool isSceneTranstionStart_ = false;
+	bool isSceneTransitionStart_ = false;
 
 	bool isSceneTransition_ = false;
 };
