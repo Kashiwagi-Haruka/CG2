@@ -125,8 +125,7 @@ void ShadowGameScene::Initialize()
 	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
 	stageManager_->SetLightManager(lightManager_.get());
 	stageManager_->InitializeStage();
-
-
+	lightManager_->SetPointLight(cameraController_->GetPlayerCamera()->GetPointLight(),0);
 
 
     //カーソルを画面中央に設定する
@@ -392,6 +391,8 @@ void ShadowGameScene::UpdatePlayerDamage() {
 
 void ShadowGameScene::UpdateLight() {
 	lightManager_->Update();
+	lightManager_->SetPointLight(cameraController_->GetPlayerCamera()->GetPointLight(), 0);
+
 }
 void ShadowGameScene::StageTransition()
 {
