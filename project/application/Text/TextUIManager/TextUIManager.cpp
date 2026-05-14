@@ -31,6 +31,13 @@ TextUIManager::TextUIManager() {
 	edamameTrivia_.SetAlign(TextAlign::Center);
 	edamameTrivia_.SetBlendMode(BlendMode::kBlendModeAlpha);
 	edamameTrivia_.UpdateLayout();
+
+	coffeeTrivia_.Initialize(fontHandle_);
+	coffeeTrivia_.SetPosition({640, 512 + 64});
+	coffeeTrivia_.SetColor({1, 1, 1, 1});
+	coffeeTrivia_.SetAlign(TextAlign::Center);
+	coffeeTrivia_.SetBlendMode(BlendMode::kBlendModeAlpha);
+	coffeeTrivia_.UpdateLayout();
 }
 
 TextUIManager::~TextUIManager() {}
@@ -39,7 +46,9 @@ void TextUIManager::Initialize() {
 	isDraw_ = false;
 	showTimer_ = showTime_;
 	edamameTriviaAlpha_ = 0.0f;
+	coffeeTriviaAlpha_ = 0.0f;
 	wasEdamameRayHit_ = false;
+	wasCoffeeRayHit_ = false;
 }
 
 void TextUIManager::Update() {
@@ -72,27 +81,35 @@ void TextUIManager::Update() {
 	}
 
 	if (CoffeeTrivia::GetIsSendStartTriviaMessage()) {
-		edamameTrivia_.SetString(CoffeeTrivia::GetString());
-		edamameTrivia_.StartTyping(0.1f); // 0.1秒ごとに1文字ずつ表示
+		coffeeTrivia_.SetString(CoffeeTrivia::GetString());
+		coffeeTrivia_.StartTyping(0.1f); // 0.1秒ごとに1文字ずつ表示
 	}
 
 	const float deltaTime = SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	const bool isEdamameRayHit = Edamame::IsRayHit();
 	const bool isCoffeeRayHit = CoffeeTrivia::IsRayHit();
-	const bool isTriviaRayHit = isEdamameRayHit || isCoffeeRayHit;
-
-	if (isTriviaRayHit) {
+	if (isEdamameRayHit) {
 		edamameTriviaAlpha_ = 1.0f;
-	} else if ((wasEdamameRayHit_ || edamameTriviaAlpha_ > 0.0f) && EdamameTrivia::GetIsCurrentVoiceFinished() && CoffeeTrivia::GetIsCurrentVoiceFinished()) {
+	} else if ((wasEdamameRayHit_ || edamameTriviaAlpha_ > 0.0f) && EdamameTrivia::GetIsCurrentVoiceFinished()) {
 		const float fadeStep = deltaTime / kEdamameFadeDuration_;
 		edamameTriviaAlpha_ = std::max(0.0f, edamameTriviaAlpha_ - fadeStep);
 	}
-	wasEdamameRayHit_ = isTriviaRayHit;
+	wasEdamameRayHit_ = isEdamameRayHit;
+
+	if (isCoffeeRayHit) {
+		coffeeTriviaAlpha_ = 1.0f;
+	} else if ((wasCoffeeRayHit_ || coffeeTriviaAlpha_ > 0.0f) && CoffeeTrivia::GetIsCurrentVoiceFinished()) {
+		const float fadeStep = deltaTime / kEdamameFadeDuration_;
+		coffeeTriviaAlpha_ = std::max(0.0f, coffeeTriviaAlpha_ - fadeStep);
+	}
+	wasCoffeeRayHit_ = isCoffeeRayHit;
 
 	edamameTrivia_.SetColor({1.0f, 1.0f, 1.0f, edamameTriviaAlpha_});
+	coffeeTrivia_.SetColor({1.0f, 1.0f, 1.0f, coffeeTriviaAlpha_});
 
 	text_.Update(true);
 	edamameTrivia_.Update();
+	coffeeTrivia_.Update();
 }
 
 void TextUIManager::Draw() {
@@ -104,6 +121,9 @@ void TextUIManager::Draw() {
 		if (EdamameTrivia::GetIsDraw() && !EdamameTrivia::GetIsDie()) {
 			// 死んでないとき且つ描画するとき
 			edamameTrivia_.Draw();
+		}
+		if (CoffeeTrivia::IsRayHit() || coffeeTriviaAlpha_ > 0.0f) {
+			coffeeTrivia_.Draw();
 		}
 	}
 }

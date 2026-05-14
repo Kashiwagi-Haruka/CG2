@@ -21,11 +21,14 @@ private:
 	uint32_t fontHandle_;
 	Text text_;
 	Text edamameTrivia_;
+	Text coffeeTrivia_;
 	float showTime_ = 1.0f;
 	float showTimer_ = showTime_;
 	bool isDraw_ = false;
 
 	float edamameTriviaAlpha_ = 0.0f;
+	float coffeeTriviaAlpha_ = 0.0f;
 	bool wasEdamameRayHit_ = false;
+	bool wasCoffeeRayHit_ = false;
 	static constexpr float kEdamameFadeDuration_ = 3.0f;
 };

@@ -348,6 +348,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Stages\Stage\RestroomStage\RestroomStage.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManagerRestRoom.cpp" />
     <ClCompile Include="application\GameObject\Toilet\Toilet.cpp" />
+    <ClCompile Include="application\GameObject\RotatingPlaygroundEquipment\RotatingPlaygroundEquipment.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -574,6 +575,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Stages\Stage\RestroomStage\RestroomStage.h" />
     <ClInclude Include="application\GameObject\Wall\WallManagerRestRoom.h" />
     <ClInclude Include="application\GameObject\Toilet\Toilet.h" />
+    <ClInclude Include="application\GameObject\RotatingPlaygroundEquipment\RotatingPlaygroundEquipment.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

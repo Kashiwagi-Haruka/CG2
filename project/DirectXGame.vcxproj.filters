@@ -422,6 +422,7 @@
     <ClCompile Include="application\GameObject\Wall\WallManagerRestRoom.cpp" />
     <ClCompile Include="application\GameObject\Toilet\Toilet.cpp" />
     <ClCompile Include="application\GameObject\Toilet\ToiletManager.cpp" />
+    <ClCompile Include="application\GameObject\RotatingPlaygroundEquipment\RotatingPlaygroundEquipment.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -832,6 +833,7 @@
     <ClInclude Include="application\GameObject\Wall\WallManagerRestRoom.h" />
     <ClInclude Include="application\GameObject\Toilet\Toilet.h" />
     <ClInclude Include="application\GameObject\Toilet\ToiletManager.h" />
+    <ClInclude Include="application\GameObject\RotatingPlaygroundEquipment\RotatingPlaygroundEquipment.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
