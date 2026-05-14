@@ -4,7 +4,7 @@
 #include "Engine/Texture/Mesh/Object3d/Object3dCommon.h"
 #include "Engine/base/DirectXCommon.h"
 #include <cmath>
-
+#include <numbers>
 namespace {
 constexpr const char* kGentlemanAnimationGroup = "Gentleman";
 constexpr const char* kSpinAnimationGroup = "RotatingPlaygroundSpin";
@@ -44,30 +44,17 @@ void RotatingPlaygroundEquipment::Initialize() {
 	constexpr size_t kGentlemanCount = 4;
 	gentlemanObj_.resize(kGentlemanCount);
 	gentlemanTransform_.resize(kGentlemanCount);
-	gentlemanSkeleton_.resize(kGentlemanCount);
-	gentlemanSkinCluster_.resize(kGentlemanCount);
-	Model* gentlemanModel = ModelManager::GetInstance()->FindModel("gentleman");
 	for (size_t i = 0; i < kGentlemanCount; ++i) {
 		auto& gentleman = gentlemanObj_[i];
 		gentleman = std::make_unique<Object3d>();
 		gentleman->Initialize();
 		gentleman->SetModel("gentleman");
-		if (gentlemanModel) {
-			gentlemanSkeleton_[i] = std::make_unique<Skeleton>(Skeleton().Create(gentlemanModel->GetModelData().rootnode));
-			gentlemanSkinCluster_[i] = CreateSkinCluster(*gentlemanSkeleton_[i], *gentlemanModel);
-			if (!gentlemanSkinCluster_[i].mappedPalette.empty()) {
-				gentleman->SetSkinCluster(&gentlemanSkinCluster_[i]);
-			}
-		}
 
 		auto& transform = gentlemanTransform_[i];
 		transform.scale = {1.0f, 1.0f, 1.0f};
-		transform.rotate = {0.0f, 0.0f, 0.0f};
+		transform.rotate = {0.0f, std::numbers::pi_v<float>/2.0f, 0.0f};
 		transform.translate = spinTransform_.translate;
 		gentleman->SetTransform(transform);
-		if (const Animation::AnimationData* roundAnimation = AnimationManager::GetInstance()->FindAnimation(kGentlemanAnimationGroup, "Round")) {
-			gentleman->SetAnimation(roundAnimation, true);
-		}
 	}
 }
 
@@ -85,23 +72,22 @@ void RotatingPlaygroundEquipment::Update() {
 	spinObj_->Update();
 
 	gentlemanOrbitAngle_ += gentlemanOrbitSpeed_;
-	constexpr float kPi = 3.1415926535f;
+	constexpr float kPi = std::numbers::pi_v<float>;
 	const float angleStep = (2.0f * kPi) / static_cast<float>(gentlemanObj_.size());
 	for (size_t i = 0; i < gentlemanObj_.size(); ++i) {
 		const float angle = gentlemanOrbitAngle_ + (angleStep * static_cast<float>(i));
 		auto& transform = gentlemanTransform_[i];
 		transform.translate = {
 		    spinTransform_.translate.x + std::cosf(angle) * gentlemanOrbitRadius_, spinTransform_.translate.y, spinTransform_.translate.z + std::sinf(angle) * gentlemanOrbitRadius_};
-		transform.rotate.y = angle + kPi;
+		transform.rotate.y = -angle + kPi;
 		gentlemanObj_[i]->SetTransform(transform);
 		gentlemanObj_[i]->Update();
 	}
 }
 
 void RotatingPlaygroundEquipment::Draw() {
-	Object3dCommon::GetInstance()->DrawCommon();
-	spinObj_->Draw();
 	Object3dCommon::GetInstance()->DrawCommonSkinning();
+	spinObj_->Draw();
 	for (auto& gentleman : gentlemanObj_) {
 		gentleman->Draw();
 	}
