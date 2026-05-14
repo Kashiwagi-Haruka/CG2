@@ -32,6 +32,11 @@ Vector3 Desk::GetWorldPosition() const
     return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
 }
 
+Matrix4x4* Desk::GetDeskDrawerMatrix()
+{
+    return &drawerMatrix_;
+}
+
 void Desk::Animation()
 {
 
@@ -80,12 +85,17 @@ void Desk::Update()
     Animation();
     obj_->Update();
 
+    //引き出しのマトリックスを得る
+    const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex("drawer.002");
+    skeleton_->SetObjectMatrix(obj_->GetWorldMatrix());
+    drawerMatrix_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndex]);
+
 }
 
 void Desk::Initialize()
 {
     obj_->Initialize();
-	obj_->RegisterEditor(animationGroupName_);
+    obj_->RegisterEditor(animationGroupName_);
     isRayHit_ = false;
     desiredAnimationName = "Idle";
 
@@ -120,14 +130,14 @@ void Desk::CheckCollision()
         //rayの当たり判定
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (!PlayerCommand::GetIsGrab()) {
-                
-                    SEManager::SoundPlay(SEManager::DESK);
-                    if (desiredAnimationName == "Idle") {
-                        desiredAnimationName = "Open";
-                    } else if (desiredAnimationName == "Open") {
-                        desiredAnimationName = "Idle";
-                    }
-                
+
+                SEManager::SoundPlay(SEManager::DESK);
+                if (desiredAnimationName == "Idle") {
+                    desiredAnimationName = "Open";
+                } else if (desiredAnimationName == "Open") {
+                    desiredAnimationName = "Idle";
+                }
+
 
             }
         }

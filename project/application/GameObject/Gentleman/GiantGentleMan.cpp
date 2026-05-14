@@ -56,16 +56,16 @@ void GiantGentleMan::Initialize()
 
     head_->Initialize();
 
-    for (auto& [name, hand] : colliders_) {
-        hand->RegisterEditor(name);
-    }
-
     colliders_["GentlemanLeftHand"]->Initialize(YoshidaMath::ColliderType::kAABB);
     colliders_["GentlemanRightHand"]->Initialize(YoshidaMath::ColliderType::kAABB);
     colliders_["GentlemanShoulder.L"]->Initialize(YoshidaMath::ColliderType::kAABB);
     colliders_["GentlemanShoulder.R"]->Initialize(YoshidaMath::ColliderType::kAABB);
     colliders_["GentlemanLeftArm"]->Initialize(YoshidaMath::ColliderType::kAABB);
     colliders_["GentlemanRightArm"]->Initialize(YoshidaMath::ColliderType::kAABB);
+
+    for (auto& [name, hand] : colliders_) {
+        hand->RegisterEditor(name);
+    }
 }
 
 void GiantGentleMan::Update()

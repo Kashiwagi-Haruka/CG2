@@ -91,7 +91,7 @@ void GentleManStage::Initialize()
 
     wallManagerRoofFoor_->Initialize();
     timeCardWatch_->Initialize();
-    documentManager_->Initialize();
+    documentManager_->Initialize("document1");
     giantGentleMan_->Initialize();
     //懐中電灯の初期化
     flashlight_->Initialize();
@@ -129,7 +129,7 @@ void GentleManStage::CheckCollision() {
             break;
         }
     }
-    for (auto& wall : wallManagerRoofFoor_->GetWalls()) {
+    for (auto& [name,wall]:wallManagerRoofFoor_->GetColliders()) {
         stageCollisionManager_->AddCollider(wall.get());
     }
 

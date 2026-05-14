@@ -7,7 +7,10 @@
 #include"GameObject/SEManager/SEManager.h"
 PlayerCamera* Document::playerCamera_ = nullptr;
 bool Document::isRayHit_ = false;
-
+namespace {
+    const Vector4 kRayHitOutlineColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+    const float kRayHitOutlineWidth = 10.0f;
+} // namespace
 Document::Document()
 {
     obj_ = std::make_unique<Object3d>();
@@ -17,9 +20,6 @@ Document::Document()
     SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
 
-    transform_.scale = { 10.0f,10.0f,10.0f };
-    transform_.rotate = { 0.0f,0.0f,0.0f };
-    transform_.translate = { 0.0f,0.0f,0.0f };
 }
 
 void Document::OnCollision(Collider* collider)
@@ -33,37 +33,6 @@ Vector3 Document::GetWorldPosition() const
 {
     return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
 }
-
-void Document::OnTriggerLookStart()
-{
-    if (isDocumentLook_) {
-        return;
-    }
-
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
-
-        if (!PlayerCommand::GetIsGrab()) {
-            SEManager::SoundPlay(SEManager::PAPER);
-            //書類を見る
-            isDocumentLook_ = true;
-        }
-    }
-}
-
-void Document::OnTriggerLookStop()
-{
-    if (!isDocumentLook_) {
-        //書類を見ていないとき
-        return;
-    }
-
-    if (PlayerCommand::GetInstance()->InteractTrigger()) {
-        SEManager::SoundPlay(SEManager::PAPER);
-        //書類を見る
-        isDocumentLook_ = false;
-    }
-}
-
 void Document::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
@@ -72,24 +41,35 @@ void Document::SetCamera(Camera* camera)
 
 void Document::Update()
 {
-
     CheckCollision();
     obj_->SetEnableLighting(false);
-    obj_->SetTransform(transform_);
     obj_->Update();
+    pos_ = obj_->GetTranslate();
 }
 
-void Document::Initialize()
+void Document::Initialize(const std::string name)
 {
     isRayHit_ = false;
     isDocumentLook_ = false;
     obj_->Initialize();
+    obj_->RegisterEditor(name);
+    obj_->SetOutlineColor(kRayHitOutlineColor);
+    obj_->SetOutlineWidth(kRayHitOutlineWidth);
 }
 
 void Document::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommon();
-    obj_->Draw();
+ 
+    if (isRayHit_&&!isDocumentLook_) {
+        Object3dCommon::GetInstance()->DrawCommon();
+        obj_->Draw();
+        Object3dCommon::GetInstance()->DrawCommonOutline();
+        obj_->Draw();
+        Object3dCommon::GetInstance()->EndOutlineDraw();
+    } else {
+        Object3dCommon::GetInstance()->DrawCommon();
+        obj_->Draw();
+    }
 
 }
 
@@ -98,15 +78,24 @@ void Document::CheckCollision()
 {
     isRayHit_ = OnCollisionRay();
 
-    OnTriggerLookStop();
+    // トリガーが押された時の処理
+    if (PlayerCommand::GetInstance()->InteractTrigger()) {
 
-   //Rayがヒットしていたら
-    if (isRayHit_) {
-        OnTriggerLookStart();
+        // 物を持っていない状態を前提とする場合
+        if (!PlayerCommand::GetIsGrab()) {
+            if (isRayHit_) {
+                isDocumentLook_ = !isDocumentLook_;
+                SEManager::SoundPlay(SEManager::PAPER);
+            }
+        }
+    }
+
+    if (!isRayHit_) {
+        //外れたら強制的に終了する
+        isDocumentLook_ = false;
     }
 
 }
-
 
 bool Document::OnCollisionRay()
 {

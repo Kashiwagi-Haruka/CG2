@@ -14,6 +14,12 @@ public:
 	PortalManager() = default;
 	PortalManager(Vector3* pos);
 	~PortalManager();
+
+	/// @brief 部屋のAABBを登録する
+	void AddRoomAABB(const AABB& aabb) { roomAABBs_.push_back(aabb); }
+	/// @brief 登録された部屋のAABBをクリアする
+	void ClearRoomAABBs() { roomAABBs_.clear(); }
+
 	void SetWhiteBoardManager(WhiteBoardManager* whiteBoardManager);
 	virtual void Initialize();
 	virtual void Update();
@@ -39,11 +45,17 @@ protected:
 	std::unique_ptr<PortalParticle> portalParticle_ = nullptr;
 	const float kWarpTime_ = 2.0f;
 	float warpCoolTimer_ = kWarpTime_;
+
+
 protected:
 	virtual void UpdatePortal();
 	virtual void DrawPortal();
 private:
-
+	
+	// ===== 追加 =====
+	std::vector<AABB> roomAABBs_;
+	/// @brief 指定した座標がどの部屋(AABB)に属しているかを取得する
+	int GetRoomIndex(const Vector3& pos);
 	// ポータルの作成
 	void SpawnPortal(WhiteBoard* board);
 	static bool canMakePortal_;

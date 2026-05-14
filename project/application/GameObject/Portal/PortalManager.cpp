@@ -6,6 +6,7 @@
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include "GameObject/YoshidaMath/YoshidaMath.h"
 #include "Function.h"
+#include<imgui.h>
 
 bool PortalManager::canMakePortal_ = false;
 
@@ -130,12 +131,30 @@ void PortalManager::SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = came
 
 void PortalManager::Update() {
 
+# ifdef USE_IMGUI
+    ImGui::Begin("PortalManager");
+    ImGui::Checkbox("canMakePortal", &canMakePortal_);
+    ImGui::Text("RoomCout,%d", roomAABBs_.size());
+    for (uint32_t i = 0; i < roomAABBs_.size(); ++i) {
+        std::string idName = "Room" +std::to_string(i);
+        std::string min = idName + "min";
+        std::string max = idName + "max";
+        ImGui::DragFloat3(min.c_str(), &roomAABBs_.at(i).min.x);
+        ImGui::DragFloat3(max.c_str(), &roomAABBs_.at(i).max.x);
+
+    }
+    ImGui::End();
+#endif
+
     UpdatePortal();
 }
 
 void PortalManager::CheckCollision() {
 
+
+
     if (isPendingPortalSpawn_) {
+        canMakePortal_ = false;
         return;
     }
 
@@ -151,6 +170,24 @@ void PortalManager::CheckCollision() {
         return;
     }
 
+    // 生成予定地（撃ったホワイトボード）の座標を取得
+    Vector3 targetPos = hitBoard->GetCollisionTransform().translate;
+    int targetRoomIndex = GetRoomIndex(targetPos);
+
+    if (targetRoomIndex != -1) {
+        for (const auto& portal : portals_) {
+            // 既存のポータルの座標を取得 (Transform.translateを使用)
+            Vector3 portalPos = portal->GetTransform().translate;
+
+            // 生成予定地と既存ポータルが同じ部屋のインデックスだった場合
+            if (GetRoomIndex(portalPos) == targetRoomIndex) {
+                canMakePortal_ = false; // ポータル作成不可状態にする
+                return;                 // 処理を中断して生成させない
+            }
+        }
+    }
+
+ 
     if (portals_.size() >= 2) {
         // ポータルの生成が2個以上になったら
         portals_.erase(portals_.begin());
@@ -162,6 +199,20 @@ void PortalManager::CheckCollision() {
     if (portalParticle_) {
         portalParticle_->Start(*playerPos_, pendingWhiteBoard_->GetCollisionTransform().translate);
     }
+}
+// ===== 追加: 座標がどの部屋に属しているかを判定する =====
+int PortalManager::GetRoomIndex(const Vector3& pos) {
+
+    for (size_t i = 0; i < roomAABBs_.size(); ++i) {
+        // 座標がAABBの中に含まれているか判定
+
+        if (pos.x >= roomAABBs_[i].min.x && pos.x <= roomAABBs_[i].max.x &&
+            pos.y >= roomAABBs_[i].min.y && pos.y <= roomAABBs_[i].max.y &&
+            pos.z >= roomAABBs_[i].min.z && pos.z <= roomAABBs_[i].max.z) {
+            return static_cast<int>(i); // 属している部屋のインデックスを返す
+        }
+    }
+    return -1; // どの部屋にも属していない場合
 }
 
 void PortalManager::SpawnPortal(WhiteBoard* board) {

@@ -33,6 +33,8 @@ void Key::Initialize()
     velocity_ = { 0.0f };
     obj_->Initialize();
     obj_->RegisterEditor("Key");
+    obj_->SetOutlineColor(kRayHitOutlineColor);
+    obj_->SetOutlineWidth(kRayHitOutlineWidth);
 
     isRayHit_ = false;
     isLockerHit_ = false;
@@ -136,7 +138,8 @@ void Key::CheckCollision() {
 
 bool Key::OnCollisionRay()
 {
-    return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate());
+    //近めに設定
+    return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate(),0.0f,1.0f);
 
 }
 

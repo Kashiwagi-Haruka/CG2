@@ -423,6 +423,10 @@
     <ClCompile Include="application\GameObject\Toilet\Toilet.cpp" />
     <ClCompile Include="application\GameObject\Toilet\ToiletManager.cpp" />
     <ClCompile Include="application\GameObject\RotatingPlaygroundEquipment\RotatingPlaygroundEquipment.cpp" />
+    <ClCompile Include="application\GameObject\HintSheet\HintSheet.cpp" />
+    <ClCompile Include="application\GameObject\HintSheet\HintSheetManager.cpp" />
+    <ClCompile Include="application\GameObject\UI\Inventory\Item\ItemSeveredHand\ItemSeveredHand.cpp" />
+    <ClCompile Include="application\GameObject\SeveredHand\SeveredHand.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -834,6 +838,10 @@
     <ClInclude Include="application\GameObject\Toilet\Toilet.h" />
     <ClInclude Include="application\GameObject\Toilet\ToiletManager.h" />
     <ClInclude Include="application\GameObject\RotatingPlaygroundEquipment\RotatingPlaygroundEquipment.h" />
+    <ClInclude Include="application\GameObject\HintSheet\HintSheet.h" />
+    <ClInclude Include="application\GameObject\HintSheet\HintSheetManager.h" />
+    <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemSeveredHand\ItemSeveredHand.h" />
+    <ClInclude Include="application\GameObject\SeveredHand\SeveredHand.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

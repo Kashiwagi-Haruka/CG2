@@ -22,6 +22,7 @@
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
+#include"GameObject/HintSheet/HintSheetManager.h"
 #include <utility>
 
 MirrorStage::MirrorStage(Player* player) : player_(player) {
@@ -49,6 +50,7 @@ MirrorStage::MirrorStage(Player* player) : player_(player) {
 	timeCard_ = std::make_unique<TimeCard>();
 	timeCardRack_ = std::make_unique<TimeCardRack>();
 	boxManager_ = std::make_unique<BoxManager>();
+	hintSheetManager_ = std::make_unique<HintSheetManager>();
 }
 
 void MirrorStage::Initialize() {
@@ -71,6 +73,7 @@ void MirrorStage::Initialize() {
 	chairManager_->Initialize();
 	wallManager_->Initialize();
 	wallManager2_->Initialize();
+
 	vendingMac_->Initialize();
 	door_->Initialize();
 	lockerManager_->Initialize();
@@ -78,7 +81,14 @@ void MirrorStage::Initialize() {
 	timeCard_->Initialize();
 	timeCardRack_->Initialize();
 	boxManager_->Initialize();
+
+	hintSheetManager_->Initialize();
+	hintSheetManager_->AddHintSheet("Resources/TXT/Hint/Hint0.txt");
+
+	hintSheetManager_->SetParentMatrix(0, deskManager_->GetDrawerMatrix(2));
+
 	InitializeLights();
+
 	hierarchy->LoadObjectEditorsFromJsonIfExists("MirrorStage_objectEditors.json");
 	hierarchy->EndRegisterFile();
 }
@@ -114,19 +124,11 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 	lockerManager_->Update();
 	deskManager_->Update();
 	whiteBoardManager_->Update();
-	/*timeCard_->SetTransform({
-	    {1.0f, 1.0f, 1.0f },
-        {0.0f, 0.0f, 0.0f },
-        {8.0f, 1.0f, -7.0f}
-    });*/
 	timeCard_->Update();
-	//timeCardRack_->SetTransform({
-	//    {1.0f,  1.0f, 1.0f },
- //       {0.0f,  0.0f, 0.0f },
- //       {7.75f, 1.3f, -7.0f}
- //   });
 	timeCardRack_->Update();
 	pc_->Update();
+	hintSheetManager_->Update();
+
 	UpdateLights();
 }
 
@@ -189,6 +191,23 @@ void MirrorStage::SetCollisionManager(CollisionManager* collisionManager) {
 	stageCollisionManager_ = collisionManager;
 }
 void MirrorStage::CheckCollision() {
+
+
+	// ==================//ポータルと部屋の当たり判定を取るために当たり判定を入れる=================================
+	// 部屋1のAABB (WallManager.cpp の壁の配置から推測)
+	portalManager_->ClearRoomAABBs();
+
+	AABB room1AABB = {
+	.min = {-7.5f, -1.0f, -7.5f},
+	.max = { 7.5f,  6.0f,  7.5f}
+	};
+
+	portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(room1AABB, wallManager_->GetRoom()->GetTranslate()));
+	// 部屋2のAABB (WallManager2.cpp の壁の配置に合わせて数値を調整してください)
+	portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(room1AABB, wallManager2_->GetRoom()->GetTranslate()));
+
+	// ===================================================
+
 	if (!stageCollisionManager_) {
 		return;
 	}
@@ -213,10 +232,10 @@ void MirrorStage::CheckCollision() {
 	for (auto& whiteBoard : whiteBoardManager_->GetWhiteBoards()) {
 		stageCollisionManager_->AddCollider(whiteBoard.get());
 	}
-	for (auto& wall : wallManager_->GetWalls()) {
+	for (auto& [name,wall]:wallManager_->GetColliders()) {
 		stageCollisionManager_->AddCollider(wall.get());
 	}
-	for (auto& wall : wallManager2_->GetWalls()) {
+	for (auto& [name, wall] : wallManager2_->GetColliders()) {
 		stageCollisionManager_->AddCollider(wall.get());
 	}
 	for (auto& chair : chairManager_->GetChairs()) {
@@ -242,7 +261,16 @@ void MirrorStage::CheckCollision() {
 	stageCollisionManager_->AddCollider(key_.get());
 	stageCollisionManager_->AddCollider(edamame_->GetEdamameModel().get());
 	stageCollisionManager_->AddCollider(pc_.get());
+
+	for (auto& hintSheet : hintSheetManager_->GetHintSheets()) {
+		stageCollisionManager_->AddCollider(hintSheet.get());
+	}
+
 	stageCollisionManager_->CheckAllCollisions();
+
+
+
+
 }
 
 void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
@@ -264,12 +292,14 @@ void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 	door_->Draw();
 	deskManager_->Draw();
 	edamame_->Draw();
+	hintSheetManager_->Draw();
 	whiteBoardManager_->Draw();
 	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 
 void MirrorStage::DrawSprite()
 {
+	hintSheetManager_->DrawUI();
 }
 
 void MirrorStage::SetSceneCameraForDraw(Camera* camera) {
@@ -293,6 +323,7 @@ void MirrorStage::SetSceneCameraForDraw(Camera* camera) {
 	timeCard_->SetCamera(camera);
 	timeCardRack_->SetCamera(camera);
 	boxManager_->SetCamera(camera);
+	hintSheetManager_->SetCamera(camera);
 }
 
 void MirrorStage::SetPlayerCamera(PlayerCamera* playerCamera) {
@@ -308,6 +339,7 @@ void MirrorStage::SetPlayerCamera(PlayerCamera* playerCamera) {
 	deskManager_->SetPlayerCamera(playerCamera);
 	boxManager_->SetPlayerCamera(playerCamera);
 	pc_->SetPlayerCamera(playerCamera);
+	hintSheetManager_->SetPlayerCamera(playerCamera);
 }
 
 PortalManager* MirrorStage::GetPortalManager() { return portalManager_.get(); }

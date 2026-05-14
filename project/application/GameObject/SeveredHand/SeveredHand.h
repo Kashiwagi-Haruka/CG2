@@ -1,38 +1,34 @@
 #pragma once
-#include <Transform.h>
-#include <string>
 #include <Camera.h>
-#include <RigidBody.h>
 #include <memory>
 #include <Object3d/Object3d.h>
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
 #include <GameObject/YoshidaMath/CollisionManager/Collider.h>
 
-class Document : public YoshidaMath::Collider
+class SeveredHand : public YoshidaMath::Collider
 {
 public:
-    Document();
-    void Initialize(const std::string name);
+    SeveredHand();
+    void Initialize();
     void Update();
     void Draw();
-    static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
+    void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
     void CheckCollision();
     bool OnCollisionRay();
     /// @brief 衝突時コールバック関数
     void OnCollision(Collider* collider)override;
     /// @brief ワールド座標を取得する
-    /// @return ワールド座標
+    /// @return ワールド座標SetParentMatrix
     Vector3 GetWorldPosition() const override;
-    static bool IsRayHit() { return isRayHit_; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
-    bool GetDocumentLook() { return isDocumentLook_; }
-    Vector3* GetTranslate() { return &pos_; };
+    void SetParentMatrix(Matrix4x4* parentMat) { parentMat_ = parentMat; }
 private:
-    bool isDocumentLook_ = false;
-    static  bool isRayHit_;
-    static PlayerCamera* playerCamera_;
+    Matrix4x4* parentMat_ = nullptr;
+    bool isRayHit_ = false;
+    bool isLook_ =  false;
     std::unique_ptr<Object3d>obj_ = nullptr;
-    Vector3 pos_;
+    PlayerCamera* playerCamera_ = nullptr;
+    Vector3 worldPos_ = { 0.0f };
 };
 

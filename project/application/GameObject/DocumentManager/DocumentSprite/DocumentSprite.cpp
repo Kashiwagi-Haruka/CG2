@@ -6,8 +6,9 @@
 #include<algorithm>
 DocumentSprite::DocumentSprite()
 {
-    handle_[DOC_TIMECARD_WATCH] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/3d/document/document0.png");
-    handle_[DOC_SECRET] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/3d/document/document1.png");
+    //handle_[DOC_TIMECARD_WATCH] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/3d/document/document0.png");
+    //handle_[DOC_SECRET] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/3d/document/document1.png");
+
     sprite_ = std::make_unique<Sprite>();
 
     // スクロールバー用の白テクスチャなどを読み込む（パスはプロジェクト環境に合わせて変更してください）
@@ -19,10 +20,11 @@ DocumentSprite::DocumentSprite()
 
 }
 
-void DocumentSprite::Initialize()
+void DocumentSprite::Initialize(const std::string name)
 {
-
-    sprite_->Initialize(handle_[DOC_TIMECARD_WATCH]);
+    std::string filePath = "Resources/TD3_3102/3d/document/" + name + ".png";
+    uint32_t handle = TextureManager::GetInstance()->GetTextureIndexByfilePath(filePath);
+    sprite_->Initialize(handle);
     sprite_->SetAnchorPoint({ 0.5f,0.0f });
     sprite_->SetRotation(0.0f);
     sprite_->SetScale({ 725.0f,1024.0f });
@@ -30,7 +32,6 @@ void DocumentSprite::Initialize()
     sprite_->SetPosition(position_);
     sprite_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
     sprite_->Update();
-
 
     // スクロールバー（背景）の初期化
     scrollbarTrackSprite_->Initialize(scrollbarTexHandle_);
@@ -56,7 +57,7 @@ void DocumentSprite::Update()
     position_.y += playerCommand->GetMouseWheelDelta();
 
     // 書類の移動限界値
-    float minY = -(sprite_->GetScale().y+ SCREEN_SIZE::HALF_HEIGHT) * 0.5f;
+    float minY = -(sprite_->GetScale().y + SCREEN_SIZE::HALF_HEIGHT) * 0.5f;
     float maxY = SCREEN_SIZE::HALF_HEIGHT;
 
 
@@ -95,9 +96,4 @@ void DocumentSprite::Draw()
     // スクロールバーを描画
     scrollbarTrackSprite_->Draw();
     scrollbarThumbSprite_->Draw();
-}
-
-void DocumentSprite::SetTexture(const Documents num)
-{
-    sprite_->SetTextureHandle(handle_[num]);
 }

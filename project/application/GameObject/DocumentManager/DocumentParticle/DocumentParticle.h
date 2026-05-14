@@ -18,7 +18,7 @@ public:
 	// --- 時間発生用の追加関数 ---
 	// 時間経過による連続発生を開始する
 	// interval: 何秒ごとに発生させるか / countPerEmit: 1回に何枚発生させるか
-	void StartEmit(const Vector3& center, float interval, uint32_t countPerEmit);
+	void StartEmit(Vector3* center, float interval, uint32_t countPerEmit);
 	// 連続発生を停止する
 	void StopEmit();
 	void SetTexture();
@@ -45,7 +45,7 @@ private:
 
 	// --- 時間発生用のメンバ変数 ---
 	bool isEmitting_ = false;       // 発生中かどうか
-	Vector3 emitCenter_ = { 0, 0, 0 }; // 発生位置
+	Vector3* emitCenter_ = nullptr; // 発生位置
 	float emitTimer_ = 0.0f;        // 経過時間計測用
 	float emitInterval_ = 0.1f;     // 発生間隔（秒）
 	uint32_t emitCount_ = 1;        // 1回あたりの発生数

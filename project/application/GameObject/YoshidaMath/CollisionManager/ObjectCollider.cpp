@@ -1,4 +1,5 @@
 #include "ObjectCollider.h"
+#include"Object3d/Object3dCommon.h"
 
 ObjectCollider::ObjectCollider()
 {
@@ -38,6 +39,7 @@ void ObjectCollider::Update()
 
 void ObjectCollider::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommon();
     primitive_->Draw();
 }
 void ObjectCollider::SetCamera(Camera* camera)

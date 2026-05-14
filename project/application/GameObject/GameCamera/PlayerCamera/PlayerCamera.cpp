@@ -74,9 +74,9 @@ void PlayerCamera::Initialize()
     SetRay();
 }
 
-bool PlayerCamera::OnCollisionRay(const AABB& localAABB, const Vector3& translate)
+bool PlayerCamera::OnCollisionRay(const AABB& localAABB, const Vector3& translate, const float min, const  float max)
 {
-    return YoshidaMath::RayIntersectsAABB(GetRay(), YoshidaMath::GetAABBWorldPos(localAABB, translate), kTMin_, kTMax_);
+    return YoshidaMath::RayIntersectsAABB(GetRay(), YoshidaMath::GetAABBWorldPos(localAABB, translate), min, max);
 }
 
 

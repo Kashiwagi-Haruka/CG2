@@ -80,9 +80,10 @@ void DocumentParticle::Emit(const Vector3& center, uint32_t count) {
         }
     }
 }
-void DocumentParticle::StartEmit(const Vector3& center, float interval, uint32_t countPerEmit) {
+void DocumentParticle::StartEmit(Vector3* center, float interval, uint32_t countPerEmit) {
     isEmitting_ = true;
     emitCenter_ = center;
+    assert(emitCenter_);
     emitInterval_ = interval;
     emitCount_ = countPerEmit;
     emitTimer_ = 0.0f; // タイマーをリセット
@@ -105,12 +106,14 @@ void DocumentParticle::Update(Camera* camera, const Vector3& lightDirection) {
     
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
 
+    assert(emitCenter_);
+
     // 1. 時間による自動発生処理
     if (isEmitting_) {
         emitTimer_ += deltaTime;
         // 指定した間隔（秒）を超えたら発生
         while (emitTimer_ >= emitInterval_) {
-            Emit(emitCenter_, emitCount_);
+            Emit(*emitCenter_, emitCount_);
             emitTimer_ -= emitInterval_; // タイマーを減らして正確な周期を保つ
         }
     }
