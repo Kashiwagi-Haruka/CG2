@@ -4431,7 +4431,7 @@
   "primitives": [
     {
       "editorId": "",
-      "index": 5,
+      "index": 11,
       "material": {
         "color": [
           1.0,
@@ -4487,7 +4487,7 @@
     },
     {
       "editorId": "",
-      "index": 6,
+      "index": 12,
       "material": {
         "color": [
           1.0,
@@ -4543,7 +4543,7 @@
     },
     {
       "editorId": "",
-      "index": 7,
+      "index": 13,
       "material": {
         "color": [
           1.0,
@@ -4599,7 +4599,7 @@
     },
     {
       "editorId": "",
-      "index": 8,
+      "index": 14,
       "material": {
         "color": [
           1.0,
@@ -4655,7 +4655,7 @@
     },
     {
       "editorId": "",
-      "index": 9,
+      "index": 15,
       "material": {
         "color": [
           1.0,
@@ -4711,7 +4711,7 @@
     },
     {
       "editorId": "",
-      "index": 10,
+      "index": 16,
       "material": {
         "color": [
           1.0,
@@ -4767,7 +4767,7 @@
     },
     {
       "editorId": "",
-      "index": 11,
+      "index": 17,
       "material": {
         "color": [
           1.0,
@@ -4823,7 +4823,7 @@
     },
     {
       "editorId": "",
-      "index": 12,
+      "index": 18,
       "material": {
         "color": [
           1.0,
@@ -4879,7 +4879,7 @@
     },
     {
       "editorId": "",
-      "index": 13,
+      "index": 19,
       "material": {
         "color": [
           1.0,

@@ -44,11 +44,6 @@ void Elevator::Initialize() {
     modelObj_->Initialize();
     modelObj_->RegisterEditor("EV");
 
-    elevatorTransform_ = {
-        .scale = {1.0f, 1.0f, 1.0f },
-        .rotate = {0.0f, Function::kPi, 0.0f },
-        .translate = {7.0f, baseHeight_,   -15.0f},
-    };
 
     isRayHit_ = false;
     desiredAnimationName = "Close";
@@ -121,7 +116,7 @@ void Elevator::SetCamera(Camera* camera) {
 
 void Elevator::Update() {
 
-    modelObj_->SetTransform(elevatorTransform_);
+
     modelObj_->Update();
 
     worldMat_ = modelObj_->GetWorldMatrix();

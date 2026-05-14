@@ -11,8 +11,6 @@ ElevatorRoomManager::ElevatorRoomManager()
     room_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/elevatorRoom", "elevatorRoom");
     room_->SetModel("elevatorRoom");
-    roomMat_ = Function::MakeIdentity4x4();
-
 
     areaLight_.color = { 1.0f,1.0f,0.75f,1.0f };
     areaLight_.intensity = 1.0f;
@@ -56,7 +54,7 @@ void ElevatorRoomManager::Initialize()
 void ElevatorRoomManager::Update()
 {
     room_->Update();
-    roomMat_ = room_->GetWorldMatrix();
+
     Vector3 translate = YoshidaMath::GetWorldPosByMat(room_->GetWorldMatrix());
 
     areaLight_.position = translate;

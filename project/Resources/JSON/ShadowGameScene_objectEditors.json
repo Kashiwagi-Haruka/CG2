@@ -2686,7 +2686,7 @@
       ],
       "intensity": 1.0
     },
-    "overrideSceneLights": false,
+    "overrideSceneLights": true,
     "point": [],
     "spot": []
   },
@@ -3249,7 +3249,7 @@
         "translate": [
           6.0,
           2.0,
-          -17.0
+          -17.5
         ]
       }
     },
