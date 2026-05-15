@@ -128,9 +128,9 @@ void Elevator::SetCamera(Camera* camera) {
 
     poster_.SetCamera(camera);
 
- /*   for (auto& [name, collider] : colliders_) {
-        collider->SetCamera(camera);
-    }*/
+    /*   for (auto& [name, collider] : colliders_) {
+           collider->SetCamera(camera);
+       }*/
 
 }
 
@@ -216,14 +216,15 @@ void Elevator::UpdateLightPos()
 {
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     Vector3 parentPos = YoshidaMath::GetWorldPosByMat(modelObj_->GetWorldMatrix());
-    lightPosY_ -= kLightVelocity_ * deltaTime;
+    lightVelocity_ = (parentPos.y + 4.0f) / insideOpenDelay_;
+    lightPosY_ -= 2.0 * lightVelocity_*deltaTime;
 
     pointLights_[0].position = { parentPos.x - 0.5f,lightPosY_,parentPos.z };
     pointLights_[1].position = { parentPos.x + 0.5f,lightPosY_,parentPos.z };
 
-    if (pointLights_[0].position.y <= parentPos.y) {
+    if (pointLights_[0].position.y <= parentPos.y-0.5f) {
         //同時に二つ初期化する
-        lightPosY_ = parentPos.y + 3.0f;
+        lightPosY_ = parentPos.y + 3.5f;
         pointLights_[0].position.y = lightPosY_;
         pointLights_[1].position.y = lightPosY_;
     }
