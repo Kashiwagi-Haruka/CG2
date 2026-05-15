@@ -6,7 +6,7 @@
 #include"Primitive/Primitive.h"
 #include"GameObject/YoshidaMath/CollisionManager/ObjectCollider.h"
 
-#include<array>
+
 class ElevatorRoomManager
 {
 public:

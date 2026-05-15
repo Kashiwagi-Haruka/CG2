@@ -8,6 +8,7 @@
 #include"GameObject/SEManager/SEManager.h"
 #include "GameBase.h"
 #include <cmath>
+#include<imgui.h>
 
 PlayerCamera* Elevator::playerCamera_ = nullptr;
 bool Elevator::isRayHit_ = false;
@@ -32,6 +33,21 @@ Elevator::Elevator() {
 
     doorMatrixLeft_ = Function::MakeIdentity4x4();
     doorMatrixRight_ = Function::MakeIdentity4x4();
+
+
+    pointLights_[0].color = { 1.0f,0.9f,0.9f,1.0f };
+    pointLights_[0].position = { 0.0f };
+    pointLights_[0].intensity = 1.0f;
+    pointLights_[0].radius = 2.0f;
+    pointLights_[0].decay = 1.0f;
+    pointLights_[0].shadowEnabled = false;
+
+    pointLights_[1].color = { 1.0f,0.9f,0.9f,1.0f };
+    pointLights_[1].position = { 0.0f };
+    pointLights_[1].intensity = 1.0f;
+    pointLights_[1].radius = 2.0f;
+    pointLights_[1].decay = 1.0f;
+    pointLights_[1].shadowEnabled = false;
 }
 
 Elevator::~Elevator()
@@ -53,6 +69,10 @@ void Elevator::Initialize() {
 
     isSceneTransition_ = false;
     isSceneTransitionStart_ = false;
+
+    lightPosY_ = 0.0f;
+    pointLights_[0].position = { 0.0f };
+    pointLights_[1].position = { 0.0f };
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/Elevator", "Elevator");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, desiredAnimationName, false);
@@ -108,9 +128,9 @@ void Elevator::SetCamera(Camera* camera) {
 
     poster_.SetCamera(camera);
 
-    //for (auto& [name, collider] : colliders_) {
-    //    collider->SetCamera(camera);
-    //}
+ /*   for (auto& [name, collider] : colliders_) {
+        collider->SetCamera(camera);
+    }*/
 
 }
 
@@ -146,6 +166,13 @@ void Elevator::Update() {
     skeleton_->SetObjectMatrix(modelObj_->GetWorldMatrix());
     doorMatrixRight_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndexRight]);
     doorMatrixLeft_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndexLeft]);
+
+
+    ImGui::Begin("Elevator");
+    ImGui::DragFloat3("position0", &pointLights_[0].position.x, 0.1f);
+    ImGui::DragFloat3("position1", &pointLights_[1].position.x, 0.1f);
+    ImGui::End();
+
 }
 
 void Elevator::Draw() {
@@ -168,6 +195,7 @@ void Elevator::Close() {
     if (desiredAnimationName == "Open") {
         SEManager::SoundPlay(SEManager::ELEVATOR_OPEN);
         desiredAnimationName = "Close";
+
     }
 }
 
@@ -176,7 +204,30 @@ void Elevator::Open() {
     if (desiredAnimationName == "Close") {
         SEManager::SoundPlay(SEManager::ELEVATOR_OPEN);
         desiredAnimationName = "Open"; // 外にいる → 開ける
+        Vector3 parentPos = YoshidaMath::GetWorldPosByMat(modelObj_->GetWorldMatrix());
+        lightPosY_ = parentPos.y + 3.0f;
+        pointLights_[0].position.y = lightPosY_;
+        pointLights_[1].position.y = lightPosY_;
+
     }
+}
+
+void Elevator::UpdateLightPos()
+{
+    const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+    Vector3 parentPos = YoshidaMath::GetWorldPosByMat(modelObj_->GetWorldMatrix());
+    lightPosY_ -= kLightVelocity_ * deltaTime;
+
+    pointLights_[0].position = { parentPos.x - 0.5f,lightPosY_,parentPos.z };
+    pointLights_[1].position = { parentPos.x + 0.5f,lightPosY_,parentPos.z };
+
+    if (pointLights_[0].position.y <= parentPos.y) {
+        //同時に二つ初期化する
+        lightPosY_ = parentPos.y + 3.0f;
+        pointLights_[0].position.y = lightPosY_;
+        pointLights_[1].position.y = lightPosY_;
+    }
+
 }
 
 void Elevator::CheckCollision() {
@@ -257,8 +308,13 @@ void Elevator::Inside() {
         return;
     }
 
+
+
     if (insideTimer_ < insideOpenDelay_) {
         //タイマーを回す
+
+        UpdateLightPos();
+
         insideTimer_ += GameBase::GetInstance()->GetDeltaTime();
         insideTimer_ = std::clamp(insideTimer_, 0.0f, insideOpenDelay_);
         if (insideTimer_ == insideOpenDelay_) {

@@ -26,7 +26,7 @@ void TutorialStage::InitializeLights()
     assert(lightManager_);
     lightManager_->ClearLights();
     lightManager_->Initialize();
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 3);
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 5);
 
     PointCommonLight pointLights_[2];
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -40,8 +40,8 @@ void TutorialStage::InitializeLights()
     pointLights_[1].intensity = 1.0f;
     pointLights_[1].radius = 10.0f;
     pointLights_[1].decay = 1.0f;
-    lightManager_->SetPointLight(pointLights_[0], 1);
-    lightManager_->SetPointLight(pointLights_[1], 2);
+    lightManager_->SetPointLight(pointLights_[0], 3);
+    lightManager_->SetPointLight(pointLights_[1], 4);
 
 
     lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
