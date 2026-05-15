@@ -46,7 +46,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>colliders_;
     std::array<PointCommonLight, 2> pointLights_;
     float lightPosY_ = 0.0f;
-    const float kLightVelocity_ = 1.0f;
+    float lightVelocity_ = 2.0f;
     // 新しい状態管理
     bool isPlayerInside_ = false;
     float insideTimer_ = 0.0f;
