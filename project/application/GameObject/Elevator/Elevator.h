@@ -8,6 +8,7 @@
 #include "Primitive/Primitive.h"
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
 #include"GameObject/Wall/Wall.h"
+#include "ElevatorNumber.h"
 
 #include <array>
 #include <memory>
@@ -50,6 +51,8 @@ private:
 	std::unique_ptr<Skeleton> skeleton_{};
 	// スキン
 	SkinCluster skinCluster_{};
+
+	std::unique_ptr<ElevatorNumber> elevatorNumber_ = nullptr;
 
 	std::string animationGroupName_ = "Elevator";
 	const float kAnimationBlendDuration_ = 1.0f;

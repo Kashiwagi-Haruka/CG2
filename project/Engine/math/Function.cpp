@@ -381,6 +381,13 @@ float Dot(const Vector3& v1, const Vector3& v2) { return v1.x * v2.x + v1.y * v2
 // 2点間の差分ベクトルを返す
 Vector3 Distance(const Vector3& pos1, const Vector3& pos2) { return {pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z}; }
 
+// 行列の親子関係を計算する（子行列 * 親行列）
+Matrix4x4 MakeParentChildMatrix(const Matrix4x4& parent, const Matrix4x4& child) { return Multiply(child, parent); }
+// トランスフォームの親子関係を計算する（子トランスフォーム * 親トランスフォーム）
+Matrix4x4 MakeParentChildTransform(const Transform& parent, const Transform& child) {
+	return MakeParentChildMatrix(MakeAffineMatrix(parent.scale, parent.rotate, parent.translate), MakeAffineMatrix(child.scale, child.rotate, child.translate));
+}
+
 // クォータニオンを正規化する
 Vector4 NormalizeQuaternion(const Vector4& q) {
 	float len = std::sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);

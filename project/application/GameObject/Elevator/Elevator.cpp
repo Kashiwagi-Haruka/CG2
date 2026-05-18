@@ -40,6 +40,7 @@ Elevator::Elevator() {
         wall->SetParentMatrix(&worldMat_);
         walls_.push_back(std::move(wall));
     }
+	elevatorNumber_ = std::make_unique<ElevatorNumber>();
 
 }
 
@@ -101,6 +102,8 @@ void Elevator::Initialize() {
     for (auto& wall : walls_) {
         wall->Initialize();
     }
+	elevatorNumber_->Initialize();
+	elevatorNumber_->SetElevatorTransform(elevatorTransform_);
 }
 
 void Elevator::SetCamera(Camera* camera) {
@@ -147,6 +150,7 @@ void Elevator::Update() {
     for (auto& wall : walls_) {
         wall->Update();
     }
+	elevatorNumber_->Update();
 }
 
 void Elevator::Draw() {
@@ -162,6 +166,7 @@ void Elevator::Draw() {
     //}
 
     poster_.Draw();
+	elevatorNumber_->Draw();
 }
 
 void Elevator::Close() {
