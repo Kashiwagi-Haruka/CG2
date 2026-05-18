@@ -104,6 +104,16 @@ void Elevator::Initialize() {
     }
 	elevatorNumber_->Initialize();
 	elevatorNumber_->SetElevatorTransform(elevatorTransform_);
+	elevatorNumber_->SetStageNumber(stageNumber_);
+	elevatorNumberText_.SetStageNumber(stageNumber_);
+}
+
+void Elevator::SetStageNumber(int stageNumber) {
+	stageNumber_ = stageNumber;
+	if (elevatorNumber_) {
+		elevatorNumber_->SetStageNumber(stageNumber_);
+	}
+	elevatorNumberText_.SetStageNumber(stageNumber_);
 }
 
 void Elevator::SetCamera(Camera* camera) {
@@ -151,22 +161,24 @@ void Elevator::Update() {
         wall->Update();
     }
 	elevatorNumber_->Update();
+	elevatorNumberText_.Update();
 }
 
 void Elevator::Draw() {
 
-    modelObj_->Draw();
+	modelObj_->Draw();
 
-    for (auto& sys : autoLockSystems_) {
-        sys->Draw();
-    }
+	for (auto& sys : autoLockSystems_) {
+		sys->Draw();
+	}
 
-    //for (auto& wall : walls_) {
-    //    wall->Draw();
-    //}
+	// for (auto& wall : walls_) {
+	//     wall->Draw();
+	// }
 
-    poster_.Draw();
+	poster_.Draw();
 	elevatorNumber_->Draw();
+	elevatorNumberText_.Draw();
 }
 
 void Elevator::Close() {

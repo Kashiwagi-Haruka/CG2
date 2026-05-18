@@ -13,6 +13,7 @@
 #include"GameSave/GameSave.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include "GameObject/UI/Inventory/Inventory.h"
+#include "Stages/StageNumber.h"
 
 ShadowGameScene::ShadowGameScene() {
 	// BGMの管理
@@ -120,6 +121,7 @@ void ShadowGameScene::Initialize()
 	elevatorRoomManager_->Initialize();
 	// エレベーター
 	elevator_->Initialize();
+	elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData_.currentStageName));
 	hierarchy->LoadObjectEditorsFromJsonIfExists("ShadowGameScene_objectEditors.json");
 	hierarchy->EndRegisterFile();
 	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
@@ -252,6 +254,7 @@ void ShadowGameScene::ChangeStage(const std::string& stageName) {
 	stageManager_->SetPlayer(player_.get());
 	stageManager_->SetCollisionManager(collisionManager_.get());
 	stageManager_->InitializeStage();
+	elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData_.currentStageName));
 	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
 	uiManager_->ShowKeyLostAtStageStartMessage();
