@@ -49,6 +49,7 @@ void RadiconStage::Initialize() {
 	lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
 	lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
+	Hierarchy::GetInstance()->LoadObjectEditorsFromJsonIfExists("RadiconStage_objectEditors.json");
 	Hierarchy::GetInstance()->EndRegisterFile();
 }
 

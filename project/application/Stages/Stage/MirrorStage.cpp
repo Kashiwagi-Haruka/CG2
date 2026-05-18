@@ -87,7 +87,7 @@ void MirrorStage::Initialize() {
 
 	hintSheetManager_->SetParentMatrix(0, deskManager_->GetDrawerMatrix(2));
 	hintSheetManager_->SetParentIsOpenEnd(0, deskManager_->GetDesks().at(2)->IsEndOpenAnimation());
-	deskManager_->GetDesks().at(2)->RegisterHintSheet(hintSheetManager_->GetHintSheets().at(0).get());
+	deskManager_->GetDesks().at(2)->RegisterReadableObject(hintSheetManager_->GetHintSheets().at(0).get());
 	InitializeLights();
 
 	hierarchy->LoadObjectEditorsFromJsonIfExists("MirrorStage_objectEditors.json");
@@ -137,10 +137,10 @@ void MirrorStage::InitializeLights() {
 	assert(lightManager_);
 	lightManager_->ClearLights();
 	lightManager_->Initialize();
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 4);
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 7);
 
-	lightManager_->SetPointLight(edamame_->GetPointLights().at(0),0);
-	lightManager_->SetPointLight(edamame_->GetPointLights().at(1),1);
+	lightManager_->SetPointLight(edamame_->GetPointLights().at(0),3);
+	lightManager_->SetPointLight(edamame_->GetPointLights().at(1),4);
 
 	//activePointLightCount_ = 4;
 	PointCommonLight pointLights_[2];
@@ -155,8 +155,8 @@ void MirrorStage::InitializeLights() {
 	pointLights_[1].intensity = 1.0f;
 	pointLights_[1].radius = 10.0f;
 	pointLights_[1].decay = 1.0f;
-	lightManager_->SetPointLight(pointLights_[0], 2);
-	lightManager_->SetPointLight(pointLights_[1], 3);
+	lightManager_->SetPointLight(pointLights_[0], 5);
+	lightManager_->SetPointLight(pointLights_[1], 6);
 
 
 	lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
@@ -180,8 +180,8 @@ void MirrorStage::UpdateLights() {
 
 	//spotLights_[0] = flashlight_->GetSpotLight();
 
-	lightManager_->SetPointLight(edamame_->GetPointLights().at(0), 0);
-	lightManager_->SetPointLight(edamame_->GetPointLights().at(1), 1);
+	lightManager_->SetPointLight(edamame_->GetPointLights().at(0), 3);
+	lightManager_->SetPointLight(edamame_->GetPointLights().at(1), 4);
 	lightManager_->SetAreaLight(vendingMac_->GetAreaLight(), 0);
 	//areaLights_[3] = wallManager_->GetAreaLight();
 	//areaLights_[4] = wallManager2_->GetAreaLight();

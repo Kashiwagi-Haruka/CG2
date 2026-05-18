@@ -356,6 +356,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\UI\Inventory\Item\ItemSeveredHand\ItemSeveredHand.cpp" />
     <ClCompile Include="application\GameObject\SeveredHand\SeveredHand.cpp" />
     <ClCompile Include="application\Stages\StageNumber.cpp" />
+    <ClCompile Include="application\GameObject\ReadableObject\ReadableObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -590,6 +591,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemSeveredHand\ItemSeveredHand.h" />
     <ClInclude Include="application\GameObject\SeveredHand\SeveredHand.h" />
     <ClInclude Include="application\Stages\StageNumber.h" />
+    <ClInclude Include="application\GameObject\ReadableObject\ReadableObject.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

@@ -8,13 +8,11 @@
 #include"GameObject/SEManager/SEManager.h"
 #include "GameBase.h"
 #include <cmath>
+#include<imgui.h>
 
 PlayerCamera* Elevator::playerCamera_ = nullptr;
 bool Elevator::isRayHit_ = false;
 
-namespace {
-    const int kMaxWall = 3;
-}
 
 Elevator::Elevator() {
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/Elevator", "Elevator");
@@ -33,39 +31,37 @@ Elevator::Elevator() {
     autoLockSystems_[1]->SetAABB({ .min = {-1.5f,0.0f,-1.0f} ,.max = {1.5f,0.02f,2.0f} });
     autoLockSystems_[1]->SetTranslate({ 0.0f,0.0f,0.0f });
 
+    doorMatrixLeft_ = Function::MakeIdentity4x4();
+    doorMatrixRight_ = Function::MakeIdentity4x4();
 
 
-    for (int i = 0; i < kMaxWall; ++i) {
-        std::unique_ptr<Wall> wall = std::make_unique<Wall>();
-        wall->SetParentMatrix(&worldMat_);
-        walls_.push_back(std::move(wall));
-    }
+
 	elevatorNumber_ = std::make_unique<ElevatorNumber>();
+    pointLights_[0].color = { 1.0f,0.9f,0.9f,1.0f };
+    pointLights_[0].position = { 0.0f };
+    pointLights_[0].intensity = 1.0f;
+    pointLights_[0].radius = 2.0f;
+    pointLights_[0].decay = 1.0f;
+    pointLights_[0].shadowEnabled = false;
 
+    pointLights_[1].color = { 1.0f,0.9f,0.9f,1.0f };
+    pointLights_[1].position = { 0.0f };
+    pointLights_[1].intensity = 1.0f;
+    pointLights_[1].radius = 2.0f;
+    pointLights_[1].decay = 1.0f;
+    pointLights_[1].shadowEnabled = false;
 }
 
 Elevator::~Elevator()
 {
-    for (auto& wall : walls_) {
-        if (wall != nullptr) {
-            wall.reset();
-            wall = nullptr;
-        }
-    }
 
-    walls_.clear();
 }
 
 void Elevator::Initialize() {
 
     modelObj_->Initialize();
-	modelObj_->RegisterEditor("EV");
+    modelObj_->RegisterEditor("EV");
 
-    elevatorTransform_ = {
-        .scale = {1.0f, 1.0f, 1.0f },
-        .rotate = {0.0f, Function::kPi, 0.0f },
-        .translate = {7.0f, baseHeight_,   -15.0f},
-    };
 
     isRayHit_ = false;
     desiredAnimationName = "Close";
@@ -74,7 +70,11 @@ void Elevator::Initialize() {
     insideTimer_ = 0.0f;
 
     isSceneTransition_ = false;
-    isSceneTranstionStart_ = false;
+    isSceneTransitionStart_ = false;
+
+    lightPosY_ = 0.0f;
+    pointLights_[0].position = { 0.0f };
+    pointLights_[1].position = { 0.0f };
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/Elevator", "Elevator");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, desiredAnimationName, false);
@@ -98,9 +98,24 @@ void Elevator::Initialize() {
     poster_.SetParentMat(&worldMat_);
     poster_.Initialize();
 
-    // 壁の初期化
-    for (auto& wall : walls_) {
-        wall->Initialize();
+    colliders_["ElevatorWall_Back"] = std::make_unique<ObjectCollider>();
+    colliders_["ElevatorWall_Left"] = std::make_unique<ObjectCollider>();
+    colliders_["ElevatorWall_Right"] = std::make_unique<ObjectCollider>();
+    colliders_["ElevatoDoor_Left"] = std::make_unique<ObjectCollider>();
+    colliders_["ElevatoDoor_Right"] = std::make_unique<ObjectCollider>();
+
+    colliders_["ElevatorWall_Back"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["ElevatorWall_Left"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["ElevatorWall_Right"]->Initialize(YoshidaMath::ColliderType::kAABB);
+
+    colliders_["ElevatoDoor_Left"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["ElevatoDoor_Right"]->Initialize(YoshidaMath::ColliderType::kAABB);
+
+    colliders_["ElevatoDoor_Left"]->SetParentMatrix(&doorMatrixLeft_);
+    colliders_["ElevatoDoor_Right"]->SetParentMatrix(&doorMatrixRight_);
+
+    for (auto& [name, collider] : colliders_) {
+        collider->RegisterEditor(name);
     }
 	elevatorNumber_->Initialize();
 	elevatorNumber_->SetElevatorTransform(elevatorTransform_);
@@ -126,20 +141,21 @@ void Elevator::SetCamera(Camera* camera) {
 
     poster_.SetCamera(camera);
 
-    //for (auto& wall : walls_) {
-    //    wall->SetCamera(camera);
-    //}
+    /*   for (auto& [name, collider] : colliders_) {
+           collider->SetCamera(camera);
+       }*/
+
 }
 
 void Elevator::Update() {
 
-    modelObj_->SetTransform(elevatorTransform_);
+
     modelObj_->Update();
 
     worldMat_ = modelObj_->GetWorldMatrix();
 
     //常にシーンの切り替わる瞬間をリセットする
-    isSceneTranstionStart_ = false;
+    isSceneTransitionStart_ = false;
 
     CheckCollision();
 
@@ -153,15 +169,25 @@ void Elevator::Update() {
     //エレベーター内のポスターの更新
     poster_.Update();
 
-    walls_[0]->SetST({ 2.0f,4.0f,4.0f }, { -2.0f ,0.0f,0.0f });
-    walls_[1]->SetST({ 2.0f,4.0f,4.0f }, { 2.0f  ,0.0f,0.0f });
-    walls_[2]->SetST({ 4.0f,4.0f,2.0f }, { 0.0f,0.0f, 2.0f });
-
-    for (auto& wall : walls_) {
-        wall->Update();
+    //当たり判定
+    for (auto& [name, collider] : colliders_) {
+        collider->Update();
     }
 	elevatorNumber_->Update();
 	elevatorNumberText_.Update();
+
+    const std::optional<int32_t> jointIndexRight = skeleton_->FindJointIndex("ボーン.002");
+    const std::optional<int32_t> jointIndexLeft = skeleton_->FindJointIndex("ボーン.004");
+    skeleton_->SetObjectMatrix(modelObj_->GetWorldMatrix());
+    doorMatrixRight_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndexRight]);
+    doorMatrixLeft_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndexLeft]);
+
+
+    ImGui::Begin("Elevator");
+    ImGui::DragFloat3("position0", &pointLights_[0].position.x, 0.1f);
+    ImGui::DragFloat3("position1", &pointLights_[1].position.x, 0.1f);
+    ImGui::End();
+
 }
 
 void Elevator::Draw() {
@@ -175,6 +201,9 @@ void Elevator::Draw() {
 	// for (auto& wall : walls_) {
 	//     wall->Draw();
 	// }
+    //for (auto& [name, collider] : colliders_) {
+    //    collider->Draw();
+    //}
 
 	poster_.Draw();
 	elevatorNumber_->Draw();
@@ -186,6 +215,7 @@ void Elevator::Close() {
     if (desiredAnimationName == "Open") {
         SEManager::SoundPlay(SEManager::ELEVATOR_OPEN);
         desiredAnimationName = "Close";
+
     }
 }
 
@@ -194,7 +224,31 @@ void Elevator::Open() {
     if (desiredAnimationName == "Close") {
         SEManager::SoundPlay(SEManager::ELEVATOR_OPEN);
         desiredAnimationName = "Open"; // 外にいる → 開ける
+        Vector3 parentPos = YoshidaMath::GetWorldPosByMat(modelObj_->GetWorldMatrix());
+        lightPosY_ = parentPos.y + 3.0f;
+        pointLights_[0].position.y = lightPosY_;
+        pointLights_[1].position.y = lightPosY_;
+
     }
+}
+
+void Elevator::UpdateLightPos()
+{
+    const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+    Vector3 parentPos = YoshidaMath::GetWorldPosByMat(modelObj_->GetWorldMatrix());
+    lightVelocity_ = (parentPos.y + 4.0f) / insideOpenDelay_;
+    lightPosY_ -= 2.0 * lightVelocity_*deltaTime;
+
+    pointLights_[0].position = { parentPos.x - 0.5f,lightPosY_,parentPos.z };
+    pointLights_[1].position = { parentPos.x + 0.5f,lightPosY_,parentPos.z };
+
+    if (pointLights_[0].position.y <= parentPos.y-0.5f) {
+        //同時に二つ初期化する
+        lightPosY_ = parentPos.y + 3.5f;
+        pointLights_[0].position.y = lightPosY_;
+        pointLights_[1].position.y = lightPosY_;
+    }
+
 }
 
 void Elevator::CheckCollision() {
@@ -275,8 +329,13 @@ void Elevator::Inside() {
         return;
     }
 
+
+
     if (insideTimer_ < insideOpenDelay_) {
         //タイマーを回す
+
+        UpdateLightPos();
+
         insideTimer_ += GameBase::GetInstance()->GetDeltaTime();
         insideTimer_ = std::clamp(insideTimer_, 0.0f, insideOpenDelay_);
         if (insideTimer_ == insideOpenDelay_) {
@@ -298,7 +357,7 @@ void Elevator::Inside() {
             if (!isSceneTransition_) {
                 //シーンの切り替わる瞬間を取得する
                 isSceneTransition_ = true;
-                isSceneTranstionStart_ = true;
+                isSceneTransitionStart_ = true;
             }
         }
     }

@@ -8,7 +8,7 @@
 #include"Animation/AnimationManager.h"
 #include "GameBase.h"
 #include"GameObject/SEManager/SEManager.h"
-#include"GameObject/HintSheet/HintSheet.h"
+#include"GameObject/ReadableObject/ReadableObject.h"
 
 PlayerCamera* Desk::playerCamera_ = nullptr;
 
@@ -95,7 +95,7 @@ void Desk::Update()
 
 void Desk::Initialize()
 {
-    hintSheets_.clear();
+    readableObject_.clear();
     obj_->Initialize();
     obj_->RegisterEditor(animationGroupName_);
     isRayHit_ = false;
@@ -132,7 +132,7 @@ void Desk::CheckCollision()
     bool isHintSheetPrioritized = false;
 
 
-    for (HintSheet* sheet : hintSheets_) {
+    for (ReadableObject* sheet : readableObject_) {
         // その書類の親マトリックスが、このDeskの引き出しマトリックスと一致しているか（親として設定されているか）確認
         if (sheet->GetParentMatrix() == &drawerMatrix_) {
             // 書類にRayが当たっている、または見ている最中なら優先フラグを立てる

@@ -12,14 +12,14 @@
 #include "Animation/SkinCluster.h"
 #include <vector>
 
-class HintSheet; // 追加: 前方宣言
+class ReadableObject; // 追加: 前方宣言
 class Desk : public YoshidaMath::Collider
 {
 public:
     Desk();
     // ヒントシートを登録する関数
-    void RegisterHintSheet(HintSheet* hintSheet) {
-        hintSheets_.push_back(hintSheet);
+    void RegisterReadableObject(ReadableObject* hintSheet) {
+        readableObject_.push_back(hintSheet);
     }
 
     void Initialize();
@@ -46,7 +46,7 @@ private:
     // アニメーション
     void Animation();
 private:
-    std::vector<HintSheet*> hintSheets_; // Deskに属するHintSheetのリスト
+    std::vector<ReadableObject*> readableObject_; // Deskに属するreadableObject_のリスト
     static PlayerCamera* playerCamera_;
     std::unique_ptr<Object3d>obj_ = nullptr;
     AABB localAABB_;

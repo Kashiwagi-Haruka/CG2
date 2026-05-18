@@ -31,7 +31,7 @@ void SeveredHand::Initialize()
     obj_->SetOutlineWidth(kRayHitOutlineWidth);
 
     isRayHit_ = false;
-    isLook_ = false;
+    isLooking_ = false;
     worldPos_ = { 0.0f };
 }
 
@@ -41,8 +41,8 @@ void SeveredHand::Update()
 
     Matrix4x4 child = Function::MakeAffineMatrix(obj_->GetScale(), obj_->GetRotate(), obj_->GetTranslate());
 
-    if (parentMat_) {
-        child = Function::Multiply(child, *parentMat_);
+    if (parentMatrix_) {
+        child = Function::Multiply(child, *parentMatrix_);
     }
 
     obj_->SetWorldMatrix(child);
@@ -54,54 +54,62 @@ void SeveredHand::Update()
     ImGui::Begin("SeveredHand");
     ImGui::Text("transform %f %f %f", obj_->GetTransform().translate.x,obj_->GetTransform().translate.y, obj_->GetTransform().translate.z);
     ImGui::DragFloat3("worldPos", &worldPos_.x);
-    ImGui::Checkbox("isLook_", &isLook_);
+    ImGui::Checkbox("isLooking_", &isLooking_);
 
     ImGui::End();
 #endif
 }
 
-void SeveredHand::Draw() {
 
-    if (isRayHit_) {
-        Object3dCommon::GetInstance()->DrawCommon();
-        obj_->Draw();
-        Object3dCommon::GetInstance()->DrawCommonOutline();
-        obj_->Draw();
-        Object3dCommon::GetInstance()->EndOutlineDraw();
-    } else {
-        Object3dCommon::GetInstance()->DrawCommon();
-        obj_->Draw();
-    }
-}
 void SeveredHand::SetPlayerCamera(PlayerCamera* camera)
 {
     playerCamera_ = camera;
-}
-
-void SeveredHand::SetCamera(Camera* camera)
-{
-    obj_->SetCamera(camera);
-    obj_->UpdateCameraMatrices();
-
 }
 
 void SeveredHand::CheckCollision() {
 
     isRayHit_ = OnCollisionRay();
 
-    if (isRayHit_ && !PlayerCommand::GetIsGrab()) {
-        if (!isLook_) {
-            isLook_ = true;
-            SEManager::SoundPlay(SEManager::KEY);
-       }
-  
+    // トリガーが押された時の処理  物を持っていない状態を前提とする場合
+    if (PlayerCommand::GetInstance()->InteractTrigger() && !PlayerCommand::GetIsGrab()) {
+
+        if (isRayHit_) {
+            //開いたアニメーションが終わった時やポインタがないとき
+            if (isOpenAnimationEndPtr_ && *isOpenAnimationEndPtr_ || !isOpenAnimationEndPtr_) {
+
+                SEManager::SoundPlay(SEManager::PAPER);
+
+                if (isLooking_) {
+                    // すでにヒントを見ているなら「閉じる」
+                    isLooking_ = false;
+                    PlayerCommand::SetIsLook(false);
+
+                }/* else {
+                    //何も見ていないとき
+                    if (!PlayerCommand::GetIsLook()) {
+                        // ヒントを見ていない ＆ レイが当たっているなら「見る」
+                        isLooking_ = true;
+
+                        PlayerCommand::SetIsLook(true);
+                    }
+                }*/
+            }
+
+
+        }
+    }
+
+    if (!isRayHit_) {
+        //外れたら強制的に終了する
+        isLooking_ = false;
+        PlayerCommand::SetIsLook(false);
     }
 
 }
 
 bool SeveredHand::OnCollisionRay()
 {
-    return playerCamera_->OnCollisionRay(GetAABB(), worldPos_);
+    return playerCamera_->OnCollisionRay(GetAABB(), worldPos_,0.0f,1.0f);
 
 }
 
@@ -123,6 +131,5 @@ void SeveredHand::OnCollision(Collider* collider)
 
 Vector3 SeveredHand::GetWorldPosition() const
 {
-
     return  worldPos_;
 }

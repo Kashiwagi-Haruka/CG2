@@ -1,5 +1,8 @@
 #include "DocumentManager.h"
 
+ bool DocumentManager::isRayHit_ = false;
+ bool DocumentManager::isLooking_ = false;
+
 DocumentManager::DocumentManager()
 {
     document_ = std::make_unique<Document>();
@@ -15,6 +18,8 @@ DocumentManagerParticle::DocumentManagerParticle()
 
 void DocumentManager::Initialize(const std::string name)
 {
+    isRayHit_ = false;
+    isLooking_ = false;
     //書類
     document_->Initialize(name);
       //スプライト
@@ -22,6 +27,9 @@ void DocumentManager::Initialize(const std::string name)
 }
 void DocumentManagerParticle::Initialize(const std::string name)
 {
+    isRayHit_ = false;
+    isLooking_ = false;
+
     documentParticle_->Initialize();
     documentParticle_->SetEmitArea({ -1.0f, 0.0f, -1.0f }, { 1.0f, 0.0f, 1.0f });
     // 基準点を上空(Y = 10.0f)に設定し、0.2秒ごとに2枚ずつ降らせる
@@ -45,9 +53,14 @@ void DocumentManagerParticle::Draw()
 void DocumentManager::Update(Camera* camera, const Vector3& lightDirection)
 {
     (void)lightDirection;
-    document_->Update();
 
-    if (document_->GetDocumentLook()) {
+
+    document_->Update();
+    
+    isRayHit_ = document_->GetIsRayHit();
+    isLooking_ = document_->GetIsLooking();
+
+    if (document_->GetIsLooking()) {
         documentSprite_->Update();
     }
 }
@@ -56,15 +69,16 @@ void DocumentManagerParticle::Update(Camera* camera, const Vector3& lightDirecti
 {
     document_->Update();
     documentParticle_->Update(camera, lightDirection);
-
-    if (document_->GetDocumentLook()) {
+    isRayHit_ = document_->GetIsRayHit();
+    isLooking_ = document_->GetIsLooking();
+    if (document_->GetIsLooking()) {
         documentSprite_->Update();
     }
 }
 
 void DocumentManager::DrawSprite()
 {
-    if (document_->GetDocumentLook()) {
+    if (document_->GetIsLooking()) {
         documentSprite_->Draw();
     }
 }

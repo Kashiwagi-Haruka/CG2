@@ -430,6 +430,7 @@
     <ClCompile Include="application\GameObject\Elevator\ElevatorNumber.cpp" />
     <ClCompile Include="application\Text\EleveterNumberText\EleveterNumberText.cpp" />
     <ClCompile Include="application\Stages\StageNumber.cpp" />
+    <ClCompile Include="application\GameObject\ReadableObject\ReadableObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -848,6 +849,7 @@
     <ClInclude Include="application\GameObject\Elevator\ElevatorNumber.h" />
     <ClInclude Include="application\Text\EleveterNumberText\EleveterNumberText.h" />
     <ClInclude Include="application\Stages\StageNumber.h" />
+    <ClInclude Include="application\GameObject\ReadableObject\ReadableObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
