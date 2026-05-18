@@ -9,6 +9,7 @@
 #include"Animation/AnimationManager.h"
 #include "GameBase.h"
 #include"GameObject/SEManager/SEManager.h"
+#include<imgui.h>
 PlayerCamera* Locker::playerCamera_ = nullptr;
 
 Locker::Locker()
@@ -16,21 +17,31 @@ Locker::Locker()
     obj_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/Locker", "Locker");
     obj_->SetModel("Locker");
-    SetAABB({ .min = {-0.5f,0.0f,-0.5f},.max = {0.5f,1.8f,0.5f} });
-    SetCollisionAttribute(kCollisionWall);
-    SetCollisionMask(kCollisionPlayer| kCollisionKey);
+    SetAABB({ .min = {-0.25f,0.0f,-0.25f},.max = {0.25f,1.8f,0.25f} });
+    SetCollisionAttribute(kCollisionLocker);
+    SetCollisionMask(kCollisionPlayer | kCollisionKey);
+    worldMatrix_ = Function::MakeIdentity4x4();
 }
 
 void Locker::OnCollision(Collider* collider)
 {
-    if (collider->GetCollisionAttribute() == kCollisionPlayer) {
 
+    if (collider->GetCollisionAttribute() == kCollisionPlayer) {
+        //プレイヤーがロッカーの中に入ったらドアを閉める
+
+        if (isPlayerIn_) {
+            return;
+        }
+
+       isPlayerIn_ = true;
+
+    
     }
 }
 
 Vector3 Locker::GetWorldPosition() const
 {
-    return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
+    return YoshidaMath::GetWorldPosByMat(worldMatrix_);
 }
 
 void Locker::Animation()
@@ -69,21 +80,46 @@ void Locker::SetCamera(Camera* camera)
 {
     obj_->SetCamera(camera);
     obj_->UpdateCameraMatrices();
+
+    for (auto& [name, collider] : colliders_) {
+        collider->SetCamera(camera);
+    }
 }
 
 void Locker::Update()
 {
-    isOpen_ = false;
+
     CheckCollision();
     obj_->Update();
+    worldMatrix_ = obj_->GetWorldMatrix();
+
+    //当たり判定
+    for (auto& [name, collider] : colliders_) {
+        collider->Update();
+    }
+
     Animation();
+
+#ifdef USE_IMGUI
+    ImGui::Begin(editorRegistrationName_.c_str());
+    ImGui::Checkbox("Open", &isOpen_);
+    ImGui::Checkbox("isPlayerIn", &isPlayerIn_);
+    ImGui::Checkbox("isPlayerPreIn_", &isPlayerPreIn_);
+
+
+
+    ImGui::End();
+#endif
 }
 
 void Locker::Initialize()
 {
     isRayHit_ = false;
+    isOpen_ = false;
+    isPlayerIn_ = false;
+    isPlayerPreIn_ = false;
     obj_->Initialize();
-	obj_->RegisterEditor(editorRegistrationName_);
+    obj_->RegisterEditor(editorRegistrationName_);
     desiredAnimationName = "Idle";
 
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/Locker", "Locker");
@@ -100,44 +136,81 @@ void Locker::Initialize()
         }
     }
 
+    colliders_.clear();
+
+    std::string back = editorRegistrationName_ + "_Back";
+    std::string left = editorRegistrationName_ + "_Left";
+    std::string right = editorRegistrationName_ + "_Right";
+    std::string front = editorRegistrationName_ + "_Front";
+
+    colliders_[back] = std::make_unique<ObjectCollider>();
+    colliders_[left] = std::make_unique<ObjectCollider>();
+    colliders_[right] = std::make_unique<ObjectCollider>();
+    colliders_[front] = std::make_unique<ObjectCollider>();
+
+    for (auto& [name, collider] : colliders_) {
+        collider->SetParentMatrix(&worldMatrix_);
+        collider->Initialize(YoshidaMath::ColliderType::kAABB);
+        collider->RegisterEditor(name);
+    }
+
 }
 
 void Locker::Draw()
 {
-    obj_->Draw();
+
+    //ロッカーに入ったら描画されない
+    if (!isPlayerIn_) {
+        obj_->Draw();
+    }
+
+
+
+    //for (auto& [name, collider] : colliders_) {
+    //    collider->Draw();
+    //}
 }
 
 
 void Locker::CheckCollision()
 {
     isRayHit_ = OnCollisionRay();
-    if (isRayHit_) {
+
+   
+
         //rayの当たり判定
 
-        if (PlayerCommand::GetInstance()->InteractTrigger()) {
-       
-            if (!PlayerCommand::GetIsGrab()) {
+            if (PlayerCommand::GetInstance()->InteractTrigger()&&
+                !PlayerCommand::GetIsGrab()&&
+                isRayHit_|| !PlayerCommand::GetIsGrab() && !isPlayerPreIn_&&isPlayerIn_) {
+
                 SEManager::SoundPlay(SEManager::DOOR_OPEN);
-                isOpen_ = !isOpen_;
-                if (isOpen_) {
+               
+
+                if (desiredAnimationName == "Open") {
+                    desiredAnimationName = "Close";
+                    isOpen_ = false;
+                } else {
+
                     if (desiredAnimationName == "Idle") {
                         desiredAnimationName = "Open";
-                    } 
-                } else {
-                    if (desiredAnimationName == "Open") {
-                        desiredAnimationName = "Close";
+                        isOpen_ = true;
                     }
                 }
-           
+  
+         
 
             }
-        }
-    }
- 
+        
+            isPlayerPreIn_ = isPlayerIn_;
+
+
 }
 
 
 bool Locker::OnCollisionRay()
 {
-    return playerCamera_->OnCollisionRay(GetAABB(), GetWorldPosition());
+    //ロッカーの前に例を飛ばす
+    std::string front = editorRegistrationName_ + "_Front";
+    return playerCamera_->OnCollisionRay(GetAABB(), colliders_[front]->GetWorldPosition());
 }

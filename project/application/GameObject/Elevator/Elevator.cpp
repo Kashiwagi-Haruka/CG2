@@ -167,12 +167,13 @@ void Elevator::Update() {
     doorMatrixRight_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndexRight]);
     doorMatrixLeft_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndexLeft]);
 
-
+#ifdef USE_IMGUI
     ImGui::Begin("Elevator");
     ImGui::DragFloat3("position0", &pointLights_[0].position.x, 0.1f);
     ImGui::DragFloat3("position1", &pointLights_[1].position.x, 0.1f);
     ImGui::End();
 
+#endif
 }
 
 void Elevator::Draw() {
@@ -217,12 +218,12 @@ void Elevator::UpdateLightPos()
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     Vector3 parentPos = YoshidaMath::GetWorldPosByMat(modelObj_->GetWorldMatrix());
     lightVelocity_ = (parentPos.y + 4.0f) / insideOpenDelay_;
-    lightPosY_ -= 2.0 * lightVelocity_*deltaTime;
+    lightPosY_ -= 2.0 * lightVelocity_ * deltaTime;
 
     pointLights_[0].position = { parentPos.x - 0.5f,lightPosY_,parentPos.z };
     pointLights_[1].position = { parentPos.x + 0.5f,lightPosY_,parentPos.z };
 
-    if (pointLights_[0].position.y <= parentPos.y-0.5f) {
+    if (pointLights_[0].position.y <= parentPos.y - 0.5f) {
         //同時に二つ初期化する
         lightPosY_ = parentPos.y + 3.5f;
         pointLights_[0].position.y = lightPosY_;

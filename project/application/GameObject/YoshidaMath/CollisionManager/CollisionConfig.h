@@ -16,6 +16,9 @@ namespace {
     constexpr uint64_t kCollisionChair = 0b1 << 5;
     //壁
     constexpr uint64_t kCollisionWall = 0b1 << 6;
+    //壁
+    constexpr uint64_t kCollisionLocker = 0b1 << 7;
+
     //鍵
     constexpr uint64_t kCollisionKey = 0b1 << 9;
     //マット

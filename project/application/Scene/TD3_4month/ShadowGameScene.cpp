@@ -258,6 +258,9 @@ void ShadowGameScene::ChangeStage(const std::string& stageName) {
 }
 
 void ShadowGameScene::CheckCollision() {
+
+
+
     if (!collisionManager_) {
         return;
     }

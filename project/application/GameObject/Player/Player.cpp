@@ -15,6 +15,7 @@
 #include"GameObject/SEManager/SEManager.h"
 #include"GameSave/GameSave.h"
 #include"GameObject/Portal/PortalManager.h"
+#include"GameObject/Locker/LockerManager.h"
 
 namespace {
 
@@ -81,13 +82,13 @@ Player::Player() {
     };
     SetAABB(localAABB_);
     SetCollisionAttribute(kCollisionPlayer);
-    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionMat);
+    SetCollisionMask(kCollisionFloor | kCollisionPortal | kCollisionEnemy | kCollisionItem | kCollisionKey | kCollisionChair | kCollisionWall | kCollisionMat | kCollisionLocker);
     // 体のObject3d
     bodyObj_ = std::make_unique<Object3d>();
-  
+
     // モデルの読み込み
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/gentleman", "gentleman");
-  
+
 }
 void Player::SetCamera(Camera* camera) {
     // カメラのセット
@@ -95,13 +96,6 @@ void Player::SetCamera(Camera* camera) {
     bodyObj_->UpdateCameraMatrices();
 }
 void Player::Initialize() {
-
-    //// 座標の初期化
-    //transform_ = {
-    //    .scale{1.0f, 1.0f, 1.0f},
-    //    .rotate{0.0f,Function::kPi, 0.0f},
-    //    .translate{6.25f, 1.5f, 4.0f}
-    //};
 
     // 速度の初期化
     velocity_ = { 0.0f };
@@ -144,6 +138,9 @@ void Player::Initialize() {
 
 void Player::Update()
 {
+
+  
+
     const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
     soundTimer_ = std::max(0.0f, soundTimer_ - deltaTime);
 
@@ -164,7 +161,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-    bodyObj_->Draw();  
+    bodyObj_->Draw();
 }
 
 void Player::Debug() {
@@ -178,44 +175,6 @@ void Player::Debug() {
             ImGui::Text("%s", desiredAnimationName);
             ImGui::TreePop();
         }
-        /*     if (!animationClips_.empty()) {
-                 std::vector<const char*> animationNames;
-                 animationNames.reserve(animationClips_.size());
-                 for (const auto& clip : animationClips_) {
-                     animationNames.push_back(clip.name.c_str());
-                 }
-                 int selectedIndex = static_cast<int>(currentAnimationIndex_);
-                 if (ImGui::Combo("Animation", &selectedIndex, animationNames.data(), static_cast<int>(animationNames.size()))) {
-                     currentAnimationIndex_ = static_cast<size_t>(selectedIndex);
-                     bodyObj_->SetAnimation(&animationClips_[currentAnimationIndex_], true);
-                     animationTime_ = 0.0f;
-                 }
-
-                 if (Model* playerModel = ModelManager::GetInstance()->FindModel("gentleman")) {
-                     const Animation::AnimationData& currentAnimation = animationClips_[currentAnimationIndex_];
-                     const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
-
-
-                     const std::optional<FootContactState> previousContact = SampleFootContactState(currentAnimation, previousTime, bodyObj_->GetWorldMatrix(), *playerModel);
-                     const std::optional<FootContactState> nextContact = SampleFootContactState(currentAnimation, nextTime, bodyObj_->GetWorldMatrix(), *playerModel);
-
-                     ImGui::Separator();
-                     ImGui::Text("Foot Contact");
-                     if (previousContact.has_value()) {
-                         ImGui::Text("Prev Frame  L:%s  R:%s", previousContact->left ? "Ground" : "Air", previousContact->right ? "Ground" : "Air");
-                         ImGui::TextDisabled("Prev Y  L:%.3f R:%.3f Ground:%.3f", previousContact->leftY, previousContact->rightY, previousContact->groundY);
-                     } else {
-                         ImGui::TextDisabled("Prev Frame: foot joint not found");
-                     }
-
-                     if (nextContact.has_value()) {
-                         ImGui::Text("Next Frame  L:%s  R:%s", nextContact->left ? "Ground" : "Air", nextContact->right ? "Ground" : "Air");
-                         ImGui::TextDisabled("Next Y  L:%.3f R:%.3f Ground:%.3f", nextContact->leftY, nextContact->rightY, nextContact->groundY);
-                     } else {
-                         ImGui::TextDisabled("Next Frame: foot joint not found");
-                     }
-                 }
-             }*/
 
         if (ImGui::TreeNode("Parameters")) {
             ImGui::DragFloat("Walk Speed", &parameters_.kWalkSpeed, 0.001f, 0.0f, 10.0f);
@@ -246,6 +205,11 @@ void Player::UpdatePlayerDamage(const float deltaTime)
 
 void Player::ApplyPlayerDamage(float damageAmount)
 {
+    if (LockerManager::GetIsInLocker()) {
+        //ロッカーに入っていたらreturnする
+        return;
+    }
+
     const float prevHp = hp_;
     hp_ = std::max(0.0f, hp_ - damageAmount);
     if (hp_ < prevHp) {
@@ -264,9 +228,17 @@ void Player::Move()
 
     velocity_.x = { 0.0f };
     velocity_.z = { 0.0f };
+
     if (PlayerCommand::GetIsUiInputLocked()) {
         return;
     }
+
+
+    if (LockerManager::GetIsInLocker()) {
+        return;
+    }
+
+
     auto* input = Input::GetInstance();
 
     Vector2 controllerPos = input->GetJoyStickLXY();
@@ -414,12 +386,25 @@ void Player::Gravity() {
 void Player::OnCollision(Collider* collider) {
     UpdateFootContact(collider);
 
-    if (collider->GetCollisionAttribute() != kCollisionMat && collider->GetCollisionAttribute() != kCollisionItem) {
+    if (collider->GetCollisionAttribute() != kCollisionMat && collider->GetCollisionAttribute() != kCollisionLocker && collider->GetCollisionAttribute() != kCollisionItem) {
         // マットじゃなかったら
         OnCollisionObstacle();
     }
     if (collider->GetCollisionAttribute() == kCollisionPortal) {
     }
+
+    //if (collider->GetCollisionAttribute() == kCollisionLocker) {
+    //    //ロッカーに入った。
+    //    PlayerCommand::SetIsInLocker(true);
+    //}
+
+    if (!LockerManager::GetIsInLocker()) {
+        //ロッカーに入っていなかったら判定する
+        if (collider->GetCollisionAttribute() == kCollisionEnemy) {
+        }
+    }
+
+
 }
 
 Vector3 Player::GetWorldPosition() const

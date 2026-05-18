@@ -6,6 +6,9 @@ bool PlayerCommand::isGrab_ = false;
 bool PlayerCommand::isStand_ = false;
 bool PlayerCommand::isUiInputLocked_ = false;
 bool PlayerCommand::isLook_ = false;
+////ロッカーにいるかどうか
+//bool PlayerCommand::isInLocker_ = false;
+
 
 PlayerCommand* PlayerCommand::GetInstance() {
     if (instance_ == nullptr) {
@@ -160,6 +163,8 @@ void PlayerCommand::Initialize() {
     // 何かにたっているかどうか
     isStand_ = false;
     isUiInputLocked_ = false;
+    //isInLocker_ = false;
+    isLook_ = false;
 }
 
 bool PlayerCommand::MoveTrigger(const GameKeyBind key, const GameKeyBind key2, const GameKeyBind controller) {

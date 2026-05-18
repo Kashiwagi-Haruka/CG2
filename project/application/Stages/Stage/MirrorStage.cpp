@@ -24,7 +24,7 @@
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include"GameObject/HintSheet/HintSheetManager.h"
 #include <utility>
-
+#include <string>
 MirrorStage::MirrorStage(Player* player) : player_(player) {
 	testField_ = std::make_unique<TestField>();
 	whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
@@ -123,6 +123,7 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 	coffeeTrivia_->Update();
 	door_->Update();
 	lockerManager_->Update();
+	lockerManager_->InLocker(player);
 	deskManager_->Update();
 	whiteBoardManager_->Update();
 	timeCard_->Update();
@@ -242,8 +243,21 @@ void MirrorStage::CheckCollision() {
 	for (auto& chair : chairManager_->GetChairs()) {
 		stageCollisionManager_->AddCollider(chair.get());
 	}
+
+
 	for (auto& locker : lockerManager_->GetLockers()) {
-		stageCollisionManager_->AddCollider(locker.get());
+		for (auto& [name, collision]:locker->GetColliders()) {
+		//開いていないときFrontのColliderを追加する
+			bool flag = locker->GetIsOpen()&& name.find("Front") != std::string::npos;
+			if (!flag) {
+				stageCollisionManager_->AddCollider(collision.get());
+			}
+		
+		}
+		if (!locker->GetIsPlayerIn()) {
+			stageCollisionManager_->AddCollider(locker.get());
+		}
+
 	}
 	for (auto& desk : deskManager_->GetDesks()) {
 		stageCollisionManager_->AddCollider(desk.get());
@@ -300,7 +314,9 @@ void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 
 void MirrorStage::DrawSprite()
 {
+	lockerManager_->DrawSprite();
 	hintSheetManager_->DrawUI();
+
 }
 
 void MirrorStage::SetSceneCameraForDraw(Camera* camera) {
