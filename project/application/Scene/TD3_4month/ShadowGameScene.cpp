@@ -13,6 +13,7 @@
 #include"GameSave/GameSave.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include "GameObject/UI/Inventory/Inventory.h"
+#include "Stages/StageNumber.h"
 
 ShadowGameScene::ShadowGameScene() {
     // BGMの管理
@@ -110,21 +111,26 @@ void ShadowGameScene::Initialize()
     cameraController_->Initialize();
     cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
 
-    lightManager_->Initialize();
-    //懐中電灯共通のプログレスセーブデータのポインタを格納
-    Flashlight::SetProgressSaveDataPtr(&progressSaveData_);
-    //紳士管理
-    gentleManManager_->Initialize();
+	lightManager_->Initialize();
+	//懐中電灯共通のプログレスセーブデータのポインタを格納
+	Flashlight::SetProgressSaveDataPtr(&progressSaveData_);
+	//紳士管理
+	gentleManManager_->Initialize();
 
-    // エレベータールーム
-    elevatorRoomManager_->Initialize();
-    // エレベーター
-    elevator_->Initialize();
-    hierarchy->LoadObjectEditorsFromJsonIfExists("ShadowGameScene_objectEditors.json");
-    hierarchy->EndRegisterFile();
-    stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
-    stageManager_->SetLightManager(lightManager_.get());
-    stageManager_->InitializeStage();
+	// エレベータールーム
+	elevatorRoomManager_->Initialize();
+	// エレベーター
+	elevator_->Initialize();
+	elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData_.currentStageName));
+	hierarchy->LoadObjectEditorsFromJsonIfExists("ShadowGameScene_objectEditors.json");
+	hierarchy->EndRegisterFile();
+	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
+	stageManager_->SetLightManager(lightManager_.get());
+	stageManager_->InitializeStage();
+
+
+
+
     lightManager_->SetPointLight(cameraController_->GetPlayerCamera()->GetPointLight(), 0);
     lightManager_->SetPointLight(elevator_->GetPointLights().at(0), 1);
     lightManager_->SetPointLight(elevator_->GetPointLights().at(1), 2);
@@ -242,19 +248,20 @@ void ShadowGameScene::DebugImGui() {
 }
 
 void ShadowGameScene::ChangeStage(const std::string& stageName) {
-    if (stageName == progressSaveData_.currentStageName) {
-        return;
-    }
-    progressSaveData_.currentStageName = stageName;
-    stageManager_->CreateStage(progressSaveData_.currentStageName);
-    stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
-    stageManager_->SetLightManager(lightManager_.get());
-    stageManager_->SetPlayer(player_.get());
-    stageManager_->SetCollisionManager(collisionManager_.get());
-    stageManager_->InitializeStage();
-    SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
+	if (stageName == progressSaveData_.currentStageName) {
+		return;
+	}
+	progressSaveData_.currentStageName = stageName;
+	stageManager_->CreateStage(progressSaveData_.currentStageName);
+	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
+	stageManager_->SetLightManager(lightManager_.get());
+	stageManager_->SetPlayer(player_.get());
+	stageManager_->SetCollisionManager(collisionManager_.get());
+	stageManager_->InitializeStage();
+	elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData_.currentStageName));
+	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
-    uiManager_->ShowKeyLostAtStageStartMessage();
+	uiManager_->ShowKeyLostAtStageStartMessage();
 }
 
 void ShadowGameScene::CheckCollision() {

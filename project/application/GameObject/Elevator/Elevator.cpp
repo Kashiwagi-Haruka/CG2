@@ -35,6 +35,8 @@ Elevator::Elevator() {
     doorMatrixRight_ = Function::MakeIdentity4x4();
 
 
+
+	elevatorNumber_ = std::make_unique<ElevatorNumber>();
     pointLights_[0].color = { 1.0f,0.9f,0.9f,1.0f };
     pointLights_[0].position = { 0.0f };
     pointLights_[0].intensity = 1.0f;
@@ -115,7 +117,18 @@ void Elevator::Initialize() {
     for (auto& [name, collider] : colliders_) {
         collider->RegisterEditor(name);
     }
+	elevatorNumber_->Initialize();
+	elevatorNumber_->SetElevatorTransform(elevatorTransform_);
+	elevatorNumber_->SetStageNumber(stageNumber_);
+	elevatorNumberText_.SetStageNumber(stageNumber_);
+}
 
+void Elevator::SetStageNumber(int stageNumber) {
+	stageNumber_ = stageNumber;
+	if (elevatorNumber_) {
+		elevatorNumber_->SetStageNumber(stageNumber_);
+	}
+	elevatorNumberText_.SetStageNumber(stageNumber_);
 }
 
 void Elevator::SetCamera(Camera* camera) {
@@ -160,6 +173,8 @@ void Elevator::Update() {
     for (auto& [name, collider] : colliders_) {
         collider->Update();
     }
+	elevatorNumber_->Update();
+	elevatorNumberText_.Update();
 
     const std::optional<int32_t> jointIndexRight = skeleton_->FindJointIndex("ボーン.002");
     const std::optional<int32_t> jointIndexLeft = skeleton_->FindJointIndex("ボーン.004");
@@ -177,17 +192,22 @@ void Elevator::Update() {
 
 void Elevator::Draw() {
 
-    modelObj_->Draw();
+	modelObj_->Draw();
 
-    for (auto& sys : autoLockSystems_) {
-        sys->Draw();
-    }
+	for (auto& sys : autoLockSystems_) {
+		sys->Draw();
+	}
 
+	// for (auto& wall : walls_) {
+	//     wall->Draw();
+	// }
     //for (auto& [name, collider] : colliders_) {
     //    collider->Draw();
     //}
 
-    poster_.Draw();
+	poster_.Draw();
+	elevatorNumber_->Draw();
+	elevatorNumberText_.Draw();
 }
 
 void Elevator::Close() {
