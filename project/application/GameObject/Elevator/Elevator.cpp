@@ -144,7 +144,7 @@ void Elevator::SetCamera(Camera* camera) {
     /*   for (auto& [name, collider] : colliders_) {
            collider->SetCamera(camera);
        }*/
-
+	elevatorNumber_->SetCamera(camera);
 }
 
 void Elevator::Update() {
@@ -173,6 +173,8 @@ void Elevator::Update() {
     for (auto& [name, collider] : colliders_) {
         collider->Update();
     }
+
+	elevatorNumber_->SetElevatorTransform(elevatorTransform_);
 	elevatorNumber_->Update();
 	elevatorNumberText_.Update();
 
