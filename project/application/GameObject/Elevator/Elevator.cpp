@@ -118,7 +118,7 @@ void Elevator::Initialize() {
         collider->RegisterEditor(name);
     }
 	elevatorNumber_->Initialize();
-	elevatorNumber_->SetElevatorTransform(elevatorTransform_);
+	elevatorNumber_->SetElevatorTransform(modelObj_->GetTransform());
 	elevatorNumber_->SetStageNumber(stageNumber_);
 	elevatorNumberText_.SetStageNumber(stageNumber_);
 }
@@ -173,8 +173,8 @@ void Elevator::Update() {
     for (auto& [name, collider] : colliders_) {
         collider->Update();
     }
-
-	elevatorNumber_->SetElevatorTransform(elevatorTransform_);
+    
+	elevatorNumber_->SetElevatorTransform(modelObj_->GetTransform());
 	elevatorNumber_->Update();
 	elevatorNumberText_.Update();
 
