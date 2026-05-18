@@ -3,6 +3,7 @@
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
+#include "Transform.h"
 #include <cstdint>
 #include <numbers>
 
@@ -71,6 +72,10 @@ Vector3 Lerp(const Vector3& start, const Vector3& end, float ratio);
 float Lerp(float start, float end, float ratio);
 // 単位行列を生成する
 Matrix4x4 MakeIdentity4x4();
+// 行列の親子関係を計算する（子行列 * 親行列）
+Matrix4x4 MakeParentChildMatrix(const Matrix4x4& parent, const Matrix4x4& child);
+// トランスフォームの親子関係を計算する（子トランスフォーム * 親トランスフォーム）
+Matrix4x4 MakeParentChildTransform(const Transform& parent, const Transform& child);
 
 // クォータニオンを正規化する
 Vector4 NormalizeQuaternion(const Vector4& q);

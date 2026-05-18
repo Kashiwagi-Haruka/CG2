@@ -2,10 +2,13 @@
 #include "Animation/Animation.h"
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
+#include "ElevatorNumber.h"
 #include "GameObject/Door/AutoLockSystem.h"
 #include "GameObject/Poster/Poster.h"
+#include "GameObject/Wall/Wall.h"
 #include "Object3d/Object3d.h"
 #include "Primitive/Primitive.h"
+#include "Text/EleveterNumberText/EleveterNumberText.h"
 #include <GameObject/GameCamera/PlayerCamera/PlayerCamera.h>
 #include"GameObject/Wall/Wall.h"
 #include"GameObject/YoshidaMath/CollisionManager/ObjectCollider.h"
@@ -18,17 +21,19 @@ class Camera;
 
 class Elevator {
 public:
-    Elevator();
-    ~Elevator();
-    void Initialize();
-    void SetCamera(Camera* camera);
-    void Update();
-    void Draw();
-    void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
-    std::array<std::unique_ptr<AutoLockSystem>, 2>& GetAutoLockSys() { return autoLockSystems_; };
-    bool IsSceneTransitionStart() const { return isSceneTransitionStart_; }
-    std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>& GetColliders() { return colliders_; }
-    std::array<PointCommonLight, 2>& GetPointLights() { return pointLights_; };
+
+	Elevator();
+	~Elevator();
+	void Initialize();
+	void SetCamera(Camera* camera);
+	void Update();
+	void Draw();
+	void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
+	void SetStageNumber(int stageNumber);
+	std::array<std::unique_ptr<AutoLockSystem>, 2>& GetAutoLockSys() { return autoLockSystems_; };
+	bool IsSceneTransitionStart() const { return isSceneTransitionStart_; }
+  std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>& GetColliders() { return colliders_; }
+  std::array<PointCommonLight, 2>& GetPointLights() { return pointLights_; };
 private:
     //ライトの位置を更新する
     void UpdateLightPos();
@@ -40,6 +45,7 @@ private:
     void Inside();
     void Open();
     void Close();
+
 
 private:
 
@@ -62,14 +68,18 @@ private:
     // スキン
     SkinCluster skinCluster_{};
 
+	std::unique_ptr<ElevatorNumber> elevatorNumber_ = nullptr;
+	int stageNumber_ = 0;
+	EleveterNumberText elevatorNumberText_{};
+
+	std::string animationGroupName_ = "Elevator";
+	const float kAnimationBlendDuration_ = 1.0f;
+	bool animationFinished_ = false;
+	std::string desiredAnimationName = "Idle";
+	static bool isRayHit_;
     Matrix4x4 doorMatrixLeft_;
     Matrix4x4 doorMatrixRight_;
-
-    std::string animationGroupName_ = "Elevator";
-    const float kAnimationBlendDuration_ = 1.0f;
-    bool animationFinished_ = false;
-    std::string desiredAnimationName = "Idle";
-    static bool isRayHit_;
+	Transform elevatorTransform_;
 
     float baseHeight_ = 0.0f;
 

@@ -35,6 +35,8 @@ Elevator::Elevator() {
     doorMatrixRight_ = Function::MakeIdentity4x4();
 
 
+
+	elevatorNumber_ = std::make_unique<ElevatorNumber>();
     pointLights_[0].color = { 1.0f,0.9f,0.9f,1.0f };
     pointLights_[0].position = { 0.0f };
     pointLights_[0].intensity = 1.0f;
@@ -115,7 +117,18 @@ void Elevator::Initialize() {
     for (auto& [name, collider] : colliders_) {
         collider->RegisterEditor(name);
     }
+	elevatorNumber_->Initialize();
+	elevatorNumber_->SetElevatorTransform(modelObj_->GetTransform());
+	elevatorNumber_->SetStageNumber(stageNumber_);
+	elevatorNumberText_.SetStageNumber(stageNumber_);
+}
 
+void Elevator::SetStageNumber(int stageNumber) {
+	stageNumber_ = stageNumber;
+	if (elevatorNumber_) {
+		elevatorNumber_->SetStageNumber(stageNumber_);
+	}
+	elevatorNumberText_.SetStageNumber(stageNumber_);
 }
 
 void Elevator::SetCamera(Camera* camera) {
@@ -131,7 +144,7 @@ void Elevator::SetCamera(Camera* camera) {
     /*   for (auto& [name, collider] : colliders_) {
            collider->SetCamera(camera);
        }*/
-
+	elevatorNumber_->SetCamera(camera);
 }
 
 void Elevator::Update() {
@@ -160,6 +173,10 @@ void Elevator::Update() {
     for (auto& [name, collider] : colliders_) {
         collider->Update();
     }
+    
+	elevatorNumber_->SetElevatorTransform(modelObj_->GetTransform());
+	elevatorNumber_->Update();
+	elevatorNumberText_.Update();
 
     const std::optional<int32_t> jointIndexRight = skeleton_->FindJointIndex("ボーン.002");
     const std::optional<int32_t> jointIndexLeft = skeleton_->FindJointIndex("ボーン.004");
@@ -167,28 +184,36 @@ void Elevator::Update() {
     doorMatrixRight_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndexRight]);
     doorMatrixLeft_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndexLeft]);
 
-#ifdef USE_IMGUI
-    ImGui::Begin("Elevator");
-    ImGui::DragFloat3("position0", &pointLights_[0].position.x, 0.1f);
-    ImGui::DragFloat3("position1", &pointLights_[1].position.x, 0.1f);
-    ImGui::End();
+    #ifdef USE_IMGUI
+	ImGui::Begin("Elevator");
+	ImGui::DragFloat3("position0", &pointLights_[0].position.x, 0.1f);
+	ImGui::DragFloat3("position1", &pointLights_[1].position.x, 0.1f);
+	ImGui::End();
+    #endif // USE_IMGUI
+
+    
 
 #endif
 }
 
 void Elevator::Draw() {
 
-    modelObj_->Draw();
+	modelObj_->Draw();
 
-    for (auto& sys : autoLockSystems_) {
-        sys->Draw();
-    }
+	for (auto& sys : autoLockSystems_) {
+		sys->Draw();
+	}
 
+	// for (auto& wall : walls_) {
+	//     wall->Draw();
+	// }
     //for (auto& [name, collider] : colliders_) {
     //    collider->Draw();
     //}
 
-    poster_.Draw();
+	poster_.Draw();
+	elevatorNumber_->Draw();
+	elevatorNumberText_.Draw();
 }
 
 void Elevator::Close() {
@@ -218,7 +243,7 @@ void Elevator::UpdateLightPos()
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     Vector3 parentPos = YoshidaMath::GetWorldPosByMat(modelObj_->GetWorldMatrix());
     lightVelocity_ = (parentPos.y + 4.0f) / insideOpenDelay_;
-    lightPosY_ -= 2.0 * lightVelocity_ * deltaTime;
+    lightPosY_ -= 2.0f * lightVelocity_*deltaTime;
 
     pointLights_[0].position = { parentPos.x - 0.5f,lightPosY_,parentPos.z };
     pointLights_[1].position = { parentPos.x + 0.5f,lightPosY_,parentPos.z };
