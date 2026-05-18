@@ -428,6 +428,8 @@
     <ClCompile Include="application\GameObject\UI\Inventory\Item\ItemSeveredHand\ItemSeveredHand.cpp" />
     <ClCompile Include="application\GameObject\SeveredHand\SeveredHand.cpp" />
     <ClCompile Include="application\GameObject\Elevator\ElevatorNumber.cpp" />
+    <ClCompile Include="application\Text\EleveterNumberText\EleveterNumberText.cpp" />
+    <ClCompile Include="application\Stages\Stage\StageNumber.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -844,6 +846,8 @@
     <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemSeveredHand\ItemSeveredHand.h" />
     <ClInclude Include="application\GameObject\SeveredHand\SeveredHand.h" />
     <ClInclude Include="application\GameObject\Elevator\ElevatorNumber.h" />
+    <ClInclude Include="application\Text\EleveterNumberText\EleveterNumberText.h" />
+    <ClInclude Include="application\Stages\Stage\StageNumber.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
