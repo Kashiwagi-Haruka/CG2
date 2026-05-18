@@ -45,6 +45,8 @@ private:
     static bool isStand_;
     //何かを見ているかどうか
     static bool isLook_;
+    ////ロッカーにいるかどうか
+    //static bool isInLocker_;
     // メニュー/オプション表示中など、ゲームプレイ入力を無効化する
     static bool isUiInputLocked_;
 
@@ -85,6 +87,8 @@ public:
     static void SetIsStand(bool flag) { isStand_ = flag; }
     static bool GetIsLook() { return isLook_; }
     static void SetIsLook(bool flag) { isLook_ = flag; }
+    //static bool GetIsInLocker() { return isInLocker_; }
+    //static void SetIsInLocker(bool flag) { isInLocker_ = flag; }
     static bool GetIsUiInputLocked() { return isUiInputLocked_; }
     static void SetIsUiInputLocked(bool flag) { isUiInputLocked_ = flag; }
     static void Initialize();

@@ -193,6 +193,7 @@ void Elevator::Update() {
 
     
 
+#endif
 }
 
 void Elevator::Draw() {
@@ -247,7 +248,7 @@ void Elevator::UpdateLightPos()
     pointLights_[0].position = { parentPos.x - 0.5f,lightPosY_,parentPos.z };
     pointLights_[1].position = { parentPos.x + 0.5f,lightPosY_,parentPos.z };
 
-    if (pointLights_[0].position.y <= parentPos.y-0.5f) {
+    if (pointLights_[0].position.y <= parentPos.y - 0.5f) {
         //同時に二つ初期化する
         lightPosY_ = parentPos.y + 3.5f;
         pointLights_[0].position.y = lightPosY_;

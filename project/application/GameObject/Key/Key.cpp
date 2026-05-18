@@ -24,7 +24,7 @@ Key::Key()
     obj_->SetOutlineWidth(kRayHitOutlineWidth);
     SetAABB({ .min = { -0.1f,-0.1f,-0.1f }, .max = { 0.1f,0.1f,0.1f } });
     SetCollisionAttribute(kCollisionKey);
-    SetCollisionMask(kCollisionChair | kCollisionWall | kCollisionFloor);
+    SetCollisionMask(kCollisionChair | kCollisionWall | kCollisionFloor|kCollisionLocker);
 }
 
 void Key::Initialize()
