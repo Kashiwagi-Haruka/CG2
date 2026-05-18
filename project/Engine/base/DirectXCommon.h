@@ -34,6 +34,8 @@ class DirectXCommon {
 
 	HRESULT hr_;
 	Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Device5> dxrDevice_ = nullptr;
+	bool isDXRSupported_ = false;
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_;
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
@@ -142,6 +144,8 @@ public:
 	void BeginOutlineRenderTarget();
 	void EndOutlineRenderTarget();
 	ID3D12Device* GetDevice() { return device_.Get(); };
+	ID3D12Device5* GetDXRDevice() { return dxrDevice_.Get(); }
+	bool IsDXRSupported() const { return isDXRSupported_; }
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
 	ID3D12CommandQueue* GetCommandQueueRaw() { return commandQueue_.Get(); }
 	ID3D12Resource* GetCurrentBackBufferResource() {
@@ -168,6 +172,7 @@ private:
 	void DebugLayer();
 	void DeviceInitialize();
 	void DebugError();
+	void InitializeDXRSupport();
 	void CommandListInitialize();
 	void SwapChainInitialize();
 	void DepthBufferCreate();

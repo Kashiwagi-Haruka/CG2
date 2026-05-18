@@ -161,7 +161,36 @@ void DirectXCommon::DeviceInitialize() {
 	// デバイスの生成がうまくいかなかったので起動できない
 	assert(device_ != nullptr);
 	Logger::Log("Complete create D3D12Device!!!\n"); // 初期化完了のログをだす
+	InitializeDXRSupport();
 	DebugError();
+}
+void DirectXCommon::InitializeDXRSupport() {
+	dxrDevice_.Reset();
+	isDXRSupported_ = false;
+	if (!device_) {
+		Logger::Log("DXR check skipped: D3D12 device is null.\n");
+		return;
+	}
+
+	HRESULT result = device_->QueryInterface(IID_PPV_ARGS(&dxrDevice_));
+	if (FAILED(result) || !dxrDevice_) {
+		Logger::Log("DXR not supported: ID3D12Device5 is unavailable.\n");
+		return;
+	}
+
+	D3D12_FEATURE_DATA_D3D12_OPTIONS5 options5{};
+	result = dxrDevice_->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &options5, sizeof(options5));
+	if (FAILED(result)) {
+		Logger::Log("DXR check failed: D3D12_OPTIONS5 query failed.\n");
+		return;
+	}
+
+	isDXRSupported_ = options5.RaytracingTier != D3D12_RAYTRACING_TIER_NOT_SUPPORTED;
+	if (isDXRSupported_) {
+		Logger::Log("DXR supported: Raytracing tier is available.\n");
+	} else {
+		Logger::Log("DXR not supported: Raytracing tier not available.\n");
+	}
 }
 void DirectXCommon::DebugError() {
 

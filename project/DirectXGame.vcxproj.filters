@@ -77,6 +77,7 @@
     <FxCompile Include="Resources\shader\Skybox\Skybox.PS.hlsl" />
     <FxCompile Include="Resources\shader\Object3d\PS_Shader\MaterialColorOnlyObject3d.PS.hlsl" />
     <FxCompile Include="Resources\shader\Sprite\FontColorNoise.PS.hlsl" />
+    <FxCompile Include="Resources\shader\Object3d\HardShadow.rt.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Texture\RenderTexture2D.cpp" />
