@@ -8,7 +8,12 @@ class ElevatorNumber {
 	std::unique_ptr<Primitive> primitive_;
 	Camera* camera_ = nullptr;
 	Transform transform_;
-	Transform elevatorTransform_;
+	Transform elevatorTransform_ = {
+	    {1.0f, 1.0f, 1.0f},
+	    {0.0f, 0.0f, 0.0f},
+	    {0.0f, 0.0f, 0.0f},
+	};
+	;
 	
 	int number_ = 0;
 	public:
