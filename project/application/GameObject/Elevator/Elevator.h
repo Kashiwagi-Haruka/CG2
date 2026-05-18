@@ -31,7 +31,7 @@ public:
 	void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
 	void SetStageNumber(int stageNumber);
 	std::array<std::unique_ptr<AutoLockSystem>, 2>& GetAutoLockSys() { return autoLockSystems_; };
-	bool IsSceneTransitionStart() const { return isSceneTranstionStart_; }
+	bool IsSceneTransitionStart() const { return isSceneTransitionStart_; }
   std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>& GetColliders() { return colliders_; }
   std::array<PointCommonLight, 2>& GetPointLights() { return pointLights_; };
 private:
@@ -79,12 +79,7 @@ private:
 	static bool isRayHit_;
     Matrix4x4 doorMatrixLeft_;
     Matrix4x4 doorMatrixRight_;
-
-    std::string animationGroupName_ = "Elevator";
-    const float kAnimationBlendDuration_ = 1.0f;
-    bool animationFinished_ = false;
-    std::string desiredAnimationName = "Idle";
-    static bool isRayHit_;
+	Transform elevatorTransform_;
 
     float baseHeight_ = 0.0f;
 
