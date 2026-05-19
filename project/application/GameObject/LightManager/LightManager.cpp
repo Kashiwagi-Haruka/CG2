@@ -34,6 +34,7 @@ void Yoshida::LightManager::Initialize()
 
     for (int i = 0; i < MAX_LIGHT; ++i) {
         useShadow_[i] = false;
+    
     }
 
 }
@@ -44,6 +45,8 @@ void Yoshida::LightManager::Update()
 	if (activeCount_[SPOT] > 0) {
 		spotLights_.at(0).shadowEnabled = 1;
 	}
+	const bool hasLocalShadowPass = useShadow_[POINT] || useShadow_[SPOT] || useShadow_[AREA];
+	useShadow_[DIRECTIONAL] = !hasLocalShadowPass;
     Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
     Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activeCount_[POINT]);
     Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeCount_[SPOT]);
