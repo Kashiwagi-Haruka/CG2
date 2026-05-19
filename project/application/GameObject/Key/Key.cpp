@@ -139,7 +139,7 @@ void Key::CheckCollision() {
 bool Key::OnCollisionRay()
 {
     //近めに設定
-    return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate(),0.0f,1.0f);
+    return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate(),0.0f,2.0f);
 
 }
 

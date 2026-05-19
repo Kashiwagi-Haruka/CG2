@@ -41,13 +41,7 @@ Matrix4x4* Desk::GetDeskDrawerMatrix()
 void Desk::Animation()
 {
 
-
     bool loopAnimation = false;
-
-    if (desiredAnimationName == "Close" && animationFinished_) {
-
-        desiredAnimationName = "Idle";
-    }
 
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     AnimationManager::PlaybackResult playbackResult{};

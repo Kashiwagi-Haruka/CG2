@@ -49,13 +49,6 @@ void Locker::Animation()
 
     bool loopAnimation = false;
 
-    if (desiredAnimationName == "Close") {
-        if (animationFinished_) {
-            //アニメーションの終了後アイドル状態にする
-            desiredAnimationName = "Idle";
-        }
-    }
-
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     AnimationManager::PlaybackResult playbackResult{};
 
@@ -192,7 +185,7 @@ void Locker::CheckCollision()
                     isOpen_ = false;
                 } else {
 
-                    if (desiredAnimationName == "Idle") {
+                    if (desiredAnimationName == "Close"|| desiredAnimationName == "Idle") {
                         desiredAnimationName = "Open";
                         isOpen_ = true;
                     }

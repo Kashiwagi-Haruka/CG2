@@ -62,7 +62,7 @@ private:
     // スキン
     SkinCluster skinCluster_{};
     std::string animationGroupName_ = "Locker";
-    const float kAnimationBlendDuration_ = 0.5f;
+    const float kAnimationBlendDuration_ = 0.0f;
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Idle";
 	std::string editorRegistrationName_ = "Locker";
