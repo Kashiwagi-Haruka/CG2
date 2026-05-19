@@ -441,47 +441,12 @@ void ShadowGameScene::DrawModel() {
 	//=======================shadowマップの開始↓=======================
 	auto* object3dCommon = Object3dCommon::GetInstance();
 
-	const bool pointEnabled = object3dCommon->IsPointShadowEnabled();
-	const bool spotEnabled = object3dCommon->IsSpotShadowEnabled();
-	const bool areaEnabled = object3dCommon->IsAreaShadowEnabled();
-
-	//object3dCommon->SetShadowMapEnabled(true, false, false, false);
-	//object3dCommon->BeginShadowMapPass();
-	//object3dCommon->DrawCommonShadow();
-	//SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
-	//DrawGameObject(true, false, false, false, false);
-	//object3dCommon->EndShadowMapPass();
-	
-
-	if (spotEnabled) {
-		object3dCommon->SetShadowMapEnabled(false, false, true, false);
-		object3dCommon->BeginShadowMapPass();
-		object3dCommon->DrawCommonShadow();
-		SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
-		DrawGameObject(true, false, false, false, false);
-		object3dCommon->EndShadowMapPass();
-	}
-
-	//if (pointEnabled) {
-	//	object3dCommon->SetShadowMapEnabled(false, true, false, false);
-	//	object3dCommon->BeginShadowMapPass();
-	//	object3dCommon->DrawCommonShadow();
-	//	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
-	//	DrawGameObject(true, false, false, false, false);
-	//	object3dCommon->EndShadowMapPass();
-	//}
-
-	//if (areaEnabled) {
-	//	object3dCommon->SetShadowMapEnabled(false, false, false, true);
-	//	object3dCommon->BeginShadowMapPass();
-	//	object3dCommon->DrawCommonShadow();
-	//	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
-	//	DrawGameObject(true, false, false, false, false);
-	//	object3dCommon->EndShadowMapPass();
-	//}
-
-	// Restore original shadow-enable mask for main pass sampling/logic.
-	object3dCommon->SetShadowMapEnabled(true, pointEnabled, spotEnabled, areaEnabled);
+	object3dCommon->SetShadowMapEnabled(true, false, false, false);
+	object3dCommon->BeginShadowMapPass();
+	object3dCommon->DrawCommonShadow();
+	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
+	DrawGameObject(true, false, false, false, false);
+	object3dCommon->EndShadowMapPass();
 
     if (auto* portalManager = stageManager_->GetPortalManager()) {
         for (auto& portal : portalManager->GetPortals()) {
