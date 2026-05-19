@@ -74,17 +74,22 @@ void FallPortalManager::SpawnPortal(WhiteBoard* board)
     // カメラをセットする
     newPortal->SetCamera(playerCamera_->GetCamera());
     newPortal->SetPlayerCamera(playerCamera_->GetCamera());
+
+    auto& firstWhiteBoard = whiteBoardManager_->GetWhiteBoards().at(0);
+    assert(firstWhiteBoard);
+
+    if (board != firstWhiteBoard.get()) {
+        newPortal->SetCanWarpAngleRange(1.0f);
+    }
     newPortal->SetParentTransform(&board->GetCollisionTransform());
     newPortal->SetPortalWorldMatrix();
 
-    auto& whiteBoard = whiteBoardManager_->GetWhiteBoards().at(0);
-
-    if (whiteBoard) {
-        newPortal->GetWarpPos()->SetParent(&whiteBoard->GetCollisionTransform());
+    if (firstWhiteBoard) {
+        newPortal->GetWarpPos()->SetParent(&firstWhiteBoard->GetCollisionTransform());
     } else {
         newPortal->GetWarpPos()->SetParent(&firstWarpPosTransform_);
     }
-   
+
     portals_.push_back(std::move(newPortal));
     SEManager::SoundPlay(SEManager::PORTAL_SPAWN);
 }

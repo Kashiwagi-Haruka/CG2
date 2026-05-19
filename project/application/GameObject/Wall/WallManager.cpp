@@ -85,9 +85,9 @@ void WallManager::Draw()
 {
     room1_->Draw();
 
-    for (auto& [name, collider] : colliders_) {
-        collider->Draw();
-    }
+    //for (auto& [name, collider] : colliders_) {
+    //    collider->Draw();
+    //}
 }
 
 void WallManager::SetCamera(Camera* camera)
@@ -95,7 +95,7 @@ void WallManager::SetCamera(Camera* camera)
     room1_->SetCamera(camera);
     room1_->UpdateCameraMatrices();
 
-    for (auto& [name, collider] : colliders_) {
-        collider->SetCamera(camera);
-    }
+    //for (auto& [name, collider] : colliders_) {
+    //    collider->SetCamera(camera);
+    //}
 }

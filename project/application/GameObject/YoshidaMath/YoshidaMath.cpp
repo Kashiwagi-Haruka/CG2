@@ -53,7 +53,18 @@ Vector3 YoshidaMath::GetDirectionFromRotateY(float rotateY)
 
     return { x, y, z };
 }
+Vector3 YoshidaMath::GetDirectionFromRotate(const Vector3& rotate)
+{
+    // X軸回転（上下）による水平面の縮み具合を計算
+    float cosX = std::cos(rotate.x);
 
+    // 各軸の方向成分を計算
+    float x = cosX * std::sin(rotate.y);
+    float y = -std::sin(rotate.x); // 視線を上げたらYが増える場合は、マイナスをとって std::sin(rotate.x) にしてください
+    float z = cosX * std::cos(rotate.y);
+
+    return { x, y, z };
+}
 float YoshidaMath::Dot(const Vector2& v1, const Vector2& v2)
 {
     return { v1.x * v2.x + v1.y * v2.y };

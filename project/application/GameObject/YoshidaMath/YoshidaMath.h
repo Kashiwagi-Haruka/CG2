@@ -33,5 +33,6 @@ namespace YoshidaMath {
 
     //Yカラ方向を求める
     Vector3 GetDirectionFromRotateY(float rotateY);
+    Vector3 GetDirectionFromRotate(const Vector3& rotate);
 
 }

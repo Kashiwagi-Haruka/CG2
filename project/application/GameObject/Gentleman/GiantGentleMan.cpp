@@ -46,9 +46,9 @@ void GiantGentleMan::Initialize()
         obj_->SetAnimation(idleAnimation, false);
     }
 
-    if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("gentleman")) {
-        skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
-        skinCluster_ = CreateSkinCluster(*skeleton_, *sizukuModel);
+    if (Model* gentlemanModel = ModelManager::GetInstance()->FindModel("gentleman")) {
+        skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(gentlemanModel->GetModelData().rootnode));
+        skinCluster_ = CreateSkinCluster(*skeleton_, *gentlemanModel);
         if (!skinCluster_.mappedPalette.empty()) {
             obj_->SetSkinCluster(&skinCluster_);
         }

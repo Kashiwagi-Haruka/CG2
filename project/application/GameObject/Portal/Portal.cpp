@@ -58,6 +58,8 @@ void Portal::Initialize()
     uvRotateZ_ = 0.0f;
     transform_ = { .scale = {0.0f,0.0f,0.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
 
+    canWarpAngleRange_= -0.25f;
+
     //ワープ座標
     warpPos_->Initialize();
 
@@ -105,6 +107,7 @@ void Portal::DrawPortals() {
 bool Portal::IsVectorsFace(const Vector3& forward)
 {
     //ポータルの親の向きYを計算する
+
     Vector3 direction = YoshidaMath::GetDirectionFromRotateY(parentTransform->rotate.y);
     float dot = Function::Dot(forward, direction);
     //向き合っているかどうか
@@ -114,9 +117,8 @@ bool Portal::IsVectorsFace(const Vector3& forward)
 bool Portal::IsVectorFaceCameraAndObj()
 {
     Vector3 forward = SetSceneCameraAndParentAndGetForward();
-    //ポータルの本体の向きを取得する ローカル回転分ずらす
-   Matrix4x4 rotateMat =  Function::MakeRotateMatrix({transform_.rotate.x,Function::kPi + transform_.rotate.y ,transform_.rotate.z});
-    Vector3 direction = YoshidaMath::GetForward(rotateMat);
+
+    Vector3 direction = YoshidaMath::GetDirectionFromRotate({ transform_.rotate.x,Function::kPi + transform_.rotate.y ,transform_.rotate.z });
     //Vector3 direction = YoshidaMath::GetDirectionFromRotateY(Function::kPi + transform_.rotate.y);
     float dot = Function::Dot(forward, direction);
     return (dot < canWarpAngleRange_);
@@ -207,7 +209,7 @@ void Portal::UpdateWorldMatrix() {
 void Portal::SetTranslate(const Vector3& forward) {
     transform_.translate = parentTransform->translate - forward * 0.0625f;
     transform_.translate.y += 0.0625f;
-    ringTranslate_ = transform_.translate - forward * 0.0625f * 0.125f;
+
 }
 
 Vector3 Portal::SetSceneCameraAndParentAndGetForward() {
