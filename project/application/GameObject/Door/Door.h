@@ -27,7 +27,7 @@ public:
     void Update();
     void Initialize();
     void Draw();
-    void CheckCollision();
+
     void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
     std::unique_ptr<AutoLockSystem>& GetAutoLockSystem() { return autoLockSystem_; };
@@ -54,6 +54,8 @@ private:
 
     void Animation();
     bool OnCollisionRay();
+    void CheckCollision();
+
     const std::string animationGroupName_ = "Door";
     //骨
     std::unique_ptr<Skeleton> skeleton_{};

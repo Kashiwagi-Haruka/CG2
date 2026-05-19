@@ -92,10 +92,12 @@ void WalkWhiteBoard::Update()
     obj_->Update();
 
     Animation();
-
-    collisionTransform_ = transform_;
-    //objectからの相対距離
-    collisionTransform_.translate.y += 1.375f;
+    Vector3 translate = { 0.0f,1.375f,0.0f };
+    Matrix4x4 child = Function::MakeTranslateMatrix(translate);
+    child =   Function::Multiply(child,obj_->GetWorldMatrix());
+   
+    collisionTransform_.translate = YoshidaMath::GetWorldPosByMat(child);
+    collisionTransform_.rotate = transform_.rotate;
     collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
 
 #ifdef _DEBUG

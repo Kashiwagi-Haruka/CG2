@@ -201,6 +201,7 @@ void MirrorStage::CheckCollision() {
 	portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(wallManager_->GetAABB(), wallManager_->GetRoom()->GetTranslate()));
 	// 部屋2のAABB (WallManager2.cpp の壁の配置に合わせて数値を調整してください)
 	portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(wallManager2_->GetAABB(), wallManager2_->GetRoom()->GetTranslate()));
+	portalManager_->CheckCollision();
 
 	// ===================================================
 
@@ -208,8 +209,8 @@ void MirrorStage::CheckCollision() {
 		return;
 	}
 
-	portalManager_->CheckCollision();
-	door_->CheckCollision();
+
+
 
 	if (vendingMac_->ConsumeInteractRequest()) {
 		coffees_->StartSpill();

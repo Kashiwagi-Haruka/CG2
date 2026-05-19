@@ -43,10 +43,10 @@ void GentleManStage::InitializeLights()
     lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 4);
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 2);
 
-    lightManager_->SetAreaLight(wallManagerRoofFoor_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManagerRoofFoor_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(0), 0);
+    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(1), 1);
 
 }
 
@@ -55,8 +55,8 @@ void GentleManStage::UpdateLights()
 
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
-    lightManager_->SetAreaLight(wallManagerRoofFoor_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManagerRoofFoor_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(0), 0);
+    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(1), 1);
 
 }
 
@@ -70,11 +70,12 @@ GentleManStage::GentleManStage(Player* player)
 
     portalManager_ = std::make_unique<GentlemanPortalManager>(&player_->GetTransform().translate);
     portalManager_->SetGentleMan(giantGentleMan_.get());
-    wallManagerRoofFoor_ = std::make_unique<WallManagerRoofFoor>();
+    wallManagerRoofFloor_ = std::make_unique<WallManagerRoofFloor>();
     documentManager_ = std::make_unique<DocumentManager>();
-
+    
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     timeCardWatch_->SetPlayer(player_);
+
     //懐中電灯の作成
     flashlight_ = std::make_unique<Flashlight>();
     flashlight_->SetPlayer(player_);
@@ -86,15 +87,16 @@ void GentleManStage::Initialize()
     Hierarchy* hierarchy = Hierarchy::GetInstance();
     hierarchy->BeginRegisterFile("GentleManStage_objectEditors.json");
 
-    InitializeLights();
-    portalManager_->Initialize();
-
-    wallManagerRoofFoor_->Initialize();
     timeCardWatch_->Initialize();
+    portalManager_->Initialize();
+    wallManagerRoofFloor_->Initialize();
+   
     documentManager_->Initialize("document1");
     giantGentleMan_->Initialize();
     //懐中電灯の初期化
     flashlight_->Initialize();
+
+    InitializeLights();
 
     hierarchy->LoadObjectEditorsFromJsonIfExists("GentleManStage_objectEditors.json");
     hierarchy->EndRegisterFile();
@@ -102,11 +104,12 @@ void GentleManStage::Initialize()
 
 void GentleManStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
     portalManager_->WarpPlayer(player);
-    wallManagerRoofFoor_->Update();
+    wallManagerRoofFloor_->Update();
     giantGentleMan_->Update();
     documentManager_->Update(camera, lightDirection);
     //懐中電灯の更新
     flashlight_->Update();
+    timeCardWatch_->Update();
     UpdateLights();
 }
 
@@ -116,11 +119,13 @@ void GentleManStage::UpdatePortal()
 }
 
 void GentleManStage::CheckCollision() {
+
+
+    portalManager_->CheckCollision();
+
     if (!stageCollisionManager_) {
         return;
     }
-
-    portalManager_->CheckCollision();
 
     for (auto& portal : portalManager_->GetPortals()) {
         if (!portal->GetIsPlayerCanWarp()) {
@@ -129,7 +134,7 @@ void GentleManStage::CheckCollision() {
             break;
         }
     }
-    for (auto& [name,wall]:wallManagerRoofFoor_->GetColliders()) {
+    for (auto& [name,wall]:wallManagerRoofFloor_->GetColliders()) {
         stageCollisionManager_->AddCollider(wall.get());
     }
 
@@ -155,7 +160,7 @@ void GentleManStage::SetCollisionManager(CollisionManager* collisionManager)
 }
 void GentleManStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
 
-    wallManagerRoofFoor_->Draw();
+    wallManagerRoofFloor_->Draw();
 
     //ここで書類パーティクルを描画させる
     documentManager_->Draw();
@@ -173,7 +178,7 @@ void GentleManStage::DrawSprite()
 void GentleManStage::SetSceneCameraForDraw(Camera* camera) {
 
     portalManager_->SetCamera(camera);
-    wallManagerRoofFoor_->SetCamera(camera);
+    wallManagerRoofFloor_->SetCamera(camera);
     documentManager_->SetCamera(camera);
     timeCardWatch_->SetCamera(camera);
     giantGentleMan_->SetCamera(camera);

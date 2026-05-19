@@ -22,11 +22,10 @@ public:
 	void CheckCollision()override;
 	static bool GetCanMakePortal() { return canMakePortal_; };
 private:
-	void UpdatePortal();
+	void UpdatePortal()override;
 	// ポータルの作成
 	void SpawnPortal();
-	void DrawPortal();
+	void DrawPortal()override;
 
 	GiantGentleMan* giantGentleman_ = nullptr;
-	static bool canMakePortal_;
 };

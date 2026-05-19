@@ -149,8 +149,6 @@ void RestroomStage::CheckCollision() {
         return;
     }
 
-    door_->CheckCollision();
-
     for (auto& portal : portalManager_->GetPortals()) {
         if (!portal->GetIsPlayerCanWarp()) {
             stageCollisionManager_->AddCollider(portal.get());

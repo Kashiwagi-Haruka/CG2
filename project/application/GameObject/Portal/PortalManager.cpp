@@ -40,6 +40,8 @@ void PortalManager::SetWhiteBoardManager(WhiteBoardManager* whiteBoardManager)
 
 void PortalManager::Initialize() {
 
+    isWarp_ = false;
+
     canMakePortal_ = false;
     warpCoolTimer_ = kWarpTime_;
     
@@ -61,6 +63,9 @@ void PortalManager::SpawnFirstPortal()
 
 void PortalManager::WarpPlayer(Player* player) {
 
+
+    isWarp_ = false;
+
     for (auto& portal : portals_) {
         //プレイヤーがヒットしているとき且つポータルと向き合っているとき
         if (portal->GetIsPlayerCanWarp()) {
@@ -75,6 +80,7 @@ void PortalManager::WarpPlayer(Player* player) {
                 transform.rotate.z = 0.0f;
                 player->SetRotate(transform.rotate);
                 SEManager::SoundPlay(SEManager::WARP);
+                isWarp_ = true;
                 break;
             }
         }
@@ -111,10 +117,10 @@ void PortalManager::SetCamera(Camera* camera) {
 void PortalManager::DrawPortal() {
 
     for (auto& portal : portals_) {
-        portal->DrawRings();
-
         portal->DrawPortals();
     }
+
+    Object3dCommon::GetInstance()->DrawCommon();
 }
 
 void PortalManager::Draw(bool isShadow, bool drawPortal, bool drawParticle) {
@@ -130,6 +136,9 @@ void PortalManager::Draw(bool isShadow, bool drawPortal, bool drawParticle) {
     if (drawParticle && portalParticle_) {
         portalParticle_->Draw();
     }
+
+    Object3dCommon::GetInstance()->DrawCommon();
+
 }
 
 void PortalManager::SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; }

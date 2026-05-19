@@ -13,6 +13,7 @@ TestField::TestField()
 
 void TestField::Initialize()
 {
+    isCollided_ = true;
     transform_ = { .scale = {28.0f,0.01f,50.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,-0.01f,0.0f} };
     box_->Initialize(Primitive::Box, "Resources/TD3_3102/2d/floor.png");
     box_->RegisterEditor("TestField");
@@ -22,6 +23,12 @@ void TestField::Initialize()
 
 void TestField::Update()
 {
+    if (isCollided_) {
+        SetCollisionAttribute(kCollisionFloor);
+    } else {
+        SetCollisionAttribute(kCollisionNone);
+    }
+
     box_->SetEnableLighting(true);
     box_->SetTransform(transform_);
     box_->SetUvTransform({ 50.0f,50.0f,50.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f });
@@ -33,6 +40,7 @@ void TestField::Update()
         ImGui::DragFloat3("translate", &transform_.translate.x, 0.1f);
         ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.1f);
         ImGui::DragFloat3("scale", &transform_.scale.x, 0.1f);
+        ImGui::Checkbox("isCollided", &isCollided_);
         ImGui::TreePop();
     }
     ImGui::End();

@@ -81,6 +81,8 @@ void Door::Update()
     }
 
     autoLockSystem_->Update();
+
+    CheckCollision();
 }
 
 void Door::Initialize()

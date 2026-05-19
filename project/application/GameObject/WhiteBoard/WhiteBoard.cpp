@@ -42,11 +42,15 @@ void WhiteBoard::Update()
     obj_->Update();
 
     obj_->SetShininess(80.0f);
-    collisionTransform_ = obj_->GetTransform();
+
+    Vector3 translate = { 0.0f,1.375f,0.0f };
+    Matrix4x4 child = Function::MakeTranslateMatrix(translate);
+    child = Function::Multiply(child, obj_->GetWorldMatrix());
+
+    collisionTransform_.translate = YoshidaMath::GetWorldPosByMat(child);
+    collisionTransform_.rotate = obj_->GetRotate();
     collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
 
-    //objectからの相対距離
-    collisionTransform_.translate.y += 1.375f;
 
 #ifdef _DEBUG
     primitive_->SetTransform(collisionTransform_);

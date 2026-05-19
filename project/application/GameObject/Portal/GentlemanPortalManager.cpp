@@ -8,8 +8,6 @@
 #include"GameObject/Gentleman/GiantGentleman.h"
 #include"GameBase.h"
 
-bool GentlemanPortalManager::canMakePortal_ = false;
-
 GentlemanPortalManager::GentlemanPortalManager(Vector3* pos) {
 
     playerPos_ = pos;
@@ -42,6 +40,7 @@ void GentlemanPortalManager::Initialize() {
     canMakePortal_ = false;
     warpCoolTimer_ = kWarpTime_;
     isPendingPortalSpawn_ = false;
+    isWarp_ = false;
     for (auto& portal : portals_) {
         portal.reset();
     }
@@ -51,6 +50,8 @@ void GentlemanPortalManager::Initialize() {
 }
 
 void GentlemanPortalManager::WarpPlayer(Player* player) {
+
+    isWarp_ = false;
 
     for (auto& portal : portals_) {
         //プレイヤーがヒットしているとき且つポータルと向き合っているとき
@@ -62,6 +63,7 @@ void GentlemanPortalManager::WarpPlayer(Player* player) {
                 player->SetTranslate(transform.translate);
                 player->SetRotate(portal->GetWarpPos()->GetTransform().rotate + transform.rotate);
                 SEManager::SoundPlay(SEManager::WARP);
+                isWarp_ = true;
                 break;
             }
         }
@@ -119,9 +121,10 @@ void GentlemanPortalManager::SpawnPortal()
 void GentlemanPortalManager::DrawPortal() {
 
     for (auto& portal : portals_) {
-        portal->DrawRings();
         portal->DrawPortals();
     }
+
+    Object3dCommon::GetInstance()->DrawCommon();
 }
 
 void GentlemanPortalManager::Draw(bool isShadow, bool drawPortal, bool drawParticle) {
@@ -137,6 +140,8 @@ void GentlemanPortalManager::Draw(bool isShadow, bool drawPortal, bool drawParti
     if (drawParticle && portalParticle_) {
         portalParticle_->Draw();
     }
+
+    Object3dCommon::GetInstance()->DrawCommon();
 }
 
 void GentlemanPortalManager::SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; }

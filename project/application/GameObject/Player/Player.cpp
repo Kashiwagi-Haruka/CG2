@@ -161,6 +161,7 @@ void Player::Update()
 
 void Player::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommon();
     bodyObj_->Draw();
 }
 

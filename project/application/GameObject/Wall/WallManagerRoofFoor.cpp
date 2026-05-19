@@ -3,7 +3,7 @@
 #include"Function.h"
 
 
-WallManagerRoofFoor::WallManagerRoofFoor()
+WallManagerRoofFloor::WallManagerRoofFloor()
 {
 
     room1_ = std::make_unique<Object3d>();
@@ -12,7 +12,7 @@ WallManagerRoofFoor::WallManagerRoofFoor()
 
 }
 
-void WallManagerRoofFoor::Update()
+void WallManagerRoofFloor::Update()
 {
     room1_->Update();
 
@@ -21,7 +21,7 @@ void WallManagerRoofFoor::Update()
     }
 }
 
-void WallManagerRoofFoor::Initialize()
+void WallManagerRoofFloor::Initialize()
 {
     room1_->Initialize();
     room1_->RegisterEditor("roofTop");

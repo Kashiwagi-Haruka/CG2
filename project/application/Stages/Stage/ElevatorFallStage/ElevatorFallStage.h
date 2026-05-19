@@ -1,9 +1,13 @@
 #pragma once
 #include"../../BaseStage.h"
 class TimeCardWatch;
-class PortalManager;
+class FallPortalManager;
 class WhiteBoardManager;
 class Flashlight;
+class WallManager2;
+class Door;
+class Key;
+class TestField;
 
 class ElevatorFallStage :
     public BaseStage
@@ -12,10 +16,16 @@ class ElevatorFallStage :
     Player* player_ = nullptr;
     Yoshida::LightManager* lightManager_ = nullptr;
     std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
-    std::unique_ptr<PortalManager> portalManager_ = nullptr;
+    std::unique_ptr<FallPortalManager> portalManager_ = nullptr;
     CollisionManager* stageCollisionManager_ = nullptr;
     std::unique_ptr<Flashlight> flashlight_ = nullptr;
     std::unique_ptr<WhiteBoardManager>  whiteBoardManager_ = nullptr;
+    std::unique_ptr<WallManager2> wallManager2_ = nullptr;
+    std::unique_ptr<TestField> testField_ = nullptr;
+
+    std::unique_ptr<Key> key_ = nullptr;
+    std::unique_ptr<Door> door_ = nullptr;
+
 private:
     void InitializeLights();
     void UpdateLights();
