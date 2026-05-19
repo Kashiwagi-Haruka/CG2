@@ -191,9 +191,6 @@ void Elevator::Update() {
 	ImGui::End();
     #endif // USE_IMGUI
 
-    
-
-#endif
 }
 
 void Elevator::Draw() {
