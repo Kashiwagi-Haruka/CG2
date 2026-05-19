@@ -134,7 +134,16 @@ float ComputeMicroShadow(float3 normal, float3 toLight, float3 toEye)
     return pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
 }
 
-float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition, float depthBias)
+float ComputeAdaptiveShadowBias(float baseBias, float3 normal, float3 lightDirection)
+{
+    float ndotl = saturate(dot(normalize(normal), normalize(lightDirection)));
+    float slopeScale = 1.0f - ndotl;
+    // 接線方向(斜め入射)ほどアクネ/めり込みが出やすいので、追加バイアスを与える。
+    float adaptiveBias = baseBias + slopeScale * 0.0010f;
+    return min(adaptiveBias, baseBias * 6.0f);
+}
+
+float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition, float baseBias, float3 normal, float3 lightDirection)
 {
     if (shadowPosition.w <= 0.0f)
     {
@@ -152,6 +161,12 @@ float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition,
     }
 
     float receiverDepth = shadowCoord.z;
+    float depthBias = ComputeAdaptiveShadowBias(baseBias, normal, lightDirection);
+    // 投影先の深度勾配が大きいほど、固定バイアスでは面に追従せず「突き刺さり」に見えるため、
+    // 受け側の深度勾配に応じて追加補正する。
+    float receiverDepthGradient = abs(ddx(receiverDepth)) + abs(ddy(receiverDepth));
+    depthBias += receiverDepthGradient * 2.0f;
+    depthBias = min(depthBias, baseBias * 12.0f);
     if (receiverDepth <= 0.0f || receiverDepth >= 1.0f)
     {
         return 1.0f;
@@ -209,10 +224,10 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
         float NDotH = dot(normalize(input.normal), halfVector);
         float specularPow = pow(saturate(NDotH), gMaterial.shininess);
         float directionalShadow = ComputeMicroShadow(normalize(input.normal), directionalLightVector, toEye);
-        float directionalShadowVisibility = ComputeShadowVisibility(gDirectionalShadowMap, input.directionalShadowPosition, 0.0005f);
-        float pointShadowVisibility = ComputeShadowVisibility(gPointShadowMap, input.pointShadowPosition, 0.0005f);
-        float spotShadowVisibility = ComputeShadowVisibility(gSpotShadowMap, input.spotShadowPosition, 0.0001f);
-        float areaShadowVisibility = ComputeShadowVisibility(gAreaShadowMap, input.areaShadowPosition, 0.0005f);
+        float directionalShadowVisibility = ComputeShadowVisibility(gDirectionalShadowMap, input.directionalShadowPosition, 0.0005f, input.normal, directionalLightVector);
+        float pointShadowVisibility = ComputeShadowVisibility(gPointShadowMap, input.pointShadowPosition, 0.0005f, input.normal, directionalLightVector);
+        float spotShadowVisibility = ComputeShadowVisibility(gSpotShadowMap, input.spotShadowPosition, 0.0001f, input.normal, directionalLightVector);
+        float areaShadowVisibility = ComputeShadowVisibility(gAreaShadowMap, input.areaShadowPosition, 0.0005f, input.normal, directionalLightVector);
         
         float directionalShadowFactor = (gDirectionalLight.shadowEnabled != 0) ? directionalShadowVisibility : 1.0f;
         float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity * directionalShadow * directionalShadowFactor;
