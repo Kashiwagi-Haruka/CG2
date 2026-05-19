@@ -134,7 +134,7 @@ float ComputeMicroShadow(float3 normal, float3 toLight, float3 toEye)
     return pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
 }
 
-float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition)
+float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition, float depthBias)
 {
     if (shadowPosition.w <= 0.0f)
     {
@@ -163,8 +163,6 @@ float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition)
 
     float2 texelPos = shadowUV * float2(width, height);
     int2 basePixel = int2(texelPos);
-
-    const float depthBias = 0.0005f;
 
     float visibility = 0.0f;
     [unroll]
@@ -211,10 +209,10 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
         float NDotH = dot(normalize(input.normal), halfVector);
         float specularPow = pow(saturate(NDotH), gMaterial.shininess);
         float directionalShadow = ComputeMicroShadow(normalize(input.normal), directionalLightVector, toEye);
-        float directionalShadowVisibility = ComputeShadowVisibility(gDirectionalShadowMap, input.directionalShadowPosition);
-        float pointShadowVisibility = ComputeShadowVisibility(gPointShadowMap, input.pointShadowPosition);
-        float spotShadowVisibility = ComputeShadowVisibility(gSpotShadowMap, input.spotShadowPosition);
-        float areaShadowVisibility = ComputeShadowVisibility(gAreaShadowMap, input.areaShadowPosition);
+        float directionalShadowVisibility = ComputeShadowVisibility(gDirectionalShadowMap, input.directionalShadowPosition, 0.0005f);
+        float pointShadowVisibility = ComputeShadowVisibility(gPointShadowMap, input.pointShadowPosition, 0.0005f);
+        float spotShadowVisibility = ComputeShadowVisibility(gSpotShadowMap, input.spotShadowPosition, 0.0020f);
+        float areaShadowVisibility = ComputeShadowVisibility(gAreaShadowMap, input.areaShadowPosition, 0.0005f);
         
         float directionalShadowFactor = (gDirectionalLight.shadowEnabled != 0) ? directionalShadowVisibility : 1.0f;
         float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity * directionalShadow * directionalShadowFactor;
