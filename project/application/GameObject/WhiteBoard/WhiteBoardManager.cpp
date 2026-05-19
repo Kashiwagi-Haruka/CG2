@@ -7,24 +7,22 @@
 #include "Model/ModelManager.h"
 #include <string>
 
-
-namespace {
-    const constexpr uint32_t kMaxWhiteBoards = 4;
-}
-
-WhiteBoardManager::WhiteBoardManager(Vector3* playerPos) {
+WhiteBoardManager::WhiteBoardManager(Vector3* playerPos, const uint32_t createWhiteBoardNum, const uint32_t createWalkWhiteBoardNum) {
     playerPos_ = playerPos;
 
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
 
-    std::unique_ptr<WalkWhiteBoard> walkWhite = std::make_unique<WalkWhiteBoard>();
     WalkWhiteBoard::LoadAnimation("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
-    walkWhite->SetModel("whiteBoard");
-    walkWhite->SetEditorRegistrationName("WalkWhiteBoard");
-    walkWhite->SetTargetPosPtr(playerPos_);
-    whiteBoards_.push_back(std::move(walkWhite));
 
-    for (int i = 0; i < kMaxWhiteBoards; ++i) {
+    for (uint32_t i = 0; i < createWalkWhiteBoardNum; ++i) {
+        std::unique_ptr<WalkWhiteBoard> walkWhite = std::make_unique<WalkWhiteBoard>();
+        walkWhite->SetModel("whiteBoard");
+        walkWhite->SetEditorRegistrationName("WalkWhiteBoard" + std::to_string(i));
+        walkWhite->SetTargetPosPtr(playerPos_);
+        whiteBoards_.push_back(std::move(walkWhite));
+    }
+
+    for (uint32_t i = 0; i < createWhiteBoardNum; ++i) {
         std::unique_ptr<WhiteBoard> white = std::make_unique<WhiteBoard>();
         white->SetModel("whiteBoard");
         white->SetEditorRegistrationName("WhiteBoard" + std::to_string(i));
@@ -54,7 +52,7 @@ void WhiteBoardManager::Update() {
 }
 
 void WhiteBoardManager::Draw() {
-	
+
     for (auto& board : whiteBoards_) {
         board->Draw();
     }

@@ -75,6 +75,7 @@ private:
 
 
 public:
+    void ResetVelocityY(const float vel) { velocity_.y = vel; }
     SkinCluster& GetSkinCluster() { return skinCluster_; };
     Matrix4x4 GetJointMatrix(const char* jointName)const;
     Vector3 GetJointWorldPos(const char* jointName)const;

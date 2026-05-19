@@ -7,6 +7,7 @@
 #include "GameObject/YoshidaMath/YoshidaMath.h"
 #include "Function.h"
 #include<imgui.h>
+#include"GameBase.h"
 
 bool PortalManager::canMakePortal_ = false;
 
@@ -17,7 +18,7 @@ PortalManager::PortalManager(Vector3* pos) {
     firstWarpPosTransform_ = {
         .scale = {1.0f,  1.0f, 1.0f},
           .rotate = {0.0f, 0.0f, 0.0f},
-          .translate = {-4.0f, 1.5f, 5.5f}
+          .translate = {-2.0f, 1.5f, 5.5f}
     };
 
     portalParticle_ = std::make_unique<PortalParticle>();
@@ -69,7 +70,10 @@ void PortalManager::WarpPlayer(Player* player) {
                 Transform transform = *portal->GetWarpPos()->GetParent();
                 transform.translate.y = 0.0f;
                 player->SetTranslate(transform.translate);
-                player->SetRotate(portal->GetWarpPos()->GetTransform().rotate + transform.rotate);
+                transform.rotate+= portal->GetWarpPos()->GetTransform().rotate;
+                transform.rotate.x = 0.0f;
+                transform.rotate.z = 0.0f;
+                player->SetRotate(transform.rotate);
                 SEManager::SoundPlay(SEManager::WARP);
                 break;
             }
@@ -79,7 +83,8 @@ void PortalManager::WarpPlayer(Player* player) {
 
 void PortalManager::UpdatePortal() {
 
-    warpCoolTimer_ += YoshidaMath::kDeltaTime;
+    const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+    warpCoolTimer_ += deltaTime;
     warpCoolTimer_ = std::clamp(warpCoolTimer_, 0.0f, kWarpTime_);
 
     if (isPendingPortalSpawn_ && portalParticle_) {

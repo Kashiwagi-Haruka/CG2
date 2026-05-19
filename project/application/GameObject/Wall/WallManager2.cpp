@@ -9,6 +9,11 @@ WallManager2::WallManager2()
     room1_->SetModel("room2");
     roomMat_ = Function::MakeIdentity4x4();
 
+    aabb_ = {
+.min = {-7.5f, -1.0f, -7.5f},
+.max = { 7.5f,  6.0f,  7.5f}
+    };
+
     //天井
     areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     areaLights_[0].position = { 7.0f, 3.0f, 0.0f };

@@ -9,6 +9,11 @@ WallManagerRestRoom::WallManagerRestRoom()
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/restRoom", "restRoom");
     room1_->SetModel("restRoom");
 
+    aabb_ = {
+        .min = {-20.0f,-1.0f,-14.0f },
+        .max = {7.5f,6.0f,7.5f}
+    };
+
 }
 
 void WallManagerRestRoom::Update()

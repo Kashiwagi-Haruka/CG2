@@ -73,7 +73,7 @@ TutorialStage::TutorialStage(Player* player)
     player_ = player;
 
     testField_ = std::make_unique<TestField>();
-    whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
+    whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate,4,0);
     portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate);
     portalManager_->SetWhiteBoardManager(whiteBoardManager_.get());
     key_ = std::make_unique<Key>();
@@ -157,17 +157,12 @@ void TutorialStage::CheckCollision() {
     // ==================//ポータルと部屋の当たり判定を取るために当たり判定を入れる=================================
 // 部屋1のAABB (WallManager.cpp の壁の配置から推測)
     portalManager_->ClearRoomAABBs();
-
-    AABB room1AABB = {
-    .min = {-7.5f, -1.0f, -7.5f},
-    .max = { 7.5f,  6.0f,  7.5f}
-    };
-
-    portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(room1AABB, wallManager_->GetRoom()->GetTranslate()));
+    portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(wallManager_->GetAABB(), wallManager_->GetRoom()->GetTranslate()));
     // 部屋2のAABB (WallManager2.cpp の壁の配置に合わせて数値を調整してください)
-    portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(room1AABB, wallManager2_->GetRoom()->GetTranslate()));
+    portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(wallManager2_->GetAABB(), wallManager2_->GetRoom()->GetTranslate()));
 
     // ===================================================
+
 
     if (!stageCollisionManager_) {
         return;

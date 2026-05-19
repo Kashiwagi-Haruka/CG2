@@ -66,14 +66,15 @@ RestroomStage::RestroomStage(Player* player)
     player_ = player;
 
 
-    whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate);
-    portalManager_ = std::make_unique<GentlemanPortalManager>(&player_->GetTransform().translate);
+    whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate,1,5);
+    portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate);
 
     portalManager_->SetWhiteBoardManager(whiteBoardManager_.get());
     wallManagerRestRoom_ = std::make_unique<WallManagerRestRoom>();
 
     key_ = std::make_unique<Key>();
     door_ = std::make_unique<Door>();
+
 
     timeCardWatch_ = std::make_unique<TimeCardWatch>();
     timeCardWatch_->SetPlayer(player_);
@@ -101,6 +102,9 @@ void RestroomStage::Initialize()
     flashlight_->Initialize();
     key_->Initialize();
     door_->Initialize();
+    //ドアは最初は開ける
+    door_->SetIsOpenAndAnimation();
+
     toiletManager_->Initialize();
     documentManager_->Initialize("document_isomer");
 
@@ -131,11 +135,20 @@ void RestroomStage::UpdatePortal()
 }
 
 void RestroomStage::CheckCollision() {
+    
+    // ==================//ポータルと部屋の当たり判定を取るために当たり判定を入れる=================================
+// 部屋1のAABB (WallManager.cpp の壁の配置から推測)
+    //portalManager_->ClearRoomAABBs();
+    //portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(wallManagerRestRoom_->GetAABB(), wallManagerRestRoom_->GetRoom()->GetTranslate()));
+    //// 部屋2のAABB (WallManager2.cpp の壁の配置に合わせて数値を調整してください)
+    //portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(wallManager2_->GetAABB(), wallManager2_->GetRoom()->GetTranslate()));
+    portalManager_->CheckCollision();
+    // ===================================================
+    
     if (!stageCollisionManager_) {
         return;
     }
 
-    portalManager_->CheckCollision();
     door_->CheckCollision();
 
     for (auto& portal : portalManager_->GetPortals()) {
@@ -150,10 +163,6 @@ void RestroomStage::CheckCollision() {
     for (auto& whiteBoard : whiteBoardManager_->GetWhiteBoards()) {
         stageCollisionManager_->AddCollider(whiteBoard.get());
     }
-
-    //for (auto& wall : wallManagerRestRoom_->GetWalls()) {
-    //    stageCollisionManager_->AddCollider(wall.get());
-    //}
     for (auto& [name, wall] : wallManagerRestRoom_->GetColliders()) {
         stageCollisionManager_->AddCollider(wall.get());
     }

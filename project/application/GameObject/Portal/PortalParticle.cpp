@@ -4,6 +4,7 @@
 #include "ParticleManager.h"
 #include <algorithm>
 #include <string>
+#include"GameBase.h"
 
 uint32_t PortalParticle::nextId_ = 0;
 
@@ -79,8 +80,8 @@ void PortalParticle::Update() {
 	if (!isVisible_) {
 		return;
 	}
-
-	effectTimer_ += YoshidaMath::kDeltaTime;
+	const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+	effectTimer_ += deltaTime;
 	if (effectTimer_ >= effectDuration_) {
 		effectTimer_ = effectDuration_;
 		isActive_ = false;

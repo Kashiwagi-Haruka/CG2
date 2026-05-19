@@ -14,6 +14,7 @@
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include "GameObject/UI/Inventory/Inventory.h"
 #include "Stages/StageNumber.h"
+#include"GameBase.h"
 
 ShadowGameScene::ShadowGameScene() {
     // BGMの管理
@@ -221,7 +222,7 @@ void ShadowGameScene::Finalize()
 void ShadowGameScene::DebugImGui() {
 #ifdef USE_IMGUI
     ImGui::Begin("shadowGameScene");
-    static constexpr const char* kStageNames[] = { "MirrorStage", "LightStage", "TutorialStage", "RadiconStage","GentleManStage","RestroomStage" };
+    static constexpr const char* kStageNames[] = { "MirrorStage", "LightStage", "TutorialStage", "RadiconStage","GentleManStage","RestroomStage","ElevatorFallStage"};
     int stageIndex = 0;
     if (progressSaveData_.currentStageName == "LightStage") {
         stageIndex = 1;
@@ -233,6 +234,8 @@ void ShadowGameScene::DebugImGui() {
         stageIndex = 4;
     } else if (progressSaveData_.currentStageName == "RestroomStage") {
         stageIndex = 5;
+    } else if (progressSaveData_.currentStageName == "ElevatorFallStage") {
+        stageIndex = 6;
     }
 
     if (ImGui::Combo("Stage", &stageIndex, kStageNames, IM_ARRAYSIZE(kStageNames))) {
@@ -309,7 +312,7 @@ void ShadowGameScene::UpdateSceneTransition() {
 
 
     if (Key::IsGetKey()) {
-        if (progressSaveData_.currentStageName == "TutorialStage" && !isTransitionOut_) {
+        if (progressSaveData_.currentStageName == "GentleManStage" && !isTransitionOut_) {
             transition_->Initialize(true);
             isTransitionIn_ = false;
             isTransitionOut_ = true;
@@ -352,7 +355,8 @@ void ShadowGameScene::UpdatePostEffect() {
 
     if (isNoise_) {
         float randomNoiseScale = 1.0f;
-        noiseTimer_ -= YoshidaMath::kDeltaTime;
+        const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+        noiseTimer_ -= deltaTime;
         if (noiseTimer_ <= 0.0f) {
             isNoise_ = false;
             noiseTimer_ = kNoiseTimer_;
@@ -411,12 +415,12 @@ void ShadowGameScene::UpdateLight() {
 }
 void ShadowGameScene::StageTransition()
 {
-    if (Key::IsGetKey() && Door::GetOpenMassage()) {
+    if (Key::IsGetKey()) {
 
+        //仮に鍵を取得したときをゲームクリアとする
         if (!progressSaveData_.isGameClear) {
             progressSaveData_.isGameClear = true;
         }
-
 
     }
 
@@ -427,9 +431,17 @@ void ShadowGameScene::StageTransition()
 
         if (progressSaveData_.currentStageName == "MirrorStage") {
             ChangeStage("TutorialStage");
-            progressSaveData_.isGameClear = false;
+        } else if (progressSaveData_.currentStageName == "TutorialStage") {
+            ChangeStage("RestroomStage");
+        } else if (progressSaveData_.currentStageName == "RestroomStage") {
+            ChangeStage("ElevatorFallStage");
+        } else if (progressSaveData_.currentStageName == "ElevatorFallStage") {
+            ChangeStage("RestroomStage");
+        } else if (progressSaveData_.currentStageName == "RestroomStage") {
+            ChangeStage("GentleManStage");
         }
 
+        progressSaveData_.isGameClear = false;
     }
 }
 #pragma endregion

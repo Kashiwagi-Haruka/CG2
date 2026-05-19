@@ -10,6 +10,7 @@
 #include"Camera.h"
 #include "TextureManager.h"
 #include "SrvManager/SrvManager.h"
+#include"GameBase.h"
 
 Camera* Portal::sceneCamera_ = nullptr;
 
@@ -78,7 +79,9 @@ void Portal::Update() {
 
     isPlayerCanWarp_ = false;
 
-    uvRotateZ_ += YoshidaMath::kDeltaTime;
+
+    const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+    uvRotateZ_ += deltaTime;
 
     UpdatePortalWorldMatrix();
     portalCircle_->Update();
@@ -189,7 +192,8 @@ void Portal::SetRotateFromDirection(const Vector3& forward) {
 }
 
 void Portal::UpdateScale() {
-    scaleTimer_ += YoshidaMath::kDeltaTime;
+    const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+    scaleTimer_ += deltaTime;
     scaleTimer_ = std::clamp(scaleTimer_, 0.0f, 1.0f);
     Vector3 scale{ 1.6f,0.9f,1.0f };
     scale.x *= parentTransform->scale.x;
