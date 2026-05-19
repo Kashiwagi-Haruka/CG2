@@ -66,7 +66,7 @@ public:
 	void Initialize();
 	void Initialize(const std::string& filePath);
 	void Update();
-	void Update(Camera* camera, const Vector3& lightDirection);
+	void Update(/*Camera* camera,*/ const Vector3& lightDirection);
 	void UpdateBillboard();
 	void UpdateCameraMatrices();
 	void Draw();

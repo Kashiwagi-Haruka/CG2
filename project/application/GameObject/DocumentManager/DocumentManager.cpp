@@ -50,10 +50,8 @@ void DocumentManagerParticle::Draw()
     document_->Draw();
 }
 
-void DocumentManager::Update(Camera* camera, const Vector3& lightDirection)
+void DocumentManager::Update()
 {
-    (void)lightDirection;
-
 
     document_->Update();
     
@@ -65,10 +63,10 @@ void DocumentManager::Update(Camera* camera, const Vector3& lightDirection)
     }
 }
 
-void DocumentManagerParticle::Update(Camera* camera, const Vector3& lightDirection)
+void DocumentManagerParticle::Update()
 {
     document_->Update();
-    documentParticle_->Update(camera, lightDirection);
+    documentParticle_->Update();
     isRayHit_ = document_->GetIsRayHit();
     isLooking_ = document_->GetIsLooking();
     if (document_->GetIsLooking()) {

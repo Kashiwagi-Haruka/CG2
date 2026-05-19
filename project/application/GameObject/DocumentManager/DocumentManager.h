@@ -22,10 +22,10 @@ public:
     DocumentManager();
     virtual void Initialize(const std::string name);
     virtual void Draw();
-    virtual void Update(Camera* camera, const Vector3& lightDirection);
+    virtual void Update();
     void DrawSprite();
     void SetPlayerCamera(PlayerCamera* playerCamera) { document_->SetPlayerCamera(playerCamera); };
-    void SetCamera(Camera* camera) { document_->SetCamera(camera); };
+    virtual void SetCamera(Camera* camera) { document_->SetCamera(camera); };
 };
 
 class DocumentManagerParticle :public DocumentManager
@@ -36,5 +36,10 @@ public:
     DocumentManagerParticle();
     void Initialize(const std::string name)override;
     void Draw()override;
-    void Update(Camera* camera, const Vector3& lightDirection)override;
+    void Update()override;
+
+    void SetCamera(Camera* camera) override {
+        document_->SetCamera(camera); 
+        documentParticle_->SetCamera(camera);
+    };
 };

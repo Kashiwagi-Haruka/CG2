@@ -103,10 +103,11 @@ void GentleManStage::Initialize()
 }
 
 void GentleManStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
+
     portalManager_->WarpPlayer(player);
     wallManagerRoofFloor_->Update();
     giantGentleMan_->Update();
-    documentManager_->Update(camera, lightDirection);
+    documentManager_->Update();
     //懐中電灯の更新
     flashlight_->Update();
     timeCardWatch_->Update();

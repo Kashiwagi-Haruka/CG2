@@ -95,8 +95,9 @@ void InstancedObject3d::Update() {
 
 	UpdateCameraMatrices();
 }
-void InstancedObject3d::Update(Camera* camera, const Vector3& lightDirection) {
-	SetCamera(camera);
+void InstancedObject3d::Update(/*Camera* camera,*/ const Vector3& lightDirection) {
+	//SetCamera(camera);
+	//UpdateCameraMatrices();
 	if (materialData_) {
 		const float lighting = std::clamp(-lightDirection.y, 0.2f, 1.0f);
 		materialData_->color = {lighting, lighting, lighting, 1.0f};
@@ -244,7 +245,8 @@ void InstancedObject3d::SetModel(const std::string& filePath) {
 	}
 	model_ = ModelManager::GetInstance()->FindModel(filePath);
 }
-void InstancedObject3d::SetCamera(Camera* camera) { camera_ = camera; }
+void InstancedObject3d::SetCamera(Camera* camera) { camera_ = camera;
+}
 void InstancedObject3d::SetScale(Vector3 scale) {
 	transform_.scale = scale;
 	isUseSetWorld = false;
