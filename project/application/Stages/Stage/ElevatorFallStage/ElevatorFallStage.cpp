@@ -74,7 +74,7 @@ void ElevatorFallStage::UpdateGameObject(Camera* camera, const Vector3& lightDir
     portalManager_->WarpPlayer(player);
 
     Vector3 translate = player->GetWorldPosition();
-    if (translate.y <= -20.0f) {
+    if (translate.y <= -35.0f) {
 
         translate = whiteBoardManager_->GetWhiteBoards().at(0)->GetWorldPosition();
         translate.y = -5.0f;

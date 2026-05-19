@@ -37,6 +37,6 @@ protected:
     Transform collisionTransform_ = {};
     std::string editorRegistrationName_ = "WhiteBoard";
 private:
-    const float kPortalCreatableAngleRange_ = 0.5f;
+    const float kPortalCreatableAngleRange_ = 0.75f;
 
 };

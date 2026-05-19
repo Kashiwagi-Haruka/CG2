@@ -177,7 +177,7 @@ void Locker::CheckCollision()
                 !PlayerCommand::GetIsGrab()&&
                 isRayHit_|| !PlayerCommand::GetIsGrab() && !isPlayerPreIn_&&isPlayerIn_) {
 
-                SEManager::SoundPlay(SEManager::DOOR_OPEN);
+                SEManager::SoundPlay(SEManager::LOCKER);
                
 
                 if (desiredAnimationName == "Open") {
