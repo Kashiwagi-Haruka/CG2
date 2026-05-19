@@ -441,7 +441,7 @@ void ShadowGameScene::DrawModel() {
     //=======================shadowマップの開始↓=======================
     auto* object3dCommon = Object3dCommon::GetInstance();
     
-    /*object3dCommon->SetShadowMapEnabled(false, false, false, false);*/
+    /*object3dCommon->SetShadowMapEnabled(true, false, true, false);*/
 	object3dCommon->BeginShadowMapPass();
 	object3dCommon->DrawCommonShadow();
 	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());

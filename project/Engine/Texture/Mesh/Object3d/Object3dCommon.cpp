@@ -545,9 +545,9 @@ Matrix4x4 Object3dCommon::GetDirectionalLightViewProjectionMatrix() const {
 	}
 
 	Vector3 focusPosition = shadowLightPosition_;
-	if (defaultCamera) {
-		focusPosition = defaultCamera->GetWorldTranslate();
-	}
+	//if (defaultCamera) {
+	//	focusPosition = defaultCamera->GetWorldTranslate();
+	//}
 
 	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
 	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
