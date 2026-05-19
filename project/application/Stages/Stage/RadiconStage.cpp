@@ -15,6 +15,7 @@ RadiconStage::RadiconStage(Player* player) : player_(player) {
 	//懐中電灯の作成
 	flashlight_ = std::make_unique<Flashlight>();
 	flashlight_->SetPlayer(player_);
+	burningObject_ = std::make_unique<BurningObject>();
 }
 
 void RadiconStage::Initialize() { 
@@ -22,6 +23,7 @@ void RadiconStage::Initialize() {
 	testField_->Initialize();
 	radicon_->Initialize();
 	operationChangeBox_->Initialize();
+	burningObject_->Initialize();
 	radicon_->SetTransform({
 	    .scale = {0.01f, 0.01f, 0.01f},
 	    .rotate = {0.0f, Function::kPi, 0.0f},
@@ -93,9 +95,10 @@ void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unu
 
 	//懐中電灯の更新
 	flashlight_->Update();
-
+	burningObject_->Update();
 	//ライトの更新
 	lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
+	burningObject_->Update();
 }
 
 void RadiconStage::UpdatePortal() {/*記載なし*/}
@@ -120,6 +123,7 @@ void RadiconStage::DrawModel([[maybe_unused]] bool isShadow, [[maybe_unused]] bo
 	operationChangeBox_->Draw();
 	radicon_->Draw();
 	flashlight_->Draw();
+	burningObject_->Draw();
 }
 
 void RadiconStage::DrawSprite()
@@ -142,6 +146,7 @@ void RadiconStage::SetPlayerCamera([[maybe_unused]] PlayerCamera* playerCamera) 
 	radicon_->SetCamera(playerCamera->GetCamera());
 	operationChangeBox_->SetPlayerCamera(playerCamera);
 	flashlight_->SetPlayerCamera(playerCamera);
+	burningObject_->SetPlayerCamera(playerCamera->GetCamera());
 }
 
 PortalManager* RadiconStage::GetPortalManager() { return nullptr; }

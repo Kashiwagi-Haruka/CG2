@@ -205,7 +205,7 @@ void SampleScene::Initialize() {
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
 	directionalLight_.intensity = 1.0f;
-	directionalLight_.shadowEnabled = 1;
+	directionalLight_.shadowEnabled = true;
 
 	activeSpotLightCount_ = 2;
 	spotLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -422,6 +422,7 @@ void SampleScene::Update() {
 	if (ImGui::Begin("Sample Lights")) {
 		if (ImGui::TreeNode("Directional")) {
 			ImGui::Checkbox("Shadow##Directional", &directionalShadowEnabled_);
+			ImGui::DragFloat3("Direction", &directionalLight_.direction.x, 0.01f);
 			ImGui::TreePop();
 		}
 
