@@ -184,10 +184,31 @@ void PortalManager::CheckCollision() {
         return;
     }
 
+
+
+
     // 生成予定地（撃ったホワイトボード）の座標を取得
     Vector3 targetPos = hitBoard->GetCollisionTransform().translate;
     int targetRoomIndex = GetRoomIndex(targetPos);
 
+    // =======================================================
+    // 追加 1: プレイヤーが同じ部屋にいるかどうかのチェック
+    // =======================================================
+    if (playerPos_) {
+        int playerRoomIndex = GetRoomIndex(*playerPos_);
+
+        // プレイヤーのいる部屋と、撃ったホワイトボードの部屋が異なる場合は生成不可
+        // (※どちらかが -1 つまりAABB外の時も弾く仕様になります)
+        if (playerRoomIndex != targetRoomIndex) {
+            canMakePortal_ = false;
+            return; // 処理を中断
+        }
+    }
+
+
+    // =======================================================
+    // 追加 2: その部屋にすでにポータルが存在しないかのチェック
+    // =======================================================
     if (targetRoomIndex != -1) {
         for (const auto& portal : portals_) {
             // 既存のポータルの座標を取得 (Transform.translateを使用)

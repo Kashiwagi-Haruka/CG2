@@ -43,6 +43,7 @@ public:
     bool GetIsPlayerCanWarp() { return isPlayerCanWarp_; };
     bool IsVectorsFace(const Vector3& forward);
     bool IsVectorFaceCameraAndObj();
+    void SetCanWarpAngleRange(const float range) { canWarpAngleRange_ = range; };
 private:
     bool ShouldProcessPortal() const;
     void UpdatePortalWorldMatrix();
@@ -52,6 +53,7 @@ private:
     void SetTranslate(const Vector3& forward);
     Vector3 SetSceneCameraAndParentAndGetForward();
     void SetParentTransformToTransform();
+
 private:
     float  preRotY_ = { 0.0f };
     bool isPlayerCanWarp_ = false;
@@ -59,7 +61,6 @@ private:
     static Camera* sceneCamera_;
 
     std::unique_ptr<PortalMesh>portalCircle_ = nullptr;
-    Vector3 ringTranslate_ = { 0.0f };
     Transform transform_ = {};
     float uvRotateZ_ = 0.0f;
     Sphere sphere_ = { 0.0f };
