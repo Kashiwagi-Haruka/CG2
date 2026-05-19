@@ -30,6 +30,7 @@ void SEManager::Load() {
 	SEs_[ELEVATOR_BELL] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/elevatorBell.mp3");
 	SEs_[PAPER] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/maou_se_sound_paper01.mp3");
 	SEs_[TOILET] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/toilet.mp3");
+	SEs_[LOCKER] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/locker.mp3");
 }
 
 void SEManager::Initialize() {

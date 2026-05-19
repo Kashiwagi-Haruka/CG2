@@ -26,6 +26,7 @@ public:
 		ELEVATOR_BELL,
 		PAPER,
 		TOILET,
+		LOCKER,
 		MAX_SE,
 	};
 

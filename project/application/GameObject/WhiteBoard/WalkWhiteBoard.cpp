@@ -98,7 +98,6 @@ void WalkWhiteBoard::Update()
     collisionTransform_.translate.y += 1.375f;
     collisionTransform_.scale = YoshidaMath::GetAABBScale(localAABB_);
 
-
 #ifdef _DEBUG
     primitive_->SetTransform(collisionTransform_);
     primitive_->Update();
