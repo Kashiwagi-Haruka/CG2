@@ -63,7 +63,7 @@ void PlayerCamera::Rotate() {
     Vector2 deltaRotate = PlayerCommand::GetInstance()->Rotate(rotateSpeed_, optionData.isFlipHorizontally, optionData.isFlipVertically);
     player_->GetTransform().rotate.y += deltaRotate.y * optionCameraMoveSpeed.y;
     param_.transform.rotate.x += deltaRotate.x * optionCameraMoveSpeed.x;
-
+#ifdef USE_IMGUI
     if (ImGui::TreeNode("Eye")) {
         ImGui::Text("rotateSpeed : %f", rotateSpeed_);
         ImGui::Text("deltaRotate x: %f,y: %f", deltaRotate.x, deltaRotate.y);
@@ -74,7 +74,7 @@ void PlayerCamera::Rotate() {
 
         ImGui::TreePop();
     }
-
+#endif
 }
 
 void PlayerCamera::SetRay()

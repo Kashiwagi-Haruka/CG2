@@ -73,7 +73,7 @@ private:
 	EleveterNumberText elevatorNumberText_{};
 
 	std::string animationGroupName_ = "Elevator";
-	const float kAnimationBlendDuration_ = 1.0f;
+	const float kAnimationBlendDuration_ = 0.0f;
 	bool animationFinished_ = false;
 	std::string desiredAnimationName = "Idle";
 	static bool isRayHit_;
