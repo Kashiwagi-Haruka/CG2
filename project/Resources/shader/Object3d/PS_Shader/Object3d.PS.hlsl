@@ -157,9 +157,29 @@ float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition)
         return 1.0f;
     }
 
-    const float depthBias = 0.002f;
-    float shadowDepth = shadowMap.Sample(gSampler, shadowUV);
-    return ((receiverDepth - depthBias) <= shadowDepth) ? 1.0f : 0.0f;
+    uint width;
+    uint height;
+    shadowMap.GetDimensions(width, height);
+
+    float2 texelPos = shadowUV * float2(width, height);
+    int2 basePixel = int2(texelPos);
+
+    const float depthBias = 0.0005f;
+
+    float visibility = 0.0f;
+    [unroll]
+    for (int y = -1; y <= 1; ++y)
+    {
+        [unroll]
+        for (int x = -1; x <= 1; ++x)
+        {
+            int2 samplePixel = clamp(basePixel + int2(x, y), int2(0, 0), int2(int(width) - 1, int(height) - 1));
+            float shadowDepth = shadowMap.Load(int3(samplePixel, 0));
+            visibility += ((receiverDepth - depthBias) <= shadowDepth) ? 1.0f : 0.0f;
+        }
+    }
+
+    return visibility / 9.0f;
 }
 
 PixelShaderOutput main(Object3dVertexShaderOutput input)
