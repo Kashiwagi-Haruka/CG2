@@ -10,8 +10,10 @@ WallManager::WallManager()
     roomMat_ = Function::MakeIdentity4x4();
 
 
-
-
+    aabb_ = {
+    .min = {-7.5f, -1.0f, -7.5f},
+    .max = { 7.5f,  6.0f,  7.5f}
+    };
 
     //天井の照明
     areaLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };

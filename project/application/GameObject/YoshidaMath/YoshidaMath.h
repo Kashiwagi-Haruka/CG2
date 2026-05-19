@@ -9,7 +9,6 @@
 class Camera;
 class Collider;
 namespace YoshidaMath {
-    const constexpr float kDeltaTime = 1.0f / 60.0f;
     const constexpr float kGravity = 0.98f;
 
     float Dot(const Vector2& v1, const Vector2& v2);

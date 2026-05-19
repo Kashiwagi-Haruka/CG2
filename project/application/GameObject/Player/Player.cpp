@@ -21,7 +21,7 @@ namespace {
 
     constexpr float kHpRegenPerSecond = 0.2f;
     constexpr float kDamageCooldown = 0.7f;
-
+    constexpr float kDeltaTime = 1.0f / 60.0f;
     struct FootContactState {
         bool left = false;
         bool right = false;
@@ -378,7 +378,8 @@ Vector3 Player::GetJointWorldPos(const char* jointName) const
 
 void Player::Gravity() {
 
-    velocity_.y -= YoshidaMath::kDeltaTime * YoshidaMath::kGravity;
+    //const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+    velocity_.y -= kDeltaTime * YoshidaMath::kGravity;
     transform_.translate.y += velocity_.y;
     velocity_.y = std::clamp(velocity_.y, -1.0f, 1.0f);
 }
@@ -393,14 +394,11 @@ void Player::OnCollision(Collider* collider) {
     if (collider->GetCollisionAttribute() == kCollisionPortal) {
     }
 
-    //if (collider->GetCollisionAttribute() == kCollisionLocker) {
-    //    //ロッカーに入った。
-    //    PlayerCommand::SetIsInLocker(true);
-    //}
 
     if (!LockerManager::GetIsInLocker()) {
         //ロッカーに入っていなかったら判定する
         if (collider->GetCollisionAttribute() == kCollisionEnemy) {
+
         }
     }
 

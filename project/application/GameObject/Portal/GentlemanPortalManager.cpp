@@ -6,6 +6,7 @@
 #include "GameObject/YoshidaMath/YoshidaMath.h"
 #include "Function.h"
 #include"GameObject/Gentleman/GiantGentleman.h"
+#include"GameBase.h"
 
 bool GentlemanPortalManager::canMakePortal_ = false;
 
@@ -69,7 +70,8 @@ void GentlemanPortalManager::WarpPlayer(Player* player) {
 
 void GentlemanPortalManager::UpdatePortal() {
 
-    warpCoolTimer_ += YoshidaMath::kDeltaTime;
+    const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+    warpCoolTimer_ += deltaTime;
     warpCoolTimer_ = std::clamp(warpCoolTimer_, 0.0f, kWarpTime_);
 
     if (isPendingPortalSpawn_ && portalParticle_) {

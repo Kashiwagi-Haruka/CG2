@@ -15,7 +15,6 @@ private:
     //スキン
     SkinCluster skinCluster_{};
     Animation::AnimationData blendedPoseAnimation_{};
-    const std::string animationGroupName_ = "walkWhiteBoard";
     const float kAnimationBlendDuration_ = 0.3f;
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Idle";

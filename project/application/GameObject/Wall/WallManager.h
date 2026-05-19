@@ -16,6 +16,7 @@ public:
     virtual void Update();
     virtual void Draw();
     virtual void SetCamera(Camera* camera);
+    AABB& GetAABB() { return aabb_; };
     std::array<AreaCommonLight,2>& GetAreaLights() { return  areaLights_; }
     std::unique_ptr<Object3d>& GetRoom() {
         return room1_;
@@ -25,7 +26,7 @@ protected:
     std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>colliders_;
     std::array<AreaCommonLight,2> areaLights_;
     Matrix4x4 roomMat_= { 0.0f };
-
+    AABB aabb_;
     std::unique_ptr<Object3d>room1_ = nullptr;
 };
 

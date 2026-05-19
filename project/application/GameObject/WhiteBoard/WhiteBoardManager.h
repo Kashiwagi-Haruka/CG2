@@ -10,7 +10,7 @@ class PlayerCamera;
 
 class WhiteBoardManager {
 public:
-	explicit WhiteBoardManager(Vector3* playerPos);
+	explicit WhiteBoardManager(Vector3* playerPos, const uint32_t createWhiteBoardNum = 4,const uint32_t createWalkWhiteBoardNum = 1);
 	~WhiteBoardManager();
 
 	void Initialize();

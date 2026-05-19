@@ -1,5 +1,6 @@
 #include "KeyBindConfig.h"
 #include "GameObject/YoshidaMath/YoshidaMath.h"
+#include"GameBase.h"
 
 std::unique_ptr<PlayerCommand> PlayerCommand::instance_ = nullptr;
 bool PlayerCommand::isGrab_ = false;
@@ -144,15 +145,18 @@ Vector2 PlayerCommand::Rotate(float rotateSpeed,const bool isFlipHorizontally,co
     float dPitch = 0.0f;
     float dYaw = 0.0f;
 
+    const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
+
     if (fabs(inputMovePos.x) > 0.0f || fabs(inputMovePos.y) > 0.0f) {
         // スティック処理が優先される
-        dYaw = inputMovePos.x * YoshidaMath::kDeltaTime * rotateSpeed * 10.0f;
-        dPitch = -inputMovePos.y * YoshidaMath::kDeltaTime * rotateSpeed * 10.0f;
+
+        dYaw = inputMovePos.x * deltaTime * rotateSpeed * 10.0f;
+        dPitch = -inputMovePos.y * deltaTime * rotateSpeed * 10.0f;
     } else {
         // マウス
         inputMovePos = input->GetMouseMove();
-        dYaw += inputMovePos.x * YoshidaMath::kDeltaTime * rotateSpeed;
-        dPitch += inputMovePos.y * YoshidaMath::kDeltaTime * rotateSpeed;
+        dYaw += inputMovePos.x * deltaTime * rotateSpeed;
+        dPitch += inputMovePos.y * deltaTime * rotateSpeed;
     }
 
     return {  isFlipVertically ? -dPitch : dPitch,isFlipHorizontally ? -dYaw : dYaw };
