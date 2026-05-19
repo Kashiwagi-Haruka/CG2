@@ -2,8 +2,10 @@
 #include"ScreenSize.h"
 #include"TextureManager.h"
 #include"SpriteCommon.h"
+bool HintSheetManager::isLooking_ = false;
 
 void HintSheetManager::Initialize() {
+    isLooking_ = false;
     fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
     FreeTypeManager::SetPixelSizes(fontHandle_, 32, 32);
     hintSheets_.clear();
@@ -35,6 +37,14 @@ void HintSheetManager::AddHintSheet(const std::string& textFilePath) {
 void HintSheetManager::Update() {
     for (auto& sheet : hintSheets_) {
         sheet->Update();
+    }
+
+    isLooking_ = false;
+    for (auto& sheet : hintSheets_) {
+        if (sheet->GetIsLooking()) {
+            isLooking_ = true;
+            break;
+        }
     }
 }
 

@@ -22,6 +22,7 @@
 #include"GameObject/DocumentManager/DocumentManager.h"
 #include"GameObject/GentleMan/GiantGentleMan.h"
 #include"GameObject/Portal/GentlemanPortalManager.h"
+#include"GameObject/HintSheet/HintSheetManager.h"
 
 RaySprite::RaySprite()
 {
@@ -65,7 +66,7 @@ void RaySprite::Update()
 
 void RaySprite::Draw()
 {
-    if (DocumentManager::IsLooking()||DocumentManagerParticle::IsLooking()) {
+    if (DocumentManager::IsLooking()||DocumentManagerParticle::IsLooking()|| HintSheetManager::GetIsLooking()) {
         //何かを見ていたらRaySpriteを描画しない
         return;
     }

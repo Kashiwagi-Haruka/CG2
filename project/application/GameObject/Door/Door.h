@@ -53,7 +53,7 @@ private:
     SkinCluster skinCluster_{};
     bool animationFinished_ = false;
     std::string desiredAnimationName = "0Idle";
-    const float kAnimationBlendDuration_ = 0.3f;
+    const float kAnimationBlendDuration_ = 0.0f;
     Animation::AnimationData blendedPoseAnimation_{};
     PlayerCamera* playerCamera_ = nullptr;
     std::unique_ptr<Object3d>obj_ = nullptr;

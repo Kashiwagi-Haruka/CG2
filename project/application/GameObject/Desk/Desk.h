@@ -57,7 +57,7 @@ private:
     // スキン
     SkinCluster skinCluster_{};
      std::string animationGroupName_ = "Desk";
-    const float kAnimationBlendDuration_ = 0.3f;
+    const float kAnimationBlendDuration_ = 0.0f;
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Idle";
     bool isRayHit_ = false;
