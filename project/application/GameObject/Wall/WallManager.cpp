@@ -66,13 +66,6 @@ void WallManager::Initialize()
         collider->RegisterEditor(name);
     }
 
-    //walls_[0]->SetST({ 2.0f,4.0f,14.0f }, { -7.0f  ,0.0f,0.0f });
-    //walls_[1]->SetST({ 2.0f,4.0f,14.0f }, { 7.0f   ,0.0f,0.0f });
-
-    //walls_[2]->SetST({ 14.0f,4.0f,1.0f }, { 0.0f ,0.0f,-7.0f });
-    //walls_[3]->SetST({ 14.0f,4.0f,1.0f }, { 0.0f ,0.0f, 7.0f });
-    
-
 
 }
 
@@ -92,9 +85,9 @@ void WallManager::Draw()
 {
     room1_->Draw();
 
-    //for (auto& [name, collider] : colliders_) {
-    //    collider->Draw();
-    //}
+    for (auto& [name, collider] : colliders_) {
+        collider->Draw();
+    }
 }
 
 void WallManager::SetCamera(Camera* camera)
@@ -102,7 +95,7 @@ void WallManager::SetCamera(Camera* camera)
     room1_->SetCamera(camera);
     room1_->UpdateCameraMatrices();
 
-    //for (auto& [name, collider] : colliders_) {
-    //    collider->SetCamera(camera);
-    //}
+    for (auto& [name, collider] : colliders_) {
+        collider->SetCamera(camera);
+    }
 }

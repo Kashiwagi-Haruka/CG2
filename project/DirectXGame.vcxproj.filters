@@ -432,6 +432,8 @@
     <ClCompile Include="application\Stages\StageNumber.cpp" />
     <ClCompile Include="application\GameObject\ReadableObject\ReadableObject.cpp" />
     <ClCompile Include="application\Stages\Stage\ElevatorFallStage\ElevatorFallStage.cpp" />
+    <ClCompile Include="application\GameObject\Portal\FallPortalManager.cpp" />
+    <ClCompile Include="application\GameObject\Wall\WallManagerElevatorFall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -852,6 +854,8 @@
     <ClInclude Include="application\Stages\StageNumber.h" />
     <ClInclude Include="application\GameObject\ReadableObject\ReadableObject.h" />
     <ClInclude Include="application\Stages\Stage\ElevatorFallStage\ElevatorFallStage.h" />
+    <ClInclude Include="application\GameObject\Portal\FallPortalManager.h" />
+    <ClInclude Include="application\GameObject\Wall\WallManagerElevatorFall.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

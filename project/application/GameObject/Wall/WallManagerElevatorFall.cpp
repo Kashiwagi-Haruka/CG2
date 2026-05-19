@@ -1,8 +1,7 @@
-#include "WallManager2.h"
+#include "WallManagerElevatorFall.h"
 #include"Model/ModelManager.h"
 #include"Function.h"
-
-WallManager2::WallManager2()
+WallManagerElevatorFall::WallManagerElevatorFall()
 {
     room1_ = std::make_unique<Object3d>();
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/room2", "room2");
@@ -35,7 +34,7 @@ WallManager2::WallManager2()
 }
 
 
-void WallManager2::Initialize()
+void WallManagerElevatorFall::Initialize()
 {
     room1_->Initialize();
     room1_->RegisterEditor("room2");
@@ -55,7 +54,7 @@ void WallManager2::Initialize()
     }
 
 }
-void WallManager2::Update()
+void WallManagerElevatorFall::Update()
 {
     room1_->Update();
 

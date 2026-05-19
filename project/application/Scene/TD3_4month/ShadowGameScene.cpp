@@ -310,8 +310,13 @@ void ShadowGameScene::UpdateCamera()
 
 void ShadowGameScene::UpdateSceneTransition() {
 
+    //デバックモードではシーン遷移しない
+    bool flag = true;
+#ifdef USE_IMGUI
+    flag = false;
+#endif
 
-    if (Key::IsGetKey()) {
+    if (Key::IsGetKey()&& flag) {
         if (progressSaveData_.currentStageName == "GentleManStage" && !isTransitionOut_) {
             transition_->Initialize(true);
             isTransitionIn_ = false;
@@ -436,9 +441,9 @@ void ShadowGameScene::StageTransition()
         } else if (progressSaveData_.currentStageName == "RestroomStage") {
             ChangeStage("ElevatorFallStage");
         } else if (progressSaveData_.currentStageName == "ElevatorFallStage") {
-            ChangeStage("RestroomStage");
-        } else if (progressSaveData_.currentStageName == "RestroomStage") {
             ChangeStage("GentleManStage");
+        } else if (progressSaveData_.currentStageName == "GentleManStage") {
+            ChangeStage("TutorialStage");
         }
 
         progressSaveData_.isGameClear = false;
@@ -472,13 +477,11 @@ void ShadowGameScene::DrawModel() {
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer, bool drawPlayerHead) {
     // エレベータルーム
+
+    Object3dCommon::GetInstance()->DrawCommon();
+
     elevatorRoomManager_->Draw();
     stageManager_->DrawModel(isShadow, drawPortal, isDrawParticle);
-
-    if (!isShadow) {
-        Object3dCommon::GetInstance()->DrawCommonSkinning();
-    }
-
     // エレベーター
     elevator_->Draw();
     gentleManManager_->Draw();

@@ -102,15 +102,6 @@ void Portal::DrawPortals() {
     }
 }
 
-void Portal::DrawRings() {
-    if (!ShouldProcessPortal()) {
-        return;
-    }
-
-    // Object3dCommon::GetInstance()->DrawCommonNoCull();
-    // ring_->Draw();
-}
-
 bool Portal::IsVectorsFace(const Vector3& forward)
 {
     //ポータルの親の向きYを計算する
@@ -124,7 +115,9 @@ bool Portal::IsVectorFaceCameraAndObj()
 {
     Vector3 forward = SetSceneCameraAndParentAndGetForward();
     //ポータルの本体の向きを取得する ローカル回転分ずらす
-    Vector3 direction = YoshidaMath::GetDirectionFromRotateY(Function::kPi + transform_.rotate.y);
+   Matrix4x4 rotateMat =  Function::MakeRotateMatrix({transform_.rotate.x,Function::kPi + transform_.rotate.y ,transform_.rotate.z});
+    Vector3 direction = YoshidaMath::GetForward(rotateMat);
+    //Vector3 direction = YoshidaMath::GetDirectionFromRotateY(Function::kPi + transform_.rotate.y);
     float dot = Function::Dot(forward, direction);
     return (dot < canWarpAngleRange_);
 }
@@ -175,7 +168,8 @@ void Portal::UpdatePortalWorldMatrix() {
     //Vector3 forward = SetSceneCameraAndParentAndGetForward();
     //SetTranslate(forward);
     transform_.rotate.y = preRotY_ + parentTransform->rotate.y;
-
+    transform_.rotate.x = parentTransform->rotate.x;
+    transform_.rotate.z = parentTransform->rotate.z;
     UpdateScale();
     UpdateWorldMatrix();
 }
@@ -190,7 +184,8 @@ void Portal::SetRotateFromDirection(const Vector3& forward) {
     }
 
     transform_.rotate.y = preRotY_ + parentTransform->rotate.y;
-
+    transform_.rotate.x = parentTransform->rotate.x;
+    transform_.rotate.z = parentTransform->rotate.z;
 }
 
 void Portal::UpdateScale() {

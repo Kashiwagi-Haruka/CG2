@@ -3,7 +3,7 @@
 
 class Door;
 class Key;
-class WallManagerRoofFoor;
+class WallManagerRoofFloor;
 
 class TimeCardWatch;
 class DocumentManager;
@@ -20,14 +20,10 @@ class GentleManStage :
     std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
     std::unique_ptr<GentlemanPortalManager> portalManager_ = nullptr;
     CollisionManager* stageCollisionManager_ = nullptr;
-    std::unique_ptr<WallManagerRoofFoor> wallManagerRoofFoor_ = nullptr;
+    std::unique_ptr<WallManagerRoofFloor> wallManagerRoofFloor_ = nullptr;
     std::unique_ptr<DocumentManager>documentManager_ = nullptr;
     std::unique_ptr<GiantGentleMan>giantGentleMan_ = nullptr;
-
-
     std::unique_ptr<Flashlight> flashlight_ = nullptr;
-
-
 private:
     void InitializeLights();
     void UpdateLights();

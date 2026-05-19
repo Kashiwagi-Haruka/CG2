@@ -40,7 +40,6 @@ public:
     const Matrix4x4& GetWorldMatrix() const { return portalCircle_->GetWorldMatrix(); };
     void TransitionToShaderResource();
     void DrawPortals();
-    void DrawRings();
     bool GetIsPlayerCanWarp() { return isPlayerCanWarp_; };
     bool IsVectorsFace(const Vector3& forward);
     bool IsVectorFaceCameraAndObj();
@@ -68,6 +67,6 @@ private:
     std::unique_ptr<WarpPos> warpPos_ = nullptr;
     std::unique_ptr<RenderTexture2D> portalRenderTexture_ = nullptr;
     Transform* parentTransform = nullptr;
-    float canWarpAngleRange_ = -0.5f;
+    float canWarpAngleRange_ = -0.25f;
 };
 

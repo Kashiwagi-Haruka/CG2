@@ -33,7 +33,7 @@ public:
 	virtual void CheckCollision();
 	virtual std::vector<std::unique_ptr<Portal>>& GetPortals() { return portals_; };
 	static bool GetCanMakePortal() { return canMakePortal_; };
-
+	bool GetIsWarp() { return isWarp_; }
 protected:
 	// 初回のワープ地点
 	Transform firstWarpPosTransform_ = { 0.0f };
@@ -45,21 +45,23 @@ protected:
 	std::unique_ptr<PortalParticle> portalParticle_ = nullptr;
 	const float kWarpTime_ = 2.0f;
 	float warpCoolTimer_ = kWarpTime_;
+	WhiteBoard* pendingWhiteBoard_ = nullptr;
 
-
+	static bool canMakePortal_;
+	WhiteBoardManager* whiteBoardManager_ = nullptr;
+	bool isWarp_ = false;
 protected:
 	virtual void UpdatePortal();
 	virtual void DrawPortal();
 private:
-	
+	// ポータルの作成
+	void SpawnPortal(WhiteBoard* board);
 	// ===== 追加 =====
 	std::vector<AABB> roomAABBs_;
 	/// @brief 指定した座標がどの部屋(AABB)に属しているかを取得する
 	int GetRoomIndex(const Vector3& pos);
-	// ポータルの作成
-	void SpawnPortal(WhiteBoard* board);
-	static bool canMakePortal_;
-	WhiteBoardManager* whiteBoardManager_ = nullptr;
-	WhiteBoard* pendingWhiteBoard_ = nullptr;
+
+
+
 
 };

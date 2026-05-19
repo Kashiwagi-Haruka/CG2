@@ -1,10 +1,11 @@
 #pragma once
 #include "WallManager.h"
+class WallManagerElevatorFall :
+    public WallManager
 
-class WallManagerRoofFloor : public WallManager
 {
 public:
-    WallManagerRoofFloor();
+    WallManagerElevatorFall();
     void Update()override;
     void Initialize()override;
 };
