@@ -5,6 +5,7 @@
 #include "Engine/Log/Logger.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
+#include "Camera.h"
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -542,10 +543,23 @@ Matrix4x4 Object3dCommon::GetDirectionalLightViewProjectionMatrix() const {
 	if (Function::Length(lightDirection) < 1.0e-5f) {
 		lightDirection = {0.0f, -1.0f, 0.0f};
 	}
-	const Vector3 lightPosition = shadowLightPosition_ - lightDirection * 120.0f;
+
+	Vector3 focusPosition = shadowLightPosition_;
+	if (defaultCamera) {
+		focusPosition = defaultCamera->GetWorldTranslate();
+	}
+
 	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
 	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
 	const Vector3 cameraUp = Function::Cross(lightDirection, right);
+
+	const float texelWorldSize = (shadowOrthoHalfWidth_ * 2.0f) / static_cast<float>(kShadowMapSize_);
+	const float snappedRight = std::round(Function::Dot(focusPosition, right) / texelWorldSize) * texelWorldSize;
+	const float snappedUp = std::round(Function::Dot(focusPosition, cameraUp) / texelWorldSize) * texelWorldSize;
+	const float focusDepth = Function::Dot(focusPosition, lightDirection);
+	focusPosition = right * snappedRight + cameraUp * snappedUp + lightDirection * focusDepth;
+
+	const Vector3 lightPosition = focusPosition - lightDirection * 120.0f;
 
 	Matrix4x4 lightView = Function::MakeIdentity4x4();
 	lightView.m[0][0] = right.x;
