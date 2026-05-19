@@ -624,9 +624,11 @@ Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
 	}
 	if (selectedLight) {
 		lightPosition = selectedLight->position;
-		lightDirection = Function::Normalize(selectedLight->direction);
+		if (Function::Length(selectedLight->direction) > 1.0e-4f) {
+			lightDirection = Function::Normalize(selectedLight->direction);
+		}
 		const float outerAngle = std::acos(std::clamp(selectedLight->cosAngle, -1.0f, 1.0f));
-		fov = outerAngle * 2.0f + 0.1f;
+		fov = outerAngle * 2.0f;
 		farPlane = std::max(shadowCameraNear_ + 0.1f, selectedLight->distance);
 	}
 	return MakeLightViewProjection(lightPosition, lightDirection, shadowCameraNear_, farPlane, fov);
