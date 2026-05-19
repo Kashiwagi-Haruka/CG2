@@ -605,12 +605,12 @@ Matrix4x4 Object3dCommon::GetPointLightViewProjectionMatrix() const {
 	}
 	return MakeLightViewProjection(lightPosition, lightDirection, shadowCameraNear_, farPlane, fov);
 }
-
 Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
 	Vector3 lightPosition = shadowLightPosition_;
 	Vector3 lightDirection = {0.0f, -1.0f, 0.0f};
 	float fov = 0.9f;
 	float farPlane = shadowCameraFar_;
+	float nearPlane = shadowCameraNear_;
 
 	const SpotCommonLight* selectedLight = nullptr;
 	for (uint32_t i = 0; i < cachedSpotLightCount_; ++i) {
@@ -627,13 +627,20 @@ Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
 		if (Function::Length(selectedLight->direction) > 1.0e-4f) {
 			lightDirection = Function::Normalize(selectedLight->direction);
 		}
+
 		const float outerAngle = std::acos(std::clamp(selectedLight->cosAngle, -1.0f, 1.0f));
 		fov = outerAngle * 2.0f;
-		farPlane = std::max(shadowCameraNear_ + 0.1f, selectedLight->distance);
-	}
-	return MakeLightViewProjection(lightPosition, lightDirection, shadowCameraNear_, farPlane, fov);
-}
 
+		farPlane = std::max(shadowCameraNear_ + 0.1f, selectedLight->distance * 1.25f);
+		const float adaptiveNear = farPlane * 0.02f;
+		nearPlane = std::clamp(adaptiveNear, shadowCameraNear_, 0.5f);
+		if (nearPlane >= farPlane - 0.05f) {
+			nearPlane = std::max(shadowCameraNear_, farPlane - 0.05f);
+		}
+	}
+
+	return MakeLightViewProjection(lightPosition, lightDirection, nearPlane, farPlane, fov);
+}
 Matrix4x4 Object3dCommon::GetAreaLightViewProjectionMatrix() const {
 	Vector3 lightPosition = shadowLightPosition_;
 	Vector3 lightDirection = {0.0f, -1.0f, 0.0f};
