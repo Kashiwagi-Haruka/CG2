@@ -40,6 +40,10 @@ void Yoshida::LightManager::Initialize()
 
 void Yoshida::LightManager::Update()
 {
+	useShadow_[SPOT] = (activeCount_[SPOT] > 0);
+	if (activeCount_[SPOT] > 0) {
+		spotLights_.at(0).shadowEnabled = 1;
+	}
     Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
     Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activeCount_[POINT]);
     Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeCount_[SPOT]);
