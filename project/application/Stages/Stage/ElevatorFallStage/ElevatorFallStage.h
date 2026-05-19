@@ -8,7 +8,7 @@ class WallManager2;
 class Door;
 class Key;
 class TestField;
-
+class WallManagerElevatorFall;
 class ElevatorFallStage :
     public BaseStage
 {
@@ -21,6 +21,7 @@ class ElevatorFallStage :
     std::unique_ptr<Flashlight> flashlight_ = nullptr;
     std::unique_ptr<WhiteBoardManager>  whiteBoardManager_ = nullptr;
     std::unique_ptr<WallManager2> wallManager2_ = nullptr;
+    std::unique_ptr<WallManagerElevatorFall> wallManagerElevatorFall_ = nullptr;
     std::unique_ptr<TestField> testField_ = nullptr;
 
     std::unique_ptr<Key> key_ = nullptr;

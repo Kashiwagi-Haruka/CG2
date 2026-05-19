@@ -10,6 +10,7 @@
 #include"GameObject/TimeCard/TimeCardWatch.h"
 #include "GameObject/Portal/FallPortalManager.h"
 #include "GameObject/Wall/WallManager2.h"
+#include "GameObject/Wall/WallManagerElevatorFall.h"
 #include "GameObject/TestField/TestField.h"
 #include "GameObject/Door/Door.h"
 
@@ -56,6 +57,7 @@ ElevatorFallStage::ElevatorFallStage(Player* player)
     flashlight_->SetPlayer(player_);
 
     wallManager2_ = std::make_unique<WallManager2>();
+    wallManagerElevatorFall_ = std::make_unique<WallManagerElevatorFall>();
     testField_ = std::make_unique<TestField>();
 
     key_ = std::make_unique<Key>();
@@ -76,6 +78,7 @@ void ElevatorFallStage::Initialize()
     //懐中電灯の初期化
     flashlight_->Initialize();
     wallManager2_->Initialize();
+    wallManagerElevatorFall_->Initialize();
     testField_->Initialize();
     //衝突しない
     testField_->SetIsCollided(false);
@@ -112,7 +115,7 @@ void ElevatorFallStage::UpdateGameObject(Camera* camera, const Vector3& lightDir
         //translate = whiteBoardManager_->GetWhiteBoards().at(1)->GetWorldPosition();
         translate.x = 7.0f;
         translate.y = -5.0f;
-        translate.z = -14.0f;
+        translate.z = -16.0f;
         player->ResetVelocityY(0.0f);
         player->SetTranslate(translate);
     }
@@ -124,6 +127,7 @@ void ElevatorFallStage::UpdateGameObject(Camera* camera, const Vector3& lightDir
     door_->Update();
 
     wallManager2_->Update();
+    wallManagerElevatorFall_->Update();
     testField_->Update();
 
     UpdateLights();
@@ -161,6 +165,11 @@ void ElevatorFallStage::CheckCollision()
         stageCollisionManager_->AddCollider(wall.get());
     }
 
+
+    for (auto& [name, wall] : wallManagerElevatorFall_->GetColliders()) {
+        stageCollisionManager_->AddCollider(wall.get());
+    }
+
     stageCollisionManager_->AddCollider(testField_.get());
 
     stageCollisionManager_->AddCollider(door_->GetAutoLockSystem().get());
@@ -184,8 +193,12 @@ void ElevatorFallStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawPar
     door_->Draw();
 
     wallManager2_->Draw();
+    wallManagerElevatorFall_->Draw();
 
-    testField_->Draw();
+    if (testField_->GetIsCollided()) {
+        testField_->Draw();
+    }
+ 
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
@@ -201,6 +214,7 @@ void ElevatorFallStage::SetSceneCameraForDraw(Camera* camera)
     flashlight_->SetCamera(camera);
     whiteBoardManager_->SetCamera(camera);
     wallManager2_->SetCamera(camera);
+    wallManagerElevatorFall_->SetCamera(camera);
     testField_->SetCamera(camera);
     key_->SetCamera(camera);
     door_->SetCamera(camera);
