@@ -137,7 +137,7 @@ void TutorialStage::UpdateGameObject(Camera* camera, const Vector3& lightDirecti
     whiteBoardManager_->Update();
     timeCard_->Update();
     timeCardRack_->Update();
-    documentManager_->Update(camera, lightDirection);
+    documentManager_->Update();
     fileManager_->Update();
     flashlight_->Update();
     deskManager_->Update();

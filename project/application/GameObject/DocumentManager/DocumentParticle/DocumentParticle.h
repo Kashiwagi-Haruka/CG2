@@ -11,10 +11,10 @@ public:
 	DocumentParticle();
 	~DocumentParticle() = default;
 	void Initialize();
-	void Update(Camera* camera, const Vector3& lightDirection);
+	void Update();
 	void Draw();
 	void Emit(const Vector3& center, uint32_t count);
-
+	void SetCamera(Camera* camera);
 	// --- 時間発生用の追加関数 ---
 	// 時間経過による連続発生を開始する
 	// interval: 何秒ごとに発生させるか / countPerEmit: 1回に何枚発生させるか

@@ -122,7 +122,7 @@ void RestroomStage::UpdateGameObject(Camera* camera, const Vector3& lightDirecti
     key_->Update();
     door_->Update();
     toiletManager_->Update();
-    documentManager_->Update(camera, lightDirection);
+    documentManager_->Update();
     //懐中電灯の更新
     flashlight_->Update();
 

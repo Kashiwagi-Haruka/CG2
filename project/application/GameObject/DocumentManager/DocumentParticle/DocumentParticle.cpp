@@ -99,7 +99,7 @@ void DocumentParticle::SetTexture()
     
 }
 
-void DocumentParticle::Update(Camera* camera, const Vector3& lightDirection) {
+void DocumentParticle::Update() {
   
     // C++
     if (!instancedObject_) return;
@@ -168,9 +168,15 @@ void DocumentParticle::Update(Camera* camera, const Vector3& lightDirection) {
         instancedObject_->SetInstanceRotate(i, doc.rotation);
     }
 
-    instancedObject_->Update(camera, lightDirection);
+    instancedObject_->Update();
 }
 
 void DocumentParticle::Draw() {
     instancedObject_->Draw();
 }
+
+void DocumentParticle::SetCamera(Camera* camera) {
+    instancedObject_->SetCamera(camera);
+    instancedObject_->UpdateCameraMatrices();
+
+};

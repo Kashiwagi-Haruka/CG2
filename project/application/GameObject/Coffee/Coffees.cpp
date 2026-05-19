@@ -514,7 +514,8 @@ void Coffees::Update(Camera* camera, const Vector3& lightDirection) {
 		}
 	}
 
-	instancedObject_->Update(camera, lightDirection);
+    (void)lightDirection;
+	instancedObject_->Update();
 }
 
 void Coffees::Draw() {
@@ -598,4 +599,7 @@ bool Coffees::CheckHitPlayer(const Vector3& playerPosition, float playerRadius, 
 
     return false;
 }
-void Coffees::SetCamera(Camera* camera) { instancedObject_->SetCamera(camera); }
+void Coffees::SetCamera(Camera* camera) {
+    instancedObject_->SetCamera(camera);
+    instancedObject_->UpdateCameraMatrices();
+}
