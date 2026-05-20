@@ -31,6 +31,7 @@ void Yoshida::LightManager::Initialize()
     directionalLight_.color = { 1.0f, 1.0f, 0.75f, 1.0f };
     directionalLight_.direction = { 0.0f, 1.0f, 0.0f };
     directionalLight_.intensity = 1.0f;
+	directionalLight_.shadowEnabled = 1;
 
     for (int i = 0; i < MAX_LIGHT; ++i) {
         useShadow_[i] = false;
@@ -46,7 +47,9 @@ void Yoshida::LightManager::Update()
 		spotLights_.at(0).shadowEnabled = 1;
 	}
 	useShadow_[DIRECTIONAL] = true;
+	directionalLight_.shadowEnabled = useShadow_[DIRECTIONAL] ? 1 : 0;
     Object3dCommon::GetInstance()->SetDirectionalLight(directionalLight_);
+
     Object3dCommon::GetInstance()->SetPointLights(pointLights_.data(), activeCount_[POINT]);
     Object3dCommon::GetInstance()->SetSpotLights(spotLights_.data(), activeCount_[SPOT]);
     Object3dCommon::GetInstance()->SetAreaLights(areaLights_.data(), activeCount_[AREA]);
