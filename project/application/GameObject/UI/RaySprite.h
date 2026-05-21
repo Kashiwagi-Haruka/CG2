@@ -8,6 +8,7 @@ class RaySprite
 public:
     enum TextureUI {
         PORTAL,
+        NOT_ABLE_PORTAL,
         HAND,
         GRAB,
         TALK,

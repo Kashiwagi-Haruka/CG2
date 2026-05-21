@@ -39,7 +39,7 @@ void GiantGentleMan::Initialize()
 
     isRayHit_ = false;
     canMakePortal_ = false;
-    isMakePortal_ = false;
+
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/gentleman", "gentleman");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, desiredAnimationName, false);
     if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, desiredAnimationName)) {
@@ -92,10 +92,6 @@ void GiantGentleMan::Update()
 void GiantGentleMan::Draw()
 {
     obj_->Draw();
-    //head_->Draw();
-    //for (auto& [name, hand] : colliders_) {
-    //    hand->Draw();
-    //}
 }
 void GiantGentleMan::SetPlayerPos(Vector3* playerPos)
 {
@@ -135,19 +131,14 @@ bool GiantGentleMan::OnCollisionRay()
 
 void GiantGentleMan::CheckCollision() {
 
-    isRayHit_ = OnCollisionRay();
-    //rayの当たり判定
-
     canMakePortal_ = false;
-
-    if (isMakePortal_) {
-        //既に作成済みだったらポータルを作成しない
-        return;
-    }
 
     if (!playerCamera_) {
         return;
     }
+
+    isRayHit_ = OnCollisionRay();
+    //rayの当たり判定
 
     if (!isRayHit_) {
         return;
@@ -160,14 +151,6 @@ void GiantGentleMan::CheckCollision() {
 
     canMakePortal_ = true;
 
-    if (!PlayerCommand::GetInstance()->Shot()) {
-        return;
-    }
-
-    // ショットSE鳴らす
-    SEManager::SoundPlay(SEManager::SHOT);
-    //ポータルを作成する
-    isMakePortal_ = true;
 }
 
 void GiantGentleMan::Animation()
