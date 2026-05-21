@@ -71,23 +71,23 @@ void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unu
 	operationChangeBox_->Update();
 	const bool isInteractRequested = operationChangeBox_->ConsumeInteractRequest();
 
-	if (!isOperationMode_ && isInteractRequested && playerCamera_ && player_) {
-		isOperationMode_ = true;
-		lockedPlayerPosition_ = player_->GetTransform().translate;
+	if (isInteractRequested && playerCamera_) {
+		if (!isOperationMode_ && player_) {
+			isOperationMode_ = true;
+			lockedPlayerPosition_ = player_->GetTransform().translate;
 
-		const Vector3 forward = operationChangeBox_->GetForward();
-		Transform operationCameraTransform{};
-		operationCameraTransform.scale = {1.0f, 1.0f, 1.0f};
-		operationCameraTransform.translate = operationChangeBox_->GetTransform().translate - forward * 1.7f + Vector3{0.0f, 0.65f, 0.0f};
-		operationCameraTransform.rotate.x = 0.17f;
-		operationCameraTransform.rotate.y = std::atan2(forward.x, forward.z);
-		operationCameraTransform.rotate.z = 0.0f;
-		playerCamera_->EnableFixedTransform(operationCameraTransform);
-	}
-
-	if (isOperationMode_ && isInteractRequested && playerCamera_) {
-		isOperationMode_ = false;
-		playerCamera_->DisableFixedTransform();
+			const Vector3 forward = operationChangeBox_->GetForward();
+			Transform operationCameraTransform{};
+			operationCameraTransform.scale = {1.0f, 1.0f, 1.0f};
+			operationCameraTransform.translate = operationChangeBox_->GetTransform().translate - forward * 1.7f + Vector3{0.0f, 0.65f, 0.0f};
+			operationCameraTransform.rotate.x = 0.17f;
+			operationCameraTransform.rotate.y = std::atan2(forward.x, forward.z);
+			operationCameraTransform.rotate.z = 0.0f;
+			playerCamera_->EnableFixedTransform(operationCameraTransform);
+		} else if (isOperationMode_) {
+			isOperationMode_ = false;
+			playerCamera_->DisableFixedTransform();
+		}
 	}
 
 	if (isOperationMode_ && player_) {
