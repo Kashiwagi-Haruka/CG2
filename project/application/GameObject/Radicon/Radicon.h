@@ -24,5 +24,5 @@ class Radicon:public YoshidaMath::Collider {
 	/// @brief ワールド座標を取得する
 	/// @return ワールド座標
 	Vector3 GetWorldPosition() const override;
-
+	const Matrix4x4& GetWorldMatrix() const override;
 };

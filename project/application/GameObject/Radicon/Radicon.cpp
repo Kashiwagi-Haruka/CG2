@@ -58,3 +58,4 @@ void Radicon::OnCollision(Collider* collider) {
 	if (collider->GetCollisionAttribute() == kCollisionPlayer) {
 	}
 }
+const Matrix4x4& Radicon::GetWorldMatrix() const { return obj_->GetWorldMatrix(); }

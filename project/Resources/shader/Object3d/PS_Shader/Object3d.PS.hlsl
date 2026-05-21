@@ -209,7 +209,7 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
         float NDotH = dot(normalize(input.normal), halfVector);
         float specularPow = pow(saturate(NDotH), gMaterial.shininess);
         float directionalShadow = ComputeMicroShadow(normalize(input.normal), directionalLightVector, toEye);
-        float directionalShadowVisibility = ComputeShadowVisibility(gDirectionalShadowMap, input.directionalShadowPosition, 0.0030f, input.normal, directionalLightVector);
+        float directionalShadowVisibility = ComputeShadowVisibility(gDirectionalShadowMap, input.directionalShadowPosition, 0.0005f, input.normal, directionalLightVector);
         //float pointShadowVisibility = ComputeShadowVisibility(gPointShadowMap, input.pointShadowPosition, 0.0005f, input.normal, directionalLightVector);
         //float spotShadowVisibility = ComputeShadowVisibility(gSpotShadowMap, input.spotShadowPosition, 0.0001f, input.normal, directionalLightVector);
         //float areaShadowVisibility = ComputeShadowVisibility(gAreaShadowMap, input.areaShadowPosition, 0.0005f, input.normal, directionalLightVector);
