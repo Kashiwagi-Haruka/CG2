@@ -184,7 +184,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\Elevator\ElevatorRoomManager.cpp" />
     <ClCompile Include="application\GameObject\VendingMac\Drink\Drink.cpp" />
     <ClCompile Include="application\GameObject\Enemy\Enemy.cpp" />
-    <ClCompile Include="application\GameObject\BurningObject\BurningObject.cpp" />
+    <ClCompile Include="application\GameObject\RadiconStage\BurningObject\BurningObject.cpp" />
     <ClCompile Include="application\GameObject\DocumentManager\DocumentParticle\DocumentParticle.cpp" />
     <ClCompile Include="application\GameObject\DocumentManager\Document\Document.cpp" />
     <ClCompile Include="application\GameObject\DocumentManager\DocumentManager.cpp" />
@@ -337,8 +337,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\UI\Inventory\Inventory.cpp" />
     <ClCompile Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.cpp" />
     <ClCompile Include="application\Stages\Stage\RadiconStage.cpp" />
-    <ClCompile Include="application\GameObject\Radicon\Radicon.cpp" />
-    <ClCompile Include="application\GameObject\OperationChangeBox\OperationChangeBox.cpp" />
+    <ClCompile Include="application\GameObject\RadiconStage\Radicon\Radicon.cpp" />
+    <ClCompile Include="application\GameObject\RadiconStage\OperationChangeBox\OperationChangeBox.cpp" />
     <ClCompile Include="application\GameObject\File\FileObject.cpp" />
     <ClCompile Include="application\GameObject\File\FileManager.cpp" />
     <ClCompile Include="application\Stages\Stage\GentleManStage\GentleManStage.cpp" />
@@ -362,6 +362,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\Portal\FallPortalManager.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManagerElevatorFall.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GentlemanTalk.cpp" />
+    <ClCompile Include="application\GameObject\RadiconStage\MiniWhiteboard\MiniWhiteboard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -417,7 +418,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\Elevator\ElevatorRoomManager.h" />
     <ClInclude Include="application\GameObject\VendingMac\Drink\Drink.h" />
     <ClInclude Include="application\GameObject\Enemy\Enemy.h" />
-    <ClInclude Include="application\GameObject\BurningObject\BurningObject.h" />
+    <ClInclude Include="application\GameObject\RadiconStage\BurningObject\BurningObject.h" />
     <ClInclude Include="application\GameObject\DocumentManager\DocumentParticle\DocumentParticle.h" />
     <ClInclude Include="application\GameObject\DocumentManager\Document\Document.h" />
     <ClInclude Include="application\GameObject\DocumentManager\DocumentManager.h" />
@@ -577,8 +578,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\UI\Inventory\Inventory.h" />
     <ClInclude Include="application\GameObject\UI\Inventory\Item\Drink\ItemDrink.h" />
     <ClInclude Include="application\Stages\Stage\RadiconStage.h" />
-    <ClInclude Include="application\GameObject\Radicon\Radicon.h" />
-    <ClInclude Include="application\GameObject\OperationChangeBox\OperationChangeBox.h" />
+    <ClInclude Include="application\GameObject\RadiconStage\Radicon\Radicon.h" />
+    <ClInclude Include="application\GameObject\RadiconStage\OperationChangeBox\OperationChangeBox.h" />
     <ClInclude Include="application\GameObject\File\FileObject.h" />
     <ClInclude Include="application\GameObject\File\FileManager.h" />
     <ClInclude Include="application\Stages\Stage\GentleManStage\GentleManStage.h" />
@@ -602,6 +603,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\Portal\FallPortalManager.h" />
     <ClInclude Include="application\GameObject\Wall\WallManagerElevatorFall.h" />
     <ClInclude Include="application\GameObject\Gentleman\GentlemanTalk.h" />
+    <ClInclude Include="application\GameObject\RadiconStage\MiniWhiteboard\MiniWhiteboard.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">
