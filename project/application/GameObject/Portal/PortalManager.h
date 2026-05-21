@@ -16,7 +16,7 @@ public:
 	~PortalManager();
 
 	/// @brief 部屋のAABBを登録する
-	void AddRoomAABB(const AABB& aabb) { roomAABBs_.push_back(aabb); }
+	void AddRoomAABB(const AABB& boxAABB) { roomAABBs_.push_back(boxAABB); }
 	/// @brief 登録された部屋のAABBをクリアする
 	void ClearRoomAABBs() { roomAABBs_.clear(); }
 

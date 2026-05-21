@@ -2,7 +2,7 @@
 #include "Engine/Loadfile/TXT/TxtManager.h"
 #include"GameObject/KeyBindConfig.h"
 
-uint32_t GentlemanTalk::talkNum_ = 0;
+size_t GentlemanTalk::talkNum_ = 0;
 bool GentlemanTalk::isSendMessage_ = false;
 bool GentlemanTalk:: isDraw_ = false;
 std::vector<std::u32string>GentlemanTalk::strings_;
