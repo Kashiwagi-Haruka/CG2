@@ -360,6 +360,10 @@ void Object3dCommon::DrawCommonEditorGrid() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonSkinning() {
+	if (isShadowMapPassActive_) {
+		DrawCommonShadow();
+		return;
+	}
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinning_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinning_->GetGraphicsPipelineState(blendMode_).Get());
@@ -367,6 +371,10 @@ void Object3dCommon::DrawCommonSkinning() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonSkinningToon() {
+	if (isShadowMapPassActive_) {
+		DrawCommonShadow();
+		return;
+	}
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinningToon_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinningToon_->GetGraphicsPipelineState(blendMode_).Get());
@@ -374,6 +382,9 @@ void Object3dCommon::DrawCommonSkinningToon() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonSkinningOutline() {
+	if (isShadowMapPassActive_) {
+		return;
+	}
 	dxCommon_->BeginOutlineRenderTarget();
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinningOutline_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinningOutline_->GetGraphicsPipelineState(blendMode_).Get());
@@ -381,6 +392,9 @@ void Object3dCommon::DrawCommonSkinningOutline() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonSkinningToonOutline() {
+	if (isShadowMapPassActive_) {
+		return;
+	}
 	dxCommon_->BeginOutlineRenderTarget();
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinningToonOutline_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinningToonOutline_->GetGraphicsPipelineState(blendMode_).Get());
@@ -395,6 +409,9 @@ void Object3dCommon::DrawCommonMirror() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonOutline() {
+	if (isShadowMapPassActive_) {
+		return;
+	}
 	dxCommon_->BeginOutlineRenderTarget();
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoOutline_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoOutline_->GetGraphicsPipelineState(blendMode_).Get());
