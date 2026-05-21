@@ -80,6 +80,12 @@ private:
 
 	// Directional Light（共通）
 	DirectionalCommonLight* directionalLightData_ = nullptr;
+	// CPU側キャッシュのディレクショナルライト
+	DirectionalCommonLight cachedDirectionalLight_ = {
+	    {1.0f, 1.0f, 1.0f, 1.0f},
+        {0.0f, -1.0f, 0.0f},
+        1.0f, 1, {0.0f, 0.0f, 0.0f}
+    };
 	// ディレクショナルライト定数バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	// ポイントライト配列へのCPU書き込みポインタ
@@ -140,9 +146,9 @@ private:
 	// シャドウマップパス中かどうかのフラグ
 	bool isShadowMapPassActive_ = false;
 	bool directionalShadowEnabled_ = true;
-	bool pointShadowEnabled_ = false;
-	bool spotShadowEnabled_ = false;
-	bool areaShadowEnabled_ = false;
+	bool pointShadowEnabled_ = true;
+	bool spotShadowEnabled_ = true;
+	bool areaShadowEnabled_ = true;
 	// シャドウ計算用ライト位置
 	Vector3 shadowLightPosition_ = {0.0f, 80.0f, 0.0f};
 	// シャドウ投影用近クリップ距離

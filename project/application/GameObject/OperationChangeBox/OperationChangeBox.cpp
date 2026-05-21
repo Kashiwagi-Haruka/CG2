@@ -20,6 +20,8 @@ void OperationChangeBox::Initialize() {
     box_->SetTransform(transform_);
     box_->SetEnableLighting(true);
     box_->SetColor(kDefaultColor);
+	controller_ = std::make_unique<Primitive>();
+	controller_->Initialize(Primitive::Box, "Resources/TD3_3102/2d/white2x2.png");
 }
 
 void OperationChangeBox::Update() {

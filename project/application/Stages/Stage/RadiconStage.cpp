@@ -15,6 +15,8 @@ RadiconStage::RadiconStage(Player* player) : player_(player) {
 	//懐中電灯の作成
 	flashlight_ = std::make_unique<Flashlight>();
 	flashlight_->SetPlayer(player_);
+	burningObject_ = std::make_unique<BurningObject>();
+
 }
 
 void RadiconStage::Initialize() { 
@@ -22,6 +24,7 @@ void RadiconStage::Initialize() {
 	testField_->Initialize();
 	radicon_->Initialize();
 	operationChangeBox_->Initialize();
+	burningObject_->Initialize();
 	radicon_->SetTransform({
 	    .scale = {0.01f, 0.01f, 0.01f},
 	    .rotate = {0.0f, Function::kPi, 0.0f},
@@ -63,22 +66,28 @@ void RadiconStage::SetCollisionManager([[maybe_unused]] CollisionManager* collis
 	stageCollisionManager_ = collisionManager;
 }
 
-void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unused]] const Vector3& lightDirection, [[maybe_unused]] Player* player) { 
+void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unused]] const Vector3& lightDirection, [[maybe_unused]] Player* player) {
 	testField_->Update();
 	operationChangeBox_->Update();
+	const bool isInteractRequested = operationChangeBox_->ConsumeInteractRequest();
 
-	if (!isOperationMode_ && operationChangeBox_->ConsumeInteractRequest() && playerCamera_ && player_) {
-		isOperationMode_ = true;
-		lockedPlayerPosition_ = player_->GetTransform().translate;
+	if (isInteractRequested && playerCamera_) {
+		if (!isOperationMode_ && player_) {
+			isOperationMode_ = true;
+			lockedPlayerPosition_ = player_->GetTransform().translate;
 
-		const Vector3 forward = operationChangeBox_->GetForward();
-		Transform operationCameraTransform{};
-		operationCameraTransform.scale = {1.0f, 1.0f, 1.0f};
-		operationCameraTransform.translate = operationChangeBox_->GetTransform().translate - forward * 1.7f + Vector3{0.0f, 0.65f, 0.0f};
-		operationCameraTransform.rotate.x = 0.17f;
-		operationCameraTransform.rotate.y = std::atan2(forward.x, forward.z);
-		operationCameraTransform.rotate.z = 0.0f;
-		playerCamera_->EnableFixedTransform(operationCameraTransform);
+			const Vector3 forward = operationChangeBox_->GetForward();
+			Transform operationCameraTransform{};
+			operationCameraTransform.scale = {1.0f, 1.0f, 1.0f};
+			operationCameraTransform.translate = operationChangeBox_->GetTransform().translate - forward * 1.7f + Vector3{0.0f, 0.65f, 0.0f};
+			operationCameraTransform.rotate.x = 0.17f;
+			operationCameraTransform.rotate.y = std::atan2(forward.x, forward.z);
+			operationCameraTransform.rotate.z = 0.0f;
+			playerCamera_->EnableFixedTransform(operationCameraTransform);
+		} else if (isOperationMode_) {
+			isOperationMode_ = false;
+			playerCamera_->DisableFixedTransform();
+		}
 	}
 
 	if (isOperationMode_ && player_) {
@@ -90,12 +99,12 @@ void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unu
 		primitive->Update();
 	}
 
-
-	//懐中電灯の更新
+	// 懐中電灯の更新
 	flashlight_->Update();
-
-	//ライトの更新
+	burningObject_->Update();
+	// ライトの更新
 	lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
+	burningObject_->Update();
 }
 
 void RadiconStage::UpdatePortal() {/*記載なし*/}
@@ -120,6 +129,7 @@ void RadiconStage::DrawModel([[maybe_unused]] bool isShadow, [[maybe_unused]] bo
 	operationChangeBox_->Draw();
 	radicon_->Draw();
 	flashlight_->Draw();
+	burningObject_->Draw();
 }
 
 void RadiconStage::DrawSprite()
@@ -142,6 +152,7 @@ void RadiconStage::SetPlayerCamera([[maybe_unused]] PlayerCamera* playerCamera) 
 	radicon_->SetCamera(playerCamera->GetCamera());
 	operationChangeBox_->SetPlayerCamera(playerCamera);
 	flashlight_->SetPlayerCamera(playerCamera);
+	burningObject_->SetPlayerCamera(playerCamera->GetCamera());
 }
 
 PortalManager* RadiconStage::GetPortalManager() { return nullptr; }

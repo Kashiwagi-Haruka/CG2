@@ -26,8 +26,10 @@ private:
 
 private:
     std::unique_ptr<Primitive> box_ = nullptr;
+	std::unique_ptr<Primitive> controller_;
     PlayerCamera* playerCamera_ = nullptr;
     Transform transform_{};
+	Transform controllerTransform_;
     bool isRayHit_ = false;
     bool interactRequested_ = false;
 };

@@ -13,7 +13,7 @@ void Game::Initialize() {
 	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());	
 
 	SceneManager::GetInstance()->ChangeScene("Title");
-	//SceneManager::GetInstance()->ChangeScene("Sample");
+	/*SceneManager::GetInstance()->ChangeScene("Sample");*/
 	// SceneManager::GetInstance()->ChangeScene("Game");
 	// SceneManager::GetInstance()->ChangeScene("Result");
 	/*SceneManager::GetInstance()->ChangeScene("Tutorial");*/

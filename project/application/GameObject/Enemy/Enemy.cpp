@@ -18,4 +18,13 @@ void Enemy::Update() {
 }
 void Enemy::Draw() {
 	Object3dCommon::GetInstance()->DrawCommonSkinning();
-	obj_->Draw(); }
+	obj_->Draw(); 
+}
+
+
+Vector3 Enemy::GetWorldPosition() const { return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix()); }
+void Enemy::OnCollision(Collider* collider) {
+	if (collider->GetCollisionAttribute() == kCollisionPlayer) {
+	}
+}
+const Matrix4x4& Enemy::GetWorldMatrix() const { return obj_->GetWorldMatrix(); }

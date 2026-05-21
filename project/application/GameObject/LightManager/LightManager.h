@@ -25,6 +25,7 @@ namespace Yoshida {
         void SetSpotLight(const SpotCommonLight& spotLight, uint32_t index);
         void Initialize();
         void Update();
+	    void SetShadowEnabled(Lights lightType, bool enabled);
         void ClearLights();
         const DirectionalCommonLight& GetDirectionalLight() { return directionalLight_; }
         const std::array<bool, MAX_LIGHT>& GetShadowFlags() { return useShadow_; }

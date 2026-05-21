@@ -13,3 +13,7 @@ void BurningObject::Draw() {
 	Object3dCommon::GetInstance()->DrawCommon();
 	obj_->Draw();
 }
+void BurningObject::SetPlayerCamera(Camera* camera) {
+	camera_ = camera;
+	obj_->SetCamera(camera);
+}

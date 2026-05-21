@@ -134,7 +134,15 @@ float ComputeMicroShadow(float3 normal, float3 toLight, float3 toEye)
     return pow(saturate(NdotL * 0.5f + 0.5f), 2.0f);
 }
 
-float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition)
+float ComputeAdaptiveShadowBias(float baseBias, float3 normal, float3 lightDirection)
+{
+    float ndotl = saturate(dot(normalize(normal), normalize(lightDirection)));
+    float slopeScale = 1.0f - ndotl;
+    // 接線方向(斜め入射)ほどアクネ/めり込みが出やすいので、追加バイアスを与える。
+    float adaptiveBias = baseBias + slopeScale * 0.0010f;
+    return min(adaptiveBias, baseBias * 6.0f);
+}
+float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition, float baseBias, float3 normal, float3 lightDirection)
 {
     if (shadowPosition.w <= 0.0f)
     {
@@ -152,34 +160,55 @@ float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition)
     }
 
     float receiverDepth = shadowCoord.z;
+    float depthBias = ComputeAdaptiveShadowBias(baseBias, normal, lightDirection);
+    // ハードシャドウでは画素ごとにバイアスが揺れるとドット状ノイズが出やすいため、
+    // 深度勾配(ddx/ddy)による追加バイアスは使わず一定の傾斜バイアスのみを利用する。
+    depthBias = min(depthBias, baseBias * 6.0f);
     if (receiverDepth <= 0.0f || receiverDepth >= 1.0f)
     {
         return 1.0f;
     }
 
-    uint shadowMapWidth;
-    uint shadowMapHeight;
-    shadowMap.GetDimensions(shadowMapWidth, shadowMapHeight);
-    float2 texelSize = 1.0f / float2(shadowMapWidth, shadowMapHeight);
-    const float depthBias = 0.002f;
+    uint width;
+    uint height;
+    shadowMap.GetDimensions(width, height);
 
+    int2 mapSize = int2(int(width), int(height));
+    float2 texelPos = shadowUV * float2(width, height) - 0.5f;
+    int2 basePixel = int2(floor(texelPos));
+    float2 fracCoord = frac(texelPos);
+
+    // 分数テクセル位置を使った重み付きPCFで、オブジェクト輪郭のジャギー感を抑える。
     float visibility = 0.0f;
+    float totalWeight = 0.0f;
+
     [unroll]
-    for (int y = -1; y <= 1; ++y)
+    for (int y = -1; y <= 2; ++y)
     {
         [unroll]
-        for (int x = -1; x <= 1; ++x)
+        for (int x = -1; x <= 2; ++x)
         {
-            float2 sampleUV = saturate(shadowUV + float2(x, y) * texelSize);
-            float shadowDepth = shadowMap.Sample(gSampler, sampleUV);
-            visibility += ((receiverDepth - depthBias) <= shadowDepth) ? 1.0f : 0.0f;
+            int2 samplePixel = clamp(basePixel + int2(x, y), int2(0, 0), mapSize - 1);
+            float shadowDepth = shadowMap.Load(int3(samplePixel, 0));
+            float sampleVisible = ((receiverDepth - depthBias) <= shadowDepth) ? 1.0f : 0.0f;
+
+            // 4x4 tentフィルタ（中心ほど重い）
+            float wx = max(0.0f, 2.0f - abs((float) x - fracCoord.x));
+            float wy = max(0.0f, 2.0f - abs((float) y - fracCoord.y));
+            float weight = wx * wy;
+
+            visibility += sampleVisible * weight;
+            totalWeight += weight;
         }
     }
 
-    visibility /= 9.0f;
-    return lerp(0.25f, 1.0f, visibility);
-}
+    if (totalWeight <= 0.0f)
+    {
+        return 1.0f;
+    }
 
+    return visibility / totalWeight;
+}
 PixelShaderOutput main(Object3dVertexShaderOutput input)
 {
     PixelShaderOutput output;
@@ -209,10 +238,10 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
         float NDotH = dot(normalize(input.normal), halfVector);
         float specularPow = pow(saturate(NDotH), gMaterial.shininess);
         float directionalShadow = ComputeMicroShadow(normalize(input.normal), directionalLightVector, toEye);
-        float directionalShadowVisibility = ComputeShadowVisibility(gDirectionalShadowMap, input.directionalShadowPosition);
-        float pointShadowVisibility = ComputeShadowVisibility(gPointShadowMap, input.pointShadowPosition);
-        float spotShadowVisibility = ComputeShadowVisibility(gSpotShadowMap, input.spotShadowPosition);
-        float areaShadowVisibility = ComputeShadowVisibility(gAreaShadowMap, input.areaShadowPosition);
+        float directionalShadowVisibility = ComputeShadowVisibility(gDirectionalShadowMap, input.directionalShadowPosition, 0.0005f, input.normal, directionalLightVector);
+        //float pointShadowVisibility = ComputeShadowVisibility(gPointShadowMap, input.pointShadowPosition, 0.0005f, input.normal, directionalLightVector);
+        //float spotShadowVisibility = ComputeShadowVisibility(gSpotShadowMap, input.spotShadowPosition, 0.0001f, input.normal, directionalLightVector);
+        //float areaShadowVisibility = ComputeShadowVisibility(gAreaShadowMap, input.areaShadowPosition, 0.0005f, input.normal, directionalLightVector);
         
         float directionalShadowFactor = (gDirectionalLight.shadowEnabled != 0) ? directionalShadowVisibility : 1.0f;
         float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity * directionalShadow * directionalShadowFactor;
@@ -236,13 +265,13 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
             float pointShadow = ComputeMicroShadow(N, Lp, toEye);
             diffuseP += gMaterial.color.rgb * textureColor.rgb *
                   pointLight.color.rgb * pointLight.intensity *
-                  NdotL_p * attenuation * pointShadow * (pointLight.shadowEnabled != 0 ? pointShadowVisibility : 1.0f);
+                  NdotL_p * attenuation * pointShadow;
 
 // 鏡面反射 (Phong)
             float NdotH_p = saturate(dot(N, H));
             float specularPowP = pow(NdotH_p, gMaterial.shininess);
             specularP += pointLight.color.rgb * pointLight.intensity *
-                   specularPowP * attenuation * pointShadow * (pointLight.shadowEnabled != 0 ? pointShadowVisibility : 1.0f);
+                   specularPowP * attenuation * pointShadow;
         }
 
 // Spot Light
@@ -268,9 +297,9 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
 
             spotLightDiffuse += gMaterial.color.rgb * textureColor.rgb *
                 spotLight.color.rgb * spotLight.intensity *
-                NdotL_s * attenuationFactor * falloffFactor * spotShadow * (spotLight.shadowEnabled != 0 ? spotShadowVisibility : 1.0f);
+                NdotL_s * attenuationFactor * falloffFactor * spotShadow;
             spotLightSpecular += spotLight.color.rgb * spotLight.intensity *
-                specularPowS * attenuationFactor * falloffFactor * spotShadow * (spotLight.shadowEnabled != 0 ? spotShadowVisibility : 1.0f);
+                specularPowS * attenuationFactor * falloffFactor * spotShadow;
         }
         // Area Light
         float3 areaLightDiffuse = float3(0.0f, 0.0f, 0.0f);
@@ -294,9 +323,9 @@ PixelShaderOutput main(Object3dVertexShaderOutput input)
 
             areaLightDiffuse += gMaterial.color.rgb * textureColor.rgb *
                 areaLight.color.rgb * intensity *
-                NdotL_a * attenuationFactor * areaShadow * (areaLight.shadowEnabled != 0 ? areaShadowVisibility : 1.0f);
+                NdotL_a * attenuationFactor * areaShadow;
             areaLightSpecular += areaLight.color.rgb * intensity *
-                specularPowA * attenuationFactor * areaShadow * (areaLight.shadowEnabled != 0 ? areaShadowVisibility : 1.0f);
+                specularPowA * attenuationFactor * areaShadow;
         }
         float3 viewDirection = normalize(input.worldPosition - gCamera.worldPosition);
         float3 reflectedDirection = reflect(viewDirection, normalize(input.normal));

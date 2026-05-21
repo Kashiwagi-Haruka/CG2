@@ -103,6 +103,7 @@ void TitleScene::Initialize() {
 
 	lightManager_->ClearLights();
 	lightManager_->Initialize();
+	lightManager_->SetShadowEnabled(Yoshida::LightManager::DIRECTIONAL, false);
 
 	// ゲームオブジェクト
 	timeCard_->Initialize();
@@ -190,7 +191,7 @@ void TitleScene::Draw() {
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(true);
 	Object3dCommon::GetInstance()->SetVignetteStrength(true);
-
+	Object3dCommon::GetInstance()->SetShadowMapEnabled(false, false, false, false);
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	Object3dCommon::GetInstance()->DrawCommon();
 

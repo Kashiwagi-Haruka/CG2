@@ -3,7 +3,7 @@
 #include "Engine/Texture/Mesh/Object3d/Object3d.h"
 #include"GameObject/YoshidaMath/CollisionManager/Collider.h"
 class Camera;
-class Radicon{
+class Radicon:public YoshidaMath::Collider {
 
 	std::unique_ptr<Object3d> obj_;
 	Camera* camera_ = nullptr;
@@ -19,6 +19,10 @@ class Radicon{
 	void Draw();
 	void SetTransform(const Transform& transform) { transform_ = transform; }
 	const Transform& GetTransform() const { return transform_; }
-	
-
+	/// @brief 衝突時コールバック関数
+	void OnCollision(Collider* collider) override;
+	/// @brief ワールド座標を取得する
+	/// @return ワールド座標
+	Vector3 GetWorldPosition() const override;
+	const Matrix4x4& GetWorldMatrix() const override;
 };

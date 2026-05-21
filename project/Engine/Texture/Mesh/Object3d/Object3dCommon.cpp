@@ -5,6 +5,7 @@
 #include "Engine/Log/Logger.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
+#include "Camera.h"
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -178,11 +179,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
 	assert(directionalLightData_);
 
-	*directionalLightData_ = {
-	    {1.0f, 1.0f, 1.0f, 1.0f},
-        {0.0f, -1.0f, 0.0f},
-        1.0f, 1, {0.0f, 0.0f, 0.0f}
-    };
+	*directionalLightData_ = cachedDirectionalLight_;
 	directionalLightResource_->Unmap(0, nullptr);
 	pointLightResource_ = CreateBufferResource(sizeof(PointCommonLight) * kMaxPointLights);
 	assert(pointLightResource_);
@@ -295,7 +292,10 @@ void Object3dCommon::DrawSet(){
 	}
 }
 void Object3dCommon::DrawCommon() {
-
+	if (isShadowMapPassActive_) {
+		DrawCommonShadow();
+		return;
+	}
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(pso_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
@@ -360,6 +360,10 @@ void Object3dCommon::DrawCommonEditorGrid() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonSkinning() {
+	if (isShadowMapPassActive_) {
+		DrawCommonShadow();
+		return;
+	}
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinning_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinning_->GetGraphicsPipelineState(blendMode_).Get());
@@ -367,6 +371,10 @@ void Object3dCommon::DrawCommonSkinning() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonSkinningToon() {
+	if (isShadowMapPassActive_) {
+		DrawCommonShadow();
+		return;
+	}
 
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinningToon_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinningToon_->GetGraphicsPipelineState(blendMode_).Get());
@@ -374,6 +382,9 @@ void Object3dCommon::DrawCommonSkinningToon() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonSkinningOutline() {
+	if (isShadowMapPassActive_) {
+		return;
+	}
 	dxCommon_->BeginOutlineRenderTarget();
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinningOutline_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinningOutline_->GetGraphicsPipelineState(blendMode_).Get());
@@ -381,6 +392,9 @@ void Object3dCommon::DrawCommonSkinningOutline() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonSkinningToonOutline() {
+	if (isShadowMapPassActive_) {
+		return;
+	}
 	dxCommon_->BeginOutlineRenderTarget();
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoSkinningToonOutline_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoSkinningToonOutline_->GetGraphicsPipelineState(blendMode_).Get());
@@ -395,6 +409,9 @@ void Object3dCommon::DrawCommonMirror() {
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::DrawCommonOutline() {
+	if (isShadowMapPassActive_) {
+		return;
+	}
 	dxCommon_->BeginOutlineRenderTarget();
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(psoOutline_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(psoOutline_->GetGraphicsPipelineState(blendMode_).Get());
@@ -533,19 +550,35 @@ void Object3dCommon::EndShadowMapPass() {
 }
 
 void Object3dCommon::SetDirectionalLight(DirectionalCommonLight& light) {
-	*directionalLightData_ = light;
-	directionalLightData_->direction = Function::Normalize(directionalLightData_->direction);
+	cachedDirectionalLight_ = light;
+	cachedDirectionalLight_.direction = Function::Normalize(cachedDirectionalLight_.direction);
+	if (Function::Length(cachedDirectionalLight_.direction) < 1.0e-5f) {
+		cachedDirectionalLight_.direction = {0.0f, -1.0f, 0.0f};
+	}
+
+	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+	*directionalLightData_ = cachedDirectionalLight_;
+	directionalLightResource_->Unmap(0, nullptr);
+	directionalLightData_ = nullptr;
 }
 
 Matrix4x4 Object3dCommon::GetDirectionalLightViewProjectionMatrix() const {
-	Vector3 lightDirection = Function::Normalize(directionalLightData_->direction);
+	Vector3 lightDirection = Function::Normalize(cachedDirectionalLight_.direction);
 	if (Function::Length(lightDirection) < 1.0e-5f) {
 		lightDirection = {0.0f, -1.0f, 0.0f};
 	}
-	const Vector3 lightPosition = shadowLightPosition_ - lightDirection * 120.0f;
+
+	Vector3 focusPosition = shadowLightPosition_;
+	//if (defaultCamera) {
+	//	focusPosition = defaultCamera->GetWorldTranslate();
+	//}
+
 	const Vector3 up = (std::abs(lightDirection.y) > 0.99f) ? Vector3{0.0f, 0.0f, 1.0f} : Vector3{0.0f, 1.0f, 0.0f};
 	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
 	const Vector3 cameraUp = Function::Cross(lightDirection, right);
+
+
+	const Vector3 lightPosition = focusPosition - lightDirection * 120.0f;
 
 	Matrix4x4 lightView = Function::MakeIdentity4x4();
 	lightView.m[0][0] = right.x;
@@ -591,12 +624,12 @@ Matrix4x4 Object3dCommon::GetPointLightViewProjectionMatrix() const {
 	}
 	return MakeLightViewProjection(lightPosition, lightDirection, shadowCameraNear_, farPlane, fov);
 }
-
 Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
 	Vector3 lightPosition = shadowLightPosition_;
 	Vector3 lightDirection = {0.0f, -1.0f, 0.0f};
 	float fov = 0.9f;
 	float farPlane = shadowCameraFar_;
+	float nearPlane = shadowCameraNear_;
 
 	const SpotCommonLight* selectedLight = nullptr;
 	for (uint32_t i = 0; i < cachedSpotLightCount_; ++i) {
@@ -610,14 +643,23 @@ Matrix4x4 Object3dCommon::GetSpotLightViewProjectionMatrix() const {
 	}
 	if (selectedLight) {
 		lightPosition = selectedLight->position;
-		lightDirection = Function::Normalize(selectedLight->direction);
-		const float outerAngle = std::acos(std::clamp(selectedLight->cosAngle, -1.0f, 1.0f));
-		fov = outerAngle * 2.0f + 0.1f;
-		farPlane = std::max(shadowCameraNear_ + 0.1f, selectedLight->distance);
-	}
-	return MakeLightViewProjection(lightPosition, lightDirection, shadowCameraNear_, farPlane, fov);
-}
+		if (Function::Length(selectedLight->direction) > 1.0e-4f) {
+			lightDirection = Function::Normalize(selectedLight->direction);
+		}
 
+		const float outerAngle = std::acos(std::clamp(selectedLight->cosAngle, -1.0f, 1.0f));
+		fov = outerAngle * 2.0f;
+
+		farPlane = std::max(shadowCameraNear_ + 0.1f, selectedLight->distance * 1.25f);
+		const float adaptiveNear = farPlane * 0.02f;
+		nearPlane = std::clamp(adaptiveNear, shadowCameraNear_, 0.5f);
+		if (nearPlane >= farPlane - 0.05f) {
+			nearPlane = std::max(shadowCameraNear_, farPlane - 0.05f);
+		}
+	}
+
+	return MakeLightViewProjection(lightPosition, lightDirection, nearPlane, farPlane, fov);
+}
 Matrix4x4 Object3dCommon::GetAreaLightViewProjectionMatrix() const {
 	Vector3 lightPosition = shadowLightPosition_;
 	Vector3 lightDirection = {0.0f, -1.0f, 0.0f};

@@ -52,4 +52,11 @@ void Radicon::Update(bool isOperationMode) {
 }
 void Radicon::Draw() {
 	Object3dCommon::GetInstance()->DrawCommonSkinning();
-	obj_->Draw(); }
+	obj_->Draw(); 
+}
+Vector3 Radicon::GetWorldPosition() const { return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix()); }
+void Radicon::OnCollision(Collider* collider) {
+	if (collider->GetCollisionAttribute() == kCollisionPlayer) {
+	}
+}
+const Matrix4x4& Radicon::GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
