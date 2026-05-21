@@ -22,6 +22,11 @@ void OperationChangeBox::Initialize() {
     box_->SetColor(kDefaultColor);
 	controller_ = std::make_unique<Primitive>();
 	controller_->Initialize(Primitive::Box, "Resources/TD3_3102/2d/white2x2.png");
+	controllerTransform_ = {
+	    .scale{0.3f,                   0.2f,	                                                                                     0.3f                  },
+	    .rotate{0.0f,                   0.0f,	                                                                                     0.0f                  },
+	    .translate{transform_.translate.x, transform_.translate.y + (transform_.scale.y * 0.5f) + (controllerTransform_.scale.y * 0.5f), transform_.translate.z}
+    };
 }
 
 void OperationChangeBox::Update() {
