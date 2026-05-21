@@ -436,6 +436,7 @@
     <ClCompile Include="application\GameObject\Wall\WallManagerElevatorFall.cpp" />
     <ClCompile Include="application\GameObject\Building\Building.cpp" />
     <ClCompile Include="application\GameObject\Gentleman\GentlemanTalk.cpp" />
+    <ClCompile Include="application\Text\LockerMenu\LockerMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -860,6 +861,7 @@
     <ClInclude Include="application\GameObject\Wall\WallManagerElevatorFall.h" />
     <ClInclude Include="application\GameObject\Building\Building.h" />
     <ClInclude Include="application\GameObject\Gentleman\GentlemanTalk.h" />
+    <ClInclude Include="application\Text\LockerMenu\LockerMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

@@ -10,6 +10,7 @@
 #include "Mission.h"
 #include "Text/TextUIManager/TextUIManager.h"
 #include"Text/GentlemanMenu/GentlemanMenu.h"
+#include"Text/LockerMenu/LockerMenu.h"
 
 
 class UIManager {
@@ -28,7 +29,8 @@ private:
     std::unique_ptr<ChairMenu>chairMenu_ = nullptr;
     //紳士メニュー
     std::unique_ptr<GentlemanMenu>gentlemanMenu_ = nullptr;
-
+    //ロッカーメニュー
+    std::unique_ptr<LockerMenu>lockerMenu_ = nullptr;
 public:
   
     static bool GetIsPause() { return isPause_; }

@@ -4,12 +4,12 @@
 #include"Function.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
-#include"GameObject/Player/Player.h"
-#include"Object3d/Object3dCommon.h"
 #include"Animation/AnimationManager.h"
 #include "GameBase.h"
 #include"GameObject/SEManager/SEManager.h"
 #include<imgui.h>
+#include"Text/LockerMenu/LockerMenu.h"
+
 PlayerCamera* Locker::playerCamera_ = nullptr;
 
 Locker::Locker()
@@ -33,9 +33,9 @@ void Locker::OnCollision(Collider* collider)
             return;
         }
 
-       isPlayerIn_ = true;
+        isPlayerIn_ = true;
 
-    
+
     }
 }
 
@@ -169,33 +169,33 @@ void Locker::CheckCollision()
 {
     isRayHit_ = OnCollisionRay();
 
-   
+    //rayの当たり判定
 
-        //rayの当たり判定
+    //プレイヤーが中に入っていたらメニューを表示する
+    LockerMenu::SetIsShowMenu(isPlayerIn_);
 
-            if (PlayerCommand::GetInstance()->InteractTrigger()&&
-                !PlayerCommand::GetIsGrab()&&
-                isRayHit_|| !PlayerCommand::GetIsGrab() && !isPlayerPreIn_&&isPlayerIn_) {
+    if (PlayerCommand::GetInstance()->InteractTrigger() &&
+        !PlayerCommand::GetIsGrab() &&
+        isRayHit_ || !PlayerCommand::GetIsGrab() && !isPlayerPreIn_ && isPlayerIn_) {
 
-                SEManager::SoundPlay(SEManager::LOCKER);
-               
+        SEManager::SoundPlay(SEManager::LOCKER);
 
-                if (desiredAnimationName == "Open") {
-                    desiredAnimationName = "Close";
-                    isOpen_ = false;
-                } else {
+        if (desiredAnimationName == "Open") {
+            desiredAnimationName = "Close";
+            isOpen_ = false;
+        } else {
 
-                    if (desiredAnimationName == "Close"|| desiredAnimationName == "Idle") {
-                        desiredAnimationName = "Open";
-                        isOpen_ = true;
-                    }
-                }
-  
-         
-
+            if (desiredAnimationName == "Close" || desiredAnimationName == "Idle") {
+                desiredAnimationName = "Open";
+                isOpen_ = true;
             }
-        
-            isPlayerPreIn_ = isPlayerIn_;
+        }
+
+
+
+    }
+
+    isPlayerPreIn_ = isPlayerIn_;
 
 
 }

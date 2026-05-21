@@ -26,7 +26,7 @@ UIManager::UIManager() {
     mission_ = std::make_unique<Mission>();
     chairMenu_ = std::make_unique<ChairMenu>();
     gentlemanMenu_ = std::make_unique<GentlemanMenu>();
- 
+    lockerMenu_ = std::make_unique<LockerMenu>();
 }
 
 void UIManager::Initialize() {
@@ -42,6 +42,7 @@ void UIManager::Initialize() {
     mission_->Initialize();
     chairMenu_->Initialize();
     gentlemanMenu_->Initialize();
+    lockerMenu_->Initialize();
     Inventory::GetInstance()->Initialize();
 
 }
@@ -89,7 +90,7 @@ void UIManager::Update() {
     } else {
         gentlemanMenu_->Update();
         chairMenu_->Update();
-
+        lockerMenu_->Update();
     }
 
     Inventory::GetInstance()->Update();
@@ -136,6 +137,10 @@ void UIManager::Draw() {
 
     if (ChairMenu::GetIsShowMenu()) {
         chairMenu_->Draw();
+    }
+
+    if (LockerMenu::GetIsShowMenu()) {
+        lockerMenu_->Draw();
     }
 
     //紳士メニュー
