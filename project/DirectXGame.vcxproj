@@ -183,7 +183,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\UI\DamageOverlay.cpp" />
     <ClCompile Include="application\GameObject\Elevator\ElevatorRoomManager.cpp" />
     <ClCompile Include="application\GameObject\VendingMac\Drink\Drink.cpp" />
-    <ClCompile Include="application\GameObject\Enemy\Enemy.cpp" />
+    <ClCompile Include="application\GameObject\RadiconStage\Enemy\Enemy.cpp" />
     <ClCompile Include="application\GameObject\RadiconStage\BurningObject\BurningObject.cpp" />
     <ClCompile Include="application\GameObject\DocumentManager\DocumentParticle\DocumentParticle.cpp" />
     <ClCompile Include="application\GameObject\DocumentManager\Document\Document.cpp" />
@@ -417,7 +417,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\UI\DamageOverlay.h" />
     <ClInclude Include="application\GameObject\Elevator\ElevatorRoomManager.h" />
     <ClInclude Include="application\GameObject\VendingMac\Drink\Drink.h" />
-    <ClInclude Include="application\GameObject\Enemy\Enemy.h" />
+    <ClInclude Include="application\GameObject\RadiconStage\Enemy\Enemy.h" />
     <ClInclude Include="application\GameObject\RadiconStage\BurningObject\BurningObject.h" />
     <ClInclude Include="application\GameObject\DocumentManager\DocumentParticle\DocumentParticle.h" />
     <ClInclude Include="application\GameObject\DocumentManager\Document\Document.h" />
