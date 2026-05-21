@@ -66,11 +66,12 @@ void RadiconStage::SetCollisionManager([[maybe_unused]] CollisionManager* collis
 	stageCollisionManager_ = collisionManager;
 }
 
-void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unused]] const Vector3& lightDirection, [[maybe_unused]] Player* player) { 
+void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unused]] const Vector3& lightDirection, [[maybe_unused]] Player* player) {
 	testField_->Update();
 	operationChangeBox_->Update();
+	const bool isInteractRequested = operationChangeBox_->ConsumeInteractRequest();
 
-	if (!isOperationMode_ && operationChangeBox_->ConsumeInteractRequest() && playerCamera_ && player_) {
+	if (!isOperationMode_ && isInteractRequested && playerCamera_ && player_) {
 		isOperationMode_ = true;
 		lockedPlayerPosition_ = player_->GetTransform().translate;
 
@@ -84,6 +85,11 @@ void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unu
 		playerCamera_->EnableFixedTransform(operationCameraTransform);
 	}
 
+	if (isOperationMode_ && isInteractRequested && playerCamera_) {
+		isOperationMode_ = false;
+		playerCamera_->DisableFixedTransform();
+	}
+
 	if (isOperationMode_ && player_) {
 		player_->SetTranslate(lockedPlayerPosition_);
 	}
@@ -93,11 +99,10 @@ void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unu
 		primitive->Update();
 	}
 
-
-	//懐中電灯の更新
+	// 懐中電灯の更新
 	flashlight_->Update();
 	burningObject_->Update();
-	//ライトの更新
+	// ライトの更新
 	lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 	burningObject_->Update();
 }

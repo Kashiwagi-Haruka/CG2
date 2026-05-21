@@ -173,12 +173,41 @@ float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition,
     uint height;
     shadowMap.GetDimensions(width, height);
 
+    int2 mapSize = int2(int(width), int(height));
     float2 texelPos = shadowUV * float2(width, height) - 0.5f;
-    int2 samplePixel = clamp(int2(floor(texelPos + 0.5f)), int2(0, 0), int2(int(width) - 1, int(height) - 1));
-    float shadowDepth = shadowMap.Load(int3(samplePixel, 0));
+    int2 basePixel = int2(floor(texelPos));
+    float2 fracCoord = frac(texelPos);
 
-    // PCFぼかしは使わず、1サンプル比較でハードシャドウを描画する。
-    return ((receiverDepth - depthBias) <= shadowDepth) ? 1.0f : 0.0f;
+    // 分数テクセル位置を使った重み付きPCFで、オブジェクト輪郭のジャギー感を抑える。
+    float visibility = 0.0f;
+    float totalWeight = 0.0f;
+
+    [unroll]
+    for (int y = -1; y <= 2; ++y)
+    {
+        [unroll]
+        for (int x = -1; x <= 2; ++x)
+        {
+            int2 samplePixel = clamp(basePixel + int2(x, y), int2(0, 0), mapSize - 1);
+            float shadowDepth = shadowMap.Load(int3(samplePixel, 0));
+            float sampleVisible = ((receiverDepth - depthBias) <= shadowDepth) ? 1.0f : 0.0f;
+
+            // 4x4 tentフィルタ（中心ほど重い）
+            float wx = max(0.0f, 2.0f - abs((float) x - fracCoord.x));
+            float wy = max(0.0f, 2.0f - abs((float) y - fracCoord.y));
+            float weight = wx * wy;
+
+            visibility += sampleVisible * weight;
+            totalWeight += weight;
+        }
+    }
+
+    if (totalWeight <= 0.0f)
+    {
+        return 1.0f;
+    }
+
+    return visibility / totalWeight;
 }
 PixelShaderOutput main(Object3dVertexShaderOutput input)
 {
