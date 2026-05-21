@@ -441,19 +441,14 @@ void ShadowGameScene::DrawModel() {
 	//=======================shadowマップの開始↓=======================
 	auto* object3dCommon = Object3dCommon::GetInstance();
 
-	const auto& shadowFlags = lightManager_->GetShadowFlags();
-	if (shadowFlags[Yoshida::LightManager::DIRECTIONAL]) {
-		object3dCommon->SetShadowMapEnabled(true, false, false, false);
-		object3dCommon->BeginShadowMapPass();
-		object3dCommon->DrawCommonShadow();
-		Object3dCommon::GetInstance()->SetDefaultCamera(cameraController_->GetPlayerCamera()->GetCamera());
-		SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
-		DrawGameObject(true, false, false, false, false);
-		object3dCommon->EndShadowMapPass();
-	}
-
-	object3dCommon->SetShadowMapEnabled(
-	    shadowFlags[Yoshida::LightManager::DIRECTIONAL], shadowFlags[Yoshida::LightManager::POINT], shadowFlags[Yoshida::LightManager::SPOT], shadowFlags[Yoshida::LightManager::AREA]);
+	
+	object3dCommon->SetShadowMapEnabled(true, false, false, false);
+	object3dCommon->BeginShadowMapPass();
+	object3dCommon->DrawCommonShadow();
+	Object3dCommon::GetInstance()->SetDefaultCamera(cameraController_->GetPlayerCamera()->GetCamera());
+	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
+	DrawGameObject(true, false, false, false, false);
+	object3dCommon->EndShadowMapPass();
 
     if (auto* portalManager = stageManager_->GetPortalManager()) {
         for (auto& portal : portalManager->GetPortals()) {
