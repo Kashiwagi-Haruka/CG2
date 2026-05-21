@@ -10,6 +10,7 @@
 #include "Animation/Animation.h"
 #include "Animation/Skeleton.h"
 #include "Animation/SkinCluster.h"
+#include"GentlemanTalk.h"
 
 
 class Gentleman : public YoshidaMath::Collider
@@ -37,6 +38,8 @@ private:
     void Animation();
 private:
     static PlayerCamera* playerCamera_;
+    //紳士トークが聴ける！！
+    std::unique_ptr<GentlemanTalk> gentlemanTalk_ = nullptr;
     std::unique_ptr<Object3d>obj_ = nullptr;
     AABB localAABB_;
     // アニメーション

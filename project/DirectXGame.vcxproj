@@ -361,6 +361,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\ReadableObject\ReadableObject.cpp" />
     <ClCompile Include="application\GameObject\Portal\FallPortalManager.cpp" />
     <ClCompile Include="application\GameObject\Wall\WallManagerElevatorFall.cpp" />
+    <ClCompile Include="application\GameObject\Gentleman\GentlemanTalk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -600,6 +601,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\ReadableObject\ReadableObject.h" />
     <ClInclude Include="application\GameObject\Portal\FallPortalManager.h" />
     <ClInclude Include="application\GameObject\Wall\WallManagerElevatorFall.h" />
+    <ClInclude Include="application\GameObject\Gentleman\GentlemanTalk.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

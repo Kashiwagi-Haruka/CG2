@@ -4,6 +4,7 @@
 
 #include "Gentleman.h"
 
+
 class PlayerCamera;
 class Camera;
 class GentleManManager

@@ -24,6 +24,8 @@ Gentleman::Gentleman()
     SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
     localAABB_ = { .min = {-0.5f,-0.5f,-0.5f},.max = {0.5f,0.5,0.5f} };
+    //紳士トーク
+    gentlemanTalk_ = std::make_unique<GentlemanTalk>();
 }
 
 void Gentleman::OnCollision(Collider* collider)
@@ -54,7 +56,7 @@ void Gentleman::Animation()
         loopAnimation = true;
     } else if (desiredAnimationName == "Tired") {
         loopAnimation = false;
-    }else if (desiredAnimationName == "Sit") {
+    } else if (desiredAnimationName == "Sit") {
         loopAnimation = true;
     }
 
@@ -91,15 +93,19 @@ void Gentleman::SetCamera(Camera* camera)
 
 void Gentleman::Update()
 {
+    //紳士トーク更新 毎フレームメッセージをリセット中
+    gentlemanTalk_->Update();
+
     CheckCollision();
     Animation();
     obj_->Update();
+
 }
 
 void Gentleman::Initialize()
 {
     obj_->Initialize();
-	obj_->RegisterEditor("gentleman");
+    obj_->RegisterEditor("gentleman");
     animationNum = 0;
 
     isRayHit_ = false;
@@ -119,12 +125,18 @@ void Gentleman::Initialize()
             obj_->SetSkinCluster(&skinCluster_);
         }
     }
+
+    //紳士トーク
+    gentlemanTalk_->Initialize();
+
+
+
 }
 
 void Gentleman::Draw()
 {
-	Object3dCommon::GetInstance()->DrawCommonSkinning();
-    obj_->Draw();        
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
+    obj_->Draw();
 }
 
 
@@ -138,34 +150,10 @@ void Gentleman::CheckCollision()
         GentlemanMenu::SetIsShowMenu(false);
     }
 
-    //if (PlayerCommand::GetInstance()->MouseWheelUp()) {
-
-    //    if (animationNum < 7) {
-    //        animationNum++;
-    //    } else {
-    //        animationNum = 0;
-    //    }
-    //}
-
-    //std::string animationName = "Idle";
-
-    //if (animationNum == 0) {
-    //    animationName = "Idle";
-    //} else if (animationNum == 1) {
-    //    animationName = "AerialPigeon";
-    //} else if (animationNum == 2) {
-    //    animationName = "Round";
-    //} else if (animationNum == 3) {
-    //    animationName = "SitDown";
-    //} else if (animationNum == 4) {
-    //    animationName = "Sleep";
-    //} else if (animationNum == 5) {
-    //    animationName = "Soft";
-    //} else if (animationNum == 6) {
-    //    animationName = "Tired";
-    //} else if (animationNum == 7) {
-    //    animationName = "Sit";
-    //}
+    if (!GentlemanMenu::GetIsShowMenu()) {
+        //メニューを表示していないときトークも表示しない
+        gentlemanTalk_->SetIsDraw(false);
+    }
 
     //rayの当たり判定
     if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger() && !PlayerCommand::GetIsGrab()) {
@@ -180,7 +168,7 @@ void Gentleman::CheckCollision()
         }
 
         SEManager::SoundPlay(SEManager::TYPE);
-   /*     SetAnimationName(animationName);*/
+        /*     SetAnimationName(animationName);*/
 
     }
 
@@ -210,10 +198,9 @@ void Gentleman::SwichCommand()
     {
     case GentlemanMenu::TALK:
         //メニューを表示しているとき
-
-
-        //グラブ終了後メニューを閉じる
-        //GentlemanMenu::SetIsShowMenu(false);
+       //gentlemanTalk_->SetStrings(progressSaveData_->currentStageName);
+        //gentlemanTalk_->SetIsDraw(true);
+        gentlemanTalk_->GentlemanSendMessage();
 
         break;
     case GentlemanMenu::SAVE:
@@ -222,10 +209,13 @@ void Gentleman::SwichCommand()
             GentlemanMenu::SetIsSaveMenuShow(true);
         }
 
+        //紳士トークが描画されていたら描画を外す
+        gentlemanTalk_->SetIsDraw(false);
         //メニューを閉じる
         GentlemanMenu::SetIsShowMenu(false);
         break;
     default:
+
         //メニューを閉じる
         GentlemanMenu::SetIsShowMenu(false);
         break;
