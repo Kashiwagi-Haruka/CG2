@@ -244,7 +244,8 @@ void MirrorStage::CheckCollision() {
 		for (auto& [name, collision]:locker->GetColliders()) {
 		//開いていないときFrontのColliderを追加する
 			bool flag = locker->GetIsOpen()&& name.find("Front") != std::string::npos;
-			if (!flag) {
+
+			if (!flag&& !locker->GetIsPlayerIn()) {
 				stageCollisionManager_->AddCollider(collision.get());
 			}
 		

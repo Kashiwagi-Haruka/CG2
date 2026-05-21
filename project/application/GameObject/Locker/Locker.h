@@ -35,7 +35,7 @@ public:
     std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>& GetColliders() {
         return colliders_ ;
     }
-    const Vector3& GetRotate() { return obj_->GetRotate(); }
+    Vector3 GetRotate() { return obj_->GetTransform().rotate; }
     bool GetIsPlayerIn() { return isPlayerIn_; };
     void SetIsPlayerIn(bool flag) { isPlayerIn_ = flag;  }
     // ★追加：フロントコライダーのワールド座標（出口）を取得する

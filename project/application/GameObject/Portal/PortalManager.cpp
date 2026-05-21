@@ -247,7 +247,8 @@ void PortalManager::CheckCollision() {
     isPendingPortalSpawn_ = true;
 
     if (portalParticle_) {
-        portalParticle_->Start(*playerPos_, pendingWhiteBoard_->GetCollisionTransform().translate);
+
+        portalParticle_->Start(playerCamera_->GetTransform().translate, pendingWhiteBoard_->GetCollisionTransform().translate);
     }
 }
 // ===== 追加: 座標がどの部屋に属しているかを判定する =====
