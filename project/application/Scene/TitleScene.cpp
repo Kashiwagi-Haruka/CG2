@@ -190,7 +190,7 @@ void TitleScene::Draw() {
 
 	Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(true);
 	Object3dCommon::GetInstance()->SetVignetteStrength(true);
-
+	Object3dCommon::GetInstance()->SetShadowMapEnabled(false, false, false, false);
 	Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 	Object3dCommon::GetInstance()->DrawCommon();
 
