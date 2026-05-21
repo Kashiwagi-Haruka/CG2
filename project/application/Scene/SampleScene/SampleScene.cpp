@@ -205,7 +205,7 @@ void SampleScene::Initialize() {
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
 	directionalLight_.intensity = 1.0f;
-	/*directionalLight_.shadowEnabled = true;*/
+	directionalLight_.shadowEnabled = true;
 
 	activeSpotLightCount_ = 2;
 	spotLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
