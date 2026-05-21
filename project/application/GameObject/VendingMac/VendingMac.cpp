@@ -49,7 +49,9 @@ void VendingMac::Update() {
 	CheckCollision();
 
 	obj_->Update();
-	drink_->SetVendingMacPosition(obj_->GetTranslate());
+	Vector3 drinkPos = obj_->GetTranslate();
+	drinkPos.y -= 0.5f;
+	drink_->SetVendingMacPosition(drinkPos);
 	drink_->SetVendingMacForward(GetForward());
 	drink_->Update();
 
