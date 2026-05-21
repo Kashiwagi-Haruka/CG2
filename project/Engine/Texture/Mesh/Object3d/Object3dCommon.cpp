@@ -560,11 +560,6 @@ Matrix4x4 Object3dCommon::GetDirectionalLightViewProjectionMatrix() const {
 	const Vector3 right = Function::Normalize(Function::Cross(up, lightDirection));
 	const Vector3 cameraUp = Function::Cross(lightDirection, right);
 
-	const float texelWorldSize = (shadowOrthoHalfWidth_ * 2.0f) / static_cast<float>(kShadowMapSize_);
-	const float snappedRight = std::round(Function::Dot(focusPosition, right) / texelWorldSize) * texelWorldSize;
-	const float snappedUp = std::round(Function::Dot(focusPosition, cameraUp) / texelWorldSize) * texelWorldSize;
-	const float focusDepth = Function::Dot(focusPosition, lightDirection);
-	focusPosition = right * snappedRight + cameraUp * snappedUp + lightDirection * focusDepth;
 
 	const Vector3 lightPosition = focusPosition - lightDirection * 120.0f;
 

@@ -142,7 +142,6 @@ float ComputeAdaptiveShadowBias(float baseBias, float3 normal, float3 lightDirec
     float adaptiveBias = baseBias + slopeScale * 0.0010f;
     return min(adaptiveBias, baseBias * 6.0f);
 }
-
 float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition, float baseBias, float3 normal, float3 lightDirection)
 {
     if (shadowPosition.w <= 0.0f)
@@ -162,11 +161,9 @@ float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition,
 
     float receiverDepth = shadowCoord.z;
     float depthBias = ComputeAdaptiveShadowBias(baseBias, normal, lightDirection);
-    // 投影先の深度勾配が大きいほど、固定バイアスでは面に追従せず「突き刺さり」に見えるため、
-    // 受け側の深度勾配に応じて追加補正する。
-    float receiverDepthGradient = abs(ddx(receiverDepth)) + abs(ddy(receiverDepth));
-    depthBias += receiverDepthGradient * 2.0f;
-    depthBias = min(depthBias, baseBias * 12.0f);
+    // ハードシャドウでは画素ごとにバイアスが揺れるとドット状ノイズが出やすいため、
+    // 深度勾配(ddx/ddy)による追加バイアスは使わず一定の傾斜バイアスのみを利用する。
+    depthBias = min(depthBias, baseBias * 6.0f);
     if (receiverDepth <= 0.0f || receiverDepth >= 1.0f)
     {
         return 1.0f;
@@ -176,25 +173,13 @@ float ComputeShadowVisibility(Texture2D<float> shadowMap, float4 shadowPosition,
     uint height;
     shadowMap.GetDimensions(width, height);
 
-    float2 texelPos = shadowUV * float2(width, height);
-    int2 basePixel = int2(texelPos);
+    float2 texelPos = shadowUV * float2(width, height) - 0.5f;
+    int2 samplePixel = clamp(int2(floor(texelPos + 0.5f)), int2(0, 0), int2(int(width) - 1, int(height) - 1));
+    float shadowDepth = shadowMap.Load(int3(samplePixel, 0));
 
-    float visibility = 0.0f;
-    [unroll]
-    for (int y = -1; y <= 1; ++y)
-    {
-        [unroll]
-        for (int x = -1; x <= 1; ++x)
-        {
-            int2 samplePixel = clamp(basePixel + int2(x, y), int2(0, 0), int2(int(width) - 1, int(height) - 1));
-            float shadowDepth = shadowMap.Load(int3(samplePixel, 0));
-            visibility += ((receiverDepth - depthBias) <= shadowDepth) ? 1.0f : 0.0f;
-        }
-    }
-
-    return visibility / 9.0f;
+    // PCFぼかしは使わず、1サンプル比較でハードシャドウを描画する。
+    return ((receiverDepth - depthBias) <= shadowDepth) ? 1.0f : 0.0f;
 }
-
 PixelShaderOutput main(Object3dVertexShaderOutput input)
 {
     PixelShaderOutput output;
