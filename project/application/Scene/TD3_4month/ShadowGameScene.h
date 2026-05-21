@@ -35,6 +35,8 @@
 #include "GameObject/Coffee/Coffees.h"
 #include "GameObject/UI/DamageOverlay.h"
 #include"GameObject/GentleMan/GentleManManager.h"
+#include"GameObject/Building/Building.h"
+
 #pragma endregion
 
 #pragma region//Event
@@ -118,8 +120,8 @@ private:
     std::unique_ptr<Elevator> elevator_ = nullptr;
     //PC
     std::unique_ptr<PC> pc_ = nullptr;
-	// コーヒー缶
-	std::unique_ptr<Coffees> coffees_ = nullptr;
+    //インスタンシングによる建物
+    std::unique_ptr<BuildingClass>buildings_ = nullptr;
     //紳士管理
     std::unique_ptr<GentleManManager>gentleManManager_ = nullptr;
     //衝突管理

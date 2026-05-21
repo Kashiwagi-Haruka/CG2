@@ -16,6 +16,7 @@
 #include "Stages/StageNumber.h"
 #include"GameBase.h"
 
+#include"Model/ModelManager.h"
 ShadowGameScene::ShadowGameScene() {
     // BGMの管理
     BGMManager::Load();
@@ -67,6 +68,9 @@ ShadowGameScene::ShadowGameScene() {
 
     damageOverlay_ = std::make_unique<DamageOverlay>();
     skyBox_ = std::make_unique<SkyBox>();
+
+    //建物
+    buildings_ = std::make_unique<BuildingClass>();
 }
 
 ShadowGameScene::~ShadowGameScene()
@@ -112,25 +116,40 @@ void ShadowGameScene::Initialize()
     cameraController_->Initialize();
     cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
 
-	lightManager_->Initialize();
-	//懐中電灯共通のプログレスセーブデータのポインタを格納
-	Flashlight::SetProgressSaveDataPtr(&progressSaveData_);
-	//紳士管理
-	gentleManManager_->Initialize();
+    lightManager_->Initialize();
+    //懐中電灯共通のプログレスセーブデータのポインタを格納
+    Flashlight::SetProgressSaveDataPtr(&progressSaveData_);
+    //紳士管理
+    gentleManManager_->Initialize();
 
-	// エレベータールーム
-	elevatorRoomManager_->Initialize();
-	// エレベーター
-	elevator_->Initialize();
-	elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData_.currentStageName));
-	hierarchy->LoadObjectEditorsFromJsonIfExists("ShadowGameScene_objectEditors.json");
-	hierarchy->EndRegisterFile();
-	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
-	stageManager_->SetLightManager(lightManager_.get());
-	stageManager_->InitializeStage();
+    // エレベータールーム
+    elevatorRoomManager_->Initialize();
+    // エレベーター
+    elevator_->Initialize();
+    elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData_.currentStageName));
 
 
 
+    hierarchy->LoadObjectEditorsFromJsonIfExists("ShadowGameScene_objectEditors.json");
+    hierarchy->EndRegisterFile();
+
+    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/bill2", "bill2");
+
+    std::vector<BuildingClass::Datas>datas(6);
+
+    datas[0] = { .pos = {25.0f,0.0f,20.0f},.rotY = -1.572f };
+    datas[1] = { .pos = {25.0f,0.0f,-20.0f},.rotY = -1.572f };
+    datas[2] = { .pos = {25.0f,0.0f,0.0f},.rotY = -1.572f };
+
+    datas[3] = { -datas[0].pos,-datas[0].rotY };
+    datas[4] = { -datas[1].pos,-datas[1].rotY };
+    datas[5] = { -datas[2].pos,-datas[2].rotY };
+
+    buildings_->Initialize("bill2", datas);
+
+    stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
+    stageManager_->SetLightManager(lightManager_.get());
+    stageManager_->InitializeStage();
 
     lightManager_->SetPointLight(cameraController_->GetPlayerCamera()->GetPointLight(), 0);
     lightManager_->SetPointLight(elevator_->GetPointLights().at(0), 1);
@@ -222,7 +241,7 @@ void ShadowGameScene::Finalize()
 void ShadowGameScene::DebugImGui() {
 #ifdef USE_IMGUI
     ImGui::Begin("shadowGameScene");
-    static constexpr const char* kStageNames[] = { "MirrorStage", "LightStage", "TutorialStage", "RadiconStage","GentleManStage","RestroomStage","ElevatorFallStage"};
+    static constexpr const char* kStageNames[] = { "MirrorStage", "LightStage", "TutorialStage", "RadiconStage","GentleManStage","RestroomStage","ElevatorFallStage" };
     int stageIndex = 0;
     if (progressSaveData_.currentStageName == "LightStage") {
         stageIndex = 1;
@@ -251,20 +270,20 @@ void ShadowGameScene::DebugImGui() {
 }
 
 void ShadowGameScene::ChangeStage(const std::string& stageName) {
-	if (stageName == progressSaveData_.currentStageName) {
-		return;
-	}
-	progressSaveData_.currentStageName = stageName;
-	stageManager_->CreateStage(progressSaveData_.currentStageName);
-	stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
-	stageManager_->SetLightManager(lightManager_.get());
-	stageManager_->SetPlayer(player_.get());
-	stageManager_->SetCollisionManager(collisionManager_.get());
-	stageManager_->InitializeStage();
-	elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData_.currentStageName));
-	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
+    if (stageName == progressSaveData_.currentStageName) {
+        return;
+    }
+    progressSaveData_.currentStageName = stageName;
+    stageManager_->CreateStage(progressSaveData_.currentStageName);
+    stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
+    stageManager_->SetLightManager(lightManager_.get());
+    stageManager_->SetPlayer(player_.get());
+    stageManager_->SetCollisionManager(collisionManager_.get());
+    stageManager_->InitializeStage();
+    elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData_.currentStageName));
+    SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
-	uiManager_->ShowKeyLostAtStageStartMessage();
+    uiManager_->ShowKeyLostAtStageStartMessage();
 }
 
 void ShadowGameScene::CheckCollision() {
@@ -316,7 +335,7 @@ void ShadowGameScene::UpdateSceneTransition() {
     flag = false;
 #endif
 
-    if (Key::IsGetKey()&& flag) {
+    if (Key::IsGetKey() && flag) {
         if (progressSaveData_.currentStageName == "GentleManStage" && !isTransitionOut_) {
             transition_->Initialize(true);
             isTransitionIn_ = false;
@@ -384,6 +403,8 @@ void ShadowGameScene::UpdateGameObject() {
     elevatorRoomManager_->Update();
     //紳士管理
     gentleManManager_->Update();
+    //建物 回数によって位置を変更する
+    buildings_->Update(StageNumber::FromStageName(progressSaveData_.currentStageName));
     ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 }
 void ShadowGameScene::UpdatePlayerDamage() {
@@ -491,6 +512,9 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
         player_->Draw();
     }
 
+    //建物
+    buildings_->Draw();
+
     if (drawPlayerHead) {
     }
 }
@@ -502,6 +526,7 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
     elevatorRoomManager_->SetCamera(camera);
     elevator_->SetCamera(camera);
     gentleManManager_->SetCamera(camera);
+    buildings_->SetCamera(camera);
 }
 void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera) {
     stageManager_->SetPlayerCamera(playerCamera);
