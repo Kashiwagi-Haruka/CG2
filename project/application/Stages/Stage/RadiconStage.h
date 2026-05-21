@@ -9,6 +9,7 @@
 #include "GameObject/OperationChangeBox/OperationChangeBox.h"
 #include <array>
 #include "GameObject/Flashlight/Flashlight.h"
+#include "Object3d/Object3d.h"
 
 class Primitive;
 class Player;

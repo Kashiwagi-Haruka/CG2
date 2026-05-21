@@ -103,6 +103,7 @@ void TitleScene::Initialize() {
 
 	lightManager_->ClearLights();
 	lightManager_->Initialize();
+	lightManager_->SetShadowEnabled(Yoshida::LightManager::DIRECTIONAL, false);
 
 	// ゲームオブジェクト
 	timeCard_->Initialize();
