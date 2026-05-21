@@ -205,7 +205,7 @@ void SampleScene::Initialize() {
 	directionalLight_.color = {1.0f, 1.0f, 1.0f, 1.0f};
 	directionalLight_.direction = {0.0f, -1.0f, 0.0f};
 	directionalLight_.intensity = 1.0f;
-	directionalLight_.shadowEnabled = true;
+	/*directionalLight_.shadowEnabled = true;*/
 
 	activeSpotLightCount_ = 2;
 	spotLights_[0].color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -537,8 +537,8 @@ void SampleScene::Update() {
 }
 void SampleScene::Draw() {
 	auto* object3dCommon = Object3dCommon::GetInstance();
-	// レイトレースシャドウに移行したため
-	object3dCommon->SetShadowMapEnabled(false, false, false, false);
+	
+	object3dCommon->SetShadowMapEnabled(true, false, false, false);
 
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
 	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);

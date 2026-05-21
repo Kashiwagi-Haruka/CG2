@@ -80,6 +80,12 @@ private:
 
 	// Directional Light（共通）
 	DirectionalCommonLight* directionalLightData_ = nullptr;
+	// CPU側キャッシュのディレクショナルライト
+	DirectionalCommonLight cachedDirectionalLight_ = {
+	    {1.0f, 1.0f, 1.0f, 1.0f},
+        {0.0f, -1.0f, 0.0f},
+        1.0f, 1, {0.0f, 0.0f, 0.0f}
+    };
 	// ディレクショナルライト定数バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
 	// ポイントライト配列へのCPU書き込みポインタ

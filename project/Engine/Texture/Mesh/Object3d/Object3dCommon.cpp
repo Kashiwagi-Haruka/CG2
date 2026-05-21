@@ -179,11 +179,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon) {
 	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
 	assert(directionalLightData_);
 
-	*directionalLightData_ = {
-	    {1.0f, 1.0f, 1.0f, 1.0f},
-        {0.0f, -1.0f, 0.0f},
-        1.0f, 1, {0.0f, 0.0f, 0.0f}
-    };
+	*directionalLightData_ = cachedDirectionalLight_;
 	directionalLightResource_->Unmap(0, nullptr);
 	pointLightResource_ = CreateBufferResource(sizeof(PointCommonLight) * kMaxPointLights);
 	assert(pointLightResource_);
@@ -296,7 +292,10 @@ void Object3dCommon::DrawSet(){
 	}
 }
 void Object3dCommon::DrawCommon() {
-
+	if (isShadowMapPassActive_) {
+		DrawCommonShadow();
+		return;
+	}
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(pso_->GetRootSignature().Get());
 	dxCommon_->GetCommandList()->SetPipelineState(pso_->GetGraphicsPipelineState(blendMode_).Get());
 	DrawSet();
@@ -534,12 +533,20 @@ void Object3dCommon::EndShadowMapPass() {
 }
 
 void Object3dCommon::SetDirectionalLight(DirectionalCommonLight& light) {
-	*directionalLightData_ = light;
-	directionalLightData_->direction = Function::Normalize(directionalLightData_->direction);
+	cachedDirectionalLight_ = light;
+	cachedDirectionalLight_.direction = Function::Normalize(cachedDirectionalLight_.direction);
+	if (Function::Length(cachedDirectionalLight_.direction) < 1.0e-5f) {
+		cachedDirectionalLight_.direction = {0.0f, -1.0f, 0.0f};
+	}
+
+	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+	*directionalLightData_ = cachedDirectionalLight_;
+	directionalLightResource_->Unmap(0, nullptr);
+	directionalLightData_ = nullptr;
 }
 
 Matrix4x4 Object3dCommon::GetDirectionalLightViewProjectionMatrix() const {
-	Vector3 lightDirection = Function::Normalize(directionalLightData_->direction);
+	Vector3 lightDirection = Function::Normalize(cachedDirectionalLight_.direction);
 	if (Function::Length(lightDirection) < 1.0e-5f) {
 		lightDirection = {0.0f, -1.0f, 0.0f};
 	}
