@@ -156,6 +156,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\GameObject\Building\Building.cpp" />
     <ClCompile Include="application\GameObject\Toilet\ToiletManager.cpp" />
     <ClCompile Include="application\Text\FreetypeManager\Font\Font.cpp" />
     <ClCompile Include="application\Text\FreetypeManager\FreeTypeManager.cpp" />
@@ -378,6 +379,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Color\Color.h" />
+    <ClInclude Include="application\GameObject\Building\Building.h" />
     <ClInclude Include="application\GameObject\Toilet\ToiletManager.h" />
     <ClInclude Include="application\GameObject\UI\GameContinued\GameContinuedData.h" />
     <ClInclude Include="application\GameObject\UI\Inventory\Item\ItemBase.h" />
