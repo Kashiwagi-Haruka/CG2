@@ -16,6 +16,7 @@ RadiconStage::RadiconStage(Player* player) : player_(player) {
 	flashlight_ = std::make_unique<Flashlight>();
 	flashlight_->SetPlayer(player_);
 	burningObject_ = std::make_unique<BurningObject>();
+
 }
 
 void RadiconStage::Initialize() { 
