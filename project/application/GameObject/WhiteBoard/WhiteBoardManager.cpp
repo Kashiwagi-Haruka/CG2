@@ -41,7 +41,7 @@ void WhiteBoardManager::Initialize() {
     for (auto& board : whiteBoards_) {
         board->Initialize();
     }
-    canMakePortal_ = false;
+
     preWhiteBoards_.clear();
 }
 
@@ -67,13 +67,13 @@ void WhiteBoardManager::SetCamera(Camera* camera) {
 bool WhiteBoardManager::OnCollisionRay(PlayerCamera* playerCamera, const AABB& aabb, const Vector3& pos) { return playerCamera->OnCollisionRay(aabb, pos); }
 
 WhiteBoard* WhiteBoardManager::CheckCollision(PlayerCamera* playerCamera) {
+   
     if (!playerCamera) {
         return nullptr;
     }
 
-    canMakePortal_ = false;
-
     for (auto& board : whiteBoards_) {
+
         if (!OnCollisionRay(playerCamera, board->GetAABB(), board->GetCollisionTransform().translate)) {
             continue;
         }
@@ -87,28 +87,25 @@ WhiteBoard* WhiteBoardManager::CheckCollision(PlayerCamera* playerCamera) {
             continue;
         }
 
-        canMakePortal_ = true;
-
-        if (!PlayerCommand::GetInstance()->Shot()) {
-            break;
-        }
-
-        // ショットSE鳴らす
-        SEManager::SoundPlay(SEManager::SHOT);
-
-        if (preWhiteBoards_.size() >= 2) {
-            // ポータルの生成が2個以上になったら
-            preWhiteBoards_.at(0)->ResetCollisionAttribute();
-            preWhiteBoards_.erase(preWhiteBoards_.begin());
-        }
-
-        preWhiteBoards_.push_back(board.get());
-
-        // マスクの設定とフラグの初期化
-        preWhiteBoards_.back()->SetCollisionAttributeNoneAndInitialize();
-
-        return preWhiteBoards_.back();
+        //ボード返すよーん
+        return board.get();
     }
 
     return nullptr;
+}
+
+void WhiteBoardManager::SetPortal(WhiteBoard* board)
+{
+
+    if (preWhiteBoards_.size() >= 2) {
+        // ポータルの生成が2個以上になったら
+        preWhiteBoards_.at(0)->ResetCollisionAttribute();
+        preWhiteBoards_.erase(preWhiteBoards_.begin());
+    }
+
+    preWhiteBoards_.push_back(board);
+
+    // マスクの設定とフラグの初期化
+    preWhiteBoards_.back()->SetCollisionAttributeNoneAndInitialize();
+
 }

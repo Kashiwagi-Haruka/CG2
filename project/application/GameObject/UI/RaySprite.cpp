@@ -29,6 +29,8 @@ RaySprite::RaySprite()
     handle_[HAND] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/hand.png");
     handle_[GRAB] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/grabHand.png");
     handle_[PORTAL] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/mouseUI.png");
+    handle_[NOT_ABLE_PORTAL] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/notAbleMakePortal.png");
+
     handle_[TALK] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/talk.png");
 
     sprite_ = std::make_unique<Sprite>();
@@ -55,7 +57,9 @@ void RaySprite::Update()
         SetTexture(RaySprite::GRAB);
     } else if (PortalManager::GetCanMakePortal()|| GentlemanPortalManager::GetCanMakePortal()) {
         SetTexture(RaySprite::PORTAL);
-    } else if(Gentleman::IsRayHit()){
+    } else if (PortalManager::GetCanMakePortalToWhiteBoard()) {
+        SetTexture(RaySprite::NOT_ABLE_PORTAL);
+    } else if (Gentleman::IsRayHit()) {
         SetTexture(RaySprite::TALK);
     } else {
         SetTexture(RaySprite::HAND);
@@ -71,9 +75,9 @@ void RaySprite::Draw()
         return;
     }
 
-    SpriteCommon::GetInstance()->DrawCommon();
 
-    if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortal()|| GentlemanPortalManager::GetCanMakePortal()) {
+    if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortalToWhiteBoard()||PortalManager::GetCanMakePortal() || GentlemanPortalManager::GetCanMakePortal()) {
+        SpriteCommon::GetInstance()->DrawCommon();
         sprite_->Draw();
     }
 

@@ -21,7 +21,8 @@ public:
 	/// @brief レイとホワイトボードの判定を行い、ポータル生成対象を返す
 	/// @return ポータル生成対象のホワイトボード。生成不要時はnullptr
 	WhiteBoard* CheckCollision(PlayerCamera* playerCamera);
-	bool GetCanMakePortal() const { return canMakePortal_; }
+	void SetPortal(WhiteBoard* board);
+
 
 	std::vector<std::unique_ptr<WhiteBoard>>& GetWhiteBoards() { return whiteBoards_; }
 
@@ -30,7 +31,6 @@ private:
 
 private:
 	Vector3* playerPos_ = nullptr;
-	bool canMakePortal_ = false;
 	std::vector<WhiteBoard*> preWhiteBoards_;
 	std::vector<std::unique_ptr<WhiteBoard>> whiteBoards_;
 };
