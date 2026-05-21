@@ -539,6 +539,12 @@ void SampleScene::Draw() {
 	auto* object3dCommon = Object3dCommon::GetInstance();
 	
 	object3dCommon->SetShadowMapEnabled(true, false, false, false);
+	object3dCommon->BeginShadowMapPass();
+	object3dCommon->DrawCommonShadow();
+	uvBallObj_->Draw();
+	fieldObj_->Draw();
+	spherePrimitive_->Draw();
+	object3dCommon->EndShadowMapPass();
 
 	// ポータルテクスチャ用に別カメラ視点をオフスクリーン描画
 	portalTextureCameraA_->SetTransform(portalTextureCameraATransform_);
