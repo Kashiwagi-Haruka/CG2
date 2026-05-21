@@ -5,6 +5,7 @@
 #include "GameObject/Coffee/CoffeeTrivia.h"
 #include "GameObject/Edamame/Edamame.h"
 #include "GameObject/Edamame/EdamameTrivia.h"
+#include "GameObject/GentleMan/GentleManTalk.h"
 #include "GameObject/Flashlight/Flashlight.h"
 #include "GameObject/Key/Key.h"
 #include "SpriteCommon.h"
@@ -38,6 +39,14 @@ TextUIManager::TextUIManager() {
 	coffeeTrivia_.SetAlign(TextAlign::Center);
 	coffeeTrivia_.SetBlendMode(BlendMode::kBlendModeAlpha);
 	coffeeTrivia_.UpdateLayout();
+
+	gentlemanTalk_.Initialize(fontHandle_);
+	gentlemanTalk_.SetPosition({ 640, 512});
+	gentlemanTalk_.SetColor({ 1, 1, 1, 1 });
+	gentlemanTalk_.SetAlign(TextAlign::Center);
+	gentlemanTalk_.SetBlendMode(BlendMode::kBlendModeAlpha);
+	gentlemanTalk_.UpdateLayout();
+
 }
 
 TextUIManager::~TextUIManager() {}
@@ -47,6 +56,7 @@ void TextUIManager::Initialize() {
 	showTimer_ = showTime_;
 	edamameTriviaAlpha_ = 0.0f;
 	coffeeTriviaAlpha_ = 0.0f;
+	gentlemanAlpha_ = 0.0f;
 	wasEdamameRayHit_ = false;
 	wasCoffeeRayHit_ = false;
 }
@@ -85,6 +95,12 @@ void TextUIManager::Update() {
 		coffeeTrivia_.StartTyping(0.1f); // 0.1秒ごとに1文字ずつ表示
 	}
 
+	if (GentlemanTalk::GetIsSendMessage()) {
+		//紳士テキスト
+		gentlemanTalk_.SetString(GentlemanTalk::GetString());
+		gentlemanTalk_.StartTyping(0.05f);
+	}
+
 	const float deltaTime = SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
 	const bool isEdamameRayHit = Edamame::IsRayHit();
 	const bool isCoffeeRayHit = CoffeeTrivia::IsRayHit();
@@ -107,9 +123,27 @@ void TextUIManager::Update() {
 	edamameTrivia_.SetColor({1.0f, 1.0f, 1.0f, edamameTriviaAlpha_});
 	coffeeTrivia_.SetColor({1.0f, 1.0f, 1.0f, coffeeTriviaAlpha_});
 
+
 	text_.Update(true);
 	edamameTrivia_.Update();
 	coffeeTrivia_.Update();
+
+
+	if (gentlemanTalk_.GetIsTying()&& GentlemanTalk::GetIsDraw()) {
+		gentlemanAlpha_ = 1.0f;
+	} else {
+		const float fadeStep = deltaTime / kEdamameFadeDuration_;
+		gentlemanAlpha_ = std::max(0.0f, gentlemanAlpha_ - fadeStep);
+	}
+
+	gentlemanTalk_.SetColor({ 1.0f,1.0f,1.0f,gentlemanAlpha_ });
+
+	if (GentlemanTalk::GetIsDraw()) {
+		//紳士が描画されているときテキストを更新する　音なる
+		gentlemanTalk_.Update(true);
+	} 
+
+
 }
 
 void TextUIManager::Draw() {
@@ -124,6 +158,11 @@ void TextUIManager::Draw() {
 		}
 		if (CoffeeTrivia::IsRayHit() || coffeeTriviaAlpha_ > 0.0f) {
 			coffeeTrivia_.Draw();
+		}
+
+		//紳士
+		if (GentlemanTalk::GetIsDraw()|| gentlemanAlpha_ > 0.0f) {
+			gentlemanTalk_.Draw();
 		}
 	}
 }

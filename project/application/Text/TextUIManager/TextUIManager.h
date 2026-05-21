@@ -22,12 +22,15 @@ private:
 	Text text_;
 	Text edamameTrivia_;
 	Text coffeeTrivia_;
+	//紳士テキスト
+	Text gentlemanTalk_;
 	float showTime_ = 1.0f;
 	float showTimer_ = showTime_;
 	bool isDraw_ = false;
 
 	float edamameTriviaAlpha_ = 0.0f;
 	float coffeeTriviaAlpha_ = 0.0f;
+	float gentlemanAlpha_ = 0.0f;
 	bool wasEdamameRayHit_ = false;
 	bool wasCoffeeRayHit_ = false;
 	static constexpr float kEdamameFadeDuration_ = 3.0f;
