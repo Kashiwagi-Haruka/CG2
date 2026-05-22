@@ -136,8 +136,11 @@ void Chair::SwichCommand()
         break;
     case ChairMenu::STAND_TEXT:
 
+        SEManager::SoundPlay(SEManager::CHAIR_STAND);
+
         //メニューを表示しているとき
         if (isStand_) {
+       
             //椅子に乗っていたら降りる
             isStand_ = false;
             //プレイヤーの状態をセットする

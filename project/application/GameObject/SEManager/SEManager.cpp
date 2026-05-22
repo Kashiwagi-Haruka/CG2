@@ -17,6 +17,8 @@ void SEManager::Load() {
 	SEs_[PUSH_WATCH] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/pushWatch.mp3");
 	SEs_[NOISE] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/noise.mp3");
 	SEs_[CHAIR] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/chair.mp3");
+	SEs_[CHAIR_STAND] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/chairStand.mp3");
+
 	SEs_[TYPE] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/voiceSE.mp3");
 	SEs_[VENDING_MAC] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/vendingMac.mp3");
 	SEs_[KEY] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/key.mp3");
