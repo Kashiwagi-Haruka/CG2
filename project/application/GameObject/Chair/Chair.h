@@ -20,6 +20,7 @@ public:
     void Update();
     void Initialize();
     void Draw();
+
     static void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);
     void RegisterEditor(const std::string& registrationName);
@@ -28,7 +29,6 @@ public:
     Transform& GetTransform() { return transform_; };
     Object3d* GetObject3d() const { return obj_.get(); }
     bool GetIsStand() { return isStand_; }
-    void SetIsStand(const bool isStand) { isStand_ = isStand; }
     bool IsRayHit() { return isRayHit_; }
 private:
     void SwichCommand();

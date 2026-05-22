@@ -45,8 +45,8 @@ class Object3d {
 	Material* materialData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Model* model_ = nullptr;
-	Matrix4x4 worldMatrix;
-	Matrix4x4 worldViewProjectionMatrix;
+	Matrix4x4 worldMatrix{0.0f};
+	Matrix4x4 worldViewProjectionMatrix{0.0f};
 	bool isUseSetWorld;
 	std::unique_ptr<Model> modelInstance_;
 	const Animation::AnimationData* animation_ = nullptr;
