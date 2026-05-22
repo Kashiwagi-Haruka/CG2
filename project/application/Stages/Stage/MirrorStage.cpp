@@ -236,7 +236,11 @@ void MirrorStage::CheckCollision() {
 		stageCollisionManager_->AddCollider(wall.get());
 	}
 	for (auto& chair : chairManager_->GetChairs()) {
-		stageCollisionManager_->AddCollider(chair.get());
+		if (!chair->GetIsStand()) {
+			//乗っていたらコリジョン無し
+			stageCollisionManager_->AddCollider(chair.get());
+		}
+	
 	}
 
 

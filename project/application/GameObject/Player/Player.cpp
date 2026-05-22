@@ -235,7 +235,7 @@ void Player::Move()
     }
 
 
-    if (LockerManager::GetIsInLocker()) {
+    if (LockerManager::GetIsInLocker()||PlayerCommand::GetIsStand()) {
         return;
     }
 
@@ -379,6 +379,10 @@ Vector3 Player::GetJointWorldPos(const char* jointName) const
 
 void Player::Gravity() {
 
+    if (PlayerCommand::GetIsStand()) {
+        return;
+    }
+
     //const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     velocity_.y -= kDeltaTime * YoshidaMath::kGravity;
     transform_.translate.y += velocity_.y;
@@ -388,7 +392,12 @@ void Player::Gravity() {
 void Player::OnCollision(Collider* collider) {
     UpdateFootContact(collider);
 
-    if (collider->GetCollisionAttribute() != kCollisionMat && collider->GetCollisionAttribute() != kCollisionLocker && collider->GetCollisionAttribute() != kCollisionItem) {
+    if (collider->GetCollisionAttribute() != kCollisionMat
+        && collider->GetCollisionAttribute() != kCollisionLocker
+        && collider->GetCollisionAttribute() != kCollisionItem
+ 
+        
+        ) {
         // マットじゃなかったら
         OnCollisionObstacle();
     }

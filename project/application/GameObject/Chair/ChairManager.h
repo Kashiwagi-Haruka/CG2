@@ -18,5 +18,6 @@ public:
 private:
     static bool isRayHit_;
     std::vector<std::unique_ptr<Chair>>chairs_;
+    float standTimer_ = 0.0f;
 };
 

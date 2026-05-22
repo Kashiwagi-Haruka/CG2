@@ -2,6 +2,8 @@
 #include"Function.h"
 #include"GameObject/Player/Player.h"
 #include"GameObject/KeyBindConfig.h"
+#include"GameObject/YoshidaMath/Easing.h"
+#include"GameBase.h"
 
 namespace {
     uint32_t maxNum_ = 4;
@@ -26,7 +28,7 @@ ChairManager::~ChairManager()
 
 void ChairManager::SetCamera(Camera* camera)
 {
-    for (auto& chair:chairs_) {
+    for (auto& chair : chairs_) {
         chair->SetCamera(camera);
     }
 
@@ -51,15 +53,15 @@ void ChairManager::Initialize()
 
 
     for (size_t i = 0; i < maxNum_ - 1; i += 2) {
-        Transform transform = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {6.25f+i*1.0f,1.0f,3.5f,}};
+        Transform transform = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {6.25f + i * 1.0f,1.0f,3.5f,} };
         chairs_.at(i)->SetTransform(transform);
         transform.rotate.y += Function::kPi;
         transform.translate.x *= -1.0f;
-        chairs_.at(i+1)->SetTransform(transform);
+        chairs_.at(i + 1)->SetTransform(transform);
         chairs_.at(i + 1)->SetMirrorTransform(&chairs_.at(i)->GetTransform());
         chairs_.at(i)->SetMirrorTransform(&chairs_.at(i + 1)->GetTransform());
     };
-    
+
 }
 
 void ChairManager::Update()
@@ -78,17 +80,37 @@ void ChairManager::Update()
 
 void ChairManager::StandChair(Player* player)
 {
+    if (!PlayerCommand::GetIsStand())
+    {
+        standTimer_ = 0.0f;
+    }
 
     for (auto& chair : chairs_) {
         if (chair->GetIsStand()) {
-            Vector3 pos = chair->GetWorldPosition();
-            pos.y += 1.0f;
-            player->SetTranslate(pos);
-            chair->SetIsStand(false);
-            PlayerCommand::SetIsStand(false);
-            break;
-        }
+
+            if (PlayerCommand::GetIsStand())
+            {
+                standTimer_ += GameBase::GetInstance()->GetDeltaTime();
+                standTimer_ = std::clamp(standTimer_, 0.0f, 1.0f);
+                Vector3 pos = chair->GetWorldPosition();
+                Vector3 easingPos = YoshidaMath::Easing::EaseInOutBack(pos, { pos.x,pos.y + 1.0f,pos.z }, standTimer_);
+                player->SetTranslate(easingPos);
+            } else {
+                Vector3 forward = player->GetForward();
+                forward.y = 0.0f;
+                Vector3 translate = player->GetTransform().translate;
+                forward.x += translate.x;
+                forward.y = translate.y;
+                forward.z += translate.z;
+                player->SetTranslate(forward);
+      
+                break;
+            }
+
+        } 
     }
+
+
 }
 
 void ChairManager::Draw()

@@ -1,6 +1,7 @@
 #include "Building.h"
 #include"Function.h"
 #include"imgui.h"
+#include"Object3d/Object3dCommon.h"
 
 void BuildingClass::Initialize(const std::string& modelPath, const std::vector<Datas>& datas)
 {
@@ -41,6 +42,8 @@ void BuildingClass::Update(const uint32_t floorNum)
 
 void BuildingClass::Draw()
 {
+    
+    Object3dCommon::GetInstance()->DrawCommon();
     if (instancedObject_) {
         instancedObject_->Draw();
     }

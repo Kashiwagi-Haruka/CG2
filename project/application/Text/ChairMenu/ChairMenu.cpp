@@ -25,7 +25,10 @@ ChairMenu::ChairMenu()
     menuText_[GRAB_TEXT].SetString(grabText_[0]);
     menuText_[GRAB_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f ,SCREEN_SIZE::HALF_HEIGHT });
 
-    menuText_[STAND_TEXT].SetString(U"椅子に乗る");
+    standText_[0] = U"椅子に乗る";
+    standText_[1] = U"椅子から降りる";
+
+    menuText_[STAND_TEXT].SetString(standText_[0]);
     menuText_[STAND_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f,SCREEN_SIZE::HALF_HEIGHT + 64.0f });
 
     menuText_[CLOSE_TEXT].SetString(U"閉じる");
@@ -61,7 +64,9 @@ void ChairMenu::Initialize()
     selectButtonNum_ = 0;
     isShowStart_ = false;
     isPreGrab_ = false;
+    isPreStand_ = false;
     menuText_[GRAB_TEXT].SetString(grabText_[0]);
+    menuText_[STAND_TEXT].SetString(standText_[0]);
 }
 
 void ChairMenu::Update()
@@ -78,8 +83,15 @@ void ChairMenu::Update()
     if (PlayerCommand::GetIsGrab() != isPreGrab_) {
         isPreGrab_ = PlayerCommand::GetIsGrab();
         //メニューテキストのテキストを設定する
-        menuText_[GRAB_TEXT].SetString(grabText_[PlayerCommand::GetIsGrab()]);
+        menuText_[GRAB_TEXT].SetString(grabText_[isPreGrab_]);
         menuText_[GRAB_TEXT].StartTyping(0.05f);
+    }
+
+    if (PlayerCommand::GetIsStand() != isPreStand_) {
+        isPreStand_ = PlayerCommand::GetIsStand();
+        //メニューテキストのスタンドテキストを設定する
+        menuText_[STAND_TEXT].SetString(standText_[isPreStand_]);
+        menuText_[STAND_TEXT].StartTyping(0.05f);
     }
 
     if (isShowMenu_) {
@@ -94,30 +106,35 @@ void ChairMenu::Update()
             isShowStart_ = true;
         }
 
-
-
         //メニューが開いた時
         if (PlayerCommand::GetInstance()->MouseWheelDown()) {
             //ホイールを下にすると
+
             if (selectButtonNum_ > 0) {
                 SEManager::SoundPlay(SEManager::PUSH_WATCH);
-                if (!PlayerCommand::GetIsGrab()) {
+
+                if (!PlayerCommand::GetIsGrab() && !PlayerCommand::GetIsStand()) {
                     //グラブしていないとき
                     selectButtonNum_--;
                 }
             }
+
             menuText_[selectButtonNum_].StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
         }
 
         if (PlayerCommand::GetInstance()->MouseWheelUp()) {
+
             //ホイールを上にすると
             if (selectButtonNum_ < menuText_.size() - 1) {
                 SEManager::SoundPlay(SEManager::PUSH_WATCH);
-                if (!PlayerCommand::GetIsGrab()) {
+                if (!PlayerCommand::GetIsGrab() && !PlayerCommand::GetIsStand()) {
                     //持っていなかったら
                     selectButtonNum_++;
                 }
             }
+
+
+
             menuText_[selectButtonNum_].StartTyping(0.05f); // 0.05秒ごとに1文字ずつ表示
         }
 
@@ -137,7 +154,7 @@ void ChairMenu::Update()
         }
 
         triangleText_.UpdateLayout(false);
-    }else{
+    } else {
         isShowStart_ = false;
     }
 
@@ -146,14 +163,21 @@ void ChairMenu::Update()
 void ChairMenu::Draw()
 {
     if (isShowMenu_) {
-  
+
         triangleText_.Draw();
-        menuText_[GRAB_TEXT].Draw();
+
+        if (!PlayerCommand::GetIsStand()) {
+            menuText_[GRAB_TEXT].Draw();
+        }
+
         if (!PlayerCommand::GetIsGrab()) {
             menuText_[STAND_TEXT].Draw();
-            menuText_[CLOSE_TEXT].Draw();
-            pressEText_.Draw();
         }
+
+        if (!PlayerCommand::GetIsGrab() && !PlayerCommand::GetIsStand()) {
+            menuText_[CLOSE_TEXT].Draw();
+        }
+        pressEText_.Draw();
     }
 }
 
