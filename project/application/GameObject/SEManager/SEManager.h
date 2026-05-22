@@ -14,6 +14,7 @@ public:
 		PUSH_WATCH,
 		NOISE,
 		CHAIR,
+		CHAIR_STAND,
 		TYPE,
 		VENDING_MAC,
 		KEY,
