@@ -51,7 +51,7 @@ Portal::~Portal()
 
 }
 
-void Portal::Initialize()
+void Portal::Initialize(const PortalMesh::MeshType& meshType)
 {
     isPlayerCanWarp_ = false;
     scaleTimer_ = 0.0f;
@@ -66,7 +66,7 @@ void Portal::Initialize()
     portalRenderTexture_ = std::make_unique<RenderTexture2D>();
     portalRenderTexture_->Initialize(WinApp::kClientWidth, WinApp::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, { 0.05f, 0.05f, 0.1f, 1.0f });
     portalCircle_ = std::make_unique<PortalMesh>();
-    portalCircle_->Initialize("Resources/TD3_3102/2d/atHome.jpg");
+    portalCircle_->Initialize("Resources/TD3_3102/2d/atHome.jpg", meshType);
     //テクスチャここで設定するよーん
     portalCircle_->SetTextureIndex(portalRenderTexture_->GetSrvIndex());
     preRotY_ = { 0.0f };
@@ -108,7 +108,7 @@ bool Portal::IsVectorsFace(const Vector3& forward)
 {
     //ポータルの親の向きYを計算する
 
-    Vector3 direction = YoshidaMath::GetDirectionFromRotateY(parentTransform->rotate.y);
+    Vector3 direction = YoshidaMath::GetDirectionFromRotateY(parentTransform->rotate.y+Function::kPi);
     float dot = Function::Dot(forward, direction);
     //向き合っているかどうか
     return(dot < 0.0f);
@@ -118,7 +118,7 @@ bool Portal::IsVectorFaceCameraAndObj()
 {
     Vector3 forward = SetSceneCameraAndParentAndGetForward();
 
-    Vector3 direction = YoshidaMath::GetDirectionFromRotate({ transform_.rotate.x,Function::kPi + transform_.rotate.y ,transform_.rotate.z });
+    Vector3 direction = YoshidaMath::GetDirectionFromRotate({ transform_.rotate.x,transform_.rotate.y ,transform_.rotate.z });
     //Vector3 direction = YoshidaMath::GetDirectionFromRotateY(Function::kPi + transform_.rotate.y);
     float dot = Function::Dot(forward, direction);
     return (dot < canWarpAngleRange_);

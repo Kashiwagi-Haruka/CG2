@@ -25,7 +25,7 @@ public:
     }
     Portal();
     ~Portal();
-    void Initialize();
+    void Initialize(const PortalMesh::MeshType& meshType = PortalMesh::MeshType::kCircle);
     void Update();
     void SetCamera(Camera* camera);
     void SetPlayerCamera(Camera* camera) { warpPos_->SetPlayerCamera(camera); };

@@ -15,7 +15,12 @@ class Camera;
 
 class PortalMesh {
 public:
-	void Initialize(const std::string& texturePath);
+	enum MeshType {
+		kCircle,
+		kSphere,
+		kMaxMeshType,
+	};
+	void Initialize(const std::string& texturePath,const MeshType& meshType = kCircle);
 	void Update();
 	void Draw();
 

@@ -8,12 +8,15 @@
 #include"GameObject/Gentleman/GiantGentleman.h"
 #include"GameBase.h"
 #include "GameObject/KeyBindConfig.h"
+
+bool GentlemanPortalManager::isMakePortal_ = false;
+
 GentlemanPortalManager::GentlemanPortalManager(Vector3* pos) {
 
     playerPos_ = pos;
 
     firstWarpPosTransform_ = {
-        .scale = {2.0f / 1.6f,  2.0f / 0.9f, 1.0f},
+        .scale = {1.0f,  1.0f, 1.0f},
           .rotate = {0.0f, 0.0f, 0.0f},
           .translate = {7.0f, -100.0f, 20.0f}
     };
@@ -101,7 +104,7 @@ void GentlemanPortalManager::SpawnPortal()
 {
     // ポータルを新たに作る
     std::unique_ptr<Portal> newPortal = std::make_unique<Portal>();
-    newPortal->Initialize();
+    newPortal->Initialize(PortalMesh::kSphere);
     //ここだけ半径を多く見積もる
     //newPortal->SetRadius(1.5f);
     newPortal->SetAABB({ .min = {-1.0f,-2.0f,-1.0f},.max = {1.0f,2.0f,1.0f} });

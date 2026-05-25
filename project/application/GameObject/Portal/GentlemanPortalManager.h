@@ -21,8 +21,9 @@ public:
 	/// @brief 作成できるポータル地点との当たり判定を作成する
 	void CheckCollision()override;
 	static bool GetCanMakePortal() { return canMakePortal_; };
+	static bool GetIsMakePortal() { return isMakePortal_; };
 private:
-	bool isMakePortal_ = false;
+	static bool isMakePortal_;
 	void UpdatePortal()override;
 	// ポータルの作成
 	void SpawnPortal();

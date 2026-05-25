@@ -11,58 +11,42 @@
 #include <cmath>
 #include <cstring>
 #include <numbers>
+#include<Primitive/Primitive.h>
 
-void PortalMesh::Initialize(const std::string& texturePath) {
+void PortalMesh::Initialize(const std::string& texturePath,  const MeshType& meshType) {
+
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByfilePath(texturePath);
 	worldMatrix_ = Function::MakeIdentity4x4();
 
 	constexpr uint32_t kPortalSegments = 32;
-	constexpr uint32_t kPortalVertexCount = kPortalSegments + 1;
-	constexpr uint32_t kPortalIndexCount = kPortalSegments * 3;
 	float kPortalRadius = transform_.scale.x / 2.0f;
 
-	std::array<VertexData, kPortalVertexCount> vertices{};
-	std::array<uint32_t, kPortalIndexCount> indices{};
-
-	vertices[0] = {
-	    {0.0f, 0.0f, 0.0f, 1.0f},
-        {0.5f, 0.5f},
-        {0.0f, 0.0f, 1.0f}
-    };
-	for (uint32_t segment = 0; segment < kPortalSegments; ++segment) {
-		const float angle = (2.0f * std::numbers::pi_v<float> * static_cast<float>(segment)) / static_cast<float>(kPortalSegments);
-		const float x = std::cos(angle) * kPortalRadius;
-		const float y = std::sin(angle) * kPortalRadius;
-		vertices[segment + 1] = {
-		    {x, y, 0.0f, 1.0f},
-            {x / (kPortalRadius * 2.0f) + 0.5f, 0.5f - y / (kPortalRadius * 2.0f)},
-            {0.0f, 0.0f, 1.0f}
-        };
-
-		const uint32_t nextSegmentIndex = (segment + 1) % kPortalSegments;
-		const uint32_t indexOffset = segment * 3;
-		indices[indexOffset + 0] = 0;
-		indices[indexOffset + 1] = nextSegmentIndex + 1;
-		indices[indexOffset + 2] = segment + 1;
+	MeshData meshData;
+	if (meshType == kCircle ) {
+		meshData = BuildMesh::BuildCircle(kPortalSegments, kPortalRadius);
+	} else {
+		meshData = BuildMesh::BuildSphere(kPortalSegments,16, kPortalRadius);
 	}
-	indexCount_ = kPortalIndexCount;
+	
+	indexCount_ = meshData.indices.size();
 
-	vertexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * vertices.size());
+	vertexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * meshData.vertices.size());
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * vertices.size());
+	vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * meshData.vertices.size());
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	VertexData* mappedVertices = nullptr;
+	
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedVertices));
-	std::memcpy(mappedVertices, vertices.data(), sizeof(VertexData) * vertices.size());
+	std::memcpy(mappedVertices, meshData.vertices.data(), sizeof(VertexData) * meshData.vertices.size());
 	vertexResource_->Unmap(0, nullptr);
 
-	indexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * indices.size());
+	indexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * meshData.indices.size());
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-	indexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * indices.size());
+	indexBufferView_.SizeInBytes = static_cast<UINT>(sizeof(uint32_t) * meshData.indices.size());
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 	uint32_t* mappedIndices = nullptr;
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedIndices));
-	std::memcpy(mappedIndices, indices.data(), sizeof(uint32_t) * indices.size());
+	std::memcpy(mappedIndices, meshData.indices.data(), sizeof(uint32_t) * meshData.indices.size());
 	indexResource_->Unmap(0, nullptr);
 
 	transformResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));

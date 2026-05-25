@@ -7,6 +7,8 @@
 #include"GameObject/SEManager/SEManager.h"
 #include<imgui.h>
 #include"GameSave/GameSave.h"
+#include"GameObject/Portal/GentlemanPortalManager.h"
+
 
 PlayerCamera* GiantGentleMan::playerCamera_ = nullptr;
 
@@ -32,7 +34,7 @@ void GiantGentleMan::Initialize()
     obj_->Initialize();
     obj_->RegisterEditor("giantGentleMan");
 
-    collisionTransform_.scale = { 2.0f/1.6f,2.0f/0.9f,1.0f };
+    collisionTransform_.scale = {- 1.5f/1.6f,-1.5f/0.9f,-1.5f };
     
     collisionTransform_.rotate = { 0.0f,Function::kPi*0.5f,0.0f };
     collisionTransform_.translate = { 0.0f };
@@ -155,6 +157,10 @@ void GiantGentleMan::CheckCollision() {
 
 void GiantGentleMan::Animation()
 {
+    
+    if (GentlemanPortalManager::GetIsMakePortal()) {
+        return;
+    }
     bool loopAnimation = true;
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     AnimationManager::PlaybackResult playbackResult{};

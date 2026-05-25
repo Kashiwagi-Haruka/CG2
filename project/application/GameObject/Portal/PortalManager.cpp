@@ -16,10 +16,10 @@ bool PortalManager::canMakePortalToWhiteBoard_ = false;
 PortalManager::PortalManager(Vector3* pos) {
 
     playerPos_ = pos;
-  
+
     firstWarpPosTransform_ = {
         .scale = {1.0f,  1.0f, 1.0f},
-          .rotate = {0.0f, 0.0f, 0.0f},
+          .rotate = {0.0f, Function::kPi, 0.0f},
           .translate = {-2.0f, 1.5f, 5.5f}
     };
 
@@ -48,7 +48,7 @@ void PortalManager::Initialize() {
     canMakePortalToWhiteBoard_ = false;
 
     warpCoolTimer_ = kWarpTime_;
-    
+
     for (auto& portal : portals_) {
         portal.reset();
     }
@@ -79,7 +79,7 @@ void PortalManager::WarpPlayer(Player* player) {
                 Transform transform = *portal->GetWarpPos()->GetParent();
                 transform.translate.y = 0.0f;
                 player->SetTranslate(transform.translate);
-                transform.rotate+= portal->GetWarpPos()->GetTransform().rotate;
+                transform.rotate.y += portal->GetWarpPos()->GetTransform().rotate.y;
                 transform.rotate.x = 0.0f;
                 transform.rotate.z = 0.0f;
                 player->SetRotate(transform.rotate);
@@ -155,7 +155,7 @@ void PortalManager::Update() {
     ImGui::Checkbox("hitWhiteBoard", &canMakePortalToWhiteBoard_);
     ImGui::Text("RoomCout,%d", roomAABBs_.size());
     for (uint32_t i = 0; i < roomAABBs_.size(); ++i) {
-        std::string idName = "Room" +std::to_string(i);
+        std::string idName = "Room" + std::to_string(i);
         std::string min = idName + "min";
         std::string max = idName + "max";
         ImGui::DragFloat3(min.c_str(), &roomAABBs_.at(i).min.x);
@@ -173,7 +173,7 @@ void PortalManager::CheckCollision() {
     canMakePortal_ = false;
     canMakePortalToWhiteBoard_ = false;
 
-    if (isPendingPortalSpawn_) { 
+    if (isPendingPortalSpawn_) {
         return;
     }
 
@@ -182,7 +182,7 @@ void PortalManager::CheckCollision() {
     }
 
     WhiteBoard* hitBoard = whiteBoardManager_->CheckCollision(playerCamera_);
-    
+
     if (!hitBoard) {
         return;
     }
