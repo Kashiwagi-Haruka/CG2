@@ -35,6 +35,7 @@ class MiniMap {
 	std::unique_ptr<PortalMesh> miniMapPortalOutline_;
 	std::unique_ptr<RenderTexture2D> miniMapRenderTexture_;
 	std::unique_ptr<Sprite> markerSprite_;
+	std::unique_ptr<Sprite> playerSprite_;
 	std::unordered_map<std::string, Entry> entries_;
 	std::vector<MarkerDrawData> visibleMarkers_;
 	Vector3 playerTranslate_ = {0.0f, 0.0f, 0.0f};
@@ -45,6 +46,7 @@ class MiniMap {
 	Vector2 miniMapScreenCenter_ = {130.0f, 590.0f};
 	float miniMapRadius_ = 90.0f;
 	uint32_t miniMapBackTextureHandle_ = 0;
+	uint32_t miniMapPlayerTextureHandle_ = 0;
 	std::string stageName_;
 
 	void UpdateCamera();

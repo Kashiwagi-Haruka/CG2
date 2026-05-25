@@ -51,6 +51,7 @@ void MiniMap::Initialize() {
 	markerObject_->SetScale({0.2f, 0.2f, 0.2f});
 
 	miniMapBackTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
+	miniMapPlayerTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/MiniMapPlayer.png");
 	miniMapPortal_ = std::make_unique<PortalMesh>();
 	Transform miniMapPortalTransform{};
 	miniMapPortalTransform.scale = {miniMapRadius_ * 2.2f, miniMapRadius_ * 2.2f, 1.0f};
@@ -82,8 +83,13 @@ void MiniMap::Initialize() {
 	markerSprite_->Initialize(miniMapBackTextureHandle_);
 	markerSprite_->SetAnchorPoint({0.5f, 0.5f});
 	markerSprite_->SetScale({8.0f, 8.0f});
-}
 
+	playerSprite_ = std::make_unique<Sprite>();
+	playerSprite_->Initialize(miniMapPlayerTextureHandle_);
+	playerSprite_->SetAnchorPoint({0.5f, 0.5f});
+	playerSprite_->SetScale({16.0f, 16.0f});
+	playerSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+}
 void MiniMap::AddObject(std::string name, Object3d* object, Vector4 color) {
 	if (!object) {
 		entries_.erase(name);
@@ -215,5 +221,10 @@ void MiniMap::Draw() {
 		markerSprite_->SetColor(marker.color);
 		markerSprite_->Update();
 		markerSprite_->Draw();
+	}
+	if (playerSprite_) {
+		playerSprite_->SetPosition(miniMapScreenCenter_);
+		playerSprite_->Update();
+		playerSprite_->Draw();
 	}
 }
