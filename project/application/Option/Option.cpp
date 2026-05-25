@@ -123,128 +123,133 @@ void Option::Update() {
     }
 
     int currentDivision = 0;
-    if (selectedParameterIndex_ == 0) {
-        //カメラの感度
-        currentDivision = DivisionFromCameraSensitivity(optionData_.CameraMoveSpeed.x);
-    } else if (selectedParameterIndex_ == 1) {
-        // 追加: 視野角
-        currentDivision = DivisionFromFieldOfView(optionData_.fieldOfView);
-    } else if (selectedParameterIndex_ == 2) {
-        //左右反転 (ON=1, OFF=0)	
-        currentDivision = optionData_.isFlipHorizontally ? 1 : 0;
-    } else if (selectedParameterIndex_ == 3) {
-        //BGMVolume
-        currentDivision = DivisionFromVolume(optionData_.BGMVolume);
-    } else if (selectedParameterIndex_ == 4) {
-        //SEVolume
-        currentDivision = DivisionFromVolume(optionData_.SEVolume);
-    } else if (selectedParameterIndex_ == 5) {
-        //VoiceVolume
-        currentDivision = DivisionFromVolume(optionData_.VoiceVolume);
-    }
+	if (selectedParameterIndex_ == 0) {
+		// カメラの感度
+		currentDivision = DivisionFromCameraSensitivity(optionData_.CameraMoveSpeed.x);
+	} else if (selectedParameterIndex_ == 1) {
+		// 追加: 視野角
+		currentDivision = DivisionFromFieldOfView(optionData_.fieldOfView);
+	} else if (selectedParameterIndex_ == 2) {
+		// 左右反転 (ON=1, OFF=0)
+		currentDivision = optionData_.isFlipHorizontally ? 1 : 0;
+	} else if (selectedParameterIndex_ == 3) {
+		// 上下反転 (ON=1, OFF=0)
+		currentDivision = optionData_.isFlipVertically ? 1 : 0;
+	} else if (selectedParameterIndex_ == 4) {
+		// BGMVolume
+		currentDivision = DivisionFromVolume(optionData_.BGMVolume);
+	} else if (selectedParameterIndex_ == 5) {
+		// SEVolume
+		currentDivision = DivisionFromVolume(optionData_.SEVolume);
+	} else if (selectedParameterIndex_ == 6) {
+		// VoiceVolume
+		currentDivision = DivisionFromVolume(optionData_.VoiceVolume);
+	}
 
-    if (moveLeft) {
-        const int nextDivision = std::max(0, currentDivision - 1);
-        if (nextDivision != currentDivision) {
-            SEManager::SoundPlay(SEManager::PUSH_WATCH);
-        }
-        currentDivision = nextDivision;
-    } else if (moveRight) {
-        //左右反転の場合は0か1のみ
-        int maxDiv = (selectedParameterIndex_ == 2) ? 1 : (kOptionParameterDivisionNum - 1);
-        const int nextDivision = std::min(maxDiv, currentDivision + 1);
-        if (nextDivision != currentDivision) {
-            SEManager::SoundPlay(SEManager::PUSH_WATCH);
-        }
-        currentDivision = nextDivision;
-    }
+	if (moveLeft) {
+		const int nextDivision = std::max(0, currentDivision - 1);
+		if (nextDivision != currentDivision) {
+			SEManager::SoundPlay(SEManager::PUSH_WATCH);
+		}
+		currentDivision = nextDivision;
+	} else if (moveRight) {
+		// 左右反転の場合は0か1のみ
+		int maxDiv = (selectedParameterIndex_ == 2 || selectedParameterIndex_ == 3) ? 1 : (kOptionParameterDivisionNum - 1);
+		const int nextDivision = std::min(maxDiv, currentDivision + 1);
+		if (nextDivision != currentDivision) {
+			SEManager::SoundPlay(SEManager::PUSH_WATCH);
+		}
+		currentDivision = nextDivision;
+	}
 
-    if (selectedParameterIndex_ == 0) {
-        const float sensitivity = CameraSensitivityFromDivision(currentDivision);
-        optionData_.CameraMoveSpeed.x = sensitivity;
-        optionData_.CameraMoveSpeed.y = sensitivity;
-    } else if (selectedParameterIndex_ == 1) {
-        // 追加: 視野角の適用
-        optionData_.fieldOfView = FieldOfViewFromDivision(currentDivision);
-    } else if (selectedParameterIndex_ == 2) {
-        // 追加: 左右反転の適用
-        optionData_.isFlipHorizontally = (currentDivision == 1);
-    } else if (selectedParameterIndex_ == 3) {
-        //BGMVolume
-        optionData_.BGMVolume = static_cast<float>(currentDivision) / 9.0f;
-    } else if (selectedParameterIndex_ == 4) {
-        //SEVolume
-        optionData_.SEVolume = static_cast<float>(currentDivision) / 9.0f;
-    } else if (selectedParameterIndex_ == 5) {
-        //VoiceVolume
-        optionData_.VoiceVolume = static_cast<float>(currentDivision) / 9.0f;
-    }
+	if (selectedParameterIndex_ == 0) {
+		const float sensitivity = CameraSensitivityFromDivision(currentDivision);
+		optionData_.CameraMoveSpeed.x = sensitivity;
+		optionData_.CameraMoveSpeed.y = sensitivity;
+	} else if (selectedParameterIndex_ == 1) {
+		// 追加: 視野角の適用
+		optionData_.fieldOfView = FieldOfViewFromDivision(currentDivision);
+	} else if (selectedParameterIndex_ == 2) {
+		// 追加: 左右反転の適用
+		optionData_.isFlipHorizontally = (currentDivision == 1);
+	} else if (selectedParameterIndex_ == 3) {
+		// 追加: 上下反転の適用
+		optionData_.isFlipVertically = (currentDivision == 1);
+	} else if (selectedParameterIndex_ == 4) {
+		// BGMVolume
+		optionData_.BGMVolume = static_cast<float>(currentDivision) / 9.0f;
+	} else if (selectedParameterIndex_ == 5) {
+		// SEVolume
+		optionData_.SEVolume = static_cast<float>(currentDivision) / 9.0f;
+	} else if (selectedParameterIndex_ == 6) {
+		// VoiceVolume
+		optionData_.VoiceVolume = static_cast<float>(currentDivision) / 9.0f;
+	}
 
-    const int cameraDivision = DivisionFromCameraSensitivity(optionData_.CameraMoveSpeed.x);
-    const int fovDivision = DivisionFromFieldOfView(optionData_.fieldOfView); // 追加
-    const bool flipDivision = optionData_.isFlipHorizontally ? 1 : 0; // 追加
+	const int cameraDivision = DivisionFromCameraSensitivity(optionData_.CameraMoveSpeed.x);
+	const int fovDivision = DivisionFromFieldOfView(optionData_.fieldOfView);   // 追加
+	const bool flipHorizontalDivision = optionData_.isFlipHorizontally ? 1 : 0; // 追加
+	const bool flipVerticalDivision = optionData_.isFlipVertically ? 1 : 0;     // 追加
 
+	const int bgmDivision = DivisionFromVolume(optionData_.BGMVolume);
+	const int seDivision = DivisionFromVolume(optionData_.SEVolume);
+	const int voiceDivision = DivisionFromVolume(optionData_.VoiceVolume);
 
-    const int bgmDivision = DivisionFromVolume(optionData_.BGMVolume);
-    const int seDivision = DivisionFromVolume(optionData_.SEVolume);
-    const int voiceDivision = DivisionFromVolume(optionData_.VoiceVolume);
+	const int divisions[kOptionParameterNum] = {cameraDivision, fovDivision, flipHorizontalDivision, flipVerticalDivision, bgmDivision, seDivision, voiceDivision};
 
-    const int divisions[kOptionParameterNum] = { cameraDivision,fovDivision, flipDivision,bgmDivision, seDivision, voiceDivision };
+	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
 
-    for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
+		if ((parameterIndex == 2 || parameterIndex == 3 || parameterIndex >= 4) && divisions[parameterIndex] == 0) {
+			optionParameterTexts_[parameterIndex].SetString(kParameterLabels_[parameterIndex] + U"×");
+		} else {
+			optionParameterTexts_[parameterIndex].SetString(kParameterLabels_[parameterIndex]);
+		}
+		optionParameterTexts_[parameterIndex].SetColor(parameterIndex == selectedParameterIndex_ ? COLOR::RED : COLOR::WHITE);
+		optionParameterTexts_[parameterIndex].UpdateLayout(false);
+	}
 
-        if (parameterIndex >= 3 && divisions[parameterIndex] == 0) {
-            optionParameterTexts_[parameterIndex].SetString(kParameterLabels_[parameterIndex] + U"×");
-        } else {
-            optionParameterTexts_[parameterIndex].SetString(kParameterLabels_[parameterIndex]);
-        }
-        optionParameterTexts_[parameterIndex].SetColor(parameterIndex == selectedParameterIndex_ ? COLOR::RED : COLOR::WHITE);
-        optionParameterTexts_[parameterIndex].UpdateLayout(false);
-    }
+	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
+		for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
 
-    for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
-        for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
+			bool isGaugeActive = false;
+			if (parameterIndex < 2) {
+				isGaugeActive = (divisionIndex <= divisions[parameterIndex]);
+			} else {
+				isGaugeActive = (divisionIndex < divisions[parameterIndex]);
+			}
 
-            bool isGaugeActive = false;
-            if (parameterIndex < 1) {
-                isGaugeActive = (divisionIndex <= divisions[parameterIndex]);
-            } else {
-                isGaugeActive = (divisionIndex < divisions[parameterIndex]);
-            }
+			if (isGaugeActive) {
+				parameterSprite_[parameterIndex][divisionIndex].SetColor(parameterIndex == selectedParameterIndex_ ? COLOR::RED : COLOR::WHITE);
+			} else {
+				parameterSprite_[parameterIndex][divisionIndex].SetColor({0.3f, 0.3f, 0.3f, 1.0f});
+			}
 
-            if (isGaugeActive) {
-                parameterSprite_[parameterIndex][divisionIndex].SetColor(parameterIndex == selectedParameterIndex_ ? COLOR::RED : COLOR::WHITE);
-            } else {
-                parameterSprite_[parameterIndex][divisionIndex].SetColor({ 0.3f, 0.3f, 0.3f, 1.0f });
-            }
-
-            parameterSprite_[parameterIndex][divisionIndex].Update();
-        }
-    }
+			parameterSprite_[parameterIndex][divisionIndex].Update();
+		}
+	}
 }
 void Option::Draw() {
 
-    SpriteCommon::GetInstance()->DrawCommonFont();
-    optionTitleText_.Draw();
-    saveHintText_.Draw();
-    for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
-        optionParameterTexts_[parameterIndex].Draw();
-    }
+	SpriteCommon::GetInstance()->DrawCommonFont();
+	optionTitleText_.Draw();
+	saveHintText_.Draw();
+	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
+		optionParameterTexts_[parameterIndex].Draw();
+	}
 
-    SpriteCommon::GetInstance()->DrawCommon();
-    for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
+	SpriteCommon::GetInstance()->DrawCommon();
+	for (int parameterIndex = 0; parameterIndex < kOptionParameterNum; ++parameterIndex) {
 
-        if (parameterIndex == 2) {
-            parameterSprite_[parameterIndex][0].Draw();
+		if (parameterIndex == 2 || parameterIndex == 3) {
+			parameterSprite_[parameterIndex][0].Draw();
 
-        } else {
-            for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
+		} else {
+			for (int divisionIndex = 0; divisionIndex < kOptionParameterDivisionNum; ++divisionIndex) {
 
-                parameterSprite_[parameterIndex][divisionIndex].Draw();
-            }
-        }
-
-    }
+				parameterSprite_[parameterIndex][divisionIndex].Draw();
+			}
+		}
+	}
 }
 
 void Option::SaveOptionData() {

@@ -9,7 +9,7 @@ class Option {
 	OptionData optionData_;
 	int selectedParameterIndex_ = 0;
 	static const int kOptionParameterDivisionNum = 10; // オプションのパラメータの分割数
-	static const int kOptionParameterNum = 6;          // オプションのパラメータの数
+	static const int kOptionParameterNum = 7;          // オプションのパラメータの数
 
 	const Vector2 kOptionSpriteStartPos = {640.0f, 220.0f};
 	const Vector2 kOptionSpriteStep = {52.0f, 64.0f};
@@ -22,12 +22,7 @@ class Option {
 	Text saveHintText_;
 	std::array<Text, kOptionParameterNum> optionParameterTexts_;
 	const std::array<std::u32string, kOptionParameterNum> kParameterLabels_ = {
-	    U"カメラの感度設定",
-		U"視野角(FOV)",        
-		U"カメラの左右反転",  
-	    U"BGMボリューム",
-	    U"SEボリューム",
-	    U"Voiceボリューム",
+	    U"カメラの感度設定", U"視野角(FOV)", U"カメラの左右反転", U"カメラの上下反転", U"BGMボリューム", U"SEボリューム", U"Voiceボリューム",
 	};
 
 	std::array<std::array<Sprite, kOptionParameterDivisionNum>, kOptionParameterNum> parameterSprite_;
