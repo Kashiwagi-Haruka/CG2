@@ -3,6 +3,9 @@
 #include "Camera.h"
 #include "Object3d/Object3d.h"
 #include "Object3d/Object3dCommon.h"
+#include "Sprite/Sprite.h"
+#include "Sprite/SpriteCommon.h"
+#include "TextureManager.h"
 
 #include <cmath>
 #include <utility>
@@ -38,6 +41,29 @@ void MiniMap::Initialize() {
 	markerObject_->SetCamera(camera_.get());
 	markerObject_->SetEnableLighting(false);
 	markerObject_->SetScale({0.2f, 0.2f, 0.2f});
+
+
+
+	miniMapBackTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
+	miniMapFrameTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/ring.png");
+
+	miniMapBackSprite_ = std::make_unique<Sprite>();
+	miniMapBackSprite_->Initialize(miniMapBackTextureHandle_);
+	miniMapBackSprite_->SetAnchorPoint({0.5f, 0.5f});
+	miniMapBackSprite_->SetPosition(miniMapScreenCenter_);
+	miniMapBackSprite_->SetScale({miniMapRadius_ * 2.0f, miniMapRadius_ * 2.0f});
+	miniMapBackSprite_->SetColor({0.04f, 0.08f, 0.12f, 0.65f});
+
+	miniMapFrameSprite_ = std::make_unique<Sprite>();
+	miniMapFrameSprite_->Initialize(miniMapFrameTextureHandle_);
+	miniMapFrameSprite_->SetAnchorPoint({0.5f, 0.5f});
+	miniMapFrameSprite_->SetPosition(miniMapScreenCenter_);
+	miniMapFrameSprite_->SetScale({miniMapRadius_ * 2.2f, miniMapRadius_ * 2.2f});
+
+	markerSprite_ = std::make_unique<Sprite>();
+	markerSprite_->Initialize(miniMapBackTextureHandle_);
+	markerSprite_->SetAnchorPoint({0.5f, 0.5f});
+	markerSprite_->SetScale({8.0f, 8.0f});
 }
 
 void MiniMap::AddObject(std::string name, Object3d* object, Vector4 color) {
@@ -109,14 +135,40 @@ void MiniMap::Update() {
 }
 
 void MiniMap::Draw() {
-	if (!markerObject_) {
+	if (!miniMapBackSprite_ || !miniMapFrameSprite_ || !markerSprite_) {
 		return;
 	}
-	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
+
+	SpriteCommon::GetInstance()->DrawCommon();
+	miniMapBackSprite_->Update();
+	miniMapBackSprite_->Draw();
+
 	for (const auto& marker : visibleMarkers_) {
-		markerObject_->SetTranslate(marker.position);
-		markerObject_->SetColor(marker.color);
-		markerObject_->Update();
-		markerObject_->Draw();
+		const float dx = marker.position.x - playerTranslate_.x;
+		const float dz = marker.position.z - playerTranslate_.z;
+		const float distance = std::sqrt((dx * dx) + (dz * dz));
+		if (distance > range_) {
+			continue;
+		}
+		const float scale = miniMapRadius_ / range_;
+		const Vector2 markerPos = {
+		    miniMapScreenCenter_.x + (dx * scale),
+		    miniMapScreenCenter_.y + (dz * scale),
+		};
+
+		const float offsetX = markerPos.x - miniMapScreenCenter_.x;
+		const float offsetY = markerPos.y - miniMapScreenCenter_.y;
+		const float radius = std::sqrt((offsetX * offsetX) + (offsetY * offsetY));
+		if (radius > (miniMapRadius_ - 8.0f)) {
+			continue;
+		}
+
+		markerSprite_->SetPosition(markerPos);
+		markerSprite_->SetColor(marker.color);
+		markerSprite_->Update();
+		markerSprite_->Draw();
 	}
+
+	miniMapFrameSprite_->Update();
+	miniMapFrameSprite_->Draw();
 }

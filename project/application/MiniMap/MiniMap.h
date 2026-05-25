@@ -9,6 +9,7 @@
 
 class Camera;
 class Object3d;
+class Sprite;
 
 class MiniMap {
 	struct Entry {
@@ -26,12 +27,19 @@ class MiniMap {
 	std::unique_ptr<Camera> camera_;
 	std::unique_ptr<Camera> miniMapCamera_;
 	std::unique_ptr<Object3d> markerObject_;
+	std::unique_ptr<Sprite> miniMapBackSprite_;
+	std::unique_ptr<Sprite> miniMapFrameSprite_;
+	std::unique_ptr<Sprite> markerSprite_;
 	std::unordered_map<std::string, Entry> entries_;
 	std::vector<MarkerDrawData> visibleMarkers_;
 	Vector3 playerTranslate_ = {0.0f, 0.0f, 0.0f};
 	float range_ = 25.0f;
 	float markerHeight_ = 0.1f;
 	Vector3 minimapAnchorOffset_ = {-14.0f, 30.0f, 22.0f};
+	Vector2 miniMapScreenCenter_ = {130.0f, 590.0f};
+	float miniMapRadius_ = 90.0f;
+	uint32_t miniMapBackTextureHandle_ = 0;
+	uint32_t miniMapFrameTextureHandle_ = 0;
 	std::string stageName_;
 
 	void UpdateCamera();
