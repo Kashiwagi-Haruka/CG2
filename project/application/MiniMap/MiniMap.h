@@ -31,6 +31,7 @@ class MiniMap {
 	float range_ = 25.0f;
 	float markerHeight_ = 0.1f;
 	Vector3 minimapAnchorOffset_ = {-14.0f, 30.0f, 22.0f};
+	std::string stageName_;
 
 	void UpdateCamera();
 	void UpdateVisibleMarkers();
@@ -49,4 +50,6 @@ public:
 	void Draw();
 	void AddObject(std::string name, Object3d* object, Vector4 color);
 	void SetPlayerTranslate(Vector3 translate);
+	void SetStage(std::string stageName);
+	void Reset();
 };

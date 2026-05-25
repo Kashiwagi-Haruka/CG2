@@ -4,6 +4,7 @@
 #include "Object3d/Object3d.h"
 
 #include <cmath>
+#include <utility>
 
 std::unique_ptr<MiniMap> MiniMap::instance_ = nullptr;
 
@@ -45,6 +46,20 @@ void MiniMap::AddObject(std::string name, Object3d* object, Vector4 color) {
 }
 
 void MiniMap::SetPlayerTranslate(Vector3 translate) { playerTranslate_ = translate; }
+
+void MiniMap::SetStage(std::string stageName) {
+	if (stageName_ == stageName) {
+		return;
+	}
+
+	stageName_ = std::move(stageName);
+	Reset();
+}
+
+void MiniMap::Reset() {
+	entries_.clear();
+	visibleMarkers_.clear();
+}
 
 void MiniMap::UpdateCamera() {
 	if (!camera_) {
