@@ -23,6 +23,7 @@
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include"GameObject/HintSheet/HintSheetManager.h"
+#include "MiniMap/MiniMap.h"
 #include <utility>
 #include <string>
 MirrorStage::MirrorStage(Player* player) : player_(player) {
@@ -88,6 +89,12 @@ void MirrorStage::Initialize() {
 	hintSheetManager_->SetParentMatrix(0, deskManager_->GetDrawerMatrix(2));
 	hintSheetManager_->SetParentIsOpenEnd(0, deskManager_->GetDesks().at(2)->IsEndOpenAnimation());
 	deskManager_->GetDesks().at(2)->RegisterReadableObject(hintSheetManager_->GetHintSheets().at(0).get());
+	MiniMap* miniMap = MiniMap::GetInstance();
+	miniMap->AddObject("MirrorStage_VendingMac", vendingMac_->GetObject3d(), {1.0f, 0.0f, 0.0f, 1.0f});
+	for (size_t i = 0; i < lockerManager_->GetLockers().size(); ++i) {
+		auto* lockerObject = lockerManager_->GetLockers().at(i)->GetObject3d();
+		miniMap->AddObject("MirrorStage_Locker" + std::to_string(i), lockerObject, {0.75f, 0.75f, 0.0f, 1.0f});
+	}
 	InitializeLights();
 
 	hierarchy->LoadObjectEditorsFromJsonIfExists("MirrorStage_objectEditors.json");

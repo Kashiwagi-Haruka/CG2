@@ -38,7 +38,7 @@ public:
     Vector3 GetRotate() { return obj_->GetTransform().rotate; }
     bool GetIsPlayerIn() { return isPlayerIn_; };
     void SetIsPlayerIn(bool flag) { isPlayerIn_ = flag;  }
-	Object3d* GetObject3d() const { return obj_.get(); }
+    Object3d* GetObject3d() const { return obj_.get(); }
     // ★追加：フロントコライダーのワールド座標（出口）を取得する
     Vector3 GetForward() {
         return YoshidaMath::GetForward(obj_->GetWorldMatrix());

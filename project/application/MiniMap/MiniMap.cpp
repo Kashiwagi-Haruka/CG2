@@ -6,7 +6,9 @@
 #include "Portal/PortalMesh.h"
 #include "Sprite/Sprite.h"
 #include "Sprite/SpriteCommon.h"
+#include "RenderTexture2D.h"
 #include "TextureManager.h"
+#include "WinApp.h"
 
 #include <cmath>
 #include <utility>
@@ -50,14 +52,24 @@ void MiniMap::Initialize() {
 
 	miniMapBackTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
 	miniMapPortal_ = std::make_unique<PortalMesh>();
-	miniMapPortal_->Initialize("Resources/TD3_3102/2d/white2x2.png");
-	miniMapPortal_->SetTextureCamera(miniMapCamera_.get());
-	miniMapPortal_->SetColor({0.65f, 0.85f, 1.0f, 0.85f});
 	Transform miniMapPortalTransform{};
 	miniMapPortalTransform.scale = {miniMapRadius_ * 2.2f, miniMapRadius_ * 2.2f, 1.0f};
 	miniMapPortalTransform.rotate = {0.0f, 0.0f, 0.0f};
 	miniMapPortalTransform.translate = {-1.2f, -0.8f, 1.5f};
 	miniMapPortal_->SetTransform(miniMapPortalTransform);
+	miniMapPortal_->Initialize("Resources/TD3_3102/2d/white2x2.png");
+	miniMapPortal_->SetTextureCamera(miniMapCamera_.get());
+	miniMapPortal_->SetColor({0.65f, 0.85f, 1.0f, 0.85f});
+
+	miniMapPortalOutline_ = std::make_unique<PortalMesh>();
+	miniMapPortalOutline_->Initialize("Resources/TD3_3102/2d/white2x2.png");
+	miniMapPortalOutline_->SetTextureCamera(miniMapCamera_.get());
+	miniMapPortalOutline_->SetColor({0.02f, 0.04f, 0.08f, 0.95f});
+	Transform miniMapPortalOutlineTransform{};
+	miniMapPortalOutlineTransform.scale = {miniMapRadius_ * 2.34f, miniMapRadius_ * 2.34f, 1.0f};
+	miniMapPortalOutlineTransform.rotate = {0.0f, 0.0f, 0.0f};
+	miniMapPortalOutlineTransform.translate = {-1.2f, -0.8f, 1.49f};
+	miniMapPortalOutline_->SetTransform(miniMapPortalOutlineTransform);
 
 	miniMapBackSprite_ = std::make_unique<Sprite>();
 	miniMapBackSprite_->Initialize(miniMapBackTextureHandle_);
@@ -111,6 +123,28 @@ void MiniMap::UpdateCamera() {
 
 	miniMapCamera_->SetTranslate({playerTranslate_.x, playerTranslate_.y + miniMapContentCameraHeight_, playerTranslate_.z});
 	miniMapCamera_->Update();
+	const float ndcX = (miniMapScreenCenter_.x / (static_cast<float>(WinApp::kClientWidth) * 0.5f)) - 1.0f;
+	const float ndcY = 1.0f - (miniMapScreenCenter_.y / (static_cast<float>(WinApp::kClientHeight) * 0.5f));
+	const float portalDepth = 15.0f;
+	const float halfFovY = camera_->GetFovY() * 0.5f;
+	const float halfHeight = std::tan(halfFovY) * portalDepth;
+	const float halfWidth = halfHeight * camera_->GetAspectRatio();
+
+	const Matrix4x4& cameraWorld = camera_->GetWorldMatrix();
+	const Vector3 right = {cameraWorld.m[0][0], cameraWorld.m[0][1], cameraWorld.m[0][2]};
+	const Vector3 up = {cameraWorld.m[1][0], cameraWorld.m[1][1], cameraWorld.m[1][2]};
+	const Vector3 forward = {cameraWorld.m[2][0], cameraWorld.m[2][1], cameraWorld.m[2][2]};
+	const Vector3 cameraWorldPos = camera_->GetWorldTranslate();
+
+	Transform miniMapPortalTransform{};
+	miniMapPortalTransform.scale = {miniMapRadius_ * 0.14f, miniMapRadius_ * 0.14f, 1.0f};
+	miniMapPortalTransform.rotate = camera_->GetRotate();
+	miniMapPortalTransform.translate = {
+	    cameraWorldPos.x + (forward.x * portalDepth) + (right.x * (ndcX * halfWidth)) + (up.x * (ndcY * halfHeight)),
+	    cameraWorldPos.y + (forward.y * portalDepth) + (right.y * (ndcX * halfWidth)) + (up.y * (ndcY * halfHeight)),
+	    cameraWorldPos.z + (forward.z * portalDepth) + (right.z * (ndcX * halfWidth)) + (up.z * (ndcY * halfHeight)),
+	};
+	miniMapPortal_->SetTransform(miniMapPortalTransform);
 }
 
 void MiniMap::UpdateVisibleMarkers() {
@@ -144,7 +178,7 @@ void MiniMap::Update() {
 }
 
 void MiniMap::Draw() {
-	if (!miniMapBackSprite_ || !miniMapPortal_ || !markerSprite_) {
+	if (!miniMapPortalOutline_ || !miniMapPortal_ || !markerSprite_) {
 		return;
 	}
 

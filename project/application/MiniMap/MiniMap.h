@@ -1,4 +1,5 @@
 #pragma once
+#include "RenderTexture2D.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
@@ -31,6 +32,8 @@ class MiniMap {
 	std::unique_ptr<Object3d> markerObject_;
 	std::unique_ptr<Sprite> miniMapBackSprite_;
 	std::unique_ptr<PortalMesh> miniMapPortal_;
+	std::unique_ptr<PortalMesh> miniMapPortalOutline_;
+	std::unique_ptr<RenderTexture2D> miniMapRenderTexture_;
 	std::unique_ptr<Sprite> markerSprite_;
 	std::unordered_map<std::string, Entry> entries_;
 	std::vector<MarkerDrawData> visibleMarkers_;
