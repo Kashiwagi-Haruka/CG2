@@ -32,6 +32,7 @@ public:
     static bool IsRayHit() { return isRayHit_; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
     void SetAnimationName(const std::string& name) { desiredAnimationName = name; };
+    void SetGentleManTackScript(const std::string& stageName) { gentlemanTalk_->SetStrings(stageName); }
 private:
     void SwichCommand();
     // アニメーション

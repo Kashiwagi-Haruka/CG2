@@ -9,6 +9,7 @@ std::vector<std::u32string>GentlemanTalk::strings_;
 
 void GentlemanTalk::SetStrings(const std::string& stageName) {
 
+    strings_.clear();
     std::u32string string;
 
     std::string filePath = "Resources/TXT/gentlemanTalk" + stageName + ".txt";
@@ -34,6 +35,7 @@ void GentlemanTalk::SetStrings(const std::string& stageName) {
     }
 
 };
+
 GentlemanTalk::GentlemanTalk()
 {
     //最初はコレ

@@ -284,6 +284,9 @@ void ShadowGameScene::ChangeStage(const std::string& stageName) {
     SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
     uiManager_->ShowKeyLostAtStageStartMessage();
+
+
+    gentleManManager_->GetGentleman()->SetGentleManTackScript(progressSaveData_.currentStageName);
 }
 
 void ShadowGameScene::CheckCollision() {
