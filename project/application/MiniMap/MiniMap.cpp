@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Object3d/Object3d.h"
 #include "Object3d/Object3dCommon.h"
+#include "Portal/PortalMesh.h"
 #include "Sprite/Sprite.h"
 #include "Sprite/SpriteCommon.h"
 #include "TextureManager.h"
@@ -34,6 +35,11 @@ void MiniMap::Initialize() {
 	camera_->SetAspectRatio(1.0f);
 
 	miniMapCamera_ = std::make_unique<Camera>();
+	miniMapCamera_->SetRotate({0.0f, 3.1415926f, 0.0f});
+	miniMapCamera_->SetNearClip(0.1f);
+	miniMapCamera_->SetFarClip(500.0f);
+	miniMapCamera_->SetFovY(0.45f);
+	miniMapCamera_->SetAspectRatio(1.0f);
 
 	markerObject_ = std::make_unique<Object3d>();
 	markerObject_->Initialize();
@@ -42,10 +48,16 @@ void MiniMap::Initialize() {
 	markerObject_->SetEnableLighting(false);
 	markerObject_->SetScale({0.2f, 0.2f, 0.2f});
 
-
-
 	miniMapBackTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
-	miniMapFrameTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/ring.png");
+	miniMapPortal_ = std::make_unique<PortalMesh>();
+	miniMapPortal_->Initialize("Resources/TD3_3102/2d/white2x2.png");
+	miniMapPortal_->SetTextureCamera(miniMapCamera_.get());
+	miniMapPortal_->SetColor({0.65f, 0.85f, 1.0f, 0.85f});
+	Transform miniMapPortalTransform{};
+	miniMapPortalTransform.scale = {miniMapRadius_ * 2.2f, miniMapRadius_ * 2.2f, 1.0f};
+	miniMapPortalTransform.rotate = {0.0f, 0.0f, 0.0f};
+	miniMapPortalTransform.translate = {-1.2f, -0.8f, 1.5f};
+	miniMapPortal_->SetTransform(miniMapPortalTransform);
 
 	miniMapBackSprite_ = std::make_unique<Sprite>();
 	miniMapBackSprite_->Initialize(miniMapBackTextureHandle_);
@@ -53,12 +65,6 @@ void MiniMap::Initialize() {
 	miniMapBackSprite_->SetPosition(miniMapScreenCenter_);
 	miniMapBackSprite_->SetScale({miniMapRadius_ * 2.0f, miniMapRadius_ * 2.0f});
 	miniMapBackSprite_->SetColor({0.04f, 0.08f, 0.12f, 0.65f});
-
-	miniMapFrameSprite_ = std::make_unique<Sprite>();
-	miniMapFrameSprite_->Initialize(miniMapFrameTextureHandle_);
-	miniMapFrameSprite_->SetAnchorPoint({0.5f, 0.5f});
-	miniMapFrameSprite_->SetPosition(miniMapScreenCenter_);
-	miniMapFrameSprite_->SetScale({miniMapRadius_ * 2.2f, miniMapRadius_ * 2.2f});
 
 	markerSprite_ = std::make_unique<Sprite>();
 	markerSprite_->Initialize(miniMapBackTextureHandle_);
@@ -102,6 +108,9 @@ void MiniMap::UpdateCamera() {
 	};
 	camera_->SetTranslate(cameraPos);
 	camera_->Update();
+
+	miniMapCamera_->SetTranslate(playerTranslate_);
+	miniMapCamera_->Update();
 }
 
 void MiniMap::UpdateVisibleMarkers() {
@@ -135,7 +144,7 @@ void MiniMap::Update() {
 }
 
 void MiniMap::Draw() {
-	if (!miniMapBackSprite_ || !miniMapFrameSprite_ || !markerSprite_) {
+	if (!miniMapBackSprite_ || !miniMapPortal_ || !markerSprite_) {
 		return;
 	}
 
@@ -169,6 +178,7 @@ void MiniMap::Draw() {
 		markerSprite_->Draw();
 	}
 
-	miniMapFrameSprite_->Update();
-	miniMapFrameSprite_->Draw();
+	Object3dCommon::GetInstance()->DrawCommon();
+	miniMapPortal_->Update();
+	miniMapPortal_->Draw();
 }
