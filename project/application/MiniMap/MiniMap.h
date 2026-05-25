@@ -1,22 +1,52 @@
 #pragma once
-#include <string>
 #include "Vector3.h"
 #include "Vector4.h"
+
 #include <memory>
-class Object3d;
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 class Camera;
+class Object3d;
+
 class MiniMap {
-	
-	std::unique_ptr<Camera> camera;
+	struct Entry {
+		Object3d* object = nullptr;
+		Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+	};
+
+	struct MarkerDrawData {
+		Vector3 position = {0.0f, 0.0f, 0.0f};
+		Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+	};
+
+	static std::unique_ptr<MiniMap> instance_;
+
+	std::unique_ptr<Camera> camera_;
+	std::unique_ptr<Object3d> markerObject_;
+	std::unordered_map<std::string, Entry> entries_;
+	std::vector<MarkerDrawData> visibleMarkers_;
+	Vector3 playerTranslate_ = {0.0f, 0.0f, 0.0f};
+	float range_ = 25.0f;
+	float markerHeight_ = 0.1f;
+	Vector3 minimapAnchorOffset_ = {-14.0f, 30.0f, 22.0f};
+
+	void UpdateCamera();
+	void UpdateVisibleMarkers();
 
 public:
-	void AddObject(std::string Name, Object3d* object,Vector4 color);
+	MiniMap() = default;
+	~MiniMap() = default;
+	MiniMap(const MiniMap&) = delete;
+	MiniMap& operator=(const MiniMap&) = delete;
 
-	MiniMap();
+	static MiniMap* GetInstance();
+	static void Finalize();
 
 	void Initialize();
 	void Update();
 	void Draw();
+	void AddObject(std::string name, Object3d* object, Vector4 color);
 	void SetPlayerTranslate(Vector3 translate);
-
 };
