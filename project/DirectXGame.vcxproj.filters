@@ -438,6 +438,7 @@
     <ClCompile Include="application\GameObject\Gentleman\GentlemanTalk.cpp" />
     <ClCompile Include="application\GameObject\RadiconStage\MiniWhiteboard\MiniWhiteboard.cpp" />
     <ClCompile Include="application\Text\LockerMenu\LockerMenu.cpp" />
+    <ClCompile Include="application\MiniMap\MiniMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -864,6 +865,7 @@
     <ClInclude Include="application\GameObject\Gentleman\GentlemanTalk.h" />
     <ClInclude Include="application\GameObject\RadiconStage\MiniWhiteboard\MiniWhiteboard.h" />
     <ClInclude Include="application\Text\LockerMenu\LockerMenu.h" />
+    <ClInclude Include="application\MiniMap\MiniMap.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

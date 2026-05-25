@@ -7,6 +7,6 @@
   "SEVolume": 1.0,
   "VoiceVolume": 1.0,
   "fieldOfView": 50.0,
-  "isFlipHorizontally": false,
-  "isFlipVertically": false
+  "isFlipHorizontally": true,
+  "isFlipVertically": true
 }
