@@ -12,11 +12,11 @@ RadiconStage::RadiconStage(Player* player) : player_(player) {
 	radicon_ = std::make_unique<Radicon>();
 	testField_ = std::make_unique<TestField>();
 	operationChangeBox_ = std::make_unique<OperationChangeBox>();
-	//懐中電灯の作成
+	// 懐中電灯の作成
 	flashlight_ = std::make_unique<Flashlight>();
 	flashlight_->SetPlayer(player_);
 	burningObject_ = std::make_unique<BurningObject>();
-
+	miniWhiteboard_ = std::make_unique<MiniWhiteboard>();
 }
 
 void RadiconStage::Initialize() { 
@@ -30,7 +30,7 @@ void RadiconStage::Initialize() {
 	    .rotate = {0.0f, Function::kPi, 0.0f},
 	    .translate = {0.0f, 0.17f, 3.5f},
 	});
-
+	miniWhiteboard_->Initialize();
 	for (auto& primitive : roomPrimitives_) {
 		primitive = std::make_unique<Primitive>();
 		primitive->Initialize(Primitive::Box, "Resources/TD3_3102/2d/white2x2.png");
@@ -102,6 +102,9 @@ void RadiconStage::UpdateGameObject([[maybe_unused]] Camera* camera, [[maybe_unu
 	// 懐中電灯の更新
 	flashlight_->Update();
 	burningObject_->Update();
+	if (player_) {
+		miniWhiteboard_->Update(player_->GetTransform().translate);
+	}
 	// ライトの更新
 	lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 	burningObject_->Update();

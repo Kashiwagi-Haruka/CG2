@@ -8,6 +8,7 @@
 #include "GameObject/GentleMan/GentleManTalk.h"
 #include "GameObject/Flashlight/Flashlight.h"
 #include "GameObject/Key/Key.h"
+#include "GameObject/RadiconStage/MiniWhiteboard/MiniWhiteboard.h"
 #include "SpriteCommon.h"
 #include <algorithm>
 
@@ -83,6 +84,9 @@ void TextUIManager::Update() {
 	} else if (Flashlight::IsGetLightMessage()) {
 		text_.SetString(U"懐中電灯を取得した。");
 		StartText();
+	} else if (MiniWhiteboard::ConsumeTooSmallMessage()) {
+		text_.SetString(U"小さすぎて通れないようだ");
+		StartText(2.5f);
 	}
 
 	if (EdamameTrivia::GetIsSendStartTriviaMessage()) {

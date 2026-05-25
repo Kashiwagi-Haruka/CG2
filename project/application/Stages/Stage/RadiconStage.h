@@ -1,14 +1,15 @@
 #pragma once
 #include "Stages/BaseStage.h"
 #include <memory>
-#include "GameObject/Radicon/Radicon.h"
-#include "GameObject/Enemy/Enemy.h"
-#include "GameObject/BurningObject/BurningObject.h"
+#include "GameObject/RadiconStage/Radicon/Radicon.h"
+#include "GameObject/RadiconStage/Enemy/Enemy.h"
+#include "GameObject/RadiconStage/BurningObject/BurningObject.h"
 #include "GameObject/YoshidaMath/CollisionManager/CollisionManager.h"
 #include "GameObject/TestField/TestField.h"
-#include "GameObject/OperationChangeBox/OperationChangeBox.h"
+#include "GameObject/RadiconStage/OperationChangeBox/OperationChangeBox.h"
 #include <array>
 #include "GameObject/Flashlight/Flashlight.h"
+#include "GameObject/RadiconStage/MiniWhiteboard/MiniWhiteboard.h"
 #include "Object3d/Object3d.h"
 
 class Primitive;
@@ -42,7 +43,7 @@ private:
 	std::unique_ptr<TestField> testField_;
 	std::unique_ptr<OperationChangeBox> operationChangeBox_;
 	std::array<std::unique_ptr<Primitive>, 5> roomPrimitives_{};
-
+	std::unique_ptr <MiniWhiteboard> miniWhiteboard_;
 
 	std::unique_ptr<Flashlight> flashlight_ = nullptr;
 
