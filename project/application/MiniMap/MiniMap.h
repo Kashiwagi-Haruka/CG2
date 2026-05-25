@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "Vector3.h"
+#include "Vector4.h"
 class Object3d;
 class Camera;
 class MiniMap {
@@ -8,7 +9,7 @@ class MiniMap {
 	Camera* camera;
 
 public:
-	void AddObject(std::string Name, Object3d* object);
+	void AddObject(std::string Name, Object3d* object,Vector4 color);
 
 	MiniMap();
 
