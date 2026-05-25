@@ -186,6 +186,11 @@ void MiniMap::Draw() {
 	miniMapBackSprite_->Update();
 	miniMapBackSprite_->Draw();
 
+	Object3dCommon::GetInstance()->DrawCommon();
+	miniMapPortal_->Update();
+	miniMapPortal_->Draw();
+
+	SpriteCommon::GetInstance()->DrawCommon();
 	for (const auto& marker : visibleMarkers_) {
 		const float dx = marker.position.x - playerTranslate_.x;
 		const float dz = marker.position.z - playerTranslate_.z;
@@ -211,8 +216,4 @@ void MiniMap::Draw() {
 		markerSprite_->Update();
 		markerSprite_->Draw();
 	}
-
-	Object3dCommon::GetInstance()->DrawCommon();
-	miniMapPortal_->Update();
-	miniMapPortal_->Draw();
 }
