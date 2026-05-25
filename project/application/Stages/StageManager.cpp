@@ -1,50 +1,56 @@
+#include "StageManager.h"
+#include "GameObject/Player/Player.h"
+#include "MiniMap/MiniMap.h"
+#include "Stage/ElevatorFallStage/ElevatorFallStage.h"
+#include "Stage/GentleManStage/GentleManStage.h"
 #include "Stage/LightStage.h"
 #include "Stage/MirrorStage.h"
 #include "Stage/RadiconStage.h"
-#include "StageManager.h"
-#include"Stage/TutorialStage/TutorialStage.h"
-#include"Stage/GentleManStage/GentleManStage.h"
-#include"Stage/RestroomStage/RestroomStage.h"
-#include"Stage/ElevatorFallStage/ElevatorFallStage.h"
+#include "Stage/RestroomStage/RestroomStage.h"
+#include "Stage/TutorialStage/TutorialStage.h"
 
 StageManager::StageManager(Player* player) : player_(player) {}
 
 void StageManager::CreateStage(const std::string& sceneName) {
-    if (stage_) {
-        stage_.reset();
-    }
+	if (stage_) {
+		stage_.reset();
+	}
 
-    if (sceneName == "MirrorStage") {
-        stage_ = std::make_unique<MirrorStage>(player_);
-    } else if (sceneName == "LightStage") {
-        stage_ = std::make_unique<LightStage>(player_);
-    } else if (sceneName == "TutorialStage") {
-        stage_ = std::make_unique<TutorialStage>(player_);
-    } else if (sceneName == "RadiconStage") {
-        stage_ = std::make_unique<RadiconStage>(player_);
-    } else if (sceneName == "GentleManStage") {
-        stage_ = std::make_unique<GentleManStage>(player_);
-    } else if (sceneName == "RestroomStage") {
-        stage_ = std::make_unique<RestroomStage>(player_);
-    } else if (sceneName == "ElevatorFallStage") {
-        stage_ = std::make_unique<ElevatorFallStage>(player_);
-    }
+	if (sceneName == "MirrorStage") {
+		stage_ = std::make_unique<MirrorStage>(player_);
+	} else if (sceneName == "LightStage") {
+		stage_ = std::make_unique<LightStage>(player_);
+	} else if (sceneName == "TutorialStage") {
+		stage_ = std::make_unique<TutorialStage>(player_);
+	} else if (sceneName == "RadiconStage") {
+		stage_ = std::make_unique<RadiconStage>(player_);
+	} else if (sceneName == "GentleManStage") {
+		stage_ = std::make_unique<GentleManStage>(player_);
+	} else if (sceneName == "RestroomStage") {
+		stage_ = std::make_unique<RestroomStage>(player_);
+	} else if (sceneName == "ElevatorFallStage") {
+		stage_ = std::make_unique<ElevatorFallStage>(player_);
+	}
+
+	MiniMap* miniMap = MiniMap::GetInstance();
+	miniMap->Initialize();
+	miniMap->SetStage(sceneName);
 }
 void StageManager::SetPlayer(Player* player) {
-    player_ = player;
-    if (stage_) {
-        stage_->SetPlayer(player_);
-    }
+	player_ = player;
+	if (stage_) {
+		stage_->SetPlayer(player_);
+	}
 }
 void StageManager::SetCollisionManager(CollisionManager* collisionManager) {
-    if (stage_) {
-        stage_->SetCollisionManager(collisionManager);
-    }
+	if (stage_) {
+		stage_->SetCollisionManager(collisionManager);
+	}
 }
 void StageManager::InitializeStage() {
-    if (stage_) {
-        stage_->Initialize();
-    }
+	if (stage_) {
+		stage_->Initialize();
+	}
 }
 
 void StageManager::UpdateLight() {}
@@ -52,35 +58,41 @@ void StageManager::UpdatePlayerDamage() {}
 void StageManager::UpdatePostEffect() {}
 
 void StageManager::UpdateGameObject(Camera* camera, const Vector3& lightDirection) {
-    if (stage_) {
-        stage_->UpdateGameObject(camera, lightDirection, player_);
-    }
+	if (stage_) {
+		stage_->UpdateGameObject(camera, lightDirection, player_);
+	}
+
+	if (player_) {
+		MiniMap::GetInstance()->SetPlayerTranslate(player_->GetTransform().translate);
+	}
+	MiniMap::GetInstance()->Update();
 }
 
 void StageManager::UpdatePortal() {
-    if (stage_) {
-        stage_->UpdatePortal();
-    }
+	if (stage_) {
+		stage_->UpdatePortal();
+	}
 }
 
 void StageManager::CheckCollision() {
-    if (stage_) {
-        stage_->CheckCollision();
-    }
+	if (stage_) {
+		stage_->CheckCollision();
+	}
 }
 void StageManager::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
-    if (stage_) {
-        stage_->DrawModel(isShadow, drawPortal, isDrawParticle);
-    }
+	if (stage_) {
+		stage_->DrawModel(isShadow, drawPortal, isDrawParticle);
+	}
 }
 
 void StageManager::DrawDamageOverlay() {}
 
-void StageManager::DrawSprite()
-{
-    if (stage_) {
-        stage_->DrawSprite();
-    }
+void StageManager::DrawSprite() {
+	if (stage_) {
+		stage_->DrawSprite();
+	}
+
+	MiniMap::GetInstance()->Draw();
 }
 
 void StageManager::SetSceneCameraForDraw(Camera* camera) {

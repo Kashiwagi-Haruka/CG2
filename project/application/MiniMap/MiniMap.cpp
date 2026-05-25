@@ -2,6 +2,7 @@
 
 #include "Camera.h"
 #include "Object3d/Object3d.h"
+#include "Object3d/Object3dCommon.h"
 
 #include <cmath>
 #include <utility>
@@ -109,7 +110,7 @@ void MiniMap::Draw() {
 	if (!markerObject_) {
 		return;
 	}
-
+	Object3dCommon::GetInstance()->DrawCommon();
 	for (const auto& marker : visibleMarkers_) {
 		markerObject_->SetTranslate(marker.position);
 		markerObject_->SetColor(marker.color);
