@@ -30,6 +30,8 @@ void MiniMap::Initialize() {
 	camera_->SetFovY(0.45f);
 	camera_->SetAspectRatio(1.0f);
 
+	miniMapCamera_ = std::make_unique<Camera>();
+
 	markerObject_ = std::make_unique<Object3d>();
 	markerObject_->Initialize();
 	markerObject_->SetModel("debugBox");
@@ -110,7 +112,7 @@ void MiniMap::Draw() {
 	if (!markerObject_) {
 		return;
 	}
-	Object3dCommon::GetInstance()->DrawCommon();
+	Object3dCommon::GetInstance()->DrawCommonNoCullDepth();
 	for (const auto& marker : visibleMarkers_) {
 		markerObject_->SetTranslate(marker.position);
 		markerObject_->SetColor(marker.color);

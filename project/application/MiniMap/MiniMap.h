@@ -24,6 +24,7 @@ class MiniMap {
 	static std::unique_ptr<MiniMap> instance_;
 
 	std::unique_ptr<Camera> camera_;
+	std::unique_ptr<Camera> miniMapCamera_;
 	std::unique_ptr<Object3d> markerObject_;
 	std::unordered_map<std::string, Entry> entries_;
 	std::vector<MarkerDrawData> visibleMarkers_;
