@@ -109,7 +109,7 @@ void MiniMap::UpdateCamera() {
 	camera_->SetTranslate(cameraPos);
 	camera_->Update();
 
-	miniMapCamera_->SetTranslate(playerTranslate_);
+	miniMapCamera_->SetTranslate({playerTranslate_.x, playerTranslate_.y + miniMapContentCameraHeight_, playerTranslate_.z});
 	miniMapCamera_->Update();
 }
 

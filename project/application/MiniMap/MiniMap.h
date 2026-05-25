@@ -37,6 +37,7 @@ class MiniMap {
 	Vector3 playerTranslate_ = {0.0f, 0.0f, 0.0f};
 	float range_ = 25.0f;
 	float markerHeight_ = 0.1f;
+	float miniMapContentCameraHeight_ = 30.0f;
 	Vector3 minimapAnchorOffset_ = {-14.0f, 30.0f, 22.0f};
 	Vector2 miniMapScreenCenter_ = {130.0f, 590.0f};
 	float miniMapRadius_ = 90.0f;
