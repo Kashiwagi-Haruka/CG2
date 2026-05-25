@@ -236,7 +236,11 @@ void MirrorStage::CheckCollision() {
 		stageCollisionManager_->AddCollider(wall.get());
 	}
 	for (auto& chair : chairManager_->GetChairs()) {
-		stageCollisionManager_->AddCollider(chair.get());
+		if (!chair->GetIsStand()) {
+			//乗っていたらコリジョン無し
+			stageCollisionManager_->AddCollider(chair.get());
+		}
+	
 	}
 
 
@@ -244,7 +248,8 @@ void MirrorStage::CheckCollision() {
 		for (auto& [name, collision]:locker->GetColliders()) {
 		//開いていないときFrontのColliderを追加する
 			bool flag = locker->GetIsOpen()&& name.find("Front") != std::string::npos;
-			if (!flag) {
+
+			if (!flag&& !locker->GetIsPlayerIn()) {
 				stageCollisionManager_->AddCollider(collision.get());
 			}
 		

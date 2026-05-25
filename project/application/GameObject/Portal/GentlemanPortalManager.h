@@ -22,6 +22,7 @@ public:
 	void CheckCollision()override;
 	static bool GetCanMakePortal() { return canMakePortal_; };
 private:
+	bool isMakePortal_ = false;
 	void UpdatePortal()override;
 	// ポータルの作成
 	void SpawnPortal();

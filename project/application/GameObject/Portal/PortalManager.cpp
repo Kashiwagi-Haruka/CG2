@@ -5,12 +5,14 @@
 #include "GameObject/SEManager/SEManager.h"
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include "GameObject/YoshidaMath/YoshidaMath.h"
+#include "GameObject/KeyBindConfig.h"
+
 #include "Function.h"
 #include<imgui.h>
 #include"GameBase.h"
 
 bool PortalManager::canMakePortal_ = false;
-
+bool PortalManager::canMakePortalToWhiteBoard_ = false;
 PortalManager::PortalManager(Vector3* pos) {
 
     playerPos_ = pos;
@@ -43,6 +45,8 @@ void PortalManager::Initialize() {
     isWarp_ = false;
 
     canMakePortal_ = false;
+    canMakePortalToWhiteBoard_ = false;
+
     warpCoolTimer_ = kWarpTime_;
     
     for (auto& portal : portals_) {
@@ -148,6 +152,7 @@ void PortalManager::Update() {
 # ifdef USE_IMGUI
     ImGui::Begin("PortalManager");
     ImGui::Checkbox("canMakePortal", &canMakePortal_);
+    ImGui::Checkbox("hitWhiteBoard", &canMakePortalToWhiteBoard_);
     ImGui::Text("RoomCout,%d", roomAABBs_.size());
     for (uint32_t i = 0; i < roomAABBs_.size(); ++i) {
         std::string idName = "Room" +std::to_string(i);
@@ -165,27 +170,24 @@ void PortalManager::Update() {
 
 void PortalManager::CheckCollision() {
 
+    canMakePortal_ = false;
+    canMakePortalToWhiteBoard_ = false;
 
-
-    if (isPendingPortalSpawn_) {
-        canMakePortal_ = false;
+    if (isPendingPortalSpawn_) { 
         return;
     }
 
     if (!whiteBoardManager_ || !playerCamera_) {
-        canMakePortal_ = false;
         return;
     }
 
     WhiteBoard* hitBoard = whiteBoardManager_->CheckCollision(playerCamera_);
-    canMakePortal_ = whiteBoardManager_->GetCanMakePortal();
-
+    
     if (!hitBoard) {
         return;
     }
-
-
-
+    //ここまで来たらホワイトボードにはポータルが作れることが分かるね。
+    canMakePortalToWhiteBoard_ = true;
 
     // 生成予定地（撃ったホワイトボード）の座標を取得
     Vector3 targetPos = hitBoard->GetCollisionTransform().translate;
@@ -222,7 +224,20 @@ void PortalManager::CheckCollision() {
         }
     }
 
- 
+    //ここまでくるとポータルが作れるよ！
+    canMakePortal_ = true;
+
+    //実際に打ってみよう！
+    if (!PlayerCommand::GetInstance()->Shot()) {
+        return;
+    }
+
+    // ショットSE鳴らす
+    SEManager::SoundPlay(SEManager::SHOT);
+
+    //ポータルをつくるよん
+    whiteBoardManager_->SetPortal(hitBoard);
+
     if (portals_.size() >= 2) {
         // ポータルの生成が2個以上になったら
         portals_.erase(portals_.begin());
@@ -232,7 +247,8 @@ void PortalManager::CheckCollision() {
     isPendingPortalSpawn_ = true;
 
     if (portalParticle_) {
-        portalParticle_->Start(*playerPos_, pendingWhiteBoard_->GetCollisionTransform().translate);
+
+        portalParticle_->Start(playerCamera_->GetTransform().translate, pendingWhiteBoard_->GetCollisionTransform().translate);
     }
 }
 // ===== 追加: 座標がどの部屋に属しているかを判定する =====

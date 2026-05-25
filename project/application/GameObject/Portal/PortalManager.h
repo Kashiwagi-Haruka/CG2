@@ -16,7 +16,7 @@ public:
 	~PortalManager();
 
 	/// @brief 部屋のAABBを登録する
-	void AddRoomAABB(const AABB& aabb) { roomAABBs_.push_back(aabb); }
+	void AddRoomAABB(const AABB& boxAABB) { roomAABBs_.push_back(boxAABB); }
 	/// @brief 登録された部屋のAABBをクリアする
 	void ClearRoomAABBs() { roomAABBs_.clear(); }
 
@@ -33,6 +33,7 @@ public:
 	virtual void CheckCollision();
 	virtual std::vector<std::unique_ptr<Portal>>& GetPortals() { return portals_; };
 	static bool GetCanMakePortal() { return canMakePortal_; };
+	static bool GetCanMakePortalToWhiteBoard() { return canMakePortalToWhiteBoard_; };
 	bool GetIsWarp() { return isWarp_; }
 protected:
 	// 初回のワープ地点
@@ -48,6 +49,7 @@ protected:
 	WhiteBoard* pendingWhiteBoard_ = nullptr;
 
 	static bool canMakePortal_;
+	static bool canMakePortalToWhiteBoard_;
 	WhiteBoardManager* whiteBoardManager_ = nullptr;
 	bool isWarp_ = false;
 protected:

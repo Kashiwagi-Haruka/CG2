@@ -7,7 +7,7 @@
 #include "Function.h"
 #include"GameObject/Gentleman/GiantGentleman.h"
 #include"GameBase.h"
-
+#include "GameObject/KeyBindConfig.h"
 GentlemanPortalManager::GentlemanPortalManager(Vector3* pos) {
 
     playerPos_ = pos;
@@ -37,7 +37,8 @@ void GentlemanPortalManager::SetGentleMan(GiantGentleMan* giantGentleMan)
 
 void GentlemanPortalManager::Initialize() {
 
-    canMakePortal_ = false;
+    canMakePortal_ = false; 
+    isMakePortal_ = false;
     warpCoolTimer_ = kWarpTime_;
     isPendingPortalSpawn_ = false;
     isWarp_ = false;
@@ -113,7 +114,7 @@ void GentlemanPortalManager::SpawnPortal()
     if (portals_.empty()) {
         // ポータルがないとき
         newPortal->GetWarpPos()->SetParent(&firstWarpPosTransform_);
-    } 
+    }
     portals_.push_back(std::move(newPortal));
     SEManager::SoundPlay(SEManager::PORTAL_SPAWN);
 }
@@ -153,12 +154,18 @@ void GentlemanPortalManager::Update() {
 
 void GentlemanPortalManager::CheckCollision() {
 
+    canMakePortal_ = false;
+
+    if (isMakePortal_) {
+        return;
+    }
+
     if (isPendingPortalSpawn_) {
         return;
     }
 
     if (!giantGentleman_ || !playerCamera_) {
-        canMakePortal_ = false;
+
         return;
     }
 
@@ -168,13 +175,18 @@ void GentlemanPortalManager::CheckCollision() {
         return;
     }
 
-    if (giantGentleman_->IsMakePortal()) {
+    if (!PlayerCommand::GetInstance()->Shot()) {
+        return;
+    }
 
-        isPendingPortalSpawn_ = true;
+    // ショットSE鳴らす
+    SEManager::SoundPlay(SEManager::SHOT);
+    isMakePortal_ = true;
 
-        if (portalParticle_) {
-            portalParticle_->Start(*playerPos_, giantGentleman_->GetCollisionTransform().translate);
-        }
+    isPendingPortalSpawn_ = true;
+
+    if (portalParticle_) {
+        portalParticle_->Start(*playerPos_, giantGentleman_->GetCollisionTransform().translate);
     }
 
 }

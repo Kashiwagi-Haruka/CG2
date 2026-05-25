@@ -49,7 +49,9 @@ void VendingMac::Update() {
 	CheckCollision();
 
 	obj_->Update();
-	drink_->SetVendingMacPosition(obj_->GetTranslate());
+	Vector3 drinkPos = obj_->GetTranslate();
+	drinkPos.y -= 0.5f;
+	drink_->SetVendingMacPosition(drinkPos);
 	drink_->SetVendingMacForward(GetForward());
 	drink_->Update();
 
@@ -119,7 +121,13 @@ float VendingMac::GetVol(float length, float maxVol) {
 	return maxVol;
 }
 
-bool VendingMac::OnCollisionRay() { return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate()); }
+bool VendingMac::OnCollisionRay() { 
+	
+	AABB aabb{ .min = {-0.5f, 0.0f,  -0.5f},
+		.max = { 0.5f,  1.83f, 0.5f }
+	};
+
+	return playerCamera_->OnCollisionRay(aabb, obj_->GetTranslate()); }
 
 void VendingMac::SetPlayerCamera(PlayerCamera* camera) {
 	playerCamera_ = camera;

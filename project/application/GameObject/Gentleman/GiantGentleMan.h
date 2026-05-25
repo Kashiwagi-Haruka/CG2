@@ -27,7 +27,6 @@ public:
     static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
     void SetCamera(Camera* camera);
     bool CanMakePortal() { return canMakePortal_; }
-    bool IsMakePortal() { return isMakePortal_; }
     //面が向き合ってるか
     bool IsFacingSurface(const Matrix4x4& cameraMat);
     GiantGentlemanHead* GetGiantGentlemanHead() { return head_.get(); }
@@ -60,7 +59,6 @@ private:
     const std::string desiredAnimationName = "SleepStand";
     bool isRayHit_;
     bool canMakePortal_ = false;
-    bool isMakePortal_ = false;
     //ポータルが出来る範囲
     const float kPortalCreatableAngleRange_ = 0.5f;
 };

@@ -5,7 +5,7 @@
 
 class GentlemanTalk
 {
-    static uint32_t talkNum_;
+    static size_t talkNum_;
     static bool isSendMessage_;
     static bool isDraw_;
     static std::vector<std::u32string>strings_;
