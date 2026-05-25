@@ -29,6 +29,7 @@ CoffeeTrivia::CoffeeTrivia() {
 CoffeeTrivia::~CoffeeTrivia() { Audio::GetInstance()->SoundUnload(&triviaVoice_); }
 
 void CoffeeTrivia::Initialize() {
+
 	triviaNum_ = strings_.size() - 1;
 	triviaObj_ = std::make_unique<Object3d>();
 	triviaObj_->Initialize();

@@ -9,7 +9,8 @@ std::vector<std::u32string>GentlemanTalk::strings_;
 
 void GentlemanTalk::SetStrings(const std::string& stageName) {
 
-    strings_.clear();
+    Initialize();
+
     std::u32string string;
 
     std::string filePath = "Resources/TXT/gentlemanTalk" + stageName + ".txt";
@@ -49,6 +50,7 @@ GentlemanTalk::~GentlemanTalk()
 
 void GentlemanTalk::Initialize()
 {
+    strings_.clear();
     talkNum_ = strings_.size() - 1;
     isSendMessage_ = false;
   
