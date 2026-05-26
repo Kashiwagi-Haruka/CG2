@@ -91,6 +91,23 @@ void MiniMap::AddObject(std::string name, Object3d* object, Vector4 color, float
 		entries_.erase(name);
 		return;
 	}
+
+	if (auto it = entries_.find(name); it != entries_.end()) {
+		if (it->second.object == object) {
+			it->second = Entry{object, color, markerSize};
+			return;
+		}
+
+		uint32_t suffix = 1;
+		std::string uniqueName = name + "_" + std::to_string(suffix);
+		while ((entries_.find(uniqueName) != entries_.end())) {
+			++suffix;
+			uniqueName = name + "_" + std::to_string(suffix);
+		}
+		entries_[uniqueName] = Entry{object, color, markerSize};
+		return;
+	}
+
 	entries_[name] = Entry{object, color, markerSize};
 }
 
