@@ -112,7 +112,7 @@ void Desk::Initialize()
 
 void Desk::Draw()
 {
-
+    Object3dCommon::GetInstance()->DrawCommon();
     obj_->Draw();
 }
 

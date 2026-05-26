@@ -120,7 +120,7 @@ void Door::Initialize()
 
 void Door::Draw()
 {
-	Object3dCommon::GetInstance()->DrawCommonSkinning();
+	Object3dCommon::GetInstance()->DrawCommon();
     obj_->Draw();
     autoLockSystem_->Draw();
 }

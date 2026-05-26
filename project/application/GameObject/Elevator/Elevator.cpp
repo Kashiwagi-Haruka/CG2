@@ -27,11 +27,6 @@ Elevator::Elevator() {
     for (auto& [name, sys] : autoLockSystems_) {
         sys->SetParentMatrix(&worldMat_);
     }
-    //autoLockSystems_[0]->SetTranslate({ 0.0f,0.0f,-4.5f });
-    //autoLockSystems_[0]->SetAABB({ .min = {-1.5f,0.0f,-0.5f} ,.max = {1.5f,0.02f,0.5f} });
-
-    //autoLockSystems_[1]->SetAABB({ .min = {-1.5f,0.0f,-1.0f} ,.max = {1.5f,0.02f,2.0f} });
-    //autoLockSystems_[1]->SetTranslate({ 0.0f,0.0f,0.0f });
 
     doorMatrixLeft_ = Function::MakeIdentity4x4();
     doorMatrixRight_ = Function::MakeIdentity4x4();
@@ -199,15 +194,13 @@ void Elevator::Update() {
 
 void Elevator::Draw() {
 
+    Object3dCommon::GetInstance()->DrawCommon();
 	modelObj_->Draw();
 
 	//for (auto& [name,sys] : autoLockSystems_) {
 	//	sys->Draw();
 	//}
 
-	// for (auto& wall : walls_) {
-	//     wall->Draw();
-	// }
     //for (auto& [name, collider] : colliders_) {
     //    collider->Draw();
     //}

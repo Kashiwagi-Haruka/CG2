@@ -98,6 +98,7 @@ void Toilet::Initialize()
 
 void Toilet::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommon();
     obj_->Draw();
 }
 
