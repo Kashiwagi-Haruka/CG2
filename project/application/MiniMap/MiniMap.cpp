@@ -15,10 +15,6 @@
 
 std::unique_ptr<MiniMap> MiniMap::instance_ = nullptr;
 
-namespace {
-float LengthXZ(const Vector3& v) { return std::sqrt((v.x * v.x) + (v.z * v.z)); }
-} // namespace
-
 MiniMap* MiniMap::GetInstance() {
 	if (!instance_) {
 		instance_ = std::make_unique<MiniMap>();
@@ -169,10 +165,6 @@ void MiniMap::UpdateVisibleMarkers() {
 		    0.0f,
 		    worldPos.z - playerTranslate_.z,
 		};
-		if (LengthXZ(offset) > range_) {
-			continue;
-		}
-
 		visibleMarkers_.push_back({
 		    {playerTranslate_.x + offset.x, playerTranslate_.y + markerHeight_, playerTranslate_.z + offset.z},
 		    entry.color,
@@ -202,10 +194,6 @@ void MiniMap::Draw() {
 	for (const auto& marker : visibleMarkers_) {
 		const float dx = marker.position.x - playerTranslate_.x;
 		const float dz = marker.position.z - playerTranslate_.z;
-		const float distance = std::sqrt((dx * dx) + (dz * dz));
-		if (distance > range_) {
-			continue;
-		}
 		const float scale = miniMapRadius_ / range_;
 		const float cosYaw = std::cos(playerYaw_);
 		const float sinYaw = std::sin(playerYaw_);
@@ -219,11 +207,15 @@ void MiniMap::Draw() {
 		const float offsetX = markerPos.x - miniMapScreenCenter_.x;
 		const float offsetY = markerPos.y - miniMapScreenCenter_.y;
 		const float radius = std::sqrt((offsetX * offsetX) + (offsetY * offsetY));
-		if (radius > (miniMapRadius_ - 8.0f)) {
-			continue;
+		Vector2 drawPos = markerPos;
+		const float clampRadius = miniMapRadius_ - 8.0f;
+		if (radius > clampRadius && radius > 0.0f) {
+			const float clampScale = clampRadius / radius;
+			drawPos.x = miniMapScreenCenter_.x + (offsetX * clampScale);
+			drawPos.y = miniMapScreenCenter_.y + (offsetY * clampScale);
 		}
 
-		markerSprite_->SetPosition(markerPos);
+		markerSprite_->SetPosition(drawPos);
 		markerSprite_->SetColor(marker.color);
 		markerSprite_->SetScale({marker.markerSize, marker.markerSize});
 		markerSprite_->Update();
