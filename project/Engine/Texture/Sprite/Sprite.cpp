@@ -1,9 +1,11 @@
+#define NOMINMAX
 #include "Sprite.h"
 #include "DirectXCommon.h"
 #include "Function.h"
 #include "SpriteCommon.h"
 #include "SrvManager/SrvManager.h"
 #include "TextureManager.h"
+#include <algorithm>
 void Sprite::Initialize(uint32_t Handle) {
 
 	textureIndex = Handle;
@@ -116,10 +118,59 @@ void Sprite::Update() {
 			bottom = -bottom;
 		}
 	}
-	vertexData[0].position = {left, top, 0.0f, 1.0f};
-	vertexData[1].position = {right, top, 0.0f, 1.0f};
-	vertexData[2].position = {left, bottom, 0.0f, 1.0f};
-	vertexData[3].position = {right, bottom, 0.0f, 1.0f};
+	float localLeft = left;
+	float localRight = right;
+	float localTop = top;
+	float localBottom = bottom;
+	float uLeft = uvLeftTop_.x;
+	float uRight = uvRightBottom_.x;
+	float vTop = uvLeftTop_.y;
+	float vBottom = uvRightBottom_.y;
+
+	if (enableClip_) {
+		float worldLeft = transform_.translate.x + localLeft * transform_.scale.x;
+		float worldRight = transform_.translate.x + localRight * transform_.scale.x;
+		float worldTop = transform_.translate.y + localTop * transform_.scale.y;
+		float worldBottom = transform_.translate.y + localBottom * transform_.scale.y;
+
+		float clippedLeft = std::max(worldLeft, clipRect_.x);
+		float clippedRight = std::min(worldRight, clipRect_.z);
+		float clippedTop = std::max(worldTop, clipRect_.y);
+		float clippedBottom = std::min(worldBottom, clipRect_.w);
+
+		if (clippedLeft >= clippedRight || clippedTop >= clippedBottom) {
+			material->color.w = 0.0f;
+		} else {
+			material->color.w = 1.0f;
+			float width = (worldRight - worldLeft);
+			float height = (worldBottom - worldTop);
+			float leftRate = (clippedLeft - worldLeft) / width;
+			float rightRate = (clippedRight - worldLeft) / width;
+			float topRate = (clippedTop - worldTop) / height;
+			float bottomRate = (clippedBottom - worldTop) / height;
+
+			localLeft = left + (right - left) * leftRate;
+			localRight = left + (right - left) * rightRate;
+			localTop = top + (bottom - top) * topRate;
+			localBottom = top + (bottom - top) * bottomRate;
+
+			float du = (uvRightBottom_.x - uvLeftTop_.x);
+			float dv = (uvRightBottom_.y - uvLeftTop_.y);
+			uLeft = uvLeftTop_.x + du * leftRate;
+			uRight = uvLeftTop_.x + du * rightRate;
+			vTop = uvLeftTop_.y + dv * topRate;
+			vBottom = uvLeftTop_.y + dv * bottomRate;
+		}
+	}
+
+	vertexData[0].position = {localLeft, localTop, 0.0f, 1.0f};
+	vertexData[1].position = {localRight, localTop, 0.0f, 1.0f};
+	vertexData[2].position = {localLeft, localBottom, 0.0f, 1.0f};
+	vertexData[3].position = {localRight, localBottom, 0.0f, 1.0f};
+	vertexData[0].texcoord = {uLeft, vTop};
+	vertexData[1].texcoord = {uRight, vTop};
+	vertexData[2].texcoord = {uLeft, vBottom};
+	vertexData[3].texcoord = {uRight, vBottom};
 
 	// World
 	Matrix4x4 world = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
@@ -150,11 +201,27 @@ void Sprite::SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize)
 	float tex_top = leftTop.y / textureHeight;
 	float tex_bottom = (leftTop.y + TextureSize.y) / textureHeight;
 
+	uvLeftTop_ = {tex_left, tex_top};
+	uvRightBottom_ = {tex_right, tex_bottom};
 	vertexData[0].texcoord = {tex_left, tex_top};
 	vertexData[1].texcoord = {tex_right, tex_top};
 	vertexData[2].texcoord = {tex_left, tex_bottom};
 	vertexData[3].texcoord = {tex_right, tex_bottom};
 }
+
+void Sprite::SetClipRect(const Vector4& clipRect) {
+	enableClip_ = true;
+	clipRect_ = clipRect;
+}
+
+void Sprite::ClearClipRect() { enableClip_ = false; }
+
+void Sprite::SetClipBySprite(const Sprite& sprite) {
+	Vector2 lt = sprite.GetLeftTop();
+	Vector2 rb = sprite.GetRightBottom();
+	SetClipRect({lt.x, lt.y, rb.x, rb.y});
+}
+
 
 void Sprite::SetIsFlipX(const bool isFlipX) { isFlipX_ = isFlipX; }
 

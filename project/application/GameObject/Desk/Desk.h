@@ -42,6 +42,8 @@ public:
       
         return &isEndOpenAnimation_;
     }
+	Object3d* GetObject3d() const { return obj_.get(); }
+
 private:
     // アニメーション
     void Animation();

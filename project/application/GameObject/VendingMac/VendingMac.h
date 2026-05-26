@@ -29,6 +29,7 @@ public:
 	static bool IsRayHit() { return isRayHit_; };
 	Vector3 GetForward() const;
 	bool ConsumeInteractRequest();
+	Object3d* GetObject3d() const { return obj_.get(); }
 
 private:
 	float GetVol(float length, float maxVol);

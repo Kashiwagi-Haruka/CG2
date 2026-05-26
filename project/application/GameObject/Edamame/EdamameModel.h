@@ -36,6 +36,8 @@ public:
 	void SetRayHit(bool isRayHit) { isRayHit_ = isRayHit; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
     void SetPlayerCameraTranslate(Vector3* playerCameraRotate) { playerCameraTranlate_ = playerCameraRotate; }
+	Object3d* GetObject3d();
+
 private:
     // アニメーション
     void Animation();
