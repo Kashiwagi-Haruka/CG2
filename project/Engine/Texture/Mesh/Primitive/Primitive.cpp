@@ -14,13 +14,11 @@
 #include <string>
 
 namespace {
-constexpr uint32_t kDefaultSlices = 32;
-constexpr float kHalfSize = 0.5f;
-constexpr float kBandWidth = 0.2f;
-struct MeshData {
-	std::vector<VertexData> vertices;
-	std::vector<uint32_t> indices;
-};
+	constexpr uint32_t kDefaultSlices = 32;
+	constexpr float kHalfSize = 0.5f;
+	constexpr float kBandWidth = 0.2f;
+}
+
 
 // 4頂点の四角形を 2 三角形としてメッシュへ追加
 void AppendQuad(MeshData& mesh, const VertexData& v0, const VertexData& v1, const VertexData& v2, const VertexData& v3) {
@@ -38,7 +36,7 @@ void AppendQuad(MeshData& mesh, const VertexData& v0, const VertexData& v1, cons
 }
 
 // 正方形の板ポリゴンを生成
-MeshData BuildPlane() {
+MeshData BuildMesh::BuildPlane() {
 	MeshData mesh;
 	VertexData v0 = {
 	    {-kHalfSize, -kHalfSize, 0.0f, 1.0f},
@@ -65,7 +63,7 @@ MeshData BuildPlane() {
 }
 
 // 単純な三角形を生成
-MeshData BuildTriangle() {
+MeshData BuildMesh::BuildTriangle() {
 	MeshData mesh;
 	mesh.vertices = {
 	    {{-kHalfSize, -kHalfSize, 0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}},
@@ -77,7 +75,7 @@ MeshData BuildTriangle() {
 }
 
 // 扇形分割で円板を生成
-MeshData BuildCircle(uint32_t slices) {
+MeshData BuildMesh::BuildCircle(uint32_t slices,const float radius) {
 	MeshData mesh;
 	mesh.vertices.reserve(slices + 1);
 	mesh.indices.reserve(slices * 3);
@@ -89,11 +87,11 @@ MeshData BuildCircle(uint32_t slices) {
 
 	for (uint32_t i = 0; i <= slices; ++i) {
 		float angle = (static_cast<float>(i) / static_cast<float>(slices)) * Function::kPi * 2.0f;
-		float x = std::cos(angle) * kHalfSize;
-		float y = std::sin(angle) * kHalfSize;
+		float x = std::cos(angle) * radius;
+		float y = std::sin(angle) * radius;
 		mesh.vertices.push_back({
 		    {x, y, 0.0f, 1.0f},
-            {(x / (kHalfSize * 2.0f)) + 0.5f, 0.5f - (y / (kHalfSize * 2.0f))},
+            {0.5f-(x / (radius * 2.0f)), 0.5f - (y / (radius * 2.0f))},
             {0.0f, 0.0f, -1.0f}
         });
 	}
@@ -107,7 +105,7 @@ MeshData BuildCircle(uint32_t slices) {
 	return mesh;
 }
 // 原点中心の線分を生成
-MeshData BuildLine() {
+MeshData BuildMesh::BuildLine() {
 	MeshData mesh;
 	mesh.vertices = {
 	    {{-kHalfSize, 0.0f, 0.0f, 1.0f}, {0.0f, 0.5f}, {0.0f, 1.0f, 0.0f}},
@@ -118,7 +116,7 @@ MeshData BuildLine() {
 }
 
 // 内径と外径を持つリングを生成
-MeshData BuildRing(uint32_t slices, const Vector2& innerDiameter, const Vector2& outerDiameter) {
+MeshData BuildMesh::BuildRing(uint32_t slices, const Vector2& innerDiameter, const Vector2& outerDiameter) {
 	MeshData mesh;
 	const float innerRadiusX = std::max(innerDiameter.x * 0.5f, 0.0f);
 	const float innerRadiusY = std::max(innerDiameter.y * 0.5f, 0.0f);
@@ -161,7 +159,7 @@ MeshData BuildRing(uint32_t slices, const Vector2& innerDiameter, const Vector2&
 }
 
 // 緯度経度分割で球を生成
-MeshData BuildSphere(uint32_t slices, uint32_t stacks) {
+MeshData BuildMesh::BuildSphere(uint32_t slices, uint32_t stacks,const float radius) {
 	MeshData mesh;
 	mesh.vertices.reserve((slices + 1) * (stacks + 1));
 	mesh.indices.reserve(slices * stacks * 6);
@@ -177,7 +175,7 @@ MeshData BuildSphere(uint32_t slices, uint32_t stacks) {
 			float sinPhi = std::sin(phi);
 			float cosPhi = std::cos(phi);
 			Vector3 normal = {sinTheta * cosPhi, cosTheta, sinTheta * sinPhi};
-			Vector4 position = {normal.x * kHalfSize, normal.y * kHalfSize, normal.z * kHalfSize, 1.0f};
+			Vector4 position = {normal.x * radius, normal.y * radius, normal.z * radius, 1.0f};
 			mesh.vertices.push_back({
 			    position, {u, 1.0f - v},
                  normal
@@ -204,7 +202,7 @@ MeshData BuildSphere(uint32_t slices, uint32_t stacks) {
 }
 
 // 主半径・副半径でトーラスを生成
-MeshData BuildTorus(uint32_t slices, uint32_t stacks) {
+MeshData BuildMesh::BuildTorus(uint32_t slices, uint32_t stacks) {
 	MeshData mesh;
 	const float majorRadius = kHalfSize * 0.8f;
 	const float minorRadius = kHalfSize * 0.3f;
@@ -250,7 +248,7 @@ MeshData BuildTorus(uint32_t slices, uint32_t stacks) {
 }
 
 // 側面+上下蓋付き円柱を生成
-MeshData BuildCylinder(uint32_t slices) {
+MeshData BuildMesh::BuildCylinder(uint32_t slices) {
 	MeshData mesh;
 	const float height = kHalfSize;
 	const float radius = kHalfSize;
@@ -329,7 +327,7 @@ MeshData BuildCylinder(uint32_t slices) {
 	return mesh;
 }
 // 側面+底面付き円錐を生成
-MeshData BuildCone(uint32_t slices) {
+MeshData BuildMesh::BuildCone(uint32_t slices) {
 	MeshData mesh;
 	const float height = kHalfSize;
 	const float radius = kHalfSize;
@@ -388,7 +386,7 @@ MeshData BuildCone(uint32_t slices) {
 	return mesh;
 }
 // 6面それぞれの法線を持つボックスを生成
-MeshData BuildBox() {
+MeshData BuildMesh::BuildBox() {
 	MeshData mesh;
 	const float s = kHalfSize;
 	Vector3 normals[6] = {
@@ -427,7 +425,7 @@ MeshData BuildBox() {
 	return mesh;
 }
 // 表裏を持つ細長い帯を生成
-MeshData BuildBand(uint32_t segments) {
+MeshData BuildMesh::BuildBand(uint32_t segments) {
 	MeshData mesh;
 	const float length = kHalfSize * 2.0f;
 	const float halfWidth = kBandWidth * 0.5f;
@@ -476,32 +474,32 @@ uint32_t ComputeStacksFromSlices(uint32_t slices) { return std::max(2u, slices /
 MeshData BuildMeshByPrimitiveName(Primitive::PrimitiveName primitiveName, uint32_t slices, uint32_t stacks) {
 	switch (primitiveName) {
 	case Primitive::Plane:
-		return BuildPlane();
+		return BuildMesh::BuildPlane();
 	case Primitive::Circle:
-		return BuildCircle(slices);
+		return  BuildMesh::BuildCircle(slices);
 	case Primitive::Ring:
-		return BuildRing(slices, {kHalfSize * 1.2f, kHalfSize * 1.2f}, {kHalfSize * 2.0f, kHalfSize * 2.0f});
+		return  BuildMesh::BuildRing(slices, {kHalfSize * 1.2f, kHalfSize * 1.2f}, {kHalfSize * 2.0f, kHalfSize * 2.0f});
 	case Primitive::Sphere:
-		return BuildSphere(slices, stacks);
+		return  BuildMesh::BuildSphere(slices, stacks);
 	case Primitive::Torus:
-		return BuildTorus(slices, stacks);
+		return  BuildMesh::BuildTorus(slices, stacks);
 	case Primitive::Cylinder:
-		return BuildCylinder(slices);
+		return  BuildMesh::BuildCylinder(slices);
 	case Primitive::Cone:
-		return BuildCone(slices);
+		return  BuildMesh::BuildCone(slices);
 	case Primitive::Triangle:
-		return BuildTriangle();
+		return  BuildMesh::BuildTriangle();
 	case Primitive::Line:
-		return BuildLine();
+		return  BuildMesh::BuildLine();
 	case Primitive::Box:
-		return BuildBox();
+		return  BuildMesh::BuildBox();
 	case Primitive::Band:
-		return BuildBand(slices);
+		return  BuildMesh::BuildBand(slices);
 	default:
-		return BuildPlane();
+		return  BuildMesh::BuildPlane();
 	}
 }
-} // namespace
+
 Primitive::~Primitive() { UnregisterFromEditor(); }
 // 既定テクスチャでプリミティブを初期化
 void Primitive::Initialize(PrimitiveName name) { Initialize(name, kDefaultSlices); }
@@ -790,7 +788,7 @@ void Primitive::SetRingDiameterXY(const Vector2& innerDiameter, const Vector2& o
 	if (primitiveName_ != Primitive::Ring) {
 		return;
 	}
-	MeshData mesh = BuildRing(slices_, innerDiameter, outerDiameter);
+	MeshData mesh = BuildMesh::BuildRing(slices_, innerDiameter, outerDiameter);
 	SetMeshData(mesh.vertices, mesh.indices);
 }
 // 外部メッシュへ置き換え、GPU バッファを再作成

@@ -90,7 +90,7 @@ void LockerManager::InLocker(Player* player)
                 Vector3 rotate = locker->GetRotate();
                 player->SetTranslate(pos);
                 player->SetRotate(rotate);
-                isInLocker_ = true;
+                isInLocker_  = true;
                 break;
 
 
