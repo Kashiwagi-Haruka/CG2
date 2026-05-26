@@ -125,7 +125,7 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 	const Vector3 vendingForward = vendingMac_->GetForward();
 	coffees_->SetSpawnOrigin({
 	    vendingPosition.x + vendingForward.x * 0.45f,
-	    vendingPosition.y + 0.9f,
+	    vendingPosition.y + 0.1f,
 	    vendingPosition.z + vendingForward.z * 0.45f,
 	});
 	coffees_->SetLaunchDirection(vendingForward);

@@ -5,6 +5,7 @@
 #include"ScreenSize/ScreenSize.h"
 #include"Color/Color.h"
 #include"GameObject/SEManager/SEManager.h"
+#include"GameObject/Chair/ChairManager.h"
 
 bool ChairMenu::isShowMenu_ = false;
 uint32_t ChairMenu::selectButtonNum_ = 0;
@@ -87,8 +88,8 @@ void ChairMenu::Update()
         menuText_[GRAB_TEXT].StartTyping(0.05f);
     }
 
-    if (PlayerCommand::GetIsStand() != isPreStand_) {
-        isPreStand_ = PlayerCommand::GetIsStand();
+    if (ChairManager::GetIsStand() != isPreStand_) {
+        isPreStand_ = ChairManager::GetIsStand();
         //メニューテキストのスタンドテキストを設定する
         menuText_[STAND_TEXT].SetString(standText_[isPreStand_]);
         menuText_[STAND_TEXT].StartTyping(0.05f);
@@ -113,7 +114,7 @@ void ChairMenu::Update()
             if (selectButtonNum_ > 0) {
                 SEManager::SoundPlay(SEManager::PUSH_WATCH);
 
-                if (!PlayerCommand::GetIsGrab() && !PlayerCommand::GetIsStand()) {
+                if (!PlayerCommand::GetIsGrab() && !ChairManager::GetIsStand()) {
                     //グラブしていないとき
                     selectButtonNum_--;
                 }
@@ -127,7 +128,7 @@ void ChairMenu::Update()
             //ホイールを上にすると
             if (selectButtonNum_ < menuText_.size() - 1) {
                 SEManager::SoundPlay(SEManager::PUSH_WATCH);
-                if (!PlayerCommand::GetIsGrab() && !PlayerCommand::GetIsStand()) {
+                if (!PlayerCommand::GetIsGrab() && !ChairManager::GetIsStand()) {
                     //持っていなかったら
                     selectButtonNum_++;
                 }
@@ -166,7 +167,7 @@ void ChairMenu::Draw()
 
         triangleText_.Draw();
 
-        if (!PlayerCommand::GetIsStand()) {
+        if (!ChairManager::GetIsStand()) {
             menuText_[GRAB_TEXT].Draw();
         }
 
@@ -174,7 +175,7 @@ void ChairMenu::Draw()
             menuText_[STAND_TEXT].Draw();
         }
 
-        if (!PlayerCommand::GetIsGrab() && !PlayerCommand::GetIsStand()) {
+        if (!PlayerCommand::GetIsGrab() && !ChairManager::GetIsStand()) {
             menuText_[CLOSE_TEXT].Draw();
         }
         pressEText_.Draw();

@@ -119,11 +119,13 @@ void ElevatorFallStage::UpdateGameObject(Camera* camera, const Vector3& lightDir
         player->ResetVelocityY(0.0f);
         player->SetTranslate(translate);
     }
+
     whiteBoardManager_->Update();
     timeCardWatch_->Update();
     //懐中電灯の更新
     flashlight_->Update();
     key_->Update();
+
     door_->Update();
 
     wallManager2_->Update();

@@ -4,7 +4,7 @@
 
 std::unique_ptr<PlayerCommand> PlayerCommand::instance_ = nullptr;
 bool PlayerCommand::isGrab_ = false;
-bool PlayerCommand::isStand_ = false;
+
 bool PlayerCommand::isUiInputLocked_ = false;
 bool PlayerCommand::isLook_ = false;
 ////ロッカーにいるかどうか
@@ -164,8 +164,6 @@ Vector2 PlayerCommand::Rotate(float rotateSpeed,const bool isFlipHorizontally,co
 
 void PlayerCommand::Initialize() {
     isGrab_ = false;
-    // 何かにたっているかどうか
-    isStand_ = false;
     isUiInputLocked_ = false;
     //isInLocker_ = false;
     isLook_ = false;

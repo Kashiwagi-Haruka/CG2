@@ -41,8 +41,6 @@ private:
     static std::unique_ptr<PlayerCommand> instance_;
     // 何かをつかんでいるかどうか
     static bool isGrab_;
-    // 何かにたっているかどうか
-    static bool isStand_;
     //何かを見ているかどうか
     static bool isLook_;
     ////ロッカーにいるかどうか
@@ -83,8 +81,6 @@ public:
     Vector2 Rotate(float rotateSpeed, const bool isFlipHorizontally, const bool isFlipVertically);
     static bool GetIsGrab() { return isGrab_; };
     static void SetIsGrab(bool flag) { isGrab_ = flag; }
-    static bool GetIsStand() { return isStand_; };
-    static void SetIsStand(bool flag) { isStand_ = flag; }
     static bool GetIsLook() { return isLook_; }
     static void SetIsLook(bool flag) { isLook_ = flag; }
     //static bool GetIsInLocker() { return isInLocker_; }

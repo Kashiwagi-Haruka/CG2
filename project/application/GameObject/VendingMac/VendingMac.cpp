@@ -7,6 +7,8 @@
 #include "Object3d/Object3dCommon.h"
 #include <imgui.h>
 #include <random>
+#include"GameObject/Chair/ChairManager.h"
+
 
 bool VendingMac::isRayHit_ = false;
 namespace {
@@ -92,8 +94,9 @@ void VendingMac::Draw() {
 void VendingMac::CheckCollision() {
 	isRayHit_ = OnCollisionRay();
 
-	if (isRayHit_) {
+	if (isRayHit_&& !ChairManager::GetIsStand()) {
 		if (PlayerCommand::GetInstance()->InteractTrigger()) {
+			
 			static std::mt19937 randomEngine{std::random_device{}()};
 			static std::bernoulli_distribution coffeeSpillDistribution{kCoffeeSpillProbability};
 

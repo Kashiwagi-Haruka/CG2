@@ -4860,7 +4860,7 @@
           15.0
         ],
         "translate": [
-          -0.5,
+          0.0,
           2.0,
           0.0
         ]
@@ -5081,7 +5081,7 @@
         "scale": [
           2.5,
           4.0,
-          2.5
+          3.0
         ],
         "translate": [
           0.0,
@@ -5093,6 +5093,62 @@
     {
       "editorId": "",
       "index": 19,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Pillar_S",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          4.0,
+          1.0
+        ],
+        "translate": [
+          0.75,
+          2.0,
+          -6.5
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 20,
       "material": {
         "color": [
           1.0,
@@ -5148,7 +5204,7 @@
     },
     {
       "editorId": "",
-      "index": 20,
+      "index": 21,
       "material": {
         "color": [
           1.0,
@@ -5204,7 +5260,7 @@
     },
     {
       "editorId": "",
-      "index": 21,
+      "index": 22,
       "material": {
         "color": [
           1.0,
@@ -5260,7 +5316,63 @@
     },
     {
       "editorId": "",
-      "index": 22,
+      "index": 23,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Pillar2_S",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          4.0,
+          1.0
+        ],
+        "translate": [
+          -0.5,
+          2.0,
+          6.5
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 24,
       "material": {
         "color": [
           1.0,
