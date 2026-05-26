@@ -100,6 +100,8 @@ void MiniMap::AddObject(std::string name, Object3d* object, Vector4 color) {
 
 void MiniMap::SetPlayerTranslate(Vector3 translate) { playerTranslate_ = translate; }
 
+void MiniMap::SetPlayerYaw(float yaw) { playerYaw_ = yaw; }
+
 void MiniMap::SetStage(std::string stageName) {
 	if (stageName_ == stageName) {
 		return;
@@ -182,7 +184,6 @@ void MiniMap::Update() {
 	UpdateCamera();
 	UpdateVisibleMarkers();
 }
-
 void MiniMap::Draw() {
 	if (!miniMapPortalOutline_ || !miniMapPortal_ || !markerSprite_) {
 		return;
@@ -205,9 +206,13 @@ void MiniMap::Draw() {
 			continue;
 		}
 		const float scale = miniMapRadius_ / range_;
+		const float cosYaw = std::cos(-playerYaw_);
+		const float sinYaw = std::sin(-playerYaw_);
+		const float rotatedX = (dx * cosYaw) - (dz * sinYaw);
+		const float rotatedZ = (dx * sinYaw) + (dz * cosYaw);
 		const Vector2 markerPos = {
-		    miniMapScreenCenter_.x + (dx * scale),
-		    miniMapScreenCenter_.y + (dz * scale),
+		    miniMapScreenCenter_.x + (rotatedX * scale),
+		    miniMapScreenCenter_.y + (rotatedZ * scale),
 		};
 
 		const float offsetX = markerPos.x - miniMapScreenCenter_.x;
@@ -224,6 +229,7 @@ void MiniMap::Draw() {
 	}
 	if (playerSprite_) {
 		playerSprite_->SetPosition(miniMapScreenCenter_);
+		playerSprite_->SetRotation(-playerYaw_);
 		playerSprite_->Update();
 		playerSprite_->Draw();
 	}

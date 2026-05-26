@@ -45,6 +45,7 @@ class MiniMap {
 	Vector3 minimapAnchorOffset_ = {-14.0f, 30.0f, 22.0f};
 	Vector2 miniMapScreenCenter_ = {130.0f, 590.0f};
 	float miniMapRadius_ = 90.0f;
+	float playerYaw_ = 0.0f;
 	uint32_t miniMapBackTextureHandle_ = 0;
 	uint32_t miniMapPlayerTextureHandle_ = 0;
 	std::string stageName_;
@@ -66,6 +67,7 @@ public:
 	void Draw();
 	void AddObject(std::string name, Object3d* object, Vector4 color);
 	void SetPlayerTranslate(Vector3 translate);
+	void SetPlayerYaw(float yaw);
 	void SetStage(std::string stageName);
 	void Reset();
 };
