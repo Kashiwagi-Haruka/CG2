@@ -6,7 +6,6 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 class Camera;
@@ -34,7 +33,7 @@ class MiniMap {
 	std::unique_ptr<Sprite> miniMapBackSprite_;
 	std::vector<std::unique_ptr<Sprite>> markerSprites_;
 	std::unique_ptr<Sprite> playerSprite_;
-	std::unordered_map<std::string, Entry> entries_;
+	std::vector<Entry> entries_;
 	std::vector<MarkerDrawData> visibleMarkers_;
 	Vector3 playerTranslate_ = {0.0f, 0.0f, 0.0f};
 	float range_ = 25.0f;
@@ -63,7 +62,7 @@ public:
 	void Initialize();
 	void Update();
 	void Draw();
-	void AddObject(std::string name, Object3d* object, Vector4 color, float markerSize = 8.0f);
+	void AddObject(Object3d* object, Vector4 color, float markerSize = 8.0f);
 	void SetPlayerTranslate(Vector3 translate);
 	void SetPlayerYaw(float yaw);
 	void SetStage(std::string stageName);

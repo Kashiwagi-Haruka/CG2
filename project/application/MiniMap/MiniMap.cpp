@@ -55,29 +55,19 @@ void MiniMap::Initialize() {
 	playerSprite_->SetScale({16.0f, 16.0f});
 	playerSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 }
-void MiniMap::AddObject(std::string name, Object3d* object, Vector4 color, float markerSize) {
+void MiniMap::AddObject(Object3d* object, Vector4 color, float markerSize) {
 	if (!object) {
-		entries_.erase(name);
 		return;
 	}
 
-	if (auto it = entries_.find(name); it != entries_.end()) {
-		if (it->second.object == object) {
-			it->second = Entry{object, color, markerSize};
+	for (auto& entry : entries_) {
+		if (entry.object == object) {
+			entry = Entry{object, color, markerSize};
 			return;
 		}
-
-		uint32_t suffix = 1;
-		std::string uniqueName = name + "_" + std::to_string(suffix);
-		while ((entries_.find(uniqueName) != entries_.end())) {
-			++suffix;
-			uniqueName = name + "_" + std::to_string(suffix);
-		}
-		entries_[uniqueName] = Entry{object, color, markerSize};
-		return;
 	}
 
-	entries_[name] = Entry{object, color, markerSize};
+	entries_.push_back(Entry{object, color, markerSize});
 }
 
 void MiniMap::SetPlayerTranslate(Vector3 translate) { playerTranslate_ = translate; }
@@ -117,8 +107,7 @@ void MiniMap::UpdateCamera() {
 
 void MiniMap::UpdateVisibleMarkers() {
 	visibleMarkers_.clear();
-	for (const auto& [name, entry] : entries_) {
-		(void)name;
+	for (const auto& entry : entries_) {
 		if (!entry.object) {
 			continue;
 		}
@@ -141,7 +130,6 @@ void MiniMap::UpdateVisibleMarkers() {
 		});
 	}
 }
-
 void MiniMap::Update() {
 	UpdateCamera();
 	UpdateVisibleMarkers();
