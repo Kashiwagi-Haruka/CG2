@@ -90,6 +90,8 @@ void MirrorStage::Initialize() {
 	hintSheetManager_->SetParentIsOpenEnd(0, deskManager_->GetDesks().at(2)->IsEndOpenAnimation());
 	deskManager_->GetDesks().at(2)->RegisterReadableObject(hintSheetManager_->GetHintSheets().at(0).get());
 	MiniMap* miniMap = MiniMap::GetInstance();
+	miniMap->AddObject(wallManager_->GetRoom().get(), {0.2f, 0.2f, 0.2f, 0.35f}, 80.0f);
+	miniMap->AddObject(wallManager2_->GetRoom().get(), {0.2f, 0.2f, 0.2f, 0.35f}, 80.0f);
 	miniMap->AddObject(vendingMac_->GetObject3d(), {1.0f, 0.0f, 0.0f, 1.0f}, 12.0f);
 	for (size_t i = 0; i < lockerManager_->GetLockers().size(); ++i) {
 		auto* lockerObject = lockerManager_->GetLockers().at(i)->GetObject3d();
