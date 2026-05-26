@@ -213,7 +213,7 @@ void MiniMap::Draw() {
 		const float rotatedZ = (dx * sinYaw) + (dz * cosYaw);
 		const Vector2 markerPos = {
 		    miniMapScreenCenter_.x + (rotatedX * scale),
-		    miniMapScreenCenter_.y + (rotatedZ * scale),
+		    miniMapScreenCenter_.y - (rotatedZ * scale),
 		};
 
 		const float offsetX = markerPos.x - miniMapScreenCenter_.x;
