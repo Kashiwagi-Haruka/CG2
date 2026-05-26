@@ -231,7 +231,7 @@ void MiniMap::Draw() {
 	}
 	if (playerSprite_) {
 		playerSprite_->SetPosition(miniMapScreenCenter_);
-		playerSprite_->SetRotation(-playerYaw_);
+		playerSprite_->SetRotation(0.0f);
 		playerSprite_->Update();
 		playerSprite_->Draw();
 	}
