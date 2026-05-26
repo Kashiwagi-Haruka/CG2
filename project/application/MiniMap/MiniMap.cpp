@@ -90,12 +90,12 @@ void MiniMap::Initialize() {
 	playerSprite_->SetScale({16.0f, 16.0f});
 	playerSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 }
-void MiniMap::AddObject(std::string name, Object3d* object, Vector4 color) {
+void MiniMap::AddObject(std::string name, Object3d* object, Vector4 color, float markerSize) {
 	if (!object) {
 		entries_.erase(name);
 		return;
 	}
-	entries_[name] = Entry{object, color};
+	entries_[name] = Entry{object, color, markerSize};
 }
 
 void MiniMap::SetPlayerTranslate(Vector3 translate) { playerTranslate_ = translate; }
@@ -176,6 +176,7 @@ void MiniMap::UpdateVisibleMarkers() {
 		visibleMarkers_.push_back({
 		    {playerTranslate_.x + offset.x, playerTranslate_.y + markerHeight_, playerTranslate_.z + offset.z},
 		    entry.color,
+		    entry.markerSize,
 		});
 	}
 }
@@ -224,6 +225,7 @@ void MiniMap::Draw() {
 
 		markerSprite_->SetPosition(markerPos);
 		markerSprite_->SetColor(marker.color);
+		markerSprite_->SetScale({marker.markerSize, marker.markerSize});
 		markerSprite_->Update();
 		markerSprite_->Draw();
 	}

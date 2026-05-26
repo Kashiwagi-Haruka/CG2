@@ -18,11 +18,13 @@ class MiniMap {
 	struct Entry {
 		Object3d* object = nullptr;
 		Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+		float markerSize = 8.0f;
 	};
 
 	struct MarkerDrawData {
 		Vector3 position = {0.0f, 0.0f, 0.0f};
 		Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+		float markerSize = 8.0f;
 	};
 
 	static std::unique_ptr<MiniMap> instance_;
@@ -65,7 +67,7 @@ public:
 	void Initialize();
 	void Update();
 	void Draw();
-	void AddObject(std::string name, Object3d* object, Vector4 color);
+	void AddObject(std::string name, Object3d* object, Vector4 color, float markerSize = 8.0f);
 	void SetPlayerTranslate(Vector3 translate);
 	void SetPlayerYaw(float yaw);
 	void SetStage(std::string stageName);
