@@ -7,6 +7,7 @@ public:
 	enum Data {
 		DOOR_LOCK,
 		DOOR_OPEN,
+		DOOR_CLOSE,
 		FOOT_STEP,
 		WARP,
 		PORTAL_SPAWN,

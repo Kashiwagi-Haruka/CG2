@@ -12,6 +12,7 @@ bool Key::isGetKey_ = false;
 bool Key::isRayHit_ = false;
 namespace {
     const Vector4 kRayHitOutlineColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+    const Vector4 kNormalColor = { 0.0f,0.0f,0.0f,1.0f };
     const float kRayHitOutlineWidth = 10.0f;
 } // namespace
 Key::Key()
@@ -20,11 +21,11 @@ Key::Key()
     // モデルをセット
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/key", "key");
     obj_->SetModel("key");
-    obj_->SetOutlineColor(kRayHitOutlineColor);
+    obj_->SetOutlineColor(kNormalColor);
     obj_->SetOutlineWidth(kRayHitOutlineWidth);
     SetAABB({ .min = { -0.1f,-0.1f,-0.1f }, .max = { 0.1f,0.1f,0.1f } });
     SetCollisionAttribute(kCollisionKey);
-    SetCollisionMask(kCollisionChair | kCollisionWall | kCollisionFloor|kCollisionLocker);
+    SetCollisionMask(kCollisionChair | kCollisionWall | kCollisionFloor | kCollisionLocker);
 }
 
 void Key::Initialize()
@@ -33,7 +34,7 @@ void Key::Initialize()
     velocity_ = { 0.0f };
     obj_->Initialize();
     obj_->RegisterEditor("Key");
-    obj_->SetOutlineColor(kRayHitOutlineColor);
+    obj_->SetOutlineColor(kNormalColor);
     obj_->SetOutlineWidth(kRayHitOutlineWidth);
 
     isRayHit_ = false;
@@ -75,6 +76,10 @@ void Key::Update()
         obj_->SetTranslate(translate_);
     }
 
+    //rayによって色を変更する
+    obj_->SetOutlineColor(isRayHit_? kRayHitOutlineColor :kNormalColor);
+
+
     obj_->Update();
 
 #ifdef USE_IMGUI
@@ -91,16 +96,13 @@ void Key::Draw() {
     if (isGetKey_) {
         return;
     }
-    if (isRayHit_) {
-        Object3dCommon::GetInstance()->DrawCommon();
-        obj_->Draw();
-        Object3dCommon::GetInstance()->DrawCommonOutline();
-        obj_->Draw();
-        Object3dCommon::GetInstance()->EndOutlineDraw();
-    } else {
-        Object3dCommon::GetInstance()->DrawCommon();
-        obj_->Draw();
-    }
+
+    Object3dCommon::GetInstance()->DrawCommon();
+    obj_->Draw();
+    Object3dCommon::GetInstance()->DrawCommonOutline();
+    obj_->Draw();
+    Object3dCommon::GetInstance()->EndOutlineDraw();
+
 }
 void Key::SetPlayerCamera(PlayerCamera* camera)
 {
@@ -139,7 +141,7 @@ void Key::CheckCollision() {
 bool Key::OnCollisionRay()
 {
     //近めに設定
-    return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate(),0.0f,2.0f);
+    return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate(), 0.0f, 2.0f);
 
 }
 
@@ -162,7 +164,7 @@ void Key::OnCollision(Collider* collider)
     }
 
     if (collider->GetCollisionAttribute() == kCollisionFloor) {
-    /*    velocity_.y = 0.0f;*/
+        /*    velocity_.y = 0.0f;*/
     }
 
     ////重力落下しない

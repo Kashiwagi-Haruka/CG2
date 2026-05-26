@@ -69,6 +69,8 @@ void Door::Update()
 
             if (autoLockSystem_->IsPlayerHit() && !autoLockSystem_->IsPlayerPreHit()) {
                 desiredAnimationName = "3Close";
+                //閉まったとき、音が鳴る
+                SEManager::SoundPlay(SEManager::DOOR_CLOSE);
             }
 
         } else if (desiredAnimationName == "3Close") {

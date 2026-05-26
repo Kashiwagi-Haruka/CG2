@@ -49,7 +49,7 @@ private:
 	// スキン
 	SkinCluster skinCluster_{};
 	std::string animationGroupName_ = "Toilet";
-	const float kAnimationBlendDuration_ = 0.5f;
+	const float kAnimationBlendDuration_ = 0.0f;
 	bool animationFinished_ = false;
 	std::string desiredAnimationName = "Close";
 	std::string editorRegistrationName_ = "Toilet";

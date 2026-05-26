@@ -379,6 +379,133 @@
           }
         ],
         "loopEnabled": false,
+        "name": "doorClose.mp3",
+        "volume": 1.0
+      },
+      {
+        "effects": [
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 0
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 1
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 2
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 3
+          }
+        ],
+        "loopEnabled": false,
         "name": "maou_se_sound_footstep02.mp3",
         "volume": 0.5
       },
@@ -1142,6 +1269,133 @@
         ],
         "loopEnabled": false,
         "name": "chair.mp3",
+        "volume": 1.0
+      },
+      {
+        "effects": [
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 0
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 1
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 2
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 3
+          }
+        ],
+        "loopEnabled": false,
+        "name": "chairStand.mp3",
         "volume": 1.0
       },
       {
@@ -2667,6 +2921,514 @@
         "loopEnabled": false,
         "name": "toilet.mp3",
         "volume": 1.0
+      },
+      {
+        "effects": [
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 0
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 1
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 2
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 3
+          }
+        ],
+        "loopEnabled": false,
+        "name": "locker.mp3",
+        "volume": 1.0
+      },
+      {
+        "effects": [
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 0
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 1
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 2
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 3
+          }
+        ],
+        "loopEnabled": false,
+        "name": "mystery.mp3",
+        "volume": 1.0
+      },
+      {
+        "effects": [
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 0
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 1
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 2
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 3
+          }
+        ],
+        "loopEnabled": false,
+        "name": "bgm1.mp3",
+        "volume": 1.0
+      },
+      {
+        "effects": [
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 0
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 1
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 2
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 3
+          }
+        ],
+        "loopEnabled": false,
+        "name": "scl_k1_cb.mp3",
+        "volume": 1.0
       }
     ]
   },
@@ -2728,7 +3490,7 @@
           0.0
         ]
       },
-      "name": "roofTop",
+      "name": "TimeCardWatch",
       "transform": {
         "rotate": [
           0.0,
@@ -2741,7 +3503,7 @@
           1.0
         ],
         "translate": [
-          7.0,
+          0.0,
           0.0,
           0.0
         ]
@@ -2784,7 +3546,7 @@
           0.0
         ]
       },
-      "name": "TimeCardWatch",
+      "name": "roofTop",
       "transform": {
         "rotate": [
           0.0,
@@ -2797,7 +3559,7 @@
           1.0
         ],
         "translate": [
-          0.0,
+          7.0,
           0.0,
           0.0
         ]
@@ -2970,12 +3732,68 @@
           1.3600000143051147
         ]
       }
+    },
+    {
+      "editorId": "",
+      "index": 9,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Door",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "translate": [
+          2.5,
+          0.0,
+          -7.0
+        ]
+      }
     }
   ],
   "primitives": [
     {
       "editorId": "",
-      "index": 0,
+      "index": 13,
       "material": {
         "color": [
           1.0,
@@ -3031,7 +3849,7 @@
     },
     {
       "editorId": "",
-      "index": 1,
+      "index": 14,
       "material": {
         "color": [
           1.0,
@@ -3087,7 +3905,7 @@
     },
     {
       "editorId": "",
-      "index": 2,
+      "index": 15,
       "material": {
         "color": [
           1.0,
@@ -3143,7 +3961,7 @@
     },
     {
       "editorId": "",
-      "index": 3,
+      "index": 16,
       "material": {
         "color": [
           1.0,
@@ -3199,7 +4017,7 @@
     },
     {
       "editorId": "",
-      "index": 4,
+      "index": 17,
       "material": {
         "color": [
           1.0,
@@ -3255,7 +4073,7 @@
     },
     {
       "editorId": "",
-      "index": 5,
+      "index": 18,
       "material": {
         "color": [
           1.0,
@@ -3311,7 +4129,7 @@
     },
     {
       "editorId": "",
-      "index": 6,
+      "index": 19,
       "material": {
         "color": [
           1.0,
@@ -3367,7 +4185,7 @@
     },
     {
       "editorId": "",
-      "index": 7,
+      "index": 20,
       "material": {
         "color": [
           1.0,
@@ -3423,7 +4241,7 @@
     },
     {
       "editorId": "",
-      "index": 8,
+      "index": 21,
       "material": {
         "color": [
           1.0,
@@ -3479,7 +4297,7 @@
     },
     {
       "editorId": "",
-      "index": 9,
+      "index": 22,
       "material": {
         "color": [
           1.0,
@@ -3535,7 +4353,7 @@
     },
     {
       "editorId": "",
-      "index": 10,
+      "index": 23,
       "material": {
         "color": [
           1.0,
@@ -3586,6 +4404,62 @@
           13.600000381469727,
           1.590000033378601,
           4.230000019073486
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 24,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "Door:AutoLockSystem",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          0.019999999552965164,
+          0.75
+        ],
+        "translate": [
+          0.0,
+          0.0,
+          -0.75
         ]
       }
     }

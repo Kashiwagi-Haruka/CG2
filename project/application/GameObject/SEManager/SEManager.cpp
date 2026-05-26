@@ -9,6 +9,7 @@ void SEManager::Load() {
 	auto* audio = Audio::GetInstance();
 	SEs_[DOOR_LOCK] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/doorLock.mp3");
 	SEs_[DOOR_OPEN] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/doorOpen.mp3");
+	SEs_[DOOR_CLOSE] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/doorClose.mp3");
 	SEs_[FOOT_STEP] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/maou_se_sound_footstep02.mp3");
 
 	SEs_[WARP] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/warp0.mp3");
