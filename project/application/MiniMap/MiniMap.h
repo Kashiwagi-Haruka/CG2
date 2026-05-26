@@ -31,12 +31,8 @@ class MiniMap {
 
 	std::unique_ptr<Camera> camera_;
 	std::unique_ptr<Camera> miniMapCamera_;
-	std::unique_ptr<Object3d> markerObject_;
 	std::unique_ptr<Sprite> miniMapBackSprite_;
-	std::unique_ptr<PortalMesh> miniMapPortal_;
-	std::unique_ptr<PortalMesh> miniMapPortalOutline_;
-	std::unique_ptr<RenderTexture2D> miniMapRenderTexture_;
-	std::unique_ptr<Sprite> markerSprite_;
+	std::vector<std::unique_ptr<Sprite>> markerSprites_;
 	std::unique_ptr<Sprite> playerSprite_;
 	std::unordered_map<std::string, Entry> entries_;
 	std::vector<MarkerDrawData> visibleMarkers_;
