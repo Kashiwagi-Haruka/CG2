@@ -23,9 +23,10 @@ Door::Door()
 
     autoLockSystem_ = std::make_unique<AutoLockSystem>();
     worldMat_ = Function::MakeIdentity4x4();
-    autoLockSystem_->SetParentMat(&worldMat_);
-    autoLockSystem_->SetTranslate({ 0.0f,0.0f,-0.75f });
-    autoLockSystem_->SetAABB({ .min = {-0.5f,0.0f,-0.375f},.max = {0.5f,0.02f,0.375f} });
+    autoLockSystem_->SetParentMatrix(&worldMat_);
+
+    //autoLockSystem_->SetTranslate({ 0.0f,0.0f,-0.75f });
+    //autoLockSystem_->SetAABB({ .min = {-0.5f,0.0f,-0.375f},.max = {0.5f,0.02f,0.375f} });
 }
 
 Door::~Door()
@@ -89,7 +90,9 @@ void Door::Initialize()
 {
     obj_->Initialize();
     obj_->RegisterEditor("Door");
+    
     autoLockSystem_->Initialize();
+    autoLockSystem_->RegisterEditor("Door:AutoLockSystem");
 
     isSendLockMessage_ = false;
     isSendOpenMessage_ = false;

@@ -28,6 +28,8 @@ public:
 		PAPER,
 		TOILET,
 		LOCKER,
+		//怪奇音
+		MYSTERY,
 		MAX_SE,
 	};
 

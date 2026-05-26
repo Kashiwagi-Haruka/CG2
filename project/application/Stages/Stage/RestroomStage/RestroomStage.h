@@ -29,7 +29,7 @@ class RestroomStage :
     std::unique_ptr<Key> key_ = nullptr;
     std::unique_ptr<Door> door_ = nullptr;
     std::unique_ptr<DocumentManager>documentManager_ = nullptr;
-
+    bool isAutoLockRemoveCollision_ = false;
 private:
     void InitializeLights();
     void UpdateLights();
