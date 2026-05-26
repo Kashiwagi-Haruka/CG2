@@ -29,6 +29,7 @@ public:
     Transform& GetTransform() { return transform_; };
     Object3d* GetObject3d() const { return obj_.get(); }
     bool GetIsStand() { return isStand_; }
+    void SetIsStand(const bool isStand) { isStand_ = isStand; }
     bool IsRayHit() { return isRayHit_; }
 private:
     void SwichCommand();

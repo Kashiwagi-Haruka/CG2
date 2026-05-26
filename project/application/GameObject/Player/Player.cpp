@@ -16,6 +16,8 @@
 #include"GameSave/GameSave.h"
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/Locker/LockerManager.h"
+#include"GameObject/Chair/ChairManager.h"
+
 
 namespace {
 
@@ -174,6 +176,8 @@ void Player::Debug() {
             ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.1f);
             ImGui::DragFloat3("Translate", &transform_.translate.x, 0.1f);
             ImGui::Text("%s", desiredAnimationName);
+            ImGui::Text("IsStand: %d", ChairManager::GetIsStand());
+            ImGui::Text("InLocker: %d", LockerManager::GetIsInLocker());
             ImGui::TreePop();
         }
 
@@ -200,14 +204,22 @@ void Player::Debug() {
 
 void Player::UpdatePlayerDamage(const float deltaTime)
 {
+
+    if (LockerManager::GetIsInLocker() || ChairManager::GetIsStand()) {
+        //ロッカーに入っていたらまたは椅子に乗っていたらreturnする
+        return;
+    }
+
     damageCooldownTimer_ = std::max(0.0f, damageCooldownTimer_ - deltaTime);
     hp_ = std::min(kMaxHp_, hp_ + (kHpRegenPerSecond * deltaTime));
 }
 
 void Player::ApplyPlayerDamage(float damageAmount)
 {
-    if (LockerManager::GetIsInLocker()) {
-        //ロッカーに入っていたらreturnする
+
+
+    if (LockerManager::GetIsInLocker()||ChairManager::GetIsStand()) {
+        //ロッカーに入っていたらまたは椅子に乗っていたらreturnする
         return;
     }
 
@@ -235,7 +247,7 @@ void Player::Move()
     }
 
 
-    if (LockerManager::GetIsInLocker()||PlayerCommand::GetIsStand()) {
+    if (LockerManager::GetIsInLocker()||ChairManager::GetIsStand()) {
         return;
     }
 
@@ -379,7 +391,7 @@ Vector3 Player::GetJointWorldPos(const char* jointName) const
 
 void Player::Gravity() {
 
-    if (PlayerCommand::GetIsStand()) {
+    if (ChairManager::GetIsStand()) {
         return;
     }
 

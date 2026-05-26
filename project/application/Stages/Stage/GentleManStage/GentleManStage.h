@@ -24,6 +24,7 @@ class GentleManStage :
     std::unique_ptr<DocumentManager>documentManager_ = nullptr;
     std::unique_ptr<GiantGentleMan>giantGentleMan_ = nullptr;
     std::unique_ptr<Flashlight> flashlight_ = nullptr;
+    std::unique_ptr<Door> door_ = nullptr;
 private:
     void InitializeLights();
     void UpdateLights();

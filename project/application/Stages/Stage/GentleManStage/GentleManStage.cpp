@@ -79,6 +79,8 @@ GentleManStage::GentleManStage(Player* player)
     //懐中電灯の作成
     flashlight_ = std::make_unique<Flashlight>();
     flashlight_->SetPlayer(player_);
+
+    door_ = std::make_unique<Door>();
 }
 
 void GentleManStage::Initialize()
@@ -95,6 +97,9 @@ void GentleManStage::Initialize()
     giantGentleMan_->Initialize();
     //懐中電灯の初期化
     flashlight_->Initialize();
+    door_->Initialize();
+    //ドアは最初は開ける
+    door_->SetIsOpenAndAnimation();
 
     InitializeLights();
 
@@ -111,6 +116,7 @@ void GentleManStage::UpdateGameObject(Camera* camera, const Vector3& lightDirect
     //懐中電灯の更新
     flashlight_->Update();
     timeCardWatch_->Update();
+    door_->Update();
     UpdateLights();
 }
 
@@ -145,6 +151,11 @@ void GentleManStage::CheckCollision() {
         stageCollisionManager_->AddCollider(hand.get());
     }
 
+    //オートロックはしません
+    if (!door_->GetIsOpen()) {
+        stageCollisionManager_->AddCollider(door_.get());
+    }
+
     stageCollisionManager_->AddCollider(flashlight_.get());
 
     stageCollisionManager_->CheckAllCollisions();
@@ -161,14 +172,13 @@ void GentleManStage::SetCollisionManager(CollisionManager* collisionManager)
 }
 void GentleManStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
 
-    wallManagerRoofFloor_->Draw();
-
-    //ここで書類パーティクルを描画させる
-    documentManager_->Draw();
     timeCardWatch_->Draw();
     giantGentleMan_->Draw();
     flashlight_->Draw();
-
+    door_->Draw();
+    wallManagerRoofFloor_->Draw();
+    //ここで書類パーティクルを描画させる
+    documentManager_->Draw();
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 void GentleManStage::DrawSprite()
@@ -184,6 +194,7 @@ void GentleManStage::SetSceneCameraForDraw(Camera* camera) {
     timeCardWatch_->SetCamera(camera);
     giantGentleMan_->SetCamera(camera);
     flashlight_->SetCamera(camera);
+    door_->SetCamera(camera);
 }
 
 void GentleManStage::SetPlayerCamera(PlayerCamera* playerCamera) {
@@ -191,6 +202,7 @@ void GentleManStage::SetPlayerCamera(PlayerCamera* playerCamera) {
     documentManager_->SetPlayerCamera(playerCamera);
     giantGentleMan_->SetPlayerCamera(playerCamera);
     flashlight_->SetPlayerCamera(playerCamera);
+    door_->SetPlayerCamera(playerCamera);
 }
 PortalManager* GentleManStage::GetPortalManager() { return portalManager_.get(); }
 

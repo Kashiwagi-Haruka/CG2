@@ -1,7 +1,7 @@
 #include "WallManagerRoofFoor.h"
 #include"Model/ModelManager.h"
 #include"Function.h"
-
+#include "GameObject/Door/Door.h"
 
 WallManagerRoofFloor::WallManagerRoofFloor()
 {

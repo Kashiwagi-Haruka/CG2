@@ -8,7 +8,7 @@
 #include "Model/ModelManager.h"
 #include "Object3d/Object3dCommon.h"
 #include "Text/ChairMenu/ChairMenu.h"
-
+#include "ChairManager.h"
 PlayerCamera* Chair::playerCamera_ = nullptr;
 
 namespace {
@@ -56,6 +56,7 @@ void Chair::Update() {
         ChairMenu::SetIsShowMenu(false);
     }
 
+   
     // rayと重なる、または椅子を持っていると
     if (isRayHit_ || isGrab_||isStand_) {
         // インタラクトをトリガーすると
@@ -65,8 +66,11 @@ void Chair::Update() {
                 SwichCommand();
 
             } else {
-                // メニューを表示してないとき表示する
-                ChairMenu::SetIsShowMenu(true);
+                if (!ChairManager::GetIsStand()) {
+                    // メニューを表示してないとき表示する
+                    ChairMenu::SetIsShowMenu(true);
+                }
+             
             }
         }
     }
@@ -142,15 +146,15 @@ void Chair::SwichCommand()
         if (isStand_) {
        
             //椅子に乗っていたら降りる
-            isStand_ = false;
-            //プレイヤーの状態をセットする
-            PlayerCommand::SetIsStand(false);
+         /*   isStand_ = false;*/
+            //////プレイヤーの状態をセットする
+            ChairManager::SetIsStand(false);
             //スタンド終了後メニューを閉じる
             ChairMenu::SetIsShowMenu(false);
         } else {
-            if (!PlayerCommand::GetIsStand()) {
-                //プレイヤーの状態をセットする
-                PlayerCommand::SetIsStand(true);
+            if (!ChairManager::GetIsStand()) {
+                ////プレイヤーの状態をセットする
+                ChairManager::SetIsStand(true);
 
                 isStand_ = true;
 

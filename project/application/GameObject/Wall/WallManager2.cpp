@@ -45,10 +45,12 @@ void WallManager2::Initialize()
     colliders_["LeftWall2"] = std::make_unique<ObjectCollider>();
     colliders_["RightWall2"] = std::make_unique<ObjectCollider>();
     colliders_["BackWall2"] = std::make_unique<ObjectCollider>();
+    colliders_["Pillar2_S"] = std::make_unique<ObjectCollider>();
 
     colliders_["LeftWall2"]->Initialize(YoshidaMath::ColliderType::kAABB);
     colliders_["RightWall2"]->Initialize(YoshidaMath::ColliderType::kAABB);
     colliders_["BackWall2"]->Initialize(YoshidaMath::ColliderType::kAABB);
+    colliders_["Pillar2_S"]->Initialize(YoshidaMath::ColliderType::kAABB);
 
     for (auto& [name, collider] : colliders_) {
         collider->RegisterEditor(name);

@@ -10,6 +10,7 @@ namespace {
 }
 
 bool ChairManager::isRayHit_ = false;
+bool ChairManager::isStand_ = false;
 ChairManager::ChairManager()
 {
     for (uint32_t i = 0; i < maxNum_; ++i) {
@@ -39,6 +40,7 @@ void ChairManager::Initialize()
 {
 
     isRayHit_ = false;
+    isStand_ = false;
 
     for (auto& chair : chairs_) {
         chair->Initialize();
@@ -80,30 +82,33 @@ void ChairManager::Update()
 
 void ChairManager::StandChair(Player* player)
 {
-    if (!PlayerCommand::GetIsStand())
+    if (!isStand_)
     {
+        //たっていない
         standTimer_ = 0.0f;
     }
 
     for (auto& chair : chairs_) {
         if (chair->GetIsStand()) {
 
-            if (PlayerCommand::GetIsStand())
+            if (isStand_)
             {
                 standTimer_ += GameBase::GetInstance()->GetDeltaTime();
                 standTimer_ = std::clamp(standTimer_, 0.0f, 1.0f);
                 Vector3 pos = chair->GetWorldPosition();
-                Vector3 easingPos = YoshidaMath::Easing::EaseInOutBack(pos, { pos.x,pos.y + 1.0f,pos.z }, standTimer_);
+                Vector3 easingPos = YoshidaMath::Easing::EaseInOutBack(pos, { pos.x,pos.y + 0.5f,pos.z }, standTimer_);
                 player->SetTranslate(easingPos);
+                break;
             } else {
                 Vector3 forward = player->GetForward();
                 forward.y = 0.0f;
+                forward *= 0.75f;
                 Vector3 translate = player->GetTransform().translate;
                 forward.x += translate.x;
                 forward.y = translate.y;
                 forward.z += translate.z;
                 player->SetTranslate(forward);
-      
+                chair->SetIsStand(false);
                 break;
             }
 

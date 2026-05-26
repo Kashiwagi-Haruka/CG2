@@ -4175,6 +4175,62 @@
           0.0
         ]
       },
+      "name": "Pillar2_S",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          4.0,
+          15.0
+        ],
+        "translate": [
+          -14.0,
+          2.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 17,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
       "name": "EV_Hole_L",
       "transform": {
         "rotate": [
@@ -4196,7 +4252,7 @@
     },
     {
       "editorId": "",
-      "index": 17,
+      "index": 18,
       "material": {
         "color": [
           1.0,
@@ -4252,7 +4308,7 @@
     },
     {
       "editorId": "",
-      "index": 18,
+      "index": 19,
       "material": {
         "color": [
           1.0,
@@ -4308,7 +4364,7 @@
     },
     {
       "editorId": "",
-      "index": 19,
+      "index": 20,
       "material": {
         "color": [
           1.0,
@@ -4364,7 +4420,7 @@
     },
     {
       "editorId": "",
-      "index": 20,
+      "index": 21,
       "material": {
         "color": [
           1.0,
@@ -4420,7 +4476,7 @@
     },
     {
       "editorId": "",
-      "index": 21,
+      "index": 22,
       "material": {
         "color": [
           1.0,
