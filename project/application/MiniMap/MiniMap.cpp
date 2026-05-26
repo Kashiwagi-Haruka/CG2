@@ -177,6 +177,7 @@ void MiniMap::Draw() {
 		markerSprite->SetPosition(drawPos);
 		markerSprite->SetColor(marker.color);
 		markerSprite->SetScale({marker.markerSize, marker.markerSize});
+		markerSprite->SetRotation(-playerYaw_);
 		markerSprite->Update();
 		markerSprite->Draw();
 		++markerIndex;

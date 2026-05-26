@@ -15,6 +15,7 @@
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include"Function.h"
 #include "GameObject/Flashlight/Flashlight.h"
+#include "MiniMap/MiniMap.h"
 
 void GentleManStage::InitializeLights()
 {
@@ -81,27 +82,29 @@ GentleManStage::GentleManStage(Player* player)
     flashlight_->SetPlayer(player_);
 }
 
-void GentleManStage::Initialize()
-{
+void GentleManStage::Initialize() {
 
-    Hierarchy* hierarchy = Hierarchy::GetInstance();
-    hierarchy->BeginRegisterFile("GentleManStage_objectEditors.json");
+	Hierarchy* hierarchy = Hierarchy::GetInstance();
+	hierarchy->BeginRegisterFile("GentleManStage_objectEditors.json");
 
-    timeCardWatch_->Initialize();
-    portalManager_->Initialize();
-    wallManagerRoofFloor_->Initialize();
-   
-    documentManager_->Initialize("document1");
-    giantGentleMan_->Initialize();
-    //懐中電灯の初期化
-    flashlight_->Initialize();
+	timeCardWatch_->Initialize();
+	portalManager_->Initialize();
+	wallManagerRoofFloor_->Initialize();
 
-    InitializeLights();
+	documentManager_->Initialize("document1");
+	giantGentleMan_->Initialize();
+	// 懐中電灯の初期化
+	flashlight_->Initialize();
 
-    hierarchy->LoadObjectEditorsFromJsonIfExists("GentleManStage_objectEditors.json");
-    hierarchy->EndRegisterFile();
+    MiniMap* miniMap = MiniMap::GetInstance();
+	miniMap->AddObject(wallManagerRoofFloor_->GetRoom().get(), {0.2f, 0.2f, 0.2f, 0.35f}, 50.0f);
+	miniMap->AddObject(giantGentleMan_->GetObject3d(), {1.0f, 0.0f, 0.0f, 1.0f}, 60.0f);
+
+	InitializeLights();
+
+	hierarchy->LoadObjectEditorsFromJsonIfExists("GentleManStage_objectEditors.json");
+	hierarchy->EndRegisterFile();
 }
-
 void GentleManStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
 
     portalManager_->WarpPlayer(player);

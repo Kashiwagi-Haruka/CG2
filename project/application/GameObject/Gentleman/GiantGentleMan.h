@@ -32,11 +32,14 @@ public:
     GiantGentlemanHead* GetGiantGentlemanHead() { return head_.get(); }
     std::unordered_map<std::string,std::unique_ptr<ObjectCollider>>& GetGiantGentlemanHand() { return colliders_; }
     Transform& GetCollisionTransform() { return collisionTransform_; };
+	Object3d* GetObject3d() const { return obj_.get(); }
+
 private:
     void CheckCollision();
     bool OnCollisionRay();
     // アニメーション
     void Animation();
+    
 
 private:
     Transform collisionTransform_ = { 0.0f };

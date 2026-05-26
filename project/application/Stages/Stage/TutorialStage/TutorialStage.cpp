@@ -19,7 +19,7 @@
 #include "GameObject/Flashlight/Flashlight.h"
 #include "GameObject/Desk/DeskManager.h"
 #include"GameObject/SeveredHand/SeveredHand.h"
-
+#include "MiniMap/MiniMap.h"
 
 void TutorialStage::InitializeLights()
 {
@@ -121,6 +121,11 @@ void TutorialStage::Initialize()
     severedHand_->SetParentMatrix(deskManager_->GetDrawerMatrix(0));
     severedHand_->SetOpenAnimationEndPtr(deskManager_->GetDesks().at(0)->IsEndOpenAnimation());
     deskManager_->GetDesks().at(0)->RegisterReadableObject(severedHand_.get());
+
+	MiniMap* miniMap = MiniMap::GetInstance();
+	miniMap->AddObject(wallManager_->GetRoom().get(), {0.2f, 0.2f, 0.2f, 0.35f}, 50.0f);
+	miniMap->AddObject(wallManager2_->GetRoom().get(), {0.2f, 0.2f, 0.2f, 0.35f}, 50.0f);
+	miniMap->AddObject(deskManager_->GetDesks().at(0)->GetObject3d(), {0.75f, 0.75f, 0.0f, 1.0f});
     hierarchy->LoadObjectEditorsFromJsonIfExists("TutorialStage_objectEditors.json");
     hierarchy->EndRegisterFile();
 }
