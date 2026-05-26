@@ -64,7 +64,9 @@ void StageManager::UpdateGameObject(Camera* camera, const Vector3& lightDirectio
 
 	if (player_) {
 		MiniMap::GetInstance()->SetPlayerTranslate(player_->GetTransform().translate);
+		MiniMap::GetInstance()->SetPlayerYaw(player_->GetTransform().rotate.y);
 	}
+
 	MiniMap::GetInstance()->Update();
 }
 

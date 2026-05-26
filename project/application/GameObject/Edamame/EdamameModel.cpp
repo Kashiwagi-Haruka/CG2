@@ -44,6 +44,7 @@ Vector3 EdamameModel::GetWorldPosition() const
 {
     return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
 }
+Object3d* EdamameModel::GetObject3d() { return obj_.get(); }
 
 void EdamameModel::Animation()
 {
