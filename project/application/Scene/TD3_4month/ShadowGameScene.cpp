@@ -511,11 +511,13 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
 
     Object3dCommon::GetInstance()->DrawCommon();
 
-    elevatorRoomManager_->Draw();
-    stageManager_->DrawModel(isShadow, drawPortal, isDrawParticle);
     // エレベーター
     elevator_->Draw();
     gentleManManager_->Draw();
+    elevatorRoomManager_->Draw();
+
+    stageManager_->DrawModel(isShadow, drawPortal, isDrawParticle);
+
 
     if (drawPlayer) {
         // プレイヤーの描画処理
@@ -532,11 +534,14 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
     skyBox_->SetCamera(camera);
     player_->SetCamera(camera);
-    stageManager_->SetSceneCameraForDraw(camera);
+    
     elevatorRoomManager_->SetCamera(camera);
     elevator_->SetCamera(camera);
     gentleManManager_->SetCamera(camera);
     buildings_->SetCamera(camera);
+
+    stageManager_->SetSceneCameraForDraw(camera);
+
 }
 void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera) {
     stageManager_->SetPlayerCamera(playerCamera);

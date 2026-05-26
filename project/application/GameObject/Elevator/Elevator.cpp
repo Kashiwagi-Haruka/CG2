@@ -139,9 +139,9 @@ void Elevator::SetCamera(Camera* camera) {
     modelObj_->SetCamera(camera);
     modelObj_->UpdateCameraMatrices();
 
-    for (auto& [name,sys] : autoLockSystems_) {
-        sys->SetCamera(camera);
-    }
+    //for (auto& [name,sys] : autoLockSystems_) {
+    //    sys->SetCamera(camera);
+    //}
 
     poster_.SetCamera(camera);
 

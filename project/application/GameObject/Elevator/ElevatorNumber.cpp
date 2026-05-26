@@ -40,4 +40,5 @@ void ElevatorNumber::Draw() {
 void ElevatorNumber::SetCamera(Camera* camera) {
 	camera_ = camera;
 	primitive_->SetCamera(camera);
+	primitive_->UpdateCameraMatrices();
 }
