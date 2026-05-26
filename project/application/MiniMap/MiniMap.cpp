@@ -159,7 +159,12 @@ void MiniMap::UpdateVisibleMarkers() {
 			continue;
 		}
 
-		const Vector3 worldPos = entry.object->GetTranslate();
+		const Matrix4x4& worldMatrix = entry.object->GetWorldMatrix();
+		const Vector3 worldPos = {
+		    worldMatrix.m[3][0],
+		    worldMatrix.m[3][1],
+		    worldMatrix.m[3][2],
+		};
 		const Vector3 offset = {
 		    worldPos.x - playerTranslate_.x,
 		    0.0f,
@@ -191,6 +196,8 @@ void MiniMap::Draw() {
 	miniMapPortal_->Draw();
 
 	SpriteCommon::GetInstance()->DrawCommon();
+
+
 	for (const auto& marker : visibleMarkers_) {
 		const float dx = marker.position.x - playerTranslate_.x;
 		const float dz = marker.position.z - playerTranslate_.z;
