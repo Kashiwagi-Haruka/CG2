@@ -104,6 +104,7 @@ void RestroomStage::Initialize()
     door_->Initialize();
     //ドアは最初は開ける
     door_->SetIsOpenAndAnimation();
+    isAutoLockRemoveCollision_ = false;
 
     toiletManager_->Initialize();
     documentManager_->Initialize("document_isomer");
@@ -121,6 +122,9 @@ void RestroomStage::UpdateGameObject(Camera* camera, const Vector3& lightDirecti
 
     key_->Update();
     door_->Update();
+    if (door_->GetAutoLockSystem()->IsPlayerHit()) {
+        isAutoLockRemoveCollision_ = true;
+    }
     toiletManager_->Update();
     documentManager_->Update();
     //懐中電灯の更新
@@ -169,8 +173,10 @@ void RestroomStage::CheckCollision() {
     for (auto& toilet : toiletManager_->GetToilets()) {
         stageCollisionManager_->AddCollider(toilet.get());
     }
+    if (!isAutoLockRemoveCollision_) {
+        stageCollisionManager_->AddCollider(door_->GetAutoLockSystem().get());
+    }
 
-    stageCollisionManager_->AddCollider(door_->GetAutoLockSystem().get());
     if (!door_->GetIsOpen()) {
         stageCollisionManager_->AddCollider(door_.get());
     }

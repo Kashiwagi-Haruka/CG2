@@ -30,7 +30,7 @@ public:
 	void Draw();
 	void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
 	void SetStageNumber(int stageNumber);
-	std::array<std::unique_ptr<AutoLockSystem>, 2>& GetAutoLockSys() { return autoLockSystems_; };
+    std::map<std::string, std::unique_ptr<AutoLockSystem>>& GetAutoLockSys() { return autoLockSystems_; };
 	bool IsSceneTransitionStart() const { return isSceneTransitionStart_; }
   std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>& GetColliders() { return colliders_; }
   std::array<PointCommonLight, 2>& GetPointLights() { return pointLights_; };
@@ -84,7 +84,7 @@ private:
     float baseHeight_ = 0.0f;
 
     // オートロック
-    std::array<std::unique_ptr<AutoLockSystem>, 2> autoLockSystems_;
+    std::map<std::string ,std::unique_ptr<AutoLockSystem>> autoLockSystems_;
 
     Poster poster_;
     bool isSceneTransitionStart_ = false;

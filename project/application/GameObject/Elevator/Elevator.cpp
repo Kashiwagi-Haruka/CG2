@@ -20,20 +20,21 @@ Elevator::Elevator() {
     modelObj_->SetModel("Elevator");
     worldMat_ = Function::MakeIdentity4x4();
 
-    for (int i = 0; i < autoLockSystems_.size(); ++i) {
-        autoLockSystems_[i] = std::make_unique<AutoLockSystem>();
-        autoLockSystems_[i]->SetParentMat(&worldMat_);
+
+    autoLockSystems_["ElevatorMat:AutoLockSystem:Out"] = std::make_unique<AutoLockSystem>();
+    autoLockSystems_["ElevatorMat:AutoLockSystem:In"] = std::make_unique<AutoLockSystem>();
+
+    for (auto& [name, sys] : autoLockSystems_) {
+        sys->SetParentMatrix(&worldMat_);
     }
+    //autoLockSystems_[0]->SetTranslate({ 0.0f,0.0f,-4.5f });
+    //autoLockSystems_[0]->SetAABB({ .min = {-1.5f,0.0f,-0.5f} ,.max = {1.5f,0.02f,0.5f} });
 
-    autoLockSystems_[0]->SetTranslate({ 0.0f,0.0f,-4.5f });
-    autoLockSystems_[0]->SetAABB({ .min = {-1.5f,0.0f,-0.5f} ,.max = {1.5f,0.02f,0.5f} });
-
-    autoLockSystems_[1]->SetAABB({ .min = {-1.5f,0.0f,-1.0f} ,.max = {1.5f,0.02f,2.0f} });
-    autoLockSystems_[1]->SetTranslate({ 0.0f,0.0f,0.0f });
+    //autoLockSystems_[1]->SetAABB({ .min = {-1.5f,0.0f,-1.0f} ,.max = {1.5f,0.02f,2.0f} });
+    //autoLockSystems_[1]->SetTranslate({ 0.0f,0.0f,0.0f });
 
     doorMatrixLeft_ = Function::MakeIdentity4x4();
     doorMatrixRight_ = Function::MakeIdentity4x4();
-
 
 
 	elevatorNumber_ = std::make_unique<ElevatorNumber>();
@@ -91,9 +92,12 @@ void Elevator::Initialize() {
     }
 
 
-    for (auto& sys : autoLockSystems_) {
+    for (auto&[name, sys]:autoLockSystems_) {
         sys->Initialize();
+        sys->RegisterEditor(name);
     }
+
+
 
     poster_.SetParentMat(&worldMat_);
     poster_.Initialize();
@@ -135,7 +139,7 @@ void Elevator::SetCamera(Camera* camera) {
     modelObj_->SetCamera(camera);
     modelObj_->UpdateCameraMatrices();
 
-    for (auto& sys : autoLockSystems_) {
+    for (auto& [name,sys] : autoLockSystems_) {
         sys->SetCamera(camera);
     }
 
@@ -163,7 +167,7 @@ void Elevator::Update() {
 
     Animation();
 
-    for (auto& sys : autoLockSystems_) {
+    for (auto& [name,sys] : autoLockSystems_) {
         sys->Update();
     }
     //エレベーター内のポスターの更新
@@ -197,9 +201,9 @@ void Elevator::Draw() {
 
 	modelObj_->Draw();
 
-	for (auto& sys : autoLockSystems_) {
-		sys->Draw();
-	}
+	//for (auto& [name,sys] : autoLockSystems_) {
+	//	sys->Draw();
+	//}
 
 	// for (auto& wall : walls_) {
 	//     wall->Draw();
@@ -269,8 +273,8 @@ void Elevator::CheckCollision() {
     } else {
 
         //当たり判定を取得しておく
-        bool hitOuter = autoLockSystems_[0]->IsPlayerHit();
-        bool hitInner = autoLockSystems_[1]->IsPlayerHit();
+        bool hitOuter = autoLockSystems_["ElevatorMat:AutoLockSystem:Out"]->IsPlayerHit();
+        bool hitInner = autoLockSystems_["ElevatorMat:AutoLockSystem:In"]->IsPlayerHit();
 
         // 外側マット（入口前）
         if (hitOuter) {
@@ -279,7 +283,7 @@ void Elevator::CheckCollision() {
             //内側にいるフラグをリセット
             insideTimer_ = 0.0f;
 
-            if (!autoLockSystems_[0]->IsPlayerPreHit()) {
+            if (!autoLockSystems_["ElevatorMat:AutoLockSystem:Out"]->IsPlayerPreHit()) {
                 Open();
             }
         }
@@ -289,7 +293,7 @@ void Elevator::CheckCollision() {
             //プレイヤーは内側にいる
             isPlayerInside_ = true;
 
-            if (!autoLockSystems_[1]->IsPlayerPreHit()) {
+            if (!autoLockSystems_["ElevatorMat:AutoLockSystem:In"]->IsPlayerPreHit()) {
                 Close();
             }
 

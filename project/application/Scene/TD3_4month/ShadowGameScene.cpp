@@ -305,7 +305,7 @@ void ShadowGameScene::CheckCollision() {
         collisionManager_->AddCollider(wall.get());
     }
 
-    for (auto& system : elevator_->GetAutoLockSys()) {
+    for (auto& [name, system] : elevator_->GetAutoLockSys()) {
         collisionManager_->AddCollider(system.get());
     }
     for (auto& [name, collider] : elevator_->GetColliders()) {
@@ -482,17 +482,17 @@ void ShadowGameScene::DrawSceneTransition() {
 }
 
 void ShadowGameScene::DrawModel() {
-	//=======================shadowマップの開始↓=======================
-	auto* object3dCommon = Object3dCommon::GetInstance();
+    //=======================shadowマップの開始↓=======================
+    auto* object3dCommon = Object3dCommon::GetInstance();
 
-	
-	object3dCommon->SetShadowMapEnabled(true, false, false, false);
-	object3dCommon->BeginShadowMapPass();
-	object3dCommon->DrawCommonShadow();
-	Object3dCommon::GetInstance()->SetDefaultCamera(cameraController_->GetPlayerCamera()->GetCamera());
-	SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
-	DrawGameObject(true, false, false, false, false);
-	object3dCommon->EndShadowMapPass();
+
+    object3dCommon->SetShadowMapEnabled(true, false, false, false);
+    object3dCommon->BeginShadowMapPass();
+    object3dCommon->DrawCommonShadow();
+    Object3dCommon::GetInstance()->SetDefaultCamera(cameraController_->GetPlayerCamera()->GetCamera());
+    SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
+    DrawGameObject(true, false, false, false, false);
+    object3dCommon->EndShadowMapPass();
 
     if (auto* portalManager = stageManager_->GetPortalManager()) {
         for (auto& portal : portalManager->GetPortals()) {

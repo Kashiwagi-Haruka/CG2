@@ -77,7 +77,7 @@ void SeveredHand::CheckCollision() {
             //開いたアニメーションが終わった時やポインタがないとき
             if (isOpenAnimationEndPtr_ && *isOpenAnimationEndPtr_ || !isOpenAnimationEndPtr_) {
 
-                SEManager::SoundPlay(SEManager::PAPER);
+                SEManager::SoundPlay(SEManager::MYSTERY);
 
                 if (isLooking_) {
                     // すでにヒントを見ているなら「閉じる」

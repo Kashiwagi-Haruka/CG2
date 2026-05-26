@@ -3046,7 +3046,7 @@
           }
         ],
         "loopEnabled": false,
-        "name": "3.mp3",
+        "name": "mystery.mp3",
         "volume": 1.0
       }
     ]
@@ -3615,6 +3615,118 @@
           0.0
         ]
       },
+      "name": "ElevatorMat:AutoLockSystem:In",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          3.0,
+          2.0,
+          2.0
+        ],
+        "translate": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 7,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "ElevatorMat:AutoLockSystem:Out",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          3.0,
+          2.0,
+          2.0
+        ],
+        "translate": [
+          0.0,
+          1.0,
+          -3.5
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 8,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
       "name": "ElevatorWall_Back",
       "transform": {
         "rotate": [
@@ -3636,7 +3748,7 @@
     },
     {
       "editorId": "",
-      "index": 7,
+      "index": 9,
       "material": {
         "color": [
           1.0,
@@ -3692,7 +3804,7 @@
     },
     {
       "editorId": "",
-      "index": 8,
+      "index": 10,
       "material": {
         "color": [
           1.0,
@@ -3748,7 +3860,7 @@
     },
     {
       "editorId": "",
-      "index": 9,
+      "index": 11,
       "material": {
         "color": [
           1.0,
@@ -3804,7 +3916,7 @@
     },
     {
       "editorId": "",
-      "index": 10,
+      "index": 12,
       "material": {
         "color": [
           1.0,

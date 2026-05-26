@@ -7,6 +7,7 @@
 #include"Animation/AnimationManager.h"
 #include"GameBase.h"
 #include"GameObject/Key/Key.h"
+#include"GameObject/SEManager/SEManager.h"
 //アニメーションクリップ
 std::vector<Animation::AnimationData>WalkWhiteBoard::animationClips_;
 
@@ -73,6 +74,10 @@ void WalkWhiteBoard::Update()
     if (!isMove_ && Key::GetGetKeyMessage()) {
         //鍵を取得すると動き出すよ～
         isMove_ = true;
+        if (SEManager::IsSoundFinished(SEManager::MYSTERY)) {
+            SEManager::SoundPlay(SEManager::MYSTERY);
+        }
+       
         desiredAnimationName = "WalkStart";
     }
 
