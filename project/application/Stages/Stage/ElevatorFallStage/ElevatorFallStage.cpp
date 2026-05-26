@@ -110,7 +110,7 @@ void ElevatorFallStage::UpdateGameObject(Camera* camera, const Vector3& lightDir
     }
 
     Vector3 translate = player->GetWorldPosition();
-    if (translate.y <= -35.0f) {
+    if (translate.y <= -40.0f) {
 
         //translate = whiteBoardManager_->GetWhiteBoards().at(1)->GetWorldPosition();
         translate.x = 7.0f;

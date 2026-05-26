@@ -204,7 +204,7 @@ void RestroomStage::SetCollisionManager(CollisionManager* collisionManager)
 }
 void RestroomStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
 
-    wallManagerRestRoom_->Draw();
+
     key_->Draw();
     timeCardWatch_->Draw();
     door_->Draw();
@@ -212,6 +212,9 @@ void RestroomStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
     flashlight_->Draw();
 
     toiletManager_->Draw();
+
+    wallManagerRestRoom_->Draw();
+
     //ここで書類パーティクルを描画させる
     documentManager_->Draw();
 
