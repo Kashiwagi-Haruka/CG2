@@ -16,6 +16,8 @@
 #include "GameObject/WhiteBoard/WhiteBoardManager.h"
 #include"GameObject/Toilet/ToiletManager.h"
 #include"GameObject/DocumentManager/DocumentManager.h"
+#include "MiniMap/MiniMap.h"
+
 
 void RestroomStage::InitializeLights()
 {
@@ -87,30 +89,35 @@ RestroomStage::RestroomStage(Player* player)
     documentManager_ = std::make_unique<DocumentManager>();
 }
 
-void RestroomStage::Initialize()
-{
+void RestroomStage::Initialize() {
 
-    Hierarchy* hierarchy = Hierarchy::GetInstance();
-    hierarchy->BeginRegisterFile("RestroomStage_objectEditors.json");
+	Hierarchy* hierarchy = Hierarchy::GetInstance();
+	hierarchy->BeginRegisterFile("RestroomStage_objectEditors.json");
 
-    InitializeLights();
-    portalManager_->Initialize();
-    whiteBoardManager_->Initialize();
-    wallManagerRestRoom_->Initialize();
-    timeCardWatch_->Initialize();
-    //懐中電灯の初期化
-    flashlight_->Initialize();
-    key_->Initialize();
-    door_->Initialize();
-    //ドアは最初は開ける
-    door_->SetIsOpenAndAnimation();
-    isAutoLockRemoveCollision_ = false;
+	InitializeLights();
+	portalManager_->Initialize();
+	whiteBoardManager_->Initialize();
+	wallManagerRestRoom_->Initialize();
+	timeCardWatch_->Initialize();
+	// 懐中電灯の初期化
+	flashlight_->Initialize();
+	key_->Initialize();
+	door_->Initialize();
+	// ドアは最初は開ける
+	door_->SetIsOpenAndAnimation();
+	isAutoLockRemoveCollision_ = false;
 
-    toiletManager_->Initialize();
-    documentManager_->Initialize("document_isomer");
+	toiletManager_->Initialize();
+	documentManager_->Initialize("document_isomer");
 
-    hierarchy->LoadObjectEditorsFromJsonIfExists("RestroomStage_objectEditors.json");
-    hierarchy->EndRegisterFile();
+	MiniMap* miniMap = MiniMap::GetInstance();
+	miniMap->AddObject(wallManagerRestRoom_->GetRoom().get(), {0.2f, 0.2f, 0.2f, 0.35f}, 50.0f);
+	for (const auto& toilet : toiletManager_->GetToilets()) {
+		miniMap->AddObject(toilet->GetObject3d(), {0.4f, 0.8f, 1.0f, 1.0f}, 8.0f);
+	}
+
+	hierarchy->LoadObjectEditorsFromJsonIfExists("RestroomStage_objectEditors.json");
+	hierarchy->EndRegisterFile();
 }
 
 void RestroomStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {

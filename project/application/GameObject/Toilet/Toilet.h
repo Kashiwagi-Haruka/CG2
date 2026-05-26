@@ -13,41 +13,44 @@
 
 class Toilet : public YoshidaMath::Collider {
 public:
-    Toilet();
-    void Initialize();
-    void Update();
-    void Draw();
-    static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
-    void SetEditorRegistrationName(const std::string& name) { editorRegistrationName_ = name; }
-    void SetCamera(Camera* camera);
-    void CheckCollision();
-    bool OnCollisionRay();
-    /// @brief 衝突時コールバック関数
-    void OnCollision(Collider* collider)override;
-    /// @brief ワールド座標を取得する
-    /// @return ワールド座標
-    Vector3 GetWorldPosition() const override;
-    bool IsRayHit() { return isRayHit_; }
-    const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
-    void SetAnimationGroupName(const std::string& name) { animationGroupName_ = name; }
-    bool GetIsOpen() { return isOpen_; }
-private:
-    void Animation();
-private:
-    bool isOpen_ = false;
-    bool isRayHit_ = false;
-    static PlayerCamera* playerCamera_;
-    std::unique_ptr<Object3d>obj_ = nullptr;
+	Toilet();
+	void Initialize();
+	void Update();
+	void Draw();
+	static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
+	void SetEditorRegistrationName(const std::string& name) { editorRegistrationName_ = name; }
+	void SetCamera(Camera* camera);
+	void CheckCollision();
+	bool OnCollisionRay();
+	/// @brief 衝突時コールバック関数
+	void OnCollision(Collider* collider) override;
+	/// @brief ワールド座標を取得する
+	/// @return ワールド座標
+	Vector3 GetWorldPosition() const override;
+	bool IsRayHit() { return isRayHit_; }
+	const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); };
+	void SetAnimationGroupName(const std::string& name) { animationGroupName_ = name; }
+	bool GetIsOpen() { return isOpen_; }
+	Object3d* GetObject3d() const { return obj_.get(); }
 
-    // アニメーション
-    Animation::AnimationData blendedPoseAnimation_{};
-    // 骨
-    std::unique_ptr<Skeleton> skeleton_{};
-    // スキン
-    SkinCluster skinCluster_{};
-    std::string animationGroupName_ = "Toilet";
-    const float kAnimationBlendDuration_ = 0.5f;
-    bool animationFinished_ = false;
-    std::string desiredAnimationName = "Close";
-    std::string editorRegistrationName_ = "Toilet";
+private:
+	void Animation();
+
+private:
+	bool isOpen_ = false;
+	bool isRayHit_ = false;
+	static PlayerCamera* playerCamera_;
+	std::unique_ptr<Object3d> obj_ = nullptr;
+
+	// アニメーション
+	Animation::AnimationData blendedPoseAnimation_{};
+	// 骨
+	std::unique_ptr<Skeleton> skeleton_{};
+	// スキン
+	SkinCluster skinCluster_{};
+	std::string animationGroupName_ = "Toilet";
+	const float kAnimationBlendDuration_ = 0.5f;
+	bool animationFinished_ = false;
+	std::string desiredAnimationName = "Close";
+	std::string editorRegistrationName_ = "Toilet";
 };
