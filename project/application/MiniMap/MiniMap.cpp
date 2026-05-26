@@ -207,8 +207,8 @@ void MiniMap::Draw() {
 			continue;
 		}
 		const float scale = miniMapRadius_ / range_;
-		const float cosYaw = std::cos(-playerYaw_);
-		const float sinYaw = std::sin(-playerYaw_);
+		const float cosYaw = std::cos(playerYaw_);
+		const float sinYaw = std::sin(playerYaw_);
 		const float rotatedX = (dx * cosYaw) - (dz * sinYaw);
 		const float rotatedZ = (dx * sinYaw) + (dz * cosYaw);
 		const Vector2 markerPos = {
