@@ -50,6 +50,11 @@ class Sprite {
 	bool isFlipX_ = false;
 	bool isFripY_ = false;
 
+	bool enableClip_ = false;
+	Vector4 clipRect_ = {0.0f, 0.0f, 0.0f, 0.0f}; // left, top, right, bottom
+	Vector2 uvLeftTop_ = {0.0f, 0.0f};
+	Vector2 uvRightBottom_ = {1.0f, 1.0f};
+
 	int handle_ = 0;
 
 	/*----------------------------------*/
@@ -99,15 +104,20 @@ public:
 	}
 	void SetColor(const Vector4& color);
 	void SetTextureRange(const Vector2& leftTop, const Vector2& TextureSize);
+	void SetClipRect(const Vector4& clipRect);
+	void ClearClipRect();
+	void SetClipBySprite(const Sprite& sprite);
 	bool GetIsFlipX() { return isFlipX_; };
 	void SetIsFlipX(const bool isFlipX);
 	bool GetIsFlipY() { return isFripY_; };
 	void SetIsFlipY(const bool isFlipY);
 	void AdjustTextureSize();
-	const Vector2 GetScale() { return { transform_.scale.x,transform_.scale.y }; }
-	const Vector2 GetTranslate() { return { transform_.translate.x,transform_.translate.y }; }
+	const Vector2 GetScale() { return {transform_.scale.x, transform_.scale.y}; }
+	const Vector2 GetTranslate() { return {transform_.translate.x, transform_.translate.y}; }
 
 	const Vector2& GetAnchorPoint() const { return anchorPoint; };
+	Vector2 GetLeftTop() const { return {transform_.translate.x + left * transform_.scale.x, transform_.translate.y + top * transform_.scale.y}; }
+	Vector2 GetRightBottom() const { return {transform_.translate.x + right * transform_.scale.x, transform_.translate.y + bottom * transform_.scale.y}; }
 	void SetAnchorPoint(const Vector2 anchorPoint) {
 		this->anchorPoint;
 		left = 0.0f - anchorPoint.x;
