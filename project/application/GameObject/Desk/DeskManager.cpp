@@ -40,7 +40,6 @@ void DeskManager::Update()
 
 void DeskManager::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommonSkinning();
     for (auto& desk : desks_) {
         desk->Draw();
     }

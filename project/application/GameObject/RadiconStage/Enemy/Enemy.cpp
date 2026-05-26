@@ -17,7 +17,7 @@ void Enemy::Update() {
 	obj_->Update();
 }
 void Enemy::Draw() {
-	Object3dCommon::GetInstance()->DrawCommonSkinning();
+	Object3dCommon::GetInstance()->DrawCommon();
 	obj_->Draw(); 
 }
 

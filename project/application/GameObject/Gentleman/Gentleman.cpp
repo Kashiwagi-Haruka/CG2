@@ -135,7 +135,7 @@ void Gentleman::Initialize()
 
 void Gentleman::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommonSkinning();
+    Object3dCommon::GetInstance()->DrawCommon();
     obj_->Draw();
 }
 
