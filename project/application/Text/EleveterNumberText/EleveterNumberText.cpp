@@ -6,7 +6,7 @@ EleveterNumberText::EleveterNumberText() {
 	fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Bold.ttf", 0);
 	FreeTypeManager::SetPixelSizes(fontHandle_, 64, 64);
 	text_.Initialize(fontHandle_);
-	text_.SetPosition({1200.0f, 200.0f});
+	text_.SetPosition({200.0f, 500.0f});
 	text_.SetAlign(TextAlign::Center);
 	text_.SetBlendMode(BlendMode::kBlendModeAlpha);
 	text_.SetColor({1.0f, 1.0f, 1.0f, 1.0f});
