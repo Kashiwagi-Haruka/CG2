@@ -35,30 +35,13 @@ void SEManager::Load() {
 	SEs_[TOILET] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/toilet.mp3");
 	SEs_[LOCKER] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/locker.mp3");
 	SEs_[MYSTERY] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/mystery.mp3");
+	SEs_[PC] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/pc.mp3");
 
 	
 }
 
 void SEManager::Initialize() {
-	//SetVol(0.25f, DOOR_LOCK);
-	//SetVol(0.25f, DOOR_OPEN);
 
-	//SetVol(0.25f, WARP);
-	//SetVol(0.25f, PORTAL_SPAWN);
-	//SetVol(0.25f, SHOT);
-	//SetVol(1.0f, PUSH_WATCH);
-	//SetVol(0.0f, NOISE);
-	//SetVol(0.5f, CHAIR);
-
-	//SetVol(1.0f, TYPE);
-	//SetVol(1.0f, VENDING_MAC);
-	//SetVol(0.5f, KEY);
-	//SetVol(1.0f, DESK);
-	//SetVol(0.25f, DAMAGE);
-	//SetVol(0.25f, CLOCK);
-
-	//SetVol(0.25f, CAN);
-	//SetVol(0.25f, BOX);
 }
 
 void SEManager::Update() {}

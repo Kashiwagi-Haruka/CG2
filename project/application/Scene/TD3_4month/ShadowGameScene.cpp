@@ -181,8 +181,7 @@ void ShadowGameScene::Update() {
     StageTransition();
     currentEvent_->Update();
 
-    // ライトの更新処理
-    UpdateLight();
+
     // ポストエフェクトの更新処理
     UpdatePostEffect();
 
@@ -204,6 +203,11 @@ void ShadowGameScene::Update() {
     // ポータル管理 カメラの更新後に行う
     stageManager_->UpdatePortal();
     UpdatePlayerDamage();
+   
+    
+    // ライトの更新処理
+    UpdateLight();
+    
     // オブジェクトの当たり判定
     CheckCollision();
     if (transition_->IsEnd() && isTransitionOut_) {

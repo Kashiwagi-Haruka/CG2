@@ -563,7 +563,12 @@ void Coffees::SetSpawnContainment(const Vector3& center, float topY, float radiu
     simulationParams_.canTopRadius = radius;
 }
 
-void Coffees::StartSpill() { isSpilling_ = true; }
+void Coffees::StartSpill() {
+    if (!isSpilling_) {
+        SEManager::SoundPlay(SEManager::MYSTERY);
+    }
+    isSpilling_ = true;
+}
 
 bool Coffees::CheckHitPlayer(const Vector3& playerPosition, float playerRadius, float minHitSpeed) const {
     if (!isSpilling_) {

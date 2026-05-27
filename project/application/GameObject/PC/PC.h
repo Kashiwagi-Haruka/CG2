@@ -44,7 +44,7 @@ private:
     // スキン
     SkinCluster skinCluster_{};
     std::string animationGroupName_ = "PC";
-    const float kAnimationBlendDuration_ = 0.5f;
+    const float kAnimationBlendDuration_ = 0.0f;
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Open";
 };

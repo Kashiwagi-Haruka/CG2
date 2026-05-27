@@ -13,8 +13,8 @@
 PlayerCamera* PC::playerCamera_ = nullptr;
 bool PC::isRayHit_ = false;
 namespace {
-const Vector4 kRayHitOutlineColor = {1.0f, 1.0f, 0.0f, 1.0f};
-const float kRayHitOutlineWidth = 10.0f;
+    const Vector4 kRayHitOutlineColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+    const float kRayHitOutlineWidth = 10.0f;
 } // namespace
 PC::PC()
 {
@@ -40,12 +40,6 @@ void PC::Animation()
 {
 
     bool loopAnimation = false;
-
-    if (desiredAnimationName == "Open") {
-        if (animationFinished_) {
-            desiredAnimationName = "Idle";
-        }
-    }
 
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     AnimationManager::PlaybackResult playbackResult{};
@@ -85,51 +79,51 @@ void PC::Update()
 }
 
 void PC::Initialize() {
-	isRayHit_ = false;
-	obj_->Initialize();
-	obj_->RegisterEditor("PC");
-	obj_->SetOutlineColor(kRayHitOutlineColor);
-	obj_->SetOutlineWidth(kRayHitOutlineWidth);
+    isRayHit_ = false;
+    obj_->Initialize();
+    obj_->RegisterEditor("PC");
+    obj_->SetOutlineColor(kRayHitOutlineColor);
+    obj_->SetOutlineWidth(kRayHitOutlineWidth);
 
-	AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/pc", "pc");
-	AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "Idle", false);
-	if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, "Idle")) {
-		obj_->SetAnimation(idleAnimation, false);
-	}
+    AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/pc", "pc");
+    AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, "Idle", false);
+    if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, "Idle")) {
+        obj_->SetAnimation(idleAnimation, false);
+    }
 
-	if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("pc")) {
-		skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
-		skinCluster_ = CreateSkinCluster(*skeleton_, *sizukuModel);
-		if (!skinCluster_.mappedPalette.empty()) {
-			obj_->SetSkinCluster(&skinCluster_);
-		}
-	}
+    if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("pc")) {
+        skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
+        skinCluster_ = CreateSkinCluster(*skeleton_, *sizukuModel);
+        if (!skinCluster_.mappedPalette.empty()) {
+            obj_->SetSkinCluster(&skinCluster_);
+        }
+    }
 }
 
 void PC::Draw() {
-	if (isRayHit_) {
-		Object3dCommon::GetInstance()->DrawCommonSkinning();
-		obj_->Draw();
-		Object3dCommon::GetInstance()->DrawCommonSkinningOutline();
-		obj_->Draw();
-		Object3dCommon::GetInstance()->EndOutlineDraw();
-	} else {
-		Object3dCommon::GetInstance()->DrawCommonSkinning();
-		obj_->Draw();
-	}
+    if (isRayHit_) {
+        Object3dCommon::GetInstance()->DrawCommonSkinning();
+        obj_->Draw();
+        Object3dCommon::GetInstance()->DrawCommonSkinningOutline();
+        obj_->Draw();
+        Object3dCommon::GetInstance()->EndOutlineDraw();
+    } else {
+        Object3dCommon::GetInstance()->DrawCommonSkinning();
+        obj_->Draw();
+    }
 }
 
 void PC::CheckCollision()
 {
-   isRayHit_ = OnCollisionRay();
+    isRayHit_ = OnCollisionRay();
     if (isRayHit_) {
 
         //rayの当たり判定
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             if (!PlayerCommand::GetIsGrab()) {
                 if (animationFinished_) {
-                    /*                SEManager::SoundPlay(SEManager::CHAIR);*/
-                    if (desiredAnimationName == "Idle") {
+                    SEManager::SoundPlay(SEManager::PC);
+                    if (desiredAnimationName == "Idle" || desiredAnimationName == "Open") {
                         desiredAnimationName = "Close";
                     } else if (desiredAnimationName == "Close") {
                         desiredAnimationName = "Open";
@@ -148,5 +142,5 @@ bool PC::OnCollisionRay()
     const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex("monitor");
     skeleton_->SetObjectMatrix(obj_->GetWorldMatrix());
     Vector3 pos = skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
-    return playerCamera_->OnCollisionRay(GetAABB(), pos,0.0f,2.0f);
+    return playerCamera_->OnCollisionRay(GetAABB(), pos, 0.0f, 2.0f);
 }
