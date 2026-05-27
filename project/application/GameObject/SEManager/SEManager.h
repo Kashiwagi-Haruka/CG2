@@ -31,6 +31,7 @@ public:
 		LOCKER,
 		//怪奇音
 		MYSTERY,
+		PC,
 		MAX_SE,
 	};
 

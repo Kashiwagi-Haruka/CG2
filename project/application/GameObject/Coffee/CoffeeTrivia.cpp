@@ -120,7 +120,7 @@ void CoffeeTrivia::Spawn(const Vector3& origin, const Vector3& forward) {
 	}
 	spawnForward_ = forward;
 	triviaObj_->SetTranslate(origin);
-	velocity_ = {forward.x * 0.06f, 0.12f, forward.z * 0.06f};
+	velocity_ = {forward.x * 0.075f, 0.12f, forward.z * 0.075f};
 	isActive_ = true;
 	isLanded_ = false;
 	isRayHit_ = false;

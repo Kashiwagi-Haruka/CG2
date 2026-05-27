@@ -207,7 +207,7 @@ void RestroomStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
 
     key_->Draw();
     timeCardWatch_->Draw();
-    door_->Draw();
+    door_->Draw(false);
     whiteBoardManager_->Draw();
     flashlight_->Draw();
 

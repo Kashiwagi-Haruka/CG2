@@ -297,7 +297,7 @@ void Player::UpdateFootContact(Collider* collider) {
     }
 
     const uint32_t collisionAttribute = collider->GetCollisionAttribute();
-    if (collisionAttribute != kCollisionFloor && collisionAttribute != kCollisionMat) {
+    if (collisionAttribute != kCollisionFloor && collisionAttribute != kCollisionMat&& collisionAttribute != kCollisionWall) {
         return;
     }
 

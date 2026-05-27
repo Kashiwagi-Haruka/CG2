@@ -26,7 +26,7 @@ public:
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
     void Update();
     void Initialize();
-    void Draw();
+    void Draw(bool drawAutoLockSys = true);
 
     void SetPlayerCamera(PlayerCamera* camera);
     void SetCamera(Camera* camera);

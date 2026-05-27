@@ -120,11 +120,15 @@ void Door::Initialize()
 
 }
 
-void Door::Draw()
+void Door::Draw(bool drawAutoLockSys)
 {
     Object3dCommon::GetInstance()->DrawCommonSkinning();
     obj_->Draw();
-    autoLockSystem_->Draw();
+
+    if (drawAutoLockSys) {
+        autoLockSystem_->Draw();
+    }
+
 }
 
 void Door::CheckCollision()
