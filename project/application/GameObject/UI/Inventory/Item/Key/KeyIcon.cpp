@@ -11,10 +11,10 @@ KeyIcon::KeyIcon()
 void KeyIcon::Initialize()
 {
     sprite_->Initialize(handle_);
-    sprite_->SetAnchorPoint({ 0.0f,1.0f });
+    sprite_->SetAnchorPoint({ 0.5f,0.5f });
     sprite_->SetRotation(0.0f);
-    sprite_->SetScale({ 128.0f,128.0f });
-    sprite_->SetPosition({ 64.0f+128.0f, SCREEN_SIZE::HEIGHT - 32.0f });
+    sprite_->SetScale({ 100.0f,100.0f });
+    sprite_->SetPosition({ SCREEN_SIZE::WIDTH - 32.0f - 50.0f, SCREEN_SIZE::HEIGHT - 32.0f- 50.0f });
     sprite_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
     sprite_->Update();
 }

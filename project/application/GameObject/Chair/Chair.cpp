@@ -52,7 +52,7 @@ void Chair::Update() {
 
 
     // Rayが外れたらメニューを自動で閉じる
-    if (isPreOnCollisionRay_ && !isRayHit_ && !isGrab_&&!isStand_ && ChairMenu::GetIsShowMenu()) {
+    if (isPreOnCollisionRay_ && !isRayHit_ && !isGrab_&&!isStand_ && ChairMenu::GetIsShowMenu()&&!ChairManager::GetIsStand()) {
         ChairMenu::SetIsShowMenu(false);
     }
 

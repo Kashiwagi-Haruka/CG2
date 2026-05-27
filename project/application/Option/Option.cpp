@@ -57,18 +57,18 @@ OptionData Option::currentOptionData_{};
 void Option::Initialize() {
     uint32_t textureHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
     fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
-    FreeTypeManager::SetPixelSizes(fontHandle_, 42, 42);
+    FreeTypeManager::SetPixelSizes(fontHandle_, 32, 32);
 
     optionTitleText_.Initialize(fontHandle_);
     optionTitleText_.SetString(U"オプション");
-    optionTitleText_.SetPosition({ WinApp::kClientWidth / 2.0f, WinApp::kClientHeight / 2.0f - 200.0f });
+    optionTitleText_.SetPosition({ WinApp::kClientWidth / 2.0f,192.0f});
     optionTitleText_.SetColor(COLOR::WHITE);
     optionTitleText_.SetAlign(TextAlign::Center);
     optionTitleText_.UpdateLayout(false);
 
     saveHintText_.Initialize(fontHandle_);
     saveHintText_.SetString(U"Eで保存して戻る");
-    saveHintText_.SetPosition({ WinApp::kClientWidth / 2.0f, WinApp::kClientHeight - 30.0f });
+    saveHintText_.SetPosition({ WinApp::kClientWidth / 2.0f, WinApp::kClientHeight - 64.0f });
     saveHintText_.SetColor(COLOR::WHITE);
     saveHintText_.SetAlign(TextAlign::Center);
     saveHintText_.UpdateLayout(false);
