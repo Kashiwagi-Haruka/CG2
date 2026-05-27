@@ -9,7 +9,7 @@
 #include"GameObject/SEManager/SEManager.h"
 #include<imgui.h>
 #include"Text/LockerMenu/LockerMenu.h"
-
+#include"GameObject/Chair/ChairManager.h"
 PlayerCamera* Locker::playerCamera_ = nullptr;
 
 Locker::Locker()
@@ -174,26 +174,28 @@ void Locker::CheckCollision()
     //プレイヤーが中に入っていたらメニューを表示する
     LockerMenu::SetIsShowMenu(isPlayerIn_);
 
-    if (PlayerCommand::GetInstance()->InteractTrigger() &&
-        !PlayerCommand::GetIsGrab() &&
-        isRayHit_ || !PlayerCommand::GetIsGrab() && !isPlayerPreIn_ && isPlayerIn_) {
+    if (!PlayerCommand::GetIsGrab()&&!ChairManager::GetIsStand()) {
+        if (PlayerCommand::GetInstance()->InteractTrigger()&&
+            isRayHit_ || !isPlayerPreIn_ && isPlayerIn_) {
 
-        SEManager::SoundPlay(SEManager::LOCKER);
+            SEManager::SoundPlay(SEManager::LOCKER);
 
-        if (desiredAnimationName == "Open") {
-            desiredAnimationName = "Close";
-            isOpen_ = false;
-        } else {
+            if (desiredAnimationName == "Open") {
+                desiredAnimationName = "Close";
+                isOpen_ = false;
+            } else {
 
-            if (desiredAnimationName == "Close" || desiredAnimationName == "Idle") {
-                desiredAnimationName = "Open";
-                isOpen_ = true;
+                if (desiredAnimationName == "Close" || desiredAnimationName == "Idle") {
+                    desiredAnimationName = "Open";
+                    isOpen_ = true;
+                }
             }
+
+
+
         }
-
-
-
     }
+
 
     isPlayerPreIn_ = isPlayerIn_;
 

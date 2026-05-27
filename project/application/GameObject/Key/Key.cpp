@@ -6,6 +6,7 @@
 #include"GameObject/SEManager/SEManager.h"
 #include"GameSave/GameSave.h"
 #include"GameBase.h"
+#include"GameObject/Chair/ChairManager.h"
 
 bool Key::isSendGetKeyMessage_ = false;
 bool Key::isGetKey_ = false;
@@ -130,7 +131,7 @@ void Key::CheckCollision() {
     isRayHit_ = OnCollisionRay();
 
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
-        if (isRayHit_ && !PlayerCommand::GetIsGrab()) {
+        if (isRayHit_ && !PlayerCommand::GetIsGrab()&&!ChairManager::GetIsStand()) {
             isGetKey_ = true;
             isSendGetKeyMessage_ = true;
             SEManager::SoundPlay(SEManager::KEY);

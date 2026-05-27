@@ -1,7 +1,7 @@
 #include "FileObject.h"
 #include"Model/ModelManager.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
-
+#include"Object3d/Object3dCommon.h"
 
 FileObject::FileObject()
 {
@@ -44,7 +44,7 @@ void FileObject::Initialize()
 
 void FileObject::Draw()
 {
-
+    Object3dCommon::GetInstance()->DrawCommon();
     obj_->Draw();
 
 }

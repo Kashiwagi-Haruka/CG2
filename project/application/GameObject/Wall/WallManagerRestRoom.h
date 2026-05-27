@@ -8,6 +8,5 @@ public:
     WallManagerRestRoom();
     void Update()override;
     void Initialize()override;
-    void Draw()override;
     void SetCamera(Camera* camera)override;
 };

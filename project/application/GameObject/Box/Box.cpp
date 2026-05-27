@@ -140,7 +140,7 @@ void Box::Grab()
 
 bool Box::OnCollisionRay()
 {
-    return playerCamera_->OnCollisionRay(GetAABB(), transform_.translate);
+    return playerCamera_->OnCollisionRay(GetAABB(), transform_.translate,0.0f,2.0f);
    
 }
 

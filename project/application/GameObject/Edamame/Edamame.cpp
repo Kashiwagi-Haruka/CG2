@@ -103,7 +103,7 @@ void Edamame::CheckCollision() {
     edamameModel_->SetRayHit(isRayHit_);
     // keyとrayの当たり判定
     if (isRayHit_) {
-        if (PlayerCommand::GetInstance()->InteractTrigger()) {
+        if (PlayerCommand::GetInstance()->InteractTrigger()&& !PlayerCommand::GetIsGrab()) {
             if (!BGMManager::GetIsEdamameSound()) {
                 BGMManager::SoundPlay(BGMManager::EDAMAME, false);
                 BGMManager::SetIsEdamameSound(true);

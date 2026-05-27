@@ -223,6 +223,7 @@ void ShadowGameScene::Draw()
     SpriteCommon::GetInstance()->DrawCommon();
     //ステージマネージャーでスプライトを描画
     stageManager_->DrawSprite();
+    elevator_->DrawSprite();
     damageOverlay_->Draw();
     if (!currentEvent_->IsRunning()) {
         //UI管理を描画する
@@ -467,7 +468,8 @@ void ShadowGameScene::StageTransition()
         } else if (progressSaveData_.currentStageName == "ElevatorFallStage") {
             ChangeStage("GentleManStage");
         } else if (progressSaveData_.currentStageName == "GentleManStage") {
-            ChangeStage("TutorialStage");
+            //巡回させてみる
+            ChangeStage("MirrorStage");
         }
 
         progressSaveData_.isGameClear = false;

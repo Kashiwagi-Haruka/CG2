@@ -50,14 +50,7 @@ void WallManagerRestRoom::Initialize()
     }
 }
 
-void WallManagerRestRoom::Draw()
-{
-    room1_->Draw();
 
-    //for (auto& [name, collider] : colliders_) {
-    //    collider->Draw();
-    //}
-}
 
 void WallManagerRestRoom::SetCamera(Camera* camera)
 {

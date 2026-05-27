@@ -204,12 +204,6 @@ void Player::Debug() {
 
 void Player::UpdatePlayerDamage(const float deltaTime)
 {
-
-    if (LockerManager::GetIsInLocker() || ChairManager::GetIsStand()) {
-        //ロッカーに入っていたらまたは椅子に乗っていたらreturnする
-        return;
-    }
-
     damageCooldownTimer_ = std::max(0.0f, damageCooldownTimer_ - deltaTime);
     hp_ = std::min(kMaxHp_, hp_ + (kHpRegenPerSecond * deltaTime));
 }

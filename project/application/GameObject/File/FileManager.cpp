@@ -1,6 +1,5 @@
 #include "FileManager.h"
 #include"FileObject.h"
-#include "Object3d/Object3dCommon.h"
 
 namespace {
     const uint32_t maxFile = 14;
@@ -33,7 +32,7 @@ void FileManager::Update()
 
 void FileManager::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommon();
+ 
     for (auto& file : files_) {
         file->Draw();
     }

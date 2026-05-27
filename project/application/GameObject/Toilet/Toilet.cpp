@@ -9,6 +9,8 @@
 #include"Animation/AnimationManager.h"
 #include "GameBase.h"
 #include"GameObject/SEManager/SEManager.h"
+#include"GameObject/Chair/ChairManager.h"
+
 
 PlayerCamera* Toilet::playerCamera_ = nullptr;
 
@@ -110,7 +112,7 @@ void Toilet::CheckCollision()
 
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
 
-            if (!PlayerCommand::GetIsGrab()) {
+            if (!PlayerCommand::GetIsGrab()&&!ChairManager::GetIsStand()) {
                 SEManager::SoundPlay(SEManager::TOILET);
                 isOpen_ = !isOpen_;
                 if (isOpen_) {

@@ -118,7 +118,7 @@ void WalkWhiteBoard::Update()
 
 void WalkWhiteBoard::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommonSkinning();
+    Object3dCommon::GetInstance()->DrawCommon();
     obj_->Draw();
 
 #ifdef _DEBUG
