@@ -11,11 +11,11 @@ class Option {
 	static const int kOptionParameterDivisionNum = 10; // オプションのパラメータの分割数
 	static const int kOptionParameterNum = 7;          // オプションのパラメータの数
 
-	const Vector2 kOptionSpriteStartPos = {640.0f, 220.0f};
-	const Vector2 kOptionSpriteStep = {52.0f, 64.0f};
-	const Vector2 kOptionSpriteSize = {40.0f, 24.0f};
-	const Vector2 kOptionLabelPos = {200.0f, 250.0f};
-	const float kOptionLabelStepY = 64.0f;
+	const Vector2 kOptionSpriteStartPos = {640.0f, 250.0f};
+	const Vector2 kOptionSpriteStep = {40.0f, 48.0f};
+	const Vector2 kOptionSpriteSize = {32.0f, 24.0f};
+	const Vector2 kOptionLabelPos = {256.0f, 256.0f+16.0f};
+	const float kOptionLabelStepY = 48.0f;
 
 	uint32_t fontHandle_ = 0;
 	Text optionTitleText_;
