@@ -194,7 +194,7 @@ void Elevator::Update() {
 
 void Elevator::Draw() {
 
-    Object3dCommon::GetInstance()->DrawCommon();
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
 	modelObj_->Draw();
 
 	//for (auto& [name,sys] : autoLockSystems_) {
@@ -204,7 +204,7 @@ void Elevator::Draw() {
     //for (auto& [name, collider] : colliders_) {
     //    collider->Draw();
     //}
-
+    Object3dCommon::GetInstance()->DrawCommon();
 	poster_.Draw();
 	elevatorNumber_->Draw();
 

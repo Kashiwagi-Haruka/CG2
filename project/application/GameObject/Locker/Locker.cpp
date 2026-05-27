@@ -10,6 +10,8 @@
 #include<imgui.h>
 #include"Text/LockerMenu/LockerMenu.h"
 #include"GameObject/Chair/ChairManager.h"
+#include"Object3d/Object3dCommon.h"
+
 PlayerCamera* Locker::playerCamera_ = nullptr;
 
 Locker::Locker()
@@ -154,6 +156,7 @@ void Locker::Draw()
 
     //ロッカーに入ったら描画されない
     if (!isPlayerIn_) {
+        Object3dCommon::GetInstance()->DrawCommonSkinning();
         obj_->Draw();
     }
 

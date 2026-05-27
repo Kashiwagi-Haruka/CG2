@@ -36,10 +36,8 @@ void CoffeeTrivia::Initialize() {
 	triviaObj_->SetModel("CoffeeBillboard");
 	triviaObj_->SetOutlineColor({1.0f, 1.0f, 0.0f, 1.0f});
 	triviaObj_->SetOutlineWidth(10.0f);
-	localAABB_ = {
-	    .min = {-1.00f, -0.10f, -1.00f},
-          .max = {1.00f,  1.10f,  1.00f }
-    };
+	localAABB_ = { .min = {-0.1f,-0.1f,-0.1f},.max = {0.1f,0.1f,0.1f} };
+
 	isActive_ = false;
 	isLanded_ = false;
 	isRayHit_ = false;

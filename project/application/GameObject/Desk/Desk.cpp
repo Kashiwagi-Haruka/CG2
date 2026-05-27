@@ -113,7 +113,7 @@ void Desk::Initialize()
 
 void Desk::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommon();
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
     obj_->Draw();
 }
 
