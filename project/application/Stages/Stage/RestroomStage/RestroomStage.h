@@ -16,6 +16,8 @@ class DocumentManager;
 class RestroomStage :
     public BaseStage
 {
+    PointCommonLight pointLights_[2];
+
     Player* player_ = nullptr;
     Yoshida::LightManager* lightManager_ = nullptr;
     std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;

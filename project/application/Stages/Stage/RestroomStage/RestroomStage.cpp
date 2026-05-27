@@ -26,7 +26,7 @@ void RestroomStage::InitializeLights()
     lightManager_->Initialize();
     lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 5);
 
-    PointCommonLight pointLights_[2];
+    
     pointLights_[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
     pointLights_[0].position = { 7.0f, 5.0f, 0.0f };
     pointLights_[0].intensity = 1.0f;
@@ -46,7 +46,7 @@ void RestroomStage::InitializeLights()
     lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 4);
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, wallManagerRestRoom_->GetAreaLights().size());
 
     lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(0), 0);
     lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(1), 1);
@@ -55,6 +55,9 @@ void RestroomStage::InitializeLights()
 
 void RestroomStage::UpdateLights()
 {
+
+    lightManager_->SetPointLight(pointLights_[0], 3);
+    lightManager_->SetPointLight(pointLights_[1], 4);
 
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
@@ -94,7 +97,7 @@ void RestroomStage::Initialize() {
 	Hierarchy* hierarchy = Hierarchy::GetInstance();
 	hierarchy->BeginRegisterFile("RestroomStage_objectEditors.json");
 
-	InitializeLights();
+
 	portalManager_->Initialize();
 	whiteBoardManager_->Initialize();
 	wallManagerRestRoom_->Initialize();
@@ -109,6 +112,9 @@ void RestroomStage::Initialize() {
 
 	toiletManager_->Initialize();
 	documentManager_->Initialize("document_isomer");
+
+
+    InitializeLights();
 
 	MiniMap* miniMap = MiniMap::GetInstance();
 	miniMap->AddObject(wallManagerRestRoom_->GetRoom().get(), {0.2f, 0.2f, 0.2f, 0.35f}, 50.0f);
