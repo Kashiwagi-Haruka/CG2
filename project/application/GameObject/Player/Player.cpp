@@ -163,7 +163,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommon();
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
     bodyObj_->Draw();
 }
 
