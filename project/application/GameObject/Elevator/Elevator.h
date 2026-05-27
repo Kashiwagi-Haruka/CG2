@@ -28,6 +28,7 @@ public:
 	void SetCamera(Camera* camera);
 	void Update();
 	void Draw();
+    void DrawSprite();
 	void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
 	void SetStageNumber(int stageNumber);
     std::map<std::string, std::unique_ptr<AutoLockSystem>>& GetAutoLockSys() { return autoLockSystems_; };

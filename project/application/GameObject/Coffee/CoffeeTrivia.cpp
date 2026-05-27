@@ -16,12 +16,12 @@ bool CoffeeTrivia::isCurrentVoiceFinished_ = true;
 CoffeeTrivia::CoffeeTrivia() {
 
 	SetVol(Option::GetCurrentOptionData().VoiceVolume);
-	strings_[0] = U"カフェインは、脳を刺激して頭痛や眠気を和らげ、腎臓に作用して尿量を増やし、心臓を刺激して心拍数を上げる働きがあります。";
-	strings_[1] = U"例えばコーヒー1杯、150mLには約90mgのカフェインが含まれています。";
-	strings_[2] = U"しかし、短時間に5g以上摂取すると重症化し、特に脳と心臓に深刻な影響が出ます。";
-	strings_[3] = U"脳では吐き気、頭痛、手足の震え、重症になると興奮、錯乱、幻覚や妄想、痙攣発作などが起きたりします。";
-	strings_[4] = U"心臓では重症になると心拍数が140回/分を超えて血圧が低下し、危険な不整脈から心停止に至ることがあります。";
-	strings_[5] = U"そのため、カフェインは短時間に大量摂取せず、適量を間隔をあけて摂ることが重要です。";
+	strings_[0] = U"カフェインは、脳を刺激して頭痛や眠気を和らげ、\n腎臓に作用して尿量を増やし、\n心臓を刺激して心拍数を上げる働きがあります。";
+	strings_[1] = U"例えばコーヒー1杯150mLには\n約90mgのカフェインが含まれています。";
+	strings_[2] = U"しかし、短時間に5g以上摂取すると重症化し、\n特に脳と心臓に深刻な影響が出ます。";
+	strings_[3] = U"脳では吐き気、頭痛、手足の震え、重症になると興奮、\n錯乱、幻覚や妄想、痙攣発作などが起きたりします。";
+	strings_[4] = U"心臓では重症になると心拍数が140回/分を超えて血圧が低下し、\n危険な不整脈から心停止に至ることがあります。";
+	strings_[5] = U"そのため、カフェインは短時間に大量摂取せず、\n適量を間隔をあけて摂ることが重要です。";
 
 	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/Coffee_billboard", "CoffeeBillboard");
 }
@@ -75,7 +75,7 @@ void CoffeeTrivia::Update() {
 		triviaObj_->UpdateBillboard();
 	}
 
-	if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger()) {
+	if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger()&& !PlayerCommand::GetIsGrab()) {
 		isSendStartTriviaMessage_ = true;
 
 		std::string filePath = "Resources/TD3_3102/Audio/Voice/Coffee/" + std::to_string(triviaNum_) + ".mp3";

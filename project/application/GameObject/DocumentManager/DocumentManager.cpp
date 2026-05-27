@@ -1,4 +1,5 @@
 #include "DocumentManager.h"
+#include"Object3d/Object3dCommon.h"
 
  bool DocumentManager::isRayHit_ = false;
  bool DocumentManager::isLooking_ = false;
@@ -41,6 +42,7 @@ void DocumentManagerParticle::Initialize(const std::string name)
 
 void DocumentManager::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommon();
     document_->Draw();
 }
 

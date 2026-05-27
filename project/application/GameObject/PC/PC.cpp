@@ -8,6 +8,7 @@
 #include"Animation/AnimationManager.h"
 #include "GameBase.h"
 #include"GameObject/SEManager/SEManager.h"
+#include"GameObject/Chair/ChairManager.h"
 
 PlayerCamera* PC::playerCamera_ = nullptr;
 bool PC::isRayHit_ = false;
@@ -147,5 +148,5 @@ bool PC::OnCollisionRay()
     const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex("monitor");
     skeleton_->SetObjectMatrix(obj_->GetWorldMatrix());
     Vector3 pos = skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
-    return playerCamera_->OnCollisionRay(GetAABB(), pos);
+    return playerCamera_->OnCollisionRay(GetAABB(), pos,0.0f,2.0f);
 }

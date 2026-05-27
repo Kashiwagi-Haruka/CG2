@@ -207,7 +207,12 @@ void Elevator::Draw() {
 
 	poster_.Draw();
 	elevatorNumber_->Draw();
-	elevatorNumberText_.Draw();
+
+}
+
+void Elevator::DrawSprite()
+{
+    elevatorNumberText_.Draw();
 }
 
 void Elevator::Close() {

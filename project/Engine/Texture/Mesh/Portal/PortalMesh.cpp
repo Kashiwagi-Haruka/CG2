@@ -28,7 +28,7 @@ void PortalMesh::Initialize(const std::string& texturePath,  const MeshType& mes
 		meshData = BuildMesh::BuildSphere(kPortalSegments,16, kPortalRadius);
 	}
 	
-	indexCount_ = meshData.indices.size();
+	indexCount_ = static_cast<uint32_t>(meshData.indices.size());
 
 	vertexResource_ = Object3dCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * meshData.vertices.size());
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();

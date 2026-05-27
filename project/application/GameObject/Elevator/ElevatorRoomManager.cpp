@@ -1,7 +1,7 @@
 #include "ElevatorRoomManager.h"
 #include"Model/ModelManager.h"
 #include"Function.h"
-
+#include"Object3d/Object3dCommon.h"
 //namespace {
 //    const int kMaxWall = 6;
 //}
@@ -13,8 +13,8 @@ ElevatorRoomManager::ElevatorRoomManager()
     room_->SetModel("elevatorRoom");
 
     areaLight_.color = { 1.0f,1.0f,0.75f,1.0f };
-    areaLight_.intensity = 1.0f;
-    areaLight_.width = 2.0f;
+    areaLight_.intensity = 2.0f;
+    areaLight_.width = 10.0f;
     areaLight_.height = 2.0f;
     areaLight_.radius = 8.0f;
     areaLight_.decay = 2.0f;
@@ -67,6 +67,8 @@ void ElevatorRoomManager::Update()
 
 void ElevatorRoomManager::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommon();
+
     room_->Draw();
 
     //for (auto& [name, collider] : colliders_) {

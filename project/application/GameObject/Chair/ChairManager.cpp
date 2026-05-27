@@ -102,7 +102,6 @@ void ChairManager::StandChair(Player* player)
             } else {
                 Vector3 forward = player->GetForward();
                 forward.y = 0.0f;
-                forward *= 0.75f;
                 Vector3 translate = player->GetTransform().translate;
                 forward.x += translate.x;
                 forward.y = translate.y;

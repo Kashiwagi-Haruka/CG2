@@ -13,11 +13,17 @@ int StageNumber::FromStageName(const std::string& stageName) {
 	if (stageName == "RadiconStage") {
 		return 4;
 	}
-	if (stageName == "GentleManStage") {
-		return 5;
-	}
+
 	if (stageName == "RestroomStage") {
 		return 6;
+	}
+
+	if (stageName == "ElevatorFallStage") {
+		return 8;
+	}
+
+	if (stageName == "GentleManStage") {
+		return 10;
 	}
 	return 0;
 }

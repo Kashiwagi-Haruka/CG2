@@ -60,7 +60,7 @@ void Door::Update()
         if (desiredAnimationName == "1Lock") {
             //アイドル状態に戻す
             desiredAnimationName = "0Idle";
-            
+
         } else  if (desiredAnimationName == "2Open") {
 
             if (!isOpen_) {
@@ -71,14 +71,16 @@ void Door::Update()
                 desiredAnimationName = "3Close";
                 //閉まったとき、音が鳴る
                 SEManager::SoundPlay(SEManager::DOOR_CLOSE);
+                if (isOpen_) {
+                    isOpen_ = false;
+                }
             }
 
         } else if (desiredAnimationName == "3Close") {
 
-            if (isOpen_) {
-                isOpen_ = false;
-                desiredAnimationName = "0Idle";
-            }
+            isOpen_ = false;
+            desiredAnimationName = "0Idle";
+
         }
 
     }
@@ -92,7 +94,7 @@ void Door::Initialize()
 {
     obj_->Initialize();
     obj_->RegisterEditor("Door");
-    
+
     autoLockSystem_->Initialize();
     autoLockSystem_->RegisterEditor("Door:AutoLockSystem");
 
@@ -120,7 +122,7 @@ void Door::Initialize()
 
 void Door::Draw()
 {
-	Object3dCommon::GetInstance()->DrawCommon();
+    Object3dCommon::GetInstance()->DrawCommon();
     obj_->Draw();
     autoLockSystem_->Draw();
 }
@@ -174,7 +176,7 @@ void Door::Animation()
 
 bool Door::OnCollisionRay()
 {
-    return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate());
+    return playerCamera_->OnCollisionRay(GetAABB(), obj_->GetTranslate(),0.0f,1.0f);
 }
 
 void Door::SetPlayerCamera(PlayerCamera* camera)

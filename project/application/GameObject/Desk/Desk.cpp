@@ -9,6 +9,7 @@
 #include "GameBase.h"
 #include"GameObject/SEManager/SEManager.h"
 #include"GameObject/ReadableObject/ReadableObject.h"
+#include"GameObject/Chair/ChairManager.h"
 
 PlayerCamera* Desk::playerCamera_ = nullptr;
 
@@ -143,7 +144,7 @@ void Desk::CheckCollision()
         //rayの当たり判定
         if (PlayerCommand::GetInstance()->InteractTrigger()) {
             //何も持っていない且つ何も見ていないとき
-            if (!PlayerCommand::GetIsGrab()) {
+            if (!PlayerCommand::GetIsGrab()&&!ChairManager::GetIsStand()) {
 
                 if (desiredAnimationName == "Idle" || desiredAnimationName == "Close") {
                     desiredAnimationName = "Open";
