@@ -44,10 +44,10 @@ void GentleManStage::InitializeLights()
     lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 2);
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 3);
 
-    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(1), 2);
 
 }
 
@@ -56,8 +56,8 @@ void GentleManStage::UpdateLights()
 
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
-    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManagerRoofFloor_->GetAreaLights().at(1), 2);
 
 }
 

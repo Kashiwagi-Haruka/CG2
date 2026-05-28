@@ -48,22 +48,22 @@ void TutorialStage::InitializeLights()
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
 
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 4);
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 4+1);
 
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 1);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 2);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 3);
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 2);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 3);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 4);
 
 }
 
 void TutorialStage::UpdateLights()
 {
 
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 1);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 2);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 3);
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 2);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 3);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 4);
 
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 }

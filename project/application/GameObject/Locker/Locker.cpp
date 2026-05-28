@@ -174,10 +174,13 @@ void Locker::CheckCollision()
 
     //rayの当たり判定
 
-    //プレイヤーが中に入っていたらメニューを表示する
-    LockerMenu::SetIsShowMenu(isPlayerIn_);
+
 
     if (!PlayerCommand::GetIsGrab()&&!ChairManager::GetIsStand()) {
+
+        //プレイヤーが中に入っていたらメニューを表示する
+        LockerMenu::SetIsShowMenu(isPlayerIn_);
+
         if (PlayerCommand::GetInstance()->InteractTrigger()&&
             isRayHit_ || !isPlayerPreIn_ && isPlayerIn_) {
 

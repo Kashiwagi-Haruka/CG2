@@ -46,10 +46,10 @@ void RestroomStage::InitializeLights()
     lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, wallManagerRestRoom_->GetAreaLights().size());
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, wallManagerRestRoom_->GetAreaLights().size()+1);
 
-    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(1), 2);
 
 }
 
@@ -61,8 +61,8 @@ void RestroomStage::UpdateLights()
 
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
-    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(1), 2);
 
 }
 

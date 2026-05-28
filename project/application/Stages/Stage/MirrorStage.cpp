@@ -173,13 +173,12 @@ void MirrorStage::InitializeLights() {
 	lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
 	lightManager_->SetSpotLight(flashlight_->GetSpotLight(),0);
 
-	lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 5);
-	lightManager_->SetAreaLight(vendingMac_->GetAreaLight(),0);
-
-	lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0),1);
-	lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1),2);
-	lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0),3);
-	lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1),4);
+	lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 5+1);
+	lightManager_->SetAreaLight(vendingMac_->GetAreaLight(),1);
+	lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0),2);
+	lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1),3);
+	lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0),4);
+	lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1),5);
 
 }
 
@@ -193,7 +192,7 @@ void MirrorStage::UpdateLights() {
 
 	lightManager_->SetPointLight(edamame_->GetPointLights().at(0), 3);
 	lightManager_->SetPointLight(edamame_->GetPointLights().at(1), 4);
-	lightManager_->SetAreaLight(vendingMac_->GetAreaLight(), 0);
+	lightManager_->SetAreaLight(vendingMac_->GetAreaLight(), 1);
 
 }
 void MirrorStage::UpdatePortal() { portalManager_->Update(); }
