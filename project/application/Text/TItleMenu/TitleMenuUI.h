@@ -25,6 +25,7 @@ private:
 		START_TEXT,
 		CONTINUE_TEXT,
 		OPTION_TEXT,
+		GAME_END_TEXT,
 		MAX_TEXT,
 	};
 
@@ -47,5 +48,6 @@ private:
 	// 続きから
 	bool isContinueTriggered_ = false;
 	bool isOptionTriggered_ = false;
+	
 	uint32_t selectButtonNum_ = START_TEXT;
 };
