@@ -21,11 +21,24 @@ void ElevatorFallStage::InitializeLights()
     assert(lightManager_);
     lightManager_->ClearLights();
     lightManager_->Initialize();
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 3);
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 2);
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 3 + 6);
 
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 1);
+    PointCommonLight pointLight;
+    pointLight.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    pointLight.position = { 7.0f, -7.0f,-18.0f };
+    pointLight.intensity = 1.0f;
+    pointLight.radius = 14.0f;
+    pointLight.decay = 1.0f;
+
+    for (int i = 0; i < 6; ++i) {
+        pointLight.position = { 7.0f, (i+1)* - 7.0f,-18.0f};
+        lightManager_->SetPointLight(pointLight, 3+i);
+    }
+
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 3);
+
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 2);
 
     lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
@@ -33,8 +46,8 @@ void ElevatorFallStage::InitializeLights()
 
 void ElevatorFallStage::UpdateLights()
 {
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 2);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 3);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 2);
 
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 }
@@ -200,7 +213,7 @@ void ElevatorFallStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawPar
     if (testField_->GetIsCollided()) {
         testField_->Draw();
     }
- 
+
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }

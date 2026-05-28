@@ -15,7 +15,7 @@
 #include <array>
 #include <memory>
 #include"Light/CommonLight/PointCommonLight.h"
-
+#include"Light/CommonLight/AreaCommonLight.h"
 
 class Camera;
 
@@ -35,6 +35,8 @@ public:
 	bool IsSceneTransitionStart() const { return isSceneTransitionStart_; }
   std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>& GetColliders() { return colliders_; }
   std::array<PointCommonLight, 2>& GetPointLights() { return pointLights_; };
+  AreaCommonLight& GetAreaLight() { return areaLight_; }
+  void SetAreaLightColor(const Vector4 color) { areaLight_.color = color; };
 private:
     //ライトの位置を更新する
     void UpdateLightPos();
@@ -52,6 +54,7 @@ private:
 
     std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>colliders_;
     std::array<PointCommonLight, 2> pointLights_;
+    AreaCommonLight areaLight_;
     float lightPosY_ = 0.0f;
     float lightVelocity_ = 2.0f;
     // 新しい状態管理

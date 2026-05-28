@@ -15,6 +15,7 @@
 #include "GameObject/UI/Inventory/Inventory.h"
 #include "Stages/StageNumber.h"
 #include"GameBase.h"
+#include"Color/Color.h"
 
 #include"Model/ModelManager.h"
 ShadowGameScene::ShadowGameScene() {
@@ -154,6 +155,8 @@ void ShadowGameScene::Initialize()
     lightManager_->SetPointLight(cameraController_->GetPlayerCamera()->GetPointLight(), 0);
     lightManager_->SetPointLight(elevator_->GetPointLights().at(0), 1);
     lightManager_->SetPointLight(elevator_->GetPointLights().at(1), 2);
+    //elevatorのエリアライトを設定する
+    lightManager_->SetAreaLight(elevator_->GetAreaLight(), 0);
 
     //カーソルを画面中央に設定する
     uiManager_->CursorHideAndStop();
@@ -445,6 +448,14 @@ void ShadowGameScene::UpdateLight() {
     //エレベータ
     lightManager_->SetPointLight(elevator_->GetPointLights().at(0), 1);
     lightManager_->SetPointLight(elevator_->GetPointLights().at(1), 2);
+    lightManager_->SetAreaLight(elevator_->GetAreaLight(), 0);
+
+    if (progressSaveData_.currentStageName == "ElevatorFallStage"&& !Key::IsGetKey()) {
+        elevator_->SetAreaLightColor(COLOR::RED);
+        
+    } else {
+        elevator_->SetAreaLightColor(COLOR::WHITE);
+    }
 
 }
 void ShadowGameScene::StageTransition()
