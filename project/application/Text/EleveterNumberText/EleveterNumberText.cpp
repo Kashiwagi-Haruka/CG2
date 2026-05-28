@@ -12,7 +12,6 @@ EleveterNumberText::EleveterNumberText() {
 	text_.SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	SetStageNumber(0);
 }
-
 void EleveterNumberText::SetStageNumber(int stageNumber) {
 	const std::string numberText = std::to_string(stageNumber);
 	text_.SetString(std::u32string(numberText.begin(), numberText.end())+U"F");
