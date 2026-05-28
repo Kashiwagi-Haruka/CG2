@@ -40,6 +40,10 @@ TitleMenuUI::TitleMenuUI()
     menuText_[OPTION_TEXT].SetString(U"設定");
     menuText_[OPTION_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f,SCREEN_SIZE::HALF_HEIGHT + 128.0f });
 
+    menuText_[GAME_END_TEXT].SetString(U"退勤する");
+    menuText_[GAME_END_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f,SCREEN_SIZE::HALF_HEIGHT + 192.0f });
+
+
     triangleText_.Initialize(menuFontHandle_);
     triangleText_.SetString(U"▶");
     Vector2 pos = menuText_[selectButtonNum_].GetPosition();
@@ -59,7 +63,7 @@ TitleMenuUI::TitleMenuUI()
     pressSpaceText_.SetBlendMode(BlendMode::kBlendModeAdd);
 
 
-   
+
 }
 
 TitleMenuUI::~TitleMenuUI()
@@ -71,7 +75,7 @@ void TitleMenuUI::Initialize() {
     isShowMenu_ = false;
     isInitStart_ = false;
     isContinueTriggered_ = false;
-	isOptionTriggered_ = false;
+    isOptionTriggered_ = false;
     selectButtonNum_ = 0;
     random_->SetMinMax(-8.0f, 8.0f);
 
@@ -101,7 +105,10 @@ void TitleMenuUI::Update() {
                 isContinueTriggered_ = true;
 
             } else if (selectButtonNum_ == OPTION_TEXT) {
-				isOptionTriggered_ = true;
+                isOptionTriggered_ = true;
+            } else if (selectButtonNum_ == GAME_END_TEXT) {
+                //もうここで呼ぶ　ゲームを終了する
+                PostQuitMessage(0);
             }
 
         } else {
@@ -173,12 +180,12 @@ bool TitleMenuUI::ConsumeContinueTriggered() {
     return true;
 }
 bool TitleMenuUI::ConsumeOptionTriggered() {
-	if (!isOptionTriggered_) {
-		return false;
-	}
+    if (!isOptionTriggered_) {
+        return false;
+    }
 
-	isOptionTriggered_ = false;
-	return true;
+    isOptionTriggered_ = false;
+    return true;
 }
 void TitleMenuUI::Draw()
 {
