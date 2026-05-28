@@ -68,7 +68,7 @@ public:
     const PlayerSaveData& GetPlayerSaveData() { return playerSaveData_; };     // プレイヤーのセーブデータ
     const CameraSaveData& GetCameraSaveData() { return cameraSaveData_; };     // カメラのセーブデータ
     const ProgressSaveData& GetProgressSaveData() { return progressSaveData_; }; // 進行状況のセーブデータ
-    const std::string GetCurrentDateTimeString();
+    const std::string GetCurrentDateTimeString(const bool isOverWrap = true);
     const std::string GetFileName(const int slotIndex);
     const std::string GetScreenShotFileName(const int slotIndex);
     const std::string GetSaveDataTime() {return  saveDateTime_; }

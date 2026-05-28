@@ -26,7 +26,7 @@ void Inventory::Initialize() {
 		countTexts_[i].SetPosition(textPos);
 		countTexts_[i].SetColor({1, 1, 1, 1});
 		countTexts_[i].SetAlign(TextAlign::Left);
-		countTexts_[i].SetBlendMode(BlendMode::kBlendModeAlpha);
+
 		countTexts_[i].UpdateLayout(false);
 		itemCounts_[i] = 0;
 		items_[i].reset();
@@ -44,7 +44,6 @@ void Inventory::Initialize() {
 	useItemText_.SetPosition({256.0f, 220.0f});
 	useItemText_.SetColor({1, 1, 1, 1});
 	useItemText_.SetAlign(TextAlign::Left);
-	useItemText_.SetBlendMode(BlendMode::kBlendModeAlpha);
 	useItemText_.UpdateLayout(false);
 }
 void Inventory::Update() {
@@ -97,6 +96,8 @@ void Inventory::Draw() {
 	}
 
 
+	SpriteCommon::GetInstance()->DrawCommonFont();
+	SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
 
 	// ▼ 変更：インデックスを使って回すように変更（座標計算などでiが必要になるため）
 	for (int i = 0; i < kMaxItemCount; ++i) {

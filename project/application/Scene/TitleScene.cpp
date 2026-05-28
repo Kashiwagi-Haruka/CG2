@@ -57,7 +57,7 @@ TitleScene::TitleScene() {
 	titleMenuUI_ = std::make_unique<TitleMenuUI>();
 	firstStory_ = std::make_unique<FirstStory>();
 	titleTimeText_ = std::make_unique<TitleTimeText>();
-	gameContinued_ = std::make_unique<GameContinued>();
+	gameContinued_ = &GameContinued::GetInstance();
 	option_ = std::make_unique<Option>();
 	// ゲームオブジェクト
 	timeCard_ = std::make_unique<TimeCard>();

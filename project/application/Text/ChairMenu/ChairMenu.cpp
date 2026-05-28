@@ -43,7 +43,6 @@ ChairMenu::ChairMenu()
     triangleText_.SetPosition(pos);
     triangleText_.SetColor(COLOR::RED);
     triangleText_.SetAlign(TextAlign::Left);
-    triangleText_.SetBlendMode(BlendMode::kBlendModeAlpha);
 
     fontTheta_ = 0.0f;
 
@@ -52,7 +51,7 @@ ChairMenu::ChairMenu()
     pressEText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH,SCREEN_SIZE::HEIGHT - 128.0f });
     pressEText_.SetColor(COLOR::WHITE);
     pressEText_.SetAlign(TextAlign::Center);
-    pressEText_.SetBlendMode(BlendMode::kBlendModeAlpha);
+
 }
 
 ChairMenu::~ChairMenu()
@@ -165,6 +164,9 @@ void ChairMenu::Draw()
 {
     if (isShowMenu_) {
 
+        SpriteCommon::GetInstance()->DrawCommonFont();
+        SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
+
         triangleText_.Draw();
 
         if (!ChairManager::GetIsStand()) {
@@ -180,5 +182,7 @@ void ChairMenu::Draw()
         }
         pressEText_.Draw();
     }
+
+    SpriteCommon::GetInstance()->DrawCommon();
 }
 

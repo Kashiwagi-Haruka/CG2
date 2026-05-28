@@ -13,6 +13,8 @@ public:
 
 	void Update();
 
+	// 変更: テクスチャIDを外部から受け取るようにする
+	void SetText(const std::string& text, const uint32_t textureID);
 	void Draw();
 	void SetTextureHandle(uint32_t Handle) { textureIndex = Handle; }
 	void SetPosition(const Vector2& pos) {
@@ -50,12 +52,10 @@ private:
     bool inUse_ = false;
 	/*----------------------------------*/
 
-	struct alignas(256) TransformationMatrix {
-		Matrix4x4 WVP;   // 64 バイト
-		Matrix4x4 World; // 64 バイト
-		// ここで自動的に 128 バイト分のパディングが入って、
-		// sizeof(TransformationMatrix) == 256 になる
-	};
+	// 💡 追加：今回のUpdateで割り当てられたリングバッファのGPUアドレスを一時保存する変数
+	D3D12_GPU_VIRTUAL_ADDRESS currentCbvAddress_ = 0;
+	// 💡 代わりに、Update時に計算したローカルの頂点データを一時保存する配列を追加
+	VertexData localVertices_[4];
 
 	struct Material {
 
@@ -94,18 +94,16 @@ private:
 	static const UINT kMaxSpriteVertices = 6 * 10000; // フレーム最大 1000 スプライト分
 
 	// バッファリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource;
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource;
 
-	VertexData* vertexData = nullptr;
 	uint32_t* indexData = nullptr;
 	Material* material = nullptr;
-	TransformationMatrix* transformData = nullptr;
 
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+
 	D3D12_INDEX_BUFFER_VIEW indexBufferView;
 	uint32_t textureIndex = 0;
 };

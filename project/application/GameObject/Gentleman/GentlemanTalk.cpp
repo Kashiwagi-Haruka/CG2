@@ -20,19 +20,19 @@ void GentlemanTalk::SetStrings(const std::string& stageName) {
         string = U"gentlemanTalk.txt の読み込みに失敗しました。";
     }
 
-    // 検索の開始位置と、見つかったカンマの位置を管理する変数
+    // 検索の開始位置と、見つかったセミコロンの位置を管理する変数
     std::u32string::size_type start = 0;
-    std::u32string::size_type end = string.find(U'\n');
+    std::u32string::size_type end = string.find(U';');
 
     while (end != std::u32string::npos) {
-        // カンマの直前までの文字列を切り出して追加
+        // セミコロンの直前までの文字列を切り出して追加
         strings_.push_back(string.substr(start, end - start));
 
-        // 次の検索開始位置を、カンマの次の文字に進める
-        start = end + 1;
+        // 次の検索開始位置を、セミコロンの次の文字に進める
+        start = end + 2;
 
-        // 次のカンマを検索
-        end = string.find(U'\n', start);
+        // 次のセミコロンを検索
+        end = string.find(U';', start);
     }
 
 };

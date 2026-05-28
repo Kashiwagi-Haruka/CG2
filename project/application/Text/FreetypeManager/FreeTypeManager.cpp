@@ -19,8 +19,36 @@ std::unordered_map<uint32_t, FTData> FreeTypeManager::fontFaces_;
 unordered_map<GlyphKey, FTTextureData> FreeTypeManager::glyphTextures_;
 std::unordered_map<GlyphKey, std::vector<std::unique_ptr<Font>>> FreeTypeManager::fontPool_;
 
+// FreeTypeManager.cpp の上部（静的変数の実体定義）に追加
+Microsoft::WRL::ComPtr<ID3D12Resource> FreeTypeManager::ringBufferResource_ = nullptr;
+TransformationMatrix* FreeTypeManager::ringBufferMappedData_ = nullptr;
+uint32_t FreeTypeManager::ringBufferIndex_ = 0;
+
+
+Microsoft::WRL::ComPtr<ID3D12Resource> FreeTypeManager::vertexBufferResource_ = nullptr;
+VertexData* FreeTypeManager::vertexBufferMappedData_ = nullptr;
+uint32_t FreeTypeManager::vertexBufferIndex_ = 0; // 現在何頂点目かを示すカーソル
+
+
+
 void FreeTypeManager::Initialize()
 {
+    // 追加：巨大な定数バッファ（リングバッファ）を1つだけ生成する
+    UINT64 bufferSize = sizeof(TransformationMatrix) * kMaxRingBufferElements;
+
+    // CreateBufferResource
+    ringBufferResource_ = SpriteCommon::GetInstance()->CreateBufferResource(bufferSize);
+
+    // Map 状態にしてポインタを保持しておく
+    ringBufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&ringBufferMappedData_));
+    ringBufferIndex_ = 0;
+
+    UINT64 vbSize = sizeof(VertexData) * kMaxVertexBufferElements;
+    vertexBufferResource_ = SpriteCommon::GetInstance()->CreateBufferResource(vbSize);
+    // Map 状態にしてポインタを保持しておく
+    vertexBufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexBufferMappedData_));
+    vertexBufferIndex_ = 0;
+
     //ライブラリの初期化　error　== 0 で成功
     FT_Error error = FT_Init_FreeType(&library_);
 
@@ -120,6 +148,9 @@ void FreeTypeManager::Finalize()
 
     fontPool_.clear();
 
+    vertexBufferResource_.Reset();
+    ringBufferResource_.Reset();
+
     //libraryの破棄
     FT_Done_FreeType(library_);
 }
@@ -216,11 +247,58 @@ void FreeTypeManager::ShowFontSize(uint32_t faceHandle)
 
 void FreeTypeManager::ResetFontUsage()
 {
+
+    // カーソルを先頭に戻すだけで、メモリの再確保は発生しないため超高速
+    ringBufferIndex_ = 0;
+    vertexBufferIndex_ = 0;
+
     for (auto& [key, pool] : fontPool_) {
         for (auto& font : pool) {
             font->SetInUse(false);
         }
     }
+}
+// 💡 FontがUpdateされたときに、行列データをリングバッファへ書き込む関数
+D3D12_GPU_VIRTUAL_ADDRESS FreeTypeManager::AllocateConstantBuffer(const TransformationMatrix& matrix)
+{
+    // 万が一最大文字数を超えそうになったら警告（または0に戻すなどの安全弁）
+    if (ringBufferIndex_ >= kMaxRingBufferElements) {
+        assert(false && "Font ring buffer overflow!");
+        ringBufferIndex_ = 0;
+    }
+
+    // 1. 現在のカーソル位置に行列データをコピー（上書き）
+    ringBufferMappedData_[ringBufferIndex_] = matrix;
+
+    // 2. このデータのGPU上の仮想アドレスを計算
+    D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = ringBufferResource_->GetGPUVirtualAddress() + (ringBufferIndex_ * sizeof(TransformationMatrix));
+
+    // 3. 次の文字のためにカーソルを1つ進める
+    ringBufferIndex_++;
+
+    return gpuAddress;
+}
+
+// 💡 Fontから渡された4頂点分のデータを共有バッファに書き込み、その場所を指すビューを返す
+D3D12_VERTEX_BUFFER_VIEW FreeTypeManager::AllocateVertexBuffer(const VertexData* vertices, uint32_t vertexCount) {
+    if (vertexBufferIndex_ + vertexCount >= kMaxVertexBufferElements) {
+        assert(false && "Vertex ring buffer overflow!");
+        vertexBufferIndex_ = 0;
+    }
+
+    // 1. 共有バッファの現在のカーソル位置にデータをコピー
+    std::memcpy(&vertexBufferMappedData_[vertexBufferIndex_], vertices, sizeof(VertexData) * vertexCount);
+
+    // 2. コピーした領域を指す VertexBufferView を作成
+    D3D12_VERTEX_BUFFER_VIEW vby{};
+    vby.BufferLocation = vertexBufferResource_->GetGPUVirtualAddress() + (vertexBufferIndex_ * sizeof(VertexData));
+    vby.SizeInBytes = sizeof(VertexData) * vertexCount;
+    vby.StrideInBytes = sizeof(VertexData);
+
+    // 3. カーソルを進める
+    vertexBufferIndex_ += vertexCount;
+
+    return vby;
 }
 
 const FTTextureData& FreeTypeManager::GetGlyphTextures(const GlyphKey& key) {

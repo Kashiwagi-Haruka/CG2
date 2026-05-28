@@ -43,7 +43,6 @@ GentlemanMenu::GentlemanMenu()
     triangleText_.SetPosition(pos);
     triangleText_.SetColor(COLOR::RED);
     triangleText_.SetAlign(TextAlign::Left);
-    triangleText_.SetBlendMode(BlendMode::kBlendModeAlpha);
 
     fontTheta_ = 0.0f;
 
@@ -52,9 +51,9 @@ GentlemanMenu::GentlemanMenu()
     pressEText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH,SCREEN_SIZE::HEIGHT - 128.0f });
     pressEText_.SetColor(COLOR::WHITE);
     pressEText_.SetAlign(TextAlign::Center);
-    pressEText_.SetBlendMode(BlendMode::kBlendModeAlpha);
 
-    gameContinued_ = std::make_unique<GameContinued>();
+
+    gameContinued_ = &GameContinued::GetInstance();
 }
 
 GentlemanMenu::~GentlemanMenu()
@@ -197,6 +196,9 @@ void GentlemanMenu::Draw()
     if (!isShowMenu_) {
         return;
     }
+    
+    SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
+    SpriteCommon::GetInstance()->DrawCommonFont();
 
     triangleText_.Draw();
     pressEText_.Draw();
@@ -214,7 +216,7 @@ void GentlemanMenu::Save()
     //スロットインデックスを取得する
     int slotIndex = gameContinued_->GetCurrentSelectNum();
     //現在の時間の文字列
-    auto dataTimeString = save.GetCurrentDateTimeString();
+    auto dataTimeString = save.GetCurrentDateTimeString(false);
     //表示するセーブデータのテキストをセットする
     gameContinued_->SetSaveData(slotIndex, "SaveFile", progressSaveData_->currentStageName.c_str(), dataTimeString.c_str());
 
