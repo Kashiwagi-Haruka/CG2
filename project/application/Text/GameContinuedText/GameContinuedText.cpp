@@ -5,13 +5,19 @@
 
 namespace {
 constexpr float kCursorOffsetX = 54.0f;
-} // namespace
-void GameContinuedText::Initialize() {
-	// フォントハンドル
+}
+GameContinuedText::GameContinuedText()
+{
+		// フォントハンドル
 	fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
 	FreeTypeManager::SetPixelSizes(fontHandle_, 32, 32);
+}
+// namespace
+void GameContinuedText::Initialize() {
+
 	gameSaveDataText_.resize(saveDataMaxNum_);
-	for (int i = 0; i < static_cast<int>(gameSaveDataText_.size()); ++i) {
+
+	for (int i = 0; i < saveDataMaxNum_; ++i) {
 
 		gameSaveDataText_[i].Name_.Initialize(fontHandle_);
 		gameSaveDataText_[i].currentStageName_.Initialize(fontHandle_);
@@ -19,22 +25,11 @@ void GameContinuedText::Initialize() {
 
 		gameSaveDataText_[i].Name_.SetAlign(TextAlign::Left);
 		gameSaveDataText_[i].currentStageName_.SetAlign(TextAlign::Left);
-		gameSaveDataText_[i].saveDateTime_.SetAlign(TextAlign::Left);
-
-		gameSaveDataText_[i].Name_.SetBlendMode(BlendMode::kBlendModeMultipy);
-		gameSaveDataText_[i].currentStageName_.SetBlendMode(BlendMode::kBlendModeMultipy);
-		gameSaveDataText_[i].saveDateTime_.SetBlendMode(BlendMode::kBlendModeMultipy);
+		gameSaveDataText_[i].saveDateTime_.SetAlign(TextAlign::Right);
 
 		gameSaveDataText_[i].Name_.SetColor(COLOR::BLACK);
 		gameSaveDataText_[i].currentStageName_.SetColor(COLOR::BLACK);
 		gameSaveDataText_[i].saveDateTime_.SetColor(COLOR::BLACK);
-
-		gameSaveDataText_[i].Name_.SetSize({200.0f, 200.0f});
-		gameSaveDataText_[i].currentStageName_.SetSize({200.0f, 200.0f});
-		gameSaveDataText_[i].saveDateTime_.SetSize({200.0f, 200.0f});
-
-
-
 
 		SetBlockLayout(i, {640.0f, 360.0f + (280.0f * static_cast<float>(i))}, {1040.0f, 240.0f});
 	}
@@ -46,15 +41,22 @@ void GameContinuedText::Initialize() {
 
 	SetCurrentSelectIndex(0);
 }
-void GameContinuedText::Update(int selectIndex) { SetCurrentSelectIndex(selectIndex); 
+void GameContinuedText::Update(int selectIndex) { 
+	
+	SetCurrentSelectIndex(selectIndex); 
+
+
 	for (auto& saveDataText : gameSaveDataText_) {
 		saveDataText.Name_.UpdateLayout(false);
 		saveDataText.currentStageName_.UpdateLayout(false);
 		saveDataText.saveDateTime_.UpdateLayout(false);
 	}
+
+	
 }
 
 void GameContinuedText::Draw() {
+
 	for (auto& saveDataText : gameSaveDataText_) {
 		saveDataText.Name_.Draw();
 		saveDataText.currentStageName_.Draw();
@@ -77,13 +79,13 @@ void GameContinuedText::SetBlockLayout(int index, const Vector2& blockCenter, co
 	const float textAreaLeft = left + 30.0f + thumbnailWidth + 40.0f;
 	const float textAreaRight = right - 48.0f;
 	const float nameX = std::max(textAreaLeft, textAreaRight - 560.0f);
-	const float stageX = std::max(textAreaLeft, textAreaRight - 340.0f);
-	const float dateX = std::max(textAreaLeft, textAreaRight - 140.0f);
+	const float stageX = std::max(textAreaLeft, textAreaRight - 320.0f);
+	const float dateX = std::max(textAreaLeft, textAreaRight - 64.0f);
 	const float textY = top + (blockScale.y * 0.5f);
 
 	gameSaveDataText_[index].Name_.SetPosition({nameX, textY});
 	gameSaveDataText_[index].currentStageName_.SetPosition({stageX, textY});
-	gameSaveDataText_[index].saveDateTime_.SetPosition({dateX, textY});
+	gameSaveDataText_[index].saveDateTime_.SetPosition({dateX, textY+64.0f});
 }
 void GameContinuedText::SetSaveDataText(const std::string& name, const std::string& currentStageName, const std::string& saveDateTime, int index) {
 	if (index < 0 || index >= saveDataMaxNum_) {

@@ -16,6 +16,10 @@ class GameContinuedText {
 	int currentSelectIndex_ = 0;
 
 public:
+
+	GameContinuedText();
+
+
 	void Initialize();
 	void Update(int selectIndex);
 	void Draw();

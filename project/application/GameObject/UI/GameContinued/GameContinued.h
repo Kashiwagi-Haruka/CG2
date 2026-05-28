@@ -42,6 +42,19 @@ private:
 	std::unique_ptr<GameContinuedText> text_;
 
 public:
+private:
+	GameContinued() = default; // コンストラクタを private にする
+	~GameContinued() {}
+public:
+	// コピー禁止
+	GameContinued(const GameContinued&) = delete;
+	GameContinued& operator=(const GameContinued&) = delete;
+
+	static GameContinued& GetInstance() {
+		static GameContinued instance;  // C++11以降はスレッドセーフ
+		return instance;
+	}
+
 	void LoadAllSlots();
 	void LoadAndSetSpriteHandle(const int index, const bool isAllowOverlap);
 	void Initialize();

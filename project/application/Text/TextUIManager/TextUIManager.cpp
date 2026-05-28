@@ -24,28 +24,24 @@ TextUIManager::TextUIManager() {
 	text_.SetPosition({640, 240});
 	text_.SetColor({1, 1, 1, 1});
 	text_.SetAlign(TextAlign::Center);
-	text_.SetBlendMode(BlendMode::kBlendModeAlpha);
 	text_.UpdateLayout();
 
 	edamameTrivia_.Initialize(fontHandle_);
 	edamameTrivia_.SetPosition({640, 512 + 64});
 	edamameTrivia_.SetColor({1, 1, 1, 1});
 	edamameTrivia_.SetAlign(TextAlign::Center);
-	edamameTrivia_.SetBlendMode(BlendMode::kBlendModeAlpha);
 	edamameTrivia_.UpdateLayout();
 
 	coffeeTrivia_.Initialize(fontHandle_);
 	coffeeTrivia_.SetPosition({640, 512 + 64});
 	coffeeTrivia_.SetColor({1, 1, 1, 1});
 	coffeeTrivia_.SetAlign(TextAlign::Center);
-	coffeeTrivia_.SetBlendMode(BlendMode::kBlendModeAlpha);
 	coffeeTrivia_.UpdateLayout();
 
 	gentlemanTalk_.Initialize(fontHandle_);
-	gentlemanTalk_.SetPosition({ 640, 512});
+	gentlemanTalk_.SetPosition({ 640, 512+64});
 	gentlemanTalk_.SetColor({ 1, 1, 1, 1 });
 	gentlemanTalk_.SetAlign(TextAlign::Center);
-	gentlemanTalk_.SetBlendMode(BlendMode::kBlendModeAlpha);
 	gentlemanTalk_.UpdateLayout();
 
 }
@@ -151,6 +147,10 @@ void TextUIManager::Update() {
 }
 
 void TextUIManager::Draw() {
+
+	SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
+	SpriteCommon::GetInstance()->DrawCommonFont();
+
 	if (isDraw_) {
 		text_.Draw();
 	}

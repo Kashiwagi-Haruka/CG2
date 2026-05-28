@@ -28,9 +28,6 @@ void Text::SetAlign(TextAlign align) {
     align_ = align;
 }
 
-void Text::SetBlendMode(const BlendMode& blendMode) {
-    blendMode_ = blendMode;
-}
 
 void Text::StartTyping(float speed)
 {
@@ -43,13 +40,15 @@ void Text::StartTyping(float speed)
 
 void Text::Draw() {
 
-    SpriteCommon::GetInstance()->DrawCommonFont();
-    SpriteCommon::GetInstance()->SetBlendMode(blendMode_);
     activeFonts_.clear();
 
     for (const auto& run : glyphRuns_) {
+
         GlyphKey key{ fontHandle_, run.glyphIndex };
-        auto* font = FreeTypeManager::GetOrCreateFont(key);
+        
+        Font* font = FreeTypeManager::GetOrCreateFont(key);
+        if (!font) continue;
+
         auto& texData = FreeTypeManager::GetGlyphTextures(key);
         // ベースラインに合わせてY位置を調整！
         float y = run.position.y - (texData.glyphSize.y + texData.bearingY) / 2.0f;
@@ -99,8 +98,9 @@ void Text::UpdateLayout(const bool isType)
     std::unordered_map<float, float> lineWidths;
     for (const auto& run : glyphRuns_) {
         auto& size = FreeTypeManager::GetGlyphTextures({ fontHandle_, run.glyphIndex }).glyphSize;
-        lineWidths[run.position.y] += size.y;
+        lineWidths[run.position.y] += size.x;
     }
+
 
     for (auto& run : glyphRuns_) {
         float offsetX = 0.0f;

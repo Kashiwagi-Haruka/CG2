@@ -21,7 +21,7 @@ TitleMenuUI::TitleMenuUI()
     titleText_.SetPosition(titleDefaultPos_);
     titleText_.SetColor(COLOR::WHITE);
     titleText_.SetAlign(TextAlign::Center);
-    titleText_.SetBlendMode(BlendMode::kBlendModeAdd);
+
 
     menuFontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
     FreeTypeManager::SetPixelSizes(menuFontHandle_, 32, 32);
@@ -51,7 +51,6 @@ TitleMenuUI::TitleMenuUI()
     triangleText_.SetPosition(pos);
     triangleText_.SetColor(COLOR::RED);
     triangleText_.SetAlign(TextAlign::Left);
-    triangleText_.SetBlendMode(BlendMode::kBlendModeAdd);
 
     fontTheta_ = 0.0f;
 
@@ -60,7 +59,6 @@ TitleMenuUI::TitleMenuUI()
     pressSpaceText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH,SCREEN_SIZE::HEIGHT - 128.0f });
     pressSpaceText_.SetColor(COLOR::WHITE);
     pressSpaceText_.SetAlign(TextAlign::Center);
-    pressSpaceText_.SetBlendMode(BlendMode::kBlendModeAdd);
 
 
 
@@ -189,6 +187,11 @@ bool TitleMenuUI::ConsumeOptionTriggered() {
 }
 void TitleMenuUI::Draw()
 {
+
+    SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAdd);
+    SpriteCommon::GetInstance()->DrawCommonFont();
+
+
     pressSpaceText_.Draw();
 
 
