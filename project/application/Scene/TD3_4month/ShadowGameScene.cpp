@@ -121,7 +121,7 @@ void ShadowGameScene::Initialize()
     Flashlight::SetProgressSaveDataPtr(&progressSaveData_);
     //紳士管理
     gentleManManager_->Initialize();
-
+    gentleManManager_->GetGentleman()->SetGentleManTackScript(progressSaveData_.currentStageName);
     // エレベータールーム
     elevatorRoomManager_->Initialize();
     // エレベーター
