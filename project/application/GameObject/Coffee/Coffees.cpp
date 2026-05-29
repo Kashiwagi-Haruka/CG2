@@ -13,7 +13,7 @@
 namespace {
     constexpr const char* kCoffeesModelDirectory = "Resources/TD3_3102/3d/Coffee";
     constexpr const char* kCoffeesModelName = "Coffee";
-    constexpr uint32_t kCoffeesInstanceCount = 800;
+    constexpr uint32_t kCoffeesInstanceCount = 600;
     constexpr uint32_t kCoffeesInitialVisibleCount = 100;
     constexpr float kCoffeesMinScale = 0.22f;
     constexpr float kCoffeesScaleStep = 0.0f;
@@ -43,6 +43,7 @@ namespace {
     constexpr float kCoffeesStopPushPower = 0.015f;
     constexpr float kCoffeesPeerPushPower = 1.75f;
     constexpr float kCoffeesDefaultRenderDistance = 18.0f;
+    constexpr float kCoffeesRoomReturnMargin = 0.35f;
 
     int64_t HashCell(int32_t x, int32_t y, int32_t z) { return (static_cast<int64_t>(x) << 42) ^ (static_cast<int64_t>(y) << 21) ^ static_cast<int64_t>(z); }
 
@@ -416,7 +417,15 @@ void Coffees::RunSimulation() {
         const float maxX = roomMaxX - instance.radius;
         const float minZ = roomMinZ + instance.radius;
         const float maxZ = roomMaxZ - instance.radius;
-
+		const bool hasLeftRoom2 = instance.position.x < (roomMinX - kCoffeesRoomReturnMargin) || instance.position.x > (roomMaxX + kCoffeesRoomReturnMargin) ||
+		                          instance.position.z < (roomMinZ - kCoffeesRoomReturnMargin) || instance.position.z > (roomMaxZ + kCoffeesRoomReturnMargin);
+		if (hasLeftRoom2) {
+			const float resetX = std::clamp(spawnOrigin_.x, minX, maxX);
+			const float resetZ = std::clamp(spawnOrigin_.z, minZ, maxZ);
+			instance.position = {resetX, minY, resetZ};
+			instance.velocity = {0.0f, 0.0f, 0.0f};
+			instance.angularVelocity = {0.0f, 0.0f, 0.0f};
+		}
         if (instance.position.x < minX) {
             instance.position.x = minX;
             if (instance.velocity.x < 0.0f) {
