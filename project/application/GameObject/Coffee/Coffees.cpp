@@ -522,6 +522,7 @@ void Coffees::Draw() {
     if (!isSpilling_) {
         return;
     }
+    Object3dCommon::GetInstance()->DrawCommon();
     instancedObject_->Draw();
 }
 

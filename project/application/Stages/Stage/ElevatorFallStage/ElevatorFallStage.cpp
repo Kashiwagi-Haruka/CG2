@@ -13,7 +13,7 @@
 #include "GameObject/Wall/WallManagerElevatorFall.h"
 #include "GameObject/TestField/TestField.h"
 #include "GameObject/Door/Door.h"
-
+#include"GameObject/SEManager/SEManager.h"
 #include "GameObject/Key/Key.h"
 
 void ElevatorFallStage::InitializeLights()
@@ -117,6 +117,11 @@ void ElevatorFallStage::UpdateGameObject(Camera* camera, const Vector3& lightDir
 
     //上で判定を取っている
     if (portalManager_->GetIsWarp()) {
+        if (SEManager::IsSoundFinished(SEManager::FOOT_STEP)) {
+            //着地音を鳴らす
+            SEManager::SoundPlay(SEManager::FOOT_STEP);
+        }
+     
         testField_->SetIsCollided(true);
     }
 

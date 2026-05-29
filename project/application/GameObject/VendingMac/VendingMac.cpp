@@ -89,6 +89,7 @@ void VendingMac::Draw() {
 		Object3dCommon::GetInstance()->DrawCommon();
 		obj_->Draw();
 	}
+
 	drink_->Draw();
 }
 void VendingMac::CheckCollision() {
