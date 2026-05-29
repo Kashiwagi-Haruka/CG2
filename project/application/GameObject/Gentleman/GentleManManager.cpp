@@ -5,6 +5,7 @@
 #include"GameObject/Player/Player.h"
 #include"GentlemanTalk.h"
 #include"GameObject/Key/Key.h"
+#include"GameObject/SEManager/SEManager.h"
 
 GentleManManager::GentleManManager()
 {
@@ -41,12 +42,12 @@ void GentleManManager::Update()
 
     //ミラーステージの時
     if (progressSaveData_->currentStageName == "MirrorStage") {
-      
+
         if (Gentleman::IsRayHit()) {
 
 
             if (isSit_) {
-              if (GentlemanTalk::GetIsTalkEnd()) {
+                if (GentlemanTalk::GetIsTalkEnd()) {
                     gentleman_->SetAnimationName("Sit");
                 } else {
                     gentleman_->SetAnimationName("SitTalk");
@@ -54,18 +55,18 @@ void GentleManManager::Update()
             } else {
 
 
-                    gentleman_->SetAnimationName("SitDown");
-                    isSit_ = true;
-       
+                gentleman_->SetAnimationName("SitDown");
+                isSit_ = true;
+
 
 
             }
-         
+
 
 
         }
 
- 
+
 
     }
 
@@ -84,17 +85,20 @@ void GentleManManager::Update()
             //  rayがヒットすると...
 
             if (Gentleman::IsRayHit()) {
-          
+
                 if (!isTired_) {
                     gentleman_->SetAnimationName("Tired");
                     isTired_ = true;
+
+                    //ドサッと倒れる音
+                    SEManager::SoundPlay(SEManager::FALL_DOWN);
                 }
-         
+
             }
 
             if (!isTired_) {
                 gentleman_->SetAnimationName("Idle");
-            } 
+            }
 
         }
 

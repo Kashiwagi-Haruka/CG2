@@ -1,7 +1,8 @@
 #pragma once
-#include "Text/ChairMenu/ChairMenu.h"
+
 #include "Text/Text.h"
 #include <memory>
+#include "Sprite.h"
 
 class TextUIManager {
 public:
@@ -10,6 +11,7 @@ public:
 	void Initialize();
 	void Update();
 	void Draw();
+	bool GetTalkTyping() { return gentlemanTalk_.GetIsTyping()|| edamameTrivia_.GetIsTyping()|| coffeeTrivia_.GetIsTyping(); };
 
 public:
 	void ShowKeyLostAtStageStartMessage();
@@ -24,8 +26,8 @@ private:
 	Text coffeeTrivia_;
 	//紳士テキスト
 	Text gentlemanTalk_;
-
-
+	float spriteAlpha_ = 0.0f;
+	std::unique_ptr<Sprite> sprite_ = nullptr;
 
 	float showTime_ = 1.0f;
 	float showTimer_ = showTime_;

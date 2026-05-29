@@ -203,7 +203,7 @@ void GentlemanMenu::Draw()
 
     triangleText_.Draw();
 
-   if(! GentlemanTalk::GetIsDraw()) {
+   if(!GentlemanTalk::GetIsDraw()&& GentlemanTalk::GetIsTalkEnd()) {
        //ジェントルマントーク中は描画しない
        mouseWheelSelectText_.Draw();
    }
