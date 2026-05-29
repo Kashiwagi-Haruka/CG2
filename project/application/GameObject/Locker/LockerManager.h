@@ -8,7 +8,7 @@ class Player;
 class LockerManager
 {
 public:
-    LockerManager();
+    LockerManager(const uint32_t num = 2);
     static bool IsRayHit() { return isRayHit_; }
     void Initialize();
     void Update();
@@ -20,7 +20,6 @@ public:
     void DrawSprite();
     static bool GetIsInLocker() { return isInLocker_; }
 private:
-    static constexpr uint32_t kMaxLockers_ = 2;
     std::vector<std::unique_ptr<Locker>>lockers_;
     static bool isRayHit_;
     std::unique_ptr<Sprite> sprite_ = nullptr;

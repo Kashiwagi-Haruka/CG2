@@ -9,6 +9,9 @@ class Door;
 class Key;
 class TestField;
 class WallManagerElevatorFall;
+class DeskManager;
+class LockerManager;
+
 class ElevatorFallStage :
     public BaseStage
 {
@@ -26,6 +29,11 @@ class ElevatorFallStage :
 
     std::unique_ptr<Key> key_ = nullptr;
     std::unique_ptr<Door> door_ = nullptr;
+
+
+    std::unique_ptr<DeskManager> deskManager_ = nullptr;
+
+    std::unique_ptr<LockerManager> lockerManager_ = nullptr;
 
 private:
     void InitializeLights();
