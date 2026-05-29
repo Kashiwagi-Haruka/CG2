@@ -65,7 +65,7 @@ void MirrorStage::Initialize() {
 	coffees_->Initialize();
 	coffeeTrivia_->Initialize();
 	coffees_->SetFloorY(0.0f);
-	coffees_->SetRoomBounds(-7.0f, 14.0f, -7.0f, 7.0f);
+	coffees_->SetRoomBounds(0.5f, 13.0f, -6.0f, 6.0f);
 	coffees_->SetSpawnContainment({0.0f, 0.0f, 0.0f}, 0.0f, 0.0f);
 	timeCardWatch_->Initialize();
 	flashlight_->Initialize();
@@ -121,6 +121,10 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 	wallManager_->Update();
 	wallManager2_->Update();
 	vendingMac_->Update();
+	const AABB& coffeeRoomAABB = wallManager2_->GetAABB();
+	const Vector3 coffeeRoomPosition = wallManager2_->GetRoom()->GetTranslate();
+	coffees_->SetRoomBounds(
+	    coffeeRoomPosition.x + coffeeRoomAABB.min.x, coffeeRoomPosition.x + coffeeRoomAABB.max.x, coffeeRoomPosition.z + coffeeRoomAABB.min.z, coffeeRoomPosition.z + coffeeRoomAABB.max.z);
 	const Vector3 vendingPosition = vendingMac_->GetWorldPosition();
 	const Vector3 vendingForward = vendingMac_->GetForward();
 	coffees_->SetSpawnOrigin({
