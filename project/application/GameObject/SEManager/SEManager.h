@@ -9,6 +9,7 @@ public:
 		DOOR_OPEN,
 		DOOR_CLOSE,
 		FOOT_STEP,
+		FALL_DOWN,
 		WARP,
 		PORTAL_SPAWN,
 		SHOT,

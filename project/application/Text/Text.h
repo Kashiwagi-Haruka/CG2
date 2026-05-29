@@ -32,7 +32,7 @@ public:
     void UpdateLayout(const bool isType = true);
     void StartTyping(float speed);
     const Vector2& GetPosition()const { return position_; }
-    bool GetIsTying() { return isTyping_; }
+    bool GetIsTyping() { return isTyping_; }
 private:
     uint32_t fontHandle_ = 0;
     std::u32string text_;
