@@ -1,12 +1,11 @@
 #define NOMINMAX
 #include "ShadowGameScene.h"
-#include "Input.h"
+
 #include "SceneManager.h"
 #include "Sprite/SpriteCommon.h"
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
 
-#include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
