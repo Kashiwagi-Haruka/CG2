@@ -80,46 +80,19 @@ private:
     //Player
     std::unique_ptr<Player> player_ = nullptr;
 
-    //TestField
-    std::unique_ptr<TestField> testField_ = nullptr;
-    // ホワイトボード管理
-    std::unique_ptr<WhiteBoardManager> whiteBoardManager_ = nullptr;
-    //ポータル管理
-    std::unique_ptr<PortalManager> portalManager_ = nullptr;
     //携帯打刻機
-    std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
-    //懐中電灯
-    std::unique_ptr<Flashlight> flashlight_ = nullptr;
-    //鍵
-    std::unique_ptr<Key> key_ = nullptr;
-    //枝豆
-    std::unique_ptr<Edamame> edamame_ = nullptr;
-    //椅子
-    std::unique_ptr<ChairManager> chairManager_ = nullptr;
-    //壁管理
-    std::unique_ptr<WallManager> wallManager_ = nullptr;
-    //壁管理2こめ
-    std::unique_ptr<WallManager2> wallManager2_ = nullptr;
+    std::array<std::unique_ptr<TimeCardWatch>,2> timeCardWatches_;
+
     //エレベータ部屋の管理
     std::unique_ptr<ElevatorRoomManager> elevatorRoomManager_ = nullptr;
 
-    //自販機
-    std::unique_ptr<VendingMac> vendingMac_ = nullptr;
-    //ドア
-    std::unique_ptr<Door> door_ = nullptr;
-    //ロッカー管理
-    std::unique_ptr<LockerManager> lockerManager_ = nullptr;
-    //デスク管理
-    std::unique_ptr<DeskManager> deskManager_ = nullptr;
-    //タイムカード
-    std::unique_ptr<TimeCard> timeCard_ = nullptr;
-    std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
-    //箱
-    std::unique_ptr<BoxManager> boxManager_ = nullptr;
+    ////タイムカード
+    //std::unique_ptr<TimeCard> timeCard_ = nullptr;
+    //std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
+
     // エレベーター
     std::unique_ptr<Elevator> elevator_ = nullptr;
-    //PC
-    std::unique_ptr<PC> pc_ = nullptr;
+
     //インスタンシングによる建物
     std::unique_ptr<BuildingClass>buildings_ = nullptr;
     //紳士管理

@@ -45,7 +45,7 @@ private:
 #pragma region //Text
     uint32_t menuFontHandle_;
     Text triangleText_;
-    Text pressEText_;
+    Text mouseWheelSelectText_;
     std::array<Text, MAX_TEXT> menuText_;
     float fontTheta_ = 0.0f;
 #pragma endregion

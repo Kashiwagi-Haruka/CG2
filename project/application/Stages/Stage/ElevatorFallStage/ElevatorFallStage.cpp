@@ -62,8 +62,6 @@ ElevatorFallStage::ElevatorFallStage(Player* player)
 
     portalManager_->SetWhiteBoardManager(whiteBoardManager_.get());
 
-    timeCardWatch_ = std::make_unique<TimeCardWatch>();
-    timeCardWatch_->SetPlayer(player_);
 
     //懐中電灯の作成
     flashlight_ = std::make_unique<Flashlight>();
@@ -86,7 +84,7 @@ void ElevatorFallStage::Initialize()
     InitializeLights();
     portalManager_->Initialize();
     whiteBoardManager_->Initialize();
-    timeCardWatch_->Initialize();
+
 
     //懐中電灯の初期化
     flashlight_->Initialize();
@@ -134,7 +132,7 @@ void ElevatorFallStage::UpdateGameObject(Camera* camera, const Vector3& lightDir
     }
 
     whiteBoardManager_->Update();
-    timeCardWatch_->Update();
+
     //懐中電灯の更新
     flashlight_->Update();
     key_->Update();
@@ -201,7 +199,6 @@ void ElevatorFallStage::CheckCollision()
 void ElevatorFallStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 {
 
-    timeCardWatch_->Draw();
     whiteBoardManager_->Draw();
     flashlight_->Draw();
     key_->Draw();
@@ -225,7 +222,6 @@ void ElevatorFallStage::DrawSprite()
 void ElevatorFallStage::SetSceneCameraForDraw(Camera* camera)
 {
     portalManager_->SetCamera(camera);
-    timeCardWatch_->SetCamera(camera);
     flashlight_->SetCamera(camera);
     whiteBoardManager_->SetCamera(camera);
     wallManager2_->SetCamera(camera);

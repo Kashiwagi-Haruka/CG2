@@ -5,6 +5,7 @@
 
 class BoxManager;
 class ChairManager;
+class DummyChair;
 class Coffees;
 class CoffeeTrivia;
 class DeskManager;
@@ -19,7 +20,7 @@ class PortalManager;
 class TestField;
 class TimeCard;
 class TimeCardRack;
-class TimeCardWatch;
+
 class VendingMac;
 class WallManager;
 class WallManager2;
@@ -38,7 +39,7 @@ private:
 	std::unique_ptr<PC> pc_ = nullptr;
 	std::unique_ptr<Coffees> coffees_ = nullptr;
 	std::unique_ptr<CoffeeTrivia> coffeeTrivia_ = nullptr;
-	std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
+
 	std::unique_ptr<Flashlight> flashlight_ = nullptr;
 	std::unique_ptr<Key> key_ = nullptr;
 	std::unique_ptr<Edamame> edamame_ = nullptr;
@@ -48,11 +49,18 @@ private:
 	std::unique_ptr<WallManager2> wallManager2_ = nullptr;
 	std::unique_ptr<VendingMac> vendingMac_ = nullptr;
 	std::unique_ptr<ChairManager> chairManager_ = nullptr;
+	
+	std::unique_ptr<DummyChair> dummyChair_ = nullptr;
+
+	
 	std::unique_ptr<DeskManager> deskManager_ = nullptr;
 	std::unique_ptr<TimeCard> timeCard_ = nullptr;
 	std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
 	std::unique_ptr<BoxManager> boxManager_ = nullptr;
 	std::unique_ptr<HintSheetManager> hintSheetManager_ = nullptr;
+
+
+
 
 	void InitializeLights();
 	void UpdateLights();

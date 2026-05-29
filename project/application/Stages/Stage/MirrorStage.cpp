@@ -1,6 +1,7 @@
 #include "MirrorStage.h"
 #include "GameObject/Box/BoxManager.h"
 #include "GameObject/Chair/ChairManager.h"
+#include "GameObject/Chair/DummyChair.h"
 #include "GameObject/Coffee/Coffees.h"
 #include "GameObject/Coffee/CoffeeTrivia.h"
 #include "GameObject/Desk/DeskManager.h"
@@ -15,7 +16,7 @@
 #include "GameObject/TestField/TestField.h"
 #include "GameObject/TimeCard/TimeCard.h"
 #include "GameObject/TimeCard/TimeCardRack.h"
-#include "GameObject/TimeCard/TimeCardWatch.h"
+
 #include "GameObject/VendingMac/VendingMac.h"
 #include "GameObject/Wall/WallManager.h"
 #include "GameObject/Wall/WallManager2.h"
@@ -35,8 +36,7 @@ MirrorStage::MirrorStage(Player* player) : player_(player) {
 	pc_ = std::make_unique<PC>();
 	coffees_ = std::make_unique<Coffees>();
 	coffeeTrivia_ = std::make_unique<CoffeeTrivia>();
-	timeCardWatch_ = std::make_unique<TimeCardWatch>();
-	timeCardWatch_->SetPlayer(player_);
+
 	flashlight_ = std::make_unique<Flashlight>();
 	flashlight_->SetPlayer(player_);
 	key_ = std::make_unique<Key>();
@@ -52,6 +52,7 @@ MirrorStage::MirrorStage(Player* player) : player_(player) {
 	timeCardRack_ = std::make_unique<TimeCardRack>();
 	boxManager_ = std::make_unique<BoxManager>();
 	hintSheetManager_ = std::make_unique<HintSheetManager>();
+	dummyChair_ = std::make_unique<DummyChair>();
 }
 
 void MirrorStage::Initialize() {
@@ -67,11 +68,12 @@ void MirrorStage::Initialize() {
 	coffees_->SetFloorY(0.0f);
 	coffees_->SetRoomBounds(-7.0f, 14.0f, -7.0f, 7.0f);
 	coffees_->SetSpawnContainment({0.0f, 0.0f, 0.0f}, 0.0f, 0.0f);
-	timeCardWatch_->Initialize();
+
 	flashlight_->Initialize();
 	key_->Initialize();
 	edamame_->Initialize();
 	chairManager_->Initialize();
+	
 	wallManager_->Initialize();
 	wallManager2_->Initialize();
 
@@ -89,6 +91,12 @@ void MirrorStage::Initialize() {
 	hintSheetManager_->SetParentMatrix(0, deskManager_->GetDrawerMatrix(2));
 	hintSheetManager_->SetParentIsOpenEnd(0, deskManager_->GetDesks().at(2)->IsEndOpenAnimation());
 	deskManager_->GetDesks().at(2)->RegisterReadableObject(hintSheetManager_->GetHintSheets().at(0).get());
+	
+	
+	//紳士用の椅子を初期化する
+	dummyChair_->Initialize();
+	
+	
 	MiniMap* miniMap = MiniMap::GetInstance();
 	miniMap->AddObject(wallManager_->GetRoom().get(), {0.2f, 0.2f, 0.2f, 0.35f}, 50.0f);
 	miniMap->AddObject(wallManager2_->GetRoom().get(), {0.2f, 0.2f, 0.2f, 0.35f}, 50.0f);
@@ -105,12 +113,11 @@ void MirrorStage::Initialize() {
 }
 void MirrorStage::SetPlayer(Player* player) {
 	player_ = player;
-	timeCardWatch_->SetPlayer(player_);
 	flashlight_->SetPlayer(player_);
 }
 void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, Player* player) {
 	portalManager_->WarpPlayer(player);
-	timeCardWatch_->Update();
+
 	flashlight_->Update();
 	key_->Update();
 	edamame_->Update();
@@ -140,6 +147,7 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 	timeCardRack_->Update();
 	pc_->Update();
 	hintSheetManager_->Update();
+	dummyChair_->Update();
 
 	UpdateLights();
 }
@@ -302,7 +310,7 @@ void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 	vendingMac_->Draw();
 	coffees_->Draw();
 	coffeeTrivia_->Draw();
-	timeCardWatch_->Draw();
+
 	flashlight_->Draw();
 	key_->Draw();
 	chairManager_->Draw();
@@ -316,6 +324,7 @@ void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 	edamame_->Draw();
 	hintSheetManager_->Draw();
 	whiteBoardManager_->Draw();
+	dummyChair_->Draw();
 	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 
@@ -331,7 +340,7 @@ void MirrorStage::SetSceneCameraForDraw(Camera* camera) {
 	whiteBoardManager_->SetCamera(camera);
 	portalManager_->SetCamera(camera);
 	pc_->SetCamera(camera);
-	timeCardWatch_->SetCamera(camera);
+
 	flashlight_->SetCamera(camera);
 	key_->SetCamera(camera);
 	edamame_->SetCamera(camera);
@@ -348,6 +357,7 @@ void MirrorStage::SetSceneCameraForDraw(Camera* camera) {
 	timeCardRack_->SetCamera(camera);
 	boxManager_->SetCamera(camera);
 	hintSheetManager_->SetCamera(camera);
+	dummyChair_->SetCamera(camera);
 }
 
 void MirrorStage::SetPlayerCamera(PlayerCamera* playerCamera) {

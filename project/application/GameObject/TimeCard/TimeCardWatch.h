@@ -2,7 +2,6 @@
 #include"Object3d/Object3d.h"
 #include<memory>
 #include"Primitive/Primitive.h"
-class Player;
 
 class Camera;
 class TimeCardWatch
@@ -13,10 +12,11 @@ public:
     void SetCamera(Camera* camera);
     void Update();
     void Draw();
-    void SetPlayer(Player* player) { player_ = player; }
+    void SetParentMat(Matrix4x4* mat) { parentMat_ = mat; }
+
 private:
     std::unique_ptr<Object3d> modelObj_ = nullptr;
-    Player* player_ = nullptr;
+    Matrix4x4* parentMat_ = nullptr;
     Transform transform_ = {};
     Camera* camera_ = nullptr;
 };

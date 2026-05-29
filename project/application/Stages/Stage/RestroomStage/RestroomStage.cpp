@@ -80,9 +80,6 @@ RestroomStage::RestroomStage(Player* player)
     key_ = std::make_unique<Key>();
     door_ = std::make_unique<Door>();
 
-
-    timeCardWatch_ = std::make_unique<TimeCardWatch>();
-    timeCardWatch_->SetPlayer(player_);
     //懐中電灯の作成
     flashlight_ = std::make_unique<Flashlight>();
     flashlight_->SetPlayer(player_);
@@ -101,7 +98,7 @@ void RestroomStage::Initialize() {
 	portalManager_->Initialize();
 	whiteBoardManager_->Initialize();
 	wallManagerRestRoom_->Initialize();
-	timeCardWatch_->Initialize();
+
 	// 懐中電灯の初期化
 	flashlight_->Initialize();
 	key_->Initialize();
@@ -212,7 +209,7 @@ void RestroomStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticl
 
 
     key_->Draw();
-    timeCardWatch_->Draw();
+
     door_->Draw(false);
     whiteBoardManager_->Draw();
     flashlight_->Draw();
@@ -236,7 +233,7 @@ void RestroomStage::SetSceneCameraForDraw(Camera* camera) {
 
     portalManager_->SetCamera(camera);
     wallManagerRestRoom_->SetCamera(camera);
-    timeCardWatch_->SetCamera(camera);
+ 
     flashlight_->SetCamera(camera);
     whiteBoardManager_->SetCamera(camera);
     key_->SetCamera(camera);

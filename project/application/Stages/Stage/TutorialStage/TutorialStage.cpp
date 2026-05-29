@@ -8,6 +8,7 @@
 #include "GameObject/Portal/PortalManager.h"
 #include "GameObject/TestField/TestField.h"
 #include "GameObject/TimeCard/TimeCard.h"
+#include "GameObject/TimeCard/TimeCardWatch.h"
 #include "GameObject/TimeCard/TimeCardRack.h"
 #include "GameObject/Wall/WallManager.h"
 #include "GameObject/Wall/WallManager2.h"

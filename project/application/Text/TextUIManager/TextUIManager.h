@@ -24,6 +24,9 @@ private:
 	Text coffeeTrivia_;
 	//紳士テキスト
 	Text gentlemanTalk_;
+
+
+
 	float showTime_ = 1.0f;
 	float showTimer_ = showTime_;
 	bool isDraw_ = false;

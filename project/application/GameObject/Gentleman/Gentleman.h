@@ -31,6 +31,8 @@ public:
     Vector3 GetWorldPosition() const override;
     static bool IsRayHit() { return isRayHit_; }
     const Matrix4x4& GetWorldMatrix() const { return obj_->GetWorldMatrix(); }
+    Matrix4x4 GetJointMatrix(const char* jointName)const;
+    Matrix4x4& GetHandMat();
     void SetAnimationName(const std::string& name) { desiredAnimationName = name; };
     void SetGentleManTackScript(const std::string& stageName) { gentlemanTalk_->SetStrings(stageName); }
 private:
@@ -56,5 +58,6 @@ private:
     static bool isRayHit_;
     bool isPreOnCollisionRay_ = false;
     uint32_t animationNum = 0;
+    Matrix4x4 handMat_;
 };
 
