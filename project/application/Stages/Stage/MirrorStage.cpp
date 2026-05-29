@@ -124,7 +124,7 @@ void MirrorStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection
 	const AABB& coffeeRoomAABB = wallManager2_->GetAABB();
 	const Vector3 coffeeRoomPosition = wallManager2_->GetRoom()->GetTranslate();
 	coffees_->SetRoomBounds(
-	    coffeeRoomPosition.x + coffeeRoomAABB.min.x, coffeeRoomPosition.x + coffeeRoomAABB.max.x-1.0f, coffeeRoomPosition.z + coffeeRoomAABB.min.z, coffeeRoomPosition.z + coffeeRoomAABB.max.z);
+	    coffeeRoomPosition.x + coffeeRoomAABB.min.x+0.5f, coffeeRoomPosition.x + coffeeRoomAABB.max.x-1.0f, coffeeRoomPosition.z + coffeeRoomAABB.min.z+1.0f, coffeeRoomPosition.z + coffeeRoomAABB.max.z-1.0f);
 	const Vector3 vendingPosition = vendingMac_->GetWorldPosition();
 	const Vector3 vendingForward = vendingMac_->GetForward();
 	coffees_->SetSpawnOrigin({

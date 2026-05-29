@@ -25,6 +25,12 @@ MiniMap* MiniMap::GetInstance() {
 void MiniMap::Finalize() { instance_.reset(); }
 
 void MiniMap::Initialize() {
+	Reset();
+
+	if (isInitialized_) {
+		return;
+	}
+
 	camera_ = std::make_unique<Camera>();
 	camera_->SetRotate({1.5707963f, 0.0f, 0.0f});
 	camera_->SetNearClip(0.1f);
@@ -54,6 +60,8 @@ void MiniMap::Initialize() {
 	playerSprite_->SetAnchorPoint({0.5f, 0.5f});
 	playerSprite_->SetScale({16.0f, 16.0f});
 	playerSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+
+	isInitialized_ = true;
 }
 void MiniMap::AddObject(Object3d* object, Vector4 color, float markerSize) {
 	if (!object) {

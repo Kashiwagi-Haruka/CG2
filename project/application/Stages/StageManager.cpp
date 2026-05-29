@@ -49,9 +49,11 @@ void StageManager::SetCollisionManager(CollisionManager* collisionManager) {
 }
 void StageManager::InitializeStage() {
 	if (stage_) {
+		MiniMap::GetInstance()->Reset();
 		stage_->Initialize();
 	}
 }
+
 
 void StageManager::UpdateLight() {}
 void StageManager::UpdatePlayerDamage() {}
