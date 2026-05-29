@@ -16,6 +16,8 @@ private:
     Player* player_ = nullptr;
 #pragma region // セーブ
     ProgressSaveData* progressSaveData_ = nullptr;
+    bool isTired_ = false;
+    bool isSit_ = false;
 public:
     Gentleman* GetGentleman() { return gentleman_.get(); }
     GentleManManager();

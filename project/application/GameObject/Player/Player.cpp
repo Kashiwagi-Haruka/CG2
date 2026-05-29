@@ -140,9 +140,6 @@ void Player::Initialize() {
 
 void Player::Update()
 {
-
-  
-
     const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
     soundTimer_ = std::max(0.0f, soundTimer_ - deltaTime);
 
@@ -156,6 +153,8 @@ void Player::Update()
 
     bodyObj_->SetTransform(transform_);
     bodyObj_->Update();
+    //手のマトリックス更新
+    handMat_ = GetJointMatrix("Hand.R");
 
     //デバック
     Debug();
@@ -381,6 +380,11 @@ Vector3 Player::GetJointWorldPos(const char* jointName) const
 
     skeleton_->SetObjectMatrix(bodyObj_->GetWorldMatrix());
     return  skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
+}
+
+Matrix4x4& Player::GetHandMatPtr()
+{
+    return handMat_;
 }
 
 void Player::Gravity() {

@@ -26,9 +26,11 @@ Gentleman::Gentleman()
     localAABB_ = { .min = {-0.5f,-0.5f,-0.5f},.max = {0.5f,0.5,0.5f} };
     //紳士トーク
     gentlemanTalk_ = std::make_unique<GentlemanTalk>();
+    handMat_ = Function::MakeIdentity4x4();
 }
 
 void Gentleman::OnCollision(Collider* collider)
+
 {
 
 }
@@ -37,6 +39,30 @@ Vector3 Gentleman::GetWorldPosition() const
 {
     return YoshidaMath::GetWorldPosByMat(obj_->GetWorldMatrix());
 }
+
+Matrix4x4 Gentleman::GetJointMatrix(const char* jointName) const
+{
+    if (!skeleton_) {
+        return { 0.0f };
+    }
+
+    const std::optional<int32_t> jointIndex = skeleton_->FindJointIndex(jointName);
+    if (!jointIndex.has_value()) {
+        return { 0.0f };
+    }
+
+    skeleton_->SetObjectMatrix(obj_->GetWorldMatrix());
+
+    return  skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndex]);
+}
+
+Matrix4x4& Gentleman::GetHandMat()
+{
+
+    return  handMat_;
+    // TODO: return ステートメントをここに挿入します
+}
+
 
 void Gentleman::Animation()
 {
@@ -48,9 +74,11 @@ void Gentleman::Animation()
         loopAnimation = false;
     } else if (desiredAnimationName == "Round") {
         loopAnimation = false;
-    } else if (desiredAnimationName == "SitDown") {
-        loopAnimation = false;
     } else if (desiredAnimationName == "Sleep") {
+        loopAnimation = true;
+    } else if (desiredAnimationName == "SleepStand") {
+        loopAnimation = true;
+    } else if (desiredAnimationName == "SleepStandPortal") {
         loopAnimation = true;
     } else if (desiredAnimationName == "Soft") {
         loopAnimation = true;
@@ -58,8 +86,25 @@ void Gentleman::Animation()
         loopAnimation = false;
     } else if (desiredAnimationName == "Sit") {
         loopAnimation = true;
+    } else if (desiredAnimationName == "SitDown") {
+        loopAnimation = false;
+    } else if (desiredAnimationName == "SitTalk") {
+        loopAnimation = true;
+    } else if (desiredAnimationName == "Talk") {
+        loopAnimation = true;
     }
 
+    if (animationFinished_) {
+        if (desiredAnimationName == "Tired") {
+            //倒れたらスリープ
+            desiredAnimationName = "Sleep";
+        }
+
+        if (desiredAnimationName == "SitDown") {
+            desiredAnimationName = "Sit";
+
+        }
+    }
 
 
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
@@ -99,7 +144,7 @@ void Gentleman::Update()
     CheckCollision();
     Animation();
     obj_->Update();
-
+    handMat_ = GetJointMatrix("Hand.R");
 }
 
 void Gentleman::Initialize()
@@ -155,8 +200,13 @@ void Gentleman::CheckCollision()
         gentlemanTalk_->SetIsDraw(false);
     }
 
-    //rayの当たり判定
-    if (isRayHit_ && PlayerCommand::GetInstance()->InteractTrigger() && !PlayerCommand::GetIsGrab()) {
+    //rayの当たり判定 疲れて寝てないときなど
+    if (isRayHit_ &&
+        PlayerCommand::GetInstance()->InteractTrigger() &&
+        !PlayerCommand::GetIsGrab()
+        && desiredAnimationName != "Sleep"
+        && desiredAnimationName != "Tired"
+        ) {
         //トリガーしたとき且つ何も持ってないとき
 
         if (GentlemanMenu::GetIsShowMenu()) {
@@ -168,7 +218,6 @@ void Gentleman::CheckCollision()
         }
 
         SEManager::SoundPlay(SEManager::TYPE);
-        /*     SetAnimationName(animationName);*/
 
     }
 

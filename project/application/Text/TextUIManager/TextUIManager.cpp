@@ -134,7 +134,14 @@ void TextUIManager::Update() {
 	} else {
 		const float fadeStep = deltaTime / kEdamameFadeDuration_;
 		gentlemanAlpha_ = std::max(0.0f, gentlemanAlpha_ - fadeStep);
+
+		if (gentlemanAlpha_ <= 0.5f) {
+			GentlemanTalk::SetIsTalkEnd(true);
+		}
+
 	}
+
+
 
 	gentlemanTalk_.SetColor({ 1.0f,1.0f,1.0f,gentlemanAlpha_ });
 

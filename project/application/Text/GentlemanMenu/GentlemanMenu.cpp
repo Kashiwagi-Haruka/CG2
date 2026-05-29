@@ -7,6 +7,7 @@
 #include"GameObject/SEManager/SEManager.h"
 #include"GameSave/GameSave.h"
 #include"GameBase.h"
+#include"GameObject/Gentleman/GentlemanTalk.h"
 
 bool GentlemanMenu::isShowMenu_ = false;
 uint32_t GentlemanMenu::selectButtonNum_ = GentlemanMenu::TALK;
@@ -46,11 +47,11 @@ GentlemanMenu::GentlemanMenu()
 
     fontTheta_ = 0.0f;
 
-    pressEText_.Initialize(menuFontHandle_);
-    pressEText_.SetString(U"マウスホイールで選択");
-    pressEText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH,SCREEN_SIZE::HEIGHT - 128.0f });
-    pressEText_.SetColor(COLOR::WHITE);
-    pressEText_.SetAlign(TextAlign::Center);
+    mouseWheelSelectText_.Initialize(menuFontHandle_);
+    mouseWheelSelectText_.SetString(U"マウスホイールで選択");
+    mouseWheelSelectText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH,SCREEN_SIZE::HEIGHT - 128.0f });
+    mouseWheelSelectText_.SetColor(COLOR::WHITE);
+    mouseWheelSelectText_.SetAlign(TextAlign::Center);
 
 
     gameContinued_ = &GameContinued::GetInstance();
@@ -80,8 +81,8 @@ void GentlemanMenu::Update()
     fontTheta_ = fmodf(fontTheta_, Function::kPi * 2.0f);
     float fontAlpha = std::sinf(fontTheta_) * 0.5f + 0.5f;
 
-    pressEText_.SetColor({ 1.0f,1.0f,1.0f,fontAlpha });
-    pressEText_.UpdateLayout(false);
+    mouseWheelSelectText_.SetColor({ 1.0f,1.0f,1.0f,fontAlpha });
+    mouseWheelSelectText_.UpdateLayout(false);
 
     if (isShowMenu_) {
 
@@ -201,7 +202,12 @@ void GentlemanMenu::Draw()
     SpriteCommon::GetInstance()->DrawCommonFont();
 
     triangleText_.Draw();
-    pressEText_.Draw();
+
+   if(! GentlemanTalk::GetIsDraw()) {
+       //ジェントルマントーク中は描画しない
+       mouseWheelSelectText_.Draw();
+   }
+
 
     for (auto& text : menuText_) {
         text.Draw();

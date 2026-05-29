@@ -5,6 +5,8 @@
 size_t GentlemanTalk::talkNum_ = 0;
 bool GentlemanTalk::isSendMessage_ = false;
 bool GentlemanTalk:: isDraw_ = false;
+bool GentlemanTalk::isTalkEnd_ = true;
+
 std::vector<std::u32string>GentlemanTalk::strings_;
 
 void GentlemanTalk::SetStrings(const std::string& stageName) {
@@ -53,7 +55,7 @@ void GentlemanTalk::Initialize()
     strings_.clear();
     talkNum_ = strings_.size() - 1;
     isSendMessage_ = false;
-  
+    isTalkEnd_ = true;
 }
 
 void GentlemanTalk::Update()
@@ -66,7 +68,7 @@ void GentlemanTalk::GentlemanSendMessage(const bool random)
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
         isDraw_ = true;
         isSendMessage_ = true;
-
+        isTalkEnd_ = false;
         if (random) {
             talkNum_ = rand() % strings_.size();
         } else {
