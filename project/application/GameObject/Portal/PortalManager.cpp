@@ -168,7 +168,7 @@ void PortalManager::Update() {
     UpdatePortal();
 }
 
-void PortalManager::CheckCollision() {
+void PortalManager::CheckCollision(const bool isOneSide) {
 
     canMakePortal_ = false;
     canMakePortalToWhiteBoard_ = false;
@@ -181,7 +181,7 @@ void PortalManager::CheckCollision() {
         return;
     }
 
-    WhiteBoard* hitBoard = whiteBoardManager_->CheckCollision(playerCamera_);
+    WhiteBoard* hitBoard = whiteBoardManager_->CheckCollision(playerCamera_, isOneSide);
 
     if (!hitBoard) {
         return;

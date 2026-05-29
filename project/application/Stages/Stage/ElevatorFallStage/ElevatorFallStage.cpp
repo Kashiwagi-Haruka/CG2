@@ -154,7 +154,7 @@ void ElevatorFallStage::UpdatePortal()
 void ElevatorFallStage::CheckCollision()
 {
 
-    portalManager_->CheckCollision();
+    portalManager_->CheckCollision(true);
 
     if (!stageCollisionManager_) {
         return;

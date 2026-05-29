@@ -66,7 +66,7 @@ void WhiteBoardManager::SetCamera(Camera* camera) {
 
 bool WhiteBoardManager::OnCollisionRay(PlayerCamera* playerCamera, const AABB& aabb, const Vector3& pos) { return playerCamera->OnCollisionRay(aabb, pos); }
 
-WhiteBoard* WhiteBoardManager::CheckCollision(PlayerCamera* playerCamera) {
+WhiteBoard* WhiteBoardManager::CheckCollision(PlayerCamera* playerCamera, const bool isOneSide) {
    
     if (!playerCamera) {
         return nullptr;
@@ -79,7 +79,7 @@ WhiteBoard* WhiteBoardManager::CheckCollision(PlayerCamera* playerCamera) {
         }
 
         //ポータルとカメラが向き合っているかどうか
-        if (!board->IsFacingSurface(playerCamera->GetCamera()->GetWorldMatrix())) {
+        if (!board->IsFacingSurface(playerCamera->GetCamera()->GetWorldMatrix(), isOneSide)) {
             continue;
         }
 
