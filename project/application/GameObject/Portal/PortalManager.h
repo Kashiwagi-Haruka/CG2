@@ -30,7 +30,7 @@ public:
 	virtual void SetCamera(Camera* camera);
 	virtual void SetPlayerCamera(PlayerCamera* playerCamera);
 	/// @brief 作成できるポータル地点との当たり判定を作成する
-	virtual void CheckCollision();
+	virtual void CheckCollision(const bool isOneSide = false);
 	virtual std::vector<std::unique_ptr<Portal>>& GetPortals() { return portals_; };
 	static bool GetCanMakePortal() { return canMakePortal_; };
 	static bool GetCanMakePortalToWhiteBoard() { return canMakePortalToWhiteBoard_; };

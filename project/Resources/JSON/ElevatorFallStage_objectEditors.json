@@ -3302,260 +3302,6 @@
         "loopEnabled": false,
         "name": "pc.mp3",
         "volume": 1.0
-      },
-      {
-        "effects": [
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 0
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 1
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 2
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 3
-          }
-        ],
-        "loopEnabled": false,
-        "name": "bgm1.mp3",
-        "volume": 1.0
-      },
-      {
-        "effects": [
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 0
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 1
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 2
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 3
-          }
-        ],
-        "loopEnabled": false,
-        "name": "scl_k1_cb.mp3",
-        "volume": 1.0
       }
     ]
   },
@@ -3788,8 +3534,8 @@
       "name": "WhiteBoard3",
       "transform": {
         "rotate": [
-          1.1399999856948853,
-          -2.5,
+          -1.340000033378601,
+          -10.229999542236328,
           0.0
         ],
         "scale": [
@@ -3900,9 +3646,9 @@
       "name": "WhiteBoard5",
       "transform": {
         "rotate": [
-          1.659999966621399,
-          -1.1109999418258667,
-          0.0
+          -1.6100000143051147,
+          -5.289999961853027,
+          -0.029999999329447746
         ],
         "scale": [
           1.0,
@@ -3911,8 +3657,8 @@
         ],
         "translate": [
           7.0,
-          -20.290000915527344,
-          -16.0
+          -21.360000610351563,
+          -15.979999542236328
         ]
       }
     },
@@ -3956,7 +3702,7 @@
       "name": "WhiteBoard6",
       "transform": {
         "rotate": [
-          1.4800000190734863,
+          -1.4800000190734863,
           -1.0499999523162842,
           0.0
         ],
@@ -4012,8 +3758,8 @@
       "name": "WhiteBoard7",
       "transform": {
         "rotate": [
-          1.5499999523162842,
-          -3.0799999237060547,
+          -1.7000000476837158,
+          0.0,
           0.0
         ],
         "scale": [
@@ -4068,8 +3814,8 @@
       "name": "WhiteBoard8",
       "transform": {
         "rotate": [
-          1.6699999570846558,
-          -5.630000114440918,
+          -1.5099999904632568,
+          -1.6699999570846558,
           0.0
         ],
         "scale": [
@@ -4124,8 +3870,8 @@
       "name": "WhiteBoard9",
       "transform": {
         "rotate": [
-          -1.440000057220459,
-          -6.139999866485596,
+          -0.5600000023841858,
+          0.14000000059604645,
           0.0
         ],
         "scale": [

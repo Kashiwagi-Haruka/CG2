@@ -20,7 +20,7 @@ public:
 
 	/// @brief レイとホワイトボードの判定を行い、ポータル生成対象を返す
 	/// @return ポータル生成対象のホワイトボード。生成不要時はnullptr
-	WhiteBoard* CheckCollision(PlayerCamera* playerCamera);
+	WhiteBoard* CheckCollision(PlayerCamera* playerCamera,const bool isOneSide = false);
 	void SetPortal(WhiteBoard* board);
 
 

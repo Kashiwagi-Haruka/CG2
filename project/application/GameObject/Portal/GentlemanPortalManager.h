@@ -19,7 +19,7 @@ public:
 	void SetCamera(Camera* camera)override;
 	void SetPlayerCamera(PlayerCamera* playerCamera)override;
 	/// @brief 作成できるポータル地点との当たり判定を作成する
-	void CheckCollision()override;
+	void CheckCollision(const bool isOneSide = false)override;
 	static bool GetCanMakePortal() { return canMakePortal_; };
 	static bool GetIsMakePortal() { return isMakePortal_; };
 private:
