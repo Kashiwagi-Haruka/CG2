@@ -125,16 +125,28 @@ void RotatingPlaygroundEquipment::Update() {
 
 void RotatingPlaygroundEquipment::Draw() {
 	Object3dCommon::GetInstance()->DrawCommonSkinning();
-	spinObj_->Draw();
+	if (spinObj_) {
+		spinObj_->UpdateCameraMatrices();
+		spinObj_->Draw();
+	}
 	for (auto& gentleman : gentlemanObj_) {
+		if (!gentleman) {
+			continue;
+		}
+		gentleman->UpdateCameraMatrices();
 		gentleman->Draw();
 	}
 }
 
 void RotatingPlaygroundEquipment::SetCamera(Camera* camera) {
 	camera_ = camera;
-	spinObj_->SetCamera(camera);
+	if (spinObj_) {
+		spinObj_->SetCamera(camera);
+	}
 	for (auto& gentleman : gentlemanObj_) {
+		if (!gentleman) {
+			continue;
+		}
 		gentleman->SetCamera(camera);
 	}
 }
