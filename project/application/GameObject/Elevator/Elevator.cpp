@@ -214,17 +214,16 @@ void Elevator::Draw() {
     Object3dCommon::GetInstance()->DrawCommonSkinning();
     modelObj_->Draw();
 
-    //for (auto& [name,sys] : autoLockSystems_) {
-    //	sys->Draw();
-    //}
-
-    //for (auto& [name, collider] : colliders_) {
-    //    collider->Draw();
-    //}
     Object3dCommon::GetInstance()->DrawCommon();
     poster_.Draw();
     elevatorNumber_->Draw();
+    //for (auto& [name,sys] : autoLockSystems_) {
+//	sys->Draw();
+//}
 
+//for (auto& [name, collider] : colliders_) {
+//    collider->Draw();
+//}
 }
 
 void Elevator::DrawSprite()

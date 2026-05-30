@@ -48,7 +48,9 @@ void DocumentManager::Draw()
 
 void DocumentManagerParticle::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommon();
     documentParticle_->Draw();
+
     document_->Draw();
 }
 

@@ -52,16 +52,16 @@ void ReadableObject::CheckCollision()
 
 void ReadableObject::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommon();
+    obj_->Draw();
+
     if (isRayHit_ && !isLooking_) {
-        Object3dCommon::GetInstance()->DrawCommon();
-        obj_->Draw();
+
         Object3dCommon::GetInstance()->DrawCommonOutline();
         obj_->Draw();
         Object3dCommon::GetInstance()->EndOutlineDraw();
-    } else {
-        Object3dCommon::GetInstance()->DrawCommon();
-        obj_->Draw();
     }
+  
 }
 
 void ReadableObject::OnCollision(Collider* collider)

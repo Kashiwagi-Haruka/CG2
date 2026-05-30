@@ -5,7 +5,7 @@
 #include"ScreenSize.h"
 #include"SpriteCommon.h"
 #include"GameObject/Player/Player.h"
-
+#include"Object3d/Object3dCommon.h"
 bool LockerManager::isRayHit_ = false;
 bool LockerManager::isInLocker_ = false;
 
@@ -104,11 +104,11 @@ void LockerManager::InLocker(Player* player)
 
 void LockerManager::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
+
     for (auto& locker : lockers_) {
         locker->Draw();
     }
-
-
 
 }
 

@@ -38,7 +38,6 @@ void DummyChair::Initialize()
 
 void DummyChair::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommon();
     obj_->Draw();
 }
 

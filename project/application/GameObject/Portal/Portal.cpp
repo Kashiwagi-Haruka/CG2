@@ -94,6 +94,7 @@ void Portal::Update() {
 }
 
 void Portal::DrawPortals() {
+
     if (!ShouldProcessPortal()) {
         return;
     }

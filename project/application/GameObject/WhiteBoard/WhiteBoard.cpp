@@ -1,6 +1,7 @@
 #include "WhiteBoard.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"Function.h"
+#include"Object3d/Object3dCommon.h"
 
 WhiteBoard::WhiteBoard()
 {
@@ -60,6 +61,7 @@ void WhiteBoard::Update()
 
 void WhiteBoard::Draw() {
 
+    Object3dCommon::GetInstance()->DrawCommon();
     obj_->Draw();
 #ifdef _DEBUG
     primitive_->Draw();

@@ -13,25 +13,25 @@ bool Flashlight::isGetLight_ = false;
 bool Flashlight::isRayHit_ = false;
 
 Flashlight::Flashlight() {
-	spotLight_ = {};
-	obj_ = std::make_unique<Object3d>();
-	ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/light", "light");
-	obj_->SetModel("light");
-	SetAABB({
-	    .min = {-0.1f, -0.1f, -0.1f},
+    spotLight_ = {};
+    obj_ = std::make_unique<Object3d>();
+    ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/light", "light");
+    obj_->SetModel("light");
+    SetAABB({
+        .min = {-0.1f, -0.1f, -0.1f},
           .max = {0.1f,  0.1f,  0.1f }
-    });
-	SetCollisionAttribute(kCollisionItem);
-	SetCollisionMask(kCollisionPlayer | kCollisionFloor);
-	spotLight_.color = {1.0f, 1.0f, 0.5f, 1.0f};
-	spotLight_.position = obj_->GetTranslate();
-	spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
-	spotLight_.intensity = 2.0f;
-	spotLight_.distance = 10.0f;
-	spotLight_.decay = 2.0f;
-	spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-	spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
-	spotLight_.shadowEnabled = 0;
+        });
+    SetCollisionAttribute(kCollisionItem);
+    SetCollisionMask(kCollisionPlayer | kCollisionFloor);
+    spotLight_.color = { 1.0f, 1.0f, 0.5f, 1.0f };
+    spotLight_.position = obj_->GetTranslate();
+    spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
+    spotLight_.intensity = 2.0f;
+    spotLight_.distance = 10.0f;
+    spotLight_.decay = 2.0f;
+    spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
+    spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+    spotLight_.shadowEnabled = 0;
 }
 
 void Flashlight::OnCollision(Collider* collider)
@@ -82,7 +82,7 @@ void Flashlight::Update()
         obj_->SetWorldMatrix(child);
 
     } else {
-        transform_ =  obj_->GetTransform();
+        transform_ = obj_->GetTransform();
         //y座標を固定する
         transform_.translate.y = std::clamp(transform_.translate.y, 0.0f, 2.4f);
         obj_->SetTransform(transform_);
@@ -97,8 +97,7 @@ void Flashlight::Update()
 
 void Flashlight::Initialize()
 {
-    assert(progressSaveData_);
-	
+
     isGetLight_ = GameSave::GetInstance().GetProgressSaveData().isLightHave;
     isLightOn_ = true;
 
@@ -107,71 +106,74 @@ void Flashlight::Initialize()
     obj_->Initialize();
     obj_->RegisterEditor("Flashlight");
     SetLight();
-	obj_->SetOutlineColor({1.0f, 1.0f, 0.0f, 1.0f});
-	obj_->SetOutlineWidth(10.0f);
+    obj_->SetOutlineColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+    obj_->SetOutlineWidth(10.0f);
 }
 
 void Flashlight::Draw() {
-	Object3dCommon::GetInstance()->DrawCommon();   
+
+    Object3dCommon::GetInstance()->DrawCommon();
+
     obj_->Draw();
-	if (isRayHit_) {
-	Object3dCommon::GetInstance()->DrawCommonOutline();
-	obj_->Draw();
-	Object3dCommon::GetInstance()->EndOutlineDraw();
+
+    if (isRayHit_) {
+        Object3dCommon::GetInstance()->DrawCommonOutline();
+        obj_->Draw();
+        Object3dCommon::GetInstance()->EndOutlineDraw();
     }
 }
 
 void Flashlight::SetLight() {
-	spotLight_.color = {1.0f, 1.0f, 0.5f, 1.0f};
-	spotLight_.position = obj_->GetTranslate();
-	spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
-	spotLight_.intensity = 1.0f;
-	spotLight_.distance = 15.0f;
-	spotLight_.decay = 2.0f;
-	spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-	spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
-	spotLight_.shadowEnabled = 0;
+    spotLight_.color = { 1.0f, 1.0f, 0.5f, 1.0f };
+    spotLight_.position = obj_->GetTranslate();
+    spotLight_.direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
+    spotLight_.intensity = 1.0f;
+    spotLight_.distance = 15.0f;
+    spotLight_.decay = 2.0f;
+    spotLight_.cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
+    spotLight_.cosFalloffStart = std::cos(std::numbers::pi_v<float> / 4.0f);
+    spotLight_.shadowEnabled = 0;
 }
 
 void Flashlight::CheckCollision() {
-	isRayHit_ = OnCollisionRay();
+    isRayHit_ = OnCollisionRay();
 
-	if (PlayerCommand::GetInstance()->InteractTrigger()) {
-		// keyとrayの当たり判定
+    if (PlayerCommand::GetInstance()->InteractTrigger()) {
+        // keyとrayの当たり判定
 
-		if (!PlayerCommand::GetIsGrab()) {
-			if (isRayHit_) {
-				isGetLight_ = true;
-				isSendGetLightMessage_ = true;
-			}
-		}
-	}
+        if (!PlayerCommand::GetIsGrab()) {
+            if (isRayHit_) {
+                isGetLight_ = true;
+                isSendGetLightMessage_ = true;
+            }
+        }
+    }
 }
 
 void Flashlight::UpdateSpotLight() {
-	spotLight_.position = GetWorldPosition();
-	spotLight_.direction = -YoshidaMath::GetForward(obj_->GetWorldMatrix());
-	spotLight_.shadowEnabled = 0;
+    spotLight_.position = GetWorldPosition();
+    spotLight_.direction = -YoshidaMath::GetForward(obj_->GetWorldMatrix());
+    spotLight_.shadowEnabled = 0;
 
-	if (!isGetLight_) {
-		spotLight_.intensity = 0.0f;
-		return;
-	}
+    if (!isGetLight_) {
+        spotLight_.intensity = 0.0f;
+        return;
+    }
 
-	if (PlayerCommand::GetInstance()->SwitchLight()) {
-		isLightOn_ = !isLightOn_;
-		SEManager::SoundPlay(SEManager::PUSH_WATCH);
-		if (isLightOn_) {
-			spotLight_.intensity = 1.0f;
-			spotLight_.shadowEnabled = 1;
-		} else {
-			spotLight_.intensity = 0.0f;
-			spotLight_.shadowEnabled = 0;
-		}
-	}
-	if (isLightOn_) {
-		spotLight_.shadowEnabled = 1;
-	}
+    if (PlayerCommand::GetInstance()->SwitchLight()) {
+        isLightOn_ = !isLightOn_;
+        SEManager::SoundPlay(SEManager::PUSH_WATCH);
+        if (isLightOn_) {
+            spotLight_.intensity = 1.0f;
+            spotLight_.shadowEnabled = 1;
+        } else {
+            spotLight_.intensity = 0.0f;
+            spotLight_.shadowEnabled = 0;
+        }
+    }
+    if (isLightOn_) {
+        spotLight_.shadowEnabled = 1;
+    }
 }
 
 

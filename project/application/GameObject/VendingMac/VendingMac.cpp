@@ -79,18 +79,18 @@ void VendingMac::Initialize() {
 }
 
 void VendingMac::Draw() {
+
+	Object3dCommon::GetInstance()->DrawCommon();
+	obj_->Draw();
+
 	if (isRayHit_) {
-		Object3dCommon::GetInstance()->DrawCommon();
-		obj_->Draw();
 		Object3dCommon::GetInstance()->DrawCommonOutline();
 		obj_->Draw();
 		Object3dCommon::GetInstance()->EndOutlineDraw();
-	} else {
-		Object3dCommon::GetInstance()->DrawCommon();
-		obj_->Draw();
 	}
 
 	drink_->Draw();
+
 }
 void VendingMac::CheckCollision() {
 	isRayHit_ = OnCollisionRay();
