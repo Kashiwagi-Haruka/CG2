@@ -11,7 +11,7 @@
 #include "Text/TextUIManager/TextUIManager.h"
 #include"Text/GentlemanMenu/GentlemanMenu.h"
 #include"Text/LockerMenu/LockerMenu.h"
-
+#include"Text/ChairMenu/ChairMenu.h"
 
 class UIManager {
 private:

@@ -6,9 +6,9 @@ EleveterNumberText::EleveterNumberText() {
 	fontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Bold.ttf", 0);
 	FreeTypeManager::SetPixelSizes(fontHandle_, 64, 64);
 	text_.Initialize(fontHandle_);
-	text_.SetPosition({200.0f, 500.0f});
-	text_.SetAlign(TextAlign::Center);
-	text_.SetBlendMode(BlendMode::kBlendModeAlpha);
+	text_.SetPosition({64.0f, 500.0f});
+	text_.SetAlign(TextAlign::Left);
+
 	text_.SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	SetStageNumber(0);
 }
@@ -20,4 +20,8 @@ void EleveterNumberText::SetStageNumber(int stageNumber) {
 
 void EleveterNumberText::Update() { text_.Update(); }
 
-void EleveterNumberText::Draw() { text_.Draw(); }
+void EleveterNumberText::Draw() { 
+	SpriteCommon::GetInstance()->DrawCommonFont();
+	SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
+	
+	text_.Draw(); }

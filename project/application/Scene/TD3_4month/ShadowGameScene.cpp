@@ -1,12 +1,11 @@
 #define NOMINMAX
 #include "ShadowGameScene.h"
-#include "Input.h"
+
 #include "SceneManager.h"
 #include "Sprite/SpriteCommon.h"
 #include"Object3d/Object3dCommon.h"
 #include"DirectXCommon.h"
 
-#include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"GameObject/KeyBindConfig.h"
 #include "Particle/ParticleManager.h"
 #include"GameObject/BGMManager/BGMManager.h"
@@ -70,6 +69,13 @@ ShadowGameScene::ShadowGameScene() {
     damageOverlay_ = std::make_unique<DamageOverlay>();
     skyBox_ = std::make_unique<SkyBox>();
 
+    for (auto& timeCardWatch : timeCardWatches_) {
+        timeCardWatch = std::make_unique<TimeCardWatch>();
+    }
+
+    timeCardWatches_[0]->SetParentMat(&player_->GetHandMatPtr());
+    timeCardWatches_[1]->SetParentMat(&gentleManManager_->GetGentleman()->GetHandMat());
+
     //建物
     buildings_ = std::make_unique<BuildingClass>();
 }
@@ -130,6 +136,11 @@ void ShadowGameScene::Initialize()
     elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData_.currentStageName));
 
 
+
+    for (auto& timeCardWatch : timeCardWatches_) {
+        timeCardWatch->Initialize();
+    }
+ 
 
     hierarchy->LoadObjectEditorsFromJsonIfExists("ShadowGameScene_objectEditors.json");
     hierarchy->EndRegisterFile();
@@ -406,8 +417,15 @@ void ShadowGameScene::UpdatePostEffect() {
 
 void ShadowGameScene::UpdateGameObject() {
     player_->Update();
+    
+    timeCardWatches_[0]->Update();
+    if (progressSaveData_.currentStageName != "GentleManStage") {
+        timeCardWatches_[1]->Update();
+    }
+
     stageManager_->SetPlayer(player_.get());
     stageManager_->UpdateGameObject(cameraController_->GetPlayerCamera()->GetCamera(), lightManager_->GetDirectionalLight().direction);
+
     // エレベーター
     elevator_->Update();
     // エレベータールーム管理
@@ -535,6 +553,10 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
 
     stageManager_->DrawModel(isShadow, drawPortal, isDrawParticle);
 
+    timeCardWatches_[0]->Draw();
+    if (progressSaveData_.currentStageName != "GentleManStage") {
+        timeCardWatches_[1]->Draw();
+    }
 
     if (drawPlayer) {
         // プレイヤーの描画処理
@@ -556,6 +578,10 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
     elevator_->SetCamera(camera);
     gentleManManager_->SetCamera(camera);
     buildings_->SetCamera(camera);
+
+    for (auto& timeCardWatch : timeCardWatches_) {
+        timeCardWatch->SetCamera(camera);
+    }
 
     stageManager_->SetSceneCameraForDraw(camera);
 

@@ -97,11 +97,16 @@ void WhiteBoard::SetCollisionAttributeNoneAndInitialize()
     SetCollisionAttribute(kCollisionNone);
 }
 
-bool WhiteBoard::IsFacingSurface(const Matrix4x4& cameraMat)
+bool WhiteBoard::IsFacingSurface(const Matrix4x4& cameraMat, const bool isOneSide)
 {
     Vector3 forward =  YoshidaMath::GetForward(cameraMat);
     Vector3 direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
     float dot = Function::Dot(forward, direction);
     
-    return(fabs(dot) >= kPortalCreatableAngleRange_);
+    if (isOneSide) {
+        return(dot <= -kPortalCreatableAngleRange_);
+    } else {
+        return(fabs(dot) >= kPortalCreatableAngleRange_);
+    }
+  
 }

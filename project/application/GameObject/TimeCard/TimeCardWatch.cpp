@@ -18,7 +18,7 @@ TimeCardWatch::TimeCardWatch()
 void TimeCardWatch::Initialize()
 {
     modelObj_->Initialize();
-    modelObj_->RegisterEditor("TimeCardWatch");
+    //modelObj_->RegisterEditor("TimeCardWatch");
     transform_ = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.04f,0.0f} };
 }
 
@@ -34,9 +34,9 @@ void TimeCardWatch::SetCamera(Camera* camera)
 void TimeCardWatch::Update()
 {
     Matrix4x4 child = Function::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-    assert(player_);
-    Matrix4x4 parent =player_->GetJointMatrix("Hand.R");
-    child = Function::Multiply(child, parent);
+    assert(parentMat_);
+    //Matrix4x4 parent =player_->GetJointMatrix("Hand.R");
+    child = Function::Multiply(child, *parentMat_);
 
     modelObj_->SetWorldMatrix(child);
     modelObj_->Update();

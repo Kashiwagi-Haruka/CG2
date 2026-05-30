@@ -10,7 +10,7 @@
 class GentlemanMenu
 {
 public:
-    enum MenuType { TALK, SAVE,CANCEL, MAX_TEXT};
+    enum MenuType { TALK, SAVE, CANCEL, MAX_TEXT };
 public:
 
     //テキストの設定
@@ -30,13 +30,13 @@ public:
     static void SetProgressSaveData(ProgressSaveData* progressSaveData) { progressSaveData_ = progressSaveData; }
 
     void Save();
-    
+
 private:
     void UpdateGentleManMenu();
     void ScreenShot();
 private:
     //ゲームコンティニュー
-    std::unique_ptr<GameContinued>gameContinued_ = nullptr;
+    GameContinued* gameContinued_ = nullptr;
 
     static PlayerCamera* playerCamera_;
     static Transform* playerTransform_;
@@ -45,7 +45,7 @@ private:
 #pragma region //Text
     uint32_t menuFontHandle_;
     Text triangleText_;
-    Text pressEText_;
+    Text mouseWheelSelectText_;
     std::array<Text, MAX_TEXT> menuText_;
     float fontTheta_ = 0.0f;
 #pragma endregion

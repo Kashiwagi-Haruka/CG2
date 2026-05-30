@@ -6,6 +6,7 @@
 #include "application/GameObject/SEManager/SEManager.h"
 #include"Inventory/Inventory.h"
 
+
 bool UIManager::isPause_ = false;
 
 void UIManager::TogglePause() {

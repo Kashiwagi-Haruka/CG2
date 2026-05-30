@@ -363,7 +363,6 @@
     <ClCompile Include="application\GameObject\Box\Box.cpp" />
     <ClCompile Include="application\GameObject\Box\BoxManager.cpp" />
     <ClCompile Include="application\GameObject\Elevator\Elevator.cpp" />
-    <ClCompile Include="application\GameObject\SavePoint\SavePoint.cpp" />
     <ClCompile Include="application\GameObject\Edamame\EdamameModel.cpp" />
     <ClCompile Include="application\GameObject\UI\UIManager.cpp" />
     <ClCompile Include="application\GameObject\UI\TabKey.cpp" />
@@ -388,7 +387,6 @@
     <ClCompile Include="application\Stages\StageManager.cpp" />
     <ClCompile Include="application\Stages\Stage\MirrorStage.cpp" />
     <ClCompile Include="application\Stages\Stage\LightStage.cpp" />
-    <ClCompile Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.cpp" />
     <ClCompile Include="Engine\Editor\EditorManager\EditorManager.cpp" />
     <ClCompile Include="Engine\Editor\EditorTool\Asset\EditorAsset.cpp" />
     <ClCompile Include="application\GameObject\LightManager\LightManager.cpp" />
@@ -439,6 +437,7 @@
     <ClCompile Include="application\GameObject\RadiconStage\MiniWhiteboard\MiniWhiteboard.cpp" />
     <ClCompile Include="application\Text\LockerMenu\LockerMenu.cpp" />
     <ClCompile Include="application\MiniMap\MiniMap.cpp" />
+    <ClCompile Include="application\GameObject\Chair\DummyChair.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -783,7 +782,6 @@
     <ClInclude Include="application\GameObject\Box\Box.h" />
     <ClInclude Include="application\GameObject\Box\BoxManager.h" />
     <ClInclude Include="application\GameObject\Elevator\Elevator.h" />
-    <ClInclude Include="application\GameObject\SavePoint\SavePoint.h" />
     <ClInclude Include="Engine\Texture\Light\SoloLight\SpotLight.h" />
     <ClInclude Include="Engine\Texture\Light\SoloLight\PointLight.h" />
     <ClInclude Include="Engine\Texture\Light\SoloLight\DirectionalLight.h" />
@@ -814,7 +812,6 @@
     <ClInclude Include="application\Stages\BaseStage.h" />
     <ClInclude Include="application\Stages\Stage\MirrorStage.h" />
     <ClInclude Include="application\Stages\Stage\LightStage.h" />
-    <ClInclude Include="Engine\Editor\EditorTool\SaveTemplate\SaveTemplate.h" />
     <ClInclude Include="Engine\Editor\EditorManager\EditorManager.h" />
     <ClInclude Include="Engine\Editor\EditorTool\Asset\EditorAsset.h" />
     <ClInclude Include="application\GameObject\LightManager\LightManager.h" />
@@ -866,6 +863,7 @@
     <ClInclude Include="application\GameObject\RadiconStage\MiniWhiteboard\MiniWhiteboard.h" />
     <ClInclude Include="application\Text\LockerMenu\LockerMenu.h" />
     <ClInclude Include="application\MiniMap\MiniMap.h" />
+    <ClInclude Include="application\GameObject\Chair\DummyChair.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

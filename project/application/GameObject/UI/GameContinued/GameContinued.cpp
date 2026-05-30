@@ -34,15 +34,18 @@ void GameContinued::LoadAllSlots()
 {
     auto& gameSave = GameSave::GetInstance();
     for (int i = 0; i < saveDataMaxNum_; ++i) {
+        
+        std::string saveFileName = "SaveFile" + std::to_string(i+1);
         if (gameSave.IsFileExistsAndLoad(i)) {
             gameSave.LoadFromIndex(i);
             auto progressSaveData = gameSave.GetProgressSaveData();
             auto saveDataTime = gameSave.GetSaveDataTime();
             LoadAndSetSpriteHandle(i, false);
             //表示するセーブデータのテキストをセットする
-            SetSaveData(i, "SaveFile", progressSaveData.currentStageName.c_str(), saveDataTime.c_str());
+            
+            SetSaveData(i, saveFileName.c_str(), progressSaveData.currentStageName.c_str(), saveDataTime.c_str());
         } else {
-            SetSaveData(i, "SaveFile", "NoData", "--:--");
+            SetSaveData(i, saveFileName.c_str(), "NoData", "--:--");
         }
     }
 }
@@ -281,7 +284,9 @@ void GameContinued::Update() {
 }
 
 void GameContinued::Draw() {
+
 	SpriteCommon::GetInstance()->DrawCommon();
+
 	for (auto& saveData : gameSaveData_) {
 		saveData.BlockSprite_->Draw();
 		saveData.GameSceneSprite_->Draw();
@@ -292,15 +297,28 @@ void GameContinued::Draw() {
         selectSpriteRight_->Draw();
 	
 	}
-	SpriteCommon::GetInstance()->DrawCommonFont();
+
+
+    SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
+    SpriteCommon::GetInstance()->DrawCommonFont();
+
 	text_->Draw();
+
 	backHintText_.Draw();
+
 	if (isSaveChecked_) {
         selectHintText_.Draw();
 	selectCancelText_.Draw();
 	selectConfirmText_.Draw();
 
+    
+    	selectCancelText_.Draw();
+    	selectConfirmText_.Draw();
+    	selectHintText_.Draw();
+
     }
+
+    SpriteCommon::GetInstance()->DrawCommon();
 }
 
 bool GameContinued::ConsumeBackTriggered() {

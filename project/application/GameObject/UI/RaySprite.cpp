@@ -1,7 +1,7 @@
 #include "RaySprite.h"
 #include "TextureManager.h"
 #include "Sprite/SpriteCommon.h"
-#include"WinApp.h"
+
 #include"GameObject/KeyBindConfig.h"
 #include"GameObject/Portal/PortalManager.h"
 #include"GameObject/Player/Player.h"

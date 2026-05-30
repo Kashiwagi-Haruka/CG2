@@ -74,9 +74,6 @@ GentleManStage::GentleManStage(Player* player)
     wallManagerRoofFloor_ = std::make_unique<WallManagerRoofFloor>();
     documentManager_ = std::make_unique<DocumentManager>();
     
-    timeCardWatch_ = std::make_unique<TimeCardWatch>();
-    timeCardWatch_->SetPlayer(player_);
-
     //懐中電灯の作成
     flashlight_ = std::make_unique<Flashlight>();
     flashlight_->SetPlayer(player_);
@@ -89,7 +86,6 @@ void GentleManStage::Initialize() {
 	Hierarchy* hierarchy = Hierarchy::GetInstance();
 	hierarchy->BeginRegisterFile("GentleManStage_objectEditors.json");
 
-	timeCardWatch_->Initialize();
 	portalManager_->Initialize();
 	wallManagerRoofFloor_->Initialize();
 
@@ -118,7 +114,7 @@ void GentleManStage::UpdateGameObject(Camera* camera, const Vector3& lightDirect
     documentManager_->Update();
     //懐中電灯の更新
     flashlight_->Update();
-    timeCardWatch_->Update();
+
     door_->Update();
     UpdateLights();
 }
@@ -176,7 +172,7 @@ void GentleManStage::SetCollisionManager(CollisionManager* collisionManager)
 void GentleManStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
 
     wallManagerRoofFloor_->Draw();
-    timeCardWatch_->Draw();
+
     giantGentleMan_->Draw();
     flashlight_->Draw();
     door_->Draw();
@@ -195,7 +191,7 @@ void GentleManStage::SetSceneCameraForDraw(Camera* camera) {
     portalManager_->SetCamera(camera);
     wallManagerRoofFloor_->SetCamera(camera);
     documentManager_->SetCamera(camera);
-    timeCardWatch_->SetCamera(camera);
+
     giantGentleMan_->SetCamera(camera);
     flashlight_->SetCamera(camera);
     door_->SetCamera(camera);

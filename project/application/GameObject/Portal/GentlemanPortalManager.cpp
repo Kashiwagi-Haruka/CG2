@@ -155,7 +155,9 @@ void GentlemanPortalManager::Update() {
     UpdatePortal();
 }
 
-void GentlemanPortalManager::CheckCollision() {
+void GentlemanPortalManager::CheckCollision(const bool isOneSide) {
+
+    (void)isOneSide;
 
     canMakePortal_ = false;
 

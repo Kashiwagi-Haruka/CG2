@@ -3,6 +3,9 @@
 #include "GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include"Text/GentlemanMenu/GentlemanMenu.h"
 #include"GameObject/Player/Player.h"
+#include"GentlemanTalk.h"
+#include"GameObject/Key/Key.h"
+#include"GameObject/SEManager/SEManager.h"
 
 GentleManManager::GentleManManager()
 {
@@ -14,7 +17,8 @@ GentleManManager::GentleManManager()
 void GentleManManager::Initialize()
 {	// セーブポイント紳士
     gentleman_->Initialize();
-
+    isTired_ = false;
+    isSit_ = false;
 }
 
 void GentleManManager::Update()
@@ -25,14 +29,79 @@ void GentleManManager::Update()
         return;
     }
 
-    //ミラーステージの時
-    if (progressSaveData_->currentStageName == "MirrorStage") {
-        gentleman_->SetAnimationName("Idle");
-    }
-
     //チュートリアルステージの時
     if (progressSaveData_->currentStageName == "TutorialStage") {
+
+        if (GentlemanTalk::GetIsTalkEnd()) {
+            gentleman_->SetAnimationName("Idle");
+        } else {
+            gentleman_->SetAnimationName("Talk");
+        }
+
+    }
+
+    //ミラーステージの時
+    if (progressSaveData_->currentStageName == "MirrorStage") {
+
+        if (Gentleman::IsRayHit()) {
+
+
+            if (isSit_) {
+                if (GentlemanTalk::GetIsTalkEnd()) {
+                    gentleman_->SetAnimationName("Sit");
+                } else {
+                    gentleman_->SetAnimationName("SitTalk");
+                }
+            } else {
+
+
+                gentleman_->SetAnimationName("SitDown");
+                isSit_ = true;
+
+
+
+            }
+
+
+
+        }
+
+
+
+    }
+
+    //落下の時
+    if (progressSaveData_->currentStageName == "ElevatorFallStage") {
         gentleman_->SetAnimationName("AerialPigeon");
+    }
+
+    //落下の時
+    if (progressSaveData_->currentStageName == "RestroomStage") {
+        if (Key::IsGetKey()) {
+
+            gentleman_->SetAnimationName("Soft");
+
+        } else {
+            //  rayがヒットすると...
+
+            if (Gentleman::IsRayHit()) {
+
+                if (!isTired_) {
+                    gentleman_->SetAnimationName("Tired");
+                    isTired_ = true;
+
+                    //ドサッと倒れる音
+                    SEManager::SoundPlay(SEManager::FALL_DOWN);
+                }
+
+            }
+
+            if (!isTired_) {
+                gentleman_->SetAnimationName("Idle");
+            }
+
+        }
+
     }
 
     // セーブポイント紳士

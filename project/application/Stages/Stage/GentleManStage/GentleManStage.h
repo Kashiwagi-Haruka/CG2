@@ -17,7 +17,7 @@ class GentleManStage :
 {
     Player* player_ = nullptr;
     Yoshida::LightManager* lightManager_ = nullptr;
-    std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
+
     std::unique_ptr<GentlemanPortalManager> portalManager_ = nullptr;
     CollisionManager* stageCollisionManager_ = nullptr;
     std::unique_ptr<WallManagerRoofFloor> wallManagerRoofFloor_ = nullptr;
