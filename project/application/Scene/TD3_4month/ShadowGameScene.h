@@ -133,6 +133,8 @@ private:
 	void UpdatePlayerDamage();
     //ポイントライトの更新処理
     void UpdateLight();
+	//elevatorの更新処理
+	void UpdateElevator();
     //ステージ遷移の更新処理
     void UpdateStagetransition();
     // =======================================

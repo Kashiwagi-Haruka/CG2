@@ -37,7 +37,8 @@ void SEManager::Load() {
 	SEs_[MYSTERY] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/mystery.mp3");
 	SEs_[PC] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/pc.mp3");
 	SEs_[FALL_DOWN]  = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/fallDown.mp3");
-	
+	SEs_[BUZZER] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/buzzer.mp3");
+
 }
 
 void SEManager::Initialize() {
