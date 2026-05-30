@@ -30,7 +30,7 @@ void RotatingPlaygroundEquipment::Initialize() {
 			spinObj_->SetSkinCluster(&spinSkinCluster_);
 		}
 	}
-	spinTransform_.scale = {0.1f, 0.1f, 0.1f};
+	spinTransform_.scale = {0.2f, 0.2f, 0.2f};
 	spinTransform_.rotate = {0.0f, 0.0f, 0.0f};
 	spinTransform_.translate = {0.0f, 0.0f, 0.0f};
 	spinObj_->SetTransform(spinTransform_);
