@@ -64,6 +64,7 @@ void ObjectCollider::Initialize(const YoshidaMath::ColliderType& type)
 {
     SetCollisionAttribute(kCollisionWall);
     SetCollisionMask(kCollisionPlayer);
+    
 
     if (type == YoshidaMath::ColliderType::kAABB) {
         primitive_->Initialize(Primitive::Box);

@@ -364,6 +364,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\GameObject\RadiconStage\MiniWhiteboard\MiniWhiteboard.cpp" />
     <ClCompile Include="application\Text\LockerMenu\LockerMenu.cpp" />
     <ClCompile Include="application\MiniMap\MiniMap.cpp" />
+    <ClCompile Include="application\Stages\Stage\LoopStage\LoopStage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -606,6 +607,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\GameObject\RadiconStage\MiniWhiteboard\MiniWhiteboard.h" />
     <ClInclude Include="application\Text\LockerMenu\LockerMenu.h" />
     <ClInclude Include="application\MiniMap\MiniMap.h" />
+    <ClInclude Include="application\Stages\Stage\LoopStage\LoopStage.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shader\FullScreenCopy\CopyImage.PS.hlsl">

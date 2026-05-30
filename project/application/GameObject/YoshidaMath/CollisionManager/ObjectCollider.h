@@ -17,6 +17,7 @@ public:
     void RegisterEditor(const std::string& name) { primitive_->RegisterEditor(name); };
     void Initialize(const YoshidaMath::ColliderType& type);
     void SetParentMatrix(Matrix4x4* parentMatrix) { parent_ = parentMatrix; }
+    void SetTextureIndex(const uint32_t textureIndex) { primitive_->SetTextureIndex(textureIndex); }
 protected:
 
     std::unique_ptr<Primitive>primitive_ = nullptr;
