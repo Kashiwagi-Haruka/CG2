@@ -10,6 +10,11 @@
 *.userosscache
 *.sln.docstates
 
+
+# セーブデータやスクショをGit管理から除外する
+project/Resources/JSON/gameSave_*.json
+project/Resources/TD3_3102/2d/SaveScreenShot/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
