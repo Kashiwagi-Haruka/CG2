@@ -51,7 +51,22 @@ public:
     }
     void PlayerSave(const Transform& transform);                                                                    // プレイヤーのセーブデータを保存する
     void CameraSave(const CameraSaveData& saveData); // カメラのセーブデータを保存する
-    void ProgressSave(const ProgressSaveData& progressSaveData); // 進行状況のセーブデータを保存する
+
+    void SetIsLightHave(const bool isLightHave) { progressSaveData_.isLightHave = isLightHave; };
+    void SetIsKeyHave(const bool isKeyHave) { progressSaveData_.isKeyHave = isKeyHave; };
+    bool SetCurrentStage(const std::string stageName) {
+        if (progressSaveData_.currentStageName == stageName) {
+            return false;
+        }
+
+        progressSaveData_.currentStageName = stageName;
+
+        return true;
+
+
+    };
+    void SetIsGameClear(const bool isClear) { progressSaveData_.isGameClear = isClear; };
+
     //セーブデータをセットする
     void SetSaveDateTime(const std::string& saveDataTime) { saveDateTime_ = saveDataTime; }
     // 引数にスロット番号を追加
@@ -71,7 +86,7 @@ public:
     const std::string GetCurrentDateTimeString(const bool isOverWrap = true);
     const std::string GetFileName(const int slotIndex);
     const std::string GetScreenShotFileName(const int slotIndex);
-    const std::string GetSaveDataTime() {return  saveDateTime_; }
+    const std::string GetSaveDataTime() { return  saveDateTime_; }
 
 
 

@@ -15,7 +15,7 @@ bool GentlemanMenu::isShowSaveMenu_ = false;
 
 PlayerCamera* GentlemanMenu::playerCamera_ = nullptr;
 Transform* GentlemanMenu::playerTransform_ = nullptr;
-ProgressSaveData* GentlemanMenu::progressSaveData_ = nullptr;
+
 
 GentlemanMenu::GentlemanMenu()
 {
@@ -224,14 +224,15 @@ void GentlemanMenu::Save()
     //現在の時間の文字列
     auto dataTimeString = save.GetCurrentDateTimeString(false);
     //表示するセーブデータのテキストをセットする
-    gameContinued_->SetSaveData(slotIndex, "SaveFile", progressSaveData_->currentStageName.c_str(), dataTimeString.c_str());
+    auto& saveData = save.GetProgressSaveData();
+
+    gameContinued_->SetSaveData(slotIndex, "SaveFile", saveData.currentStageName.c_str(), dataTimeString.c_str());
 
     //スロットインデックスを入れる
     preGameContinueSelectIndex_ = slotIndex;
 
     save.CameraSave(playerCamera_->GetParam());
     save.PlayerSave(*playerTransform_);
-    save.ProgressSave(*progressSaveData_);
     save.SetSaveDateTime(dataTimeString);
 
     save.Save(slotIndex);

@@ -24,13 +24,16 @@ void GentleManManager::Initialize()
 void GentleManManager::Update()
 {
 
+
+   auto saveData = GameSave::GetInstance().GetProgressSaveData();
+
     //最終ステージの時はいない
-    if (progressSaveData_->currentStageName == "GentleManStage") {
+    if (saveData.currentStageName == "GentleManStage") {
         return;
     }
 
     //チュートリアルステージの時
-    if (progressSaveData_->currentStageName == "TutorialStage") {
+    if (saveData.currentStageName == "TutorialStage") {
 
         if (GentlemanTalk::GetIsTalkEnd()) {
             gentleman_->SetAnimationName("Idle");
@@ -41,7 +44,7 @@ void GentleManManager::Update()
     }
 
     //ミラーステージの時
-    if (progressSaveData_->currentStageName == "MirrorStage") {
+    if (saveData.currentStageName == "MirrorStage") {
 
         if (Gentleman::IsRayHit()) {
 
@@ -71,12 +74,12 @@ void GentleManManager::Update()
     }
 
     //落下の時
-    if (progressSaveData_->currentStageName == "ElevatorFallStage") {
+    if (saveData.currentStageName == "ElevatorFallStage") {
         gentleman_->SetAnimationName("AerialPigeon");
     }
 
     //落下の時
-    if (progressSaveData_->currentStageName == "RestroomStage") {
+    if (saveData.currentStageName == "RestroomStage") {
         if (Key::IsGetKey()) {
 
             gentleman_->SetAnimationName("Soft");
@@ -111,8 +114,11 @@ void GentleManManager::Update()
 
 void GentleManManager::Draw()
 {
+
+    auto saveData = GameSave::GetInstance().GetProgressSaveData();
+
     //最終ステージの時はいない
-    if (progressSaveData_->currentStageName == "GentleManStage") {
+    if (saveData.currentStageName == "GentleManStage") {
         return;
     }
     // セーブポイント紳士
@@ -143,9 +149,3 @@ void GentleManManager::SetPlayer(Player* player)
     GentlemanMenu::SetPlayerTransform(&player_->GetTransform());
 }
 
-void GentleManManager::SetProgressSaveData(ProgressSaveData* progressSaveData)
-{
-    progressSaveData_ = progressSaveData;
-
-    GentlemanMenu::SetProgressSaveData(progressSaveData_);
-}

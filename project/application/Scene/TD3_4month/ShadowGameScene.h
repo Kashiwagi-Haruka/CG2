@@ -73,9 +73,6 @@ private:
 	std::string nextSceneName_;
 #pragma endregion
 
-#pragma region // セーブ
-    ProgressSaveData progressSaveData_;
-#pragma endregion
 #pragma region//ゲームオブジェクトの設定
     //Player
     std::unique_ptr<Player> player_ = nullptr;
@@ -85,11 +82,6 @@ private:
 
     //エレベータ部屋の管理
     std::unique_ptr<ElevatorRoomManager> elevatorRoomManager_ = nullptr;
-
-    ////タイムカード
-    //std::unique_ptr<TimeCard> timeCard_ = nullptr;
-    //std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
-
     // エレベーター
     std::unique_ptr<Elevator> elevator_ = nullptr;
 
@@ -142,7 +134,7 @@ private:
     //ポイントライトの更新処理
     void UpdateLight();
     //ステージ遷移の更新処理
-    void StageTransition();
+    void UpdateStagetransition();
     // =======================================
     // プライベート描画処理
     // =======================================

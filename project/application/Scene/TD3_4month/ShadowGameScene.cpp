@@ -18,14 +18,14 @@
 
 #include"Model/ModelManager.h"
 ShadowGameScene::ShadowGameScene() {
+
     // BGMの管理
     BGMManager::Load();
-
     // シーン遷移の設定
     transition_ = std::make_unique<SceneTransition>();
-
     // プレイヤーの生成
     player_ = std::make_unique<Player>();
+
     auto& gameSave = GameSave::GetInstance();
 
     if (gameSave.GetInitStart()) {
@@ -35,24 +35,22 @@ ShadowGameScene::ShadowGameScene() {
         gameSave.LoadFromIndex(gameSave.GetSelectSlotIndex());
     }
 
-    progressSaveData_ = gameSave.GetProgressSaveData();
-    // プレイヤーの初期化
-    player_->Initialize();
-    player_->SetTransform(gameSave.GetPlayerSaveData().transform);
+    auto saveData = gameSave.GetProgressSaveData();
+
     // カメラコントローラー
     cameraController_ = CameraController::GetInstance();
     cameraController_->SetPlayer(player_.get());
-
+    //ライト管理
     lightManager_ = std::make_unique<Yoshida::LightManager>();
-
+    //ステージ管理
     stageManager_ = std::make_unique<StageManager>(player_.get());
-    stageManager_->CreateStage(progressSaveData_.currentStageName);
+    stageManager_->CreateStage(saveData.currentStageName);
     // エレベーター
     elevator_ = std::make_unique<Elevator>();
     //紳士管理
     gentleManManager_ = std::make_unique<GentleManManager>();
     gentleManManager_->SetPlayer(player_.get());
-    gentleManManager_->SetProgressSaveData(&progressSaveData_);
+
     // エレベータールーム
     elevatorRoomManager_ = std::make_unique<ElevatorRoomManager>();
     // 衝突管理
@@ -65,14 +63,16 @@ ShadowGameScene::ShadowGameScene() {
     firstEvent_ = std::make_unique<FirstGameEvent>();
     // PlayerCameraをセットする
     SetPlayerCamera(cameraController_->GetPlayerCamera());
-
+    //ダメージ
     damageOverlay_ = std::make_unique<DamageOverlay>();
+    //スカイボックス
     skyBox_ = std::make_unique<SkyBox>();
 
+    //携帯打刻機　
     for (auto& timeCardWatch : timeCardWatches_) {
         timeCardWatch = std::make_unique<TimeCardWatch>();
     }
-
+    //一つはプレイやー一つは紳士用
     timeCardWatches_[0]->SetParentMat(&player_->GetHandMatPtr());
     timeCardWatches_[1]->SetParentMat(&gentleManManager_->GetGentleman()->GetHandMat());
 
@@ -116,31 +116,31 @@ void ShadowGameScene::Initialize()
         // 一旦ここでロード
         gameSave.LoadFromIndex(gameSave.GetSelectSlotIndex());
     }
-    progressSaveData_ = gameSave.GetProgressSaveData();
+
+    // プレイヤーの初期化
+    player_->Initialize();
 
     PlayerCommand::Initialize();
     //カメラコントローラー
     cameraController_->Initialize();
     cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
-
+    //ライト管理
     lightManager_->Initialize();
-    //懐中電灯共通のプログレスセーブデータのポインタを格納
-    Flashlight::SetProgressSaveDataPtr(&progressSaveData_);
+
+
+    auto progress = gameSave.GetProgressSaveData();
     //紳士管理
     gentleManManager_->Initialize();
-    gentleManManager_->GetGentleman()->SetGentleManTackScript(progressSaveData_.currentStageName);
+    gentleManManager_->GetGentleman()->SetGentleManTackScript(progress.currentStageName);
     // エレベータールーム
     elevatorRoomManager_->Initialize();
     // エレベーター
     elevator_->Initialize();
-    elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData_.currentStageName));
-
-
+    elevator_->SetStageNumber(StageNumber::FromStageName(progress.currentStageName));
 
     for (auto& timeCardWatch : timeCardWatches_) {
         timeCardWatch->Initialize();
     }
- 
 
     hierarchy->LoadObjectEditorsFromJsonIfExists("ShadowGameScene_objectEditors.json");
     hierarchy->EndRegisterFile();
@@ -171,18 +171,18 @@ void ShadowGameScene::Initialize()
 
     //カーソルを画面中央に設定する
     uiManager_->CursorHideAndStop();
+    uiManager_->ShowKeyLostAtStageStartMessage();
+
     //カメラをセットする
     SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
     //最初のイベントをセットする
     currentEvent_ = firstEvent_.get();
-
-
+    currentEvent_->StartEvent();
 
     Update();
 
-    currentEvent_->StartEvent();
-    uiManager_->ShowKeyLostAtStageStartMessage();
+
 }
 
 void ShadowGameScene::Update() {
@@ -192,23 +192,25 @@ void ShadowGameScene::Update() {
     // BGMの更新処理
     BGMManager::Update();
 
-    StageTransition();
+    UpdateStagetransition();
     currentEvent_->Update();
-
 
     // ポストエフェクトの更新処理
     UpdatePostEffect();
 
-    if (!currentEvent_->IsRunning()) {
+    if (currentEvent_->IsRunning()) {
+        //イベント中は一旦プレイヤー移動をロックする
+        PlayerCommand::SetIsMoveLocked(true);
+
+    } else {
         // UI管理
         uiManager_->Update();
         if (Inventory::GetInstance()->ConsumeItemUseEvent()) {
             player_->SetHP(player_->GetMaxHP());
         }
-        PlayerCommand::SetIsUiInputLocked(UIManager::IsUiOperationBlocked());
+        PlayerCommand::SetIsMoveLocked(UIManager::IsUiOperationBlocked());
     }
-    // シーン遷移の更新処理
-    UpdateSceneTransition();
+
 
     // ゲームオブジェクトの更新処理
     UpdateGameObject();
@@ -216,20 +218,17 @@ void ShadowGameScene::Update() {
     UpdateCamera();
     // ポータル管理 カメラの更新後に行う
     stageManager_->UpdatePortal();
+    //プレイヤーのダメージ
     UpdatePlayerDamage();
-   
-    
+
     // ライトの更新処理
     UpdateLight();
-    
+
     // オブジェクトの当たり判定
     CheckCollision();
-    if (transition_->IsEnd() && isTransitionOut_) {
-        if (!nextSceneName_.empty()) {
-            // シーンの切り替え
-            SceneManager::GetInstance()->ChangeScene(nextSceneName_);
-        }
-    }
+
+    // シーン遷移の更新処理
+    UpdateSceneTransition();
 }
 
 void ShadowGameScene::Draw()
@@ -262,17 +261,19 @@ void ShadowGameScene::DebugImGui() {
     ImGui::Begin("shadowGameScene");
     static constexpr const char* kStageNames[] = { "MirrorStage", "LightStage", "TutorialStage", "RadiconStage","GentleManStage","RestroomStage","ElevatorFallStage" };
     int stageIndex = 0;
-    if (progressSaveData_.currentStageName == "LightStage") {
+    auto& progressSaveData = GameSave::GetInstance().GetProgressSaveData();
+
+    if (progressSaveData.currentStageName == "LightStage") {
         stageIndex = 1;
-    } else if (progressSaveData_.currentStageName == "TutorialStage") {
+    } else if (progressSaveData.currentStageName == "TutorialStage") {
         stageIndex = 2;
-    } else if (progressSaveData_.currentStageName == "RadiconStage") {
+    } else if (progressSaveData.currentStageName == "RadiconStage") {
         stageIndex = 3;
-    } else if (progressSaveData_.currentStageName == "GentleManStage") {
+    } else if (progressSaveData.currentStageName == "GentleManStage") {
         stageIndex = 4;
-    } else if (progressSaveData_.currentStageName == "RestroomStage") {
+    } else if (progressSaveData.currentStageName == "RestroomStage") {
         stageIndex = 5;
-    } else if (progressSaveData_.currentStageName == "ElevatorFallStage") {
+    } else if (progressSaveData.currentStageName == "ElevatorFallStage") {
         stageIndex = 6;
     }
 
@@ -280,32 +281,42 @@ void ShadowGameScene::DebugImGui() {
         ChangeStage(kStageNames[stageIndex]);
     }
 
-    ImGui::Checkbox("isGameClear", &progressSaveData_.isGameClear);
-    ImGui::Checkbox("isKeyHave", &progressSaveData_.isKeyHave);
-    ImGui::Checkbox("isLightHave", &progressSaveData_.isLightHave);
+    ImGui::Text("isGameClear : %d", progressSaveData.isGameClear);
+    ImGui::Text("isKeyHave : %d", progressSaveData.isKeyHave);
+    ImGui::Text("isLightHave : %d", progressSaveData.isLightHave);
+
 
     ImGui::End();
 #endif // USE_IMGUI
 }
 
 void ShadowGameScene::ChangeStage(const std::string& stageName) {
-    if (stageName == progressSaveData_.currentStageName) {
+
+    auto& gameSave = GameSave::GetInstance();
+
+    if (!gameSave.SetCurrentStage(stageName)) {
         return;
     }
-    progressSaveData_.currentStageName = stageName;
-    stageManager_->CreateStage(progressSaveData_.currentStageName);
+
+    auto& progressSaveData = gameSave.GetProgressSaveData();
+
+    //キーをなくす
+    gameSave.SetIsKeyHave(false);
+    uiManager_->ShowKeyLostAtStageStartMessage();
+
+    stageManager_->CreateStage(progressSaveData.currentStageName);
     stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
     stageManager_->SetLightManager(lightManager_.get());
     stageManager_->SetPlayer(player_.get());
     stageManager_->SetCollisionManager(collisionManager_.get());
     stageManager_->InitializeStage();
-    elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData_.currentStageName));
+    //elevatorの番号を変更する
+    elevator_->SetStageNumber(StageNumber::FromStageName(progressSaveData.currentStageName));
+    //紳士のトークを変更する
+    gentleManManager_->GetGentleman()->SetGentleManTackScript(progressSaveData.currentStageName);
+
     SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
-    uiManager_->ShowKeyLostAtStageStartMessage();
-
-
-    gentleManManager_->GetGentleman()->SetGentleManTackScript(progressSaveData_.currentStageName);
 }
 
 void ShadowGameScene::CheckCollision() {
@@ -357,8 +368,10 @@ void ShadowGameScene::UpdateSceneTransition() {
     flag = false;
 #endif
 
+    auto& progressSaveData = GameSave::GetInstance().GetProgressSaveData();
+
     if (Key::IsGetKey() && flag) {
-        if (progressSaveData_.currentStageName == "GentleManStage" && !isTransitionOut_) {
+        if (progressSaveData.currentStageName == "GentleManStage" && !isTransitionOut_) {
             transition_->Initialize(true);
             isTransitionIn_ = false;
             isTransitionOut_ = true;
@@ -417,9 +430,12 @@ void ShadowGameScene::UpdatePostEffect() {
 
 void ShadowGameScene::UpdateGameObject() {
     player_->Update();
-    
+
     timeCardWatches_[0]->Update();
-    if (progressSaveData_.currentStageName != "GentleManStage") {
+
+    auto& progressSaveData = GameSave::GetInstance().GetProgressSaveData();
+
+    if (progressSaveData.currentStageName != "GentleManStage") {
         timeCardWatches_[1]->Update();
     }
 
@@ -433,7 +449,7 @@ void ShadowGameScene::UpdateGameObject() {
     //紳士管理
     gentleManManager_->Update();
     //建物 回数によって位置を変更する
-    buildings_->Update(StageNumber::FromStageName(progressSaveData_.currentStageName));
+    buildings_->Update(StageNumber::FromStageName(progressSaveData.currentStageName));
     ParticleManager::GetInstance()->Update(cameraController_->GetPlayerCamera()->GetCamera());
 }
 void ShadowGameScene::UpdatePlayerDamage() {
@@ -468,46 +484,51 @@ void ShadowGameScene::UpdateLight() {
     lightManager_->SetPointLight(elevator_->GetPointLights().at(1), 2);
     lightManager_->SetAreaLight(elevator_->GetAreaLight(), 0);
 
-    if (progressSaveData_.currentStageName == "ElevatorFallStage"&& !Key::IsGetKey()) {
+    auto& progressSaveData = GameSave::GetInstance().GetProgressSaveData();
+    if (progressSaveData.currentStageName == "ElevatorFallStage" && !Key::IsGetKey()) {
         elevator_->SetAreaLightColor(COLOR::RED);
-        
+
     } else {
         elevator_->SetAreaLightColor(COLOR::WHITE);
     }
 
 }
-void ShadowGameScene::StageTransition()
+void ShadowGameScene::UpdateStagetransition()
 {
-    if (Key::IsGetKey()) {
 
+    auto& gameSave = GameSave::GetInstance();
+    auto& saveData = gameSave.GetProgressSaveData();
+    //ゲームクリアを初期化する
+    gameSave.SetIsKeyHave(Key::IsGetKey());
+    gameSave.SetIsLightHave(Flashlight::IsGetLight());
+
+    if (saveData.isKeyHave && !saveData.isGameClear) {
         //仮に鍵を取得したときをゲームクリアとする
-        if (!progressSaveData_.isGameClear) {
-            progressSaveData_.isGameClear = true;
-        }
-
+        gameSave.SetIsGameClear(true);
     }
 
 
-
     //ステージの切り替え
-    if (elevator_->IsSceneTransitionStart() && progressSaveData_.isGameClear) {
+    if (elevator_->IsSceneTransitionStart() && saveData.isGameClear) {
 
-        if (progressSaveData_.currentStageName == "MirrorStage") {
+        if (saveData.currentStageName == "MirrorStage") {
             ChangeStage("TutorialStage");
-        } else if (progressSaveData_.currentStageName == "TutorialStage") {
+        } else if (saveData.currentStageName == "TutorialStage") {
             ChangeStage("RestroomStage");
-        } else if (progressSaveData_.currentStageName == "RestroomStage") {
+        } else if (saveData.currentStageName == "RestroomStage") {
             ChangeStage("ElevatorFallStage");
-        } else if (progressSaveData_.currentStageName == "ElevatorFallStage") {
+        } else if (saveData.currentStageName == "ElevatorFallStage") {
             ChangeStage("GentleManStage");
-        } else if (progressSaveData_.currentStageName == "GentleManStage") {
+        } else if (saveData.currentStageName == "GentleManStage") {
             //巡回させてみる
             ChangeStage("MirrorStage");
         }
 
-        progressSaveData_.isGameClear = false;
+        //ゲームクリアを初期化する
+        gameSave.SetIsGameClear(false);
     }
 }
+
 #pragma endregion
 #pragma region // private描画処理
 void ShadowGameScene::DrawSceneTransition() {
@@ -519,8 +540,6 @@ void ShadowGameScene::DrawSceneTransition() {
 void ShadowGameScene::DrawModel() {
     //=======================shadowマップの開始↓=======================
     auto* object3dCommon = Object3dCommon::GetInstance();
-
-
     object3dCommon->SetShadowMapEnabled(true, false, false, false);
     object3dCommon->BeginShadowMapPass();
     object3dCommon->DrawCommonShadow();
@@ -554,7 +573,9 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     stageManager_->DrawModel(isShadow, drawPortal, isDrawParticle);
 
     timeCardWatches_[0]->Draw();
-    if (progressSaveData_.currentStageName != "GentleManStage") {
+
+    auto progressSaveData = GameSave::GetInstance().GetProgressSaveData();
+    if (progressSaveData.currentStageName != "GentleManStage") {
         timeCardWatches_[1]->Draw();
     }
 
@@ -573,7 +594,7 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
     skyBox_->SetCamera(camera);
     player_->SetCamera(camera);
-    
+
     elevatorRoomManager_->SetCamera(camera);
     elevator_->SetCamera(camera);
     gentleManManager_->SetCamera(camera);
