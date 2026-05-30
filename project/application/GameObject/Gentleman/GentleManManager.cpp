@@ -121,6 +121,7 @@ void GentleManManager::Draw()
     if (saveData.currentStageName == "GentleManStage") {
         return;
     }
+
     // セーブポイント紳士
     gentleman_->Draw();
 

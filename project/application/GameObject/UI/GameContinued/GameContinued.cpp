@@ -285,35 +285,31 @@ void GameContinued::Update() {
 
 void GameContinued::Draw() {
 
-	SpriteCommon::GetInstance()->DrawCommon();
+    SpriteCommon::GetInstance()->DrawCommon();
 
 	for (auto& saveData : gameSaveData_) {
 		saveData.BlockSprite_->Draw();
 		saveData.GameSceneSprite_->Draw();
 	}
-    if (isSaveChecked_) {
-        selectHintSprite_->Draw();
-        selectSpriteLeft_->Draw();
-        selectSpriteRight_->Draw();
-	
-	}
-
 
     SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
     SpriteCommon::GetInstance()->DrawCommonFont();
 
 	text_->Draw();
-
 	backHintText_.Draw();
 
-	if (isSaveChecked_) {
+    if (isSaveChecked_) {
+        SpriteCommon::GetInstance()->DrawCommon();
+        selectHintSprite_->Draw();
+        selectSpriteLeft_->Draw();
+        selectSpriteRight_->Draw();
 
-    selectHintText_.Draw();
-	selectCancelText_.Draw();
-	selectConfirmText_.Draw();
-
-
+        SpriteCommon::GetInstance()->DrawCommonFont();
+        selectHintText_.Draw();
+        selectCancelText_.Draw();
+        selectConfirmText_.Draw();
     }
+
 
     SpriteCommon::GetInstance()->DrawCommon();
 }

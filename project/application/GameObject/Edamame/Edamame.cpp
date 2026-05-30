@@ -81,6 +81,7 @@ void Edamame::Update()
 
 void Edamame::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommon();
     obj_->Draw();
     edamameModel_->Draw();
 }

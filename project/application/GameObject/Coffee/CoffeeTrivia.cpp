@@ -97,11 +97,13 @@ void CoffeeTrivia::Draw() {
 	}
 	Object3dCommon::GetInstance()->DrawCommon();
 	triviaObj_->Draw();
+
 	if (isRayHit_) {
 		Object3dCommon::GetInstance()->DrawCommonOutline();
 		triviaObj_->Draw();
 		Object3dCommon::GetInstance()->EndOutlineDraw();
 	}
+
 }
 
 void CoffeeTrivia::SetVol(float vol) { Audio::GetInstance()->SetSoundVolume(&triviaVoice_, vol); }

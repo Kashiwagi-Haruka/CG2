@@ -67,8 +67,6 @@ void ElevatorRoomManager::Update()
 
 void ElevatorRoomManager::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommon();
-
     room_->Draw();
 
     //for (auto& [name, collider] : colliders_) {

@@ -305,27 +305,38 @@ void MirrorStage::CheckCollision() {
 }
 
 void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
+	
+	//DrawCommon普通描画
+	Object3dCommon::GetInstance()->DrawCommon();
 	testField_->Draw();
 	wallManager_->Draw();
 	wallManager2_->Draw();
-	vendingMac_->Draw();
 	coffees_->Draw();
-	coffeeTrivia_->Draw();
+	timeCard_->Draw();
+	timeCardRack_->Draw();
+	dummyChair_->Draw();
 
+	//これは状況によりアウトラインあり
+	vendingMac_->Draw();
+	coffeeTrivia_->Draw();
 	flashlight_->Draw();
 	key_->Draw();
 	chairManager_->Draw();
-	timeCard_->Draw();
-	timeCardRack_->Draw();
 	boxManager_->Draw();
-	lockerManager_->Draw();
-	pc_->Draw();
-	door_->Draw();
-	deskManager_->Draw();
-	edamame_->Draw();
 	hintSheetManager_->Draw();
+
+	//スキニングアリ
+	lockerManager_->Draw();
+	deskManager_->Draw();
+
+	//スキニングと普通描画が混ざる
 	whiteBoardManager_->Draw();
-	dummyChair_->Draw();
+	door_->Draw();
+
+	//スキニングアウトライン
+	pc_->Draw();
+	edamame_->Draw();
+
 	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 

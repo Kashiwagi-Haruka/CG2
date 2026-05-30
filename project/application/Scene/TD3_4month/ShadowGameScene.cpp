@@ -1,4 +1,5 @@
 #define NOMINMAX
+#define NOMINMAX
 #include "ShadowGameScene.h"
 
 #include "SceneManager.h"
@@ -561,34 +562,33 @@ void ShadowGameScene::DrawModel() {
     SetCameraAndDraw(cameraController_->GetPlayerCamera()->GetCamera(), true, true, true, false);
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer, bool drawPlayerHead) {
-    // エレベータルーム
-
-    Object3dCommon::GetInstance()->DrawCommon();
 
     // エレベーター
     elevator_->Draw();
     gentleManManager_->Draw();
-    elevatorRoomManager_->Draw();
 
-    stageManager_->DrawModel(isShadow, drawPortal, isDrawParticle);
-
-    timeCardWatches_[0]->Draw();
 
     auto progressSaveData = GameSave::GetInstance().GetProgressSaveData();
     if (progressSaveData.currentStageName != "GentleManStage") {
         timeCardWatches_[1]->Draw();
     }
 
+    Object3dCommon::GetInstance()->DrawCommon();
+    stageManager_->DrawModel(isShadow, drawPortal, isDrawParticle);
+    
     if (drawPlayer) {
+
+        timeCardWatches_[0]->Draw();
         // プレイヤーの描画処理
         player_->Draw();
+      
     }
 
+    Object3dCommon::GetInstance()->DrawCommon();
+    // エレベータルーム
+    elevatorRoomManager_->Draw();
     //建物
     buildings_->Draw();
-
-    if (drawPlayerHead) {
-    }
 }
 
 void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
@@ -609,7 +609,6 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
 }
 void ShadowGameScene::SetPlayerCamera(PlayerCamera* playerCamera) {
     stageManager_->SetPlayerCamera(playerCamera);
-
     gentleManManager_->SetPlayerCamera(playerCamera);
     elevator_->SetPlayerCamera(playerCamera);
 }

@@ -161,20 +161,21 @@ void Drink::Update() {
 }
 
 void Drink::Draw() {
+
 	for (const auto& spawnedDrink : spawnedDrinks_) {
 		if (spawnedDrink.object) {
+
+			Object3dCommon::GetInstance()->DrawCommon();
+			spawnedDrink.object->Draw();
+
 			if (spawnedDrink.isRayHit) {
-				Object3dCommon::GetInstance()->DrawCommon();
-				spawnedDrink.object->Draw();
 				Object3dCommon::GetInstance()->DrawCommonOutline();
 				spawnedDrink.object->Draw();
 				Object3dCommon::GetInstance()->EndOutlineDraw();
-			} else {
-				Object3dCommon::GetInstance()->DrawCommon();
-				spawnedDrink.object->Draw();
 			}
 		}
 	}
+
 }
 
 void Drink::SetCamera(Camera* camera) {

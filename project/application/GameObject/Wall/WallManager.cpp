@@ -86,7 +86,7 @@ void WallManager::Update()
 
 void WallManager::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommon();
+
     room1_->Draw();
 
     //for (auto& [name, collider] : colliders_) {

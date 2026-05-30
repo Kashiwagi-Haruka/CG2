@@ -519,10 +519,11 @@ void Coffees::Update(Camera* camera, const Vector3& lightDirection) {
 }
 
 void Coffees::Draw() {
+   
     if (!isSpilling_) {
         return;
     }
-    Object3dCommon::GetInstance()->DrawCommon();
+
     instancedObject_->Draw();
 }
 

@@ -44,7 +44,7 @@ void FileObject::Initialize()
 
 void FileObject::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommon();
+
     obj_->Draw();
 
 }

@@ -4,6 +4,8 @@
 #include"Function.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"Option/Option.h"
+#include"Object3d/Object3dCommon.h"
+
 WarpPos::WarpPos()
 {
     camera_ = std::make_unique<Camera>();
@@ -65,6 +67,7 @@ void WarpPos::Update()
 void WarpPos::Draw()
 {
 #ifdef USE_IMGUI
+    Object3dCommon::GetInstance()->DrawCommon();
     object3d_->Draw();
 #endif
  

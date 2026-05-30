@@ -100,16 +100,16 @@ void Chair::Initialize() {
 void Chair::RegisterEditor(const std::string& registrationName) { obj_->RegisterEditor(registrationName); }
 
 void Chair::Draw() {
+
+    Object3dCommon::GetInstance()->DrawCommon();
+    obj_->Draw();
+
     if (isRayHit_) {
-        Object3dCommon::GetInstance()->DrawCommon();
-        obj_->Draw();
         Object3dCommon::GetInstance()->DrawCommonOutline();
         obj_->Draw();
         Object3dCommon::GetInstance()->EndOutlineDraw();
-    } else {
-        Object3dCommon::GetInstance()->DrawCommon();
-        obj_->Draw();
     }
+
 }
 
 void Chair::SwichCommand()

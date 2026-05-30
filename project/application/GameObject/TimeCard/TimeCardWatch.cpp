@@ -7,7 +7,7 @@
 #include"Camera.h"
 #include"Audio.h"
 #include"GameObject/Player/Player.h"
-
+#include "Object3d/Object3dCommon.h"
 TimeCardWatch::TimeCardWatch()
 {
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/timeCardWatch", "timeCardWatch");
@@ -52,6 +52,7 @@ void TimeCardWatch::Update()
 
 void TimeCardWatch::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommon();
     modelObj_->Draw();   
 }
 
