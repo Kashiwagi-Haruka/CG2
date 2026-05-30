@@ -171,14 +171,20 @@ void GentleManStage::SetCollisionManager(CollisionManager* collisionManager)
 }
 void GentleManStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
 
-    wallManagerRoofFloor_->Draw();
-
-    giantGentleMan_->Draw();
+    //Rayヒットすると変化する
     flashlight_->Draw();
-    door_->Draw();
-
-    //ここで書類パーティクルを描画させる
+    //ここで書類パーティクル
     documentManager_->Draw();
+
+    //スキニングアリ
+    door_->Draw();
+    //スキニングアリ
+    giantGentleMan_->Draw();
+
+    //DrawCommon
+    Object3dCommon::GetInstance()->DrawCommon();
+    wallManagerRoofFloor_->Draw();
+    
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 void GentleManStage::DrawSprite()

@@ -207,20 +207,23 @@ void RestroomStage::SetCollisionManager(CollisionManager* collisionManager)
 }
 void RestroomStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
 
-
+    //Rayによって変化する
     key_->Draw();
-
-    door_->Draw(false);
-    whiteBoardManager_->Draw();
     flashlight_->Draw();
 
-    toiletManager_->Draw();
-
-    wallManagerRestRoom_->Draw();
-
+    //普通描画とスキニングがある
+    whiteBoardManager_->Draw();
     //ここで書類パーティクルを描画させる
     documentManager_->Draw();
 
+    //skinning
+    toiletManager_->Draw();
+    door_->Draw(false);
+
+    //DrawCommon
+    Object3dCommon::GetInstance()->DrawCommon();
+
+    wallManagerRestRoom_->Draw();
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
