@@ -36,7 +36,8 @@ public:
   std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>& GetColliders() { return colliders_; }
   std::array<PointCommonLight, 2>& GetPointLights() { return pointLights_; };
   AreaCommonLight& GetAreaLight() { return areaLight_; }
-  void SetAreaLightColor(const Vector4 color) { areaLight_.color = color; };
+  void SetFallAnimation();
+  bool IsFall() { return  desiredAnimationName == "Fall"; }
 private:
     //ライトの位置を更新する
     void UpdateLightPos();
@@ -83,6 +84,7 @@ private:
 	static bool isRayHit_;
     Matrix4x4 doorMatrixLeft_;
     Matrix4x4 doorMatrixRight_;
+
 	Transform elevatorTransform_;
 
     float baseHeight_ = 0.0f;

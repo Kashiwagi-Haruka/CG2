@@ -9,7 +9,7 @@
 #include "GameBase.h"
 #include <cmath>
 #include<imgui.h>
-
+#include"Color/Color.h"
 PlayerCamera* Elevator::playerCamera_ = nullptr;
 bool Elevator::isRayHit_ = false;
 
@@ -83,7 +83,8 @@ void Elevator::Initialize() {
     pointLights_[0].position = { 0.0f };
     pointLights_[1].position = { 0.0f };
     areaLight_.position = { 0.0f };
-    SetAreaLightColor({ 1.0f,1.0f,1.0f,1.0f });
+    areaLight_.color = COLOR::WHITE;
+
     AnimationManager::GetInstance()->LoadAnimationGroup(animationGroupName_, "Resources/TD3_3102/3d/Elevator", "Elevator");
     AnimationManager::GetInstance()->ResetPlayback(animationGroupName_, desiredAnimationName, false);
     if (const Animation::AnimationData* idleAnimation = AnimationManager::GetInstance()->FindAnimation(animationGroupName_, desiredAnimationName)) {
@@ -115,6 +116,9 @@ void Elevator::Initialize() {
     colliders_["ElevatoDoor_Left"] = std::make_unique<ObjectCollider>();
     colliders_["ElevatoDoor_Right"] = std::make_unique<ObjectCollider>();
 
+    colliders_["ElevatorFloor"] = std::make_unique<ObjectCollider>();
+
+
     colliders_["ElevatorWall_Back"]->Initialize(YoshidaMath::ColliderType::kAABB);
     colliders_["ElevatorWall_Left"]->Initialize(YoshidaMath::ColliderType::kAABB);
     colliders_["ElevatorWall_Right"]->Initialize(YoshidaMath::ColliderType::kAABB);
@@ -122,8 +126,11 @@ void Elevator::Initialize() {
     colliders_["ElevatoDoor_Left"]->Initialize(YoshidaMath::ColliderType::kAABB);
     colliders_["ElevatoDoor_Right"]->Initialize(YoshidaMath::ColliderType::kAABB);
 
+    colliders_["ElevatorFloor"]->Initialize(YoshidaMath::ColliderType::kAABB);
+
     colliders_["ElevatoDoor_Left"]->SetParentMatrix(&doorMatrixLeft_);
     colliders_["ElevatoDoor_Right"]->SetParentMatrix(&doorMatrixRight_);
+    colliders_["ElevatorFloor"]->SetCollisionAttribute(kCollisionFloor);
 
     for (auto& [name, collider] : colliders_) {
         collider->RegisterEditor(name);
@@ -160,6 +167,8 @@ void Elevator::SetCamera(Camera* camera) {
 
 void Elevator::Update() {
 
+    //落下中かそうでないかで判断する
+    areaLight_.color = IsFall()?COLOR::RED:COLOR::WHITE;
 
     modelObj_->Update();
 
@@ -194,6 +203,7 @@ void Elevator::Update() {
 
     const std::optional<int32_t> jointIndexRight = skeleton_->FindJointIndex("ボーン.002");
     const std::optional<int32_t> jointIndexLeft = skeleton_->FindJointIndex("ボーン.004");
+
     skeleton_->SetObjectMatrix(modelObj_->GetWorldMatrix());
     doorMatrixRight_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndexRight]);
     doorMatrixLeft_ = skeleton_->GetJointWorldMatrix(skeleton_->GetJoints()[*jointIndexLeft]);
@@ -220,7 +230,7 @@ void Elevator::Draw() {
     //for (auto& [name,sys] : autoLockSystems_) {
 //	sys->Draw();
 //}
-
+//
 //for (auto& [name, collider] : colliders_) {
 //    collider->Draw();
 //}
@@ -242,7 +252,7 @@ void Elevator::Close() {
 
 void Elevator::Open() {
     //しまっているとき開く
-    if (desiredAnimationName == "Close") {
+    if (desiredAnimationName == "Close" || desiredAnimationName == "Fall") {
         SEManager::SoundPlay(SEManager::ELEVATOR_OPEN);
         desiredAnimationName = "Open"; // 外にいる → 開ける
         Vector3 parentPos = YoshidaMath::GetWorldPosByMat(modelObj_->GetWorldMatrix());
@@ -251,6 +261,18 @@ void Elevator::Open() {
         pointLights_[1].position.y = lightPosY_;
 
     }
+}
+
+void Elevator::SetFallAnimation()
+{
+    if (IsFall()) {
+        return;
+    }
+
+    desiredAnimationName = "Fall";
+    //ブザーを鳴らす
+    SEManager::SoundPlay(SEManager::BUZZER);
+    isSceneTransition_ = false;
 }
 
 void Elevator::UpdateLightPos()

@@ -340,6 +340,9 @@ void ShadowGameScene::CheckCollision() {
         collisionManager_->AddCollider(system.get());
     }
     for (auto& [name, collider] : elevator_->GetColliders()) {
+        if (name == "ElevatorFloor" && elevator_->IsFall()) {
+            continue;
+        }
         collisionManager_->AddCollider(collider.get());
     }
 
@@ -443,8 +446,8 @@ void ShadowGameScene::UpdateGameObject() {
     stageManager_->SetPlayer(player_.get());
     stageManager_->UpdateGameObject(cameraController_->GetPlayerCamera()->GetCamera(), lightManager_->GetDirectionalLight().direction);
 
-    // エレベーター
-    elevator_->Update();
+    UpdateElevator();
+
     // エレベータールーム管理
     elevatorRoomManager_->Update();
     //紳士管理
@@ -485,14 +488,19 @@ void ShadowGameScene::UpdateLight() {
     lightManager_->SetPointLight(elevator_->GetPointLights().at(1), 2);
     lightManager_->SetAreaLight(elevator_->GetAreaLight(), 0);
 
+
+}
+void ShadowGameScene::UpdateElevator()
+{
+
     auto& progressSaveData = GameSave::GetInstance().GetProgressSaveData();
     if (progressSaveData.currentStageName == "ElevatorFallStage" && !Key::IsGetKey()) {
-        elevator_->SetAreaLightColor(COLOR::RED);
-
-    } else {
-        elevator_->SetAreaLightColor(COLOR::WHITE);
+        //落下アニメーションを設定する
+        elevator_->SetFallAnimation();
     }
 
+    // エレベーター
+    elevator_->Update();
 }
 void ShadowGameScene::UpdateStagetransition()
 {
@@ -575,13 +583,13 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
 
     Object3dCommon::GetInstance()->DrawCommon();
     stageManager_->DrawModel(isShadow, drawPortal, isDrawParticle);
-    
+
     if (drawPlayer) {
 
         timeCardWatches_[0]->Draw();
         // プレイヤーの描画処理
         player_->Draw();
-      
+
     }
 
     Object3dCommon::GetInstance()->DrawCommon();

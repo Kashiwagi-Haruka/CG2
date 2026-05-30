@@ -33,6 +33,7 @@ public:
 		//怪奇音
 		MYSTERY,
 		PC,
+		BUZZER,
 		MAX_SE,
 	};
 

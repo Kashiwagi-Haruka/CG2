@@ -89,14 +89,11 @@ void ElevatorFallStage::Initialize()
     portalManager_->Initialize();
     whiteBoardManager_->Initialize();
 
-
     //懐中電灯の初期化
     flashlight_->Initialize();
     wallManager2_->Initialize();
     wallManagerElevatorFall_->Initialize();
     testField_->Initialize();
-    //衝突しない
-    testField_->SetIsCollided(false);
 
     key_->Initialize();
     door_->Initialize();
@@ -127,8 +124,6 @@ void ElevatorFallStage::UpdateGameObject(Camera* camera, const Vector3& lightDir
             //着地音を鳴らす
             SEManager::SoundPlay(SEManager::FOOT_STEP);
         }
-     
-        testField_->SetIsCollided(true);
     }
 
     Vector3 translate = player->GetWorldPosition();
@@ -249,9 +244,9 @@ void ElevatorFallStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawPar
 
     wallManager2_->Draw();
     wallManagerElevatorFall_->Draw();
-    if (testField_->GetIsCollided()) {
-        testField_->Draw();
-    }
+ 
+    testField_->Draw();
+
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }

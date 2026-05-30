@@ -17,11 +17,7 @@ public:
     /// @return ワールド座標
     Vector3 GetWorldPosition() const  override;
     const Matrix4x4& GetWorldMatrix() const {return box_->GetWorldMatrix(); };
-    bool GetIsCollided() { return isCollided_; };
-    void SetIsCollided(const bool flag) { isCollided_ = flag; }
 private:
     std::unique_ptr<Primitive>box_ = nullptr;
-    Transform transform_ = {};
-    bool isCollided_ = true;
 };
 
