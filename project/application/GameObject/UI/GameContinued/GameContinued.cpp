@@ -307,14 +307,11 @@ void GameContinued::Draw() {
 	backHintText_.Draw();
 
 	if (isSaveChecked_) {
-        selectHintText_.Draw();
+
+    selectHintText_.Draw();
 	selectCancelText_.Draw();
 	selectConfirmText_.Draw();
 
-    
-    	selectCancelText_.Draw();
-    	selectConfirmText_.Draw();
-    	selectHintText_.Draw();
 
     }
 
