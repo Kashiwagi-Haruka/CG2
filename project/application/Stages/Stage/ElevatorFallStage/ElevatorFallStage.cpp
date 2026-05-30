@@ -33,8 +33,8 @@ void ElevatorFallStage::InitializeLights()
 
 void ElevatorFallStage::UpdateLights()
 {
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 2);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 3);
+	lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 0);
+	lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 1);
 
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 }

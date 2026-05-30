@@ -9,6 +9,7 @@ class TimeCardWatch;
 class DocumentManager;
 class GentlemanPortalManager;
 class GiantGentleMan;
+class RotatingPlaygroundEquipment;
 
 class Flashlight;
 
