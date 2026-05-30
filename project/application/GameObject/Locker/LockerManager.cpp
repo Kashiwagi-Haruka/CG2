@@ -11,7 +11,7 @@ bool LockerManager::isInLocker_ = false;
 
 LockerManager::LockerManager(const uint32_t num)
 {
-    for (int i = 0; i < num; ++i) {
+    for (uint32_t i = 0; i < num; ++i) {
         std::unique_ptr<Locker> locker = std::make_unique<Locker>();
         std::string name = "Locker" + std::to_string(i);
         locker->SetAnimationGroupName(name);
