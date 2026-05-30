@@ -105,9 +105,6 @@ const std::string GameSave::GetCurrentDateTimeString(const bool isOverWrap)
 
 void GameSave::PlayerSave(const Transform& transform) { playerSaveData_.transform = transform; }
 
-void GameSave::ProgressSave(const ProgressSaveData& progressSaveData) {
-    progressSaveData_ = progressSaveData;
-}
 
 void GameSave::Save(const int slotIndex) {
     nlohmann::json saveJson;

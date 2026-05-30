@@ -15,7 +15,6 @@ private:
 
     Player* player_ = nullptr;
 #pragma region // セーブ
-    ProgressSaveData* progressSaveData_ = nullptr;
     bool isTired_ = false;
     bool isSit_ = false;
 public:
@@ -27,6 +26,5 @@ public:
     void SetCamera(Camera* camera);
     void SetPlayerCamera(PlayerCamera* playerCamera);
     void SetPlayer(Player* player);
-    void SetProgressSaveData(ProgressSaveData* progressSaveData);
 };
 

@@ -22,6 +22,8 @@ void CameraController::Initialize()
     currentLerp_ = 0.0f;
     
     eventCameraTransform_.scale = { 1.0f,1.0f,1.0f };
+    eventCameraTransform_.rotate = { 0.0f,0.0f,0.0f };
+    eventCameraTransform_.translate = { 0.0f,0.0f,0.0f };
 
     playerCamera_->Initialize();
     //デバックカメラの設定
@@ -53,8 +55,8 @@ void CameraController::Update()
                 }
             }
 
-            playerCamera_->GetCamera()->SetTranslate(YoshidaMath::Easing::Lerp(eventCameraTransform_.translate, targetPos_, currentLerp_));
-            playerCamera_->GetCamera()->SetRotate(YoshidaMath::Easing::Lerp(eventCameraTransform_.rotate, targetRot_, currentLerp_));
+            playerCamera_->GetCamera()->SetTranslate(YoshidaMath::Easing::EaseInOut(eventCameraTransform_.translate, targetPos_, currentLerp_));
+            playerCamera_->GetCamera()->SetRotate(YoshidaMath::Easing::EaseInOut(eventCameraTransform_.rotate, targetRot_, currentLerp_));
         
  
         } else {

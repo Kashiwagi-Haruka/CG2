@@ -27,7 +27,6 @@ public:
 
     static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
     static void SetPlayerTransform(Transform* transform) { playerTransform_ = transform; };
-    static void SetProgressSaveData(ProgressSaveData* progressSaveData) { progressSaveData_ = progressSaveData; }
 
     void Save();
 
@@ -40,7 +39,6 @@ private:
 
     static PlayerCamera* playerCamera_;
     static Transform* playerTransform_;
-    static ProgressSaveData* progressSaveData_;
 
 #pragma region //Text
     uint32_t menuFontHandle_;

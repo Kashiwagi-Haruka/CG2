@@ -114,6 +114,7 @@ void Player::Initialize() {
     bodyObj_->Initialize();
     bodyObj_->RegisterEditor("Player");
     bodyObj_->SetTransform(transform_);
+    bodyObj_->Update();
 
     // 体にモデル挿入
     bodyObj_->SetModel("gentleman");
@@ -124,8 +125,6 @@ void Player::Initialize() {
         bodyObj_->SetAnimation(idleAnimation, true);
     }
 
-
-
     if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("gentleman")) {
         skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
         skinCluster_ = CreateSkinCluster(*skeleton_, *sizukuModel);
@@ -133,9 +132,10 @@ void Player::Initialize() {
             bodyObj_->SetSkinCluster(&skinCluster_);
         }
     }
-    //アニメーション
-    Animation();
+    ////アニメーション
+    //Animation();
     bodyObj_->SetShininess(20.0f);
+    bodyObj_->Update();
 }
 
 void Player::Update()
@@ -557,4 +557,8 @@ void Player::LoadParameters() {
     }
 
     parameterStatusMessage_ = "Loaded player parameters";
+
+    auto& gameSave = GameSave::GetInstance();
+    transform_ =  gameSave.GetPlayerSaveData().transform;
+
 }

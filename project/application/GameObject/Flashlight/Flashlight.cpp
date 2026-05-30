@@ -11,7 +11,7 @@
 bool Flashlight::isSendGetLightMessage_ = false;
 bool Flashlight::isGetLight_ = false;
 bool Flashlight::isRayHit_ = false;
-ProgressSaveData* Flashlight::progressSaveData_ = nullptr;
+
 Flashlight::Flashlight() {
 	spotLight_ = {};
 	obj_ = std::make_unique<Object3d>();
@@ -98,8 +98,8 @@ void Flashlight::Update()
 void Flashlight::Initialize()
 {
     assert(progressSaveData_);
-
-    isGetLight_ = progressSaveData_->isLightHave;
+	
+    isGetLight_ = GameSave::GetInstance().GetProgressSaveData().isLightHave;
     isLightOn_ = true;
 
     isSendGetLightMessage_ = false;
@@ -142,11 +142,7 @@ void Flashlight::CheckCollision() {
 		if (!PlayerCommand::GetIsGrab()) {
 			if (isRayHit_) {
 				isGetLight_ = true;
-				/*          PlayerCommand::SetIsGrab(true);*/
 				isSendGetLightMessage_ = true;
-				assert(progressSaveData_);
-				// 記録する
-				progressSaveData_->isLightHave = isGetLight_;
 			}
 		}
 	}

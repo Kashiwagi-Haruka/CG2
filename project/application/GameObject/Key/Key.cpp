@@ -42,13 +42,7 @@ void Key::Initialize()
     isLockerHit_ = false;
 
     auto& gameSave = GameSave::GetInstance();
-
-    if (!gameSave.GetInitStart()) {
-        isGetKey_ = gameSave.GetProgressSaveData().isKeyHave;
-    } else {
-        isGetKey_ = false;
-    }
-
+    isGetKey_ = gameSave.GetProgressSaveData().isKeyHave;
 
     isChairHit_ = false;
     isSendGetKeyMessage_ = false;
@@ -78,7 +72,7 @@ void Key::Update()
     }
 
     //rayによって色を変更する
-    obj_->SetOutlineColor(isRayHit_? kRayHitOutlineColor :kNormalColor);
+    obj_->SetOutlineColor(isRayHit_ ? kRayHitOutlineColor : kNormalColor);
 
 
     obj_->Update();
@@ -131,7 +125,7 @@ void Key::CheckCollision() {
     isRayHit_ = OnCollisionRay();
 
     if (PlayerCommand::GetInstance()->InteractTrigger()) {
-        if (isRayHit_ && !PlayerCommand::GetIsGrab()&&!ChairManager::GetIsStand()) {
+        if (isRayHit_ && !PlayerCommand::GetIsGrab() && !ChairManager::GetIsStand()) {
             isGetKey_ = true;
             isSendGetKeyMessage_ = true;
             SEManager::SoundPlay(SEManager::KEY);
