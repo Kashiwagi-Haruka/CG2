@@ -306,16 +306,6 @@ void MirrorStage::CheckCollision() {
 
 void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
 	
-	//DrawCommon普通描画
-	Object3dCommon::GetInstance()->DrawCommon();
-	testField_->Draw();
-	wallManager_->Draw();
-	wallManager2_->Draw();
-	coffees_->Draw();
-	timeCard_->Draw();
-	timeCardRack_->Draw();
-	dummyChair_->Draw();
-
 	//これは状況によりアウトラインあり
 	vendingMac_->Draw();
 	coffeeTrivia_->Draw();
@@ -336,6 +326,16 @@ void MirrorStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 	//スキニングアウトライン
 	pc_->Draw();
 	edamame_->Draw();
+
+	//DrawCommon普通描画
+	Object3dCommon::GetInstance()->DrawCommon();
+	timeCard_->Draw();
+	timeCardRack_->Draw();
+	dummyChair_->Draw();
+	coffees_->Draw();
+	testField_->Draw();
+	wallManager_->Draw();
+	wallManager2_->Draw();
 
 	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }

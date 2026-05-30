@@ -234,20 +234,24 @@ void ElevatorFallStage::CheckCollision()
 void ElevatorFallStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 {
 
-    whiteBoardManager_->Draw();
+    //状況によってアウトライン変化
     flashlight_->Draw();
     key_->Draw();
+    //skinningと普通描画が混ざる
     door_->Draw();
+    whiteBoardManager_->Draw();
+    //skinning
     deskManager_->Draw();
     lockerManager_->Draw();
 
+    //DrawCommon
+    Object3dCommon::GetInstance()->DrawCommon();
+
     wallManager2_->Draw();
     wallManagerElevatorFall_->Draw();
-
     if (testField_->GetIsCollided()) {
         testField_->Draw();
     }
-
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }

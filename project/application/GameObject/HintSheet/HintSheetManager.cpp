@@ -56,18 +56,24 @@ void HintSheetManager::Draw() {
 
 void HintSheetManager::DrawUI() {
 
+    SpriteCommon::GetInstance()->DrawCommon();
+
     for (auto& sheet : hintSheets_) {
         if (sheet->GetIsLooking()) {
-            SpriteCommon::GetInstance()->DrawCommon();
             sprite_->Draw();
             break;
         }
     }
 
+    SpriteCommon::GetInstance()->DrawCommonFont();
+
     for (auto& sheet : hintSheets_) {
         // 現在「見ている」状態のシートだけが内部でDrawを実行します
         sheet->DrawUI();
     }
+
+    SpriteCommon::GetInstance()->DrawCommon();
+
 }
 
 void HintSheetManager::SetCamera(Camera* camera) {

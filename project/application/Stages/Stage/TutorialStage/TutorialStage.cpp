@@ -215,31 +215,30 @@ void TutorialStage::SetPlayer(Player* player)
     flashlight_->SetPlayer(player_);
 }
 void TutorialStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
-    //普通描画
-    Object3dCommon::GetInstance()->DrawCommon();
-    testField_->Draw();
-    wallManager_->Draw();
-    wallManager2_->Draw();
-    //ここで書類パーティクルを描画させる
-    documentManager_->Draw();
-    fileManager_->Draw();
-
-    timeCard_->Draw();
-    timeCardRack_->Draw();
-
 
     //状況によってアウトラインかそうでないかが移り変わる
     flashlight_->Draw();
     key_->Draw();
     severedHand_->Draw();
+    //ここで書類パーティクルを描画させる
+    documentManager_->Draw();
 
     //スキニング
     deskManager_->Draw();
 
     //スキニングと普通が混ざる
-    whiteBoardManager_->Draw();
     door_->Draw();
+    whiteBoardManager_->Draw();
 
+    //普通描画
+    Object3dCommon::GetInstance()->DrawCommon();
+    timeCard_->Draw();
+    timeCardRack_->Draw();
+    fileManager_->Draw();
+
+    testField_->Draw();
+    wallManager_->Draw();
+    wallManager2_->Draw();
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 

@@ -1,6 +1,6 @@
 #include "ToiletManager.h"
 #include <string>
-
+#include"Object3d/Object3dCommon.h"
 bool ToiletManager::isRayHit_ = false;
 
 ToiletManager::ToiletManager()
@@ -41,9 +41,11 @@ void ToiletManager::Update()
 
 void ToiletManager::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
     for (auto& toilet : toilets_) {
         toilet->Draw();
     }
+
 }
 
 void ToiletManager::SetCamera(Camera* camera)

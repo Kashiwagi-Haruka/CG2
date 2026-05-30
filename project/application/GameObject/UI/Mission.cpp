@@ -11,7 +11,7 @@ void Mission::Initialize() {
 	MissionText_.Initialize(fontHandle_);
 	MissionText_.SetString(U"ミッション");
 	MissionText_.SetPosition({32, 128+16});
-	MissionText_.SetColor(Color::RGBAToVector4(180, 180, 50, 255));
+	MissionText_.SetColor(COLOR::RED);
 	MissionText_.SetAlign(TextAlign::Left);
 	MissionText_.UpdateLayout(false);
 

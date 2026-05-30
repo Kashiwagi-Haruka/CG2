@@ -56,7 +56,6 @@ void ReadableObject::Draw()
     obj_->Draw();
 
     if (isRayHit_ && !isLooking_) {
-
         Object3dCommon::GetInstance()->DrawCommonOutline();
         obj_->Draw();
         Object3dCommon::GetInstance()->EndOutlineDraw();
