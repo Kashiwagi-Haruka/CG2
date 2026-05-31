@@ -71,6 +71,9 @@ void FallPortalManager::SpawnPortal(WhiteBoard* board)
     // ポータルを新たに作る
     std::unique_ptr<Portal> newPortal = std::make_unique<Portal>();
     newPortal->Initialize();
+    //半径を大きくして通りやすくする
+    newPortal->SetRadius(0.5f);
+
     // カメラをセットする
     newPortal->SetCamera(playerCamera_->GetCamera());
     newPortal->SetPlayerCamera(playerCamera_->GetCamera());
