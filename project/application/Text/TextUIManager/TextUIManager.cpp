@@ -121,7 +121,8 @@ void TextUIManager::Update() {
     const float deltaTime = SpriteCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
     const bool isEdamameRayHit = Edamame::IsRayHit();
     const bool isCoffeeRayHit = CoffeeTrivia::IsRayHit();
-    if (isEdamameRayHit) {
+	const bool isEdamameTalking = EdamameTrivia::GetIsSendStartTriviaMessage() || edamameTrivia_.GetIsTyping() || !EdamameTrivia::GetIsCurrentVoiceFinished();
+	if (isEdamameRayHit && isEdamameTalking) {
         edamameTriviaAlpha_ = 1.0f;
     } else if ((wasEdamameRayHit_ || edamameTriviaAlpha_ > 0.0f) && EdamameTrivia::GetIsCurrentVoiceFinished()) {
         const float fadeStep = deltaTime / kEdamameFadeDuration_;
