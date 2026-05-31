@@ -10,7 +10,7 @@ class FileObject;
 class FileManager
 {
 public:
-    FileManager();
+    FileManager(const uint32_t count = 14);
     void Initialize();
     void Update();
     void Draw();

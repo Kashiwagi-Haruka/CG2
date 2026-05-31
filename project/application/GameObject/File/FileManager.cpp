@@ -1,13 +1,10 @@
 #include "FileManager.h"
 #include"FileObject.h"
 
-namespace {
-    const uint32_t maxFile = 14;
-}
 
-FileManager::FileManager()
+FileManager::FileManager(const uint32_t count)
 {
-    for (int i = 0; i < maxFile; ++i) {
+    for (uint32_t i = 0; i < count; ++i) {
        std::unique_ptr<FileObject>newFile =  std::make_unique<FileObject>();
        newFile->SetEditorRegistrationName("FileObject" + std::to_string(i));
 

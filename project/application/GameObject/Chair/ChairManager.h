@@ -17,6 +17,7 @@ public:
     std::vector<std::unique_ptr<Chair>>& GetChairs() { return chairs_; };
     static void SetIsStand(const bool isStand) { isStand_ = isStand; };
     static bool GetIsStand() { return isStand_; };
+    static void Reset();
 private:
     static bool isStand_;
     static bool isRayHit_;

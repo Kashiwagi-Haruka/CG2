@@ -11,6 +11,7 @@ namespace {
 
 bool ChairManager::isRayHit_ = false;
 bool ChairManager::isStand_ = false;
+
 ChairManager::ChairManager()
 {
     for (uint32_t i = 0; i < maxNum_; ++i) {
@@ -41,6 +42,7 @@ void ChairManager::Initialize()
 
     isRayHit_ = false;
     isStand_ = false;
+   
 
     for (auto& chair : chairs_) {
         chair->Initialize();
@@ -128,4 +130,10 @@ void ChairManager::Draw()
 void ChairManager::SetPlayerCamera(PlayerCamera* camera)
 {
     Chair::SetPlayerCamera(camera);
+}
+
+void ChairManager::Reset()
+{
+    isRayHit_ = false;
+    isStand_ = false;
 }

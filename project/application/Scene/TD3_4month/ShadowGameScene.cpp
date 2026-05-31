@@ -308,6 +308,11 @@ void ShadowGameScene::ChangeStage(const std::string& stageName) {
 
     auto& progressSaveData = gameSave.GetProgressSaveData();
 
+    //掴んでいたものをはなすなど
+    ChairMenu::SetIsShowMenu(false);
+    ChairManager::Reset();
+    PlayerCommand::SetIsGrab(false);
+
     if (progressSaveData.currentStageName != "GentleManStage" && progressSaveData.currentStageName != "LoopStage") {
 
         //最終ステージ付近ではないとき鍵をなくす
@@ -330,7 +335,8 @@ void ShadowGameScene::ChangeStage(const std::string& stageName) {
     gentleManManager_->GetGentleman()->SetGentleManTackScript(progressSaveData.currentStageName);
 
     SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
-
+    
+   
     //ゲームクリアを初期化する
     gameSave.SetIsGameClear(false);
 }
