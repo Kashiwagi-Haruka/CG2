@@ -1,6 +1,7 @@
 #define NOMINMAX
 #define NOMINMAX
 #include "ShadowGameScene.h"
+#include"GameObject/GentleMan/GiantEnemyManager.h"
 
 #include "SceneManager.h"
 #include "Sprite/SpriteCommon.h"
@@ -260,7 +261,7 @@ void ShadowGameScene::Finalize()
 void ShadowGameScene::DebugImGui() {
 #ifdef USE_IMGUI
     ImGui::Begin("shadowGameScene");
-    static constexpr const char* kStageNames[] = { "MirrorStage", "LightStage", "TutorialStage", "RadiconStage","GentleManStage","RestroomStage","ElevatorFallStage" ,"LoopStage"};
+    static constexpr const char* kStageNames[] = { "MirrorStage", "LightStage", "TutorialStage", "RadiconStage","GentleManStage","RestroomStage","ElevatorFallStage" ,"LoopStage" };
     int stageIndex = 0;
     auto& progressSaveData = GameSave::GetInstance().GetProgressSaveData();
 
@@ -303,9 +304,15 @@ void ShadowGameScene::ChangeStage(const std::string& stageName) {
 
     auto& progressSaveData = gameSave.GetProgressSaveData();
 
-    //キーをなくす
-    gameSave.SetIsKeyHave(false);
-    uiManager_->ShowKeyLostAtStageStartMessage();
+    if (progressSaveData.currentStageName != "GentleManStage" && progressSaveData.currentStageName != "LoopStage") {
+
+        //最終ステージ付近ではないとき鍵をなくす
+
+        //キーをなくす
+        gameSave.SetIsKeyHave(false);
+        uiManager_->ShowKeyLostAtStageStartMessage();
+    }
+
 
     stageManager_->CreateStage(progressSaveData.currentStageName);
     stageManager_->SetPlayerCamera(cameraController_->GetPlayerCamera());
@@ -320,6 +327,8 @@ void ShadowGameScene::ChangeStage(const std::string& stageName) {
 
     SetSceneCameraForDraw(cameraController_->GetPlayerCamera()->GetCamera());
 
+    //ゲームクリアを初期化する
+    gameSave.SetIsGameClear(false);
 }
 
 void ShadowGameScene::CheckCollision() {
@@ -368,15 +377,16 @@ void ShadowGameScene::UpdateCamera()
 
 void ShadowGameScene::UpdateSceneTransition() {
 
-    //デバックモードではシーン遷移しない
-    bool flag = true;
-#ifdef USE_IMGUI
-    flag = false;
-#endif
+    //    //デバックモードではシーン遷移しない
+    //    bool flag = true;
+    //#ifdef USE_IMGUI
+    //    flag = false;
+    //#endif
 
     auto& progressSaveData = GameSave::GetInstance().GetProgressSaveData();
 
-    if (Key::IsGetKey() && flag) {
+    if (GiantEnemyManager::GetIsAllPortal()/* && flag*/) {
+        //巨人が前夫ポータルになったら
         if (progressSaveData.currentStageName == "LoopStage" && !isTransitionOut_) {
             transition_->Initialize(true);
             isTransitionIn_ = false;
@@ -408,15 +418,12 @@ void ShadowGameScene::UpdatePostEffect() {
     Object3dCommon::GetInstance()->GetDxCommon()->SetVignetteStrength(vignetteStrength);
     Object3dCommon::GetInstance()->SetVignetteStrength(vignetteStrength);
 
-    if (auto* portalManager = stageManager_->GetPortalManager()) {
-        for (auto& portal : portalManager->GetPortals()) {
-            if (portal->GetIsPlayerCanWarp()) {
-                if (!isNoise_) {
-                    isNoise_ = true;
-                }
-            }
+    if (isPlayerWarp()) {
+        if (!isNoise_) {
+            isNoise_ = true;
         }
-    }
+    };
+
 
     if (isNoise_) {
         float randomNoiseScale = 1.0f;
@@ -513,35 +520,73 @@ void ShadowGameScene::UpdateStagetransition()
     gameSave.SetIsKeyHave(Key::IsGetKey());
     gameSave.SetIsLightHave(Flashlight::IsGetLight());
 
-    if (saveData.isKeyHave && !saveData.isGameClear) {
-        //仮に鍵を取得したときをゲームクリアとする
-        gameSave.SetIsGameClear(true);
-    }
+    if (!saveData.isGameClear) {
+        //未クリア時
+        if (saveData.currentStageName == "GentleManStage") {
+            //巨人ステージの時
+            if (isPlayerWarp()) {
+                gameSave.SetIsGameClear(true);
+            }
 
+        } else if (saveData.currentStageName == "LoopStage") {
+            //LoopStage
+            if (GiantEnemyManager::GetIsAllPortal()) {
+                gameSave.SetIsGameClear(true);
+            }
 
-    //ステージの切り替え
-    if (elevator_->IsSceneTransitionStart() && saveData.isGameClear) {
-
-        if (saveData.currentStageName == "MirrorStage") {
-            ChangeStage("TutorialStage");
-        } else if (saveData.currentStageName == "TutorialStage") {
-            ChangeStage("RestroomStage");
-        } else if (saveData.currentStageName == "RestroomStage") {
-            ChangeStage("ElevatorFallStage");
-        } else if (saveData.currentStageName == "ElevatorFallStage") {
-            ChangeStage("GentleManStage");
-        } else if (saveData.currentStageName == "GentleManStage") {
-            //巡回させてみる
-            ChangeStage("LoopStage");
+        } else {
+            //その他ステージの時
+            if (saveData.isKeyHave) {
+                //仮に鍵を取得したときをゲームクリアとする
+                gameSave.SetIsGameClear(true);
+            }
         }
-
-        //ゲームクリアを初期化する
-        gameSave.SetIsGameClear(false);
     }
+
+
+    //最後のステージじゃないときステージの変更をする
+    if (saveData.isGameClear && saveData.currentStageName != "LoopStage") {
+        //巨人ステージの場合　elevatorを仲介しない
+        if (saveData.currentStageName == "GentleManStage") {
+            //ループステージ
+            ChangeStage("LoopStage");
+        } else {
+            //ステージの切り替え
+            if (elevator_->IsSceneTransitionStart()) {
+
+                if (saveData.currentStageName == "MirrorStage") {
+                    ChangeStage("TutorialStage");
+                } else if (saveData.currentStageName == "TutorialStage") {
+                    ChangeStage("RestroomStage");
+                } else if (saveData.currentStageName == "RestroomStage") {
+                    ChangeStage("ElevatorFallStage");
+                } else if (saveData.currentStageName == "ElevatorFallStage") {
+                    ChangeStage("GentleManStage");
+                }
+
+            }
+        }
+    }
+
+
 }
 
 #pragma endregion
-#pragma region // private描画処理
+#pragma region 
+bool ShadowGameScene::isPlayerWarp()
+{
+
+    if (auto* portalManager = stageManager_->GetPortalManager()) {
+        for (auto& portal : portalManager->GetPortals()) {
+            if (portal->GetIsPlayerCanWarp()) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+// private描画処理
 void ShadowGameScene::DrawSceneTransition() {
     if (isTransitionIn_ || isTransitionOut_) {
         transition_->Draw();

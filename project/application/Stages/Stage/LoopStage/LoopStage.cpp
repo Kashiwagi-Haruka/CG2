@@ -7,6 +7,8 @@
 #include "MiniMap/MiniMap.h"
 #include "GameObject/Portal/SpherePortalManager/SpherePortalManager.h"
 #include "GameObject/GentleMan/GiantEnemyManager.h"
+#include"TextureManager.h"
+
 void LoopStage::InitializeLights()
 {
     assert(lightManager_);
@@ -35,13 +37,18 @@ LoopStage::LoopStage(Player* player)
     flashlight_ = std::make_unique<Flashlight>();
     flashlight_->SetPlayer(player_);
 
-   giantEnemyManager_ = std::make_unique<GiantEnemyManager>(&player_->GetTransform().translate,3);
+    giantEnemyManager_ = std::make_unique<GiantEnemyManager>(&player_->GetTransform().translate, 3);
     portalManager_ = std::make_unique<SpherePortalManager>(&player_->GetTransform().translate);
 
     fieldCollider_["LoopStageField"] = std::make_unique<ObjectCollider>();
+    fieldCollider_["LoopStageWall_L"] = std::make_unique<ObjectCollider>();
+    fieldCollider_["LoopStageWall_R"] = std::make_unique<ObjectCollider>();
+    fieldCollider_["LoopStageWall_B"] = std::make_unique<ObjectCollider>();
+    fieldCollider_["LoopStageWall_F"] = std::make_unique<ObjectCollider>();
+
 
     portalManager_->SetGiantEnemyManager(giantEnemyManager_.get());
-  
+
 
 }
 
@@ -60,10 +67,21 @@ void LoopStage::Initialize()
     flashlight_->Initialize();
 
     //コライダーの設定
-    fieldCollider_["LoopStageField"]->Initialize(YoshidaMath::kAABB);
-    fieldCollider_["LoopStageField"]->RegisterEditor("LoopStageField");
-    fieldCollider_["LoopStageField"]->SetCollisionAttribute(kCollisionFloor);
-    //fieldCollider_["LoopStageField"]->SetTextureIndex();
+    uint32_t textureHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/floor.png");
+    uint32_t wallTextureHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/wall.png");
+
+    for (auto& [name, collider] : fieldCollider_) {
+        fieldCollider_[name]->Initialize(YoshidaMath::kAABB);
+        fieldCollider_[name]->RegisterEditor(name);
+        if (name == "LoopStageField") {
+            fieldCollider_[name]->SetCollisionAttribute(kCollisionFloor);
+            fieldCollider_[name]->SetTextureIndex(textureHandle);
+        } else {
+            fieldCollider_[name]->SetTextureIndex(wallTextureHandle);
+        }
+    }
+
+
 
     InitializeLights();
 
@@ -95,24 +113,31 @@ void LoopStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, 
     portalManager_->Update();
     //懐中電灯の更新
     flashlight_->Update();
-    fieldCollider_["LoopStageField"]->Update();
+
+    for (auto& [name, collider] : fieldCollider_) {
+        fieldCollider_[name]->Update();
+    }
+
     UpdateLights();
 }
 
 void LoopStage::UpdatePortal()
 {
     portalManager_->Update();
+
+
 }
 
 void LoopStage::CheckCollision()
-{    // ==================//ポータルと部屋の当たり判定を取るために当たり判定を入れる=================================
-// 部屋1のAABB (WallManager.cpp の壁の配置から推測)
-    //portalManager_->ClearRoomAABBs();
-    //portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(wallManagerRestRoom_->GetAABB(), wallManagerRestRoom_->GetRoom()->GetTranslate()));
-    //// 部屋2のAABB (WallManager2.cpp の壁の配置に合わせて数値を調整してください)
-    //portalManager_->AddRoomAABB(YoshidaMath::GetAABBWorldPos(wallManager2_->GetAABB(), wallManager2_->GetRoom()->GetTranslate()));
+{
+    if (fieldCollider_["LoopStageField"]) {
+        //ここに足のSE追加
+        giantEnemyManager_->CheckFloorCollision(fieldCollider_["LoopStageField"].get());
+    }
+
+    // ==================//ポータル================================
     portalManager_->CheckCollision();
-    // ===================================================
+    // ==================//ポータル================================
 
     if (!stageCollisionManager_) {
         return;
@@ -132,11 +157,11 @@ void LoopStage::CheckCollision()
         }
     }
 
-    for (auto& [name, collider]: fieldCollider_) {
-        stageCollisionManager_->AddCollider(collider.get());
-        //ここに足のSE追加
-        giantEnemyManager_->CheckFloorCollision(collider.get());
+    for (auto& [name, collider] : fieldCollider_) {
+        stageCollisionManager_->AddCollider(collider.get());       
     }
+
+
 
     stageCollisionManager_->AddCollider(flashlight_.get());
 
@@ -149,9 +174,11 @@ void LoopStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 {
     flashlight_->Draw();
 
-    for (auto& [name, collider] : fieldCollider_){
+    for (auto& [name, collider] : fieldCollider_) {
         collider->Draw();
     }
+
+    //fieldCollider_["LoopStageField"]->Draw();
 
     giantEnemyManager_->Draw();
 
@@ -178,7 +205,7 @@ void LoopStage::SetPlayerCamera(PlayerCamera* playerCamera)
 {
     portalManager_->SetPlayerCamera(playerCamera);
     flashlight_->SetPlayerCamera(playerCamera);
-   
+
 }
 
 PortalManager* LoopStage::GetPortalManager()

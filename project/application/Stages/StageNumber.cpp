@@ -25,5 +25,9 @@ int StageNumber::FromStageName(const std::string& stageName) {
 	if (stageName == "GentleManStage") {
 		return 10;
 	}
+
+	if (stageName == "LoopStage") {
+		return 666;
+	}
 	return 0;
 }

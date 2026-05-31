@@ -1,5 +1,7 @@
 #include "GiantEnemyManager.h"
 #include "Model/ModelManager.h"
+
+bool GiantEnemyManager::isAllPortal_ = false;
 GiantEnemyManager::GiantEnemyManager(Vector3* playerPos, const uint32_t createNum)
 {
 
@@ -12,7 +14,7 @@ GiantEnemyManager::GiantEnemyManager(Vector3* playerPos, const uint32_t createNu
     }
 
     GiantEnemy::SetTargetPos(playerPos);
-
+    createNum_ = createNum;
 }
 
 GiantEnemyManager::~GiantEnemyManager()
@@ -25,6 +27,7 @@ GiantEnemyManager::~GiantEnemyManager()
 
 void GiantEnemyManager::Initialize()
 {
+    isAllPortal_ = false;
 
     for (auto& enemy : giantEnemies_) {
         enemy->Initialize();
@@ -102,6 +105,7 @@ void GiantEnemyManager::SetPortal(GiantEnemy* enemy)
     // マスクの設定とフラグの初期化
     pregiantEnemies_.back()->SetCollisionAttributeWallAndInitialize();
 
+    isAllPortal_ = IsAllPortal();
 }
 
 void GiantEnemyManager::CheckFloorCollision(YoshidaMath::Collider* collider)

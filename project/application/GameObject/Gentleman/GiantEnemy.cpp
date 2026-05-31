@@ -166,12 +166,11 @@ void GiantEnemy::Draw()
 {
     Object3dCommon::GetInstance()->DrawCommonSkinning();
     obj_->Draw();
-    Object3dCommon::GetInstance()->DrawCommon();
-    for (auto& [name, collider] : colliders_) {
-        collider->Draw();
-    }
+    //Object3dCommon::GetInstance()->DrawCommon();
+    //for (auto& [name, collider] : colliders_) {
+    //    collider->Draw();
+    //}
 }
-
 
 void GiantEnemy::ResetCollisionAttribute()
 {
@@ -196,9 +195,9 @@ void GiantEnemy::SetCamera(Camera* camera)
     obj_->SetCamera(camera);
     obj_->UpdateCameraMatrices();
 
-    for (auto& [name, collider] : colliders_) {
-        collider->SetCamera(camera);
-    }
+    //for (auto& [name, collider] : colliders_) {
+    //    collider->SetCamera(camera);
+    //}
 }
 
 bool GiantEnemy::IsFacingSurface(const Matrix4x4& cameraMat)
@@ -256,7 +255,7 @@ void GiantEnemy::OnCollisionWithFloor(YoshidaMath::Collider* collider)
 bool GiantEnemy::OnCollisionRay(PlayerCamera* playerCamera)
 {
     //かなり遠くからでも打てるようにする
-    return playerCamera->OnCollisionRay(localAABB, collisionTransform_.translate, 0.0f, 3000.0f);
+    return playerCamera->OnCollisionRay(localAABB, collisionTransform_.translate, 0.0f, 2000.0f);
 }
 
 void GiantEnemy::Animation()
