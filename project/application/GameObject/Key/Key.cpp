@@ -62,6 +62,8 @@ void Key::Update()
         //重力処理をしてみる
         const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
         velocity_.y -= YoshidaMath::kGravity * deltaTime;
+        velocity_.y = std::clamp(velocity_.y,-1.0f, 10.0f);
+
         translate_ = obj_->GetTransform().translate;
         translate_ += velocity_ * deltaTime;
         translate_.y = std::clamp(translate_.y, GetAABB().max.y, 2.4f);
