@@ -171,7 +171,6 @@ void Portal::UpdatePortalWorldMatrix(bool setTransform) {
     if (setTransform) {
         Vector3 forward = SetSceneCameraAndParentAndGetForward();
         SetTranslate(forward);
-
     }
 
     transform_.rotate.y = preRotY_ + parentTransform->rotate.y;
