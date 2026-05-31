@@ -13,7 +13,7 @@
 namespace {
     constexpr const char* kCoffeesModelDirectory = "Resources/TD3_3102/3d/Coffee";
     constexpr const char* kCoffeesModelName = "Coffee";
-    constexpr uint32_t kCoffeesInstanceCount = 800;
+    constexpr uint32_t kCoffeesInstanceCount = 600;
     constexpr uint32_t kCoffeesInitialVisibleCount = 100;
     constexpr float kCoffeesMinScale = 0.22f;
     constexpr float kCoffeesScaleStep = 0.0f;
@@ -416,31 +416,46 @@ void Coffees::RunSimulation() {
         const float maxX = roomMaxX - instance.radius;
         const float minZ = roomMinZ + instance.radius;
         const float maxZ = roomMaxZ - instance.radius;
+		const bool hasLeftRoom = instance.position.x < roomMinX || instance.position.x > roomMaxX || instance.position.z < roomMinZ || instance.position.z > roomMaxZ;
 
-        if (instance.position.x < minX) {
-            instance.position.x = minX;
-            if (instance.velocity.x < 0.0f) {
-                instance.velocity.x *= -kCoffeesWallBounceDamping;
-            }
-        } else if (instance.position.x > maxX) {
-            instance.position.x = maxX;
-            if (instance.velocity.x > 0.0f) {
-                instance.velocity.x *= -kCoffeesWallBounceDamping;
-            }
-        }
+		if (hasLeftRoom) {
+			const bool leftX = instance.position.x < roomMinX || instance.position.x > roomMaxX;
+			const bool leftZ = instance.position.z < roomMinZ || instance.position.z > roomMaxZ;
+			instance.position.x = std::clamp(instance.position.x, minX, maxX);
+			instance.position.z = std::clamp(instance.position.z, minZ, maxZ);
+			if (leftX) {
+				instance.velocity.x = 0.0f;
+				instance.angularVelocity.z = 0.0f;
+			}
+			if (leftZ) {
+				instance.velocity.z = 0.0f;
+				instance.angularVelocity.x = 0.0f;
+			}
+		} else {
+			if (instance.position.x < minX) {
+				instance.position.x = minX;
+				if (instance.velocity.x < 0.0f) {
+					instance.velocity.x *= -kCoffeesWallBounceDamping;
+				}
+			} else if (instance.position.x > maxX) {
+				instance.position.x = maxX;
+				if (instance.velocity.x > 0.0f) {
+					instance.velocity.x *= -kCoffeesWallBounceDamping;
+				}
+			}
 
-        if (instance.position.z < minZ) {
-            instance.position.z = minZ;
-            if (instance.velocity.z < 0.0f) {
-                instance.velocity.z *= -kCoffeesWallBounceDamping;
-            }
-        } else if (instance.position.z > maxZ) {
-            instance.position.z = maxZ;
-            if (instance.velocity.z > 0.0f) {
-                instance.velocity.z *= -kCoffeesWallBounceDamping;
-            }
-        }
-
+			if (instance.position.z < minZ) {
+				instance.position.z = minZ;
+				if (instance.velocity.z < 0.0f) {
+					instance.velocity.z *= -kCoffeesWallBounceDamping;
+				}
+			} else if (instance.position.z > maxZ) {
+				instance.position.z = maxZ;
+				if (instance.velocity.z > 0.0f) {
+					instance.velocity.z *= -kCoffeesWallBounceDamping;
+				}
+			}
+		}
         if (simulationParams_.baseContainmentRadius > 0.0f) {
 			const float maxContainmentRadius = std::max(0.0f, simulationParams_.baseContainmentRadius - instance.radius);
 			const float offsetX = instance.position.x - simulationParams_.baseContainmentCenter.x;

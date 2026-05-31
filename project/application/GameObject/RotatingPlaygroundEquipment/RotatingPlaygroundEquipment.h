@@ -35,4 +35,5 @@ public:
 	void Update();
 	void Draw();
 	void SetCamera(Camera* camera);
+	void SetTranslate(Vector3 translate){spinTransform_.translate = translate;};
 };

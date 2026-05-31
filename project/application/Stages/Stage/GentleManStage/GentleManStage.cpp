@@ -6,6 +6,7 @@
 #include "GameObject/Key/Key.h"
 #include "GameObject/Player/Player.h"
 #include "GameObject/Portal/GentlemanPortalManager.h"
+#include "GameObject/RotatingPlaygroundEquipment/RotatingPlaygroundEquipment.h"
 #include "GameObject/Gentleman/GiantGentleMan.h"
 
 #include "GameObject/Wall/wallManagerRoofFoor.h"
@@ -61,9 +62,8 @@ void GentleManStage::UpdateLights()
 
 }
 
-GentleManStage::GentleManStage(Player* player)
-{
-    player_ = player;
+GentleManStage::GentleManStage(Player* player) {
+	player_ = player;
 
     //巨大紳士
     giantGentleMan_ = std::make_unique<GiantGentleMan>();
@@ -72,12 +72,17 @@ GentleManStage::GentleManStage(Player* player)
     portalManager_->SetGentleMan(giantGentleMan_.get());
     wallManagerRoofFloor_ = std::make_unique<WallManagerRoofFloor>();
     documentManager_ = std::make_unique<DocumentManager>();
+  	rotatingPlaygroundEquipment_ = std::make_unique<RotatingPlaygroundEquipment>();
     
     //懐中電灯の作成
     flashlight_ = std::make_unique<Flashlight>();
     flashlight_->SetPlayer(player_);
 
-    door_ = std::make_unique<Door>();
+	// 懐中電灯の作成
+	flashlight_ = std::make_unique<Flashlight>();
+	flashlight_->SetPlayer(player_);
+
+	door_ = std::make_unique<Door>();
 }
 
 void GentleManStage::Initialize() {
@@ -90,13 +95,15 @@ void GentleManStage::Initialize() {
 
 	documentManager_->Initialize("document1");
 	giantGentleMan_->Initialize();
+	rotatingPlaygroundEquipment_->Initialize();
+	rotatingPlaygroundEquipment_->SetTranslate({3.0f, 0.0f, 0.0f});
 	// 懐中電灯の初期化
 	flashlight_->Initialize();
 
-      door_->Initialize();
-    //ドアは最初は開ける
-    door_->SetIsOpenAndAnimation();
-    MiniMap* miniMap = MiniMap::GetInstance();
+	door_->Initialize();
+	// ドアは最初は開ける
+	door_->SetIsOpenAndAnimation();
+	MiniMap* miniMap = MiniMap::GetInstance();
 	miniMap->AddObject(wallManagerRoofFloor_->GetRoom().get(), {0.2f, 0.2f, 0.2f, 0.35f}, 50.0f);
 	miniMap->AddObject(giantGentleMan_->GetObject3d(), {1.0f, 0.0f, 0.0f, 1.0f}, 60.0f);
 
@@ -111,12 +118,14 @@ void GentleManStage::UpdateGameObject(Camera* camera, const Vector3& lightDirect
     wallManagerRoofFloor_->Update();
     giantGentleMan_->Update();
     documentManager_->Update();
+  	rotatingPlaygroundEquipment_->Update();
     //懐中電灯の更新
     flashlight_->Update();
 
     door_->Update();
     UpdateLights();
 }
+
 
 void GentleManStage::UpdatePortal()
 {
@@ -174,7 +183,7 @@ void GentleManStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawPartic
     flashlight_->Draw();
     //ここで書類パーティクル
     documentManager_->Draw();
-
+	  rotatingPlaygroundEquipment_->Draw();
     //スキニングアリ
     door_->Draw();
     //スキニングアリ
@@ -183,25 +192,22 @@ void GentleManStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawPartic
     //DrawCommon
     Object3dCommon::GetInstance()->DrawCommon();
     wallManagerRoofFloor_->Draw();
-    
-    portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
-}
-void GentleManStage::DrawSprite()
-{
-    documentManager_->DrawSprite();
 
+	// ここで書類パーティクルを描画させる
+	documentManager_->Draw();
+	portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
+void GentleManStage::DrawSprite() { documentManager_->DrawSprite(); }
 void GentleManStage::SetSceneCameraForDraw(Camera* camera) {
 
     portalManager_->SetCamera(camera);
     wallManagerRoofFloor_->SetCamera(camera);
     documentManager_->SetCamera(camera);
-
+	  rotatingPlaygroundEquipment_->SetCamera(camera);
     giantGentleMan_->SetCamera(camera);
     flashlight_->SetCamera(camera);
     door_->SetCamera(camera);
 }
-
 void GentleManStage::SetPlayerCamera(PlayerCamera* playerCamera) {
     portalManager_->SetPlayerCamera(playerCamera);
     documentManager_->SetPlayerCamera(playerCamera);

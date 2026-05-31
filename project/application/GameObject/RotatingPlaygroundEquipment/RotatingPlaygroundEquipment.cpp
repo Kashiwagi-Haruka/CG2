@@ -30,7 +30,7 @@ void RotatingPlaygroundEquipment::Initialize() {
 			spinObj_->SetSkinCluster(&spinSkinCluster_);
 		}
 	}
-	spinTransform_.scale = {0.1f, 0.1f, 0.1f};
+	spinTransform_.scale = {0.2f, 0.2f, 0.2f};
 	spinTransform_.rotate = {0.0f, 0.0f, 0.0f};
 	spinTransform_.translate = {0.0f, 0.0f, 0.0f};
 	spinObj_->SetTransform(spinTransform_);
@@ -125,16 +125,28 @@ void RotatingPlaygroundEquipment::Update() {
 
 void RotatingPlaygroundEquipment::Draw() {
 	Object3dCommon::GetInstance()->DrawCommonSkinning();
-	spinObj_->Draw();
+	if (spinObj_) {
+		spinObj_->UpdateCameraMatrices();
+		spinObj_->Draw();
+	}
 	for (auto& gentleman : gentlemanObj_) {
+		if (!gentleman) {
+			continue;
+		}
+		gentleman->UpdateCameraMatrices();
 		gentleman->Draw();
 	}
 }
 
 void RotatingPlaygroundEquipment::SetCamera(Camera* camera) {
 	camera_ = camera;
-	spinObj_->SetCamera(camera);
+	if (spinObj_) {
+		spinObj_->SetCamera(camera);
+	}
 	for (auto& gentleman : gentlemanObj_) {
+		if (!gentleman) {
+			continue;
+		}
 		gentleman->SetCamera(camera);
 	}
 }

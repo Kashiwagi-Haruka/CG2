@@ -46,6 +46,7 @@ class MiniMap {
 	uint32_t miniMapBackTextureHandle_ = 0;
 	uint32_t miniMapPlayerTextureHandle_ = 0;
 	std::string stageName_;
+	bool isInitialized_ = false;
 
 	void UpdateCamera();
 	void UpdateVisibleMarkers();
