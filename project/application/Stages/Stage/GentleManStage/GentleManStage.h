@@ -13,19 +13,20 @@ class RotatingPlaygroundEquipment;
 
 class Flashlight;
 
-class GentleManStage : public BaseStage {
-	Player* player_ = nullptr;
-	Yoshida::LightManager* lightManager_ = nullptr;
-	std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
-	std::unique_ptr<GentlemanPortalManager> portalManager_ = nullptr;
-	CollisionManager* stageCollisionManager_ = nullptr;
-	std::unique_ptr<WallManagerRoofFloor> wallManagerRoofFloor_ = nullptr;
-	std::unique_ptr<DocumentManager> documentManager_ = nullptr;
-	std::unique_ptr<GiantGentleMan> giantGentleMan_ = nullptr;
-	std::unique_ptr<RotatingPlaygroundEquipment> rotatingPlaygroundEquipment_ = nullptr;
-	std::unique_ptr<Flashlight> flashlight_ = nullptr;
-	std::unique_ptr<Door> door_ = nullptr;
+class GentleManStage :
+    public BaseStage
+{
+    Player* player_ = nullptr;
+    Yoshida::LightManager* lightManager_ = nullptr;
 
+    std::unique_ptr<GentlemanPortalManager> portalManager_ = nullptr;
+    CollisionManager* stageCollisionManager_ = nullptr;
+    std::unique_ptr<WallManagerRoofFloor> wallManagerRoofFloor_ = nullptr;
+    std::unique_ptr<DocumentManager>documentManager_ = nullptr;
+    std::unique_ptr<GiantGentleMan>giantGentleMan_ = nullptr;
+    std::unique_ptr<RotatingPlaygroundEquipment> rotatingPlaygroundEquipment_ = nullptr;
+    std::unique_ptr<Flashlight> flashlight_ = nullptr;
+    std::unique_ptr<Door> door_ = nullptr;
 private:
 	void InitializeLights();
 	void UpdateLights();

@@ -20,7 +20,7 @@ class RestroomStage :
 
     Player* player_ = nullptr;
     Yoshida::LightManager* lightManager_ = nullptr;
-    std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
+
     std::unique_ptr<PortalManager> portalManager_ = nullptr;
     CollisionManager* stageCollisionManager_ = nullptr;
     std::unique_ptr<WallManagerRestRoom> wallManagerRestRoom_ = nullptr;

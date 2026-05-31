@@ -13,10 +13,10 @@ TitleTimeText::TitleTimeText()
 
     dateText_.Initialize(fontHandle_);
     dateText_.SetString(U"test");
-    dateText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH + 64.0f,SCREEN_SIZE::HALF_HEIGHT });
+    dateText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH ,SCREEN_SIZE::HALF_HEIGHT });
     dateText_.SetColor(COLOR::WHITE);
     dateText_.SetAlign(TextAlign::Center);
-    dateText_.SetBlendMode(BlendMode::kBlendModeAdd);
+
 }
 
 void TitleTimeText::Initialize()

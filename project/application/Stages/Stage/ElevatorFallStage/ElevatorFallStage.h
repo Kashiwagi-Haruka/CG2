@@ -9,13 +9,16 @@ class Door;
 class Key;
 class TestField;
 class WallManagerElevatorFall;
+class DeskManager;
+class LockerManager;
+
 class ElevatorFallStage :
     public BaseStage
 {
 
     Player* player_ = nullptr;
     Yoshida::LightManager* lightManager_ = nullptr;
-    std::unique_ptr<TimeCardWatch> timeCardWatch_ = nullptr;
+
     std::unique_ptr<FallPortalManager> portalManager_ = nullptr;
     CollisionManager* stageCollisionManager_ = nullptr;
     std::unique_ptr<Flashlight> flashlight_ = nullptr;
@@ -26,6 +29,11 @@ class ElevatorFallStage :
 
     std::unique_ptr<Key> key_ = nullptr;
     std::unique_ptr<Door> door_ = nullptr;
+
+
+    std::unique_ptr<DeskManager> deskManager_ = nullptr;
+
+    std::unique_ptr<LockerManager> lockerManager_ = nullptr;
 
 private:
     void InitializeLights();

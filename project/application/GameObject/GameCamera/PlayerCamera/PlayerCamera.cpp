@@ -31,9 +31,6 @@ void PlayerCamera::Update() {
 void PlayerCamera::Rotate() {
 
 #ifdef USE_IMGUI
-
-
-
     if (ImGui::TreeNode("Eye Point Light")) {
         // カラー編集 (RGBA)
         ImGui::ColorEdit4("Color", &pointLight_.color.x);
@@ -87,21 +84,17 @@ void PlayerCamera::SetRay()
 void PlayerCamera::Initialize()
 {
     auto& gaveSave = GameSave::GetInstance();
-   
-    if (!gaveSave.GetInitStart()) {
-        param_ = gaveSave.GetCameraSaveData();
-    } else {
-        param_.transform = { .scale = {1.0f,1.0f,1.0f},.rotate = {0.0f,0.0f,0.0f},.translate = {0.0f,0.0f,0.0f} };
-    }
-    
-    const float fovY = Option::GetCurrentOptionData().fieldOfView * Function::kPi / 180.0f;
-    camera_->SetFovY(fovY);
+    param_ = gaveSave.GetCameraSaveData();
 
     SetHeadTransform();
     SetTransform();
     SetRay();
 
-    pointLight_.color = {1.0f,0.9f,0.9f,1.0f};
+    const float fovY = Option::GetCurrentOptionData().fieldOfView * Function::kPi / 180.0f;
+    camera_->SetFovY(fovY);
+    camera_->Update();
+
+    pointLight_.color = { 1.0f,0.9f,0.9f,1.0f };
     pointLight_.decay = 1.3f;
     pointLight_.intensity = 1.0f;
     pointLight_.position = param_.transform.translate;

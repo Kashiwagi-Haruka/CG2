@@ -46,10 +46,10 @@ void RestroomStage::InitializeLights()
     lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, static_cast<uint32_t>(wallManagerRestRoom_->GetAreaLights().size()));
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, static_cast<uint32_t>(wallManagerRestRoom_->GetAreaLights().size()+1));
 
-    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(1), 2);
 
 }
 
@@ -61,8 +61,8 @@ void RestroomStage::UpdateLights()
 
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
-    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManagerRestRoom_->GetAreaLights().at(1), 2);
 
 }
 
@@ -80,9 +80,6 @@ RestroomStage::RestroomStage(Player* player)
     key_ = std::make_unique<Key>();
     door_ = std::make_unique<Door>();
 
-
-    timeCardWatch_ = std::make_unique<TimeCardWatch>();
-    timeCardWatch_->SetPlayer(player_);
     //懐中電灯の作成
     flashlight_ = std::make_unique<Flashlight>();
     flashlight_->SetPlayer(player_);
@@ -101,7 +98,7 @@ void RestroomStage::Initialize() {
 	portalManager_->Initialize();
 	whiteBoardManager_->Initialize();
 	wallManagerRestRoom_->Initialize();
-	timeCardWatch_->Initialize();
+
 	// 懐中電灯の初期化
 	flashlight_->Initialize();
 	key_->Initialize();
@@ -210,20 +207,23 @@ void RestroomStage::SetCollisionManager(CollisionManager* collisionManager)
 }
 void RestroomStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
 
-
+    //Rayによって変化する
     key_->Draw();
-    timeCardWatch_->Draw();
-    door_->Draw(false);
-    whiteBoardManager_->Draw();
     flashlight_->Draw();
 
-    toiletManager_->Draw();
-
-    wallManagerRestRoom_->Draw();
-
+    //普通描画とスキニングがある
+    whiteBoardManager_->Draw();
     //ここで書類パーティクルを描画させる
     documentManager_->Draw();
 
+    //skinning
+    toiletManager_->Draw();
+    door_->Draw(false);
+
+    //DrawCommon
+    Object3dCommon::GetInstance()->DrawCommon();
+
+    wallManagerRestRoom_->Draw();
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
@@ -236,7 +236,7 @@ void RestroomStage::SetSceneCameraForDraw(Camera* camera) {
 
     portalManager_->SetCamera(camera);
     wallManagerRestRoom_->SetCamera(camera);
-    timeCardWatch_->SetCamera(camera);
+ 
     flashlight_->SetCamera(camera);
     whiteBoardManager_->SetCamera(camera);
     key_->SetCamera(camera);

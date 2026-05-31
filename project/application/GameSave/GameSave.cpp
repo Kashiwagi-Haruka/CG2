@@ -74,7 +74,7 @@ const std::string GameSave::GetScreenShotFileName(const int slotIndex)
     return screenShotFileName;
 }
 
-const std::string GameSave::GetCurrentDateTimeString()
+const std::string GameSave::GetCurrentDateTimeString(const bool isOverWrap)
 {
     // 1. 現在時刻（システムクロック）を取得
     auto now = std::chrono::system_clock::now();
@@ -93,16 +93,18 @@ const std::string GameSave::GetCurrentDateTimeString()
     // 4. 文字列にフォーマット
     std::stringstream ss;
     // "%Y/%m/%d %H:%M:%S" -> 2024/05/2015:30:45
-    ss << std::put_time(&now_tm, "%Y/%m/%d\n%H:%M:%S");
+    if (isOverWrap) {
+        ss << std::put_time(&now_tm, "%Y/%m/%d\n%H:%M:%S");
+    } else {
+        ss << std::put_time(&now_tm, "%Y/%m/%d/%H:%M:%S");
+    }
+
 
     return ss.str();
 }
 
 void GameSave::PlayerSave(const Transform& transform) { playerSaveData_.transform = transform; }
 
-void GameSave::ProgressSave(const ProgressSaveData& progressSaveData) {
-    progressSaveData_ = progressSaveData;
-}
 
 void GameSave::Save(const int slotIndex) {
     nlohmann::json saveJson;
@@ -201,8 +203,8 @@ void GameSave::LoadFirstStage()
 
     if (jsonManager->LoadJson(fileName)) {
         Load(fileName);
-        // セーブデータの保存日時
-        saveDateTime_ = GetCurrentDateTimeString();
+        // セーブデータの保存日時 折り返さない
+        saveDateTime_ = GetCurrentDateTimeString(false);
     } else {
         Reset();
         return;

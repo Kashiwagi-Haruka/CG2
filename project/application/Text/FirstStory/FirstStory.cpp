@@ -15,7 +15,7 @@ FirstStory::FirstStory()
     text_.SetPosition({ SCREEN_SIZE::HALF_WIDTH,128.0f+64.0f });
     text_.SetColor(COLOR::WHITE);
     text_.SetAlign(TextAlign::Center);
-    text_.SetBlendMode(BlendMode::kBlendModeAlpha);
+
 
     strings_ = U"その日も残業だった。\n気が付くと他の部署はとっくに消灯していて、\n閑散とした部屋にパソコンのモーター音だけが\nうるさく鳴り響いていた。\n眠気覚ましにコーヒーサーバーを動かす。\n湯気は立っているのに、香りがほとんどしない。\n味も薄い。機械の調子が悪いのか、\nそれとも自分の舌が麻痺しているのか。\n「残りは家でやるか。」\nそうして、いつものように打刻機へ手を伸ばした。";
 }
@@ -47,6 +47,8 @@ void FirstStory::Update()
 
 void FirstStory::Draw()
 {
+    SpriteCommon::GetInstance()->DrawCommonFont();
+    SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
 
     text_.Draw();
     //FreeTypeManager::ResetFontUsage();

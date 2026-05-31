@@ -17,11 +17,11 @@ TitleMenuUI::TitleMenuUI()
     titleDefaultPos_ = { SCREEN_SIZE::HALF_WIDTH,240 };
 
     titleText_.Initialize(fontHandle_);
-    titleText_.SetString(U"パラ- 再打刻");
+    titleText_.SetString(U"p- 再打刻");
     titleText_.SetPosition(titleDefaultPos_);
     titleText_.SetColor(COLOR::WHITE);
     titleText_.SetAlign(TextAlign::Center);
-    titleText_.SetBlendMode(BlendMode::kBlendModeAdd);
+
 
     menuFontHandle_ = FreeTypeManager::CreateFace("Resources/TD3_3102/Irohakaku/irohakakuC-Medium.ttf", 0);
     FreeTypeManager::SetPixelSizes(menuFontHandle_, 32, 32);
@@ -40,6 +40,10 @@ TitleMenuUI::TitleMenuUI()
     menuText_[OPTION_TEXT].SetString(U"設定");
     menuText_[OPTION_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f,SCREEN_SIZE::HALF_HEIGHT + 128.0f });
 
+    menuText_[GAME_END_TEXT].SetString(U"退勤する");
+    menuText_[GAME_END_TEXT].SetPosition({ SCREEN_SIZE::HALF_WIDTH + 256.0f,SCREEN_SIZE::HALF_HEIGHT + 192.0f });
+
+
     triangleText_.Initialize(menuFontHandle_);
     triangleText_.SetString(U"▶");
     Vector2 pos = menuText_[selectButtonNum_].GetPosition();
@@ -47,7 +51,6 @@ TitleMenuUI::TitleMenuUI()
     triangleText_.SetPosition(pos);
     triangleText_.SetColor(COLOR::RED);
     triangleText_.SetAlign(TextAlign::Left);
-    triangleText_.SetBlendMode(BlendMode::kBlendModeAdd);
 
     fontTheta_ = 0.0f;
 
@@ -56,10 +59,9 @@ TitleMenuUI::TitleMenuUI()
     pressSpaceText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH,SCREEN_SIZE::HEIGHT - 128.0f });
     pressSpaceText_.SetColor(COLOR::WHITE);
     pressSpaceText_.SetAlign(TextAlign::Center);
-    pressSpaceText_.SetBlendMode(BlendMode::kBlendModeAdd);
 
 
-   
+
 }
 
 TitleMenuUI::~TitleMenuUI()
@@ -71,7 +73,7 @@ void TitleMenuUI::Initialize() {
     isShowMenu_ = false;
     isInitStart_ = false;
     isContinueTriggered_ = false;
-	isOptionTriggered_ = false;
+    isOptionTriggered_ = false;
     selectButtonNum_ = 0;
     random_->SetMinMax(-8.0f, 8.0f);
 
@@ -101,7 +103,10 @@ void TitleMenuUI::Update() {
                 isContinueTriggered_ = true;
 
             } else if (selectButtonNum_ == OPTION_TEXT) {
-				isOptionTriggered_ = true;
+                isOptionTriggered_ = true;
+            } else if (selectButtonNum_ == GAME_END_TEXT) {
+                //もうここで呼ぶ　ゲームを終了する
+                PostQuitMessage(0);
             }
 
         } else {
@@ -173,15 +178,20 @@ bool TitleMenuUI::ConsumeContinueTriggered() {
     return true;
 }
 bool TitleMenuUI::ConsumeOptionTriggered() {
-	if (!isOptionTriggered_) {
-		return false;
-	}
+    if (!isOptionTriggered_) {
+        return false;
+    }
 
-	isOptionTriggered_ = false;
-	return true;
+    isOptionTriggered_ = false;
+    return true;
 }
 void TitleMenuUI::Draw()
 {
+
+    SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAdd);
+    SpriteCommon::GetInstance()->DrawCommonFont();
+
+
     pressSpaceText_.Draw();
 
 

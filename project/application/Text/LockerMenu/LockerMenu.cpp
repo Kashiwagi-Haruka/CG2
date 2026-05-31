@@ -27,7 +27,6 @@ LockerMenu::LockerMenu()
     triangleText_.SetPosition(pos);
     triangleText_.SetColor(COLOR::RED);
     triangleText_.SetAlign(TextAlign::Left);
-    triangleText_.SetBlendMode(BlendMode::kBlendModeAlpha);
 
     fontTheta_ = 0.0f;
 
@@ -73,6 +72,9 @@ void LockerMenu::Draw()
     if (!isShowMenu_) {
         return;
     }
+
+    SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
+    SpriteCommon::GetInstance()->DrawCommonFont();
 
     triangleText_.Draw();
     exitText_.Draw();

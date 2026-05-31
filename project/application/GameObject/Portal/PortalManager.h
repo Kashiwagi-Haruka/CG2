@@ -30,10 +30,10 @@ public:
 	virtual void SetCamera(Camera* camera);
 	virtual void SetPlayerCamera(PlayerCamera* playerCamera);
 	/// @brief 作成できるポータル地点との当たり判定を作成する
-	virtual void CheckCollision();
+	virtual void CheckCollision(const bool isOneSide = false);
 	virtual std::vector<std::unique_ptr<Portal>>& GetPortals() { return portals_; };
 	static bool GetCanMakePortal() { return canMakePortal_; };
-	static bool GetCanMakePortalToWhiteBoard() { return canMakePortalToWhiteBoard_; };
+	static bool GetCanMakePortalToObj() { return canMakePortalToObj_; };
 	bool GetIsWarp() { return isWarp_; }
 protected:
 	// 初回のワープ地点
@@ -49,7 +49,7 @@ protected:
 	WhiteBoard* pendingWhiteBoard_ = nullptr;
 
 	static bool canMakePortal_;
-	static bool canMakePortalToWhiteBoard_;
+	static bool canMakePortalToObj_;
 	WhiteBoardManager* whiteBoardManager_ = nullptr;
 	bool isWarp_ = false;
 protected:

@@ -42,9 +42,7 @@ void BuildingClass::Update(const uint32_t floorNum)
 
 void BuildingClass::Draw()
 {
-    
     if (instancedObject_) {
-        Object3dCommon::GetInstance()->DrawCommon();
         instancedObject_->Draw();
     }
 }

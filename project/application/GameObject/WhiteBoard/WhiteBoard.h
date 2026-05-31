@@ -27,7 +27,7 @@ public:
     //衝突マスクをセットするのとイニシャライズ
     virtual void SetCollisionAttributeNoneAndInitialize();
     //面が向き合ってるか
-    bool IsFacingSurface(const Matrix4x4& cameraMat);
+    bool IsFacingSurface(const Matrix4x4& cameraMat,const bool isOneSide = false);
 protected:
     std::unique_ptr<Object3d>obj_ = nullptr;
 #ifdef _DEBUG

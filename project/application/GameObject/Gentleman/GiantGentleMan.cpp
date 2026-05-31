@@ -73,6 +73,13 @@ void GiantGentleMan::Initialize()
 void GiantGentleMan::Update()
 {
     CheckCollision();
+
+    if (GentlemanPortalManager::GetIsMakePortal()) {
+        desiredAnimationName = "SleepStandPortal";
+    } else {
+        desiredAnimationName = "SleepStand";
+    }
+
     Animation();
     obj_->Update();
     head_->Update();
@@ -94,10 +101,6 @@ void GiantGentleMan::Update()
 void GiantGentleMan::Draw()
 {
     obj_->Draw();
-}
-void GiantGentleMan::SetPlayerPos(Vector3* playerPos)
-{
-    playerPos_ = playerPos;
 }
 void GiantGentleMan::SetCamera(Camera* camera)
 {
@@ -158,9 +161,6 @@ void GiantGentleMan::CheckCollision() {
 void GiantGentleMan::Animation()
 {
     
-    if (GentlemanPortalManager::GetIsMakePortal()) {
-        return;
-    }
     bool loopAnimation = true;
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     AnimationManager::PlaybackResult playbackResult{};

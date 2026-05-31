@@ -8,8 +8,6 @@ class WalkWhiteBoard :
     public WhiteBoard
 {
 private:
-    //アニメーションクリップ
-    static std::vector<Animation::AnimationData> animationClips_;
     //骨
     std::unique_ptr<Skeleton> skeleton_{};
     //スキン
@@ -22,7 +20,6 @@ public:
     WalkWhiteBoard();
     void OnCollision(Collider* collider)override;
     void SetTargetPosPtr(Vector3* pos) { targetPos_ = pos; };
-    static void LoadAnimation(const std::string& directionalPath, const std::string& filePath);
     void Initialize()override;
     void Update()override;
     void Draw()override;

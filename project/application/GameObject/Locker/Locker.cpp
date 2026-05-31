@@ -10,7 +10,7 @@
 #include<imgui.h>
 #include"Text/LockerMenu/LockerMenu.h"
 #include"GameObject/Chair/ChairManager.h"
-#include"Object3d/Object3dCommon.h"
+
 
 PlayerCamera* Locker::playerCamera_ = nullptr;
 
@@ -156,11 +156,8 @@ void Locker::Draw()
 
     //ロッカーに入ったら描画されない
     if (!isPlayerIn_) {
-        Object3dCommon::GetInstance()->DrawCommonSkinning();
         obj_->Draw();
     }
-
-
 
     //for (auto& [name, collider] : colliders_) {
     //    collider->Draw();
@@ -174,10 +171,13 @@ void Locker::CheckCollision()
 
     //rayの当たり判定
 
-    //プレイヤーが中に入っていたらメニューを表示する
-    LockerMenu::SetIsShowMenu(isPlayerIn_);
+
 
     if (!PlayerCommand::GetIsGrab()&&!ChairManager::GetIsStand()) {
+
+        //プレイヤーが中に入っていたらメニューを表示する
+        LockerMenu::SetIsShowMenu(isPlayerIn_);
+
         if (PlayerCommand::GetInstance()->InteractTrigger()&&
             isRayHit_ || !isPlayerPreIn_ && isPlayerIn_) {
 

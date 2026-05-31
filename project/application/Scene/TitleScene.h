@@ -31,7 +31,7 @@ private:
 	std::unique_ptr<TimeCard> timeCard_ = nullptr;
 	std::unique_ptr<TimeCardRack> timeCardRack_ = nullptr;
 	std::unique_ptr<Wall> wall_ = nullptr;
-	std::unique_ptr<GameContinued> gameContinued_ = nullptr;
+	GameContinued* gameContinued_ = nullptr;
 	std::unique_ptr<Option> option_ = nullptr;
 	bool isGameContinuedOpen_ = false;
 	bool isOptionOpen_ = false;

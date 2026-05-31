@@ -38,7 +38,7 @@ void HintSheet::Initialize(uint32_t fontHandle, const std::string& textFilePath)
     hintText_.Initialize(fontHandle);
     // 画面中央に配置
     hintText_.SetPosition({ SCREEN_SIZE::HALF_WIDTH, SCREEN_SIZE::HALF_HEIGHT });
-    hintText_.SetColor(COLOR::WHITE);
+    hintText_.SetColor(COLOR::RED);
     hintText_.SetAlign(TextAlign::Center);
 
 

@@ -34,15 +34,18 @@ void GameContinued::LoadAllSlots()
 {
     auto& gameSave = GameSave::GetInstance();
     for (int i = 0; i < saveDataMaxNum_; ++i) {
+        
+        std::string saveFileName = "SaveFile" + std::to_string(i+1);
         if (gameSave.IsFileExistsAndLoad(i)) {
             gameSave.LoadFromIndex(i);
             auto progressSaveData = gameSave.GetProgressSaveData();
             auto saveDataTime = gameSave.GetSaveDataTime();
             LoadAndSetSpriteHandle(i, false);
             //表示するセーブデータのテキストをセットする
-            SetSaveData(i, "SaveFile", progressSaveData.currentStageName.c_str(), saveDataTime.c_str());
+            
+            SetSaveData(i, saveFileName.c_str(), progressSaveData.currentStageName.c_str(), saveDataTime.c_str());
         } else {
-            SetSaveData(i, "SaveFile", "NoData", "--:--");
+            SetSaveData(i, saveFileName.c_str(), "NoData", "--:--");
         }
     }
 }
@@ -64,28 +67,32 @@ void GameContinued::Initialize() {
     int screenTextureHandle_ = 0;
     blockTextureHandle_ = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/white2x2.png");
 
+
+   uint32_t selectTextureHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/frame.jpg");
+
+
     selectSpriteLeft_ = std::make_unique<Sprite>();
-	selectSpriteLeft_->Initialize(blockTextureHandle_);
+	selectSpriteLeft_->Initialize(selectTextureHandle);
 	selectSpriteLeft_->SetAnchorPoint({0.5f, 0.5f});
-	selectSpriteLeft_->SetScale({340.0f, 140.0f});
-	selectSpriteLeft_->SetPosition({kBlockCenterX - 360.0f, kBlockCenterY+140.0f});
-	selectSpriteLeft_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	selectSpriteLeft_->SetScale({ 192.0f, 64.0f});
+	selectSpriteLeft_->SetPosition({kBlockCenterX - 192.0f, kBlockCenterY+64.0f});
+	selectSpriteLeft_->SetColor(COLOR::BLACK);
 	selectSpriteLeft_->Update();
 
 	selectSpriteRight_ = std::make_unique<Sprite>();
-	selectSpriteRight_->Initialize(blockTextureHandle_);
+	selectSpriteRight_->Initialize(selectTextureHandle);
     selectSpriteRight_->SetAnchorPoint({0.5f, 0.5f});
-    selectSpriteRight_->SetScale({340.0f, 140.0f});
-	selectSpriteRight_->SetPosition({kBlockCenterX + 360.0f, kBlockCenterY+140.0f});
-	selectSpriteRight_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+    selectSpriteRight_->SetScale({192.0f, 64.0f});
+	selectSpriteRight_->SetPosition({kBlockCenterX + 192.0f, kBlockCenterY+64.0f});
+	selectSpriteRight_->SetColor(COLOR::BLACK);
 	selectSpriteRight_->Update();
 
     selectHintSprite_ = std::make_unique<Sprite>();
 	selectHintSprite_->Initialize(blockTextureHandle_);
 	selectHintSprite_->SetAnchorPoint({0.5f, 0.5f});
-	selectHintSprite_->SetScale({800.0f, 140.0f});
-    selectHintSprite_->SetPosition({kBlockCenterX, kBlockCenterY - 100.0f});
-	selectHintSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	selectHintSprite_->SetScale({800.0f, 360.0f});
+    selectHintSprite_->SetPosition({kBlockCenterX, kBlockCenterY});
+	selectHintSprite_->SetColor(COLOR::BLACK);
 	selectHintSprite_->Update();
 
     for (auto& saveData : gameSaveData_) {
@@ -141,22 +148,23 @@ void GameContinued::Initialize() {
     selectCancelText_.Initialize(backHintFontHandle_);
 	selectCancelText_.SetString(U"いいえ");
 	selectCancelText_.SetAlign(TextAlign::Center);
-    selectCancelText_.SetPosition({kBlockCenterX-380.0f, kBlockCenterY + 140.0f});
-	selectCancelText_.SetColor(COLOR::BLACK);
+    selectCancelText_.SetPosition({kBlockCenterX + 192.0f -20.0f, kBlockCenterY + 64.0f+20.0f});
+	selectCancelText_.SetColor(COLOR::WHITE);
 	selectCancelText_.UpdateLayout(false);
 
+    //こっちを左側に移動する
 	selectConfirmText_.Initialize(backHintFontHandle_);
 	selectConfirmText_.SetString(U"はい");
     selectConfirmText_.SetAlign(TextAlign::Center);
-	selectConfirmText_.SetPosition({kBlockCenterX+360.0f, kBlockCenterY + 140.0f});
-	selectConfirmText_.SetColor(COLOR::BLACK);
+	selectConfirmText_.SetPosition({kBlockCenterX - 192.0f, kBlockCenterY + 64.0f+20.0f});
+	selectConfirmText_.SetColor(COLOR::WHITE);
 	selectConfirmText_.UpdateLayout(false);
 
     selectHintText_.Initialize(backHintFontHandle_);
 	selectHintText_.SetString(U"このセーブデータにしますか？");
 	selectHintText_.SetAlign(TextAlign::Center);
-	selectHintText_.SetPosition({kBlockCenterX-70.0f, kBlockCenterY - 100.0f});
-	selectHintText_.SetColor(COLOR::BLACK);
+	selectHintText_.SetPosition({kBlockCenterX-70.0f, kBlockCenterY});
+	selectHintText_.SetColor(COLOR::WHITE);
 	selectHintText_.UpdateLayout(false);
 
 
@@ -187,28 +195,40 @@ void GameContinued::Update() {
 		}
 	} else {
 		if (isSaveConfirmed_) {
-			selectSpriteRight_->SetColor({1.0f, 0.8f, 0.2f, 1.0f});
-			selectSpriteLeft_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+            //左側をRED右側側をBlackに
+			selectSpriteLeft_->SetColor(COLOR::RED);
+            selectSpriteRight_->SetColor(COLOR::BLACK);
+           
+            selectConfirmText_.SetColor(COLOR::RED);
+            selectCancelText_.SetColor(COLOR::WHITE);
+
 		} else {
-			selectSpriteLeft_->SetColor({1.0f, 0.8f, 0.2f, 1.0f});
-			selectSpriteRight_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+			selectSpriteLeft_->SetColor(COLOR::BLACK);
+			selectSpriteRight_->SetColor(COLOR::RED);
+
+            selectCancelText_.SetColor(COLOR::RED);
+            selectConfirmText_.SetColor(COLOR::WHITE);
         }
+        selectCancelText_.UpdateLayout(false);
+        selectConfirmText_.UpdateLayout(false);
+
 		if (command->UiMoveLeftTrigger() || command->UiMoveRightTrigger()) {
             SEManager::SoundPlay(SEManager::PUSH_WATCH);
+            //トグルする
 			isSaveConfirmed_ = !isSaveConfirmed_;
         }
+
 		if (command->UiInteractTrigger()) {
 			if (isSaveConfirmed_) {
-				SEManager::SoundPlay(SEManager::PORTAL_SPAWN);
+				SEManager::SoundPlay(SEManager::DOOR_OPEN);
 				isSaveChecked_ = false;
 				isSaveConfirmed_ = false;
 				isSelected_ = true;
-				selectSpriteRight_->SetColor({1.0f, 0.3f, 0.3f, 1.0f});
+
 			} else {
-				SEManager::SoundPlay(SEManager::PORTAL_SPAWN);
+				SEManager::SoundPlay(SEManager::DOOR_CLOSE);
 				isSaveConfirmed_ = false;
 				isSaveChecked_ = false;
-				selectSpriteLeft_->SetColor({1.0f, 0.3f, 0.3f, 1.0f});
             }
 			
 		}	
@@ -264,24 +284,34 @@ void GameContinued::Update() {
 }
 
 void GameContinued::Draw() {
-	SpriteCommon::GetInstance()->DrawCommon();
+
+    SpriteCommon::GetInstance()->DrawCommon();
+
 	for (auto& saveData : gameSaveData_) {
 		saveData.BlockSprite_->Draw();
 		saveData.GameSceneSprite_->Draw();
 	}
-    if (isSaveChecked_) {
-        selectSpriteLeft_->Draw();
-        selectSpriteRight_->Draw();
-		selectHintSprite_->Draw();
-	}
-	SpriteCommon::GetInstance()->DrawCommonFont();
+
+    SpriteCommon::GetInstance()->SetBlendMode(BlendMode::kBlendModeAlpha);
+    SpriteCommon::GetInstance()->DrawCommonFont();
+
 	text_->Draw();
 	backHintText_.Draw();
-	if (isSaveChecked_) {
-	selectCancelText_.Draw();
-	selectConfirmText_.Draw();
-	selectHintText_.Draw();
+
+    if (isSaveChecked_) {
+        SpriteCommon::GetInstance()->DrawCommon();
+        selectHintSprite_->Draw();
+        selectSpriteLeft_->Draw();
+        selectSpriteRight_->Draw();
+
+        SpriteCommon::GetInstance()->DrawCommonFont();
+        selectHintText_.Draw();
+        selectCancelText_.Draw();
+        selectConfirmText_.Draw();
     }
+
+
+    SpriteCommon::GetInstance()->DrawCommon();
 }
 
 bool GameContinued::ConsumeBackTriggered() {

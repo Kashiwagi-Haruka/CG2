@@ -34,7 +34,7 @@ std::u32string ToMenuLabel(const std::string& menuName) {
 		return U"タイトルへ戻る";
 	}
 	if (menuName == "GameEnd") {
-		return U"退勤";
+		return U"退勤する";
 	}
 	return U"";
 }

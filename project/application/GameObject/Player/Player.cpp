@@ -114,6 +114,7 @@ void Player::Initialize() {
     bodyObj_->Initialize();
     bodyObj_->RegisterEditor("Player");
     bodyObj_->SetTransform(transform_);
+    bodyObj_->Update();
 
     // 体にモデル挿入
     bodyObj_->SetModel("gentleman");
@@ -124,8 +125,6 @@ void Player::Initialize() {
         bodyObj_->SetAnimation(idleAnimation, true);
     }
 
-
-
     if (Model* sizukuModel = ModelManager::GetInstance()->FindModel("gentleman")) {
         skeleton_ = std::make_unique<Skeleton>(Skeleton().Create(sizukuModel->GetModelData().rootnode));
         skinCluster_ = CreateSkinCluster(*skeleton_, *sizukuModel);
@@ -133,16 +132,14 @@ void Player::Initialize() {
             bodyObj_->SetSkinCluster(&skinCluster_);
         }
     }
-    //アニメーション
-    Animation();
+    ////アニメーション
+    //Animation();
     bodyObj_->SetShininess(20.0f);
+    bodyObj_->Update();
 }
 
 void Player::Update()
 {
-
-  
-
     const float deltaTime = Object3dCommon::GetInstance()->GetDxCommon()->GetDeltaTime();
     soundTimer_ = std::max(0.0f, soundTimer_ - deltaTime);
 
@@ -156,6 +153,8 @@ void Player::Update()
 
     bodyObj_->SetTransform(transform_);
     bodyObj_->Update();
+    //手のマトリックス更新
+    handMat_ = GetJointMatrix("Hand.R");
 
     //デバック
     Debug();
@@ -383,6 +382,11 @@ Vector3 Player::GetJointWorldPos(const char* jointName) const
     return  skeleton_->GetJointWorldPosition(skeleton_->GetJoints()[*jointIndex]);
 }
 
+Matrix4x4& Player::GetHandMatPtr()
+{
+    return handMat_;
+}
+
 void Player::Gravity() {
 
     if (ChairManager::GetIsStand()) {
@@ -466,7 +470,7 @@ void Player::Animation()
 
     if (PlayerCommand::GetInstance()->Shot()) {
         //ポータル作れそうなときとか
-        if (PortalManager::GetCanMakePortal()|| PortalManager::GetCanMakePortalToWhiteBoard()) {
+        if (PortalManager::GetCanMakePortal()|| PortalManager::GetCanMakePortalToObj()) {
             desiredAnimationName = "ShotWatch";
         }
     } else {
@@ -553,4 +557,8 @@ void Player::LoadParameters() {
     }
 
     parameterStatusMessage_ = "Loaded player parameters";
+
+    auto& gameSave = GameSave::GetInstance();
+    transform_ =  gameSave.GetPlayerSaveData().transform;
+
 }

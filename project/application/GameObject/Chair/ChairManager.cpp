@@ -122,6 +122,7 @@ void ChairManager::Draw()
     for (auto& chair : chairs_) {
         chair->Draw();
     }
+
 }
 
 void ChairManager::SetPlayerCamera(PlayerCamera* camera)

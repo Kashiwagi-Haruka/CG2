@@ -8,8 +8,6 @@
 #include"GameBase.h"
 #include"GameObject/Key/Key.h"
 #include"GameObject/SEManager/SEManager.h"
-//アニメーションクリップ
-std::vector<Animation::AnimationData>WalkWhiteBoard::animationClips_;
 
 WalkWhiteBoard::WalkWhiteBoard()
 {
@@ -28,12 +26,6 @@ void WalkWhiteBoard::OnCollision(Collider* collider)
     }
 
 
-}
-
-void WalkWhiteBoard::LoadAnimation(const std::string& directionalPath, const std::string& filePath)
-{
-    //アニメーションクリップ
-    animationClips_ = Animation::LoadAnimationClips(directionalPath, filePath);
 }
 
 void WalkWhiteBoard::Initialize()
@@ -118,10 +110,11 @@ void WalkWhiteBoard::Update()
 
 void WalkWhiteBoard::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommon();
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
     obj_->Draw();
 
 #ifdef _DEBUG
+    Object3dCommon::GetInstance()->DrawCommon();
     primitive_->Draw();
 #endif
 }

@@ -4,7 +4,7 @@
 //FT_FREETYPE_H はマクロです。
 #include FT_FREETYPE_H
 #include"Text/FreetypeManager/Font/Font.h"
-
+#include "SpriteCommon.h"
 //DirectX
 #include<wrl.h>
 #include<d3d12.h>
@@ -66,6 +66,15 @@ struct FTTextureData {
     Vector2 glyphSize;
     float bearingY = 0.0f;
     uint64_t lastUsedFrame = 0; // 追加：いつ使われたかを記録
+};
+
+
+
+struct alignas(256) TransformationMatrix {
+    Matrix4x4 WVP;   // 64 バイト
+    Matrix4x4 World; // 64 バイト
+    // ここで自動的に 128 バイト分のパディングが入って、
+    // sizeof(TransformationMatrix) == 256 になる
 };
 
 class FreeTypeManager {
@@ -139,6 +148,12 @@ public:
 
     /// @brief エンジンでCommandQueueを送った後にリセットする
     static void ResetFontUsage();
+
+
+    static D3D12_GPU_VIRTUAL_ADDRESS AllocateConstantBuffer(const TransformationMatrix& matrix);
+    // 💡 追加：Fontクラスが描画する直前に、自身の頂点データを共有バッファに書き込んでVBV（ビュー）を受け取る関数
+    static D3D12_VERTEX_BUFFER_VIEW AllocateVertexBuffer(const VertexData* vertices, uint32_t vertexCount);
+
     /// @brief FTTextureDataの取得関数
     /// @param key keyを入れる
     /// @return FTTextureData
@@ -169,8 +184,21 @@ private:
     static std::unordered_map<GlyphKey, std::vector<std::unique_ptr<Font>>> fontPool_;
 
 
+    // 💡 追加：リングバッファ用のメンバ変数
+    static const uint32_t kMaxRingBufferElements = 4096; // 1フレームに描画できる最大文字数
+    static Microsoft::WRL::ComPtr<ID3D12Resource> ringBufferResource_;
+    static TransformationMatrix* ringBufferMappedData_;
+    static uint32_t ringBufferIndex_; // 現在何文字目かを示すカーソル
+
+    // 💡 追加：頂点リングバッファ用のメンバ変数
+    static const uint32_t kMaxVertexBufferElements = 4096 * 4; // 最大4096文字分 (1文字4頂点)
+    static Microsoft::WRL::ComPtr<ID3D12Resource> vertexBufferResource_;
+    static VertexData* vertexBufferMappedData_;
+    static uint32_t vertexBufferIndex_; // 現在何頂点目かを示すカーソル
+
     // 最大確保枚数（例：256文字分まで）
     static const size_t MAX_FONT_GLYPHS = 256;
+
     // 空いている（再利用可能な）SRVインデックスのプール
     static std::vector<uint32_t> srvPool_;
 

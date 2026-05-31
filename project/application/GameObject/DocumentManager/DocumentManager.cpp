@@ -42,14 +42,17 @@ void DocumentManagerParticle::Initialize(const std::string name)
 
 void DocumentManager::Draw()
 {
-    Object3dCommon::GetInstance()->DrawCommon();
     document_->Draw();
+    Object3dCommon::GetInstance()->DrawCommon();
 }
 
 void DocumentManagerParticle::Draw()
 {
+
+    Object3dCommon::GetInstance()->DrawCommon();
     documentParticle_->Draw();
     document_->Draw();
+    Object3dCommon::GetInstance()->DrawCommon();
 }
 
 void DocumentManager::Update()

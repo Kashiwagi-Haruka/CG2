@@ -3,6 +3,9 @@
 #include "GameObject/GameCamera/PlayerCamera/PlayerCamera.h"
 #include"Text/GentlemanMenu/GentlemanMenu.h"
 #include"GameObject/Player/Player.h"
+#include"GentlemanTalk.h"
+#include"GameObject/Key/Key.h"
+#include"GameObject/SEManager/SEManager.h"
 
 GentleManManager::GentleManManager()
 {
@@ -14,25 +17,88 @@ GentleManManager::GentleManManager()
 void GentleManManager::Initialize()
 {	// セーブポイント紳士
     gentleman_->Initialize();
-
+    isTired_ = false;
+    isSit_ = false;
 }
 
 void GentleManManager::Update()
 {
 
+   auto saveData = GameSave::GetInstance().GetProgressSaveData();
+
     //最終ステージの時はいない
-    if (progressSaveData_->currentStageName == "GentleManStage") {
+    if (saveData.currentStageName == "GentleManStage") {
         return;
     }
 
-    //ミラーステージの時
-    if (progressSaveData_->currentStageName == "MirrorStage") {
-        gentleman_->SetAnimationName("Idle");
+    //チュートリアルステージの時
+    if (saveData.currentStageName == "TutorialStage"|| saveData.currentStageName == "LoopStage"|| saveData.currentStageName == "ElevatorFallStage") {
+
+        if (GentlemanTalk::GetIsTalkEnd()) {
+            gentleman_->SetAnimationName("Idle");
+        } else {
+            gentleman_->SetAnimationName("Talk");
+        }
+
     }
 
-    //チュートリアルステージの時
-    if (progressSaveData_->currentStageName == "TutorialStage") {
-        gentleman_->SetAnimationName("AerialPigeon");
+    //ミラーステージの時
+    if (saveData.currentStageName == "MirrorStage") {
+
+        if (Gentleman::IsRayHit()) {
+
+
+            if (isSit_) {
+                if (GentlemanTalk::GetIsTalkEnd()) {
+                    gentleman_->SetAnimationName("Sit");
+                } else {
+                    gentleman_->SetAnimationName("SitTalk");
+                }
+            } else {
+
+
+                gentleman_->SetAnimationName("SitDown");
+                isSit_ = true;
+
+
+
+            }
+
+
+
+        }
+
+
+
+    }
+
+    //落下の時
+    if (saveData.currentStageName == "RestroomStage") {
+        if (Key::IsGetKey()) {
+
+            gentleman_->SetAnimationName("Soft");
+
+        } else {
+            //  rayがヒットすると...
+
+            if (Gentleman::IsRayHit()) {
+
+                if (!isTired_) {
+                    gentleman_->SetAnimationName("Tired");
+                    isTired_ = true;
+
+                    //ドサッと倒れる音
+                    SEManager::SoundPlay(SEManager::FALL_DOWN);
+                }
+
+            }
+
+            if (!isTired_) {
+                gentleman_->SetAnimationName("Idle");
+            }
+
+        }
+
     }
 
     // セーブポイント紳士
@@ -42,10 +108,14 @@ void GentleManManager::Update()
 
 void GentleManManager::Draw()
 {
+
+    auto saveData = GameSave::GetInstance().GetProgressSaveData();
+
     //最終ステージの時はいない
-    if (progressSaveData_->currentStageName == "GentleManStage") {
+    if (saveData.currentStageName == "GentleManStage") {
         return;
     }
+
     // セーブポイント紳士
     gentleman_->Draw();
 
@@ -74,9 +144,3 @@ void GentleManManager::SetPlayer(Player* player)
     GentlemanMenu::SetPlayerTransform(&player_->GetTransform());
 }
 
-void GentleManManager::SetProgressSaveData(ProgressSaveData* progressSaveData)
-{
-    progressSaveData_ = progressSaveData;
-
-    GentlemanMenu::SetProgressSaveData(progressSaveData_);
-}

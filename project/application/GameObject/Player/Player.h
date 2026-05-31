@@ -28,6 +28,8 @@ private:
     const float kAnimationBlendDuration_ = 0.3f;
     bool animationFinished_ = false;
     std::string desiredAnimationName = "Idle";
+
+    Matrix4x4 handMat_;
 #pragma endregion
     // 体の座標
     Transform transform_{};
@@ -79,6 +81,7 @@ public:
     SkinCluster& GetSkinCluster() { return skinCluster_; };
     Matrix4x4 GetJointMatrix(const char* jointName)const;
     Vector3 GetJointWorldPos(const char* jointName)const;
+    Matrix4x4& GetHandMatPtr();
     void OnCollision(Collider* collider) override;
     /// @brief ワールド座標を取得する
     /// @return ワールド座標

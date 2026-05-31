@@ -23,7 +23,6 @@ public:
     void Initialize();
     void Update();
     void Draw();
-    void SetPlayerPos(Vector3* playerPos);
     static void SetPlayerCamera(PlayerCamera* camera) { playerCamera_ = camera; };
     void SetCamera(Camera* camera);
     bool CanMakePortal() { return canMakePortal_; }
@@ -39,11 +38,10 @@ private:
     bool OnCollisionRay();
     // アニメーション
     void Animation();
-    
 
 private:
     Transform collisionTransform_ = { 0.0f };
-    Vector3* playerPos_ = nullptr;
+
     std::unique_ptr<GiantGentlemanHead>head_ = nullptr;
     std::unordered_map<std::string, std::unique_ptr<ObjectCollider>>colliders_;
 
@@ -59,7 +57,7 @@ private:
     std::string animationGroupName_ = "GiantGentleman";
     const float kAnimationBlendDuration_ = 0.3f;
     bool animationFinished_ = false;
-    const std::string desiredAnimationName = "SleepStand";
+    std::string desiredAnimationName = "SleepStand";
     bool isRayHit_;
     bool canMakePortal_ = false;
     //ポータルが出来る範囲

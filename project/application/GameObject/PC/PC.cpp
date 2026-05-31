@@ -101,15 +101,14 @@ void PC::Initialize() {
 }
 
 void PC::Draw() {
+
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
+    obj_->Draw();
+
     if (isRayHit_) {
-        Object3dCommon::GetInstance()->DrawCommonSkinning();
-        obj_->Draw();
         Object3dCommon::GetInstance()->DrawCommonSkinningOutline();
         obj_->Draw();
         Object3dCommon::GetInstance()->EndOutlineDraw();
-    } else {
-        Object3dCommon::GetInstance()->DrawCommonSkinning();
-        obj_->Draw();
     }
 }
 

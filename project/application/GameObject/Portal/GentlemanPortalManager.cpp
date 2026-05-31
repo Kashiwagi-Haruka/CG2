@@ -18,7 +18,7 @@ GentlemanPortalManager::GentlemanPortalManager(Vector3* pos) {
     firstWarpPosTransform_ = {
         .scale = {1.0f,  1.0f, 1.0f},
           .rotate = {0.0f, 0.0f, 0.0f},
-          .translate = {7.0f, -100.0f, 20.0f}
+          .translate = {0.0f, 10.0f, 0.0f}
     };
 
     portalParticle_ = std::make_unique<PortalParticle>();
@@ -45,6 +45,7 @@ void GentlemanPortalManager::Initialize() {
     warpCoolTimer_ = kWarpTime_;
     isPendingPortalSpawn_ = false;
     isWarp_ = false;
+
     for (auto& portal : portals_) {
         portal.reset();
     }
@@ -155,7 +156,9 @@ void GentlemanPortalManager::Update() {
     UpdatePortal();
 }
 
-void GentlemanPortalManager::CheckCollision() {
+void GentlemanPortalManager::CheckCollision(const bool isOneSide) {
+
+    (void)isOneSide;
 
     canMakePortal_ = false;
 

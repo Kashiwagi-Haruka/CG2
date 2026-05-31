@@ -1,6 +1,7 @@
 #include "WhiteBoard.h"
 #include"GameObject/YoshidaMath/YoshidaMath.h"
 #include"Function.h"
+#include"Object3d/Object3dCommon.h"
 
 WhiteBoard::WhiteBoard()
 {
@@ -60,6 +61,7 @@ void WhiteBoard::Update()
 
 void WhiteBoard::Draw() {
 
+    Object3dCommon::GetInstance()->DrawCommon();
     obj_->Draw();
 #ifdef _DEBUG
     primitive_->Draw();
@@ -97,11 +99,16 @@ void WhiteBoard::SetCollisionAttributeNoneAndInitialize()
     SetCollisionAttribute(kCollisionNone);
 }
 
-bool WhiteBoard::IsFacingSurface(const Matrix4x4& cameraMat)
+bool WhiteBoard::IsFacingSurface(const Matrix4x4& cameraMat, const bool isOneSide)
 {
     Vector3 forward =  YoshidaMath::GetForward(cameraMat);
     Vector3 direction = YoshidaMath::GetForward(obj_->GetWorldMatrix());
     float dot = Function::Dot(forward, direction);
     
-    return(fabs(dot) >= kPortalCreatableAngleRange_);
+    if (isOneSide) {
+        return(dot <= -kPortalCreatableAngleRange_);
+    } else {
+        return(fabs(dot) >= kPortalCreatableAngleRange_);
+    }
+  
 }

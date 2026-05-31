@@ -13,19 +13,34 @@
 #include "GameObject/Wall/WallManagerElevatorFall.h"
 #include "GameObject/TestField/TestField.h"
 #include "GameObject/Door/Door.h"
-
+#include"GameObject/SEManager/SEManager.h"
 #include "GameObject/Key/Key.h"
+#include "GameObject/Desk/DeskManager.h"
+#include "GameObject/Locker/LockerManager.h"
 
 void ElevatorFallStage::InitializeLights()
 {
     assert(lightManager_);
     lightManager_->ClearLights();
     lightManager_->Initialize();
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 3);
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 2);
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::POINT, 3 + 6);
 
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 1);
+    PointCommonLight pointLight;
+    pointLight.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    pointLight.position = { 7.0f, -7.0f,-18.0f };
+    pointLight.intensity = 1.0f;
+    pointLight.radius = 14.0f;
+    pointLight.decay = 1.0f;
+
+    for (int i = 0; i < 6; ++i) {
+        pointLight.position = { 7.0f, (i+1)* - 7.0f,-18.0f};
+        lightManager_->SetPointLight(pointLight, 3+i);
+    }
+
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 3);
+
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 2);
 
     lightManager_->SetActiveLightCount(Yoshida::LightManager::SPOT, 1);
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
@@ -33,8 +48,8 @@ void ElevatorFallStage::InitializeLights()
 
 void ElevatorFallStage::UpdateLights()
 {
-	lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 0);
-	lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 1);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 2);
 
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 }
@@ -49,8 +64,6 @@ ElevatorFallStage::ElevatorFallStage(Player* player)
 
     portalManager_->SetWhiteBoardManager(whiteBoardManager_.get());
 
-    timeCardWatch_ = std::make_unique<TimeCardWatch>();
-    timeCardWatch_->SetPlayer(player_);
 
     //懐中電灯の作成
     flashlight_ = std::make_unique<Flashlight>();
@@ -63,6 +76,8 @@ ElevatorFallStage::ElevatorFallStage(Player* player)
     key_ = std::make_unique<Key>();
     door_ = std::make_unique<Door>();
 
+    deskManager_ = std::make_unique<DeskManager>(8);
+    lockerManager_ = std::make_unique<LockerManager>(8);
 }
 
 void ElevatorFallStage::Initialize()
@@ -73,18 +88,17 @@ void ElevatorFallStage::Initialize()
     InitializeLights();
     portalManager_->Initialize();
     whiteBoardManager_->Initialize();
-    timeCardWatch_->Initialize();
 
     //懐中電灯の初期化
     flashlight_->Initialize();
     wallManager2_->Initialize();
     wallManagerElevatorFall_->Initialize();
     testField_->Initialize();
-    //衝突しない
-    testField_->SetIsCollided(false);
 
     key_->Initialize();
     door_->Initialize();
+    deskManager_->Initialize();
+    lockerManager_->Initialize();
 
     hierarchy->LoadObjectEditorsFromJsonIfExists("ElevatorFallStage_objectEditors.json");
     hierarchy->EndRegisterFile();
@@ -106,7 +120,10 @@ void ElevatorFallStage::UpdateGameObject(Camera* camera, const Vector3& lightDir
 
     //上で判定を取っている
     if (portalManager_->GetIsWarp()) {
-        testField_->SetIsCollided(true);
+        if (SEManager::IsSoundFinished(SEManager::FOOT_STEP)) {
+            //着地音を鳴らす
+            SEManager::SoundPlay(SEManager::FOOT_STEP);
+        }
     }
 
     Vector3 translate = player->GetWorldPosition();
@@ -121,7 +138,7 @@ void ElevatorFallStage::UpdateGameObject(Camera* camera, const Vector3& lightDir
     }
 
     whiteBoardManager_->Update();
-    timeCardWatch_->Update();
+
     //懐中電灯の更新
     flashlight_->Update();
     key_->Update();
@@ -131,6 +148,10 @@ void ElevatorFallStage::UpdateGameObject(Camera* camera, const Vector3& lightDir
     wallManager2_->Update();
     wallManagerElevatorFall_->Update();
     testField_->Update();
+    deskManager_->Update();
+
+    lockerManager_->Update();
+  /*  lockerManager_->InLocker(player);*/
 
     UpdateLights();
 }
@@ -143,7 +164,7 @@ void ElevatorFallStage::UpdatePortal()
 void ElevatorFallStage::CheckCollision()
 {
 
-    portalManager_->CheckCollision();
+    portalManager_->CheckCollision(true);
 
     if (!stageCollisionManager_) {
         return;
@@ -172,6 +193,26 @@ void ElevatorFallStage::CheckCollision()
         stageCollisionManager_->AddCollider(wall.get());
     }
 
+    for (auto& desk : deskManager_->GetDesks()) {
+        stageCollisionManager_->AddCollider(desk.get());
+    }
+
+    for (auto& locker : lockerManager_->GetLockers()) {
+        for (auto& [name, collision] : locker->GetColliders()) {
+            //開いていないときFrontのColliderを追加する
+            bool flag = locker->GetIsOpen() && name.find("Front") != std::string::npos;
+
+            if (!flag && !locker->GetIsPlayerIn()) {
+                stageCollisionManager_->AddCollider(collision.get());
+            }
+
+        }
+        if (!locker->GetIsPlayerIn()) {
+            stageCollisionManager_->AddCollider(locker.get());
+        }
+
+    }
+
     stageCollisionManager_->AddCollider(testField_.get());
 
     stageCollisionManager_->AddCollider(door_->GetAutoLockSystem().get());
@@ -188,31 +229,36 @@ void ElevatorFallStage::CheckCollision()
 void ElevatorFallStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 {
 
-    timeCardWatch_->Draw();
-    whiteBoardManager_->Draw();
+    //状況によってアウトライン変化
     flashlight_->Draw();
     key_->Draw();
+    //skinningと普通描画が混ざる
     door_->Draw();
+    whiteBoardManager_->Draw();
+    //skinning
+    deskManager_->Draw();
+    lockerManager_->Draw();
+
+    //DrawCommon
+    Object3dCommon::GetInstance()->DrawCommon();
 
     wallManager2_->Draw();
     wallManagerElevatorFall_->Draw();
-
-    if (testField_->GetIsCollided()) {
-        testField_->Draw();
-    }
  
+    testField_->Draw();
+
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
 
 void ElevatorFallStage::DrawSprite()
 {
+    lockerManager_->DrawSprite();
 }
 
 void ElevatorFallStage::SetSceneCameraForDraw(Camera* camera)
 {
     portalManager_->SetCamera(camera);
-    timeCardWatch_->SetCamera(camera);
     flashlight_->SetCamera(camera);
     whiteBoardManager_->SetCamera(camera);
     wallManager2_->SetCamera(camera);
@@ -220,6 +266,8 @@ void ElevatorFallStage::SetSceneCameraForDraw(Camera* camera)
     testField_->SetCamera(camera);
     key_->SetCamera(camera);
     door_->SetCamera(camera);
+    deskManager_->SetCamera(camera);
+    lockerManager_->SetCamera(camera);
 }
 
 void ElevatorFallStage::SetPlayerCamera(PlayerCamera* playerCamera)
@@ -228,6 +276,8 @@ void ElevatorFallStage::SetPlayerCamera(PlayerCamera* playerCamera)
     flashlight_->SetPlayerCamera(playerCamera);
     key_->SetPlayerCamera(playerCamera);
     door_->SetPlayerCamera(playerCamera);
+    deskManager_->SetPlayerCamera(playerCamera);
+    lockerManager_->SetPlayerCamera(playerCamera);
 }
 
 PortalManager* ElevatorFallStage::GetPortalManager()

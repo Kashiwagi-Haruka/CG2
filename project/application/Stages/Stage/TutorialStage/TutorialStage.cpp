@@ -48,22 +48,22 @@ void TutorialStage::InitializeLights()
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 
 
-    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 4);
+    lightManager_->SetActiveLightCount(Yoshida::LightManager::AREA, 4+1);
 
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 1);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 2);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 3);
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 2);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 3);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 4);
 
 }
 
 void TutorialStage::UpdateLights()
 {
 
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 0);
-    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 1);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 2);
-    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 3);
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(0), 1);
+    lightManager_->SetAreaLight(wallManager_->GetAreaLights().at(1), 2);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(0), 3);
+    lightManager_->SetAreaLight(wallManager2_->GetAreaLights().at(1), 4);
 
     lightManager_->SetSpotLight(flashlight_->GetSpotLight(), 0);
 }
@@ -215,25 +215,32 @@ void TutorialStage::SetPlayer(Player* player)
     flashlight_->SetPlayer(player_);
 }
 void TutorialStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle) {
-    testField_->Draw();
-    wallManager_->Draw();
-    wallManager2_->Draw();
+
+    //状況によってアウトラインかそうでないかが移り変わる
+    flashlight_->Draw();
+    key_->Draw();
+    severedHand_->Draw();
     //ここで書類パーティクルを描画させる
     documentManager_->Draw();
 
-    flashlight_->Draw();
-    key_->Draw();
-    timeCard_->Draw();
-    timeCardRack_->Draw();
-    door_->Draw();
-    fileManager_->Draw();
+    //スキニング
     deskManager_->Draw();
-    severedHand_->Draw();
 
+    //スキニングと普通が混ざる
+    door_->Draw();
     whiteBoardManager_->Draw();
 
-    portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
+    //普通描画
+    Object3dCommon::GetInstance()->DrawCommon();
+    timeCard_->Draw();
+    timeCardRack_->Draw();
+    fileManager_->Draw();
 
+    testField_->Draw();
+    wallManager_->Draw();
+    wallManager2_->Draw();
+
+    portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 
 }
 void TutorialStage::DrawSprite()

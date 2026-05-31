@@ -9,6 +9,8 @@ public:
 		DOOR_OPEN,
 		DOOR_CLOSE,
 		FOOT_STEP,
+		FOOT_STEP_BIG,
+		FALL_DOWN,
 		WARP,
 		PORTAL_SPAWN,
 		SHOT,
@@ -32,6 +34,7 @@ public:
 		//怪奇音
 		MYSTERY,
 		PC,
+		BUZZER,
 		MAX_SE,
 	};
 

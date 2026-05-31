@@ -5,13 +5,13 @@
 #include"ScreenSize.h"
 #include"SpriteCommon.h"
 #include"GameObject/Player/Player.h"
-
+#include"Object3d/Object3dCommon.h"
 bool LockerManager::isRayHit_ = false;
 bool LockerManager::isInLocker_ = false;
 
-LockerManager::LockerManager()
+LockerManager::LockerManager(const uint32_t num)
 {
-    for (int i = 0; i < kMaxLockers_; ++i) {
+    for (uint32_t i = 0; i < num; ++i) {
         std::unique_ptr<Locker> locker = std::make_unique<Locker>();
         std::string name = "Locker" + std::to_string(i);
         locker->SetAnimationGroupName(name);
@@ -104,11 +104,11 @@ void LockerManager::InLocker(Player* player)
 
 void LockerManager::Draw()
 {
+    Object3dCommon::GetInstance()->DrawCommonSkinning();
+
     for (auto& locker : lockers_) {
         locker->Draw();
     }
-
-
 
 }
 

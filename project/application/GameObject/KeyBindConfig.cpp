@@ -5,11 +5,8 @@
 std::unique_ptr<PlayerCommand> PlayerCommand::instance_ = nullptr;
 bool PlayerCommand::isGrab_ = false;
 
-bool PlayerCommand::isUiInputLocked_ = false;
+bool PlayerCommand::iMoveLocked_ = false;
 bool PlayerCommand::isLook_ = false;
-////ロッカーにいるかどうか
-//bool PlayerCommand::isInLocker_ = false;
-
 
 PlayerCommand* PlayerCommand::GetInstance() {
     if (instance_ == nullptr) {
@@ -19,28 +16,28 @@ PlayerCommand* PlayerCommand::GetInstance() {
 }
 
 bool PlayerCommand::MoveLeft() {
-    if (isUiInputLocked_) {
+    if (iMoveLocked_) {
         return false;
     }
     return Move(K_MoveLeft, K_MoveLeftArrow, C_MoveLeft);
 }
 
 bool PlayerCommand::MoveRight() {
-    if (isUiInputLocked_) {
+    if (iMoveLocked_) {
         return false;
     }
     return Move(K_MoveRight, K_MoveRightArrow, C_MoveRight);
 }
 
 bool PlayerCommand::MoveForward() {
-    if (isUiInputLocked_) {
+    if (iMoveLocked_) {
         return false;
     }
     return Move(K_MoveForward, K_MoveForwardArrow, C_MoveForward);
 }
 
 bool PlayerCommand::MoveBackward() {
-    if (isUiInputLocked_) {
+    if (iMoveLocked_) {
         return false;
     }
     return Move(K_MoveBackward, K_MoveBackwardArrow, C_MoveBackward);
@@ -56,14 +53,14 @@ bool PlayerCommand::EvetSkipTrigger()
 }
 
 bool PlayerCommand::MoveForwardTrigger() {
-    if (isUiInputLocked_) {
+    if (iMoveLocked_) {
         return false;
     }
     return MoveTrigger(K_MoveForward, K_MoveForwardArrow, C_MoveForward);
 }
 
 bool PlayerCommand::MoveBackwardTrigger() {
-    if (isUiInputLocked_) {
+    if (iMoveLocked_) {
         return false;
     }
     return MoveTrigger(K_MoveBackward, K_MoveBackwardArrow, C_MoveBackward);
@@ -92,7 +89,7 @@ bool PlayerCommand::Sneak() {
 }
 
 bool PlayerCommand::Interact() {
-    if (isUiInputLocked_) {
+    if (iMoveLocked_) {
         return false;
     }
     auto* input = Input::GetInstance();
@@ -107,7 +104,7 @@ bool PlayerCommand::ItemUseTrigger() {
 	return input->TriggerKey(K_Interact) || input->TriggerButton(Input::PadButton(C_Interact));
 }
 bool PlayerCommand::InteractTrigger() {
-    if (isUiInputLocked_) {
+    if (iMoveLocked_) {
         return false;
     }
     auto* input = Input::GetInstance();
@@ -139,6 +136,12 @@ bool PlayerCommand::UiMoveLeft() { return Move(K_MoveLeft, K_MoveLeftArrow, C_Mo
 bool PlayerCommand::UiMoveRight() { return Move(K_MoveRight, K_MoveRightArrow, C_MoveRight); }
 
 Vector2 PlayerCommand::Rotate(float rotateSpeed,const bool isFlipHorizontally,const bool isFlipVertically) {
+   
+    if (iMoveLocked_) {
+        //UIでロックされているとき0でリターンする
+        return { 0.0f };
+    }
+    
     auto* input = Input::GetInstance();
 
     Vector2 inputMovePos = input->GetJoyStickRXY();
@@ -164,8 +167,7 @@ Vector2 PlayerCommand::Rotate(float rotateSpeed,const bool isFlipHorizontally,co
 
 void PlayerCommand::Initialize() {
     isGrab_ = false;
-    isUiInputLocked_ = false;
-    //isInLocker_ = false;
+    iMoveLocked_ = false;
     isLook_ = false;
 }
 

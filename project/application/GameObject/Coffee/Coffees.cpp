@@ -534,9 +534,11 @@ void Coffees::Update(Camera* camera, const Vector3& lightDirection) {
 }
 
 void Coffees::Draw() {
+   
     if (!isSpilling_) {
         return;
     }
+
     instancedObject_->Draw();
 }
 
