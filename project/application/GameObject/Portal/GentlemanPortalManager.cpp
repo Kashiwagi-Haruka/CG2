@@ -45,6 +45,7 @@ void GentlemanPortalManager::Initialize() {
     warpCoolTimer_ = kWarpTime_;
     isPendingPortalSpawn_ = false;
     isWarp_ = false;
+
     for (auto& portal : portals_) {
         portal.reset();
     }

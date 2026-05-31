@@ -633,6 +633,133 @@
           }
         ],
         "loopEnabled": false,
+        "name": "footStepBig.mp3",
+        "volume": 0.5555555820465088
+      },
+      {
+        "effects": [
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 0
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 1
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 2
+          },
+          {
+            "echo": {
+              "Delay": 800.0,
+              "Feedback": 65.0,
+              "WetDryMix": 60.0
+            },
+            "enabled": false,
+            "equalizer": {
+              "Bandwidth0": 18.0,
+              "Bandwidth1": 18.0,
+              "Bandwidth2": 18.0,
+              "Bandwidth3": 18.0,
+              "FrequencyCenter0": 800.0,
+              "FrequencyCenter1": 2000.0,
+              "FrequencyCenter2": 8000.0,
+              "FrequencyCenter3": 12000.0,
+              "Gain0": 4.5,
+              "Gain1": -5.0,
+              "Gain2": 6.0,
+              "Gain3": 3.0
+            },
+            "limiter": {
+              "Loudness": 1000,
+              "Release": 6
+            },
+            "reverb": {
+              "WetDryMix": 65.0
+            },
+            "type": 3
+          }
+        ],
+        "loopEnabled": false,
         "name": "warp0.mp3",
         "volume": 1.0
       },
@@ -3875,7 +4002,7 @@
       "transform": {
         "rotate": [
           0.0,
-          0.0,
+          -4.139999866485596,
           0.0
         ],
         "scale": [
@@ -3884,9 +4011,9 @@
           10.0
         ],
         "translate": [
-          7.0,
+          6.920000076293945,
           0.0,
-          0.0
+          15.0
         ]
       }
     },
@@ -3940,9 +4067,9 @@
           10.0
         ],
         "translate": [
-          -5.170000076293945,
+          -11.350000381469727,
           0.0,
-          -12.0
+          -24.010000228881836
         ]
       }
     },
@@ -3996,9 +4123,9 @@
           10.0
         ],
         "translate": [
-          13.859999656677246,
+          -10.0,
           0.0,
-          10.380000114440918
+          12.0
         ]
       }
     },
@@ -4097,7 +4224,7 @@
           0.0
         ]
       },
-      "name": "GiantEnemy0Head",
+      "name": "LoopStageField",
       "transform": {
         "rotate": [
           0.0,
@@ -4105,13 +4232,13 @@
           0.0
         ],
         "scale": [
-          0.25,
-          0.25,
-          0.25
+          120.0,
+          0.009999999776482582,
+          120.0
         ],
         "translate": [
           0.0,
-          0.0,
+          -0.009999999776482582,
           0.0
         ]
       }
@@ -4153,7 +4280,7 @@
           0.0
         ]
       },
-      "name": "GiantEnemy0Foot_L",
+      "name": "LoopStageWall_B",
       "transform": {
         "rotate": [
           0.0,
@@ -4161,14 +4288,14 @@
           0.0
         ],
         "scale": [
-          0.375,
-          0.375,
-          0.375
+          100.0,
+          10.0,
+          1.0
         ],
         "translate": [
           0.0,
-          -0.10000000149011612,
-          0.0
+          5.0,
+          -50.0
         ]
       }
     },
@@ -4209,7 +4336,7 @@
           0.0
         ]
       },
-      "name": "GiantEnemy0Foot_R",
+      "name": "LoopStageWall_F",
       "transform": {
         "rotate": [
           0.0,
@@ -4217,14 +4344,14 @@
           0.0
         ],
         "scale": [
-          0.375,
-          0.375,
-          0.375
+          100.0,
+          10.0,
+          1.0
         ],
         "translate": [
           0.0,
-          -0.10000000149011612,
-          0.0
+          5.0,
+          50.0
         ]
       }
     },
@@ -4265,7 +4392,7 @@
           0.0
         ]
       },
-      "name": "GiantEnemy1Head",
+      "name": "LoopStageWall_L",
       "transform": {
         "rotate": [
           0.0,
@@ -4273,13 +4400,13 @@
           0.0
         ],
         "scale": [
-          0.25,
-          0.25,
-          0.25
+          1.0,
+          10.0,
+          100.0
         ],
         "translate": [
-          0.0,
-          0.0,
+          -50.0,
+          5.0,
           0.0
         ]
       }
@@ -4321,7 +4448,7 @@
           0.0
         ]
       },
-      "name": "GiantEnemy1Foot_L",
+      "name": "LoopStageWall_R",
       "transform": {
         "rotate": [
           0.0,
@@ -4329,293 +4456,13 @@
           0.0
         ],
         "scale": [
-          0.375,
-          0.375,
-          0.375
+          1.0,
+          10.0,
+          100.0
         ],
         "translate": [
-          0.0,
-          -0.10000000149011612,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 19,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "GiantEnemy1Foot_R",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          0.375,
-          0.375,
-          0.375
-        ],
-        "translate": [
-          0.0,
-          -0.10000000149011612,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 20,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "GiantEnemy2Head",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          0.25,
-          0.25,
-          0.25
-        ],
-        "translate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 21,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "GiantEnemy2Foot_L",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          0.375,
-          0.375,
-          0.375
-        ],
-        "translate": [
-          0.0,
-          -0.10000000149011612,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 22,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "GiantEnemy2Foot_R",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          0.375,
-          0.375,
-          0.375
-        ],
-        "translate": [
-          0.0,
-          -0.10000000149011612,
-          0.0
-        ]
-      }
-    },
-    {
-      "editorId": "",
-      "index": 23,
-      "material": {
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "distortionFalloff": 1.0,
-        "distortionStrength": 0.0,
-        "enableLighting": true,
-        "environmentCoefficient": 0.0,
-        "grayscaleEnabled": false,
-        "sepiaEnabled": false,
-        "shininess": 40.0,
-        "uvAnchor": [
-          0.0,
-          0.0
-        ],
-        "uvRotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "uvScale": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "uvTranslate": [
-          0.0,
-          0.0,
-          0.0
-        ]
-      },
-      "name": "LoopStageField",
-      "transform": {
-        "rotate": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1000.0,
-          0.009999999776482582,
-          1000.0
-        ],
-        "translate": [
-          0.0,
-          -0.009999999776482582,
+          50.0,
+          5.0,
           0.0
         ]
       }
