@@ -3,6 +3,9 @@
 #include"GameBase.h"
 #include"GameObject/YoshidaMath/Easing.h"
 #include<imgui.h>
+ namespace {
+    constexpr float kDeltaTime = 1.0f / 60.0f;
+}
 
 CameraController::CameraController()
 {    //プレイヤー視点のカメラ
@@ -45,8 +48,7 @@ void CameraController::Update()
     } else {
 
         if (isEventMode_) {
-
-            currentLerp_ += GameBase::GetInstance()->GetDeltaTime() / lerpTime_;
+            currentLerp_ += kDeltaTime / lerpTime_;
             currentLerp_ = std::min(currentLerp_, 1.0f);
 
             if (currentLerp_ == 1.0f) {

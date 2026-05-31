@@ -167,3 +167,8 @@ Vector3 PlayerCamera::GetForward()
     return  YoshidaMath::GetForward(camera_->GetWorldMatrix());
 }
 
+void PlayerCamera::CameraUpdate()
+{
+    camera_->Update();
+}
+

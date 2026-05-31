@@ -24,10 +24,11 @@ void FirstGameEvent::Update()
 
             const  float qPi = Function::kPi * 0.125f;
             const float rotateX = 0.75f;
-            Vector3 offsetTransform = { 0.0f,-0.25f,-0.5f };
+
+            Vector3 offsetTransform = cameraForward_;
             if (count_ == 0) {
                 Vector3 offset = { rotateX,qPi,0.0f };
-                cameraController->MoveTo(playerTransform.translate, playerTransform.rotate, playerTransform.translate + offsetTransform, playerTransform.rotate + offset, 1.25f);
+                cameraController->MoveTo(playerTransform.translate, playerTransform.rotate , playerTransform.translate + offsetTransform, playerTransform.rotate + offset, 1.25f);
             } else if (count_ == 1) {
                 Vector3 offsetX = { rotateX,0.0f,0.0f };
                 Vector3 offsetY = { 0.0f,qPi,0.0f };
@@ -51,9 +52,15 @@ void FirstGameEvent::OnStart()
     count_ = 0;
     triggerCount_ = 0;
     auto* cameraController = CameraController::GetInstance();
+    
+    
+    cameraForward_ = cameraController->GetPlayerCamera()->GetForward();
+    cameraForward_ *= 0.5f;
+    cameraForward_.y = -0.25f;
+
     cameraController->SetEventMode(true);
 
-    cameraController->MoveTo({ 1.0f,1.0f,-5.0f }, { 0.0f,Function::kPi,0.0f }, { 2.5f,1.0f,-5.0f }, { 0.0f,Function::kPi,0.0f }, 5.0f);
+    cameraController->MoveTo({ 1.0f,1.0f,-5.0f }, { 0.0f,Function::kPi,0.0f }, { 2.5f,1.0f,-5.0f }, { 0.0f,Function::kPi,0.0f }, 2.0f);
 }
 
 void FirstGameEvent::OnEnd()
