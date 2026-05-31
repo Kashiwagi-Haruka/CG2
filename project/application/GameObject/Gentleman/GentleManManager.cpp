@@ -24,7 +24,6 @@ void GentleManManager::Initialize()
 void GentleManManager::Update()
 {
 
-
    auto saveData = GameSave::GetInstance().GetProgressSaveData();
 
     //最終ステージの時はいない
@@ -33,7 +32,7 @@ void GentleManManager::Update()
     }
 
     //チュートリアルステージの時
-    if (saveData.currentStageName == "TutorialStage") {
+    if (saveData.currentStageName == "TutorialStage"|| saveData.currentStageName == "LoopStage"|| saveData.currentStageName == "ElevatorFallStage") {
 
         if (GentlemanTalk::GetIsTalkEnd()) {
             gentleman_->SetAnimationName("Idle");
@@ -71,11 +70,6 @@ void GentleManManager::Update()
 
 
 
-    }
-
-    //落下の時
-    if (saveData.currentStageName == "ElevatorFallStage") {
-        gentleman_->SetAnimationName("AerialPigeon");
     }
 
     //落下の時

@@ -18,7 +18,7 @@ GentlemanPortalManager::GentlemanPortalManager(Vector3* pos) {
     firstWarpPosTransform_ = {
         .scale = {1.0f,  1.0f, 1.0f},
           .rotate = {0.0f, 0.0f, 0.0f},
-          .translate = {7.0f, -100.0f, 20.0f}
+          .translate = {0.0f, 10.0f, 0.0f}
     };
 
     portalParticle_ = std::make_unique<PortalParticle>();
