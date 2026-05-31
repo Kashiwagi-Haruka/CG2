@@ -84,6 +84,7 @@ void EdamameTrivia::SetSound() {
 
 	filePath = "Resources/TD3_3102/Audio/Voice/Edamame/" + std::to_string(triviaNum_) + ".mp3";
 	triviaVoice_ = Audio::GetInstance()->SoundLoadFile(filePath.c_str());
+	isCurrentVoiceFinished_ = false;
 	Audio::GetInstance()->SoundPlayWave(triviaVoice_, false);
 }
 
