@@ -123,12 +123,13 @@ void ShadowGameScene::Initialize()
     player_->Initialize();
 
     PlayerCommand::Initialize();
+    PlayerCommand::SetIsMoveLocked(true);
+
     //カメラコントローラー
     cameraController_->Initialize();
     cameraController_->GetInstance()->GetPlayerCamera()->SetParam(gameSave.GetCameraSaveData());
     //ライト管理
     lightManager_->Initialize();
-
 
     auto progress = gameSave.GetProgressSaveData();
     //紳士管理

@@ -30,10 +30,12 @@ public:
     void DisableFixedTransform();
     bool IsFixedTransformEnabled() const { return isFixedTransformEnabled_; }
     PointCommonLight& GetPointLight() { return pointLight_; }
+    Vector3 GetForward();
+    void CameraUpdate();
 private:
     //回転
     void Rotate();
-    Vector3 GetForward();
+
 private:
     CameraSaveData param_;
     const float rotateSpeed_ = 0.02f;       // カメラの回転速度
