@@ -3683,260 +3683,6 @@
         "loopEnabled": false,
         "name": "buzzer.mp3",
         "volume": 1.0
-      },
-      {
-        "effects": [
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 0
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 1
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 2
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 3
-          }
-        ],
-        "loopEnabled": false,
-        "name": "bgm1.mp3",
-        "volume": 0.4444444477558136
-      },
-      {
-        "effects": [
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 0
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 1
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 2
-          },
-          {
-            "echo": {
-              "Delay": 800.0,
-              "Feedback": 65.0,
-              "WetDryMix": 60.0
-            },
-            "enabled": false,
-            "equalizer": {
-              "Bandwidth0": 18.0,
-              "Bandwidth1": 18.0,
-              "Bandwidth2": 18.0,
-              "Bandwidth3": 18.0,
-              "FrequencyCenter0": 800.0,
-              "FrequencyCenter1": 2000.0,
-              "FrequencyCenter2": 8000.0,
-              "FrequencyCenter3": 12000.0,
-              "Gain0": 4.5,
-              "Gain1": -5.0,
-              "Gain2": 6.0,
-              "Gain3": 3.0
-            },
-            "limiter": {
-              "Loudness": 1000,
-              "Release": 6
-            },
-            "reverb": {
-              "WetDryMix": 65.0
-            },
-            "type": 3
-          }
-        ],
-        "loopEnabled": false,
-        "name": "scl_k1_cb.mp3",
-        "volume": 0.4444444477558136
       }
     ]
   },
@@ -4181,6 +3927,1126 @@
         "translate": [
           7.0,
           0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 8,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject0",
+      "transform": {
+        "rotate": [
+          1.5700000524520874,
+          -1.5700000524520874,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -23.139999389648438,
+          8.0,
+          -57.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 9,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject1",
+      "transform": {
+        "rotate": [
+          1.5720000267028809,
+          -1.5700000524520874,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -25.969999313354492,
+          8.0,
+          -57.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 10,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject2",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -57.0,
+          1.5,
+          0.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 11,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject3",
+      "transform": {
+        "rotate": [
+          -0.05000000074505806,
+          1.5700000524520874,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -0.5099999904632568,
+          1.5,
+          57.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 12,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject4",
+      "transform": {
+        "rotate": [
+          -1.5720000267028809,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -57.0,
+          8.0,
+          -9.890000343322754
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 13,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject5",
+      "transform": {
+        "rotate": [
+          0.0,
+          3.061000108718872,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          57.0,
+          1.1699999570846558,
+          -0.9300000071525574
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 14,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject6",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -57.0,
+          1.5,
+          -47.93000030517578
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 15,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject7",
+      "transform": {
+        "rotate": [
+          0.0,
+          1.5720000267028809,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          14.260000228881836,
+          1.5,
+          -56.380001068115234
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 16,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject8",
+      "transform": {
+        "rotate": [
+          -0.18000000715255737,
+          -4.389999866485596,
+          -0.07999999821186066
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -35.720001220703125,
+          3.75,
+          53.65999984741211
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 17,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject9",
+      "transform": {
+        "rotate": [
+          0.0,
+          1.531999945640564,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          16.43000030517578,
+          1.5,
+          57.619998931884766
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 18,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject10",
+      "transform": {
+        "rotate": [
+          0.0,
+          1.6100000143051147,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -58.86000061035156,
+          1.5,
+          14.239999771118164
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 19,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject11",
+      "transform": {
+        "rotate": [
+          0.0,
+          0.019999999552965164,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          57.33000183105469,
+          1.5,
+          -31.299999237060547
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 20,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject12",
+      "transform": {
+        "rotate": [
+          0.0,
+          -0.6100000143051147,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -59.599998474121094,
+          1.5,
+          -19.200000762939453
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 21,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject13",
+      "transform": {
+        "rotate": [
+          -0.11999999731779099,
+          -1.5199999809265137,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          29.290000915527344,
+          2.1600000858306885,
+          -56.86000061035156
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 22,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject14",
+      "transform": {
+        "rotate": [
+          0.0,
+          1.440000057220459,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -20.6299991607666,
+          1.5,
+          57.45000076293945
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 23,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject15",
+      "transform": {
+        "rotate": [
+          0.0,
+          3.1500000953674316,
+          0.0
+        ],
+        "scale": [
+          55.0,
+          55.0,
+          55.0
+        ],
+        "translate": [
+          -57.0,
+          1.5,
+          32.060001373291016
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 24,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject16",
+      "transform": {
+        "rotate": [
+          -0.17000000178813934,
+          0.07000000029802322,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -55.77000045776367,
+          4.539999961853027,
+          -33.83000183105469
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 25,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject17",
+      "transform": {
+        "rotate": [
+          0.15000000596046448,
+          -0.05999999865889549,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          57.0,
+          2.9200000762939453,
+          15.0
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 26,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject18",
+      "transform": {
+        "rotate": [
+          0.0,
+          -3.509999990463257,
+          0.0
+        ],
+        "scale": [
+          60.0,
+          60.0,
+          60.0
+        ],
+        "translate": [
+          55.65999984741211,
+          4.480000019073486,
+          -14.729999542236328
+        ]
+      }
+    },
+    {
+      "editorId": "",
+      "index": 27,
+      "material": {
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "distortionFalloff": 1.0,
+        "distortionStrength": 0.0,
+        "enableLighting": true,
+        "environmentCoefficient": 0.0,
+        "grayscaleEnabled": false,
+        "sepiaEnabled": false,
+        "shininess": 40.0,
+        "uvAnchor": [
+          0.0,
+          0.0
+        ],
+        "uvRotate": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "uvScale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "uvTranslate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "name": "FileObject19",
+      "transform": {
+        "rotate": [
+          0.0,
+          -2.3499999046325684,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0,
+          50.0
+        ],
+        "translate": [
+          -56.849998474121094,
+          6.340000152587891,
           0.0
         ]
       }

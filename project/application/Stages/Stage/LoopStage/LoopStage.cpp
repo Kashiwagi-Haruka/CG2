@@ -8,6 +8,7 @@
 #include "GameObject/Portal/SpherePortalManager/SpherePortalManager.h"
 #include "GameObject/GentleMan/GiantEnemyManager.h"
 #include"TextureManager.h"
+#include"GameObject/File/FileManager.h"
 
 void LoopStage::InitializeLights()
 {
@@ -49,7 +50,7 @@ LoopStage::LoopStage(Player* player)
 
     portalManager_->SetGiantEnemyManager(giantEnemyManager_.get());
 
-
+    fileManager_ = std::make_unique<FileManager>(20);
 }
 
 void LoopStage::Initialize()
@@ -65,6 +66,8 @@ void LoopStage::Initialize()
 
     // 懐中電灯の初期化
     flashlight_->Initialize();
+
+    fileManager_->Initialize();
 
     //コライダーの設定
     uint32_t textureHandle = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/floor.png");
@@ -113,6 +116,7 @@ void LoopStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, 
     portalManager_->Update();
     //懐中電灯の更新
     flashlight_->Update();
+    fileManager_->Update();
 
     for (auto& [name, collider] : fieldCollider_) {
         fieldCollider_[name]->Update();
@@ -172,15 +176,19 @@ void LoopStage::CheckCollision()
 
 void LoopStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
 {
+
     flashlight_->Draw();
 
-    for (auto& [name, collider] : fieldCollider_) {
-        collider->Draw();
-    }
+    //for (auto& [name, collider] : fieldCollider_) {
+    //    collider->Draw();
+    //}
 
-    //fieldCollider_["LoopStageField"]->Draw();
+    fieldCollider_["LoopStageField"]->Draw();
 
     giantEnemyManager_->Draw();
+
+    Object3dCommon::GetInstance()->DrawCommon();
+    fileManager_->Draw();
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
@@ -195,10 +203,14 @@ void LoopStage::SetSceneCameraForDraw(Camera* camera)
     giantEnemyManager_->SetCamera(camera);
 
     flashlight_->SetCamera(camera);
+    
+    fileManager_->SetCamera(camera);
 
-    for (auto& [name, collider] : fieldCollider_) {
+ /*   for (auto& [name, collider] : fieldCollider_) {
         collider->SetCamera(camera);
-    }
+    }  */ 
+    fieldCollider_["LoopStageField"]->SetCamera(camera);
+
 }
 
 void LoopStage::SetPlayerCamera(PlayerCamera* playerCamera)

@@ -134,7 +134,7 @@ void RestroomStage::UpdateGameObject(Camera* camera, const Vector3& lightDirecti
     door_->Update();
     if (door_->GetAutoLockSystem()->IsPlayerHit()) {
         isAutoLockRemoveCollision_ = true;
-    }
+    } 
     toiletManager_->Update();
     documentManager_->Update();
     //懐中電灯の更新

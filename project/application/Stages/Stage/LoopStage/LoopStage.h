@@ -6,6 +6,7 @@ class TestField;
 class ObjectCollider;
 class SpherePortalManager;
 class GiantEnemyManager;
+class FileManager;
 
 class LoopStage   : public BaseStage
 {
@@ -16,6 +17,9 @@ class LoopStage   : public BaseStage
     CollisionManager* stageCollisionManager_ = nullptr;
     std::unique_ptr<Flashlight> flashlight_ = nullptr;
     std::map< std::string, std::unique_ptr<ObjectCollider>>fieldCollider_;
+
+    std::unique_ptr<FileManager>fileManager_ = nullptr;
+
 private:
   void InitializeLights();
   void UpdateLights();

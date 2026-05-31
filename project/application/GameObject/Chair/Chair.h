@@ -31,6 +31,7 @@ public:
     bool GetIsStand() { return isStand_; }
     void SetIsStand(const bool isStand) { isStand_ = isStand; }
     bool IsRayHit() { return isRayHit_; }
+
 private:
     void SwichCommand();
     void Mirror();

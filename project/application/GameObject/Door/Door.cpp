@@ -134,6 +134,13 @@ void Door::Draw(bool drawAutoLockSys)
 
 void Door::CheckCollision()
 {
+
+    if (isOpen_) {
+        //開いていたら例をヒットさせないよ
+        isRayHit_ = false;
+        return;
+    }
+
     isRayHit_ = OnCollisionRay();
     //自販機とrayの当たり判定
     if (isRayHit_) {

@@ -87,7 +87,7 @@ void Chair::Initialize() {
 
     isRayHit_ = false;
     isStand_ = false;
-
+    isGrab_ = false;
 
     obj_->Initialize();
     velocity_ = { 0.0f };
