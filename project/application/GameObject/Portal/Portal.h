@@ -26,7 +26,7 @@ public:
     Portal();
     ~Portal();
     void Initialize(const PortalMesh::MeshType& meshType = PortalMesh::MeshType::kCircle);
-    void Update();
+    void Update(bool setTransform = false);
     void SetCamera(Camera* camera);
     void SetPlayerCamera(Camera* camera) { warpPos_->SetPlayerCamera(camera); };
     Transform& GetTransform() { return transform_; };
@@ -46,7 +46,7 @@ public:
     void SetCanWarpAngleRange(const float range) { canWarpAngleRange_ = range; };
 private:
     bool ShouldProcessPortal() const;
-    void UpdatePortalWorldMatrix();
+    void UpdatePortalWorldMatrix(bool setTransform = false);
     void SetRotateFromDirection(const Vector3& forward);
     void UpdateScale();
     void UpdateWorldMatrix();

@@ -22,8 +22,14 @@ void ObjectCollider::Update()
     Vector3 scale = primitive_->GetTransform().scale;
 
     auto type = GetType();
+    
+    if (scale_) {
+        scale.x *= scale_->x;
+        scale.y *= scale_->y;
+        scale.z *= scale_->z;
+    }
 
-    if (type == YoshidaMath::ColliderType::kAABB) {
+    if (type == YoshidaMath::ColliderType::kAABB) {    
         scale.x *= 0.5f;
         scale.y *= 0.5f;
         scale.z *= 0.5f;
@@ -70,6 +76,7 @@ void ObjectCollider::Initialize(const YoshidaMath::ColliderType& type)
         primitive_->Initialize(Primitive::Box);
         SetAABB({ .min = {-0.5f,-0.5f,-0.5f},.max = {0.5f,0.5f,0.5f} });
     } else if (type == YoshidaMath::ColliderType::kSphere) {
+        primitive_->Initialize(Primitive::Sphere);
         SetRadius(primitive_->GetTransform().scale.x * 0.5f);
     } else {
         //BOXを入れる

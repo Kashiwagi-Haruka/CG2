@@ -470,7 +470,7 @@ void Player::Animation()
 
     if (PlayerCommand::GetInstance()->Shot()) {
         //ポータル作れそうなときとか
-        if (PortalManager::GetCanMakePortal()|| PortalManager::GetCanMakePortalToWhiteBoard()) {
+        if (PortalManager::GetCanMakePortal()|| PortalManager::GetCanMakePortalToObj()) {
             desiredAnimationName = "ShotWatch";
         }
     } else {

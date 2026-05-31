@@ -12,7 +12,8 @@
 #include"GameBase.h"
 
 bool PortalManager::canMakePortal_ = false;
-bool PortalManager::canMakePortalToWhiteBoard_ = false;
+bool PortalManager::canMakePortalToObj_ = false;
+
 PortalManager::PortalManager(Vector3* pos) {
 
     playerPos_ = pos;
@@ -45,7 +46,7 @@ void PortalManager::Initialize() {
     isWarp_ = false;
 
     canMakePortal_ = false;
-    canMakePortalToWhiteBoard_ = false;
+    canMakePortalToObj_ = false;
 
     warpCoolTimer_ = kWarpTime_;
 
@@ -152,7 +153,7 @@ void PortalManager::Update() {
 # ifdef USE_IMGUI
     ImGui::Begin("PortalManager");
     ImGui::Checkbox("canMakePortal", &canMakePortal_);
-    ImGui::Checkbox("hitWhiteBoard", &canMakePortalToWhiteBoard_);
+    ImGui::Checkbox("hitWhiteBoard", &canMakePortalToObj_);
     ImGui::Text("RoomCout,%d", roomAABBs_.size());
     for (uint32_t i = 0; i < roomAABBs_.size(); ++i) {
         std::string idName = "Room" + std::to_string(i);
@@ -171,7 +172,7 @@ void PortalManager::Update() {
 void PortalManager::CheckCollision(const bool isOneSide) {
 
     canMakePortal_ = false;
-    canMakePortalToWhiteBoard_ = false;
+    canMakePortalToObj_ = false;
 
     if (isPendingPortalSpawn_) {
         return;
@@ -187,7 +188,7 @@ void PortalManager::CheckCollision(const bool isOneSide) {
         return;
     }
     //ここまで来たらホワイトボードにはポータルが作れることが分かるね。
-    canMakePortalToWhiteBoard_ = true;
+    canMakePortalToObj_ = true;
 
     // 生成予定地（撃ったホワイトボード）の座標を取得
     Vector3 targetPos = hitBoard->GetCollisionTransform().translate;

@@ -11,7 +11,8 @@ void SEManager::Load() {
 	SEs_[DOOR_OPEN] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/doorOpen.mp3");
 	SEs_[DOOR_CLOSE] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/doorClose.mp3");
 	SEs_[FOOT_STEP] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/maou_se_sound_footstep02.mp3");
-
+	SEs_[FOOT_STEP_BIG] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/footStepBig.mp3");
+	
 	SEs_[WARP] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/warp0.mp3");
 	SEs_[PORTAL_SPAWN] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/warp1.mp3");
 	SEs_[SHOT] = audio->SoundLoadFile("Resources/TD3_3102/Audio/SE/shot.mp3");

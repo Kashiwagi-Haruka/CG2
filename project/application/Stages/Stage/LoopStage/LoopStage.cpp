@@ -5,8 +5,8 @@
 #include "Engine/Editor/EditorTool/Hierarchy/Hierarchy.h"
 #include "GameObject/Flashlight/Flashlight.h"
 #include "MiniMap/MiniMap.h"
-#include "GameObject/Portal/PortalManager.h"
-
+#include "GameObject/Portal/SpherePortalManager/SpherePortalManager.h"
+#include "GameObject/GentleMan/GiantEnemyManager.h"
 void LoopStage::InitializeLights()
 {
     assert(lightManager_);
@@ -35,13 +35,13 @@ LoopStage::LoopStage(Player* player)
     flashlight_ = std::make_unique<Flashlight>();
     flashlight_->SetPlayer(player_);
 
-    //whiteBoardManager_ = std::make_unique<WhiteBoardManager>(&player_->GetTransform().translate, 1, 5);
-    portalManager_ = std::make_unique<PortalManager>(&player_->GetTransform().translate);
+   giantEnemyManager_ = std::make_unique<GiantEnemyManager>(&player_->GetTransform().translate,3);
+    portalManager_ = std::make_unique<SpherePortalManager>(&player_->GetTransform().translate);
 
     fieldCollider_["LoopStageField"] = std::make_unique<ObjectCollider>();
 
-    //portalManager_->SetWhiteBoardManager(whiteBoardManager_.get());
-    //wallManagerRestRoom_ = std::make_unique<WallManagerRestRoom>();
+    portalManager_->SetGiantEnemyManager(giantEnemyManager_.get());
+  
 
 }
 
@@ -53,7 +53,8 @@ void LoopStage::Initialize()
 
 
     portalManager_->Initialize();
-    //whiteBoardManager_->Initialize();
+    giantEnemyManager_->Initialize();
+
 
     // 懐中電灯の初期化
     flashlight_->Initialize();
@@ -61,6 +62,7 @@ void LoopStage::Initialize()
     //コライダーの設定
     fieldCollider_["LoopStageField"]->Initialize(YoshidaMath::kAABB);
     fieldCollider_["LoopStageField"]->RegisterEditor("LoopStageField");
+    fieldCollider_["LoopStageField"]->SetCollisionAttribute(kCollisionFloor);
     //fieldCollider_["LoopStageField"]->SetTextureIndex();
 
     InitializeLights();
@@ -76,6 +78,8 @@ void LoopStage::SetPlayer(Player* player)
 {
     player_ = player;
     flashlight_->SetPlayer(player_);
+
+
 }
 
 void LoopStage::SetCollisionManager(CollisionManager* collisionManager)
@@ -87,6 +91,8 @@ void LoopStage::UpdateGameObject(Camera* camera, const Vector3& lightDirection, 
 {
     //ポータルでワープする
     portalManager_->WarpPlayer(player);
+    giantEnemyManager_->Update();
+    portalManager_->Update();
     //懐中電灯の更新
     flashlight_->Update();
     fieldCollider_["LoopStageField"]->Update();
@@ -120,13 +126,23 @@ void LoopStage::CheckCollision()
         }
     }
 
+    for (auto& enemy : giantEnemyManager_->GetEnemies()) {
+        for (auto& [name, collider] : enemy->GetColliders()) {
+            stageCollisionManager_->AddCollider(collider.get());
+        }
+    }
+
     for (auto& [name, collider]: fieldCollider_) {
         stageCollisionManager_->AddCollider(collider.get());
+        //ここに足のSE追加
+        giantEnemyManager_->CheckFloorCollision(collider.get());
     }
 
     stageCollisionManager_->AddCollider(flashlight_.get());
 
     stageCollisionManager_->CheckAllCollisions();
+
+
 }
 
 void LoopStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
@@ -136,6 +152,8 @@ void LoopStage::DrawModel(bool isShadow, bool drawPortal, bool isDrawParticle)
     for (auto& [name, collider] : fieldCollider_){
         collider->Draw();
     }
+
+    giantEnemyManager_->Draw();
 
     portalManager_->Draw(isShadow, drawPortal, isDrawParticle);
 }
@@ -147,6 +165,8 @@ void LoopStage::DrawSprite()
 void LoopStage::SetSceneCameraForDraw(Camera* camera)
 {
     portalManager_->SetCamera(camera);
+    giantEnemyManager_->SetCamera(camera);
+
     flashlight_->SetCamera(camera);
 
     for (auto& [name, collider] : fieldCollider_) {
@@ -158,6 +178,7 @@ void LoopStage::SetPlayerCamera(PlayerCamera* playerCamera)
 {
     portalManager_->SetPlayerCamera(playerCamera);
     flashlight_->SetPlayerCamera(playerCamera);
+   
 }
 
 PortalManager* LoopStage::GetPortalManager()

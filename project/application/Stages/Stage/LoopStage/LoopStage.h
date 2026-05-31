@@ -4,11 +4,15 @@
 class Flashlight;
 class TestField;
 class ObjectCollider;
+class SpherePortalManager;
+class GiantEnemyManager;
+
 class LoopStage   : public BaseStage
 {
     Player* player_ = nullptr;
     Yoshida::LightManager* lightManager_ = nullptr;
-    std::unique_ptr<PortalManager> portalManager_ = nullptr;
+    std::unique_ptr<SpherePortalManager> portalManager_ = nullptr;
+    std::unique_ptr<GiantEnemyManager>giantEnemyManager_ = nullptr;
     CollisionManager* stageCollisionManager_ = nullptr;
     std::unique_ptr<Flashlight> flashlight_ = nullptr;
     std::map< std::string, std::unique_ptr<ObjectCollider>>fieldCollider_;
