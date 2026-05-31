@@ -72,7 +72,7 @@ void Flashlight::Update()
 
     if (isGetLight_) {
 
-        transform_.translate = { 0.0f,0.1f,0.0f };
+        transform_.translate = { 0.0f,0.15f,-0.05f };
         transform_.rotate = { 0.0f,Function::kPi * 0.5f,0.0f };
         transform_.scale = { 1.0f,1.0f,1.0f };
 

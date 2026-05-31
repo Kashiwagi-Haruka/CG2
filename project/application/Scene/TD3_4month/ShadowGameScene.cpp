@@ -242,7 +242,11 @@ void ShadowGameScene::Draw()
     SpriteCommon::GetInstance()->DrawCommon();
     //ステージマネージャーでスプライトを描画
     stageManager_->DrawSprite();
+
+    auto progressSaveData = GameSave::GetInstance().GetProgressSaveData();
+
     elevator_->DrawSprite();
+
     damageOverlay_->Draw();
     if (!currentEvent_->IsRunning()) {
         //UI管理を描画する
@@ -333,8 +337,6 @@ void ShadowGameScene::ChangeStage(const std::string& stageName) {
 
 void ShadowGameScene::CheckCollision() {
 
-
-
     if (!collisionManager_) {
         return;
     }
@@ -343,24 +345,29 @@ void ShadowGameScene::CheckCollision() {
 
     collisionManager_->AddCollider(player_.get());
 
-    for (auto& [name, wall] : elevatorRoomManager_->GetColliders()) {
-        collisionManager_->AddCollider(wall.get());
-    }
 
-    for (auto& [name, system] : elevator_->GetAutoLockSys()) {
-        collisionManager_->AddCollider(system.get());
-    }
-    for (auto& [name, collider] : elevator_->GetColliders()) {
-        if (name == "ElevatorFloor" && elevator_->IsFall()) {
-            continue;
+    if (!isEndStage()) {
+
+        for (auto& [name, wall] : elevatorRoomManager_->GetColliders()) {
+            collisionManager_->AddCollider(wall.get());
         }
-        collisionManager_->AddCollider(collider.get());
-    }
 
+        //最終ステージの時はセットしない
+        for (auto& [name, system] : elevator_->GetAutoLockSys()) {
+            collisionManager_->AddCollider(system.get());
+        }
+        for (auto& [name, collider] : elevator_->GetColliders()) {
+            if (name == "ElevatorFloor" && elevator_->IsFall()) {
+                continue;
+            }
+            collisionManager_->AddCollider(collider.get());
+        }
+
+    }
 
     collisionManager_->AddCollider(gentleManManager_->GetGentleman());
-
     stageManager_->SetCollisionManager(collisionManager_.get());
+
     stageManager_->CheckCollision();
 }
 
@@ -377,17 +384,11 @@ void ShadowGameScene::UpdateCamera()
 
 void ShadowGameScene::UpdateSceneTransition() {
 
-    //    //デバックモードではシーン遷移しない
-    //    bool flag = true;
-    //#ifdef USE_IMGUI
-    //    flag = false;
-    //#endif
-
     auto& progressSaveData = GameSave::GetInstance().GetProgressSaveData();
 
-    if (GiantEnemyManager::GetIsAllPortal()/* && flag*/) {
+    if (GiantEnemyManager::GetIsAllPortal()) {
         //巨人が前夫ポータルになったら
-        if (progressSaveData.currentStageName == "LoopStage" && !isTransitionOut_) {
+        if (isEndStage() && !isTransitionOut_) {
             transition_->Initialize(true);
             isTransitionIn_ = false;
             isTransitionOut_ = true;
@@ -457,8 +458,7 @@ void ShadowGameScene::UpdateGameObject() {
 
     UpdateElevator();
 
-    // エレベータールーム管理
-    elevatorRoomManager_->Update();
+
     //紳士管理
     gentleManManager_->Update();
     //建物 回数によって位置を変更する
@@ -502,7 +502,13 @@ void ShadowGameScene::UpdateLight() {
 void ShadowGameScene::UpdateElevator()
 {
 
+
+    if (isEndStage()) {
+        return;
+        //最終ステージだったらカエル
+    }
     auto& progressSaveData = GameSave::GetInstance().GetProgressSaveData();
+
     if (progressSaveData.currentStageName == "ElevatorFallStage" && !Key::IsGetKey()) {
         //落下アニメーションを設定する
         elevator_->SetFallAnimation();
@@ -510,6 +516,9 @@ void ShadowGameScene::UpdateElevator()
 
     // エレベーター
     elevator_->Update();
+
+    // エレベータールーム管理
+    elevatorRoomManager_->Update();
 }
 void ShadowGameScene::UpdateStagetransition()
 {
@@ -586,6 +595,19 @@ bool ShadowGameScene::isPlayerWarp()
 
     return false;
 }
+bool ShadowGameScene::isEndStage()
+{
+    auto progressSaveData = GameSave::GetInstance().GetProgressSaveData();
+
+
+    // エレベーター
+    if (progressSaveData.currentStageName == "LoopStage") {
+        return true;
+    }
+
+    return false;
+
+}
 // private描画処理
 void ShadowGameScene::DrawSceneTransition() {
     if (isTransitionIn_ || isTransitionOut_) {
@@ -618,12 +640,15 @@ void ShadowGameScene::DrawModel() {
 }
 void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDrawParticle, bool drawPlayer, bool drawPlayerHead) {
 
+    auto progressSaveData = GameSave::GetInstance().GetProgressSaveData();
+
     // エレベーター
-    elevator_->Draw();
+    if (!isEndStage()) {
+        elevator_->Draw();
+    }
+
     gentleManManager_->Draw();
 
-
-    auto progressSaveData = GameSave::GetInstance().GetProgressSaveData();
     if (progressSaveData.currentStageName != "GentleManStage") {
         timeCardWatches_[1]->Draw();
     }
@@ -640,8 +665,12 @@ void ShadowGameScene::DrawGameObject(bool isShadow, bool drawPortal, bool isDraw
     }
 
     Object3dCommon::GetInstance()->DrawCommon();
-    // エレベータルーム
-    elevatorRoomManager_->Draw();
+
+    if (!isEndStage()) {
+        // エレベータルーム
+        elevatorRoomManager_->Draw();
+    }
+
     //建物
     buildings_->Draw();
 }
@@ -650,8 +679,14 @@ void ShadowGameScene::SetSceneCameraForDraw(Camera* camera) {
     skyBox_->SetCamera(camera);
     player_->SetCamera(camera);
 
-    elevatorRoomManager_->SetCamera(camera);
-    elevator_->SetCamera(camera);
+    auto progressSaveData = GameSave::GetInstance().GetProgressSaveData();
+
+    if (!isEndStage()) {
+        //最終ステージの時はセットしない
+        elevatorRoomManager_->SetCamera(camera);
+        elevator_->SetCamera(camera);
+    }
+
     gentleManManager_->SetCamera(camera);
     buildings_->SetCamera(camera);
 

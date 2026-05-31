@@ -141,6 +141,7 @@ private:
     // プライベート描画処理
     // =======================================
 	bool isPlayerWarp();
+	bool isEndStage();
     //シーン遷移の描画処理
     void DrawSceneTransition();
     //ゲームオブジェクトの描画処理

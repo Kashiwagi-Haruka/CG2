@@ -255,7 +255,7 @@ void GiantEnemy::OnCollisionWithFloor(YoshidaMath::Collider* collider)
 bool GiantEnemy::OnCollisionRay(PlayerCamera* playerCamera)
 {
     //かなり遠くからでも打てるようにする
-    return playerCamera->OnCollisionRay(localAABB, collisionTransform_.translate, 0.0f, 2000.0f);
+    return playerCamera->OnCollisionRay(localAABB, collisionTransform_.translate, 0.0f, 500.0f);
 }
 
 void GiantEnemy::Animation()
