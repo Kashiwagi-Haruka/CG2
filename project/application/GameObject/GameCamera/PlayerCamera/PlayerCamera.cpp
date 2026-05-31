@@ -86,6 +86,10 @@ void PlayerCamera::Initialize()
     auto& gaveSave = GameSave::GetInstance();
     param_ = gaveSave.GetCameraSaveData();
 
+    param_.transform.translate = { 1.0f,1.0f,1.0f };
+    param_.transform.rotate = { 0.0f,0.0f,0.0f };
+    param_.transform.scale = { 1.0f,1.0f,1.0f };
+
     SetHeadTransform();
     SetTransform();
     SetRay();

@@ -110,6 +110,9 @@ void Player::Initialize() {
 
     LoadParameters();
 
+    auto& gameSave = GameSave::GetInstance();
+    transform_ = gameSave.GetPlayerSaveData().transform;
+
     // 体の初期化
     bodyObj_->Initialize();
     bodyObj_->RegisterEditor("Player");
@@ -558,7 +561,6 @@ void Player::LoadParameters() {
 
     parameterStatusMessage_ = "Loaded player parameters";
 
-    auto& gameSave = GameSave::GetInstance();
-    transform_ =  gameSave.GetPlayerSaveData().transform;
+
 
 }

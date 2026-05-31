@@ -20,7 +20,6 @@ void FirstGameEvent::Update()
 
         if (count_ < 3) {
 
-            cameraController->GetPlayerCamera()->Update();
             Transform playerTransform = cameraController->GetPlayerCamera()->GetTransform();
 
             const  float qPi = Function::kPi * 0.125f;
@@ -53,6 +52,7 @@ void FirstGameEvent::OnStart()
     triggerCount_ = 0;
     auto* cameraController = CameraController::GetInstance();
     cameraController->SetEventMode(true);
+
     cameraController->MoveTo({ 1.0f,1.0f,-5.0f }, { 0.0f,Function::kPi,0.0f }, { 2.5f,1.0f,-5.0f }, { 0.0f,Function::kPi,0.0f }, 5.0f);
 }
 
