@@ -8,6 +8,7 @@
 #include "Stage/RadiconStage.h"
 #include "Stage/RestroomStage/RestroomStage.h"
 #include "Stage/TutorialStage/TutorialStage.h"
+#include"Stage/LoopStage/LoopStage.h"
 
 StageManager::StageManager(Player* player) : player_(player) {}
 
@@ -30,6 +31,8 @@ void StageManager::CreateStage(const std::string& sceneName) {
 		stage_ = std::make_unique<RestroomStage>(player_);
 	} else if (sceneName == "ElevatorFallStage") {
 		stage_ = std::make_unique<ElevatorFallStage>(player_);
+	} else if (sceneName == "LoopStage") {
+		stage_ = std::make_unique<LoopStage>(player_);
 	}
 
 	MiniMap* miniMap = MiniMap::GetInstance();

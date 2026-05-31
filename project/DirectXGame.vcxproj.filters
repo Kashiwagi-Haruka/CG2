@@ -438,6 +438,10 @@
     <ClCompile Include="application\Text\LockerMenu\LockerMenu.cpp" />
     <ClCompile Include="application\MiniMap\MiniMap.cpp" />
     <ClCompile Include="application\GameObject\Chair\DummyChair.cpp" />
+    <ClCompile Include="application\Stages\Stage\LoopStage\LoopStage.cpp" />
+    <ClCompile Include="application\GameObject\Portal\SpherePortalManager\SpherePortalManager.cpp" />
+    <ClCompile Include="application\GameObject\Gentleman\GiantEnemy.cpp" />
+    <ClCompile Include="application\GameObject\Gentleman\GiantEnemyManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Texture\RenderTexture2D.h" />
@@ -864,6 +868,10 @@
     <ClInclude Include="application\Text\LockerMenu\LockerMenu.h" />
     <ClInclude Include="application\MiniMap\MiniMap.h" />
     <ClInclude Include="application\GameObject\Chair\DummyChair.h" />
+    <ClInclude Include="application\Stages\Stage\LoopStage\LoopStage.h" />
+    <ClInclude Include="application\GameObject\Portal\SpherePortalManager\SpherePortalManager.h" />
+    <ClInclude Include="application\GameObject\Gentleman\GiantEnemy.h" />
+    <ClInclude Include="application\GameObject\Gentleman\GiantEnemyManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

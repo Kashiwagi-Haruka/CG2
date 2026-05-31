@@ -74,7 +74,7 @@ void Portal::Initialize(const PortalMesh::MeshType& meshType)
 
 }
 
-void Portal::Update() {
+void Portal::Update(bool setTransform) {
     if (!ShouldProcessPortal()) {
         return;
     }
@@ -85,7 +85,7 @@ void Portal::Update() {
     const float deltaTime = GameBase::GetInstance()->GetDeltaTime();
     uvRotateZ_ += deltaTime;
 
-    UpdatePortalWorldMatrix();
+    UpdatePortalWorldMatrix(setTransform);
     portalCircle_->Update();
 
     warpPos_->SetIsLookPortal(IsVectorFaceCameraAndObj());
@@ -163,13 +163,17 @@ void Portal::SetPortalWorldMatrix() {
     UpdateWorldMatrix();
 }
 
-void Portal::UpdatePortalWorldMatrix() {
+void Portal::UpdatePortalWorldMatrix(bool setTransform) {
     if (!ShouldProcessPortal()) {
         return;
     }
 
-    //Vector3 forward = SetSceneCameraAndParentAndGetForward();
-    //SetTranslate(forward);
+    if (setTransform) {
+        Vector3 forward = SetSceneCameraAndParentAndGetForward();
+        SetTranslate(forward);
+
+    }
+
     transform_.rotate.y = preRotY_ + parentTransform->rotate.y;
     transform_.rotate.x = parentTransform->rotate.x;
     transform_.rotate.z = parentTransform->rotate.z;

@@ -67,7 +67,6 @@ GentleManStage::GentleManStage(Player* player)
 
     //巨大紳士
     giantGentleMan_ = std::make_unique<GiantGentleMan>();
-    giantGentleMan_->SetPlayerPos(&player_->GetTransform().translate);
 
     portalManager_ = std::make_unique<GentlemanPortalManager>(&player_->GetTransform().translate);
     portalManager_->SetGentleMan(giantGentleMan_.get());

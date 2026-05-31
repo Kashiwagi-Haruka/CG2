@@ -119,6 +119,7 @@ public:
 	Vector3 GetTranslate() { return transform_.translate; }
 	Vector3 GetRotate() { return transform_.rotate; }
 	Vector3 GetScale() { return transform_.scale; }
+	Vector3& GetScalePtr() { return transform_.scale; }
 	Transform GetTransform() const { return transform_; }
 	void SetEditorId(const std::string& id) { editorId_ = id; }
 	const std::string& GetEditorId() const { return editorId_; }
@@ -129,4 +130,5 @@ public:
 	void RegisterToEditor(const std::string& saveFileName, const std::string& registrationName);
 	void UnregisterFromEditor();
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix; }
+	Matrix4x4& GetWorldMatrixPtr() { return worldMatrix; }
 };

@@ -23,7 +23,8 @@
 #include"GameObject/GentleMan/GiantGentleMan.h"
 #include"GameObject/Portal/GentlemanPortalManager.h"
 #include"GameObject/HintSheet/HintSheetManager.h"
-
+#include"GameObject/GentleMan/GiantEnemyManager.h"
+#include"GameObject/Portal/SpherePortalManager/SpherePortalManager.h"
 RaySprite::RaySprite()
 {
     handle_[HAND] = TextureManager::GetInstance()->GetTextureIndexByfilePath("Resources/TD3_3102/2d/hand.png");
@@ -55,9 +56,9 @@ void RaySprite::Update()
     if (PlayerCommand::GetIsGrab()) {
         // インタラクトの処理
         SetTexture(RaySprite::GRAB);
-    } else if (PortalManager::GetCanMakePortal()|| GentlemanPortalManager::GetCanMakePortal()) {
+    } else if (PortalManager::GetCanMakePortal()|| GentlemanPortalManager::GetCanMakePortal()|| SpherePortalManager::GetCanMakePortal()) {
         SetTexture(RaySprite::PORTAL);
-    } else if (PortalManager::GetCanMakePortalToWhiteBoard()) {
+    } else if (PortalManager::GetCanMakePortalToObj()|| SpherePortalManager::GetCanMakePortalToObj()) {
         SetTexture(RaySprite::NOT_ABLE_PORTAL);
     } else if (Gentleman::IsRayHit()) {
         SetTexture(RaySprite::TALK);
@@ -76,7 +77,7 @@ void RaySprite::Draw()
     }
 
 
-    if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortalToWhiteBoard()||PortalManager::GetCanMakePortal() || GentlemanPortalManager::GetCanMakePortal()) {
+    if (IsRayHit() || PlayerCommand::GetIsGrab() || PortalManager::GetCanMakePortalToObj()||PortalManager::GetCanMakePortal() || GentlemanPortalManager::GetCanMakePortal()) {
         SpriteCommon::GetInstance()->DrawCommon();
         sprite_->Draw();
     }

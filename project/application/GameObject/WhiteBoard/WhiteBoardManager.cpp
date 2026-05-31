@@ -12,8 +12,6 @@ WhiteBoardManager::WhiteBoardManager(Vector3* playerPos, const uint32_t createWh
 
     ModelManager::GetInstance()->LoadGltfModel("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
 
-    WalkWhiteBoard::LoadAnimation("Resources/TD3_3102/3d/whiteBoard", "whiteBoard");
-
     for (uint32_t i = 0; i < createWalkWhiteBoardNum; ++i) {
         std::unique_ptr<WalkWhiteBoard> walkWhite = std::make_unique<WalkWhiteBoard>();
         walkWhite->SetModel("whiteBoard");
@@ -64,7 +62,9 @@ void WhiteBoardManager::SetCamera(Camera* camera) {
     }
 }
 
-bool WhiteBoardManager::OnCollisionRay(PlayerCamera* playerCamera, const AABB& aabb, const Vector3& pos) { return playerCamera->OnCollisionRay(aabb, pos); }
+bool WhiteBoardManager::OnCollisionRay(PlayerCamera* playerCamera, const AABB& aabb, const Vector3& pos) {
+    return playerCamera->OnCollisionRay(aabb, pos);
+}
 
 WhiteBoard* WhiteBoardManager::CheckCollision(PlayerCamera* playerCamera, const bool isOneSide) {
    

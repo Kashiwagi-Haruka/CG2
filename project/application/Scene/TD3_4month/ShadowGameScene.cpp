@@ -260,7 +260,7 @@ void ShadowGameScene::Finalize()
 void ShadowGameScene::DebugImGui() {
 #ifdef USE_IMGUI
     ImGui::Begin("shadowGameScene");
-    static constexpr const char* kStageNames[] = { "MirrorStage", "LightStage", "TutorialStage", "RadiconStage","GentleManStage","RestroomStage","ElevatorFallStage" };
+    static constexpr const char* kStageNames[] = { "MirrorStage", "LightStage", "TutorialStage", "RadiconStage","GentleManStage","RestroomStage","ElevatorFallStage" ,"LoopStage"};
     int stageIndex = 0;
     auto& progressSaveData = GameSave::GetInstance().GetProgressSaveData();
 
@@ -276,6 +276,8 @@ void ShadowGameScene::DebugImGui() {
         stageIndex = 5;
     } else if (progressSaveData.currentStageName == "ElevatorFallStage") {
         stageIndex = 6;
+    } else if (progressSaveData.currentStageName == "LoopStage") {
+        stageIndex = 7;
     }
 
     if (ImGui::Combo("Stage", &stageIndex, kStageNames, IM_ARRAYSIZE(kStageNames))) {
@@ -375,7 +377,7 @@ void ShadowGameScene::UpdateSceneTransition() {
     auto& progressSaveData = GameSave::GetInstance().GetProgressSaveData();
 
     if (Key::IsGetKey() && flag) {
-        if (progressSaveData.currentStageName == "GentleManStage" && !isTransitionOut_) {
+        if (progressSaveData.currentStageName == "LoopStage" && !isTransitionOut_) {
             transition_->Initialize(true);
             isTransitionIn_ = false;
             isTransitionOut_ = true;
@@ -530,7 +532,7 @@ void ShadowGameScene::UpdateStagetransition()
             ChangeStage("GentleManStage");
         } else if (saveData.currentStageName == "GentleManStage") {
             //巡回させてみる
-            ChangeStage("MirrorStage");
+            ChangeStage("LoopStage");
         }
 
         //ゲームクリアを初期化する
