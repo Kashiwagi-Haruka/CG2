@@ -331,6 +331,7 @@ void Elevator::CheckCollision() {
 
             if (!autoLockSystems_["ElevatorMat:AutoLockSystem:In"]->IsPlayerPreHit()) {
                 Close();
+                insideTimer_ = 0.0f; // ★ ここを追加：閉まると同時にタイマーをリセット
             }
 
 
