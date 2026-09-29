@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.13.35825.156
+# Visual Studio Version 18
+VisualStudioVersion = 18.9.12128.139 oobstable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CG2", "DirectXGame.vcxproj", "{ECB10110-08EE-4090-A008-699BEB82F926}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -17,7 +17,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTex", "externals\Dir
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "..\imgui\imgui.vcxproj", "{9786AE2D-605C-459A-9123-663554FF7D3F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "..\imgui\imgui.vcxproj", "{9E0DBD91-C4B6-4030-B874-7DC15B39A237}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freetype", "externals\freetype\freetype.vcxproj", "{4E1626A4-C7C4-493F-8696-2807B247D79B}"
 EndProject
@@ -40,12 +40,12 @@ Global
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Development|x64.Build.0 = Development|x64
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x64.ActiveCfg = Release|x64
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x64.Build.0 = Release|x64
-		{9786AE2D-605C-459A-9123-663554FF7D3F}.Debug|x64.ActiveCfg = Debug|x64
-		{9786AE2D-605C-459A-9123-663554FF7D3F}.Debug|x64.Build.0 = Debug|x64
-		{9786AE2D-605C-459A-9123-663554FF7D3F}.Development|x64.ActiveCfg = Development|x64
-		{9786AE2D-605C-459A-9123-663554FF7D3F}.Development|x64.Build.0 = Development|x64
-		{9786AE2D-605C-459A-9123-663554FF7D3F}.Release|x64.ActiveCfg = Release|x64
-		{9786AE2D-605C-459A-9123-663554FF7D3F}.Release|x64.Build.0 = Release|x64
+		{9E0DBD91-C4B6-4030-B874-7DC15B39A237}.Debug|x64.ActiveCfg = Debug|x64
+		{9E0DBD91-C4B6-4030-B874-7DC15B39A237}.Debug|x64.Build.0 = Debug|x64
+		{9E0DBD91-C4B6-4030-B874-7DC15B39A237}.Development|x64.ActiveCfg = Development|x64
+		{9E0DBD91-C4B6-4030-B874-7DC15B39A237}.Development|x64.Build.0 = Development|x64
+		{9E0DBD91-C4B6-4030-B874-7DC15B39A237}.Release|x64.ActiveCfg = Release|x64
+		{9E0DBD91-C4B6-4030-B874-7DC15B39A237}.Release|x64.Build.0 = Release|x64
 		{4E1626A4-C7C4-493F-8696-2807B247D79B}.Debug|x64.ActiveCfg = Debug|x64
 		{4E1626A4-C7C4-493F-8696-2807B247D79B}.Debug|x64.Build.0 = Debug|x64
 		{4E1626A4-C7C4-493F-8696-2807B247D79B}.Development|x64.ActiveCfg = Development|x64
@@ -58,7 +58,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77} = {DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}
-		{9786AE2D-605C-459A-9123-663554FF7D3F} = {DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}
+		{9E0DBD91-C4B6-4030-B874-7DC15B39A237} = {DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}
 		{4E1626A4-C7C4-493F-8696-2807B247D79B} = {DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

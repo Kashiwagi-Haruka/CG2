@@ -22,6 +22,7 @@ Key::Key()
     ModelManager::GetInstance()->LoadModel("Resources/TD3_3102/3d/key", "key");
     obj_->SetModel("key");
     obj_->SetOutlineWidth(kRayHitOutlineWidth);
+
     SetAABB({ .min = { -0.1f,-0.1f,-0.1f }, .max = { 0.1f,0.1f,0.1f } });
     SetCollisionAttribute(kCollisionKey);
     SetCollisionMask(kCollisionChair | kCollisionWall | kCollisionFloor | kCollisionLocker);
@@ -52,6 +53,7 @@ void Key::Update()
 {
     isSendGetKeyMessage_ = false;
     obj_->SetEnableLighting(false);
+    obj_->SetColor({ 1.0f,0.5f,0.5f,1.0f });
     CheckCollision();
 
     if (isGetKey_) {
